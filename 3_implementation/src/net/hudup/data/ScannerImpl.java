@@ -319,7 +319,6 @@ public class ScannerImpl extends Scanner {
 	}
 
 	
-
 	@Override
 	public Profile profileOf(Context context) {
 		// TODO Auto-generated method stub

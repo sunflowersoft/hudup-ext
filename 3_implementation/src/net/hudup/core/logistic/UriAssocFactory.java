@@ -1,3 +1,6 @@
+/**
+ * 
+ */
 package net.hudup.core.logistic;
 
 import java.awt.Component;
@@ -7,27 +10,65 @@ import java.nio.file.Path;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
 
-import net.hudup.core.Constants;
 import de.schlichtherle.truezip.file.TFile;
 import de.schlichtherle.truezip.file.swing.TFileChooser;
 import de.schlichtherle.truezip.nio.file.TPath;
+import net.hudup.core.Constants;
+import net.hudup.core.data.DataConfig;
+
+
+/**
+ * Factory utility class for creating a suitable URI associator that implements interface {@link UriAssoc}.
+ * @author Loc Nguyen
+ * @version 11
+ *
+ */
+public class UriAssocFactory {
+	
+	
+	/**
+	 * Creating suitable URI associator according to data configuration.
+	 * @param config specified configuration.
+	 * @return suitable URI associator according to data configuration referred by {@link UriAssoc}.
+	 */
+	public static UriAssoc create(DataConfig config) {
+		xURI uri = config.getStoreUri();
+		if (uri == null)
+			return null;
+		
+		UriAssoc assoc = null;
+		String schema = uri.getScheme();
+		if (schema == null)
+			assoc = new UriAssocTrueZip();
+		else if (schema.equals("ftp")) {
+			//Current implementation does not support FTP file system yet.
+			throw new RuntimeException("Current implementation does not support FTP file system yet.");
+		}
+		else
+			assoc = new UriAssocTrueZip();
+		
+		return assoc;
+	}
+	
+	
+}
 
 
 /**
  * This class is default implementation of the interface {@link UriAssoc}. In other words, it is the default URI associator.
- * In current implementation, {@link UriAssocDefault} uses the programming library TrueZip for processing on file system, compressed file, HTTP.
+ * In current implementation, {@link UriAssocTrueZip} uses the programming library TrueZip for processing on file system, compressed file, HTTP.
  * TrueZip is developed by Schlichtherle IT Services, available at <a href="https://christian-schlichtherle.bitbucket.io/truezip/">https://christian-schlichtherle.bitbucket.io/truezip</a>
  * @author Loc Nguyen
  * @version 11.0
  *
  */
-public class UriAssocDefault extends UriAssocAbstract {
+class UriAssocTrueZip extends UriAssocAbstract {
 
 	
 	/**
 	 * Default constructor
 	 */
-	public UriAssocDefault() {
+	public UriAssocTrueZip() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
@@ -184,7 +225,7 @@ public class UriAssocDefault extends UriAssocAbstract {
 	
 	
 	/**
-	 * The class {@link ChosenUriResult} represents chosen files are returned by method {@link UriAssocDefault#chooseUriResult(Component, boolean, String[], String[], xURI)}.
+	 * The class {@link ChosenUriResult} represents chosen files are returned by method {@link UriAssocTrueZip#chooseUriResult(Component, boolean, String[], String[], xURI)}.
 	 * It contains the URI and extension of chosen archive (file).
 	 * @author Loc Nguyen
 	 * @version 10.0
@@ -268,7 +309,6 @@ public class UriAssocDefault extends UriAssocAbstract {
 		}
 
 		
-		
 		@Override
 		public boolean accept(File f) {
 			if (f.isDirectory())
@@ -282,7 +322,6 @@ public class UriAssocDefault extends UriAssocAbstract {
 			return false;
 		}
 
-		
 		
 		@Override
 		public String getDescription() {
@@ -303,3 +342,4 @@ public class UriAssocDefault extends UriAssocAbstract {
 
 	
 }
+

@@ -24,7 +24,7 @@ import net.hudup.core.data.DataDriver;
 
 /**
  * This class is the abstract URI associator which defines most of simple methods of the interface {@link UriAssoc}.
- * The default URI associator {@link UriAssocDefault} extends from this abstract class.  
+ * The default URI associator {@link UriAssocTrueZip} extends from this abstract class.  
  * @author Loc Nguyen
  * @version 11.0
  *

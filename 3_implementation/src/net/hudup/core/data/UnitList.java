@@ -1,19 +1,11 @@
 package net.hudup.core.data;
 
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
 import java.util.Collection;
 import java.util.List;
 
 import net.hudup.core.Util;
-import net.hudup.core.client.Service;
-import net.hudup.core.client.SocketConnection;
-import net.hudup.core.data.DataDriver.DataType;
 import net.hudup.core.data.ui.UnitListBox;
-import net.hudup.core.logistic.UriAdapter;
-import net.hudup.core.logistic.xURI;
+import net.hudup.data.ProviderAssocFactory;
 
 
 /**
@@ -324,133 +316,20 @@ public class UnitList {
 	 */
 	public static boolean connectUnitList(DataConfig config, UnitList unitList) {
 		unitList.clear();
-		xURI uri = config.getStoreUri();
+		ProviderAssoc providerAssoc = ProviderAssocFactory.create(config);
+		boolean result = (providerAssoc != null);
 		
-		boolean result = false;
-		
-		DataDriver driver = DataDriver.create(config.getStoreUri());
-		if (driver.isFlatServer()) {
-			UriAdapter adapter = new UriAdapter(config);
-			xURI store = adapter.isStore(uri) ? uri : adapter.getStoreOf(uri);
-			
-			List<xURI> uriList = adapter.getUriList(store, null);
-			
-			for (xURI u : uriList) {
-				String lastname = u.getLastName();
-				if (lastname != null && !lastname.isEmpty()) {
-					Unit unit = new Unit(lastname);
-					unitList.add(unit);
-				}
-			}
-			
-			adapter.close();
-			result = true;
+		try {
+			UnitList retrievedUnitList = providerAssoc.getUnitList();
+			unitList.addAll(retrievedUnitList);
+			providerAssoc.close();
 		}
-		else if (driver.isDbServer()) {
-			
-			Connection conn = null;
-			ResultSet rs = null;
-			try {
-				conn = createConnection(config);
-				
-				DatabaseMetaData metadata = conn.getMetaData();
-				rs = metadata.getTables(null, null, null, new String[] {"TABLE"});
-				
-				while (rs.next()) {
-					Unit unit = new Unit(rs.getString("TABLE_NAME"));
-					unitList.add(unit);
-				}
-				
-				result = true;
-			}
-			catch (Exception e) {
-				e.printStackTrace();
-				result = false;
-			}
-			finally {
-				try {
-					if (rs != null)
-						rs.close();
-				} 
-				catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				
-				try {
-					if (conn != null)
-						conn.close();
-				} 
-				catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				
-			}
-			
-		}
-		else if (driver.isHudupServer()) {
-			
-			if (driver.getType() == DataType.hudup_rmi) {
-				Service service = net.hudup.core.client.DriverManager.getRemoteService(
-						uri.getHost(),
-						uri.getPort(),
-						config.getStoreAccount(), 
-						config.getStorePassword().getText());
-				
-				result = (service != null);
-			}
-			else if (driver.getType() == DataType.hudup_socket) {
-				SocketConnection connection = net.hudup.core.client.DriverManager.getSocketConnection(
-						uri,
-						config.getStoreAccount(), 
-						config.getStorePassword().getText());
-				
-				result = (connection != null && connection.isConnected());
-				if (connection != null)
-					connection.close();
-			}
-				
-		}
-		
-		
-		UnitList defaultUnitList = DataConfig.getDefaultUnitList();
-		for (int i = 0; i < unitList.size(); i++) {
-			Unit unit = unitList.get(i);
-			if (!defaultUnitList.contains(unit))
-				unit.setExtra(true);
+		catch (Throwable e) {
+			e.printStackTrace();
+			result = false;
 		}
 		
 		return result;
-	}
-	
-	
-	/**
-	 * Creating database connection with given configuration.
-	 * Connection information such as connection URI of store, user name, and password is stored in such configuration.
-	 *  
-	 * @param config specified connection.
-	 * @return database connection.
-	 */
-	public static Connection createConnection(DataConfig config) {
-		String username = config.getStoreAccount();
-		HiddenText password = config.getStorePassword();
-		
-		try {
-			
-			String url = config.getStoreUri().toString();
-			if (username == null || password == null)
-				return DriverManager.getConnection(url);
-			else
-				return DriverManager.getConnection(url, username, password.getText());
-			
-		} 
-		catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		return null;
 	}
 	
 	

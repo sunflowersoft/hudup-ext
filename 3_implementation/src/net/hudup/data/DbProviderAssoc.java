@@ -1,5 +1,8 @@
 package net.hudup.data;
 
+import java.rmi.NoSuchObjectException;
+import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
@@ -11,6 +14,7 @@ import java.sql.Types;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 import net.hudup.core.Constants;
 import net.hudup.core.Util;
@@ -20,6 +24,7 @@ import net.hudup.core.data.AttributeList;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.DataDriver;
 import net.hudup.core.data.Fetcher;
+import net.hudup.core.data.FetcherMetadata;
 import net.hudup.core.data.HiddenText;
 import net.hudup.core.data.Keys;
 import net.hudup.core.data.MemFetcher;
@@ -31,9 +36,12 @@ import net.hudup.core.data.ProviderAssocAbstract;
 import net.hudup.core.data.Unit;
 import net.hudup.core.data.UnitList;
 import net.hudup.core.logistic.xURI;
+import net.hudup.core.parser.TextParsable;
+import net.hudup.core.parser.TextParserUtil;
 
 
 /**
+ * Associator of provider for database.
  * 
  * @author Loc Nguyen
  * @version 10.0
@@ -43,14 +51,15 @@ public class DbProviderAssoc extends ProviderAssocAbstract {
 
 	
 	/**
-	 * 
+	 * Internal connection.
 	 */
 	protected Connection conn = null;
 	
 	
 	/**
+	 * Constructor with specified configuration.
 	 * 
-	 * @param config
+	 * @param config specified configuration.
 	 */
 	public DbProviderAssoc(DataConfig config) {
 		super(config);
@@ -59,8 +68,8 @@ public class DbProviderAssoc extends ProviderAssocAbstract {
 
 	
 	/**
-	 * 
-	 * @return {@link Connection}
+	 * Getting internal database connection.
+	 * @return {@link Connection} as internal database connection.
 	 */
 	public Connection getConnection() {
 		return conn;
@@ -68,8 +77,8 @@ public class DbProviderAssoc extends ProviderAssocAbstract {
 	
 	
 	/**
-	 * 
-	 * @param type
+	 * Converting internal attribute type into SQL type.
+	 * @param type specified attribute type.
 	 * @return SQL type of {@link Type}
 	 */
 	public static int toSqlType(Type type) {
@@ -97,8 +106,8 @@ public class DbProviderAssoc extends ProviderAssocAbstract {
 
 	
 	/**
-	 * 
-	 * @param type
+	 * Converting internal attribute type into SQL type name.
+	 * @param type internal attribute type.
 	 * @return SQL type name of {@link Type}
 	 */
 	public String toSqlTypeName(Type type) {
@@ -134,9 +143,9 @@ public class DbProviderAssoc extends ProviderAssocAbstract {
 
 	
 	/**
-	 * 
-	 * @param sqlType
-	 * @return {@link Type} from SQL type
+	 * Converting SQL type into attribute type.
+	 * @param sqlType SQL type.
+	 * @return {@link Type} from SQL type.
 	 */
 	public static Attribute.Type fromSqlType(int sqlType) {
 		if (sqlType == Types.ARRAY) //java.lang.reflect.Array
@@ -208,9 +217,10 @@ public class DbProviderAssoc extends ProviderAssocAbstract {
 
 	
 	/**
-	 * 
-	 * @param string
-	 * @return normalized DBMS SQL string
+	 * Normalizing the specified string into a string for particular database.
+	 * For example, a table name of MySQL database should be wrapped by quotes like `Table 1`. 
+	 * @param string specified string.
+	 * @return normalized DBMS SQL string like `Table 1` for MySQL.
 	 */
 	public String norm(String string) {
 		xURI store = config.getStoreUri();
@@ -226,9 +236,9 @@ public class DbProviderAssoc extends ProviderAssocAbstract {
 	
 	
 	/**
-	 * 
-	 * @param list
-	 * @return condition text of list of {@link Attribute}
+	 * Converting a specified list of attributes into a condition in form of &quot;a1 = ? and a2 = ?&quot;.
+	 * @param list a specified list of attributes.
+	 * @return condition text of list of {@link Attribute} in form of &quot;a1 = ? and a2 = ?&quot;.
 	 */
 	private String toAndConditionText(List<Attribute> list) {
 		StringBuffer buffer = new StringBuffer();
@@ -245,8 +255,8 @@ public class DbProviderAssoc extends ProviderAssocAbstract {
 	
 	
 	/**
-	 * 
-	 * @param list
+	 * Getting indexes of the specified list of attributes.
+	 * @param list the specified list of attributes.
 	 * @return list of indices of attributes
 	 */
 	private List<Integer> getIndexes(List<Attribute> list) {
@@ -261,8 +271,9 @@ public class DbProviderAssoc extends ProviderAssocAbstract {
 
 	
 	/**
+	 * Generate the create SQL for configuration table.
 	 * 
-	 * @return create SQL
+	 * @return create SQL for configuration table.
 	 */
 	public String genConfigCreateSql() {
 		return "create table " + norm(config.getConfigUnit()) + " ( " + 
@@ -273,9 +284,9 @@ public class DbProviderAssoc extends ProviderAssocAbstract {
 	
 	
 	/**
-	 * 
-	 * @param att
-	 * @return select SQL
+	 * Generate the select SQL given specified attribute for configuration table.
+	 * @param att specified attribute.
+	 * @return select SQL given specified attribute for configuration table.
 	 */
 	public String genConfigSelectSql(String att) {
 		return  "select * from " + norm(config.getConfigUnit()) + 
@@ -284,8 +295,8 @@ public class DbProviderAssoc extends ProviderAssocAbstract {
 
 	
 	/**
-	 * 
-	 * @return select SQL
+	 * Generate the select SQL for configuration table.
+	 * @return select SQL for configuration table.
 	 */
 	public String genConfigSelectSql() {
 		return "select * from " + norm(config.getConfigUnit());
@@ -293,8 +304,8 @@ public class DbProviderAssoc extends ProviderAssocAbstract {
 	
 	
 	/**
-	 * 
-	 * @return select SQL
+	 * Generate select SQL for retrieving minimum rating value from configuration table.
+	 * @return select SQL for retrieving minimum rating value from configuration table.
 	 */
 	public String genMinRatingSelectSql() {
 		return "select " + norm(DataConfig.ATTRIBUTE_VALUE_FIELD) + " from " + norm(config.getConfigUnit()) + 
@@ -303,8 +314,8 @@ public class DbProviderAssoc extends ProviderAssocAbstract {
 	
 	
 	/**
-	 * 
-	 * @return select SQL
+	 * Generate select SQL for retrieving maximum rating value from configuration table.
+	 * @return select SQL for retrieving maximum rating value from configuration table.
 	 */
 	public String genMaxRatingSelectSql() {
 		return "select " + norm(DataConfig.ATTRIBUTE_VALUE_FIELD) + " from " + norm(config.getConfigUnit()) + 
@@ -313,10 +324,10 @@ public class DbProviderAssoc extends ProviderAssocAbstract {
 
 	
 	/**
-	 * 
-	 * @param att
-	 * @param value
-	 * @return insert SQL
+	 * Generate an insert SQL statement for inserting a pair of attribute and value into configuration table.
+	 * @param att specified attribute.
+	 * @param value specified value.
+	 * @return insert SQL statement for inserting a pair of attribute and value into configuration table.
 	 */
 	public String genConfigInsertSql(String att, String value) {
 		return 	"insert into " + norm(config.getConfigUnit()) + 
@@ -326,8 +337,8 @@ public class DbProviderAssoc extends ProviderAssocAbstract {
 
 	
 	/**
-	 * 
-	 * @return insert SQL
+	 * Generate an parametric insertion SQL for configuration table.
+	 * @return parametric insertion SQL for configuration table.
 	 */
 	public ParamSql genConfigInsertSql() {
 		return new ParamSql(
@@ -339,10 +350,10 @@ public class DbProviderAssoc extends ProviderAssocAbstract {
 
 	
 	/**
-	 * 
-	 * @param att
-	 * @param value
-	 * @return update SQL
+	 * Generate an updating SQL statement for updating a pair of attribute and value into configuration table.
+	 * @param att specified attribute.
+	 * @param value specified value.
+	 * @return updating SQL statement for updating a pair of attribute and value into configuration table.
 	 */
 	public String genConfigUpdateSql(String att, String value) {
 		return 	"update " + norm(config.getConfigUnit()) + 
@@ -352,8 +363,8 @@ public class DbProviderAssoc extends ProviderAssocAbstract {
 
 	
 	/**
-	 * 
-	 * @return update SQL
+	 * Generate an parametric updating SQL for configuration table.
+	 * @return parametric updating SQL for configuration table.
 	 */
 	public ParamSql genConfigUpdateSql() {
 		return new ParamSql(
@@ -365,9 +376,9 @@ public class DbProviderAssoc extends ProviderAssocAbstract {
 
 	
 	/**
-	 * 
-	 * @param att
-	 * @return delete SQL
+	 * Generate an deletion SQL statement for deleting a specified attribute from configuration table.
+	 * @param att specified attribute.
+	 * @return deletion SQL statement for deleting a specified attribute from configuration table.
 	 */
 	public String genConfigDeleteSql(String att) {
 		return 
@@ -376,8 +387,8 @@ public class DbProviderAssoc extends ProviderAssocAbstract {
 	
 	
 	/**
-	 * 
-	 * @return delete SQL
+	 * Generate an parametric deletion SQL statement for deleting a specified attribute from configuration table.
+	 * @return parametric deletion SQL statement for deleting a specified attribute from configuration table.
 	 */
 	public ParamSql genConfigDeleteSql() {
 		return new ParamSql(
@@ -2491,18 +2502,20 @@ public class DbProviderAssoc extends ProviderAssocAbstract {
 	 * 
 	 * @return {@link Connection}
 	 */
-	public static Connection createConnection(DataConfig config) {
+	private static Connection createConnection(DataConfig config) {
 		String username = config.getStoreAccount();
 		HiddenText password = config.getStorePassword();
 		
 		try {
 			
 			String url = config.getStoreUri().toString();
-			if (username == null || password == null)
-				return DriverManager.getConnection(url);
-			else
-				return DriverManager.getConnection(url, username, password.getText());
-			
+			Properties properties = new Properties();
+			properties.setProperty("useSSL", "false");
+			if (username != null && password != null) {
+				properties.setProperty("user", username);
+				properties.setProperty("password", password.getText());
+			}
+			return DriverManager.getConnection(url, properties);
 		} 
 		catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -2517,7 +2530,7 @@ public class DbProviderAssoc extends ProviderAssocAbstract {
 	 * 
 	 * @param rs
 	 */
-	public static void closeResultSet(ResultSet rs) {
+	private static void closeResultSet(ResultSet rs) {
 		if (rs == null)
 			return;
 		
@@ -2533,8 +2546,210 @@ public class DbProviderAssoc extends ProviderAssocAbstract {
 			e.printStackTrace();
 		}
 	}
+	
 
+	/**
+	 * @author Loc Nguyen
+	 * @version 10.0
+	 *
+	 */
+	static abstract class DbFetcher<E> implements Fetcher<E> {
+		
+		/**
+		 * 
+		 */
+		protected ResultSet rs = null;
+		
+		/**
+		 * 
+		 */
+		protected FetcherMetadata metadata = null;
+		
+		/**
+		 * 
+		 * @param rs
+		 */
+		public DbFetcher(ResultSet rs) {
+			this.rs = rs;
+			this.metadata = new FetcherMetadata();
+			
+			try {
+				if (rs.last()) {
+					this.metadata.setSize(rs.getRow());
+					rs.beforeFirst();
+				}
+			} 
+			catch (Throwable e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				logger.error("DbFetcher initialized fail, error " + e.getMessage());
+			}
+		}
+		
+		@Override
+		public boolean next() throws RemoteException {
+			// TODO Auto-generated method stub
+			
+			try {
+				return (rs != null && rs.next());
+			}
+			catch (Throwable e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				return false;
+			}
+		}
+
+		@Override
+		public E pick() throws RemoteException {
+			// TODO Auto-generated method stub
+			return create(rs);
+		}
+
+		@Override
+		public void reset() throws RemoteException {
+			// TODO Auto-generated method stub
+			
+			try {
+				rs.beforeFirst();
+			} 
+			catch (Throwable e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+
+		@Override
+		public FetcherMetadata getMetadata() throws RemoteException {
+			// TODO Auto-generated method stub
+			return metadata;
+		}
+
+		@Override
+		public void close() throws RemoteException {
+			// TODO Auto-generated method stub
+			if (rs == null)
+				return;
+			
+			closeResultSet(rs);
+			rs = null;
+			metadata = null;
+			
+		}
+
+		@Override
+		protected void finalize() throws Throwable {
+			// TODO Auto-generated method stub
+			super.finalize();
+			
+			try {
+				close();
+			}
+			catch (Throwable e) {
+				e.printStackTrace();
+			}
+		}
+
+		/**
+		 * 
+		 * @param rs
+		 * @return created element
+		 */
+		public abstract E create(ResultSet rs);
+		
+		@Override
+		public String toText() {
+			// TODO Auto-generated method stub
+			StringBuffer buffer = new StringBuffer();
+			int i = 0;
+			
+			try {
+				while(next()) {
+					if (i > 0)
+						buffer.append("\n");
+					
+					E el = pick();
+					if (el == null)
+						continue;
+					
+					String row = el.getClass().toString() + TextParserUtil.LINK_SEP;
+					if (el instanceof TextParsable)
+						buffer.append(row + ((TextParsable)el).toText());
+					else
+						buffer.append(row + el.toString());
+							
+					i++;
+				}
+				reset();
+			}
+			catch (Throwable e) {
+				e.printStackTrace();
+			}
+			finally {
+				try {
+					reset();
+				} 
+				catch (Throwable e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			
+			return buffer.toString();
+		}
+
+		@Override
+		public void parseText(String spec) {
+			// TODO Auto-generated method stub
+			throw new RuntimeException("Not support this method");
+		}
+		
+	}
 	
 	
+	/**
+	 * 
+	 * @author Loc Nguyen
+	 * @version 10.0
+	 * @param <E>
+	 */
+	static abstract class RmiDbFetcher<E> extends DbFetcher<E> {
+		
+		/**
+		 * 
+		 * @param rs
+		 */
+		public RmiDbFetcher(ResultSet rs) {
+			super(rs);
+			// TODO Auto-generated constructor stub
+			try {
+				UnicastRemoteObject.exportObject(this, 0);
+			} 
+			catch (RemoteException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+
+		@Override
+		public void close() throws RemoteException {
+			// TODO Auto-generated method stub
+			
+			if (rs != null) {
+				try {
+					UnicastRemoteObject.unexportObject(this, true);
+				} 
+				catch (NoSuchObjectException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					logger.error("No such object exported, error " + e.getMessage());
+				}
+			}
+			
+			super.close();
+		}
+
+	}
+
 
 }

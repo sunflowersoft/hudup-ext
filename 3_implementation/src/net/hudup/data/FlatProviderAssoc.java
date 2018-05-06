@@ -40,7 +40,7 @@ public class FlatProviderAssoc extends ProviderAssocAbstract {
 
 	
 	/**
-	 * 
+	 * Default delimiter.
 	 */
 	public final static char DELIMITER = ',';
 	
@@ -100,7 +100,9 @@ public class FlatProviderAssoc extends ProviderAssocAbstract {
 		try {
 			UnitList defaultUnitList = DataConfig.getDefaultUnitList();
 			
-			List<xURI> uriList = adapter.getUriList(config.getStoreUri(), null);
+			xURI uri = config.getStoreUri(); // the method DataConfig.getStoreUri() may return URI of a unit.
+			xURI store = adapter.isStore(uri) ? uri : adapter.getStoreOf(uri); // Getting URI of real store.
+			List<xURI> uriList = adapter.getUriList(store, null);
 			for (xURI u : uriList) {
 				if (adapter.isStore(u))
 					continue;
@@ -116,7 +118,7 @@ public class FlatProviderAssoc extends ProviderAssocAbstract {
 		}
 		catch (Throwable e) {
 			e.printStackTrace();
-			logger.error("Get database metadata error: " + e.getMessage());
+			logger.error("Get file system metadata error: " + e.getMessage());
 		}
 		
 		return tblList;
@@ -800,7 +802,7 @@ public class FlatProviderAssoc extends ProviderAssocAbstract {
 	
 	/**
 	 * Getting profile with regard to specified attribute list.
-	 * @param record record.
+	 * @param record specified record.
 	 * @param attributes specified attribute list.
 	 * @return {@link Profile} with regard to specified attribute list.
 	 */

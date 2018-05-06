@@ -51,7 +51,6 @@
 	<classpathentry kind="lib" path="lib/jxp.jar"/>
 	<classpathentry kind="lib" path="lib/log4j.jar"/>
 	<classpathentry kind="lib" path="lib/mchange-commons-java-0.2.2.jar" sourcepath="lib/src/mchange-commons-java-0.2.2-src.jar"/>
-	<classpathentry kind="lib" path="lib/mysql-connector-java-5.1.20-bin.jar" sourcepath="lib/src/mysql-connector-java-5.1.20-src.zip"/>
 	<classpathentry kind="lib" path="lib/quicktable2swing11design.jar">
 		<attributes>
 			<attribute name="javadoc_location" value="jar:platform:/resource/hudup3/lib/doc/quicktable2swing11design-doc.zip!/"/>
@@ -82,5 +81,6 @@
 			<attribute name="javadoc_location" value="jar:platform:/resource/hudup3/lib/doc/commons-math3-3.5-javadoc.jar!/"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="lib/mysql-connector-java-5.1.46-bin.jar" sourcepath="lib/src/mysql-connector-java-5.1.46-src.zip"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
