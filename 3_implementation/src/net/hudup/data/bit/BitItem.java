@@ -14,6 +14,8 @@ import net.hudup.core.data.Pair;
 import net.hudup.core.data.RatingVector;
 
 /**
+ * This class represents a bit item.
+ * 
  * @author Loc Nguyen
  * @version 10.0
  *
@@ -36,8 +38,8 @@ public class BitItem implements Cloneable {
 	/**
 	 * Item constructor
 	 * 
-	 * @param bitItem {@link BitsetItem}
-	 * @param pair {@link Pair}
+	 * @param bitItem specified {@link BitsetItem}
+	 * @param pair specified {@link Pair}
 	 */
 	public BitItem(BitsetItem bitItem, Pair pair) {
 		this.bitItem = bitItem;
@@ -162,4 +164,6 @@ public class BitItem implements Cloneable {
 		
 		Collections.sort(items, comparator);
 	}
+	
+	
 }

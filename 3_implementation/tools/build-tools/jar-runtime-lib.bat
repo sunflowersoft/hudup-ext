@@ -1,7 +1,7 @@
 @echo off
 
 cd ..\..
-call .\build.bat jar-include-runtime-lib
+call .\build.bat jar-runtime-lib
 cd tools\build-tools
 
 @echo on

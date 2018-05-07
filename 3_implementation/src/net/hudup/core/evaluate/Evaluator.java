@@ -417,7 +417,7 @@ public abstract class Evaluator extends AbstractRunner implements SetupAlgListen
 	
 	/**
 	 * Checking whether the specified algorithm is accepted by this evaluator.
-	 * @param algClass specified algorithm.
+	 * @param alg specified algorithm.
 	 * @return whether the specified algorithm is accepted by this evaluator.
 	 */
 	public abstract boolean acceptAlg(Alg alg);

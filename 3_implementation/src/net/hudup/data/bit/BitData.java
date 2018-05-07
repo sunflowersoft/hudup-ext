@@ -22,6 +22,7 @@ import net.hudup.core.data.RatingVector;
 import net.hudup.core.logistic.MinMax;
 
 /**
+ * This class represents a rating matrix in bit form. It is also a bit dataset.
  * @author Loc Nguyen
  * @version 10.0
  *
@@ -38,7 +39,7 @@ public class BitData implements Cloneable, net.hudup.core.data.AutoCloseable {
 
 	
 	/**
-	 * 
+	 * Profiles of bit items.s
 	 */
 	private Profiles bitItemProfiles = MemProfiles.createEmpty();
 	
@@ -50,13 +51,13 @@ public class BitData implements Cloneable, net.hudup.core.data.AutoCloseable {
 	
 
 	/**
-	 * Real (original) session (user) id list in rating matrix
+	 * Real (original) session (user) id list in rating matrix.
 	 */
 	private List<Integer> realSessionIds = Util.newList();
 
 	
 	/**
-	 * 
+	 * Real (original) session (user) profile list in rating matrix
 	 */
 	private Profiles realSessionProfiles = MemProfiles.createEmpty();
 	
@@ -70,7 +71,7 @@ public class BitData implements Cloneable, net.hudup.core.data.AutoCloseable {
 
 	
 	/**
-	 * 
+	 * Getting bit item id (s).
 	 * @return set of bit item id (s)
 	 */
 	public Set<Integer> bitItemIds() {
@@ -131,7 +132,7 @@ public class BitData implements Cloneable, net.hudup.core.data.AutoCloseable {
 
 	
 	/**
-	 * 
+	 * Getting profile associated with a bit item id.
 	 * @param bitItemId bit item id
 	 * @return {@link Profile} associated with a bit item id
 	 */
@@ -141,7 +142,7 @@ public class BitData implements Cloneable, net.hudup.core.data.AutoCloseable {
 	
 	
 	/**
-	 * 
+	 * Getting profile associated with a real session id.
 	 * @param realSessionId real session id
 	 * @return {@link Profile} associated with a real session id
 	 */
@@ -170,7 +171,7 @@ public class BitData implements Cloneable, net.hudup.core.data.AutoCloseable {
 	
 	
 	/**
-	 * 
+	 * Clearing this bit data.
 	 */
 	public void clear() {
 		bitItemMap.clear();
@@ -203,7 +204,7 @@ public class BitData implements Cloneable, net.hudup.core.data.AutoCloseable {
 	/**
 	 * Getting a bit bit set from real rating vector.
 	 * Each {@link BitSet} represents an list of rated bit items
-	 * @param vRate
+	 * @param vRate rating vector.
 	 * @return {@link BitSet}
 	 */
 	public BitSet toItemBitSet(RatingVector vRate) {
@@ -341,8 +342,8 @@ public class BitData implements Cloneable, net.hudup.core.data.AutoCloseable {
 
 	
 	/**
-	 * 
-	 * @return {@link BitMatrix}
+	 * Creating session bit (rating) matrix from this bit dataset.
+	 * @return {@link BitMatrix} from this bit dataset.
 	 */
 	public BitMatrix createBitSessionMatrix() {
 		
@@ -370,8 +371,8 @@ public class BitData implements Cloneable, net.hudup.core.data.AutoCloseable {
 	
 	
 	/**
-	 * 
-	 * @return {@link BitMatrix}
+	 * Creating item bit (rating) matrix from this bit dataset.
+	 * @return {@link BitMatrix} matrix from this bit dataset.
 	 */
 	public BitMatrix createBitItemMatrix() {
 		
@@ -397,9 +398,9 @@ public class BitData implements Cloneable, net.hudup.core.data.AutoCloseable {
 
 	
 	/**
-	 * 
-	 * @param bitItemIds collection of bit item id (s)
-	 * @return {@link BitData}
+	 * Getting sub bit dataset by specified collection of bit item id (s)
+	 * @param bitItemIds collection of bit item id (s).
+	 * @return Sub {@link BitData} by specified collection of bit item id (s).
 	 */
 	public BitData getSub(Collection<Integer> bitItemIds) {
 		Map<Integer, BitItem> bitItemMap = Util.newMap();
@@ -445,7 +446,6 @@ public class BitData implements Cloneable, net.hudup.core.data.AutoCloseable {
 			e.printStackTrace();
 		}
 	}
-	
 	
 	
 }

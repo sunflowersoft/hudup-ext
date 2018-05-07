@@ -39,8 +39,9 @@ public abstract class StartDlg extends JDialog {
     
     
 	/**
-	 * Constructor with parent component.
+	 * Constructor with parent component and title.
 	 * @param comp parent component.
+	 * @param title title of dialog.
 	 */
 	public StartDlg(Component comp, String title) {
 		// TODO Auto-generated constructor stub

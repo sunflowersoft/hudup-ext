@@ -163,7 +163,7 @@ public class Metrics implements Serializable {
 	
 	
 	/**
-	 * 
+	 * Getting list of distinct metric wrappers.
 	 * @return list of distinct {@link MetricWrapper}.
 	 */
 	protected List<MetricWrapper> getDistinctMetricList() {
@@ -189,10 +189,10 @@ public class Metrics implements Serializable {
 	
 	
 	/**
-	 * 
-	 * @param algName
-	 * @param datasetId
-	 * @return list of metric names
+	 * Getting names of metrics associated with specified algorithm name and dataset identifier.
+	 * @param algName specified algorithm name.
+	 * @param datasetId specified dataset identifier.
+	 * @return list of metric names.
 	 */
 	public List<String> getMetricNameList(String algName, int datasetId) {
 		List<String> names = Util.newList();
@@ -214,9 +214,9 @@ public class Metrics implements Serializable {
 	
 	
 	/**
-	 * 
-	 * @param algName
-	 * @return list of metric names
+	 * Getting names of metrics associated with algorithm name.
+	 * @param algName specified algorithm name.
+	 * @return list of metric names.
 	 */
 	public List<String> getMetricNameList(String algName) {
 		Set<String> names = Util.newSet();
@@ -240,9 +240,9 @@ public class Metrics implements Serializable {
 	
 	
 	/**
-	 * 
-	 * @param datasetId
-	 * @return list of metric names
+	 * Getting names of metrics associated with dataset identifier.
+	 * @param datasetId dataset identifier.
+	 * @return list of metric names.
 	 */
 	public List<String> getMetricNameList(int datasetId) {
 		Set<String> names = Util.newSet();
@@ -360,7 +360,7 @@ public class Metrics implements Serializable {
 	/**
 	 * Getting URI of specified dataset.
 	 * @param datasetId dataset identifier.
-	 * @return dataset {@link xURI}
+	 * @return dataset {@link xURI}.
 	 */
 	public xURI getDatasetUri(int datasetId) {
 		return datasetUriMap.get(datasetId);
@@ -368,9 +368,9 @@ public class Metrics implements Serializable {
 	
 	
 	/**
-	 * 
-	 * @param datasetId
-	 * @return list of algorithm names
+	 * Getting algorithm name list, associating with specified dataset identifier.
+	 * @param datasetId specified dataset identifier.
+	 * @return list of algorithm names.
 	 */
 	public List<String> getAlgNameList(int datasetId) {
 		Set<String> algNameSet = Util.newSet();
@@ -394,7 +394,7 @@ public class Metrics implements Serializable {
 	
 	
 	/**
-	 * 
+	 * Getting list of algorithm name (s).
 	 * @return list of algorithm name (s)
 	 */
 	public List<String> getAlgNameList() {
@@ -410,12 +410,12 @@ public class Metrics implements Serializable {
 	}
 	
 	
-	/**
-	 * 
-	 * @param metricName
-	 * @param algName
-	 * @param datasetId
-	 * @return index of {@link MetricWrapper}
+	/** 
+	 * Finding an specified metric wrapper with specified metric name, algorithm name, and dataset identifier.
+	 * @param metricName specified metric name.
+	 * @param algName specified algorithm name.
+	 * @param datasetId specified dataset identifier.
+	 * @return index of {@link MetricWrapper}.
 	 */
 	public int indexOf(String metricName, String algName, int datasetId) {
 		try {
@@ -436,8 +436,8 @@ public class Metrics implements Serializable {
 	
 	
 	/**
-	 * 
-	 * @param wrapper
+	 * Finding an specified metric wrapper.
+	 * @param wrapper specified metric wrapper.
 	 * @return index of {@link MetricWrapper}
 	 */
 	public int indexOf(MetricWrapper wrapper) {
@@ -446,9 +446,9 @@ public class Metrics implements Serializable {
 	
 	
 	/**
-	 * 
-	 * @param index
-	 * @return {@link MetricWrapper}
+	 * Getting metric wrapper at specified index.
+	 * @param index specified index.
+	 * @return {@link MetricWrapper} at specified index.
 	 */
 	public MetricWrapper get(int index) {
 		return metricWrapperList.get(index);
@@ -456,11 +456,11 @@ public class Metrics implements Serializable {
 	
 	
 	/**
-	 * 
-	 * @param metricName
-	 * @param algName
-	 * @param datasetId
-	 * @return {@link MetricWrapper}
+	 * Getting metric wrapper according to specified metric name, algorithm name, and dataset identifier.
+	 * @param metricName specified metric name.
+	 * @param algName specified algorithm name.
+	 * @param datasetId specified dataset identifier.
+	 * @return {@link MetricWrapper} metric wrapper according to specified metric name, algorithm name, and dataset identifier.
 	 */
 	public MetricWrapper get(String metricName, String algName, int datasetId) {
 		int index = indexOf(metricName, algName, datasetId);
@@ -472,10 +472,10 @@ public class Metrics implements Serializable {
 	
 	
 	/**
-	 * 
-	 * @param algName
-	 * @param datasetId
-	 * @return {@link Metrics}
+	 * Getting metric wrappers that associate with specified algorithm name and dataset identifier.
+	 * @param algName specified algorithm name.
+	 * @param datasetId specified dataset identifier.
+	 * @return {@link Metrics} as metric wrappers that associate with specified algorithm name and dataset identifier.
 	 */
 	public Metrics gets(String algName, int datasetId) {
 		Metrics result = new Metrics();
@@ -499,9 +499,9 @@ public class Metrics implements Serializable {
 	
 	
 	/**
-	 * 
-	 * @param algName
-	 * @return map of {@link Metrics}
+	 * Getting a map of metric wrappers associating with specified algorithm name.
+	 * @param algName specified algorithm name.
+	 * @return map of {@link Metrics} associating with specified algorithm name.
 	 */
 	public Map<Integer, Metrics> gets(String algName) {
 		Map<Integer, Metrics> result = Util.newMap();
@@ -519,8 +519,8 @@ public class Metrics implements Serializable {
 	/**
 	 * Calculating the mean metric for each algorithm because an algorithm runs on many database which corresponding a kind of metric. 
 	 * So there are many metrics that have the same kind and we calculate their mean.
-	 * @param algName
-	 * @return mean {@link Metrics}
+	 * @param algName specified algorithm name.
+	 * @return mean {@link Metrics}.
 	 */
 	public Metrics mean(String algName) {
 		List<MetricWrapper> wrapperList = getDistinctMetricList();
@@ -561,9 +561,9 @@ public class Metrics implements Serializable {
 	
 	
 	/**
-	 * 
-	 * @param datasetId
-	 * @return map of {@link Metrics} (s)
+	 * Getting map of metric wrappers associating with specified dataset identifier.
+	 * @param datasetId specified dataset identifier.
+	 * @return map of {@link Metrics} (s) associating with specified dataset identifier.
 	 */
 	public Map<String, Metrics> gets(int datasetId) {
 		Map<String, Metrics> result = Util.newMap();
@@ -579,8 +579,8 @@ public class Metrics implements Serializable {
 	
 	
 	/**
-	 * 
-	 * @param metricWrapper
+	 * Adding a specified metric wrapper.
+	 * @param metricWrapper specified metric wrapper.
 	 * @return whether adding successfully
 	 */
 	public boolean add(MetricWrapper metricWrapper) {
@@ -600,9 +600,9 @@ public class Metrics implements Serializable {
 	
 	
 	/**
-	 * 
-	 * @param metrics
-	 * @return whether adding successfully
+	 * Adding a specified list of metric wrappers.
+	 * @param metrics specified list of metric wrappers.
+	 * @return whether adding successfully.
 	 */
 	public boolean add(Metrics metrics) {
 		for (int i = 0; i < metrics.size(); i++) {
@@ -615,12 +615,12 @@ public class Metrics implements Serializable {
 	
 	
 	/**
-	 * 
-	 * @param algName
-	 * @param datasetId
-	 * @param datasetUri
-	 * @param metric
-	 * @return whether adding successfully
+	 * Adding a specified metric associated with specified algorithm name, dataset identifier, dataset URI.
+	 * @param algName specified algorithm name.
+	 * @param datasetId specified dataset identifier.
+	 * @param datasetUri specified dataset URI.
+	 * @param metric specified metric.
+	 * @return whether adding successfully.
 	 */
 	public boolean add(String algName, int datasetId, xURI datasetUri, Metric metric) {
 		MetricWrapper wrapper = MetricWrapper.create(metric, algName, datasetId, datasetUri);
@@ -636,11 +636,11 @@ public class Metrics implements Serializable {
 	
 	
 	/**
-	 * 
-	 * @param algName
-	 * @param datasetId
-	 * @param metric
-	 * @return whether adding successfully
+	 * Adding a specified metric associated with specified algorithm name and dataset identifier.
+	 * @param algName specified algorithm name.
+	 * @param datasetId specified dataset identifier.
+	 * @param metric specified metric.
+	 * @return whether adding successfully.
 	 */
 	public boolean add(String algName, int datasetId, Metric metric) {
 		return add(algName, datasetId, null, metric);
@@ -648,12 +648,12 @@ public class Metrics implements Serializable {
 
 	
 	/**
-	 * 
-	 * @param algName
-	 * @param datasetId
-	 * @param datasetUri
-	 * @param defaultMetricList
-	 * @return whether adding successfully
+	 * Adding a specified list of metrics associated with specified algorithm name, dataset identifier, dataset URI.
+	 * @param algName specified algorithm name.
+	 * @param datasetId specified dataset identifier.
+	 * @param datasetUri specified dataset URI.
+	 * @param defaultMetricList specified list of metrics.
+	 * @return whether adding successfully.
 	 */
 	public boolean add(String algName, int datasetId, xURI datasetUri, List<Metric> defaultMetricList) {
 		for (Metric metric : defaultMetricList) {
@@ -665,10 +665,10 @@ public class Metrics implements Serializable {
 	
 	
 	/**
-	 * 
-	 * @param algName
-	 * @param datasetId
-	 * @param defaultMetricList
+	 * Adding a specified list of metrics associated with specified algorithm name and dataset identifier.
+	 * @param algName specified algorithm name.
+	 * @param datasetId specified dataset identifier.
+	 * @param defaultMetricList specified list of metrics.
 	 * @return whether adding successfully
 	 */
 	public boolean add(String algName, int datasetId, List<Metric> defaultMetricList) {
@@ -677,8 +677,8 @@ public class Metrics implements Serializable {
 
 	
 	/**
-	 * 
-	 * @return size of metrics
+	 * Getting size of this metrics.
+	 * @return size of this metrics.
 	 */
 	public int size() {
 		return metricWrapperList.size();
@@ -686,9 +686,9 @@ public class Metrics implements Serializable {
 	
 	
 	/**
-	 * 
-	 * @param index
-	 * @return removed {@link MetricWrapper}
+	 * Removing the metric wrapper at specified index.
+	 * @param index specified index.
+	 * @return removed {@link MetricWrapper}.
 	 */
 	public MetricWrapper removeByIndex(int index) {
 		return metricWrapperList.remove(index);
@@ -696,9 +696,9 @@ public class Metrics implements Serializable {
 	
 	
 	/**
-	 * 
-	 * @param wrapper
-	 * @return removed {@link MetricWrapper}
+	 * Removing the specified metric wrapper.
+	 * @param wrapper specified metric wrapper.
+	 * @return removed {@link MetricWrapper}.
 	 */
 	public MetricWrapper remove(MetricWrapper wrapper) {
 		int index = indexOf(wrapper);
@@ -710,11 +710,11 @@ public class Metrics implements Serializable {
 	
 	
 	/**
-	 * 
-	 * @param metricName
-	 * @param algName
-	 * @param datasetId
-	 * @return removed {@link MetricWrapper}
+	 * Removing the metric associated with specified metric name, algorithm name, and dataset identifier.
+	 * @param metricName specified metric name.
+	 * @param algName specified algorithm name.
+	 * @param datasetId specified dataset identifier.
+	 * @return removed {@link MetricWrapper}.
 	 */
 	public MetricWrapper remove(String metricName, String algName, int datasetId) {
 		int index = indexOf(metricName, algName, datasetId);
@@ -726,10 +726,10 @@ public class Metrics implements Serializable {
 
 	
 	/**
-	 * 
-	 * @param algName
-	 * @param datasetId
-	 * @return removed {@link Metrics}
+	 * Removing metrics associated with specified algorithm name and dataset identifier.
+	 * @param algName specified algorithm name.
+	 * @param datasetId specified dataset identifier.
+	 * @return removed {@link Metrics}.
 	 */
 	public Metrics remove(String algName, int datasetId) {
 		Metrics removed = new Metrics();
@@ -747,8 +747,8 @@ public class Metrics implements Serializable {
 	
 	
 	/**
-	 * 
-	 * @param algName
+	 * Removing all metric wrappers associated with specified algorithm name.
+	 * @param algName specified algorithm name.
 	 * @return removed {@link Metrics}
 	 */
 	public Metrics remove(String algName) {
@@ -764,9 +764,9 @@ public class Metrics implements Serializable {
 
 	
 	/**
-	 * 
-	 * @param datasetId
-	 * @return removed {@link Metrics}
+	 * Removing all metric wrappers associated with specified dataset identifier.
+	 * @param datasetId specified dataset identifier.
+	 * @return removed {@link Metrics}.
 	 */
 	public Metrics removeByDatasetId(int datasetId) {
 		Metrics removed = new Metrics();
@@ -782,7 +782,7 @@ public class Metrics implements Serializable {
 	
 	
 	/**
-	 * 
+	 * Clearing this metrics.
 	 */
 	public void clear() {
 		metricWrapperList.clear();

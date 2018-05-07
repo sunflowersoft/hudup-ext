@@ -161,7 +161,7 @@ public class DatasetSampler implements AutoCloseable {
 
 	
 	/**
-	 * Making sparse the unit (table) specified by the internal source configuration {@link #srcConfig} and source unit {@link #srcUnit}.
+	 * Making sparse the unit (table) specified by the specified source configuration and source unit.
 	 * The resulted sparse unit is stored in the storage of source unit.
 	 * @param srcUnit source unit.
 	 * @param sparseRatio ratio of making sparse.
@@ -267,7 +267,7 @@ public class DatasetSampler implements AutoCloseable {
 	
 	/**
 	 * Add the specified listener to the end of listener list.
-	 * @param specified listener.
+	 * @param listener specified listener.
 	 */
 	public void addProgressListener(ProgressListener listener) {
 		synchronized (listenerList) {
@@ -278,7 +278,7 @@ public class DatasetSampler implements AutoCloseable {
     
 	/**
 	 * Remove the specified progress listener from the listener list.
-	 * @param specified progress listener.
+	 * @param listener specified progress listener.
 	 */
     public void removeProgressListener(ProgressListener listener) {
 		synchronized (listenerList) {

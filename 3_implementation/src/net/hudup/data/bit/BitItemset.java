@@ -14,6 +14,8 @@ import net.hudup.core.parser.TextParsable;
 import net.hudup.core.parser.TextParserUtil;
 
 /**
+ * This class represents a bit itemset.
+ * 
  * @author Loc Nguyen
  * @version 10.0
  *

@@ -22,6 +22,7 @@ import net.hudup.data.SnapshotImpl;
 
 
 /**
+ * This is utility class that provides utility methods for processing bit data.
  * 
  * @author Loc Nguyen
  * @version 10.0
@@ -50,14 +51,13 @@ public final class BitDataUtil {
 	}
 
 	
-	
 	/**
 	 * Finding bit item id of original (real) item id with its value
 	 * (Example: item 2 rated value 5 has bit id 10)
 	 * @param bitItemMap has: key is bit item id and value is Pair (real id, rating value)
-	 * @param originItemId
-	 * @param ratingValue
-	 * @return bit item id
+	 * @param originItemId original (real) item id
+	 * @param ratingValue rating value.
+	 * @return bit item id.
 	 */
 	public static int findBitItemIdOf(
 			Map<Integer, Pair> bitItemMap, 
@@ -79,7 +79,7 @@ public final class BitDataUtil {
 	 * Finding bit item id (s) of original (real) item id
 	 * 
 	 * @param bitItemMap has: key is bit item id and value is Pair (real id, rating value)
-	 * @param originItemId
+	 * @param originItemId original (real) item id.
 	 * @return list of bit item id (s)
 	 */
 	public static List<Integer> findBitItemIdOf(
@@ -147,8 +147,8 @@ public final class BitDataUtil {
 	 * Each {@link Pair} represents a original (real) item with its value.
 	 * 
 	 * @param bitItemMap is a map of {@link Pair} having: key is bit item id and value is Pair (real id, rating value)
-	 * @param itemset
-	 * @return list of {@link Pair}
+	 * @param itemset bit item set.
+	 * @return list of {@link Pair}.
 	 */
 	public static List<Pair> toItemPairList(Map<Integer, Pair> bitItemMap, BitItemset itemset) {
 		return toItemPairList(bitItemMap, itemset.toBitSet(bitItemMap.size()));
@@ -156,8 +156,8 @@ public final class BitDataUtil {
 	
 	
 	/**
-	 * 
-	 * @param reader
+	 * Reading bit item map from specified reader.
+	 * @param reader specified reader.
 	 * @return map of {@link Pair} has: key is bit item id and value is Pair (real id, rating value)
 	 */
 	public static Map<Integer, Pair> readBitItemMap(BufferedReader reader) {
@@ -189,7 +189,7 @@ public final class BitDataUtil {
 	
 	
 	/**
-	 * 
+	 * Write bit item map by specified writer.
 	 * @param bitItemMap is map of {@link Pair} has: key is bit item id and value is Pair (real id, rating value)
 	 * @param writer is {@link Writer}
 	 */
@@ -203,7 +203,6 @@ public final class BitDataUtil {
 		
 		writer.flush();
 	}
-	
 	
 	
 }

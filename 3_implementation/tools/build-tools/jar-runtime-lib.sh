@@ -1,3 +1,3 @@
 cd ../..
-./build.sh jar-include-runtime-lib
+./build.sh jar-runtime-lib
 cd tools/build-tools

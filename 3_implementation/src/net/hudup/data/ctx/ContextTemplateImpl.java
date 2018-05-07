@@ -14,7 +14,8 @@ import net.hudup.core.data.ctx.ContextTemplateList;
 import net.hudup.core.data.ctx.HierContextTemplate;
 
 /**
- * 
+ * This class is the default implementation of hierarchical context template.
+ *  
  * @author Loc Nguyen
  * @version 10.0
  *
@@ -29,52 +30,52 @@ public class ContextTemplateImpl implements HierContextTemplate {
 
 
 	/**
-	 * 
+	 * Internal configuration.
 	 */
 	protected DataConfig config = null;
 	
 	
 	/**
-	 * 
+	 * Identifier of this template.
 	 */
 	protected int id = -1;
 	
 	
 	/**
-	 * 
+	 * Name of this template.
 	 */
 	protected String name = "";
 	
 	
 	/**
-	 * 
+	 * Attribute of this template.
 	 */
 	protected Attribute attribute = new Attribute(DataConfig.CONTEXT_TEMPLATE_UNIT, Type.integer);
 	
 	
 	/**
-	 * 
+	 * Parent context template.
 	 */
 	protected ContextTemplate parent = null;
 	
 	
 	/**
-	 * 
+	 * List of child templates.
 	 */
 	protected ContextTemplateList children = new ContextTemplateList();
 	
 	
 	/**
-	 * 
+	 * Attribute list of profile of this template.
 	 */
 	protected AttributeList profileAttributes = new AttributeList();
 	
 	
 	/**
-	 * 
-	 * @param id
-	 * @param name
-	 * @param attribute
+	 * Constructor with specified identifier, name, and attribute.
+	 * @param id specified identifier.
+	 * @param name specified name.
+	 * @param attribute specified attribute.
 	 */
 	private ContextTemplateImpl(int id, String name, Attribute attribute) {
 		super();
@@ -234,8 +235,8 @@ public class ContextTemplateImpl implements HierContextTemplate {
 	
 	
 	/**
-	 * 
-	 * @param children
+	 * Adding child templates.
+	 * @param children child templates.
 	 */
 	public void addChildren(ContextTemplate[] children) {
 		for (ContextTemplate child : children) {
@@ -359,6 +360,9 @@ public class ContextTemplateImpl implements HierContextTemplate {
 	}
 
 	
+	/**
+	 * Getting all templates from this template as root.
+	 */
 	public ContextTemplate[] getAllTemplates() {
 		List<ContextTemplate> outList = Util.newList();
 		getAllTemplates(this, outList);
@@ -368,9 +372,9 @@ public class ContextTemplateImpl implements HierContextTemplate {
 	
 	
 	/**
-	 * 
-	 * @param root
-	 * @param outList
+	 * Getting all templates from root template.
+	 * @param root root template.
+	 * @param outList list of returned templates.
 	 */
 	private static void getAllTemplates(ContextTemplateImpl root, List<ContextTemplate> outList) {
 		if (root == null)
@@ -482,11 +486,11 @@ public class ContextTemplateImpl implements HierContextTemplate {
 
 
 	/**
-	 * 
-	 * @param id
-	 * @param name
-	 * @param attribute
-	 * @return {@link ContextTemplate}
+	 * Static method to create a context template with specified identifier, name, and attribute.
+	 * @param id specified identifier.
+	 * @param name specified name.
+	 * @param attribute specified attribute.
+	 * @return {@link ContextTemplate} with specified identifier, name, and attribute.
 	 */
 	public static ContextTemplateImpl create(int id, String name, Attribute attribute) {
 		if (id < 0 || name == null || name.isEmpty() || attribute == null)
@@ -497,11 +501,11 @@ public class ContextTemplateImpl implements HierContextTemplate {
 
 
 	/**
-	 * 
-	 * @param id
-	 * @param name
-	 * @param type
-	 * @return {@link ContextTemplate}
+	 * Static method to create a context template with specified identifier, name, and attribute type.
+	 * @param id specified identifier.
+	 * @param name specified name.
+	 * @param type specified attribute type.
+	 * @return {@link ContextTemplate} with specified identifier, name, and attribute type.
 	 */
 	public static ContextTemplateImpl create(int id, String name, Type type) {
 		Attribute attribute = new Attribute(
@@ -511,11 +515,11 @@ public class ContextTemplateImpl implements HierContextTemplate {
 
 	
 	/**
-	 * 
-	 * @param id
-	 * @param name
-	 * @param type
-	 * @return {@link ContextTemplate}
+	 * Static method to create a context template with specified identifier, name, and attribute type.
+	 * @param id specified identifier.
+	 * @param name specified name.
+	 * @param type specified attribute type as integer.
+	 * @return {@link ContextTemplate} with specified identifier, name, and attribute type.
 	 */
 	public static ContextTemplateImpl create(int id, String name, int type) {
 		Attribute attribute = new Attribute(
@@ -524,5 +528,4 @@ public class ContextTemplateImpl implements HierContextTemplate {
 	}
 
 
-	
 }

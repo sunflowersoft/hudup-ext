@@ -449,8 +449,8 @@ public class DbProviderAssoc extends ProviderAssocAbstract {
 	
 	/**
 	 * 
-	 * @param userId
-	 * @param itemId
+	 * @param userId user identifier.
+	 * @param itemId item identifier.
 	 * @return delete SQL
 	 */
 	public String genRatingDeleteSql(int userId, int itemId) {
@@ -474,7 +474,7 @@ public class DbProviderAssoc extends ProviderAssocAbstract {
 
 	
 	/**
-	 * 
+	 * @param userId user identifier.
 	 * @return select SQL
 	 */
 	public String genUserRatingSelectSql(int userId) {
@@ -493,9 +493,9 @@ public class DbProviderAssoc extends ProviderAssocAbstract {
 	
 	/**
 	 * 
-	 * @param userId
-	 * @param itemId
-	 * @return select SQL
+	 * @param userId user identifier.
+	 * @param itemId item identifier.
+	 * @return select SQL.
 	 */
 	public String genUserItemRatingSelectSql(int userId, int itemId) {
 		return genRatingSelectSql() + " where " + 
@@ -505,7 +505,7 @@ public class DbProviderAssoc extends ProviderAssocAbstract {
 	
 	/**
 	 * 
-	 * @param userId
+	 * @param userId user identifier.
 	 * @return delete SQL
 	 */
 	public String genUserRatingDeleteSql(int userId) {
@@ -543,7 +543,7 @@ public class DbProviderAssoc extends ProviderAssocAbstract {
 	
 	/**
 	 * 
-	 * @param userId
+	 * @param userId user identifier.
 	 * @return select SQL
 	 */
 	public String genUserProfileSelectSql(int userId) {
@@ -553,8 +553,8 @@ public class DbProviderAssoc extends ProviderAssocAbstract {
 	
 	/**
 	 * 
-	 * @param userId
-	 * @return delete SQL
+	 * @param userId user identifier.
+	 * @return delete SQL.
 	 */
 	public String genUserProfileDeleteSql(int userId) {
 		return 
@@ -575,7 +575,7 @@ public class DbProviderAssoc extends ProviderAssocAbstract {
 	
 	/**
 	 * 
-	 * @param itemId
+	 * @param itemId item identifier.
 	 * @return select SQL
 	 */
 	public String genItemRatingSelectSql(int itemId) {
@@ -594,7 +594,7 @@ public class DbProviderAssoc extends ProviderAssocAbstract {
 	
 	/**
 	 * 
-	 * @param itemId
+	 * @param itemId item identifier.
 	 * @return delete SQL
 	 */
 	public String genItemRatingDeleteSql(int itemId) {
@@ -632,7 +632,7 @@ public class DbProviderAssoc extends ProviderAssocAbstract {
 	
 	/**
 	 * 
-	 * @param itemId
+	 * @param itemId item identifier.
 	 * @return select SQL
 	 */
 	public String genItemProfileSelectSql(int itemId) {
@@ -641,7 +641,7 @@ public class DbProviderAssoc extends ProviderAssocAbstract {
 
 	
 	/**
-	 * 
+	 * @param itemId item identifier.
 	 * @return delete SQL
 	 */
 	public String genItemProfileDeleteSql(int itemId) {
@@ -690,9 +690,9 @@ public class DbProviderAssoc extends ProviderAssocAbstract {
 	
 	/**
 	 * 
-	 * @param refUnit
-	 * @param att
-	 * @return select SQL
+	 * @param refUnit reference unit.
+	 * @param att specified attribute.
+	 * @return select SQL.
 	 */
 	public String genNominalSelectSql(String refUnit, String att) {
 		return 
@@ -705,10 +705,10 @@ public class DbProviderAssoc extends ProviderAssocAbstract {
 	
 	/**
 	 * 
-	 * @param refUnit
-	 * @param att
-	 * @param nominal_index
-	 * @return select SQL
+	 * @param refUnit reference unit.
+	 * @param att specified attribute.
+	 * @param nominal_index nominal index.
+	 * @return select SQL.
 	 */
 	public String genNominalSelectSql(String refUnit, String att, int nominal_index) {
 		return 
@@ -722,12 +722,12 @@ public class DbProviderAssoc extends ProviderAssocAbstract {
 	
 	/**
 	 * 
-	 * @param refUnit
-	 * @param att
-	 * @param nominal_index
-	 * @param nominal_value
-	 * @param parent_index
-	 * @return insert SQL
+	 * @param refUnit reference unit.
+	 * @param att specified attribute.
+	 * @param nominal_index nominal index.
+	 * @param nominal_value nominal value.
+	 * @param parent_index parent index of specified nominal.
+	 * @return insert SQL.
 	 */
 	public String genNominalInsertSql(
 			String refUnit, String att, int nominal_index, String nominal_value, int parent_index) {
@@ -763,12 +763,12 @@ public class DbProviderAssoc extends ProviderAssocAbstract {
 	
 	/**
 	 * 
-	 * @param refUnit
-	 * @param att
-	 * @param nominal_index
-	 * @param nominal_value
-	 * @param parent_index
-	 * @return update SQL
+	 * @param refUnit reference unit.
+	 * @param att specified attribute.
+	 * @param nominal_index nominal index.
+	 * @param nominal_value nominal value.
+	 * @param parent_index parent index of specified nominal.
+	 * @return update SQL.
 	 */
 	public String genNominalUpdateSql(
 			String refUnit, String att, int nominal_index, String nominal_value, int parent_index) {
@@ -802,10 +802,10 @@ public class DbProviderAssoc extends ProviderAssocAbstract {
 	
 	/**
 	 * 
-	 * @param refUnit
-	 * @param att
-	 * @param nominal_index
-	 * @return delete SQL
+	 * @param refUnit reference unit.
+	 * @param att specified attribute.
+	 * @param nominal_index nominal index.
+	 * @return delete SQL.
 	 */
 	public String genNominalDeleteSql(String refUnit, String att, int nominal_index) {
 		return 
@@ -819,9 +819,9 @@ public class DbProviderAssoc extends ProviderAssocAbstract {
 	
 	/**
 	 * 
-	 * @param refUnit
-	 * @param att
-	 * @return delete SQL
+	 * @param refUnit reference unit.
+	 * @param att specified attribute.
+	 * @return delete SQL.
 	 */
 	public String genNominalDeleteSql(String refUnit, String att) {
 		return 
@@ -834,8 +834,8 @@ public class DbProviderAssoc extends ProviderAssocAbstract {
 	
 	/**
 	 * 
-	 * @param refUnit
-	 * @return delete SQL
+	 * @param refUnit reference unit.
+	 * @return delete SQL.
 	 */
 	public String genNominalDeleteSql(String refUnit) {
 		return 
@@ -972,8 +972,8 @@ public class DbProviderAssoc extends ProviderAssocAbstract {
 	
 	/**
 	 * 
-	 * @param internalUnit
-	 * @return delete SQL
+	 * @param internalUnit internal unit.
+	 * @return delete SQL.
 	 */
 	public String genAttributeMapDeleteSql(String internalUnit) {
 		return 
@@ -1017,10 +1017,10 @@ public class DbProviderAssoc extends ProviderAssocAbstract {
 	
 	/**
 	 * 
-	 * @param accName
-	 * @param accPwd
-	 * @param privs
-	 * @return insert SQL
+	 * @param accName account name.
+	 * @param accPwd account password.
+	 * @param privs privileges.
+	 * @return insert SQL.
 	 */
 	public String genAccountInsertSql(String accName, String accPwd, int privs) {
 		return 
@@ -1045,10 +1045,10 @@ public class DbProviderAssoc extends ProviderAssocAbstract {
 	
 	/**
 	 * 
-	 * @param accName
-	 * @param accPwd
-	 * @param privs
-	 * @return update SQL
+	 * @param accName account name.
+	 * @param accPwd account password.
+	 * @param privs specified privileges.
+	 * @return update SQL.
 	 */
 	public String genAccountUpdateSql(String accName, String accPwd, int privs) {
 		return 	
@@ -1095,9 +1095,9 @@ public class DbProviderAssoc extends ProviderAssocAbstract {
 	
 	/**
 	 * 
-	 * @param profileUnit
-	 * @param attList
-	 * @return create SQL
+	 * @param profileUnit specified profile unit.
+	 * @param attList specified attribute list.
+	 * @return create SQL.
 	 */
 	public String genProfileCreateSql(String profileUnit, AttributeList attList) {
 		Keys keys = attList.getKeys();
@@ -1139,7 +1139,7 @@ public class DbProviderAssoc extends ProviderAssocAbstract {
 	
 	/**
 	 * 
-	 * @param profileUnit
+	 * @param profileUnit specified profile unit.
 	 * @return select SQL
 	 */
 	public String genProfileSelectSql(String profileUnit) {
@@ -1149,9 +1149,9 @@ public class DbProviderAssoc extends ProviderAssocAbstract {
 
 	/**
 	 * 
-	 * @param profileUnit
-	 * @param conditionAttList
-	 * @return select SQL
+	 * @param profileUnit specified profile unit.
+	 * @param conditionAttList conditional attribute list.
+	 * @return select SQL.
 	 */
 	public ParamSql genProfileSelectSql(String profileUnit, AttributeList conditionAttList) {
 		Keys keys = conditionAttList.getKeys();
@@ -1169,8 +1169,8 @@ public class DbProviderAssoc extends ProviderAssocAbstract {
 	
 	/**
 	 * 
-	 * @param profileUnit
-	 * @param condition
+	 * @param profileUnit specified profile unit.
+	 * @param condition specified condition.
 	 * @return {@link ParamSql}
 	 */
 	public ParamSql genProfileSelectSql2(String profileUnit, Profile condition) {
@@ -1187,9 +1187,9 @@ public class DbProviderAssoc extends ProviderAssocAbstract {
 	
 	/**
 	 * 
-	 * @param profileUnit
-	 * @param profileIdName
-	 * @return select SQL
+	 * @param profileUnit specified profile unit.
+	 * @param profileIdName name of ID field in the unit.
+	 * @return select SQL.s
 	 */
 	public String genProfileIdsSelectSql(String profileUnit, String profileIdName) {
 		return "select " + norm(profileIdName) + " from " + norm(profileUnit);
@@ -1198,8 +1198,8 @@ public class DbProviderAssoc extends ProviderAssocAbstract {
 	
 	/**
 	 * 
-	 * @param profileUnit
-	 * @param profileIdName
+	 * @param profileUnit specified profile unit.
+	 * @param profileIdName name of ID field in the unit.
 	 * @return select SQL
 	 */
 	public String genMaxIdProfileSelectSql(String profileUnit, String profileIdName) {
@@ -1209,9 +1209,9 @@ public class DbProviderAssoc extends ProviderAssocAbstract {
 	
 	/**
 	 * 
-	 * @param profileUnit
-	 * @param attList
-	 * @return insert SQL
+	 * @param profileUnit specified profile unit.
+	 * @param attList specified attribute list.
+	 * @return insert SQL.
 	 */
 	public ParamSql genProfileInsertSql(
 			String profileUnit, 
@@ -1252,9 +1252,9 @@ public class DbProviderAssoc extends ProviderAssocAbstract {
 
 	/**
 	 * 
-	 * @param profileUnit
-	 * @param conditionAttList
-	 * @return update SQL
+	 * @param profileUnit specified profile unit.
+	 * @param conditionAttList conditional attribute list.
+	 * @return update SQL.
 	 */
 	public ParamSql genProfileUpdateSql(
 			String profileUnit, 
@@ -1298,8 +1298,8 @@ public class DbProviderAssoc extends ProviderAssocAbstract {
 	
 	/**
 	 * 
-	 * @param profileUnit
-	 * @return delete SQL
+	 * @param profileUnit specified profile unit.
+	 * @return delete SQL.
 	 */
 	public String genProfileDeleteSql(String profileUnit) {
 		return "delete from " + norm(profileUnit);
@@ -1308,9 +1308,9 @@ public class DbProviderAssoc extends ProviderAssocAbstract {
 	
 	/**
 	 * 
-	 * @param profileUnit
-	 * @param conditionAttList
-	 * @return delete SQL
+	 * @param profileUnit specified profile unit.
+	 * @param conditionAttList conditional attribute list.
+	 * @return delete SQL.
 	 */
 	public ParamSql genProfileDeleteSql(String profileUnit, AttributeList conditionAttList) {
 		Keys keys = conditionAttList.getKeys();
@@ -1328,9 +1328,9 @@ public class DbProviderAssoc extends ProviderAssocAbstract {
 	
 	/**
 	 * 
-	 * @param profileUnit
-	 * @param condition
-	 * @return delete SQL
+	 * @param profileUnit specified profile unit.
+	 * @param condition specified condition.
+	 * @return delete SQL.
 	 */
 	public ParamSql genProfileDeleteSql2(String profileUnit, Profile condition) {
 		Keys keys = condition.getNotMissingAtts();
@@ -1370,8 +1370,8 @@ public class DbProviderAssoc extends ProviderAssocAbstract {
 
 	/**
 	 * 
-	 * @param ctxTemplateId
-	 * @return select SQL
+	 * @param ctxTemplateId specified context template ID.
+	 * @return select SQL.
 	 */
 	public String genContextTemplateSelectSql(int ctxTemplateId) {
 		return "select * from " + norm(getConfig().getContextTemplateUnit()) + 
@@ -1453,10 +1453,10 @@ public class DbProviderAssoc extends ProviderAssocAbstract {
 	
 	/**
 	 * 
-	 * @param userId
-	 * @param itemId
-	 * @param ctxTemplateId
-	 * @return select SQL
+	 * @param userId user identifier.
+	 * @param itemId item identifier.
+	 * @param ctxTemplateId context template ID.
+	 * @return select SQL.
 	 */
 	public String genContextSelectSql(int userId, int itemId, int ctxTemplateId) {
 		return "select * from " + norm(config.getContextUnit()) + 
@@ -1468,9 +1468,9 @@ public class DbProviderAssoc extends ProviderAssocAbstract {
 	
 	/**
 	 * 
-	 * @param userId
-	 * @param itemId
-	 * @return select SQL
+	 * @param userId user identifier.
+	 * @param itemId item identifier.
+	 * @return select SQL.
 	 */
 	public String genContextSelectSql(int userId, int itemId) {
 		return "select * from " + norm(config.getContextUnit()) + 
@@ -1514,10 +1514,10 @@ public class DbProviderAssoc extends ProviderAssocAbstract {
 	
 	/**
 	 * 
-	 * @param userId
-	 * @param itemId
-	 * @param ctxTemplateId
-	 * @return delete SQL
+	 * @param userId user identifier.
+	 * @param itemId item identifier.
+	 * @param ctxTemplateId context template identifier.
+	 * @return delete SQL.
 	 */
 	public String genContextDeleteSql(int userId, int itemId, int ctxTemplateId) {
 		return "delete from " + norm(config.getContextUnit()) + 
@@ -1530,9 +1530,9 @@ public class DbProviderAssoc extends ProviderAssocAbstract {
 	
 	/**
 	 * 
-	 * @param userId
-	 * @param itemId
-	 * @return delete SQL
+	 * @param userId user identifier.
+	 * @param itemId item identifier.
+	 * @return delete SQL.
 	 */
 	public String genContextDeleteSql(int userId, int itemId) {
 		return "delete from " + norm(config.getContextUnit()) + 
@@ -1558,7 +1558,7 @@ public class DbProviderAssoc extends ProviderAssocAbstract {
 	
 	/**
 	 * 
-	 * @param userId
+	 * @param userId user identifier.
 	 * @return delete SQL
 	 */
 	public String genUserContextDeleteSql(int userId) {
@@ -1569,7 +1569,7 @@ public class DbProviderAssoc extends ProviderAssocAbstract {
 	
 	/**
 	 * 
-	 * @param itemId
+	 * @param itemId item identifier.
 	 * @return delete SQL
 	 */
 	public String genItemContextDeleteSql(int itemId) {
@@ -1580,8 +1580,8 @@ public class DbProviderAssoc extends ProviderAssocAbstract {
 	
 	/**
 	 * 
-	 * @param unit
-	 * @return select SQL
+	 * @param unit specified unit.
+	 * @return select SQL.
 	 */
 	public Map<Integer, String> genAttributeBoundSql(String unit) {
 		Map<Integer, String> map = Util.newMap();
@@ -1614,7 +1614,7 @@ public class DbProviderAssoc extends ProviderAssocAbstract {
 	
 	/**
 	 * 
-	 * @param unit
+	 * @param unit specified unit.
 	 * @return select SQL
 	 */
 	public String genSelectSql(String unit) {
@@ -1666,7 +1666,7 @@ public class DbProviderAssoc extends ProviderAssocAbstract {
 	
 	/**
 	 * 
-	 * @param unit
+	 * @param unit specified unit.
 	 * @return insert SQL
 	 */
 	public ParamSql genInsertSql(String unit) {
@@ -1722,7 +1722,7 @@ public class DbProviderAssoc extends ProviderAssocAbstract {
 	
 	/**
 	 * 
-	 * @param unit
+	 * @param unit specified unit.
 	 * @return update SQL
 	 */
 	public ParamSql genUpdateSql(String unit) {
@@ -1778,8 +1778,8 @@ public class DbProviderAssoc extends ProviderAssocAbstract {
 
 	/**
 	 * 
-	 * @param unit
-	 * @return delete SQL
+	 * @param unit specified unit.
+	 * @return delete SQL.
 	 */
 	public ParamSql genDeleteSql(String unit) {
 		Map<String, ParamSql> map = Util.newMap();

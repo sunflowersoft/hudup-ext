@@ -28,6 +28,8 @@ import org.junit.runner.Result;
 import org.junit.runner.notification.Failure;
 
 /**
+ * This class is a test case for bit data {@link BitData}.
+ * 
  * @author Loc Nguyen
  * @version 10.0
  *
@@ -42,13 +44,13 @@ public class BitDataTest {
 
 	
 	/**
-	 * 
+	 * Internal dataset.
 	 */
 	private Dataset dataset = null;
 	
 	
 	/**
-	 * 
+	 * Testing how to create {@link BitData}.
 	 */
 	@Test
 	@Deprecated
@@ -97,8 +99,8 @@ public class BitDataTest {
 	
 
 	/**
-	 * 
-	 * @throws IOException
+	 * Setting up method for test case.
+	 * @throws IOException if any error raises.
 	 */
 	@Before
 	public void setUp() throws IOException {
@@ -114,7 +116,7 @@ public class BitDataTest {
 	
 	
 	/**
-	 * 
+	 * Tear down method.
 	 */
 	@After
 	public void tearDown() {
@@ -125,10 +127,10 @@ public class BitDataTest {
 	
 	
 	/**
-	 * This method is used to check RatingVetor
-	 * @param v1
-	 * @param v2
-	 * @return whether two vectors are equal
+	 * This method is used to check whether rating vector 1 and rating vector 2 are equal.
+	 * @param v1 rating vector 1.
+	 * @param v2 rating vector 2.
+	 * @return whether two vectors are equal.
 	 */
 	private static boolean checkValueEquals(RatingVector v1, RatingVector v2) {
 		if (v1.id() != v2.id()) return false;
@@ -152,8 +154,8 @@ public class BitDataTest {
 
 	
 	/**
-	 * 
-	 * @param args
+	 * Main method.
+	 * @param args argument parameter.
 	 */
 	public static void main(String[] args) {
 		Result result = JUnitCore.runClasses(BitDataTest.class);

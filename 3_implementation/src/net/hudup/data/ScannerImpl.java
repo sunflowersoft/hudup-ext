@@ -29,6 +29,7 @@ import net.hudup.core.data.ctx.ContextTemplateSchema;
 
 
 /**
+ * This class is the default implementation of Scanner.
  * 
  * @author Loc Nguyen
  * @version 10.0
@@ -44,26 +45,26 @@ public class ScannerImpl extends Scanner {
 
 
 	/**
-	 * 
+	 * Internal provider.
 	 */
 	protected Provider provider = null;
 	
 	
 	/**
-	 * 
+	 * Internal user attribute list.
 	 */
 	protected AttributeList userAttributes = null;
 	
 	
 	/**
-	 * 
+	 * Internal item attribute list.
 	 */
 	protected AttributeList itemAttributes = null;;
 	
 	
 	/**
-	 * 
-	 * @param config
+	 * Constructor with specified configuration.
+	 * @param config specified configuration.
 	 */
 	public ScannerImpl(DataConfig config) {
 		this (new ProviderImpl(config));
@@ -71,8 +72,8 @@ public class ScannerImpl extends Scanner {
 	
 	
 	/**
-	 * 
-	 * @param provider
+	 * Constructor with specified provider.
+	 * @param provider specified provider.
 	 */
 	protected ScannerImpl(Provider provider) {
 		this.provider = provider;

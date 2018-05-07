@@ -158,9 +158,9 @@ public class ProviderImpl implements Provider {
 
 
 	/**
-	 * 
-	 * @param cfgAttribute
-	 * @return whether contains configuration attribute 
+	 * Testing whether dataset contains specified configuration attribute.
+	 * @param cfgAttribute specified configuration attribute.
+	 * @return whether contains configuration attribute.
 	 */
 	protected boolean containsConfigProfile(String cfgAttribute) {
 		Profile profile = new Profile(assoc.getAttributes(getConfig().getConfigUnit()));
@@ -171,9 +171,9 @@ public class ProviderImpl implements Provider {
 	
 	
 	/**
-	 * 
-	 * @param userId
-	 * @return whether contains user id
+	 * Testing whether dataset contains specified user id.
+	 * @param userId specified user id.
+	 * @return whether contains user id.
 	 */
 	protected boolean containsUserProfile(int userId) {
 		Profile profile = new Profile(assoc.getAttributes(getConfig().getUserUnit()));
@@ -184,9 +184,9 @@ public class ProviderImpl implements Provider {
 	
 
 	/**
-	 * 
-	 * @param itemId
-	 * @return whether contains item id
+	 * Testing whether dataset contains specified item id.
+	 * @param itemId specified item id.
+	 * @return whether contains item id.
 	 */
 	protected boolean containsItemProfile(int itemId) {
 		Profile profile = new Profile(assoc.getAttributes(getConfig().getItemUnit()));
@@ -197,9 +197,9 @@ public class ProviderImpl implements Provider {
 
 	
 	/** 
-	 * 
-	 * @param userId
-	 * @param itemId
+	 * Testing whether dataset contains rating at specified user id and item id.
+	 * @param userId specified user id.
+	 * @param itemId specified item id.
 	 * @return whether contains rating of user id and item id
 	 */
 	protected boolean containsRating(int userId, int itemId) {
@@ -214,11 +214,11 @@ public class ProviderImpl implements Provider {
 	
 	
 	/**
-	 * 
-	 * @param unitName
-	 * @param attName
-	 * @param nominalIdx
-	 * @return whether contains nominal
+	 * Testing whether dataset contains nominal at specified unit, attribute name, and nominal index.
+	 * @param unitName specified unit.
+	 * @param attName specified attribute name.
+	 * @param nominalIdx specified nominal index.
+	 * @return whether contains nominal at specified unit, attribute name, and nominal index.
 	 */
 	protected boolean containsNominal(String unitName, String attName, int nominalIdx) {
 		Profile profile = new Profile(assoc.getAttributes(getConfig().getNominalUnit()));
@@ -232,9 +232,9 @@ public class ProviderImpl implements Provider {
 	
 	
 	/**
-	 * 
-	 * @param internalRecord
-	 * @return whether contains attribute map
+	 * Testing whether dataset contains specified internal record.
+	 * @param internalRecord specified internal record.
+	 * @return whether contains specified internal record.
 	 */
 	protected boolean containsAttributeMap(InternalRecord internalRecord) {
 		if (!internalRecord.isValid())
@@ -251,9 +251,9 @@ public class ProviderImpl implements Provider {
 	
 	
 	/**
-	 * 
-	 * @param accName
-	 * @return whether contains account
+	 * Testing whether dataset contains specified account.
+	 * @param accName specified account name.
+	 * @return whether contains specified account.
 	 */
 	protected boolean containsAccount(String accName) {
 		Profile profile = new Profile(assoc.getAttributes(getConfig().getAccountUnit()));
@@ -264,9 +264,9 @@ public class ProviderImpl implements Provider {
 
 	
 	/**
-	 * 
-	 * @param ctxTemplateId
-	 * @return whether contains context template
+	 * Testing whether dataset contains specified context template.
+	 * @param ctxTemplateId specified context template id.
+	 * @return whether contains specified context template.
 	 */
 	protected boolean containsContextTemplate(int ctxTemplateId) {
 		Profile profile = new Profile(assoc.getAttributes(getConfig().getContextTemplateUnit()));
@@ -277,11 +277,11 @@ public class ProviderImpl implements Provider {
 
 	
 	/**
-	 * 
-	 * @param userId
-	 * @param itemId
-	 * @param ctxTemplateId
-	 * @return whether contains context
+	 * Testing whether dataset contains specified context template along with specified user id and item id.
+	 * @param userId specified user id.
+	 * @param itemId specified item id
+	 * @param ctxTemplateId specified context template id.
+	 * @return whether contains specified context template along with specified user id and item id.
 	 */
 	protected boolean containsContext(int userId, int itemId, int ctxTemplateId) {
 		Profile profile = new Profile(assoc.getAttributes(getConfig().getContextUnit()));
@@ -370,11 +370,12 @@ public class ProviderImpl implements Provider {
 	
 	
 	/**
-	 * 
-	 * @param userId
-	 * @param itemId
-	 * @param ratingValue
-	 * @return whether insert successfully
+	 * Inserting rating value with user identifier, item identifier, and rating date.
+	 * @param userId user identifier.
+	 * @param itemId item identifier.
+	 * @param ratingValue rating value.
+	 * @param ratedDate rating date.
+	 * @return whether insert successfully.
 	 */
 	private boolean insertRatingValue(int userId, int itemId, double ratingValue, Date ratedDate) {
 		if (!containsUserProfile(userId)) {
@@ -400,11 +401,11 @@ public class ProviderImpl implements Provider {
 
 	
 	/**
-	 * 
-	 * @param userId
-	 * @param itemId
-	 * @param ratingValue
-	 * @param ratedDate
+	 * Updating rating value with user identifier, item identifier, and rating date.
+	 * @param userId user identifier.
+	 * @param itemId item identifier.
+	 * @param ratingValue rating value.
+	 * @param ratedDate rating date.
 	 * @return whether update successfully 
 	 */
 	private boolean updateRatingValue(int userId, int itemId, double ratingValue, Date ratedDate) {
@@ -419,11 +420,11 @@ public class ProviderImpl implements Provider {
 	
 	
 	/**
-	 * 
-	 * @param userId
-	 * @param itemId
-	 * @param context
-	 * @return whether update successfully
+	 * Inserting context with user identifier and item identifier.
+	 * @param userId user identifier.
+	 * @param itemId item identifier.
+	 * @param context specified context.
+	 * @return whether update successfully.
 	 */
 	private boolean insertContext(int userId, int itemId, Context context) {
 		Profile profile = new Profile(assoc.getAttributes(getConfig().getContextUnit()));
@@ -437,10 +438,10 @@ public class ProviderImpl implements Provider {
 	
 	
 	/**
-	 * 
-	 * @param userId
-	 * @param itemId
-	 * @param context
+	 * Updating context with user identifier and item identifier.
+	 * @param userId user identifier.
+	 * @param itemId item identifier.
+	 * @param context specified context.
 	 * @return update SQL
 	 */
 	@SuppressWarnings("unused")
@@ -553,10 +554,10 @@ public class ProviderImpl implements Provider {
 
 	
 	/**
-	 * 
-	 * @param userId
-	 * @param itemId
-	 * @return whether delete rating successfully 
+	 * Deleting ratings of specified user identifier and item identifier.
+	 * @param userId user identifier.
+	 * @param itemId item identifier.
+	 * @return whether delete rating successfully.
 	 */
 	private boolean deleteRating(int userId, int itemId) {
 		Profile profile = new Profile(assoc.getAttributes(getConfig().getContextUnit()));
@@ -2117,6 +2118,5 @@ public class ProviderImpl implements Provider {
 		}
 	}
 
-	
 	
 }

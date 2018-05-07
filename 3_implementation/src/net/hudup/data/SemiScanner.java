@@ -13,7 +13,7 @@ import net.hudup.core.data.Rating;
 import net.hudup.core.data.RatingVector;
 
 /**
- * 
+ * This class represents a semi-scanner which is a scanner but store frequent-access rating matrix in memory.
  * @author Loc Nguyen
  * @version 10.0
  *
@@ -28,26 +28,26 @@ public class SemiScanner extends ScannerImpl {
 
 
 	/**
-	 * 
+	 * In-memory user rating matrix.
 	 */
 	protected Map<Integer, RatingVector> userRatingMap = null;
 
 	
 	/**
-	 * 
+	 * In-memory item rating matrix.
 	 */
 	protected Map<Integer, RatingVector> itemRatingMap = null;
 
 	
 	/**
-	 * 
+	 * Indicating whether or not rating matrix is loaded.
 	 */
 	protected boolean loaded = false;
 
 	
 	/**
-	 * 
-	 * @param config
+	 * Constructor with specified configuration.
+	 * @param config specified configuration.
 	 */
 	public SemiScanner(DataConfig config) {
 		super(config);
@@ -58,7 +58,7 @@ public class SemiScanner extends ScannerImpl {
 
 
 	/**
-	 * 
+	 * Loading rating matrix.
 	 */
 	protected void loadRatingData() {
 		
@@ -172,7 +172,7 @@ public class SemiScanner extends ScannerImpl {
 
 	
 	/**
-	 * 
+	 * Enhancing internal data structures.
 	 */
 	public void enhance() {
 		userRatingMap.keySet();
@@ -203,6 +203,5 @@ public class SemiScanner extends ScannerImpl {
 		userRatingMap.clear();
 	}
 
-	
 	
 }

@@ -2,7 +2,6 @@ package net.hudup.core;
 
 import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.AlgList;
-import net.hudup.core.alg.Recommender;
 import net.hudup.core.data.ExternalQuery;
 import net.hudup.core.data.ctx.CTSManager;
 import net.hudup.core.evaluate.Metric;
@@ -29,8 +28,8 @@ import net.hudup.core.parser.DatasetParser;
  * <li>Metric {@code Metric}.</li>
  * </ul>
  * In general, this {@link PluginStorage} manages many {@link RegisterTable} (s) and each {@link RegisterTable} stores algorithms having the same type.
- * For examples, the internal variable {@link #recommenderReg} which is a register table manages recommendation algorithms (recommenders).
- * The internal variable {@link #metricReg} which is a register table manages metrics for evaluating recommenders.
+ * For examples, the internal variable {@link #normalAlgReg} which is a register table manages normal algorithms.
+ * The internal variable {@link #metricReg} which is a register table manages metrics for evaluating algorithms.
  * {@link PluginStorage} also manages a list of next-update algorithms. Next-update algorithm is the one which needs to be updated in next version of Hudup framework because it is not perfect, for example.
  * Currently, next-update algorithms are not used.
  * 
@@ -215,7 +214,7 @@ public final class PluginStorage {
 	 * Looking up the register table whose name is equal to specified name
 	 * @param algTypeName specified name. This is the name implying the type of algorithm.
 	 * <ul>
-	 * <li>Register table of {@link Recommender} (s) has name specified by the constant {@link #RECOMMENDER}.</li>
+	 * <li>Register table of {@link Alg} (s) has name specified by the constant {@link #NORMAL_ALG}.</li>
 	 * <li>Register table of {@link DatasetParser} (s) has name specified by the constant {@link #PARSER}.</li>
 	 * <li>Register table of {@link Metric} (s) has name specified by the constant {@link #METRIC}.</li>
 	 * <li>Register table of {@link ExternalQuery} (s) has name specified by the constant {@link #EXTERNAL_QUERY}.</li>
@@ -244,7 +243,7 @@ public final class PluginStorage {
 	 * @param algClass specified class of algorithm.
 	 * @return type name of specified class of algorithm.
 	 * <ul>
-	 * <li>Class of {@link Recommender} (s) has type name specified by the constant {@link #RECOMMENDER}.</li>
+	 * <li>Class of {@link Alg} (s) has type name specified by the constant {@link #NORMAL_ALG}.</li>
 	 * <li>Class of {@link DatasetParser} (s) has type name specified by the constant {@link #PARSER}.</li>
 	 * <li>Class of {@link Metric} (s) has type name specified by the constant {@link #METRIC}.</li>
 	 * <li>Class of {@link ExternalQuery} (s) has type name specified by the constant {@link #EXTERNAL_QUERY}.</li>

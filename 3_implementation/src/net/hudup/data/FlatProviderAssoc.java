@@ -893,13 +893,15 @@ public class FlatProviderAssoc extends ProviderAssocAbstract {
 		
 		/**
 		 * Writing the specified column to current record.
-		 * @return whether writing successfully.
+		 * @param column column (field) to be written.
+		 * @throws IOException if any error raises.
 		 */
 		void write(String column) throws IOException;
 		
 		/**
 		 * Writing the specified record into CSV file.
-		 * @return whether writing successfully.
+		 * @param record record (row) to be written. 
+		 * @throws IOException if any error raises.
 		 */
 		void writeRecord(String[] record) throws IOException;
 		

@@ -10,7 +10,7 @@ import net.hudup.core.logistic.MathUtil;
 
 
 /**
- * The first row is list of item id (s). The first column is list of user id (s)
+ * This class represents a matrix where the first row is list of item id (s). The first column is list of user id (s)
  * @author Loc Nguyen
  * @version 10.0
  */
@@ -18,9 +18,9 @@ public class UserPaddingMatrix extends PaddingMatrix {
 
 	
 	/**
-	 * 
-	 * @param dataset
-	 * @param vRating
+	 * Constructor with specified dataset and rating vector.
+	 * @param dataset specified dataset.
+	 * @param vRating specified rating vector.
 	 */
 	public UserPaddingMatrix(Dataset dataset, RatingVector vRating) {
 		super(dataset, vRating);
@@ -182,8 +182,6 @@ public class UserPaddingMatrix extends PaddingMatrix {
 		
 		return new Point(col, row);
 	}
-	
-	
 	
 	
 }

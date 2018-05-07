@@ -52,6 +52,7 @@ import net.hudup.parser.SnapshotParserImpl;
 
 
 /**
+ * This is the second utility class for processing dataset.
  * 
  * @author Loc Nguyen
  * @version 10.0
@@ -60,9 +61,9 @@ public final class DatasetUtil2 {
 	
 	
 	/**
-	 * 
-	 * @param defaultAlg
-	 * @return {@link DataConfig}
+	 * Creating default data configuration from specified algorithm.
+	 * @param defaultAlg specified algorithm.
+	 * @return {@link DataConfig} from specified algorithm.
 	 */
 	public static DataConfig createDefaultConfig(Alg defaultAlg) {
 		if (defaultAlg == null)
@@ -99,12 +100,12 @@ public final class DatasetUtil2 {
 
 	
 	/**
-	 * 
-	 * @param comp
-	 * @param parserList
-	 * @param dataDriverList
-	 * @param defaultConfig
-	 * @return {@link DataConfig}
+	 * Opening choosing dialog for constructing a data configuration from specified list of algorithms and data driver list.
+	 * @param comp parent component.
+	 * @param parserList specified list of algorithms.
+	 * @param dataDriverList specified data driver list.
+	 * @param defaultConfig default configuration.
+	 * @return {@link DataConfig}.
 	 */
 	public static DataConfig chooseConfig(
 			Component comp, 
@@ -123,10 +124,10 @@ public final class DatasetUtil2 {
 
 	
 	/**
-	 * 
-	 * @param comp
-	 * @param initConfig
-	 * @return toolkit {@link DataConfig}
+	 * Opening choosing dialog for constructing a data configuration from initial configuration.
+	 * @param comp parent component.
+	 * @param initConfig initial configuration.
+	 * @return {@link DataConfig} from initial configuration.
 	 */
 	public static DataConfig chooseConfig(Component comp, DataConfig initConfig) {
 		DataConfig defaultConfig = initConfig == null ? new DataConfig() : (DataConfig) initConfig.clone();
@@ -171,11 +172,11 @@ public final class DatasetUtil2 {
 
 	
 	/**
-	 * 
-	 * @param comp
-	 * @param defaultConfig
-	 * @param alg
-	 * @return training {@link DataConfig}
+	 * Opening choosing dialog for constructing a data configuration of training dataset from default configuration and algorithm.
+	 * @param comp parent component.
+	 * @param defaultConfig default configuration.
+	 * @param alg specified algorithm.
+	 * @return {@link DataConfig} of training dataset from default configuration and algorithm.
 	 */
 	public static DataConfig chooseTrainingConfig(Component comp, DataConfig defaultConfig, Alg alg) {
 		if (alg == null)
@@ -206,9 +207,10 @@ public final class DatasetUtil2 {
 
 	
 	/**
-	 * 
-	 * @param defaultConfig
-	 * @return testing {@link DataConfig}
+	 * Opening choosing dialog for constructing a data configuration of testing dataset from default configuration.
+	 * @param comp parent component.
+	 * @param defaultConfig default configuration.
+	 * @return {@link DataConfig} of testing dataset from default configuration.
 	 */
 	public static DataConfig chooseTestingConfig(Component comp, DataConfig defaultConfig) {
 		
@@ -224,10 +226,10 @@ public final class DatasetUtil2 {
 
 	
 	/**
-	 * 
-	 * @param comp
-	 * @param initConfig
-	 * @return server {@link DataConfig}
+	 * Opening choosing dialog for constructing a data configuration of server from initial configuration.
+	 * @param comp parent component.
+	 * @param initConfig initial configuration.
+	 * @return {@link DataConfig} of server from initial configuration.
 	 */
 	public static DataConfig chooseServerConfig(Component comp, DataConfig initConfig) {
 		DataConfig defaultConfig = initConfig == null ? new DataConfig() : (DataConfig) initConfig.clone();
@@ -272,9 +274,9 @@ public final class DatasetUtil2 {
 
 	
 	/**
-	 * 
-	 * @param config
-	 * @return {@link Properties}
+	 * Loading properties of configuration of file system (flat system).
+	 * @param config configuration of file system (flat system).
+	 * @return {@link Properties}.
 	 */
 	public static Properties loadFlatConfig(DataConfig config) {
 		Properties props = new Properties();
@@ -298,11 +300,11 @@ public final class DatasetUtil2 {
 	
 	
 	/**
-	 * 
-	 * @param comp
-	 * @param training
-	 * @param algList
-	 * @return whether dataset conform with algorithms
+	 * Validating the specified training dataset conforms with list of algorithms.
+	 * @param comp parent component.
+	 * @param training training dataset.
+	 * @param algList specified list of algorithms.
+	 * @return whether training dataset conforms with algorithms.
 	 */
 	public static boolean validateTrainingset(Component comp, Dataset training, Alg[] algList) {
 		if (training == null)
@@ -390,9 +392,10 @@ public final class DatasetUtil2 {
 
 	
 	/**
-	 * 
-	 * @param reader
-	 * @return map of {@link Attribute}
+	 * Loading nominal attributes from reader.
+	 * @param reader specified reader.
+	 * @param filterUnit filtered unit which is unit to be read.
+	 * @return map of nominal {@link Attribute}.
 	 */
 	public static Map<String, Attribute> loadNominalAttributes(Reader reader, String filterUnit) {
 		Map<String, List<ObjectPair<Nominal>>> map = Util.newMap();
@@ -453,10 +456,11 @@ public final class DatasetUtil2 {
 	
 	
 	/**
-	 * 
-	 * @param adapter
-	 * @param uri
-	 * @return map of {@link Attribute}
+	 * Loading nominal attributes from specified URI.
+	 * @param adapter specified URI.
+	 * @param uri URI adapter.
+	 * @param filterUnit filtered unit which is unit to be read.
+	 * @return map of {@link Attribute} from specified URI.
 	 */
 	public static Map<String, Attribute> loadNominalAttributes(UriAdapter adapter, xURI uri, String filterUnit) {
 		Reader reader = adapter.getReader(uri);
@@ -478,9 +482,10 @@ public final class DatasetUtil2 {
 	
 	
 	/**
-	 * 
-	 * @param nominalAttributes
-	 * @param writer
+	 * Saving nominal attributes by writer
+	 * @param nominalAttributes collection of nominal attributes.
+	 * @param writer specified writer.
+	 * @param filterUnit filtered unit.
 	 */
 	public static void saveNominalAttributes(
 			Collection<Attribute> nominalAttributes, 
@@ -523,10 +528,11 @@ public final class DatasetUtil2 {
 
 	
 	/**
-	 * 
-	 * @param nominalAttributes
-	 * @param adapter
-	 * @param uri
+	 * Saving nominal attributes to resource specified by URI.
+	 * @param nominalAttributes collection of nominal attributes.
+	 * @param adapter URI adapter.
+	 * @param uri URI pointing to resource.
+	 * @param filterUnit filtered unit.
 	 */
 	public static void saveNominalAttributes(
 			Collection<Attribute> nominalAttributes,
@@ -550,9 +556,10 @@ public final class DatasetUtil2 {
 	
 	
 	/**
-	 * 
-	 * @param realValues
-	 * @return zero-based integer array
+	 * Converting real rating values to integer rating values based on zero.
+	 * @param realValues real rating values.
+	 * @param minRating minimum rating value.
+	 * @return zero-based integer array.
 	 */
 	public static int[] zeroBasedRatingValueOf(double[] realValues, double minRating) {
 		int[] inner = new int[realValues.length];
@@ -566,8 +573,9 @@ public final class DatasetUtil2 {
 
 	
 	/**
-	 * 
-	 * @param realValue
+	 * Converting real rating value to integer rating value based on zero.
+	 * @param realValue real rating value.s
+	 * @param minRating minimum rating value.
 	 * @return zero-based value
 	 */
 	public static int zeroBasedRatingValueOf(double realValue, double minRating) {
@@ -576,9 +584,10 @@ public final class DatasetUtil2 {
 
 	
 	/**
-	 * 
-	 * @param zeroBasedValue
-	 * @return real rating value
+	 * Converting zero-based value to real value with minimum rating value.
+	 * @param zeroBasedValue zero-based value.
+	 * @param minRating minimum rating value.
+	 * @return real rating value.
 	 */
 	public static double realRatingValueOf(int zeroBasedValue, double minRating) {
 		return zeroBasedValue + minRating;

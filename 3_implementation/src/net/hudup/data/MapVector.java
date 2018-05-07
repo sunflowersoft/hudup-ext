@@ -10,36 +10,36 @@ import net.hudup.core.Util;
 
 
 /**
- * 
+ * This class is a map of general-type elements but it represents a (rating) vector having identifier.
  * @author Loc Nguyen
  * @version 10.0
- * @param <T>
+ * @param <T> general type.
  */
 public class MapVector<T> {
 
 
 	/**
-	 * 
+	 * Identifier of this vector.
 	 */
 	protected int id = -1;
 	
 	
 	/**
-	 * 
+	 * Internal map.
 	 */
 	protected Map<Integer, T> map = Util.newMap();
 	
 
 	/**
-	 * 
+	 * Default constructor.
 	 */
 	public MapVector() {
 	}
 	
 	
 	/**
-	 * 
-	 * @param id
+	 * Constructor with identifier.
+	 * @param id specified idenifier.
 	 */
 	public MapVector(int id) {
 		this.id = id;
@@ -47,8 +47,8 @@ public class MapVector<T> {
 	
 	
 	/**
-	 * 
-	 * @return id
+	 * Getting identifier.
+	 * @return identifier of this vector.
 	 */
 	public int id() {
 		return id;
@@ -56,16 +56,16 @@ public class MapVector<T> {
 	
 	
 	/**
-	 * 
-	 * @param id
+	 * Setting identifier.
+	 * @param id identifier of this vector.
 	 */
 	public void setId(int id) {
 		this.id = id;
 	}
 	
 	/**
-	 * 
-	 * @return size of vector
+	 * Getting size of vector.
+	 * @return size of vector.
 	 */
 	public int size() {
 		return map.size();
@@ -83,7 +83,7 @@ public class MapVector<T> {
 	
 	
 	/**
-	 * 
+	 * Getting collection of values.
 	 * @return collection of values
 	 */
 	public Collection<T> gets() {
@@ -92,9 +92,9 @@ public class MapVector<T> {
 	
 	
 	/**
-	 * Method is used to put rating at fieldId
-	 * @param fieldId
-	 * @param value
+	 * Method is used to put a (rating) value at field identifier.
+	 * @param fieldId specified field identifier.
+	 * @param value specified (rating) value.
 	 */
 	public void put(int fieldId, T value) {
 		map.put(fieldId, value);
@@ -102,8 +102,8 @@ public class MapVector<T> {
 	
 	
 	/**
-	 * To remove rating at fieldId
-	 * @param fieldId
+	 * To remove rating at specified field identifier.
+	 * @param fieldId specified field identifier.
 	 */
 	public void remove(int fieldId) {
 		map.remove(fieldId);
@@ -111,8 +111,8 @@ public class MapVector<T> {
 
 	
 	/**
-	 * 
-	 * @param fieldIds
+	 * To remove (rating) values at specified field identifiers.
+	 * @param fieldIds collection of specified field identifiers.
 	 */
 	public void remove(Collection<Integer> fieldIds) {
 		 for (Integer fieldId : fieldIds) {
@@ -122,7 +122,7 @@ public class MapVector<T> {
 	
 	
 	/**
-	 * 
+	 * Clearing this vector.
 	 */
 	public void clear() {
 		map.clear();
@@ -130,8 +130,8 @@ public class MapVector<T> {
 	
 	
 	/**
-	 * 
-	 * @param map
+	 * Setting up this vector by a specified map of values.
+	 * @param map specified map.
 	 */
 	protected void setup(Map<Integer, T> map) {
 		clear();
@@ -140,8 +140,8 @@ public class MapVector<T> {
 	
 	
 	/**
-	 * This method is used to set key
-	 * @return key contained in the map
+	 * This method is used to retrieve keys (fields).
+	 * @return key contained in the map.
 	 */
 	public Set<Integer> fieldIds() {
 		return map.keySet();
@@ -149,8 +149,8 @@ public class MapVector<T> {
 
 
 	/**
-	 * 
-	 * @param fieldPattern
+	 * Getting list of value according to specified pattern.
+	 * @param fieldPattern specified pattern.
 	 * @return list of value according to pattern
 	 */
 	public List<T> toList(List<Integer> fieldPattern) {
@@ -163,8 +163,8 @@ public class MapVector<T> {
 
 	
 	/**
-	 * 
-	 * @param fieldId
+	 * Testing whether this vector contains specified field id.
+	 * @param fieldId specified field id.
 	 * @return whether contains field id
 	 */
 	public boolean contains(int fieldId) {
@@ -173,10 +173,10 @@ public class MapVector<T> {
 
 	
 	/**
-	 * 
-	 * @param rowName
-	 * @param columnName
-	 * @return text presentation
+	 * Converting this vector into text by specified row and column.
+	 * @param rowName specified row.
+	 * @param columnName specified column.
+	 * @return text presentation of this vector.
 	 */
 	public String toString(String rowName, String columnName) {
 		StringBuffer buffer = new StringBuffer();
@@ -206,7 +206,6 @@ public class MapVector<T> {
 		return buffer.toString();
 		
 	}
-	
 	
 	
 }

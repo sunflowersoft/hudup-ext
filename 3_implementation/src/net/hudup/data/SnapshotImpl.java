@@ -66,13 +66,13 @@ public class SnapshotImpl extends Snapshot {
 
 
 	/**
-	 * 
+	 * This variable store user external records.
 	 */
 	protected Map<Integer, ExternalRecord> externalUserRecordMap = Util.newMap();
 	
 	
 	/**
-	 * 
+	 * User rating matrix.
 	 */
 	protected Map<Integer, RatingVector> userRatingMap = Util.newMap();
 	
@@ -84,37 +84,37 @@ public class SnapshotImpl extends Snapshot {
 	
 	
 	/**
-	 * 
+	 * This variable store item external records.
 	 */
 	protected Map<Integer, ExternalRecord> externalItemRecordMap = Util.newMap();
 
 	
 	/**
-	 * 
+	 * Item rating matrix.
 	 */
 	protected Map<Integer, RatingVector> itemRatingMap = Util.newMap();
 	
 	
 	/**
-	 * 
+	 * Item profiles
 	 */
 	protected MemProfiles itemProfiles = MemProfiles.createEmpty();
 	
 	
 	/**
-	 * 
+	 * Context template schema.
 	 */
 	protected ContextTemplateSchema ctSchema = ContextTemplateSchemaImpl.create();
 
 	
 	/**
-	 * 
+	 * Profiles of context template schema.
 	 */
 	protected CTSMultiProfiles ctsProfiles = CTSMemMultiProfiles.create();
 	
 	
 	/**
-	 * 
+	 * Other sample.
 	 */
 	protected List<Profile> sampleProfiles = Util.newList();
 	
@@ -355,16 +355,16 @@ public class SnapshotImpl extends Snapshot {
 	
 	/**
 	 * Assigning all internal variables of this snapshot by respective specified parameters.
-	 * @param config
-	 * @param externalUserRecordMap
-	 * @param userRatingMap
-	 * @param userProfiles
-	 * @param externalItemRecordMap
-	 * @param itemRatingMap
-	 * @param itemProfiles
-	 * @param ctxTemplateSchema
-	 * @param ctsProfiles
-	 * @param sampleProfiles
+	 * @param config specified configuration.
+	 * @param externalUserRecordMap specified external user records.
+	 * @param userRatingMap specified user rating matrix.
+	 * @param userProfiles specified user profiles
+	 * @param externalItemRecordMap specified external item records.
+	 * @param itemRatingMap specified item rating matrix.
+	 * @param itemProfiles specified item profiles.
+	 * @param ctxTemplateSchema specified context template schema.
+	 * @param ctsProfiles specified profiles of context template schema.
+	 * @param sampleProfiles specified other sample.
 	 */
 	public void assign(
 			DataConfig config,
@@ -415,7 +415,7 @@ public class SnapshotImpl extends Snapshot {
 	
 	
 	/**
-	 * 
+	 * Enhancing internal structures.
 	 */
 	public void enhance() {
 		userRatingMap.keySet();
@@ -511,9 +511,10 @@ public class SnapshotImpl extends Snapshot {
 
 
 	/**
-	 * 
-	 * @param tripleList
-	 * @return {@link SnapshotImpl}
+	 * Creating snapshot by triples of ratings.
+	 * @param tripleList specified triples of ratings.
+	 * @param datasetMetadata dataset meta-data.
+	 * @return {@link SnapshotImpl} created from triples of ratings.
 	 */
 	public static SnapshotImpl create(Collection<RatingTriple> tripleList, DatasetMetadata datasetMetadata) {
 		
@@ -557,10 +558,10 @@ public class SnapshotImpl extends Snapshot {
 	
 	
 	/**
-	 * 
-	 * @param matrix
-	 * @param userMatrix
-	 * @return {@link SnapshotImpl}
+	 * Creating snapshot by specified rating matrix.
+	 * @param matrix specified rating matrix.
+	 * @param userMatrix if true the, the specified rating matrix is user rating matrix.
+	 * @return {@link SnapshotImpl} created from rating matrix.
 	 */
 	public static SnapshotImpl create(RatingMatrix matrix, boolean userMatrix) {
 		SnapshotImpl snapshot = new SnapshotImpl();
@@ -618,9 +619,9 @@ public class SnapshotImpl extends Snapshot {
 	
 	
 	/**
-	 * 
-	 * @param config
-	 * @return {@link SnapshotImpl}
+	 * Create snapshot from resource specified by data configuration.
+	 * @param config data configuration referring to specified resource (database, file directory, etc.).
+	 * @return {@link SnapshotImpl} created from resource specified by data configuration.
 	 */
 	public static SnapshotImpl create(DataConfig config) {
 		

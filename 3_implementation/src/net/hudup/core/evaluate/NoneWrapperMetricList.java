@@ -12,6 +12,8 @@ import net.hudup.core.alg.Alg;
 
 
 /**
+ * This class represents a list of metrics with note that these metrics are not wrappers.
+ * Such metrics are called non-wrapper metrics.
  * 
  * @author Loc Nguyen
  * @version 10.0
@@ -21,13 +23,13 @@ public class NoneWrapperMetricList implements Cloneable {
 
 	
 	/**
-	 * 
+	 * List of non-wrapper metrics.s
 	 */
 	protected List<Metric> mlist = Util.newList();
 	
 	
 	/**
-	 * 
+	 * Deault constructor
 	 */
 	public NoneWrapperMetricList() {
 		
@@ -35,8 +37,8 @@ public class NoneWrapperMetricList implements Cloneable {
 	
 	
 	/**
-	 * 
-	 * @return size of metric list
+	 * Getting size of this metric list.
+	 * @return size of metric list.
 	 */
 	public int size() {
 		return mlist.size();
@@ -44,9 +46,9 @@ public class NoneWrapperMetricList implements Cloneable {
 	
 	
 	/**
-	 * 
-	 * @param index
-	 * @return {@link Metric} at specified index
+	 * Getting the metric at specified index.
+	 * @param index specified index.
+	 * @return {@link Metric} at specified index.
 	 */
 	public Metric get(int index) {
 		return mlist.get(index);
@@ -54,8 +56,8 @@ public class NoneWrapperMetricList implements Cloneable {
 	
 	
 	/**
-	 * 
-	 * @return list of metric
+	 * Getting the internal list of metrics.
+	 * @return internal list of metric.
 	 */
 	public List<Metric> list() {
 		return mlist;
@@ -63,8 +65,8 @@ public class NoneWrapperMetricList implements Cloneable {
 	
 	
 	/**
-	 * 
-	 * @param metric
+	 * Adding a specified metric.
+	 * @param metric specified metric.
 	 * @return whether adding successfully
 	 */
 	public boolean add(Metric metric) {
@@ -75,8 +77,8 @@ public class NoneWrapperMetricList implements Cloneable {
 	
 	
 	/**
-	 * 
-	 * @param metrics
+	 * Adding the specified collection of metrics.
+	 * @param metrics specified collection of metrics.
 	 */
 	public void addAll(Collection<Metric> metrics) {
 		for (Metric metric : metrics)
@@ -85,9 +87,9 @@ public class NoneWrapperMetricList implements Cloneable {
 	
 	
 	/**
-	 * 
-	 * @param index
-	 * @return removed {@link MetaMetric}
+	 * Remove the metric at specified index.
+	 * @param index specified index.
+	 * @return removed {@link MetaMetric}.
 	 */
 	public Metric remove(int index) {
 		return mlist.remove(index);
@@ -95,8 +97,8 @@ public class NoneWrapperMetricList implements Cloneable {
 	
 	
 	/**
-	 * 
-	 * @param metric
+	 * Removing the specified metric from this list.
+	 * @param metric specified metric.
 	 * @return whether removal is successfully
 	 */
 	public boolean remove(Metric metric) {
@@ -105,7 +107,7 @@ public class NoneWrapperMetricList implements Cloneable {
 	
 	
 	/**
-	 * 
+	 * Clearing this metric list.
 	 */
 	public void clear() {
 		mlist.clear();
@@ -113,7 +115,8 @@ public class NoneWrapperMetricList implements Cloneable {
 	
 	
 	/**
-	 * 
+	 * Sorting this metric list.
+	 * @return sorted this metric list.
 	 */
 	public NoneWrapperMetricList sort() {
 		Collections.sort(mlist, new Comparator<Metric>() {
@@ -172,9 +175,9 @@ public class NoneWrapperMetricList implements Cloneable {
 	
 	
 	/**
-	 * 
-	 * @param rTable
-	 * @return {@link NoneWrapperMetricList} extracted from {@link RegisterTable}
+	 * Extracting {@link NoneWrapperMetricList} from a specified register table.
+	 * @param rTable specified register table.
+	 * @return {@link NoneWrapperMetricList} extracted from {@link RegisterTable}.
 	 */
 	public static NoneWrapperMetricList extract(RegisterTable rTable) {
 		List<Alg> algList = rTable.getAlgList();

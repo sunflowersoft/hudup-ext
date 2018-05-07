@@ -319,7 +319,7 @@
 	Archive: newtech-research/prog-language/java/persistence/jdbc/mysql
 	Status: using
 	-->
-	<property name="mysql-connector-java.jar" value="${lib.home}/mysql-connector-java-5.1.20-bin.jar"/>
+	<property name="mysql-connector-java.jar" value="${lib.home}/mysql-connector-java-5.1.46-bin.jar"/>
 
 
 	<!--

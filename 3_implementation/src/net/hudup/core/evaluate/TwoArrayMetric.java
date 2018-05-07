@@ -65,7 +65,7 @@ public abstract class TwoArrayMetric extends DefaultMetric {
 	
 	/**
 	 * Parsing the list of parameter into two metric values as elements of internal arrays.
-	 * @param object specified list of parameter.
+	 * @param params specified list of parameter.
 	 * @return two metric values parsed from specified list of parameter. 
 	 */
 	protected abstract MetricValue[] parseParams(Object... params);

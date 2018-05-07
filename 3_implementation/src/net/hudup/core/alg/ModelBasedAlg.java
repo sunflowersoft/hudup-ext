@@ -20,7 +20,7 @@ public interface ModelBasedAlg extends Alg {
 	
 	/**
 	 * Creating a new knowledge base represented by {@link KBase} interface.
-	 * Normally, {@code KBase} is created from dataset. Note, any recommender has a reference to dataset returned from the method {@link #getDataset()}.
+	 * Normally, {@code KBase} is created from dataset.
 	 * For example, if model-based recommender uses frequent purchase pattern to make recommendation, the new {@code KBase} contains such pattern.
 	 * @return knowledge base {@link KBase}
 	 */

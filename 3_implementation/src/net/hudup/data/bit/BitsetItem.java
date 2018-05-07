@@ -14,12 +14,15 @@ import net.hudup.core.data.RatingVector;
 import net.hudup.core.logistic.DSUtil;
 
 /**
+ * This atomic class represents an item rating vector as a bit set.
+ * 
  * @author Loc Nguyen
  * @version 10.0
  *
  */
 public class BitsetItem implements Cloneable {
 
+	
 	/**
 	 * Bit item id of this {@link BitsetItem}
 	 */
@@ -196,7 +199,6 @@ public class BitsetItem implements Cloneable {
 		else
 			return new BitsetItem(bitItemId, bs, (double)count / (double)list.size());
 	}
-	
 	
 	
 }
