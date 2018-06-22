@@ -12,16 +12,16 @@ import javax.swing.JScrollPane;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import net.hudup.core.Util;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Provider;
 import net.hudup.core.data.Unit;
 import net.hudup.core.data.ui.DataConfigTextField;
+import net.hudup.core.data.ui.UnitTable;
 import net.hudup.core.logistic.ui.UIUtil;
 import net.hudup.data.DatasetUtil2;
 import net.hudup.data.ProviderImpl;
 import net.hudup.data.ui.UnitListBoxExt;
-import net.hudup.data.ui.UnitTable;
-import net.hudup.data.ui.UnitTableFactory;
 
 
 /**
@@ -52,7 +52,7 @@ public class DatasetInput extends JPanel implements Dispose {
 	
 	
 	/**
-	 * 
+	 * Default constructor.
 	 */
 	public DatasetInput() {
 		setLayout(new BorderLayout());
@@ -105,7 +105,7 @@ public class DatasetInput extends JPanel implements Dispose {
 		JPanel body = new JPanel(new BorderLayout());
 		add(body, BorderLayout.CENTER);
 		
-		unitTable = UnitTableFactory.create();
+		unitTable = Util.getFactory().createUnitTable();
 		body.add(unitTable.getComponent(), BorderLayout.CENTER);
 
 		unitList = new UnitListBoxExt() {
@@ -163,7 +163,7 @@ public class DatasetInput extends JPanel implements Dispose {
 				}
 				
 				
-				unitTable.update(provider, unit.getName());
+				unitTable.update(provider.getAssoc(), unit.getName());
 			}
 		});
 		if (txtConfig.getConfig() != null)
@@ -174,8 +174,8 @@ public class DatasetInput extends JPanel implements Dispose {
 	
 	
 	/**
-	 * 
-	 * @return this dataset input
+	 * Getting this dataset input.
+	 * @return this dataset input.
 	 */
 	private DatasetInput getThis() {
 		return this;

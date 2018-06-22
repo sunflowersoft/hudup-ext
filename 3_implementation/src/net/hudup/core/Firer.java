@@ -9,7 +9,6 @@ import java.util.Properties;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.java.plugin.boot.Boot;
 import org.reflections.Reflections;
 
 import net.hudup.core.alg.Alg;
@@ -125,16 +124,6 @@ public class Firer implements PluginManager {
 		}
 
 		discover(UriAdapter.packageSlashToDot(Constants.ROOT_PACKAGE));
-		
-		if (Constants.BOOT_PLUGIN) {
-			try {
-				Boot.main(new String[0]);
-			}
-			catch (Throwable e) {
-				e.printStackTrace();
-			}
-		}
-		
 	}
 	
 	

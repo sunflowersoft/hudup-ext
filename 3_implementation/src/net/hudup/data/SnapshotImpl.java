@@ -30,6 +30,8 @@ import net.hudup.core.data.MemFetcher;
 import net.hudup.core.data.MemProfiles;
 import net.hudup.core.data.Profile;
 import net.hudup.core.data.Profiles;
+import net.hudup.core.data.ProviderAssoc;
+import net.hudup.core.data.ProviderAssoc.CsvReader;
 import net.hudup.core.data.Rating;
 import net.hudup.core.data.RatingMatrix;
 import net.hudup.core.data.RatingTriple;
@@ -44,7 +46,6 @@ import net.hudup.core.data.ctx.ContextTemplate;
 import net.hudup.core.data.ctx.ContextTemplateSchema;
 import net.hudup.core.data.ctx.ContextValue;
 import net.hudup.core.logistic.DSUtil;
-import net.hudup.data.FlatProviderAssoc.CsvReader;
 import net.hudup.data.ctx.ContextTemplateSchemaImpl;
 import net.hudup.data.ctx.ContextValueImpl;
 
@@ -768,7 +769,7 @@ public class SnapshotImpl extends Snapshot {
 		// TODO Auto-generated method stub
 		
 		ProviderImpl provider = new ProviderImpl(config);
-		FlatProviderAssoc assoc = new FlatProviderAssoc(config);
+		ProviderAssoc assoc = Util.getFactory().createProviderAssoc(config);
 		
 		// Reading user profiles
 		MemProfiles userProfiles = MemProfiles.createEmpty();
@@ -783,7 +784,7 @@ public class SnapshotImpl extends Snapshot {
 				userAtts.parseText(Arrays.asList(header));
 				while (userReader.readRecord()) {
 					String[] record = userReader.getRecord();
-					Profile profile = FlatProviderAssoc.getProfile(record, userAtts);
+					Profile profile = Profile.create(record, userAtts);
 					if (profile != null)
 						userProfileMap.put(profile.getIdValueAsInt(), profile);
 				}
@@ -818,7 +819,7 @@ public class SnapshotImpl extends Snapshot {
 				itemAtts.parseText(Arrays.asList(header));
 				while (itemReader.readRecord()) {
 					String[] record = itemReader.getRecord();
-					Profile profile = FlatProviderAssoc.getProfile(record, itemAtts);
+					Profile profile = Profile.create(record, itemAtts);
 					if (profile != null)
 						itemProfileMap.put(profile.getIdValueAsInt(), profile);
 				}
@@ -852,7 +853,7 @@ public class SnapshotImpl extends Snapshot {
 				attMapAtts.parseText(Arrays.asList(header));
 				while (attMapReader.readRecord()) {
 					String[] record = attMapReader.getRecord();
-					Profile profile = FlatProviderAssoc.getProfile(record, attMapAtts);
+					Profile profile = Profile.create(record, attMapAtts);
 					if (profile == null)
 						continue;
 					
@@ -913,7 +914,7 @@ public class SnapshotImpl extends Snapshot {
 				ratingAtts.parseText(Arrays.asList(header));
 				while (ratingReader.readRecord()) {
 					String[] record  = ratingReader.getRecord(); 
-					Profile profile = FlatProviderAssoc.getProfile(record, ratingAtts);
+					Profile profile = Profile.create(record, ratingAtts);
 					if (profile == null)
 						continue;
 					
@@ -974,7 +975,7 @@ public class SnapshotImpl extends Snapshot {
 				ctxAtts.parseText(Arrays.asList(header));
 				while (ctxReader.readRecord()) {
 					String[] record = ctxReader.getRecord(); 
-					Profile profile = FlatProviderAssoc.getProfile(record, ctxAtts);
+					Profile profile = Profile.create(record, ctxAtts);
 					if (profile == null)
 						continue;
 					
@@ -1033,7 +1034,7 @@ public class SnapshotImpl extends Snapshot {
 				sampleAtts.parseText(Arrays.asList(header));
 				while (sampleReader.readRecord()) {
 					String[] record = sampleReader.getRecord(); 
-					Profile profile = FlatProviderAssoc.getProfile(record, sampleAtts);
+					Profile profile = Profile.create(record, sampleAtts);
 					if (profile != null)
 						sampleProfiles.add(profile);
 				}

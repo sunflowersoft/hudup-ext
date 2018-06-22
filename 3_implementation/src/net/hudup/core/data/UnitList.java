@@ -5,7 +5,6 @@ import java.util.List;
 
 import net.hudup.core.Util;
 import net.hudup.core.data.ui.UnitListBox;
-import net.hudup.data.ProviderAssocFactory;
 
 
 /**
@@ -316,7 +315,7 @@ public class UnitList {
 	 */
 	public static boolean connectUnitList(DataConfig config, UnitList unitList) {
 		unitList.clear();
-		ProviderAssoc providerAssoc = ProviderAssocFactory.create(config);
+		ProviderAssoc providerAssoc = Util.getFactory().createProviderAssoc(config);
 		boolean result = (providerAssoc != null);
 		
 		try {

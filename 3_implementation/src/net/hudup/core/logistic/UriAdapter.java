@@ -24,10 +24,8 @@ import net.hudup.core.data.UnitList;
 /**
  * This class is also a URI associator because it implements the interface {@link UriAssoc} but it hides all physical systems and protocols (file system, compressed file, HTTP, database, etc.).
  * Actually, programmers should use this class for processing (creating, copying, renaming, deleting, getting reader, getting writer, etc.) on objects identified by URI, instead of implementing {@link UriAssoc}.
- * The completion level of {@link UriAdapter} is higher than the completion level of {@link UriAssocTrueZip}.
  * {@link UriAdapter} is the most complete URI associator and it can use other URI associators for different physical systems and protocols.
  * Concretely, the internal variable {@link #assoc} refers to other URI associators.
- * In current implementation, {@link UriAdapter} uses {@link UriAssocTrueZip} in default case and {@link UriAdapter} does not support FTP protocol yet.
  * As a convention, {@link UriAdapter} is also called URI adapter.
  * @author Loc Nguyen
  * @version 11.0
@@ -38,7 +36,6 @@ public class UriAdapter implements UriAssoc, AutoCloseable {
 	
 	/**
 	 * This is the internal variable {@link #assoc} refers to other URI associators for different storage systems and protocols.
-	 * In default case, this variable refers to {@link UriAssocTrueZip}.
 	 */
 	protected UriAssoc assoc = null;
 	
@@ -87,7 +84,7 @@ public class UriAdapter implements UriAssoc, AutoCloseable {
 			e.printStackTrace();
 		}
 		
-		assoc = UriAssocFactory.create(config);
+		assoc = Util.getFactory().createUriAssoc(config);
 		if (assoc == null)
 			return false;
 		else
@@ -315,7 +312,6 @@ public class UriAdapter implements UriAssoc, AutoCloseable {
 	
 	/**
 	 * Firstly, this method retrieves a list of URI (s) referring objects inside the specified store with regard to specified filter. For each retrieved URI, some task is processed on the object referred by such URI and so the specified {@link UriProcessor} is responsible for doing such task.
-	 * In current implementation, this method calls {@link UriAssocTrueZip#uriListProcess(UriAssoc, xURI, UriFilter, UriProcessor)}.
 	 * @param store URI of specified store.
 	 * @param filter Specified filter represented by {@link UriFilter}.
 	 * @param processor Specified {@link UriProcessor} is responsible for doing such task on the object referred by each retrieved URI.

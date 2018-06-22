@@ -75,19 +75,6 @@
 
 
 	<!--
-	Function: building up Bayesian network, used for collaborative filtering algorithm based on Bayesian network
-	Affected packages, classes: net.hudup.alg.cf.bnet.*, net.hudup.logistic.Bnet*
-	Referred jars:
-	Source: http://leo.ugr.es/elvira, http://www.ia.uned.es/~elvira
-	Vendor: Elvira System - Spanish
-	Archive: newtech-research/bayesian-network/ELVIRA
-	Status: using
-	Note: replaced by enhanced Bayasian system
-	-->
-	<property name="elvira.jar" value="${lib.home}/Elvira.jar"/>
-
-
-	<!--
 	Function:
 	Affected packages, classes:
 	Referred jars:
@@ -130,32 +117,6 @@
 	Function:
 	Affected packages, classes:
 	Referred jars:
-	Source: 
-	Vendor:
-	Archive:
-	Status:
-	Note:
-	-->
-	<property name="jama.jar" value="${lib.home}/Jama-1.0.3.jar"/>
-
-
-	<!--
-	Function:
-	Affected packages, classes:
-	Referred jars:
-	Source: 
-	Vendor:
-	Archive:
-	Status:
-	Note:
-	-->
-	<property name="javabayes.jar" value="${lib.home}/javabayes.jar"/>
-
-
-	<!--
-	Function:
-	Affected packages, classes:
-	Referred jars:
 	Source: https://www.csvreader.com/java_csv.php
 	Vendor: Java CSV
 	Archive:
@@ -176,34 +137,6 @@
 	Note:
 	-->
 	<property name="javassist.jar" value="${lib.home}/javassist-3.12.1.GA.jar"/>
-
-
-	<!--
-	Function:
-	Affected packages, classes:
-	Referred jars:
-	Source: https://github.com/jgraph
-	Vendor: JGraph Ltd
-	Archive:
-	Status:
-	Note:
-	-->
-	<property name="jgraphx.jar" value="${lib.home}/jgraphx.jar"/>
-
-
-	<!--
-	Function: Loading plug-ins (java classes) when booting application
-	Affected packages, classes: net.hudup.core.PluginManager
-	Referred jars: log4j.jar
-	Source: http://jpf.sourceforge.net/boot.html
-	Vendor: Java Plug-in Framework (JPF) Project
-	Archive: newtech-research/prog-language/java/plugin/jpf
-	Status: not using
-	Note:
-	-->
-	<property name="jpf.jar" value="${lib.home}/jpf.jar"/>
-	<property name="jpf-boot.jar" value="${lib.home}/jpf-boot.jar"/>
-	<property name="jpf-tools.jar" value="${lib.home}/jpf-tools.jar"/>
 
 
 	<!--
@@ -246,19 +179,6 @@
 
 
 	<!--
-	Function:
-	Affected packages, classes:
-	Referred jars:
-	Source: 
-	Vendor:
-	Archive:
-	Status:
-	Note:
-	-->
-	<property name="junit.jar" value="${lib.home}/junit.jar"/>
-
-
-	<!--
 	Function: Processing Excel files.
 	Affected packages, classes:
 	Referred jars:
@@ -272,19 +192,6 @@
 
 
 	<!--
-	Function: Java scripted page (Jxp) is a script-processor that process JSP-like files
-	Affected packages, classes:
-	Referred jars:
-	Source: http://jxp.sourceforge.net/downloads.html
-	Vendor: OneMind
-	Archive:
-	Status:
-	Note:
-	-->
-	<property name="jxp.jar" value="${lib.home}/jxp.jar"/>
-
-
-	<!--
 	Function: Apache Logging Services (log4j)
 	Affected packages, classes:
 	Referred jars:
@@ -295,19 +202,6 @@
 	Note:
 	-->
 	<property name="log4j.jar" value="${lib.home}/log4j.jar"/>
-
-
-	<!--
-	Function: JDBC connecting pool
-	Affected packages, classes:
-	Referred jars:
-	Source: 
-	Vendor:
-	Archive:
-	Status:
-	Note:
-	-->
-	<property name="mchange-commons-java.jar" value="${lib.home}/mchange-commons-java-0.2.2.jar"/>
 
 
 	<!--
@@ -398,19 +292,6 @@
 	Status: using
 	-->
 	<property name="truezip.jar" value="${lib.home}/truezip-samples-7.7.4-jar-with-dependencies.jar"/>
-
-
-	<!--
-	Function: data mining - Weka is a collection of machine learning algorithms for data mining tasks
-	Affected packages, classes: net.hudup.core.data.Attribute, net.hudup.core.data.Profile
-	Referred jars:
-	Source: http://www.cs.waikato.ac.nz/ml/weka/downloading.html
-	Vendor: Waikato Environment for Knowledge Analysis, University of Waikato, New Zealand
-	Archive: newtech-research/data-mining-analyzing/soft-tool/WEKA
-	Status: using
-	Note:
-	-->
-	<property name="weka.jar" value="${lib.home}/weka.jar"/>
 
 
 	<!--

@@ -145,7 +145,7 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 			
 			int port = NetUtil.getPort(this.config.getServerPort(), Constants.TRY_RANDOM_PORT);
 			if (port < 0)
-				throw new RuntimeException("Invalid port number");
+				throw new Exception("Invalid port number");
 			this.config.setServerPort(port);
 			
 			registry = LocateRegistry.createRegistry(port);

@@ -1,7 +1,6 @@
 package net.hudup.core.data;
 
 
-
 /**
  * Condition is the special profile which is used in condition clause {@code where} in SQL statement for processing database, for example.
  * Note that SQL is formal programming language used for querying, updating, processing objects in database.

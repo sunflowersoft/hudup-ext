@@ -395,7 +395,7 @@ public abstract class SocketServer extends AbstractRunner implements Server {
 			try {
 				int port = NetUtil.getPort(config.getServerPort(), Constants.TRY_RANDOM_PORT);
 				if (port < 0)
-					throw new RuntimeException("Invalid port number");
+					throw new Exception("Invalid port number");
 				config.setServerPort(port);
 
 				serverSocket = new ServerSocket(port);

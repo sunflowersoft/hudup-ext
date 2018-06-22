@@ -11,6 +11,7 @@ import net.hudup.core.alg.Alg;
  */
 public interface AlgListUI {
 
+	
 	/**
 	 * Returning selected algorithm.
 	 * @return selected algorithm.

@@ -1,9 +1,14 @@
 Hudup - A framework of e-commercial recommendation algorithms
+
 Owners:
        Prof. Dr. Bich-Ngoc Tran, Sunflower Soft Company, Vietnam
        Prof. Dr. Thu-Hang Thi Ho, Vinh Long General Hospital, Vietnam
- 
+Authors:
+       Prof. Dr. Loc Nguyen
+       Prof. Dr. Minh-Phung Thi Do
 
+	   
+--------------------
 Hudup product is the recommender framework dedicated to scientists and software developers who create or deploy recommendation solutions and algorithms in e-commerce and e-learning.
 
 Hudup application has five main modules such as Evaluator, Server, Listener, Balancer and one additional module Toolkit. Note that the Server, Listener and Balancer service ports are 10151, 10152 and 10154, respectively. Toolkit module is used to configure, create and modify datasets.
@@ -23,7 +28,7 @@ After installing Hudup in your computer by executing appropriate installer packa
 3. Running access point Server, which in turn, running access point Listener or Balancer, which in turn, running access point Evaluator so as to deploy Hudup in client-listener-server environment. You must select "socket_server_query" algorithm in Evaluator in order to evaluate Hudup in client-listener-server environment. 
 
 
-Hudup software also provides 10 developing jar packages:
+Hudup software also provides 10 developing packages:
 - datasets.zip: contains movielens datasets
 - hudup-${version}.zip: contains hudup.jar including five modules Evaluator, Server, Listener, Balancer and Toolkit.
 - hudup-${version}-all-in-one.zip: contains whole Hudup product both code and source.
@@ -37,14 +42,15 @@ Hudup software also provides 10 developing jar packages:
 
 When you uncompress hudup-${version}-*.zip, there are a respective hudup-*.jar module and shell command files used to execute such jar module. You should copy runtime-lib.jar to the same directory with such jar module for running successfully. You can copy these jar modules to your application's library directory in order to develop new software.
 
-Thank you for enjoying product
+Thank you for enjoying product.
 Best regards,
 
-Prof. Loc Nguyen, PhD, MD, MBA
-Poet and Mathematician,
-Director of International Engineering and Technology Institute,
-ORCID: 0000-0001-5192-8106,
-ResearcherID: F-7019-2014,
+Mr. Loc Nguyen,
+Independent Scholar,
 Homepage: www.locnguyen.net,
 Email: ng_phloc@yahoo.com,
 Tel: 84-975250362
+
+
+---
+P/S: Current version of JRE and JDK is 1.8.0. Current version of Hudup is 11. The last built date is June 22, 2018. 

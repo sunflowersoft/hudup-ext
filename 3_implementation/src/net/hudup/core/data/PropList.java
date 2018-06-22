@@ -20,6 +20,15 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.apache.log4j.Logger;
+import org.w3c.dom.CDATASection;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.w3c.dom.Text;
+import org.xml.sax.InputSource;
+
 import net.hudup.core.Cloneable;
 import net.hudup.core.Constants;
 import net.hudup.core.Util;
@@ -33,15 +42,6 @@ import net.hudup.core.logistic.xURI;
 import net.hudup.core.parser.JsonUtil;
 import net.hudup.core.parser.TextParsable;
 import net.hudup.core.parser.TextParserUtil;
-
-import org.apache.log4j.Logger;
-import org.w3c.dom.CDATASection;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.w3c.dom.Text;
-import org.xml.sax.InputSource;
 
 
 /**

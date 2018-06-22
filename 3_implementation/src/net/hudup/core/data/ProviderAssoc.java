@@ -1,13 +1,6 @@
 package net.hudup.core.data;
 
-import net.hudup.core.data.AttributeList;
-import net.hudup.core.data.AutoCloseable;
-import net.hudup.core.data.DataConfig;
-import net.hudup.core.data.Fetcher;
-import net.hudup.core.data.NominalList;
-import net.hudup.core.data.ParamSql;
-import net.hudup.core.data.Profile;
-import net.hudup.core.data.UnitList;
+import java.io.IOException;
 
 
 /**
@@ -219,6 +212,93 @@ public interface ProviderAssoc extends AutoCloseable {
 	 * @return whether delete successfully.
 	 */
 	boolean deleteProfile(String profileUnit, Profile condition);
+	
+	
+	/**
+	 * Creating CSV from from specified unit.
+	 * @param unit specified unit.
+	 * @return {@link CsvReader} from specified unit.
+	 */
+	CsvReader getReader(String unit);
+	
+	
+	/**
+	 * Creating CSV writer from specified unit.
+	 * @param unit specified unit.
+	 * @param append if true that allowing to continue to write at the end of this CSV file.
+	 * @return {@link CsvWriter} from specified unit.
+	 */
+	CsvWriter getWriter(String unit, boolean append);
+	
+	
+	/**
+	 * Interface for CSV reader.
+	 * @author Loc Nguyen
+	 * @version 1.0
+	 */
+	interface CsvReader {
+		
+		/**
+		 * Reading header of CSV file.
+		 * @return whether reading successfully.
+		 * @throws IOException if any IO error raises.
+		 */
+		boolean readHeader() throws IOException;
+		
+		/**
+		 * Getting header of CSV file.
+		 * @return header as an array of strings.
+		 * @throws IOException if any IO error raises.
+		 */
+		String[] getHeader() throws IOException;
+		
+		/**
+		 * Reading record of CSV file.
+		 * @return whether reading successfully.
+		 * @throws IOException if any IO error raises.
+		 */
+		boolean readRecord() throws IOException;
+		
+		/**
+		 * Getting a record of CSV file.
+		 * @return record as an array of strings.
+		 * @throws IOException if any IO error raises.
+		 */
+		String[] getRecord() throws IOException;
+		
+		/**
+		 * Close this reader.
+		 */
+		void close();
+	}
+	
+	
+	/**
+	 * Interface for CSV writer.
+	 * @author Loc Nguyen
+	 * @version 1.0
+	 */
+	public static interface CsvWriter {
+		
+		/**
+		 * Writing the specified column to current record.
+		 * @param column column (field) to be written.
+		 * @throws IOException if any error raises.
+		 */
+		void write(String column) throws IOException;
+		
+		/**
+		 * Writing the specified record into CSV file.
+		 * @param record record (row) to be written. 
+		 * @throws IOException if any error raises.
+		 */
+		void writeRecord(String[] record) throws IOException;
+		
+		/**
+		 * Close this writer.
+		 */
+		void close();
+	}
 	
 	
 }

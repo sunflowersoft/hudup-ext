@@ -15,6 +15,7 @@ import javax.swing.JScrollPane;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import net.hudup.core.Util;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.DataDriverList;
 import net.hudup.core.data.ExternalConfig;
@@ -22,12 +23,11 @@ import net.hudup.core.data.ExternalQuery;
 import net.hudup.core.data.Unit;
 import net.hudup.core.data.ui.DataConfigTextField;
 import net.hudup.core.data.ui.SysConfigPane;
+import net.hudup.core.data.ui.UnitTable;
 import net.hudup.data.DatasetUtil2;
 import net.hudup.data.DefaultExternalQuery;
 import net.hudup.data.ui.ExternalConfigurator;
 import net.hudup.data.ui.UnitListBoxExt;
-import net.hudup.data.ui.UnitTable;
-import net.hudup.data.ui.UnitTableFactory;
 import net.hudup.server.external.ExternalServerConfig;
 import net.hudup.server.ui.SetupServerWizard;
 
@@ -217,7 +217,7 @@ public class SetupExternalServerWizard extends SetupServerWizard {
 		JPanel body = new JPanel(new BorderLayout());
 		main.add(body, BorderLayout.CENTER);
 		
-		final UnitTable unitTable = UnitTableFactory.create();
+		final UnitTable unitTable = Util.getFactory().createUnitTable();
 		body.add(unitTable.getComponent(), BorderLayout.CENTER);
 
 		final UnitListBoxExt unitList = new UnitListBoxExt() {
@@ -274,7 +274,7 @@ public class SetupExternalServerWizard extends SetupServerWizard {
 				}
 				
 				
-				unitTable.update(provider, unit.getName());
+				unitTable.update(provider.getAssoc(), unit.getName());
 			}
 		});
 

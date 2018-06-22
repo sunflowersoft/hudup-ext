@@ -5,9 +5,6 @@ package net.hudup.core.data;
 
 import net.hudup.core.Cloneable;
 import net.hudup.core.Transfer;
-import net.hudup.core.data.AttributeList;
-import net.hudup.core.data.Fetcher;
-import net.hudup.core.data.Profile;
 
 /**
  * This interface represents a collection of profiles. Recall that each profile is represented by {@link Profile} class.

@@ -30,6 +30,7 @@ import javax.swing.JTextField;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import net.hudup.core.Util;
 import net.hudup.core.client.ConnectServerDlg;
 import net.hudup.core.client.PowerServer;
 import net.hudup.core.client.RemoteServerCP;
@@ -43,18 +44,16 @@ import net.hudup.core.data.Provider;
 import net.hudup.core.data.Unit;
 import net.hudup.core.data.ui.SysConfigPane;
 import net.hudup.core.data.ui.UnitListBox;
+import net.hudup.core.data.ui.UnitTable;
+import net.hudup.core.data.ui.UnitTable.SelectionChangedEvent;
+import net.hudup.core.data.ui.UnitTable.SelectionChangedListener;
 import net.hudup.core.logistic.xURI;
 import net.hudup.core.logistic.ui.UIUtil;
 import net.hudup.data.DatasetUtil2;
 import net.hudup.data.ProviderImpl;
-import net.hudup.data.ui.UnitTable;
-import net.hudup.data.ui.UnitTableFactory;
-import net.hudup.data.ui.UnitTableImpl;
 import net.hudup.logistic.SystemPropertiesPane;
 import net.hudup.logistic.math.HudupCipher;
 import net.hudup.server.PowerServerConfig;
-import quick.dbtable.DBTableEventListener;
-import quick.dbtable.DatabaseChangeListener;
 
 /**
  * The difference from {@link RemoteServerCP} is to have full of features of server
@@ -74,58 +73,127 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 	
 	//protected JButton btnExternalConfig = null;
 
+	/**
+	 * System configuration pane.
+	 */
 	protected SysConfigPane paneConfig = null;
 	
+	/**
+	 * Setting server button.
+	 */
 	protected JButton btnSetupServer = null;
 	
+	/**
+	 * Exiting server button.
+	 */
 	protected JButton btnExitServer = null;
 	
+	/**
+	 * Starting server button.
+	 */
 	protected JButton btnStart = null;
 	
+	/**
+	 * Pause/resume server button.
+	 */
 	protected JButton btnPauseResume = null;
 
+	/**
+	 * Stopping server button.
+	 */
 	protected JButton btnStop = null;
 	
+	/**
+	 * Applying configuration server.
+	 */
 	protected JButton btnApplyConfig = null;
 	
+	/**
+	 * Resetting configuration button.
+	 */
 	protected JButton btnResetConfig = null;
 
+	/**
+	 * Refreshing button.
+	 */
 	protected JButton btnRefresh = null;
 
+	/**
+	 * Loading store button.
+	 */
 	protected JButton btnLoadStore = null;
 
+	/**
+	 * Unit list box.
+	 */
 	protected UnitListBox unitList = null;
 	
+	/**
+	 * Unit table.
+	 */
 	protected UnitTable unitTable = null;
 	
+	/**
+	 * Unit table for account.
+	 */
 	protected UnitTable accUnitTable = null;
 
+	/**
+	 * Updating account table.
+	 */
 	protected JButton btnUpdateAcc = null;
 
+	/**
+	 * Deleting account button.
+	 */
 	protected JButton btnDeleteAcc = null;
 	
+	/**
+	 * Account name text box.
+	 */
 	protected JTextField txtAccName = null;
 	
+	/**
+	 * Account password.
+	 */
 	protected JPasswordField txtAccPass = null;
 	
+	/**
+	 * Account privileges.
+	 */
 	protected JTextField txtAccPrivs = null;
 	
+	/**
+	 * Power server.
+	 */
 	protected PowerServer server = null;
 	
+	/**
+	 * Data provider.
+	 */
 	protected Provider provider = null;
 	
+	/**
+	 * RMI registry.
+	 */
 	protected Registry registry = null;
 
+	/**
+	 * Binded URI of power server.
+	 */
 	protected xURI bindUri = null;
 	
+	/**
+	 * If true, the power server is remote.
+	 */
 	protected boolean bRemote = false;
 	
 	
 	/**
-	 * 
-	 * @param server
-	 * @param bindUri
-	 * @param bRemote
+	 * Constructor with specified server and binded URI of such server.
+	 * @param server specified server
+	 * @param bindUri binded URI of such server.
+	 * @param bRemote if true then the server is remote.
 	 */
 	public PowerServerCP(PowerServer server, xURI bindUri, boolean bRemote) {
 		super("Server control panel");
@@ -170,14 +238,12 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 			e.printStackTrace();
 		}
 		
-		
-		
 	}
 	
 	
 	/**
-	 * 
-	 * @param server
+	 * Constructor with specified power server.
+	 * @param server specified power server.
 	 */
 	public PowerServerCP(PowerServer server) {
 		this(server, null, false);
@@ -185,7 +251,7 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 	
 	
 	/**
-	 * 
+	 * Binding remote server.
 	 */
 	protected void bindServer() throws RemoteException {
 		boolean result = false;
@@ -231,7 +297,7 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 					result = false;
 				}
 			
-			} // if (bindUri_ != null)
+			} // if (bindUri != null)
 		}
 		
 		
@@ -241,9 +307,9 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 
 	
 	/**
-	 * 
-	 * @return {@link JPanel}
-	 * @throws Exception
+	 * Create general panel.
+	 * @return general {@link JPanel}.
+	 * @throws Exception if any error raises.
 	 */
 	protected JPanel createGeneralPane() throws Exception {
 		JPanel general = new JPanel(new BorderLayout());
@@ -387,14 +453,14 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 	
 	
 	/**
-	 * 
-	 * @return {@link JPanel}
-	 * @throws Exception
+	 * Create store pane.
+	 * @return store {@link JPanel}.
+	 * @throws Exception if any error raises.
 	 */
 	private JPanel createStorePane() throws Exception {
 		JPanel store = new JPanel(new BorderLayout());
 		
-		unitTable = UnitTableFactory.create();
+		unitTable = Util.getFactory().createUnitTable();
 		store.add(unitTable.getComponent(), BorderLayout.CENTER);
 
 		
@@ -412,33 +478,31 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 					return;
 				}
 				
-				
-				unitTable.update(provider, unit.getName());
-				
+				unitTable.update(provider.getAssoc(), unit.getName());
 			}
 		});
-		
 		
 		return store;
 	}
 	
 	
 	/**
-	 * 
-	 * @return {@link JPanel}
+	 * Create account pane.
+	 * @return account {@link JPanel}.
 	 */
 	private JPanel createAccountPane() {
 		final JPanel main = new JPanel(new BorderLayout());
 		
-		accUnitTable = UnitTableFactory.create();
-		if (!(accUnitTable instanceof UnitTableImpl)) {
-			JOptionPane.showMessageDialog(
-					this, 
-					"Not support non-database unit table", 
-					"Not support non-database unit table", JOptionPane.INFORMATION_MESSAGE);
+		accUnitTable = Util.getFactory().createUnitTable();
+		accUnitTable.addSelectionChangedListener(new SelectionChangedListener() {
 			
-			return main;
-		}
+			@Override
+			public void respond(SelectionChangedEvent evt) {
+				// TODO Auto-generated method stub
+				updateAccData();
+			}
+		});
+			
 		
 		JPanel body = new JPanel(new BorderLayout());
 		main.add(body, BorderLayout.CENTER);
@@ -538,84 +602,34 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 		});
 		footer.add(btnDeleteAcc);
 		
-		getAccUnitTable().addDBTableEventListener(new DBTableEventListener() {
-
-			@Override
-			public void afterRowSelectionChange(int fromRow, int toRow) {
-				// TODO Auto-generated method stub
-				super.afterRowSelectionChange(fromRow, toRow);
-				
-				updateAccData();
-			}
-			
-		});
-		
-		getAccUnitTable().addDatabaseChangeListener(new DatabaseChangeListener() {
-
-			@Override
-			public void afterDelete(int row) {
-				// TODO Auto-generated method stub
-				super.afterDelete(row);
-				updateAccData();
-			}
-
-			@Override
-			public void afterInsert(int row) {
-				// TODO Auto-generated method stub
-				super.afterInsert(row);
-				updateAccData();
-			}
-
-			@Override
-			public void afterUpdate(int row) {
-				// TODO Auto-generated method stub
-				super.afterUpdate(row);
-				updateAccData();
-			}
-			
-		});
-		
 		return main;
 	}
 	
 	
 	/**
-	 * 
+	 * Update account data.
 	 */
 	private void updateAccData() {
-		if (getAccUnitTable().getSelectedRow() == -1 && 
-				getAccUnitTable().getRowCount() > 0) {
-			getAccUnitTable().selectFirstVisibleColumnCell(0, true);
-		}
 		txtAccName.setText("");
 		txtAccPass.setText("");
 		txtAccPrivs.setText("");
 		
-		int selected = getAccUnitTable().getSelectedRow();
+		int selected = accUnitTable.getSelectedRow();
 		if (selected == -1)
 			return;
 		
-		String accName = getAccUnitTable().getValueAt(selected, 0).toString();
+		String accName = accUnitTable.getValueAt(selected, 0).toString();
 		txtAccName.setText(accName);
 		
 		txtAccPass.setText("");
 		
-		String accPrivs = getAccUnitTable().getValueAt(selected, 2).toString();
+		String accPrivs = accUnitTable.getValueAt(selected, 2).toString();
 		txtAccPrivs.setText(accPrivs);
 	}
 	
 	
 	/**
-	 * 
-	 * @return {@link UnitTableImpl}
-	 */
-	private UnitTableImpl getAccUnitTable() {
-		return (UnitTableImpl) accUnitTable;
-	}
-	
-	
-	/**
-	 * 
+	 * Start remote server.
 	 */
 	protected void start() {
 		try {
@@ -633,7 +647,7 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 	
 	
 	/**
-	 * 
+	 * Pause and resume remote server.
 	 */
 	protected void pauseResume() {
 		try {
@@ -652,7 +666,7 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 	
 	
 	/**
-	 * 
+	 * Stop remote server.
 	 */
 	protected void stop() {
 		try {
@@ -670,7 +684,7 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 	
 	
 	/**
-	 * 
+	 * Setting up remote server.
 	 */
 	protected void setupServer() {
 		try {
@@ -698,9 +712,8 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 	}
 	
 	
-	
 	/**
-	 * 
+	 * Exiting remote server.
 	 */
 	protected void exit() {
 		if (bRemote)
@@ -717,7 +730,7 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 	
 	
 	/**
-	 * 
+	 * Applying configuration to remote server.
 	 */
 	protected void applyConfig() {
 		try {
@@ -756,7 +769,7 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 	
 	
 	/**
-	 * 
+	 * Reset configuration for remote server.
 	 */
 	protected void resetConfig() {
 		try {
@@ -796,7 +809,7 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 
 	
 	/**
-	 * 
+	 * Loading store for remote server.
 	 */
 	protected void loadStore() {
 		try {
@@ -838,10 +851,9 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 	}
 	
 	
-	
 	/**
-	 * 
-	 * @param enabled
+	 * Enable / disable controls.
+	 * @param enabled if true then, controls are enabled and vice versa.
 	 */
 	private void enableControls(boolean enabled) {
 		btnSetupServer.setEnabled(enabled);
@@ -864,8 +876,8 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 	
 	
 	/**
-	 * 
-	 * @param state
+	 * Update current controls when receiving specified remote status.
+	 * @param state specified remote status.
 	 */
 	protected void updateControls(ServerStatusEvent.Status state)
 			throws RemoteException {
@@ -900,8 +912,7 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 			unitList.validate();
 			unitList.updateUI();
 			
-			accUnitTable.update(provider, config.getAccountUnit());
-			accUnitTable.first();
+			accUnitTable.update(provider.getAssoc(), config.getAccountUnit());
 			updateAccData();
 			
 			try {
@@ -985,7 +996,7 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 	
 	
 	/**
-	 * 
+	 * Update controls.
 	 */
 	protected void updateControls() throws RemoteException {
 		if (server == null)
@@ -1007,7 +1018,6 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 	}
 	
 	
-	
 	@Override
 	public void statusChanged(ServerStatusEvent evt) throws RemoteException {
 		// TODO Auto-generated method stub
@@ -1018,9 +1028,8 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 	}
 	
 	
-	
 	/**
-	 * 
+	 * Close this control panel.
 	 */
 	private void close() {
 		
@@ -1064,8 +1073,8 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 	
 	
 	/**
-	 * 
-	 * @param args
+	 * Main method.
+	 * @param args specified arguments.
 	 */
 	public static void main(String[] args) {
 		ConnectServerDlg dlg = new ConnectServerDlg();
@@ -1074,7 +1083,6 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 		if (server != null)
 			new PowerServerCP((PowerServer)server, dlg.getBindUri(), true);
 	}
-	
 	
 	
 }

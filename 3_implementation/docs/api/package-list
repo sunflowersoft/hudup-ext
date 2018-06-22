@@ -1,5 +1,4 @@
 net.hudup
-net.hudup.alg.cf.bnet
 net.hudup.alg.cf.gfall
 net.hudup.alg.cf.mf
 net.hudup.alg.cf.stat
@@ -13,6 +12,7 @@ net.hudup.core.data
 net.hudup.core.data.ctx
 net.hudup.core.data.ui
 net.hudup.core.evaluate
+net.hudup.core.factory
 net.hudup.core.logistic
 net.hudup.core.logistic.ui
 net.hudup.core.parser
@@ -27,16 +27,11 @@ net.hudup.evaluate.ui
 net.hudup.listener
 net.hudup.listener.ui
 net.hudup.logistic
-net.hudup.logistic.inference
-net.hudup.logistic.inference.ui
 net.hudup.logistic.math
 net.hudup.logistic.math.ui
-net.hudup.logistic.mining
 net.hudup.parser
 net.hudup.server
 net.hudup.server.external
 net.hudup.server.external.ui
 net.hudup.server.ui
 net.hudup.sparse
-net.hudup.temp
-vn.pimath

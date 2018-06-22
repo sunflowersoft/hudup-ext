@@ -14,16 +14,16 @@ import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 import javax.swing.tree.TreePath;
 
+import org.jdesktop.swingx.JXTreeTable;
+import org.jdesktop.swingx.tree.TreeModelSupport;
+import org.jdesktop.swingx.treetable.AbstractTreeTableModel;
+
 import net.hudup.core.data.Attribute.Type;
 import net.hudup.core.data.ctx.ContextTemplate;
 import net.hudup.core.data.ctx.ContextTemplateSchema;
 import net.hudup.core.data.ctx.HierContextTemplate;
 import net.hudup.core.logistic.ui.UIUtil;
 import net.hudup.data.ui.AttributeListTable;
-
-import org.jdesktop.swingx.JXTreeTable;
-import org.jdesktop.swingx.tree.TreeModelSupport;
-import org.jdesktop.swingx.treetable.AbstractTreeTableModel;
 
 
 /**

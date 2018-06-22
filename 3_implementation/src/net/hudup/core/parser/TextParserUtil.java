@@ -22,8 +22,6 @@ import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.xURI;
 
 
-
-
 /**
  * This final utility class provides constants and static methods for parsing, converting, encrypting, decrypting, splitting a text.
  * This class is used more by classes that implement {@code TextParsable} interface.

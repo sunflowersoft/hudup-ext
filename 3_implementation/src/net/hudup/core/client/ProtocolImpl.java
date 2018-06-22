@@ -3,6 +3,8 @@ package net.hudup.core.client;
 import java.io.Serializable;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
+
 import net.hudup.core.alg.RecommendParam;
 import net.hudup.core.data.ExternalRecord;
 import net.hudup.core.data.InternalRecord;
@@ -10,8 +12,6 @@ import net.hudup.core.data.Nominal;
 import net.hudup.core.data.Profile;
 import net.hudup.core.data.Rating;
 import net.hudup.core.data.RatingVector;
-
-import org.apache.log4j.Logger;
 
 /**
  * This class is the current implementation of {@code Protocol} interface.

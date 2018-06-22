@@ -7,7 +7,6 @@ import javax.swing.JDialog;
 import javax.swing.JProgressBar;
 
 
-
 /**
  * This graphic user interface (GUI) component shows a progress dialog.
  * The dialog shows a progress bar of a ongoing process. This dialog implements the {@link ProgressListener}.

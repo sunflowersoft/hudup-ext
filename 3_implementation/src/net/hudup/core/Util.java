@@ -3,7 +3,10 @@
  */
 package net.hudup.core;
 
+import static net.hudup.core.Constants.ROOT_PACKAGE;
+
 import java.io.File;
+import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Date;
@@ -12,10 +15,12 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Queue;
 import java.util.Set;
 import java.util.Vector;
 
+import net.hudup.core.factory.Factory;
 import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.xURI;
 
@@ -179,5 +184,26 @@ public final class Util {
 		return (!(Double.isNaN(value))) && (value != Constants.UNUSED);
 	}
 
+	
+	/**
+	 * Getting factory to create associators, for example.
+	 * @return factory to create associators, for example.
+	 */
+	public static Factory getFactory() {
+		Properties props = new Properties();
+		try {
+			InputStream in = Util.class.getResourceAsStream(ROOT_PACKAGE + "hudup.properties");		
+			props.load(in);
+			String factoryClassName = props.getProperty("factory");
+			if (factoryClassName == null)
+				return new Factory();
+			else
+				return (Factory)Class.forName(factoryClassName).newInstance();
+		}
+		catch (Throwable ex) {}
+		
+		return new Factory();
+	}
+	
 	
 }

@@ -4,12 +4,12 @@
 package net.hudup.core.data;
 
 
+import org.apache.log4j.Logger;
+
 import net.hudup.core.Cloneable;
 import net.hudup.core.Constants;
 import net.hudup.core.logistic.xSubURI;
 import net.hudup.core.logistic.xURI;
-
-import org.apache.log4j.Logger;
 
 
 /**

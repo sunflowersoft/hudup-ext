@@ -1,7 +1,6 @@
 package net.hudup.core.alg;
 
 
-
 /**
  * This is not real recommender (recommendation algorithm). Actually, it points to another real recommender.
  * This service recommender is very useful in client-server architecture.

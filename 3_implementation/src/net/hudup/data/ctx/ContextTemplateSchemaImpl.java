@@ -5,9 +5,9 @@ import java.util.List;
 
 import net.hudup.core.Util;
 import net.hudup.core.data.Attribute;
+import net.hudup.core.data.Attribute.Type;
 import net.hudup.core.data.AttributeList;
 import net.hudup.core.data.DataConfig;
-import net.hudup.core.data.Attribute.Type;
 import net.hudup.core.data.ctx.ContextTemplate;
 import net.hudup.core.data.ctx.ContextTemplateList;
 import net.hudup.core.data.ctx.ContextTemplateSchema;

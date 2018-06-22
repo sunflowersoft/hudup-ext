@@ -1012,4 +1012,61 @@ public class Profile implements Cloneable, TextParsable, Serializable {
 	}
 	
 
+	/**
+	 * Converting the specified profile values into an array of strings
+	 * @return string array of profile values.
+	 */
+	public String[] toStringArray() {
+		List<String> record = Util.newList();
+
+		int n = getAttCount();
+		for (int i = 0; i < n; i++) {
+			Object value = getValue(i);
+			if (value == null)
+				record.add("");
+			else if (value instanceof Date) {
+				SimpleDateFormat df = new SimpleDateFormat(Constants.DATE_FORMAT);
+				record.add(df.format(value));
+			}
+			else
+				record.add(value.toString());
+		}
+		
+		return record.toArray(new String[] { });
+	}
+	
+	
+	/**
+	 * Creating profile with regard to specified attribute list.
+	 * @param record specified record.
+	 * @param attributes specified attribute list.
+	 * @return {@link Profile} with regard to specified attribute list.
+	 */
+	public static Profile create(String[] record, AttributeList attributes) {
+		if (attributes.size() == 0)
+			return null;
+		
+		try {
+			Profile profile = new Profile(attributes);
+			for (int i = 0; i < attributes.size(); i++) {
+				Object value = null;
+				try {
+					value = Profile.createValue(attributes.get(i), record[i]);
+				} 
+				catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				profile.setValue(i, value);
+			}
+			return profile;
+		}
+		catch (Throwable e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+
 }

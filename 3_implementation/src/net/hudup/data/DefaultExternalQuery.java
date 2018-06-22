@@ -17,11 +17,12 @@ import net.hudup.core.data.InternalRecord;
 import net.hudup.core.data.ParamSql;
 import net.hudup.core.data.Profile;
 import net.hudup.core.data.Provider;
+import net.hudup.core.data.ProviderAssoc;
+import net.hudup.core.data.ProviderAssoc.CsvWriter;
 import net.hudup.core.data.Rating;
 import net.hudup.core.data.UnitList;
 import net.hudup.core.logistic.ui.ProgressEvent;
 import net.hudup.core.logistic.ui.ProgressListener;
-import net.hudup.data.FlatProviderAssoc.CsvWriter;
 
 
 /**
@@ -372,7 +373,7 @@ public class DefaultExternalQuery implements ExternalQuery {
 		AttributeList attMapAttributes = internalProvider.getProfileAttributes(internalConfig.getAttributeMapUnit());
 		AttributeList ratingAttributes = internalProvider.getProfileAttributes(internalConfig.getRatingUnit());
 		
-		FlatProviderAssoc assoc = new FlatProviderAssoc(internalConfig);
+		ProviderAssoc assoc = Util.getFactory().createProviderAssoc(internalConfig);
 		CsvWriter csvUserWriter = assoc.getWriter(internalConfig.getUserUnit(), false);
 		CsvWriter csvItemWriter = assoc.getWriter(internalConfig.getItemUnit(), false);
 		CsvWriter csvAttMapWriter = assoc.getWriter(internalConfig.getAttributeMapUnit(), false);
@@ -813,17 +814,17 @@ public class DefaultExternalQuery implements ExternalQuery {
 	
 	
 	/**
-	 * 
-	 * @param writer
-	 * @param profile
-	 * @return whether insert profile successfully
+	 * Inserting profile to CSV file.
+	 * @param writer CSV writer.
+	 * @param profile specified profile.
+	 * @return whether insert profile successfully.
 	 */
 	private static boolean insertProfile(CsvWriter writer, Profile profile) {
 		if (profile == null || profile.getAttCount() == 0)
 			return false;
 		
 		try {
-			writer.writeRecord(FlatProviderAssoc.toStringArray(profile));
+			writer.writeRecord(profile.toStringArray());
 			return true;
 		}
 		catch (Throwable e) {

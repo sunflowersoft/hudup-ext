@@ -7,6 +7,8 @@ import java.awt.Component;
 
 import javax.swing.JOptionPane;
 
+import org.apache.log4j.Logger;
+
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.Datasource;
@@ -14,8 +16,6 @@ import net.hudup.core.data.Pointer;
 import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.UriFilter;
 import net.hudup.core.logistic.xURI;
-
-import org.apache.log4j.Logger;
 
 
 /**

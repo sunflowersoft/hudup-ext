@@ -5,7 +5,6 @@ import java.io.Serializable;
 import net.hudup.core.data.Dataset;
 
 
-
 /**
  * This interface represents a filter which is performed before any recommendation tasks.
  * As a convention, this interface is called {@code filter}.

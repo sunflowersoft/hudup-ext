@@ -18,6 +18,10 @@ import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 import javax.swing.tree.TreePath;
 
+import org.jdesktop.swingx.JXTreeTable;
+import org.jdesktop.swingx.tree.TreeModelSupport;
+import org.jdesktop.swingx.treetable.AbstractTreeTableModel;
+
 import net.hudup.core.Constants;
 import net.hudup.core.data.Attribute;
 import net.hudup.core.data.Attribute.Type;
@@ -30,10 +34,6 @@ import net.hudup.core.data.ctx.HierContextTemplate;
 import net.hudup.core.logistic.ui.UIUtil;
 import net.hudup.data.ui.AttributeListTable;
 import net.hudup.data.ui.AttributeListTable.TypeCellEditor;
-
-import org.jdesktop.swingx.JXTreeTable;
-import org.jdesktop.swingx.tree.TreeModelSupport;
-import org.jdesktop.swingx.treetable.AbstractTreeTableModel;
 
 
 /**

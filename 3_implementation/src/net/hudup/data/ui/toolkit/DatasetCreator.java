@@ -18,6 +18,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import net.hudup.core.Constants;
+import net.hudup.core.Util;
 import net.hudup.core.data.Attribute;
 import net.hudup.core.data.AttributeList;
 import net.hudup.core.data.BooleanWrapper;
@@ -31,6 +32,7 @@ import net.hudup.core.data.Unit;
 import net.hudup.core.data.UnitList;
 import net.hudup.core.data.ui.DataConfigTextField;
 import net.hudup.core.data.ui.SysConfigPane;
+import net.hudup.core.data.ui.UnitTable;
 import net.hudup.core.logistic.ui.UIUtil;
 import net.hudup.data.DatasetUtil2;
 import net.hudup.data.DefaultExternalQuery;
@@ -38,8 +40,6 @@ import net.hudup.data.ProviderImpl;
 import net.hudup.data.ui.AttributeListTable;
 import net.hudup.data.ui.ExternalConfigurator;
 import net.hudup.data.ui.UnitListBoxExt;
-import net.hudup.data.ui.UnitTable;
-import net.hudup.data.ui.UnitTableFactory;
 
 
 /**
@@ -759,18 +759,16 @@ public class DatasetCreator extends JPanel implements Dispose {
 		JPanel body = new JPanel(new BorderLayout());
 		main.add(body, BorderLayout.CENTER);
 		
-		final UnitTable unitTable = UnitTableFactory.create();
+		final UnitTable unitTable = Util.getFactory().createUnitTable();
 		body.add(unitTable.getComponent(), BorderLayout.CENTER);
 
 		final UnitListBoxExt unitList = new UnitListBoxExt() {
-
 			
 			/**
 			 * Serial version UID for serializable class. 
 			 */
 			private static final long serialVersionUID = 1L;
 
-			
 			@Override
 			public void clearData() {
 				// TODO Auto-generated method stub
@@ -778,7 +776,6 @@ public class DatasetCreator extends JPanel implements Dispose {
 				unitTable.clear();
 			}
 
-			
 			@Override
 			public void modify() {
 				// TODO Auto-generated method stub
@@ -789,7 +786,6 @@ public class DatasetCreator extends JPanel implements Dispose {
 						JOptionPane.INFORMATION_MESSAGE);
 			}
 
-			
 			@Override
 			public void drop() {
 				// TODO Auto-generated method stub
@@ -815,8 +811,7 @@ public class DatasetCreator extends JPanel implements Dispose {
 					return;
 				}
 				
-				
-				unitTable.update(provider, unit.getName());
+				unitTable.update(provider.getAssoc(), unit.getName());
 			}
 		});
 

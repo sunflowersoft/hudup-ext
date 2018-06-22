@@ -27,7 +27,6 @@ import net.hudup.core.data.ctx.ContextTemplateSchema;
 import net.hudup.core.data.ctx.ContextValue;
 import net.hudup.core.data.ctx.HierContextTemplate;
 import net.hudup.core.parser.TextParserUtil;
-import net.hudup.data.ProviderAssocFactory;
 
 
 /**
@@ -78,7 +77,7 @@ public class DefaultCTSManager extends CTSManagerAbstract {
 			e.printStackTrace();
 		}
 		
-		assoc = ProviderAssocFactory.create(config);
+		assoc = Util.getFactory().createProviderAssoc(config);
 		ctSchema = ContextTemplateSchemaImpl.create();
 		reload();
 

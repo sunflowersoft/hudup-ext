@@ -16,8 +16,9 @@ import net.hudup.core.logistic.DSUtil;
  */
 public final class DatasetAssoc {
 
+	
 	/**
-	 * 
+	 * Internal dataset.
 	 */
 	protected Dataset dataset = null;
 	

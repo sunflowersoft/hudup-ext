@@ -19,6 +19,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import net.hudup.core.Constants;
+import net.hudup.core.Util;
 import net.hudup.core.client.PowerServer;
 import net.hudup.core.data.Attribute;
 import net.hudup.core.data.AttributeList;
@@ -29,13 +30,12 @@ import net.hudup.core.data.Unit;
 import net.hudup.core.data.UnitList;
 import net.hudup.core.data.ui.DataConfigTextField;
 import net.hudup.core.data.ui.SysConfigPane;
+import net.hudup.core.data.ui.UnitTable;
 import net.hudup.core.logistic.ui.UIUtil;
 import net.hudup.data.DatasetUtil2;
 import net.hudup.data.ProviderImpl;
 import net.hudup.data.ui.AttributeListTable;
 import net.hudup.data.ui.UnitListBoxExt;
-import net.hudup.data.ui.UnitTable;
-import net.hudup.data.ui.UnitTableFactory;
 import net.hudup.server.PowerServerConfig;
 
 
@@ -766,7 +766,7 @@ public class SetupServerWizard extends JDialog {
 		JPanel body = new JPanel(new BorderLayout());
 		main.add(body, BorderLayout.CENTER);
 		
-		final UnitTable unitTable = UnitTableFactory.create();
+		final UnitTable unitTable = Util.getFactory().createUnitTable();
 		body.add(unitTable.getComponent(), BorderLayout.CENTER);
 
 		final UnitListBoxExt unitList = new UnitListBoxExt() {
@@ -822,8 +822,7 @@ public class SetupServerWizard extends JDialog {
 					return;
 				}
 				
-				
-				unitTable.update(provider, unit.getName());
+				unitTable.update(provider.getAssoc(), unit.getName());
 			}
 		});
 

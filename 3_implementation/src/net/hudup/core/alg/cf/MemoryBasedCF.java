@@ -7,8 +7,8 @@ import java.util.List;
 import java.util.Set;
 
 import net.hudup.core.Util;
-import net.hudup.core.alg.RecommendFilterParam;
 import net.hudup.core.alg.MemoryBasedRecommender;
+import net.hudup.core.alg.RecommendFilterParam;
 import net.hudup.core.alg.RecommendParam;
 import net.hudup.core.alg.Recommender;
 import net.hudup.core.data.DataConfig;

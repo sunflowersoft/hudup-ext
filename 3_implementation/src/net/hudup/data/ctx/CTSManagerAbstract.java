@@ -142,7 +142,6 @@ public abstract class CTSManagerAbstract implements CTSManager {
 	@Override
 	public void resetConfig() {
 		// TODO Auto-generated method stub
-		
 		throw new RuntimeException("Not support this method");
 	}
 

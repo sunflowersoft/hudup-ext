@@ -89,7 +89,7 @@ public class Listener extends SocketServer implements ServerStatusListener, Gate
 		try {
 			int port = NetUtil.getPort(config.getExportPort(), Constants.TRY_RANDOM_PORT);
 			if (port < 0)
-				throw new RuntimeException("Invalid port number");
+				throw new Exception("Invalid port number");
 			config.setExportPort(port);
 
 			registry = LocateRegistry.createRegistry(port);

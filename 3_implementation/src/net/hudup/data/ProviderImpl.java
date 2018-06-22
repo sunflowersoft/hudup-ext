@@ -77,7 +77,7 @@ public class ProviderImpl implements Provider {
 	 * @param config specified configuration.
 	 */
 	public ProviderImpl(DataConfig config) {
-		this.assoc = ProviderAssocFactory.create(config);
+		this.assoc = Util.getFactory().createProviderAssoc(config);
 		
 		try {
 			complete();

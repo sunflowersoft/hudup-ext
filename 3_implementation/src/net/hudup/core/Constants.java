@@ -48,14 +48,6 @@ public final class Constants {
 	 */
 	public final static String  DATE_FORMAT        = "yyyy-MM-dd HH-mm-ss";
 	
-	/**
-	 * Indicating whether or not the third-party library is used to load automatically plug-ins (algorithms, metrics, etc.) when booting.
-	 * Default value of this constant is {@code false} which means there is no third-party library is used to load automatically plug-ins.
-	 * However Hudup framework will use JPF boot library developed by Java Plug-in Framework (JPF) Project if this constant is set to be {@code true}.
-	 * JPF boot library is available at <a href="http://jpf.sourceforge.net/boot.html">http://jpf.sourceforge.net/boot.html</a>.
-	 */
-	public final static boolean BOOT_PLUGIN        = false;
-	
 	
 	/**
 	 * Default relative working directory.

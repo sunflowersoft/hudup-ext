@@ -3,9 +3,6 @@
  */
 package net.hudup.core.alg;
 
-import net.hudup.core.alg.Recommender;
-
-
 /**
  * Two typical inherited classes of {@link Recommender} are {@code MemoryBasedRecomender} and {@code ModelBasedRecommender}
  * which in turn are abstract classes for memory-based recommendation algorithm and model-based recommendation algorithm.
