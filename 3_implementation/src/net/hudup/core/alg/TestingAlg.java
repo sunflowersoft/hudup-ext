@@ -19,7 +19,23 @@ public interface TestingAlg extends Alg {
 	
 	
 	/**
-	 * Translate this regression model into text.
+	 * Getting parameter of the algorithm.
+	 * @return parameter of the algorithm. Return null if the algorithm does not run yet or run failed. 
+	 */
+	Object getParameter();
+	
+	
+    /**
+     * Convert parameter to shown text.
+     * @param parameter specified parameter.
+     * @param info addition information.
+     * @return shown text converted from specified parameter.
+     */
+    String parameterToShownText(Object parameter, Object...info);
+    
+    
+	/**
+	 * Translate this algorithm into text.
 	 * @return text form of this model.
 	 */
 	String getDescription();

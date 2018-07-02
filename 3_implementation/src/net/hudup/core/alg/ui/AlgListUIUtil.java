@@ -6,9 +6,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 
 import net.hudup.core.alg.Alg;
+import net.hudup.core.alg.TestingAlg;
 import net.hudup.core.logistic.ui.UIUtil;
 
 
@@ -36,15 +38,35 @@ public final class AlgListUIUtil {
 		
 		JPopupMenu ctxMenu = new JPopupMenu();
 		
+		//Configure the algorithm
 		JMenuItem miConfig = new JMenuItem("Configure");
 		miConfig.addActionListener( 
 			new ActionListener() {
 				
+				@Override
 				public void actionPerformed(ActionEvent e) {
 					config(ui);
 				}
 			});
 		ctxMenu.add(miConfig);
+		
+		//Showing description of the algorithm
+		if (alg instanceof TestingAlg) {
+			JMenuItem miDesc = new JMenuItem("Description");
+			miDesc.addActionListener( 
+				new ActionListener() {
+					
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						JOptionPane.showMessageDialog(
+								getFrame(ui), 
+								((TestingAlg)alg).getDescription(), 
+								"Description of " + alg.getName(), 
+								JOptionPane.INFORMATION_MESSAGE);
+					}
+				});
+			ctxMenu.add(miDesc);
+		}
 		
 		return ctxMenu;
 	}
