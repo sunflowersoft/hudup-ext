@@ -6,7 +6,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 
 import net.hudup.core.alg.Alg;
@@ -52,20 +51,16 @@ public final class AlgListUIUtil {
 		
 		//Showing description of the algorithm
 		if (alg instanceof TestingAlg) {
-			JMenuItem miDesc = new JMenuItem("Description");
-			miDesc.addActionListener( 
+			JMenuItem miManifest = new JMenuItem("Manifest");
+			miManifest.addActionListener( 
 				new ActionListener() {
 					
 					@Override
 					public void actionPerformed(ActionEvent e) {
-						JOptionPane.showMessageDialog(
-								getFrame(ui), 
-								((TestingAlg)alg).getDescription(), 
-								"Description of " + alg.getName(), 
-								JOptionPane.INFORMATION_MESSAGE);
+						((TestingAlg)alg).manifest();
 					}
 				});
-			ctxMenu.add(miDesc);
+			ctxMenu.add(miManifest);
 		}
 		
 		return ctxMenu;

@@ -42,6 +42,12 @@ public interface TestingAlg extends Alg {
 	
 
 	/**
+	 * Showing a dialog to describe the algorithm.
+	 */
+	void manifest();
+	
+	
+	/**
 	/**
 	 * Add the specified setting up listener to the end of listener list.
 	 * @param listener specified setting up listener

@@ -3,8 +3,6 @@
  */
 package net.hudup.core;
 
-
-
 /**
  * This utility final class defines essential constants used over Hudup framework.
  * @author Loc Nguyen
@@ -39,11 +37,6 @@ public final class Constants {
 	public final static String DEFAULT_EXT             = "hdp";
 	
 	/**
-	 * Field name of the maximum number digits in decimal precision.
-	 */
-	public final static String DECIMAL_PRECISION_FIELD = "hudup_decimal_precision";
-	
-	/**
 	 * The maximum number digits in decimal precision.
 	 */
 	public static int          DECIMAL_PRECISION       = 12;
@@ -51,7 +44,7 @@ public final class Constants {
 	/**
 	 * Default date format.
 	 */
-	public final static String  DATE_FORMAT           = "yyyy-MM-dd HH-mm-ss";
+	public final static String  DATE_FORMAT            = "yyyy-MM-dd HH-mm-ss";
 	
 	
 	/**
@@ -184,12 +177,12 @@ public final class Constants {
 	 */
 	static {
 		try {
-			String decimal = System.getProperty(DECIMAL_PRECISION_FIELD, null);
+			String decimal = System.getProperty("hudup_decimal_precision", null);
 			if (decimal != null)
 				DECIMAL_PRECISION = Integer.parseInt(decimal);
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			System.out.println("Error when getting exchanged property");
 		}
 	}
 	
