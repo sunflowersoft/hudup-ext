@@ -66,7 +66,7 @@ public class BitProbMatrixTableModel extends DefaultTableModel {
 				int colBitId = bitIdList.get(j);
 				double prob = this.matrix.get(rowBitId, colBitId);
 				
-				row.add(MathUtil.round(prob));
+				row.add(MathUtil.format(prob));
 			}
 			
 			data.add(row);

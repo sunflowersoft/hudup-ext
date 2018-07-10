@@ -301,7 +301,7 @@ class FreqItemsetListTM extends DefaultTableModel {
 		
 		Vector<Object> row = new Vector<Object>();
 		row.add("Frequent itemset " + (idx + 1));
-		row.add(MathUtil.round(itemset.getSupport()));
+		row.add(MathUtil.format(itemset.getSupport()));
 			
 		for (int columnId : columnIds) {
 			int found = itemset.indexOfReal(columnId, bitData);
@@ -309,7 +309,7 @@ class FreqItemsetListTM extends DefaultTableModel {
 			if (found != -1) {
 				int bitItemId = itemset.get(found);
 				double value = bitData.get(bitItemId).pair().value();
-				row.add(MathUtil.round(value));
+				row.add(MathUtil.format(value));
 			}
 			else {
 				row.add("");
@@ -336,7 +336,7 @@ class FreqItemsetListTM extends DefaultTableModel {
 		
 		Vector<Object> row = new Vector<Object>();
 		row.add("Frequent itemset " + (idx + 1));
-		row.add(MathUtil.round(itemset.getSupport()));
+		row.add(MathUtil.format(itemset.getSupport()));
 		
 		for (int columnId : columnIds) {
 			List<Integer> bitItemIdList = BitDataUtil.findBitItemIdOf(bitItemMap, columnId);
@@ -354,7 +354,7 @@ class FreqItemsetListTM extends DefaultTableModel {
 				continue;
 			
 			if (bitItemMap.containsKey(columnId))
-				row.add(MathUtil.round(bitItemMap.get(bitItemIdFound).value()));
+				row.add(MathUtil.format(bitItemMap.get(bitItemIdFound).value()));
 			else
 				row.add("");
 		}

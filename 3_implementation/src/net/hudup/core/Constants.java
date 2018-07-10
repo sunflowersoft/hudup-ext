@@ -26,27 +26,32 @@ public final class Constants {
 	/**
 	 * Default minimum rating value in rating matrix.
 	 */
-	public final static double   DEFAULT_MIN_RATING = 1;
+	public final static double DEFAULT_MIN_RATING = 1;
 	
 	/**
 	 * Default maximum rating value in rating matrix.
 	 */
-	public final static double   DEFAULT_MAX_RATING = 5;
+	public final static double DEFAULT_MAX_RATING      = 5;
 	
 	/**
 	 * Default extension of default file. Such default file is called Hudup file &quot;.hdp&quot;.
 	 */
-	public final static String  DEFAULT_EXT        = "hdp";
+	public final static String DEFAULT_EXT             = "hdp";
+	
+	/**
+	 * Field name of the maximum number digits in decimal precision.
+	 */
+	public final static String DECIMAL_PRECISION_FIELD = "hudup_decimal_precision";
 	
 	/**
 	 * The maximum number digits in decimal precision.
 	 */
-	public final static int     DECIMAL_PRECISION  = 12;
+	public static int          DECIMAL_PRECISION       = 12;
 	
 	/**
 	 * Default date format.
 	 */
-	public final static String  DATE_FORMAT        = "yyyy-MM-dd HH-mm-ss";
+	public final static String  DATE_FORMAT           = "yyyy-MM-dd HH-mm-ss";
 	
 	
 	/**
@@ -173,6 +178,20 @@ public final class Constants {
 	 */
 	public static final boolean SUPPORT_AUTO_INCREMENT_ID     = false;
 
+	
+	/**
+	 * Static code to load dynamic constant.
+	 */
+	static {
+		try {
+			String decimal = System.getProperty(DECIMAL_PRECISION_FIELD, null);
+			if (decimal != null)
+				DECIMAL_PRECISION = Integer.parseInt(decimal);
+		}
+		catch (Throwable e) {
+			e.printStackTrace();
+		}
+	}
 	
 	
 }

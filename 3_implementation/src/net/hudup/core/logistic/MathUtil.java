@@ -179,7 +179,7 @@ public final class MathUtil {
 	 * @return text format of the specified number.
 	 */
 	public static String format(double number, int decimal) {
-		return Double.toString(round(number, decimal));
+		return String.format("%." + decimal + "f", number);
 	}
 
 
@@ -189,8 +189,7 @@ public final class MathUtil {
 	 * @return text format of number of the specified number.
 	 */
 	public static String format(double number) {
-		return Double.toString(round(number, Constants.DECIMAL_PRECISION));
-		
+		return format(number, Constants.DECIMAL_PRECISION);
 	}
 
 
@@ -201,7 +200,7 @@ public final class MathUtil {
 	 * @param n decimal precision which is the number of decimal digits.
 	 * @return number rounded from the specified number.
 	 */
-	public static double round(double number, int n) {
+	public static double round2(double number, int n) {
 		if (Double.isNaN(number))
 			return Double.NaN;
 		
@@ -219,7 +218,7 @@ public final class MathUtil {
 		if (Double.isNaN(number))
 			return Double.NaN;
 		
-		return round(number, Constants.DECIMAL_PRECISION);
+		return round2(number, Constants.DECIMAL_PRECISION);
 	}
 
 	
