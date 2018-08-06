@@ -56,6 +56,19 @@ public class Evaluator implements AccessPoint {
 		// TODO Auto-generated method stub
 		new Firer();
 		
+		if (args != null && args.length > 0) {
+			String evClassName = args[0];
+			try {
+				net.hudup.core.evaluate.Evaluator ev = (net.hudup.core.evaluate.Evaluator)Class.forName(evClassName).newInstance();
+				run0(ev);
+				return;
+			}
+			catch (Throwable e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
 		List<net.hudup.core.evaluate.Evaluator> evList = SystemUtil.getInstances(ROOT_PACKAGE, net.hudup.core.evaluate.Evaluator.class);
 		if (evList.size() == 0) {
 			JOptionPane.showMessageDialog(

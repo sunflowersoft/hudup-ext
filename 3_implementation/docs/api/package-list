@@ -12,6 +12,7 @@ net.hudup.core.data
 net.hudup.core.data.ctx
 net.hudup.core.data.ui
 net.hudup.core.evaluate
+net.hudup.core.evaluate.testing
 net.hudup.core.factory
 net.hudup.core.logistic
 net.hudup.core.logistic.ui

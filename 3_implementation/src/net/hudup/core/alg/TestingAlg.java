@@ -1,5 +1,7 @@
 package net.hudup.core.alg;
 
+import net.hudup.core.data.Dataset;
+
 /**
  * This interface represents any executable algorithm.
  * 
@@ -9,6 +11,30 @@ package net.hudup.core.alg;
  */
 public interface TestingAlg extends Alg {
 	
+	
+	/**
+	 * Setting up this testing algorithm based on specified dataset.
+	 * In this current version, this method initialize the data sample for learning parameter.
+	 * @param dataset specified dataset.
+	 * @param info additional parameters to set up this EM. This parameter is really an array of sub-parameters.
+	 * @throws Exception if any error raises.
+	 */
+	void setup(Dataset dataset, Object... info) throws Exception;
+
+	
+	/**
+	 * Unsetup this testing algorithm. After this method is called, this algorithm cannot be used unless the method {@link #setup(Dataset, Object...)} is called again.
+	 */
+	public void unsetup();
+	
+	
+	/**
+	 * Main method to learn parameters. As usual, it is called by {@link #setup(Dataset, Object...)}.
+	 * @return the parameter to be learned.
+	 * @exception Exception if any error occurs.
+	 */
+	public Object learn() throws Exception;
+
 	
 	/**
 	 * Executing this algorithm by input parameter.
@@ -35,14 +61,14 @@ public interface TestingAlg extends Alg {
     
     
 	/**
-	 * Translate this algorithm into text.
+	 * Getting description of this algorithm.
 	 * @return text form of this model.
 	 */
 	String getDescription();
 	
 
 	/**
-	 * Showing a dialog to describe the algorithm.
+	 * Showing a dialog to describe or operate the algorithm.
 	 */
 	void manifest();
 	
