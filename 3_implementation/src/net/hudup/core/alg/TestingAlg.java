@@ -14,16 +14,17 @@ public interface TestingAlg extends Alg {
 	
 	/**
 	 * Setting up this testing algorithm based on specified dataset.
-	 * In this current version, this method initialize the data sample for learning parameter.
+	 * In this current version, this method initializes the data sample for learning parameter and then calls {@link #learn()} method.
 	 * @param dataset specified dataset.
-	 * @param info additional parameters to set up this EM. This parameter is really an array of sub-parameters.
+	 * @param info additional parameters to set up this algorithm. This parameter is really an array of sub-parameters.
 	 * @throws Exception if any error raises.
 	 */
 	void setup(Dataset dataset, Object... info) throws Exception;
 
 	
 	/**
-	 * Unsetup this testing algorithm. After this method is called, this algorithm cannot be used unless the method {@link #setup(Dataset, Object...)} is called again.
+	 * Unset up this testing algorithm, which release resources used by the {@link #setup(Dataset, Object...)} method.
+	 * Exceptionally, for testing algorithm, after this method is called, this algorithm can be used (dependent on specific application).
 	 */
 	public void unsetup();
 	
@@ -38,7 +39,7 @@ public interface TestingAlg extends Alg {
 	
 	/**
 	 * Executing this algorithm by input parameter.
-	 * @param input specified input parameter
+	 * @param input specified input parameter.
 	 * @return result of execution.
 	 */
 	Object execute(Object input);
