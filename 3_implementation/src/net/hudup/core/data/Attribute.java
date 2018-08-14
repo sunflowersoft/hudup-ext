@@ -9,6 +9,7 @@ import java.util.List;
 
 import net.hudup.core.Cloneable;
 import net.hudup.core.Constants;
+import net.hudup.core.logistic.NextUpdate;
 import net.hudup.core.parser.TextParsable;
 import net.hudup.core.parser.TextParserUtil;
 
@@ -515,6 +516,17 @@ public class Attribute implements Cloneable, TextParsable, Serializable {
 		return name;
 	}
 		
+	
+	/**
+	 * Setting the name of this attribute. Please use this method carefully when you know clearly your task.
+	 * This method will be improved for safety.
+	 * @param name specified name.
+	 */
+	@NextUpdate
+	public void setName(String name) {
+		this.name = name;
+	}
+	
 	
 	@Override
 	public Object clone() {
