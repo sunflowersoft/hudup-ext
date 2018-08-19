@@ -266,7 +266,7 @@ public class MetricsAnalyzeDlg extends JDialog {
 	
 	
 	/**
-	 * 
+	 * Zooming parameters.
 	 */
 	private void zoomParameters() {
 		final JDialog zoomDlg = new JDialog(this, 
@@ -302,11 +302,12 @@ public class MetricsAnalyzeDlg extends JDialog {
 
 	
 	/**
-	 * 
+	 * Exporting metrics to file.
 	 */
 	private void export() {
 		MetricsUtil util = new MetricsUtil(metrics, algTable);
 		util.export(this);
 	}
+	
 	
 }

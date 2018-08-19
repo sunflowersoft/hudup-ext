@@ -10,6 +10,7 @@ import net.hudup.core.logistic.SystemUtil;
 
 
 /**
+ * Text area to show system properties.
  * 
  * @author Loc Nguyen
  * @version 11.0
@@ -25,9 +26,10 @@ public class SystemPropertiesTextArea extends JTextArea {
 
 	
 	/**
+	 * Constructor with specified rows and columns.
 	 * 
-	 * @param rows
-	 * @param columns
+	 * @param rows specified rows.
+	 * @param columns specified columns.
 	 */
 	public SystemPropertiesTextArea(int rows, int columns) {
 		super(rows, columns);
@@ -38,7 +40,7 @@ public class SystemPropertiesTextArea extends JTextArea {
 
 
 	/**
-	 * 
+	 * Default constructor.
 	 */
 	public SystemPropertiesTextArea() {
 		super();
@@ -47,7 +49,7 @@ public class SystemPropertiesTextArea extends JTextArea {
 	
 	
 	/**
-	 * 
+	 * Initialization method.
 	 */
 	private void init() {
 		setEditable(false);
@@ -59,7 +61,7 @@ public class SystemPropertiesTextArea extends JTextArea {
 	
 	
 	/**
-	 * 
+	 * Refreshing this text area.
 	 */
 	public void refresh() {
 		PropList sysProps = SystemUtil.getSystemProperties();

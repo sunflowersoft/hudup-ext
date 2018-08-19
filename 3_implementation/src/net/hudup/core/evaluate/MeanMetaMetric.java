@@ -92,43 +92,62 @@ public class MeanMetaMetric extends MetaMetric {
 			return recalc0(mean);
 		}
 		
-		if (value instanceof Collection) {
-			List<Double> list = Util.newList();
-			Collection<?> valueList = (Collection<?>)value;
-			if (valueList.size() == 0)
-				return false;
-			for (Object v : valueList) {
-				if (!(v instanceof Number))
-					return false;
-				else
-					list.add(((Number)v).doubleValue());
-			}
-			value = list;
-			mean = new RealArrayMeanMetricValue();
-		}
-		else if (value instanceof double[]) {
-			List<Double> list = Util.newList();
-			double[] valueList = (double[])value;
-			if (valueList.length == 0)
-				return false;
-			for (double v : valueList) {
-				list.add(v);
-			}
-			value = list;
-			mean = new RealArrayMeanMetricValue();
-		}
-		else if (value instanceof Number)
-			mean = new RealMeanMetricValue();
-		
-		if (mean != null) {
-			mean.initialize(value);
-			return recalc0(mean);
-		}
-		else
+		List<Double> list = parseRealNumberList(value);
+		if (list.size() == 0)
 			return false;
+		else if (list.size() == 1) {
+			value = list.get(0);
+			mean = new RealMeanMetricValue();
+		}
+		else {
+			value = list;
+			mean = new RealArrayMeanMetricValue();
+		}
+		
+		mean.initialize(value);
+		return recalc0(mean);
 	}
 
 
+	/**
+	 * Parsing a list of real number from specified parameter.
+	 * @param param specified parameter.
+	 * @return list of real number parsed from specified parameter.
+	 */
+	public static List<Double> parseRealNumberList(Object param) {
+		List<Double> vector = Util.newList();
+
+		if (param instanceof Collection<?>) {
+			Collection<?> valueList = (Collection<?>)param;
+			for (Object v : valueList) {
+				if (v instanceof Number)
+				vector.add(((Number)v).doubleValue());
+			}
+		}
+		else if (param instanceof double[]) {
+			double[] valueList = (double[])param;
+			for (double v : valueList)
+				vector.add(v);
+		}
+		else if (param instanceof Double[]) { // Add on August 16, 2018. Check it later.
+			Double[] valueList = (Double[])param;
+			for (double v : valueList)
+				vector.add(v);
+		}
+		else if (param instanceof Object[]) { // Add on August 16, 2018. Check it later.
+			Object[] valueList = (Object[])param;
+			for (Object v : valueList) {
+				if (v instanceof Number)
+					vector.add(((Number)v).doubleValue());
+			}
+		}
+		else if (param instanceof Number)
+			vector.add(((Number)param).doubleValue());
+		
+		return vector;
+	}
+
+	
 	@Override
 	public Alg newInstance() {
 		// TODO Auto-generated method stub

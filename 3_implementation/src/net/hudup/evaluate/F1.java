@@ -6,8 +6,8 @@ import net.hudup.core.evaluate.MetricValue;
 import net.hudup.core.evaluate.RealMetricValue;
 
 
-
 /**
+ * This class represents F1 metric.
  * 
  * @author Loc Nguyen
  * @version 10.0
@@ -23,7 +23,7 @@ public class F1 extends MetaMetric {
 
 	
 	/**
-	 * 
+	 * Default constructor.
 	 */
 	public F1() {
 		super();
@@ -32,9 +32,9 @@ public class F1 extends MetaMetric {
 
 
 	/**
-	 * 
-	 * @param precision
-	 * @param recall
+	 * Setting up F1 metric with precision metric and recall metric.
+	 * @param precision precision metric.
+	 * @param recall recall metric.
 	 */
 	public void setup(Precision precision, Recall recall) {
 		// TODO Auto-generated method stub

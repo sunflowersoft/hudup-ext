@@ -92,7 +92,7 @@ public final class DSUtil {
 	 * @return {@link List} of elements (with template E).
 	 */
 	public static <E> List<E> toList(E[] array) {
-		List<E> list = Util.newList();
+		List<E> list = Util.newList(array.length);
 		for (E e : array) {
 			list.add(e);
 		}
@@ -100,6 +100,35 @@ public final class DSUtil {
 		return list;
 	}
 	
+	
+	/**
+	 * Converting a specified array of real numbers into list of real numbers.
+	 * @param array array of real numbers.
+	 * @return list of real numbers.
+	 */
+	public static List<Double> toDoubleList(double[] array) {
+		List<Double> list = Util.newList(array.length);
+		for (double e : array) {
+			list.add(e);
+		}
+		
+		return list;
+	}
+	
+	
+	/**
+	 * Cloning a specified collection of real numbers.
+	 * @param collection the specified collection of real numbers.
+	 * @return the cloned list of real numbers.
+	 */
+	public final static List<Double> toDoubleList(Collection<Double> collection) {
+		List<Double> newList = Util.newList(collection.size());
+		for (Double item : collection) {
+			newList.add(item.doubleValue());
+		}
+		return newList;
+	}
+
 	
 	/**
 	 * Converting a specified collection of double values into array of double values.
@@ -118,7 +147,23 @@ public final class DSUtil {
 		return array;
 	}
 
-
+	
+	/**
+	 * Initialize a list of real numbers that has exact size contains filled values.
+	 * @param size exact size.
+	 * @param filledValue filled value.
+	 * @return a list of real numbers that has exact size contains filled values.
+	 */
+	public final static List<Double> initDoubleList(int size, double filledValue) {
+		List<Double> newList = Util.newList(size);
+		for (int i = 0; i < size; i++) {
+			newList.add(filledValue);
+		}
+		
+		return newList;
+	}
+	
+	
 	/**
 	 * Converting a specified collection of double values into array of integer values.
 	 * @param collection specified collection of double values.
@@ -180,7 +225,7 @@ public final class DSUtil {
 	 * @return {@link List} of {@link BitSet} (s) cloned from the specified list of bit sets. 
 	 */
 	public final static List<BitSet> clone(List<BitSet> bsList) {
-		List<BitSet> result = Util.newList();
+		List<BitSet> result = Util.newList(bsList.size());
 		
 		for (BitSet bs : bsList) {
 			result.add((BitSet)bs.clone());
@@ -195,7 +240,7 @@ public final class DSUtil {
 	 * @return a list of cloned profiles.
 	 */
 	public static List<Profile> clone(Collection<Profile> profiles) {
-		List<Profile> profileList = Util.newList();
+		List<Profile> profileList = Util.newList(profiles.size());
 		for(Profile profile : profiles) {
 			Profile clonedProfile = (Profile)profile.clone();
 			profileList.add(clonedProfile);
@@ -210,7 +255,7 @@ public final class DSUtil {
 	 * @return a list of transferred profiles.
 	 */
 	public static List<Profile> transfer(Collection<Profile> profiles) {
-		List<Profile> profileList = Util.newList();
+		List<Profile> profileList = Util.newList(profiles.size());
 		for(Profile profile : profiles) {
 			profileList.add(profile);
 		}

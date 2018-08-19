@@ -1,6 +1,5 @@
 package net.hudup.core.logistic;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -153,9 +152,9 @@ public final class MathUtil {
 	 * @return List of Cartesian products for list of many sets.
 	 */
 	public static <T> List<Set<T>> cartesianProduct(List<Set<T>> list) {
-	    List<Iterator<T>> iterators = new ArrayList<Iterator<T>>(list.size());
-	    List<T> elements = new ArrayList<T>(list.size());
-	    List<Set<T>> toRet = new ArrayList<Set<T>>();
+	    List<Iterator<T>> iterators = Util.newList(list.size());
+	    List<T> elements = Util.newList(list.size());
+	    List<Set<T>> toRet = Util.newList();
 	    for (int i = 0; i < list.size(); i++) {
 	            iterators.add(list.get(i).iterator());
 	            elements.add(iterators.get(i).next());
@@ -200,7 +199,7 @@ public final class MathUtil {
 	 * @param n decimal precision which is the number of decimal digits.
 	 * @return number rounded from the specified number.
 	 */
-	public static double round2(double number, int n) {
+	public static double round(double number, int n) {
 		if (Double.isNaN(number))
 			return Double.NaN;
 		
@@ -218,7 +217,7 @@ public final class MathUtil {
 		if (Double.isNaN(number))
 			return Double.NaN;
 		
-		return round2(number, Constants.DECIMAL_PRECISION);
+		return round(number, Constants.DECIMAL_PRECISION);
 	}
 
 	

@@ -1,6 +1,8 @@
 package net.hudup.core.alg;
 
 import net.hudup.core.data.Dataset;
+import net.hudup.core.data.Fetcher;
+import net.hudup.core.data.Profile;
 
 /**
  * This interface represents any executable algorithm.
@@ -19,7 +21,17 @@ public interface TestingAlg extends Alg {
 	 * @param info additional parameters to set up this algorithm. This parameter is really an array of sub-parameters.
 	 * @throws Exception if any error raises.
 	 */
-	void setup(Dataset dataset, Object... info) throws Exception;
+	void setup(Dataset dataset, Object...info) throws Exception;
+	
+	
+	/**
+	 * Setting up this testing algorithm based on specified sample.
+	 * In this current version, this method calls {@link #learn()} method.
+	 * @param sample specified sample.
+	 * @param info additional parameters to set up this algorithm. This parameter is really an array of sub-parameters.
+	 * @throws Exception if any error raises.
+	 */
+	void setup(Fetcher<Profile> sample, Object...info) throws Exception;
 
 	
 	/**
@@ -31,16 +43,17 @@ public interface TestingAlg extends Alg {
 	
 	/**
 	 * Main method to learn parameters. As usual, it is called by {@link #setup(Dataset, Object...)}.
-	 * @return the parameter to be learned.
+	 * @param info additional parameter.
+	 * @return the parameter to be learned. Return null if learning is failed.
 	 * @exception Exception if any error occurs.
 	 */
-	public Object learn() throws Exception;
+	public Object learn(Object...info) throws Exception;
 
 	
 	/**
 	 * Executing this algorithm by input parameter.
 	 * @param input specified input parameter.
-	 * @return result of execution.
+	 * @return result of execution. Return null if execution is failed.
 	 */
 	Object execute(Object input);
 	

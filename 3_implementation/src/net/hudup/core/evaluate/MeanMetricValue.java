@@ -1,5 +1,7 @@
 package net.hudup.core.evaluate;
 
+import net.hudup.core.logistic.MathUtil;
+
 /**
  * This abstract class represents a average number called mean in form (average) as a {@link MetricValue}.
  * The average is referred by the internal variable {@link #value}.
@@ -90,6 +92,8 @@ public abstract class MeanMetricValue implements MetricValue {
 		// TODO Auto-generated method stub
 		if (!isUsed())
 			return "";
+		else if (value instanceof Number)
+			return MathUtil.format(((Number)value).doubleValue());
 		else
 			return value.toString();
 	}

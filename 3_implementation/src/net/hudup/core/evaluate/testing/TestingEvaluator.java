@@ -88,6 +88,9 @@ public abstract class TestingEvaluator extends Evaluator {
 		MAE mae = new MAE();
 		metricList.add(mae);
 
+		MAEVector maeVector = new MAEVector();
+		metricList.add(maeVector);
+
 		MSE mse = new MSE();
 		metricList.add(mse);
 		

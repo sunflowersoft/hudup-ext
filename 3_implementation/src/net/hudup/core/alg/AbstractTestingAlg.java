@@ -3,6 +3,8 @@ package net.hudup.core.alg;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Arrays;
+import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -12,17 +14,19 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.event.EventListenerList;
 
+import net.hudup.core.Util;
 import net.hudup.core.alg.SetupAlgEvent.Type;
+import net.hudup.core.data.AttributeList;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.Fetcher;
 import net.hudup.core.data.Profile;
 import net.hudup.core.logistic.ui.UIUtil;
 
 /**
- * <code>AbstractTestingAlg</code> is the most abstract class for testing algorithm.
+ * This is the most abstract class for testing algorithm.
  * 
  * @author Loc Nguyen
- * @version 1.0*
+ * @version 1.0
  */
 public abstract class AbstractTestingAlg extends AbstractAlg implements TestingAlg {
 
@@ -61,12 +65,17 @@ public abstract class AbstractTestingAlg extends AbstractAlg implements TestingA
 	}
 
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public synchronized void setup(Dataset dataset, Object... info) throws Exception {
+	public synchronized void setup(Dataset dataset, Object...info) throws Exception {
 		// TODO Auto-generated method stub
 		unsetup();
 		this.dataset = dataset;
-		this.sample = dataset.fetchSample();
+		if (info != null && info.length > 0 && (info[0] instanceof Fetcher<?>))
+			this.sample = (Fetcher<Profile>)info[0];
+		else
+			this.sample = dataset.fetchSample();
+		
 		learn();
 		
 		SetupAlgEvent evt = new SetupAlgEvent(
@@ -80,9 +89,20 @@ public abstract class AbstractTestingAlg extends AbstractAlg implements TestingA
 
 	
 	@Override
+	public void setup(Fetcher<Profile> sample, Object...info) throws Exception {
+		// TODO Auto-generated method stub
+		List<Object> additionalInfo = Util.newList();
+		additionalInfo.add(sample);
+		additionalInfo.addAll(Arrays.asList(info));
+
+		setup((Dataset)null, additionalInfo.toArray());
+	}
+
+
+	@Override
 	public synchronized void unsetup() {
 		try {
-			if (sample != null)
+			if (dataset != null && sample != null)
 				sample.close();
 		}
 		catch(Exception e) {
@@ -91,7 +111,7 @@ public abstract class AbstractTestingAlg extends AbstractAlg implements TestingA
 		finally {
 			sample = null;
 		}
-
+	
 		if (dataset != null && dataset.isExclusive())
 			dataset.clear();
 		dataset = null;
@@ -182,6 +202,36 @@ public abstract class AbstractTestingAlg extends AbstractAlg implements TestingA
 	}
 
 
+	/**
+	 * Getting attribute list of sample.
+	 * @param sample specified sample.
+	 * @return attribute list of sample.
+	 */
+	public static AttributeList getSampleAttributeList(Fetcher<Profile> sample) {
+		AttributeList attList = null;
+		try {
+			synchronized (sample) {
+				while (sample.next()) {
+					Profile profile = sample.pick();
+					if (profile == null)
+						continue;
+					
+					attList = profile.getAttRef();
+					if (attList != null)
+						break;
+				}
+				sample.reset();
+			}
+		}
+		catch (Throwable e) {
+			e.printStackTrace();
+			attList = null;
+		}
+		
+		return attList;
+	}
+	
+	
 	@Override
 	protected void finalize() throws Throwable {
 		// TODO Auto-generated method stub

@@ -148,7 +148,6 @@ public class MetricWrapper extends AbstractMetric {
 	}
 
 	
-	
 	@Override
 	public boolean isValid() {
 		// TODO Auto-generated method stub

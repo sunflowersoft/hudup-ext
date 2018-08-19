@@ -68,7 +68,4 @@ public class HudupRecallMetric extends DefaultMetric {
 	}
 
 
-
-	
-	
 }

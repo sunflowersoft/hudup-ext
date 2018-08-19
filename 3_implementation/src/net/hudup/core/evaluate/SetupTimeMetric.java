@@ -55,12 +55,4 @@ public class SetupTimeMetric extends TimeMetric {
 	}
 
 
-
-
-
-
-
-	
-	
-	
 }

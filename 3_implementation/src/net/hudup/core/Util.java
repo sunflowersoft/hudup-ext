@@ -56,6 +56,18 @@ public final class Util {
 	    return new ArrayList<T>();
 	}
 
+	
+	/**
+	 * Creating a new {@link List} with initial capacity.
+	 * @param <T> type of elements in list.
+	 * @param capacity initial capacity of this list.
+	 * @return new {@link List}.
+	 */
+	public static <T> List<T> newList(int initialCapacity) {
+	    return new ArrayList<T>(initialCapacity);
+	}
+
+	
 	/**
 	 * Creating a new {@link Set}.
 	 * @param <T> type of elements in set.

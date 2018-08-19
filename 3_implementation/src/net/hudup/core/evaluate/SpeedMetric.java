@@ -19,7 +19,7 @@ public class SpeedMetric extends TimeMetric {
 
 
 	/**
-	 * 
+	 * Default constructor.
 	 */
 	public SpeedMetric() {
 		// TODO Auto-generated constructor stub

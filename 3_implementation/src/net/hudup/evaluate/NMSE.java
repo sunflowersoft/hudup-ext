@@ -11,6 +11,7 @@ import net.hudup.core.evaluate.MetricValue;
 
 
 /**
+ * This class represents NMSE metric for recommendation algorithms.
  * 
  * @author Loc Nguyen
  * @version 10.0
@@ -92,7 +93,6 @@ public class NMSE extends PredictiveAccuracy {
 		// TODO Auto-generated method stub
 		return new NMSE();
 	}
-
 
 
 }

@@ -76,7 +76,6 @@ public class FractionMetricValue implements MetricValue {
 				!(metricValue instanceof FractionMetricValue))
 			return;
 		
-		
 		FractionMetricValue fraction = (FractionMetricValue)metricValue;
 		if (!isUsed()) {
 			this.a = fraction.a();

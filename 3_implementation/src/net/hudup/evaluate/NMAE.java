@@ -11,6 +11,7 @@ import net.hudup.core.evaluate.MetricValue;
 
 
 /**
+ * This class represents NMAE metric for recommendation algorithms.
  * 
  * @author Loc Nguyen
  * @version 10.0

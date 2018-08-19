@@ -11,6 +11,7 @@ import net.hudup.core.evaluate.MetricValue;
 
 
 /**
+ * This class represents Recall metric for recommendation algorithms.
  * 
  * @author Loc Nguyen
  * @version 10.0
@@ -26,7 +27,7 @@ public class Recall extends ClassificationAccuracy {
 
 
 	/**
-	 * 
+	 * Default constructor.
 	 */
 	public Recall() {
 		super();

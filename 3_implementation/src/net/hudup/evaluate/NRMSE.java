@@ -7,6 +7,7 @@ import net.hudup.core.evaluate.RealMetricValue;
 
 
 /**
+ * This class represents NRMSE metric for recommendation algorithms.
  * 
  * @author Loc Nguyen
  * @version 10.0
@@ -88,8 +89,4 @@ public class NRMSE extends MetaMetric {
 	}
 
 
-
-	
-	
-	
 }

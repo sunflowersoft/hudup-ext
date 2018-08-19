@@ -6,7 +6,7 @@ import net.hudup.core.evaluate.FractionMetricValue;
 import net.hudup.core.evaluate.MetricValue;
 
 /**
- * This class represents mean absolute error for evaluating dual regression EM algorithm.
+ * This class represents mean absolute error for evaluating testing algorithms.
  * 
  * @author Loc Nguyen
  * @version 1.0

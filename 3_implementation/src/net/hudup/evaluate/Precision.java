@@ -11,6 +11,7 @@ import net.hudup.core.evaluate.MetricValue;
 
 
 /**
+ * This class represents Precision metric for recommendation algorithms.
  * 
  * @author Loc Nguyen
  * @version 10.0
@@ -90,15 +91,4 @@ public class Precision extends ClassificationAccuracy {
 	}
 
 
-
-
-
-
-
-
-
-
-	
-	
-	
 }

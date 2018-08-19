@@ -1,6 +1,5 @@
 package net.hudup.core.data;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -87,8 +86,8 @@ public class ObjectPair<T> implements Cloneable {
 	 * @param pairList specified list of pairs.
 	 * @return list of keys. 
 	 */
-	public static <T> ArrayList<T> getKeyList(List<ObjectPair<T>> pairList) {
-		ArrayList<T> keyList = new ArrayList<T>();
+	public static <T> List<T> getKeyList(List<ObjectPair<T>> pairList) {
+		List<T> keyList = Util.newList();
 		for (ObjectPair<T> pair : pairList) {
 			keyList.add(pair.key());
 		}
@@ -108,7 +107,7 @@ public class ObjectPair<T> implements Cloneable {
 	public static <T> void sort(List<ObjectPair<T>> pairList, int maxNumber, boolean descending) {
 		sort(pairList, descending);
 		
-		List<ObjectPair<T>> newPairList = new ArrayList<ObjectPair<T>>();
+		List<ObjectPair<T>> newPairList = Util.newList();
 		newPairList.addAll(
 				pairList.subList(0, Math.min(maxNumber, pairList.size()))
 				);

@@ -25,6 +25,8 @@ import net.hudup.core.logistic.xURI;
 
 
 /**
+ * This class represents the estimation evaluator for recommendation algorithms. It is inherited from {@link RecommendEvaluator} class.
+ * Please see {@link RecommendEvaluator} for more details.
  * 
  * @author Loc Nguyen
  * @version 10.0

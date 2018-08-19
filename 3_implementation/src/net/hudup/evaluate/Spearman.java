@@ -14,6 +14,7 @@ import net.hudup.core.logistic.Vector;
 
 
 /**
+ * This class represents Spearman metric for recommendation algorithms.
  * 
  * @author Loc Nguyen
  * @version 10.0

@@ -6,6 +6,7 @@ import net.hudup.core.evaluate.RealMetricValue;
 import net.hudup.core.evaluate.RealTwoArrayMetricValue;
 import net.hudup.core.evaluate.TwoArrayMetric;
 import net.hudup.core.evaluate.TwoArrayMetricValue;
+import net.hudup.core.logistic.MathUtil;
 import net.hudup.core.logistic.Vector;
 
 /**
@@ -114,6 +115,8 @@ public class Pearson extends TwoArrayMetric {
 			Object value = value();
 			if (value == null)
 				return "";
+			else if (value instanceof Number)
+				return MathUtil.format(((Number)value).doubleValue());
 			else
 				return value.toString();
 		}
