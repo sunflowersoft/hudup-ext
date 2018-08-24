@@ -5,10 +5,10 @@ import java.util.List;
 import net.hudup.core.Util;
 import net.hudup.core.alg.Alg;
 import net.hudup.core.evaluate.FractionMetricValue;
-import net.hudup.core.evaluate.MeanMetaMetric;
 import net.hudup.core.evaluate.MetricValue;
 import net.hudup.core.evaluate.VectorMetric;
 import net.hudup.core.evaluate.VectorMetricValue;
+import net.hudup.core.logistic.DSUtil;
 
 /**
  * This class represents vector of mean absolute errors for evaluating testing algorithms.
@@ -68,11 +68,11 @@ public class MAEVector extends VectorMetric {
 		if (params == null || params.length < 2)
 			return null;
 		
-		List<Double> vector0 = MeanMetaMetric.parseRealNumberList(params[0]);
+		List<Double> vector0 = DSUtil.toDoubleList(params[0], true);
 		if (vector0.size() == 0)
 			return null;
 		
-		List<Double> vector1 = MeanMetaMetric.parseRealNumberList(params[1]);
+		List<Double> vector1 = DSUtil.toDoubleList(params[1], true);
 		if (vector1.size() == 0)
 			return null;
 		

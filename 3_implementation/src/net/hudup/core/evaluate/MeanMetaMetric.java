@@ -1,11 +1,10 @@
 package net.hudup.core.evaluate;
 
-import java.util.Collection;
 import java.util.List;
 
-import net.hudup.core.Util;
 import net.hudup.core.alg.Alg;
 import net.hudup.core.logistic.BaseClass;
+import net.hudup.core.logistic.DSUtil;
 
 
 /**
@@ -92,7 +91,7 @@ public class MeanMetaMetric extends MetaMetric {
 			return recalc0(mean);
 		}
 		
-		List<Double> list = parseRealNumberList(value);
+		List<Double> list = DSUtil.toDoubleList(value, true);
 		if (list.size() == 0)
 			return false;
 		else if (list.size() == 1) {
@@ -109,45 +108,6 @@ public class MeanMetaMetric extends MetaMetric {
 	}
 
 
-	/**
-	 * Parsing a list of real number from specified parameter.
-	 * @param param specified parameter.
-	 * @return list of real number parsed from specified parameter.
-	 */
-	public static List<Double> parseRealNumberList(Object param) {
-		List<Double> vector = Util.newList();
-
-		if (param instanceof Collection<?>) {
-			Collection<?> valueList = (Collection<?>)param;
-			for (Object v : valueList) {
-				if (v instanceof Number)
-				vector.add(((Number)v).doubleValue());
-			}
-		}
-		else if (param instanceof double[]) {
-			double[] valueList = (double[])param;
-			for (double v : valueList)
-				vector.add(v);
-		}
-		else if (param instanceof Double[]) { // Add on August 16, 2018. Check it later.
-			Double[] valueList = (Double[])param;
-			for (double v : valueList)
-				vector.add(v);
-		}
-		else if (param instanceof Object[]) { // Add on August 16, 2018. Check it later.
-			Object[] valueList = (Object[])param;
-			for (Object v : valueList) {
-				if (v instanceof Number)
-					vector.add(((Number)v).doubleValue());
-			}
-		}
-		else if (param instanceof Number)
-			vector.add(((Number)param).doubleValue());
-		
-		return vector;
-	}
-
-	
 	@Override
 	public Alg newInstance() {
 		// TODO Auto-generated method stub

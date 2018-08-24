@@ -7,10 +7,12 @@ import java.io.BufferedReader;
 import java.io.Reader;
 import java.util.BitSet;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import net.hudup.core.Constants;
 import net.hudup.core.Util;
 import net.hudup.core.data.Profile;
 import net.hudup.core.data.RatingTriple;
@@ -129,6 +131,126 @@ public final class DSUtil {
 		return newList;
 	}
 
+	
+	/**
+	 * Converting specified object into real number.
+	 * @param object specified object.
+	 * @return real number.
+	 */
+	public final static double toDouble(Object object) {
+		if (object == null)
+			return Constants.UNUSED;
+		else if (object instanceof Double)
+			return (double)object;
+		else if (object instanceof Number)
+			return ((Number)object).doubleValue();
+		else if (object instanceof Boolean)
+			return ((boolean)object) ? 1.0 : 0.0;
+		else if (object instanceof Character)
+			return Character.getNumericValue(((Character)object));
+		else if (object instanceof Date)
+			return ((Date)object).getTime();
+		else {
+			try {
+				return Double.parseDouble(object.toString());
+			}
+			catch (Exception e) {
+				
+			}
+			return Constants.UNUSED;
+		}
+	}
+	
+	
+	/**
+	 * Converting any object of a list of real numbers.
+	 * @param object specified object.
+	 * @param removeUnusedValues if true, unused real numbers are removed from list;
+	 * @return a list of real numbers.
+	 */
+	public final static List<Double> toDoubleList(Object object, boolean removeUnusedValues) {
+		if(object == null)
+			return Util.newList();
+		
+		List<Double> newList = Util.newList();
+		if (object instanceof Collection) {
+			Collection<?> collections = (Collection<?>)object;
+			for (Object el : collections)
+				newList.add(toDouble(el));
+		}
+		else if (object instanceof Double[]) {
+			Double[] array = (Double[])object;
+			for (Double el : array)
+				newList.add(el);
+		}
+		else if (object instanceof Object[]) {
+			Object[] array = (Object[])object;
+			for (Object el : array)
+				newList.add(toDouble(el));
+		}
+		else if (object instanceof double[]) {
+			double[] array = (double[])object;
+			for (double el : array)
+				newList.add(el);
+		}
+		else if (object instanceof float[]) {
+			float[] array = (float[])object;
+			for (float el : array)
+				newList.add((double)el);
+		}
+		else if (object instanceof long[]) {
+			long[] array = (long[])object;
+			for (long el : array)
+				newList.add((double)el);
+		}
+		else if (object instanceof int[]) {
+			int[] array = (int[])object;
+			for (int el : array)
+				newList.add((double)el);
+		}
+		else if (object instanceof short[]) {
+			short[] array = (short[])object;
+			for (short el : array)
+				newList.add((double)el);
+		}
+		else if (object instanceof byte[]) {
+			byte[] array = (byte[])object;
+			for (byte el : array)
+				newList.add((double)el);
+		}
+		else if (object instanceof boolean[]) {
+			boolean[] array = (boolean[])object;
+			for (boolean el : array)
+				newList.add(el ? 1.0 : 0.0);
+		}
+		else if (object instanceof char[]) {
+			char[] array = (char[])object;
+			for (char el : array)
+				newList.add((double)Character.getNumericValue(el));
+		}
+		else if (object instanceof Profile) {
+			Profile profile = (Profile)object;
+			int n = profile.getAttCount();
+			for (int i = 0; i < n; i++)
+				newList.add(profile.getValueAsReal(i));
+		}
+		else {
+			double value = toDouble(object);
+			newList.add(value);
+		}
+		
+		if (removeUnusedValues) {
+			List<Double> tempList = Util.newList(newList.size());
+			for (Double v : newList) {
+				if (Util.isUsed(v))
+					tempList.add(v);
+			}
+			newList = tempList;
+		}
+		
+		return newList;
+	}
+	
 	
 	/**
 	 * Converting a specified collection of double values into array of double values.
