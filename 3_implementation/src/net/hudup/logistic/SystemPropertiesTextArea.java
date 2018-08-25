@@ -64,10 +64,10 @@ public class SystemPropertiesTextArea extends JTextArea {
 	 * Refreshing this text area.
 	 */
 	public void refresh() {
+		StringBuffer buffer = new StringBuffer();
 		PropList sysProps = SystemUtil.getSystemProperties();
 		List<String> keys = Util.newList();
 		keys.addAll(sysProps.keySet());
-		StringBuffer buffer = new StringBuffer();
 		for (int i = 0; i < keys.size(); i++) {
 			if (i > 0)
 				buffer.append("\n\n");

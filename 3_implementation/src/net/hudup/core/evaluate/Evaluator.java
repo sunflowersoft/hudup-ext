@@ -230,7 +230,7 @@ public abstract class Evaluator extends AbstractRunner implements SetupAlgListen
 					long endSetupTime = System.currentTimeMillis();
 					long setupElapsed = endSetupTime - beginSetupTime;
 					Metrics setupMetrics = result.recalc(
-							alg.getName(), 
+							alg, 
 							datasetId, 
 							SetupTimeMetric.class, 
 							new Object[] { setupElapsed / 1000.0f }
@@ -267,7 +267,7 @@ public abstract class Evaluator extends AbstractRunner implements SetupAlgListen
 						//
 						long recommendElapsed = endRecommendTime - beginRecommendTime;
 						Metrics speedMetrics = result.recalc(
-								alg.getName(), 
+								alg, 
 								datasetId, 
 								SpeedMetric.class, 
 								new Object[] { recommendElapsed / 1000.0f }
@@ -279,7 +279,7 @@ public abstract class Evaluator extends AbstractRunner implements SetupAlgListen
 						
 						if (executedResult != null) { // successful recommendation
 							Metrics executedMetrics = result.recalc(
-									alg.getName(), 
+									alg, 
 									datasetId,
 									new Object[] { executedResult, extractTestValue(alg, testingProfile) }
 								); // calculating execution metric
@@ -305,7 +305,7 @@ public abstract class Evaluator extends AbstractRunner implements SetupAlgListen
 					} // User id iterate
 					
 					Metrics hudupRecallMetrics = result.recalc(
-							alg.getName(), 
+							alg, 
 							datasetId, 
 							HudupRecallMetric.class, 
 							new Object[] { new FractionMetricValue(vExecutedCount, vCurrentTotal) }

@@ -16,7 +16,7 @@ public interface TestingAlg extends Alg {
 	
 	/**
 	 * Setting up this testing algorithm based on specified dataset.
-	 * In this current version, this method initializes the data sample for learning parameter and then calls {@link #learn()} method.
+	 * In this current version, this method initializes the data sample for learning parameter and then calls {@link #learn(Object...)} method.
 	 * @param dataset specified dataset.
 	 * @param info additional parameters to set up this algorithm. This parameter is really an array of sub-parameters.
 	 * @throws Exception if any error raises.
@@ -26,7 +26,7 @@ public interface TestingAlg extends Alg {
 	
 	/**
 	 * Setting up this testing algorithm based on specified sample.
-	 * In this current version, this method calls {@link #learn()} method.
+	 * In this current version, this method calls {@link #learn(Object...)} method.
 	 * @param sample specified sample.
 	 * @param info additional parameters to set up this algorithm. This parameter is really an array of sub-parameters.
 	 * @throws Exception if any error raises.

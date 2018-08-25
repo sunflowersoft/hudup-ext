@@ -1,4 +1,4 @@
-package net.hudup.evaluate.ui;
+package net.hudup.core.evaluate;
 
 import java.awt.Component;
 import java.io.OutputStream;
@@ -13,6 +13,7 @@ import java.util.Vector;
 
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
+import javax.swing.JTextArea;
 import javax.swing.table.DefaultTableModel;
 
 import flanagan.plot.PlotGraph;
@@ -29,9 +30,6 @@ import net.hudup.core.RegisterTable;
 import net.hudup.core.Util;
 import net.hudup.core.alg.Alg;
 import net.hudup.core.data.PropList;
-import net.hudup.core.evaluate.Metric;
-import net.hudup.core.evaluate.MetricValue;
-import net.hudup.core.evaluate.Metrics;
 import net.hudup.core.logistic.MathUtil;
 import net.hudup.core.logistic.SystemUtil;
 import net.hudup.core.logistic.UriAdapter;
@@ -307,10 +305,92 @@ public class MetricsUtil {
 
 	
 	/**
+	 * Create table for showing algorithms descriptions.
+	 * @return {@link JTable} for showing algorithms descriptions.
+	 */
+	public JTable createAlgDescsTable() {
+		List<String> algNameList = this.metrics.getAlgNameList();
+		Collections.sort(algNameList);
+		
+		List<Integer> datasetIdList = this.metrics.getDatasetIdList();
+		Collections.sort(datasetIdList);
+		
+		Vector<Vector<Object>> data = Util.newVector();
+		for (int datasetId : datasetIdList) {
+			Vector<Object> row = Util.newVector();
+			row.add("Dataset \"" + datasetId + "\"");
+			
+			for (String algName : algNameList) {
+				String algDesc = metrics.getAlgDesc(algName, datasetId);
+				algDesc = algDesc == null ? "" : algDesc; 
+				row.add(algDesc);
+				
+			}
+			data.add(row);
+		}
+		
+		Vector<String> columns = Util.newVector();
+		columns.add("");
+		columns.addAll(algNameList);
+		
+		DefaultTableModel generalModel = new DefaultTableModel(data, columns) {
+
+			/**
+			 * Serial version UID for serializable class. 
+			 */
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public boolean isCellEditable(int row, int column) {
+				// TODO Auto-generated method stub
+				return false;
+			}
+			
+		};
+		
+		
+		JTable table = new JTable(generalModel);
+		return table;
+	}
+
+	
+	/**
+	 * Create text area for showing algorithms descriptions.
+	 * @return {@link JTable} for showing algorithms descriptions.
+	 */
+	public JTextArea createAlgDescsTextArea() {
+		List<String> algNameList = this.metrics.getAlgNameList();
+		Collections.sort(algNameList);
+		List<Integer> datasetIdList = this.metrics.getDatasetIdList();
+		Collections.sort(datasetIdList);
+
+		StringBuffer buffer = new StringBuffer();
+		for (int i = 0; i < algNameList.size(); i++) {
+			String algName = algNameList.get(i);
+			if (i > 0)
+				buffer.append("\n\n");
+			buffer.append(algName);
+			
+			for (int j = 0; j < datasetIdList.size(); j++) {
+				int datasetId = datasetIdList.get(j);
+				String algDesc = metrics.getAlgDesc(algName, datasetId);
+				algDesc = algDesc == null ? "" : algDesc;
+				buffer.append("\n  Dataset \"" + datasetId + "\": " + algDesc);
+			}
+		}
+		
+		JTextArea txtAlgDescs = new JTextArea(buffer.toString());
+		txtAlgDescs.setEditable(false);
+		
+		return txtAlgDescs;
+	}
+	
+	
+	/**
 	 * Create metrics evaluation by parameters.
 	 * @return parameters {@link JTable} metrics evaluation by parameters.
 	 */
-	public JTable createParametersTable() {
+	public JTable createAlgParamsTable() {
 		List<String> algNameList = this.metrics.getAlgNameList();
 		
 		Map<String, Map<Integer, String>> map = Util.newMap();
@@ -457,6 +537,7 @@ public class MetricsUtil {
 		List<String> metricNameList = this.metrics.getMetricNameList();
 		Collections.sort(metricNameList);
 		
+		//Create metric cells for given dataset.
 		for (String metricName : metricNameList) {
 			Label lblMetricName = new Label(col, row, metricName, cellFormat12);
 			sheet.addCell(lblMetricName);
@@ -548,6 +629,7 @@ public class MetricsUtil {
 			sheet.addCell(lblDataset);
 			
 			newcol = col + 1;
+			
 			for (String algName : algNameList) {
 				Metric metric = this.metrics.get(metricName, algName, datasetId);
 				MetricValue metricValue = null;
@@ -569,88 +651,38 @@ public class MetricsUtil {
 
 	
 	/**
-	 * Create excel file for metrics evaluation.
-	 * @param uri specified URI of excel file.
+	 * Create excel rows of algorithm parameters.
+	 * @param sheet excel sheet writer.
+	 * @param metricName metric name.
+	 * @param row starting row index.
+	 * @param col starting column index.
+	 * @return rows to be saved
 	 * @throws Exception if any error raises.
 	 */
-	public void createExcel(xURI uri) throws Exception {
-		UriAdapter adapter = new UriAdapter(uri);
-		OutputStream os = adapter.getOutputStream(uri, false);
-		WritableWorkbook workbook = Workbook.createWorkbook(os);
+	private int createAlgParamsExcel(
+			WritableSheet sheet, 
+			int row, 
+			int col) throws Exception {
 		
-		WritableSheet sheet = workbook.createSheet("Results", 0);
-	
-		WritableFont font12 = new WritableFont(WritableFont.TIMES, 12,
-				WritableFont.NO_BOLD, false);
-		WritableCellFormat cellFormat12 = new WritableCellFormat(font12);
-
-		WritableFont boldFont14 = new WritableFont(WritableFont.TIMES, 14,
-				WritableFont.BOLD, false);
-		WritableCellFormat boldCellFormat14 = new WritableCellFormat(boldFont14);
-
 		WritableFont boldFont12 = new WritableFont(WritableFont.TIMES, 12,
 				WritableFont.BOLD, false);
 		WritableCellFormat boldCellFormat12 = new WritableCellFormat(boldFont12);
 
-		int row = 0;
-		
-		
-		Label lblGeneral = new Label(0, row, "General evaluation", boldCellFormat14);
-		sheet.addCell(lblGeneral);
-		row += 1;
-		
-		int count = createDatasetExcel(sheet, row, 0);
-		row += count + 2;
-				
-		Label lblDsDetails = new Label(0, row, "Datasets evaluation", boldCellFormat14);
-		sheet.addCell(lblDsDetails);
-		row += 1;
+		WritableFont font12 = new WritableFont(WritableFont.TIMES, 12,
+				WritableFont.NO_BOLD, false);
+		WritableCellFormat cellFormat12 = new WritableCellFormat(font12);
 
 		List<String> algNameList = this.metrics.getAlgNameList();
 		Collections.sort(algNameList);
-		List<Integer> datasetIdList = this.metrics.getDatasetIdList();
-		Collections.sort(datasetIdList);
-		int maxCount = 0;
-		int col = 0;
-		for (int datasetId : datasetIdList) {
-			Label lblDataset = new Label(col, row, "Dataset \"" + datasetId + "\"", boldCellFormat12);
-			sheet.addCell(lblDataset);
-			
-			count = createDatasetExcel(sheet, datasetId, row + 1, col);
-			col += algNameList.size() + 3;
-			
-			if (maxCount < count)
-				maxCount = count;
-		}
-		maxCount++;
-		row += maxCount + 2;
-		
-		// Evaluation on each metric
-		List<String> metricNameList = this.metrics.getMetricNameList();
-		Collections.sort(metricNameList);
-		for (String metricName : metricNameList) {
-			Label lblMetricName = new Label(0, row, metricName + " evaluation", boldCellFormat14);
-			sheet.addCell(lblMetricName);
-			row += 1;
-			row += createMetricExcel(sheet, metricName, row, 0) + 2;
-		}
 
-		
-		// Algorithm parameters
-		Label lblParameters = new Label(0, row, "Algorithm parameters", boldCellFormat14);
-		sheet.addCell(lblParameters);
-		int r = 0;
-		int c = 0;
 		int maxRow = 0;
-		row ++;
-		for (String algName : algNameList) {
-			
+		for (int c = 0; c < algNameList.size(); c++) {
+			String algName = algNameList.get(c);
 			Alg alg = algTable.query(algName);
 			if (alg == null) continue;
 			
-			r = 0;
-			c ++;
-			Label lblAlg = new Label(c, row + r, algName, boldCellFormat12);
+			int r = 0;
+			Label lblAlg = new Label(c + 1, row + r, algName, boldCellFormat12);
 			sheet.addCell(lblAlg);
 			
 			List<String> paramNames = Util.newList();
@@ -675,19 +707,102 @@ public class MetricsUtil {
 				
 				r ++;
 				countRow ++;
-				Label paramCell = new Label(c, row + r, paramText, cellFormat12);
+				Label paramCell = new Label(c + 1, row + r, paramText, cellFormat12);
 				sheet.addCell(paramCell);
 			}
 			maxRow = Math.max(maxRow, countRow);
 		}
-		row += maxRow + 3;
 		
+		return maxRow + 1;
+	}
+	
+	
+	/**
+	 * Create excel rows of algorithm descriptions.
+	 * @param sheet excel sheet writer.
+	 * @param metricName metric name.
+	 * @param row starting row index.
+	 * @param col starting column index.
+	 * @return rows to be saved
+	 * @throws Exception if any error raises.
+	 */
+	private int createAlgDescsExcel(
+			WritableSheet sheet, 
+			int row, 
+			int col) throws Exception {
+		int rows = 0;
 		
-		// Note
-		Label lblNote = new Label(0, row, "Note", boldCellFormat12);
-		sheet.addCell(lblNote);
-		row += 1;
+		WritableFont boldFont12 = new WritableFont(WritableFont.TIMES, 12,
+				WritableFont.BOLD, false);
+		WritableCellFormat boldCellFormat12 = new WritableCellFormat(boldFont12);
+
+		WritableFont font12 = new WritableFont(WritableFont.TIMES, 12,
+				WritableFont.NO_BOLD, false);
+		WritableCellFormat cellFormat12 = new WritableCellFormat(font12);
+
+		List<String> algNameList = this.metrics.getAlgNameList();
+		Collections.sort(algNameList);
+		int newcol = col + 1;
+		for (String algName : algNameList) {
+			Label lblAlg = new Label(newcol, row, algName, boldCellFormat12);
+			sheet.addCell(lblAlg);
+			
+			newcol++;
+		}
+		row++;
+		rows++;
 		
+		List<Integer> datasetIdList = this.metrics.getDatasetIdList();
+		Collections.sort(datasetIdList);
+		for (int datasetId : datasetIdList) {
+			Label lblDataset = new Label(
+					col, 
+					row, 
+					"Dataset \"" + datasetId + "\"", 
+					cellFormat12);
+			
+			sheet.addCell(lblDataset);
+			
+			newcol = col + 1;
+			
+			for (String algName : algNameList) {
+				String algDesc = metrics.getAlgDesc(algName, datasetId);
+				algDesc = algDesc == null ? "" : algDesc; 
+				
+				Label cell = new Label(newcol, row, algDesc, cellFormat12);
+				sheet.addCell(cell);
+
+				newcol++;
+			}
+			row ++;
+			rows ++;
+		}
+		
+		return rows;
+	}
+
+	
+	/**
+	 * Create excel rows of notes.
+	 * @param sheet excel sheet writer.
+	 * @param metricName metric name.
+	 * @param row starting row index.
+	 * @param col starting column index.
+	 * @return rows to be saved
+	 * @throws Exception if any error raises.
+	 */
+	private int createNoteExcel(
+			WritableSheet sheet, 
+			int row, 
+			int col) throws Exception {
+		
+		WritableFont font12 = new WritableFont(WritableFont.TIMES, 12,
+				WritableFont.NO_BOLD, false);
+		WritableCellFormat cellFormat12 = new WritableCellFormat(font12);
+
+		List<Integer> datasetIdList = this.metrics.getDatasetIdList();
+		Collections.sort(datasetIdList);
+		int rows = 0;
 		for (int datasetId : datasetIdList) {
 			xURI datasetUri = metrics.getDatasetUri(datasetId);
 			
@@ -698,6 +813,7 @@ public class MetricsUtil {
 				sheet.addCell(lbl);
 				
 				row ++;
+				rows ++;
 			}
 		}
 		
@@ -706,12 +822,105 @@ public class MetricsUtil {
 		keys.addAll(sysProps.keySet());
 		for (int i = 0; i < keys.size(); i++) {
 			row ++;
+			rows ++;
+			
 			String key = keys.get(i).toString();
 			Label lbl = new Label(0, row, 
 					key + ": " + sysProps.getAsString(key), 
 					cellFormat12);
 			sheet.addCell(lbl);
 		}
+		
+		return rows;
+	}
+	
+	
+	/**
+	 * Create excel file for metrics evaluation.
+	 * @param uri specified URI of excel file.
+	 * @throws Exception if any error raises.
+	 */
+	public void createExcel(xURI uri) throws Exception {
+		UriAdapter adapter = new UriAdapter(uri);
+		OutputStream os = adapter.getOutputStream(uri, false);
+		WritableWorkbook workbook = Workbook.createWorkbook(os);
+		
+		WritableSheet sheet = workbook.createSheet("Results", 0);
+	
+		WritableFont boldFont14 = new WritableFont(WritableFont.TIMES, 14,
+				WritableFont.BOLD, false);
+		WritableCellFormat boldCellFormat14 = new WritableCellFormat(boldFont14);
+
+		WritableFont boldFont12 = new WritableFont(WritableFont.TIMES, 12,
+				WritableFont.BOLD, false);
+		WritableCellFormat boldCellFormat12 = new WritableCellFormat(boldFont12);
+
+		int row = 0;
+		
+		
+		//General evaluation
+		Label lblGeneral = new Label(0, row, "General evaluation", boldCellFormat14);
+		sheet.addCell(lblGeneral);
+		row ++;
+		int count = createDatasetExcel(sheet, row, 0);
+		row += count + 2;
+		
+		
+		//Dataset evaluation
+		Label lblDsDetails = new Label(0, row, "Datasets evaluation", boldCellFormat14);
+		sheet.addCell(lblDsDetails);
+		row ++;
+		List<String> algNameList = this.metrics.getAlgNameList();
+		Collections.sort(algNameList);
+		List<Integer> datasetIdList = this.metrics.getDatasetIdList();
+		Collections.sort(datasetIdList);
+		int maxCount = 0;
+		int col = 0;
+		for (int datasetId : datasetIdList) {
+			Label lblDataset = new Label(col, row, "Dataset \"" + datasetId + "\"", boldCellFormat12);
+			sheet.addCell(lblDataset);
+			
+			count = createDatasetExcel(sheet, datasetId, row + 1, col);
+			col += algNameList.size() + 3;
+			
+			if (maxCount < count)
+				maxCount = count;
+		}
+		maxCount++;
+		row += maxCount + 2;
+		
+		
+		// Evaluation on each metric
+		List<String> metricNameList = this.metrics.getMetricNameList();
+		Collections.sort(metricNameList);
+		for (String metricName : metricNameList) {
+			Label lblMetricName = new Label(0, row, metricName + " evaluation", boldCellFormat14);
+			sheet.addCell(lblMetricName);
+			row ++;
+			row += createMetricExcel(sheet, metricName, row, 0) + 2;
+		}
+
+		
+		// Algorithm parameters
+		Label lblParameters = new Label(0, row, "Algorithm parameters", boldCellFormat14);
+		sheet.addCell(lblParameters);
+		row ++;
+		row += createAlgParamsExcel(sheet, row, col) + 2;
+		
+		
+		// Algorithm descriptions
+		Label lblDescs = new Label(0, row, "Algorithm descriptions", boldCellFormat14);
+		sheet.addCell(lblDescs);
+		row ++;
+		row += createAlgDescsExcel(sheet, row, 0) + 2;
+		
+		
+		// Note
+		Label lblNote = new Label(0, row, "Note", boldCellFormat12);
+		sheet.addCell(lblNote);
+		row ++;
+		row += createNoteExcel(sheet, row, 0) + 2;
+		
 		
 		workbook.write();
 		workbook.close();
@@ -804,8 +1013,6 @@ public class MetricsUtil {
 						
 						buffer.append("\n    Dataset \"" + datasetId + "\" got " + MetricValue.valueToText(metricValue));
 					}
-					
-					
 				}
 				
 			} // algorithm name iteration
@@ -817,7 +1024,6 @@ public class MetricsUtil {
 		buffer.append("\n\n\nAlgorithm parameters");
 		for (String algName : algNameList) {
 			buffer.append("\n\n  " + algName);
-			
 			Alg alg = algTable.query(algName);
 			if (alg == null) continue;
 			
@@ -844,6 +1050,19 @@ public class MetricsUtil {
 			}
 		}
 		
+		
+		// Algorithm descriptions
+		buffer.append("\n\n\nAlgorithm descriptions");
+		for (String algName : algNameList) {
+			buffer.append("\n\n  " + algName);
+			for (int datasetId : datasetIdList) {
+				String algDesc = metrics.getAlgDesc(algName, datasetId);
+				algDesc = algDesc == null ? "" : algDesc;
+				buffer.append("\n    Dataset \"" + datasetId + "\" got " + algDesc);
+			}
+			
+		} // algorithm name iteration
+
 		
 		buffer.append("\n\n\nNote");
 		for (int datasetId : datasetIdList) {

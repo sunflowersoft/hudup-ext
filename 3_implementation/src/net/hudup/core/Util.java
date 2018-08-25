@@ -60,7 +60,7 @@ public final class Util {
 	/**
 	 * Creating a new {@link List} with initial capacity.
 	 * @param <T> type of elements in list.
-	 * @param capacity initial capacity of this list.
+	 * @param initialCapacity initial capacity of this list.
 	 * @return new {@link List}.
 	 */
 	public static <T> List<T> newList(int initialCapacity) {

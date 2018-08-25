@@ -8,6 +8,8 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import net.hudup.core.Util;
+import net.hudup.core.alg.Alg;
+import net.hudup.core.alg.TestingAlg;
 import net.hudup.core.logistic.xURI;
 
 /**
@@ -45,6 +47,12 @@ public class Metrics implements Serializable {
 	
 	
 	/**
+	 * Map of algorithms according to dataset.
+	 */
+	protected Map<String, Map<Integer, String>> algDatasetDescMap = Util.newMap();
+
+	
+	/**
 	 * Default constructor.
 	 */
 	public Metrics() {
@@ -53,7 +61,7 @@ public class Metrics implements Serializable {
 
 	
 	/**
-	 * Reseting all metrics, which means
+	 * Reseting all metrics.
 	 */
 	public void reset() {
 		for (MetricWrapper metricWrapper : metricWrapperList) {
@@ -151,6 +159,43 @@ public class Metrics implements Serializable {
 	
 	
 	/**
+	 * Re-calculating all metrics in metric wrappers of this metrics.
+	 * {@code Evaluator} often calls this method to re-calculate all metrics after each iteration of algorithm execution.
+	 * @param alg only metric wrappers (of this metrics) having the same algorithm specified by this input parameter are calculated.
+	 * @param datasetId only metric wrappers (of this metrics) having the same dataset identifier specified by this input parameter are calculated.
+	 * @param metricClass if {@code not null}, only metric wrappers (of this metrics) having the same class specified by the input parameter {@code metricClass} are calculated.
+	 * @param params input parameters of method {@link MetricWrapper#recalc(Object...)} for re-calculating metrics.
+	 * @return current computed metrics.
+	 */
+	public Metrics recalc(
+			Alg alg, 
+			int datasetId, 
+			Class<? extends Metric> metricClass, 
+			Object[] params) {
+		Metrics result = recalc(alg.getName(), datasetId, metricClass, params);
+
+		if (alg instanceof TestingAlg) {
+			String algName = alg.getName();
+			String algDesc = ((TestingAlg)alg).getDescription();
+			algDesc = algDesc == null ? "" : algDesc;
+			
+			Map<Integer, String> descMap = null;
+			if (this.algDatasetDescMap.containsKey(algName))
+				descMap = this.algDatasetDescMap.get(algName);
+			else {
+				descMap = Util.newMap();
+				this.algDatasetDescMap.put(algName, descMap);
+			}
+			descMap.put(datasetId, algDesc);
+		}
+		
+		result.algDatasetDescMap.clear();
+		result.algDatasetDescMap.putAll(this.algDatasetDescMap);
+		return result;
+	}
+
+	
+	/**
 	 * This method calls the method {@link #recalc(String, int, Class, Object[])} to re-calculate all metrics in metric wrappers of this {@link Metrics}.
 	 * @param algName only metric wrappers (of this {@link Metrics}) having the same algorithm specified by this input parameter are calculated.
 	 * @param datasetId only metric wrappers (of this {@link Metrics}) having the same dataset identifier specified by this input parameter are calculated.
@@ -161,6 +206,18 @@ public class Metrics implements Serializable {
 		return recalc(algName, datasetId, (Class<? extends Metric>)null, params);
 	}
 	
+	
+	/**
+	 * This method calls the method {@link #recalc(Alg, int, Class, Object[])} to re-calculate all metrics in metric wrappers of this metrics.
+	 * @param alg only metric wrappers (of this metrics) having the same algorithm specified by this input parameter are calculated.
+	 * @param datasetId only metric wrappers (of this metrics) having the same dataset identifier specified by this input parameter are calculated.
+	 * @param params input parameters of method {@link MetricWrapper#recalc(Object...)} for re-calculating metrics.
+	 * @return current computed {@link Metrics}.
+	 */
+	public Metrics recalc(Alg alg, int datasetId, Object[] params) {
+		return recalc(alg, datasetId, (Class<? extends Metric>)null, params);
+	}
+
 	
 	/**
 	 * Getting list of distinct metric wrappers.
@@ -409,6 +466,24 @@ public class Metrics implements Serializable {
 		return nameList;
 	}
 	
+	
+	/**
+	 * Getting description of specified algorithm and dataset ID.
+	 * @param algName specified algorithm.
+	 * @param datasetId specified dataset ID.
+	 * @return description of specified algorithm and dataset ID.
+	 */
+	public String getAlgDesc(String algName, int datasetId) {
+		if (!this.algDatasetDescMap.containsKey(algName))
+			return "";
+		
+		Map<Integer, String> descMap = this.algDatasetDescMap.get(algName);
+		if (descMap.containsKey(datasetId))
+			return descMap.get(datasetId);
+		else
+			return "";
+	}
+
 	
 	/** 
 	 * Finding an specified metric wrapper with specified metric name, algorithm name, and dataset identifier.
@@ -830,12 +905,55 @@ public class Metrics implements Serializable {
 			}
 			
 			buffer.append("\n\n========== Algorithm \"" + algName + "\" - Final result ==========");
+		}
+		
+		String algDescs = translateAlgDescs();
+		if (algDescs.length() > 0)
+			return buffer.toString() + "\n\n\n" + algDescs;
+		else
+			return buffer.toString();
+	}
+
+	
+	/**
+	 * Translate descriptions of algorithms.
+	 * @return descriptions of algorithms.
+	 */
+	private String translateAlgDescs() {
+		// TODO Auto-generated method stub
+		StringBuffer buffer = new StringBuffer();
+		
+		List<String> algNameList = getAlgNameList();
+		Collections.sort(algNameList);
+
+		int i = 0;
+		for (String algName : algNameList) {
+			if (!this.algDatasetDescMap.containsKey(algName))
+				continue;
+			Map<Integer, String> descMap = this.algDatasetDescMap.get(algName);
 			
+			if (i > 0)
+				buffer.append("\n\n\n");
 			
+			buffer.append("========== Algorithm \"" + algName + "\" - Description ==========");
+			List<Integer> datasetIdList = getDatasetIdList(algName);
+			Collections.sort(datasetIdList);
+			for (int datasetId : datasetIdList) {
+				if (!descMap.containsKey(datasetId))
+					continue;
+				
+				buffer.append("\n\n----- Testing dataset \"" + datasetId + "\" -----");
+				buffer.append("\n" + descMap.get(datasetId));
+				buffer.append("\n----- Testing dataset \"" + datasetId + "\" -----");
+			}
+			
+			buffer.append("\n\n========== Algorithm \"" + algName + "\" - Final Description ==========");
+			
+			i++;
 		}
 		
 		return buffer.toString();
 	}
 
-	
+
 }

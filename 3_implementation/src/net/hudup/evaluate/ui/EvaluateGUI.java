@@ -49,6 +49,7 @@ import net.hudup.core.evaluate.EvaluatorEvent;
 import net.hudup.core.evaluate.EvaluatorEvent.Type;
 import net.hudup.core.evaluate.EvaluatorProgressEvent;
 import net.hudup.core.evaluate.Metrics;
+import net.hudup.core.evaluate.MetricsUtil;
 import net.hudup.core.logistic.ClipboardUtil;
 import net.hudup.core.logistic.HudupException;
 import net.hudup.core.logistic.UriAdapter;
@@ -834,6 +835,11 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 				    // Exporting excel file
 					MetricsUtil util = new MetricsUtil(this.result, new RegisterTable(Arrays.asList(getAlg())));
 					util.createExcel(store.concat(METRICS_ANALYZE_EXCEL_FILE_NAME));
+					// Begin exporting plain text. It is possible to remove this snippet.
+					channel = getIOChannel(store, METRICS_ANALYZE_EXCEL_FILE_NAME2, false);
+					buffer = ByteBuffer.wrap(util.createPlainText().getBytes());
+					channel.write(buffer);
+					// End exporting plain text. It is possible to remove this snippet.
 					
 					closeIOChannels();
 				}

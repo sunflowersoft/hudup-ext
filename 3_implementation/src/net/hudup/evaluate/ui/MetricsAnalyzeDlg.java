@@ -21,12 +21,14 @@ import javax.swing.JTextArea;
 
 import net.hudup.core.RegisterTable;
 import net.hudup.core.evaluate.Metrics;
+import net.hudup.core.evaluate.MetricsUtil;
 import net.hudup.core.logistic.xURI;
 import net.hudup.core.logistic.ui.UIUtil;
 import net.hudup.logistic.SystemPropertiesTextArea;
 
 
 /**
+ * This is the dialog shows analysis of metrics for evaluating algorithms.
  * 
  * @author Loc Nguyen
  * @version 10.0
@@ -42,22 +44,23 @@ public class MetricsAnalyzeDlg extends JDialog {
 
 	
 	/**
-	 * 
+	 * Metrics.
 	 */
 	private Metrics metrics = null;
 	
 	
 	/**
-	 * 
+	 * Registered table of algorithms.
 	 */
 	private RegisterTable algTable = null;
 	
 	
 	/**
+	 * Constructor with specified metrics and registered table of algorithms.
 	 * 
-	 * @param comp
-	 * @param metrics
-	 * @param algTable
+	 * @param comp parent component.
+	 * @param metrics specified metrics.
+	 * @param algTable specified registered table of algorithms.
 	 */
 	public MetricsAnalyzeDlg(final Component comp, final Metrics metrics, final RegisterTable algTable) {
 		super(UIUtil.getFrameForComponent(comp), "Metrics viewer", true);
@@ -152,12 +155,12 @@ public class MetricsAnalyzeDlg extends JDialog {
 		List<String> metricNameList = metrics.getMetricNameList();
 		Collections.sort(metricNameList);
 		for (String metricName : metricNameList) {
-			JPanel timeDetails = new JPanel(new BorderLayout());
-			body.add(timeDetails);
-			timeDetails.add(new JLabel(metricName + " evaluation "), BorderLayout.NORTH);
-			JTable tblTime = util.createMetricTable(metricName);
-			tblTime.setPreferredScrollableViewportSize(new Dimension(200, 100));
-			timeDetails.add(new JScrollPane(tblTime), BorderLayout.CENTER);
+			JPanel metricDetails = new JPanel(new BorderLayout());
+			body.add(metricDetails);
+			metricDetails.add(new JLabel(metricName + " evaluation "), BorderLayout.NORTH);
+			JTable tblMetric = util.createMetricTable(metricName);
+			tblMetric.setPreferredScrollableViewportSize(new Dimension(200, 100));
+			metricDetails.add(new JScrollPane(tblMetric), BorderLayout.CENTER);
 		}
 		
 		
@@ -166,7 +169,7 @@ public class MetricsAnalyzeDlg extends JDialog {
 
 		parameters.add(new JLabel("Algorithm parameters"), BorderLayout.NORTH);
 		
-		JTable tblParameters = util.createParametersTable();
+		JTable tblParameters = util.createAlgParamsTable();
 		tblParameters.setPreferredScrollableViewportSize(new Dimension(200, 100));
 		parameters.add(new JScrollPane(tblParameters), BorderLayout.CENTER);
 		
@@ -186,6 +189,32 @@ public class MetricsAnalyzeDlg extends JDialog {
 			});
 		zoomParameters.setMargin(new Insets(0, 0 , 0, 0));
 		parametersTool.add(zoomParameters);
+
+		
+		JPanel algDescs = new JPanel(new BorderLayout());
+		body.add(algDescs);
+
+		algDescs.add(new JLabel("Algorithm descriptions"), BorderLayout.NORTH);
+		
+		JTextArea tblAlgDescs = util.createAlgDescsTextArea();
+		algDescs.add(new JScrollPane(tblAlgDescs), BorderLayout.CENTER);
+		
+		JPanel algDescsTool = new JPanel();
+		algDescs.add(algDescsTool, BorderLayout.SOUTH);
+		JButton zoomAlgDescs = UIUtil.makeIconButton(
+			"zoomin-16x16.png", 
+			"zoom", "Zoom", "Zoom", 
+				
+			new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					// TODO Auto-generated method stub
+					zoomAlgDescs();
+				}
+			});
+		zoomAlgDescs.setMargin(new Insets(0, 0 , 0, 0));
+		algDescsTool.add(zoomAlgDescs);
 
 		
 		JPanel footer = new JPanel();
@@ -229,8 +258,8 @@ public class MetricsAnalyzeDlg extends JDialog {
 	
 	
 	/**
-	 * 
-	 * @param datasetId
+	 * Zooming evaluation of specified dataset ID.
+	 * @param datasetId specified dataset ID.
 	 */
 	private void zoomMetrics(int datasetId) {
 		final JDialog zoomDlg = new JDialog(this, 
@@ -279,8 +308,44 @@ public class MetricsAnalyzeDlg extends JDialog {
 		zoomDlg.add(new JLabel("Algorithm parameters"), BorderLayout.NORTH);
 		
 		MetricsUtil util = new MetricsUtil(metrics, algTable);
-		JTable tblParameters = util.createParametersTable();
+		JTable tblParameters = util.createAlgParamsTable();
 		zoomDlg.add(new JScrollPane(tblParameters), BorderLayout.CENTER);
+		
+		
+		JPanel footer = new JPanel();
+		zoomDlg.add(footer, BorderLayout.SOUTH);
+		
+		JButton close = new JButton("Close");
+		close.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				zoomDlg.dispose();
+			}
+		});
+		footer.add(close);
+
+		zoomDlg.setVisible(true);
+	}
+
+	
+	/**
+	 * Zooming show of algorithm descriptions.
+	 */
+	private void zoomAlgDescs() {
+		final JDialog zoomDlg = new JDialog(this, 
+				"Zoom for algorithm descriptions", false);
+		zoomDlg.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+		zoomDlg.setSize(600, 400);
+		zoomDlg.setLocationRelativeTo(this);
+		zoomDlg.setLayout(new BorderLayout());
+		
+		zoomDlg.add(new JLabel("Algorithm descriptions"), BorderLayout.NORTH);
+		
+		MetricsUtil util = new MetricsUtil(metrics, algTable);
+		JTextArea tblAlgDescs = util.createAlgDescsTextArea();
+		zoomDlg.add(new JScrollPane(tblAlgDescs), BorderLayout.CENTER);
 		
 		
 		JPanel footer = new JPanel();

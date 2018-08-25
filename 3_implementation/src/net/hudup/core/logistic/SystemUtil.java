@@ -72,41 +72,47 @@ public final class SystemUtil {
 	 */
 	public static PropList getSystemProperties() {
 		PropList props = new PropList();
-		Properties sysProps = System.getProperties();
 		
-		props.put("Java", 
-				sysProps.getProperty("java.runtime.name") + " version " + sysProps.getProperty("java.runtime.version") + ", " +
-				sysProps.getProperty("java.vm.name") + " version " + sysProps.getProperty("java.vm.version") + ", " +
-				"Class version " + sysProps.getProperty("java.class.version") + ", " +
-				"Vendor \"" + sysProps.getProperty("java.vendor") + "\" at " + sysProps.getProperty("java.vendor.url") 
-			);
+		try {
+			Properties sysProps = System.getProperties();
+			
+			props.put("Java", 
+					sysProps.getProperty("java.runtime.name") + " version " + sysProps.getProperty("java.runtime.version") + ", " +
+					sysProps.getProperty("java.vm.name") + " version " + sysProps.getProperty("java.vm.version") + ", " +
+					"Class version " + sysProps.getProperty("java.class.version") + ", " +
+					"Vendor \"" + sysProps.getProperty("java.vendor") + "\" at " + sysProps.getProperty("java.vendor.url") 
+				);
+			
+			props.put("OS", 
+					sysProps.getProperty("os.name") + ", " +
+					sysProps.getProperty("os.arch") + ", " +
+					"version " + sysProps.getProperty("os.version")
+				);
+			
+			Runtime runtime = Runtime.getRuntime();
+			double allocatedMemory = runtime.totalMemory() / 1024.0 / 1024.0;
+			double freeMemory = runtime.freeMemory() / 1024.0 / 1024.0;
+			double maxMemory = runtime.maxMemory() / 1024.0 / 1024.0;
+			
+			props.put("Memory(VM)", 
+					"Allocated memory = " + MathUtil.format(allocatedMemory, 2) + "MB, " +
+					"Free memory = " + MathUtil.format(freeMemory, 2) + "MB, " +
+					"Max memory = " + MathUtil.format(maxMemory, 2) + "MB"
+				);
+			
+			props.put("CPU", 
+					System.getenv("PROCESSOR_IDENTIFIER") + ", " +
+					System.getenv("PROCESSOR_ARCHITECTURE") + ", " +
+					"the number of processors is " + System.getenv("NUMBER_OF_PROCESSORS")
+				);
 		
-		props.put("OS", 
-				sysProps.getProperty("os.name") + ", " +
-				sysProps.getProperty("os.arch") + ", " +
-				"version " + sysProps.getProperty("os.version")
-			);
-		
-		Runtime runtime = Runtime.getRuntime();
-		double allocatedMemory = runtime.totalMemory() / 1024.0 / 1024.0;
-		double freeMemory = runtime.freeMemory() / 1024.0 / 1024.0;
-		double maxMemory = runtime.maxMemory() / 1024.0 / 1024.0;
-		
-		props.put("Memory(VM)", 
-				"Allocated memory = " + MathUtil.format(allocatedMemory, 2) + "MB, " +
-				"Free memory = " + MathUtil.format(freeMemory, 2) + "MB, " +
-				"Max memory = " + MathUtil.format(maxMemory, 2) + "MB"
-			);
-		
-		props.put("CPU", 
-				System.getenv("PROCESSOR_IDENTIFIER") + ", " +
-				System.getenv("PROCESSOR_ARCHITECTURE") + ", " +
-				"the number of processors is " + System.getenv("NUMBER_OF_PROCESSORS")
-			);
-	
-		props.put("Directory", 
-				"Current working directory is \"" + System.getProperty("user.dir") + "\""
-			);
+			props.put("Directory", 
+					"Current working directory is \"" + System.getProperty("user.dir") + "\""
+				);
+		}
+		catch (Throwable e) {
+			e.printStackTrace();
+		}
 		
 		return props;
 	}

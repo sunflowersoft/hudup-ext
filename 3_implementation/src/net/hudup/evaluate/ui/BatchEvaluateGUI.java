@@ -44,6 +44,7 @@ import net.hudup.core.evaluate.EvaluatorEvent;
 import net.hudup.core.evaluate.EvaluatorEvent.Type;
 import net.hudup.core.evaluate.EvaluatorProgressEvent;
 import net.hudup.core.evaluate.Metrics;
+import net.hudup.core.evaluate.MetricsUtil;
 import net.hudup.core.logistic.ClipboardUtil;
 import net.hudup.core.logistic.HudupException;
 import net.hudup.core.logistic.UriAdapter;
@@ -866,8 +867,15 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 				
 			    // Exporting excel file
 				if (evt.getType() == Type.done || evt.getType() == Type.done_one) {
+				    // Exporting excel file
 					MetricsUtil util = new MetricsUtil(this.result, new RegisterTable(lbAlgs.getAlgList()));
 					util.createExcel(store.concat(METRICS_ANALYZE_EXCEL_FILE_NAME));
+					// Begin exporting plain text. It is possible to remove this snippet.
+					ByteChannel channel = getIOChannel(store, METRICS_ANALYZE_EXCEL_FILE_NAME2, false);
+					ByteBuffer buffer = ByteBuffer.wrap(util.createPlainText().getBytes());
+					channel.write(buffer);
+					closeIOChannel(METRICS_ANALYZE_EXCEL_FILE_NAME2);
+					// End exporting plain text. It is possible to remove this snippet.
 					
 					if (evt.getType() == Type.done)
 						closeIOChannels();

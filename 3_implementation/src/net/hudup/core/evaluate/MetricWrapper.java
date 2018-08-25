@@ -72,7 +72,7 @@ public class MetricWrapper extends AbstractMetric {
 	public void setup(Object... params) {
 		// TODO Auto-generated method stub
 		
-		if (params.length == 3 && 
+		if (params != null && params.length >= 3 && 
 				params[0] instanceof Metric && 
 				params[1] instanceof String && 
 				params[2] instanceof Integer) {

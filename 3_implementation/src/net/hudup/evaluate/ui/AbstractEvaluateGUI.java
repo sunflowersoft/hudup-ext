@@ -75,6 +75,12 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	
 	
 	/**
+	 * Metrics analyzing Excel file name.
+	 */
+	protected final static String METRICS_ANALYZE_EXCEL_FILE_NAME2 = "analyze.hdp";
+
+	
+	/**
 	 * Main evaluator.
 	 */
 	protected Evaluator evaluator = null;
