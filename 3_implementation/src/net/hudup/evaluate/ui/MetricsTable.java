@@ -19,6 +19,7 @@ import net.hudup.core.evaluate.MetricWrapper;
 import net.hudup.core.evaluate.Metrics;
 import net.hudup.core.evaluate.MetricsUtil;
 import net.hudup.core.logistic.ClipboardUtil;
+import net.hudup.core.logistic.ui.DescriptionDlg;
 import net.hudup.core.logistic.ui.SortableTable;
 import net.hudup.core.logistic.ui.SortableTableModel;
 import net.hudup.core.logistic.ui.UIUtil;
@@ -64,11 +65,8 @@ public class MetricsTable extends SortableTable {
 					JMenuItem miCopyToClipboard = UIUtil.makeMenuItem((String)null, "Copy to clipboard", 
 						new ActionListener() {
 							
-							/**
-							 * 
-							 */
+							@Override
 							public void actionPerformed(ActionEvent e) {
-								
 								ClipboardUtil.util.setText(metrics.translate());
 							}
 						});
@@ -77,15 +75,19 @@ public class MetricsTable extends SortableTable {
 					JMenuItem miSave = UIUtil.makeMenuItem((String)null, "Save", 
 						new ActionListener() {
 							
-							/**
-							 * 
-							 */
+							@Override
 							public void actionPerformed(ActionEvent e) {
 								MetricsUtil util = new MetricsUtil(metrics, algTable);
 								util.export(getThis());
 							}
 						});
 					contextMenu.add(miSave);
+					
+					JMenuItem miAlgDesc = createAlgDescMenuItem();
+					if (miAlgDesc != null) {
+						contextMenu.addSeparator();
+						contextMenu.add(miAlgDesc);
+					}
 
 					if(contextMenu != null) 
 						contextMenu.show((Component)e.getSource(), e.getX(), e.getY());
@@ -96,6 +98,47 @@ public class MetricsTable extends SortableTable {
 		});
 	}
 
+	
+	/**
+	 * Creating menu item of algorithm description.
+	 * @return menu item of algorithm description.
+	 */
+	private JMenuItem createAlgDescMenuItem() {
+		int selectedRow = getSelectedRow();
+		if (selectedRow == -1)
+			return null;
+		Object algName = getValueAt(selectedRow, 1);
+		if (algName == null)
+			return null;
+		Object datasetId = getValueAt(selectedRow, 2);
+		if (datasetId == null)
+			return null;
+		
+		try {
+			algName = algName.toString();
+			datasetId = Integer.parseInt(datasetId.toString());
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+		
+		String algDesc = getMetricsTM().getMetrics().getAlgDesc((String)algName, (Integer)datasetId);
+		if (algDesc == null || algDesc.isEmpty())
+			return null;
+		
+		String description = "Algorithm \"" + algName + "\":\n    " + algDesc + "\n\n" + "Testing dataset pair: " + datasetId;
+		JMenuItem miAlgDesc = UIUtil.makeMenuItem((String)null, "Algorithm description", 
+			new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					new DescriptionDlg(getThis(), "Algorithm description", description).setVisible(true);;
+				}
+			});
+		
+		return miAlgDesc;
+	}
 	
 	
 	/**

@@ -5,6 +5,7 @@ package net.hudup.core.logistic;
 
 import java.io.BufferedReader;
 import java.io.Reader;
+import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Collection;
 import java.util.Date;
@@ -249,6 +250,22 @@ public final class DSUtil {
 		}
 		
 		return newList;
+	}
+	
+	
+	/**
+	 * Converting a collection of double arrays to a list of double array.
+	 * @param collection collection of double arrays.
+	 * @return a list of double array.
+	 */
+	public final static List<double[]> cloneDoubleArrayList(Collection<double[]> collection) {
+		List<double[]> list = Util.newList(collection.size());
+		for (double[] array : collection) {
+			double[] newArray = Arrays.copyOf(array, array.length);
+			list.add(newArray);
+		}
+		
+		return list;
 	}
 	
 	
