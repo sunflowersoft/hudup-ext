@@ -278,6 +278,7 @@ public class DatasetPoolDlg extends JDialog {
 				true, 
 				new String[] {"properties", "script", "hudup"}, 
 				new String[] {"Properties files", "Script files", "Hudup files"},
+				null,
 				null);
 		adapter.close();
 		
@@ -339,6 +340,7 @@ public class DatasetPoolDlg extends JDialog {
 				false, 
 				new String[] {"properties", "script", "hudup"}, 
 				new String[] {"Properties URI (s)", "Script files", "Hudup URI (s)"},
+				null,
 				null);
         adapter.close();
         

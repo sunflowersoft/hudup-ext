@@ -259,9 +259,9 @@ public class UriAdapter implements UriAssoc, AutoCloseable {
 	
 	@Override
 	public xURI chooseUri(Component comp, boolean open, String[] exts,
-			String[] descs, xURI curStore) {
+			String[] descs, xURI curStore, String defaultExt) {
 		// TODO Auto-generated method stub
-		return assoc.chooseUri(comp, open, exts, descs, curStore);
+		return assoc.chooseUri(comp, open, exts, descs, curStore, defaultExt);
 	}
 
 

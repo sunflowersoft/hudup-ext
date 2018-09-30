@@ -196,20 +196,21 @@ public interface UriAssoc extends AutoCloseable {
 	 * Such chosen object is returned by its referred URI.
 	 * @param comp The graphic user interface (GUI) component works as a parent component of choice dialog.
 	 * @param open If true then, choice dialog is <i>open</i> dialog allowing users to choose and open files. Otherwise, choice dialog is <i>save</i> dialog allowing users to choose and save objects.
-	 * @param exts The specified array of archive (file) extensions which are used to filter objects that users select, for example, &quot;*.hdp&quot;, &quot;*.xls&quot;. Each extension has a description. The respective array of extension descriptions is specified by the parameter {@code descs}.
-	 * @param descs The specified array of descriptions, for example, &quot;Hudup file&quot;, &quot;Excel 97-2003&quot;. Note that each extension has a description and the respective array of file extensions is represented by the parameter {@code exts}.
-	 * @param curStore Current store (directory) to open <i>choice dialog</i>
+	 * @param exts The specified array of archive (file) extensions which are used to filter objects that users select, for example, &quot;*.hdp&quot;, &quot;*.xls&quot;. Each extension has a description. The respective array of extension descriptions is specified by the parameter {@code descs}. This parameter can be null.
+	 * @param descs The specified array of descriptions, for example, &quot;Hudup file&quot;, &quot;Excel 97-2003&quot;. Note that each extension has a description and the respective array of file extensions is represented by the parameter {@code exts}. This parameter can be null.
+	 * @param curStore Current store (directory) to open <i>choice dialog</i>. Current store can be null.
+	 * @param defaultExt default extension can be null.
 	 * @return URI represented by {@link xURI} of chosen object.
 	 */
-	xURI chooseUri(Component comp, boolean open, String[] exts, String[] descs, xURI curStore);
+	xURI chooseUri(Component comp, boolean open, String[] exts, String[] descs, xURI curStore, String defaultExt);
 	
 	
 	/**
-	 * This method is similar to the method {@link #chooseUri(Component, boolean, String[], String[], xURI)} when it also allows users to select object except that it only lists default objects for choice.
+	 * This method is similar to the method {@link #chooseUri(Component, boolean, String[], String[], xURI, String)} when it also allows users to select object except that it only lists default objects for choice.
 	 * In current implementation, defaults objects are archives (files) having extensions: &quot;*.*&quot; (all files), &quot;*.hdp&quot; (Hudup files), and &quot;*.xls&quot; (97-2003 Excel files). 
 	 * @param comp The graphic user interface (GUI) component works as a parent component of choice dialog.
 	 * @param open If true then, choice dialog is <i>open</i> dialog allowing users to choose and open files. Otherwise, choice dialog is <i>save</i> dialog allowing users to choose and save objects.
-	 * @param curStore Current store (directory) to open <i>choice dialog</i>.
+	 * @param curStore Current store (directory) to open <i>choice dialog</i>. Current store can be null.
 	 * @return URI represented by {@link xURI} of chosen object.
 	 */
 	xURI chooseDefaultUri(Component comp, boolean open, xURI curStore);

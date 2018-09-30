@@ -227,6 +227,7 @@ public class PropPane extends JPanel {
 						"Hudup file (*." + Constants.DEFAULT_EXT + ")",
 						"XML file (*.xml)"
 					},
+				null,
 				null);
 		adapter.close();
 		
@@ -256,6 +257,7 @@ public class PropPane extends JPanel {
 						"Hudup file (*." + Constants.DEFAULT_EXT + ")",
 						"XML file (*.xml)"
 					},
+				null,
 				null);
 		adapter.close();
 		

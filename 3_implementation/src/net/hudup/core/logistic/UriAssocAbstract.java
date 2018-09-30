@@ -616,7 +616,8 @@ public abstract class UriAssocAbstract implements UriAssoc {
 						"Hudup file (*." + Constants.DEFAULT_EXT + ")",
 						"Excel 97-2003 (*.xls)"
 					},
-				curStore);
+				curStore,
+				null);
 	}
 	
 	

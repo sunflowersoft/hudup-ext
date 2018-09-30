@@ -357,7 +357,7 @@ public class DatasetConfigurator extends JDialog {
 				// TODO Auto-generated method stub
 				
 				UriAdapter adapter = new UriAdapter();
-				xURI uri = adapter.chooseUri(getThis(), true, null, null, null);
+				xURI uri = adapter.chooseUri(getThis(), true, null, null, null, null);
 				adapter.close();
 				
 				if (uri == null)

@@ -565,7 +565,7 @@ class UriAssocTrueZip extends UriAssocAbstract {
 	
 	@Override
 	public xURI chooseUri(Component comp, boolean open, 
-			String[] exts, String[] descs, xURI curStore) {
+			String[] exts, String[] descs, xURI curStore, String defaultExt) {
 		
 		ChosenUriResult result = chooseUriResult(
 				comp, 
@@ -581,8 +581,12 @@ class UriAssocTrueZip extends UriAssocAbstract {
         String ext = uri.getLastNameExtension();
         if (open == false && ext == null) {
         	ext = result.getChosenExt();
-        	if (ext == null)
-        		ext = Constants.DEFAULT_EXT;
+        	if (ext == null) {
+        		if (defaultExt == null)
+        			ext = Constants.DEFAULT_EXT;
+        		else
+        			ext = defaultExt;
+        	}
         	uri = xURI.create(uri.toString() + "." + ext);
         }
         
@@ -633,7 +637,7 @@ class UriAssocTrueZip extends UriAssocAbstract {
 	 * @param exts The specified array of archive (file) extensions which are used to filter objects that users select, for example, &quot;*.hdp&quot;, &quot;*.xls&quot;. Each extension has a description. The respective array of extension descriptions is specified by the parameter {@code descs}.  
 	 * @param descs The specified array of descriptions, for example, &quot;Hudup file&quot;, &quot;Excel 97-2003&quot;. Note that each extension has a description and the respective array of file extensions is represented by the parameter {@code exts}. The combination of parameter {@code exts} and parameter {@code descs} forms filters for selection such as &quot;Hudup file (*.hdp)&quot; and &quot;Excel 97-2003 (*.xls)&quot;.
 	 * @param mode The specified mode sets the <i>choice dialog</i> to show only archives (files) or only store (directories) or both archives (files) and store (directories). 
-	 * @param curDir Current store (directory) to open <i>choice dialog</i>
+	 * @param curDir Current store (directory) to open <i>choice dialog</i>. Current store can be null.
 	 * @return Chosen files are returned as the class {@link ChosenUriResult}
 	 */
 	private ChosenUriResult chooseUriResult(

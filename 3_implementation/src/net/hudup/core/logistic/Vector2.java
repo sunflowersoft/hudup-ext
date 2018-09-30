@@ -1,15 +1,12 @@
-/**
- * 
- */
 package net.hudup.core.logistic;
 
 import java.io.Serializable;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
 import net.hudup.core.Cloneable;
 import net.hudup.core.Constants;
+import net.hudup.core.Util;
 import net.hudup.core.parser.TextParsable;
 import net.hudup.core.parser.TextParserUtil;
 
@@ -24,7 +21,7 @@ import net.hudup.core.parser.TextParserUtil;
  * @version 10.0
  *
  */
-public class Vector implements Cloneable, TextParsable, Serializable {
+public class Vector2 implements Cloneable, TextParsable, Serializable {
 
 	
 	/**
@@ -36,7 +33,7 @@ public class Vector implements Cloneable, TextParsable, Serializable {
 	/**
 	 * The internal array of double values.
 	 */
-	protected double[] data = new double[0];
+	protected List<Double> data = Util.newList();
 	
 	
 	/**
@@ -45,10 +42,8 @@ public class Vector implements Cloneable, TextParsable, Serializable {
 	 * @param dim specified dimension.
 	 * @param initValue specified initial value.
 	 */
-	public Vector(int dim, double initValue) {
-		data = new double[dim];
-		
-		Arrays.fill(data, initValue);
+	public Vector2(int dim, double initValue) {
+		data = DSUtil.initDoubleList(dim, initValue);
 	}
 	
 	
@@ -56,8 +51,8 @@ public class Vector implements Cloneable, TextParsable, Serializable {
 	 * Constructor with specified array of double values.
 	 * @param data specified array of double values.
 	 */
-	public Vector(double[] data) {
-		this.data = Arrays.copyOf(data, data.length);
+	public Vector2(double[] data) {
+		this.data = DSUtil.toDoubleList(data);
 	}
 
 	
@@ -65,8 +60,8 @@ public class Vector implements Cloneable, TextParsable, Serializable {
 	 * Constructor with specified list of double values.
 	 * @param data specified collection of double values.
 	 */
-	public Vector(Collection<Double> data) {
-		this.data = DSUtil.toDoubleArray(data);
+	public Vector2(Collection<Double> data) {
+		this.data = DSUtil.toDoubleList(data);
 	}
 	
 	
@@ -75,7 +70,7 @@ public class Vector implements Cloneable, TextParsable, Serializable {
 	 * @return dimension of this vector.
 	 */
 	public int dim() {
-		return data.length;
+		return data.size();
 	}
 	
 	
@@ -85,7 +80,7 @@ public class Vector implements Cloneable, TextParsable, Serializable {
 	 * @return value at specified index.
 	 */
 	public double get(int idx) {
-		return data[idx];
+		return data.get(idx);
 	}
 	
 	
@@ -93,9 +88,30 @@ public class Vector implements Cloneable, TextParsable, Serializable {
 	 * Setting a value at specified index.
 	 * @param idx specified index.
 	 * @param value to be set at specified index.
+	 * @return the previous value that is replaced by current value.
 	 */
-	public void set(int idx, double value) {
-		data[idx] = value;
+	public double set(int idx, double value) {
+		return data.set(idx, value);
+	}
+	
+	
+	/**
+	 * Adding specified value.
+	 * @param value specified value.
+	 * @return true if adding is successful.
+	 */
+	public boolean add(double value) {
+		return data.add(value);
+	}
+	
+	
+	/**
+	 * Removing value at specified index.
+	 * @param idx specified index.
+	 * @return removed value.
+	 */
+	public double remove(int idx) {
+		return data.remove(idx);
 	}
 	
 	
@@ -119,14 +135,14 @@ public class Vector implements Cloneable, TextParsable, Serializable {
 	 * @return mean of this vector.
 	 */
 	public double mean() {
-		if (data.length == 0)
+		if (data.size() == 0)
 			return Constants.UNUSED;
 		
 		double sum = 0;
 		for (double value : data) {
 			sum += value;
 		}
-		return sum / data.length;
+		return sum / data.size();
 	}
 
 	
@@ -135,7 +151,7 @@ public class Vector implements Cloneable, TextParsable, Serializable {
 	 * @return variance of this vector.
 	 */
 	public double var() {
-		if (data.length < 2)
+		if (data.size() < 2)
 			return Constants.UNUSED;
 
 		double mean = mean();
@@ -144,7 +160,7 @@ public class Vector implements Cloneable, TextParsable, Serializable {
 			double deviation = value - mean;
 			sum += deviation * deviation;
 		}
-		return sum / (double)(data.length - 1);
+		return sum / (double)(data.size() - 1);
 	}
 	
 	
@@ -153,7 +169,7 @@ public class Vector implements Cloneable, TextParsable, Serializable {
 	 * @return variance of this vector according to maximum likelihood estimation (MLE) method.
 	 */
 	public double mleVar() {
-		if (data.length == 0)
+		if (data.size() == 0)
 			return Constants.UNUSED;
 
 		double mean = mean();
@@ -162,7 +178,7 @@ public class Vector implements Cloneable, TextParsable, Serializable {
 			double deviation = value - mean;
 			sum += deviation * deviation;
 		}
-		return sum / (double)(data.length);
+		return sum / (double)data.size();
 	}
 
 	
@@ -180,10 +196,10 @@ public class Vector implements Cloneable, TextParsable, Serializable {
 	 * @return standard error of this vector.
 	 */
 	public double se() {
-		if (data.length == 0)
+		if (data.size() == 0)
 			return Constants.UNUSED;
 		else
-			return Math.sqrt(var() / data.length);
+			return Math.sqrt(var() / data.size());
 	}
 	
 	
@@ -192,12 +208,12 @@ public class Vector implements Cloneable, TextParsable, Serializable {
 	 * @param other other vector.
 	 * @return Euclidean distance between this vector and the other vector.
 	 */
-	public double distance(Vector other) {
+	public double distance(Vector2 other) {
 		double dis = 0;
 		
-		int n = data.length;
+		int n = data.size();
 		for (int i = 0; i < n; i++) {
-			double deviate =  data[i] - other.data[i];
+			double deviate =  data.get(i) - other.data.get(i);
 			dis += deviate * deviate;
 		}
 		return Math.sqrt(dis);
@@ -209,11 +225,11 @@ public class Vector implements Cloneable, TextParsable, Serializable {
 	 * @param other other vector
 	 * @return dot product (scalar product) of this vector and the other vector.
 	 */
-	public double product(Vector other) {
+	public double product(Vector2 other) {
 		double product = 0;
-		int n = data.length;
+		int n = data.size();
 		for (int i = 0; i < n; i++) {
-			product += data[i] * other.data[i];
+			product += data.get(i) * other.data.get(i);
 		}
 		
 		return product;
@@ -225,7 +241,7 @@ public class Vector implements Cloneable, TextParsable, Serializable {
 	 * @param other other vector.
 	 * @return cosine of this vector and the other vector.
 	 */
-	public double cosine(Vector other) {
+	public double cosine(Vector2 other) {
 		double module1 = module();
 		double module2 = other.module();
 		if (module1 == 0 || module2 == 0)
@@ -240,16 +256,16 @@ public class Vector implements Cloneable, TextParsable, Serializable {
 	 * @param other other vector.
 	 * @return correlation coefficient of this vector and the other vector.
 	 */
-	public double corr(Vector other) {
+	public double corr(Vector2 other) {
 		double mean1 = mean();
 		double mean2 = other.mean();
 		
-		int n = data.length;
+		int n = data.size();
 		double VX = 0, VY = 0;
 		double VXY = 0;
 		for (int i = 0; i < n; i++) {
-			double deviate1 = data[i] - mean1;
-			double deviate2 = other.data[i] - mean2;
+			double deviate1 = data.get(i) - mean1;
+			double deviate2 = other.data.get(i) - mean2;
 			
 			VX += deviate1 * deviate1;
 			VY += deviate2 * deviate2;
@@ -267,14 +283,10 @@ public class Vector implements Cloneable, TextParsable, Serializable {
 	 * Concatenating this vector with the specified vector so that this vector contains values of specified vector.
 	 * @param vector specified vector.
 	 */
-	public void concat(Vector vector) {
-		int n = this.dim();
-		int m = n + vector.dim();
-		double[] newdata = Arrays.copyOf(data, m);
-		
-		for (int i = n; i < m; i++)
-			newdata[i] = vector.data[i - n];
-		
+	public void concat(Vector2 vector) {
+		List<Double> newdata = Util.newList(this.dim() + vector.dim());
+		newdata.addAll(this.data);
+		newdata.addAll(vector.data);
 		this.data = newdata;
 	}
 	
@@ -284,11 +296,11 @@ public class Vector implements Cloneable, TextParsable, Serializable {
 	 * @param that specified vector.
 	 * @return resulted vector from subtracting this vector by specified vector.
 	 */
-	public Vector subtract(Vector that) {
+	public Vector2 subtract(Vector2 that) {
 		int n = Math.min(this.dim(), that.dim());
-		Vector result = new Vector(n, 0);
+		Vector2 result = new Vector2(n, 0);
 		for (int i = 0; i < n; i++) {
-			result.data[i] = this.data[i] - that.data[i];
+			result.data.set(i, this.data.get(i) - that.data.get(i));
 		}
 		
 		return result;
@@ -300,11 +312,11 @@ public class Vector implements Cloneable, TextParsable, Serializable {
 	 * @param that specified vector.
 	 * @return resulted vector from adding this vector and specified vector.
 	 */
-	public Vector add(Vector that) {
+	public Vector2 add(Vector2 that) {
 		int n = Math.min(this.dim(), that.dim());
-		Vector result = new Vector(n, 0);
+		Vector2 result = new Vector2(n, 0);
 		for (int i = 0; i < n; i++) {
-			result.data[i] = this.data[i] + that.data[i];
+			result.data.set(i, this.data.get(i) + that.data.get(i));
 		}
 		
 		return result;
@@ -316,10 +328,10 @@ public class Vector implements Cloneable, TextParsable, Serializable {
 	 * @param alpha specified number.
 	 * @return resulted vector from multiplying this vector by specified number. 
 	 */
-	public Vector multiply(double alpha) {
-		Vector result = new Vector(this.dim(), 0);
+	public Vector2 multiply(double alpha) {
+		Vector2 result = new Vector2(this.dim(), 0);
 		for (int i = 0; i < this.dim(); i++) {
-			result.data[i] = alpha * this.data[i];
+			result.data.set(i, alpha * this.data.get(i));
 		}
 		
 		return result;
@@ -331,10 +343,10 @@ public class Vector implements Cloneable, TextParsable, Serializable {
 	 * @param alpha specified number.
 	 * @return resulted vector from dividing this vector by specified number.
 	 */
-	public Vector divide(double alpha) {
-		Vector result = new Vector(this.dim(), 0);
+	public Vector2 divide(double alpha) {
+		Vector2 result = new Vector2(this.dim(), 0);
 		for (int i = 0; i < this.dim(); i++) {
-			result.data[i] = this.data[i] / alpha;
+			result.data.set(i, this.data.get(i) / alpha);
 		}
 		
 		return result;
@@ -352,9 +364,9 @@ public class Vector implements Cloneable, TextParsable, Serializable {
 	public void parseText(String spec) {
 		// TODO Auto-generated method stub
 		List<String> list = TextParserUtil.parseTextList(spec, ",");
-		data = new double[list.size()];
-		for (int i = 0; i < data.length; i++) {
-			data[i] = Double.parseDouble(list.get(i));
+		data = Util.newList(list.size());
+		for (int i = 0; i < list.size(); i++) {
+			data.set(i, Double.parseDouble(list.get(i)));
 		}
 			
 	}
@@ -362,7 +374,7 @@ public class Vector implements Cloneable, TextParsable, Serializable {
 
 	@Override
     public Object clone() {
-    	return new Vector(data);
+    	return new Vector2(data);
     }
 
 

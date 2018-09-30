@@ -102,7 +102,7 @@ public class ErrorRange extends ArrayMetric {
 			// TODO Auto-generated method stub
 			Vector v = toVector();
 			double mean = v.mean();
-			double sd = v.sd();
+			double sd = Math.sqrt(v.mleVar());
 			
 			List<Double> valueList = Util.newList();
 			if (Util.isUsed(sd)) {
