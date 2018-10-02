@@ -345,6 +345,27 @@ public final class TextParserUtil {
 
 	
 	/**
+	 * Converting a specified array of double numbers into a column list of strings.
+	 * Words in such returned string are connected by the character specified by the parameter {@code sep}. 
+	 * @param array Specified array of objects.
+	 * @return Column list of strings given the specified array of double numbers. 
+	 */
+	public static StringBuffer toColumnText(double[] array) {
+		StringBuffer buffer = new StringBuffer();
+		
+		for (int i = 0; i < array.length; i++) {
+			if ( i > 0)
+				buffer.append("\n");
+
+			double value = array[i];
+			buffer.append(value);
+		}
+		
+		return buffer;
+	}
+
+	
+	/**
 	 * Converting a specified collection of objects (any type) into a string in which each object is converted as a word in such string.
 	 * Words in such returned string are connected by the character specified by the parameter {@code sep}. 
 	 * This is template static method and so the type of object is specified by the template &lt;{@code T}&gt;.
@@ -372,6 +393,34 @@ public final class TextParserUtil {
 		return buffer.toString();
 	}
 	
+	
+	/**
+	 * Converting a specified collection of objects (any type) into a column string list in which each object is converted as a word in such string.
+	 * Words in such returned string are connected by the character specified by the parameter {@code sep}. 
+	 * This is template static method and so the type of object is specified by the template &lt;{@code T}&gt;.
+	 * @param <T> type of each object in the specified collection.
+	 * @param list Specified collection of objects.
+	 * @return Column string list of the specified collection of objects, in which each object is converted as a word in such text form.
+	 */
+	public static <T extends Object> StringBuffer toColumnText(Collection<T> list) {
+		StringBuffer buffer = new StringBuffer();
+		
+		int i = 0;
+		for (T value : list) {
+			if (i > 0)
+				buffer.append("\n");
+			
+			if (value instanceof TextParsable)
+				buffer.append(((TextParsable)value).toText());
+			else
+				buffer.append(value);
+			
+			i++;
+		}
+			
+		return buffer;
+	}
+
 	
 	/**
 	 * Splitting (parsing) a specified string into many words (tokens). The character (string) that is used for separation is specified by the parameter {@code sep} which follows Java regular expression.
