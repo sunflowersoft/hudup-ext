@@ -15,6 +15,12 @@ public class FlanaganStat extends Stat {
 
 
 	/**
+	 * Bin number for histogram.
+	 */
+	public static final double DEFAULT_BIN_NUMBER = 50;
+
+	
+	/**
 	 * Distribute data into bins to obtain histogram and plot histogram
 	 * zero bin position and upper limit provided.
 	 * @param data specified data.

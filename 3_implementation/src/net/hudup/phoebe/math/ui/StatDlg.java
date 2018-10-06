@@ -7,6 +7,7 @@ import java.awt.Dimension;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.List;
 import java.util.Vector;
 
 import javax.swing.AbstractAction;
@@ -21,6 +22,7 @@ import flanagan.analysis.Stat;
 import flanagan.math.Fmath;
 import flanagan.plot.PlotGraph;
 import net.hudup.core.logistic.ClipboardUtil;
+import net.hudup.core.logistic.DSUtil;
 import net.hudup.core.logistic.MathUtil;
 import net.hudup.core.logistic.ui.UIUtil;
 import net.hudup.core.parser.TextParserUtil;
@@ -43,36 +45,14 @@ public class StatDlg extends JDialog {
 	
 	
 	/**
-	 * Bin number for histogram.
-	 */
-	public static final double BIN_NUMBER = 50;
-
-	
-	/**
-	 * Internal data.
-	 */
-	private double[] data = new double[0];
-	
-	
-	/**
-	 * Constructor with data.
-	 * @param data specified data.
-	 */
-	public StatDlg(double[] data) {
-		this(null, data);
-	}
-
-	
-	/**
-	 * Constructor with data and parent component.
+	 * Constructor with data (list), parent component, and modal mode.
 	 * @param comp parent component.
 	 * @param data specified data.
+	 * @param modal model mode.
 	 */
-	public StatDlg(Component comp, double[] data) {
-		this(comp, data, false);
-		this.data = data;
+	public StatDlg(Component comp, List<Double> data, boolean modal) {
+		this(comp, DSUtil.toDoubleArray(data), modal);
 	}
-	
 	
 	/**
 	 * Constructor with data, parent component, and modal mode.
@@ -82,7 +62,6 @@ public class StatDlg extends JDialog {
 	 */
 	public StatDlg(Component comp, double[] data, boolean modal) {
 		super(UIUtil.getFrameForComponent(comp), "Estimated values Statistics", modal);
-		this.data = data;
 	
 		this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		
@@ -92,7 +71,7 @@ public class StatDlg extends JDialog {
 		add(header, BorderLayout.NORTH);
 
 		Vector<Vector<Object>> rowData = new Vector<Vector<Object>>();
-		rowData.add(createRow());
+		rowData.add(createRow(data));
 		JTable tblStat = new JTable(new DefaultTableModel(rowData, createColumns()) {
 			
 	    	/**
@@ -119,7 +98,7 @@ public class StatDlg extends JDialog {
 
 					@Override
 					public void actionPerformed(ActionEvent e) {
-						ClipboardUtil.util.setText(TextParserUtil.toColumnText(getThis().data).toString());
+						ClipboardUtil.util.setText(TextParserUtil.toColumnText(data).toString());
 					}
 			});
 		btnCopy.setMargin(new Insets(0, 0 , 0, 0));
@@ -127,7 +106,7 @@ public class StatDlg extends JDialog {
 
 		JPanel body = new JPanel(new BorderLayout());
 		add(body, BorderLayout.CENTER);
-		double bintWidth = (Fmath.maximum(data) - Fmath.minimum(data)) / BIN_NUMBER;
+		double bintWidth = (Fmath.maximum(data) - Fmath.minimum(data)) / FlanaganStat.DEFAULT_BIN_NUMBER;
 		PlotGraph graph = FlanaganStat.histogramBinsPlot2(data, bintWidth);
 		body.add(graph, BorderLayout.CENTER);
 		graph.setBackground(Color.WHITE);
@@ -156,22 +135,14 @@ public class StatDlg extends JDialog {
 	
 	
 	/**
-	 * Getting this dialog.
-	 * @return this dialog.
-	 */
-	private StatDlg getThis() {
-		return this;
-	}
-	
-	
-	/**
 	 * Creating row.
+	 * @param array specified data.
 	 * @return row created.
 	 */
-	private Vector<Object> createRow() {
+	private Vector<Object> createRow(double[] array) {
 		Vector<Object> row = new Vector<Object>();
 		
-		Stat stat = new Stat(data);
+		Stat stat = new Stat(array);
 		
 		row.add(MathUtil.round(stat.minimum()));
 		row.add(MathUtil.round(stat.maximum()));

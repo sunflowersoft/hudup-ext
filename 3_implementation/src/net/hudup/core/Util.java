@@ -48,6 +48,17 @@ public final class Util {
 
 	
 	/**
+	 * Creating a new {@link Vector} with initial capacity.
+	 * @param <T> type of elements in vector.
+	 * @param initialCapacity initial capacity of this vector.
+	 * @return new {@link Vector}.
+	 */
+	public static <T> Vector<T> newVector(int initialCapacity) {
+	    return new Vector<T>(initialCapacity);
+	}
+
+	
+	/**
 	 * Creating a new {@link List}.
 	 * @param <T> type of elements in list.
 	 * @return new {@link List}.

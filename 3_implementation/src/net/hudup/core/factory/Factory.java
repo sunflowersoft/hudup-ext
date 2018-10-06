@@ -117,6 +117,16 @@ public class Factory {
 	 */
 	public UriAssoc createUriAssoc(DataConfig config) {
 		xURI uri = config.getStoreUri();
+		return createUriAssoc(uri);
+	}
+
+
+	/**
+	 * Creating suitable URI associator according to specified URI.
+	 * @param uri specified URI.
+	 * @return suitable URI associator according to specified URI referred by {@link UriAssoc}.
+	 */
+	public UriAssoc createUriAssoc(xURI uri) {
 		if (uri == null)
 			return null;
 		
