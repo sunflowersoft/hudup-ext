@@ -328,4 +328,38 @@ public final class MathUtil {
 	}
 	
 	
+	/**
+	 * Finding maximum value in the specified list.
+	 * @param list specified list.
+	 * @return maximum value in the specified list. Return NaN if the specified list is empty.
+	 */
+	public static double max(List<Double> list) {
+		if (list == null || list.size() == 0)
+			return Constants.UNUSED;
+		
+		//Getting the first used value as maximum value.
+		double maxValue = Constants.UNUSED;
+		int k = -1;
+		for (int i = 0; i < list.size(); i++) {
+			double value = list.get(i);
+			if (Util.isUsed(value)) {
+				maxValue = value;
+				k = i;
+				break;
+			}
+		}
+		if (k == -1)
+			return Constants.UNUSED;
+		
+		//Finding maximum value.
+		for (int i = k + 1; i < list.size(); i++) {
+			double value = list.get(i);
+			if (Util.isUsed(value) && maxValue < value)
+				maxValue = value;
+		}
+		
+		return maxValue;
+	}
+	
+	
 }
