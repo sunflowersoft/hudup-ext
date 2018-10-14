@@ -329,36 +329,50 @@ public final class MathUtil {
 	
 	
 	/**
-	 * Finding maximum value in the specified list.
+	 * Finding extreme value in the specified list.
 	 * @param list specified list.
-	 * @return maximum value in the specified list. Return NaN if the specified list is empty.
+	 * @param isMax true if finding maximum; otherwise finding minimum.
+	 * @return a 2-element array whose first element is the extreme value and second element is the first index of such extreme value. Return null if extreme value cannot be found.
 	 */
-	public static double max(List<Double> list) {
+	public static double[] findExtremeValue(List<Double> list, boolean isMax) {
 		if (list == null || list.size() == 0)
-			return Constants.UNUSED;
+			return null;
 		
-		//Getting the first used value as maximum value.
-		double maxValue = Constants.UNUSED;
+		//Getting the first used value as extreme value.
+		double extremeValue = Constants.UNUSED;
 		int k = -1;
 		for (int i = 0; i < list.size(); i++) {
 			double value = list.get(i);
 			if (Util.isUsed(value)) {
-				maxValue = value;
+				extremeValue = value;
 				k = i;
 				break;
 			}
 		}
 		if (k == -1)
-			return Constants.UNUSED;
+			return null;
 		
-		//Finding maximum value.
+		//Finding extreme value.
+		int extremeIndex = k;
 		for (int i = k + 1; i < list.size(); i++) {
 			double value = list.get(i);
-			if (Util.isUsed(value) && maxValue < value)
-				maxValue = value;
+			if (!Util.isUsed(value))
+				continue;
+			if (isMax) {
+				if (extremeValue < value) {
+					extremeValue = value;
+					extremeIndex = i;
+				}
+			}
+			else {
+				if (extremeValue > value) {
+					extremeValue = value;
+					extremeIndex = i;
+				}
+			}
 		}
 		
-		return maxValue;
+		return new double[] {extremeValue, extremeIndex};
 	}
 	
 	
