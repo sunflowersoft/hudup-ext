@@ -165,8 +165,11 @@ public class Profile implements Cloneable, TextParsable, Serializable {
 	 */
 	public void setIdValue(Object id) {
 		Keys keys = getKeys();
-		if (keys.size() == 0)
-			throw new RuntimeException("Have more than one key");
+		if (keys.size() == 0) {
+			//throw new RuntimeException("Have more than one key"); //Depreciated code
+			System.out.println("There is no key or more than one key");
+			return;
+		}
 
 		Attribute key0 = keys.get(0);
 		setValue(key0.getIndex(), id);

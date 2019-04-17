@@ -117,7 +117,12 @@ public class Rating implements Cloneable, Serializable, TextParsable {
 		// TODO Auto-generated method stub
 		Rating rating = new Rating(this.value);
 		rating.contexts = (ContextList) this.contexts.clone();
-		rating.ratedDate = new Date(this.ratedDate.getTime());
+		if (this.ratedDate == null) { //Fixing null rated date on April 16, 2019
+			System.out.println("Null rated date");
+			rating.ratedDate = new Date();
+		}
+		else
+			rating.ratedDate = new Date(this.ratedDate.getTime());
 		
 		return rating;
 	}
