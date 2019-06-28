@@ -401,6 +401,44 @@ public class RatingVector implements Cloneable, TextParsable, Serializable {
 
 	
 	/**
+	 * Calculating variance of this vector.
+	 * @return variance of this vector.
+	 */
+	public double var() {
+		Set<Integer> fieldIds = fieldIds(true);
+		if (fieldIds.size() < 2)
+			return Constants.UNUSED;
+
+		double mean = mean();
+		double sum = 0;
+		for (int fieldId : fieldIds) {
+			double deviation = get(fieldId).value - mean;
+			sum += deviation * deviation;
+		}
+		return sum / (double)(fieldIds.size() - 1);
+	}
+	
+	
+	/**
+	 * Calculating variance of this vector according to maximum likelihood estimation (MLE) method.
+	 * @return variance of this vector according to maximum likelihood estimation (MLE) method.
+	 */
+	public double mleVar() {
+		Set<Integer> fieldIds = fieldIds(true);
+		if (fieldIds.size() == 0)
+			return Constants.UNUSED;
+
+		double mean = mean();
+		double sum = 0;
+		for (int fieldId : fieldIds) {
+			double deviation = get(fieldId).value - mean;
+			sum += deviation * deviation;
+		}
+		return sum / (double)fieldIds.size();
+	}
+
+	
+	/**
 	 * Calculating Euclidean distance of this rating vector and the specified rating vector according to their values.
 	 * Concretely, this rating vector and the specified rating vectors produce two vectors of their values and this method calculates the distance of such two value vectors.
 	 * @param that specified rating vector
@@ -478,9 +516,12 @@ public class RatingVector implements Cloneable, TextParsable, Serializable {
 			product += value1 * value2;
 		}
 		
-		if (length1 == 0 || length2 == 0)
+		if (length1 == 0 && length2 == 0)
+			return 1;
+		else if (length1 == 0 || length2 == 0)
 			return Constants.UNUSED;
-		return product / Math.sqrt(length1 * length2);
+		else
+			return product / Math.sqrt(length1 * length2);
 	}
 	
 	

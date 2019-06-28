@@ -244,10 +244,12 @@ public class Vector2 implements Cloneable, TextParsable, Serializable {
 	public double cosine(Vector2 other) {
 		double module1 = module();
 		double module2 = other.module();
-		if (module1 == 0 || module2 == 0)
+		if (module1 == 0 && module2 == 0)
+			return 1;
+		else if (module1 == 0 || module2 == 0)
 			return Constants.UNUSED;
-		
-		return product(other) / ( module1 * module2);
+		else
+			return product(other) / Math.sqrt(module1 * module2);
 	}
 	
 	
