@@ -86,8 +86,8 @@ public class NeighborUserBasedCF extends NeighborCF implements DuplicatableAlg {
 			
 			double mean = param.ratingVector.mean();
 			double value = simTotal == 0 ? mean : mean + accum / simTotal;
-			value = Math.min(value, maxValue);
-			value = Math.max(value, minValue);
+			value = (Util.isUsed(maxValue)) && (!Double.isNaN(maxValue)) ? Math.min(value, maxValue) : value;
+			value = (Util.isUsed(minValue)) && (!Double.isNaN(minValue)) ? Math.max(value, minValue) : value;
 			
 			result.put(queryId, value);
 		}

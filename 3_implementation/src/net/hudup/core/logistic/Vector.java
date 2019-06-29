@@ -233,7 +233,7 @@ public class Vector implements Cloneable, TextParsable, Serializable {
 		else if (module1 == 0 || module2 == 0)
 			return Constants.UNUSED;
 		else
-			return product(other) / Math.sqrt(module1 * module2);
+			return product(other) / (module1 * module2);
 	}
 	
 	

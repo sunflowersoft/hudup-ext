@@ -382,6 +382,25 @@ public class RatingVector implements Cloneable, TextParsable, Serializable {
 	
 	
 	/**
+	 * Calculating the module (length) of this vector.
+	 * For example, the module of vector (3, 4) is Sqrt(3^2 + 4^2) = 5. 
+	 * @return module of this vector.
+	 */
+	public double module() {
+		Set<Integer> fieldIds = fieldIds(true);
+		if (fieldIds.size() < 2)
+			return Constants.UNUSED;
+		
+		double module = 0;
+		for (int fieldId : fieldIds) {
+			double value = get(fieldId).value;
+			module += value*value;
+		}
+		return Math.sqrt(module);
+	}
+
+	
+	/**
 	 * Calculating the mean value (average value) over all values of ratings in this vector.
 	 * @return mean value (average value) over all values of ratings.
 	 */
