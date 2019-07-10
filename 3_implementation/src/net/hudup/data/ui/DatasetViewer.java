@@ -25,6 +25,7 @@ import net.hudup.data.ctx.ui.CTSviewer;
 
 
 /**
+ * This class represents the viewer of dataset.
  * 
  * @author Loc Nguyen
  * @version 10.0
@@ -61,7 +62,7 @@ public class DatasetViewer extends JDialog {
 
 	
 	/**
-	 * 
+	 * Internal dataset.
 	 */
 	protected Dataset dataset = null;
 	
@@ -82,9 +83,9 @@ public class DatasetViewer extends JDialog {
 	
 	
 	/**
-	 * 
-	 * @param comp
-	 * @param dataset
+	 * Constructor with specified dataset.
+	 * @param comp parent component.
+	 * @param dataset specified dataset.
 	 */
 	public DatasetViewer(Component comp, Dataset dataset) {
 		super(UIUtil.getFrameForComponent(comp), "Dataset viewer", true);
@@ -226,8 +227,8 @@ public class DatasetViewer extends JDialog {
 	
 	
 	/**
-	 * 
-	 * @return rating matrix panel
+	 * Create the rating matrix panel.
+	 * @return rating matrix panel.
 	 */
 	private RatingMatrixPane createRatingMatrixPane() {
 		return new RatingMatrixPane(dataset);
@@ -236,7 +237,7 @@ public class DatasetViewer extends JDialog {
 	
 	/**
 	 * 
-	 * @return user profile panel
+	 * @return user profile panel.
 	 */
 	private JPanel createUserProfilePane() {
 		JPanel main = new JPanel(new BorderLayout());

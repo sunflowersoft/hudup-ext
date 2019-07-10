@@ -120,8 +120,15 @@ public class MemProfiles implements Profiles, Serializable {
 	/**
 	 * Making union of profiles in this collection and profiles whose identifiers are specified by the input parameters.
 	 * @param profileIds specified identifiers of profiles.
+	 * @param possibleIdName specified ID name.
 	 */
-	public void fillUnion(Collection<Integer> profileIds) {
+	public void fillUnion(Collection<Integer> profileIds, String possibleIdName) {
+		//Attribute list must not be empty. Fixing bug date: 2019.07.09
+		if (attList.size() == 0) {
+			attList.add(new Attribute(possibleIdName.trim(), Type.integer));
+			attList.setKey(0);
+		}
+		
 		for (int profileId : profileIds) {
 			if (profileMap.containsKey(profileId))
 				continue;
@@ -129,7 +136,6 @@ public class MemProfiles implements Profiles, Serializable {
 			try {
 				Profile profile = new Profile(attList);
 				profile.setIdValue(new Integer(profileId));
-				
 				profileMap.put(profileId, profile);
 			}
 			catch (Throwable e) {
@@ -137,6 +143,15 @@ public class MemProfiles implements Profiles, Serializable {
 			}
 			
 		}
+	}
+	
+	
+	/**
+	 * Making union of profiles in this collection and profiles whose identifiers are specified by the input parameters.
+	 * @param profileIds specified identifiers of profiles.
+	 */
+	public void fillUnion(Collection<Integer> profileIds) {
+		fillUnion(profileIds, "profileid");
 	}
 	
 	

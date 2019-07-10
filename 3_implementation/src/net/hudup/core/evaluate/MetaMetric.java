@@ -71,6 +71,7 @@ public abstract class MetaMetric extends DefaultMetric {
 	 * @return names of internal metrics.
 	 */
 	public String[] getMetaNameList() {
+		if (meta == null) return new String[] {}; //Fix bug: 2019.07.08
 		String[] nameList = new String[meta.length];
 		
 		for (int i = 0; i < meta.length; i++) {

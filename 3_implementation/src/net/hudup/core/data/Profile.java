@@ -162,17 +162,19 @@ public class Profile implements Cloneable, TextParsable, Serializable {
 	 * This method sets the value of identification by specified object.
 	 * 
 	 * @param id specified object.
+	 * @return true if setting ID is successfully.
 	 */
-	public void setIdValue(Object id) {
+	public boolean setIdValue(Object id) {
 		Keys keys = getKeys();
 		if (keys.size() == 0) {
-			//throw new RuntimeException("Have more than one key"); //Depreciated code
-			System.out.println("There is no key or more than one key");
-			return;
+			//throw new RuntimeException("There is no key"); //Depreciated code
+			System.out.println("There is no key");
+			return false;
 		}
 
 		Attribute key0 = keys.get(0);
 		setValue(key0.getIndex(), id);
+		return true;
 	}
 	
 	

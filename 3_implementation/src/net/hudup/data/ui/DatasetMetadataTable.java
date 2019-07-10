@@ -104,7 +104,7 @@ class DatasetMetadataTM extends DefaultTableModel {
 	
 	
 	/**
-	 * 
+	 * Default constructor.
 	 */
 	public DatasetMetadataTM() {
 		super();

@@ -182,5 +182,4 @@ public abstract class MemoryBasedCF extends MemoryBasedRecommender {
 	}
 	
 	
-	
 }

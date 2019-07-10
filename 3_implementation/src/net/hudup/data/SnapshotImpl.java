@@ -221,8 +221,8 @@ public class SnapshotImpl extends Snapshot {
 		}
 		item.put(userId, rating);
 		
-		userProfiles.fillUnion(Arrays.asList(userId));
-		itemProfiles.fillUnion(Arrays.asList(itemId));
+		userProfiles.fillUnion(Arrays.asList(userId), DataConfig.USERID_FIELD);
+		itemProfiles.fillUnion(Arrays.asList(itemId), DataConfig.ITEMID_FIELD);
 	}
 	
 	
@@ -548,10 +548,10 @@ public class SnapshotImpl extends Snapshot {
 		}
 		
 		snapshot.userProfiles = MemProfiles.createEmpty(DataConfig.USERID_FIELD, Type.integer);
-		((MemProfiles)snapshot.userProfiles).fillUnion(snapshot.userRatingMap.keySet());
+		((MemProfiles)snapshot.userProfiles).fillUnion(snapshot.userRatingMap.keySet(), DataConfig.USERID_FIELD);
 		
 		snapshot.itemProfiles = MemProfiles.createEmpty(DataConfig.ITEMID_FIELD, Type.integer);
-		((MemProfiles)snapshot.itemProfiles).fillUnion(snapshot.itemRatingMap.keySet());
+		((MemProfiles)snapshot.itemProfiles).fillUnion(snapshot.itemRatingMap.keySet(), DataConfig.ITEMID_FIELD);
 
 		snapshot.enhance();
 		return snapshot;
@@ -609,10 +609,10 @@ public class SnapshotImpl extends Snapshot {
 		
 		
 		snapshot.userProfiles = MemProfiles.createEmpty(DataConfig.USERID_FIELD, Type.integer);
-		((MemProfiles)snapshot.userProfiles).fillUnion(snapshot.userRatingMap.keySet());
+		((MemProfiles)snapshot.userProfiles).fillUnion(snapshot.userRatingMap.keySet(), DataConfig.USERID_FIELD);
 		
 		snapshot.itemProfiles = MemProfiles.createEmpty(DataConfig.ITEMID_FIELD, Type.integer);
-		((MemProfiles)snapshot.itemProfiles).fillUnion(snapshot.itemRatingMap.keySet());
+		((MemProfiles)snapshot.itemProfiles).fillUnion(snapshot.itemRatingMap.keySet(), DataConfig.ITEMID_FIELD);
 		
 		snapshot.enhance();
 		return snapshot;
@@ -717,6 +717,10 @@ public class SnapshotImpl extends Snapshot {
 					item.put(userId, rating);
 				}
 			}
+			//Filling additional user profiles and item profiles which can be lacked.
+			//Fixing bug date: 2019.07.09
+			userProfiles.fillUnion(userRatingMap.keySet(), DataConfig.USERID_FIELD);
+			itemProfiles.fillUnion(itemRatingMap.keySet(), DataConfig.ITEMID_FIELD);
 			
 			
 			// Getting sample profiles
@@ -945,8 +949,9 @@ public class SnapshotImpl extends Snapshot {
 					}
 					item.put(userId, rating);
 				}
-				userProfiles.fillUnion(userRatingMap.keySet());
-				itemProfiles.fillUnion(itemRatingMap.keySet());
+				//Filling additional user profiles and item profiles which can be lacked.
+				userProfiles.fillUnion(userRatingMap.keySet(), DataConfig.USERID_FIELD);
+				itemProfiles.fillUnion(itemRatingMap.keySet(), DataConfig.ITEMID_FIELD);
 			}//End if
 		}
 		catch (Throwable e) {

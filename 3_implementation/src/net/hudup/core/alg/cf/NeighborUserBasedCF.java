@@ -3,7 +3,6 @@
  */
 package net.hudup.core.alg.cf;
 
-import java.rmi.RemoteException;
 import java.util.Set;
 
 import net.hudup.core.Util;
@@ -45,66 +44,92 @@ public class NeighborUserBasedCF extends NeighborCF implements DuplicatableAlg {
 
 	@Override
 	public RatingVector estimate(RecommendParam param, Set<Integer> queryIds) {
-		if (param.ratingVector.count(true) < 2)
-			return null;
+		// TODO Auto-generated method stub
+		return estimate(this, param, queryIds);
+	}
+
+
+	/**
+	 * This method is very important, which is used to estimate rating values of given items (users). Any class that extends this abstract class must implement this method.
+	 * Note that the role of user and the role of item are exchangeable. Rating vector can be user rating vector or item rating vector. Please see {@link RatingVector} for more details. 
+	 * The input parameters are a recommendation parameter and a set of item (user) identifiers.
+	 * The output result is a set of predictive or estimated rating values of items (users) specified by the second input parameter.
+	 * @param cf current neighbor algorithm.
+	 * @param param recommendation parameter. Please see {@link RecommendParam} for more details of this parameter.
+	 * @param queryIds set of identifications (IDs) of items that need to be estimated their rating values.
+	 * @return rating vector contains estimated rating values of the specified set of IDs of items (users).
+	 */
+	public static RatingVector estimate(NeighborCF cf, RecommendParam param, Set<Integer> queryIds) {
+		if (param.ratingVector == null) return null;
+		RatingVector thisUser = param.ratingVector.compactClone();
+		RatingVector innerUser = cf.dataset.getUserRating(thisUser.id());
+		if (innerUser != null) {
+			Set<Integer> itemIds = innerUser.fieldIds(true);
+			for (int itemId : itemIds) {
+				if (!thisUser.isRated(itemId))
+					thisUser.put(itemId, innerUser.get(itemId));
+			}
+		}
+		if (thisUser.size() == 0) return null;
 		
-		Fetcher<RatingVector> vRatings = null;
-		vRatings = dataset.fetchUserRatings();
-		
-		RatingVector result = param.ratingVector.newInstance(true);
-		boolean hybrid = config.getAsBoolean(HYBRID);
-		double minValue = dataset.getConfig().getMinRating();
-		double maxValue = dataset.getConfig().getMaxRating();
-		for (int queryId : queryIds) {
+		RatingVector result = thisUser.newInstance(true);
+		boolean hybrid = cf.getConfig().getAsBoolean(HYBRID);
+		double minValue = cf.dataset.getConfig().getMinRating();
+		double maxValue = cf.dataset.getConfig().getMaxRating();
+		double thisMean = thisUser.mean();
+		Fetcher<RatingVector> userRatings = cf.dataset.fetchUserRatings();
+		for (int itemId : queryIds) {
+			if (thisUser.isRated(itemId)) {
+				result.put(itemId, thisUser.get(itemId));
+				continue;
+			}
+			
 			double accum = 0;
 			double simTotal = 0;
+			boolean calculated = false;
 			try {
-				while (vRatings.next()) {
-					RatingVector that = vRatings.pick();
-					if (that == null || !that.isRated(queryId))
+				while (userRatings.next()) {
+					RatingVector thatUser = userRatings.pick();
+					if (thatUser == null || thatUser.id()== thisUser.id() || !thatUser.isRated(itemId))
 						continue;
 					
 					Profile profile1 = hybrid ? param.profile : null;
-					Profile profile2 = hybrid ? dataset.getUserProfile(that.id()) : null;
+					Profile profile2 = hybrid ? cf.dataset.getUserProfile(thatUser.id()) : null;
 					
-					// computing similarity array
-					double sim = similar(param.ratingVector, that, profile1, profile2);
-					if (!Util.isUsed(sim))
-						continue;
+					// computing similarity
+					double sim = cf.similar(thisUser, thatUser, profile1, profile2);
+					if (!Util.isUsed(sim)) continue;
 					
-					double thatValue = that.get(queryId).value;
-					double thatMean = that.mean();
+					double thatValue = thatUser.get(itemId).value;
+					double thatMean = thatUser.mean();
 					double deviate = thatValue - thatMean;
 					accum += sim * deviate;
 					simTotal += Math.abs(sim);
+					
+					calculated = true;
 				}
-				vRatings.reset();
+				userRatings.reset();
 			}
 			catch (Throwable e) {
 				e.printStackTrace();
 			}
+			if (!calculated) continue;
 			
-			double mean = param.ratingVector.mean();
-			double value = simTotal == 0 ? mean : mean + accum / simTotal;
+			double value = simTotal == 0 ? thisMean : thisMean + accum / simTotal;
 			value = (Util.isUsed(maxValue)) && (!Double.isNaN(maxValue)) ? Math.min(value, maxValue) : value;
 			value = (Util.isUsed(minValue)) && (!Double.isNaN(minValue)) ? Math.max(value, minValue) : value;
-			
-			result.put(queryId, value);
+			result.put(itemId, value);
 		}
 		
 		try {
-			vRatings.close();
+			userRatings.close();
 		} 
-		catch (RemoteException e) {
+		catch (Throwable e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
-		if (result.size() == 0)
-			return null;
-		else
-			return result;
-
+		return result.size() == 0 ? null : result;
 	}
 
 	

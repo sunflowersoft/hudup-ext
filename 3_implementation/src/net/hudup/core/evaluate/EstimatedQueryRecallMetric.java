@@ -4,13 +4,13 @@ import net.hudup.core.alg.Alg;
 
 
 /**
- * This class implements Hudup recall metric.
+ * This class implements recall metric for estimation on query ID.
  * 
  * @author Loc Nguyen
- * @version 10.0
+ * @version 1.0
  *
  */
-public class HudupRecallMetric extends DefaultMetric {
+public class EstimatedQueryRecallMetric extends DefaultMetric {
 
 	
 	/**
@@ -22,7 +22,7 @@ public class HudupRecallMetric extends DefaultMetric {
 	/**
 	 * Default constructor.
 	 */
-	public HudupRecallMetric() {
+	public EstimatedQueryRecallMetric() {
 		// TODO Auto-generated constructor stub
 	}
 
@@ -30,7 +30,7 @@ public class HudupRecallMetric extends DefaultMetric {
 	@Override
 	public String getDesc() {
 		// TODO Auto-generated method stub
-		return "Hudup recall";
+		return "Estimated query recall";
 	}
 
 	
@@ -58,14 +58,14 @@ public class HudupRecallMetric extends DefaultMetric {
 	@Override
 	public String getName() {
 		// TODO Auto-generated method stub
-		return "Hudup recall";
+		return "Recall.estimate";
 	}
 
 
 	@Override
 	public Alg newInstance() {
 		// TODO Auto-generated method stub
-		return new HudupRecallMetric();
+		return new EstimatedQueryRecallMetric();
 	}
 
 

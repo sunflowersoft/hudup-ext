@@ -1,9 +1,7 @@
 package net.hudup.evaluate;
 
-import java.util.List;
 import java.util.Set;
 
-import net.hudup.core.Util;
 import net.hudup.core.alg.RecommendParam;
 import net.hudup.core.alg.Recommender;
 import net.hudup.core.data.DataConfig;
@@ -11,6 +9,7 @@ import net.hudup.core.data.Dataset;
 import net.hudup.core.data.DatasetPair;
 import net.hudup.core.data.Fetcher;
 import net.hudup.core.data.RatingVector;
+import net.hudup.core.evaluate.EstimatedQueryRecallMetric;
 import net.hudup.core.evaluate.EvaluatorEvent;
 import net.hudup.core.evaluate.EvaluatorEvent.Type;
 import net.hudup.core.evaluate.EvaluatorProgressEvent;
@@ -20,7 +19,6 @@ import net.hudup.core.evaluate.Metrics;
 import net.hudup.core.evaluate.NoneWrapperMetricList;
 import net.hudup.core.evaluate.SetupTimeMetric;
 import net.hudup.core.evaluate.SpeedMetric;
-import net.hudup.core.logistic.MathUtil;
 import net.hudup.core.logistic.xURI;
 
 
@@ -65,7 +63,7 @@ public class EstimateEvaluator extends RecommendEvaluator {
 					Dataset     training = dsPair.getTraining();
 					Dataset     testing = dsPair.getTesting();
 					int         datasetId = j + 1;
-					xURI         datasetUri = testing.getConfig().getUriId();
+					xURI        datasetUri = testing.getConfig().getUriId();
 					
 					// Adding default metrics to metric result
 					result.add( recommender.getName(), datasetId, datasetUri, ((NoneWrapperMetricList)metricList.clone()).sort().list() );
@@ -88,8 +86,10 @@ public class EstimateEvaluator extends RecommendEvaluator {
 
 					testingUserIds = testing.fetchUserIds();
 					int vCurrentTotal = testingUserIds.getMetadata().getSize();
-					int vCurrentCount = 0;
-					int vEstimatedCount = 0;
+					int vCurrentCount = 0; //Total vector count for Hudup recall metric.
+					int vEstimatedCount = 0; //Estimated vector count for Hudup recall metric.
+					int queryIdCurrentCount = 0; //Total vector count for query ID recall metric.
+					int queryIdEstimatedCount = 0; //Estimated vector count for query ID recall metric.
 					while (testingUserIds.next() && current == thread) {
 						
 						progressStep++;
@@ -110,6 +110,7 @@ public class EstimateEvaluator extends RecommendEvaluator {
 						Set<Integer> queryIds = setupQueryIds(unratedCount, vQuery);
 						if (queryIds.size() == 0)
 							continue;
+						queryIdCurrentCount += queryIds.size(); //Increase total query ID count.
 						
 						RecommendParam param = new RecommendParam(vQuery, testing.getUserProfile(testingUserId));
 						//
@@ -143,6 +144,7 @@ public class EstimateEvaluator extends RecommendEvaluator {
 								); // calculating recommendation metric
 							
 							vEstimatedCount++;
+							queryIdEstimatedCount += estimated.size(); //Increase estimated query ID count.
 							
 							fireEvaluatorEvent(new EvaluatorEvent(
 									this, 
@@ -170,6 +172,14 @@ public class EstimateEvaluator extends RecommendEvaluator {
 						);
 					fireEvaluatorEvent(new EvaluatorEvent(this, Type.doing, hudupRecallMetrics));
 					
+					Metrics estimateRecallMetrics = result.recalc(
+							recommender.getName(), 
+							datasetId, 
+							EstimatedQueryRecallMetric.class, 
+							new Object[] { new FractionMetricValue(queryIdEstimatedCount, queryIdCurrentCount) }
+						);
+					fireEvaluatorEvent(new EvaluatorEvent(this, Type.doing, estimateRecallMetrics));
+
 					Metrics doneOneMetrics = result.gets(recommender.getName(), datasetId);
 					fireEvaluatorEvent(new EvaluatorEvent(this, Type.done_one, doneOneMetrics));
 					
@@ -216,24 +226,58 @@ public class EstimateEvaluator extends RecommendEvaluator {
 	 */
     protected static Set<Integer> setupQueryIds(int unratedCount, RatingVector outQuery) {
 		
-		List<Integer> ratedList = Util.newList();
-		ratedList.addAll(outQuery.fieldIds(true) );
+//		List<Integer> ratedList = Util.newList();
+//		ratedList.addAll(outQuery.fieldIds(true) );
+//		
+//		unratedCount = unratedCount == 0 ? ratedList.size() : unratedCount;
+//		unratedCount = Math.min(unratedCount, ratedList.size());
+//		List<Integer> rndList = MathUtil.pickingOrdering(ratedList, unratedCount);
+//		
+//		Set<Integer> result = Util.newSet(rndList.size());
+//		result.addAll(rndList);
+//		outQuery.remove(rndList);
+//		outQuery.compact();
+//		
+//		return result;
 		
-		Set<Integer> result = Util.newSet();
-		if (ratedList.size() < 2)
-			return result;
-		
-		unratedCount = unratedCount == 0 ? ratedList.size() : unratedCount;
-		unratedCount = Math.min(unratedCount, ratedList.size());
-		List<Integer> rndList = MathUtil.pickingOrdering(ratedList, unratedCount);
-		result.addAll(rndList);
-		
-		outQuery.remove(rndList);
-		
-		return result;
+    	//Estimating all internal item of the rating vector. Fix: 2019.07.08
+		Set<Integer> queryIds = outQuery.fieldIds(true);
+		outQuery.clear();
+		return queryIds;
     }
 
 
+	@Override
+	public NoneWrapperMetricList defaultMetrics() {
+		// TODO Auto-generated method stub
+		NoneWrapperMetricList metricList = new NoneWrapperMetricList();
+		
+		SetupTimeMetric setupTime = new SetupTimeMetric();
+		metricList.add(setupTime);
+		
+		SpeedMetric speed = new SpeedMetric();
+		metricList.add(speed);
+		
+		HudupRecallMetric hudupRecall = new HudupRecallMetric();
+		metricList.add(hudupRecall);
+		
+		EstimatedQueryRecallMetric estimatedRecall = new EstimatedQueryRecallMetric();
+		metricList.add(estimatedRecall);
+
+		MAE mae = new MAE();
+		metricList.add(mae);
+
+		MSE mse = new MSE();
+		metricList.add(mse);
+
+		RMSE rmse = new RMSE();
+		rmse.setup(mse);
+		metricList.add(rmse);
+
+		return metricList;
+	}
+
+	
 	@Override
 	public String getName() {
 		// TODO Auto-generated method stub

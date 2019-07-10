@@ -88,6 +88,18 @@ public final class Util {
 	    return new HashSet<T>();
 	}
 
+	
+	/**
+	 * Creating a new {@link Set} with initial capacity.
+	 * @param <T> type of elements in set.
+	 * @param initialCapacity initial capacity of this list.
+	 * @return new {@link Set}.
+	 */
+	public static <T> Set<T> newSet(int initialCapacity) {
+	    return new HashSet<T>(initialCapacity);
+	}
+
+	
 	/**
 	 * Creating a new {@link Map}.
 	 * @param <K> type of key.
@@ -96,6 +108,18 @@ public final class Util {
 	 */
 	public static <K, V> Map<K, V> newMap() {
 	    return new HashMap<K, V>();
+	}
+
+	
+	/**
+	 * Creating a new {@link Map}.
+	 * @param <K> type of key.
+	 * @param <V> type of value.
+	 * @param initialCapacity initial capacity of this list.
+	 * @return new {@link Map}.
+	 */
+	public static <K, V> Map<K, V> newMap(int initialCapacity) {
+	    return new HashMap<K, V>(initialCapacity);
 	}
 
 	

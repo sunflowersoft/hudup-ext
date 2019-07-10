@@ -94,7 +94,7 @@ public class RatingMatrixPane extends JPanel {
 	
 	
 	/**
-	 * 
+	 * Viewing cell.
 	 */
 	protected void viewCell() {
 		paneRating.clear();
@@ -150,6 +150,7 @@ public class RatingMatrixPane extends JPanel {
 
 
 /**
+ * This class represents the rating panel.
  * 
  * @author Loc Nguyen
  * @version 10.0
@@ -260,7 +261,7 @@ class RatingPane extends JPanel {
 	
 	
 	/**
-	 * 
+	 * Setting rating panel.
 	 * @param rating
 	 */
 	public void set(Rating rating) {
@@ -276,8 +277,8 @@ class RatingPane extends JPanel {
 	
 	
 	/**
-	 * 
-	 * @return whether apply successfully
+	 * Applying value.
+	 * @return whether apply successfully.
 	 */
 	protected boolean apply() {
 		if (!validateValues()) {
@@ -313,7 +314,7 @@ class RatingPane extends JPanel {
 	
 	
 	/**
-	 * 
+	 * Clearing values.
 	 */
 	public void clear() {
 		txtValue.setValue(null);

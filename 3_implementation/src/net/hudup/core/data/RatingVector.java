@@ -388,8 +388,6 @@ public class RatingVector implements Cloneable, TextParsable, Serializable {
 	 */
 	public double module() {
 		Set<Integer> fieldIds = fieldIds(true);
-		if (fieldIds.size() < 2)
-			return Constants.UNUSED;
 		
 		double module = 0;
 		for (int fieldId : fieldIds) {
@@ -571,6 +569,20 @@ public class RatingVector implements Cloneable, TextParsable, Serializable {
 	}
 	
 
+	/**
+	 * Clone this rating vector with rated values.
+	 * @return cloned rating vector with rated values.
+	 */
+	public RatingVector compactClone() {
+		RatingVector newVector = newInstance();
+		Set<Integer> fields = fieldIds(true);
+		for (int field : fields) {
+			newVector.put(field, get(field));
+		}
+		return newVector;
+	}
+	
+	
 	/**
 	 * For ratings which are unrated, this method sets their values by specified filling value.
 	 * As a definition, a rating is called {@code rated} (user rated an item) if its rating value is not {@link Constants#UNUSED}; otherwise such rating is called {@code unrated}.
