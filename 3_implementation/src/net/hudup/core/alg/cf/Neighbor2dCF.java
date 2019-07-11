@@ -12,7 +12,6 @@ import net.hudup.core.alg.RecommendParam;
 import net.hudup.core.data.Fetcher;
 import net.hudup.core.data.Profile;
 import net.hudup.core.data.RatingVector;
-import net.hudup.core.logistic.NextUpdate;
 
 /**
  * This class is also the neighbor collaborative filtering (Neighbor CF) algorithm for users because it extends directly {@link NeighborUserBasedCF}.
@@ -26,7 +25,7 @@ import net.hudup.core.logistic.NextUpdate;
  * @version 10.0
  *
  */
-@NextUpdate
+@Deprecated
 public class Neighbor2dCF extends NeighborUserBasedCF {
 
 	

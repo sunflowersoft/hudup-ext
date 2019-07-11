@@ -11,6 +11,7 @@ import net.hudup.core.RegisterTable.AlgFilter;
 import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.SetupAlgEvent;
 import net.hudup.core.alg.SetupAlgListener;
+import net.hudup.core.alg.SupportCacheAlg;
 import net.hudup.core.alg.TestingAlg;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Dataset;
@@ -165,6 +166,21 @@ public abstract class Evaluator extends AbstractRunner implements SetupAlgListen
 		this.pool = pool;
 		this.parameter = parameter;
 		this.result = null;
+		
+		//Setting cache mode in algorithm list. Improving date: 2019.07.11 by Loc Nguyen
+		try { //Use try-catch block because this code block is not important.
+			if (this.config.containsKey(SupportCacheAlg.SUPPORT_CACHE_FIELD)) {
+				boolean cache = this.config.getAsBoolean(SupportCacheAlg.SUPPORT_CACHE_FIELD);
+				for (Alg alg : algList) {
+					if (alg instanceof SupportCacheAlg)
+						((SupportCacheAlg)alg).setCached(cache);
+				}
+			}
+		}
+		catch (Throwable e) {
+			logger.error("Error in setting support cache mode");
+		}
+
 		start();
 	}
 	
