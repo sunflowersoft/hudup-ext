@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.EventObject;
 import java.util.List;
 
+import net.hudup.core.data.RatingVector;
 import net.hudup.core.parser.TextParsable;
 
 
@@ -188,7 +189,9 @@ public class EvaluatorEvent extends EventObject {
 		if (params != null) {
 			if (params.length >= 1 && params[0] != null) {
 				testingResult += "\nResult = [";
-				if (params[0] instanceof TextParsable)
+				if (params[0] instanceof RatingVector)
+					testingResult += ((RatingVector)params[0]).toTextNice();
+				else if (params[0] instanceof TextParsable)
 					testingResult += ((TextParsable)params[0]).toText();
 				else
 					testingResult += params[0].toString();
@@ -196,7 +199,9 @@ public class EvaluatorEvent extends EventObject {
 			}
 			if (params.length >= 2 && params[1] != null) {
 				testingRecord += "\nTesting = [";
-				if (params[1] instanceof TextParsable)
+				if (params[1] instanceof RatingVector)
+					testingRecord += ((RatingVector)params[1]).toText(); //Can be toTextNice()
+				else if (params[1] instanceof TextParsable)
 					testingRecord += ((TextParsable)params[1]).toText();
 				else
 					testingRecord += params[1].toString();

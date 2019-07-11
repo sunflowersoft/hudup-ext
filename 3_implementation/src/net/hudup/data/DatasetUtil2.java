@@ -323,13 +323,13 @@ public final class DatasetUtil2 {
 				boolean flag = false;
 				
 				for (Alg alg : algList) {
-					if (!(alg instanceof ModelBasedAlg || alg instanceof CompositeAlg)) {
+					if (alg instanceof ModelBasedAlg || alg instanceof CompositeAlg) {
 						flag = true;
 						break;
 					}
 				}
 				
-				if (flag) {
+				if (!flag) {
 					JOptionPane.showMessageDialog(
 							comp, 
 							"Training dataset is KBasePointer but there is not model based recommender nor composite recomender", 
@@ -343,16 +343,16 @@ public final class DatasetUtil2 {
 				boolean flag = false;
 				
 				for (Alg alg : algList) {
-					if (!(alg instanceof ServiceAlg || alg instanceof CompositeAlg)) {
+					if (alg instanceof ServiceAlg || alg instanceof CompositeAlg) {
 						flag = true;
 						break;
 					}
 				}
 				
-				if (flag) {
+				if (!flag) {
 					JOptionPane.showMessageDialog(
 							comp, 
-							"Training dataset is Pointer but algorithm isn't service recommender nor composite recommender", 
+							"Training dataset is Pointer but there is not service recommender nor composite recommender", 
 							"Invalid training dataset", 
 							JOptionPane.ERROR_MESSAGE);
 					
@@ -368,16 +368,16 @@ public final class DatasetUtil2 {
 			boolean flag = false;
 			
 			for (Alg alg : algList) {
-				if (alg instanceof ServiceAlg) {
+				if (!(alg instanceof ServiceAlg)) {
 					flag = true;
 					break;
 				}
 			}
 			
-			if (flag) {
+			if (!flag) {
 				JOptionPane.showMessageDialog(
 						comp, 
-						"Training dataset is normal dataset but there is a service recommender", 
+						"Training dataset is normal dataset but there are all service recommenders", 
 						"Invalid training dataset", 
 						JOptionPane.ERROR_MESSAGE);
 				

@@ -16,6 +16,7 @@ import net.hudup.core.Util;
 import net.hudup.core.data.ctx.ContextList;
 import net.hudup.core.logistic.ListMap;
 import net.hudup.core.logistic.ListSet;
+import net.hudup.core.logistic.MathUtil;
 import net.hudup.core.parser.TextParsable;
 import net.hudup.core.parser.TextParserUtil;
 
@@ -763,6 +764,25 @@ public class RatingVector implements Cloneable, TextParsable, Serializable {
 	
 	@Override
 	public String toText() {
+		return toText(false);
+	}
+	
+	
+	/**
+	 * Converting TextParsable object into nice text.
+	 * @return Nice text presentation of object.
+	 */
+	public String toTextNice() {
+		return toText(true);
+	}
+	
+	
+	/**
+	 * Converting TextParsable object into nice text.
+	 * @param nice indicator of whether or not the rating vector is converted in nice-form text.
+	 * @return Nice text presentation of object.
+	 */
+	private String toText(boolean nice) {
 		StringBuffer buffer = new StringBuffer();
 		buffer.append(id);
 		
@@ -778,12 +798,12 @@ public class RatingVector implements Cloneable, TextParsable, Serializable {
 			
 			int fieldId = fieldIdList.get(i);
 			Rating rating = get(fieldId);
-			buffer.append(fieldId + "=" + rating.value);
+			buffer.append(fieldId + "=" + (nice ? MathUtil.format(rating.value) : rating.value));
 		}
 		
 		return buffer.toString();
 	}
-	
+
 	
 	/**
 	 * Deep cloning the specified map of ratings.
