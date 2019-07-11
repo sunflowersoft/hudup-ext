@@ -274,6 +274,9 @@ public class EstimateEvaluator extends RecommendEvaluator {
 		rmse.setup(mse);
 		metricList.add(rmse);
 
+		Pearson pearson = new Pearson();
+		metricList.add(pearson);
+
 		return metricList;
 	}
 

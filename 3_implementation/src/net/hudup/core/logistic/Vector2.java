@@ -274,7 +274,9 @@ public class Vector2 implements Cloneable, TextParsable, Serializable {
 			VXY += deviate1 * deviate2;
 		}
 		
-		if (VX == 0 || VY == 0)
+		if (VX == 0 && VY == 0)
+			return 1;
+		else if (VX == 0 || VY == 0)
 			return Constants.UNUSED;
 		else
 			return VXY / Math.sqrt(VX * VY);
