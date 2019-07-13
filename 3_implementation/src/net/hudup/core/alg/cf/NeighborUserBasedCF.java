@@ -61,10 +61,12 @@ public class NeighborUserBasedCF extends NeighborCF implements DuplicatableAlg {
 	 */
 	public static RatingVector estimate(NeighborCF cf, RecommendParam param, Set<Integer> queryIds) {
 		if (param.ratingVector == null) return null;
-		RatingVector thisUser = param.ratingVector.compactClone();
+		RatingVector thisUser = param.ratingVector;
 		RatingVector innerUser = cf.dataset.getUserRating(thisUser.id());
 		if (innerUser != null) {
 			Set<Integer> itemIds = innerUser.fieldIds(true);
+			itemIds.removeAll(thisUser.fieldIds(true));
+			if (itemIds.size() > 0) thisUser = (RatingVector)thisUser.clone();
 			for (int itemId : itemIds) {
 				if (!thisUser.isRated(itemId))
 					thisUser.put(itemId, innerUser.get(itemId));

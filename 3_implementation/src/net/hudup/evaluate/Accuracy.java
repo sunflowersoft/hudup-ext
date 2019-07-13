@@ -102,7 +102,7 @@ public abstract class Accuracy extends DefaultMetric {
 	/**
 	 * Testing whether the specified rating value is relevant.
 	 * Note, a rating value is relevant if it is larger than or equal to the average rating (rating mean).
-	 * The average rating is a half of the deviation {@code {@link DataConfig#getMaxRating()} - {@link DataConfig#getMinRating()}}.
+	 * The average rating is a half of the sum {@code {@link DataConfig#getMaxRating()} + {@link DataConfig#getMinRating()}}.
 	 * Such {@link DataConfig} is configuration of the specified testing dataset.
 	 * @param rating specified rating value.
 	 * @param testing specified testing dataset whose maximum rating value and minium rating value are used to calculate the rating average. 
@@ -111,8 +111,8 @@ public abstract class Accuracy extends DefaultMetric {
 	protected static boolean isRelevant(double rating, Dataset testing) {
 		
 		DataConfig config = testing.getConfig(); 
-		double     interval = config.getMaxRating() - config.getMinRating();
-		if (rating < interval / 2.0)
+		double     threshold = (config.getMaxRating() + config.getMinRating()) / 2.0;
+		if (rating < threshold)
 			return false;
 		else
 			return true;

@@ -63,7 +63,7 @@ public abstract class StatCF extends ModelBasedCF {
 	@Override
 	public RatingVector recommend(RecommendParam param, int maxRecommend) {
 		// TODO Auto-generated method stub
-		param = preprocess(param);
+		param = recommendPreprocess(param);
 		if (param == null)
 			return null;
 		filterList.prepare(param);

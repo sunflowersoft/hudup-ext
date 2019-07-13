@@ -91,7 +91,7 @@ public class BayesLookupTableCF extends ModelBasedCF {
 		if (kb.isEmpty())
 			return null;
 
-		param = preprocess(param);
+		param = recommendPreprocess(param);
 		if (param == null)
 			return null;
 		

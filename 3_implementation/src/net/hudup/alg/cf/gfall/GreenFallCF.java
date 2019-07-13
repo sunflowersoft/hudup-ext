@@ -8,6 +8,8 @@ import net.hudup.core.alg.Alg;
 
 
 /**
+ * This class implements the Green Fall algorithm.
+ * 
  * @author Loc Nguyen
  * @version 10.0
  *
@@ -22,7 +24,7 @@ public class GreenFallCF extends FreqItemsetBasedCF {
 
 	
 	/**
-	 * 
+	 * Default constructor.
 	 */
 	public GreenFallCF() {
 		super();

@@ -343,6 +343,16 @@ public class DataConfig extends PropList {
 	 */
 	public final static int ACCOUNT_ADMIN_PRIVILEGE = 3;
 	
+	/**
+	 * Minimum rating field name
+	 */
+	public final static double MIN_RATING_DEFAULT            = 1;
+	
+	/**
+	 * Maximum rating field name
+	 */
+	public final static double MAX_RATING_DEFAULT            = 5;
+
 	
 	/**
 	 * Default constructor

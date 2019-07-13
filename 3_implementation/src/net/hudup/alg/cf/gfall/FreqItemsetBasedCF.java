@@ -82,7 +82,7 @@ public abstract class FreqItemsetBasedCF extends ModelBasedCF {
 
 	
 	/**
-	 * 
+	 * This class represents the estimation result.
 	 * @author Loc Nguyen
 	 * @version 10.0
 	 *
@@ -191,7 +191,7 @@ public abstract class FreqItemsetBasedCF extends ModelBasedCF {
 	@Override
 	public RatingVector recommend(RecommendParam param, int maxRecommend) {
 		// maxRecommend = 0: get All
-		param = preprocess(param);
+		param = recommendPreprocess(param);
 		if (param == null)
 			return null;
 		
@@ -220,7 +220,7 @@ public abstract class FreqItemsetBasedCF extends ModelBasedCF {
 
 	
 	/**
-	 * 
+	 * Optimizing the recommendation result.
 	 * @param itemset specified bit itemset specified by {@link BitItemset} class.
 	 * @param rec recommended rating vector.
 	 * @param maxRecommend maximum number of items in recommended list.
@@ -260,7 +260,7 @@ public abstract class FreqItemsetBasedCF extends ModelBasedCF {
 	
 	
 	/**
-	 * 
+	 * Create the finder to find frequent item set.
 	 * @return frequent itemsets finder {@link FreqItemsetFinder}
 	 */
 	protected abstract FreqItemsetFinder createFreqItemsetFinder();

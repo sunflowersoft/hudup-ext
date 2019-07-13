@@ -5,6 +5,8 @@ package net.hudup.core.alg;
 
 import java.util.Set;
 
+import net.hudup.core.Util;
+import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.Profile;
 import net.hudup.core.data.RatingVector;
@@ -117,19 +119,28 @@ public abstract class Recommender extends AbstractAlg {
 	 * @param param recommendation parameter. Please see {@link RecommendParam} for more details of this parameter.
 	 * @return new recommendation parameter that is processed from the specified recommendation parameter.
 	 */
-	protected RecommendParam preprocess(RecommendParam param) {
+	protected RecommendParam recommendPreprocess(RecommendParam param) {
 		if (param == null || param.ratingVector == null)
 			return null;
 		
 		// Pay attention following lines
 		Dataset dataset = getDataset();
+		int userId = param.ratingVector.id();
+		RatingVector vRating = dataset.getUserRating(userId);
 		if (param.ratingVector.size() == 0) {
-			int userId = param.ratingVector.id();
-			RatingVector vRating = dataset.getUserRating(userId);
 			if (vRating == null || vRating.size() == 0)
 				return null;
-			param.ratingVector = vRating;
-			
+			else
+				param.ratingVector = vRating;
+		}
+		else if (vRating != null) {//Fixing date: 2019.07.13 by Loc Nguyen
+			Set<Integer> itemIds = vRating.fieldIds(true);
+			if (itemIds.size() > 0)
+				param.ratingVector = (RatingVector)param.ratingVector.clone();
+			for (int itemId : itemIds) {
+				if (!param.ratingVector.contains(itemId))
+					param.ratingVector.put(itemId, vRating.get(itemId));
+			}
 		}
 		
 		if (param.profile == null) {
@@ -138,6 +149,30 @@ public abstract class Recommender extends AbstractAlg {
 		}
 		
 		return param;
+	}
+	
+	
+	/**
+	 * Getting minimum rating.
+	 * @return minimum rating.
+	 */
+	public double getMinRating() {
+		double minRating = getDataset().getConfig().getMinRating();
+		if (!Util.isUsed(minRating))
+			minRating = getConfig().getAsReal(DataConfig.MIN_RATING_FIELD);
+		return minRating; 
+	}
+
+	
+	/**
+	 * Getting maximum rating.
+	 * @return maximum rating.
+	 */
+	public double getMaxRating() {
+		double maxRating = getDataset().getConfig().getMaxRating();
+		if (!Util.isUsed(maxRating))
+			maxRating = getConfig().getAsReal(DataConfig.MAX_RATING_FIELD);
+		return maxRating; 
 	}
 	
 	

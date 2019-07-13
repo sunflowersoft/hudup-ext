@@ -94,7 +94,7 @@ public abstract class MemoryBasedCF extends MemoryBasedRecommender {
 
 	@Override
 	public RatingVector recommend(RecommendParam param, int maxRecommend) {
-		param = preprocess(param);
+		param = recommendPreprocess(param);
 		if (param == null)
 			return null;
 		
@@ -102,7 +102,7 @@ public abstract class MemoryBasedCF extends MemoryBasedRecommender {
 		Fetcher<Integer> fieldIds = dataset.fetchItemIds();
 		
 		List<Pair> pairs = Util.newList();
-		double maxRating = dataset.getConfig().getMaxRating();
+		double maxRating = getMaxRating(); //Bug fixing date: 2019.07.13 by Loc Nguyen
 		try {
 			int size = fieldIds.getMetadata().getSize();
 			
