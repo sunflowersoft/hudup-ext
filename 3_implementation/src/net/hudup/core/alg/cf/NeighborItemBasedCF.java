@@ -79,7 +79,7 @@ public class NeighborItemBasedCF extends NeighborCF implements DuplicatableAlg {
 				continue;
 			}
 			
-			Profile profile1 = hybrid ? cf.dataset.getItemProfile(itemId) : null;
+			Profile itemProfile1 = hybrid ? cf.dataset.getItemProfile(itemId) : null;
 			double thisMean = thisItem.mean();
 			double accum = 0;
 			double simTotal = 0;
@@ -96,10 +96,10 @@ public class NeighborItemBasedCF extends NeighborCF implements DuplicatableAlg {
 					if (!thatItem.isRated(thisUser.id()))
 						continue;
 					
-					Profile profile2 = hybrid ? cf.dataset.getItemProfile(thatItem.id()) : null;
+					Profile itemProfile2 = hybrid ? cf.dataset.getItemProfile(thatItem.id()) : null;
 					
 					// computing similarity
-					double sim = cf.similar(thisItem, thatItem, profile1, profile2);
+					double sim = cf.similar(thisItem, thatItem, itemProfile1, itemProfile2);
 					if (!Util.isUsed(sim)) continue;
 					
 					double thatValue = thatItem.get(thisUser.id()).value;

@@ -76,6 +76,7 @@ public class NeighborUserBasedCF extends NeighborCF implements DuplicatableAlg {
 		
 		RatingVector result = thisUser.newInstance(true);
 		boolean hybrid = cf.getConfig().getAsBoolean(HYBRID);
+		Profile userProfile1 = hybrid ? param.profile : null;
 		double minValue = cf.dataset.getConfig().getMinRating();
 		double maxValue = cf.dataset.getConfig().getMaxRating();
 		double thisMean = thisUser.mean();
@@ -95,11 +96,10 @@ public class NeighborUserBasedCF extends NeighborCF implements DuplicatableAlg {
 					if (thatUser == null || thatUser.id()== thisUser.id() || !thatUser.isRated(itemId))
 						continue;
 					
-					Profile profile1 = hybrid ? param.profile : null;
-					Profile profile2 = hybrid ? cf.dataset.getUserProfile(thatUser.id()) : null;
+					Profile userProfile2 = hybrid ? cf.dataset.getUserProfile(thatUser.id()) : null;
 					
 					// computing similarity
-					double sim = cf.similar(thisUser, thatUser, profile1, profile2);
+					double sim = cf.similar(thisUser, thatUser, userProfile1, userProfile2);
 					if (!Util.isUsed(sim)) continue;
 					
 					double thatValue = thatUser.get(itemId).value;
