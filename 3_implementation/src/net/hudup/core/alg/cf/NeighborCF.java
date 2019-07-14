@@ -202,45 +202,21 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 
 	
 	/**
-	 * Internal item identifiers.
+	 * General user mean.
 	 */
-	protected Set<Integer> itemIds = Util.newSet();
+	protected double ratingMean = Constants.UNUSED;
 
 	
 	/**
-	 * General item mean.
+	 * General user variance.
 	 */
-	protected double generalItemMean = Constants.UNUSED;
+	protected double ratingVar = Constants.UNUSED;
 
-	
-	/**
-	 * Internal item means.
-	 */
-	protected Map<Integer, Double> itemMeans = Util.newMap();
-
-	
-	/**
-	 * General item variance.
-	 */
-	protected double generalItemVar = Constants.UNUSED;
-
-	
-	/**
-	 * Internal item variances.
-	 */
-	protected Map<Integer, Double> itemVars = Util.newMap();
-	
 	
 	/**
 	 * Internal item identifiers.
 	 */
 	protected Set<Integer> userIds = Util.newSet();
-
-	
-	/**
-	 * General user mean.
-	 */
-	protected double generalUserMean = Constants.UNUSED;
 
 	
 	/**
@@ -250,16 +226,28 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 
 	
 	/**
-	 * General user variance.
-	 */
-	protected double generalUserVar = Constants.UNUSED;
-
-	
-	/**
 	 * Internal user variances.
 	 */
 	protected Map<Integer, Double> userVars = Util.newMap();
 
+	
+	/**
+	 * Internal item identifiers.
+	 */
+	protected Set<Integer> itemIds = Util.newSet();
+
+	
+	/**
+	 * Internal item means.
+	 */
+	protected Map<Integer, Double> itemMeans = Util.newMap();
+
+	
+	/**
+	 * Internal item variances.
+	 */
+	protected Map<Integer, Double> itemVars = Util.newMap();
+	
 	
 	/**
 	 * Row similarity cache.
@@ -309,8 +297,8 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 		this.bcfColumnModuleCache.clear();
 		this.bcColumnCache.clear();
 
-		updateItemMeanVars(dataset);
 		updateUserMeanVars(dataset);
+		updateItemMeanVars(dataset);
 	}
 
 
@@ -323,16 +311,15 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 		this.maxRating = DataConfig.MAX_RATING_DEFAULT;
 		this.ratingMedian = (this.minRating + this.maxRating) / 2.0;
 		
+		this.ratingMean = Constants.UNUSED;
+		this.ratingVar = Constants.UNUSED;
+		this.userMeans.clear();
+		this.userVars.clear();
+		
 		this.itemIds.clear();
-		this.generalItemMean = Constants.UNUSED;
 		this.itemMeans.clear();
-		this.generalItemVar = Constants.UNUSED;
 		this.itemVars.clear();
 		this.userIds.clear();
-		this.generalUserMean = Constants.UNUSED;
-		this.userMeans.clear();
-		this.generalUserVar = Constants.UNUSED;
-		this.userVars.clear();
 		
 		this.rowSimCache.clear();
 		
@@ -343,152 +330,115 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 
 
 	/**
-	 * Updating individual item means and variances from specified dataset.
-	 * @param dataset specified dataset.
-	 * @throws Exception if any error raises.
-	 */
-	private void updateItemMeanVars(Dataset dataset) throws Exception {
-		int totalItemCount = 0;
-		this.itemIds.clear();
-		this.generalItemMean = 0.0;
-		this.itemMeans.clear();
-		this.generalItemVar = 0.0;
-		this.itemVars.clear();
-		
-		//Resetting individual item counts and means
-		Map<Integer, Double> itemCounts = Util.newMap();
-		Fetcher<Integer> itemFetcher = dataset.fetchItemIds();
-		while (itemFetcher.next()) {
-			int itemId = itemFetcher.pick();
-			this.itemIds.add(itemId);
-			this.itemMeans.put(itemId, 0.0);
-			itemCounts.put(itemId, 0.0);
-		}
-		itemFetcher.close();
-		
-		//Calculating item means and counts
-		Fetcher<RatingVector> ratings = dataset.fetchUserRatings();
-		while (ratings.next()) {
-			RatingVector rating = ratings.pick();
-			if (rating == null) continue;
-			
-			Set<Integer> itemIds = rating.fieldIds(true);
-			for (int itemId : itemIds) {
-				double count = itemCounts.get(itemId);
-				itemCounts.put(itemId, count + 1);
-				double oldMean = this.itemMeans.get(itemId);
-				double newValue = rating.get(itemId).value;
-				this.itemMeans.put(itemId, (oldMean*count + newValue) / (count + 1));
-				
-				totalItemCount++;
-				this.generalItemMean += newValue;
-			}
-		}
-		this.generalItemMean = this.generalItemMean / (double)totalItemCount;
-		
-		//Calculating sum of item variances.
-		ratings.reset();
-		while (ratings.next()) {
-			RatingVector rating = ratings.pick();
-			if (rating == null) continue;
-			
-			Set<Integer> itemIds = rating.fieldIds(true);
-			for (int itemId : itemIds) {
-				double value = rating.get(itemId).value;
-				double d = value - this.itemMeans.get(itemId);
-				if (!this.itemVars.containsKey(itemId))
-					this.itemVars.put(itemId, d*d);
-				else
-					this.itemVars.put(itemId, this.itemVars.get(itemId) + d*d);
-				
-				double D = value - this.generalItemMean;
-				this.generalItemVar += D*D;
-			}
-		}
-		ratings.close();
-		this.generalItemVar = this.generalItemVar / (double)totalItemCount;
-		
-		//Calculating item variances.
-		Set<Integer> itemIds = this.itemVars.keySet();
-		for (int itemId : itemIds) {
-			this.itemVars.put(itemId, this.itemVars.get(itemId) / itemCounts.get(itemId)); //Use MLE variance
-		}
-	}
-	
-	
-	/**
 	 * Updating individual user means and variances from specified dataset.
 	 * @param dataset specified dataset.
 	 * @throws Exception if any error raises.
 	 */
 	private void updateUserMeanVars(Dataset dataset) throws Exception {
-		int totalUserCount = 0;
+		int totalRatingCount = 0;
+		this.ratingMean = 0.0;
+		this.ratingVar = 0.0;
 		this.userIds.clear();
-		this.generalUserMean = 0.0;
 		this.userMeans.clear();
-		this.generalUserVar = 0.0;
 		this.userVars.clear();
 		
-		//Resetting individual user counts and means
-		Map<Integer, Double> userCounts = Util.newMap();
-		Fetcher<Integer> userFetcher = dataset.fetchUserIds();
-		while (userFetcher.next()) {
-			int userId = userFetcher.pick();
+		//Calculating user means
+		Fetcher<RatingVector> users = dataset.fetchUserRatings();
+		while (users.next()) {
+			RatingVector user = users.pick();
+			if (user == null) continue;
+			
+			int userId = user.id();
 			this.userIds.add(userId);
-			this.userMeans.put(userId, 0.0);
-			userCounts.put(userId, 0.0);
-		}
-		userFetcher.close();
-		
-		//Calculating user means and counts
-		Fetcher<RatingVector> ratings = dataset.fetchItemRatings();
-		while (ratings.next()) {
-			RatingVector rating = ratings.pick();
-			if (rating == null) continue;
 			
-			Set<Integer> userIds = rating.fieldIds(true);
-			for (int userId : userIds) {
-				double count = userCounts.get(userId);
-				userCounts.put(userId, count + 1);
-				double oldMean = this.userMeans.get(userId);
-				double newValue = rating.get(userId).value;
-				this.userMeans.put(userId, (oldMean*count + newValue) / (count + 1));
+			Set<Integer> itemIds = user.fieldIds(true);
+			double meanSum = 0;
+			for (int itemId : itemIds) {
+				double value = user.get(itemId).value;
+				meanSum += value;
 				
-				totalUserCount++;
-				this.generalUserMean += newValue;
+				totalRatingCount++;
+				this.ratingMean += value;
 			}
+			this.userMeans.put(userId, meanSum / (double)(itemIds.size()));
 		}
-		this.generalUserMean = this.generalUserMean / (double)totalUserCount;
+		this.ratingMean = this.ratingMean / (double)totalRatingCount;
+
+		//Calculating user variances
+		users.reset();
+		while (users.next()) {
+			RatingVector user = users.pick();
+			if (user == null) continue;
 		
-		//Calculating sum of user variances.
-		ratings.reset();
-		while (ratings.next()) {
-			RatingVector rating = ratings.pick();
-			if (rating == null) continue;
-			
-			Set<Integer> userIds = rating.fieldIds(true);
-			for (int userId : userIds) {
-				double value = rating.get(userId).value;
-				double d = value - this.userMeans.get(userId);
-				if (!this.userVars.containsKey(userId))
-					this.userVars.put(userId, d*d);
-				else
-					this.userVars.put(userId, this.userVars.get(userId) + d*d);
+			Set<Integer> itemIds = user.fieldIds(true);
+			int userId = user.id();
+			double varSum = 0;
+			double userMean = this.userMeans.get(userId);
+			for (int itemId : itemIds) {
+				double value = user.get(itemId).value;
+				double d = value - userMean;
+				varSum += d*d;
 				
-				double D = value - this.generalUserMean;
-				this.generalUserVar += D*D;
+				double D = value - this.ratingMean;
+				this.ratingVar += D*D;
 			}
+			this.userVars.put(userId, varSum / (double)(itemIds.size()));
 		}
-		ratings.close();
-		this.generalUserVar = this.generalUserVar / (double)totalUserCount;
+		this.ratingVar = this.ratingVar / (double)totalRatingCount;
 		
-		//Calculating user variances.
-		Set<Integer> userIds = this.userVars.keySet();
-		for (int userId : userIds) {
-			this.userVars.put(userId, this.userVars.get(userId) / userCounts.get(userId)); //Use MLE variance
-		}
+		users.close();
 	}
 
+	
+	/**
+	 * Updating individual item means and variances from specified dataset.
+	 * @param dataset specified dataset.
+	 * @throws Exception if any error raises.
+	 */
+	private void updateItemMeanVars(Dataset dataset) throws Exception {
+		this.itemIds.clear();
+		this.itemMeans.clear();
+		this.itemVars.clear();
+		
+		//Calculating item means
+		Fetcher<RatingVector> items = dataset.fetchItemRatings();
+		while (items.next()) {
+			RatingVector item = items.pick();
+			if (item == null) continue;
+			
+			int itemId = item.id();
+			this.itemIds.add(itemId);
+			
+			Set<Integer> userIds = item.fieldIds(true);
+			double meanSum = 0;
+			for (int userId : userIds) {
+				double value = item.get(userId).value;
+				meanSum += value;
+			}
+			this.itemMeans.put(itemId, meanSum / (double)(userIds.size()));
+		}
+
+		//Calculating user variances
+		items.reset();
+		while (items.next()) {
+			RatingVector item = items.pick();
+			if (item == null) continue;
+		
+			Set<Integer> userIds = item.fieldIds(true);
+			int itemId = item.id();
+			double varSum = 0;
+			double itemMean = this.itemMeans.get(itemId);
+			for (int userId : userIds) {
+				double value = item.get(userId).value;
+				double d = value - itemMean;
+				varSum += d*d;
+			}
+			this.itemVars.put(itemId, varSum / (double)(userIds.size()));
+		}
+		
+		items.close();
+	}
+	
 	
 	/**
 	 * Getting the list of supported similar measures in names.
@@ -600,6 +550,10 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 			return pss(vRating1, vRating2, profile1, profile2);
 		else if (measure.equals(NHSM))
 			return nhsm(vRating1, vRating2, profile1, profile2);
+		else if (measure.equals(BCF))
+			return bcf(vRating1, vRating2, profile1, profile2);
+		else if (measure.equals(BCFJ))
+			return bcfj(vRating1, vRating2, profile1, profile2);
 		else
 			return Constants.UNUSED;
 			
@@ -1080,49 +1034,37 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 			
 			@Override
 			public Object perform(Object...params) {
-				return bcAsUsual(vRating1, vRating2, profile1, profile2);
+				List<Double> bins = valueBins;
+				if (bins.isEmpty())
+					bins = extractValueBins(vRating1, vRating2);
+				
+				Set<Integer> ids1 = vRating1.fieldIds(true);
+				Set<Integer> ids2 = vRating2.fieldIds(true);
+				int n1 = ids1.size();
+				int n2 = ids2.size();
+				if (n1 == 0 && n2 == 0) return 1;
+				if (n1 == 0 || n2 == 0) return Constants.UNUSED;
+				
+				double bc = 0;
+				for (double bin : bins) {
+					int count1 = 0, count2 = 0;
+					for (int id1 : ids1) {
+						if (vRating1.get(id1).value == bin)
+							count1++;
+					}
+					for (int id2 : ids2) {
+						if (vRating2.get(id2).value == bin)
+							count2++;
+					}
+					
+					bc += Math.sqrt( ((double)count1/(double)n1) * ((double)count2/(double)n2) ); 
+				}
+				
+				return bc;
 			}
 		};
 		
 		return (double)cacheTask(vRating1.id(), vRating2.id(), this.bcColumnCache, task);
-	}
-
-	
-	/**
-	 * Calculate the Bhattacharyya measure from specified rating vectors as usual. BC measure is modified by Bidyut Kr. Patra, Raimo Launonen, Ville Ollikainen, Sukumar Nandi, and implemented by Loc Nguyen.
-	 * @param vRating1 first rating vector.
-	 * @param vRating2 second rating vector.
-	 * @author Bidyut Kr. Patra, Raimo Launonen, Ville Ollikainen, Sukumar Nandi.
-	 * @return Bhattacharyya measure from specified rating vectors.
-	 */
-	protected double bcAsUsual(RatingVector vRating1, RatingVector vRating2,
-			Profile profile1, Profile profile2) {
-		List<Double> bins = this.valueBins;
-		if (bins.isEmpty())
-			bins = extractValueBins(vRating1, vRating2);
-		
-		Set<Integer> ids1 = vRating1.fieldIds(true);
-		Set<Integer> ids2 = vRating2.fieldIds(true);
-		int n1 = ids1.size();
-		int n2 = ids2.size();
-		if (n1 == 0 && n2 == 0) return 1;
-		if (n1 == 0 || n2 == 0) return Constants.UNUSED;
-		double bc = 0;
-		for (double bin : bins) {
-			int count1 = 0, count2 = 0;
-			for (int id1 : ids1) {
-				if (vRating1.get(id1).value == bin)
-					count1++;
-			}
-			for (int id2 : ids2) {
-				if (vRating2.get(id2).value == bin)
-					count2++;
-			}
-			
-			bc += Math.sqrt( ((double)count1/(double)n1) * ((double)count2/(double)n2) ); 
-		}
-		
-		return bc;
 	}
 
 	
