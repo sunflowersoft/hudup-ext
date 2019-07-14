@@ -14,7 +14,7 @@ import net.hudup.core.data.Profile;
 import net.hudup.core.data.RatingVector;
 
 /**
- * This class is also the neighbor collaborative filtering (Neighbor CF) algorithm for users because it extends directly {@link NeighborUserBasedCF}.
+ * This class is also the neighbor collaborative filtering (Neighbor CF) algorithm for users because it extends directly {@link NeighborCFUserBased}.
  * However it tries to calculate a so-called 2D (2-Dimension) similar measure which is the weighted sum of two similar measures.
  * The first similar measure is of two users and second similar measure is of two items.
  * So it is called 2D (2-Dimension) Neighbor CF algorithm. It mainly re-defines the method {@link #estimate(RecommendParam, Set)} for supporting 2D similar measure.
@@ -26,7 +26,7 @@ import net.hudup.core.data.RatingVector;
  *
  */
 @Deprecated
-public class Neighbor2dCF extends NeighborUserBasedCF {
+public class NeighborCF2dDeprecated extends NeighborCFUserBased {
 
 	
 	/**
@@ -38,7 +38,7 @@ public class Neighbor2dCF extends NeighborUserBasedCF {
 	/**
 	 * Default constructor.
 	 */
-	public Neighbor2dCF() {
+	public NeighborCF2dDeprecated() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
@@ -143,14 +143,14 @@ public class Neighbor2dCF extends NeighborUserBasedCF {
 	@Override
 	public String getName() {
 		// TODO Auto-generated method stub
-		return "neighbor_2d";
+		return "neighborcf_2d_deprecated";
 	}
 
 
 	@Override
 	public Alg newInstance() {
 		// TODO Auto-generated method stub
-		return new Neighbor2dCF();
+		return new NeighborCF2dDeprecated();
 	}
 	
 	

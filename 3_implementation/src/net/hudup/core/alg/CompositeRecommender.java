@@ -1,7 +1,7 @@
 package net.hudup.core.alg;
 
 import net.hudup.core.Constants;
-import net.hudup.core.alg.cf.NeighborItemBasedCF;
+import net.hudup.core.alg.cf.NeighborCFItemBased;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.logistic.Composite;
@@ -37,7 +37,7 @@ public abstract class CompositeRecommender extends Recommender implements Compos
 	/**
 	 * This constant specifies the class of default internal recommender.
 	 */
-	public final static Class<? extends Recommender> DEFAULT_RECOMMENDER_CLASS = NeighborItemBasedCF.class;
+	public final static Class<? extends Recommender> DEFAULT_RECOMMENDER_CLASS = NeighborCFItemBased.class;
 
 	
 	/**

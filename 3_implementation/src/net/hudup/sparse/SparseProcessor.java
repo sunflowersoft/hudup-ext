@@ -16,7 +16,7 @@ import net.hudup.core.alg.RecommendParam;
 import net.hudup.core.alg.Recommender;
 import net.hudup.core.alg.cf.CFAnnotation;
 import net.hudup.core.alg.cf.MemoryBasedCF;
-import net.hudup.core.alg.cf.NeighborUserBasedCF;
+import net.hudup.core.alg.cf.NeighborCFUserBased;
 import net.hudup.core.data.Fetcher;
 import net.hudup.core.data.FetcherUtil;
 import net.hudup.core.data.Rating;
@@ -184,7 +184,7 @@ public class SparseProcessor {
 	public boolean algComplete(Snapshot snapshot, Alg completeMethod) {
 		
 		if (completeMethod == null)
-			completeMethod = new NeighborUserBasedCF();
+			completeMethod = new NeighborCFUserBased();
 		else if (!(completeMethod instanceof Recommender) ||
 				completeMethod.getClass().getAnnotation(CFAnnotation.class) == null) {
 			throw new RuntimeException("Not implement yet for none-collaborative filtering algorithm");
@@ -290,7 +290,7 @@ public class SparseProcessor {
 	 */
 	public boolean algComplete(RatingMatrix userMatrix, Alg completeMethod, boolean updateMetadata) {
 		if (completeMethod == null)
-			completeMethod = new NeighborUserBasedCF();
+			completeMethod = new NeighborCFUserBased();
 		else if (!(completeMethod instanceof Recommender) ||
 				completeMethod.getClass().getAnnotation(CFAnnotation.class) == null) {
 			throw new RuntimeException("Not implement yet for none-collaborative filtering algorithm");
