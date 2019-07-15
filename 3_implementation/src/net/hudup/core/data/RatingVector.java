@@ -516,6 +516,23 @@ public class RatingVector implements Cloneable, TextParsable, Serializable {
 	
 
 	/**
+	 * Calculating the product of this rating vector and the specified rating vector according to their values.
+	 * @param that specified rating vector.
+	 * @return product of this rating vector and the specified rating vector.
+	 */
+	public double product(RatingVector that) {
+		Set<Integer> fieldIds = fieldIds(true);
+		double product = 0;
+		for (int fieldId : fieldIds) {
+			if (that.isRated(fieldId)) 
+				product += this.ratedMap.get(fieldId).value * that.ratedMap.get(fieldId).value;
+		}
+		
+		return product;
+	}
+
+	
+	/**
 	 * Calculating the cosine of this rating vector and the specified rating vector according to their values.
 	 * Concretely, this rating vector and the specified rating vector produce two vectors of their values and this method calculates the cosine of such two value vectors.
 	 * @param that specified rating vector.
