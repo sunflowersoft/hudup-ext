@@ -405,16 +405,16 @@ public class RatingVector implements Cloneable, TextParsable, Serializable {
 	 */
 	public double mean() {
 		Set<Integer> fieldIds = fieldIds(true);
+		if (fieldIds.size() == 0)
+			return Constants.UNUSED;
 		
 		double accum = 0;
-		int count = 0;
 		for (int fieldId : fieldIds) {
 			double value = get(fieldId).value;
 			accum += value;
-			count ++;
 		}
 		
-		return accum / count;
+		return accum / (double)fieldIds.size();
 	}
 
 	
@@ -506,9 +506,7 @@ public class RatingVector implements Cloneable, TextParsable, Serializable {
 			VXY += deviate1 * deviate2;
 		}
 		
-		if (VX == 0 && VY == 0)
-			return 1;
-		else if (VX == 0 || VY == 0)
+		if (VX == 0 || VY == 0)
 			return Constants.UNUSED;
 		else
 			return VXY / Math.sqrt(VX * VY);
@@ -541,14 +539,14 @@ public class RatingVector implements Cloneable, TextParsable, Serializable {
 	public double cosine(RatingVector that) {
 		Set<Integer> fieldIds = fieldIds(true);
 		
-		double product = 0f;
-		double length1 = 0f;
-		double length2 = 0f;
+		double product = 0;
+		double length1 = 0;
+		double length2 = 0;
 		for (int fieldId : fieldIds) {
 			if (!that.isRated(fieldId)) 
 				continue;
 			
-			double value1 = ratedMap.get(fieldId).value;
+			double value1 = this.ratedMap.get(fieldId).value;
 			double value2 = that.ratedMap.get(fieldId).value;
 			
 			length1 += value1 * value1;
@@ -556,14 +554,44 @@ public class RatingVector implements Cloneable, TextParsable, Serializable {
 			product += value1 * value2;
 		}
 		
-		if (length1 == 0 && length2 == 0)
-			return 1;
-		else if (length1 == 0 || length2 == 0)
+		if (length1 == 0 || length2 == 0)
 			return Constants.UNUSED;
 		else
 			return product / Math.sqrt(length1 * length2);
 	}
 	
+	
+	/**
+	 * Calculating the normalized cosine of this rating vector and the specified rating vector according to their values.
+	 * Concretely, this rating vector and the specified rating vector produce two vectors of their values and this method calculates the cosine of such two value vectors.
+	 * @param that specified rating vector.
+	 * @param average averaged value.
+	 * @return cosine of this rating vector and the specified rating vector.
+	 */
+	public double cosine(RatingVector that, double average) {
+		Set<Integer> fieldIds = fieldIds(true);
+		
+		double product = 0;
+		double length1 = 0;
+		double length2 = 0;
+		for (int fieldId : fieldIds) {
+			if (!that.isRated(fieldId)) 
+				continue;
+			
+			double value1 = this.ratedMap.get(fieldId).value - average;
+			double value2 = that.ratedMap.get(fieldId).value - average;
+			
+			length1 += value1 * value1;
+			length2 += value2 * value2;
+			product += value1 * value2;
+		}
+		
+		if (length1 == 0 || length2 == 0)
+			return Constants.UNUSED;
+		else
+			return product / Math.sqrt(length1 * length2);
+	}
+
 	
 	/**
 	 * This method makes ratings associated with the field ID (s) in the specified collection to be not rated.

@@ -211,9 +211,9 @@ public class Vector2 implements Cloneable, TextParsable, Serializable {
 	public double distance(Vector2 other) {
 		double dis = 0;
 		
-		int n = data.size();
+		int n = Math.min(this.data.size(), other.data.size());
 		for (int i = 0; i < n; i++) {
-			double deviate =  data.get(i) - other.data.get(i);
+			double deviate =  this.data.get(i) - other.data.get(i);
 			dis += deviate * deviate;
 		}
 		return Math.sqrt(dis);
@@ -227,9 +227,9 @@ public class Vector2 implements Cloneable, TextParsable, Serializable {
 	 */
 	public double product(Vector2 other) {
 		double product = 0;
-		int n = data.size();
+		int n = Math.min(this.data.size(), other.data.size());
 		for (int i = 0; i < n; i++) {
-			product += data.get(i) * other.data.get(i);
+			product += this.data.get(i) * other.data.get(i);
 		}
 		
 		return product;
@@ -244,14 +244,39 @@ public class Vector2 implements Cloneable, TextParsable, Serializable {
 	public double cosine(Vector2 other) {
 		double module1 = module();
 		double module2 = other.module();
-		if (module1 == 0 && module2 == 0)
-			return 1;
-		else if (module1 == 0 || module2 == 0)
+		if (module1 == 0 || module2 == 0)
 			return Constants.UNUSED;
 		else
 			return product(other) / (module1 * module2);
 	}
 	
+	
+	/**
+	 * Calculating the normalized cosine of this vector and the other vector.
+	 * @param other other vector.
+	 * @param average averaged value.
+	 * @return normalized cosine of this vector and the other vector.
+	 */
+	public double cosine(Vector2 other, double average) {
+		double product = 0;
+		double length1 = 0;
+		double length2 = 0;
+		int n = Math.min(this.data.size(), other.data.size());
+		for (int i = 0; i < n; i++) {
+			double value1 = this.data.get(i) - average;
+			double value2 = other.data.get(i) - average;
+			
+			length1 += value1 * value1;
+			length2 += value2 * value2;
+			product += value1 * value2;
+		}
+		
+		if (length1 == 0 || length2 == 0)
+			return Constants.UNUSED;
+		else
+			return product / Math.sqrt(length1 * length2);
+	}
+
 	
 	/**
 	 * Calculating the correlation coefficient of this vector and the other vector.
@@ -262,7 +287,7 @@ public class Vector2 implements Cloneable, TextParsable, Serializable {
 		double mean1 = mean();
 		double mean2 = other.mean();
 		
-		int n = data.size();
+		int n = Math.min(this.data.size(), other.data.size());
 		double VX = 0, VY = 0;
 		double VXY = 0;
 		for (int i = 0; i < n; i++) {
@@ -274,9 +299,7 @@ public class Vector2 implements Cloneable, TextParsable, Serializable {
 			VXY += deviate1 * deviate2;
 		}
 		
-		if (VX == 0 && VY == 0)
-			return 1;
-		else if (VX == 0 || VY == 0)
+		if (VX == 0 || VY == 0)
 			return Constants.UNUSED;
 		else
 			return VXY / Math.sqrt(VX * VY);

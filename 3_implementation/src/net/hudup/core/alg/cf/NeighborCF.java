@@ -154,6 +154,18 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 
 	
 	/**
+	 * Cosine normalized mode.
+	 */
+	public static final String COSINE_NORMALIZED_FIELD = "cos_normalized";
+
+	
+	/**
+	 * Default cosine normalized mode.
+	 */
+	public static final boolean COSINE_NORMALIZED_DEFAULT = false;
+
+	
+	/**
 	 * Value bins.
 	 */
 	public static final String BCF_VALUE_BINS_FIELD = "bcf_value_bins";
@@ -575,14 +587,15 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 			RatingVector vRating1, RatingVector vRating2,
 			Profile profile1, Profile profile2) {
 		
-		if (profile1 == null || profile2 == null) 
-			return vRating1.cosine(vRating2);
+		boolean normalized = getConfig().getAsBoolean(COSINE_NORMALIZED_FIELD);
+		if (profile1 == null || profile2 == null)
+			return normalized ? vRating1.cosine(vRating2, this.ratingMedian) : vRating1.cosine(vRating2);
 		
 		Vector[] vectors = toNormVector(vRating1, vRating2, profile1, profile2);
 		Vector vector1 = vectors[0];
 		Vector vector2 = vectors[1];
 		
-		return vector1.cosine(vector2);
+		return normalized ? vector1.cosine(vector2, this.ratingMedian) : vector1.cosine(vector2);
 	}
 
 	
@@ -761,9 +774,7 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 			VXY += deviate1 * deviate2;
 		}
 		
-		if (VX == 0 && VY == 0)
-			return 1;
-		else if (VX == 0 || VY == 0)
+		if (VX == 0 || VY == 0)
 			return Constants.UNUSED;
 		else
 			return VXY / Math.sqrt(VX * VY);
@@ -798,9 +809,7 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 			VXY += deviate1 * deviate2;
 		}
 		
-		if (VX == 0 && VY == 0)
-			return 1;
-		else if (VX == 0 || VY == 0)
+		if (VX == 0 || VY == 0)
 			return Constants.UNUSED;
 		else
 			return VXY / Math.sqrt(VX * VY);
@@ -864,17 +873,12 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 	 */
 	public double jaccard(RatingVector vRating1, RatingVector vRating2,
 			Profile profile1, Profile profile2) {
-		Set<Integer> ratedIds1 = vRating1.fieldIds(true);
-		Set<Integer> ratedIds2 = vRating2.fieldIds(true);
-		if (ratedIds1.size() == 0 && ratedIds2.size() == 0)
-			return 1;
-		if (ratedIds1.size() == 0 || ratedIds2.size() == 0)
-			return 0;
-		
 		Set<Integer> common = commonFieldIds(vRating1, vRating2);
 		Set<Integer> union = unionFieldIds(vRating1, vRating2);
-		return (double)common.size() / (double)(union.size());
-
+		if (union.size() == 0)
+			return Constants.UNUSED;
+		else
+			return (double)common.size() / (double)(union.size());
 	}
 	
 	
@@ -893,8 +897,6 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 			Profile profile1, Profile profile2) {
 		Set<Integer> ratedIds1 = vRating1.fieldIds(true);
 		Set<Integer> ratedIds2 = vRating2.fieldIds(true);
-		if (ratedIds1.size() == 0 && ratedIds2.size() == 0)
-			return 1;
 		if (ratedIds1.size() == 0 || ratedIds2.size() == 0)
 			return Constants.UNUSED;
 		
@@ -1042,7 +1044,6 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 				Set<Integer> ids2 = vRating2.fieldIds(true);
 				int n1 = ids1.size();
 				int n2 = ids2.size();
-				if (n1 == 0 && n2 == 0) return 1;
 				if (n1 == 0 || n2 == 0) return Constants.UNUSED;
 				
 				double bc = 0;
@@ -1083,8 +1084,6 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 			Profile profile1, Profile profile2) {
 		Set<Integer> columnIds1 = vRating1.fieldIds(true);
 		Set<Integer> columnIds2 = vRating2.fieldIds(true);
-		if (columnIds1.size() == 0 && columnIds2.size() == 0)
-			return 1;
 		if (columnIds1.size() == 0 || columnIds2.size() == 0)
 			return Constants.UNUSED;
 		
@@ -1280,6 +1279,7 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 		tempConfig.put(DataConfig.MIN_RATING_FIELD, DataConfig.MIN_RATING_DEFAULT);
 		tempConfig.put(DataConfig.MAX_RATING_FIELD, DataConfig.MAX_RATING_DEFAULT);
 		tempConfig.put(MEASURE, getDefaultSimilarMeasure());
+		tempConfig.put(COSINE_NORMALIZED_FIELD, COSINE_NORMALIZED_DEFAULT);
 		tempConfig.put(BCF_VALUE_BINS_FIELD, BCF_VALUE_BINS_DEFAULT);
 		tempConfig.put(BCF_MEDIAN_MODE_FIELD, BCF_MEDIAN_MODE_DEFAULT);
 		tempConfig.put(SUPPORT_CACHE_FIELD, SUPPORT_CACHE_DEFAULT);

@@ -195,7 +195,7 @@ public class Vector implements Cloneable, TextParsable, Serializable {
 	public double distance(Vector other) {
 		double dis = 0;
 		
-		int n = data.length;
+		int n = Math.min(this.data.length, other.data.length);
 		for (int i = 0; i < n; i++) {
 			double deviate =  data[i] - other.data[i];
 			dis += deviate * deviate;
@@ -211,7 +211,7 @@ public class Vector implements Cloneable, TextParsable, Serializable {
 	 */
 	public double product(Vector other) {
 		double product = 0;
-		int n = data.length;
+		int n = Math.min(this.data.length, other.data.length);
 		for (int i = 0; i < n; i++) {
 			product += data[i] * other.data[i];
 		}
@@ -228,14 +228,39 @@ public class Vector implements Cloneable, TextParsable, Serializable {
 	public double cosine(Vector other) {
 		double module1 = module();
 		double module2 = other.module();
-		if (module1 == 0 && module2 == 0)
-			return 1;
-		else if (module1 == 0 || module2 == 0)
+		if (module1 == 0 || module2 == 0)
 			return Constants.UNUSED;
 		else
 			return product(other) / (module1 * module2);
 	}
 	
+	
+	/**
+	 * Calculating the normalized cosine of this vector and the other vector.
+	 * @param other other vector.
+	 * @param average averaged value.
+	 * @return normalized cosine of this vector and the other vector.
+	 */
+	public double cosine(Vector other, double average) {
+		double product = 0f;
+		double length1 = 0f;
+		double length2 = 0f;
+		int n = Math.min(this.data.length, other.data.length);
+		for (int i = 0; i < n; i++) {
+			double value1 = this.data[i] - average;
+			double value2 = other.data[i] - average;
+			
+			length1 += value1 * value1;
+			length2 += value2 * value2;
+			product += value1 * value2;
+		}
+		
+		if (length1 == 0 || length2 == 0)
+			return Constants.UNUSED;
+		else
+			return product / Math.sqrt(length1 * length2);
+	}
+
 	
 	/**
 	 * Calculating the correlation coefficient of this vector and the other vector.
@@ -246,7 +271,7 @@ public class Vector implements Cloneable, TextParsable, Serializable {
 		double mean1 = mean();
 		double mean2 = other.mean();
 		
-		int n = data.length;
+		int n = Math.min(this.data.length, other.data.length);
 		double VX = 0, VY = 0;
 		double VXY = 0;
 		for (int i = 0; i < n; i++) {
@@ -258,9 +283,7 @@ public class Vector implements Cloneable, TextParsable, Serializable {
 			VXY += deviate1 * deviate2;
 		}
 		
-		if (VX == 0 && VY == 0)
-			return 1;
-		else if (VX == 0 || VY == 0)
+		if (VX == 0 || VY == 0)
 			return Constants.UNUSED;
 		else
 			return VXY / Math.sqrt(VX * VY);
