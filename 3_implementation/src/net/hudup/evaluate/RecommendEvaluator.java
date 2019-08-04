@@ -1,5 +1,7 @@
 package net.hudup.evaluate;
 
+import java.rmi.RemoteException;
+
 import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.RecommendParam;
 import net.hudup.core.alg.Recommender;
@@ -10,7 +12,7 @@ import net.hudup.core.data.DatasetPair;
 import net.hudup.core.data.Fetcher;
 import net.hudup.core.data.Profile;
 import net.hudup.core.data.RatingVector;
-import net.hudup.core.evaluate.Evaluator;
+import net.hudup.core.evaluate.AbstractEvaluator;
 import net.hudup.core.evaluate.EvaluatorEvent;
 import net.hudup.core.evaluate.EvaluatorEvent.Type;
 import net.hudup.core.evaluate.EvaluatorProgressEvent;
@@ -25,7 +27,7 @@ import net.hudup.core.logistic.xURI;
 
 
 /**
- * {@link Evaluator} is one of main classes of Hudup framework, which is responsible for executing and evaluation algorithms according to built-in and user-defined metrics.
+ * {@link AbstractEvaluator} is one of main classes of Hudup framework, which is responsible for executing and evaluation algorithms according to built-in and user-defined metrics.
  * Such metrics implement by {@code Metric} interface. As an evaluator of any recommendation algorithm, {@code Evaluator} is the bridge between {@code Dataset} and {@code Recommender} and it has six roles:
  * <ol>
  * <li>
@@ -89,7 +91,7 @@ import net.hudup.core.logistic.xURI;
  * @version 10.0
  *
  */
-public class RecommendEvaluator extends Evaluator {
+public class RecommendEvaluator extends AbstractEvaluator {
 
 	
     /**
@@ -373,7 +375,7 @@ public class RecommendEvaluator extends Evaluator {
 
 
 	@Override
-	public void receivedSetup(SetupAlgEvent evt) {
+	public void receivedSetup(SetupAlgEvent evt) throws RemoteException {
 		// TODO Auto-generated method stub
 		throw new RuntimeException("Do not support this method");
 	}

@@ -10,7 +10,7 @@ import net.hudup.core.logistic.xURI;
 
 /**
  * This class specifies the configuration of an evaluator represented ({@code Evaluator}.
- * Recall that {@link Evaluator} is one of main classes of Hudup framework, which is responsible for executing and evaluation algorithms according to built-in and user-defined metrics.
+ * Recall that {@link AbstractEvaluator} is one of main classes of Hudup framework, which is responsible for executing and evaluation algorithms according to built-in and user-defined metrics.
  * 
  * @author Loc Nguyen
  * @version 10.0

@@ -28,13 +28,13 @@ public class ContextTemplateSchemaImpl implements ContextTemplateSchema {
 
 
 	/**
-	 * 
+	 * Root context templates.
 	 */
 	private ContextTemplateList roots = new ContextTemplateList();
 	
 	
 	/**
-	 * 
+	 * Constructor with root templates.
 	 * @param roots
 	 */
 	private ContextTemplateSchemaImpl(ContextTemplateList roots) {

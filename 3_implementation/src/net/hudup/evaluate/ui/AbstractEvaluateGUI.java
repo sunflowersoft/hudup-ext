@@ -18,7 +18,7 @@ import net.hudup.core.Util;
 import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.Recommender;
 import net.hudup.core.alg.SetupAlgListener;
-import net.hudup.core.evaluate.Evaluator;
+import net.hudup.core.evaluate.AbstractEvaluator;
 import net.hudup.core.evaluate.EvaluatorListener;
 import net.hudup.core.evaluate.EvaluatorProgressListener;
 import net.hudup.core.evaluate.Metric;
@@ -30,7 +30,7 @@ import net.hudup.core.logistic.ui.CounterClock;
 
 
 /**
- * This abstract class represents an abstract GUI to allow users to interact with {@link Evaluator}.
+ * This abstract class represents an abstract GUI to allow users to interact with {@link AbstractEvaluator}.
  * 
  * @author Loc Nguyen
  * @version 10.0
@@ -83,7 +83,7 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	/**
 	 * Main evaluator.
 	 */
-	protected Evaluator evaluator = null;
+	protected AbstractEvaluator evaluator = null;
 
 	
 	/**
@@ -108,7 +108,7 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	 * Constructor with specified evaluator.
 	 * @param evaluator specified evaluator.
 	 */
-	public AbstractEvaluateGUI(Evaluator evaluator) {
+	public AbstractEvaluateGUI(AbstractEvaluator evaluator) {
 		setupListeners(evaluator);
 		
 		this.evaluator = evaluator;
@@ -142,9 +142,9 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	
 	/**
 	 * Getting current evaluator.
-	 * @return current {@link Evaluator}.
+	 * @return current {@link AbstractEvaluator}.
 	 */
-	public Evaluator getEvaluator() {
+	public AbstractEvaluator getEvaluator() {
 		return evaluator;
 	}
 	
@@ -298,7 +298,7 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	 * Switching the inside evaluator by specified evaluator.
 	 * @param newEvaluator new specified evaluator.
 	 */
-	protected void switchEvaluator(Evaluator newEvaluator) {
+	protected void switchEvaluator(AbstractEvaluator newEvaluator) {
 		stop();
 		unsetupListeners(this.evaluator);
 		setupListeners(newEvaluator);
@@ -327,7 +327,14 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 					JOptionPane.WARNING_MESSAGE);
 		}
 		
-		evaluator.setMetricList(selectedMetricList);
+		try {
+			evaluator.setMetricList(selectedMetricList);
+		}
+		catch (Throwable e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			logger.error("Error in setting metrics");
+		}
 	}
 	
 	
@@ -335,10 +342,15 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	 * Add this GUI as listeners to specified evaluator.
 	 * @param evaluator specified evaluator.
 	 */
-	private void setupListeners(Evaluator evaluator) {
-		evaluator.addEvaluatorListener(this);
-		evaluator.addProgressListener(this);
-		evaluator.addSetupAlgListener(this);
+	private void setupListeners(AbstractEvaluator evaluator) {
+		try {
+			evaluator.addEvaluatorListener(this);
+			evaluator.addProgressListener(this);
+			evaluator.addSetupAlgListener(this);
+		}
+		catch (Throwable e) {
+			e.printStackTrace();
+		}
 	}
 	
 	
@@ -346,10 +358,15 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	 * Remove this GUI as listeners from specified evaluator.
 	 * @param evaluator specified evaluator.
 	 */
-	private void unsetupListeners(Evaluator evaluator) {
-		evaluator.removeEvaluatorListener(this);
-		evaluator.removeProgressListener(this);
-		evaluator.removeSetupAlgListener(this);
+	private void unsetupListeners(AbstractEvaluator evaluator) {
+		try {
+			evaluator.removeEvaluatorListener(this);
+			evaluator.removeProgressListener(this);
+			evaluator.removeSetupAlgListener(this);
+		}
+		catch (Throwable e) {
+			e.printStackTrace();
+		}
 	}
 	
 	

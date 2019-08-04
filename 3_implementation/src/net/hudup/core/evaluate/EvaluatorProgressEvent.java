@@ -22,7 +22,7 @@ public class EvaluatorProgressEvent extends EventObject {
 	/**
 	 * Referred evaluator.
 	 */
-	protected Evaluator evaluator = null;
+	protected AbstractEvaluator evaluator = null;
 
 	
 	/**
@@ -67,7 +67,7 @@ public class EvaluatorProgressEvent extends EventObject {
 	 * @param progressTotal total number of steps in progress.
 	 * @param progressStep current step.
 	 */
-	public EvaluatorProgressEvent(Evaluator evaluator, int progressTotal, int progressStep) {
+	public EvaluatorProgressEvent(AbstractEvaluator evaluator, int progressTotal, int progressStep) {
 		super(evaluator);
 		// TODO Auto-generated constructor stub
 		
@@ -78,10 +78,10 @@ public class EvaluatorProgressEvent extends EventObject {
 	
 	/**
 	 * Getting evaluator.
-	 * @return {@link Evaluator}.
+	 * @return {@link AbstractEvaluator}.
 	 */
-	public Evaluator getEvaluator() {
-		return (Evaluator)getSource();
+	public AbstractEvaluator getEvaluator() {
+		return (AbstractEvaluator)getSource();
 	}
 	
 	

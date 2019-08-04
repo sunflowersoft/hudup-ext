@@ -6,7 +6,7 @@ import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.Fetcher;
 import net.hudup.core.data.Profile;
-import net.hudup.core.evaluate.Evaluator;
+import net.hudup.core.evaluate.AbstractEvaluator;
 import net.hudup.core.evaluate.HudupRecallMetric;
 import net.hudup.core.evaluate.NoneWrapperMetricList;
 import net.hudup.core.evaluate.SetupTimeMetric;
@@ -19,7 +19,7 @@ import net.hudup.core.evaluate.SpeedMetric;
  * @version 1.0
  *
  */
-public abstract class TestingEvaluator extends Evaluator {
+public abstract class TestingEvaluator extends AbstractEvaluator {
 
 	
 	/**

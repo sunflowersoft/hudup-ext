@@ -15,6 +15,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.nio.ByteBuffer;
 import java.nio.channels.ByteChannel;
+import java.rmi.RemoteException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -44,14 +45,13 @@ import net.hudup.core.data.Dataset;
 import net.hudup.core.data.DatasetPool;
 import net.hudup.core.data.DatasetUtil;
 import net.hudup.core.data.Pointer;
-import net.hudup.core.evaluate.Evaluator;
+import net.hudup.core.evaluate.AbstractEvaluator;
 import net.hudup.core.evaluate.EvaluatorEvent;
 import net.hudup.core.evaluate.EvaluatorEvent.Type;
 import net.hudup.core.evaluate.EvaluatorProgressEvent;
 import net.hudup.core.evaluate.Metrics;
 import net.hudup.core.evaluate.MetricsUtil;
 import net.hudup.core.logistic.ClipboardUtil;
-import net.hudup.core.logistic.HudupException;
 import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.xURI;
 import net.hudup.core.logistic.ui.UIUtil;
@@ -61,7 +61,7 @@ import net.hudup.data.ui.StatusBar;
 import net.hudup.data.ui.TxtOutput;
 
 /**
- * This class represents a graphic user interface (GUI) for {@link Evaluator} with a pair of training dataset and testing dataset.
+ * This class represents a graphic user interface (GUI) for {@link AbstractEvaluator} with a pair of training dataset and testing dataset.
  * 
  * @author Loc Nguyen
  * @version 10.0
@@ -122,7 +122,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 	 * Constructor with specified evaluator.
 	 * @param evaluator specified evaluator.
 	 */
-	public EvaluateGUI(Evaluator evaluator) {
+	public EvaluateGUI(AbstractEvaluator evaluator) {
 		super(evaluator);
 		algRegTable.copy(evaluator.extractAlgFromPluginStorage());
 		
@@ -794,7 +794,14 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			
 		List<Alg> algList = Util.newList();
 		algList.add(alg);
-		evaluator.evaluate(algList, pool, null);
+		try {
+			evaluator.evaluate(algList, pool, null);
+		}
+		catch (Throwable e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			logger.error("Error in evaluation");
+		}
 		
 		counterClock.start();
 		updateMode();
@@ -802,7 +809,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 
 	
 	@Override
-	public void receivedEvaluation(EvaluatorEvent evt) throws HudupException {
+	public void receivedEvaluation(EvaluatorEvent evt) throws RemoteException {
 		if (evt.getMetrics() == null)
 			return;
 		
@@ -876,7 +883,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 	
 	
 	@Override
-	public void receivedProgress(EvaluatorProgressEvent evt) {
+	public void receivedProgress(EvaluatorProgressEvent evt) throws RemoteException {
 		// TODO Auto-generated method stub
 
 		int progressTotal = evt.getProgressTotal();
@@ -901,7 +908,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 
 
 	@Override
-	public void receivedSetup(SetupAlgEvent evt) {
+	public void receivedSetup(SetupAlgEvent evt) throws RemoteException {
 		// TODO Auto-generated method stub
 		Alg alg = evt.getAlg();
 		if (alg == null) return;

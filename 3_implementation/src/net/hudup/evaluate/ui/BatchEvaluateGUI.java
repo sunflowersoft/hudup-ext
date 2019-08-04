@@ -15,6 +15,7 @@ import java.io.Reader;
 import java.io.Writer;
 import java.nio.ByteBuffer;
 import java.nio.channels.ByteChannel;
+import java.rmi.RemoteException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -39,14 +40,13 @@ import net.hudup.core.alg.ui.AlgListChooser;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.DatasetPair;
 import net.hudup.core.data.DatasetPool;
-import net.hudup.core.evaluate.Evaluator;
+import net.hudup.core.evaluate.AbstractEvaluator;
 import net.hudup.core.evaluate.EvaluatorEvent;
 import net.hudup.core.evaluate.EvaluatorEvent.Type;
 import net.hudup.core.evaluate.EvaluatorProgressEvent;
 import net.hudup.core.evaluate.Metrics;
 import net.hudup.core.evaluate.MetricsUtil;
 import net.hudup.core.logistic.ClipboardUtil;
-import net.hudup.core.logistic.HudupException;
 import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.xURI;
 import net.hudup.core.logistic.ui.UIUtil;
@@ -58,7 +58,7 @@ import net.hudup.data.ui.TxtOutput;
 
 
 /**
- * This class represents a graphic user interface (GUI) for {@link Evaluator} with many pairs of training dataset and testing dataset.
+ * This class represents a graphic user interface (GUI) for {@link AbstractEvaluator} with many pairs of training dataset and testing dataset.
  * @author Loc Nguyen
  * @version 10.0
  */
@@ -214,7 +214,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 	 * Constructor with specified evaluator.
 	 * @param evaluator specified evaluator.
 	 */
-	public BatchEvaluateGUI(Evaluator evaluator) {
+	public BatchEvaluateGUI(AbstractEvaluator evaluator) {
 		super(evaluator);
 		// TODO Auto-generated constructor stub
 		algRegTable.copy(evaluator.extractAlgFromPluginStorage());
@@ -811,7 +811,14 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 		}
 		
 		clearResult();
-		evaluator.evaluate(lbAlgs.getAlgList(), pool, null);
+		try {
+			evaluator.evaluate(lbAlgs.getAlgList(), pool, null);
+		}
+		catch (Throwable e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			logger.error("Error in evaluation");
+		}
 		
 		counterClock.start();
 		updateMode();
@@ -819,7 +826,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 
 	
 	@Override
-	public void receivedEvaluation(EvaluatorEvent evt) throws HudupException {
+	public void receivedEvaluation(EvaluatorEvent evt) throws RemoteException {
 		
 		if (chkDisplay.isSelected()) {
 			String info = evt.translate() + "\n\n\n\n";
@@ -899,7 +906,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 
 	
 	@Override
-	public void receivedProgress(EvaluatorProgressEvent evt) {
+	public void receivedProgress(EvaluatorProgressEvent evt) throws RemoteException {
 		// TODO Auto-generated method stub
 		int progressTotal = evt.getProgressTotal();
 		int progressStep = evt.getProgressStep();
@@ -923,7 +930,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 
 	
 	@Override
-	public void receivedSetup(SetupAlgEvent evt) {
+	public void receivedSetup(SetupAlgEvent evt) throws RemoteException {
 		// TODO Auto-generated method stub
 		Alg alg = evt.getAlg();
 		if (alg == null) return;

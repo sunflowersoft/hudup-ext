@@ -1204,9 +1204,6 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 	 * @return common field IDs of two rating vectors.
 	 */
 	protected static Set<Integer> commonFieldIds(RatingVector vRating1, RatingVector vRating2) {
-		if (vRating1 == null || vRating2 == null)
-			return Util.newSet();
-		
 		Set<Integer> common = Util.newSet();
 		common.addAll(vRating1.fieldIds(true));
 		common.retainAll(vRating2.fieldIds(true));
@@ -1221,9 +1218,6 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 	 * @return common field IDs of two rating vectors.
 	 */
 	protected static Set<Integer> unionFieldIds(RatingVector vRating1, RatingVector vRating2) {
-		if (vRating1 == null || vRating2 == null)
-			return Util.newSet();
-		
 		Set<Integer> union = Util.newSet();
 		union.addAll(vRating1.fieldIds(true));
 		union.addAll(vRating2.fieldIds(true));

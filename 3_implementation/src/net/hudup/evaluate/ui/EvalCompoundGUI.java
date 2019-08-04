@@ -28,7 +28,7 @@ import net.hudup.core.PluginChangedEvent;
 import net.hudup.core.PluginChangedListener;
 import net.hudup.core.PluginStorage;
 import net.hudup.core.RegisterTable;
-import net.hudup.core.evaluate.Evaluator;
+import net.hudup.core.evaluate.AbstractEvaluator;
 import net.hudup.core.evaluate.EvaluatorConfig;
 import net.hudup.core.evaluate.MetaMetric;
 import net.hudup.core.evaluate.Metric;
@@ -88,9 +88,9 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 	
 	/**
 	 * Constructor with specified evaluator.
-	 * @param evaluator specified {@link Evaluator}.
+	 * @param evaluator specified {@link AbstractEvaluator}.
 	 */
-	public EvalCompoundGUI(Evaluator evaluator) {
+	public EvalCompoundGUI(AbstractEvaluator evaluator) {
 		super("Evaluator GUI");
 		this.thisConfig = evaluator.getConfig();
 		
@@ -241,7 +241,7 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 				return;
 		}
 	
-		List<Evaluator> evList = SystemUtil.getInstances(ROOT_PACKAGE, Evaluator.class);
+		List<AbstractEvaluator> evList = SystemUtil.getInstances(ROOT_PACKAGE, AbstractEvaluator.class);
 		if (evList.size() == 0) {
 			JOptionPane.showMessageDialog(
 					null, 
@@ -251,18 +251,18 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 			return;
 		}
 		
-		Collections.sort(evList, new Comparator<Evaluator>() {
+		Collections.sort(evList, new Comparator<AbstractEvaluator>() {
 
 			@Override
-			public int compare(Evaluator o1, Evaluator o2) {
+			public int compare(AbstractEvaluator o1, AbstractEvaluator o2) {
 				// TODO Auto-generated method stub
 				return o1.getName().compareTo(o2.getName());
 			}
 		});
 		
         AbstractEvaluateGUI evaluatorGUI = (AbstractEvaluateGUI) body.getSelectedComponent();
-		Evaluator initialEv = null;
-		for (Evaluator ev : evList) {
+		AbstractEvaluator initialEv = null;
+		for (AbstractEvaluator ev : evList) {
 			if (ev.getName().equals(evaluatorGUI.getEvaluator().getName())) {
 				initialEv = ev;
 				break;
@@ -279,7 +279,7 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 			@Override
 			protected void start() {
 				// TODO Auto-generated method stub
-				Evaluator newEvaluator = (Evaluator) getItemControl().getSelectedItem();
+				AbstractEvaluator newEvaluator = (AbstractEvaluator) getItemControl().getSelectedItem();
 				dispose();
 				switchEvaluator0(newEvaluator);
 			}
@@ -287,7 +287,7 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 			@Override
 			protected JComboBox<?> createItemControl() {
 				// TODO Auto-generated method stub
-				return new JComboBox<Evaluator>(evList.toArray(new Evaluator[0]));
+				return new JComboBox<AbstractEvaluator>(evList.toArray(new AbstractEvaluator[0]));
 			}
 			
 			@Override
@@ -310,7 +310,7 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 	 * Switch to the new evaluator 
 	 * @param newEvaluator new evaluator.
 	 */
-	private void switchEvaluator0(Evaluator newEvaluator) {
+	private void switchEvaluator0(AbstractEvaluator newEvaluator) {
 		RegisterTable algReg = newEvaluator.extractAlgFromPluginStorage();
 		if (algReg.size() == 0) {
 			JOptionPane.showMessageDialog(this, 

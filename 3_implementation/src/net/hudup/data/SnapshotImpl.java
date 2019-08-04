@@ -67,55 +67,55 @@ public class SnapshotImpl extends Snapshot {
 
 
 	/**
-	 * This variable store user external records.
+	 * This variable store user external records. It must be serializable in remote call.
 	 */
 	protected Map<Integer, ExternalRecord> externalUserRecordMap = Util.newMap();
 	
 	
 	/**
-	 * User rating matrix.
+	 * User rating matrix. It must be serializable in remote call.
 	 */
 	protected Map<Integer, RatingVector> userRatingMap = Util.newMap();
 	
 	
 	/**
-	 * This variable stores all user profiles.
+	 * This variable stores all user profiles. It is serializable here.
 	 */
 	protected MemProfiles userProfiles = MemProfiles.createEmpty();
 	
 	
 	/**
-	 * This variable store item external records.
+	 * This variable store item external records. It must be serializable in remote call.
 	 */
 	protected Map<Integer, ExternalRecord> externalItemRecordMap = Util.newMap();
 
 	
 	/**
-	 * Item rating matrix.
+	 * Item rating matrix. It must be serializable in remote call.
 	 */
 	protected Map<Integer, RatingVector> itemRatingMap = Util.newMap();
 	
 	
 	/**
-	 * Item profiles
+	 * Item profiles. It is serializable here.
 	 */
 	protected MemProfiles itemProfiles = MemProfiles.createEmpty();
 	
 	
 	/**
-	 * Context template schema.
+	 * Context template schema. It is serializable here.
 	 */
 	protected ContextTemplateSchema ctSchema = ContextTemplateSchemaImpl.create();
 
 	
 	/**
-	 * Profiles of context template schema.
+	 * Profiles of context template schema. It is serializable here.
 	 */
 	protected CTSMultiProfiles ctsProfiles = CTSMemMultiProfiles.create();
 	
 	
 	/**
-	 * Other sample.
+	 * Other sample. It must be serializable in remote call.
 	 */
 	protected List<Profile> sampleProfiles = Util.newList();
 	

@@ -1,5 +1,6 @@
 package net.hudup.core.alg;
 
+import java.io.Serializable;
 import java.util.EventObject;
 
 import net.hudup.core.data.Dataset;
@@ -52,7 +53,7 @@ public class SetupAlgEvent extends EventObject {
 	
 	
 	/**
-	 * Training dataset.
+	 * Training dataset. It must be serializable in remote call.
 	 */
 	protected Dataset trainingDataset = null;
 	
@@ -60,7 +61,7 @@ public class SetupAlgEvent extends EventObject {
 	/**
 	 * Result of successful setting up an algorithm.
 	 */
-	protected Object setupResult = null;
+	protected Serializable setupResult = null;
 	
 	
 	/**
@@ -70,7 +71,7 @@ public class SetupAlgEvent extends EventObject {
 	 * @param trainingDataset training dataset.
 	 * @param setupResult specified result.
 	 */
-	public SetupAlgEvent(Object source, Type type, Alg alg, Dataset trainingDataset, Object setupResult) {
+	public SetupAlgEvent(Serializable source, Type type, Alg alg, Dataset trainingDataset, Serializable setupResult) {
 		super(source);
 		// TODO Auto-generated constructor stub
 		this.alg = alg;
@@ -111,7 +112,7 @@ public class SetupAlgEvent extends EventObject {
 	 * Getting the setup result issued by the algorithm.
 	 * @return setup result issued by the algorithm.
 	 */
-	public Object getSetupResult() {
+	public Serializable getSetupResult() {
 		return setupResult;
 	}
 	
