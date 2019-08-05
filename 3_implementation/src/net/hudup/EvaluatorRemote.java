@@ -2,13 +2,12 @@ package net.hudup;
 
 import javax.swing.JOptionPane;
 
-import org.apache.log4j.Logger;
-
 import net.hudup.core.AccessPoint;
 import net.hudup.core.client.ConnectServerDlg;
 import net.hudup.core.client.PowerServer;
 import net.hudup.core.client.Server;
 import net.hudup.core.client.Service;
+import net.hudup.evaluate.ui.EvalCompoundGUI;
 
 
 /**
@@ -19,12 +18,6 @@ import net.hudup.core.client.Service;
  *
  */
 public class EvaluatorRemote implements AccessPoint {
-
-	
-	/**
-	 * Logger of this class.
-	 */
-	protected final static Logger logger = Logger.getLogger(Evaluator.class);
 	
 	
 	/**
@@ -59,9 +52,15 @@ public class EvaluatorRemote implements AccessPoint {
 		
 		try {
 			Service service = ((PowerServer)server).getService();
-			if (service == null) return;
+			if (service == null) {
+				JOptionPane.showMessageDialog(
+						null, "Can't get remote service", "Connection to service fail", JOptionPane.ERROR_MESSAGE);
+				return;
+			}
 			
-			//Evaluator evaluator = service.getEvaluator(evaluatorName);
+			net.hudup.core.evaluate.Evaluator evaluator = service.getEvaluator("Estimation Evaluator");
+			evaluator.getPluginStorage().assignToSystem();
+			EvalCompoundGUI.run(evaluator);
 		}
 		catch (Exception e) {
 			// TODO Auto-generated catch block

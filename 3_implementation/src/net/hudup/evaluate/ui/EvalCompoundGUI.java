@@ -403,8 +403,8 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 	public boolean isIdle() {
 		// TODO Auto-generated method stub
 		try {
-			return !evaluateGUI.getEvaluator().getController().isStarted() 
-					&& !batchEvaluateGUI.getEvaluator().getController().isStarted();
+			return !evaluateGUI.getEvaluator().remoteIsStarted() 
+					&& !batchEvaluateGUI.getEvaluator().remoteIsStarted();
 		} catch (Throwable e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -413,6 +413,50 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 	}
 	
 	
+	/**
+	 * Staring the particular evaluator selected by user.
+	 * @param evaluator particular evaluator selected by user.
+	 */
+	public static void run(Evaluator evaluator) {
+		try {
+			RegisterTable algReg = evaluator.extractAlgFromPluginStorage();
+			if (algReg == null || algReg.size() == 0) {
+				JOptionPane.showMessageDialog(null, 
+						"There is no registered algorithm.\nProgramm not run", 
+						"No algorithm", JOptionPane.INFORMATION_MESSAGE);
+				return;
+			}
+			
+			RegisterTable parserReg = PluginStorage.getParserReg();
+			if (parserReg.size() == 0) {
+				JOptionPane.showMessageDialog(null, 
+						"There is no registered dataset parser.\n Programm not run", 
+						"No dataset parser", JOptionPane.INFORMATION_MESSAGE);
+				return;
+			}
+			
+			RegisterTable metricReg = PluginStorage.getMetricReg();
+			NoneWrapperMetricList metricList = evaluator.defaultMetrics();
+			for (int i = 0; i < metricList.size(); i++) {
+				Metric metric = metricList.get(i);
+				if(!(metric instanceof MetaMetric))
+					continue;
+				metricReg.unregister(metric.getName());
+				
+				boolean registered = metricReg.register(metric);
+				if (registered)
+					logger.info("Registered algorithm: " + metricList.get(i).getName());
+			}
+
+			new EvalCompoundGUI(evaluator);
+		}
+		catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+
 }
 
 

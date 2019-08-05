@@ -4,11 +4,13 @@ import static net.hudup.core.Constants.ROOT_PACKAGE;
 
 import java.io.Serializable;
 import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
 import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
 
+import net.hudup.core.Constants;
 import net.hudup.core.Util;
 import net.hudup.core.alg.RecommendParam;
 import net.hudup.core.alg.Recommender;
@@ -1366,6 +1368,8 @@ public class DefaultService implements Service, AutoCloseable {
 					break;
 				}
 			}
+			
+			UnicastRemoteObject.exportObject(evaluator, Constants.DEFAULT_SERVER_PORT);
 		}
 		catch (Throwable e) {
 			e.printStackTrace();

@@ -8,6 +8,7 @@ import java.util.List;
 import javax.swing.event.EventListenerList;
 
 import net.hudup.core.PluginStorage;
+import net.hudup.core.PluginStorageWrapper;
 import net.hudup.core.RegisterTable;
 import net.hudup.core.RegisterTable.AlgFilter;
 import net.hudup.core.alg.Alg;
@@ -479,6 +480,11 @@ public abstract class AbstractEvaluator extends AbstractRunner implements Evalua
 	public RegisterTable extractAlgFromPluginStorage() throws RemoteException {
 		List<Alg> algList = PluginStorage.getNormalAlgReg().getAlgList(new AlgFilter() {
 			
+			/**
+			 * Default serial version UID.
+			 */
+			private static final long serialVersionUID = 1L;
+
 			@Override
 			public boolean accept(Alg alg) {
 				// TODO Auto-generated method stub
@@ -497,6 +503,13 @@ public abstract class AbstractEvaluator extends AbstractRunner implements Evalua
 	}
 	
 	
+	@Override
+	public PluginStorageWrapper getPluginStorage() throws RemoteException {
+		// TODO Auto-generated method stub
+		return new PluginStorageWrapper();
+	}
+
+
 	@Override
 	protected void clear() {
 		// TODO Auto-generated method stub
@@ -699,70 +712,60 @@ public abstract class AbstractEvaluator extends AbstractRunner implements Evalua
 	}
 
 
-    /**
-     * Getting this evaluator.
-     * @return this evaluator.
-     */
-    private AbstractEvaluator getThisEvaluator() {
-    	return this;
-    }
-    
-    
 	@Override
-	public Controller getController() throws RemoteException {
+	public void remoteStart(List<Alg> algList, DatasetPool pool, Serializable parameter) throws RemoteException {
 		// TODO Auto-generated method stub
-		return new Controller() {
-			
-			@Override
-			public void start(List<Alg> algList, DatasetPool pool, Serializable parameter) throws RemoteException {
-				// TODO Auto-generated method stub
-				getThisEvaluator().evaluate(algList, pool, parameter);
-			}
-
-			@Override
-			public void pause() throws RemoteException {
-				// TODO Auto-generated method stub
-				getThisEvaluator().pause();
-			}
-
-			@Override
-			public void resume() throws RemoteException {
-				// TODO Auto-generated method stub
-				getThisEvaluator().resume();
-			}
-
-			@Override
-			public void stop() throws RemoteException {
-				// TODO Auto-generated method stub
-				getThisEvaluator().stop();
-			}
-
-			@Override
-			public void forceStop() throws RemoteException {
-				// TODO Auto-generated method stub
-				getThisEvaluator().forceStop();
-			}
-
-			@Override
-			public boolean isStarted() throws RemoteException {
-				// TODO Auto-generated method stub
-				return getThisEvaluator().isStarted();
-			}
-
-			@Override
-			public boolean isPaused() throws RemoteException {
-				// TODO Auto-generated method stub
-				return getThisEvaluator().isPaused();
-			}
-
-			@Override
-			public boolean isRunning() throws RemoteException {
-				// TODO Auto-generated method stub
-				return getThisEvaluator().isRunning();
-			}
-			
-		};
+		evaluate(algList, pool, parameter);
 	}
 
+	
+	@Override
+	public void remotePause() throws RemoteException {
+		// TODO Auto-generated method stub
+		pause();
+	}
+
+	
+	@Override
+	public void remoteResume() throws RemoteException {
+		// TODO Auto-generated method stub
+		resume();
+	}
+
+	
+	@Override
+	public void remoteStop() throws RemoteException {
+		// TODO Auto-generated method stub
+		stop();
+	}
+
+	
+	@Override
+	public void remoteForceStop() throws RemoteException {
+		// TODO Auto-generated method stub
+		forceStop();
+	}
+
+	
+	@Override
+	public boolean remoteIsStarted() throws RemoteException {
+		// TODO Auto-generated method stub
+		return isStarted();
+	}
+
+	
+	@Override
+	public boolean remoteIsPaused() throws RemoteException {
+		// TODO Auto-generated method stub
+		return isPaused();
+	}
+
+	
+	@Override
+	public boolean remoteIsRunning() throws RemoteException {
+		// TODO Auto-generated method stub
+		return isRunning();
+	}
+			
 
 }

@@ -40,6 +40,7 @@ import net.hudup.core.alg.ui.AlgListChooser;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.DatasetPair;
 import net.hudup.core.data.DatasetPool;
+import net.hudup.core.evaluate.AbstractEvaluator;
 import net.hudup.core.evaluate.Evaluator;
 import net.hudup.core.evaluate.EvaluatorEvent;
 import net.hudup.core.evaluate.EvaluatorEvent.Type;
@@ -783,7 +784,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 	@Override
 	protected void refresh() {
 		try {
-			if (evaluator.getController().isStarted())
+			if (evaluator.remoteIsStarted())
 				return;
 			
 			this.pool.reload();
@@ -803,7 +804,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 	@Override
 	protected void clear() {
 		try {
-			if (evaluator.getController().isStarted())
+			if (evaluator.remoteIsStarted())
 				return;
 			
 			this.pool.clear();
@@ -824,8 +825,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 	@Override
 	protected void run() {
 		try {
-			Evaluator.Controller controller = evaluator.getController();
-			if (controller.isStarted())
+			if (evaluator.remoteIsStarted())
 				return;
 			
 			if (pool.size() == 0 || lbAlgs.getAlgList().size() == 0) {
@@ -839,7 +839,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			}
 			
 			clearResult();
-			controller.start(lbAlgs.getAlgList(), pool, null);
+			evaluator.remoteStart(lbAlgs.getAlgList(), pool, null);
 			
 			counterClock.start();
 			updateMode();
@@ -1004,8 +1004,6 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 		try {
 			closeIOChannels();
 			
-			Evaluator.Controller controller = evaluator.getController();
-
 			if (lbAlgs.getAlgList().size() == 0) {
 				setInternalEnable(false);
 				setResultVisible(false);
@@ -1029,8 +1027,8 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 				prgRunning.setValue(0);
 				prgRunning.setVisible(false);
 			}
-			else if (controller.isStarted()) {
-				if (controller.isRunning()) {
+			else if (evaluator.remoteIsStarted()) {
+				if (evaluator.remoteIsRunning()) {
 					setInternalEnable(false);
 					setResultVisible(false);
 					
@@ -1153,7 +1151,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 	 */
 	protected void loadBatchScript() {
 		try {
-			if (evaluator.getController().isStarted() || this.lbAlgs.getAlgList().size() == 0)
+			if (evaluator.remoteIsStarted() || this.lbAlgs.getAlgList().size() == 0)
 				return;
 			
 			UriAdapter adapter = new UriAdapter();
@@ -1233,7 +1231,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 	 */
 	protected void addDataset() {
 		try {
-			if (evaluator.getController().isStarted() || this.lbAlgs.getAlgList().size() == 0)
+			if (evaluator.remoteIsStarted() || this.lbAlgs.getAlgList().size() == 0)
 				return;
 			
 			new AddingDatasetDlg(this, pool, this.lbAlgs.getAlgList(), evaluator.getMainUnit());

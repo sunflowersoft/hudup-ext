@@ -180,15 +180,13 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	 */
 	protected void pauseResume() {
 		try {
-			Evaluator.Controller controller = evaluator.getController();
-			
-			if (controller.isPaused()) {
-				controller.resume();
+			if (evaluator.remoteIsPaused()) {
+				evaluator.remoteResume();
 				counterClock.resume();
 				updateMode();
 			}
-			else if (controller.isRunning()) {
-				controller.pause();
+			else if (evaluator.remoteIsRunning()) {
+				evaluator.remotePause();
 				counterClock.pause();
 				updateMode();
 			}
@@ -205,7 +203,7 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	 */
 	protected void stop() {
 		try {
-			evaluator.getController().stop();
+			evaluator.remoteStop();
 			counterClock.stop();
 			updateMode();
 		}
@@ -221,7 +219,7 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	 */
 	protected void forceStop() {
 		try {
-			evaluator.getController().forceStop();
+			evaluator.remoteForceStop();
 			counterClock.stop();
 		
 			List<Alg> list = getCurrentAlgList();
@@ -339,7 +337,7 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	 */
 	protected void metricsOption() {
 		try {
-			if (evaluator.getController().isStarted()) {
+			if (evaluator.remoteIsStarted()) {
 				logger.error("Evaluator started, it is impossible to set up metric list");
 				return;
 			}

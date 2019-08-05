@@ -4,6 +4,7 @@
 package net.hudup.alg.cf.stat;
 
 import java.io.Reader;
+import java.io.Serializable;
 import java.io.Writer;
 import java.util.Collection;
 import java.util.List;
@@ -45,7 +46,7 @@ public abstract class StatCF extends ModelBasedCF {
 
 	
 	/**
-	 * 
+	 * Default constructor.
 	 */
 	public StatCF() {
 		super();
@@ -88,8 +89,6 @@ public abstract class StatCF extends ModelBasedCF {
 		return rec;
 	}
 
-	
-	
 	
 }
 
@@ -431,10 +430,17 @@ abstract class StatKB extends KBaseAbstract {
  * @version 10.0
  *
  */
-class GeneralStat implements Cloneable, TextParsable {
+class GeneralStat implements Serializable, Cloneable, TextParsable {
+	
 	
 	/**
-	 * 
+	 * Default serial version UID.
+	 */
+	private static final long serialVersionUID = 1L;
+	
+	
+	/**
+	 * Mean
 	 */
 	public double mean = 0;
 	
@@ -489,7 +495,13 @@ class GeneralStat implements Cloneable, TextParsable {
  * @version 10.0
  *
  */
-class Stat implements Cloneable, TextParsable {
+class Stat implements Serializable, Cloneable, TextParsable {
+	
+	
+	/**
+	 * Default serial version UID.
+	 */
+	private static final long serialVersionUID = 1L;
 	
 	
 	/**

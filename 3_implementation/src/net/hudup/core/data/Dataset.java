@@ -48,7 +48,7 @@ import net.hudup.core.data.ctx.ContextTemplateSchema;
  * @version 10.0
  *
  */
-public interface Dataset extends Cloneable {
+public interface Dataset extends Cloneable, Serializable {
 
 	
 	/**

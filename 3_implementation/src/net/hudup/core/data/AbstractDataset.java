@@ -1,7 +1,5 @@
 package net.hudup.core.data;
 
-import java.io.Serializable;
-
 import org.apache.log4j.Logger;
 
 
@@ -13,7 +11,7 @@ import org.apache.log4j.Logger;
  * @author Loc Nguyen
  * @version 10.0
  */
-public abstract class AbstractDataset implements Dataset, Serializable  {
+public abstract class AbstractDataset implements Dataset  {
 
 	
 	/**

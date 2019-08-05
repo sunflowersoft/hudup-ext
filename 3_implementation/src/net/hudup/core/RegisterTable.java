@@ -302,8 +302,13 @@ public final class RegisterTable implements Cloneable, Serializable {
 	 * @version 10.0
 	 *
 	 */
-	public static abstract class AlgFilter {
+	public static abstract class AlgFilter implements Serializable {
 		
+		/**
+		 * Default serial version UID.
+		 */
+		private static final long serialVersionUID = 1L;
+
 		/**
 		 * This method defines some criteria to filtering (selecting) an specified algorithm.
 		 * @param alg specified algorithm

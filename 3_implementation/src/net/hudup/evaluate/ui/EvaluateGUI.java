@@ -45,6 +45,7 @@ import net.hudup.core.data.Dataset;
 import net.hudup.core.data.DatasetPool;
 import net.hudup.core.data.DatasetUtil;
 import net.hudup.core.data.Pointer;
+import net.hudup.core.evaluate.AbstractEvaluator;
 import net.hudup.core.evaluate.Evaluator;
 import net.hudup.core.evaluate.EvaluatorEvent;
 import net.hudup.core.evaluate.EvaluatorEvent.Type;
@@ -598,7 +599,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 	 */
 	protected void openTrainingSet() {
 		try {
-			if (evaluator.getController().isStarted())
+			if (evaluator.remoteIsStarted())
 				return;
 			
 			DataConfig defaultConfig = txtTrainingBrowse.getConfig(); 
@@ -635,7 +636,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 	 */
 	protected void openTrainingSet(DataConfig config) {
 		try {
-			if (evaluator.getController().isStarted())
+			if (evaluator.remoteIsStarted())
 				return;
 		
 			clearResult();
@@ -672,7 +673,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 	 */
 	protected void openTestingSet() {
 		try {
-			if (evaluator.getController().isStarted())
+			if (evaluator.remoteIsStarted())
 				return;
 	
 			DataConfig defaultConfig = txtTestingBrowse.getConfig();
@@ -710,7 +711,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 	 */
 	protected void openTestingSet(DataConfig config) {
 		try {
-			if (evaluator.getController().isStarted())
+			if (evaluator.remoteIsStarted())
 				return;
 			
 			clearResult();
@@ -750,7 +751,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 	@Override
 	protected void refresh() {
 		try {
-			if (evaluator.getController().isStarted())
+			if (evaluator.remoteIsStarted())
 				return;
 			
 			DataConfig trainingCfg = txtTrainingBrowse.getConfig();
@@ -777,7 +778,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 	@Override
 	protected void clear() {
 		try {
-			if (evaluator.getController().isStarted())
+			if (evaluator.remoteIsStarted())
 				return;
 			
 			this.txtTrainingBrowse.setDataset(null);
@@ -822,8 +823,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 	@Override
 	protected void run() {
 		try {
-			Evaluator.Controller controller = evaluator.getController();
-			if (controller.isStarted())
+			if (evaluator.remoteIsStarted())
 				return;
 			
 			Alg alg = getAlg();
@@ -841,7 +841,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 				
 			List<Alg> algList = Util.newList();
 			algList.add(alg);
-			controller.start(algList, pool, null);
+			evaluator.remoteStart(algList, pool, null);
 		
 			counterClock.start();
 			updateMode();
@@ -1006,7 +1006,6 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			
 			Dataset training = txtTrainingBrowse.getDataset();
 			Dataset testing = txtTestingBrowse.getDataset();
-			Evaluator.Controller controller = evaluator.getController();
 			
 			if (cmbAlgs.getItemCount() == 0) {
 				setInternalEnable(false);
@@ -1033,8 +1032,8 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 				prgRunning.setValue(0);
 				prgRunning.setVisible(false);
 			}
-			else if (controller.isStarted()) {
-				if (controller.isRunning()) {
+			else if (evaluator.remoteIsStarted()) {
+				if (evaluator.remoteIsRunning()) {
 					setInternalEnable(false);
 					setResultVisible(false);
 					

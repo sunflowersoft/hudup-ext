@@ -3,6 +3,7 @@
  */
 package net.hudup.core.data;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 
@@ -19,7 +20,13 @@ import net.hudup.core.logistic.xURI;
  * @author Loc Nguyen
  * @version 10.0
  */
-public class DatasetPool {
+public class DatasetPool implements Serializable {
+	
+	
+	/**
+	 * Default serial version UID.
+	 */
+	private static final long serialVersionUID = 1L;
 	
 	
 	/**

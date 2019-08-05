@@ -5,6 +5,7 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.List;
 
+import net.hudup.core.PluginStorageWrapper;
 import net.hudup.core.RegisterTable;
 import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.SetupAlgListener;
@@ -79,76 +80,66 @@ public interface Evaluator extends Remote {
 
 	
 	/**
-	 * This interface represents remote controller for evaluator.
-	 * @author Loc Nguyen
-	 * @version 1.0
-	 *
-	 */
-	interface Controller extends Remote {
-		
-		/**
-		 * Evaluator starts.
-		 * @param algList specified list of algorithms. It must be serializable in remote call.
-		 * @param pool specified dataset pool containing many training datasets and testing datasets. It must be serializable in remote call.
-		 * @param parameter additional parameter.
-		 * @throws RemoteException if any error raises.
-		 */
-		void start(List<Alg> algList, DatasetPool pool, Serializable parameter) throws RemoteException;
-	
-		/**
-		 * Evaluator pauses.
-		 * @throws RemoteException if any error raises.
-		 */
-		void pause() throws RemoteException;
-	
-		/**
-		 * Evaluator resumes
-		 * @throws RemoteException if any error raises.
-		 */
-		void resume() throws RemoteException;
-	
-		/**
-		 * Evaluator stops.
-		 * @throws RemoteException if any error raises.
-		 */
-		void stop() throws RemoteException;
-		
-		/**
-		 * Evaluator forces to stop.
-		 * @throws RemoteException if any error raises.
-		 */
-		void forceStop() throws RemoteException;
-	
-		/**
-		 * Checking whether evaluator started.
-		 * @return true if evaluator started.
-		 * @throws RemoteException if any error raises.
-		 */
-		boolean isStarted() throws RemoteException;
-		
-		/**
-		 * Checking whether evaluator paused.
-		 * @return true if evaluator paused.
-		 * @throws RemoteException if any error raises.
-		 */
-		boolean isPaused() throws RemoteException;
-	
-		/**
-		 * Checking whether evaluator is running.
-		 * @return true if evaluator is running.
-		 * @throws RemoteException if any error raises.
-		 */
-		boolean isRunning() throws RemoteException;
-		
-	}
-	
-	/**
-	 * Getting remote controller.
-	 * @return remote controller.
+	 * Evaluator starts.
+	 * @param algList specified list of algorithms. It must be serializable in remote call.
+	 * @param pool specified dataset pool containing many training datasets and testing datasets. It must be serializable in remote call.
+	 * @param parameter additional parameter.
 	 * @throws RemoteException if any error raises.
 	 */
-	Controller getController() throws RemoteException;
+	void remoteStart(List<Alg> algList, DatasetPool pool, Serializable parameter) throws RemoteException;
+
 	
+	/**
+	 * Evaluator pauses.
+	 * @throws RemoteException if any error raises.
+	 */
+	void remotePause() throws RemoteException;
+
+	
+	/**
+	 * Evaluator resumes
+	 * @throws RemoteException if any error raises.
+	 */
+	void remoteResume() throws RemoteException;
+
+	
+	/**
+	 * Evaluator stops.
+	 * @throws RemoteException if any error raises.
+	 */
+	void remoteStop() throws RemoteException;
+	
+	
+	/**
+	 * Evaluator forces to stop.
+	 * @throws RemoteException if any error raises.
+	 */
+	void remoteForceStop() throws RemoteException;
+
+	
+	/**
+	 * Checking whether evaluator started.
+	 * @return true if evaluator started.
+	 * @throws RemoteException if any error raises.
+	 */
+	boolean remoteIsStarted() throws RemoteException;
+	
+	
+	/**
+	 * Checking whether evaluator paused.
+	 * @return true if evaluator paused.
+	 * @throws RemoteException if any error raises.
+	 */
+	boolean remoteIsPaused() throws RemoteException;
+
+	
+	/**
+	 * Checking whether evaluator is running.
+	 * @return true if evaluator is running.
+	 * @throws RemoteException if any error raises.
+	 */
+	boolean remoteIsRunning() throws RemoteException;
+
 	
 	/**
 	 * Returning name of this evaluator.
@@ -222,6 +213,14 @@ public interface Evaluator extends Remote {
 	 */
 	RegisterTable extractAlgFromPluginStorage() throws RemoteException;
 
+	
+	/**
+	 * Getting system plug-in storage.
+	 * @return wrapper of system plug-in storage.
+	 * @throws RemoteException if any error raises.
+	 */
+	PluginStorageWrapper getPluginStorage() throws RemoteException;
+	
 	
 	/**
 	 * Add the specified listener to the end of listener list.

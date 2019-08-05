@@ -15,11 +15,6 @@ import org.apache.log4j.Logger;
 
 import net.hudup.core.AccessPoint;
 import net.hudup.core.Firer;
-import net.hudup.core.PluginStorage;
-import net.hudup.core.RegisterTable;
-import net.hudup.core.evaluate.MetaMetric;
-import net.hudup.core.evaluate.Metric;
-import net.hudup.core.evaluate.NoneWrapperMetricList;
 import net.hudup.core.logistic.SystemUtil;
 import net.hudup.core.logistic.ui.StartDlg;
 import net.hudup.evaluate.ui.EvalCompoundGUI;
@@ -59,7 +54,7 @@ public class Evaluator implements AccessPoint {
 			String evClassName = args[0];
 			try {
 				net.hudup.core.evaluate.Evaluator ev = (net.hudup.core.evaluate.Evaluator)Class.forName(evClassName).newInstance();
-				run0(ev);
+				EvalCompoundGUI.run(ev);
 				return;
 			}
 			catch (Throwable e) {
@@ -120,7 +115,7 @@ public class Evaluator implements AccessPoint {
 				// TODO Auto-generated method stub
 				final net.hudup.core.evaluate.Evaluator ev = (net.hudup.core.evaluate.Evaluator) getItemControl().getSelectedItem();
 				dispose();
-				run0(ev);
+				EvalCompoundGUI.run(ev);
 			}
 			
 			@Override
@@ -145,50 +140,6 @@ public class Evaluator implements AccessPoint {
 	}
 
 
-	/**
-	 * Staring the particular evaluator selected by user.
-	 * @param ev particular evaluator selected by user.
-	 */
-	private void run0(net.hudup.core.evaluate.Evaluator ev) {
-		try {
-			RegisterTable algReg = ev.extractAlgFromPluginStorage();
-			if (algReg == null || algReg.size() == 0) {
-				JOptionPane.showMessageDialog(null, 
-						"There is no registered algorithm.\nProgramm not run", 
-						"No algorithm", JOptionPane.INFORMATION_MESSAGE);
-				return;
-			}
-			
-			RegisterTable parserReg = PluginStorage.getParserReg();
-			if (parserReg.size() == 0) {
-				JOptionPane.showMessageDialog(null, 
-						"There is no registered dataset parser.\n Programm not run", 
-						"No dataset parser", JOptionPane.INFORMATION_MESSAGE);
-				return;
-			}
-			
-			RegisterTable metricReg = PluginStorage.getMetricReg();
-			NoneWrapperMetricList metricList = ev.defaultMetrics();
-			for (int i = 0; i < metricList.size(); i++) {
-				Metric metric = metricList.get(i);
-				if(!(metric instanceof MetaMetric))
-					continue;
-				metricReg.unregister(metric.getName());
-				
-				boolean registered = metricReg.register(metric);
-				if (registered)
-					logger.info("Registered algorithm: " + metricList.get(i).getName());
-			}
-
-			new EvalCompoundGUI(ev.getClass().newInstance());
-		}
-		catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-	
-	
 	@Override
 	public String getName() {
 		// TODO Auto-generated method stub

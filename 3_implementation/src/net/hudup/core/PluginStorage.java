@@ -82,38 +82,38 @@ public final class PluginStorage implements Serializable {
 	/**
 	 * Normal algorithm register. Note, this is public and static variable.
 	 */
-	private final static RegisterTable normalAlgReg = new RegisterTable();
+	protected static RegisterTable normalAlgReg = new RegisterTable();
 
 	
 	/**
 	 * {@link DatasetParser} register. Note, this is public and static variable.
 	 */
-	private final static RegisterTable parserReg = new RegisterTable();
+	protected static RegisterTable parserReg = new RegisterTable();
 
 	
 	/**
 	 * {@link Metric} register. Note, this is public and static variable.
 	 */
-	private final static RegisterTable metricReg = new RegisterTable();
+	protected static RegisterTable metricReg = new RegisterTable();
 
 	
 	/**
 	 * {@link ExternalQuery} register. Note, this is public and static variable.
 	 */
-	private final static RegisterTable externalQueryReg = new RegisterTable();
+	protected static RegisterTable externalQueryReg = new RegisterTable();
 
 	
 	/**
 	 * {@link CTSManager} register. Note, this is public and static variable.
 	 */
-	private final static RegisterTable ctsmReg = new RegisterTable();
+	protected static RegisterTable ctsmReg = new RegisterTable();
 
 	
 	/**
 	 * List of next-update algorithms. Next-update algorithm is the one which needs to be updated in next version of Hudup framework because it is not perfect, for example.
 	 * Currently, next-update algorithms are not used. Note, this is public and static variable.
 	 */
-	private final static AlgList nextUpdateList = new AlgList();
+	protected static AlgList nextUpdateList = new AlgList();
 	
 	
 	/**

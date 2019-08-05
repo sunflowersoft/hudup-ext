@@ -3,6 +3,8 @@
  */
 package net.hudup.core.data;
 
+import java.io.Serializable;
+
 /**
  * This contains a pair of dataset such as training dataset and testing dataset.
  * Note, training dataset is the dataset used to build up some model like knowledge database ({@code KBase}) whereas testing dataset is the dataset used to test or evaluate such model.
@@ -13,9 +15,15 @@ package net.hudup.core.data;
  * @author Loc Nguyen
  * @version 10.0
  */
-public class DatasetPair {
+public class DatasetPair implements Serializable {
 	
 	
+	/**
+	 * Default serial version UID.
+	 */
+	private static final long serialVersionUID = 1L;
+
+
 	/**
 	 * Training dataset.
 	 */
