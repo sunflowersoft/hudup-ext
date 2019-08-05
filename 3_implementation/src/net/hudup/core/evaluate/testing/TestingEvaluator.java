@@ -1,5 +1,7 @@
 package net.hudup.core.evaluate.testing;
 
+import java.rmi.RemoteException;
+
 import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.TestingAlg;
 import net.hudup.core.data.DataConfig;
@@ -72,7 +74,7 @@ public abstract class TestingEvaluator extends AbstractEvaluator {
 
 	
 	@Override
-	public NoneWrapperMetricList defaultMetrics() {
+	public NoneWrapperMetricList defaultMetrics() throws RemoteException {
 		// TODO Auto-generated method stub
 		NoneWrapperMetricList metricList = new NoneWrapperMetricList();
 		
@@ -112,7 +114,7 @@ public abstract class TestingEvaluator extends AbstractEvaluator {
 
 	
 	@Override
-	public boolean acceptAlg(Alg alg) {
+	public boolean acceptAlg(Alg alg) throws RemoteException {
 		// TODO Auto-generated method stub
 		return (alg instanceof TestingAlg);
 	}

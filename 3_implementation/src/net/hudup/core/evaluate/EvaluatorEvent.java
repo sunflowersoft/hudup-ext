@@ -68,10 +68,10 @@ public class EvaluatorEvent extends EventObject {
 	
 	/**
 	 * Constructor with specified evaluator and event type.
-	 * @param evaluator reference to an {@link AbstractEvaluator}.
+	 * @param evaluator reference to an {@link Evaluator}.
 	 * @param type type of this event.
 	 */
-	public EvaluatorEvent(AbstractEvaluator evaluator, Type type) {
+	public EvaluatorEvent(Evaluator evaluator, Type type) {
 		super(evaluator);
 		// TODO Auto-generated constructor stub
 		
@@ -85,7 +85,7 @@ public class EvaluatorEvent extends EventObject {
 	 * @param type specified type of evaluation event.
 	 * @param metrics specified list of metrics.
 	 */
-	public EvaluatorEvent(AbstractEvaluator evaluator, Type type, Metrics metrics) {
+	public EvaluatorEvent(Evaluator evaluator, Type type, Metrics metrics) {
 		this(evaluator, type);
 		// TODO Auto-generated constructor stub
 		
@@ -100,7 +100,7 @@ public class EvaluatorEvent extends EventObject {
 	 * @param metrics specified list of metrics.
 	 * @param params additional parameters.
 	 */
-	public EvaluatorEvent(AbstractEvaluator evaluator, Type type, Metrics metrics, Object... params) {
+	public EvaluatorEvent(Evaluator evaluator, Type type, Metrics metrics, Object... params) {
 		this(evaluator, type, metrics);
 		// TODO Auto-generated constructor stub
 		
@@ -110,10 +110,10 @@ public class EvaluatorEvent extends EventObject {
 	
 	/**
 	 * Getting evaluator.
-	 * @return {@link AbstractEvaluator} that fires this event.
+	 * @return {@link Evaluator} that fires this event.
 	 */
-	public AbstractEvaluator getEvaluator() {
-		return (AbstractEvaluator) getSource();
+	public Evaluator getEvaluator() {
+		return (Evaluator) getSource();
 	}
 	
 	

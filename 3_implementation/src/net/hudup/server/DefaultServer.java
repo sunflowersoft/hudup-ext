@@ -54,7 +54,7 @@ public class DefaultServer extends PowerServerImpl {
 
 
 	/**
-	 * 
+	 * Internal default service.
 	 */
 	protected DefaultService service = null;
 	
@@ -82,7 +82,7 @@ public class DefaultServer extends PowerServerImpl {
 
 	
 	/**
-	 * 
+	 * Create default service.
 	 * @return {@link Service}
 	 */
 	protected DefaultService createService() {
@@ -185,9 +185,9 @@ public class DefaultServer extends PowerServerImpl {
 
 
 	/**
-	 * 
-	 * @param key
-	 * @return message according to key
+	 * Getting message given key.
+	 * @param key given key.
+	 * @return message according to key.
 	 */
 	protected String getMessage(String key) {
 		return I18nUtil.getMessage(config, key);
@@ -195,8 +195,8 @@ public class DefaultServer extends PowerServerImpl {
 
 	
 	/**
-	 * 
-	 * @return whether create system tray successfully
+	 * Create system tray.
+	 * @return whether create system tray successfully.
 	 */
 	protected boolean createSysTray() {
 		if (!SystemTray.isSupported())
@@ -285,7 +285,7 @@ public class DefaultServer extends PowerServerImpl {
 	
 	
 	/**
-	 * 
+	 * Show control panel.
 	 */
 	protected void showCP() {
 		try {
@@ -299,8 +299,8 @@ public class DefaultServer extends PowerServerImpl {
 	
 	
 	/**
-	 * 
-	 * @return {@link DefaultServer}
+	 * Static method to create default server.
+	 * @return {@link DefaultServer}.
 	 */
 	public static DefaultServer create() {
 		return create(xURI.create(PowerServerConfig.serverConfig));
@@ -308,8 +308,8 @@ public class DefaultServer extends PowerServerImpl {
 	
 	
 	/**
-	 * 
-	 * @param srvConfigUri
+	 * Static method to create default server with specified configuration URI.
+	 * @param srvConfigUri specified configuration URI.
 	 * @return {@link DefaultServer}
 	 */
 	public static DefaultServer create(xURI srvConfigUri) {
@@ -355,8 +355,9 @@ public class DefaultServer extends PowerServerImpl {
 	
 	
 	/**
-	 * @param srvConfigUri
-	 * @return whether require set up
+	 * Testing whether requiring set up given configuration URI.
+	 * @param srvConfigUri given configuration URI.
+	 * @return whether requiring set up.
 	 */
 	protected static boolean requireSetup(xURI srvConfigUri) {
 		
@@ -378,8 +379,10 @@ public class DefaultServer extends PowerServerImpl {
 				
 				UnitList unitList = provider.getUnitList();
 				UnitList defaultUnitList = DataConfig.getDefaultUnitList();
+				//Removing unimportant units.
 				defaultUnitList.remove(DataConfig.CONTEXT_TEMPLATE_UNIT);
 				defaultUnitList.remove(DataConfig.CONTEXT_UNIT);
+				defaultUnitList.remove(DataConfig.SAMPLE_UNIT);
 				
 				if (!unitList.contains(defaultUnitList)) {
 					provider.close();
@@ -399,8 +402,4 @@ public class DefaultServer extends PowerServerImpl {
 	}
 
 	
-
-
-
-
 }

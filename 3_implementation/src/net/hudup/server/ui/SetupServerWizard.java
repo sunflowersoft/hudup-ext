@@ -902,8 +902,8 @@ public class SetupServerWizard extends JDialog {
 
 	
 	/**
-	 * 
-	 * @param flag
+	 * Setting visibility of controls according to specified visible flag.
+	 * @param flag visible flag.
 	 */
 	private void setVisibleControls(boolean flag) {
 		btnBack.setVisible(flag);
@@ -914,7 +914,7 @@ public class SetupServerWizard extends JDialog {
 	
 	
 	/**
-	 * 
+	 * Back step.
 	 */
 	private void back() {
 		switch (currentStep) {
@@ -942,7 +942,7 @@ public class SetupServerWizard extends JDialog {
 	
 	
 	/**
-	 * 
+	 * Next step.
 	 */
 	private void next() {
 		switch (currentStep) {
@@ -987,7 +987,7 @@ public class SetupServerWizard extends JDialog {
 	
 	
 	/**
-	 * 
+	 * Update step.
 	 */
 	private void updateStep() {
 		main.removeAll();

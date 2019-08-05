@@ -1,7 +1,10 @@
 package net.hudup.server;
 
+import static net.hudup.core.Constants.ROOT_PACKAGE;
+
 import java.io.Serializable;
 import java.rmi.RemoteException;
+import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -29,6 +32,8 @@ import net.hudup.core.data.Rating;
 import net.hudup.core.data.RatingVector;
 import net.hudup.core.data.Scanner;
 import net.hudup.core.data.Snapshot;
+import net.hudup.core.evaluate.Evaluator;
+import net.hudup.core.logistic.SystemUtil;
 import net.hudup.data.SnapshotImpl;
 
 
@@ -50,20 +55,20 @@ public class DefaultService implements Service, AutoCloseable {
 
 	
 	/**
-	 * 
+	 * Internal transaction.
 	 */
 	protected Transaction trans = null;
 	
 	
 	/**
-	 * 
+	 * Recommender algorithm.
 	 */
 	protected Recommender recommender = null;
 	
 	
 	/**
-	 * 
-	 * @param trans
+	 * Constructor with specified transaction.
+	 * @param trans specified transaction.
 	 */
 	public DefaultService(Transaction trans) {
 		super();
@@ -74,10 +79,10 @@ public class DefaultService implements Service, AutoCloseable {
 
 	
 	/**
-	 * 
-	 * @param config
-	 * @param params
-	 * @return whether open service successfully
+	 * Open service with specified configuration and parameters.
+	 * @param config specified configuration.
+	 * @param params specified parameters.
+	 * @return whether open service successfully.
 	 */
 	public boolean open(PowerServerConfig config, Object... params) {
 		try {
@@ -109,8 +114,8 @@ public class DefaultService implements Service, AutoCloseable {
 	
 	
 	/**
-	 * 
-	 * @return whether service is opened
+	 * Testing whether service is opened.
+	 * @return whether service is opened.
 	 */
 	public boolean isOpened() {
 		return recommender != null;
@@ -127,9 +132,9 @@ public class DefaultService implements Service, AutoCloseable {
 
 
 	/**
-	 * 
-	 * @param target
-	 * @return whether transfer successfully
+	 * Transfer to target service.
+	 * @param target target service.
+	 * @return whether transfer successfully.
 	 */
 	public boolean transfer(DefaultService target) {
 		if (!isOpened())
@@ -156,8 +161,8 @@ public class DefaultService implements Service, AutoCloseable {
 	
 	
 	/**
-	 * 
-	 * @return scanner inside recommender algorithm
+	 * Getting dataset (scanner).
+	 * @return scanner inside recommender algorithm.
 	 */
 	protected Dataset getDataset() {
 		if (isOpened())
@@ -169,7 +174,7 @@ public class DefaultService implements Service, AutoCloseable {
 	
 	/**
 	 * That provider is null means read only service.
-	 * @return provider
+	 * @return provider.
 	 */
 	protected Provider getProvider() {
 		Dataset dataset = getDataset();
@@ -1344,6 +1349,35 @@ public class DefaultService implements Service, AutoCloseable {
 		}
 		
 		return snapshot;
+	}
+
+
+	@Override
+	public Evaluator getEvaluator(String evaluatorName) throws RemoteException {
+		// TODO Auto-generated method stub
+		Evaluator evaluator = null;
+		
+		trans.lockRead();
+		try {
+			List<Evaluator> evList = SystemUtil.getInstances(ROOT_PACKAGE, Evaluator.class);
+			for (Evaluator ev : evList) {
+				if (ev.getName().equals(evaluatorName)) {
+					evaluator = ev;
+					break;
+				}
+			}
+		}
+		catch (Throwable e) {
+			e.printStackTrace();
+			evaluator = null;
+			
+			logger.error("Service fail to get evaluator, caused by " + e.getMessage());
+		}
+		finally {
+			trans.unlockRead();
+		}
+		
+		return evaluator;
 	}
 
 

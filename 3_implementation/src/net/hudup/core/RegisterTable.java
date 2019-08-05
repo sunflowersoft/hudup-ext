@@ -3,14 +3,13 @@
  */
 package net.hudup.core;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import org.apache.log4j.Logger;
 
 import net.hudup.core.alg.Alg;
 
@@ -48,17 +47,24 @@ import net.hudup.core.alg.Alg;
  * @author Loc Nguyen
  * @version 10.0
  */
-public final class RegisterTable implements Cloneable {
+public final class RegisterTable implements Cloneable, Serializable {
 
 	
 	/**
-	 * Logger of this class.
+	 * Default serial version UID.
 	 */
-	protected final static Logger logger = Logger.getLogger(RegisterTable.class);
+	private static final long serialVersionUID = 1L;
+
+
+//	/**
+//	 * Logger of this class.
+//	 */
+//	protected final static Logger logger = Logger.getLogger(RegisterTable.class);
 
 	
 	/**
 	 * Map of registered algorithms. Each algorithm is associated by an string key which is the name of this algorithm.
+	 * This map must be serializable in remote call.
 	 */
 	private Map<String, Alg> algMap = Util.newMap();
 	
@@ -90,7 +96,7 @@ public final class RegisterTable implements Cloneable {
 	 */
 	public boolean register(Alg alg) {
 		if (!canRegister(alg)) {
-			logger.error("Algorithm \"" + alg.getName() + "\" existed");
+			System.out.println("Algorithm \"" + alg.getName() + "\" existed");
 			return false;
 		}
 		else {

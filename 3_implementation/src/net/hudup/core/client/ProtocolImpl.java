@@ -686,5 +686,16 @@ public class ProtocolImpl implements Protocol {
 		
 	}
 
+
+	@Override
+	public Request createGetEvaluatorRequest(String evaluatorName) {
+		// TODO Auto-generated method stub
+		Request request = new Request();
+		request.action = GET_EVALUATOR;
+		request.evaluatorName = evaluatorName;
+		
+		return request;
+	}
+
 	
 }

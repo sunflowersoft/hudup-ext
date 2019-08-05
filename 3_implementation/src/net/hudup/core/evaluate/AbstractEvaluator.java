@@ -144,9 +144,14 @@ public abstract class AbstractEvaluator extends AbstractRunner implements Evalua
 	 * Default constructor.
 	 */
 	public AbstractEvaluator() {
-		this.config = new EvaluatorConfig(xURI.create(EvaluatorConfig.evalConfig));
-		metricList = defaultMetrics();
-		metricList.sort();
+		try {
+			this.config = new EvaluatorConfig(xURI.create(EvaluatorConfig.evalConfig));
+			metricList = defaultMetrics();
+			metricList.sort();
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
 	
@@ -435,33 +440,8 @@ public abstract class AbstractEvaluator extends AbstractRunner implements Evalua
 	}
 	
 	
-	/**
-	 * Defining the list of default metrics.
-	 * @return the list of default metrics as {@link NoneWrapperMetricList}.
-	 */
-	public abstract NoneWrapperMetricList defaultMetrics();
-	
-	
-	/**
-	 * Checking whether the specified algorithm is accepted by this evaluator.
-	 * @param alg specified algorithm.
-	 * @return whether the specified algorithm is accepted by this evaluator.
-	 */
-	public abstract boolean acceptAlg(Alg alg);
-	
-	
-	/**
-	 * Returning name of this evaluator.
-	 * @return name of this evaluator.
-	 */
-	public abstract String getName();
-	
-	
-	/**
-	 * Getting main data unit for evaluation such as rating matrix, sample.
-	 * @return main data unit for evaluation such as rating matrix, sample.
-	 */
-	public String getMainUnit() {
+	@Override
+	public String getMainUnit() throws RemoteException {
 		return DataConfig.RATING_UNIT;
 	}
 	
@@ -472,42 +452,44 @@ public abstract class AbstractEvaluator extends AbstractRunner implements Evalua
 	}
 
 	
-	/**
-	 * Setting metric list.
-	 * @param metricList specified metric list.
-	 */
+	@Override
+	public List<Metric> getMetricList() throws RemoteException {
+		synchronized(metricList) {
+			return this.metricList.list();
+		}
+	}
+
+	
+	@Override
 	public synchronized void setMetricList(List<Metric> metricList) throws RemoteException {
 		if (isStarted()) {
 			logger.error("Evaluator is started and so it is impossible to set up metric list");
 			return;
 		}
 		
-		this.metricList.clear();
-		this.metricList.addAll(metricList);
-		this.metricList.sort();
+		synchronized(metricList) {
+			this.metricList.clear();
+			this.metricList.addAll(metricList);
+			this.metricList.sort();
+		}
 	}
 	
 	
-	/**
-	 * Getting the list of metrics resulted from the evaluation process.
-	 * @return list of metrics resulted from the evaluation process.
-	 */
-	public List<Metric> getMetricList() {
-		return this.metricList.list();
-	}
-	
-	
-	/**
-	 * Extracting algorithms from plug-in storage.
-	 * @return register table to store algorithms extracted from plug-in storage.
-	 */
-	public RegisterTable extractAlgFromPluginStorage() {
+	@Override
+	public RegisterTable extractAlgFromPluginStorage() throws RemoteException {
 		List<Alg> algList = PluginStorage.getNormalAlgReg().getAlgList(new AlgFilter() {
 			
 			@Override
 			public boolean accept(Alg alg) {
 				// TODO Auto-generated method stub
-				return acceptAlg(alg);
+				try {
+					return acceptAlg(alg);
+				} 
+				catch (Throwable e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					return false;
+				}
 			}
 		});
 		
@@ -548,11 +530,8 @@ public abstract class AbstractEvaluator extends AbstractRunner implements Evalua
 	}
 	
 	
-	/**
-	 * Getting configuration of this evaluator.
-	 * @return configuration of this evaluator.
-	 */
-	public EvaluatorConfig getConfig() {
+	@Override
+	public EvaluatorConfig getConfig() throws RemoteException {
 		return config;
 	}
 	
@@ -708,64 +687,82 @@ public abstract class AbstractEvaluator extends AbstractRunner implements Evalua
     @Override
 	public String toString() {
 		// TODO Auto-generated method stub
-		return getName();
+    	String evaluatorName = "No name";
+		try {
+			evaluatorName = getName();
+		}
+		catch (Throwable e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return evaluatorName;
 	}
 
 
-	@Override
-	public void remoteStart(List<Alg> algList, DatasetPool pool, Serializable parameter) throws RemoteException {
-		// TODO Auto-generated method stub
-		evaluate(algList, pool, parameter);
-	}
-
-
-	@Override
-	public void remotePause() throws RemoteException {
-		// TODO Auto-generated method stub
-		pause();
-	}
-
-
-	@Override
-	public void remoteResume() throws RemoteException {
-		// TODO Auto-generated method stub
-		resume();
-	}
-
-
-	@Override
-	public void remoteStop() throws RemoteException {
-		// TODO Auto-generated method stub
-		stop();
-	}
-
-
-	@Override
-	public void remoteForceStop() throws RemoteException {
-		// TODO Auto-generated method stub
-		forceStop();
-	}
-
-
-	@Override
-	public boolean remoteIsStarted() throws RemoteException {
-		// TODO Auto-generated method stub
-		return isStarted();
-	}
-
-
-	@Override
-	public boolean remoteIsPaused() throws RemoteException {
-		// TODO Auto-generated method stub
-		return isPaused();
-	}
-
-
-	@Override
-	public boolean remoteIsRunning() throws RemoteException {
-		// TODO Auto-generated method stub
-		return isRunning();
-	}
-
+    /**
+     * Getting this evaluator.
+     * @return this evaluator.
+     */
+    private AbstractEvaluator getThisEvaluator() {
+    	return this;
+    }
     
+    
+	@Override
+	public Controller getController() throws RemoteException {
+		// TODO Auto-generated method stub
+		return new Controller() {
+			
+			@Override
+			public void start(List<Alg> algList, DatasetPool pool, Serializable parameter) throws RemoteException {
+				// TODO Auto-generated method stub
+				getThisEvaluator().evaluate(algList, pool, parameter);
+			}
+
+			@Override
+			public void pause() throws RemoteException {
+				// TODO Auto-generated method stub
+				getThisEvaluator().pause();
+			}
+
+			@Override
+			public void resume() throws RemoteException {
+				// TODO Auto-generated method stub
+				getThisEvaluator().resume();
+			}
+
+			@Override
+			public void stop() throws RemoteException {
+				// TODO Auto-generated method stub
+				getThisEvaluator().stop();
+			}
+
+			@Override
+			public void forceStop() throws RemoteException {
+				// TODO Auto-generated method stub
+				getThisEvaluator().forceStop();
+			}
+
+			@Override
+			public boolean isStarted() throws RemoteException {
+				// TODO Auto-generated method stub
+				return getThisEvaluator().isStarted();
+			}
+
+			@Override
+			public boolean isPaused() throws RemoteException {
+				// TODO Auto-generated method stub
+				return getThisEvaluator().isPaused();
+			}
+
+			@Override
+			public boolean isRunning() throws RemoteException {
+				// TODO Auto-generated method stub
+				return getThisEvaluator().isRunning();
+			}
+			
+		};
+	}
+
+
 }

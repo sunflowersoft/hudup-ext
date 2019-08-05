@@ -1,5 +1,6 @@
 package net.hudup.core.evaluate;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -19,11 +20,17 @@ import net.hudup.core.alg.Alg;
  * @version 10.0
  *
  */
-public class NoneWrapperMetricList implements Cloneable {
+public class NoneWrapperMetricList implements Cloneable, Serializable {
 
 	
 	/**
-	 * List of non-wrapper metrics.s
+	 * Serial version UID.
+	 */
+	private static final long serialVersionUID = 1L;
+	
+	
+	/**
+	 * List of non-wrapper metrics. This list must be serializable in remote call.
 	 */
 	protected List<Metric> mlist = Util.newList();
 	

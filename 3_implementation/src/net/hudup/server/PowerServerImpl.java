@@ -2,7 +2,6 @@ package net.hudup.server;
 
 import java.net.URL;
 import java.rmi.Naming;
-import java.rmi.RMISecurityManager;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -51,7 +50,7 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 
 	
 	/**
-	 * 
+	 * Server policy file.
 	 */
 	public final static String  SERVER_POLICY = Constants.ROOT_PACKAGE + "hudup_server.policy";
 	
@@ -63,69 +62,70 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 
 	
 	/**
-	 * 
+	 * Starting flag.
 	 */
 	protected boolean started = false;
 	
 	
 	/**
-	 * 
+	 * Pausing flag.
 	 */
 	protected boolean paused = false;
 	
 	
 	/**
-	 * 
+	 * Configuration.
 	 */
 	protected PowerServerConfig config = null;
 
 	
 	/**
-	 * 
+	 * List of listeners.
 	 */
     protected EventListenerList listenerList = new EventListenerList();
 
     
 	/**
-	 * 
+	 * Transaction.
 	 */
 	protected Transaction trans = null;
 
 	
 	/**
-	 * 
+	 * RMI registry.
 	 */
 	protected Registry registry = null;
 	
 	
 	/**
-	 * 
+	 * Internal timer.
 	 */
 	protected Timer timer = null;
 
 	
 	/**
-	 * 
+	 * Gateway
 	 */
 	protected Gateway gateway = null;
 	
 	
 	/**
-	 * 
+	 * Active measures.
 	 */
 	protected ActiveMeasure activeMeasure = new ActiveMeasureImpl();
 	
 	
 	/**
-	 * 
+	 * Shutdown hook status.
 	 */
 	protected boolean shutdownHookStatus = false;
 	
 	
 	/**
-	 * 
-	 * @param config
+	 * Constructor with specified configuration.
+	 * @param config specified configuration.
 	 */
+	@SuppressWarnings("deprecation")
 	public PowerServerImpl(PowerServerConfig config) {
 		super();
 		
@@ -139,8 +139,13 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 			URL policyUrl = getClass().getResource(SERVER_POLICY);
 			if (policyUrl != null) {
 				System.setProperty("java.security.policy", policyUrl.toString());
-				if (System.getSecurityManager() == null)
-					System.setSecurityManager(new RMISecurityManager());
+				if (System.getSecurityManager() == null) {
+					int version = SystemUtil.getJavaVersion();
+					if (version < 8)
+						System.setSecurityManager(new java.rmi.RMISecurityManager());
+					else
+						System.setSecurityManager(new SecurityManager());
+				}
 			}
 			
 			int port = NetUtil.getPort(this.config.getServerPort(), Constants.TRY_RANDOM_PORT);
@@ -189,8 +194,8 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 
 	
 	/**
-	 * 
-	 * @return {@link Transaction}
+	 * Create transaction.
+	 * @return {@link Transaction}.
 	 */
 	protected abstract Transaction createTransaction();
 
@@ -237,7 +242,7 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 
     
     /**
-     * 
+     * Some tasks right after started.
      */
     protected abstract void doWhenStart();
     
@@ -425,7 +430,7 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 
 	
 	/**
-	 * 
+	 * Server can have some internal tasks when it is running. These tasks are specified by method {@link #serverTasks()} which in turn is called by this method.
 	 */
 	private synchronized void callServerTasks() throws RemoteException {
 		if (!isRunning())
@@ -445,19 +450,19 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 
 	
 	/**
-	 * 
+	 * Server can have some internal tasks when it is running. These tasks are specified by this method.
 	 */
 	protected abstract void serverTasks();
 
 	
 	/**
-	 * 
+	 * Initialize storage system.
 	 */
 	protected abstract void initStorageSystem();
 	
 	
 	/**
-	 * 
+	 * Destroy storage system.
 	 */
 	protected abstract void destroyStorageSystem();
 	
@@ -484,8 +489,8 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 
 
 	/**
-	 * 
-	 * @return gateway bind name
+	 * Getting bind name.
+	 * @return gateway bind name.
 	 */
 	private String getGatewayBindName() {
 		xURI uri = xURI.create( "rmi://localhost:" + config.getServerPort() + "/" + Protocol.GATEWAY);
@@ -549,7 +554,7 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 	
 	
 	/**
-     * 
+     * Getting server status listener.
      * @return array of {@link ServerStatusListener}
      */
     public ServerStatusListener[] getStatusListeners() {
@@ -590,8 +595,8 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 	
 	
 	/**
-     * 
-     * @param evt
+     * Fire status event.
+     * @param evt status event.
      */
 	private void fireStatusEvent(ServerStatusEvent evt) {
 		ServerStatusListener[] listeners = getStatusListeners();
@@ -694,38 +699,32 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 	
 	
 	/**
-	 * 
 	 * (1) Interface "Gateway" has no method to retrieve PowerServer instance so that the client stub can't access PowerServer instance
 	 * (2) Class "GatewayImpl" has "final" modifier. Modifier "final" is also important, it prevents from overriding injection class
 	 * 
 	 * So using Gateway is the solution of avoiding exporting PowerServer instance
 	 * @author Loc Nguyen
 	 * @version 10.0
-	 *
 	 */
 	final static private class GatewayImpl implements Gateway {
 
-		
 		/**
 		 * Serial version UID for serializable class. 
 		 */
 		private static final long serialVersionUID = 1L;
 
-		
 		/**
-		 * 
+		 * Internal gateway.
 		 */
 		private Gateway gateway = null;
 		
-		
 		/**
-		 * 
-		 * @param gateway
+		 * Constructor with specified gateway.
+		 * @param gateway specified gateway.
 		 */
 		public GatewayImpl(Gateway gateway) {
 			this.gateway = gateway;
 		}
-		
 		
 		@Override
 		public Server getRemoteServer(String account, String password)
@@ -735,7 +734,6 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 			return gateway.getRemoteServer(account, password);
 		}
 
-		
 		@Override
 		public Service getRemoteService(String account, String password)
 				throws RemoteException {
@@ -747,8 +745,6 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 	}
 
 	
-	
-
 }
 
 

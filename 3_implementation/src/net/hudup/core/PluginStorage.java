@@ -1,5 +1,7 @@
 package net.hudup.core;
 
+import java.io.Serializable;
+
 import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.AlgList;
 import net.hudup.core.data.ExternalQuery;
@@ -37,7 +39,13 @@ import net.hudup.core.parser.DatasetParser;
  * @version 10.0
  *
  */
-public final class PluginStorage {
+public final class PluginStorage implements Serializable {
+
+	
+	/**
+	 * Default serial version UID.
+	 */
+	private static final long serialVersionUID = 1L;
 
 	
 	/**

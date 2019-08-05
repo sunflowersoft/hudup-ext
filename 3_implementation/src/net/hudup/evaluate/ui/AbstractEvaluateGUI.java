@@ -19,6 +19,7 @@ import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.Recommender;
 import net.hudup.core.alg.SetupAlgListener;
 import net.hudup.core.evaluate.AbstractEvaluator;
+import net.hudup.core.evaluate.Evaluator;
 import net.hudup.core.evaluate.EvaluatorListener;
 import net.hudup.core.evaluate.EvaluatorProgressListener;
 import net.hudup.core.evaluate.Metric;
@@ -83,7 +84,7 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	/**
 	 * Main evaluator.
 	 */
-	protected AbstractEvaluator evaluator = null;
+	protected Evaluator evaluator = null;
 
 	
 	/**
@@ -108,7 +109,7 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	 * Constructor with specified evaluator.
 	 * @param evaluator specified evaluator.
 	 */
-	public AbstractEvaluateGUI(AbstractEvaluator evaluator) {
+	public AbstractEvaluateGUI(Evaluator evaluator) {
 		setupListeners(evaluator);
 		
 		this.evaluator = evaluator;
@@ -122,8 +123,15 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	 * @return message according to key.
 	 */
 	protected String getMessage(String key) {
-		return I18nUtil.getMessage(evaluator.getConfig(), key);
-		
+		try {
+			return I18nUtil.getMessage(evaluator.getConfig(), key);
+		}
+		catch (Throwable e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			logger.error("Error in getting evaluator configuration");
+			return "error";
+		}
 	}
 	
 	
@@ -142,9 +150,9 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	
 	/**
 	 * Getting current evaluator.
-	 * @return current {@link AbstractEvaluator}.
+	 * @return current evaluator.
 	 */
-	public AbstractEvaluator getEvaluator() {
+	public Evaluator getEvaluator() {
 		return evaluator;
 	}
 	
@@ -171,17 +179,24 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	 * Pause/resume evaluator.
 	 */
 	protected void pauseResume() {
-		if (evaluator.isPaused()) {
-			evaluator.resume();
-			counterClock.resume();
+		try {
+			Evaluator.Controller controller = evaluator.getController();
+			
+			if (controller.isPaused()) {
+				controller.resume();
+				counterClock.resume();
+				updateMode();
+			}
+			else if (controller.isRunning()) {
+				controller.pause();
+				counterClock.pause();
+				updateMode();
+			}
+		}
+		catch (Throwable e) {
+			e.printStackTrace();
 			updateMode();
 		}
-		else if (evaluator.isRunning()) {
-			evaluator.pause();
-			counterClock.pause();
-			updateMode();
-		}
-		
 	}
 
 	
@@ -189,9 +204,15 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	 * Stop evaluator in secure manner.
 	 */
 	protected void stop() {
-		evaluator.stop();
-		counterClock.stop();
-		updateMode();
+		try {
+			evaluator.getController().stop();
+			counterClock.stop();
+			updateMode();
+		}
+		catch (Throwable e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	
@@ -199,16 +220,22 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	 * Force to stop evaluator in insecure manner.
 	 */
 	protected void forceStop() {
-		evaluator.forceStop();
-		counterClock.stop();
+		try {
+			evaluator.getController().forceStop();
+			counterClock.stop();
 		
-		List<Alg> list = getCurrentAlgList();
-		for (Alg alg : list) {
-			if (alg instanceof Recommender)
-				((Recommender)alg).unsetup();
+			List<Alg> list = getCurrentAlgList();
+			for (Alg alg : list) {
+				if (alg instanceof Recommender)
+					((Recommender)alg).unsetup();
+			}
+			
+			updateMode();
 		}
-		
-		updateMode();
+		catch (Throwable e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	
@@ -298,7 +325,7 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	 * Switching the inside evaluator by specified evaluator.
 	 * @param newEvaluator new specified evaluator.
 	 */
-	protected void switchEvaluator(AbstractEvaluator newEvaluator) {
+	protected void switchEvaluator(Evaluator newEvaluator) {
 		stop();
 		unsetupListeners(this.evaluator);
 		setupListeners(newEvaluator);
@@ -311,23 +338,23 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	 * Change list of metrics in evaluator.
 	 */
 	protected void metricsOption() {
-		if (evaluator.isStarted()) {
-			logger.error("Evaluator started, it is impossible to set up metric list");
-			return;
-		}
-		
-		MetricsOptionDlg dlg = new MetricsOptionDlg(this, evaluator.getMetricList());
-		List<Metric> selectedMetricList = dlg.getSelectedMetricList();
-		
-		if (selectedMetricList.size() == 0) {
-			JOptionPane.showMessageDialog(
-					this, 
-					"No metrics option selected", 
-					"No metrics option selected", 
-					JOptionPane.WARNING_MESSAGE);
-		}
-		
 		try {
+			if (evaluator.getController().isStarted()) {
+				logger.error("Evaluator started, it is impossible to set up metric list");
+				return;
+			}
+
+			MetricsOptionDlg dlg = new MetricsOptionDlg(this, evaluator.getMetricList());
+			List<Metric> selectedMetricList = dlg.getSelectedMetricList();
+			
+			if (selectedMetricList.size() == 0) {
+				JOptionPane.showMessageDialog(
+						this, 
+						"No metrics option selected", 
+						"No metrics option selected", 
+						JOptionPane.WARNING_MESSAGE);
+			}
+			
 			evaluator.setMetricList(selectedMetricList);
 		}
 		catch (Throwable e) {
@@ -342,7 +369,7 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	 * Add this GUI as listeners to specified evaluator.
 	 * @param evaluator specified evaluator.
 	 */
-	private void setupListeners(AbstractEvaluator evaluator) {
+	private void setupListeners(Evaluator evaluator) {
 		try {
 			evaluator.addEvaluatorListener(this);
 			evaluator.addProgressListener(this);
@@ -358,7 +385,7 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	 * Remove this GUI as listeners from specified evaluator.
 	 * @param evaluator specified evaluator.
 	 */
-	private void unsetupListeners(AbstractEvaluator evaluator) {
+	private void unsetupListeners(Evaluator evaluator) {
 		try {
 			evaluator.removeEvaluatorListener(this);
 			evaluator.removeProgressListener(this);

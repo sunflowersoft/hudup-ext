@@ -111,7 +111,13 @@ public class RecommendEvaluator extends AbstractEvaluator {
 		
 		Thread current = Thread.currentThread();
 		for (int i = 0; current == thread && algList != null && i < algList.size(); i++) {
-			if (!acceptAlg(algList.get(i))) continue;
+			try {
+				if (!acceptAlg(algList.get(i))) continue;
+			} catch (Throwable e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				continue;
+			}
 			Recommender recommender = (Recommender)algList.get(i);
 			
 			for (int j = 0; current == thread && pool != null && j < pool.size(); j++) {
@@ -262,14 +268,14 @@ public class RecommendEvaluator extends AbstractEvaluator {
 
 
 	@Override
-	public String getName() {
+	public String getName() throws RemoteException {
 		// TODO Auto-generated method stub
 		return "Recommendation Evaluator";
 	}
 
 
 	@Override
-	public NoneWrapperMetricList defaultMetrics() {
+	public NoneWrapperMetricList defaultMetrics() throws RemoteException {
 		// TODO Auto-generated method stub
 		NoneWrapperMetricList metricList = new NoneWrapperMetricList();
 		
@@ -368,7 +374,7 @@ public class RecommendEvaluator extends AbstractEvaluator {
 
 	
 	@Override
-	public boolean acceptAlg(Alg alg) {
+	public boolean acceptAlg(Alg alg) throws RemoteException {
 		// TODO Auto-generated method stub
 		return alg instanceof Recommender;
 	}

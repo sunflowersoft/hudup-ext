@@ -23,7 +23,7 @@ After installing Hudup in your computer by executing appropriate installer packa
 
 1. Running access point Evaluator. You can choose "Batch evaluate" tab, press "Load script" button and open "batch-sample.script" file at current directory. All sample datasets in folder "datasets" at current directory.
 
-2. Running access point Server, which in turn, running access point Evaluator so as to deploy Hudup in client-server environment. Server automatically remind you to set up Server configuration, for default, you only press "Next" button and finish set up. Note that you must select "rmi_server_query" algorithm in Evaluator in order to evaluate Hudup in client-server environment.
+2. Running access point Server, which in turn, running access point Evaluator so as to deploy Hudup in client-server environment. Server automatically remind you to set up Server configuration, for default, you only press "Next" button and finish set up. Note that you must select "rmi_server_query" algorithm in Evaluator in order to evaluate Hudup in client-server environment. Administrator is "admin" with password "admin".
 
 3. Running access point Server, which in turn, running access point Listener or Balancer, which in turn, running access point Evaluator so as to deploy Hudup in client-listener-server environment. You must select "socket_server_query" algorithm in Evaluator in order to evaluate Hudup in client-listener-server environment. 
 

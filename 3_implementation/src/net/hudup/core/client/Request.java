@@ -215,6 +215,11 @@ public class Request extends ProtocolParam {
 	 */
 	public int                              userid                        = -1;
 	
+	/**
+	 * Evaluator name. This field is effective only if the evaluation package is loaded.
+	 */
+	public String                           evaluatorName                 = null;
+
 	
 	/**
 	 * Default constructor.

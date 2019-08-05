@@ -29,6 +29,7 @@ import net.hudup.core.PluginChangedListener;
 import net.hudup.core.PluginStorage;
 import net.hudup.core.RegisterTable;
 import net.hudup.core.evaluate.AbstractEvaluator;
+import net.hudup.core.evaluate.Evaluator;
 import net.hudup.core.evaluate.EvaluatorConfig;
 import net.hudup.core.evaluate.MetaMetric;
 import net.hudup.core.evaluate.Metric;
@@ -90,9 +91,16 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 	 * Constructor with specified evaluator.
 	 * @param evaluator specified {@link AbstractEvaluator}.
 	 */
-	public EvalCompoundGUI(AbstractEvaluator evaluator) {
+	public EvalCompoundGUI(Evaluator evaluator) {
 		super("Evaluator GUI");
-		this.thisConfig = evaluator.getConfig();
+		try {
+			this.thisConfig = evaluator.getConfig();
+		}
+		catch (Throwable e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			logger.error("Error in getting evaluator configuration");
+		}
 		
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		addWindowListener(new WindowAdapter() {
@@ -241,7 +249,7 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 				return;
 		}
 	
-		List<AbstractEvaluator> evList = SystemUtil.getInstances(ROOT_PACKAGE, AbstractEvaluator.class);
+		List<Evaluator> evList = SystemUtil.getInstances(ROOT_PACKAGE, Evaluator.class);
 		if (evList.size() == 0) {
 			JOptionPane.showMessageDialog(
 					null, 
@@ -251,21 +259,34 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 			return;
 		}
 		
-		Collections.sort(evList, new Comparator<AbstractEvaluator>() {
+		Collections.sort(evList, new Comparator<Evaluator>() {
 
 			@Override
-			public int compare(AbstractEvaluator o1, AbstractEvaluator o2) {
+			public int compare(Evaluator o1, Evaluator o2) {
 				// TODO Auto-generated method stub
-				return o1.getName().compareTo(o2.getName());
+				try {
+					return o1.getName().compareTo(o2.getName());
+				}
+				catch (Throwable e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					return -1;
+				}
 			}
 		});
 		
         AbstractEvaluateGUI evaluatorGUI = (AbstractEvaluateGUI) body.getSelectedComponent();
-		AbstractEvaluator initialEv = null;
-		for (AbstractEvaluator ev : evList) {
-			if (ev.getName().equals(evaluatorGUI.getEvaluator().getName())) {
-				initialEv = ev;
-				break;
+		Evaluator initialEv = null;
+		for (Evaluator ev : evList) {
+			try {
+				if (ev.getName().equals(evaluatorGUI.getEvaluator().getName())) {
+					initialEv = ev;
+					break;
+				}
+			}
+			catch (Throwable e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 		}
         
@@ -279,7 +300,7 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 			@Override
 			protected void start() {
 				// TODO Auto-generated method stub
-				AbstractEvaluator newEvaluator = (AbstractEvaluator) getItemControl().getSelectedItem();
+				Evaluator newEvaluator = (Evaluator) getItemControl().getSelectedItem();
 				dispose();
 				switchEvaluator0(newEvaluator);
 			}
@@ -287,7 +308,7 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 			@Override
 			protected JComboBox<?> createItemControl() {
 				// TODO Auto-generated method stub
-				return new JComboBox<AbstractEvaluator>(evList.toArray(new AbstractEvaluator[0]));
+				return new JComboBox<Evaluator>(evList.toArray(new Evaluator[0]));
 			}
 			
 			@Override
@@ -310,41 +331,41 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 	 * Switch to the new evaluator 
 	 * @param newEvaluator new evaluator.
 	 */
-	private void switchEvaluator0(AbstractEvaluator newEvaluator) {
-		RegisterTable algReg = newEvaluator.extractAlgFromPluginStorage();
-		if (algReg.size() == 0) {
-			JOptionPane.showMessageDialog(this, 
-					"There is no registered algorithm.\nProgramm not run", 
-					"No algorithm", JOptionPane.INFORMATION_MESSAGE);
-			return;
-		}
-		
-		RegisterTable parserReg = PluginStorage.getParserReg();
-		if (parserReg.size() == 0) {
-			JOptionPane.showMessageDialog(this, 
-					"There is no registered dataset parser.\n Programm not run", 
-					"No dataset parser", JOptionPane.INFORMATION_MESSAGE);
-			return;
-		}
-		
-		RegisterTable metricReg = PluginStorage.getMetricReg();
-		NoneWrapperMetricList metricList = newEvaluator.defaultMetrics();
-		for (int i = 0; i < metricList.size(); i++) {
-			Metric metric = metricList.get(i);
-			if(!(metric instanceof MetaMetric))
-				continue;
-			metricReg.unregister(metric.getName());
-			
-			boolean registered = metricReg.register(metric);
-			if (registered)
-				logger.info("Registered algorithm: " + metricList.get(i).getName());
-		}
-		
+	private void switchEvaluator0(Evaluator newEvaluator) {
 		try {
+			RegisterTable algReg = newEvaluator.extractAlgFromPluginStorage();
+			if (algReg.size() == 0) {
+				JOptionPane.showMessageDialog(this, 
+						"There is no registered algorithm.\nProgramm not run", 
+						"No algorithm", JOptionPane.INFORMATION_MESSAGE);
+				return;
+			}
+			
+			RegisterTable parserReg = PluginStorage.getParserReg();
+			if (parserReg.size() == 0) {
+				JOptionPane.showMessageDialog(this, 
+						"There is no registered dataset parser.\n Programm not run", 
+						"No dataset parser", JOptionPane.INFORMATION_MESSAGE);
+				return;
+			}
+			
+			RegisterTable metricReg = PluginStorage.getMetricReg();
+			NoneWrapperMetricList metricList = newEvaluator.defaultMetrics();
+			for (int i = 0; i < metricList.size(); i++) {
+				Metric metric = metricList.get(i);
+				if(!(metric instanceof MetaMetric))
+					continue;
+				metricReg.unregister(metric.getName());
+				
+				boolean registered = metricReg.register(metric);
+				if (registered)
+					logger.info("Registered algorithm: " + metricList.get(i).getName());
+			}
+			
 			this.dispose();
 			new EvalCompoundGUI(newEvaluator.getClass().newInstance());
 		}
-		catch (Exception e) {
+		catch (Throwable e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
@@ -381,7 +402,14 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 	@Override
 	public boolean isIdle() {
 		// TODO Auto-generated method stub
-		return !evaluateGUI.getEvaluator().isStarted() && !batchEvaluateGUI.getEvaluator().isStarted();
+		try {
+			return !evaluateGUI.getEvaluator().getController().isStarted() 
+					&& !batchEvaluateGUI.getEvaluator().getController().isStarted();
+		} catch (Throwable e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return false;
+		}
 	}
 	
 	

@@ -24,6 +24,7 @@ import net.hudup.core.data.Rating;
 import net.hudup.core.data.RatingVector;
 import net.hudup.core.data.Snapshot;
 import net.hudup.core.data.UserRating;
+import net.hudup.core.evaluate.Evaluator;
 
 
 /**
@@ -671,6 +672,18 @@ public class SocketWrapper extends ProtocolImpl implements Service {
 			return null;
 		
 		return response.snapshot;
+	}
+
+
+	@Override
+	public Evaluator getEvaluator(String evaluatorName) throws RemoteException {
+		// TODO Auto-generated method stub
+		Request request = createGetEvaluatorRequest(evaluatorName);
+		Response response = sendRequest(request);
+		if (response == null)
+			return null;
+		
+		return response.evaluator;
 	}
 
 

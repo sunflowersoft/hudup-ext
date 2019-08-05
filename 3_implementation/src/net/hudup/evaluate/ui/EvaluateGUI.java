@@ -45,7 +45,7 @@ import net.hudup.core.data.Dataset;
 import net.hudup.core.data.DatasetPool;
 import net.hudup.core.data.DatasetUtil;
 import net.hudup.core.data.Pointer;
-import net.hudup.core.evaluate.AbstractEvaluator;
+import net.hudup.core.evaluate.Evaluator;
 import net.hudup.core.evaluate.EvaluatorEvent;
 import net.hudup.core.evaluate.EvaluatorEvent.Type;
 import net.hudup.core.evaluate.EvaluatorProgressEvent;
@@ -122,9 +122,15 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 	 * Constructor with specified evaluator.
 	 * @param evaluator specified evaluator.
 	 */
-	public EvaluateGUI(AbstractEvaluator evaluator) {
+	public EvaluateGUI(Evaluator evaluator) {
 		super(evaluator);
-		algRegTable.copy(evaluator.extractAlgFromPluginStorage());
+		try {
+			algRegTable.copy(evaluator.extractAlgFromPluginStorage());
+		}
+		catch (Throwable e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 		setLayout(new BorderLayout(2, 2));
 		
@@ -153,10 +159,15 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 	
 	@Override
 	public void pluginChanged() {
-		algRegTable.clear();
-		algRegTable.copy(evaluator.extractAlgFromPluginStorage());
-		cmbAlgs.update(algRegTable.getAlgList());
-		updateMode();
+		try {
+			algRegTable.clear();
+			algRegTable.copy(evaluator.extractAlgFromPluginStorage());
+			cmbAlgs.update(algRegTable.getAlgList());
+			updateMode();
+		}
+		catch (Throwable e) {
+			e.printStackTrace();
+		}
 	}
 	
 	
@@ -586,30 +597,35 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 	 * Opening training dataset.
 	 */
 	protected void openTrainingSet() {
-		if (evaluator.isStarted())
-			return;
-		
-		DataConfig defaultConfig = txtTrainingBrowse.getConfig(); 
-		if (defaultConfig == null)
-			defaultConfig = DatasetUtil2.createDefaultConfig(getAlg());
-		
-		if (evaluator.getMainUnit() != null) {
-			defaultConfig = (DataConfig)defaultConfig.clone();
-			defaultConfig.setMainUnit(evaluator.getMainUnit());
+		try {
+			if (evaluator.getController().isStarted())
+				return;
+			
+			DataConfig defaultConfig = txtTrainingBrowse.getConfig(); 
+			if (defaultConfig == null)
+				defaultConfig = DatasetUtil2.createDefaultConfig(getAlg());
+			
+			if (evaluator.getMainUnit() != null) {
+				defaultConfig = (DataConfig)defaultConfig.clone();
+				defaultConfig.setMainUnit(evaluator.getMainUnit());
+			}
+			
+			DataConfig config = DatasetUtil2.chooseTrainingConfig(this, defaultConfig, getAlg());
+			
+			if (config == null) {
+				JOptionPane.showMessageDialog(
+					this, 
+					"Not open training set", 
+					"Not open training set", 
+					JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+			
+			openTrainingSet(config);
 		}
-		
-		DataConfig config = DatasetUtil2.chooseTrainingConfig(this, defaultConfig, getAlg());
-		
-		if (config == null) {
-			JOptionPane.showMessageDialog(
-				this, 
-				"Not open training set", 
-				"Not open training set", 
-				JOptionPane.ERROR_MESSAGE);
-			return;
+		catch (Throwable e) {
+			e.printStackTrace();
 		}
-		
-		openTrainingSet(config);
 	}
 	
 	
@@ -618,30 +634,36 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 	 * @param config specified configuration.
 	 */
 	protected void openTrainingSet(DataConfig config) {
-		if (evaluator.isStarted())
-			return;
+		try {
+			if (evaluator.getController().isStarted())
+				return;
 		
-		clearResult();
-		updateMode();
-		
-		Dataset dataset = DatasetUtil.loadDataset(config);
-		if (dataset == null) {
-			JOptionPane.showMessageDialog(
-				this, 
-				"Training set not parsed", 
-				"Training set not parsed", 
-				JOptionPane.ERROR_MESSAGE);
+			clearResult();
+			updateMode();
 			
-			return;
+			Dataset dataset = DatasetUtil.loadDataset(config);
+			if (dataset == null) {
+				JOptionPane.showMessageDialog(
+					this, 
+					"Training set not parsed", 
+					"Training set not parsed", 
+					JOptionPane.ERROR_MESSAGE);
+				
+				return;
+			}
+			
+			if (!DatasetUtil2.validateTrainingset(this, dataset, new Alg[] { getAlg() })) {
+				dataset.clear();
+				return;
+			}
+			
+			this.txtTrainingBrowse.setDataset(dataset);
+			updateMode();
 		}
-		
-		if (!DatasetUtil2.validateTrainingset(this, dataset, new Alg[] { getAlg() })) {
-			dataset.clear();
-			return;
+		catch (Throwable e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-		
-		this.txtTrainingBrowse.setDataset(dataset);
-		updateMode();
 	}
 	
 	
@@ -649,31 +671,37 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 	 * Opening testing dataset.
 	 */
 	protected void openTestingSet() {
-		if (evaluator.isStarted())
-			return;
-
-		DataConfig defaultConfig = txtTestingBrowse.getConfig();
-		if (defaultConfig == null)
-			defaultConfig = new DataConfig();
-		
-		if (evaluator.getMainUnit() != null) {
-			defaultConfig = (DataConfig)defaultConfig.clone();
-			defaultConfig.setMainUnit(evaluator.getMainUnit());
+		try {
+			if (evaluator.getController().isStarted())
+				return;
+	
+			DataConfig defaultConfig = txtTestingBrowse.getConfig();
+			if (defaultConfig == null)
+				defaultConfig = new DataConfig();
+			
+			if (evaluator.getMainUnit() != null) {
+				defaultConfig = (DataConfig)defaultConfig.clone();
+				defaultConfig.setMainUnit(evaluator.getMainUnit());
+			}
+			
+			DataConfig config = DatasetUtil2.chooseTestingConfig(this, defaultConfig);
+			
+			if (config == null) {
+				JOptionPane.showMessageDialog(
+					this, 
+					"Not open testing dataset", 
+					"Not open testing dataset", 
+					JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+			
+			openTestingSet(config);
 		}
-		
-		DataConfig config = DatasetUtil2.chooseTestingConfig(this, defaultConfig);
-		
-		if (config == null) {
-			JOptionPane.showMessageDialog(
-				this, 
-				"Not open testing dataset", 
-				"Not open testing dataset", 
-				JOptionPane.ERROR_MESSAGE);
-			return;
+		catch (Throwable e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-		
-		openTestingSet(config);
-	}
+}
 	
 	
 	/**
@@ -681,70 +709,87 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 	 * @param config specified configuration.
 	 */
 	protected void openTestingSet(DataConfig config) {
-		if (evaluator.isStarted())
-			return;
-		
-		clearResult();
-		updateMode();
-		
-		Dataset dataset = DatasetUtil.loadDataset(config);
-		if (dataset == null) {
-			JOptionPane.showMessageDialog(
-				this, 
-				"Testing dataset not parsed", 
-				"Testing dataset not parsed", 
-				JOptionPane.ERROR_MESSAGE);
+		try {
+			if (evaluator.getController().isStarted())
+				return;
 			
-			return;
-		}
-		
-		if (dataset instanceof Pointer) {
-			JOptionPane.showMessageDialog(
+			clearResult();
+			updateMode();
+			
+			Dataset dataset = DatasetUtil.loadDataset(config);
+			if (dataset == null) {
+				JOptionPane.showMessageDialog(
 					this, 
-					"Testing dataset is pointer", 
-					"Invalid testing dataset", 
+					"Testing dataset not parsed", 
+					"Testing dataset not parsed", 
 					JOptionPane.ERROR_MESSAGE);
 				
 				return;
+			}
+			
+			if (dataset instanceof Pointer) {
+				JOptionPane.showMessageDialog(
+						this, 
+						"Testing dataset is pointer", 
+						"Invalid testing dataset", 
+						JOptionPane.ERROR_MESSAGE);
+					
+					return;
+			}
+	
+			this.txtTestingBrowse.setDataset(dataset);
+			updateMode();
 		}
-
-		this.txtTestingBrowse.setDataset(dataset);
-		updateMode();
+		catch (Throwable e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	
 	@Override
 	protected void refresh() {
-		if (evaluator.isStarted())
-			return;
-		
-		DataConfig trainingCfg = txtTrainingBrowse.getConfig();
-		if (trainingCfg != null)
-			trainingCfg = (DataConfig) trainingCfg.clone();
-		
-		DataConfig testingCfg = txtTestingBrowse.getConfig();
-		if (testingCfg != null)
-			testingCfg = (DataConfig) testingCfg.clone();
-		
-		if (trainingCfg != null)
-			openTrainingSet(trainingCfg);
-		
-		if (testingCfg != null)
-			openTestingSet(testingCfg);
-		
+		try {
+			if (evaluator.getController().isStarted())
+				return;
+			
+			DataConfig trainingCfg = txtTrainingBrowse.getConfig();
+			if (trainingCfg != null)
+				trainingCfg = (DataConfig) trainingCfg.clone();
+			
+			DataConfig testingCfg = txtTestingBrowse.getConfig();
+			if (testingCfg != null)
+				testingCfg = (DataConfig) testingCfg.clone();
+			
+			if (trainingCfg != null)
+				openTrainingSet(trainingCfg);
+			
+			if (testingCfg != null)
+				openTestingSet(testingCfg);
+		}
+		catch (Throwable e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	
 	@Override
 	protected void clear() {
-		if (evaluator.isStarted())
-			return;
-		
-		this.txtTrainingBrowse.setDataset(null);
-		this.txtTestingBrowse.setDataset(null);
-		
-		clearResult();
-		updateMode();
+		try {
+			if (evaluator.getController().isStarted())
+				return;
+			
+			this.txtTrainingBrowse.setDataset(null);
+			this.txtTestingBrowse.setDataset(null);
+			
+			clearResult();
+			updateMode();
+		}
+		catch (Throwable e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	
@@ -776,35 +821,36 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 
 	@Override
 	protected void run() {
-		if (evaluator.isStarted())
-			return;
-		
-		Alg alg = getAlg();
-		Dataset training = txtTrainingBrowse.getDataset();
-		Dataset testing = txtTestingBrowse.getDataset();
-		if (alg == null || training == null || testing == null)
-			return;
-		
-		if (!DatasetUtil2.validateTrainingset(this, training, new Alg[] { getAlg() }))
-			return;
-		
-		clearResult();
-		
-		DatasetPool pool = new DatasetPool(training, testing);
-			
-		List<Alg> algList = Util.newList();
-		algList.add(alg);
 		try {
-			evaluator.evaluate(algList, pool, null);
+			Evaluator.Controller controller = evaluator.getController();
+			if (controller.isStarted())
+				return;
+			
+			Alg alg = getAlg();
+			Dataset training = txtTrainingBrowse.getDataset();
+			Dataset testing = txtTestingBrowse.getDataset();
+			if (alg == null || training == null || testing == null)
+				return;
+			
+			if (!DatasetUtil2.validateTrainingset(this, training, new Alg[] { getAlg() }))
+				return;
+			
+			clearResult();
+			
+			DatasetPool pool = new DatasetPool(training, testing);
+				
+			List<Alg> algList = Util.newList();
+			algList.add(alg);
+			controller.start(algList, pool, null);
+		
+			counterClock.start();
+			updateMode();
 		}
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			logger.error("Error in evaluation");
 		}
-		
-		counterClock.start();
-		updateMode();
 	}
 
 	
@@ -955,90 +1001,96 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 
 	@Override
 	protected void updateMode() {
-		closeIOChannels();
-		
-		Dataset training = txtTrainingBrowse.getDataset();
-		Dataset testing = txtTestingBrowse.getDataset();
-		
-		if (cmbAlgs.getItemCount() == 0) {
-			setInternalEnable(false);
-			setResultVisible(false);
+		try {
+			closeIOChannels();
 			
-			cmbAlgs.setEnabled(true);
+			Dataset training = txtTrainingBrowse.getDataset();
+			Dataset testing = txtTestingBrowse.getDataset();
+			Evaluator.Controller controller = evaluator.getController();
 			
-			prgRunning.setMaximum(0);
-			prgRunning.setValue(0);
-			prgRunning.setVisible(false);
-		}
-		else if (training == null || testing == null) {
-			setInternalEnable(false);
-			setResultVisible(false);
-			
-			cmbAlgs.setEnabled(true);
-			btnConfig.setEnabled(true);
-			btnTrainingBrowse.setEnabled(true);
-			btnTestingBrowse.setEnabled(true);
-			btnRefresh.setEnabled(training != null || testing != null);
-			btnClear.setEnabled(training != null || testing != null);
-			
-			prgRunning.setMaximum(0);
-			prgRunning.setValue(0);
-			prgRunning.setVisible(false);
-		}
-		else if (evaluator.isStarted()) {
-			if (evaluator.isRunning()) {
+			if (cmbAlgs.getItemCount() == 0) {
 				setInternalEnable(false);
 				setResultVisible(false);
 				
-				btnPauseResume.setText(getMessage("pause"));
-				btnPauseResume.setEnabled(true);
-				btnStop.setEnabled(true);
-				btnForceStop.setEnabled(true);
+				cmbAlgs.setEnabled(true);
 				
-				prgRunning.setVisible(true);
+				prgRunning.setMaximum(0);
+				prgRunning.setValue(0);
+				prgRunning.setVisible(false);
+			}
+			else if (training == null || testing == null) {
+				setInternalEnable(false);
+				setResultVisible(false);
 				
+				cmbAlgs.setEnabled(true);
+				btnConfig.setEnabled(true);
+				btnTrainingBrowse.setEnabled(true);
+				btnTestingBrowse.setEnabled(true);
+				btnRefresh.setEnabled(training != null || testing != null);
+				btnClear.setEnabled(training != null || testing != null);
+				
+				prgRunning.setMaximum(0);
+				prgRunning.setValue(0);
+				prgRunning.setVisible(false);
+			}
+			else if (controller.isStarted()) {
+				if (controller.isRunning()) {
+					setInternalEnable(false);
+					setResultVisible(false);
+					
+					btnPauseResume.setText(getMessage("pause"));
+					btnPauseResume.setEnabled(true);
+					btnStop.setEnabled(true);
+					btnForceStop.setEnabled(true);
+					
+					prgRunning.setVisible(true);
+					
+				}
+				else {
+					setInternalEnable(false);
+					setResultVisible(true);
+					
+					btnPauseResume.setText(getMessage("resume"));
+					btnPauseResume.setEnabled(true);
+					btnStop.setEnabled(true);
+					btnForceStop.setEnabled(true);
+					txtRunInfo.setEnabled(true);
+					chkSave.setEnabled(true);
+					chkDisplay.setEnabled(true);
+					
+					tblMetrics.update(result);
+				}
 			}
 			else {
-				setInternalEnable(false);
+				setInternalEnable(true);
 				setResultVisible(true);
 				
-				btnPauseResume.setText(getMessage("resume"));
-				btnPauseResume.setEnabled(true);
-				btnStop.setEnabled(true);
-				btnForceStop.setEnabled(true);
-				txtRunInfo.setEnabled(true);
-				chkSave.setEnabled(true);
-				chkDisplay.setEnabled(true);
-				
+				btnPauseResume.setText(getMessage("pause"));
+				btnPauseResume.setEnabled(false);
+				btnStop.setEnabled(false);
+				btnForceStop.setEnabled(false);
+	
 				tblMetrics.update(result);
+				prgRunning.setMaximum(0);
+				prgRunning.setValue(0);
+				prgRunning.setVisible(false);
+				
 			}
-		}
-		else {
-			setInternalEnable(true);
-			setResultVisible(true);
 			
-			btnPauseResume.setText(getMessage("pause"));
-			btnPauseResume.setEnabled(false);
-			btnStop.setEnabled(false);
-			btnForceStop.setEnabled(false);
-
-			tblMetrics.update(result);
-			prgRunning.setMaximum(0);
-			prgRunning.setValue(0);
-			prgRunning.setVisible(false);
+			if (chkSave.isSelected() && (txtSaveBrowse.getText() == null || txtSaveBrowse.getText().isEmpty()))
+				chkSave.setSelected(false);
 			
+			if (result == null)
+				statusBar.clearText();
+			
+			this.statusBar.setTextPane0( 
+					evaluator.getName() + " - " +
+					(chkDisplay.isSelected() ? getMessage("display") : getMessage("undisplay"))
+				);
 		}
-		
-		if (chkSave.isSelected() && (txtSaveBrowse.getText() == null || txtSaveBrowse.getText().isEmpty()))
-			chkSave.setSelected(false);
-		
-		if (result == null)
-			statusBar.clearText();
-		
-		this.statusBar.setTextPane0( 
-				evaluator.getName() + " - " +
-				(chkDisplay.isSelected() ? getMessage("display") : getMessage("undisplay"))
-			);
+		catch (Throwable e) {
+			e.printStackTrace();
+		}
 	}
 	
 	

@@ -162,7 +162,7 @@ public class ConnectServerDlg extends JDialog {
 	
 	
 	/**
-	 * Creating the binded URI. In current implementation, it is &quot;rmi://localhost:&lt;port&gt;/connect&quot;
+	 * Creating the binded URI for the control panel. In current implementation, it is &quot;rmi://localhost:&lt;port&gt;/connect&quot;
 	 * @return binded URI.
 	 */
 	public xURI getBindUri() {

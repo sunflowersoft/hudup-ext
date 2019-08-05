@@ -9,6 +9,7 @@ import net.hudup.core.data.NominalList;
 import net.hudup.core.data.Profile;
 import net.hudup.core.data.RatingVector;
 import net.hudup.core.data.Snapshot;
+import net.hudup.core.evaluate.Evaluator;
 import net.hudup.core.parser.JsonUtil;
 
 
@@ -135,6 +136,12 @@ public class Response extends ProtocolParam {
 	
 	
 	/**
+	 * Remote evaluator.
+	 */
+	public Evaluator                 evaluator           = null;
+
+	
+	/**
 	 * Default constructor.
 	 */
 	private Response() {
@@ -185,6 +192,9 @@ public class Response extends ProtocolParam {
 		
 		else if (externalRecord != null)
 			return externalRecord;
+
+		else if (evaluator != null)
+			return evaluator;
 
 		else
 			return null;
@@ -374,6 +384,19 @@ public class Response extends ProtocolParam {
 	public static Response create(ExternalRecord externalRecord) {
 		Response response = new Response();
 		response.externalRecord = externalRecord;
+		
+		return response;
+	}
+
+	
+	/**
+	 * Creating result (response) as evaluator.
+	 * @param evaluator specified evaluator.
+	 * @return result (response) as evaluator.
+	 */
+	public static Response create(Evaluator evaluator) {
+		Response response = new Response();
+		response.evaluator = evaluator;
 		
 		return response;
 	}

@@ -392,6 +392,11 @@ public interface Protocol {
 	 * Action of request of getting session attribute. Such request is created by method {@link #createGetSessionAttributeRequest(String)}.
 	 */
 	static final String GET_SESSION_ATTRIBUTE =             "get_session_attribute";
+	
+	/**
+	 * Action of request of getting evaluator. Such request is created by method {@link #createGetEvaluatorRequest(String)}.
+	 */
+	static final String GET_EVALUATOR =                     "get_evaluator";
 
 	
 	/**
@@ -986,9 +991,17 @@ public interface Protocol {
 	/**
 	 * Creating a request for retrieving an image of dataset owned by Hudup server at current time point.
 	 * Such image is snapshot stored in memory. Snapshot is represented by {@code Snapshot} class.
-	 * @return a request for retrieving an image (called snapshot) of dataset owned by Hudup server
+	 * @return a request for retrieving an image (called snapshot) of dataset owned by Hudup server.
 	 */
 	Request createGetSnapshotRequest();
+
+
+	/**
+	 * Creating a request for retrieving evaluator. This method is effective only if the evaluation package is loaded.
+	 * @param evaluatorName evaluator name.
+	 * @return a request for retrieving evaluator.
+	 */
+	Request createGetEvaluatorRequest(String evaluatorName);
 
 
 }

@@ -347,6 +347,9 @@ public class Delegator extends AbstractDelegator {
 			
 			else if (action.equals(GET_SNAPSHOT))
 				return Response.create(service.getSnapshot());
+			
+			else if (action.equals(GET_EVALUATOR))
+				return Response.create(service.getEvaluator(request.evaluatorName)); //This method is effective only if the evaluation package is loaded.
 		}
 		catch (Throwable e) {
 			e.printStackTrace();

@@ -40,7 +40,7 @@ import net.hudup.core.alg.ui.AlgListChooser;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.DatasetPair;
 import net.hudup.core.data.DatasetPool;
-import net.hudup.core.evaluate.AbstractEvaluator;
+import net.hudup.core.evaluate.Evaluator;
 import net.hudup.core.evaluate.EvaluatorEvent;
 import net.hudup.core.evaluate.EvaluatorEvent.Type;
 import net.hudup.core.evaluate.EvaluatorProgressEvent;
@@ -214,10 +214,16 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 	 * Constructor with specified evaluator.
 	 * @param evaluator specified evaluator.
 	 */
-	public BatchEvaluateGUI(AbstractEvaluator evaluator) {
+	public BatchEvaluateGUI(Evaluator evaluator) {
 		super(evaluator);
 		// TODO Auto-generated constructor stub
-		algRegTable.copy(evaluator.extractAlgFromPluginStorage());
+		try {
+			algRegTable.copy(evaluator.extractAlgFromPluginStorage());
+		}
+		catch (Throwable e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		pool = new DatasetPool();
 		
 		setLayout(new BorderLayout(2, 2));
@@ -246,10 +252,15 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 	
 	@Override
 	public void pluginChanged() {
-		algRegTable.clear();
-		algRegTable.copy(evaluator.extractAlgFromPluginStorage());
-		this.lbAlgs.update(algRegTable.getAlgList());
-		updateMode();
+		try {
+			algRegTable.clear();
+			algRegTable.copy(evaluator.extractAlgFromPluginStorage());
+			this.lbAlgs.update(algRegTable.getAlgList());
+			updateMode();
+		}
+		catch (Throwable e) {
+			e.printStackTrace();
+		}
 	}
 
 	
@@ -281,11 +292,16 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 				if (evaluator == null || algRegTable == null)
 					return;
 				
-				List<Alg> list = evt.getAlgList();
-				for (Alg alg : list) {
-					if (!evaluator.acceptAlg(alg)) continue;
-					if (!algRegTable.contains(alg.getName()))
-						algRegTable.register(alg);
+				try {
+					List<Alg> list = evt.getAlgList();
+					for (Alg alg : list) {
+						if (!evaluator.acceptAlg(alg)) continue;
+						if (!algRegTable.contains(alg.getName()))
+							algRegTable.register(alg);
+					}
+				}
+				catch (Throwable e) {
+					e.printStackTrace();
 				}
 			}
 		});
@@ -766,62 +782,71 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 
 	@Override
 	protected void refresh() {
-		if (evaluator.isStarted())
-			return;
-		
-		this.pool.reload();
-
-		tblDatasetPool.update(pool);
-		clearResult();
-		updateMode();
-		
-		updateGUI();
+		try {
+			if (evaluator.getController().isStarted())
+				return;
+			
+			this.pool.reload();
+	
+			tblDatasetPool.update(pool);
+			clearResult();
+			updateMode();
+			
+			updateGUI();
+		}
+		catch (Throwable e) {
+			e.printStackTrace();
+		}
 	}
 	
 	
 	@Override
 	protected void clear() {
-		if (evaluator.isStarted())
-			return;
-		
-		this.pool.clear();
-		this.tblDatasetPool.update(this.pool);
-		this.lbAlgs.update(algRegTable.getAlgList());
-		
-		clearResult();
-		
-		updateMode();
-		updateGUI();
+		try {
+			if (evaluator.getController().isStarted())
+				return;
+			
+			this.pool.clear();
+			this.tblDatasetPool.update(this.pool);
+			this.lbAlgs.update(algRegTable.getAlgList());
+			
+			clearResult();
+			
+			updateMode();
+			updateGUI();
+		}
+		catch (Throwable e) {
+			e.printStackTrace();
+		}
 	}
 	
 
 	@Override
 	protected void run() {
-		if (evaluator.isStarted())
-			return;
-		
-		if (pool.size() == 0 || lbAlgs.getAlgList().size() == 0) {
-			JOptionPane.showMessageDialog(
-				getThis(), 
-				"Not load data set pool", 
-				"Not load data set pool", 
-				JOptionPane.WARNING_MESSAGE);
-			
-			return;
-		}
-		
-		clearResult();
 		try {
-			evaluator.evaluate(lbAlgs.getAlgList(), pool, null);
+			Evaluator.Controller controller = evaluator.getController();
+			if (controller.isStarted())
+				return;
+			
+			if (pool.size() == 0 || lbAlgs.getAlgList().size() == 0) {
+				JOptionPane.showMessageDialog(
+					getThis(), 
+					"Not load data set pool", 
+					"Not load data set pool", 
+					JOptionPane.WARNING_MESSAGE);
+				
+				return;
+			}
+			
+			clearResult();
+			controller.start(lbAlgs.getAlgList(), pool, null);
+			
+			counterClock.start();
+			updateMode();
 		}
 		catch (Throwable e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
-			logger.error("Error in evaluation");
 		}
-		
-		counterClock.start();
-		updateMode();
 	}
 
 	
@@ -976,86 +1001,93 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 	
 	@Override
 	protected void updateMode() {
-		closeIOChannels();
-		
-		if (lbAlgs.getAlgList().size() == 0) {
-			setInternalEnable(false);
-			setResultVisible(false);
+		try {
+			closeIOChannels();
 			
-			btnConfigAlgs.setEnabled(true);
-			
-			prgRunning.setMaximum(0);
-			prgRunning.setValue(0);
-			prgRunning.setVisible(false);
-		}
-		else if (pool.size() == 0) {
-			setInternalEnable(false);
-			setResultVisible(false);
-			
-			lbAlgs.setEnabled(true);
-			btnConfigAlgs.setEnabled(true);
-			btnAddDataset.setEnabled(true);
-			btnLoadBatchScript.setEnabled(true);
-			
-			prgRunning.setMaximum(0);
-			prgRunning.setValue(0);
-			prgRunning.setVisible(false);
-		}
-		else if (evaluator.isStarted()) {
-			if (evaluator.isRunning()) {
+			Evaluator.Controller controller = evaluator.getController();
+
+			if (lbAlgs.getAlgList().size() == 0) {
 				setInternalEnable(false);
 				setResultVisible(false);
 				
-				result = null;
-				tblMetrics.clear();
-				txtRunInfo.setText("");
-				btnPauseResume.setText("Pause");
-				btnPauseResume.setEnabled(true);
-				btnStop.setEnabled(true);
-				btnForceStop.setEnabled(true);
+				btnConfigAlgs.setEnabled(true);
 				
-				prgRunning.setVisible(true);
+				prgRunning.setMaximum(0);
+				prgRunning.setValue(0);
+				prgRunning.setVisible(false);
+			}
+			else if (pool.size() == 0) {
+				setInternalEnable(false);
+				setResultVisible(false);
+				
+				lbAlgs.setEnabled(true);
+				btnConfigAlgs.setEnabled(true);
+				btnAddDataset.setEnabled(true);
+				btnLoadBatchScript.setEnabled(true);
+				
+				prgRunning.setMaximum(0);
+				prgRunning.setValue(0);
+				prgRunning.setVisible(false);
+			}
+			else if (controller.isStarted()) {
+				if (controller.isRunning()) {
+					setInternalEnable(false);
+					setResultVisible(false);
+					
+					result = null;
+					tblMetrics.clear();
+					txtRunInfo.setText("");
+					btnPauseResume.setText("Pause");
+					btnPauseResume.setEnabled(true);
+					btnStop.setEnabled(true);
+					btnForceStop.setEnabled(true);
+					
+					prgRunning.setVisible(true);
+				}
+				else {
+					setInternalEnable(false);
+					setResultVisible(true);
+					
+					btnPauseResume.setText("Resume");
+					btnPauseResume.setEnabled(true);
+					btnStop.setEnabled(true);
+					btnForceStop.setEnabled(true);
+					txtRunInfo.setEnabled(true);
+					chkSave.setEnabled(true);
+					chkDisplay.setEnabled(true);
+					
+					tblMetrics.update(result);
+				}
 			}
 			else {
-				setInternalEnable(false);
+				setInternalEnable(true);
 				setResultVisible(true);
 				
-				btnPauseResume.setText("Resume");
-				btnPauseResume.setEnabled(true);
-				btnStop.setEnabled(true);
-				btnForceStop.setEnabled(true);
-				txtRunInfo.setEnabled(true);
-				chkSave.setEnabled(true);
-				chkDisplay.setEnabled(true);
+				btnPauseResume.setText("Pause");
+				btnPauseResume.setEnabled(false);
+				btnStop.setEnabled(false);
+				btnForceStop.setEnabled(false);
 				
 				tblMetrics.update(result);
+				prgRunning.setMaximum(0);
+				prgRunning.setValue(0);
+				prgRunning.setVisible(false);
 			}
-		}
-		else {
-			setInternalEnable(true);
-			setResultVisible(true);
 			
-			btnPauseResume.setText("Pause");
-			btnPauseResume.setEnabled(false);
-			btnStop.setEnabled(false);
-			btnForceStop.setEnabled(false);
+			if (chkSave.isSelected() && (txtSaveBrowse.getText() == null || txtSaveBrowse.getText().isEmpty()))
+				chkSave.setSelected(false);
+	
+			if (result == null)
+				statusBar.clearText();
 			
-			tblMetrics.update(result);
-			prgRunning.setMaximum(0);
-			prgRunning.setValue(0);
-			prgRunning.setVisible(false);
+			this.statusBar.setTextPane0( 
+					evaluator.getName() + " - " + 
+					(chkDisplay.isSelected() ? getMessage("display") : getMessage("undisplay"))
+				);
 		}
-		
-		if (chkSave.isSelected() && (txtSaveBrowse.getText() == null || txtSaveBrowse.getText().isEmpty()))
-			chkSave.setSelected(false);
-
-		if (result == null)
-			statusBar.clearText();
-		
-		this.statusBar.setTextPane0( 
-				evaluator.getName() + " - " + 
-				(chkDisplay.isSelected() ? getMessage("display") : getMessage("undisplay"))
-			);
+		catch (Throwable e) {
+			e.printStackTrace();
+		}
 	}
 	
 	
@@ -1120,29 +1152,29 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 	 * Load batch script.
 	 */
 	protected void loadBatchScript() {
-		if (evaluator.isStarted() || this.lbAlgs.getAlgList().size() == 0)
-			return;
-		
-		UriAdapter adapter = new UriAdapter();
-		xURI uri = adapter.chooseUri(
-				this, 
-				true, 
-				new String[] {"properties", "script", "hudup"}, 
-				new String[] {"Properties files", "Script files", "Hudup files"},
-				null,
-				null);
-		adapter.close();
-		
-		if (uri == null) {
-			JOptionPane.showMessageDialog(
-					this, 
-					"URI not open", 
-					"URI not open", 
-					JOptionPane.ERROR_MESSAGE);
-			return;
-		}
-		
 		try {
+			if (evaluator.getController().isStarted() || this.lbAlgs.getAlgList().size() == 0)
+				return;
+			
+			UriAdapter adapter = new UriAdapter();
+			xURI uri = adapter.chooseUri(
+					this, 
+					true, 
+					new String[] {"properties", "script", "hudup"}, 
+					new String[] {"Properties files", "Script files", "Hudup files"},
+					null,
+					null);
+			adapter.close();
+			
+			if (uri == null) {
+				JOptionPane.showMessageDialog(
+						this, 
+						"URI not open", 
+						"URI not open", 
+						JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+			
 			adapter = new UriAdapter(uri);
 			Reader reader = adapter.getReader(uri);
 			BatchScript script = BatchScript.parse(reader, evaluator.getMainUnit());
@@ -1188,7 +1220,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			
 			updateGUI();
 		}
-		catch (Exception e) {
+		catch (Throwable e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
@@ -1200,14 +1232,19 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 	 * Adding dataset.
 	 */
 	protected void addDataset() {
-		if (evaluator.isStarted() || this.lbAlgs.getAlgList().size() == 0)
-			return;
-		
-		new AddingDatasetDlg(this, pool, this.lbAlgs.getAlgList(), evaluator.getMainUnit());
-		this.tblDatasetPool.update(this.pool);
-		
-		clearResult();
-		updateMode();
+		try {
+			if (evaluator.getController().isStarted() || this.lbAlgs.getAlgList().size() == 0)
+				return;
+			
+			new AddingDatasetDlg(this, pool, this.lbAlgs.getAlgList(), evaluator.getMainUnit());
+			this.tblDatasetPool.update(this.pool);
+			
+			clearResult();
+			updateMode();
+		}
+		catch (Throwable e) {
+			e.printStackTrace();
+		}
 	}
 
 

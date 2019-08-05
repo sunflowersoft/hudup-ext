@@ -1,5 +1,6 @@
 package net.hudup.evaluate;
 
+import java.rmi.RemoteException;
 import java.util.Set;
 
 import net.hudup.core.alg.RecommendParam;
@@ -52,7 +53,13 @@ public class EstimateEvaluator extends RecommendEvaluator {
 		
 		Thread current = Thread.currentThread();
 		for (int i = 0; i < algList.size() && current == thread; i++) {
-			if (!acceptAlg(algList.get(i))) continue;
+			try {
+				if (!acceptAlg(algList.get(i))) continue;
+			} catch (Throwable e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				continue;
+			}
 			Recommender recommender = (Recommender)algList.get(i);
 			
 			for (int j = 0; j < pool.size() && current == thread; j++) {
@@ -248,7 +255,7 @@ public class EstimateEvaluator extends RecommendEvaluator {
 
 
 	@Override
-	public NoneWrapperMetricList defaultMetrics() {
+	public NoneWrapperMetricList defaultMetrics() throws RemoteException {
 		// TODO Auto-generated method stub
 		NoneWrapperMetricList metricList = new NoneWrapperMetricList();
 		
@@ -282,7 +289,7 @@ public class EstimateEvaluator extends RecommendEvaluator {
 
 	
 	@Override
-	public String getName() {
+	public String getName() throws RemoteException {
 		// TODO Auto-generated method stub
 		return "Estimation Evaluator";
 	}

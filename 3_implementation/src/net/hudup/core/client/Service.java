@@ -17,6 +17,7 @@ import net.hudup.core.data.Profile;
 import net.hudup.core.data.Rating;
 import net.hudup.core.data.RatingVector;
 import net.hudup.core.data.Snapshot;
+import net.hudup.core.evaluate.Evaluator;
 
 /**
  * Service interface specifies methods to serve user requests. These methods focus on providing recommendation, inserting, updating and getting information such as user ratings, user profiles, and item profiles stored in database.
@@ -586,5 +587,14 @@ public interface Service extends Remote {
 	 */
 	Snapshot getSnapshot() throws RemoteException;
 	
+
+	/**
+	 * Getting evaluator with specified evaluator name. This method is effective only if the evaluation package is loaded.
+	 * @param evaluatorName evaluator name.
+	 * @return evaluator.
+	 * @throws RemoteException if any error raises.
+	 */
+	Evaluator getEvaluator(String evaluatorName) throws RemoteException;
+
 
 }

@@ -11,7 +11,7 @@ import sun.misc.BASE64Encoder;
 
 
 /**
- * This utility class provides methods of encryption and dercyption.
+ * This utility class provides methods of encryption and decryption.
  * It also contains the secret key for encrypting internal information of Hudup framework.
  * 
  * @author Loc Nguyen

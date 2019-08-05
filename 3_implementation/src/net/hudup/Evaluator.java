@@ -24,7 +24,6 @@ import net.hudup.core.logistic.SystemUtil;
 import net.hudup.core.logistic.ui.StartDlg;
 import net.hudup.evaluate.ui.EvalCompoundGUI;
 
-
 /**
  * 
  * @author Loc Nguyen
@@ -59,7 +58,7 @@ public class Evaluator implements AccessPoint {
 		if (args != null && args.length > 0) {
 			String evClassName = args[0];
 			try {
-				net.hudup.core.evaluate.AbstractEvaluator ev = (net.hudup.core.evaluate.AbstractEvaluator)Class.forName(evClassName).newInstance();
+				net.hudup.core.evaluate.Evaluator ev = (net.hudup.core.evaluate.Evaluator)Class.forName(evClassName).newInstance();
 				run0(ev);
 				return;
 			}
@@ -69,7 +68,7 @@ public class Evaluator implements AccessPoint {
 			}
 		}
 		
-		List<net.hudup.core.evaluate.AbstractEvaluator> evList = SystemUtil.getInstances(ROOT_PACKAGE, net.hudup.core.evaluate.AbstractEvaluator.class);
+		List<net.hudup.core.evaluate.Evaluator> evList = SystemUtil.getInstances(ROOT_PACKAGE, net.hudup.core.evaluate.Evaluator.class);
 		if (evList.size() == 0) {
 			JOptionPane.showMessageDialog(
 					null, 
@@ -79,20 +78,33 @@ public class Evaluator implements AccessPoint {
 			return;
 		}
 		
-		Collections.sort(evList, new Comparator<net.hudup.core.evaluate.AbstractEvaluator>() {
+		Collections.sort(evList, new Comparator<net.hudup.core.evaluate.Evaluator>() {
 
 			@Override
-			public int compare(net.hudup.core.evaluate.AbstractEvaluator o1, net.hudup.core.evaluate.AbstractEvaluator o2) {
+			public int compare(net.hudup.core.evaluate.Evaluator o1, net.hudup.core.evaluate.Evaluator o2) {
 				// TODO Auto-generated method stub
-				return o1.getName().compareTo(o2.getName());
+				try {
+					return o1.getName().compareTo(o2.getName());
+				}
+				catch (Throwable e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					return -1;
+				}
 			}
 		});
 		
-		net.hudup.core.evaluate.AbstractEvaluator initialEv = null;
-		for (net.hudup.core.evaluate.AbstractEvaluator ev : evList) {
-			if (ev.getName().equals("Recommendation")) {
-				initialEv = ev;
-				break;
+		net.hudup.core.evaluate.Evaluator initialEv = null;
+		for (net.hudup.core.evaluate.Evaluator ev : evList) {
+			try {
+				if (ev.getName().equals("Recommendation")) {
+					initialEv = ev;
+					break;
+				}
+			}
+			catch (Throwable e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 		}
 		
@@ -106,7 +118,7 @@ public class Evaluator implements AccessPoint {
 			@Override
 			protected void start() {
 				// TODO Auto-generated method stub
-				final net.hudup.core.evaluate.AbstractEvaluator ev = (net.hudup.core.evaluate.AbstractEvaluator) getItemControl().getSelectedItem();
+				final net.hudup.core.evaluate.Evaluator ev = (net.hudup.core.evaluate.Evaluator) getItemControl().getSelectedItem();
 				dispose();
 				run0(ev);
 			}
@@ -114,7 +126,7 @@ public class Evaluator implements AccessPoint {
 			@Override
 			protected JComboBox<?> createItemControl() {
 				// TODO Auto-generated method stub
-				return new JComboBox<net.hudup.core.evaluate.AbstractEvaluator>(evList.toArray(new net.hudup.core.evaluate.AbstractEvaluator[0]));
+				return new JComboBox<net.hudup.core.evaluate.Evaluator>(evList.toArray(new net.hudup.core.evaluate.Evaluator[0]));
 			}
 			
 			@Override
@@ -137,36 +149,37 @@ public class Evaluator implements AccessPoint {
 	 * Staring the particular evaluator selected by user.
 	 * @param ev particular evaluator selected by user.
 	 */
-	private void run0(net.hudup.core.evaluate.AbstractEvaluator ev) {
-		RegisterTable algReg = ev.extractAlgFromPluginStorage();
-		if (algReg.size() == 0) {
-			JOptionPane.showMessageDialog(null, 
-					"There is no registered algorithm.\nProgramm not run", 
-					"No algorithm", JOptionPane.INFORMATION_MESSAGE);
-			return;
-		}
-		
-		RegisterTable parserReg = PluginStorage.getParserReg();
-		if (parserReg.size() == 0) {
-			JOptionPane.showMessageDialog(null, 
-					"There is no registered dataset parser.\n Programm not run", 
-					"No dataset parser", JOptionPane.INFORMATION_MESSAGE);
-			return;
-		}
-		
-		RegisterTable metricReg = PluginStorage.getMetricReg();
-		NoneWrapperMetricList metricList = ev.defaultMetrics();
-		for (int i = 0; i < metricList.size(); i++) {
-			Metric metric = metricList.get(i);
-			if(!(metric instanceof MetaMetric))
-				continue;
-			metricReg.unregister(metric.getName());
-			
-			boolean registered = metricReg.register(metric);
-			if (registered)
-				logger.info("Registered algorithm: " + metricList.get(i).getName());
-		}
+	private void run0(net.hudup.core.evaluate.Evaluator ev) {
 		try {
+			RegisterTable algReg = ev.extractAlgFromPluginStorage();
+			if (algReg == null || algReg.size() == 0) {
+				JOptionPane.showMessageDialog(null, 
+						"There is no registered algorithm.\nProgramm not run", 
+						"No algorithm", JOptionPane.INFORMATION_MESSAGE);
+				return;
+			}
+			
+			RegisterTable parserReg = PluginStorage.getParserReg();
+			if (parserReg.size() == 0) {
+				JOptionPane.showMessageDialog(null, 
+						"There is no registered dataset parser.\n Programm not run", 
+						"No dataset parser", JOptionPane.INFORMATION_MESSAGE);
+				return;
+			}
+			
+			RegisterTable metricReg = PluginStorage.getMetricReg();
+			NoneWrapperMetricList metricList = ev.defaultMetrics();
+			for (int i = 0; i < metricList.size(); i++) {
+				Metric metric = metricList.get(i);
+				if(!(metric instanceof MetaMetric))
+					continue;
+				metricReg.unregister(metric.getName());
+				
+				boolean registered = metricReg.register(metric);
+				if (registered)
+					logger.info("Registered algorithm: " + metricList.get(i).getName());
+			}
+
 			new EvalCompoundGUI(ev.getClass().newInstance());
 		}
 		catch (Exception e) {
