@@ -1,5 +1,6 @@
 package net.hudup.logistic.math;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -15,8 +16,15 @@ import net.hudup.data.bit.BitDataUtil;
  * @author Loc Nguyen
  * @version 10.0
  */
-public class BinaryProbItemMatrix {
+public class BinaryProbItemMatrix implements Serializable {
 	
+	
+	/**
+	 * Default serial version UID.
+	 */
+	private static final long serialVersionUID = 1L;
+
+
 	/**
 	 * Items are translated into bit items. 
 	 * For example: item 1 with rating 4 is translated into 9.

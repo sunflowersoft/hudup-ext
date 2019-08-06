@@ -1,5 +1,6 @@
 package net.hudup.logistic.math;
 
+import java.io.Serializable;
 import java.util.BitSet;
 import java.util.List;
 import java.util.Map;
@@ -17,16 +18,28 @@ import net.hudup.data.bit.BitItem;
  * @author Loc Nguyen
  * @version 10.0
  */
-public class BinaryAndNotProbItemMatrix {
+public class BinaryAndNotProbItemMatrix implements Serializable {
 
 	
+	/**
+	 * Default serial version UID.
+	 */
+	private static final long serialVersionUID = 1L;
+
+
 	/**
 	 * 
 	 * @author Loc Nguyen
 	 * @version 10.0
 	 */
-	public class Prob {
+	public class Prob implements Serializable {
 		
+		/**
+		 * Default serial version UID.
+		 */
+		private static final long serialVersionUID = 1L;
+
+
 		/**
 		 * 
 		 */

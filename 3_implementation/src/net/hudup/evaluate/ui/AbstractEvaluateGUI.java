@@ -25,6 +25,8 @@ import net.hudup.core.evaluate.EvaluatorProgressListener;
 import net.hudup.core.evaluate.Metric;
 import net.hudup.core.evaluate.Metrics;
 import net.hudup.core.logistic.I18nUtil;
+import net.hudup.core.logistic.NetUtil;
+import net.hudup.core.logistic.NetUtil.RegistryRemote;
 import net.hudup.core.logistic.UriAdapter.AdapterWriteChannel;
 import net.hudup.core.logistic.xURI;
 import net.hudup.core.logistic.ui.CounterClock;
@@ -106,10 +108,27 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	
 	
 	/**
+	 * Remote bind URI.
+	 */
+	protected xURI bindUri = null;
+	
+	
+	/**
+	 * Remote registry.
+	 */
+	protected RegistryRemote registry = null;
+	
+	
+	/**
 	 * Constructor with specified evaluator.
 	 * @param evaluator specified evaluator.
+	 * @param bindUri bound URI.
 	 */
-	public AbstractEvaluateGUI(Evaluator evaluator) {
+	public AbstractEvaluateGUI(Evaluator evaluator, xURI bindUri) {
+		this.bindUri = bindUri;
+		if (bindUri != null)
+			this.registry = NetUtil.RegistryRemote.registerExport(this, bindUri);
+
 		setupListeners(evaluator);
 		
 		this.evaluator = evaluator;
@@ -311,11 +330,23 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	 * Dispose this GUI.
 	 */
 	public void dispose() {
-		stop();
-		clear();
-		closeIOChannels();
-
-		unsetupListeners(this.evaluator);
+		try {
+			stop();
+			clear();
+			closeIOChannels();
+	
+			unsetupListeners(this.evaluator);
+			
+			this.evaluator.remoteUnexport();
+			
+			if (this.registry != null) {
+				NetUtil.RegistryRemote.unregisterUnexport(this.registry.getRegistry(), this);
+				this.registry = null;
+			}
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
 	

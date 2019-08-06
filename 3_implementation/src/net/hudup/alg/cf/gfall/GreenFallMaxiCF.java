@@ -4,6 +4,7 @@
 package net.hudup.alg.cf.gfall;
 
 import net.hudup.core.alg.Alg;
+import net.hudup.core.logistic.NextUpdate;
 
 
 /**
@@ -11,6 +12,7 @@ import net.hudup.core.alg.Alg;
  * @version 10.0
  *
  */
+@NextUpdate
 public class GreenFallMaxiCF extends GreenFallCF {
 
 	

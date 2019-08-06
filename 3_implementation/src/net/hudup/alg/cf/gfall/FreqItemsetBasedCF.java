@@ -87,19 +87,22 @@ public abstract class FreqItemsetBasedCF extends ModelBasedCF {
 	 * @version 10.0
 	 *
 	 */
-	protected class Estimate {
+	protected class Estimate implements Serializable {
 		
+		/**
+		 * Default serial version UID.
+		 */
+		private static final long serialVersionUID = 1L;
+
 		/**
 		 * Result of frequent bit itemset, represented by {@link FreqResult}.
 		 */
 		public FreqResult freq = null;
 		
-		
 		/**
 		 * Result of recommendation as a list of recommended items represented by {@link RatingVector}.
 		 */
 		public RatingVector result = null;
-		
 		
 		/**
 		 * Constructor with specified result of frequent bit itemset and specified result of recommendation.
@@ -652,13 +655,11 @@ abstract class FreqItemsetKB extends KBaseAbstract {
 	protected static FreqItemsetKB create(final FreqItemsetBasedCF cf) {
 		return new FreqItemsetKB() {
 
-			
 			/**
 			 * Serial version UID for serializable class. 
 			 */
 			private static final long serialVersionUID = 1L;
 
-			
 			@Override
 			public String getName() {
 				// TODO Auto-generated method stub
@@ -797,9 +798,15 @@ class FreqResult implements TextParsable, Serializable {
  * @version 10.0
  *
  */
-class FreqResultMinMax {
+class FreqResultMinMax implements Serializable {
 	
 	
+	/**
+	 * Default serial version UID.
+	 */
+	private static final long serialVersionUID = 1L;
+
+
 	/**
 	 * Minimum frequent result containing minimum frequent bit itemset.
 	 */

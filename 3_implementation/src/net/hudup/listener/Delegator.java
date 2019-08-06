@@ -252,13 +252,13 @@ public class Delegator extends AbstractDelegator {
 				return Response.create(service.deleteRating(request.rating_vector));
 
 			else if (action.equals(GET_USERIDS))
-				return Response.create3(new MemFetcher<Integer>(service.getUserIds(), true));
+				return Response.createIdFetcher(new MemFetcher<Integer>(service.getUserIds(), true));
 
 			else if (action.equals(GET_USER_RATING))
 				return Response.create(service.getUserRating(request.userid));
 			
 			else if (action.equals(GET_USER_RATINGS))
-				return Response.create(service.getUserRatings());
+				return Response.createRatingVectorFetcher(service.getUserRatings());
 			
 			else if (action.equals(DELETE_USER_RATING))
 				return Response.create(service.deleteUserRating(request.userid));
@@ -270,7 +270,7 @@ public class Delegator extends AbstractDelegator {
 				return Response.create(service.getUserProfileByExternal(request.external_userid));
 
 			else if (action.equals(GET_USER_PROFILES))
-				return Response.create2(service.getUserProfiles());
+				return Response.createProfileFetcher(service.getUserProfiles());
 			
 			else if (action.equals(GET_USER_ATTRIBUTE_LIST))
 				return Response.create(service.getUserAttributeList());
@@ -285,13 +285,13 @@ public class Delegator extends AbstractDelegator {
 				return Response.create(service.getUserExternalRecord(request.userid));
 
 			else if (action.equals(GET_ITEMIDS))
-				return Response.create3(new MemFetcher<Integer>(service.getItemIds(), true));
+				return Response.createIdFetcher(new MemFetcher<Integer>(service.getItemIds(), true));
 			
 			else if (action.equals(GET_ITEM_RATING))
 				return Response.create(service.getItemRating(request.itemid));
 			
 			else if (action.equals(GET_ITEM_RATINGS))
-				return Response.create(service.getItemRatings());
+				return Response.createRatingVectorFetcher(service.getItemRatings());
 			
 			else if (action.equals(DELETE_ITEM_RATING))
 				return Response.create(service.deleteItemRating(request.itemid));
@@ -303,7 +303,7 @@ public class Delegator extends AbstractDelegator {
 				return Response.create(service.getItemProfileByExternal(request.external_itemid));
 
 			else if (action.equals(GET_ITEM_PROFILES))
-				return Response.create2(service.getItemProfiles());
+				return Response.createProfileFetcher(service.getItemProfiles());
 			
 			else if (action.equals(GET_ITEM_ATTRIBUTE_LIST))
 				return Response.create(service.getItemAttributeList());
@@ -349,7 +349,10 @@ public class Delegator extends AbstractDelegator {
 				return Response.create(service.getSnapshot());
 			
 			else if (action.equals(GET_EVALUATOR))
-				return Response.create(service.getEvaluator(request.evaluatorName)); //This method is effective only if the evaluation package is loaded.
+				return Response.create(service.getEvaluator(request.evaluatorName));
+			
+			else if (action.equals(GET_EVALUATOR_NAMES))
+				return Response.create(service.getEvaluatorNames());
 		}
 		catch (Throwable e) {
 			e.printStackTrace();

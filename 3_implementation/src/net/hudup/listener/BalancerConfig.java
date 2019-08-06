@@ -92,7 +92,7 @@ public class BalancerConfig extends ListenerConfig {
 		
 		setServerPort(Constants.DEFAULT_BALANCER_PORT);
 		setServerTimeout(Constants.DEFAULT_SERVER_TIMEOUT);
-		setServerTaskPeriod(Constants.DEFAULT_LISTENER_TASK_PERIOD);
+		setServerTasksPeriod(Constants.DEFAULT_LISTENER_TASK_PERIOD);
 		
 		clearRemoteInfoList();
 		RemoteInfo rInfo = 

@@ -3,6 +3,7 @@
  */
 package net.hudup.data.bit;
 
+import java.io.Serializable;
 import java.util.BitSet;
 import java.util.Collection;
 import java.util.Collections;
@@ -27,9 +28,15 @@ import net.hudup.core.logistic.MinMax;
  * @version 10.0
  *
  */
-public class BitData implements Cloneable, net.hudup.core.data.AutoCloseable {
+public class BitData implements Cloneable, net.hudup.core.data.AutoCloseable, Serializable {
 	
 	
+	/**
+	 * Default serial version UID.
+	 */
+	private static final long serialVersionUID = 1L;
+
+
 	/**
 	 * Items are translated into bit items. 
 	 * For example: item 1 with rating 4 is translated into 9.

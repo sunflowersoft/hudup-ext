@@ -63,10 +63,12 @@ import net.hudup.data.ui.TxtOutput;
 
 /**
  * This class represents a graphic user interface (GUI) for {@link AbstractEvaluator} with a pair of training dataset and testing dataset.
+ * This class is deprecated because it is less useful than the batch evaluator.
  * 
  * @author Loc Nguyen
  * @version 10.0
  */
+@Deprecated
 public class EvaluateGUI extends AbstractEvaluateGUI {
 	
 
@@ -122,9 +124,10 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 	/**
 	 * Constructor with specified evaluator.
 	 * @param evaluator specified evaluator.
+	 * @param bindUri bound URI.
 	 */
-	public EvaluateGUI(Evaluator evaluator) {
-		super(evaluator);
+	public EvaluateGUI(Evaluator evaluator, xURI bindUri) {
+		super(evaluator, bindUri);
 		try {
 			algRegTable.copy(evaluator.extractAlgFromPluginStorage());
 		}
@@ -919,7 +922,8 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 		}
 		
 		
-		this.result = evt.getEvaluator().getResult();
+		//this.result = evt.getEvaluator().getResult();
+		this.result = evaluator.getResult(); //Fix bug date: 2019.08.06 by Loc Nguyen.
 		if (evt.getType() == Type.done) {
 			counterClock.stop();
 			updateMode();

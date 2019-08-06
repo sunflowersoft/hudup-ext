@@ -31,31 +31,31 @@ public class PowerServerConfig extends ServerConfig {
 
 
 	/**
-	 * 
+	 * Server configuration path.
 	 */
 	public final static String serverConfig = Constants.WORKING_DIRECTORY + "/serverconfig.xml";
 	
 	
 	/**
-	 * 
+	 * Sample data path.
 	 */
 	public final static String  TEMPLATES_SAMPLE_DATA = Constants.TEMPLATES_PACKAGE + "hudup_sample_data.zip";
 	
 
 	/**
-	 * 
+	 * Server recommender field.
 	 */
 	public final static String SERVER_RECOMMENDER_FIELD = changeCase("server_recommender");
 
 	
 	/**
-	 * 
+	 * Server parser.
 	 */
 	public final static String SERVER_PARSER_FIELD = changeCase("server_parser");
 	
 	
 	/**
-	 * 
+	 * Default constructor.
 	 */
 	public PowerServerConfig() {
 		super();
@@ -64,8 +64,8 @@ public class PowerServerConfig extends ServerConfig {
 
 
 	/**
-	 * 
-	 * @param uri
+	 * Constructor with URI.
+	 * @param uri specified URI.
 	 */
 	public PowerServerConfig(xURI uri) {
 		super(uri);
@@ -94,8 +94,8 @@ public class PowerServerConfig extends ServerConfig {
 
 	
 	/**
-	 * 
-	 * @return server recommender {@link Recommender}
+	 * Getting recommender.
+	 * @return server recommender {@link Recommender}.
 	 */
 	public Recommender getRecommender() {
 		return (Recommender) get(SERVER_RECOMMENDER_FIELD);
@@ -103,8 +103,8 @@ public class PowerServerConfig extends ServerConfig {
 	
 	
 	/**
-	 * 
-	 * @param recommender Server recommender {@link Recommender}
+	 * Setting recommender.
+	 * @param recommender Server recommender {@link Recommender}.
 	 */
 	public void setRecommender(Recommender recommender) {
 		if (recommender != null)
@@ -136,7 +136,5 @@ public class PowerServerConfig extends ServerConfig {
 		return cfg;
 	}
 
-	
-	
 	
 }

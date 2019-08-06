@@ -1,5 +1,7 @@
 package net.hudup.core.logistic;
 
+import java.io.Serializable;
+
 /**
  * This class is similar to {@link xURI} except that the scheme inside the path of {@link xSubURI} is simplest.
  * For example, given a JDBC MySQL connection string &quot;jdbc:mysql://localhost:3306/hudup&quot;, specified fully by {@link xURI}, in which the whole complex scheme is &quot;jdbc:mysql&quot;.
@@ -10,9 +12,15 @@ package net.hudup.core.logistic;
  * @version 10.0
  *
  */
-public class xSubURI {
+public class xSubURI implements Serializable {
 	
 	
+	/**
+	 * Default serial version UID.
+	 */
+	private static final long serialVersionUID = 1L;
+
+
 	/**
 	 * The whole complex scheme, for example, &quot;jdbc:mysql&quot;.
 	 */

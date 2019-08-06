@@ -1,6 +1,7 @@
 package net.hudup.data;
 
 import java.io.Reader;
+import java.io.Serializable;
 import java.io.Writer;
 import java.util.List;
 
@@ -22,9 +23,15 @@ import net.hudup.core.parser.TextParserUtil;
  * @author Loc Nguyen
  * @version 10.0
  */
-public class BatchScript {
+public class BatchScript implements Serializable {
 
 	
+	/**
+	 * Default serial version UID.
+	 */
+	private static final long serialVersionUID = 1L;
+
+
 	/**
 	 * Dataset pool.
 	 */

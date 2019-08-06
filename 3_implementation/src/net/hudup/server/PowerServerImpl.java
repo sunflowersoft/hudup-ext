@@ -388,7 +388,7 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 	private void createTimer() {
 		destroyTimer();
 		
-		int milisec = config.getServerTaskPeriod();
+		int milisec = config.getServerTasksPeriod();
 		if (milisec == 0)
 			return;
 		
@@ -433,9 +433,10 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 	 * Server can have some internal tasks when it is running. These tasks are specified by method {@link #serverTasks()} which in turn is called by this method.
 	 */
 	private synchronized void callServerTasks() throws RemoteException {
-		if (!isRunning())
-			return;
+		if (!isRunning()) return;
 
+		if (!config.isDoServerTasks()) return;
+		
 		try {
 			serverTasks();
 			logger.info("Server has done timer internal tasks");

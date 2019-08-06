@@ -18,6 +18,7 @@ import net.hudup.core.logistic.NextUpdate;
  *
  */
 @NextUpdate
+@Deprecated
 public abstract class BayesFunctionalHybrid extends ModelBasedCF {
 
 	
@@ -61,6 +62,7 @@ public abstract class BayesFunctionalHybrid extends ModelBasedCF {
  *
  */
 @NextUpdate
+@Deprecated
 abstract class BayesFunctionalHybridKB extends KBaseAbstract {
 
 	

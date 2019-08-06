@@ -687,6 +687,18 @@ public class SocketWrapper extends ProtocolImpl implements Service {
 	}
 
 
+	@Override
+	public String[] getEvaluatorNames() throws RemoteException {
+		// TODO Auto-generated method stub
+		Request request = createGetEvaluatorNamesRequest();
+		Response response = sendRequest(request);
+		if (response == null)
+			return null;
+		
+		return response.stringArray;
+	}
+
+
 	/**
 	 * Sending the quit request to server.
 	 * Quit request is the one that requires server to quit, which means that server will be stopped and removed from memory.

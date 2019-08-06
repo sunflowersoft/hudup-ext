@@ -5,6 +5,7 @@ import static net.hudup.core.Constants.ROOT_PACKAGE;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Image;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -24,10 +25,15 @@ import javax.swing.JTextArea;
 
 import org.apache.log4j.Logger;
 
+import net.hudup.core.Constants;
 import net.hudup.core.PluginChangedEvent;
 import net.hudup.core.PluginChangedListener;
 import net.hudup.core.PluginStorage;
 import net.hudup.core.RegisterTable;
+import net.hudup.core.client.ConnectServerDlg;
+import net.hudup.core.client.PowerServer;
+import net.hudup.core.client.Server;
+import net.hudup.core.client.Service;
 import net.hudup.core.evaluate.AbstractEvaluator;
 import net.hudup.core.evaluate.Evaluator;
 import net.hudup.core.evaluate.EvaluatorConfig;
@@ -36,6 +42,7 @@ import net.hudup.core.evaluate.Metric;
 import net.hudup.core.evaluate.NoneWrapperMetricList;
 import net.hudup.core.logistic.I18nUtil;
 import net.hudup.core.logistic.SystemUtil;
+import net.hudup.core.logistic.xURI;
 import net.hudup.core.logistic.ui.HelpContent;
 import net.hudup.core.logistic.ui.StartDlg;
 import net.hudup.core.logistic.ui.UIUtil;
@@ -43,7 +50,7 @@ import net.hudup.data.ui.SysConfigDlgExt;
 
 
 /**
- * This class represents the entire frame allowing users to interact fully with evaluator in single mode or batch mode.
+ * This class represents the entire frame allowing users to interact fully with evaluator.
  * 
  * @author Loc Nguyen
  * @version 10.0
@@ -70,47 +77,57 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 	
 	
 	/**
-	 * 
+	 * Body panel.
 	 */
 	private JTabbedPane body = null;
 	
 	
-	/**
-	 * 
-	 */
-	private EvaluateGUI evaluateGUI = null;
+//	/**
+//	 * Single mode evaluator GUI.
+//	 */
+//	@Deprecated
+//	private EvaluateGUI evaluateGUI = null;
 	
 	
 	/**
-	 * 
+	 * Batch mode evaluator GUI.
 	 */
 	private BatchEvaluateGUI batchEvaluateGUI = null;
 	
 	
 	/**
+	 * Bound URI.
+	 */
+	protected xURI bindUri = null;
+	
+	
+	/**
 	 * Constructor with specified evaluator.
 	 * @param evaluator specified {@link AbstractEvaluator}.
+	 * @param bindUri bound URI.
 	 */
-	public EvalCompoundGUI(Evaluator evaluator) {
+	public EvalCompoundGUI(Evaluator evaluator, xURI bindUri) {
 		super("Evaluator GUI");
 		try {
 			this.thisConfig = evaluator.getConfig();
+			this.thisConfig.setSaveAbility(bindUri == null); //Do not save remote configuration.
 		}
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			logger.error("Error in getting evaluator configuration");
 		}
+		this.bindUri = bindUri;
 		
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		addWindowListener(new WindowAdapter() {
 
 			@Override
-			public void windowClosing(WindowEvent e) {
+			public void windowClosed(WindowEvent e) {
 				// TODO Auto-generated method stub
-				super.windowClosing(e);
+				super.windowClosed(e);
 				
-				evaluateGUI.dispose();
+				//evaluateGUI.dispose(); //Single mode is removed. Fix bug date: August 6, 2019.
 				batchEvaluateGUI.dispose();
 				
 				thisConfig.save();
@@ -132,10 +149,11 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 		body = new JTabbedPane();
 		content.add(body, BorderLayout.CENTER);
 		
-		evaluateGUI = new EvaluateGUI(evaluator);
-		body.add(getMessage("evaluate"), evaluateGUI);
+//		 //Single mode is removed. Fix bug date: August 6, 2019.
+//		evaluateGUI = new EvaluateGUI(evaluator, bindUri);
+//		body.add(getMessage("evaluate"), evaluateGUI);
 		
-		batchEvaluateGUI = new BatchEvaluateGUI(evaluator);
+		batchEvaluateGUI = new BatchEvaluateGUI(evaluator, bindUri);
 		body.add(getMessage("evaluate_batch"), batchEvaluateGUI);
 		
 		setTitle(getMessage("evaluator"));
@@ -147,7 +165,7 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 	 * Getting this GUI.
 	 * @return this GUI.
 	 */
-	private EvalCompoundGUI getThis() {
+	private EvalCompoundGUI getThisEvalGUI() {
 		return this;
 	}
 	
@@ -197,7 +215,6 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 				 */
 				private static final long serialVersionUID = 1L;
 
-				
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					switchEvaluator();
@@ -220,7 +237,7 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					new HelpContent(getThis());
+					new HelpContent(getThisEvalGUI());
 				}
 			
 			});
@@ -238,7 +255,7 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 	private void switchEvaluator() {
 		if (!isIdle()) {
 			int confirm = JOptionPane.showConfirmDialog(
-					UIUtil.getFrameForComponent(getThis()), 
+					UIUtil.getFrameForComponent(getThisEvalGUI()), 
 					"Evaluation task will be terminated if switching evaluator.\n" +
 						"Are you sure to switch evaluator?", 
 					"Switching evaluator", 
@@ -249,6 +266,68 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 				return;
 		}
 	
+		try {
+			if (bindUri == null)
+				switchEvaluator(batchEvaluateGUI.getEvaluator().getName(), this);
+			else
+				switchRemoteEvaluator(batchEvaluateGUI.getEvaluator().getName(), this);
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	
+	/**
+	 * Show an dialog allowing users to see and modify the configuration of system.
+	 */
+	private void sysConfig() {
+		if (!isIdle()) {
+			JOptionPane.showMessageDialog(
+					getThisEvalGUI(), 
+					"Evaluatior is running.\n It is impossible to configure system", 
+					"Evaluatior is running", 
+					JOptionPane.WARNING_MESSAGE);
+			return;
+		}
+		
+		SysConfigDlgExt cfg = new SysConfigDlgExt(this, getMessage("system_configure"), this);
+		cfg.update(thisConfig);
+		cfg.setVisible(true);
+	}
+
+
+	@Override
+	public void pluginChanged(PluginChangedEvent evt) {
+		// TODO Auto-generated method stub
+//		evaluateGUI.pluginChanged(); //Single mode is removed. Fix bug date: August 6, 2019.
+		batchEvaluateGUI.pluginChanged();
+	}
+
+
+	@Override
+	public boolean isIdle() {
+		// TODO Auto-generated method stub
+		try {
+//			//Single mode is removed. Fix bug date: August 6, 2019.
+//			return !evaluateGUI.getEvaluator().remoteIsStarted() 
+//					&& !batchEvaluateGUI.getEvaluator().remoteIsStarted();
+			return !batchEvaluateGUI.getEvaluator().remoteIsStarted();
+		}
+		catch (Throwable e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return false;
+		}
+	}
+	
+	
+	/**
+	 * Switching evaluator.
+	 * @param selectedEvName selected evaluator name.
+	 * @param oldGUI old GUI.
+	 */
+	public static void switchEvaluator(String selectedEvName, Window oldGUI) {
 		List<Evaluator> evList = SystemUtil.getInstances(ROOT_PACKAGE, Evaluator.class);
 		if (evList.size() == 0) {
 			JOptionPane.showMessageDialog(
@@ -275,22 +354,23 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 			}
 		});
 		
-        AbstractEvaluateGUI evaluatorGUI = (AbstractEvaluateGUI) body.getSelectedComponent();
 		Evaluator initialEv = null;
-		for (Evaluator ev : evList) {
-			try {
-				if (ev.getName().equals(evaluatorGUI.getEvaluator().getName())) {
-					initialEv = ev;
-					break;
+		if (selectedEvName != null) {
+			for (Evaluator ev : evList) {
+				try {
+					if (ev.getName().equals(Constants.DEFAULT_EVALUATOR_NAME)) {
+						initialEv = ev;
+						break;
+					}
+				}
+				catch (Throwable e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
 			}
-			catch (Throwable e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
 		}
-        
-		final StartDlg dlgEvSwitcher = new StartDlg(this, "List of evaluators") {
+		
+		final StartDlg dlgEvStarter = new StartDlg((JFrame)null, "List of evaluators") {
 			
 			/**
 			 * Serial version UID for serializable class.
@@ -300,9 +380,11 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 			@Override
 			protected void start() {
 				// TODO Auto-generated method stub
-				Evaluator newEvaluator = (Evaluator) getItemControl().getSelectedItem();
+				final Evaluator ev = (Evaluator) getItemControl().getSelectedItem();
 				dispose();
-				switchEvaluator0(newEvaluator);
+				if (oldGUI != null) oldGUI.dispose();
+
+				run(ev, null, null);
 			}
 			
 			@Override
@@ -321,103 +403,111 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 		};
 		
 		if (initialEv != null)
-			dlgEvSwitcher.getItemControl().setSelectedItem(initialEv);
-		dlgEvSwitcher.setSize(400, 150);
-        dlgEvSwitcher.setVisible(true);
+			dlgEvStarter.getItemControl().setSelectedItem(initialEv);
+		dlgEvStarter.setSize(400, 150);
+        dlgEvStarter.setVisible(true);
 	}
 	
 	
 	/**
-	 * Switch to the new evaluator 
-	 * @param newEvaluator new evaluator.
+	 * Switching remote evaluator.
+	 * @param selectedEvName selected evaluator name.
+	 * @param oldGUI old GUI.
 	 */
-	private void switchEvaluator0(Evaluator newEvaluator) {
-		try {
-			RegisterTable algReg = newEvaluator.extractAlgFromPluginStorage();
-			if (algReg.size() == 0) {
-				JOptionPane.showMessageDialog(this, 
-						"There is no registered algorithm.\nProgramm not run", 
-						"No algorithm", JOptionPane.INFORMATION_MESSAGE);
-				return;
-			}
-			
-			RegisterTable parserReg = PluginStorage.getParserReg();
-			if (parserReg.size() == 0) {
-				JOptionPane.showMessageDialog(this, 
-						"There is no registered dataset parser.\n Programm not run", 
-						"No dataset parser", JOptionPane.INFORMATION_MESSAGE);
-				return;
-			}
-			
-			RegisterTable metricReg = PluginStorage.getMetricReg();
-			NoneWrapperMetricList metricList = newEvaluator.defaultMetrics();
-			for (int i = 0; i < metricList.size(); i++) {
-				Metric metric = metricList.get(i);
-				if(!(metric instanceof MetaMetric))
-					continue;
-				metricReg.unregister(metric.getName());
-				
-				boolean registered = metricReg.register(metric);
-				if (registered)
-					logger.info("Registered algorithm: " + metricList.get(i).getName());
-			}
-			
-			this.dispose();
-			new EvalCompoundGUI(newEvaluator.getClass().newInstance());
-		}
-		catch (Throwable e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-	
-	
-	/**
-	 * Show an dialog allowing users to see and modify the configuration of system.
-	 */
-	private void sysConfig() {
-		if (!isIdle()) {
+	public static void switchRemoteEvaluator(String selectedEvName, Window oldGUI) {
+		final ConnectServerDlg dlgConnect = new ConnectServerDlg();
+		Server server = dlgConnect.getServer();
+		if (server == null || !(server instanceof PowerServer)) {
 			JOptionPane.showMessageDialog(
-					getThis(), 
-					"Evaluatior is running.\n It is impossible to configure system", 
-					"Evaluatior is running", 
-					JOptionPane.WARNING_MESSAGE);
+					null, "Can't connect to server or server is not power server", "Connection to server fail", JOptionPane.ERROR_MESSAGE);
 			return;
 		}
 		
-		SysConfigDlgExt cfg = new SysConfigDlgExt(this, getMessage("system_configure"), this);
-		cfg.update(thisConfig);
-		cfg.setVisible(true);
-	}
-
-
-	@Override
-	public void pluginChanged(PluginChangedEvent evt) {
-		// TODO Auto-generated method stub
-		evaluateGUI.pluginChanged();
-		batchEvaluateGUI.pluginChanged();
-	}
-
-
-	@Override
-	public boolean isIdle() {
-		// TODO Auto-generated method stub
 		try {
-			return !evaluateGUI.getEvaluator().remoteIsStarted() 
-					&& !batchEvaluateGUI.getEvaluator().remoteIsStarted();
-		} catch (Throwable e) {
+			Service service = ((PowerServer)server).getService();
+			if (service == null) {
+				JOptionPane.showMessageDialog(
+						null, "Can't get remote service", "Connection to service fail", JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+			
+			String[] evNames = service.getEvaluatorNames();
+			if (evNames == null || evNames.length == 0) {
+				JOptionPane.showMessageDialog(
+						null, "No remote evaluator", "No remote evaluator", JOptionPane.INFORMATION_MESSAGE);
+				return;
+			}
+			
+			String initialEvName = null;
+			if (selectedEvName != null) {
+				for (String evName : evNames) {
+					if (evName.equals(selectedEvName)) {
+						initialEvName = evName;
+						break;
+					}
+				}
+			}
+			
+			final StartDlg dlgEvStarter = new StartDlg((JFrame)null, "List of evaluators") {
+				
+				/**
+				 * Serial version UID for serializable class.
+				 */
+				private static final long serialVersionUID = 1L;
+
+				@Override
+				protected void start() {
+					// TODO Auto-generated method stub
+					String evName = (String) getItemControl().getSelectedItem();
+					try {
+						final Evaluator ev = service.getEvaluator(evName);
+						dispose();
+						if (oldGUI != null) oldGUI.dispose();
+						
+						ev.getPluginStorage().assignToSystem(); //This code line is very important for initializing plug-in storage.
+						run(ev, dlgConnect.getBindUri(), null);
+					}
+					catch (Exception e) {
+						e.printStackTrace();
+						JOptionPane.showMessageDialog(
+								null, "Can't get remote evaluator", "Connection to evaluator fail", JOptionPane.ERROR_MESSAGE);
+					}
+				}
+				
+				@Override
+				protected JComboBox<?> createItemControl() {
+					// TODO Auto-generated method stub
+					return new JComboBox<String>(evNames);
+				}
+				
+				@Override
+				protected JTextArea createHelp() {
+					// TODO Auto-generated method stub
+					JTextArea toolkit = new JTextArea("Thank you for choosing evaluators");
+					toolkit.setEditable(false);
+					return toolkit;
+				}
+			};
+			
+			if (initialEvName != null)
+				dlgEvStarter.getItemControl().setSelectedItem(initialEvName);
+			dlgEvStarter.setSize(400, 150);
+	        dlgEvStarter.setVisible(true);
+		}
+		catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			return false;
 		}
 	}
-	
+
 	
 	/**
 	 * Staring the particular evaluator selected by user.
 	 * @param evaluator particular evaluator selected by user.
+	 * @param bindUri bound URI. If this parameter is null, evaluator is inside evaluator, otherwise it is remote evaluator.
+	 * @param oldGUI old GUI.
 	 */
-	public static void run(Evaluator evaluator) {
+	public static void run(Evaluator evaluator, xURI bindUri, Window oldGUI) {
 		try {
 			RegisterTable algReg = evaluator.extractAlgFromPluginStorage();
 			if (algReg == null || algReg.size() == 0) {
@@ -427,6 +517,7 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 				return;
 			}
 			
+			//PluginStorageWrapper.assignToSystem() must be called before.
 			RegisterTable parserReg = PluginStorage.getParserReg();
 			if (parserReg.size() == 0) {
 				JOptionPane.showMessageDialog(null, 
@@ -435,6 +526,7 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 				return;
 			}
 			
+			//PluginStorageWrapper.assignToSystem() must be called before.
 			RegisterTable metricReg = PluginStorage.getMetricReg();
 			NoneWrapperMetricList metricList = evaluator.defaultMetrics();
 			for (int i = 0; i < metricList.size(); i++) {
@@ -448,7 +540,8 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 					logger.info("Registered algorithm: " + metricList.get(i).getName());
 			}
 
-			new EvalCompoundGUI(evaluator);
+			if (oldGUI != null) oldGUI.dispose();
+			new EvalCompoundGUI(evaluator, bindUri);
 		}
 		catch (Exception e) {
 			// TODO Auto-generated catch block

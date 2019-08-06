@@ -121,6 +121,11 @@ public class Response extends ProtocolParam {
 	public String                    stringResult        = null;
 	
 	/**
+	 * Remote evaluator names.
+	 */
+	public String[]                  stringArray         = null;
+
+	/**
 	 * Result as rating vector.
 	 * Note, rating vector represented {@link RatingVector} contains ratings.
 	 * If rating vector is user rating vector, it contains all ratings of the same user on many items.
@@ -134,12 +139,11 @@ public class Response extends ProtocolParam {
 	 */
 	public ExternalRecord            externalRecord      = null;
 	
-	
 	/**
-	 * Remote evaluator.
+	 * Remote evaluator. Note, evaluator is remote object and it is not serializable object.
 	 */
 	public Evaluator                 evaluator           = null;
-
+	
 	
 	/**
 	 * Default constructor.
@@ -187,6 +191,9 @@ public class Response extends ProtocolParam {
 		else if (stringResult != null)
 			return stringResult;
 		
+		else if (stringArray != null)
+			return stringArray;
+
 		else if (vRating != null)
 			return vRating;
 		
@@ -263,7 +270,7 @@ public class Response extends ProtocolParam {
 	 * @param fRating fetcher of many rating vectors
 	 * @return result (response) as fetcher of many rating vectors.
 	 */
-	public static Response create(Fetcher<RatingVector> fRating) {
+	public static Response createRatingVectorFetcher(Fetcher<RatingVector> fRating) {
 		Response response = new Response();
 		response.fRating = fRating;
 		
@@ -276,7 +283,7 @@ public class Response extends ProtocolParam {
 	 * @param fProfile specified fetcher of many profiles.
 	 * @return result (response) as fetcher of many profiles.
 	 */
-	public static Response create2(Fetcher<Profile> fProfile) {
+	public static Response createProfileFetcher(Fetcher<Profile> fProfile) {
 		Response response = new Response();
 		response.fProfile = fProfile;
 		
@@ -289,7 +296,7 @@ public class Response extends ProtocolParam {
 	 * @param fId fetcher of many identifiers.
 	 * @return result (response) as fetcher of many identifiers.
 	 */
-	public static Response create3(Fetcher<Integer> fId) {
+	public static Response createIdFetcher(Fetcher<Integer> fId) {
 		Response response = new Response();
 		response.fId = fId;
 		
@@ -358,6 +365,19 @@ public class Response extends ProtocolParam {
 	public static Response create(String stringResult) {
 		Response response = new Response();
 		response.stringResult = stringResult;
+		
+		return response;
+	}
+
+	
+	/**
+	 * Creating result (response) as string array.
+	 * @param stringArray specified string array.
+	 * @return result (response) as string array.
+	 */
+	public static Response create(String[] stringArray) {
+		Response response = new Response();
+		response.stringArray = stringArray;
 		
 		return response;
 	}

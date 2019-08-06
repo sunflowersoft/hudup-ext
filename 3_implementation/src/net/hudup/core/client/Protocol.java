@@ -398,6 +398,11 @@ public interface Protocol {
 	 */
 	static final String GET_EVALUATOR =                     "get_evaluator";
 
+	/**
+	 * Action of request of getting evaluator names. Such request is created by method {@link #createGetEvaluatorNamesRequest()}.
+	 */
+	static final String GET_EVALUATOR_NAMES =               "get_evaluator_names";
+
 	
 	/**
 	 * Creating estimation request based on specified recommendation parameter and specified set of identifiers (IDs).
@@ -997,11 +1002,18 @@ public interface Protocol {
 
 
 	/**
-	 * Creating a request for retrieving evaluator. This method is effective only if the evaluation package is loaded.
+	 * Creating a request for retrieving evaluator.
 	 * @param evaluatorName evaluator name.
 	 * @return a request for retrieving evaluator.
 	 */
 	Request createGetEvaluatorRequest(String evaluatorName);
+
+
+	/**
+	 * Creating a request for retrieving evaluator names.
+	 * @return a request for retrieving evaluator names.
+	 */
+	Request createGetEvaluatorNamesRequest();
 
 
 }

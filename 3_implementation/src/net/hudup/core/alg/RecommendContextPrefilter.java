@@ -7,6 +7,7 @@ import net.hudup.core.data.Dataset;
 import net.hudup.core.data.Rating;
 import net.hudup.core.data.RatingVector;
 import net.hudup.core.data.ctx.ContextList;
+import net.hudup.core.logistic.BaseClass;
 
 
 /**
@@ -36,6 +37,7 @@ import net.hudup.core.data.ctx.ContextList;
  * @version 10.0
  *
  */
+@BaseClass
 public class RecommendContextPrefilter extends CompositeRecommender {
 
 	

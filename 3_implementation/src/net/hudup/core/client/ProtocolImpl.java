@@ -697,5 +697,15 @@ public class ProtocolImpl implements Protocol {
 		return request;
 	}
 
+
+	@Override
+	public Request createGetEvaluatorNamesRequest() {
+		// TODO Auto-generated method stub
+		Request request = new Request();
+		request.action = GET_EVALUATOR_NAMES;
+		
+		return request;
+	}
+
 	
 }

@@ -6,6 +6,7 @@ package net.hudup.core.data;
 import java.io.BufferedReader;
 import java.io.PrintWriter;
 import java.io.Reader;
+import java.io.Serializable;
 import java.io.Writer;
 import java.util.List;
 
@@ -29,9 +30,15 @@ import net.hudup.core.parser.TextParserUtil;
  * @version 10.0
  *
  */
-public class RatingMatrix {
+public class RatingMatrix implements Serializable {
 
 	
+	/**
+	 * Default serial version UID.
+	 */
+	private static final long serialVersionUID = 1L;
+
+
 	/**
 	 * The public variable for fast access, representing a matrix of rating values.
 	 * In case of user rating matrix, each row of the matrix is a vector of rating values that a user gives on many items.

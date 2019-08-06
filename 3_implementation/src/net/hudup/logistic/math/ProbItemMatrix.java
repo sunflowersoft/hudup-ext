@@ -1,5 +1,6 @@
 package net.hudup.logistic.math;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
@@ -15,8 +16,15 @@ import net.hudup.data.DatasetUtil2;
  * @author Loc Nguyen
  * @version 10.0
  */
-public class ProbItemMatrix {
+public class ProbItemMatrix implements Serializable {
 	
+	
+	/**
+	 * Default serial version UID.
+	 */
+	private static final long serialVersionUID = 1L;
+
+
 	/**
 	 * 
 	 */

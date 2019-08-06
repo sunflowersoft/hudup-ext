@@ -4,6 +4,7 @@ import net.hudup.core.alg.Alg;
 import net.hudup.core.evaluate.MetaMetric;
 import net.hudup.core.evaluate.MetricValue;
 import net.hudup.core.evaluate.RealMetricValue;
+import net.hudup.core.logistic.NextUpdate;
 
 /**
  * This class represents root mean squared error for evaluating dual regression expectation maximization (EM) algorithm.
@@ -12,6 +13,7 @@ import net.hudup.core.evaluate.RealMetricValue;
  * @version 1.0
  *
  */
+@NextUpdate
 public class RMSE extends MetaMetric {
 
 	

@@ -24,6 +24,7 @@ import net.hudup.core.data.Fetcher;
 import net.hudup.core.data.Profile;
 import net.hudup.core.evaluate.EvaluatorEvent.Type;
 import net.hudup.core.logistic.AbstractRunner;
+import net.hudup.core.logistic.NetUtil;
 import net.hudup.core.logistic.SystemUtil;
 import net.hudup.core.logistic.xURI;
 import net.hudup.core.logistic.ui.ProgressEvent;
@@ -126,7 +127,7 @@ public abstract class AbstractEvaluator extends AbstractRunner implements Evalua
     /**
      * Additional parameter for this evaluator.
      */
-    protected Object parameter = null;
+    protected Serializable parameter = null;
     
     
 	/**
@@ -140,6 +141,12 @@ public abstract class AbstractEvaluator extends AbstractRunner implements Evalua
      */
 	protected NoneWrapperMetricList metricList = null;
 
+	
+	/**
+	 * Exported flag.
+	 */
+	protected Boolean remoteExported = false;
+	
 	
     /**
 	 * Default constructor.
@@ -765,6 +772,44 @@ public abstract class AbstractEvaluator extends AbstractRunner implements Evalua
 	public boolean remoteIsRunning() throws RemoteException {
 		// TODO Auto-generated method stub
 		return isRunning();
+	}
+
+
+	@Override
+	public synchronized void remoteExport(int serverPort) throws RemoteException {
+		// TODO Auto-generated method stub
+		synchronized (remoteExported) {
+			if (!remoteExported) {
+				NetUtil.RegistryRemote.export(this, serverPort);
+				remoteExported = true;
+			}
+		}
+	}
+
+
+	@Override
+	public synchronized void remoteUnexport() throws RemoteException {
+		// TODO Auto-generated method stub
+		synchronized (remoteExported) {
+			if (remoteExported) {
+				NetUtil.RegistryRemote.unexport(this);
+				remoteExported = false;
+			}
+		}
+	}
+
+
+	@Override
+	protected void finalize() throws Throwable {
+		// TODO Auto-generated method stub
+		super.finalize();
+		
+		try {
+			remoteUnexport();
+		}
+		catch (Throwable e) {
+			e.printStackTrace();
+		}
 	}
 			
 

@@ -4,6 +4,7 @@ import net.hudup.core.alg.Alg;
 import net.hudup.core.evaluate.MetaMetric;
 import net.hudup.core.evaluate.MetricValue;
 import net.hudup.core.evaluate.RealMetricValue;
+import net.hudup.core.logistic.NextUpdate;
 
 
 /**
@@ -13,6 +14,7 @@ import net.hudup.core.evaluate.RealMetricValue;
  * @version 10.0
  *
  */
+@NextUpdate
 public class F1 extends MetaMetric {
 
 	

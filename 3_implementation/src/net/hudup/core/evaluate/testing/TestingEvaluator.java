@@ -99,9 +99,10 @@ public abstract class TestingEvaluator extends AbstractEvaluator {
 		MSE mse = new MSE();
 		metricList.add(mse);
 		
-		RMSE rmse = new RMSE();
-		rmse.setup(mse);
-		metricList.add(rmse);
+//		//Meta metric is not supported from August 6, 2019. Fix date August 6, 2019 by Loc Nguyen.
+//		RMSE rmse = new RMSE();
+//		rmse.setup(mse);
+//		metricList.add(rmse);
 		
 		ErrorRange errorRange = new ErrorRange();
 		metricList.add(errorRange);

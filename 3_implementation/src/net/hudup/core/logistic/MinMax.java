@@ -14,6 +14,12 @@ public class MinMax extends Dual {
 
 	
 	/**
+	 * Default serial version UID.
+	 */
+	private static final long serialVersionUID = 1L;
+
+
+	/**
 	 * Constructor with specified minimum value and maximum value.
 	 * @param min specified minimum value.
 	 * @param max specified maximum value.

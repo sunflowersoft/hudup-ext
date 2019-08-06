@@ -88,6 +88,12 @@ class RollingStepMaxi extends RollingStep {
 
 
 	/**
+	 * Default serial version UID.
+	 */
+	private static final long serialVersionUID = 1L;
+
+
+	/**
 	 *
 	 * Default constructor
 	 */

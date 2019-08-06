@@ -16,11 +16,13 @@ import net.hudup.core.logistic.xURI;
 
 /**
  * This interface indicates an socket service considered as a recommendation algorithm.
+ * This class is deprecated because it is similar to {@link RmiRecommender}.
  * 
  * @author Loc Nguyen
  * @version 10.0
  *
  */
+@Deprecated
 public class SocketRecommender extends ServiceRecommender implements SocketAlg {
 
 	

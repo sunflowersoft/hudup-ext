@@ -589,12 +589,20 @@ public interface Service extends Remote {
 	
 
 	/**
-	 * Getting evaluator with specified evaluator name. This method is effective only if the evaluation package is loaded.
+	 * Getting evaluator with specified evaluator name.
 	 * @param evaluatorName evaluator name.
 	 * @return evaluator.
 	 * @throws RemoteException if any error raises.
 	 */
 	Evaluator getEvaluator(String evaluatorName) throws RemoteException;
+	
+
+	/**
+	 * Getting evaluator names.
+	 * @return evaluator names.
+	 * @throws RemoteException if any error raises.
+	 */
+	String[] getEvaluatorNames() throws RemoteException;
 
 
 }

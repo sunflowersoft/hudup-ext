@@ -1,5 +1,6 @@
 package net.hudup.logistic.math;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 
@@ -16,7 +17,13 @@ import net.hudup.core.data.RatingVector;
  * @author Loc Nguyen
  * @version 10.0
  */
-public class DatasetStatsProcessor {
+public class DatasetStatsProcessor implements Serializable {
+	
+	
+	/**
+	 * Default serial version UID.
+	 */
+	private static final long serialVersionUID = 1L;
 	
 	
 	/**

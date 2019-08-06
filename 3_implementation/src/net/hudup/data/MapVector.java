@@ -1,5 +1,6 @@
 package net.hudup.data;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -15,7 +16,13 @@ import net.hudup.core.Util;
  * @version 10.0
  * @param <T> general type.
  */
-public class MapVector<T> {
+public class MapVector<T> implements Serializable {
+
+
+	/**
+	 * Default serial version UID.
+	 */
+	private static final long serialVersionUID = 1L;
 
 
 	/**

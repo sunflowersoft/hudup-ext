@@ -16,7 +16,7 @@ import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.Profile;
 import net.hudup.core.data.RatingVector;
-import net.hudup.core.logistic.NextUpdate;
+import net.hudup.core.logistic.BaseClass;
 
 
 /**
@@ -25,7 +25,7 @@ import net.hudup.core.logistic.NextUpdate;
  * @version 10.0
  *
  */
-@NextUpdate
+@BaseClass
 public class ExternalServerRecommender extends CompositeRecommender {
 
 	

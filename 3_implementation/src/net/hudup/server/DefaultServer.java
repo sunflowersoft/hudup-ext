@@ -21,7 +21,9 @@ import net.hudup.core.data.DataDriver;
 import net.hudup.core.data.DataDriver.DataType;
 import net.hudup.core.data.Provider;
 import net.hudup.core.data.UnitList;
+import net.hudup.core.evaluate.EvaluatorConfig;
 import net.hudup.core.logistic.I18nUtil;
+import net.hudup.core.logistic.NextUpdate;
 import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.xURI;
 import net.hudup.core.logistic.ui.HelpContent;
@@ -97,7 +99,18 @@ public class DefaultServer extends PowerServerImpl {
 	
 	
 	@Override
+	@NextUpdate
 	protected void doWhenStop() {
+		//Saving evaluator configuration here is not best solution. Update later.
+		try {
+			EvaluatorConfig evaluatorConfig = service.getEvaluatorConfig();
+			if (evaluatorConfig != null)
+				evaluatorConfig.save();
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		
 		service.close();
 	}
 	

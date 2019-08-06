@@ -269,5 +269,21 @@ public interface Evaluator extends Remote {
 	 */
     void removeSetupAlgListener(SetupAlgListener listener) throws RemoteException;
 
+    
+    /**
+     * Remote exporting this evaluator.
+     * @param serverPort server port.
+     * @throws RemoteException if any error raises.
+     */
+    void remoteExport(int serverPort) throws RemoteException;
+    
+    
+    /**
+     * Remote unexporting this evaluator.
+     * @throws RemoteException if any error raises.
+     */
+    void remoteUnexport() throws RemoteException;
+    
+    
 
 }

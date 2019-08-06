@@ -753,6 +753,11 @@ public class UriChooser extends JDialog {
 		RegisterTable regTable = (RegisterTable) PluginStorage.getParserReg().clone();
 		List<Alg> indicators = regTable.getAlgList(new RegisterTable.AlgFilter() {
 
+			/**
+			 * Default serial version UID.
+			 */
+			private static final long serialVersionUID = 1L;
+
 			@Override
 			public boolean accept(Alg alg) {
 				// TODO Auto-generated method stub

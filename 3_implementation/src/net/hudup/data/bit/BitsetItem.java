@@ -3,6 +3,7 @@
  */
 package net.hudup.data.bit;
 
+import java.io.Serializable;
 import java.util.BitSet;
 import java.util.Collections;
 import java.util.Comparator;
@@ -20,9 +21,15 @@ import net.hudup.core.logistic.DSUtil;
  * @version 10.0
  *
  */
-public class BitsetItem implements Cloneable {
+public class BitsetItem implements Cloneable, Serializable {
 
 	
+	/**
+	 * Default serial version UID.
+	 */
+	private static final long serialVersionUID = 1L;
+
+
 	/**
 	 * Bit item id of this {@link BitsetItem}
 	 */

@@ -3,6 +3,7 @@
  */
 package net.hudup.alg.cf.gfall;
 
+import java.io.Serializable;
 import java.util.BitSet;
 import java.util.List;
 
@@ -153,9 +154,15 @@ public class YRoller extends FreqItemsetFinder {
  * @version 10.0
  *
  */
-class RollingStep {
+class RollingStep implements Serializable {
 	
 	
+	/**
+	 * Default serial version UID.
+	 */
+	private static final long serialVersionUID = 1L;
+
+
 	/**
 	 * Minimum support
 	 */

@@ -2,6 +2,7 @@ package net.hudup.alg.cf.mf;
 
 import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.KBase;
+import net.hudup.core.logistic.NextUpdate;
 
 
 /**
@@ -10,6 +11,7 @@ import net.hudup.core.alg.KBase;
  * @version 10.0
  *
  */
+@NextUpdate
 public class SvdGradientPlusCF extends SvdGradientCF {
 
 	

@@ -4,13 +4,12 @@ import static net.hudup.core.Constants.ROOT_PACKAGE;
 
 import java.io.Serializable;
 import java.rmi.RemoteException;
-import java.rmi.server.UnicastRemoteObject;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
 
-import net.hudup.core.Constants;
 import net.hudup.core.Util;
 import net.hudup.core.alg.RecommendParam;
 import net.hudup.core.alg.Recommender;
@@ -35,6 +34,8 @@ import net.hudup.core.data.RatingVector;
 import net.hudup.core.data.Scanner;
 import net.hudup.core.data.Snapshot;
 import net.hudup.core.evaluate.Evaluator;
+import net.hudup.core.evaluate.EvaluatorConfig;
+import net.hudup.core.logistic.NextUpdate;
 import net.hudup.core.logistic.SystemUtil;
 import net.hudup.data.SnapshotImpl;
 
@@ -54,6 +55,18 @@ public class DefaultService implements Service, AutoCloseable {
 	 * Logger of this class.
 	 */
 	protected final static Logger logger = Logger.getLogger(Service.class);
+
+	
+	/**
+	 * Server configuration.
+	 */
+	protected PowerServerConfig serverConfig = null;
+	
+	
+	/**
+	 * Evaluator configuration.
+	 */
+	protected EvaluatorConfig evaluatorConfig = null;
 
 	
 	/**
@@ -82,11 +95,11 @@ public class DefaultService implements Service, AutoCloseable {
 	
 	/**
 	 * Open service with specified configuration and parameters.
-	 * @param config specified configuration.
+	 * @param serverConfig specified configuration.
 	 * @param params specified parameters.
 	 * @return whether open service successfully.
 	 */
-	public boolean open(PowerServerConfig config, Object... params) {
+	public boolean open(PowerServerConfig serverConfig, Object... params) {
 		try {
 			close();
 		}
@@ -95,12 +108,13 @@ public class DefaultService implements Service, AutoCloseable {
 		}
 		
 		boolean opened = true;
+		this.serverConfig = serverConfig;
 		try {
-			Dataset dataset = config.getParser().parse((DataConfig)config.clone());
+			Dataset dataset = serverConfig.getParser().parse((DataConfig)serverConfig.clone());
 			dataset.setExclusive(true);
 			
-			recommender = (Recommender) config.getRecommender().newInstance();
-			recommender.getConfig().putAll(config.getRecommender().getConfig());
+			recommender = (Recommender) serverConfig.getRecommender().newInstance();
+			recommender.getConfig().putAll(serverConfig.getRecommender().getConfig());
 			recommender.setup(dataset, params);
 		}
 		catch (Throwable e) {
@@ -188,6 +202,15 @@ public class DefaultService implements Service, AutoCloseable {
 			return null;
 	}
 
+	
+	/**
+	 * Getting evaluator configuration.
+	 * @return evaluator configuration.
+	 */
+	protected EvaluatorConfig getEvaluatorConfig() {
+		return evaluatorConfig;
+	}
+	
 	
 	@Override
 	public RatingVector estimate(RecommendParam param, Set<Integer> queryIds) throws RemoteException {
@@ -1355,11 +1378,12 @@ public class DefaultService implements Service, AutoCloseable {
 
 
 	@Override
+	@NextUpdate
 	public Evaluator getEvaluator(String evaluatorName) throws RemoteException {
 		// TODO Auto-generated method stub
 		Evaluator evaluator = null;
 		
-		trans.lockRead();
+		trans.lockWrite();
 		try {
 			List<Evaluator> evList = SystemUtil.getInstances(ROOT_PACKAGE, Evaluator.class);
 			for (Evaluator ev : evList) {
@@ -1369,7 +1393,13 @@ public class DefaultService implements Service, AutoCloseable {
 				}
 			}
 			
-			UnicastRemoteObject.exportObject(evaluator, Constants.DEFAULT_SERVER_PORT);
+			if (evaluator != null) {
+				evaluator.remoteExport(serverConfig.getServerPort());
+				
+				//Getting evaluator configuration here is not best solution. Update later.
+				if (this.evaluatorConfig == null)
+					this.evaluatorConfig = evaluator.getConfig();
+			}
 		}
 		catch (Throwable e) {
 			e.printStackTrace();
@@ -1378,10 +1408,35 @@ public class DefaultService implements Service, AutoCloseable {
 			logger.error("Service fail to get evaluator, caused by " + e.getMessage());
 		}
 		finally {
-			trans.unlockRead();
+			trans.unlockWrite();
 		}
 		
 		return evaluator;
+	}
+
+
+	@Override
+	public String[] getEvaluatorNames() throws RemoteException {
+		// TODO Auto-generated method stub
+		List<String> evaluatorNames = Util.newList();
+		
+		trans.lockRead();
+		try {
+			List<Evaluator> evList = SystemUtil.getInstances(ROOT_PACKAGE, Evaluator.class);
+			for (Evaluator ev : evList) {
+				evaluatorNames.add(ev.getName());
+			}
+		}
+		catch (Throwable e) {
+			e.printStackTrace();
+			logger.error("Service fail to get evaluator, caused by " + e.getMessage());
+		}
+		finally {
+			trans.unlockRead();
+		}
+		
+		Collections.sort(evaluatorNames);
+		return evaluatorNames.toArray(new String[0]);
 	}
 
 

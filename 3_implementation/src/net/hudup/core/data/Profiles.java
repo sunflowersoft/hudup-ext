@@ -3,6 +3,8 @@
  */
 package net.hudup.core.data;
 
+import java.io.Serializable;
+
 import net.hudup.core.Cloneable;
 import net.hudup.core.Transfer;
 
@@ -18,7 +20,7 @@ import net.hudup.core.Transfer;
  * @version 10.0
  * 
  */
-public interface Profiles extends Cloneable, Transfer {
+public interface Profiles extends Cloneable, Transfer, Serializable {
 
 	
 	/**

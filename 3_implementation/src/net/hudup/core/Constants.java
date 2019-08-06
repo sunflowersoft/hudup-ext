@@ -37,6 +37,11 @@ public final class Constants {
 	public final static String DEFAULT_EXT             = "hdp";
 	
 	/**
+	 * Default evaluator name.
+	 */
+	public final static String DEFAULT_EVALUATOR_NAME  = "Recommendation Evaluator";
+
+	/**
 	 * The maximum number digits in decimal precision.
 	 */
 	public static int          DECIMAL_PRECISION       = 12;
@@ -115,32 +120,32 @@ public final class Constants {
 	/**
 	 * Default port of Hudup listener. Note that listener is responsible for interact between user and Hudup server.
 	 */
-	public final static int     DEFAULT_LISTENER_PORT         = 10152;
+	public final static int     DEFAULT_LISTENER_PORT         = DEFAULT_SERVER_PORT + 1;
 	
 	/**
 	 * Default exported port of Hudup listener. RMI application connects with listener via this port.
 	 * Java Remote Method Invocation (RMI) is a protocol that allows an Java application to call remotely methods of Java objects inside other Java application over network.
 	 * Please see Oracle Java document for more details about RMI (<a href="https://docs.oracle.com/javase/tutorial/rmi/index.html">https://docs.oracle.com/javase/tutorial/rmi/index.html</a>).
 	 */
-	public final static int     DEFAULT_LISTENER_EXPORT_PORT  = 10153;
+	public final static int     DEFAULT_LISTENER_EXPORT_PORT  = DEFAULT_SERVER_PORT + 2;
 	
 	/**
 	 * Default port of Hudup balancer. Essentialy, balancer is a particular listener that supports balancing in busy network.
 	 * For example, if there are many Hudup servers, balancer will choose a least busy server to process incoming request.
 	 */
-	public final static int     DEFAULT_BALANCER_PORT         = 10154;
+	public final static int     DEFAULT_BALANCER_PORT         = DEFAULT_SERVER_PORT + 3;
 	
 	/**
 	 * Default exported port of Hudup balancer. RMI application connects with balancer via this port.
 	 * Java Remote Method Invocation (RMI) is a protocol that allows an Java application to call remotely methods of Java objects inside other Java application over network.
 	 * Please see Oracle Java document for more details about RMI (<a href="https://docs.oracle.com/javase/tutorial/rmi/index.html">https://docs.oracle.com/javase/tutorial/rmi/index.html</a>).
 	 */
-	public final static int     DEFAULT_BALANCER_EXPORT_PORT  = 10155;
+	public final static int     DEFAULT_BALANCER_EXPORT_PORT  = DEFAULT_SERVER_PORT + 4;
 	
 	/**
 	 * The graphic user interface (GUI) allowing users to control Hudup server is called control panel. Control panel uses this port to connect with Hudup server instead of using {@link #DEFAULT_SERVER_PORT}.
 	 */
-	public final static int     DEFAULT_CONTROL_PANEL_PORT    = 10156;
+	public final static int     DEFAULT_CONTROL_PANEL_PORT    = DEFAULT_SERVER_PORT + 5;
 	
 	/**
 	 * When Hudup server, listener, or balancer starts, it uses firstly the port {@link #DEFAULT_SERVER_PORT}. If this constant is {@code true}, many random ports are tried until success.
@@ -151,7 +156,7 @@ public final class Constants {
 	/**
 	 * This is the period in miliseconds that the Hudup server does periodically internal tasks such as data mining and learning knowledge base.
 	 */
-	public final static int     DEFAULT_SERVER_TASK_PERIOD    = (int) (1000 * 60 * 5); // 5 minute
+	public final static int     DEFAULT_SERVER_TASKS_PERIOD    = (int) (1000 * 60 * 5); // 5 minute
 	
 	/**
 	 * The Hudup server is available to serve incoming request in a interval called a timeout in miliseconds. This constant specifies such timeout.

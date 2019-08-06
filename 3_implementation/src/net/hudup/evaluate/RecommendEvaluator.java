@@ -2,6 +2,7 @@ package net.hudup.evaluate;
 
 import java.rmi.RemoteException;
 
+import net.hudup.core.Constants;
 import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.RecommendParam;
 import net.hudup.core.alg.Recommender;
@@ -270,7 +271,7 @@ public class RecommendEvaluator extends AbstractEvaluator {
 	@Override
 	public String getName() throws RemoteException {
 		// TODO Auto-generated method stub
-		return "Recommendation Evaluator";
+		return Constants.DEFAULT_EVALUATOR_NAME;
 	}
 
 
@@ -300,13 +301,15 @@ public class RecommendEvaluator extends AbstractEvaluator {
 		NMSE nmse = new NMSE();
 		metricList.add(nmse);
 		
-		RMSE rmse = new RMSE();
-		rmse.setup(mse);
-		metricList.add(rmse);
+//		//Meta metric is not supported from August 6, 2019. Fix date August 6, 2019 by Loc Nguyen.
+//		RMSE rmse = new RMSE();
+//		rmse.setup(mse);
+//		metricList.add(rmse);
 
-		NRMSE nrmse = new NRMSE();
-		nrmse.setup(nmse);
-		metricList.add(nrmse);
+//		//Meta metric is not supported from August 6, 2019. Fix date August 6, 2019 by Loc Nguyen.
+//		NRMSE nrmse = new NRMSE();
+//		nrmse.setup(nmse);
+//		metricList.add(nrmse);
 
 		Precision precision = new Precision();
 		metricList.add(precision);
@@ -314,9 +317,10 @@ public class RecommendEvaluator extends AbstractEvaluator {
 		Recall recall = new Recall();
 		metricList.add(recall);
 		
-		F1 f1 = new F1();
-		f1.setup(precision, recall);
-		metricList.add(f1);
+//		//Meta metric is not supported from August 6, 2019. Fix date August 6, 2019 by Loc Nguyen.
+//		F1 f1 = new F1();
+//		f1.setup(precision, recall);
+//		metricList.add(f1);
 		
 		Pearson pearson = new Pearson();
 		metricList.add(pearson);

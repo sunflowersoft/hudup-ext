@@ -3,6 +3,7 @@
  */
 package net.hudup.logistic.math;
 
+import java.io.Serializable;
 import java.util.BitSet;
 import java.util.Collection;
 import java.util.List;
@@ -18,8 +19,14 @@ import net.hudup.data.bit.BitItem;
  * @version 10.0
  *
  */
-public final class BitDatasetStatsProcessor {
+public final class BitDatasetStatsProcessor implements Serializable {
 
+	
+	/**
+	 * Default serial version UID.
+	 */
+	private static final long serialVersionUID = 1L;
+	
 	
 	/**
 	 * 

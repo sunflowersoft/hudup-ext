@@ -8,7 +8,6 @@ import net.hudup.alg.cf.mf.SvdGradientCF;
 import net.hudup.alg.cf.mf.SvdGradientKB;
 import net.hudup.alg.cf.stat.BayesLookupTableCF;
 import net.hudup.alg.cf.stat.BayesLookupTableKB;
-import net.hudup.alg.cf.stat.MeanItemCF;
 import net.hudup.core.Constants;
 import net.hudup.core.Util;
 import net.hudup.core.alg.Alg;
@@ -23,20 +22,24 @@ import net.hudup.core.data.Rating;
 import net.hudup.core.data.RatingMatrix;
 import net.hudup.core.data.RatingVector;
 import net.hudup.core.data.Snapshot;
+import net.hudup.core.logistic.NextUpdate;
 import net.hudup.data.SnapshotImpl;
 
 
 /**
+ * This class is a ulity class for solving sparse problem. It is now deprecated because it needs to be improved.
  * 
  * @author Loc Nguyen
  * @version 10.0
  *
  */
+@Deprecated
+@NextUpdate
 public class SparseProcessor {
 
 	
 	/**
-	 * 
+	 * Default constructor.
 	 */
 	public SparseProcessor() {
 		
@@ -295,7 +298,7 @@ public class SparseProcessor {
 				completeMethod.getClass().getAnnotation(CFAnnotation.class) == null) {
 			throw new RuntimeException("Not implement yet for none-collaborative filtering algorithm");
 		}
-		else if (completeMethod instanceof MeanItemCF) {
+		else if (completeMethod instanceof net.hudup.alg.cf.stat.MeanItemCF) {
 			boolean result = columnMeanComplete(userMatrix.matrix);
 			if (updateMetadata)
 				userMatrix.updateMetadata();

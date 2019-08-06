@@ -16,6 +16,7 @@ import net.hudup.core.data.RatingVector;
  * @version 10.0
  *
  */
+@Deprecated
 public class StatNaiveCF extends StatCF {
 
 	

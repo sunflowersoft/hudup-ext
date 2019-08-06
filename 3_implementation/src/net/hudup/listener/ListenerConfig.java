@@ -84,7 +84,7 @@ public class ListenerConfig extends ServerConfig {
 		
 		setServerPort(Constants.DEFAULT_LISTENER_PORT);
 		setServerTimeout(Constants.DEFAULT_SERVER_TIMEOUT);
-		setServerTaskPeriod(Constants.DEFAULT_LISTENER_TASK_PERIOD);
+		setServerTasksPeriod(Constants.DEFAULT_LISTENER_TASK_PERIOD);
 		
 		setRemoteHost("localhost");
 		setRemotePort(Constants.DEFAULT_SERVER_PORT);

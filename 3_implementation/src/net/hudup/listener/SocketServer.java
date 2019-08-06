@@ -291,7 +291,7 @@ public abstract class SocketServer extends AbstractRunner implements Server {
 		destroyTimer();
 		
 		try {
-			int milisec = config.getServerTaskPeriod();
+			int milisec = config.getServerTasksPeriod();
 			if (milisec == 0)
 				return;
 			

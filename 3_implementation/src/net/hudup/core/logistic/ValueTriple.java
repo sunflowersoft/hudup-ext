@@ -1,5 +1,6 @@
 package net.hudup.core.logistic;
 
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -18,9 +19,15 @@ import net.hudup.core.data.RatingVector;
  * @version 10.0
  *
  */
-public class ValueTriple implements Cloneable {
+public class ValueTriple implements Cloneable, Serializable {
 	
 	
+	/**
+	 * Default serial version UID.
+	 */
+	private static final long serialVersionUID = 1L;
+
+
 	/**
 	 * The key
 	 */

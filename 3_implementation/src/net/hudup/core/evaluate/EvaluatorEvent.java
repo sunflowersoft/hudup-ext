@@ -1,5 +1,6 @@
 package net.hudup.core.evaluate;
 
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.EventObject;
 import java.util.List;
@@ -63,12 +64,12 @@ public class EvaluatorEvent extends EventObject {
 	/**
 	 * Additional information for calculating metrics.
 	 */
-	protected Object[] params = null;
+	protected Serializable[] params = null;
 	
 	
 	/**
 	 * Constructor with specified evaluator and event type.
-	 * @param evaluator reference to an {@link Evaluator}.
+	 * @param evaluator reference to an {@link Evaluator}. This evaluator is invalid in remote call.
 	 * @param type type of this event.
 	 */
 	public EvaluatorEvent(Evaluator evaluator, Type type) {
@@ -81,7 +82,7 @@ public class EvaluatorEvent extends EventObject {
 	
 	/**
 	 * Constructor with specified evaluator, type of evaluation event, and list of metrics. 
-	 * @param evaluator specified evaluator.
+	 * @param evaluator specified evaluator. This evaluator is invalid in remote call.
 	 * @param type specified type of evaluation event.
 	 * @param metrics specified list of metrics.
 	 */
@@ -95,7 +96,7 @@ public class EvaluatorEvent extends EventObject {
 	
 	/**
 	 * Constructor with specified evaluator, type of evaluation event, list of metrics, and additional parameters. 
-	 * @param evaluator specified evaluator.
+	 * @param evaluator specified evaluator. This evaluator is invalid in remote call.
 	 * @param type specified type of evaluation event.
 	 * @param metrics specified list of metrics.
 	 * @param params additional parameters.
@@ -109,10 +110,12 @@ public class EvaluatorEvent extends EventObject {
 
 	
 	/**
-	 * Getting evaluator.
+	 * Getting evaluator. This method is invalid in remote call.
 	 * @return {@link Evaluator} that fires this event.
 	 */
-	public Evaluator getEvaluator() {
+	@SuppressWarnings("unused")
+	@Deprecated
+	private Evaluator getEvaluator() {
 		return (Evaluator) getSource();
 	}
 	
@@ -158,7 +161,7 @@ public class EvaluatorEvent extends EventObject {
 	 * Setting additional parameter list.
 	 * @param params additional parameter list.
 	 */
-	public void setParams(Object... params) {
+	public void setParams(Serializable... params) {
 		this.params = params;
 	}
 	

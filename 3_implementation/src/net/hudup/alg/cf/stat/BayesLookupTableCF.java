@@ -15,15 +15,18 @@ import net.hudup.core.alg.cf.ModelBasedCF;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Pair;
 import net.hudup.core.data.RatingVector;
+import net.hudup.core.logistic.NextUpdate;
 import net.hudup.core.logistic.xURI;
 
 
 /**
+ * This class implements a collaborative filtering algorithm based on Bayesian look up table.
  * 
  * @author Loc Nguyen
  * @version 10.0
  *
  */
+@NextUpdate
 public class BayesLookupTableCF extends ModelBasedCF {
 
 	
@@ -46,7 +49,7 @@ public class BayesLookupTableCF extends ModelBasedCF {
 
 	
 	/**
-	 * 
+	 * Default constructor.
 	 */
 	public BayesLookupTableCF() {
 		super();

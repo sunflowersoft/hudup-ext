@@ -1,5 +1,6 @@
 package net.hudup.listener;
 
+import java.io.Serializable;
 import java.util.Map;
 
 import net.hudup.core.Util;
@@ -16,13 +17,19 @@ import net.hudup.core.data.DataConfig;
  * @version 10.0
  *
  */
-public class UserSession {
+public class UserSession implements Serializable {
+	
+	
+	/**
+	 * Default serial version UID.
+	 */
+	private static final long serialVersionUID = 1L;
 	
 	
 	/**
 	 * The internal map stores user information as entries.
 	 */
-	protected Map<String, Object> userSession = Util.newMap();
+	protected Map<String, Serializable> userSession = Util.newMap();
 
 	
 	/**
@@ -39,7 +46,7 @@ public class UserSession {
 	 * @param key specified key.
 	 * @param value specified value.
 	 */
-	public void put(String key, Object value) {
+	public void put(String key, Serializable value) {
 		userSession.put(key, value);
 	}
 	

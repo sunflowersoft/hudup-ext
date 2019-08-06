@@ -4,6 +4,8 @@
 package net.hudup.core.data;
 
 
+import java.io.Serializable;
+
 import org.apache.log4j.Logger;
 
 import net.hudup.core.Cloneable;
@@ -24,9 +26,15 @@ import net.hudup.core.logistic.xURI;
  * @version 10.0
  *
  */
-public final class DataDriver implements Cloneable {
+public final class DataDriver implements Cloneable, Serializable {
 	
 	
+	/**
+	 * Default serial version UID.
+	 */
+	private static final long serialVersionUID = 1L;
+
+
 	/**
 	 * Logger of this class.
 	 */

@@ -30,7 +30,13 @@ public abstract class SysConfig extends DataConfig {
 	/**
 	 * URI string points to where to save (store, write) system configuration.
 	 */
-	protected String uri;
+	protected String uri = null;
+	
+	
+	/**
+	 * Ability to save.
+	 */
+	protected boolean saveAbility = true;
 	
 	
 	/**
@@ -53,6 +59,24 @@ public abstract class SysConfig extends DataConfig {
 	}
 
 
+	/**
+	 * Testing ability to save.
+	 * @return true if being able to save.
+	 */
+	public boolean isSaveAbility() {
+		return saveAbility;
+	}
+	
+	
+	/**
+	 * Setting ability to save.
+	 * @param saveAbility ability to save.
+	 */
+	public void setSaveAbility(boolean saveAbility) {
+		this.saveAbility = saveAbility;
+	}
+	
+	
 	/**
 	 * Loading configuration settings from inner URI.
 	 * @return whether loading successfully.
@@ -82,8 +106,10 @@ public abstract class SysConfig extends DataConfig {
 	public boolean save() {
 		if (this.uri == null)
 			return false;
-		else
+		else if (isSaveAbility())
 			return save(xURI.create(this.uri));
+		else
+			return false;
 	}
 	
 	

@@ -19,7 +19,7 @@ import net.hudup.core.data.Attribute.Type;
  * @version 10.0
  *
  */
-public class MemProfiles implements Profiles, Serializable {
+public class MemProfiles implements Profiles {
 
 
 	/**

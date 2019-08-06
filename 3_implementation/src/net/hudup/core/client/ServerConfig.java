@@ -33,7 +33,14 @@ public class ServerConfig extends SysConfig {
 	 * This constant specifies key name of server task period.
 	 * Note, the period in miliseconds that the Hudup server does periodically internal tasks such as data mining and learning knowledge base.
 	 */
-	public final static String SERVER_TASK_PERIOD_FIELD = changeCase("server_task_period");
+	public final static String SERVER_TASKS_PERIOD_FIELD = changeCase("server_tasks_period");
+
+	
+	/**
+	 * Every new information (new entry) that is put into server configuration has a key.
+	 * This constant specifies key name of whether doing server task.
+	 */
+	public final static String DO_SERVER_TASKS_FIELD = changeCase("do_servers_task");
 
 	
 	/**
@@ -41,6 +48,12 @@ public class ServerConfig extends SysConfig {
 	 * This constant specifies key name of server timeout interval.
 	 */
 	public final static String SERVER_TIMEOUT_FIELD = changeCase("server_timeout");
+
+	
+	/**
+	 * By default, it is necessary to do server tasks.
+	 */
+	public final static boolean DO_SERVER_TASKS_DEFAULT = true;
 
 	
 	/**
@@ -69,7 +82,8 @@ public class ServerConfig extends SysConfig {
 		
 		setServerPort(Constants.DEFAULT_SERVER_PORT);
 		setServerTimeout(Constants.DEFAULT_SERVER_TIMEOUT);
-		setServerTaskPeriod(Constants.DEFAULT_SERVER_TASK_PERIOD);
+		setServerTasksPeriod(Constants.DEFAULT_SERVER_TASKS_PERIOD);
+		setDoServerTasks(DO_SERVER_TASKS_DEFAULT);
 	}
 
 	
@@ -96,8 +110,8 @@ public class ServerConfig extends SysConfig {
 	 * Note, the period in miliseconds that the Hudup server does periodically internal tasks such as data mining and learning knowledge base.
 	 * @param milisec task period in miliseconds.
 	 */
-	public void setServerTaskPeriod(int milisec) {
-		put(SERVER_TASK_PERIOD_FIELD, milisec);
+	public void setServerTasksPeriod(int milisec) {
+		put(SERVER_TASKS_PERIOD_FIELD, milisec);
 	}
 	
 	
@@ -106,11 +120,28 @@ public class ServerConfig extends SysConfig {
 	 * Note, the period in miliseconds that the Hudup server does periodically internal tasks such as data mining and learning knowledge base.
 	 * @return task period in mili seconds.
 	 */
-	public int getServerTaskPeriod() {
-		return getAsInt(SERVER_TASK_PERIOD_FIELD);
+	public int getServerTasksPeriod() {
+		return getAsInt(SERVER_TASKS_PERIOD_FIELD);
 	}
 	
 	
+	/**
+	 * Setting flag to do server tasks.
+	 * @param flag flag to do server tasks.
+	 */
+	public void setDoServerTasks(boolean flag) {
+		put(DO_SERVER_TASKS_FIELD, flag);
+	}
+	
+	
+	/**
+	 * Getting flag to do server tasks.
+	 * @return flag to do server tasks.
+	 */
+	public boolean isDoServerTasks() {
+		return getAsBoolean(DO_SERVER_TASKS_FIELD);
+	}
+
 	
 	/**
 	 * Setting server timeout in miliseconds.

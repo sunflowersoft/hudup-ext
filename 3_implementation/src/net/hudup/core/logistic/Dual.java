@@ -3,6 +3,8 @@
  */
 package net.hudup.core.logistic;
 
+import java.io.Serializable;
+
 import net.hudup.core.Constants;
 
 
@@ -13,7 +15,14 @@ import net.hudup.core.Constants;
  * @version 10.0
  *
  */
-public class Dual {
+public class Dual implements Serializable {
+
+	
+	/**
+	 * Default serial version UID.
+	 */
+	private static final long serialVersionUID = 1L;
+
 
 	/**
 	 * This variable represents the first value. Note that two variables {@link #one} and {@link #other} are dual.

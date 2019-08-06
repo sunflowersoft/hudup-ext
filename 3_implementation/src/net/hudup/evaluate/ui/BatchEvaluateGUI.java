@@ -214,9 +214,10 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 	/**
 	 * Constructor with specified evaluator.
 	 * @param evaluator specified evaluator.
+	 * @param bindUri bound URI.
 	 */
-	public BatchEvaluateGUI(Evaluator evaluator) {
-		super(evaluator);
+	public BatchEvaluateGUI(Evaluator evaluator, xURI bindUri) {
+		super(evaluator, bindUri);
 		// TODO Auto-generated constructor stub
 		try {
 			algRegTable.copy(evaluator.extractAlgFromPluginStorage());
@@ -921,7 +922,8 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 		}
 		
 		
-		this.result = evt.getEvaluator().getResult();
+		//this.result = evt.getEvaluator().getResult();
+		this.result = evaluator.getResult(); //Fix bug date: 2019.08.06 by Loc Nguyen.
 		if (evt.getType() == Type.done) {
 			counterClock.stop();
 			updateMode();
