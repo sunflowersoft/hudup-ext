@@ -435,8 +435,6 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 	private synchronized void callServerTasks() throws RemoteException {
 		if (!isRunning()) return;
 
-		if (!config.isDoServerTasks()) return;
-		
 		try {
 			serverTasks();
 			logger.info("Server has done timer internal tasks");

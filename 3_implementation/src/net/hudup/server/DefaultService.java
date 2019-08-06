@@ -212,6 +212,15 @@ public class DefaultService implements Service, AutoCloseable {
 	}
 	
 	
+	/**
+	 * Setting evaluator configuration.
+	 * @param evaluatorConfig specified evaluator configuration. 
+	 */
+	protected void setEvaluatorConfig(EvaluatorConfig evaluatorConfig) {
+		this.evaluatorConfig = evaluatorConfig;
+	}
+	
+	
 	@Override
 	public RatingVector estimate(RecommendParam param, Set<Integer> queryIds) throws RemoteException {
 		// TODO Auto-generated method stub

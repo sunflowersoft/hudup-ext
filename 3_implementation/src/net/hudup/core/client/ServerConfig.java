@@ -38,22 +38,9 @@ public class ServerConfig extends SysConfig {
 	
 	/**
 	 * Every new information (new entry) that is put into server configuration has a key.
-	 * This constant specifies key name of whether doing server task.
-	 */
-	public final static String DO_SERVER_TASKS_FIELD = changeCase("do_servers_task");
-
-	
-	/**
-	 * Every new information (new entry) that is put into server configuration has a key.
 	 * This constant specifies key name of server timeout interval.
 	 */
 	public final static String SERVER_TIMEOUT_FIELD = changeCase("server_timeout");
-
-	
-	/**
-	 * By default, it is necessary to do server tasks.
-	 */
-	public final static boolean DO_SERVER_TASKS_DEFAULT = true;
 
 	
 	/**
@@ -83,7 +70,6 @@ public class ServerConfig extends SysConfig {
 		setServerPort(Constants.DEFAULT_SERVER_PORT);
 		setServerTimeout(Constants.DEFAULT_SERVER_TIMEOUT);
 		setServerTasksPeriod(Constants.DEFAULT_SERVER_TASKS_PERIOD);
-		setDoServerTasks(DO_SERVER_TASKS_DEFAULT);
 	}
 
 	
@@ -124,24 +110,6 @@ public class ServerConfig extends SysConfig {
 		return getAsInt(SERVER_TASKS_PERIOD_FIELD);
 	}
 	
-	
-	/**
-	 * Setting flag to do server tasks.
-	 * @param flag flag to do server tasks.
-	 */
-	public void setDoServerTasks(boolean flag) {
-		put(DO_SERVER_TASKS_FIELD, flag);
-	}
-	
-	
-	/**
-	 * Getting flag to do server tasks.
-	 * @return flag to do server tasks.
-	 */
-	public boolean isDoServerTasks() {
-		return getAsBoolean(DO_SERVER_TASKS_FIELD);
-	}
-
 	
 	/**
 	 * Setting server timeout in miliseconds.

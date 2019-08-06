@@ -104,10 +104,12 @@ public class DefaultServer extends PowerServerImpl {
 		//Saving evaluator configuration here is not best solution. Update later.
 		try {
 			EvaluatorConfig evaluatorConfig = service.getEvaluatorConfig();
-			if (evaluatorConfig != null)
+			if (evaluatorConfig != null) {
 				evaluatorConfig.save();
+				service.setEvaluatorConfig(null);
+			}
 		}
-		catch (Exception e) {
+		catch (Throwable e) {
 			e.printStackTrace();
 		}
 		
@@ -120,8 +122,10 @@ public class DefaultServer extends PowerServerImpl {
 		// TODO Auto-generated method stub
 		
 		// Task 1
-		DefaultService newService = createService();
-		newService.transfer(service);
+		if (config.isRecommenderPeriodLearn()) { //This method is used to prevent time consuming to learn internal recommender.
+			DefaultService newService = createService();
+			newService.transfer(service);
+		}
 	}
 	
 	
