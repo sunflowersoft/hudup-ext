@@ -1,5 +1,7 @@
 package net.hudup.server.external;
 
+import java.io.Serializable;
+import java.rmi.RemoteException;
 import java.util.Set;
 
 import net.hudup.alg.cf.gfall.GreenFallCF;
@@ -48,7 +50,7 @@ public class ExternalServerRecommender extends CompositeRecommender {
 
 	
 	@Override
-	public void setup(Dataset dataset, Object... params) throws Exception {
+	public void setup(Dataset dataset, Serializable... params) throws RemoteException {
 		// TODO Auto-generated method stub
 		super.setup(dataset, params);
 		
@@ -57,7 +59,7 @@ public class ExternalServerRecommender extends CompositeRecommender {
 
 
 	@Override
-	public void unsetup() {
+	public void unsetup() throws RemoteException {
 		// TODO Auto-generated method stub
 		super.unsetup();
 		filterList.clear();
@@ -117,14 +119,14 @@ public class ExternalServerRecommender extends CompositeRecommender {
 
 	
 	@Override
-	public RatingVector estimate(RecommendParam param, Set<Integer> queryIds) {
+	public RatingVector estimate(RecommendParam param, Set<Integer> queryIds) throws RemoteException {
 		// TODO Auto-generated method stub
 		return ((Recommender)getInnerRecommenders().get(0)).estimate(param, queryIds);
 	}
 
 	
 	@Override
-	public RatingVector recommend(RecommendParam param, int maxRecommend) {
+	public RatingVector recommend(RecommendParam param, int maxRecommend) throws RemoteException {
 		// TODO Auto-generated method stub
 		return ((Recommender)getInnerRecommenders().get(0)).recommend(param, maxRecommend);
 	}

@@ -203,7 +203,14 @@ public class EstimateEvaluator extends RecommendEvaluator {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-					recommender.unsetup();
+					
+					try {
+						recommender.unsetup();
+					}
+					catch (Throwable e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 				}
 				
 				

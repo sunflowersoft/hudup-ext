@@ -1,6 +1,7 @@
 package net.hudup.core.alg;
 
 import java.io.Serializable;
+import java.util.Collection;
 
 import net.hudup.core.Util;
 import net.hudup.core.data.DataConfig;
@@ -22,6 +23,16 @@ public class AlgDesc implements Serializable, net.hudup.core.Cloneable {
 	private static final long serialVersionUID = 1L;
 
 
+	/**
+	 * Type of algorithm.
+	 * @author Loc Nguyen
+	 * @version 1.0
+	 */
+	public enum MethodologyType {
+		memorybased, modelbased, composite, service, unknown
+	}
+	
+	
 	/**
 	 * Algorithm name.
 	 */
@@ -119,6 +130,80 @@ public class AlgDesc implements Serializable, net.hudup.core.Cloneable {
 		return new AlgDesc(algClassName.toString(), (DataConfig) config.clone());
 	}
 	
+	
+	/**
+	 * Getting type of given algorithm.
+	 * @param alg given algorithm.
+	 * @return type of given algorithm.
+	 */
+	public static MethodologyType getTypeOf(Alg alg) {
+		if (alg instanceof MemoryBasedAlg)
+			return MethodologyType.memorybased;
+		else if (alg instanceof ModelBasedAlg)
+			return MethodologyType.modelbased;
+		else if (alg instanceof CompositeAlg)
+			return MethodologyType.composite;
+		else if (alg instanceof ServiceAlg)
+			return MethodologyType.service;
+		else
+			return MethodologyType.unknown;
+	}
+
+	
+	/**
+	 * Getting type of given algorithms.
+	 * @param algs given algorithms.
+	 * @return type of given algorithms.
+	 */
+	public static MethodologyType getTypeOf(Collection<Alg> algs) {
+		if (algs == null || algs.size() == 0)
+			return MethodologyType.unknown;
+		
+		boolean memorybased = true, modelbased = true, composite = true, service = true;
+		for (Alg alg : algs) {
+			if (alg instanceof MemoryBasedAlg) {
+				memorybased = memorybased && true;
+				modelbased = modelbased && false;
+				composite = composite && false;
+				service = service && false;
+			}
+			else if (alg instanceof ModelBasedAlg) {
+				memorybased = memorybased && false;
+				modelbased = modelbased && true;
+				composite = composite && false;
+				service = service && false;
+			}
+			else if (alg instanceof CompositeAlg) {
+				memorybased = memorybased && false;
+				modelbased = modelbased && false;
+				composite = composite && true;
+				service = service && false;
+			}
+			else if (alg instanceof ServiceAlg) {
+				memorybased = memorybased && false;
+				modelbased = modelbased && false;
+				composite = composite && false;
+				service = service && true;
+			}
+			else {
+				memorybased = memorybased && false;
+				modelbased = modelbased && false;
+				composite = composite && false;
+				service = service && false;
+			}
+		}
+		
+		if (memorybased)
+			return MethodologyType.memorybased;
+		else if (modelbased)
+			return MethodologyType.modelbased;
+		else if (composite)
+			return MethodologyType.composite;
+		else if (service)
+			return MethodologyType.service;
+		else
+			return MethodologyType.unknown;
+	}
 	
 
 }

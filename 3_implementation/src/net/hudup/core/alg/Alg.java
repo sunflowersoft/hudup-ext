@@ -4,6 +4,7 @@
 package net.hudup.core.alg;
 
 import java.io.Serializable;
+import java.rmi.Remote;
 
 import net.hudup.core.data.DataConfig;
 
@@ -28,7 +29,7 @@ import net.hudup.core.data.DataConfig;
  * @author Loc Nguyen
  * @version 10.0
  */
-public interface Alg extends Serializable {
+public interface Alg extends Remote, Serializable {
 	
 	
 	/**
@@ -65,5 +66,6 @@ public interface Alg extends Serializable {
 	 * @return New {@link Alg} instance
 	 */
 	Alg newInstance();
+	
 	
 }

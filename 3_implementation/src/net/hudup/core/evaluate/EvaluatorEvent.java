@@ -101,7 +101,7 @@ public class EvaluatorEvent extends EventObject {
 	 * @param metrics specified list of metrics.
 	 * @param params additional parameters.
 	 */
-	public EvaluatorEvent(Evaluator evaluator, Type type, Metrics metrics, Object... params) {
+	public EvaluatorEvent(Evaluator evaluator, Type type, Metrics metrics, Serializable... params) {
 		this(evaluator, type, metrics);
 		// TODO Auto-generated constructor stub
 		
@@ -152,7 +152,7 @@ public class EvaluatorEvent extends EventObject {
 	 * Getting additional parameter list.
 	 * @return additional  parameter list
 	 */
-	public Object[] getParams() {
+	public Serializable[] getParams() {
 		return params;
 	}
 	

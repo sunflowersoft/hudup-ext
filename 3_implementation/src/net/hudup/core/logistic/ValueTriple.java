@@ -19,6 +19,7 @@ import net.hudup.core.data.RatingVector;
  * @version 10.0
  *
  */
+@Deprecated
 public class ValueTriple implements Cloneable, Serializable {
 	
 	

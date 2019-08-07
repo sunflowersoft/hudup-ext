@@ -1,9 +1,9 @@
 package net.hudup.listener;
 
 import net.hudup.core.Constants;
+import net.hudup.core.Util;
 import net.hudup.core.client.ServerConfig;
 import net.hudup.core.data.HiddenText;
-import net.hudup.core.logistic.Cipher;
 import net.hudup.core.logistic.xURI;
 
 
@@ -211,16 +211,14 @@ public class ListenerConfig extends ServerConfig {
 	@Override
 	protected String encrypt(HiddenText hidden) {
 		// TODO Auto-generated method stub
-		Cipher cipher = new Cipher();
-		return cipher.encrypt(hidden.getText());
+		return Util.getCipher().encrypt(hidden.getText());
 	}
 
 
 	@Override
 	protected HiddenText decrypt(String text) {
 		// TODO Auto-generated method stub
-		Cipher cipher = new Cipher();
-		return new HiddenText(cipher.decrypt(text));
+		return new HiddenText(Util.getCipher().decrypt(text));
 	}
 
 

@@ -6,6 +6,7 @@ package net.hudup.parser;
  * @author Loc Nguyen
  * @version 10.0
  */
+@Deprecated
 public interface Mapper {
 	
 	/**

@@ -19,6 +19,7 @@ public interface MetricValue extends Serializable, Cloneable {
 	
 	/**
 	 * Getting value of {@code MetricValue}. For example, such value is often mean number (average number).
+	 * The returned object is often serializable. It can be geometric object.
 	 * @return value of {@code MetricValue}.
 	 */
 	Object value();

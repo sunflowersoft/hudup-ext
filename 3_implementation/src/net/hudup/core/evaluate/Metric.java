@@ -69,7 +69,7 @@ public interface Metric extends Alg, Serializable {
 	
 	/**
 	 * Setting up (Initializing) this metric based on an array of objects known as parameters
-	 * @param params specified array of objects known as parameters.
+	 * @param params specified array of objects known as parameters. The parameters should be serializable.
 	 */
 	void setup(Object... params);
 	
@@ -101,6 +101,7 @@ public interface Metric extends Alg, Serializable {
 	/**
 	 * This is the most important method expressing how to re-calculate a concrete {@code metric} according to specified parameters.
 	 * @param params specified array of objects known as parameters. Such parameters varied according to concrete metric.
+	 * The parameters should be serializable.
 	 * @return whether calculating successfully
 	 * @throws Exception if any error raises.
 	 */

@@ -12,6 +12,7 @@ import net.hudup.core.Util;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.PropList;
 import net.hudup.core.data.RatingMatrix;
+import net.hudup.core.logistic.NextUpdate;
 import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.Vector;
 import net.hudup.core.logistic.xURI;
@@ -23,6 +24,8 @@ import net.hudup.core.parser.TextParserUtil;
  * @version 10.0
  *
  */
+@NextUpdate
+@Deprecated
 public abstract class SvdGradientPlusKB extends SvdGradientKB {
 
 	

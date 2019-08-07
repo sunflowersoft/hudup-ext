@@ -3,8 +3,8 @@ package net.hudup.listener;
 import java.io.Serializable;
 
 import net.hudup.core.Cloneable;
+import net.hudup.core.Util;
 import net.hudup.core.data.HiddenText;
-import net.hudup.core.logistic.Cipher;
 import net.hudup.core.parser.TextParsable;
 import net.hudup.core.parser.TextParserUtil;
 
@@ -93,11 +93,10 @@ public class RemoteInfo implements Serializable, Cloneable, TextParsable {
 	@Override
 	public String toText() {
 		// TODO Auto-generated method stub
-		Cipher cipher = new Cipher();
 		return host + TextParserUtil.MAIN_SEP + 
 				port + TextParserUtil.MAIN_SEP +
 				account + TextParserUtil.MAIN_SEP +
-				cipher.encrypt(password.getText());
+				Util.getCipher().encrypt(password.getText());
 	}
 
 	
@@ -148,8 +147,7 @@ public class RemoteInfo implements Serializable, Cloneable, TextParsable {
 					account = part;
 					break;
 				case 3:
-					Cipher cipher = new Cipher();
-					password = new HiddenText(cipher.decrypt(part));
+					password = new HiddenText(Util.getCipher().decrypt(part));
 					break;
 				}
 				index ++;

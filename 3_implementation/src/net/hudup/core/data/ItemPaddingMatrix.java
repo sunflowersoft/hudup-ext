@@ -15,6 +15,7 @@ import net.hudup.core.logistic.MathUtil;
  * @author Loc Nguyen
  * @version 10.0
  */
+@Deprecated
 public class ItemPaddingMatrix extends PaddingMatrix {
 
 	public ItemPaddingMatrix(Dataset dataset, RatingVector vRat) {

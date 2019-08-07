@@ -11,6 +11,7 @@ import java.io.BufferedReader;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.io.Writer;
+import java.rmi.RemoteException;
 import java.util.BitSet;
 import java.util.List;
 import java.util.Map;
@@ -118,7 +119,7 @@ public abstract class FreqItemsetBasedCF extends ModelBasedCF {
 
 	
 	@Override
-	public RatingVector estimate(RecommendParam param, Set<Integer> queryIds) {
+	public RatingVector estimate(RecommendParam param, Set<Integer> queryIds) throws RemoteException {
 		if (param == null)
 			return null;
 		
@@ -192,7 +193,7 @@ public abstract class FreqItemsetBasedCF extends ModelBasedCF {
 
 	
 	@Override
-	public RatingVector recommend(RecommendParam param, int maxRecommend) {
+	public RatingVector recommend(RecommendParam param, int maxRecommend) throws RemoteException {
 		// maxRecommend = 0: get All
 		param = recommendPreprocess(param);
 		if (param == null)

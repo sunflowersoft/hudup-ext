@@ -15,6 +15,7 @@ import net.hudup.core.logistic.NextUpdate;
  *
  */
 @NextUpdate
+@Deprecated
 public class F1 extends MetaMetric {
 
 	

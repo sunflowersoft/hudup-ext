@@ -8,11 +8,11 @@ import java.net.URL;
 
 import net.hudup.alg.cf.gfall.GreenFallCF;
 import net.hudup.core.Constants;
+import net.hudup.core.Util;
 import net.hudup.core.alg.Recommender;
 import net.hudup.core.client.ServerConfig;
 import net.hudup.core.data.HiddenText;
 import net.hudup.core.logistic.xURI;
-import net.hudup.logistic.math.HudupCipher;
 import net.hudup.parser.SemiScannerParser;
 import net.hudup.parser.SnapshotParserImpl;
 
@@ -149,16 +149,14 @@ public class PowerServerConfig extends ServerConfig {
 	@Override
 	protected String encrypt(HiddenText hidden) {
 		// TODO Auto-generated method stub
-		HudupCipher cipher = new HudupCipher();
-		return cipher.encrypt(hidden.getText());
+		return Util.getCipher().encrypt(hidden.getText());
 	}
 
 
 	@Override
 	protected HiddenText decrypt(String text) {
 		// TODO Auto-generated method stub
-		HudupCipher cipher = new HudupCipher();
-		return new HiddenText(cipher.decrypt(text));
+		return new HiddenText(Util.getCipher().decrypt(text));
 	}
 	
 	

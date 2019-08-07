@@ -1,6 +1,7 @@
 package net.hudup.alg.cf.stat;
 
 import java.io.Serializable;
+import java.rmi.RemoteException;
 import java.util.List;
 import java.util.Set;
 
@@ -27,6 +28,7 @@ import net.hudup.core.logistic.xURI;
  *
  */
 @NextUpdate
+@Deprecated
 public class BayesLookupTableCF extends ModelBasedCF {
 
 	
@@ -65,7 +67,7 @@ public class BayesLookupTableCF extends ModelBasedCF {
 
 	
 	@Override
-	public RatingVector estimate(RecommendParam param, Set<Integer> queryIds) {
+	public RatingVector estimate(RecommendParam param, Set<Integer> queryIds) throws RemoteException {
 		// TODO Auto-generated method stub
 		BayesLookupTableKB kb = (BayesLookupTableKB) getKBase();
 		if (kb.isEmpty())
@@ -88,7 +90,7 @@ public class BayesLookupTableCF extends ModelBasedCF {
 
 
 	@Override
-	public RatingVector recommend(RecommendParam param, int maxRecommend) {
+	public RatingVector recommend(RecommendParam param, int maxRecommend) throws RemoteException {
 		// TODO Auto-generated method stub
 		BayesLookupTableKB kb = (BayesLookupTableKB) getKBase();
 		if (kb.isEmpty())

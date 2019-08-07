@@ -95,7 +95,7 @@ public class RatingMulti extends Rating {
 		}
 		else {
 			this.value = Constants.UNUSED;
-			this.contexts.clear();;
+			this.contexts.clear();
 			this.ratedDate = new Date();
 		}
 	}

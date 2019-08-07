@@ -141,7 +141,7 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 				System.setProperty("java.security.policy", policyUrl.toString());
 				if (System.getSecurityManager() == null) {
 					int version = SystemUtil.getJavaVersion();
-					if (version < 8)
+					if (version <= 8)
 						System.setSecurityManager(new java.rmi.RMISecurityManager());
 					else
 						System.setSecurityManager(new SecurityManager());

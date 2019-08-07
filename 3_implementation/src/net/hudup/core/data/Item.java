@@ -14,6 +14,7 @@ import net.hudup.core.Cloneable;
  * @version 10.0
  *
  */
+@Deprecated
 public class Item extends Profile implements Cloneable {
 	
 	

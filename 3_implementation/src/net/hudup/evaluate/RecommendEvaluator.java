@@ -1,5 +1,6 @@
 package net.hudup.evaluate;
 
+import java.io.Serializable;
 import java.rmi.RemoteException;
 
 import net.hudup.core.Constants;
@@ -245,7 +246,14 @@ public class RecommendEvaluator extends AbstractEvaluator {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-					recommender.unsetup();
+					
+					try {
+						recommender.unsetup();
+					}
+					catch (Throwable e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 				}
 				
 				SystemUtil.enhanceAuto();
@@ -364,14 +372,14 @@ public class RecommendEvaluator extends AbstractEvaluator {
 
 
 	@Override
-	protected Object executeAlg(Alg alg, Profile param) {
+	protected Serializable executeAlg(Alg alg, Profile param) {
 		// TODO Auto-generated method stub
 		throw new RuntimeException("Do not support this method");
 	}
 
 
 	@Override
-	protected Object extractTestValue(Alg alg, Profile testingProfile) {
+	protected Serializable extractTestValue(Alg alg, Profile testingProfile) {
 		// TODO Auto-generated method stub
 		throw new RuntimeException("Do not support this method");
 	}

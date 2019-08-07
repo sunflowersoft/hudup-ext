@@ -1,6 +1,6 @@
 package net.hudup.core.data;
 
-import net.hudup.core.logistic.Cipher;
+import net.hudup.core.Util;
 import net.hudup.core.logistic.xURI;
 
 
@@ -274,16 +274,14 @@ public class ExternalConfig extends SysConfig {
 	@Override
 	protected String encrypt(HiddenText hidden) {
 		// TODO Auto-generated method stub
-		Cipher cipher = new Cipher();
-		return cipher.encrypt(hidden.getText());
+		return Util.getCipher().encrypt(hidden.getText());
 	}
 
 
 	@Override
 	protected HiddenText decrypt(String text) {
 		// TODO Auto-generated method stub
-		Cipher cipher = new Cipher();
-		return new HiddenText(cipher.decrypt(text));
+		return new HiddenText(Util.getCipher().decrypt(text));
 	}
 
 

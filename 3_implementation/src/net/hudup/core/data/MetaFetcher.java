@@ -1,21 +1,29 @@
 package net.hudup.core.data;
 
+import java.io.Serializable;
 import java.rmi.RemoteException;
 
 
 /**
+ * This class implements the meta fetcher.
  * 
  * @author Loc Nguyen
  * @version 10.0
  *
- * @param <U>
- * @param <V>
+ * @param <U> Key type.
+ * @param <V> Value type.
  */
-public abstract class MetaFetcher<U, V> implements Fetcher<V> {
+public abstract class MetaFetcher<U extends Serializable, V extends Serializable> implements Fetcher<V> {
 
 	
 	/**
-	 * 
+	 * Default serial version UID.
+	 */
+	private static final long serialVersionUID = 1L;
+	
+	
+	/**
+	 * Internal fetcher.
 	 */
 	protected Fetcher<U> fetcher = null;
 

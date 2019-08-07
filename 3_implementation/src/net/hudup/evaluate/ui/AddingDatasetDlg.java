@@ -13,6 +13,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import net.hudup.core.alg.Alg;
+import net.hudup.core.alg.AlgDesc;
+import net.hudup.core.alg.AlgDesc.MethodologyType;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.DatasetPair;
@@ -78,6 +80,7 @@ public class AddingDatasetDlg extends JDialog {
 	 */
 	public AddingDatasetDlg(Component comp, DatasetPool pool, List<Alg> algList, String mainUnit) {
 		super(UIUtil.getFrameForComponent(comp), "Add datasets", true);
+		this.setTitle(getMessage("add_datasets"));
 		this.pool = pool;
 		this.algList = algList;
 		
@@ -94,25 +97,23 @@ public class AddingDatasetDlg extends JDialog {
 		header.add(left, BorderLayout.WEST);
 		
 		
-		btnTrainingBrowse = new JButton("Training set / KBase");
+		btnTrainingBrowse = new JButton(getMessage("training_set"));
 		btnTrainingBrowse.addActionListener(new ActionListener() {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
-				
 				openTrainingSet(mainUnit);
 			}
 		});
 		left.add(btnTrainingBrowse);
 		
-		btnTestingBrowse = new JButton("Testing set");
+		btnTestingBrowse = new JButton(getMessage("testing_set"));
 		btnTestingBrowse.addActionListener(new ActionListener() {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
-				
 				openTestingSet(mainUnit);
 			}
 		});
@@ -134,33 +135,54 @@ public class AddingDatasetDlg extends JDialog {
 		JPanel footer = new JPanel();
 		add(footer, BorderLayout.SOUTH);
 		
-		JButton btnAdd = new JButton("Add dataset");
+		JButton btnAdd = new JButton(getMessage("add_dataset"));
 		btnAdd.addActionListener(new ActionListener() {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
-				
 				addDataset();
 			}
 		});
 		footer.add(btnAdd);
 		
-		JButton btnClose = new JButton("Close");
+		JButton btnClose = new JButton(getMessage("close"));
 		btnClose.addActionListener(new ActionListener() {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
-				
 				dispose();
 			}
 		});
 		footer.add(btnClose);
 		
+		algChanged(); //Update GUI according to algorithm.
+		
 		setVisible(true);
 	}
 
+	
+	/**
+	 * Change GUI according to algorithms. 
+	 */
+	private void algChanged() {
+		if (this.algList == null || this.algList.size() == 0)
+			return;
+		
+		MethodologyType type = AlgDesc.getTypeOf(this.algList);
+		if (type == MethodologyType.memorybased)
+			btnTrainingBrowse.setText(getMessage("training_set"));
+		else if (type == MethodologyType.modelbased)
+			btnTrainingBrowse.setText(getMessage("training_set_kbase"));
+		else if (type == MethodologyType.composite)
+			btnTrainingBrowse.setText(getMessage("any_source"));
+		else if (type == MethodologyType.service)
+			btnTrainingBrowse.setText(getMessage("service_pointer"));
+		else
+			btnTrainingBrowse.setText(getMessage("training_set"));
+	}
+	
 	
 	/**
 	 * Open training set.
@@ -169,14 +191,23 @@ public class AddingDatasetDlg extends JDialog {
 	protected void openTrainingSet(String mainUnit) {
 		
 		DataConfig defaultCfg = txtTrainingBrowse.getConfig();
-		if (defaultCfg == null)
-			defaultCfg = new DataConfig();
+		MethodologyType type = AlgDesc.getTypeOf(this.algList);
+		
+		//Getting default configuration according to algorithm if possible.
+		if (defaultCfg == null) {
+			defaultCfg = type != MethodologyType.unknown ?
+						DatasetUtil2.createDefaultConfig(this.algList.get(0))
+						: new DataConfig();
+		}
+		
 		if (mainUnit != null) {
 			defaultCfg = (DataConfig)defaultCfg.clone();
 			defaultCfg.setMainUnit(mainUnit);
 		}
-			
-		DataConfig config = net.hudup.data.DatasetUtil2.chooseConfig(this, defaultCfg);
+		
+		//Getting default configuration according to algorithm if possible.
+		DataConfig config = DatasetUtil2.chooseTrainingConfig(this, defaultCfg,
+				type != MethodologyType.unknown ? this.algList.get(0) : null);
 		
 		if (config == null) {
 			JOptionPane.showMessageDialog(
@@ -206,7 +237,7 @@ public class AddingDatasetDlg extends JDialog {
 			defaultCfg.setMainUnit(mainUnit);
 		}
 		
-		DataConfig config = net.hudup.data.DatasetUtil2.chooseConfig(this, defaultCfg);
+		DataConfig config = DatasetUtil2.chooseTestingConfig(this, defaultCfg);
 			
 		if (config == null) {
 			JOptionPane.showMessageDialog(
@@ -318,4 +349,14 @@ public class AddingDatasetDlg extends JDialog {
 	}
 	
 	
+	/**
+	 * Getting message by specified key.
+	 * @param key specified key.
+	 * @return message according to key.
+	 */
+	protected String getMessage(String key) {
+		return key;
+	}
+
+
 }

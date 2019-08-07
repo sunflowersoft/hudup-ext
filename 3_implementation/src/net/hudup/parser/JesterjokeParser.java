@@ -12,6 +12,7 @@ import net.hudup.core.parser.SnapshotParser;
  * @version 10.0
  *
  */
+@Deprecated
 public abstract class JesterjokeParser extends SnapshotParser {
 
 	

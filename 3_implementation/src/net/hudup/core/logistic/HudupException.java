@@ -10,6 +10,7 @@ package net.hudup.core.logistic;
  * @version 10.0
  *
  */
+@Deprecated
 public class HudupException extends Exception {
 
 	

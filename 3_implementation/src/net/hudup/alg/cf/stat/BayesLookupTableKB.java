@@ -13,6 +13,7 @@ import net.hudup.core.data.Dataset;
 import net.hudup.core.data.Fetcher;
 import net.hudup.core.data.Rating;
 import net.hudup.core.data.RatingVector;
+import net.hudup.core.logistic.NextUpdate;
 
 /**
  * 
@@ -20,6 +21,8 @@ import net.hudup.core.data.RatingVector;
  * @version 10.0
  *
  */
+@NextUpdate
+@Deprecated
 public abstract class BayesLookupTableKB extends KBaseAbstract {
 
 	

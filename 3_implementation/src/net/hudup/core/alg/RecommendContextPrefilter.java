@@ -1,5 +1,7 @@
 package net.hudup.core.alg;
 
+import java.io.Serializable;
+import java.rmi.RemoteException;
 import java.util.Set;
 
 import net.hudup.core.Util;
@@ -86,7 +88,7 @@ public class RecommendContextPrefilter extends CompositeRecommender {
 	
 	
 	@Override
-	public void setup(Dataset dataset, Object... params) throws Exception {
+	public void setup(Dataset dataset, Serializable... params) throws RemoteException {
 		// TODO Auto-generated method stub
 		unsetup();
 		
@@ -98,7 +100,7 @@ public class RecommendContextPrefilter extends CompositeRecommender {
 				((Recommender)getInnerRecommenders().get(0)).setup(filteredDataset);
 			}
 			else
-				throw new Exception("Invalid parameter");
+				throw new RemoteException("Invalid parameter");
 		}
 		
 	}
@@ -124,7 +126,7 @@ public class RecommendContextPrefilter extends CompositeRecommender {
 	
 	
 	@Override
-	public void unsetup() {
+	public void unsetup() throws RemoteException {
 		// TODO Auto-generated method stub
 		super.unsetup();
 		
@@ -172,7 +174,7 @@ public class RecommendContextPrefilter extends CompositeRecommender {
 	
 	
 	@Override
-	public RatingVector estimate(RecommendParam param, Set<Integer> queryIds) {
+	public RatingVector estimate(RecommendParam param, Set<Integer> queryIds) throws RemoteException {
 		// TODO Auto-generated method stub
 		
 		try {
@@ -190,7 +192,7 @@ public class RecommendContextPrefilter extends CompositeRecommender {
 
 	
 	@Override
-	public RatingVector recommend(RecommendParam param, int maxRecommend) {
+	public RatingVector recommend(RecommendParam param, int maxRecommend) throws RemoteException {
 		// TODO Auto-generated method stub
 
 		try {

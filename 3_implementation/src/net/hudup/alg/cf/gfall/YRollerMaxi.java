@@ -33,6 +33,7 @@ import net.hudup.data.bit.BitsetItem;
  * @version 10.0
  *
  */
+@Deprecated
 public class YRollerMaxi extends YRoller {
 
 	

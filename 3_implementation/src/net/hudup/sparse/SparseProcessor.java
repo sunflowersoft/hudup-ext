@@ -209,7 +209,13 @@ public class SparseProcessor {
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			recommender.unsetup();
+			try {
+				recommender.unsetup();
+			}
+			catch (Throwable e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 			
 			return false;
 		}
@@ -276,7 +282,13 @@ public class SparseProcessor {
 				e.printStackTrace();
 			}
 			
-			recommender.unsetup();
+			try {
+				recommender.unsetup();
+			}
+			catch (Throwable e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		
 		
@@ -371,7 +383,13 @@ public class SparseProcessor {
 			result = false;
 		}
 		finally {
-			svdCf.unsetup();
+			try {
+				svdCf.unsetup();
+			}
+			catch (Throwable e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		
 		return result;
@@ -403,7 +421,13 @@ public class SparseProcessor {
 			result = false;
 		}
 		finally {
-			svdCf.unsetup();
+			try {
+				svdCf.unsetup();
+			}
+			catch (Throwable e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		
 		return result;
@@ -454,7 +478,13 @@ public class SparseProcessor {
 			result = false;
 		}
 		finally {
-			bayesLutCf.unsetup();
+			try {
+				bayesLutCf.unsetup();
+			}
+			catch (Throwable e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		
 		return result;

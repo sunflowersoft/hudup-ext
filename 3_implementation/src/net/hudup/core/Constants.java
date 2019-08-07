@@ -3,6 +3,9 @@
  */
 package net.hudup.core;
 
+import java.io.InputStream;
+import java.util.Properties;
+
 /**
  * This utility final class defines essential constants used over Hudup framework.
  * @author Loc Nguyen
@@ -182,12 +185,15 @@ public final class Constants {
 	 */
 	static {
 		try {
-			String decimal = System.getProperty("hudup_decimal_precision", null);
+			Properties props = new Properties();
+			InputStream in = Util.class.getResourceAsStream(ROOT_PACKAGE + "hudup.properties");		
+			props.load(in);
+			String decimal = props.getProperty("decimal_precision");
 			if (decimal != null)
 				DECIMAL_PRECISION = Integer.parseInt(decimal);
 		}
 		catch (Throwable e) {
-			System.out.println("Error when getting exchanged property");
+			System.out.println("Error when parsing decimal decision");
 		}
 	}
 	

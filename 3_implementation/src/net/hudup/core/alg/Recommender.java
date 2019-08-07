@@ -1,8 +1,7 @@
-/**
- * 
- */
 package net.hudup.core.alg;
 
+import java.io.Serializable;
+import java.rmi.RemoteException;
 import java.util.Set;
 
 import net.hudup.core.Util;
@@ -53,15 +52,16 @@ public abstract class Recommender extends AbstractAlg {
 	 * 
 	 * @param dataset dataset is the main parameter to setup this recommender.
 	 * @param params Additional parameters to set up this recommender. This parameter is really an array of sub-parameters.
-	 * @exception Exception if any error occurs.
+	 * @exception RemoteException if any error occurs.
 	 */
-	public abstract void setup(Dataset dataset, Object... params) throws Exception;
+	public abstract void setup(Dataset dataset, Serializable... params) throws RemoteException;
 	
 	
 	/**
 	 * Unset this recommender. After this method is called, this recommender cannot be used unless the method {@link #setup(Dataset, Object...)} is called again.
+	 * @throws RemoteException if any error raises.
 	 */
-	public void unsetup() {
+	public void unsetup() throws RemoteException {
 		filterList.clear();
 		Dataset dataset = getDataset();
 		if (dataset != null && dataset.isExclusive())
@@ -97,8 +97,9 @@ public abstract class Recommender extends AbstractAlg {
 	 * @param param recommendation parameter. Please see {@link RecommendParam} for more details of this parameter.
 	 * @param queryIds set of identifications (IDs) of items that need to be estimated their rating values.
 	 * @return rating vector contains estimated rating values of the specified set of IDs of items (users).
+	 * @throws RemoteException if any error raises.
 	 */
-	public abstract RatingVector estimate(RecommendParam param, Set<Integer> queryIds);
+	public abstract RatingVector estimate(RecommendParam param, Set<Integer> queryIds) throws RemoteException;
 
 	
 	/**
@@ -109,8 +110,9 @@ public abstract class Recommender extends AbstractAlg {
 	 * @param param recommendation parameter. Please see {@link RecommendParam} for more details of this parameter.
 	 * @param maxRecommend the maximum recommended items (users) in the returned rating vector.
 	 * @return list of recommended items (users) which is provided to the user (item), represented by {@link RatingVector} class. The number of items (users) of such list is specified by the the maximum number.
+	 * @throws RemoteException if any error raises.
 	 */
-	public abstract RatingVector recommend(RecommendParam param, int maxRecommend);
+	public abstract RatingVector recommend(RecommendParam param, int maxRecommend) throws RemoteException;
 
 	
 	/**
@@ -175,7 +177,7 @@ public abstract class Recommender extends AbstractAlg {
 		return maxRating; 
 	}
 	
-	
+
 	@Override
 	protected void finalize() throws Throwable {
 		// TODO Auto-generated method stub

@@ -17,6 +17,7 @@ import net.hudup.core.data.RatingVector;
  * @author Loc Nguyen
  * @version 10.0
  */
+@Deprecated
 public class DatasetStatsProcessor implements Serializable {
 	
 	

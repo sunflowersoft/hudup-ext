@@ -225,6 +225,11 @@ public class ScannerImpl extends Scanner {
 		
 		return new MetaFetcher<Integer, RatingVector>(userIds) {
 
+			/**
+			 * Default serial version UID.
+			 */
+			private static final long serialVersionUID = 1L;
+
 			@Override
 			public RatingVector create(Integer u) {
 				// TODO Auto-generated method stub
@@ -250,6 +255,11 @@ public class ScannerImpl extends Scanner {
 		Fetcher<Integer> itemIds = fetchItemIds();
 		
 		return new MetaFetcher<Integer, RatingVector>(itemIds) {
+
+			/**
+			 * Default serial version UID.
+			 */
+			private static final long serialVersionUID = 1L;
 
 			@Override
 			public RatingVector create(Integer u) {

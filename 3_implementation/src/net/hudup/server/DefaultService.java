@@ -141,8 +141,15 @@ public class DefaultService implements Service, AutoCloseable {
 	@Override
 	public void close() {
 		// TODO Auto-generated method stub
-		if (recommender != null)
-			recommender.unsetup();
+		if (recommender != null) {
+			try {
+				recommender.unsetup();
+			}
+			catch (Throwable e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 		recommender = null;
 	}
 

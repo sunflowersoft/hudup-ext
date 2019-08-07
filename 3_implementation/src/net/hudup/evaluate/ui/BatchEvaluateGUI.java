@@ -247,7 +247,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 	 * Returning this batch evaluator.
 	 * @return this batch evaluator.
 	 */
-	private BatchEvaluateGUI getThis() {
+	private BatchEvaluateGUI getThisGUI() {
 		return this;	
 	}
 	
@@ -333,7 +333,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 					List<Alg> list = lbAlgs.getAlgList();
 					if (list.size() == 0) {
 						JOptionPane.showMessageDialog(
-								getThis(), 
+								getThisGUI(), 
 								"List empty", 
 								"List empty", 
 								JOptionPane.ERROR_MESSAGE);
@@ -342,7 +342,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 						
 					}
 					
-					AlgListChooser dlg = new AlgListChooser(getThis(), algRegTable.getAlgList(), lbAlgs.getAlgList());
+					AlgListChooser dlg = new AlgListChooser(getThisGUI(), algRegTable.getAlgList(), lbAlgs.getAlgList());
 					if (!dlg.isOK())
 						return;
 					
@@ -374,7 +374,6 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 				if (ret) {
 					clearResult();
 					updateMode();
-					
 				}
 				
 				return ret;
@@ -447,7 +446,6 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 		        	if (adapter != null)
 		        		adapter.close();
 		        }
-		        
 			}
 			
 		};
@@ -477,7 +475,6 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
-				
 				loadBatchScript();
 			}
 		});
@@ -497,7 +494,6 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					// TODO Auto-generated method stub
-					
 					refresh();
 				}
 			});
@@ -517,6 +513,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 					// TODO Auto-generated method stub
 					clear();
 				}
+				
 			});
 		this.btnClear.setMargin(new Insets(0, 0 , 0, 0));
 		toolGrp2.add(this.btnClear);
@@ -535,6 +532,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 					
 					forceStop();
 				}
+				
 			});
 		this.btnForceStop.setMargin(new Insets(0, 0 , 0, 0));
 		toolGrp2.add(this.btnForceStop);
@@ -582,9 +580,9 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
-				
 				stop();
 			}
+			
 		});
 		paneControl.add(this.btnStop);
 
@@ -614,11 +612,11 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 				// TODO Auto-generated method stub
 				if(chkSave.isSelected()) {
 					UriAdapter adapter = new UriAdapter();
-					xURI store = adapter.chooseStore(getThis());
+					xURI store = adapter.chooseStore(getThisGUI());
 					adapter.close();
 					if (store == null) {
 						JOptionPane.showMessageDialog(
-							getThis(), 
+							getThisGUI(), 
 							"Not open store", 
 							"Not open store", 
 							JOptionPane.WARNING_MESSAGE);
@@ -631,6 +629,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 				}
 				updateMode();
 			}
+			
 		});
 		pane.add(this.chkSave, BorderLayout.WEST);
 
@@ -666,9 +665,9 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					// TODO Auto-generated method stub
-					
 					metricsOption();
 				}
+				
 			});
 		this.btnMetricsOption.setMargin(new Insets(0, 0 , 0, 0));
 		buttons.add(this.btnMetricsOption);
@@ -709,34 +708,36 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
 				if (result != null)
-					new MetricsAnalyzeDlg(getThis(), result, new RegisterTable(lbAlgs.getAlgList()));
+					new MetricsAnalyzeDlg(getThisGUI(), result, new RegisterTable(lbAlgs.getAlgList()));
 				else {
 					JOptionPane.showMessageDialog(
-							getThis(), 
+							getThisGUI(), 
 							"No result", 
 							"No result", 
 							JOptionPane.WARNING_MESSAGE);
 				}
 			}
+			
 		});
 		toolbar.add(this.btnAnalyzeResult);
 
 		
 		this.btnCopyResult = UIUtil.makeIconButton(
-				"copy-16x16.png", 
-				"copy_result_to_clipboard", 
-				getMessage("copy_result_to_clipboard"), 
-				getMessage("copy_result_to_clipboard"), 
-					
-				new ActionListener() {
+			"copy-16x16.png", 
+			"copy_result_to_clipboard", 
+			getMessage("copy_result_to_clipboard"), 
+			getMessage("copy_result_to_clipboard"), 
+				
+			new ActionListener() {
 
-					@Override
-					public void actionPerformed(ActionEvent e) {
-						
-						if (result != null) {
-							ClipboardUtil.util.setText(result.translate());
-						}
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					
+					if (result != null) {
+						ClipboardUtil.util.setText(result.translate());
 					}
+				}
+				
 			});
 		this.btnCopyResult.setMargin(new Insets(0, 0 , 0, 0));
 		toolbar.add(this.btnCopyResult);
@@ -831,7 +832,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			
 			if (pool.size() == 0 || lbAlgs.getAlgList().size() == 0) {
 				JOptionPane.showMessageDialog(
-					getThis(), 
+					getThisGUI(), 
 					"Not load data set pool", 
 					"Not load data set pool", 
 					JOptionPane.WARNING_MESSAGE);
@@ -1236,7 +1237,20 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			if (evaluator.remoteIsStarted() || this.lbAlgs.getAlgList().size() == 0)
 				return;
 			
-			new AddingDatasetDlg(this, pool, this.lbAlgs.getAlgList(), evaluator.getMainUnit());
+			new AddingDatasetDlg(this, pool, this.lbAlgs.getAlgList(), evaluator.getMainUnit()) {
+
+				/**
+				 * Default serial version UID.
+				 */
+				private static final long serialVersionUID = 1L;
+
+				@Override
+				protected String getMessage(String key) {
+					// TODO Auto-generated method stub
+					return getThisGUI().getMessage(key);
+				}
+				
+			};
 			this.tblDatasetPool.update(this.pool);
 			
 			clearResult();

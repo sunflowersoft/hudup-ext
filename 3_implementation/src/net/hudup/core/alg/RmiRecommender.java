@@ -1,5 +1,7 @@
 package net.hudup.core.alg;
 
+import java.io.Serializable;
+import java.rmi.RemoteException;
 import java.util.Set;
 
 import net.hudup.core.client.DriverManager;
@@ -73,7 +75,7 @@ public class RmiRecommender extends ServiceRecommender implements RmiAlg {
 
 
 	@Override
-	public void setup(Dataset dataset, Object... params) {
+	public void setup(Dataset dataset, Serializable... params) throws RemoteException {
 		// TODO Auto-generated method stub
 		unsetup();
 		
@@ -87,7 +89,7 @@ public class RmiRecommender extends ServiceRecommender implements RmiAlg {
 
 	
 	@Override
-	public void unsetup() {
+	public void unsetup() throws RemoteException {
 		// TODO Auto-generated method stub
 		service = null;
 
@@ -96,7 +98,7 @@ public class RmiRecommender extends ServiceRecommender implements RmiAlg {
 
 
 	@Override
-	public RatingVector estimate(RecommendParam param, Set<Integer> queryIds) {
+	public RatingVector estimate(RecommendParam param, Set<Integer> queryIds) throws RemoteException {
 		// TODO Auto-generated method stub
 		
 		try {
@@ -111,7 +113,7 @@ public class RmiRecommender extends ServiceRecommender implements RmiAlg {
 
 	
 	@Override
-	public RatingVector recommend(RecommendParam param, int maxRecommend) {
+	public RatingVector recommend(RecommendParam param, int maxRecommend) throws RemoteException {
 		// TODO Auto-generated method stub
 
 		try {

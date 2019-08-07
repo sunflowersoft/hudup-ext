@@ -1,11 +1,10 @@
 package net.hudup.core.data;
 
+import java.io.Serializable;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
 import net.hudup.core.parser.TextParsable;
-
-
 
 /**
  * Fetcher is the interface for iterating each item of an associated collection.
@@ -23,8 +22,9 @@ import net.hudup.core.parser.TextParsable;
  * @author Loc Nguyen
  * @version 10.0
  */
-public interface Fetcher<E> extends Remote, AutoCloseable, TextParsable {
+public interface Fetcher<E extends Serializable> extends Remote, AutoCloseable, TextParsable, Serializable {
 
+	
 	/**
 	 * Moving to next item of associated collection.
 	 * @return whether fetcher has element

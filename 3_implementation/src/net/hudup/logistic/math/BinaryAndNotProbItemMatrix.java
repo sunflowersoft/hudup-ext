@@ -18,6 +18,7 @@ import net.hudup.data.bit.BitItem;
  * @author Loc Nguyen
  * @version 10.0
  */
+@Deprecated
 public class BinaryAndNotProbItemMatrix implements Serializable {
 
 	

@@ -19,6 +19,7 @@ import net.hudup.data.bit.BitItem;
  * @version 10.0
  *
  */
+@Deprecated
 public final class BitDatasetStatsProcessor implements Serializable {
 
 	

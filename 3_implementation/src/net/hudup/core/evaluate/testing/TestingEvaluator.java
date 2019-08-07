@@ -1,5 +1,6 @@
 package net.hudup.core.evaluate.testing;
 
+import java.io.Serializable;
 import java.rmi.RemoteException;
 
 import net.hudup.core.alg.Alg;
@@ -48,7 +49,13 @@ public abstract class TestingEvaluator extends AbstractEvaluator {
 	@Override
 	protected void unsetupAlg(Alg alg) {
 		// TODO Auto-generated method stub
-		((TestingAlg)alg).unsetup();
+		try {
+			((TestingAlg)alg).unsetup();
+		}
+		catch (Throwable e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	
@@ -67,7 +74,7 @@ public abstract class TestingEvaluator extends AbstractEvaluator {
 
 	
 	@Override
-	protected Object executeAlg(Alg alg, Profile param) {
+	protected Serializable executeAlg(Alg alg, Profile param) {
 		// TODO Auto-generated method stub
 		return ((TestingAlg)alg).execute(param);
 	}

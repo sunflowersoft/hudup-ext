@@ -45,7 +45,7 @@ public class NeighborCF2dDeprecated extends NeighborCFUserBased {
 
 	
 	@Override
-	public RatingVector estimate(RecommendParam param, Set<Integer> queryIds) {
+	public RatingVector estimate(RecommendParam param, Set<Integer> queryIds) throws RemoteException {
 		// TODO Auto-generated method stub
 		
 		Fetcher<RatingVector> vUserRatings = null;

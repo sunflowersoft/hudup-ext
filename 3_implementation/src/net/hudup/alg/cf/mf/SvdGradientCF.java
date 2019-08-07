@@ -1,6 +1,7 @@
 package net.hudup.alg.cf.mf;
 
 import java.io.Serializable;
+import java.rmi.RemoteException;
 import java.util.List;
 import java.util.Set;
 
@@ -67,7 +68,7 @@ public class SvdGradientCF extends ModelBasedCF {
 
 	
 	@Override
-	public RatingVector estimate(RecommendParam param, Set<Integer> queryIds) {
+	public RatingVector estimate(RecommendParam param, Set<Integer> queryIds) throws RemoteException {
 		// TODO Auto-generated method stub
 		SvdGradientKB kb = (SvdGradientKB) getKBase();
 		if (kb.isEmpty())
@@ -90,7 +91,7 @@ public class SvdGradientCF extends ModelBasedCF {
 
 	
 	@Override
-	public RatingVector recommend(RecommendParam param, int maxRecommend) {
+	public RatingVector recommend(RecommendParam param, int maxRecommend) throws RemoteException {
 		// TODO Auto-generated method stub
 		
 		SvdGradientKB kb = (SvdGradientKB) getKBase();

@@ -1,11 +1,10 @@
-package net.hudup.logistic.math;
+package net.hudup.core.security;
 
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
-import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
@@ -17,43 +16,41 @@ import sun.misc.BASE64Encoder;
 
 
 /**
+ * This utility class provides methods of encryption and decryption. Methods here are available on internet.
+ * It also contains the secret key for encrypting internal information of Hudup framework.
  * 
  * @author Loc Nguyen
  * @version 10.0
  *
  */
-public class HudupCipher {
+public class CipherImpl implements Cipher {
 	
 	
 	/**
-	 * 
+	 * Name of symmetric cipher algorithm (secret-key encryption/decryption algorithm) in Hudup Framework.
 	 */
 	private static final String CALG = "AES";
 	
 	
 	/**
-	 * 
+	 * The secret key for encrypting internal information of Hudup framework.
 	 */
 	private static SecretKey secretKey = null;
 	
 	
 	/**
-	 * 
+	 * Default constructor. It creates the secret key {@link #secretKey} for encrypting internal information of Hudup framework.
 	 */
-	public HudupCipher() {
+	public CipherImpl() {
 		secretKey = new SecretKeySpec(new TransferKey().transfer(), CALG); 
 	}
 
 	
-	/**
-	 * 
-	 * @param data
-	 * @return encrypted text
-	 */
+	@Override
 	public String encrypt(String data) {
 		try {
-	        Cipher cipher = Cipher.getInstance(CALG);
-	        cipher.init(Cipher.ENCRYPT_MODE, secretKey);
+			javax.crypto.Cipher cipher = javax.crypto.Cipher.getInstance(CALG);
+	        cipher.init(javax.crypto.Cipher.ENCRYPT_MODE, secretKey);
 	        
 	        byte[] encode = cipher.doFinal(data.getBytes());
 	        String code = new BASE64Encoder().encode(encode);
@@ -67,15 +64,11 @@ public class HudupCipher {
     }
 
 	
-	/**
-	 * 
-	 * @param encrypted
-	 * @return plain text
-	 */
+	@Override
 	public String decrypt(String encrypted) {
 		try {
-	        Cipher cipher = Cipher.getInstance(CALG);
-	        cipher.init(Cipher.DECRYPT_MODE, secretKey);
+			javax.crypto.Cipher cipher = javax.crypto.Cipher.getInstance(CALG);
+	        cipher.init(javax.crypto.Cipher.DECRYPT_MODE, secretKey);
 	        
 	        String code = fromHex(encrypted);
 	        byte[] decode = new BASE64Decoder().decodeBuffer(code);
@@ -92,9 +85,9 @@ public class HudupCipher {
 	
 	
 	/**
-	 * 
-	 * @param text
-	 * @return hex text
+	 * Converting the plain text into the string of hex numbers.
+	 * @param text specified plain text.
+	 * @return string of hex numbers converted from specified plain text. 
 	 */
 	private static String toHex(String text) {
 		byte[] bytes = text.getBytes();
@@ -108,9 +101,9 @@ public class HudupCipher {
 	
 	
 	/**
-	 * 
-	 * @param hexText
-	 * @return plain text
+	 * Converting string of hex numbers into the the plain text. This method is opposite to the method {@link #toHex(String)}.
+	 * @param hexText string of hex numbers.
+	 * @return plain text converted from the string of hex numbers.
 	 */
 	private static String fromHex(String hexText) { 
 		StringBuilder buffer = new StringBuilder();
@@ -123,7 +116,7 @@ public class HudupCipher {
 	
 	
 	/**
-	 * 
+	 * Compile and transfer secret key.
 	 */
 	public static void compileTransfer() {
 		try {
@@ -140,8 +133,8 @@ public class HudupCipher {
 	
 
 	/**
-	 * 
-	 * @param keyStore
+	 * Loading key from key store.
+	 * @param keyStore URI of key store.
 	 * @return {@link SecretKey}
 	 */
 	@SuppressWarnings("unused")
@@ -175,10 +168,10 @@ public class HudupCipher {
 	
 	
 	/**
-	 * 
-	 * @param keyStore
-	 * @param key
-	 * @return whether save {@link SecretKey} successfully
+	 * Saving key to key store.
+	 * @param keyStore key store.
+	 * @param key secret key.
+	 * @return whether save {@link SecretKey} successfully.
 	 */
 	@SuppressWarnings("unused")
 	private static boolean saveKey(xURI keyStore, SecretKey key) {
@@ -193,8 +186,8 @@ public class HudupCipher {
 	
 	
 	/**
-	 * 
-	 * @return {@link SecretKey}
+	 * Generating key.
+	 * @return {@link SecretKey} generated.
 	 */
 	@SuppressWarnings("unused")
 	private static SecretKey genKey() {
@@ -208,13 +201,7 @@ public class HudupCipher {
 	}
 	
 	
-	
-	
-	/**
-	 * 
-	 * @param text
-	 * @return md5 text
-	 */
+	@Override
 	public String md5Encrypt(String text) {
 		try {
 			MessageDigest md = MessageDigest.getInstance("MD5");

@@ -3,6 +3,7 @@
  */
 package net.hudup.core.data;
 
+import java.io.Serializable;
 import java.util.Collection;
 
 /**
@@ -23,7 +24,7 @@ public class FetcherUtil {
 	 * @param fetcher specified fetcher which is iterated to retrieve its elements which are filled in the specified collection.
 	 * @param autoClose if {@code true}, the fetcher is automatically closed after the filling task is finished.
 	 */
-	public static <E> void fillCollection(Collection<E> collection, Fetcher<E> fetcher, boolean autoClose) {
+	public static <E extends Serializable> void fillCollection(Collection<E> collection, Fetcher<E> fetcher, boolean autoClose) {
 		try {
 			while (fetcher.next()) {
 				E el = fetcher.pick();

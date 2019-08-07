@@ -3,6 +3,8 @@
  */
 package net.hudup.core.alg.cf;
 
+import java.io.Serializable;
+import java.rmi.RemoteException;
 import java.util.List;
 import java.util.Set;
 
@@ -69,7 +71,7 @@ public abstract class MemoryBasedCF extends MemoryBasedRecommender {
 
 
 	@Override
-	public void setup(Dataset dataset, Object... params) throws Exception {
+	public void setup(Dataset dataset, Serializable... params) throws RemoteException {
 		// TODO Auto-generated method stub
 		unsetup();
 		
@@ -78,7 +80,7 @@ public abstract class MemoryBasedCF extends MemoryBasedRecommender {
 	
 	
 	@Override
-	public void unsetup() {
+	public void unsetup() throws RemoteException {
 		// TODO Auto-generated method stub
 		super.unsetup();
 		
@@ -93,7 +95,7 @@ public abstract class MemoryBasedCF extends MemoryBasedRecommender {
 	
 
 	@Override
-	public RatingVector recommend(RecommendParam param, int maxRecommend) {
+	public RatingVector recommend(RecommendParam param, int maxRecommend) throws RemoteException {
 		param = recommendPreprocess(param);
 		if (param == null)
 			return null;

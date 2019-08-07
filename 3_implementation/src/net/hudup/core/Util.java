@@ -23,6 +23,8 @@ import java.util.Vector;
 import net.hudup.core.factory.Factory;
 import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.xURI;
+import net.hudup.core.security.Cipher;
+import net.hudup.core.security.CipherImpl;
 
 
 /**
@@ -237,8 +239,8 @@ public final class Util {
 	 * @return factory to create associators, for example.
 	 */
 	public static Factory getFactory() {
-		Properties props = new Properties();
 		try {
+			Properties props = new Properties();
 			InputStream in = Util.class.getResourceAsStream(ROOT_PACKAGE + "hudup.properties");		
 			props.load(in);
 			String factoryClassName = props.getProperty("factory");
@@ -247,10 +249,31 @@ public final class Util {
 			else
 				return (Factory)Class.forName(factoryClassName).newInstance();
 		}
-		catch (Throwable ex) {}
+		catch (Throwable e) {}
 		
 		return new Factory();
 	}
 	
 	
+	/**
+	 * Getting cipher utility.
+	 * @return cipher utility.
+	 */
+	public static Cipher getCipher() {
+		try {
+			Properties props = new Properties();
+			InputStream in = Util.class.getResourceAsStream(ROOT_PACKAGE + "hudup.properties");		
+			props.load(in);
+			String cipherClassName = props.getProperty("cipher");
+			if (cipherClassName == null)
+				return new CipherImpl();
+			else
+				return (Cipher)Class.forName(cipherClassName).newInstance();
+		}
+		catch (Throwable e) {}
+		
+		return new CipherImpl();
+	}
+
+
 }

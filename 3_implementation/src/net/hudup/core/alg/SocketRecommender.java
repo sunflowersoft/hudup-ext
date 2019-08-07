@@ -3,6 +3,8 @@
  */
 package net.hudup.core.alg;
 
+import java.io.Serializable;
+import java.rmi.RemoteException;
 import java.util.Set;
 
 import net.hudup.core.client.DriverManager;
@@ -22,7 +24,6 @@ import net.hudup.core.logistic.xURI;
  * @version 10.0
  *
  */
-@Deprecated
 public class SocketRecommender extends ServiceRecommender implements SocketAlg {
 
 	
@@ -79,7 +80,7 @@ public class SocketRecommender extends ServiceRecommender implements SocketAlg {
 
 
 	@Override
-	public void setup(Dataset dataset, Object... params) {
+	public void setup(Dataset dataset, Serializable... params) throws RemoteException {
 		// TODO Auto-generated method stub
 		unsetup();
 		
@@ -95,7 +96,7 @@ public class SocketRecommender extends ServiceRecommender implements SocketAlg {
 
 	
 	@Override
-	public void unsetup() {
+	public void unsetup() throws RemoteException {
 		try {
 			if (connection != null) {
 				connection.close();
@@ -111,7 +112,7 @@ public class SocketRecommender extends ServiceRecommender implements SocketAlg {
 
 	
 	@Override
-	public RatingVector estimate(RecommendParam param, Set<Integer> queryIds) {
+	public RatingVector estimate(RecommendParam param, Set<Integer> queryIds) throws RemoteException {
 		// TODO Auto-generated method stub
 		
 		if (connection == null)
@@ -130,7 +131,7 @@ public class SocketRecommender extends ServiceRecommender implements SocketAlg {
 
 	
 	@Override
-	public RatingVector recommend(RecommendParam param, int maxRecommend) {
+	public RatingVector recommend(RecommendParam param, int maxRecommend) throws RemoteException {
 		// TODO Auto-generated method stub
 		
 		if (connection == null)

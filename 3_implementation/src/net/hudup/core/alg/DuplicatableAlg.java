@@ -20,15 +20,6 @@ public interface DuplicatableAlg extends Alg {
 		
 	
 	/**
-	 * Declaring the name of algorithm, the name is used to query algorithm in register table.
-	 * Especially, the name of an algorithm that can be duplicated is retrieved by looking up the field {@value #DUPLICATED_ALG_NAME_FIELD} in its configuration.
-	 * If such field does not exist, users define particular name via the returned value of this method.  
-	 * @return name of algorithm
-	 */
-	String getName();
-	
-	
-	/**
 	 * Setting the name Declaring the name of algorithm, the name is used to query algorithm in register table. 
 	 * Especially, the name of an algorithm that can be duplicated is retrieved by looking up the field {@value #DUPLICATED_ALG_NAME_FIELD} in its configuration.
 	 * If such field does not exist, users define particular name via the returned value of {@link #getName()} method.  

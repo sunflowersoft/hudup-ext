@@ -12,6 +12,7 @@ import net.hudup.core.logistic.NextUpdate;
  *
  */
 @NextUpdate
+@Deprecated
 public class SvdGradientPlusCF extends SvdGradientCF {
 
 	

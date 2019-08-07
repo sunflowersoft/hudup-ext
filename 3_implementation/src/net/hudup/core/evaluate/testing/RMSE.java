@@ -14,6 +14,7 @@ import net.hudup.core.logistic.NextUpdate;
  *
  */
 @NextUpdate
+@Deprecated
 public class RMSE extends MetaMetric {
 
 	

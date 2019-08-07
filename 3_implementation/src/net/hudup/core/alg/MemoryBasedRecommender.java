@@ -15,7 +15,7 @@ package net.hudup.core.alg;
  * @version 10.0
  *
  */
-public abstract class MemoryBasedRecommender extends Recommender {
+public abstract class MemoryBasedRecommender extends Recommender implements MemoryBasedAlg {
 
 	
 	/**

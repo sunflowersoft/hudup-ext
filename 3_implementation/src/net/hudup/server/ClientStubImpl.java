@@ -19,6 +19,7 @@ import net.hudup.core.parser.TextParserUtil;
  * @version 10.0
  *
  */
+@Deprecated
 public class ClientStubImpl implements ClientStub {
 
 	
@@ -28,8 +29,6 @@ public class ClientStubImpl implements ClientStub {
 	private static final long serialVersionUID = 1L;
 
 
-	
-	
 	/**
 	 * 
 	 */

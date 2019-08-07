@@ -6,6 +6,7 @@ package net.hudup.alg.cf.stat;
 import java.io.Reader;
 import java.io.Serializable;
 import java.io.Writer;
+import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -36,6 +37,7 @@ import net.hudup.core.parser.TextParserUtil;
  * @version 10.0
  *
  */
+@Deprecated
 public abstract class StatCF extends ModelBasedCF {
 
 	
@@ -62,7 +64,7 @@ public abstract class StatCF extends ModelBasedCF {
 
 
 	@Override
-	public RatingVector recommend(RecommendParam param, int maxRecommend) {
+	public RatingVector recommend(RecommendParam param, int maxRecommend) throws RemoteException {
 		// TODO Auto-generated method stub
 		param = recommendPreprocess(param);
 		if (param == null)

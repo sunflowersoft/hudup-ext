@@ -6,6 +6,7 @@ package net.hudup.data.ui;
  * @author Loc Nguyen
  * @version 10.0
  */
+@Deprecated
 public class YRollerDatasetTable extends RatingValueTable {
 
 	

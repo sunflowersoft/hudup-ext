@@ -22,6 +22,7 @@ import net.hudup.core.parser.TextParserUtil;
  *
  * @param <E> type of objects in vector.
  */
+@Deprecated
 public abstract class ObjectVector<E extends Serializable> implements Cloneable, TextParsable, Serializable {
 
 	

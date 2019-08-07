@@ -1,5 +1,6 @@
 package net.hudup.core.alg.cf;
 
+import java.rmi.RemoteException;
 import java.util.Set;
 
 import net.hudup.core.Util;
@@ -44,7 +45,7 @@ public class NeighborCFItemBased extends NeighborCF implements DuplicatableAlg {
 
 	
 	@Override
-	public RatingVector estimate(RecommendParam param, Set<Integer> queryIds) {
+	public RatingVector estimate(RecommendParam param, Set<Integer> queryIds) throws RemoteException {
 		// TODO Auto-generated method stub
 		return estimate(this, param, queryIds);
 	}

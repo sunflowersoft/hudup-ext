@@ -1,5 +1,7 @@
 package net.hudup.core.alg.cf;
 
+import java.io.Serializable;
+import java.rmi.RemoteException;
 import java.util.Set;
 
 import net.hudup.core.Util;
@@ -43,7 +45,7 @@ public class NeighborCF2d extends NeighborCFUserBased {
 
 	
 	@Override
-	public void setup(Dataset dataset, Object... params) throws Exception {
+	public void setup(Dataset dataset, Serializable... params) throws RemoteException {
 		// TODO Auto-generated method stub
 		super.setup(dataset, params);
 		this.itemBasedCF.setup(dataset, params);
@@ -51,7 +53,7 @@ public class NeighborCF2d extends NeighborCFUserBased {
 
 
 	@Override
-	public void unsetup() {
+	public void unsetup() throws RemoteException {
 		// TODO Auto-generated method stub
 		super.unsetup();
 		this.itemBasedCF.unsetup();
@@ -59,7 +61,7 @@ public class NeighborCF2d extends NeighborCFUserBased {
 
 
 	@Override
-	public RatingVector estimate(RecommendParam param, Set<Integer> queryIds) {
+	public RatingVector estimate(RecommendParam param, Set<Integer> queryIds) throws RemoteException {
 		// TODO Auto-generated method stub
 		if (param.ratingVector == null) return null;
 		RatingVector thisUser = param.ratingVector;

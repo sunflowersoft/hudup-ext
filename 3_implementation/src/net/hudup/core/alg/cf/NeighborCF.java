@@ -2,6 +2,7 @@ package net.hudup.core.alg.cf;
 
 import java.awt.Component;
 import java.io.Serializable;
+import java.rmi.RemoteException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -295,7 +296,7 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 
 
 	@Override
-	public void setup(Dataset dataset, Object... params) throws Exception {
+	public void setup(Dataset dataset, Serializable... params) throws RemoteException {
 		// TODO Auto-generated method stub
 		super.setup(dataset, params);
 		
@@ -315,7 +316,7 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 
 
 	@Override
-	public void unsetup() {
+	public void unsetup() throws RemoteException {
 		// TODO Auto-generated method stub
 		super.unsetup();
 		
@@ -344,9 +345,9 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 	/**
 	 * Updating individual user means and variances from specified dataset.
 	 * @param dataset specified dataset.
-	 * @throws Exception if any error raises.
+	 * @throws RemoteException if any error raises.
 	 */
-	private void updateUserMeanVars(Dataset dataset) throws Exception {
+	private void updateUserMeanVars(Dataset dataset) throws RemoteException {
 		int totalRatingCount = 0;
 		this.ratingMean = 0.0;
 		this.ratingVar = 0.0;
@@ -405,9 +406,9 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 	/**
 	 * Updating individual item means and variances from specified dataset.
 	 * @param dataset specified dataset.
-	 * @throws Exception if any error raises.
+	 * @throws RemoteException if any error raises.
 	 */
-	private void updateItemMeanVars(Dataset dataset) throws Exception {
+	private void updateItemMeanVars(Dataset dataset) throws RemoteException {
 		this.itemIds.clear();
 		this.itemMeans.clear();
 		this.itemVars.clear();

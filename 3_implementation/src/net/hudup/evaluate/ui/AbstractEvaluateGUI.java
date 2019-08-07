@@ -120,6 +120,12 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	
 	
 	/**
+	 * Internationalization utility.
+	 */
+	protected I18nUtil i18n = null;
+	
+	
+	/**
 	 * Constructor with specified evaluator.
 	 * @param evaluator specified evaluator.
 	 * @param bindUri bound URI.
@@ -133,6 +139,16 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 		
 		this.evaluator = evaluator;
 		this.counterClock = new CounterClock();
+		
+		//Internationalization utility.
+		try {
+			this.i18n = new I18nUtil(this.evaluator.getConfig());
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			logger.error("Error in getting evaluator configuration");
+			this.i18n = null;
+		}
 	}
 	
 	
@@ -143,14 +159,16 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	 */
 	protected String getMessage(String key) {
 		try {
-			return I18nUtil.getMessage(evaluator.getConfig(), key);
+			if (this.i18n != null)
+				return this.i18n.getMessage(key);
+			else
+				return key;
 		}
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			logger.error("Error in getting evaluator configuration");
-			return "error";
 		}
+		return key;
 	}
 	
 	
@@ -350,17 +368,18 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	}
 	
 	
-	/**
-	 * Switching the inside evaluator by specified evaluator.
-	 * @param newEvaluator new specified evaluator.
-	 */
-	protected void switchEvaluator(Evaluator newEvaluator) {
-		stop();
-		unsetupListeners(this.evaluator);
-		setupListeners(newEvaluator);
-		
-		updateMode();
-	}
+//	/**
+//	 * Switching the inside evaluator by specified evaluator. This method is deprecated.
+//	 * @param newEvaluator new specified evaluator.
+//	 */
+//	@Deprecated
+//	protected void switchEvaluator(Evaluator newEvaluator) {
+//		stop();
+//		unsetupListeners(this.evaluator);
+//		setupListeners(newEvaluator);
+//		
+//		updateMode();
+//	}
 	
 	
 	/**

@@ -16,6 +16,7 @@ import net.hudup.data.DatasetUtil2;
  * @author Loc Nguyen
  * @version 10.0
  */
+@Deprecated
 public class ProbItemMatrix implements Serializable {
 	
 	

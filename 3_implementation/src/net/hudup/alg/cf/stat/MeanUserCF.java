@@ -3,6 +3,7 @@
  */
 package net.hudup.alg.cf.stat;
 
+import java.rmi.RemoteException;
 import java.util.Set;
 
 import net.hudup.core.alg.Alg;
@@ -32,7 +33,7 @@ public class MeanUserCF extends StatCF {
 
 	
 	@Override
-	public RatingVector estimate(RecommendParam param, Set<Integer> queryIds) {
+	public RatingVector estimate(RecommendParam param, Set<Integer> queryIds) throws RemoteException {
 		// TODO Auto-generated method stub
 		StatKB sKb = (StatKB)kb;
 		

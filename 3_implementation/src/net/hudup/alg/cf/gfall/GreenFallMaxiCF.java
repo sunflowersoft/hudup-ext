@@ -13,6 +13,7 @@ import net.hudup.core.logistic.NextUpdate;
  *
  */
 @NextUpdate
+@Deprecated
 public class GreenFallMaxiCF extends GreenFallCF {
 
 	

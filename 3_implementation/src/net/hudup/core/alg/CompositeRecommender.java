@@ -1,5 +1,8 @@
 package net.hudup.core.alg;
 
+import java.io.Serializable;
+import java.rmi.RemoteException;
+
 import net.hudup.core.Constants;
 import net.hudup.core.alg.cf.NeighborCFItemBased;
 import net.hudup.core.data.DataConfig;
@@ -71,7 +74,7 @@ public abstract class CompositeRecommender extends Recommender implements Compos
 
 
 	@Override
-	public void setup(Dataset dataset, Object... params) throws Exception {
+	public void setup(Dataset dataset, Serializable... params) throws RemoteException {
 		// TODO Auto-generated method stub
 		unsetup();
 		
@@ -84,7 +87,7 @@ public abstract class CompositeRecommender extends Recommender implements Compos
 
 
 	@Override
-	public void unsetup() {
+	public void unsetup() throws RemoteException {
 		// TODO Auto-generated method stub
 		super.unsetup();
 		
@@ -102,7 +105,13 @@ public abstract class CompositeRecommender extends Recommender implements Compos
 	 * @param recommenders specified list of recommender (s).
 	 */
 	protected void setInnerRecommenders(AlgList recommenders) {
-		unsetup();
+		try {
+			unsetup();
+		}
+		catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 		for (int i = 0; i < recommenders.size(); i++) {
 			Recommender recommender = (Recommender) recommenders.get(i);

@@ -52,7 +52,6 @@ import net.hudup.core.logistic.ui.UIUtil;
 import net.hudup.data.DatasetUtil2;
 import net.hudup.data.ProviderImpl;
 import net.hudup.logistic.SystemPropertiesPane;
-import net.hudup.logistic.math.HudupCipher;
 import net.hudup.server.PowerServerConfig;
 
 /**
@@ -558,7 +557,7 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 					accProfile.setValue(
 							DataConfig.ACCOUNT_NAME_FIELD, acc);
 					accProfile.setValue(DataConfig.ACCOUNT_PASSWORD_FIELD, 
-							new HudupCipher().md5Encrypt(password));
+							Util.getCipher().md5Encrypt(password));
 					accProfile.setValue(
 							DataConfig.ACCOUNT_PRIVILEGES_FIELD, priv);
 					

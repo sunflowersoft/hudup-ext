@@ -1,5 +1,8 @@
 package net.hudup.core.alg;
 
+import java.io.Serializable;
+import java.rmi.RemoteException;
+
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.Fetcher;
 import net.hudup.core.data.Profile;
@@ -16,38 +19,38 @@ public interface TestingAlg extends Alg {
 	
 	/**
 	 * Setting up this testing algorithm based on specified dataset.
-	 * In this current version, this method initializes the data sample for learning parameter and then calls {@link #learn(Object...)} method.
+	 * In this current version, this method initializes the data sample for learning parameter and then calls {@link #learn(Serializable...)} method.
 	 * @param dataset specified dataset.
 	 * @param info additional parameters to set up this algorithm. This parameter is really an array of sub-parameters.
-	 * @throws Exception if any error raises.
+	 * @throws RemoteException if any error raises.
 	 */
-	void setup(Dataset dataset, Object...info) throws Exception;
+	void setup(Dataset dataset, Serializable...info) throws RemoteException;
 	
 	
 	/**
 	 * Setting up this testing algorithm based on specified sample.
-	 * In this current version, this method calls {@link #learn(Object...)} method.
+	 * In this current version, this method calls {@link #learn(Serializable...)} method.
 	 * @param sample specified sample.
 	 * @param info additional parameters to set up this algorithm. This parameter is really an array of sub-parameters.
-	 * @throws Exception if any error raises.
+	 * @throws RemoteException if any error raises.
 	 */
-	void setup(Fetcher<Profile> sample, Object...info) throws Exception;
+	void setup(Fetcher<Profile> sample, Serializable...info) throws RemoteException;
 
 	
 	/**
-	 * Unset up this testing algorithm, which release resources used by the {@link #setup(Dataset, Object...)} method.
+	 * Unset up this testing algorithm, which release resources used by the {@link #setup(Dataset, Serializable...)} method.
 	 * Exceptionally, for testing algorithm, after this method is called, this algorithm can be used (dependent on specific application).
 	 */
-	public void unsetup();
+	public void unsetup() throws RemoteException ;
 	
 	
 	/**
-	 * Main method to learn parameters. As usual, it is called by {@link #setup(Dataset, Object...)}.
+	 * Main method to learn parameters. As usual, it is called by {@link #setup(Dataset, Serializable...)}.
 	 * @param info additional parameter.
 	 * @return the parameter to be learned. Return null if learning is failed.
 	 * @exception Exception if any error occurs.
 	 */
-	public Object learn(Object...info) throws Exception;
+	Serializable learn(Serializable...info) throws Exception;
 
 	
 	/**
@@ -55,14 +58,14 @@ public interface TestingAlg extends Alg {
 	 * @param input specified input parameter.
 	 * @return result of execution. Return null if execution is failed.
 	 */
-	Object execute(Object input);
+	Serializable execute(Serializable input);
 	
 	
 	/**
 	 * Getting parameter of the algorithm.
 	 * @return parameter of the algorithm. Return null if the algorithm does not run yet or run failed. 
 	 */
-	Object getParameter();
+	Serializable getParameter();
 	
 	
     /**
@@ -71,7 +74,7 @@ public interface TestingAlg extends Alg {
      * @param info addition information.
      * @return shown text converted from specified parameter.
      */
-    String parameterToShownText(Object parameter, Object...info);
+    String parameterToShownText(Serializable parameter, Serializable...info);
     
     
 	/**

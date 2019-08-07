@@ -1,5 +1,6 @@
 package net.hudup.core.data;
 
+import java.io.Serializable;
 
 /**
  * This is the wrapper of any object. The variable {@link #object} is such internal object.
@@ -8,20 +9,26 @@ package net.hudup.core.data;
  * @version 10.0
  *
  */
-public class Wrapper {
+public class Wrapper implements Serializable {
 
+	
+	/**
+	 * Default serial version UID.
+	 */
+	private static final long serialVersionUID = 1L;
+	
 	
 	/**
 	 * The internal object wrapped by this wrapper.
 	 */
-	private Object object = null;
+	private Serializable object = null;
 	
 	
 	/**
 	 * Constructor with specified object.
 	 * @param object specified object.
 	 */
-	public Wrapper(Object object) {
+	public Wrapper(Serializable object) {
 		this.object = object;
 	}
 	
@@ -30,7 +37,7 @@ public class Wrapper {
 	 * Getting the internal object wrapped by this wrapper.
 	 * @return internal object wrapped by this wrapper.
 	 */
-	public Object getObject() {
+	public Serializable getObject() {
 		return object;
 	}
 	
@@ -39,7 +46,7 @@ public class Wrapper {
 	 * Setting the internal object by specified object.
 	 * @param object specified object that is wrapped by this wrapper.
 	 */
-	public void setObject(Object object) {
+	public void setObject(Serializable object) {
 		this.object = object;
 	}
 	

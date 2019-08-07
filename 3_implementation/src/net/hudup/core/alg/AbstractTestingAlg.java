@@ -1,5 +1,7 @@
 package net.hudup.core.alg;
 
+import java.io.Serializable;
+import java.rmi.RemoteException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -59,7 +61,7 @@ public abstract class AbstractTestingAlg extends AbstractAlg implements TestingA
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public synchronized void setup(Dataset dataset, Object...info) throws Exception {
+	public synchronized void setup(Dataset dataset, Serializable...info) throws RemoteException {
 		// TODO Auto-generated method stub
 		unsetup();
 		this.dataset = dataset;
@@ -68,7 +70,13 @@ public abstract class AbstractTestingAlg extends AbstractAlg implements TestingA
 		else
 			this.sample = dataset.fetchSample();
 		
-		learn();
+		try {
+			learn();
+		}
+		catch (Exception e) {
+			// TODO Auto-generated catch block
+			throw new RemoteException(e.getMessage(), e);
+		}
 		
 		SetupAlgEvent evt = new SetupAlgEvent(
 				this,
@@ -81,9 +89,9 @@ public abstract class AbstractTestingAlg extends AbstractAlg implements TestingA
 
 	
 	@Override
-	public void setup(Fetcher<Profile> sample, Object...info) throws Exception {
+	public void setup(Fetcher<Profile> sample, Serializable...info) throws RemoteException {
 		// TODO Auto-generated method stub
-		List<Object> additionalInfo = Util.newList();
+		List<Serializable> additionalInfo = Util.newList();
 		additionalInfo.add(sample);
 		additionalInfo.addAll(Arrays.asList(info));
 
@@ -92,7 +100,7 @@ public abstract class AbstractTestingAlg extends AbstractAlg implements TestingA
 
 
 	@Override
-	public synchronized void unsetup() {
+	public synchronized void unsetup() throws RemoteException {
 		try {
 			if (dataset != null && sample != null)
 				sample.close();

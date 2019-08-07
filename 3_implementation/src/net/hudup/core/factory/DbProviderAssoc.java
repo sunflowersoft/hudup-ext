@@ -1,5 +1,6 @@
 package net.hudup.core.factory;
 
+import java.io.Serializable;
 import java.rmi.NoSuchObjectException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
@@ -2136,6 +2137,11 @@ class DbProviderAssoc extends ProviderAssocAbstract {
 		
 		return new DbFetcher<Profile>(rs) {
 
+			/**
+			 * Default serial version UID.
+			 */
+			private static final long serialVersionUID = 1L;
+
 			@Override
 			public Profile create(ResultSet rs) {
 				// TODO Auto-generated method stub
@@ -2154,6 +2160,11 @@ class DbProviderAssoc extends ProviderAssocAbstract {
 			return new MemFetcher<Profile>();
 		
 		return new DbFetcher<Profile>(rs) {
+
+			/**
+			 * Default serial version UID.
+			 */
+			private static final long serialVersionUID = 1L;
 
 			@Override
 			public Profile create(ResultSet rs) {
@@ -2179,6 +2190,11 @@ class DbProviderAssoc extends ProviderAssocAbstract {
 			return new MemFetcher<Integer>();
 		
 		return new DbFetcher<Integer>(rs) {
+
+			/**
+			 * Default serial version UID.
+			 */
+			private static final long serialVersionUID = 1L;
 
 			@Override
 			public Integer create(ResultSet rs) {
@@ -2568,8 +2584,13 @@ class DbProviderAssoc extends ProviderAssocAbstract {
 	 * @version 10.0
 	 *
 	 */
-	static abstract class DbFetcher<E> implements Fetcher<E> {
+	static abstract class DbFetcher<E extends Serializable> implements Fetcher<E> {
 		
+		/**
+		 * Default serial version UID.
+		 */
+		private static final long serialVersionUID = 1L;
+
 		/**
 		 * 
 		 */
@@ -2728,8 +2749,13 @@ class DbProviderAssoc extends ProviderAssocAbstract {
 	 * @version 10.0
 	 * @param <E>
 	 */
-	static abstract class RmiDbFetcher<E> extends DbFetcher<E> {
+	static abstract class RmiDbFetcher<E extends Serializable> extends DbFetcher<E> {
 		
+		/**
+		 * Default serial version UID.
+		 */
+		private static final long serialVersionUID = 1L;
+
 		/**
 		 * 
 		 * @param rs

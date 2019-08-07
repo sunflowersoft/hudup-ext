@@ -42,7 +42,6 @@ import net.hudup.core.parser.DatasetParser;
 import net.hudup.core.parser.Indicator;
 import net.hudup.core.parser.ScannerParser;
 import net.hudup.data.ctx.DefaultCTSManager;
-import net.hudup.logistic.math.HudupCipher;
 
 
 /**
@@ -339,6 +338,11 @@ public class ProviderImpl implements Provider {
 				getConfig().getRatingUnit(), null);
 		
 		return new MetaFetcher<Profile, RatingTriple>(fetcher) {
+
+			/**
+			 * Default serial version UID.
+			 */
+			private static final long serialVersionUID = 1L;
 
 			@Override
 			public RatingTriple create(Profile u) {
@@ -1143,7 +1147,7 @@ public class ProviderImpl implements Provider {
 		if (pwd == null)
 			return false;
 		
-		String digest = new HudupCipher().md5Encrypt(password);
+		String digest = Util.getCipher().md5Encrypt(password);
 		if (!digest.equals(pwd))
 			return false;
 		
@@ -1379,7 +1383,7 @@ public class ProviderImpl implements Provider {
 		// Updating administrator account
 		Profile accProfile = new Profile(getProfileAttributes(config.getAccountUnit()));
 		accProfile.setValue(DataConfig.ACCOUNT_NAME_FIELD, "admin");
-		accProfile.setValue(DataConfig.ACCOUNT_PASSWORD_FIELD, new HudupCipher().md5Encrypt("admin"));
+		accProfile.setValue(DataConfig.ACCOUNT_PASSWORD_FIELD, Util.getCipher().md5Encrypt("admin"));
 		accProfile.setValue(DataConfig.ACCOUNT_PRIVILEGES_FIELD, "3");
 		result &= insertAccount(accProfile);
 		

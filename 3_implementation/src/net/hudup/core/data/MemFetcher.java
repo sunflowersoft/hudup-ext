@@ -3,6 +3,7 @@
  */
 package net.hudup.core.data;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -22,9 +23,15 @@ import net.hudup.core.parser.TextParserUtil;
  * @author Loc Nguyen
  * @version 10.0
  */
-public class MemFetcher<E> implements Fetcher<E> {
+public class MemFetcher<E extends Serializable> implements Fetcher<E> {
 	
 	
+	/**
+	 * Default serial version UID.
+	 */
+	private static final long serialVersionUID = 1L;
+
+
 	/**
 	 * The internal collection stores elements over which this memory fetcher iterates.
 	 */
@@ -155,7 +162,7 @@ public class MemFetcher<E> implements Fetcher<E> {
 	 * This static method creates an empty memory fetcher which has no element.
 	 * @return empty memory fetcher.
 	 */
-	public static <E> MemFetcher<E> createEmpty() {
+	public static <E extends Serializable> MemFetcher<E> createEmpty() {
 		Set<E> set = Util.newSet();
 		return new MemFetcher<E>(set);
 	}

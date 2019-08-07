@@ -3,6 +3,9 @@
  */
 package net.hudup.core.alg;
 
+import java.io.Serializable;
+import java.rmi.RemoteException;
+
 import net.hudup.core.Constants;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Dataset;
@@ -62,7 +65,7 @@ public abstract class ModelBasedRecommender extends Recommender implements Model
 
 
 	@Override
-	public void setup(Dataset dataset, Object... params) throws Exception {
+	public void setup(Dataset dataset, Serializable... params) throws RemoteException {
 		// TODO Auto-generated method stub
 		unsetup();
 		
@@ -78,7 +81,7 @@ public abstract class ModelBasedRecommender extends Recommender implements Model
 
 	
 	@Override
-	public void unsetup() {
+	public void unsetup() throws RemoteException {
 		// TODO Auto-generated method stub
 		super.unsetup();
 		if (kb != null)

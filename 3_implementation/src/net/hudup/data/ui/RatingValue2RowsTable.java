@@ -19,6 +19,7 @@ import net.hudup.data.MapVector;
  * @author Loc Nguyen
  * @version 10.0
  */
+@Deprecated
 public class RatingValue2RowsTable extends RatingValueTable {
 
 	

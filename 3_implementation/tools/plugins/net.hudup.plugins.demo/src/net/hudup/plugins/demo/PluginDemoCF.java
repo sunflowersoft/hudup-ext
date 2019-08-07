@@ -3,6 +3,7 @@
  */
 package net.hudup.plugins.demo;
 
+import java.rmi.RemoteException;
 import java.util.Set;
 
 import net.hudup.core.alg.Alg;
@@ -48,7 +49,7 @@ public class PluginDemoCF extends MemoryBasedCF {
 
 
 	@Override
-	public RatingVector estimate(RecommendParam param, Set<Integer> queryIds) {
+	public RatingVector estimate(RecommendParam param, Set<Integer> queryIds) throws RemoteException {
 		// TODO Auto-generated method stub
 		return null;
 	}

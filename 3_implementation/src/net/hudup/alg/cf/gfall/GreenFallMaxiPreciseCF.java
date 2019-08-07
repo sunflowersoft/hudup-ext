@@ -22,6 +22,7 @@ import net.hudup.core.logistic.RatingFilter;
  *
  */
 @NextUpdate
+@Deprecated
 public class GreenFallMaxiPreciseCF extends GreenFallMaxiCF {
 
 	

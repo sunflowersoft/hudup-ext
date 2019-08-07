@@ -23,6 +23,7 @@ import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.DataDriver;
 import net.hudup.core.data.DataDriver.DataType;
 import net.hudup.core.data.Fetcher;
+import net.hudup.core.data.MemFetcher;
 import net.hudup.core.data.NominalList;
 import net.hudup.core.data.ParamSql;
 import net.hudup.core.data.Profile;
@@ -172,126 +173,144 @@ class HudupProviderAssoc extends ProviderAssocAbstract {
 	@Override
 	public boolean createUnit(String unitName, AttributeList attList) {
 		// TODO Auto-generated method stub
-		throw new RuntimeException("Not implemented yet");
+		//throw new RuntimeException("Not implemented yet");
+		return false; //Fixing bug date: 2019.08.07 by Loc Nguyen
 	}
 
 	
 	@Override
 	public boolean deleteUnitData(String unitName) {
 		// TODO Auto-generated method stub
-		throw new RuntimeException("Not implemented yet");
+		//throw new RuntimeException("Not implemented yet");
+		return false; //Fixing bug date: 2019.08.07 by Loc Nguyen
 	}
 
 	
 	@Override
 	public boolean dropUnit(String unitName) {
 		// TODO Auto-generated method stub
-		throw new RuntimeException("Not implemented yet");
+		//throw new RuntimeException("Not implemented yet");
+		return false; //Fixing bug date: 2019.08.07 by Loc Nguyen
 	}
 
 	
 	@Override
 	public UnitList getUnitList() {
 		// TODO Auto-generated method stub
-		throw new RuntimeException("Not implemented yet");
+		//throw new RuntimeException("Not implemented yet");
+		return new UnitList(); //Fixing bug date: 2019.08.07 by Loc Nguyen
 	}
 
 	
 	@Override
 	public NominalList getNominalList(String filterUnit, String attName) {
 		// TODO Auto-generated method stub
-		throw new RuntimeException("Not implemented yet");
+		//throw new RuntimeException("Not implemented yet");
+		return new NominalList(); //Fixing bug date: 2019.08.07 by Loc Nguyen
 	}
 
 	
 	@Override
 	public AttributeList getAttributes(String profileUnit) {
 		// TODO Auto-generated method stub
-		throw new RuntimeException("Not implemented yet");
+		//throw new RuntimeException("Not implemented yet");
+		return new AttributeList(); //Fixing bug date: 2019.08.07 by Loc Nguyen
 	}
 
 	
 	@Override
 	public AttributeList getAttributes(ParamSql selectSql, Profile condition) {
 		// TODO Auto-generated method stub
-		throw new RuntimeException("Not implemented yet");
+		//throw new RuntimeException("Not implemented yet");
+		return new AttributeList(); //Fixing bug date: 2019.08.07 by Loc Nguyen
 	}
 
 	
 	@Override
 	public boolean containsProfile(String profileUnit, Profile profile) {
 		// TODO Auto-generated method stub
-		throw new RuntimeException("Not implemented yet");
+		//throw new RuntimeException("Not implemented yet");
+		return false; //Fixing bug date: 2019.08.07 by Loc Nguyen
 	}
 
 	
 	@Override
 	public Profile getProfile(String profileUnit, Profile condition) {
 		// TODO Auto-generated method stub
-		throw new RuntimeException("Not implemented yet");
+		//throw new RuntimeException("Not implemented yet");
+		return null; //Fixing bug date: 2019.08.07 by Loc Nguyen
 	}
 
 	
 	@Override
 	public Fetcher<Profile> getProfiles(String profileUnit, Profile condition) {
 		// TODO Auto-generated method stub
-		throw new RuntimeException("Not implemented yet");
+		//throw new RuntimeException("Not implemented yet");
+		return new MemFetcher<Profile>(); //Fixing bug date: 2019.08.07 by Loc Nguyen
 	}
 
 	
 	@Override
 	public Fetcher<Profile> getProfiles(ParamSql selectSql, Profile condition) {
 		// TODO Auto-generated method stub
-		throw new RuntimeException("Not implemented yet");
+		//throw new RuntimeException("Not implemented yet");
+		return new MemFetcher<Profile>(); //Fixing bug date: 2019.08.07 by Loc Nguyen
 	}
 
 	
 	@Override
 	public Fetcher<Integer> getProfileIds(String profileUnit) {
 		// TODO Auto-generated method stub
-		throw new RuntimeException("Not implemented yet");
+		//throw new RuntimeException("Not implemented yet");
+		return new MemFetcher<Integer>(); //Fixing bug date: 2019.08.07 by Loc Nguyen
 	}
 
 	
 	@Override
 	public int getProfileMaxId(String profileUnit) {
 		// TODO Auto-generated method stub
-		throw new RuntimeException("Not implemented yet");
+		//throw new RuntimeException("Not implemented yet");
+		return -1; //Fixing bug date: 2019.08.07 by Loc Nguyen
 	}
 
 	
 	@Override
 	public boolean insertProfile(String profileUnit, Profile profile) {
 		// TODO Auto-generated method stub
-		throw new RuntimeException("Not implemented yet");
+		//throw new RuntimeException("Not implemented yet");
+		return false; //Fixing bug date: 2019.08.07 by Loc Nguyen
 	}
 
 	
 	@Override
 	public boolean updateProfile(String profileUnit, Profile profile) {
 		// TODO Auto-generated method stub
-		throw new RuntimeException("Not implemented yet");
+		//throw new RuntimeException("Not implemented yet");
+		return false; //Fixing bug date: 2019.08.07 by Loc Nguyen
 	}
 
 	
 	@Override
 	public boolean deleteProfile(String profileUnit, Profile condition) {
 		// TODO Auto-generated method stub
-		throw new RuntimeException("Not implemented yet");
+		//throw new RuntimeException("Not implemented yet");
+		return false; //Fixing bug date: 2019.08.07 by Loc Nguyen
 	}
 
 	
 	@Override
 	public CsvReader getReader(String unit) {
 		// TODO Auto-generated method stub
-		throw new RuntimeException("Not support CSV reader");
+		//throw new RuntimeException("Not implemented yet");
+		return null; //Fixing bug date: 2019.08.07 by Loc Nguyen
 	}
 
 
 	@Override
 	public CsvWriter getWriter(String unit, boolean append) {
 		// TODO Auto-generated method stub
-		throw new RuntimeException("Not support CSV writer");
+		//throw new RuntimeException("Not implemented yet");
+		return null; //Fixing bug date: 2019.08.07 by Loc Nguyen
 	}
 
 

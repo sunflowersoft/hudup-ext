@@ -156,7 +156,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 	 * Getting this evaluator GUI.
 	 * @return this evaluator GUI.
 	 */
-	private EvaluateGUI getThis() {
+	private EvaluateGUI getThisGUI() {
 		return this;	
 	}
 	
@@ -219,7 +219,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					// TODO Auto-generated method stub
-					new AlgConfigDlg(getThis(), getAlg()).
+					new AlgConfigDlg(getThisGUI(), getAlg()).
 						setVisible(true);
 				}
 			});
@@ -357,7 +357,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 		else
 			btnTrainingBrowse.setText(getMessage("training_set"));
 		
-		DatasetUtil2.validateTrainingset(getThis(), txtTrainingBrowse.getDataset(), new Alg[] { alg });
+		DatasetUtil2.validateTrainingset(getThisGUI(), txtTrainingBrowse.getDataset(), new Alg[] { alg });
 		updateMode();
 	}
 	
@@ -435,12 +435,12 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 				if(chkSave.isSelected()) {
 					
 					UriAdapter adapter = new UriAdapter();
-					xURI store = adapter.chooseStore(getThis());
+					xURI store = adapter.chooseStore(getThisGUI());
 					adapter.close();
 					
 					if (store == null) {
 						JOptionPane.showMessageDialog(
-							getThis(), 
+							getThisGUI(), 
 							"Not open store", 
 							"Not open store", 
 							JOptionPane.WARNING_MESSAGE);
@@ -531,10 +531,10 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
 				if (result != null)
-					new MetricsAnalyzeDlg(getThis(), result, new RegisterTable(Arrays.asList(getAlg())));
+					new MetricsAnalyzeDlg(getThisGUI(), result, new RegisterTable(Arrays.asList(getAlg())));
 				else {
 					JOptionPane.showMessageDialog(
-							getThis(), 
+							getThisGUI(), 
 							"No result", 
 							"No result", 
 							JOptionPane.WARNING_MESSAGE);

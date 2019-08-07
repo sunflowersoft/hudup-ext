@@ -302,7 +302,7 @@ public abstract class AbstractEvaluator extends AbstractRunner implements Evalua
 						Profile param = prepareExecuteAlg(alg, testingProfile);
 						//
 						long beginRecommendTime = System.currentTimeMillis();
-						Object executedResult = executeAlg(alg, param);
+						Serializable executedResult = executeAlg(alg, param);
 						long endRecommendTime = System.currentTimeMillis();
 						//
 						long recommendElapsed = endRecommendTime - beginRecommendTime;
@@ -429,7 +429,7 @@ public abstract class AbstractEvaluator extends AbstractRunner implements Evalua
 	 * @param param specified profile as parameter for algorithm execution.
 	 * @return an object as result of algorithm execution.
 	 */
-	protected abstract Object executeAlg(Alg alg, Profile param);
+	protected abstract Serializable executeAlg(Alg alg, Profile param);
 	
 	
 	/**
@@ -438,7 +438,7 @@ public abstract class AbstractEvaluator extends AbstractRunner implements Evalua
 	 * @param testingProfile testing profile.
 	 * @return value from testing profile.
 	 */
-	protected abstract Object extractTestValue(Alg alg, Profile testingProfile);
+	protected abstract Serializable extractTestValue(Alg alg, Profile testingProfile);
 	
 	
 	@Override
