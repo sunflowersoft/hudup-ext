@@ -27,17 +27,18 @@ public interface Factory {
 	
 	/**
 	 * Utility method to create a table for showing data in unit.
+	 * @param uri store URI.
 	 * @return {@link UnitTable} created.
 	 */
-	UnitTable createUnitTable();
+	UnitTable createUnitTable(xURI uri);
 	
 	
-	/**
-	 * Creating suitable URI associator according to data configuration.
-	 * @param config specified configuration.
-	 * @return suitable URI associator according to data configuration referred by {@link UriAssoc}.
-	 */
-	UriAssoc createUriAssoc(DataConfig config);
+//	/**
+//	 * Creating suitable URI associator according to data configuration.
+//	 * @param config specified configuration.
+//	 * @return suitable URI associator according to data configuration referred by {@link UriAssoc}.
+//	 */
+//	UriAssoc createUriAssoc(DataConfig config);
 
 
 	/**

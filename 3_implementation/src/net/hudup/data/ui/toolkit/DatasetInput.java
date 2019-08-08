@@ -105,7 +105,7 @@ public class DatasetInput extends JPanel implements Dispose {
 		JPanel body = new JPanel(new BorderLayout());
 		add(body, BorderLayout.CENTER);
 		
-		unitTable = Util.getFactory().createUnitTable();
+		unitTable = Util.getFactory().createUnitTable(txtConfig.getConfig().getStoreUri());
 		body.add(unitTable.getComponent(), BorderLayout.CENTER);
 
 		unitList = new UnitListBoxExt() {

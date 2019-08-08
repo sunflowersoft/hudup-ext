@@ -807,7 +807,7 @@ public class SetupServerWizard extends JDialog {
 		JPanel body = new JPanel(new BorderLayout());
 		main.add(body, BorderLayout.CENTER);
 		
-		final UnitTable unitTable = Util.getFactory().createUnitTable();
+		final UnitTable unitTable = Util.getFactory().createUnitTable(config.getStoreUri());
 		body.add(unitTable.getComponent(), BorderLayout.CENTER);
 
 		final UnitListBoxExt unitList = new UnitListBoxExt() {

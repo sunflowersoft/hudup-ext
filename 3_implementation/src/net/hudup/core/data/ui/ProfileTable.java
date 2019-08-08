@@ -41,6 +41,15 @@ public class ProfileTable extends JTable {
 
 	
 	/**
+	 * Default constructor.
+	 */
+	public ProfileTable() {
+		super(new ProfileTableModel(Util.newList()));
+		initGUI();
+	}
+
+	
+	/**
 	 * Constructor with a collection of profiles.
 	 * @param profiles collection of profiles.
 	 */
@@ -97,6 +106,15 @@ public class ProfileTable extends JTable {
 	
 	
 	/**
+	 * Update this model by empty data and specified attribute list.
+	 * @param attRef specified attribute list.
+	 */
+	public void update(AttributeList attRef) {
+		getProfileTableModel().update(attRef);
+	}
+	
+	
+	/**
 	 * Update table with specified collection of profiles.
 	 * @param profiles specified collection of profiles.
 	 */
@@ -107,10 +125,10 @@ public class ProfileTable extends JTable {
 	
 	/**
 	 * Update table with specified fetcher of profiles.
-	 * @param profiles specified fetcher of profiles.
+	 * @param fetcher specified fetcher of profiles.
 	 */
-	public void update(Fetcher<Profile> profiles) {
-		getProfileTableModel().update(profiles);
+	public void update(Fetcher<Profile> fetcher) {
+		getProfileTableModel().update(fetcher);
 	}
 	
 	
@@ -243,6 +261,18 @@ class ProfileTableModel extends DefaultTableModel implements TableModelListener 
 	
 	
 	/**
+	 * Update this model by empty data and specified attribute list.
+	 * @param attRef specified attribute list.
+	 */
+	public void update(AttributeList attRef) {
+		this.attRef = attRef;
+		setDataVector(
+				Util.newVector(), 
+				toColumns(attRef));
+	}
+	
+	
+	/**
 	 * Updating this model by the specified collection of profiles.
 	 * @param profiles specified collection of profiles.
 	 */
@@ -366,6 +396,7 @@ class ProfileTableModel extends DefaultTableModel implements TableModelListener 
 	@Override
 	public void tableChanged(TableModelEvent e) {
 		// TODO Auto-generated method stub
+		System.out.println("Profile table model changed: " + e.getType());
 		updateInternalData(); //This code line is not optimized, which is a work-around solution.
 	}
 

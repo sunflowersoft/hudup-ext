@@ -154,7 +154,7 @@ public final class Constants {
 	 * When Hudup server, listener, or balancer starts, it uses firstly the port {@link #DEFAULT_SERVER_PORT}. If this constant is {@code true}, many random ports are tried until success.
 	 * By default, this constant is {@code false}, which means that there is no such randomization. 
 	 */
-	public static final boolean TRY_RANDOM_PORT               = false;
+	public static final boolean TRY_RANDOM_PORT               = true;
 	
 	/**
 	 * This is the period in miliseconds that the Hudup server does periodically internal tasks such as data mining and learning knowledge base.

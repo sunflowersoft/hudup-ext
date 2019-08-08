@@ -2,13 +2,15 @@ package net.hudup.core.factory;
 
 import java.awt.Component;
 import java.io.File;
-import java.io.Serializable;
 import java.nio.file.Path;
 import java.sql.SQLException;
 import java.util.Map;
 
 import javax.swing.JFileChooser;
+import javax.swing.JScrollPane;
 import javax.swing.event.EventListenerList;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.filechooser.FileFilter;
 
 import org.apache.log4j.Logger;
@@ -101,16 +103,24 @@ public class FactoryImpl implements Factory {
 	
 	
 	@Override
-	public UnitTable createUnitTable() {
-		return new UnitTableDBImpl();
+	public UnitTable createUnitTable(xURI uri) {
+		DataDriver dataDriver = DataDriver.create(uri);
+		if (dataDriver == null)
+			return null;
+		else if (dataDriver.isFlatServer())
+			return new FlatUnitTable();
+		else if (dataDriver.isDbServer())
+			return new DBUnitTable();
+		else
+			return null;
 	}
 	
 	
-	@Override
-	public UriAssoc createUriAssoc(DataConfig config) {
-		xURI uri = config.getStoreUri();
-		return createUriAssoc(uri);
-	}
+//	@Override
+//	public UriAssoc createUriAssoc(DataConfig config) {
+//		xURI uri = config.getStoreUri();
+//		return createUriAssoc(uri);
+//	}
 
 
 	@Override
@@ -312,13 +322,13 @@ class HudupProviderAssoc extends ProviderAssocAbstract {
 
 
 /**
- * This is the default implementation of {@link UnitTable}.
+ * This is an implementation of {@link UnitTable} for flat structure.
  * 
  * @author Loc Nguyen
  * @version 1.0
  *
  */
-class UnitTableImpl implements UnitTable, Serializable {
+class FlatUnitTable extends ProfileTable implements UnitTable {
 
 	
 	/**
@@ -328,114 +338,132 @@ class UnitTableImpl implements UnitTable, Serializable {
 
 	
 	/**
-	 * Logger of this class.
+	 * Internal provider associator.
 	 */
-	protected final static Logger logger = Logger.getLogger(UnitTable.class);
-
-	
-	/**
-	 * Holding a list of event listeners.
-	 * 
-	 */
-    protected EventListenerList listenerList = new EventListenerList();
-    
-    
-	/**
-	 * Table for database
-	 */
-	protected DBTable dbTable = null;
+	protected ProviderAssoc providerAssoc = null;
 	
 	
 	/**
-	 * Table for flat structure like CSV file.
+	 * Internal unit.
 	 */
-	protected ProfileTable flatTable = null;
-	
-	
-	/**
-	 * Data driver.
-	 */
-	protected DataDriver dataDriver = null;
+	protected String unit = null;
 	
 	
 	/**
 	 * Default constructor.
 	 */
-	public UnitTableImpl() {
+	public FlatUnitTable() {
 		super();
 		// TODO Auto-generated constructor stub
+		setEditable(false);
+		getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+			
+			@Override
+			public void valueChanged(ListSelectionEvent e) {
+				// TODO Auto-generated method stub
+				fireSelectionChangedEvent(new SelectionChangedEvent(getThisUnitTable()));
+			}
+		});
+	}
+
+
+	/**
+	 * Getting this table.
+	 * @return this table.
+	 */
+	private UnitTable getThisUnitTable() {
+		return this;
 	}
 
 	
 	@Override
 	public void update(ProviderAssoc providerAssoc, String unit) {
 		// TODO Auto-generated method stub
-//		this.dataDriver = DataDriver.create(providerAssoc.getConfig().getStoreUri());
-//		if (dataDriver == null)
-//			return;
-//		
-//		if (dataDriver.isFlatServer()) {
-//			
-//		}
-//			return flatTable;
-//		else if (dataDriver.isDbServer())
-//			return dbTable;
-//		else
-//			return null;
-//		
-//		setEditable(true);
-//		createControlPanel();
+		if (providerAssoc == null || unit == null)
+			return;
+		
+		try {
+			Fetcher<Profile> fetcher = providerAssoc.getProfiles(unit, null);
+			update(fetcher);
+			fetcher.close();
+		}
+		catch (Exception e){
+			e.printStackTrace();
+		}
+		
+		this.providerAssoc = providerAssoc;
+		this.unit = unit;
 	}
 
+	
 	@Override
 	public void clear() {
 		// TODO Auto-generated method stub
-		
+		System.out.println("UnitFlatTableImpl#clear() is not supported yet.");
 	}
 
-	@Override
-	public Component getComponent() {
-		// TODO Auto-generated method stub
-		if (dataDriver == null)
-			return null;
-		else if (dataDriver.isFlatServer())
-			return flatTable;
-		else if (dataDriver.isDbServer())
-			return dbTable;
-		else
-			return null;
-	}
-
-	@Override
-	public void addSelectionChangedListener(SelectionChangedListener listener) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void removeSelectionChangedListener(SelectionChangedListener listener) {
-		// TODO Auto-generated method stub
-		
-	}
-
+	
 	@Override
 	public void refresh() {
 		// TODO Auto-generated method stub
-		
+		update(this.providerAssoc, this.unit);
 	}
 
-	@Override
-	public int getSelectedRow() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public Object getValueAt(int row, int column) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 	
+	@Override
+	public Component getComponent() {
+		// TODO Auto-generated method stub
+		return new JScrollPane(this);
+	}
+
+	
+	@Override
+	public void addSelectionChangedListener(SelectionChangedListener listener) {
+		synchronized (listenerList) {
+			listenerList.add(SelectionChangedListener.class, listener);
+		}
+    }
+
+    
+	@Override
+    public void removeSelectionChangedListener(SelectionChangedListener listener) {
+		synchronized (listenerList) {
+			listenerList.remove(SelectionChangedListener.class, listener);
+		}
+    }
+	
+    
+    /**
+     * Return array of selection changed listeners.
+     * @return array of selection changed listeners.
+     */
+    protected SelectionChangedListener[] getSelectionChangedListeners() {
+		synchronized (listenerList) {
+			return listenerList.getListeners(SelectionChangedListener.class);
+		}
+    }
+
+    
+    /**
+     * Firing (issuing) an event from this table to all selection changed listeners. 
+     * @param evt selection changed event.
+     */
+    protected void fireSelectionChangedEvent(SelectionChangedEvent evt) {
+    	
+    	SelectionChangedListener[] listeners = getSelectionChangedListeners();
+		
+		for (SelectionChangedListener listener : listeners) {
+			try {
+				listener.respond(evt);
+			}
+			catch (Throwable e) {
+				e.printStackTrace();
+			}
+		}
+	
+    }
+
+
 }
 
 
@@ -446,8 +474,7 @@ class UnitTableImpl implements UnitTable, Serializable {
  * @version 10.0
  *
  */
-@Deprecated
-class UnitTableDBImpl extends DBTable implements UnitTable {
+class DBUnitTable extends DBTable implements UnitTable {
 
 	
 	/**
@@ -472,11 +499,47 @@ class UnitTableDBImpl extends DBTable implements UnitTable {
 	/**
 	 * Default constructor.
 	 */
-	public UnitTableDBImpl() {
+	public DBUnitTable() {
 		super();
 		// TODO Auto-generated constructor stub
 		setEditable(true);
 		createControlPanel();
+		
+		addDBTableEventListener(new DBTableEventListener() {
+
+			@Override
+			public void afterRowSelectionChange(int fromRow, int toRow) {
+				// TODO Auto-generated method stub
+				super.afterRowSelectionChange(fromRow, toRow);
+				fireSelectionChangedEvent(new SelectionChangedEvent(getThisUnitTable()));
+			}
+			
+		});
+		
+		addDatabaseChangeListener(new DatabaseChangeListener() {
+
+			@Override
+			public void afterDelete(int row) {
+				// TODO Auto-generated method stub
+				super.afterDelete(row);
+				fireSelectionChangedEvent(new SelectionChangedEvent(getThisUnitTable()));
+			}
+
+			@Override
+			public void afterInsert(int row) {
+				// TODO Auto-generated method stub
+				super.afterInsert(row);
+				fireSelectionChangedEvent(new SelectionChangedEvent(getThisUnitTable()));
+			}
+
+			@Override
+			public void afterUpdate(int row) {
+				// TODO Auto-generated method stub
+				super.afterUpdate(row);
+				fireSelectionChangedEvent(new SelectionChangedEvent(getThisUnitTable()));
+			}
+			
+		});
 	}
 
 
@@ -484,7 +547,7 @@ class UnitTableDBImpl extends DBTable implements UnitTable {
 	 * Getting this table.
 	 * @return this table.
 	 */
-	private UnitTable getThis() {
+	private UnitTable getThisUnitTable() {
 		return this;
 	}
 	
@@ -538,44 +601,6 @@ class UnitTableDBImpl extends DBTable implements UnitTable {
 			e.printStackTrace();
 		}
 		
-		addDBTableEventListener(new DBTableEventListener() {
-
-			@Override
-			public void afterRowSelectionChange(int fromRow, int toRow) {
-				// TODO Auto-generated method stub
-				super.afterRowSelectionChange(fromRow, toRow);
-				fireSelectionChangedEvent(new SelectionChangedEvent(getThis()));
-			}
-			
-		});
-		
-		addDatabaseChangeListener(new DatabaseChangeListener() {
-
-			@Override
-			public void afterDelete(int row) {
-				// TODO Auto-generated method stub
-				super.afterDelete(row);
-				fireSelectionChangedEvent(new SelectionChangedEvent(getThis()));
-			}
-
-			@Override
-			public void afterInsert(int row) {
-				// TODO Auto-generated method stub
-				super.afterInsert(row);
-				fireSelectionChangedEvent(new SelectionChangedEvent(getThis()));
-			}
-
-			@Override
-			public void afterUpdate(int row) {
-				// TODO Auto-generated method stub
-				super.afterUpdate(row);
-				fireSelectionChangedEvent(new SelectionChangedEvent(getThis()));
-			}
-			
-		});
-
-		
-		setEditable(true);
 	}
 	
 	

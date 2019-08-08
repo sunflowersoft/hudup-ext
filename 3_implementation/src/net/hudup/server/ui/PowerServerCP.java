@@ -460,7 +460,8 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 	private JPanel createStorePane() throws Exception {
 		JPanel store = new JPanel(new BorderLayout());
 		
-		unitTable = Util.getFactory().createUnitTable();
+		unitTable = Util.getFactory().createUnitTable(
+				((DataConfig)paneConfig.getPropTable().getPropList()).getStoreUri());
 		store.add(unitTable.getComponent(), BorderLayout.CENTER);
 
 		
@@ -493,7 +494,8 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 	private JPanel createAccountPane() {
 		final JPanel main = new JPanel(new BorderLayout());
 		
-		accUnitTable = Util.getFactory().createUnitTable();
+		accUnitTable = Util.getFactory().createUnitTable(
+				((DataConfig)paneConfig.getPropTable().getPropList()).getStoreUri());
 		accUnitTable.addSelectionChangedListener(new SelectionChangedListener() {
 			
 			@Override

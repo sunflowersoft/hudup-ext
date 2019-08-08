@@ -84,7 +84,7 @@ public class UriAdapter implements UriAssoc, AutoCloseable {
 			e.printStackTrace();
 		}
 		
-		assoc = Util.getFactory().createUriAssoc(config);
+		assoc = Util.getFactory().createUriAssoc(config.getStoreUri());
 		if (assoc == null)
 			return false;
 		else
