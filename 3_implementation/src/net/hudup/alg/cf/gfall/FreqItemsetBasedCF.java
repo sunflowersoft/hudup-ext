@@ -137,7 +137,7 @@ public abstract class FreqItemsetBasedCF extends ModelBasedCF {
 
 	
 	/**
-	 * 
+	 * This method perform specific estimation.
 	 * @param param recommendation parameter specified by {@link RecommendParam}
 	 * @param queryIds query identifiers (IDs). Such IDs can be item IDs or user IDs.
 	 * @param referredRatingValue referred rating value.

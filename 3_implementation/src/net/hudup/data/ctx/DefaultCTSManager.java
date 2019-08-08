@@ -30,6 +30,7 @@ import net.hudup.core.parser.TextParserUtil;
 
 
 /**
+ * This class is default implementation of context template schema (CTS) manager.
  * 
  * @author Loc Nguyen
  * @version 10.0
@@ -45,19 +46,19 @@ public class DefaultCTSManager extends CTSManagerAbstract {
 
 	
 	/**
-	 * 
+	 * Context template schema.
 	 */
 	protected ContextTemplateSchema ctSchema = null;
 	
 	
 	/**
-	 * 
+	 * Provider associator.
 	 */
 	protected ProviderAssoc assoc = null;
 
 	
 	/**
-	 * 
+	 * Default constructor.
 	 */
 	public DefaultCTSManager() {
 		super();
@@ -154,10 +155,10 @@ public class DefaultCTSManager extends CTSManagerAbstract {
 
 	
 	/**
-	 * 
-	 * @param templateId
-	 * @param templates
-	 * @return {@link ContextTemplate}
+	 * Create context template.
+	 * @param templateId context template identifier.
+	 * @param templates templates list.
+	 * @return {@link ContextTemplate} created.
 	 */
 	private ContextTemplate createTemplate(int templateId, ContextTemplateList templates) {
 		// Return if invalid template id or existing template

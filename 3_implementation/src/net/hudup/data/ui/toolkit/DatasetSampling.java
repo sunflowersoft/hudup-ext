@@ -73,6 +73,11 @@ public class DatasetSampling extends JPanel implements ProgressListener, Dispose
 	protected JTextField txtTestRatios = null;
 	
 	/**
+	 * Folder number text field.
+	 */
+	protected JTextField txtFolderNumber = null;
+
+	/**
 	 * Sparse ratio text field.
 	 */
 	protected JTextField txtSparseRatios = null;
@@ -123,6 +128,7 @@ public class DatasetSampling extends JPanel implements ProgressListener, Dispose
 		
 		header_left.add(new JLabel("Unit"));
 		header_left.add(new JLabel("Test ratios"));
+		header_left.add(new JLabel("Folder number"));
 		header_left.add(new JLabel("Sparse ratios"));
 
 		JPanel header_center = new JPanel(new GridLayout(0, 1));
@@ -136,9 +142,13 @@ public class DatasetSampling extends JPanel implements ProgressListener, Dispose
 		txtUnit.setEditable(false);
 		header_center.add(txtUnit);
 		
-		txtTestRatios = new JTextField("0.5");
+		txtTestRatios = new JTextField("0.1, 0.5, 0.9");
 		txtTestRatios.setEditable(true);
 		header_center.add(txtTestRatios);
+
+		txtFolderNumber = new JTextField("5"); //If the folder number is zero, the folder number is inverse of the test ratio.
+		txtFolderNumber.setEditable(true);
+		header_center.add(txtFolderNumber);
 
 		txtSparseRatios = new JTextField("0.2, 0.4, 0.6, 0.8");
 		txtSparseRatios.setEditable(true);
@@ -284,7 +294,7 @@ public class DatasetSampling extends JPanel implements ProgressListener, Dispose
 	
 	
 	/**
-	 * Making sparse the input unit
+	 * Sampling the input unit
 	 */
 	private void sampling() {
 		if (txtConfig.getConfig() == null) {
@@ -327,6 +337,22 @@ public class DatasetSampling extends JPanel implements ProgressListener, Dispose
 			return;
 		}
 		
+		List<Double> folderNumberTemp = parseRatios(txtFolderNumber.getText());
+		final int folderNumber;
+		if (folderNumberTemp.size() == 0)
+			folderNumber = 0; //When the folder number is zero, the folder number is inverse of the test ratio.
+		else {
+			folderNumber = folderNumberTemp.get(0).intValue();
+			if (folderNumber < 0) {
+				JOptionPane.showMessageDialog(
+					getThis(), 
+					"Folder number cannot be negative", 
+					"Invalid folder number", 
+					JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+		}
+
 		List<Double> sparseRatiosTemp = parseRatios(txtSparseRatios.getText());
 		final List<Double> sparseRatios = Util.newList();
 		for (double ratio : sparseRatiosTemp) {
@@ -366,7 +392,7 @@ public class DatasetSampling extends JPanel implements ProgressListener, Dispose
 					DatasetSampler sampler = new DatasetSampler(srcConfig);
 					sampler.addProgressListener(getThis());
 					for (double testRatio : testRatios) {
-						sampler.split(srcUnit, testRatio);
+						sampler.split(srcUnit, testRatio, folderNumber);
 					}
 					prgRunning.setValue(0);
 					
@@ -390,16 +416,16 @@ public class DatasetSampling extends JPanel implements ProgressListener, Dispose
 							"Sampling dataset successfully",
 							JOptionPane.INFORMATION_MESSAGE);
 					
-					int confirm = JOptionPane.showConfirmDialog(
-							getThis(), 
-							"Do you want to view these datasets?", 
-							"Dataset viewer",
-							JOptionPane.YES_NO_OPTION,
-							JOptionPane.QUESTION_MESSAGE);
-					if (confirm != JOptionPane.YES_OPTION) {
-						sampler.close();
-						return;
-					}
+//					int confirm = JOptionPane.showConfirmDialog(
+//							getThis(), 
+//							"Do you want to view these datasets?", 
+//							"Dataset viewer",
+//							JOptionPane.YES_NO_OPTION,
+//							JOptionPane.QUESTION_MESSAGE);
+//					if (confirm != JOptionPane.YES_OPTION) {
+//						sampler.close();
+//						return;
+//					}
 					
 					sampler.close();
 					

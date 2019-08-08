@@ -4,6 +4,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 
 /**
+ * This class implements the transaction interface, please see {@link Transaction}.
  * 
  * @author Loc Nguyen
  * @version 10.0
@@ -13,13 +14,13 @@ public class TransactionImpl implements Transaction {
 
 	
 	/**
-	 * 
+	 * Internal lock.
 	 */
 	protected ReentrantReadWriteLock lock = null;
 	
 	
 	/**
-	 * 
+	 * Default constructor.
 	 */
 	public TransactionImpl() {
 		// TODO Auto-generated constructor stub
@@ -28,8 +29,8 @@ public class TransactionImpl implements Transaction {
 
 	
 	/**
-	 * 
-	 * @param fair
+	 * Constructor with fair parameter.
+	 * @param fair true if using the fair ordering policy. Please see {@link ReentrantReadWriteLock}.
 	 */
 	public TransactionImpl(boolean fair) {
 		// TODO Auto-generated constructor stub

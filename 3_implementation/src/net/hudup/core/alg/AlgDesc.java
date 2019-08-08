@@ -29,7 +29,31 @@ public class AlgDesc implements Serializable, net.hudup.core.Cloneable {
 	 * @version 1.0
 	 */
 	public enum MethodologyType {
-		memorybased, modelbased, composite, service, unknown
+		
+		/**
+		 * Memory-based algorithm.
+		 */
+		memorybased,
+		
+		/**
+		 * Model-based algorithm.
+		 */
+		modelbased,
+		
+		/**
+		 * Composite algorithm.
+		 */
+		composite,
+		
+		/**
+		 * Service algorithm is a service that points to another algorithm.
+		 */
+		service,
+		
+		/**
+		 * Unknown algorithm.
+		 */
+		unknown
 	}
 	
 	

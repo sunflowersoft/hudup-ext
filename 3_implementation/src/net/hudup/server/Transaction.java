@@ -12,32 +12,32 @@ package net.hudup.server;
 public interface Transaction {
 
 	/**
-	 * 
+	 * Read locking.
 	 */
 	void lockRead();
 
 	
 	/**
-	 * 
+	 * Read unlocking.
 	 */
 	void unlockRead();
 	
 	
 	/**
-	 * 
+	 * Write locking.
 	 */
 	void lockWrite();
 
 
 	/**
-	 * 
+	 * Write unlocking.
 	 */
 	void unlockWrite();
 	
 	
 	/**
-	 * 
-	 * @return whether write locked by current thread
+	 * Testing whether write locked by current thread.
+	 * @return whether write locked by current thread.
 	 */
     boolean isWriteLockedByCurrentThread();
 	

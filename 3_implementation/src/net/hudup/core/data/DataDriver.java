@@ -511,7 +511,7 @@ public final class DataDriver implements Cloneable, Serializable {
 		else if (spec.startsWith("jdbc:oracle:"))
 			return new DataDriver(DataType.oracle);
 		else if (spec.startsWith("jdbc:postgresql:"))
-			return new DataDriver(DataType.oracle);
+			return new DataDriver(DataType.postgresql);
 		else if (isCompressed(uri)) {
 			xSubURI subUri = createSubURI(uri);
 			return create(subUri.brief);

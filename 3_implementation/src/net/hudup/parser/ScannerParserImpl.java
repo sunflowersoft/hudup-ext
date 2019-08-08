@@ -10,6 +10,8 @@ import net.hudup.core.parser.ScannerParser;
 import net.hudup.data.ScannerImpl;
 
 /**
+ * This class implements scanner parser.
+ * 
  * @author Loc Nguyen
  * @version 10.0
  *
@@ -24,7 +26,7 @@ public class ScannerParserImpl extends ScannerParser {
 
 	
 	/**
-	 * 
+	 * Default constructor.
 	 */
 	public ScannerParserImpl() {
 		super();

@@ -14,6 +14,7 @@ import net.hudup.core.parser.TextParserUtil;
 
 
 /**
+ * This class is a stub of server at client. It is called client stub. Please see {@link ClientStub}.
  * 
  * @author Loc Nguyen
  * @version 10.0
@@ -30,19 +31,19 @@ public class ClientStubImpl implements ClientStub {
 
 
 	/**
-	 * 
+	 * Registered name.
 	 */
 	protected String regName = "";
 	
 	
 	/**
-	 * 
+	 * Map of external item information.
 	 */
 	protected Map<Integer, ExternalItemInfo> itemInfo = Util.newMap();
 	
 	
 	/**
-	 * 
+	 * Default constructor.
 	 */
 	public ClientStubImpl() {
 		if (!(itemInfo instanceof Serializable))
@@ -51,8 +52,9 @@ public class ClientStubImpl implements ClientStub {
 	
 	
 	/**
-	 * @param regName
-	 * @param itemInfos
+	 * Constructor with registered name and map of external item formation.
+	 * @param regName registered name.
+	 * @param itemInfos external item formation.
 	 */
 	public ClientStubImpl(String regName, Map<Integer, ExternalItemInfo> itemInfos) {
 		if (!(itemInfos instanceof Serializable))
@@ -64,7 +66,7 @@ public class ClientStubImpl implements ClientStub {
 	
 	
 	/**
-	 * 
+	 * Clear information of this stub.
 	 */
 	protected void clear() {
 		regName = "";
@@ -150,10 +152,11 @@ public class ClientStubImpl implements ClientStub {
 
 
 	/**
-	 * 
-	 * @param regName
-	 * @param itemIds
-	 * @return {@link ClientStubImpl}
+	 * Create this stub with specified registered name, item identifiers, and external query.
+	 * @param regName registered name.
+	 * @param itemIds item identifiers.
+	 * @param externalQuery external query.
+	 * @return Client stub created with specified registered name, item identifiers, and external query.
 	 */
 	public static ClientStubImpl create(String regName, Collection<Integer> itemIds, ExternalQuery externalQuery) {
 		Map<Integer, ExternalItemInfo> itemInfos = Util.newMap();

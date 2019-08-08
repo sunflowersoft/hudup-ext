@@ -8,6 +8,7 @@ import net.hudup.core.logistic.xURI;
 
 
 /**
+ * This class represents data configuration for listener.
  * 
  * @author Loc Nguyen
  * @version 10.0
@@ -23,37 +24,37 @@ public class ListenerConfig extends ServerConfig {
 	
 	
 	/**
-	 * 
+	 * Configuration path.
 	 */
 	public final static String listenerConfig = Constants.WORKING_DIRECTORY + "/listenerconfig.xml";
 
 	
 	/**
-	 * 
+	 * Remote host field.
 	 */
 	public static final String REMOTE_HOST_FIELD = changeCase("remote_host");
 	
 	
 	/**
-	 * 
+	 * Remote port field.
 	 */
 	public static final String REMOTE_PORT_FIELD = changeCase("remote_port");
 	
 	
 	/**
-	 * 
+	 * Remote account field.
 	 */
 	public static final String REMOTE_ACCOUNT_FIELD = changeCase("remote_account");
 
 	
 	/**
-	 * 
+	 * Remote password.
 	 */
 	public static final String REMOTE_PASSWORD_FIELD = changeCase("remote_password");
 	
 	
 	/**
-	 * 
+	 * Export port field.
 	 */
 	public final static String EXPORT_PORT_FIELD = changeCase("export_port");
 
@@ -68,8 +69,8 @@ public class ListenerConfig extends ServerConfig {
 
 
 	/**
-	 * 
-	 * @param uri
+	 * Constructor with specified URI.
+	 * @param uri specified URI.
 	 */
 	public ListenerConfig(xURI uri) {
 		super(uri);
@@ -96,8 +97,8 @@ public class ListenerConfig extends ServerConfig {
 	
 
 	/**
-	 * 
-	 * @param port
+	 * Setting exported port.
+	 * @param port exported port used for remote control panel.
 	 */
 	public void setExportPort(int port) {
 		put(EXPORT_PORT_FIELD, port);
@@ -105,8 +106,8 @@ public class ListenerConfig extends ServerConfig {
 	
 	
 	/**
-	 * 
-	 * @return export port used for remote control panel
+	 * Getting exported port.
+	 * @return export port used for remote control panel.
 	 */
 	public int getExportPort() {
 		return getAsInt(EXPORT_PORT_FIELD);
@@ -114,8 +115,8 @@ public class ListenerConfig extends ServerConfig {
 
 	
 	/**
-	 * 
-	 * @param host
+	 * Setting remote host (server).
+	 * @param host remote host.
 	 */
 	public void setRemoteHost(String host) {
 		put(REMOTE_HOST_FIELD, host);
@@ -123,8 +124,8 @@ public class ListenerConfig extends ServerConfig {
 	
 	
 	/**
-	 * 
-	 * @return remote host
+	 * Getting remote host (server).
+	 * @return remote host.
 	 */
 	public String getRemoteHost() {
 		return getAsString(REMOTE_HOST_FIELD);
@@ -132,8 +133,8 @@ public class ListenerConfig extends ServerConfig {
 
 	
 	/**
-	 * 
-	 * @param port
+	 * Setting remote port (server port).
+	 * @param port remote port.
 	 */
 	public void setRemotePort(int port) {
 		put(REMOTE_PORT_FIELD, port);
@@ -141,8 +142,8 @@ public class ListenerConfig extends ServerConfig {
 	
 	
 	/**
-	 * 
-	 * @return remote port
+	 * Getting remote port (server port).
+	 * @return remote port.
 	 */
 	public int getRemotePort() {
 		return getAsInt(REMOTE_PORT_FIELD);
@@ -150,8 +151,8 @@ public class ListenerConfig extends ServerConfig {
 
 
 	/**
-	 * 
-	 * @param account
+	 * Setting remote account (account on server).
+	 * @param account remote account (account on server).
 	 */
 	public void setRemoteAccount(String account) {
 		put(REMOTE_ACCOUNT_FIELD, account);
@@ -159,8 +160,8 @@ public class ListenerConfig extends ServerConfig {
 	
 	
 	/**
-	 * 
-	 * @return remote account
+	 * Getting remote account (account on server).
+	 * @return remote account.
 	 */
 	public String getRemoteAccount() {
 		return getAsString(REMOTE_ACCOUNT_FIELD);
@@ -168,8 +169,8 @@ public class ListenerConfig extends ServerConfig {
 
 
 	/**
-	 * 
-	 * @param password
+	 * Getting remote password (password of account on server).
+	 * @param password remote password (password of account on server).
 	 */
 	public void setRemotePassword(HiddenText password) {
 		put(REMOTE_PASSWORD_FIELD, password);
@@ -177,8 +178,8 @@ public class ListenerConfig extends ServerConfig {
 	
 	
 	/**
-	 * 
-	 * @return remote password
+	 * Setting remote password (password of account on server).
+	 * @return remote password (password of account on server).
 	 */
 	public HiddenText getRemotePassword() {
 		return getAsHidden(REMOTE_PASSWORD_FIELD);
@@ -186,8 +187,8 @@ public class ListenerConfig extends ServerConfig {
 
 	
 	/**
-	 * 
-	 * @return {@link RemoteInfo}
+	 * Getting remote information (server information).
+	 * @return remote information (server information).
 	 */
 	public RemoteInfo getRemoteInfo() {
 		return new RemoteInfo(
@@ -197,8 +198,8 @@ public class ListenerConfig extends ServerConfig {
 
 	
 	/**
-	 * 
-	 * @param rInfo
+	 * Setting remote information (server information).
+	 * @param rInfo remote information (server information).
 	 */
 	public void setRemoteInfo(RemoteInfo rInfo) {
 		setRemoteHost(rInfo.host);

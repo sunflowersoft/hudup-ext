@@ -129,10 +129,10 @@ public class ContextValueImpl implements ContextValue {
 	
 	
 	/**
-	 * 
-	 * @param type
-	 * @param value
-	 * @return {@link ContextValue}
+	 * Create context value.
+	 * @param type specified type.
+	 * @param value specified value.
+	 * @return {@link ContextValue} created.
 	 */
 	public static ContextValue create(Type type, Serializable value) {
 		Attribute attribute = new Attribute(DataConfig.CTX_VALUE_FIELD, type);
@@ -141,9 +141,9 @@ public class ContextValueImpl implements ContextValue {
 	
 	
 	/**
-	 * 
-	 * @param value
-	 * @return {@link ContextValue}
+	 * Create context value.
+	 * @param value specified value.
+	 * @return {@link ContextValue} created.
 	 */
 	public static ContextValue create(Serializable value) {
 		if (value == null)

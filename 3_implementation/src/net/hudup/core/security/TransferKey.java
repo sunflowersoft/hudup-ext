@@ -1,10 +1,5 @@
 package net.hudup.core.security;
 
-import static net.hudup.core.Constants.ROOT_PACKAGE;
-
-import java.io.InputStream;
-import java.util.Properties;
-
 import net.hudup.core.Util;
 
 /**
@@ -22,15 +17,8 @@ public class TransferKey {
 	 * @return transfer key
 	 */
 	protected byte[] transfer() {
-		String encryptedKey = "stbqsk61mqegxiok";
-		Properties props = new Properties();
-		try {
-			InputStream in = Util.class.getResourceAsStream(ROOT_PACKAGE + "hudup.properties");		
-			props.load(in);
-			encryptedKey = props.getProperty("encryptedkey", encryptedKey);
-		}
-		catch (Throwable e) { }
-		
+		String encryptedKey = Util.getHudupProperty("cipherkey");
+		encryptedKey = encryptedKey == null? "stbqsk61mqegxiok" : encryptedKey;
 		return encryptedKey.getBytes();
 	}
 	

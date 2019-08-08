@@ -19,6 +19,7 @@ import net.hudup.core.logistic.xURI;
 import net.hudup.core.parser.TextParserUtil;
 
 /**
+ * This class is knowledge base for SVD+ algorithm.
  * 
  * @author Loc Nguyen
  * @version 10.0
@@ -36,49 +37,49 @@ public abstract class SvdGradientPlusKB extends SvdGradientKB {
 
 	
 	/**
-	 * 
+	 * Lamda 2 field.
 	 */
 	public final static String LAMDA2 = "lamda2";
 
 	
 	/**
-	 * 
+	 * Extended gradient factors fields.
 	 */
 	public final static String GRADIENT_FACTORS_EXT = "gradient_info_ext";
 
 	
 	/**
-	 * 
+	 * New default gamma.
 	 */
 	public final static double DEFAULT_GAMMA = 0.007;
 	
 	
 	/**
-	 * 
+	 * New default lamda.
 	 */
 	public final static double DEFAULT_LAMDA = 0.005;
 
 	
 	/**
-	 * 
+	 * New default lamda 2.
 	 */
 	public final static double DEFAULT_LAMDA2 = 0.015;
 
 	
 	/**
-	 * 
+	 * Map of user rated indices.
 	 */
 	protected Map<Integer, List<Integer>> userRatedIndexes = Util.newMap();
 	
 	
 	/**
-	 * 
+	 * List of implicit factors.
 	 */
 	protected List<Vector> itemImplicitFactors = Util.newList();
 
 	
 	/**
-	 * 
+	 * Default constructor.
 	 */
 	public SvdGradientPlusKB() {
 		super();
@@ -364,9 +365,9 @@ public abstract class SvdGradientPlusKB extends SvdGradientKB {
 
 
 	/**
-	 * 
-	 * @param userIndex
-	 * @return implicit rated vector
+	 * Getting implicit rated vector.
+	 * @param userIndex user index.
+	 * @return implicit rated vector.
 	 */
 	private Vector userImplicitRatedVector(int userIndex) {
 		List<Integer> ratedItemIndexes = userRatedIndexes.get(userIndex);
@@ -410,14 +411,12 @@ public abstract class SvdGradientPlusKB extends SvdGradientKB {
 	public static SvdGradientPlusKB create(final SvdGradientPlusCF cf) {
 		
 		return new SvdGradientPlusKB() {
-
 			
 			/**
-			 * 
+			 * Default serial version UID.
 			 */
 			private static final long serialVersionUID = 1L;
 
-			
 			@Override
 			public String getName() {
 				// TODO Auto-generated method stub
@@ -425,7 +424,6 @@ public abstract class SvdGradientPlusKB extends SvdGradientKB {
 			}
 		};
 	}
-	
 	
 	
 }

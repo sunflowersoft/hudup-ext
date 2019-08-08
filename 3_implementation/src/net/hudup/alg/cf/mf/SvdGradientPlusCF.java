@@ -6,6 +6,7 @@ import net.hudup.core.logistic.NextUpdate;
 
 
 /**
+ * This class is enhanced version of Singular Vector Decomposition (SVD+) algorithm.
  * 
  * @author Loc Nguyen
  * @version 10.0
@@ -23,7 +24,7 @@ public class SvdGradientPlusCF extends SvdGradientCF {
 
 	
 	/**
-	 * 
+	 * Default constructor.
 	 */
 	public SvdGradientPlusCF() {
 		super();

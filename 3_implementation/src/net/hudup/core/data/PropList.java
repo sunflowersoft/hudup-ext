@@ -39,7 +39,6 @@ import net.hudup.core.alg.AlgList;
 import net.hudup.core.data.Attribute.Type;
 import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.xURI;
-import net.hudup.core.parser.JsonUtil;
 import net.hudup.core.parser.TextParsable;
 import net.hudup.core.parser.TextParserUtil;
 
@@ -888,7 +887,7 @@ public class PropList implements TextParsable, Serializable, Cloneable {
 	 * @return whether loading successfully
 	 */
 	public boolean loadJson(Reader reader) {
-		PropList propList = (PropList) JsonUtil.parseJson(reader);
+		PropList propList = (PropList) Util.getJsonParser().parseJson(reader);
 		this.putAll(propList.convertAfterLoad());
 		
 		return true;
@@ -902,7 +901,7 @@ public class PropList implements TextParsable, Serializable, Cloneable {
 	 * @return whether saving successfully
 	 */
 	public boolean saveJson(Writer writer) {
-		return JsonUtil.toJson(convertBeforeSave(), writer);
+		return Util.getJsonParser().toJson(convertBeforeSave(), writer);
 	}
 
 	

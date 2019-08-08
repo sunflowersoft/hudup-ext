@@ -51,6 +51,54 @@ Homepage: www.locnguyen.net,
 Email: ng_phloc@yahoo.com,
 Tel: 84-975250362
 
-
 ---
-P/S: Current version of JRE and JDK is 1.8.0. Current version of Hudup is 11. The last built date is June 22, 2018. 
+P/S: Current version of JRE and JDK is 1.8.0. Current version of Hudup is 11. The last built date is June 22, 2018.
+
+	   
+--------------------
+Acknowledgements:
+This product is the place to acknowledge Sir Vu, Ngoc-Dong who gave me valuable comments and advices. These comments help me to improve this product. We also thank following scientists and organizations who gave us software libraries used in Hudup:
+
+The Apache Software Foundation (https://apache.org) provided Apache Common Logging, Apache Commons IO, Apache Commons Math, Apache Logging Services (log4j), Derby JDBC, and XML Commons.
+
+GitHub provided Flexible XML framework for Java available at https://dom4j.github.io.
+
+The National Distance Education University provided Elvira project for building and evaluating Bayesian network available at https://goo.gl/oEhXgS.
+
+Michael Thomas Flanagan - University College London provided statistic software package "Java Scientific Library" available at https://goo.gl/oX5mvU.
+
+Google LLC provided GSON library for processing JSON format and Google Core Libraries for Java.
+
+National Institute of Standards and Technology (NIST) provided Java Matrix Package (JAMA) available at https://goo.gl/4Kj9p3.
+
+Fabio Gagliardi Cozman - University of Sao Paulo provided JavaBayes for building and evaluating Bayesian network, available at https://goo.gl/KvrZsg.
+
+Java CSV Team provided Java library for processing CSV files available at https://goo.gl/fXJZvH.
+
+JBoss provided Javassist (Java Programming Assistant) to make Java bytecode manipulation simple, available at https://goo.gl/ncSmbS.
+
+JGraph Ltd provided the graph visualization software JGraph available at https://github.com/jgraph.
+
+JPF Team provided Java Plug-in Framework (JPF) Project available at http://jpf.sourceforge.net.
+
+ECMA International provided JSON library for Java, available at http://www.json.org.
+
+John DeRegnaucourt provided Java library for JSON format available at https://goo.gl/c9k6N4.
+
+Java Community Process (JCP) Program provided Java Specification Requests (JSRs) for Java annotation.
+
+Kent Beck, Erich Gamma, David Saff, and Mike Clark are developers of JUnit - A unit testing framework for the Java programming language.
+
+Alex Lynch provided JXL library for processing Excel file available at http://jxl.sourceforge.net.
+
+OneMind provided Java scripted page (Jxp) which is a script-processor that processes JSP-like files, available at http://jxp.sourceforge.net.
+
+Steve Waldman provided mchange-commons-java package for JDBC connection pool available at https://goo.gl/1VAYre.
+
+MySQL Team provided MySQL JDBC driver available at https://goo.gl/LpDX5V.
+
+QuickTable Team provided trial version of QuickTable component which is a Java database grid control, available at http://quicktablejava.appspot.com.
+
+Sam Hocevar provided Reflections package which is a Java runtime metadata analysis which allows users to scan and collection metadata about Java classes and packages in Java projects. Reflections library is available at https://goo.gl/Lf9Evr.
+
+Quality Open Software Company provided the Simple Logging Facade for Java (SLF4J) as a simple facade of logging frameworks, available at https://www.slf4j.org.

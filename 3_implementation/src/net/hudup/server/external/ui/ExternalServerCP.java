@@ -26,6 +26,7 @@ import net.hudup.server.ui.PowerServerCP;
 
 
 /**
+ * This class provides a remote control panel for external server. It is an enhanced version of {@link PowerServerCP}.
  * 
  * @author Loc Nguyen
  * @version 10.0
@@ -41,16 +42,16 @@ public class ExternalServerCP extends PowerServerCP {
 
 	
 	/**
-	 * 
+	 * External configuration.
 	 */
 	protected JButton btnExternalConfig;
 	
 	
 	/**
-	 * 
-	 * @param server
-	 * @param bindUri
-	 * @param bRemote
+	 * Constructor with specified server and binded URI of such server.
+	 * @param server specified server
+	 * @param bindUri binded URI of such server.
+	 * @param bRemote if true then the server is remote.
 	 */
 	public ExternalServerCP(PowerServer server, xURI bindUri,
 			boolean bRemote) {
@@ -60,8 +61,8 @@ public class ExternalServerCP extends PowerServerCP {
 
 	
 	/**
-	 * 
-	 * @param server
+	 * Constructor with specified power server.
+	 * @param server specified power server.
 	 */
 	public ExternalServerCP(PowerServer server) {
 		super(server);
@@ -249,7 +250,7 @@ public class ExternalServerCP extends PowerServerCP {
 	
 	
 	/**
-	 * 
+	 * Load external configuration.
 	 */
 	protected void externalConfig() {
 		DataConfig svrConfig = null;

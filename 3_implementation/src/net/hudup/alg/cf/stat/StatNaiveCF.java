@@ -13,6 +13,7 @@ import net.hudup.core.data.Rating;
 import net.hudup.core.data.RatingVector;
 
 /**
+ * This class is the naive statistics CF algorithms.
  * @author Loc Nguyen
  * @version 10.0
  *
@@ -28,7 +29,7 @@ public class StatNaiveCF extends StatCF {
 
 	
 	/**
-	 * 
+	 * Default constructor.
 	 */
 	public StatNaiveCF() {
 		super();

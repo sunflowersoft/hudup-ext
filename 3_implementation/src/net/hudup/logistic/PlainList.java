@@ -9,11 +9,13 @@ import net.hudup.core.parser.TextParsable;
 import net.hudup.core.parser.TextParserUtil;
 
 /**
+ * This class is list of plain texts (strings). This class is mainly used for text selection.
  * 
  * @author Loc Nguyen
  * @version 10.0
  *
  */
+@Deprecated
 public class PlainList implements TextParsable, Serializable {
 	
 	
@@ -24,19 +26,19 @@ public class PlainList implements TextParsable, Serializable {
 	
 	
 	/**
-	 * 
+	 * Internal plain list (list of strings).
 	 */
 	protected List<String> list = Util.newList();
 	
 	
 	/**
-	 * 
+	 * Selected index.
 	 */
 	protected int selectedIndex = -1;
 	
 	
 	/**
-	 * 
+	 * Default constructor.
 	 */
 	public PlainList() {
 		
@@ -44,9 +46,9 @@ public class PlainList implements TextParsable, Serializable {
 
 	
 	/**
-	 * 
-	 * @param index
-	 * @return string at specified index
+	 * Getting text at specified index.
+	 * @param index specified index.
+	 * @return string at specified index.
 	 */
 	public String get(int index) {
 		return list.get(index);
@@ -54,8 +56,8 @@ public class PlainList implements TextParsable, Serializable {
 	
 	
 	/**
-	 * 
-	 * @return size of list
+	 * Getting size of list.
+	 * @return size of list.
 	 */
 	public int size() {
 		return list.size();
@@ -63,8 +65,8 @@ public class PlainList implements TextParsable, Serializable {
 	
 	
 	/**
-	 * 
-	 * @param element
+	 * Add specified text.
+	 * @param element specified text.
 	 */
 	public void add(String element) {
 		if (!list.contains(element))
@@ -76,8 +78,8 @@ public class PlainList implements TextParsable, Serializable {
 	
 	
 	/**
-	 * 
-	 * @param collection
+	 * Adding all texts from other collection.
+	 * @param collection other collection of texts.
 	 */
 	public void addAll(Collection<String> collection) {
 		for (String element : collection)
@@ -85,6 +87,9 @@ public class PlainList implements TextParsable, Serializable {
 	}
 	
 	
+	/**
+	 * Clearing this list.
+	 */
 	public void clear() {
 		list.clear();
 		selectedIndex = -1;
@@ -92,8 +97,8 @@ public class PlainList implements TextParsable, Serializable {
 	
 	
 	/**
-	 * 
-	 * @return selected index
+	 * Getting selected index.
+	 * @return selected index.
 	 */
 	public int getSelectedIndex() {
 		return selectedIndex;
@@ -101,8 +106,8 @@ public class PlainList implements TextParsable, Serializable {
 	
 	
 	/**
-	 * 
-	 * @return selected text
+	 * Getting selected text.
+	 * @return selected text.
 	 */
 	public String getSelectedText() {
 		if (selectedIndex == -1)
@@ -113,8 +118,8 @@ public class PlainList implements TextParsable, Serializable {
 	
 	
 	/**
-	 * 
-	 * @param text
+	 * Setting selected text.
+	 * @param text selected text.
 	 */
 	public void setSelectedText(String text) {
 		int index = list.indexOf(text);
@@ -124,8 +129,8 @@ public class PlainList implements TextParsable, Serializable {
 	
 	
 	/**
-	 * 
-	 * @param selectedIndex
+	 * Setting selected index.
+	 * @param selectedIndex selected index.
 	 */
 	public void setSelectedIndex(int selectedIndex) {
 		if (selectedIndex >= 0 && selectedIndex < list.size())
@@ -134,8 +139,8 @@ public class PlainList implements TextParsable, Serializable {
 	
 	
 	/**
-	 * 
-	 * @param index
+	 * Removing text at specified index.
+	 * @param index specified index.
 	 */
 	public void remove(int index) {
 		String selectedText = getSelectedText();
@@ -155,8 +160,8 @@ public class PlainList implements TextParsable, Serializable {
 	
 	
 	/**
-	 * 
-	 * @return array of elements
+	 * Converting this list into array of texts.
+	 * @return array of elements (array of texts).
 	 */
 	public String[] toArray() {
 		return list.toArray(new String[] { });

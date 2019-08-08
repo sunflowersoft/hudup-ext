@@ -19,7 +19,7 @@ import java.net.Socket;
  */
 public class SocketConnection extends SocketWrapper {
 
-	
+
 	/**
 	 * Internal network socket.
 	 */

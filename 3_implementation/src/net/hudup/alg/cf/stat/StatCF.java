@@ -33,6 +33,9 @@ import net.hudup.core.parser.TextParserUtil;
 
 
 /**
+ * This is abstract class for all CF algorithms based on statistical measures.
+ * They are called statistics CF algorithms.
+ * 
  * @author Loc Nguyen
  * @version 10.0
  *
@@ -96,6 +99,7 @@ public abstract class StatCF extends ModelBasedCF {
 
 
 /**
+ * This class is knowledge base for a statistics CF algorithm.
  * 
  * @author Loc Nguyen
  * @version 10.0
@@ -111,19 +115,19 @@ abstract class StatKB extends KBaseAbstract {
 
 	
 	/**
-	 * 
+	 * General statistics.
 	 */
 	protected GeneralStat generalStat = new GeneralStat();
 	
 	
 	/**
-	 * 
+	 * User statistics.
 	 */
 	protected Map<Integer, Stat> userStats = Util.newMap();
 
 	
 	/**
-	 * 
+	 * Item statistics.
 	 */
 	protected Map<Integer, Stat> itemStats = Util.newMap();
 
@@ -390,8 +394,8 @@ abstract class StatKB extends KBaseAbstract {
 
 	
 	/**
-	 * 
-	 * @return set of item id
+	 * Getting item identifiers.
+	 * @return set of item identifiers.
 	 */
 	protected Set<Integer> getItemIds() {
 		return itemStats.keySet();
@@ -399,9 +403,9 @@ abstract class StatKB extends KBaseAbstract {
 	
 	
 	/**
-	 * 
-	 * @param cf
-	 * @return {@link StatKB}
+	 * Create knowledge base for a statistics CF algorithm.
+	 * @param cf given statistics CF algorithm.
+	 * @return {@link StatKB} of given statistics CF algorithm.
 	 */
 	public static StatKB create(final StatCF cf) {
 		return new StatKB() {
@@ -427,6 +431,7 @@ abstract class StatKB extends KBaseAbstract {
 
 
 /**
+ * General statistics such as mean and variance over all ratings.
  * 
  * @author Loc Nguyen
  * @version 10.0
@@ -458,7 +463,7 @@ class GeneralStat implements Serializable, Cloneable, TextParsable {
 	
 	
 	/**
-	 * 
+	 * Converting this statistics into text.
 	 */
 	public String toText() {
 		return mean + "";
@@ -481,7 +486,7 @@ class GeneralStat implements Serializable, Cloneable, TextParsable {
 	
 	
 	/**
-	 * 
+	 * Clearing this statistics.
 	 */
 	public void clear() {
 		
@@ -492,6 +497,7 @@ class GeneralStat implements Serializable, Cloneable, TextParsable {
 
 
 /**
+ * Statistics such as mean and variance for user or item.
  * 
  * @author Loc Nguyen
  * @version 10.0
@@ -507,25 +513,25 @@ class Stat implements Serializable, Cloneable, TextParsable {
 	
 	
 	/**
-	 * 
+	 * Mean
 	 */
 	public double mean = 0;
 	
 	
 	/**
-	 * 
+	 * Standard deviation.
 	 */
 	public double dev = 0;
 	
 	
 	/**
-	 * 
+	 * Overall standard deviation.
 	 */
 	public double overDev = 0;
 
 	
 	/**
-	 * 
+	 * Default constructor.
 	 */
 	public Stat() {
 		super();

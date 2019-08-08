@@ -25,6 +25,7 @@ import net.hudup.core.parser.TextParserUtil;
 import net.hudup.data.ui.RatingValueTable;
 
 /**
+ * This class is knowledge base for SVD algorithm.
  * 
  * @author Loc Nguyen
  * @version 10.0
@@ -40,115 +41,115 @@ public abstract class SvdGradientKB extends KBaseRecommendIntegrated {
 
 	
 	/**
-	 * 
+	 * Precision parameter field.
 	 */
 	public final static String PRECISION = "precision";
 	
     
 	/**
-	 * 
+	 * Gamma parameter field.
 	 */
 	public final static String GAMMA = "gamma";
 	
 	
 	/**
-	 * 
+	 * Lamda parameter field.
 	 */
 	public final static String LAMDA = "lamda";
 	
 	
 	/**
-	 * 
+	 * Maximum iteration field.
 	 */
 	public final static String MAX_ITERATION = "max_iteration";
 
 	
 	/**
-	 * 
+	 * Maximum factor field.
 	 */
 	public final static String MAX_FACTOR = "max_factor";
 
 	
 	/**
-	 * 
+	 * Gradient factors field.
 	 */
 	public final static String GRADIENT_FACTORS = "gradient_info";
 	
 	
 	/**
-	 * 
+	 * Default precision parameter.
 	 */
 	public final static double DEFAULT_PRECISION = 0.9; // 90% precision
 	
     
 	/**
-	 * 
+	 * Default gamma parameter.
 	 */
 	public final static double DEFAULT_GAMMA = 0.005;
 	
 	
 	/**
-	 * 
+	 * Default lamda parameter.
 	 */
 	public final static double DEFAULT_LAMDA = 0.02;
 	
 	
 	/**
-	 * 
+	 * Default maximum iteration.
 	 */
 	public final static int DEFAULT_MAX_ITERATION = 100;
 
 	
 	/**
-	 * 
+	 * Default maxium factor.
 	 */
 	public final static int DEFAULT_MAX_FACTOR = 1000;
 
 	
 	/**
-	 * 
+	 * List of user identifiers.
 	 */
 	protected List<Integer> userIds = Util.newList();
 	
 	
 	/**
-	 * 
+	 * List of item identifiers.
 	 */
 	protected List<Integer> itemIds = Util.newList();
 
 	
 	/**
-	 * 
+	 * Average rating.
 	 */
 	protected double avgRating = Constants.UNUSED;
 	
 	
 	/**
-	 * 
+	 * List of user factors.
 	 */
 	protected List<Vector> userFactors = Util.newList();
 	
 	
 	/**
-	 * 
+	 * List of item factors.
 	 */
 	protected List<Vector> itemFactors = Util.newList();
 	
 	
 	/**
-	 * 
+	 * User biases.
 	 */
 	protected List<Double> userBias = Util.newList();
 
 	
 	/**
-	 * 
+	 * Item biases.
 	 */
 	protected List<Double> itemBias = Util.newList();
 	
 	
 	/**
-	 * 
+	 * Default constructor.
 	 */
 	public SvdGradientKB() {
 		super();
@@ -172,7 +173,7 @@ public abstract class SvdGradientKB extends KBaseRecommendIntegrated {
 	
 
 	/**
-	 * 
+	 * Estimating rating by user index and item index.
 	 * @param userIndex specified user index.
 	 * @param itemIndex specified item index.
 	 * @return estimated rating value.
@@ -189,7 +190,7 @@ public abstract class SvdGradientKB extends KBaseRecommendIntegrated {
 	
 	
 	/**
-	 * 
+	 * Getting list of user identifiers.
 	 * @return list of user id (s)
 	 */
 	public List<Integer> getUserIds() {
@@ -198,7 +199,7 @@ public abstract class SvdGradientKB extends KBaseRecommendIntegrated {
 	
 
 	/**
-	 * 
+	 * Getting list of item identifiers.
 	 * @return list of item id (s)
 	 */
 	public List<Integer> getItemIds() {
@@ -347,7 +348,7 @@ public abstract class SvdGradientKB extends KBaseRecommendIntegrated {
 	
 	
 	/**
-	 * 
+	 * Learning knowledge base from rating matrix.
 	 * @param userMatrix specified user rating matrix, represented by {@link RatingMatrix} class.
 	 */
 	protected void learn_main(RatingMatrix userMatrix) {
@@ -583,8 +584,8 @@ public abstract class SvdGradientKB extends KBaseRecommendIntegrated {
 
 	
 	/**
-	 * 
-	 * @return user {@link RatingMatrix}
+	 * Create user rating matrix from this knowledge base.
+	 * @return user {@link RatingMatrix}.
 	 */
 	public RatingMatrix createUserRatingMatrix() {
 		if (isEmpty())
@@ -633,7 +634,7 @@ public abstract class SvdGradientKB extends KBaseRecommendIntegrated {
 
 	
 	/**
-	 * 
+	 * Creating knowledge base for SVD algorithm.
 	 * @param cf specified SVD Gradient Collaborative Filtering (SVD Gradient CF) algorithm.
 	 * @return {@link SvdGradientKB}
 	 */
@@ -641,12 +642,10 @@ public abstract class SvdGradientKB extends KBaseRecommendIntegrated {
 		
 		return new SvdGradientKB() {
 
-			
 			/**
 			 * Serial version UID for serializable class. 
 			 */
 			private static final long serialVersionUID = 1L;
-			
 			
 			@Override
 			public String getName() {

@@ -21,8 +21,11 @@ import java.util.Set;
 import java.util.Vector;
 
 import net.hudup.core.factory.Factory;
+import net.hudup.core.factory.FactoryImpl;
 import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.xURI;
+import net.hudup.core.parser.JsonParser;
+import net.hudup.core.parser.JsonParserImpl;
 import net.hudup.core.security.Cipher;
 import net.hudup.core.security.CipherImpl;
 
@@ -235,23 +238,42 @@ public final class Util {
 
 	
 	/**
+	 * Getting property of specified key in Hudup property &quot;hudup.properties&quot;.
+	 * @param key specified key
+	 * @return property of specified key in Hudup property &quot;hudup.properties&quot;.
+	 */
+	public static String getHudupProperty(String key) {
+		try {
+			Properties props = new Properties();
+			InputStream in = Util.class.getResourceAsStream(ROOT_PACKAGE + "hudup.properties");		
+			props.load(in);
+			return props.getProperty(key);
+		}
+		catch (Throwable e) {
+			e.printStackTrace();
+		}
+		
+		return null;
+	}
+
+	
+	/**
 	 * Getting factory to create associators, for example.
 	 * @return factory to create associators, for example.
 	 */
 	public static Factory getFactory() {
 		try {
-			Properties props = new Properties();
-			InputStream in = Util.class.getResourceAsStream(ROOT_PACKAGE + "hudup.properties");		
-			props.load(in);
-			String factoryClassName = props.getProperty("factory");
+			String factoryClassName = getHudupProperty("factory");
 			if (factoryClassName == null)
-				return new Factory();
+				return new FactoryImpl();
 			else
 				return (Factory)Class.forName(factoryClassName).newInstance();
 		}
-		catch (Throwable e) {}
+		catch (Throwable e) {
+			e.printStackTrace();
+		}
 		
-		return new Factory();
+		return new FactoryImpl();
 	}
 	
 	
@@ -261,19 +283,38 @@ public final class Util {
 	 */
 	public static Cipher getCipher() {
 		try {
-			Properties props = new Properties();
-			InputStream in = Util.class.getResourceAsStream(ROOT_PACKAGE + "hudup.properties");		
-			props.load(in);
-			String cipherClassName = props.getProperty("cipher");
+			String cipherClassName = getHudupProperty("cipher");
 			if (cipherClassName == null)
 				return new CipherImpl();
 			else
 				return (Cipher)Class.forName(cipherClassName).newInstance();
 		}
-		catch (Throwable e) {}
+		catch (Throwable e) {
+			e.printStackTrace();
+		}
 		
 		return new CipherImpl();
 	}
 
+	
+	/**
+	 * Getting JSON parser.
+	 * @return JSON parser.
+	 */
+	public static JsonParser getJsonParser() {
+		try {
+			String jsonParserClassName = getHudupProperty("jsonparser");
+			if (jsonParserClassName == null)
+				return new JsonParserImpl();
+			else
+				return (JsonParser)Class.forName(jsonParserClassName).newInstance();
+		}
+		catch (Throwable e) {
+			e.printStackTrace();
+		}
+		
+		return new JsonParserImpl();
+	}
 
+	
 }

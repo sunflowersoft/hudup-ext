@@ -30,7 +30,7 @@ import net.hudup.core.logistic.xURI;
 
 
 /**
- * 
+ * This is abstract class for power sever which is the base of recommendation server.
  * <br>
  * Note, the sub-architecture of recommendation server (recommender) is inspired from the architecture of Oracle database management system (Oracle DBMS);
  * especially concepts of listener and share memory layer are borrowed from concepts &quot;Listener&quot; and &quot;System Global Area&quot; of Oracle DBMS, respectively,

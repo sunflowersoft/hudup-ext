@@ -15,7 +15,6 @@ import net.hudup.core.data.Nominal;
 import net.hudup.core.data.Profile;
 import net.hudup.core.data.Rating;
 import net.hudup.core.data.RatingVector;
-import net.hudup.core.parser.JsonUtil;
 import net.hudup.core.parser.TextParserUtil;
 
 
@@ -256,7 +255,7 @@ public class Request extends ProtocolParam {
 	@Override
 	public String toJson() {
 		// TODO Auto-generated method stub
-		return JsonUtil.toJson(this);
+		return Util.getJsonParser().toJson(this);
 	}
 
 	
@@ -268,7 +267,7 @@ public class Request extends ProtocolParam {
 	 * @return request from JSON text.
 	 */
 	public static Request parse(String jsonText) {
-		return (Request) JsonUtil.parseJson(jsonText);
+		return (Request) Util.getJsonParser().parseJson(jsonText);
 	}
 	
 	

@@ -16,7 +16,7 @@ import java.util.Random;
 
 
 /**
- * This final class provides utility static methods for network programming.
+ * This final class provides utility static methods for network programming. Some methods in this class are available on internet.
  * 
  * @author Loc Nguyen
  * @version 10.0

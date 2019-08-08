@@ -21,6 +21,7 @@ import net.hudup.core.logistic.xURI;
 
 
 /**
+ * This class implements Singular Vector Decomposition (SVD) algorithm for collaborative filtering.
  * 
  * @author Loc Nguyen
  * @version 10.0
@@ -36,7 +37,7 @@ public class SvdGradientCF extends ModelBasedCF {
 
 	
 	/**
-	 * 
+	 * Default constructor.
 	 */
 	public SvdGradientCF() {
 		super();
@@ -55,7 +56,7 @@ public class SvdGradientCF extends ModelBasedCF {
 
 	
 	/**
-	 * 
+	 * Setting up algorithm with user rating matrix.
 	 * @param userMatrix specified user rating matrix, represented by {@link RatingMatrix}.
 	 * @throws Exception if any error raises.
 	 */
@@ -180,7 +181,6 @@ public class SvdGradientCF extends ModelBasedCF {
 			 */
 			private static final long serialVersionUID = 1L;
 
-			
 			@Override
 			public boolean validate(String key, Serializable value) {
 				

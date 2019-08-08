@@ -10,6 +10,8 @@ import net.hudup.core.parser.SnapshotParser;
 import net.hudup.data.SnapshotImpl;
 
 /**
+ * This class implements snapshot parser.
+ * 
  * @author Loc Nguyen
  * @version 10.0
  *

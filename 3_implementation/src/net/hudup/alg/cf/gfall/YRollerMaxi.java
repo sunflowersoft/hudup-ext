@@ -8,6 +8,7 @@ import java.util.List;
 
 import net.hudup.core.Util;
 import net.hudup.core.alg.Alg;
+import net.hudup.core.logistic.BaseClass;
 import net.hudup.core.logistic.DSUtil;
 import net.hudup.data.bit.BitData;
 import net.hudup.data.bit.BitItem;
@@ -34,6 +35,7 @@ import net.hudup.data.bit.BitsetItem;
  *
  */
 @Deprecated
+@BaseClass
 public class YRollerMaxi extends YRoller {
 
 	

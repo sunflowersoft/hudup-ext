@@ -1,5 +1,6 @@
 package net.hudup.core.client;
 
+import net.hudup.core.Util;
 import net.hudup.core.data.AttributeList;
 import net.hudup.core.data.BooleanWrapper;
 import net.hudup.core.data.DataConfig;
@@ -10,7 +11,6 @@ import net.hudup.core.data.Profile;
 import net.hudup.core.data.RatingVector;
 import net.hudup.core.data.Snapshot;
 import net.hudup.core.evaluate.Evaluator;
-import net.hudup.core.parser.JsonUtil;
 
 
 /**
@@ -425,7 +425,7 @@ public class Response extends ProtocolParam {
 	@Override
 	public String toJson() {
 		// TODO Auto-generated method stub
-		return JsonUtil.toJson(this);
+		return Util.getJsonParser().toJson(this);
 	}
 
 
@@ -437,7 +437,7 @@ public class Response extends ProtocolParam {
 	 * @return response from JSON text.
 	 */
 	public static Response parse(String jsonText) {
-		return (Response) JsonUtil.parseJson(jsonText);
+		return (Response) Util.getJsonParser().parseJson(jsonText);
 	}
 	
 	

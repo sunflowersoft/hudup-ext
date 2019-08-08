@@ -21,6 +21,7 @@ import net.hudup.data.ctx.ui.CTScreator;
 
 
 /**
+ * This is abstract class for context template schema (CTS) manager.
  * 
  * @author Loc Nguyen
  * @version 10.0
@@ -36,7 +37,7 @@ public abstract class CTSManagerAbstract implements CTSManager {
 
 	
 	/**
-	 * 
+	 * Default constructor.
 	 */
 	public CTSManagerAbstract() {
 		
@@ -111,9 +112,9 @@ public abstract class CTSManagerAbstract implements CTSManager {
 
 
 	/**
-	 * 
-	 * @param unitName
-	 * @return extracted number
+	 * Extracting template identifier from unit name.
+	 * @param unitName specified unit name.
+	 * @return extracted number (template identifier).
 	 */
 	protected int extractTemplateId(String unitName) {
 		try {

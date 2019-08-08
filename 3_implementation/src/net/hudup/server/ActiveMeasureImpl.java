@@ -4,6 +4,7 @@ import net.hudup.core.client.ActiveMeasure;
 
 
 /**
+ * This class implements active measure of server. Please see {@link ActiveMeasure}.
  * 
  * @author Loc Nguyen
  * @version 10.0
@@ -19,13 +20,13 @@ public class ActiveMeasureImpl implements ActiveMeasure {
 	
 	
 	/**
-	 * 
+	 * Request count.
 	 */
 	private int requestCount = 0;
 	
 	
 	/**
-	 * 
+	 * Default constructor.
 	 */
 	public ActiveMeasureImpl() {
 		

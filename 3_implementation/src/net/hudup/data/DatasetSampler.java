@@ -71,7 +71,7 @@ public class DatasetSampler implements AutoCloseable {
 	/**
 	 * Splitting dataset into training dataset and testing dataset.
 	 * @param srcUnit source unit.
-	 * @param testRatio ratio of splitting.
+	 * @param testRatio ratio of splitting. The folder number is inverse of the test ratio.
 	 * @return list of configurations of training datasets and testing datasets.
 	 * @throws Exception if any error raises.
 	 */
@@ -122,14 +122,14 @@ public class DatasetSampler implements AutoCloseable {
 		
 		String[] foldUnits = new String[numFold * 2];
 		for (int i = 0; i < numFold * 2; i += 2) {
-			String baseUnit = srcUnit + (i/2+1) + TRAINING_SUFFIX;
+			String baseUnit = srcUnit + "-" + testRatio + "-" + (i/2+1) + TRAINING_SUFFIX;
 			foldUnits[i] = baseUnit;
 			if(doesExist(baseUnit))
 				provider.deleteUnitData(baseUnit);
 			else
 				provider.createUnit(baseUnit, attributes);
 			
-			String testUnit = srcUnit + (i/2+1) + TESTING_SUFFIX;
+			String testUnit = srcUnit + "-" + testRatio + "-" + (i/2+1) + TESTING_SUFFIX;
 			foldUnits[i + 1] = testUnit;
 			if(doesExist(testUnit))
 				provider.deleteUnitData(testUnit);
@@ -154,6 +154,88 @@ public class DatasetSampler implements AutoCloseable {
 			}
 			
 			fireProgressEvent(new ProgressEvent(this, content.size(), i + 1, "Inserted: " + line));
+		}
+		
+		return cfgList;
+	}
+
+	
+	/**
+	 * Splitting dataset into training dataset and testing dataset with specified folder number.
+	 * @param srcUnit source unit.
+	 * @param testRatio ratio of splitting.
+	 * @param numFold folder number. If the folder number is zero, the method {@link #split(String, double)} is called instead.
+	 * In other words, if the folder number is zero, the folder number is inverse of the test ratio.
+	 * @return list of configurations of training datasets and testing datasets.
+	 * @throws Exception if any error raises.
+	 */
+	public List<DataConfig[]> split(String srcUnit, double testRatio, int numFold) throws Exception {
+		List<DataConfig[]> cfgList = Util.newList();
+		if (testRatio <= 0 || testRatio > 1 || numFold < 0)
+			return cfgList;
+		if (numFold == 0)
+			return split(srcUnit, testRatio);
+		
+		// Retrieving source content
+		AttributeList attributes = provider.getProfileAttributes(srcUnit);
+		Fetcher<Profile> fetcher = provider.getProfiles(srcUnit, null);
+		List<Profile> content = Util.newList();
+		while (fetcher.next()) {
+			Profile profile = fetcher.pick();
+			if (profile != null)
+				content.add(profile);
+		}
+		fetcher.close();
+		if (content.size() == 0) return cfgList;
+		
+		String[] foldUnits = new String[numFold * 2];
+		for (int i = 0; i < numFold * 2; i += 2) {
+			String baseUnit = srcUnit + "-" + testRatio + "-" + (i/2+1) + TRAINING_SUFFIX;
+			foldUnits[i] = baseUnit;
+			if(doesExist(baseUnit))
+				provider.deleteUnitData(baseUnit);
+			else
+				provider.createUnit(baseUnit, attributes);
+			
+			String testUnit = srcUnit + "-" + testRatio + "-" + (i/2+1) + TESTING_SUFFIX;
+			foldUnits[i + 1] = testUnit;
+			if(doesExist(testUnit))
+				provider.deleteUnitData(testUnit);
+			else
+				provider.createUnit(testUnit, attributes);
+			
+			cfgList.add(new DataConfig[] {
+					makeConfigOfUnit(baseUnit),
+					makeConfigOfUnit(testUnit),
+				});
+		}
+
+		int eachTestSize = (int)(testRatio * content.size());
+		int count = 0;
+		for (int i = 0; i < numFold; i++) {
+			List<Integer> lineNumber = Util.newList();
+			for (int j = 0; j < content.size(); j++) {
+				lineNumber.add(j);
+			}
+			
+			Random rnd = new Random();
+			for (int j = 0; j < eachTestSize; j++) {
+				int k = rnd.nextInt(lineNumber.size());
+				Profile line = content.get(lineNumber.get(k));
+				lineNumber.remove(k);
+				provider.insertProfile(foldUnits[2*i + 1], line); // insert profile into test unit
+				
+				count++;
+				fireProgressEvent(new ProgressEvent(this, content.size()*numFold, count, "Inserted: " + line));
+			}
+			
+			for (int j = 0; j < lineNumber.size(); j++) {
+				Profile line = content.get(lineNumber.get(j));
+				provider.insertProfile(foldUnits[2*i], line); // insert profile into base unit
+				
+				count++;
+				fireProgressEvent(new ProgressEvent(this, content.size()*numFold, count, "Inserted: " + line));
+			}
 		}
 		
 		return cfgList;
@@ -197,7 +279,7 @@ public class DatasetSampler implements AutoCloseable {
 			removedRowColumnList.add(new int[] {row, column});
 		}
 		
-		String dstUnit = srcUnit + "." + sparseRatio + MISSING_SUFFIX;
+		String dstUnit = srcUnit + "-" + sparseRatio + MISSING_SUFFIX;
 		AttributeList attributes = provider.getProfileAttributes(srcUnit);
 		if(doesExist(dstUnit))
 			provider.deleteUnitData(dstUnit);
@@ -257,7 +339,7 @@ public class DatasetSampler implements AutoCloseable {
 	 * @param unit specified unit;
 	 * @return configuration for specified unit.
 	 */
-	private DataConfig makeConfigOfUnit(String unit) {
+	protected DataConfig makeConfigOfUnit(String unit) {
 		DataConfig config = (DataConfig) provider.getConfig().clone();
 		if (config.getMainUnit() != null)
 			config.put(config.getMainUnit(), unit);

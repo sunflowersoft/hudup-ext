@@ -18,6 +18,7 @@ import net.hudup.core.parser.TextParsable;
  * @version 10.0
  *
  */
+@Deprecated
 public interface ClientStub extends Serializable, TextParsable, Cloneable {
 	
 	

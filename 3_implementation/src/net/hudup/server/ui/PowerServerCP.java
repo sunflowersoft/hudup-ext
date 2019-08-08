@@ -55,6 +55,7 @@ import net.hudup.logistic.SystemPropertiesPane;
 import net.hudup.server.PowerServerConfig;
 
 /**
+ * This class provides a remote control panel for power server.
  * The difference from {@link RemoteServerCP} is to have full of features of server
  * 
  * @author Loc Nguyen

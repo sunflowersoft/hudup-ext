@@ -8,6 +8,8 @@ import net.hudup.core.logistic.NextUpdate;
 
 
 /**
+ * This class implements Green Fall algorithm with maximum improvement.
+ * 
  * @author Loc Nguyen
  * @version 10.0
  *
@@ -24,7 +26,7 @@ public class GreenFallMaxiCF extends GreenFallCF {
 
 	
 	/**
-	 * 
+	 * Default constructor.
 	 */
 	public GreenFallMaxiCF() {
 		super();
@@ -53,6 +55,4 @@ public class GreenFallMaxiCF extends GreenFallCF {
 	}
 	
 	
-
-
 }

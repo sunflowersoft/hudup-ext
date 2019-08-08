@@ -23,7 +23,7 @@ import net.hudup.core.data.RatingVector;
  *
  */
 public class ProtocolImpl implements Protocol {
-
+	
 	
 	/**
 	 * Logger of this class.

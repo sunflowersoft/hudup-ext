@@ -62,8 +62,8 @@ public class DefaultServer extends PowerServerImpl {
 	
 	
 	/**
-	 * 
-	 * @param config
+	 * Constructor with configuration.
+	 * @param config power server configuration.
 	 */
 	protected DefaultServer(PowerServerConfig config) {
 		super(config);

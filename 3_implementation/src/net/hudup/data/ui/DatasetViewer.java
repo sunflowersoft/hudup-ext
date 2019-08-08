@@ -20,6 +20,7 @@ import javax.swing.event.ListSelectionListener;
 
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.DatasetMetadata;
+import net.hudup.core.data.ui.ProfileTable;
 import net.hudup.core.logistic.ui.UIUtil;
 import net.hudup.data.ctx.ui.CTSviewer;
 

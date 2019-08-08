@@ -16,6 +16,7 @@ import net.hudup.core.data.RatingVector;
 import net.hudup.core.logistic.NextUpdate;
 
 /**
+ * This class is knowledge base for Bayesian Lookup Table CF algorithm.
  * 
  * @author Loc Nguyen
  * @version 10.0
@@ -33,31 +34,31 @@ public abstract class BayesLookupTableKB extends KBaseAbstract {
 
 	
 	/**
-	 * 
+	 * Precision field.
 	 */
 	public final static String PRECISION = "precision";
 	
     
 	/**
-	 * 
+	 * Maximum iteration field.
 	 */
 	public final static String MAX_ITERATION = "max_iteration";
 
 	
 	/**
-	 * 
+	 * List of item identifiers.
 	 */
 	protected List<Integer> itemIds = Util.newList();
 	
 	
 	/**
-	 * 
+	 * Map of parameters.
 	 */
 	protected Map<Integer, Map<Integer, Map<Integer, Double>>> parameters = Util.newMap(); 
 	
 	
 	/**
-	 * 
+	 * Default constructor.
 	 */
 	public BayesLookupTableKB() {
 		super();
@@ -66,7 +67,7 @@ public abstract class BayesLookupTableKB extends KBaseAbstract {
 	
 	
 	/**
-	 * 
+	 * Estimating rating value given specified user identifier and item identifier.
 	 * @param userId specified user identifier (user ID).
 	 * @param itemId specified item identifier (item ID).
 	 * @return estimated rating value.
@@ -96,7 +97,7 @@ public abstract class BayesLookupTableKB extends KBaseAbstract {
 	
 	
 	/**
-	 * 
+	 * Getting user identifiers.
 	 * @return set of user id (s)
 	 */
 	public Set<Integer> getUserIds() {
@@ -105,8 +106,8 @@ public abstract class BayesLookupTableKB extends KBaseAbstract {
 
 	
 	/**
-	 * 
-	 * @return list of item id (s)
+	 * Getting item identifiers.
+	 * @return list of item id (s).
 	 */
 	public List<Integer> getItemIds() {
 		return itemIds;
@@ -412,7 +413,7 @@ public abstract class BayesLookupTableKB extends KBaseAbstract {
 	
 	
 	/**
-	 * 
+	 * Destroy data structure.
 	 */
 	protected void destroyDataStructure() {
 		itemIds.clear();
@@ -421,21 +422,19 @@ public abstract class BayesLookupTableKB extends KBaseAbstract {
 	
 	
 	/**
-	 * 
+	 * Create knowledge base for Bayesian Lookup Table CF algorithm.
 	 * @param cf specified Bayesian Lookup Table Collaborative Filtering (Bayesian Lookup Table CF) algorithm.
 	 * @return {@link BayesLookupTableKB}
 	 */
 	public static BayesLookupTableKB create(final BayesLookupTableCF cf) {
 		
 		return new BayesLookupTableKB() {
-
 			
 			/**
 			 * Serial version UID for serializable class. 
 			 */
 			private static final long serialVersionUID = 1L;
 
-			
 			@Override
 			public String getName() {
 				// TODO Auto-generated method stub
@@ -443,7 +442,6 @@ public abstract class BayesLookupTableKB extends KBaseAbstract {
 			}
 		};
 	}
-	
 	
 	
 }

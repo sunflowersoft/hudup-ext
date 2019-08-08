@@ -115,10 +115,33 @@ public class CipherImpl implements Cipher {
 	} 
 	
 	
+	@Override
+	public String md5Encrypt(String text) {
+		try {
+			MessageDigest md = MessageDigest.getInstance("MD5");
+			byte[] digest = md.digest(text.getBytes());
+			StringBuffer buffer = new StringBuffer();
+			for (Byte c : digest)
+				buffer.append(c.toString());
+			
+			return buffer.toString();
+		} 
+		catch (NoSuchAlgorithmException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return null;
+	}
+
+	
 	/**
 	 * Compile and transfer secret key.
+	 * This method is current not used.
 	 */
-	public static void compileTransfer() {
+	@SuppressWarnings("unused")
+	@Deprecated
+	private static void compileTransfer() {
 		try {
 			// 1. Input dialog or automatically
 			// 2. Create java source (TransferKey) as memory String so as to change the return value of TransferKey.transfer
@@ -134,10 +157,12 @@ public class CipherImpl implements Cipher {
 
 	/**
 	 * Loading key from key store.
+	 * This method is current not used.
 	 * @param keyStore URI of key store.
 	 * @return {@link SecretKey}
 	 */
 	@SuppressWarnings("unused")
+	@Deprecated
 	private static SecretKey loadKey(xURI keyStore) {
 		UriAdapter adapter = new UriAdapter(keyStore);
 		boolean existed = adapter.exists(keyStore);
@@ -169,11 +194,13 @@ public class CipherImpl implements Cipher {
 	
 	/**
 	 * Saving key to key store.
+	 * This method is current not used.
 	 * @param keyStore key store.
 	 * @param key secret key.
 	 * @return whether save {@link SecretKey} successfully.
 	 */
 	@SuppressWarnings("unused")
+	@Deprecated
 	private static boolean saveKey(xURI keyStore, SecretKey key) {
 		byte[] encoded = key.getEncoded();
 		
@@ -187,9 +214,11 @@ public class CipherImpl implements Cipher {
 	
 	/**
 	 * Generating key.
+	 * This method is current not used.
 	 * @return {@link SecretKey} generated.
 	 */
 	@SuppressWarnings("unused")
+	@Deprecated
 	private static SecretKey genKey() {
 		try {
 			return KeyGenerator.getInstance(CALG).generateKey();
@@ -197,26 +226,6 @@ public class CipherImpl implements Cipher {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		return null;
-	}
-	
-	
-	@Override
-	public String md5Encrypt(String text) {
-		try {
-			MessageDigest md = MessageDigest.getInstance("MD5");
-			byte[] digest = md.digest(text.getBytes());
-			StringBuffer buffer = new StringBuffer();
-			for (Byte c : digest)
-				buffer.append(c.toString());
-			
-			return buffer.toString();
-		} 
-		catch (NoSuchAlgorithmException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
 		return null;
 	}
 	

@@ -482,7 +482,7 @@ public final class DatasetUtil2 {
 	
 	
 	/**
-	 * Saving nominal attributes by writer
+	 * Saving nominal attributes by writer.
 	 * @param nominalAttributes collection of nominal attributes.
 	 * @param writer specified writer.
 	 * @param filterUnit filtered unit.

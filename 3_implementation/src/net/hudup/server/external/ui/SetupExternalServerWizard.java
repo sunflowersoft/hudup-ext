@@ -33,6 +33,7 @@ import net.hudup.server.ui.SetupServerWizard;
 
 
 /**
+ * This class provides a wizard to set up external server. It is an enhanced version of {@link SetupServerWizard}.
  * 
  * @author Loc Nguyen
  * @version 10.0
@@ -48,9 +49,9 @@ public class SetupExternalServerWizard extends SetupServerWizard {
 
 	
 	/**
-	 * 
-	 * @param comp
-	 * @param srvConfig
+	 * Constructor with configuration.
+	 * @param comp parent component.
+	 * @param srvConfig external server configuration.
 	 */
 	public SetupExternalServerWizard(Component comp, ExternalServerConfig srvConfig) {
 		super(comp, srvConfig);
@@ -222,13 +223,11 @@ public class SetupExternalServerWizard extends SetupServerWizard {
 
 		final UnitListBoxExt unitList = new UnitListBoxExt() {
 
-			
 			/**
 			 * Serial version UID for serializable class. 
 			 */
 			private static final long serialVersionUID = 1L;
 
-			
 			@Override
 			public void clearData() {
 				// TODO Auto-generated method stub
@@ -236,7 +235,6 @@ public class SetupExternalServerWizard extends SetupServerWizard {
 				unitTable.clear();
 			}
 
-			
 			@Override
 			public void modify() {
 				// TODO Auto-generated method stub
@@ -247,7 +245,6 @@ public class SetupExternalServerWizard extends SetupServerWizard {
 						JOptionPane.INFORMATION_MESSAGE);
 			}
 
-			
 			@Override
 			public void drop() {
 				// TODO Auto-generated method stub
@@ -272,7 +269,6 @@ public class SetupExternalServerWizard extends SetupServerWizard {
 					unitTable.clear();
 					return;
 				}
-				
 				
 				unitTable.update(provider.getAssoc(), unit.getName());
 			}
@@ -393,6 +389,5 @@ public class SetupExternalServerWizard extends SetupServerWizard {
 		return main;
 	}
 
-	
 	
 }

@@ -10,6 +10,9 @@ import net.hudup.core.Util;
 import net.hudup.core.logistic.DSUtil;
 
 /**
+ * This represents an associator utility (helper) classes for dataset.
+ * It implements some utility methods processing on dataset.
+ * 
  * @author Loc Nguyen
  * @version 10.0
  *
@@ -33,8 +36,8 @@ public final class DatasetAssoc {
 	
 	
 	/**
-	 * 
-	 * @return rating user id (s)
+	 * Getting rating user identifiers.
+	 * @return rating user id (s).
 	 */
 	public List<Integer> getUserRatedIds() {
 		return getRatedIds(true);
@@ -42,8 +45,8 @@ public final class DatasetAssoc {
 	
 	
 	/**
-	 * 
-	 * @return rated item id (s)
+	 * Getting rated item identifiers.
+	 * @return rated item id (s).
 	 */
 	public List<Integer> getItemRatedIds() {
 		return getRatedIds(false);
@@ -51,9 +54,9 @@ public final class DatasetAssoc {
 
 	
 	/**
-	 * 
-	 * @param user
-	 * @return list of non-empty id (s)
+	 * Getting rating user or rated item identifiers.
+	 * @param user true if returned list is list of user identifiers. Otherwise, returned list is list of item identifiers. 
+	 * @return list of non-empty id (s).
 	 */
 	private List<Integer> getRatedIds(boolean user) {
 		List<Integer> ids = Util.newList();
@@ -89,7 +92,7 @@ public final class DatasetAssoc {
 	
 	
 	/**
-	 * 
+	 * Creating user rating matrix or item rating matrix.
 	 * @param user user {@link RatingMatrix} or item {@link RatingMatrix} 
 	 * @return {@link RatingMatrix}
 	 */

@@ -119,8 +119,8 @@ public class ContextTemplateSchemaImpl implements ContextTemplateSchema {
 
 	
 	/**
-	 * 
-	 * @param templates
+	 * Assigning the specified root templates to this schema.
+	 * @param templates specified root templates
 	 */
 	public void assign(ContextTemplateList templates) {
 		clear();
@@ -261,8 +261,8 @@ public class ContextTemplateSchemaImpl implements ContextTemplateSchema {
 
 
 	/**
-	 * 
-	 * @param templates
+	 * Creating this schema from specified root templates.
+	 * @param templates specified root templates.
 	 * @return {@link ContextTemplateSchemaImpl}
 	 */
 	public static ContextTemplateSchemaImpl create(Collection<ContextTemplate> templates) {
@@ -284,8 +284,8 @@ public class ContextTemplateSchemaImpl implements ContextTemplateSchema {
 	
 	
 	/**
-	 * 
-	 * @return {@link ContextTemplateSchemaImpl}
+	 * Create this schema.
+	 * @return created {@link ContextTemplateSchemaImpl}.
 	 */
 	public static ContextTemplateSchemaImpl create() {
 		return new ContextTemplateSchemaImpl(new ContextTemplateList());

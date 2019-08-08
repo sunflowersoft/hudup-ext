@@ -13,6 +13,7 @@ import net.hudup.core.logistic.SystemUtil;
 import net.hudup.core.logistic.ui.UIUtil;
 
 /**
+ * This class shows panel of system properties.
  * 
  * @author Loc Nguyen
  * @version 11.0
@@ -28,7 +29,7 @@ public class SystemPropertiesPane extends JPanel {
 
 	
 	/**
-	 * 
+	 * Default constructor.
 	 */
 	public SystemPropertiesPane() {
 		super(new BorderLayout());
@@ -75,8 +76,8 @@ public class SystemPropertiesPane extends JPanel {
 	
 	
 	/**
-	 * 
-	 * @return this system pane
+	 * Getting this system pane.
+	 * @return this system pane.
 	 */
 	private SystemPropertiesPane getThis() {
 		return this;

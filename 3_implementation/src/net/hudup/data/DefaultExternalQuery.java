@@ -708,13 +708,13 @@ public class DefaultExternalQuery implements ExternalQuery {
 
 	
 	/**
-	 * 
-	 * @param internalConfig
-	 * @param userWriter
-	 * @param csvAttMapWriter
-	 * @param attMapAttributes
-	 * @param user
-	 * @param externalRecord
+	 * Inserting user profile.
+	 * @param internalConfig specified internal configuration.
+	 * @param userWriter CSV writer for user profile.
+	 * @param csvAttMapWriter CSV writer for attribute map.
+	 * @param attMapAttributes attribute list.
+	 * @param user user profile.
+	 * @param externalRecord external record.
 	 * @return whether insert profile successfully
 	 */
 	private static boolean insertUserProfile(DataConfig internalConfig, CsvWriter userWriter, CsvWriter csvAttMapWriter, AttributeList attMapAttributes, Profile user, ExternalRecord externalRecord) {
@@ -738,13 +738,13 @@ public class DefaultExternalQuery implements ExternalQuery {
 
 	
 	/**
-	 * 
-	 * @param internalConfig
-	 * @param itemWriter
-	 * @param csvAttMapWriter
-	 * @param attMapAttributes
-	 * @param item
-	 * @param externalRecord
+	 * Inserting item profile.
+	 * @param internalConfig specified internal configuration.
+	 * @param itemWriter CSV writer for item profile.
+	 * @param csvAttMapWriter CSV writer for attribute map.
+	 * @param attMapAttributes attribute list.
+	 * @param item item profile.
+	 * @param externalRecord external record.
 	 * @return whether insert profile successfully
 	 */
 	private static boolean insertItemProfile(DataConfig internalConfig, CsvWriter itemWriter, CsvWriter csvAttMapWriter, AttributeList attMapAttributes, Profile item, ExternalRecord externalRecord) {
@@ -768,12 +768,12 @@ public class DefaultExternalQuery implements ExternalQuery {
 
 	
 	/**
-	 * 
-	 * @param ratingWriter
-	 * @param ratingAttributes
-	 * @param userId
-	 * @param itemId
-	 * @param rating
+	 * Inserting rating.
+	 * @param ratingWriter rating writer.
+	 * @param ratingAttributes rating attributes.
+	 * @param userId user identifier.
+	 * @param itemId item identifier.
+	 * @param rating specified rating.
 	 * @return whether insert profile successfully
 	 */
 	private boolean insertRating(CsvWriter ratingWriter, AttributeList ratingAttributes, int userId, int itemId, Rating rating) {
@@ -789,11 +789,11 @@ public class DefaultExternalQuery implements ExternalQuery {
 	
 	
 	/**
-	 * 
-	 * @param attMapWriter
-	 * @param attMapAttributes
-	 * @param attributeMap
-	 * @return whether insert profile successfully
+	 * Inserting attributes.
+	 * @param attMapWriter writer for attribute.
+	 * @param attMapAttributes attribute list.
+	 * @param attributeMap interchanged attribute map.
+	 * @return whether insert profile successfully.
 	 */
 	private static boolean insertAttributeMap(CsvWriter attMapWriter, AttributeList attMapAttributes, InterchangeAttributeMap attributeMap) {
 		if (!attributeMap.isValid())

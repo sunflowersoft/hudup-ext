@@ -14,6 +14,7 @@ import net.hudup.data.bit.BitItem;
 import net.hudup.data.bit.BitItemset;
 
 /**
+ * This class implements how to find frequent itemsets.
  * 
  * @author Loc Nguyen
  * @version 10.0
@@ -29,25 +30,25 @@ public abstract class FreqItemsetFinder implements Alg {
 
 	
 	/**
-	 * 
+	 * Minimum support field.
 	 */
 	public final static String MIN_SUP = "min_sup";
 	
 	
 	/**
-	 * 
+	 * Default minimum support.
 	 */
 	public final static double DEFAULT_MIN_SUP = 0.0;
 
 	
 	/**
-	 * 
+	 * Configuration.
 	 */
 	protected DataConfig config = null;
 
 	
 	/**
-	 * {@link BitData}
+	 * Bit data.
 	 */
 	protected BitData bitData = null;
 	
@@ -61,7 +62,7 @@ public abstract class FreqItemsetFinder implements Alg {
 	
 	
 	/**
-	 * Getting {@link BitData}
+	 * Getting {@link BitData}.
 	 * @return internal bit data.
 	 * 
 	 */

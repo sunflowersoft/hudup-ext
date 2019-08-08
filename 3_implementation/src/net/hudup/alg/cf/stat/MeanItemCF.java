@@ -11,6 +11,8 @@ import net.hudup.core.alg.RecommendParam;
 import net.hudup.core.data.RatingVector;
 
 /**
+ * This algorithm simply recommend items to users based on mean item rating.
+ * 
  * @author Loc Nguyen
  * @version 10.0
  *
@@ -61,7 +63,5 @@ public class MeanItemCF extends StatCF {
 		return new MeanItemCF();
 	}
 
-	
-	
 	
 }

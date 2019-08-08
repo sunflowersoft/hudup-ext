@@ -21,7 +21,8 @@ import net.hudup.core.logistic.xURI;
 
 
 /**
- * This class implements a collaborative filtering algorithm based on Bayesian look up table.
+ * This class implements a collaborative filtering algorithm based on Bayesian lookup table.
+ * It is called Bayesian Lookup Table CF algorithm.
  * 
  * @author Loc Nguyen
  * @version 10.0
@@ -39,13 +40,13 @@ public class BayesLookupTableCF extends ModelBasedCF {
 
 	
 	/**
-	 * 
+	 * Default precision.
 	 */
 	public final static double DEFAULT_PRECISION = 0.80; // 20% deviation ratio
 	
     
 	/**
-	 * 
+	 * Default maximum iteration.
 	 */
 	public final static int DEFAULT_MAX_ITERATION = 100;
 
@@ -204,8 +205,3 @@ public class BayesLookupTableCF extends ModelBasedCF {
 	}
 	
 }
-
-
-
-
-

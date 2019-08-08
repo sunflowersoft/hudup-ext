@@ -20,7 +20,6 @@ import javax.swing.event.ListSelectionListener;
 
 import net.hudup.core.Constants;
 import net.hudup.core.Util;
-import net.hudup.core.client.PowerServer;
 import net.hudup.core.data.Attribute;
 import net.hudup.core.data.AttributeList;
 import net.hudup.core.data.BooleanWrapper;
@@ -40,6 +39,7 @@ import net.hudup.server.PowerServerConfig;
 
 
 /**
+ * This class provides a wizard to set up server.
  * 
  * @author Loc Nguyen
  * @version 10.0
@@ -55,34 +55,78 @@ public class SetupServerWizard extends JDialog {
 
 	
 	/**
-	 * 
+	 * Steps to set up server.
 	 * @author Loc Nguyen
 	 * @version 10.0
-	 *
 	 */
-	protected enum Step {config, create_schema, import_data, finished}
+	protected enum Step {
+		
+		/**
+		 * Configuration step.
+		 */
+		config,
+		
+		/**
+		 * Creating schema step.
+		 */
+		create_schema,
+		
+		/**
+		 * Importing data step.
+		 */
+		import_data,
+		
+		/**
+		 * Finished step.
+		 */
+		finished
+	}
 	
 	
+	/**
+	 * Current step.
+	 */
 	protected Step currentStep = Step.config;
 	
+	/**
+	 * Back button.
+	 */
 	protected JButton btnBack = null;
 	
+	/**
+	 * Next button.
+	 */
 	protected JButton btnNext = null;
 	
+	/**
+	 * Finished button.
+	 */
 	protected JButton btnFinished = null;
 	
+	/**
+	 * Cancel button.
+	 */
 	protected JButton btnCancel = null;
 	
+	/**
+	 * Main panel.
+	 */
 	protected JPanel main = null;
 
 	
+	/**
+	 * Server configuration.
+	 */
 	protected PowerServerConfig config = null;
 	
+	/**
+	 * Provider.
+	 */
 	protected Provider provider = null;
 
 	
 	/**
-	 * 
+	 * Constructor with server configuration.
 	 */
 	public SetupServerWizard(Component comp, PowerServerConfig srvConfig) {
 		super(UIUtil.getFrameForComponent(comp), "Setup server", true);
@@ -111,8 +155,8 @@ public class SetupServerWizard extends JDialog {
 	
 	
 	/**
-	 * 
-	 * @return this
+	 * Getting this wizard.
+	 * @return this wizard.
 	 */
 	protected SetupServerWizard getWizard() {
 		return this;
@@ -120,8 +164,8 @@ public class SetupServerWizard extends JDialog {
 	
 	
 	/**
-	 * 
-	 * @return {@link JPanel}
+	 * Creating footer panel.
+	 * @return footer panel.
 	 */
 	private JPanel createFooter() {
 		JPanel footer = new JPanel();
@@ -179,7 +223,7 @@ public class SetupServerWizard extends JDialog {
 	
 	
 	/**
-	 * 
+	 * Create provider.
 	 */
 	private void createProvider() {
 		if (this.provider != null) {
@@ -192,8 +236,8 @@ public class SetupServerWizard extends JDialog {
 
 	
 	/**
-	 * 
-	 * @return {@link JPanel}
+	 * Create configuration panel.
+	 * @return configuration panel.
 	 */
 	protected JPanel createConfigPane() {
 		JPanel main = new JPanel(new BorderLayout());
@@ -310,8 +354,8 @@ public class SetupServerWizard extends JDialog {
 
 	
 	/**
-	 * 
-	 * @return {@link JPanel}
+	 * Create schema panel.
+	 * @return schema panel.
 	 */
 	private JPanel createCreateSchemaPane() {
 		JPanel main = new JPanel(new BorderLayout());
@@ -329,13 +373,11 @@ public class SetupServerWizard extends JDialog {
 		
 		final UnitListBoxExt unitList = new UnitListBoxExt() {
 
-			
 			/**
 			 * Serial version UID for serializable class. 
 			 */
 			private static final long serialVersionUID = 1L;
 
-			
 			@Override
 			public void clearData() {
 				// TODO Auto-generated method stub
@@ -345,7 +387,6 @@ public class SetupServerWizard extends JDialog {
 						"Not support this method", 
 						JOptionPane.INFORMATION_MESSAGE);
 			}
-
 
 			@Override
 			public void modify() {
@@ -540,8 +581,8 @@ public class SetupServerWizard extends JDialog {
 
 	
 	/**
-	 * 
-	 * @return whether create schema successfully
+	 * Create schema.
+	 * @return whether create schema successfully.
 	 */
 	private boolean createSchema() {
 		final JDialog createAttDlg = new JDialog(
@@ -632,8 +673,8 @@ public class SetupServerWizard extends JDialog {
 	
 	
 	/**
-	 * 
-	 * @return whether create extra unit successfully
+	 * Create or modify extra unit.
+	 * @return whether create or modify extra unit successfully.
 	 */
 	private boolean createModifyUnit(String newUnit) {
 		String ctxTemplateUnit = config.getContextTemplateUnit();
@@ -757,8 +798,8 @@ public class SetupServerWizard extends JDialog {
 
 	
 	/**
-	 * 
-	 * @return {@link JPanel}
+	 * Create importing data panel.
+	 * @return importing data panel.
 	 */
 	protected JPanel createImportDataPane() {
 		JPanel main = new JPanel(new BorderLayout());
@@ -771,13 +812,11 @@ public class SetupServerWizard extends JDialog {
 
 		final UnitListBoxExt unitList = new UnitListBoxExt() {
 
-			
 			/**
 			 * Serial version UID for serializable class. 
 			 */
 			private static final long serialVersionUID = 1L;
 
-			
 			@Override
 			public void clearData() {
 				// TODO Auto-generated method stub
@@ -785,7 +824,6 @@ public class SetupServerWizard extends JDialog {
 				unitTable.clear();
 			}
 
-			
 			@Override
 			public void modify() {
 				// TODO Auto-generated method stub
@@ -796,7 +834,6 @@ public class SetupServerWizard extends JDialog {
 						JOptionPane.INFORMATION_MESSAGE);
 			}
 
-			
 			@Override
 			public void drop() {
 				// TODO Auto-generated method stub
@@ -883,8 +920,8 @@ public class SetupServerWizard extends JDialog {
 	
 	
 	/**
-	 * 
-	 * @return {@link JPanel}
+	 * Create finished panel.
+	 * @return finished panel.
 	 */
 	private JPanel createFinishedPane() {
 		JPanel main = new JPanel(new BorderLayout());
@@ -1024,7 +1061,7 @@ public class SetupServerWizard extends JDialog {
 	
 	
 	/**
-	 * 
+	 * Finish the setting up server process.
 	 */
 	private void finished() {
 		config.save();
@@ -1033,7 +1070,7 @@ public class SetupServerWizard extends JDialog {
 	
 	
 	/**
-	 * 
+	 * Cancel the setting up server process.
 	 */
 	private void cancel() {
 		if (provider == null) {
@@ -1071,7 +1108,7 @@ public class SetupServerWizard extends JDialog {
 	
 	
 	/**
-	 * 
+	 * Testing the setting up server process is finished.
 	 * @return whether finished
 	 */
 	public boolean isFinished() {
@@ -1080,18 +1117,12 @@ public class SetupServerWizard extends JDialog {
 	
 	
 	/**
-	 * 
-	 * @return {@link PowerServer}
+	 * Getting server configuration.
+	 * @return server configuration.
 	 */
 	public PowerServerConfig getServerConfig() {
 		return config;
 	}
-	
-	
-	
-	
-	
-	
 	
 	
 }

@@ -9,6 +9,7 @@ import java.util.List;
 
 import net.hudup.core.Util;
 import net.hudup.core.alg.Alg;
+import net.hudup.core.logistic.BaseClass;
 import net.hudup.core.logistic.DSUtil;
 import net.hudup.data.bit.BitData;
 import net.hudup.data.bit.BitItem;
@@ -40,6 +41,7 @@ import net.hudup.data.bit.BitsetItem;
  * @version 10.0
  * 
  */
+@BaseClass
 public class YRoller extends FreqItemsetFinder {
 
 	
@@ -209,7 +211,7 @@ class RollingStep implements Serializable {
 	
 	
 	/**
-	 * The main method of YRoller algorithm
+	 * The main method of YRoller algorithm.
 	 * Finding an frequent {@link BitItemset} by rolling on {@link BitData}
 	 * If BitItem is the same support, it will be added to Itemset 
 	 * 

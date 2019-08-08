@@ -12,7 +12,8 @@ import net.hudup.core.logistic.NextUpdate;
 
 
 /**
- * 
+ * This class will implement a so-called hybrid Bayes functional CF algorithm.
+ *  
  * @author Loc Nguyen
  * @version 10.0
  *
@@ -29,7 +30,7 @@ public abstract class BayesFunctionalHybrid extends ModelBasedCF {
 
 	
 	/**
-	 * 
+	 * Default constructor.
 	 */
 	public BayesFunctionalHybrid() {
 		super();
@@ -54,9 +55,8 @@ public abstract class BayesFunctionalHybrid extends ModelBasedCF {
 }
 
 
-
 /**
- * 
+ * Knowledge base of the hybrid Bayes functional CF algorithm.
  * @author Loc Nguyen
  * @version 10.0
  *
@@ -73,49 +73,49 @@ abstract class BayesFunctionalHybridKB extends KBaseAbstract {
 
 	
 	/**
-	 * 
+	 * Maximum user features.
 	 */
 	public static final int MAX_USER_FEATURES = 10;
 	
 	
 	/**
-	 * 
+	 * Maximum item features.
 	 */
 	public static final int MAX_ITEM_FEATURES = 10;
 
 	
 	/**
-	 * 
+	 * User features values.
 	 */
 	protected Map<Integer, List<Integer>> uFeatureValues = Util.newMap();
 
 	
 	/**
-	 * 
+	 * Item features values.
 	 */
 	protected Map<Integer, List<Integer>> iFeatureValues = Util.newMap();
 
 	
 	/**
-	 * 
+	 * Map of user feature parameters.
 	 */
 	protected Map<Integer, Map<Integer, Map<Integer, Double>>> uFeatureParams = Util.newMap();
 	
 	
 	/**
-	 * 
+	 * Map of item feature parameters.
 	 */
 	protected Map<Integer, Map<Integer, Map<Integer, Double>>> iFeatureParams = Util.newMap();
 
 
 	/**
-	 * 
+	 * Map of rating parameters.
 	 */
 	protected Map<Integer, Double> rParams = Util.newMap();
 	
 	
 	/**
-	 * 
+	 * Default constructors.
 	 */
 	public BayesFunctionalHybridKB() {
 		
@@ -131,8 +131,8 @@ abstract class BayesFunctionalHybridKB extends KBaseAbstract {
 
 	
 	/**
-	 * 
-	 * @return list user feature id (s)
+	 * Getting list user feature id (s).
+	 * @return list user feature id (s).
 	 */
 	protected Set<Integer> uFeatureIds() {
 		return uFeatureValues.keySet();
@@ -140,8 +140,8 @@ abstract class BayesFunctionalHybridKB extends KBaseAbstract {
 	
 	
 	/**
-	 * 
-	 * @return list item feature id (s)
+	 * Getting list item feature id (s).
+	 * @return list item feature id (s).
 	 */
 	protected Set<Integer> iFeatureIds() {
 		return iFeatureValues.keySet();
@@ -149,8 +149,8 @@ abstract class BayesFunctionalHybridKB extends KBaseAbstract {
 
 	
 	/**
-	 * 
-	 * @return possible rating (s)
+	 * Getting possible rating (s).
+	 * @return possible rating (s).
 	 */
 	protected Set<Integer> ratings() {
 		return rParams.keySet();
@@ -158,7 +158,7 @@ abstract class BayesFunctionalHybridKB extends KBaseAbstract {
 	
 	
 	/**
-	 * 
+	 * Destroying data structure.
 	 */
 	private void destroyDataStructure() {
 		uFeatureValues.clear();
@@ -177,15 +177,14 @@ abstract class BayesFunctionalHybridKB extends KBaseAbstract {
 	
 	
 	/**
-	 * 
-	 * @param innerCf
+	 * Create knowledge base of the hybrid Bayes functional CF algorithm.
+	 * @param innerCf the hybrid Bayes functional CF algorithm.
 	 * @return {@link BayesFunctionalHybrid}
 	 */
 	public static BayesFunctionalHybridKB create(final BayesFunctionalHybrid recommender) {
 		
 		return new BayesFunctionalHybridKB() {
 
-			
 			/**
 			 * Serial version UID for serializable class. 
 			 */
@@ -197,6 +196,7 @@ abstract class BayesFunctionalHybridKB extends KBaseAbstract {
 				// TODO Auto-generated method stub
 				return recommender.getName();
 			}
+			
 		};
 	}
 

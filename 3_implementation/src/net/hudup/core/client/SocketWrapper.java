@@ -39,7 +39,7 @@ import net.hudup.core.evaluate.Evaluator;
  */
 public class SocketWrapper extends ProtocolImpl implements Service {
 
-	
+
 	/**
 	 * Remote host for socket connection.
 	 */

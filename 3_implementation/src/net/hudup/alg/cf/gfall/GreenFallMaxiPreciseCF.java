@@ -17,6 +17,8 @@ import net.hudup.core.logistic.NextUpdate;
 import net.hudup.core.logistic.RatingFilter;
 
 /**
+ * This class is an extension of maximum Green Fall algorithm.
+ * 
  * @author Loc Nguyen
  * @version 10.0
  *
@@ -33,7 +35,7 @@ public class GreenFallMaxiPreciseCF extends GreenFallMaxiCF {
 
 	
 	/**
-	 * 
+	 * Default constructor.
 	 */
 	public GreenFallMaxiPreciseCF() {
 		super();

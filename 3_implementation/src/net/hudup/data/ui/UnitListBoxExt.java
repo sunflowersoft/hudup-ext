@@ -13,12 +13,15 @@ import javax.swing.SwingUtilities;
 
 import net.hudup.core.data.Provider;
 import net.hudup.core.data.Unit;
+import net.hudup.core.data.UnitList;
 import net.hudup.core.data.ui.UnitListBox;
 import net.hudup.core.logistic.ui.UIUtil;
 import net.hudup.data.ProviderImpl;
 
 
 /**
+ * The graphic user interface (GUI) component as list box shows the {@link UnitList}.
+ * It is an extended version of {@link UnitListBox}.
  * 
  * @author Loc Nguyen
  * @version 10.0
@@ -34,7 +37,7 @@ public class UnitListBoxExt extends UnitListBox {
 
 
 	/**
-	 * 
+	 * Default constructor.
 	 */
 	public UnitListBoxExt() {
 		super();
@@ -55,8 +58,8 @@ public class UnitListBoxExt extends UnitListBox {
 
 	
 	/**
-	 * 
-	 * @return context menu
+	 * Create context menu.
+	 * @return context menu.
 	 */
 	private JPopupMenu createContextMenu() {
 		if (config == null)
@@ -103,7 +106,7 @@ public class UnitListBoxExt extends UnitListBox {
 	
 	
 	/**
-	 * 
+	 * Clearing data (units).
 	 */
 	public void clearData() {
 		Unit selected = getSelectedValue();
@@ -118,9 +121,9 @@ public class UnitListBoxExt extends UnitListBox {
 	
 	
 	/**
-	 * 
+	 * Modifying data (units).
 	 */
-	public void modify() {
+	protected void modify() {
 		JOptionPane.showMessageDialog(
 			null, 
 			"Not implement yet", 
@@ -130,9 +133,9 @@ public class UnitListBoxExt extends UnitListBox {
 	
 	
 	/**
-	 * 
+	 * Dropping selected unit.
 	 */
-	public void drop() {
+	protected void drop() {
 		Unit selected = getSelectedValue();
 		if (selected == null)
 			return;
@@ -146,6 +149,4 @@ public class UnitListBoxExt extends UnitListBox {
 	}
 	
 
-	
-	
 }
