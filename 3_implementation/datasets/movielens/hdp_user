@@ -1,4 +1,4 @@
-userid~integer~0~true~false,age~integer~1~false~false,gender~integer~2~false~false,occupation~integer~3~false~false,zipcode~string~4~false~false
+userid~integer~0~true~false,age~integer~1~false~false,gender~nominal~2~false~false,occupation~nominal~3~false~false,zipcode~string~4~false~false
 1,24,0,19,85711
 2,53,1,13,94043
 3,23,0,20,32067

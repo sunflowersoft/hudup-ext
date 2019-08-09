@@ -50,7 +50,7 @@ public class AttributeListTable extends JTable {
 
 	
 	/**
-	 * 
+	 * Default constructor.
 	 */
 	public AttributeListTable() {
 		super(new AttributeListTM());
@@ -119,7 +119,7 @@ public class AttributeListTable extends JTable {
 	
 	
 	/**
-	 * 
+	 * Clear table.
 	 */
 	public void clear() {
 		getAttributeListTM().clear();
@@ -174,7 +174,7 @@ public class AttributeListTable extends JTable {
 
 	
 	/**
-	 * 
+	 * Create context menu.
 	 * @return {@link JPopupMenu}
 	 */
 	private JPopupMenu createContextMenu() {

@@ -163,7 +163,29 @@ public class ExternalConfigurator extends JDialog {
 				if (uri == null)
 					return;
 				
-				txtPath.setText(uri.toString());
+				//Fixing bug date: 2019.08.09
+				String host = uri.getHost();
+				if (host != null && !host.isEmpty())
+					txtHost.setText(host);
+				
+				int port = uri.getPort();
+				if (port > 0)
+					txtPort.setValue(port);
+				
+				String username = uri.getUserName();
+				if (username != null && !username.isEmpty())
+					txtUsername.setText(username);
+				
+				String password = uri.getPassword();
+				if (password != null && !password.isEmpty())
+					txtPassword.setText(password);
+
+				String path = uri.getPath();
+				if (path != null && !path.isEmpty())
+					txtPath.setText(path);
+				//Fixing bug date: 2019.08.09
+
+				//txtPath.setText(uri.toString());
 			}
 		});
 		//

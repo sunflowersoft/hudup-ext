@@ -22,6 +22,7 @@ import net.hudup.core.Constants;
 import net.hudup.core.client.Service;
 import net.hudup.core.client.SocketConnection;
 import net.hudup.core.data.AttributeList;
+import net.hudup.core.data.AutoCloseable;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.DataDriver;
 import net.hudup.core.data.DataDriver.DataType;
@@ -104,19 +105,22 @@ public class FactoryImpl implements Factory {
 	
 	@Override
 	public UnitTable createUnitTable(xURI uri) {
+		if (uri == null) return new FlatUnitTable();
+		
 		DataDriver dataDriver = DataDriver.create(uri);
 		if (dataDriver == null)
-			return null;
+			return new FlatUnitTable();
 		else if (dataDriver.isFlatServer())
 			return new FlatUnitTable();
 		else if (dataDriver.isDbServer())
 			return new DBUnitTable();
 		else
-			return null;
+			return new FlatUnitTable();
 	}
 	
 	
 //	@Override
+//	@Deprecated
 //	public UriAssoc createUriAssoc(DataConfig config) {
 //		xURI uri = config.getStoreUri();
 //		return createUriAssoc(uri);
@@ -322,13 +326,13 @@ class HudupProviderAssoc extends ProviderAssocAbstract {
 
 
 /**
- * This is an implementation of {@link UnitTable} for flat structure.
+ * This is an implementation of {@link UnitTable} for flat structure. It is also the default implementation of unit table.
  * 
  * @author Loc Nguyen
  * @version 1.0
  *
  */
-class FlatUnitTable extends ProfileTable implements UnitTable {
+class FlatUnitTable extends ProfileTable implements UnitTable, AutoCloseable {
 
 	
 	/**
@@ -386,20 +390,23 @@ class FlatUnitTable extends ProfileTable implements UnitTable {
 			Fetcher<Profile> fetcher = providerAssoc.getProfiles(unit, null);
 			update(fetcher);
 			fetcher.close();
+			
+			this.providerAssoc = providerAssoc;
+			this.unit = unit;
 		}
 		catch (Exception e){
 			e.printStackTrace();
+			this.providerAssoc = null;
+			this.unit = null;
 		}
 		
-		this.providerAssoc = providerAssoc;
-		this.unit = unit;
 	}
 
 	
 	@Override
 	public void clear() {
 		// TODO Auto-generated method stub
-		System.out.println("UnitFlatTableImpl#clear() is not supported yet.");
+		update(getAttributeList());
 	}
 
 	
@@ -462,6 +469,30 @@ class FlatUnitTable extends ProfileTable implements UnitTable {
 		}
 	
     }
+
+
+	@Override
+	public void close() throws Exception {
+		// TODO Auto-generated method stub
+		if (providerAssoc != null)
+			providerAssoc.close();
+		providerAssoc = null;
+		unit = null;
+	}
+
+
+	@Override
+	protected void finalize() throws Throwable {
+		// TODO Auto-generated method stub
+		super.finalize();
+		
+		try {
+			close();
+		}
+		catch (Throwable e) {
+			e.printStackTrace();
+		}
+	}
 
 
 }

@@ -37,6 +37,7 @@ import net.hudup.core.evaluate.Evaluator;
 import net.hudup.core.evaluate.EvaluatorConfig;
 import net.hudup.core.logistic.NextUpdate;
 import net.hudup.core.logistic.SystemUtil;
+import net.hudup.data.ProviderImpl;
 import net.hudup.data.SnapshotImpl;
 
 
@@ -79,6 +80,12 @@ public class DefaultService implements Service, AutoCloseable {
 	 * Recommender algorithm.
 	 */
 	protected Recommender recommender = null;
+	
+	
+	/**
+	 * Provider. Do not retrieve directly this variable. Using method {@link #getProvider()} instead.
+	 */
+	private Provider provider = null;
 	
 	
 	/**
@@ -151,6 +158,16 @@ public class DefaultService implements Service, AutoCloseable {
 			}
 		}
 		recommender = null;
+		
+		if (provider != null) {
+			try {
+				provider.close();
+			}
+			catch (Throwable e) {
+				e.printStackTrace();
+			}
+		}
+		provider = null;
 	}
 
 
@@ -201,12 +218,36 @@ public class DefaultService implements Service, AutoCloseable {
 	 */
 	protected Provider getProvider() {
 		Dataset dataset = getDataset();
-		if (dataset == null)
+		if (dataset == null) {
+			if (provider != null) {
+				try {
+					provider.close();
+				}
+				catch (Exception e) {
+					e.printStackTrace();
+				}
+				provider = null;
+			}
 			return null;
-		else if (dataset instanceof Scanner)
-			return ((Scanner)dataset).getProvider();
-		else
-			return null;
+		}
+		else if (dataset instanceof Scanner) {
+			try {
+				provider.close();
+			}
+			catch (Exception e) {
+				e.printStackTrace();
+			}
+			provider = null;
+			
+			return ((Scanner)dataset).getProvider(); //Only scanner owns provider.
+		}
+		else {
+			if (provider == null) {
+				DataConfig config = (DataConfig)dataset.getConfig().clone();
+				provider = new ProviderImpl(config);
+			}
+			return provider;
+		}
 	}
 
 	

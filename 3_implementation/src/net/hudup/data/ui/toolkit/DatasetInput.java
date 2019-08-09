@@ -25,6 +25,8 @@ import net.hudup.data.ui.UnitListBoxExt;
 
 
 /**
+ * This is utility class for inputing dataset. Currently, it only support to input database.
+ * In flat system such as file structure, this class only provides viewer.
  * 
  * @author Loc Nguyen
  * @version 10.0
@@ -38,16 +40,39 @@ public class DatasetInput extends JPanel implements Dispose {
 	 */
 	private static final long serialVersionUID = 1L;
 
+	/**
+	 * Body panel. This panel is stored to change unit table if necessary.
+	 */
+	JPanel body = null;
+	
+	/**
+	 * Configuration button.
+	 */
 	JButton btnConfig = null;
 	
+	/**
+	 * Refreshing button.
+	 */
 	JButton btnRefresh = null;
 
+	/**
+	 * Configuration text field.
+	 */
 	DataConfigTextField txtConfig = null;
 	
+	/**
+	 * Unit table.
+	 */
 	UnitTable unitTable = null;
 	
+	/**
+	 * Unit list box.
+	 */
 	UnitListBoxExt unitList = null;
 	
+	/**
+	 * Provider.
+	 */
 	Provider provider = null;
 	
 	
@@ -102,15 +127,15 @@ public class DatasetInput extends JPanel implements Dispose {
 		btnRefresh.setMargin(new Insets(0, 0 , 0, 0));
 		header.add(btnRefresh, BorderLayout.EAST);
 
-		JPanel body = new JPanel(new BorderLayout());
+		body = new JPanel(new BorderLayout());
 		add(body, BorderLayout.CENTER);
 		
-		unitTable = Util.getFactory().createUnitTable(txtConfig.getConfig().getStoreUri());
+		unitTable = Util.getFactory().createUnitTable(
+				txtConfig.getConfig() != null ? txtConfig.getConfig().getStoreUri() : null);
 		body.add(unitTable.getComponent(), BorderLayout.CENTER);
 
 		unitList = new UnitListBoxExt() {
 
-			
 			/**
 			 * Serial version UID for serializable class. 
 			 */
@@ -197,7 +222,19 @@ public class DatasetInput extends JPanel implements Dispose {
 		
 		txtConfig.setConfig(config);
 		unitList.connectUpdate(config);
+		
+		body.remove(unitTable.getComponent());
+		try {
+			unitTable.close();
+		}
+		catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		unitTable = Util.getFactory().createUnitTable(config.getStoreUri());
+		body.add(unitTable.getComponent(), BorderLayout.CENTER);
 		unitTable.clear();
+		validate();
 	}
 
 

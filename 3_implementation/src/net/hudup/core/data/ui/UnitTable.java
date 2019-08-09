@@ -4,6 +4,7 @@ import java.awt.Component;
 import java.util.EventListener;
 import java.util.EventObject;
 
+import net.hudup.core.data.AutoCloseable;
 import net.hudup.core.data.ProviderAssoc;
 
 
@@ -14,7 +15,7 @@ import net.hudup.core.data.ProviderAssoc;
  * @version 10.0
  *
  */
-public interface UnitTable {
+public interface UnitTable extends AutoCloseable {
 
 	
 	/**
@@ -26,7 +27,7 @@ public interface UnitTable {
 	
 	
 	/**
-	 * Clear table.
+	 * Clear table. Note, only clearing GUI, not clearing (deleting) database 
 	 */
 	void clear();
 	

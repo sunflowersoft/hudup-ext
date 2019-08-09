@@ -397,9 +397,23 @@ public class Profile implements Cloneable, TextParsable, Serializable {
 			break;
 			
 		case nominal:
-			if (value instanceof String || value instanceof Nominal) {
-				int valueIndex = value instanceof Nominal ?
-					att.indexOfNominal((Nominal)value) : att.indexOfNominal((String)value);
+			if (value instanceof String) {
+				int tryInteger = -1;
+				try {
+					//Fixing bug: In CSV file, all fields are texts.
+					//Fixing date: 2019.08.09 by Loc Nguyen.
+					tryInteger = Integer.parseInt((String)value);
+				}
+				catch (Exception e) {
+					tryInteger = -1;
+				}
+				int valueIndex = tryInteger >= 0? tryInteger : att.indexOfNominal((String)value);
+						
+				if (valueIndex != -1)
+					newValue = valueIndex;
+			}
+			else if (value instanceof Nominal) {
+				int valueIndex = att.indexOfNominal((Nominal)value); 
 						
 				if (valueIndex != -1)
 					newValue = valueIndex;

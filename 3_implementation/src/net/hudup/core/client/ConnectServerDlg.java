@@ -103,10 +103,10 @@ public class ConnectServerDlg extends JDialog {
 		txtRemotePort = new JTextField("" + Constants.DEFAULT_SERVER_PORT);
 		right.add(txtRemotePort);
 		
-		txtRemoteUsername = new JTextField();
+		txtRemoteUsername = new JTextField("admin");
 		right.add(txtRemoteUsername);
 
-		txtRemotePassword = new JPasswordField();
+		txtRemotePassword = new JPasswordField("admin");
 		right.add(txtRemotePassword);
 
 		JPanel footer = new JPanel();

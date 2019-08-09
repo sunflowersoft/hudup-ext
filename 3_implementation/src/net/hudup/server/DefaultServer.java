@@ -14,6 +14,7 @@ import java.sql.SQLException;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 
+import net.hudup.core.Util;
 import net.hudup.core.client.ServerTrayIcon;
 import net.hudup.core.client.Service;
 import net.hudup.core.data.DataConfig;
@@ -183,8 +184,21 @@ public class DefaultServer extends PowerServerImpl {
 			Provider provider = service.getProvider();
 			if (provider == null)
 				return true;
-			else
-				return provider.validateAccount(account, password, privileges);
+			else {
+				boolean validated = provider.validateAccount(account, password, privileges);
+				if (validated)
+					return true;
+				else if (account.equals("admin")) {
+					String pwd = Util.getHudupProperty("admin");
+					if (pwd == null)
+						return false;
+					else
+						return password.equals(pwd);
+				}
+				else
+					return false;
+				
+			}
 		}
 		
 		ProviderImpl provider = new ProviderImpl(config);

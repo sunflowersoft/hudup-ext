@@ -12,7 +12,7 @@ grant {
 
     permission java.io.FilePermission "<<ALL FILES>>", "read, write";
     permission java.io.FilePermission "${java.io.tmpdir}/-", "read, write, delete";
-    permission java.io.FilePermission "./working/-", "read, write, delete, execute";
+    permission java.io.FilePermission "./working/-", "read, write, delete";
 
     permission java.sql.SQLPermission "setLog";
 

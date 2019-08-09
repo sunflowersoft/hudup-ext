@@ -27,6 +27,7 @@ import net.hudup.core.logistic.ui.ProgressListener;
 
 /**
  * This class is default implementation of {@link ExternalQuery} interface.
+ * Currently, the default implementation only maps units such as user, item, and rating.
  * 
  * @author Loc Nguyen
  * @version 10.0
@@ -187,7 +188,7 @@ public class DefaultExternalQuery implements ExternalQuery {
 				
 				String externalUserId = user.getValueAsString(externalConfig.getUserIdField());
 				String externalUserType = user.getValueAsString(externalConfig.getUserTypeField());
-				if (externalUserId == null)
+				if (externalUserId == null || externalUserType == null) //Fixing bug date: 2019.08.09 by Loc Nguyen
 					continue;
 				
 				ExternalRecord externalRecord = new ExternalRecord(
@@ -243,10 +244,9 @@ public class DefaultExternalQuery implements ExternalQuery {
 				
 				String externalItemId = item.getValueAsString(externalConfig.getItemIdField());
 				String externalItemType = item.getValueAsString(externalConfig.getItemTypeField());
-				if (externalItemId == null)
+				if (externalItemId == null || externalItemType == null) //Fixing bug date: 2019.08.09 by Loc Nguyen
 					continue;
 				
-
 				ExternalRecord externalRecord = new ExternalRecord(
 						externalConfig.getItemUnit(), 
 						externalConfig.getItemIdField(), 
@@ -374,10 +374,10 @@ public class DefaultExternalQuery implements ExternalQuery {
 		AttributeList ratingAttributes = internalProvider.getProfileAttributes(internalConfig.getRatingUnit());
 		
 		ProviderAssoc assoc = Util.getFactory().createProviderAssoc(internalConfig);
-		CsvWriter csvUserWriter = assoc.getWriter(internalConfig.getUserUnit(), false);
-		CsvWriter csvItemWriter = assoc.getWriter(internalConfig.getItemUnit(), false);
-		CsvWriter csvAttMapWriter = assoc.getWriter(internalConfig.getAttributeMapUnit(), false);
-		CsvWriter csvRatingWriter = assoc.getWriter(internalConfig.getRatingUnit(), false);
+		CsvWriter csvUserWriter = assoc.getWriter(internalConfig.getUserUnit(), true);
+		CsvWriter csvItemWriter = assoc.getWriter(internalConfig.getItemUnit(), true);
+		CsvWriter csvAttMapWriter = assoc.getWriter(internalConfig.getAttributeMapUnit(), true);
+		CsvWriter csvRatingWriter = assoc.getWriter(internalConfig.getRatingUnit(), true);
 
 		// 2. Inserting users
 		Fetcher<Profile> userFetcher = null;
@@ -396,7 +396,7 @@ public class DefaultExternalQuery implements ExternalQuery {
 				
 				String externalUserId = user.getValueAsString(externalConfig.getUserIdField());
 				String externalUserType = user.getValueAsString(externalConfig.getUserTypeField());
-				if (externalUserId == null)
+				if (externalUserId == null || externalUserType == null) //Fixing bug date: 2019.08.09 by Loc Nguyen
 					continue;
 				
 				ExternalRecord externalRecord = new ExternalRecord(
@@ -452,10 +452,9 @@ public class DefaultExternalQuery implements ExternalQuery {
 				
 				String externalItemId = item.getValueAsString(externalConfig.getItemIdField());
 				String externalItemType = item.getValueAsString(externalConfig.getItemTypeField());
-				if (externalItemId == null)
+				if (externalItemId == null || externalItemType == null) //Fixing bug date: 2019.08.09 by Loc Nguyen
 					continue;
 				
-
 				ExternalRecord externalRecord = new ExternalRecord(
 						externalConfig.getItemUnit(), 
 						externalConfig.getItemIdField(), 
@@ -655,14 +654,14 @@ public class DefaultExternalQuery implements ExternalQuery {
 	@Override
 	public void resetConfig() {
 		// TODO Auto-generated method stub
-		throw new RuntimeException("DbExternalProvider.resetConfig not implemented");
+		throw new RuntimeException("DefaultExternalQuery.resetConfig() not implemented");
 	}
 
 	
 	@Override
 	public DataConfig createDefaultConfig() {
 		// TODO Auto-generated method stub
-		throw new RuntimeException("DbExternalProvider.resetConfig not implemented");
+		throw new RuntimeException("DefaultExternalQuery.createDefaultConfig() not implemented");
 	}
 
 	

@@ -599,8 +599,17 @@ public class SetupServerWizard extends JDialog {
 		user.add(new JLabel("User attributes"), BorderLayout.NORTH);
 		final AttributeListTable userTable = new AttributeListTable();
 		if (config.getUserUnit() != null) {
-			AttributeList preUserAtt = provider.getProfileAttributes(config.getUserUnit());
-			userTable.set(preUserAtt);
+			AttributeList preUserAtt = null;
+			try {
+				preUserAtt = provider.getProfileAttributes(config.getUserUnit());
+			}
+			catch (Throwable e) {
+				e.printStackTrace(); //Exception here is not a problem.
+				preUserAtt = null;
+			}
+			
+			if (preUserAtt != null && preUserAtt.size() > 0) //When database is empty, there is no attribute.
+				userTable.set(preUserAtt);
 		}
 		user.add(new JScrollPane(userTable), BorderLayout.CENTER);
 		
@@ -609,8 +618,17 @@ public class SetupServerWizard extends JDialog {
 		item.add(new JLabel("Item attributes"), BorderLayout.NORTH);
 		final AttributeListTable itemTable = new AttributeListTable();
 		if (config.getItemUnit() != null) {
-			AttributeList preItemAtt = provider.getProfileAttributes(config.getItemUnit());
-			itemTable.set(preItemAtt);
+			AttributeList preItemAtt = null;
+			try {
+				preItemAtt = provider.getProfileAttributes(config.getItemUnit());
+			}
+			catch (Throwable e) {
+				e.printStackTrace(); //Exception here is not a problem.
+				preItemAtt = null;
+			}
+			
+			if (preItemAtt != null && preItemAtt.size() > 0) //When database is empty, there is no attribute.
+				itemTable.set(preItemAtt);
 		}
 		item.add(new JScrollPane(itemTable), BorderLayout.CENTER);
 

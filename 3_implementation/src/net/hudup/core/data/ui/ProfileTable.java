@@ -16,6 +16,7 @@ import javax.swing.table.TableCellRenderer;
 
 import net.hudup.core.Util;
 import net.hudup.core.data.Attribute;
+import net.hudup.core.data.Attribute.Type;
 import net.hudup.core.data.AttributeList;
 import net.hudup.core.data.Fetcher;
 import net.hudup.core.data.FetcherUtil;
@@ -85,7 +86,9 @@ public class ProfileTable extends JTable {
 				if(!model.isEditable()) return;
 				
 				ActionEvent evt = null;
-				if(e.getKeyCode() == KeyEvent.VK_DELETE)
+				if(e.getKeyCode() == KeyEvent.VK_F12)
+					evt = new ActionEvent(model, 0, "Add");
+				else if(e.getKeyCode() == KeyEvent.VK_DELETE)
 					evt = new ActionEvent(model, 0, "Remove");
 				else if(e.getKeyCode() == KeyEvent.VK_F5)
 					evt = new ActionEvent(model, 0, "Refresh");
@@ -104,6 +107,24 @@ public class ProfileTable extends JTable {
 		return (ProfileTableModel)getModel();
 	}
 	
+	
+	/**
+	 * Getting internal data.
+	 * @return internal data.
+	 */
+	public List<Profile> getData() {
+		return getProfileTableModel().getData();
+	}
+	
+	
+	/**
+	 * Getting attribute list.
+	 * @return attribute list.
+	 */
+	public AttributeList getAttributeList() {
+		return getProfileTableModel().getAttributeList();
+	}
+
 	
 	/**
 	 * Update this model by empty data and specified attribute list.
@@ -140,7 +161,7 @@ public class ProfileTable extends JTable {
 		String cmd = e.getActionCommand();
 		
 		if(cmd.equals("Add")) {
-			
+			System.out.println("Add command is not implemented yet");
 		}
 		else if(cmd.equals("Remove")) {
 			int selectedRow = getSelectedRow();
@@ -148,7 +169,7 @@ public class ProfileTable extends JTable {
 				getProfileTableModel().removeRow(selectedRow);
 		}
 		else if(cmd.equals("Refresh")) {
-			
+			System.out.println("Refresh command is not implemented yet");
 		}
 	}
 
@@ -247,6 +268,7 @@ class ProfileTableModel extends DefaultTableModel implements TableModelListener 
 	public ProfileTableModel(Collection<Profile> profiles) {
 		super();
 		update(profiles);
+		addTableModelListener(this);
 	}
 
 	
@@ -348,7 +370,8 @@ class ProfileTableModel extends DefaultTableModel implements TableModelListener 
 	 * Extracting data.
 	 * @return data as list of profiles.
 	 */
-	protected void updateInternalData() {
+	@NextUpdate
+	private void updateInternalData() {
 		this.data.clear();
 		if (this.attRef == null)
 			return;
@@ -392,12 +415,29 @@ class ProfileTableModel extends DefaultTableModel implements TableModelListener 
 	}
 
 
+	@Override
+	public void setValueAt(Object value, int row, int column) {
+		super.setValueAt(value, row, column);
+	}
+
+	
+	@Override
+	public Class<?> getColumnClass(int columnIndex) {
+		// TODO Auto-generated method stub
+		if (attRef == null || columnIndex >= attRef.size())
+			return super.getColumnClass(columnIndex);
+		
+		Type type = attRef.get(columnIndex).getType();
+		return Attribute.toObjectClass(type);
+	}
+
+
 	@NextUpdate
 	@Override
 	public void tableChanged(TableModelEvent e) {
 		// TODO Auto-generated method stub
-		System.out.println("Profile table model changed: " + e.getType());
-		updateInternalData(); //This code line is not optimized, which is a work-around solution.
+//		System.out.println("ProfileTableModel.tableChanged(TableModelEvent) not implemented yet");
+//		updateInternalData(); //This code line is not optimized, which is a work-around solution.
 	}
 
 
