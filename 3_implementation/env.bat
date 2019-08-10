@@ -17,4 +17,6 @@ echo CLASSPATH=%CLASSPATH%
 
 set JAVA_CMD=java -cp %CLASSPATH%
 
+set JAVAW_CMD=javaw -cp %CLASSPATH%
+
 @echo on

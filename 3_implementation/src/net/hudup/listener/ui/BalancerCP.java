@@ -21,7 +21,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
-import net.hudup.core.client.ConnectServerDlg;
+import net.hudup.core.client.ConnectDlg;
 import net.hudup.core.client.Server;
 import net.hudup.core.client.ServerStatusEvent;
 import net.hudup.core.client.ServerStatusEvent.Status;
@@ -761,7 +761,7 @@ public class BalancerCP extends JFrame implements ServerStatusListener {
 	 * @param args The argument parameter of main method. It contains command line arguments.
 	 */
 	public static void main(String[] args) {
-		ConnectServerDlg dlg = new ConnectServerDlg();
+		ConnectDlg dlg = ConnectDlg.connectServer();
 		Image image = UIUtil.getImage("balancer-32x32.png");
         if (image != null)
         	dlg.setIconImage(image);

@@ -76,7 +76,7 @@ import net.hudup.core.data.DatasetPool;
  * @version 10.0
  *
  */
-public interface Evaluator extends Remote {
+public interface Evaluator extends Remote, SetupAlgListener {
 
 	
 	/**

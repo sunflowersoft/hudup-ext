@@ -31,7 +31,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import net.hudup.core.Util;
-import net.hudup.core.client.ConnectServerDlg;
+import net.hudup.core.client.ConnectDlg;
 import net.hudup.core.client.PowerServer;
 import net.hudup.core.client.RemoteServerCP;
 import net.hudup.core.client.Server;
@@ -1079,7 +1079,7 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 	 * @param args specified arguments.
 	 */
 	public static void main(String[] args) {
-		ConnectServerDlg dlg = new ConnectServerDlg();
+		ConnectDlg dlg = ConnectDlg.connectServer();
 		
 		Server server = dlg.getServer();
 		if (server != null)

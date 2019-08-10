@@ -32,13 +32,30 @@ public final class DriverManager {
 	 */
 	public final static SocketConnection getSocketConnection(
 			xURI uri, String username, String password) {
+		if (uri == null) return null;
 		
 		String host = uri.getHost();
+		int port = uri.getPort();
+		
+		return getSocketConnection(host, port, username, password);
+	}
+	
+	
+	/**
+	 * Getting a socket with given remote host, remote port, authenticated user name, and authenticated password.
+	 * @param host remote host.
+	 * @param port remote port.
+	 * @param username authenticated user name
+	 * @param password authenticated password.
+	 * @return {@link SocketConnection} according to RMI protocol.
+	 */
+	public final static SocketConnection getSocketConnection(
+			String host, int port, String username, String password) {
+		
 		if (host == null)
 			return null;
 		
-		int port = uri.getPort();
-		if (port < 0)
+		if (port < 1)
 			port = Constants.DEFAULT_SERVER_PORT;
 		
 		SocketConnection connection = new SocketConnection(host, port);
@@ -47,33 +64,35 @@ public final class DriverManager {
 		else
 			return null;
 	}
+
 	
-	
-	/**
-	 * Creating {@link SocketWrapper} with given URI of server, user name, and password.
-	 * {@link SocketWrapper} is also a service that sends only one request to server and then receives only one response (result) from server at one time, according to socket interaction.
-	 * So every time users want to send/receive request/response to/from server, they must re-create a new instance of {@link SocketWrapper}.
-	 * 
-	 * @param uri URI of server
-	 * @param username authenticated user name.
-	 * @param password authenticated password.
-	 * @return {@link SocketWrapper} with given URI of server, user name, and password.
-	 */
-	public final static SocketWrapper getSocketWrapper(xURI uri, String username, String password) {
-		String schema = uri.getScheme();
-		if (schema == null || !schema.equals(Protocol.HDP_PROTOCOL))
-			return null;
-		
-		String host = uri.getHost();
-		if (host == null)
-			return null;
-		
-		int port = uri.getPort();
-		if (port < 0)
-			port = Constants.DEFAULT_SERVER_PORT;
-		
-		return new SocketWrapper(host, port);
-	}
+//	/**
+//	 * Creating {@link SocketWrapper} with given URI of server, user name, and password.
+//	 * {@link SocketWrapper} is also a service that sends only one request to server and then receives only one response (result) from server at one time, according to socket interaction.
+//	 * So every time users want to send/receive request/response to/from server, they must re-create a new instance of {@link SocketWrapper}.
+//	 * 
+//	 * @param uri URI of server
+//	 * @param username authenticated user name.
+//	 * @param password authenticated password.
+//	 * @return {@link SocketWrapper} with given URI of server, user name, and password.
+//	 */
+//	@SuppressWarnings("unused")
+//	@Deprecated
+//	private final static SocketWrapper getSocketWrapper(xURI uri, String username, String password) {
+//		String schema = uri.getScheme();
+//		if (schema == null || !schema.equals(Protocol.HDP_PROTOCOL))
+//			return null;
+//		
+//		String host = uri.getHost();
+//		if (host == null)
+//			return null;
+//		
+//		int port = uri.getPort();
+//		if (port < 0)
+//			port = Constants.DEFAULT_SERVER_PORT;
+//		
+//		return new SocketWrapper(host, port);
+//	}
 
 
 	/**

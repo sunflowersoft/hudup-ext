@@ -18,3 +18,5 @@ export CLASSPATH=./hudup.jar:./hudup-server.jar:./hudup-evaluator.jar:./hudup-li
 echo CLASSPATH=$CLASSPATH
 
 export JAVA_CMD=java -cp $CLASSPATH
+
+export JAVAW_CMD=javaw -cp $CLASSPATH

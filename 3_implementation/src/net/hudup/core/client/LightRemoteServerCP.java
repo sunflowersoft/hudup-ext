@@ -599,7 +599,7 @@ public class LightRemoteServerCP extends JFrame {
 	 * @param args argument parameter of main method. It contains command line arguments.
 	 */
 	public static void main(String[] args) {
-		ConnectServerDlg dlg = new ConnectServerDlg();
+		ConnectDlg dlg = ConnectDlg.connectServer();
 		
 		Server server = dlg.getServer();
 		if (server != null)

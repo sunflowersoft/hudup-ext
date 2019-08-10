@@ -30,7 +30,7 @@ import net.hudup.core.PluginChangedEvent;
 import net.hudup.core.PluginChangedListener;
 import net.hudup.core.PluginStorage;
 import net.hudup.core.RegisterTable;
-import net.hudup.core.client.ConnectServerDlg;
+import net.hudup.core.client.ConnectDlg;
 import net.hudup.core.client.PowerServer;
 import net.hudup.core.client.Server;
 import net.hudup.core.client.Service;
@@ -415,22 +415,39 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 	 * @param oldGUI old GUI.
 	 */
 	public static void switchRemoteEvaluator(String selectedEvName, Window oldGUI) {
-		final ConnectServerDlg dlgConnect = new ConnectServerDlg();
-		Server server = dlgConnect.getServer();
+		ConnectDlg connectDlg = ConnectDlg.connectServer();
+		Server server = connectDlg.getServer();
+
+		Service service = null;
 		if (server == null || !(server instanceof PowerServer)) {
+			JOptionPane.showMessageDialog(null,
+					"Can't connect to server or server is not power server.\nHence, try to connect socket service",
+					"Try to connect again", JOptionPane.INFORMATION_MESSAGE);
+			System.out.println("Can't connect to server or server is not power server.\nHence, try to connect socket service");
+			connectDlg.dispose();
+			
+			connectDlg = ConnectDlg.connectSocketService();
+			service = connectDlg.getSocketService();
+		}
+		else {
+			try {
+				service = ((PowerServer)server).getService();
+			}
+			catch (Exception e) {
+				e.printStackTrace();
+				service = null;
+			}
+		}
+		
+		
+		if (service == null) {
 			JOptionPane.showMessageDialog(
-					null, "Can't connect to server or server is not power server", "Connection to server fail", JOptionPane.ERROR_MESSAGE);
+				null, "Can't retrieve service", "Retrieval to service failed", JOptionPane.ERROR_MESSAGE);
 			return;
 		}
 		
+		
 		try {
-			Service service = ((PowerServer)server).getService();
-			if (service == null) {
-				JOptionPane.showMessageDialog(
-						null, "Can't get remote service", "Connection to service fail", JOptionPane.ERROR_MESSAGE);
-				return;
-			}
-			
 			String[] evNames = service.getEvaluatorNames();
 			if (evNames == null || evNames.length == 0) {
 				JOptionPane.showMessageDialog(
@@ -448,6 +465,8 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 				}
 			}
 			
+			final Service finalService = service;
+			final ConnectDlg finalConnectDlg = connectDlg;
 			final StartDlg dlgEvStarter = new StartDlg((JFrame)null, "List of evaluators") {
 				
 				/**
@@ -460,12 +479,12 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 					// TODO Auto-generated method stub
 					String evName = (String) getItemControl().getSelectedItem();
 					try {
-						final Evaluator ev = service.getEvaluator(evName);
+						final Evaluator ev = finalService.getEvaluator(evName);
 						dispose();
 						if (oldGUI != null) oldGUI.dispose();
 						
 						ev.getPluginStorage().assignToSystem(); //This code line is very important for initializing plug-in storage.
-						run(ev, dlgConnect.getBindUri(), null);
+						run(ev, finalConnectDlg.getBindUri(), null);
 					}
 					catch (Exception e) {
 						e.printStackTrace();

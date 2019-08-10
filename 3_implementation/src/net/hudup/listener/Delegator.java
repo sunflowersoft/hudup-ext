@@ -2,15 +2,38 @@ package net.hudup.listener;
 
 import java.io.DataOutputStream;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.net.Socket;
+import java.rmi.RemoteException;
+import java.util.EventListener;
+import java.util.List;
 import java.util.Map;
 
+import javax.swing.event.EventListenerList;
+
+import net.hudup.core.PluginStorageWrapper;
+import net.hudup.core.RegisterTable;
+import net.hudup.core.alg.Alg;
+import net.hudup.core.alg.SetupAlgEvent;
+import net.hudup.core.alg.SetupAlgListener;
 import net.hudup.core.client.PowerServer;
 import net.hudup.core.client.Protocol;
 import net.hudup.core.client.Request;
 import net.hudup.core.client.Response;
+import net.hudup.core.client.ServerConfig;
 import net.hudup.core.client.Service;
+import net.hudup.core.data.DatasetPool;
 import net.hudup.core.data.MemFetcher;
+import net.hudup.core.evaluate.Evaluator;
+import net.hudup.core.evaluate.EvaluatorConfig;
+import net.hudup.core.evaluate.EvaluatorEvent;
+import net.hudup.core.evaluate.EvaluatorListener;
+import net.hudup.core.evaluate.EvaluatorProgressEvent;
+import net.hudup.core.evaluate.EvaluatorProgressListener;
+import net.hudup.core.evaluate.Metric;
+import net.hudup.core.evaluate.Metrics;
+import net.hudup.core.evaluate.NoneWrapperMetricList;
+import net.hudup.core.logistic.NetUtil;
 import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.xURI;
 import net.hudup.core.parser.HtmlParsable;
@@ -348,8 +371,13 @@ public class Delegator extends AbstractDelegator {
 			else if (action.equals(GET_SNAPSHOT))
 				return Response.create(service.getSnapshot());
 			
-			else if (action.equals(GET_EVALUATOR))
-				return Response.create(service.getEvaluator(request.evaluatorName));
+			else if (action.equals(GET_EVALUATOR)) {
+				Evaluator remoteEvaluator = service.getEvaluator(request.evaluatorName);
+				if (remoteEvaluator == null)
+					return null;
+				DelegatorEvaluator evaluator = new DelegatorEvaluator(this, remoteEvaluator);
+				return Response.create(evaluator);
+			}
 			
 			else if (action.equals(GET_EVALUATOR_NAMES))
 				return Response.create(service.getEvaluatorNames());
@@ -377,4 +405,392 @@ public class Delegator extends AbstractDelegator {
 	}
 
 	
+}
+
+
+
+/**
+ * This class is a wrapper of evaluator used for listener.
+ * 
+ * @author Loc Nguyen
+ * @version 1.0
+ *
+ */
+class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluatorProgressListener {
+
+	
+	/**
+	 * Holding a list of {@link EventListener} (s)
+	 * 
+	 */
+    protected EventListenerList listenerList = new EventListenerList();
+
+    
+    /**
+	 * Internal delegator.
+	 */
+	protected Delegator delegator = null;
+
+	
+	/**
+	 * Internal evaluator.
+	 * 
+	 */
+    protected Evaluator evaluator = null;
+
+    
+	/**
+	 * Exported flag.
+	 */
+	protected Boolean remoteExported = false;
+	
+	
+    /**
+	 * Default constructor.
+	 */
+	public DelegatorEvaluator(Delegator delegator, Evaluator evaluator) {
+		try {
+			this.delegator = delegator;
+			this.evaluator = evaluator;
+			remoteExport(((ServerConfig)delegator.server.getConfig()).getServerPort());
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	
+	@Override
+	public String getName() throws RemoteException {
+		// TODO Auto-generated method stub
+		return evaluator.getName();
+	}
+
+
+	@Override
+	public boolean acceptAlg(Alg alg) throws RemoteException {
+		// TODO Auto-generated method stub
+		return evaluator.acceptAlg(alg);
+	}
+
+
+	@Override
+	public NoneWrapperMetricList defaultMetrics() throws RemoteException {
+		// TODO Auto-generated method stub
+		return evaluator.defaultMetrics();
+	}
+
+
+	@Override
+	public String getMainUnit() throws RemoteException {
+		return evaluator.getMainUnit();
+	}
+	
+	
+	@Override
+	public Metrics getResult() throws RemoteException {
+		return evaluator.getResult();
+	}
+
+	
+	@Override
+	public List<Metric> getMetricList() throws RemoteException {
+		return evaluator.getMetricList();
+	}
+
+	
+	@Override
+	public void setMetricList(List<Metric> metricList) throws RemoteException {
+		evaluator.setMetricList(metricList);
+	}
+	
+	
+	@Override
+	public RegisterTable extractAlgFromPluginStorage() throws RemoteException {
+		return evaluator.extractAlgFromPluginStorage();
+	}
+	
+	
+	@Override
+	public PluginStorageWrapper getPluginStorage() throws RemoteException {
+		// TODO Auto-generated method stub
+		return evaluator.getPluginStorage();
+	}
+
+
+	@Override
+	public EvaluatorConfig getConfig() throws RemoteException {
+		return evaluator.getConfig();
+	}
+	
+	
+	@Override
+	public void addEvaluatorListener(EvaluatorListener listener) throws RemoteException {
+		synchronized (listenerList) {
+			listenerList.add(EvaluatorListener.class, listener);
+		}
+    }
+
+    
+	@Override
+    public void removeEvaluatorListener(EvaluatorListener listener) throws RemoteException {
+		synchronized (listenerList) {
+			listenerList.remove(EvaluatorListener.class, listener);
+		}
+    }
+	
+    
+    /**
+     * Return a {@link EvaluatorListener} list for this evaluator.
+     * 
+     * @return array of {@link EvaluatorListener} for this evaluator.
+     * 
+     */
+    protected EvaluatorListener[] getEvaluatorListeners() {
+		synchronized (listenerList) {
+			return listenerList.getListeners(EvaluatorListener.class);
+		}
+    }
+
+    
+    /**
+     * Firing (issuing) an event from this evaluator to all listeners. 
+     * 
+     * @param evt event from this evaluator.
+     */
+    protected void fireEvaluatorEvent(EvaluatorEvent evt) {
+    	
+		EvaluatorListener[] listeners = getEvaluatorListeners();
+		
+		for (EvaluatorListener listener : listeners) {
+			try {
+				listener.receivedEvaluation(evt);
+			}
+			catch (Throwable e) {
+				e.printStackTrace();
+			}
+		}
+	
+    }
+
+    
+    @Override
+	public void receivedEvaluation(EvaluatorEvent evt) throws RemoteException {
+		// TODO Auto-generated method stub
+    	fireEvaluatorEvent(evt);
+	}
+
+
+	@Override
+	public void addProgressListener(EvaluatorProgressListener listener) throws RemoteException {
+		synchronized (listenerList) {
+			listenerList.add(EvaluatorProgressListener.class, listener);
+		}
+    }
+
+    
+    @Override
+    public void removeProgressListener(EvaluatorProgressListener listener) throws RemoteException {
+		synchronized (listenerList) {
+			listenerList.remove(EvaluatorProgressListener.class, listener);
+		}
+    }
+	
+    
+    /**
+     * Getting an array of evaluation progress listener.
+     * @return array of {@link ProgressListener} (s).
+     */
+    protected EvaluatorProgressListener[] getProgressListeners() {
+		synchronized (listenerList) {
+			return listenerList.getListeners(EvaluatorProgressListener.class);
+		}
+    }
+    
+    
+    /**
+     * Firing {@link ProgressEvent}.
+     * @param evt the specified for evaluation progress.
+     */
+    protected void fireProgressEvent(EvaluatorProgressEvent evt) {
+    	EvaluatorProgressListener[] listeners = getProgressListeners();
+		
+		for (EvaluatorProgressListener listener : listeners) {
+			try {
+				listener.receivedProgress(evt);
+			}
+			catch (Throwable e) {
+				e.printStackTrace();
+			}
+		}
+	
+    }
+
+
+    @Override
+	public void receivedProgress(EvaluatorProgressEvent evt) throws RemoteException {
+		// TODO Auto-generated method stub
+		fireProgressEvent(evt);
+	}
+
+
+	@Override
+	public void addSetupAlgListener(SetupAlgListener listener) throws RemoteException {
+		synchronized (listenerList) {
+			listenerList.add(SetupAlgListener.class, listener);
+		}
+    }
+
+    
+    @Override
+    public void removeSetupAlgListener(SetupAlgListener listener) throws RemoteException {
+		synchronized (listenerList) {
+			listenerList.remove(SetupAlgListener.class, listener);
+		}
+    }
+	
+    
+    /**
+     * Getting an array of setup algorithm listeners.
+     * @return array of setup algorithm listeners.
+     */
+    protected SetupAlgListener[] getSetupAlgListeners() {
+		synchronized (listenerList) {
+			return listenerList.getListeners(SetupAlgListener.class);
+		}
+    }
+    
+    
+    /**
+     * Firing setup algorithm event.
+     * @param evt the specified for setup algorithm event.
+     */
+    protected void fireSetupAlgEvent(SetupAlgEvent evt) {
+    	SetupAlgListener[] listeners = getSetupAlgListeners();
+		
+		for (SetupAlgListener listener : listeners) {
+			try {
+				listener.receivedSetup(evt);
+			}
+			catch (Throwable e) {
+				e.printStackTrace();
+			}
+		}
+	
+    }
+
+    
+	@Override
+	public void receivedSetup(SetupAlgEvent evt) throws RemoteException {
+		// TODO Auto-generated method stub
+		fireSetupAlgEvent(evt);
+	}
+
+
+	@Override
+	public void remoteStart(List<Alg> algList, DatasetPool pool, Serializable parameter) throws RemoteException {
+		// TODO Auto-generated method stub
+		evaluator.remoteStart(algList, pool, parameter);
+	}
+
+	
+	@Override
+	public void remotePause() throws RemoteException {
+		// TODO Auto-generated method stub
+		evaluator.remotePause();
+	}
+
+	
+	@Override
+	public void remoteResume() throws RemoteException {
+		// TODO Auto-generated method stub
+		evaluator.remoteResume();
+	}
+
+	
+	@Override
+	public void remoteStop() throws RemoteException {
+		// TODO Auto-generated method stub
+		evaluator.remoteStop();
+	}
+
+	
+	@Override
+	public void remoteForceStop() throws RemoteException {
+		// TODO Auto-generated method stub
+		evaluator.remoteForceStop();
+	}
+
+	
+	@Override
+	public boolean remoteIsStarted() throws RemoteException {
+		// TODO Auto-generated method stub
+		return evaluator.remoteIsStarted();
+	}
+
+	
+	@Override
+	public boolean remoteIsPaused() throws RemoteException {
+		// TODO Auto-generated method stub
+		return evaluator.remoteIsPaused();
+	}
+
+	
+	@Override
+	public boolean remoteIsRunning() throws RemoteException {
+		// TODO Auto-generated method stub
+		return evaluator.remoteIsRunning();
+	}
+
+
+	@Override
+	public synchronized void remoteExport(int serverPort) throws RemoteException {
+		// TODO Auto-generated method stub
+		synchronized (remoteExported) {
+			if (!remoteExported) {
+				NetUtil.RegistryRemote.export(this, serverPort);
+
+				evaluator.addEvaluatorListener(this);
+				evaluator.addProgressListener(this);
+				evaluator.addSetupAlgListener(this);
+				
+				delegator.server.incRequest();
+				remoteExported = true;
+			}
+		}
+	}
+
+
+	@Override
+	public synchronized void remoteUnexport() throws RemoteException {
+		// TODO Auto-generated method stub
+		synchronized (remoteExported) {
+			if (remoteExported) {
+				evaluator.removeEvaluatorListener(this);
+				evaluator.removeProgressListener(this);
+				evaluator.removeSetupAlgListener(this);
+				evaluator.remoteUnexport();
+				
+				delegator.server.decRequest();
+				NetUtil.RegistryRemote.unexport(this);
+				remoteExported = false;
+			}
+		}
+	}
+
+
+	@Override
+	protected void finalize() throws Throwable {
+		// TODO Auto-generated method stub
+		super.finalize();
+		
+		try {
+			remoteUnexport();
+		}
+		catch (Throwable e) {
+			e.printStackTrace();
+		}
+	}
+			
+
 }

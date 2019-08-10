@@ -96,7 +96,7 @@ import net.hudup.core.logistic.ui.ProgressListener;
  * @version 10.0
  *
  */
-public abstract class AbstractEvaluator extends AbstractRunner implements Evaluator, SetupAlgListener {
+public abstract class AbstractEvaluator extends AbstractRunner implements Evaluator {
 
 	
 	/**
@@ -441,6 +441,10 @@ public abstract class AbstractEvaluator extends AbstractRunner implements Evalua
 	protected abstract Serializable extractTestValue(Alg alg, Profile testingProfile);
 	
 	
+	/**
+	 * As usual, the GUI receives event but this set up event is issued by algorithm.
+	 * Hence, this evaluator receives the set up event and then passes it to the GUI.
+	 */
 	@Override
 	public void receivedSetup(SetupAlgEvent evt) throws RemoteException {
 		// TODO Auto-generated method stub
