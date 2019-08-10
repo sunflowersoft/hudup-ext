@@ -4,6 +4,7 @@
 package net.hudup.core.client;
 
 import java.io.BufferedReader;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
@@ -33,9 +34,9 @@ public class SocketConnection extends SocketWrapper {
 	
 	
 	/**
-	 * Reader for reading data from network socket.
+	 * Input stream for reading data from network socket.
 	 */
-	protected BufferedReader in = null;
+	protected InputStream in = null;
 	
 	
 	/**
@@ -62,7 +63,7 @@ public class SocketConnection extends SocketWrapper {
 			
 			socket = new Socket(host, port);
 			out = new PrintWriter(socket.getOutputStream(), true);
-			in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+			in = socket.getInputStream();
 			
 			boolean validated = validateAccount(account, password, priv);
 			if (!validated)
@@ -95,22 +96,28 @@ public class SocketConnection extends SocketWrapper {
 			return null;
 		}
 		
-		String responseText = null;
+		//String responseText = null;
 		try {
 			out.println(request.toJson());
 			
-			responseText = in.readLine();
+			if (request.action.equals(GET_EVALUATOR)) {
+				return Response.parse(in);
+			}
+			else {
+				BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+				String responseText = reader.readLine();
+				if (responseText == null)
+					return null;
+				else
+					return Response.parse(responseText);
+			}
 		}
 		catch (Exception e) {
 			e.printStackTrace();
 			logger.error("Socket sends request to server, causes error " + e.getMessage());
-			responseText = null;
 		}
 		
-		if (responseText == null)
-			return null;
-		else
-			return Response.parse(responseText);
+		return null;
 	}
 	
 	

@@ -31,8 +31,6 @@ import net.hudup.core.PluginChangedListener;
 import net.hudup.core.PluginStorage;
 import net.hudup.core.RegisterTable;
 import net.hudup.core.client.ConnectDlg;
-import net.hudup.core.client.PowerServer;
-import net.hudup.core.client.Server;
 import net.hudup.core.client.Service;
 import net.hudup.core.evaluate.AbstractEvaluator;
 import net.hudup.core.evaluate.Evaluator;
@@ -415,31 +413,9 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 	 * @param oldGUI old GUI.
 	 */
 	public static void switchRemoteEvaluator(String selectedEvName, Window oldGUI) {
-		ConnectDlg connectDlg = ConnectDlg.connectServer();
-		Server server = connectDlg.getServer();
+		ConnectDlg connectDlg = ConnectDlg.connect();
+		Service service = connectDlg.getService();
 
-		Service service = null;
-		if (server == null || !(server instanceof PowerServer)) {
-			JOptionPane.showMessageDialog(null,
-					"Can't connect to server or server is not power server.\nHence, try to connect socket service",
-					"Try to connect again", JOptionPane.INFORMATION_MESSAGE);
-			System.out.println("Can't connect to server or server is not power server.\nHence, try to connect socket service");
-			connectDlg.dispose();
-			
-			connectDlg = ConnectDlg.connectSocketService();
-			service = connectDlg.getSocketService();
-		}
-		else {
-			try {
-				service = ((PowerServer)server).getService();
-			}
-			catch (Exception e) {
-				e.printStackTrace();
-				service = null;
-			}
-		}
-		
-		
 		if (service == null) {
 			JOptionPane.showMessageDialog(
 				null, "Can't retrieve service", "Retrieval to service failed", JOptionPane.ERROR_MESSAGE);

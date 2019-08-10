@@ -6,8 +6,10 @@ import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.rmi.Remote;
+import java.rmi.RemoteException;
 
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -35,6 +37,30 @@ public abstract class ConnectDlg extends JDialog {
 	 * Serial version UID for serializable class. 
 	 */
 	private static final long serialVersionUID = 1L;
+	
+	
+	/**
+	 * Server connection.
+	 */
+	protected final static String SERVER_CONNECT = "Server";
+	
+	
+	/**
+	 * RMI service connection.
+	 */
+	protected final static String RMI_SERVICE_CONNECT = "RMI service";
+
+	
+	/**
+	 * Socket service connection.
+	 */
+	protected final static String SOCKET_SERVICE_CONNECT = "Socket service";
+
+	
+	/**
+	 * Connection type.
+	 */
+	protected JComboBox<String> cmbConnectType = null;
 	
 	
 	/**
@@ -70,7 +96,7 @@ public abstract class ConnectDlg extends JDialog {
 	/**
 	 * Default constructor.
 	 */
-	public ConnectDlg() {
+	protected ConnectDlg() {
 		super((JFrame)null, "Remote connection", true);
 		
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
@@ -88,6 +114,7 @@ public abstract class ConnectDlg extends JDialog {
 		JPanel left = new JPanel(new GridLayout(0, 1));
 		header.add(left, BorderLayout.WEST);
 		
+		left.add(new JLabel("Connection type:"));
 		left.add(new JLabel("Remote host:"));
 		left.add(new JLabel("Remote port:"));
 		left.add(new JLabel("Remote username:"));
@@ -95,6 +122,11 @@ public abstract class ConnectDlg extends JDialog {
 		
 		JPanel right = new JPanel(new GridLayout(0, 1));
 		header.add(right, BorderLayout.CENTER);
+		
+		cmbConnectType = new JComboBox<String>(new String[] {
+				SERVER_CONNECT, RMI_SERVICE_CONNECT, SOCKET_SERVICE_CONNECT
+			});
+		right.add(cmbConnectType);
 		
 		txtRemoteHost = new JTextField("localhost");
 		right.add(txtRemoteHost);
@@ -138,36 +170,74 @@ public abstract class ConnectDlg extends JDialog {
 	
 	
 	/**
-	 * Getting RMI server.
-	 * @return RMI server.
+	 * Testing whether connecting to server.
+	 * @return true if connecting to server.
+	 */
+	public boolean isServer() {
+		if (connector == null)
+			return false;
+		else
+			return (connector instanceof Server);
+	}
+
+	/**
+	 * Getting server.
+	 * @return server.
 	 */
 	public Server getServer() {
-		return (Server)connector;
+		if (isServer())
+			return (Server)connector;
+		else
+			return null;
 	}
 
 	
 	/**
-	 * Getting RMI service.
-	 * @return RMI service.
+	 * Testing whether connecting to service.
+	 * @return true if connecting to service.
 	 */
-	public Service getRmiService() {
-		return (Service)connector;
+	public boolean isService() {
+		if (connector == null)
+			return false;
+		else
+			return (connector instanceof Service);
 	}
-
+	
 	
 	/**
-	 * Getting socket service.
-	 * @return socket service.
+	 * Getting service.
+	 * @return service.
 	 */
-	public SocketConnection getSocketService() {
-		return (SocketConnection)connector;
+	public Service getService() {
+		if (connector == null)
+			return null;
+		else if (isService())
+			return (Service)connector;
+		else if (isServer()) {
+			Server server = getServer();
+			if (server instanceof PowerServer) {
+				try {
+					return ((PowerServer)server).getService();
+				}
+				catch (RemoteException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+				return null;
+			}
+			else
+				return null;
+		}
+		else
+			return null;
 	}
 
 	
 	/**
 	 * Connect to remote server / service.
 	 */
-	protected abstract void connect();
+	protected abstract void connect0();
 	
 	
 	/**
@@ -184,10 +254,10 @@ public abstract class ConnectDlg extends JDialog {
 	
 	
 	/**
-	 * Connecting server.
+	 * Connecting to server or service.
 	 * @return connection dialog.
 	 */
-	public static ConnectDlg connectServer() {
+	public static ConnectDlg connect() {
 		return new ConnectDlg() {
 			
 			/**
@@ -197,95 +267,35 @@ public abstract class ConnectDlg extends JDialog {
 
 			@SuppressWarnings("deprecation")
 			@Override
-			protected void connect() {
+			protected void connect0() {
 				// TODO Auto-generated method stub
 				String remoteHost = txtRemoteHost.getText().trim();
 				String remotePort_s = txtRemotePort.getText().trim();
 				int remotePort = -1;
 				if (!remotePort_s.isEmpty()) remotePort = Integer.parseInt(remotePort_s);
-					
-				connector = DriverManager.getRemoteServer(remoteHost, remotePort, txtRemoteUsername.getText(), txtRemotePassword.getText());
+				
+				String connectType = cmbConnectType.getSelectedItem().toString();
+				if (connectType.equals(SERVER_CONNECT))
+					connector = DriverManager.getRemoteServer(remoteHost, remotePort, txtRemoteUsername.getText(), txtRemotePassword.getText());
+				else if (connectType.equals(RMI_SERVICE_CONNECT))
+					connector = DriverManager.getRemoteService(remoteHost, remotePort, txtRemoteUsername.getText(), txtRemotePassword.getText());
+				else if (connectType.equals(SOCKET_SERVICE_CONNECT))
+					connector = DriverManager.getSocketConnection(remoteHost, remotePort, txtRemoteUsername.getText(), txtRemotePassword.getText());
+				else
+					connector = null;
 				
 				if (connector == null) {
 					JOptionPane.showMessageDialog(
 						this, "Can't connect to server", "Can't connect to server", JOptionPane.ERROR_MESSAGE);
 				}
-				else {
-					dispose();
-				}
-			}
-		};
-	}
-	
-	
-	/**
-	 * Connecting RMI service.
-	 * @return connection dialog.
-	 */
-	public static ConnectDlg connectRmiService() {
-		return new ConnectDlg() {
-			
-			/**
-			 * Default serial version UID.
-			 */
-			private static final long serialVersionUID = 1L;
-
-			@SuppressWarnings("deprecation")
-			@Override
-			protected void connect() {
-				// TODO Auto-generated method stub
-				String remoteHost = txtRemoteHost.getText().trim();
-				String remotePort_s = txtRemotePort.getText().trim();
-				int remotePort = -1;
-				if (!remotePort_s.isEmpty()) remotePort = Integer.parseInt(remotePort_s);
-					
-				connector = DriverManager.getRemoteService(remoteHost, remotePort, txtRemoteUsername.getText(), txtRemotePassword.getText());
 				
-				if (connector == null) {
-					JOptionPane.showMessageDialog(
-						this, "Can't connect to RMI service", "Can't connect to RMI service", JOptionPane.ERROR_MESSAGE);
-				}
-				else {
-					dispose();
-				}
+				dispose();
 			}
 		};
+		
 	}
-
 	
-	/**
-	 * Connecting socket service.
-	 * @return connection dialog.
-	 */
-	public static ConnectDlg connectSocketService() {
-		return new ConnectDlg() {
-			
-			/**
-			 * Default serial version UID.
-			 */
-			private static final long serialVersionUID = 1L;
-
-			@SuppressWarnings("deprecation")
-			@Override
-			protected void connect() {
-				// TODO Auto-generated method stub
-				String remoteHost = txtRemoteHost.getText().trim();
-				String remotePort_s = txtRemotePort.getText().trim();
-				int remotePort = -1;
-				if (!remotePort_s.isEmpty()) remotePort = Integer.parseInt(remotePort_s);
-					
-				connector = DriverManager.getSocketConnection(remoteHost, remotePort, txtRemoteUsername.getText(), txtRemotePassword.getText());
-				
-				if (connector == null) {
-					JOptionPane.showMessageDialog(
-						this, "Can't connect to socket service", "Can't connect to socket service", JOptionPane.ERROR_MESSAGE);
-				}
-				else {
-					dispose();
-				}
-			}
-		};
-	}
+	
 
 	
 }

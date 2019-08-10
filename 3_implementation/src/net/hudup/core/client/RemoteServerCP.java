@@ -561,7 +561,7 @@ public class RemoteServerCP extends JFrame implements ServerStatusListener {
 	 * @param args argument parameter of main method. It contains command line arguments.
 	 */
 	public static void main(String[] args) {
-		ConnectDlg dlg = ConnectDlg.connectServer();
+		ConnectDlg dlg = ConnectDlg.connect();
 		
 		Server server = dlg.getServer();
 		if (server != null)

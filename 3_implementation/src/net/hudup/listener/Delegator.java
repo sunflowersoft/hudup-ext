@@ -20,7 +20,6 @@ import net.hudup.core.client.PowerServer;
 import net.hudup.core.client.Protocol;
 import net.hudup.core.client.Request;
 import net.hudup.core.client.Response;
-import net.hudup.core.client.ServerConfig;
 import net.hudup.core.client.Service;
 import net.hudup.core.data.DatasetPool;
 import net.hudup.core.data.MemFetcher;
@@ -36,6 +35,8 @@ import net.hudup.core.evaluate.NoneWrapperMetricList;
 import net.hudup.core.logistic.NetUtil;
 import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.xURI;
+import net.hudup.core.logistic.ui.ProgressEvent;
+import net.hudup.core.logistic.ui.ProgressListener;
 import net.hudup.core.parser.HtmlParsable;
 
 
@@ -183,7 +184,10 @@ public class Delegator extends AbstractDelegator {
 		try {
 			if (protocol == HDP_PROTOCOL) {
 				Response response = processRequest(request);
-				out.write( (response.toJson() + "\n").getBytes() );
+				if (request.action.equals(GET_EVALUATOR))
+					response.toObject(out);
+				else
+					out.write( (response.toJson() + "\n").getBytes() );
 			}
 			else if (protocol == HTTP_PROTOCOL) {
 				String action = request.action;
@@ -376,7 +380,7 @@ public class Delegator extends AbstractDelegator {
 				if (remoteEvaluator == null)
 					return null;
 				DelegatorEvaluator evaluator = new DelegatorEvaluator(this, remoteEvaluator);
-				return Response.create(evaluator);
+				return Response.create(evaluator.stub);
 			}
 			
 			else if (action.equals(GET_EVALUATOR_NAMES))
@@ -445,6 +449,12 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluatorProgr
 	protected Boolean remoteExported = false;
 	
 	
+	/**
+	 * Stub object as evaluator.
+	 */
+	protected Evaluator stub = null;
+	
+	
     /**
 	 * Default constructor.
 	 */
@@ -452,7 +462,7 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluatorProgr
 		try {
 			this.delegator = delegator;
 			this.evaluator = evaluator;
-			remoteExport(((ServerConfig)delegator.server.getConfig()).getServerPort());
+			remoteExport(((ListenerConfig)delegator.server.getConfig()).getExportPort());
 		}
 		catch (Exception e) {
 			e.printStackTrace();
@@ -748,7 +758,7 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluatorProgr
 		// TODO Auto-generated method stub
 		synchronized (remoteExported) {
 			if (!remoteExported) {
-				NetUtil.RegistryRemote.export(this, serverPort);
+				stub = (Evaluator)NetUtil.RegistryRemote.export(this, 10153);
 
 				evaluator.addEvaluatorListener(this);
 				evaluator.addProgressListener(this);
@@ -773,6 +783,8 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluatorProgr
 				
 				delegator.server.decRequest();
 				NetUtil.RegistryRemote.unexport(this);
+				stub = null;
+				delegator.stop();
 				remoteExported = false;
 			}
 		}

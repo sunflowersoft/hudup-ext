@@ -1079,7 +1079,7 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 	 * @param args specified arguments.
 	 */
 	public static void main(String[] args) {
-		ConnectDlg dlg = ConnectDlg.connectServer();
+		ConnectDlg dlg = ConnectDlg.connect();
 		
 		Server server = dlg.getServer();
 		if (server != null)

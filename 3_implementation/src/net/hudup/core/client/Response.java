@@ -1,5 +1,11 @@
 package net.hudup.core.client;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
+
 import net.hudup.core.Util;
 import net.hudup.core.data.AttributeList;
 import net.hudup.core.data.BooleanWrapper;
@@ -438,6 +444,43 @@ public class Response extends ProtocolParam {
 	 */
 	public static Response parse(String jsonText) {
 		return (Response) Util.getJsonParser().parseJson(jsonText);
+	}
+	
+	
+	/**
+	 * Serialize this response.
+	 * @param out output stream.
+	 */
+	public void toObject(OutputStream out) {
+		try {
+			ObjectOutputStream objectOut = new ObjectOutputStream(out);
+			objectOut.writeObject(this);
+		}
+		catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
+	
+	
+	/**
+	 * Deserializing stream data into the response object
+	 * @param in input stream.
+	 * @return Deserialized response from stream data.
+	 */
+	public static Response parse(InputStream in) {
+		try {
+			ObjectInputStream objectIn = new ObjectInputStream(in);
+			return (Response)objectIn.readObject();
+		}
+		catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return null;
+		
 	}
 	
 	

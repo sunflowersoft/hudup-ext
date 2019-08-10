@@ -692,7 +692,7 @@ public class ListenerCP extends JFrame implements ServerStatusListener {
 	 * @param args The argument parameter of main method. It contains command line arguments.
 	 */
 	public static void main(String[] args) {
-		ConnectDlg dlg = ConnectDlg.connectServer();
+		ConnectDlg dlg = ConnectDlg.connect();
 		Image image = UIUtil.getImage("listener-32x32.png");
         if (image != null)
         	dlg.setIconImage(image);

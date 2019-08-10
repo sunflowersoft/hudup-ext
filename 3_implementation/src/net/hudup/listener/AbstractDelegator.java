@@ -2,6 +2,7 @@ package net.hudup.listener;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
 
@@ -87,7 +88,21 @@ public abstract class AbstractDelegator extends ProtocolImpl implements Runner {
 			
 			userSession.clear();
 			String requestText = null;
-			while ( (!socket.isClosed()) && (requestText = in.readLine()) != null ) {
+			while (!socket.isClosed()) {
+				try {
+					requestText = in.readLine(); //Wait here.
+				}
+				catch (IOException e) {
+					if (!socket.isClosed())
+						e.printStackTrace();
+					else
+						logger.info("Error by socket interupted.");
+					
+					requestText = null;
+					break;
+				}
+				if (requestText == null)
+					break;
 				
 				synchronized (this) {
 					Request request = parseRequest(requestText);
