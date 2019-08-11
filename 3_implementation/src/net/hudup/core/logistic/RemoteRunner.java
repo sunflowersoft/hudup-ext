@@ -1,6 +1,7 @@
 package net.hudup.core.logistic;
 
 import java.io.Serializable;
+import java.rmi.Remote;
 import java.rmi.RemoteException;
 
 /**
@@ -10,7 +11,7 @@ import java.rmi.RemoteException;
  * @version 1.0
  *
  */
-public interface RemoteRunner {
+public interface RemoteRunner extends Remote {
 	
 	
 	/**

@@ -853,6 +853,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			logger.error("Error in evaluation");
+			updateMode(); //Added date: 2019.08.12 by Loc Nguyen
 		}
 	}
 

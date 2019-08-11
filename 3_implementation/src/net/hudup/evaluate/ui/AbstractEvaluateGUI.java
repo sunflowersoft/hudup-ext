@@ -249,6 +249,7 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			updateMode(); //Added date: 2019.08.12 by Loc Nguyen
 		}
 	}
 	
@@ -272,6 +273,7 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			updateMode(); //Added date: 2019.08.12 by Loc Nguyen
 		}
 	}
 	

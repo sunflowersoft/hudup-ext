@@ -21,6 +21,7 @@ import net.hudup.core.data.DataConfig;
 import net.hudup.core.logistic.AbstractRunner;
 import net.hudup.core.logistic.I18nUtil;
 import net.hudup.core.logistic.NetUtil;
+import net.hudup.core.logistic.RemoteRunner;
 import net.hudup.core.logistic.Runner;
 import net.hudup.core.logistic.RunnerThread;
 
@@ -74,6 +75,18 @@ public abstract class SocketServer extends AbstractRunner implements Server {
 	 * </code> 
 	 */
 	protected boolean shutdownHookStatus = false;
+	
+	
+	/**
+	 * List of internal runners.
+	 */
+	protected List<Object> internalRunners = Util.newList(); //Added date 2019.09.11 by Loc Nguyen
+	
+	
+	/**
+	 * Flag for some uses.
+	 */
+	protected Boolean flag = false;
 	
 	
 	/**
@@ -196,11 +209,13 @@ public abstract class SocketServer extends AbstractRunner implements Server {
 		// TODO Auto-generated method stub
 		if (isRunning()) {
 		
+			pauseInternalRunners(); //Added date: 2019.08.11 by Loc Nguyen.
+			pauseDelegators();
+
 			destroyTimer();
 			new SocketWrapper("localhost", 
 					config.getServerPort()).sendQuitRequest();
 			super.pause();
-			pauseDelegators();
 			
 			fireStatusEvent(new ServerStatusEvent(this, Status.paused));
 			logger.info("Socket server paused");
@@ -213,7 +228,9 @@ public abstract class SocketServer extends AbstractRunner implements Server {
 		// TODO Auto-generated method stub
 		if (isPaused()) {
 		
-			resumeDelegators(); //Fixing bug date: 2019.08.11 by Loc Nguyen. Resume all delegators first.
+			resumeInternalRunners(); //Added date: 2019.08.11 by Loc Nguyen.
+			resumeDelegators(); //Added date: 2019.08.11 by Loc Nguyen. Resume all delegators first.
+			
 			super.resume();
 			createTimer();
 			
@@ -231,11 +248,13 @@ public abstract class SocketServer extends AbstractRunner implements Server {
 		
 		logger.info("Socket server prepare to stop, please waiting...");
 		
+		stopInternalRunners(); //Added date 2019.09.11 by Loc Nguyen
+		stopDelegators();
+
 		destroyTimer();
 		if (!paused)
 			new SocketWrapper("localhost", config.getServerPort()).sendQuitRequest();
 		super.stop();
-		stopDelegators();
 		
 		fireStatusEvent(new ServerStatusEvent(this, Status.stopped));
 		logger.info("Socket server stopped");
@@ -266,9 +285,13 @@ public abstract class SocketServer extends AbstractRunner implements Server {
 
 	
 	@Override
-	protected void clear() {
+	protected synchronized void clear() {
 		// TODO Auto-generated method stub
 		destroyServerSocket();
+		
+		synchronized(internalRunners) {
+			internalRunners.clear();
+		}
 	}
 
 	
@@ -580,16 +603,25 @@ public abstract class SocketServer extends AbstractRunner implements Server {
 	 * Note, a delegator when is responsible for handling and processing incoming request that server dispatches to it.
 	 */
 	protected void pauseDelegators() {
-		List<AbstractDelegator> delegators = getDelegators();
-		for (AbstractDelegator delegator : delegators) {
-			try {
-				delegator.pause();
+		new Thread() {
+
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+				super.run();
+				
+				List<AbstractDelegator> delegators = getDelegators();
+				for (AbstractDelegator delegator : delegators) {
+					try {
+						delegator.pause();
+					}
+					catch (Throwable e) {
+						e.printStackTrace();
+				        logger.error("Socket server fail to pause delegator, caused by " + e.getMessage());
+					}
+				}
 			}
-			catch (Throwable e) {
-				e.printStackTrace();
-		        logger.error("Socket server fail to pause delegator, caused by " + e.getMessage());
-			}
-		}
+		}.start();
 		
 	}
 	
@@ -622,5 +654,118 @@ public abstract class SocketServer extends AbstractRunner implements Server {
 		return I18nUtil.getMessage(config, key);
 	}
 
+	
+	//Added date 2019.09.11 by Loc Nguyen
+	/**
+	 * Add runner.
+	 * @param runner runnable object.
+	 */
+	protected void addRunner(Object runner) {
+		if (!(runner instanceof Runner) && !(runner instanceof RemoteRunner))
+			return;
+		
+		synchronized (internalRunners) {
+			internalRunners.add(runner);
+		}
+	}
+	
+	
+	//Added date 2019.09.11 by Loc Nguyen
+	/**
+	 * Remove runner.
+	 * @param runner runnable object.
+	 */
+	protected void removeRunner(Object runner) {
+		synchronized (internalRunners) {
+			internalRunners.remove(runner);
+		}
+	}
+	
+	
+	//Added date 2019.09.11 by Loc Nguyen
+	/**
+	 * Pause internal runners.
+	 */
+	protected void pauseInternalRunners() {
+		synchronized (internalRunners) {
+			synchronized (flag) {
+				flag = true;
+				for (Object runner : internalRunners) {
+					try {
+						if (runner instanceof Runner)
+							((Runner)runner).pause();
+						else if (runner instanceof RemoteRunner)
+							((RemoteRunner)runner).remotePause();
+					}
+					catch (Throwable e) {
+						e.printStackTrace();
+					}
+				}
+				flag = false;
+			}
+		}
+	}
+	
+	
+	//Added date 2019.09.11 by Loc Nguyen
+	/**
+	 * Resume internal runners.
+	 */
+	protected void resumeInternalRunners() {
+		synchronized (internalRunners) {
+			synchronized (flag) {
+				flag = true;
+				for (Object runner : internalRunners) {
+					try {
+						if (runner instanceof Runner)
+							((Runner)runner).resume();
+						else if (runner instanceof RemoteRunner)
+							((RemoteRunner)runner).remoteResume();
+					}
+					catch (Throwable e) {
+						e.printStackTrace();
+					}
+				}
+				flag = false;
+			}
+		}
+	}
+
+	
+	//Added date 2019.09.11 by Loc Nguyen
+	/**
+	 * Stop internal runners.
+	 */
+	protected void stopInternalRunners() {
+		synchronized (internalRunners) {
+			synchronized (flag) {
+				flag = true;
+				for (Object runner : internalRunners) {
+					try {
+						if (runner instanceof Runner)
+							((Runner)runner).stop();
+						else if (runner instanceof RemoteRunner)
+							((RemoteRunner)runner).remoteStop();
+					}
+					catch (Throwable e) {
+						e.printStackTrace();
+					}
+				}
+				flag = false;
+			}
+		}
+	}
+
+
+	/**
+	 * Getting flag.
+	 * @return flag for some uses.
+	 */
+	protected boolean getFlag() {
+		synchronized (flag) {
+			return flag;
+		}
+	}
+	
 	
 }

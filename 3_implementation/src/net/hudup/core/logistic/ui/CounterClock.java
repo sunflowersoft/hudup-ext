@@ -88,7 +88,7 @@ public class CounterClock extends AbstractRunner {
 
 	
 	@Override
-	protected void clear() {
+	protected synchronized void clear() {
 		// TODO Auto-generated method stub
 		
 	}

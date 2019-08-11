@@ -522,7 +522,7 @@ public abstract class AbstractEvaluator extends AbstractRunner implements Evalua
 
 
 	@Override
-	protected void clear() {
+	protected synchronized void clear() {
 		// TODO Auto-generated method stub
 		this.algList = null;
 		this.pool = null;

@@ -74,13 +74,13 @@ public abstract class AbstractRunner implements Runner {
 
 	
 	/**
-	 * The actual tasks (works) which are performed when runner is running.
+	 * The actual tasks (works) which are performed when runner is running. This method should not be synchronized because it is called inside the loop of run method.
 	 */
 	public abstract void task();
 	
 	
 	/**
-	 * Clearing all resources after runner run (stopped).
+	 * Clearing all resources after runner run (stopped). This method should be synchronized so as to prevent calling it unexpectedly.
 	 */
 	protected abstract void clear();
 	

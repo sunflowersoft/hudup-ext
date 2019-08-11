@@ -20,7 +20,6 @@ import net.hudup.core.client.PowerServer;
 import net.hudup.core.client.Protocol;
 import net.hudup.core.client.Request;
 import net.hudup.core.client.Response;
-import net.hudup.core.client.ServerConfig;
 import net.hudup.core.client.Service;
 import net.hudup.core.data.DatasetPool;
 import net.hudup.core.data.MemFetcher;
@@ -58,38 +57,38 @@ public class Delegator extends AbstractDelegator {
 	 * The power server binds with this delegator.
 	 * The delegator dispatches request to this server.
 	 * The result of recommendation process from server, represented by {@link Response}, is sent back to users/applications by delegator.
-	 * In fact, the service {@link #service} of this server processed the request.
+	 * In fact, the service {@link #remoteService} of this server processed the request.
 	 */
-	protected PowerServer server = null;
+	protected PowerServer remoteServer = null;
 
 	
 	/**
-	 * The service of the binding server {@link #server} actually processes request from the delegator.
+	 * The service of the binding server {@link #remoteServer} actually processes request from the delegator.
 	 */
-	protected Service service = null;
+	protected Service remoteService = null;
 	
 	
 	/**
 	 * Constructor with specified socket and power server.
-	 * @param server power server binds with this delegator.
+	 * @param remoteServer power server binds with this delegator.
 	 * @param socket specified Java socket for receiving (reading) requests from client and sending back (writing) responses to client via input / output streams.
-	 * @param socketConfig socket configuration.
+	 * @param socketServer socket server is often listener.
 	 * The delegator dispatches request to this server.
 	 * The result of recommendation process from server, represented by {@link Response}, is sent back to users/applications by delegator.
-	 * In fact, the service {@link #service} of this server processed the request.
+	 * In fact, the service {@link #remoteService} of this server processed the request.
 	 */
-	public Delegator(PowerServer server, Socket socket, ServerConfig socketConfig) {
-		super(socket, socketConfig);
+	public Delegator(PowerServer remoteServer, Socket socket, SocketServer socketServer) {
+		super(socket, socketServer);
 		
-		this.server = server;
+		this.remoteServer = remoteServer;
 		
 		try {
-			this.service = server.getService();
+			this.remoteService = remoteServer.getService();
 		} 
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			this.service = null;
+			this.remoteService = null;
 			
 			logger.error("Delegator fail to be constructed in constructor method, causes error " + e.getMessage());
 		}
@@ -100,7 +99,7 @@ public class Delegator extends AbstractDelegator {
 	public void run() {
 		// TODO Auto-generated method stub
 		try {
-			server.incRequest();
+			remoteServer.incRequest();
 		} 
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
@@ -111,13 +110,17 @@ public class Delegator extends AbstractDelegator {
 		super.run();
 		
 		try {
-			server.decRequest();
+			remoteServer.decRequest();
 		} 
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			logger.error("Delegator fail to decrease server request, causes error " + e.getMessage());
 		}
+		
+		//Clear extra data.
+		remoteServer = null;
+		remoteService = null;
 	}
 	
 	
@@ -262,123 +265,123 @@ public class Delegator extends AbstractDelegator {
 			String action = request.action;
 			
 			if (action.equals(Protocol.ESTIMATE))
-				return Response.create(service.estimate(request.recommend_param, request.queryids));
+				return Response.create(remoteService.estimate(request.recommend_param, request.queryids));
 			
 			else if (action.equals(RECOMMEND))
-				return Response.create(service.recommend(request.recommend_param, request.max_recommend));
+				return Response.create(remoteService.recommend(request.recommend_param, request.max_recommend));
 			
 			else if (action.equals(RECOMMEND_USER))
-				return Response.create(service.recommend(request.userid, request.max_recommend));
+				return Response.create(remoteService.recommend(request.userid, request.max_recommend));
 			
 			else if (action.equals(RECOMMENDLET))
-				return Response.create(service.recommend(request.host, request.port, request.reg_name, 
+				return Response.create(remoteService.recommend(request.host, request.port, request.reg_name, 
 						request.external_userid, request.external_itemid, request.max_recommend, request.rating));
 
 			else if (action.equals(UPDATE_RATING))
-				return Response.create(service.updateRating(request.rating_vector));
+				return Response.create(remoteService.updateRating(request.rating_vector));
 			
 			else if (action.equals(DELETE_RATING))
-				return Response.create(service.deleteRating(request.rating_vector));
+				return Response.create(remoteService.deleteRating(request.rating_vector));
 
 			else if (action.equals(GET_USERIDS))
-				return Response.createIdFetcher(new MemFetcher<Integer>(service.getUserIds(), true));
+				return Response.createIdFetcher(new MemFetcher<Integer>(remoteService.getUserIds(), true));
 
 			else if (action.equals(GET_USER_RATING))
-				return Response.create(service.getUserRating(request.userid));
+				return Response.create(remoteService.getUserRating(request.userid));
 			
 			else if (action.equals(GET_USER_RATINGS))
-				return Response.createRatingVectorFetcher(service.getUserRatings());
+				return Response.createRatingVectorFetcher(remoteService.getUserRatings());
 			
 			else if (action.equals(DELETE_USER_RATING))
-				return Response.create(service.deleteUserRating(request.userid));
+				return Response.create(remoteService.deleteUserRating(request.userid));
 
 			else if (action.equals(GET_USER_PROFILE))
-				return Response.create(service.getUserProfile(request.userid));
+				return Response.create(remoteService.getUserProfile(request.userid));
 
 			else if (action.equals(GET_USER_PROFILE_BY_EXTERNAL))
-				return Response.create(service.getUserProfileByExternal(request.external_userid));
+				return Response.create(remoteService.getUserProfileByExternal(request.external_userid));
 
 			else if (action.equals(GET_USER_PROFILES))
-				return Response.createProfileFetcher(service.getUserProfiles());
+				return Response.createProfileFetcher(remoteService.getUserProfiles());
 			
 			else if (action.equals(GET_USER_ATTRIBUTE_LIST))
-				return Response.create(service.getUserAttributeList());
+				return Response.create(remoteService.getUserAttributeList());
 			
 			else if (action.equals(UPDATE_USER_PROFILE))
-				return Response.create(service.updateUserProfile(request.profile));
+				return Response.create(remoteService.updateUserProfile(request.profile));
 
 			else if (action.equals(DELETE_USER_PROFILE))
-				return Response.create(service.deleteUserProfile(request.userid));
+				return Response.create(remoteService.deleteUserProfile(request.userid));
 
 			else if (action.equals(GET_USER_EXTERNAL_RECORD))
-				return Response.create(service.getUserExternalRecord(request.userid));
+				return Response.create(remoteService.getUserExternalRecord(request.userid));
 
 			else if (action.equals(GET_ITEMIDS))
-				return Response.createIdFetcher(new MemFetcher<Integer>(service.getItemIds(), true));
+				return Response.createIdFetcher(new MemFetcher<Integer>(remoteService.getItemIds(), true));
 			
 			else if (action.equals(GET_ITEM_RATING))
-				return Response.create(service.getItemRating(request.itemid));
+				return Response.create(remoteService.getItemRating(request.itemid));
 			
 			else if (action.equals(GET_ITEM_RATINGS))
-				return Response.createRatingVectorFetcher(service.getItemRatings());
+				return Response.createRatingVectorFetcher(remoteService.getItemRatings());
 			
 			else if (action.equals(DELETE_ITEM_RATING))
-				return Response.create(service.deleteItemRating(request.itemid));
+				return Response.create(remoteService.deleteItemRating(request.itemid));
 			
 			else if (action.equals(GET_ITEM_PROFILE))
-				return Response.create(service.getItemProfile(request.itemid));
+				return Response.create(remoteService.getItemProfile(request.itemid));
 			
 			else if (action.equals(GET_ITEM_PROFILE_BY_EXTERNAL))
-				return Response.create(service.getItemProfileByExternal(request.external_itemid));
+				return Response.create(remoteService.getItemProfileByExternal(request.external_itemid));
 
 			else if (action.equals(GET_ITEM_PROFILES))
-				return Response.createProfileFetcher(service.getItemProfiles());
+				return Response.createProfileFetcher(remoteService.getItemProfiles());
 			
 			else if (action.equals(GET_ITEM_ATTRIBUTE_LIST))
-				return Response.create(service.getItemAttributeList());
+				return Response.create(remoteService.getItemAttributeList());
 
 			else if (action.equals(UPDATE_ITEM_PROFILE))
-				return Response.create(service.updateItemProfile(request.profile));
+				return Response.create(remoteService.updateItemProfile(request.profile));
 			
 			else if (action.equals(DELETE_ITEM_PROFILE))
-				return Response.create(service.deleteUserProfile(request.itemid));
+				return Response.create(remoteService.deleteUserProfile(request.itemid));
 			
 			else if (action.equals(GET_ITEM_EXTERNAL_RECORD))
-				return Response.create(service.getItemExternalRecord(request.itemid));
+				return Response.create(remoteService.getItemExternalRecord(request.itemid));
 
 			else if (action.equals(GET_NOMINAL))
-				return Response.create(service.getNominal(request.unit, request.attribute));
+				return Response.create(remoteService.getNominal(request.unit, request.attribute));
 
 			else if (action.equals(UPDATE_NOMINAL))
-				return Response.create(service.updateNominal(request.unit, request.attribute, request.nominal));
+				return Response.create(remoteService.updateNominal(request.unit, request.attribute, request.nominal));
 			
 			else if (action.equals(DELETE_NOMINAL))
-				return Response.create(service.deleteNominal(request.unit, request.attribute));
+				return Response.create(remoteService.deleteNominal(request.unit, request.attribute));
 
 			else if (action.equals(GET_EXTERNAL_RECORD))
-				return Response.create(service.getExternalRecord(request.internal_record));
+				return Response.create(remoteService.getExternalRecord(request.internal_record));
 
 			else if (action.equals(UPDATE_EXTERNAL_RECORD))
-				return Response.create(service.updateExternalRecord(request.internal_record, request.external_record));
+				return Response.create(remoteService.updateExternalRecord(request.internal_record, request.external_record));
 
 			else if (action.equals(DELETE_EXTERNAL_RECORD))
-				return Response.create(service.deleteExternalRecord(request.internal_record));
+				return Response.create(remoteService.deleteExternalRecord(request.internal_record));
 
 			else if (action.equals(VALIDATE_ACCOUNT))
 				return Response.create(validateAccount(
 						request.account_name, request.account_password, request.account_privileges));
 			
 			else if (action.equals(GET_SERVER_CONFIG))
-				return Response.create(service.getServerConfig());
+				return Response.create(remoteService.getServerConfig());
 			
 			else if (action.equals(GET_SESSION_ATTRIBUTE))
 				return Response.create(userSession.get(request.attribute).toString());
 			
 			else if (action.equals(GET_SNAPSHOT))
-				return Response.create(service.getSnapshot());
+				return Response.create(remoteService.getSnapshot());
 			
 			else if (action.equals(GET_EVALUATOR)) {
-				Evaluator remoteEvaluator = service.getEvaluator(request.evaluatorName);
+				Evaluator remoteEvaluator = remoteService.getEvaluator(request.evaluatorName);
 				if (remoteEvaluator == null)
 					return null;
 				DelegatorEvaluator evaluator = new DelegatorEvaluator(this, remoteEvaluator);
@@ -386,7 +389,7 @@ public class Delegator extends AbstractDelegator {
 			}
 			
 			else if (action.equals(GET_EVALUATOR_NAMES))
-				return Response.create(service.getEvaluatorNames());
+				return Response.create(remoteService.getEvaluatorNames());
 		}
 		catch (Throwable e) {
 			e.printStackTrace();
@@ -401,7 +404,7 @@ public class Delegator extends AbstractDelegator {
 	protected boolean validateAccount(String account, String password, int privileges) {
 		
 		try {
-			return server.validateAccount(account, password, privileges);
+			return remoteServer.validateAccount(account, password, privileges);
 		}
 		catch (Throwable e) {
 			e.printStackTrace();
@@ -433,18 +436,30 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluatorProgr
 
     
     /**
-	 * Internal delegator.
+	 * Remote server.
 	 */
-	protected Delegator delegator = null;
+	protected PowerServer remoteServer = null;
 
 	
-	/**
-	 * Internal evaluator.
+    /**
+	 * Remote evaluator.
 	 * 
 	 */
-    protected Evaluator evaluator = null;
+    protected Evaluator remoteEvaluator = null;
 
     
+    /**
+     * Socket server is often listener.
+     */
+    protected SocketServer socketServer = null;
+    
+    
+	/**
+	 * Stub object of this evaluator which is serialized to client.
+	 */
+	protected Evaluator stub = null;
+	
+	
 	/**
 	 * Exported flag.
 	 */
@@ -452,22 +467,17 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluatorProgr
 	
 	
 	/**
-	 * Stub object as evaluator.
+	 * Constructor with evaluator and socket server.
+	 * @param delegator internal delegator.
+	 * @param remoteEvaluator remote evaluator.
 	 */
-	protected Evaluator stub = null;
-	
-	
-    /**
-	 * Default constructor.
-	 */
-	public DelegatorEvaluator(Delegator delegator, Evaluator evaluator) {
+	public DelegatorEvaluator(Delegator delegator, Evaluator remoteEvaluator) {
 		try {
-			this.delegator = delegator;
-			this.evaluator = evaluator;
+			this.remoteServer = delegator.remoteServer;
+			this.socketServer = delegator.socketServer;
+			this.remoteEvaluator = remoteEvaluator;
 			
-			remoteExport(delegator.socketConfig.getAsInt(ListenerConfig.EXPORT_PORT_FIELD));
-			
-			this.delegator.addRunner(this);
+			remoteExport(delegator.socketServer.getConfig().getAsInt(ListenerConfig.EXPORT_PORT_FIELD));
 		}
 		catch (Exception e) {
 			e.printStackTrace();
@@ -478,64 +488,64 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluatorProgr
 	@Override
 	public String getName() throws RemoteException {
 		// TODO Auto-generated method stub
-		return evaluator.getName();
+		return remoteEvaluator.getName();
 	}
 
 
 	@Override
 	public boolean acceptAlg(Alg alg) throws RemoteException {
 		// TODO Auto-generated method stub
-		return evaluator.acceptAlg(alg);
+		return remoteEvaluator.acceptAlg(alg);
 	}
 
 
 	@Override
 	public NoneWrapperMetricList defaultMetrics() throws RemoteException {
 		// TODO Auto-generated method stub
-		return evaluator.defaultMetrics();
+		return remoteEvaluator.defaultMetrics();
 	}
 
 
 	@Override
 	public String getMainUnit() throws RemoteException {
-		return evaluator.getMainUnit();
+		return remoteEvaluator.getMainUnit();
 	}
 	
 	
 	@Override
 	public Metrics getResult() throws RemoteException {
-		return evaluator.getResult();
+		return remoteEvaluator.getResult();
 	}
 
 	
 	@Override
 	public List<Metric> getMetricList() throws RemoteException {
-		return evaluator.getMetricList();
+		return remoteEvaluator.getMetricList();
 	}
 
 	
 	@Override
 	public void setMetricList(List<Metric> metricList) throws RemoteException {
-		evaluator.setMetricList(metricList);
+		remoteEvaluator.setMetricList(metricList);
 	}
 	
 	
 	@Override
 	public RegisterTable extractAlgFromPluginStorage() throws RemoteException {
-		return evaluator.extractAlgFromPluginStorage();
+		return remoteEvaluator.extractAlgFromPluginStorage();
 	}
 	
 	
 	@Override
 	public PluginStorageWrapper getPluginStorage() throws RemoteException {
 		// TODO Auto-generated method stub
-		return evaluator.getPluginStorage();
+		return remoteEvaluator.getPluginStorage();
 	}
 
 
 	@Override
 	public EvaluatorConfig getConfig() throws RemoteException {
-		return evaluator.getConfig();
+		return remoteEvaluator.getConfig();
 	}
 	
 	
@@ -703,65 +713,107 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluatorProgr
 
 
 	@Override
-	public void remoteStart(Serializable... parameters) throws RemoteException {
+	public synchronized void remoteStart(Serializable... parameters) throws RemoteException {
 		// TODO Auto-generated method stub
-		evaluator.remoteStart(parameters);
+		boolean flag = socketServer.getFlag();
+		
+		if (flag)
+			remoteEvaluator.remoteStart(parameters);
+		else if (socketServer.isRunning())
+			remoteEvaluator.remoteStart(parameters);
+		else
+			throw new RemoteException("Socket server is not running");
 	}
 
 
 	@Override
-	public void remoteStart(List<Alg> algList, DatasetPool pool, Serializable parameter) throws RemoteException {
+	public synchronized void remoteStart(List<Alg> algList, DatasetPool pool, Serializable parameter) throws RemoteException {
 		// TODO Auto-generated method stub
-		evaluator.remoteStart(algList, pool, parameter);
+		boolean flag = socketServer.getFlag();
+		
+		if (flag)
+			remoteEvaluator.remoteStart(algList, pool, parameter);
+		else if (socketServer.isRunning())
+			remoteEvaluator.remoteStart(algList, pool, parameter);
+		else
+			throw new RemoteException("Socket server is not running");
 	}
 
 	
 	@Override
-	public void remotePause() throws RemoteException {
+	public synchronized void remotePause() throws RemoteException {
 		// TODO Auto-generated method stub
-		evaluator.remotePause();
+		boolean flag = socketServer.getFlag();
+
+		if (flag)
+			remoteEvaluator.remotePause();
+		else if (socketServer.isRunning())
+			remoteEvaluator.remotePause();
+		else
+			throw new RemoteException("Socket server is not running");
 	}
 
 	
 	@Override
-	public void remoteResume() throws RemoteException {
+	public synchronized void remoteResume() throws RemoteException {
 		// TODO Auto-generated method stub
-		evaluator.remoteResume();
+		boolean flag = socketServer.getFlag();
+
+		if (flag)
+			remoteEvaluator.remoteResume();
+		else if (socketServer.isRunning())
+			remoteEvaluator.remoteResume();
+		else
+			throw new RemoteException("Socket server is not running");
 	}
 
 	
 	@Override
-	public void remoteStop() throws RemoteException {
+	public synchronized void remoteStop() throws RemoteException {
 		// TODO Auto-generated method stub
-		evaluator.remoteStop();
+		boolean flag = socketServer.getFlag();
+
+		if (flag)
+			remoteEvaluator.remoteStop();
+		else if (socketServer.isRunning())
+			remoteEvaluator.remoteStop();
+		else
+			throw new RemoteException("Socket server is not running");
 	}
 
 	
 	@Override
 	public void remoteForceStop() throws RemoteException {
 		// TODO Auto-generated method stub
-		evaluator.remoteForceStop();
+		boolean flag = socketServer.getFlag();
+		
+		if (flag)
+			remoteEvaluator.remoteForceStop();
+		else if (socketServer.isRunning())
+			remoteEvaluator.remoteForceStop();
+		else
+			throw new RemoteException("Socket server is not running");
 	}
 
 	
 	@Override
 	public boolean remoteIsStarted() throws RemoteException {
 		// TODO Auto-generated method stub
-		return evaluator.remoteIsStarted();
+		return remoteEvaluator.remoteIsStarted();
 	}
 
 	
 	@Override
 	public boolean remoteIsPaused() throws RemoteException {
 		// TODO Auto-generated method stub
-		return evaluator.remoteIsPaused();
+		return remoteEvaluator.remoteIsPaused();
 	}
 
 	
 	@Override
 	public boolean remoteIsRunning() throws RemoteException {
 		// TODO Auto-generated method stub
-		return evaluator.remoteIsRunning();
+		return remoteEvaluator.remoteIsRunning();
 	}
 
 
@@ -772,11 +824,12 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluatorProgr
 			if (!remoteExported) {
 				stub = (Evaluator)NetUtil.RegistryRemote.export(this, serverPort);
 
-				evaluator.addEvaluatorListener(this);
-				evaluator.addProgressListener(this);
-				evaluator.addSetupAlgListener(this);
+				remoteEvaluator.addEvaluatorListener(this);
+				remoteEvaluator.addProgressListener(this);
+				remoteEvaluator.addSetupAlgListener(this);
 				
-				delegator.server.incRequest();
+				socketServer.addRunner(this);
+				remoteServer.incRequest();
 				remoteExported = true;
 			}
 		}
@@ -788,18 +841,16 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluatorProgr
 		// TODO Auto-generated method stub
 		synchronized (remoteExported) {
 			if (remoteExported) {
-				delegator.stop();
-				//new SocketWrapper("localhost", delegator.socketConfig.getServerPort()).sendQuitRequest();
-
-				evaluator.removeEvaluatorListener(this);
-				evaluator.removeProgressListener(this);
-				evaluator.removeSetupAlgListener(this);
-				evaluator.remoteUnexport();
+				remoteEvaluator.removeEvaluatorListener(this);
+				remoteEvaluator.removeProgressListener(this);
+				remoteEvaluator.removeSetupAlgListener(this);
+				remoteEvaluator.remoteUnexport();
 				
-				delegator.server.decRequest();
+				socketServer.removeRunner(this);
+				this.remoteStop(); //It is possible to stop this evaluator because its is delegated evaluator.
 				NetUtil.RegistryRemote.unexport(this);
-				delegator.removeRunner(this);
 				stub = null;
+				remoteServer.decRequest();
 				remoteExported = false;
 			}
 		}

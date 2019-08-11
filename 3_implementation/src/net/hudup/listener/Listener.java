@@ -209,7 +209,7 @@ public class Listener extends SocketServer implements ServerStatusListener, Gate
 			
 			if (bindServerList.size() > 0)
 				return new Delegator(bindServerList.get().getServer(),
-						socket, config);
+						socket, this);
 			else
 				return null;
 		}

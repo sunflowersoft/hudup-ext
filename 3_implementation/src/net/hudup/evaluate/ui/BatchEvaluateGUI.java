@@ -848,6 +848,8 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 		}
 		catch (Throwable e) {
 			e.printStackTrace();
+			logger.error("Error in evaluation");
+			updateMode(); //Added date: 2019.08.12 by Loc Nguyen
 		}
 	}
 
