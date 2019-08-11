@@ -20,6 +20,7 @@ import net.hudup.core.client.PowerServer;
 import net.hudup.core.client.Protocol;
 import net.hudup.core.client.Request;
 import net.hudup.core.client.Response;
+import net.hudup.core.client.ServerConfig;
 import net.hudup.core.client.Service;
 import net.hudup.core.data.DatasetPool;
 import net.hudup.core.data.MemFetcher;
@@ -70,14 +71,15 @@ public class Delegator extends AbstractDelegator {
 	
 	/**
 	 * Constructor with specified socket and power server.
-	 * @param socket specified Java socket for receiving (reading) requests from client and sending back (writing) responses to client via input / output streams.
 	 * @param server power server binds with this delegator.
+	 * @param socket specified Java socket for receiving (reading) requests from client and sending back (writing) responses to client via input / output streams.
+	 * @param socketConfig socket configuration.
 	 * The delegator dispatches request to this server.
 	 * The result of recommendation process from server, represented by {@link Response}, is sent back to users/applications by delegator.
 	 * In fact, the service {@link #service} of this server processed the request.
 	 */
-	public Delegator(Socket socket, PowerServer server) {
-		super(socket);
+	public Delegator(PowerServer server, Socket socket, ServerConfig socketConfig) {
+		super(socket, socketConfig);
 		
 		this.server = server;
 		
@@ -184,7 +186,7 @@ public class Delegator extends AbstractDelegator {
 		try {
 			if (protocol == HDP_PROTOCOL) {
 				Response response = processRequest(request);
-				if (request.action.equals(GET_EVALUATOR))
+				if (request.notJsonParsing)
 					response.toObject(out);
 				else
 					out.write( (response.toJson() + "\n").getBytes() );
@@ -462,7 +464,10 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluatorProgr
 		try {
 			this.delegator = delegator;
 			this.evaluator = evaluator;
-			remoteExport(((ListenerConfig)delegator.server.getConfig()).getExportPort());
+			
+			remoteExport(delegator.socketConfig.getAsInt(ListenerConfig.EXPORT_PORT_FIELD));
+			
+			this.delegator.addRunner(this);
 		}
 		catch (Exception e) {
 			e.printStackTrace();
@@ -698,6 +703,13 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluatorProgr
 
 
 	@Override
+	public void remoteStart(Serializable... parameters) throws RemoteException {
+		// TODO Auto-generated method stub
+		evaluator.remoteStart(parameters);
+	}
+
+
+	@Override
 	public void remoteStart(List<Alg> algList, DatasetPool pool, Serializable parameter) throws RemoteException {
 		// TODO Auto-generated method stub
 		evaluator.remoteStart(algList, pool, parameter);
@@ -758,7 +770,7 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluatorProgr
 		// TODO Auto-generated method stub
 		synchronized (remoteExported) {
 			if (!remoteExported) {
-				stub = (Evaluator)NetUtil.RegistryRemote.export(this, 10153);
+				stub = (Evaluator)NetUtil.RegistryRemote.export(this, serverPort);
 
 				evaluator.addEvaluatorListener(this);
 				evaluator.addProgressListener(this);
@@ -776,6 +788,9 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluatorProgr
 		// TODO Auto-generated method stub
 		synchronized (remoteExported) {
 			if (remoteExported) {
+				delegator.stop();
+				//new SocketWrapper("localhost", delegator.socketConfig.getServerPort()).sendQuitRequest();
+
 				evaluator.removeEvaluatorListener(this);
 				evaluator.removeProgressListener(this);
 				evaluator.removeSetupAlgListener(this);
@@ -783,8 +798,8 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluatorProgr
 				
 				delegator.server.decRequest();
 				NetUtil.RegistryRemote.unexport(this);
+				delegator.removeRunner(this);
 				stub = null;
-				delegator.stop();
 				remoteExported = false;
 			}
 		}

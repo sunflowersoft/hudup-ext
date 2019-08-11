@@ -100,7 +100,7 @@ public class SocketConnection extends SocketWrapper {
 		try {
 			out.println(request.toJson());
 			
-			if (request.action.equals(GET_EVALUATOR)) {
+			if (request.notJsonParsing) {
 				return Response.parse(in);
 			}
 			else {

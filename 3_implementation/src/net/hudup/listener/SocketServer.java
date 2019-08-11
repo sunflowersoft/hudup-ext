@@ -174,7 +174,7 @@ public abstract class SocketServer extends AbstractRunner implements Server {
 		if (isStarted())
 			return;
 		
-		logger.info("Socket server is initializing to start, please waiting...");
+		logger.info("Socket server is initializing to start, please wait...");
 		setupServerSocket();
 		if (!testServerSocket()) {
 			fireStatusEvent(new ServerStatusEvent(this, Status.stopped));
@@ -213,8 +213,8 @@ public abstract class SocketServer extends AbstractRunner implements Server {
 		// TODO Auto-generated method stub
 		if (isPaused()) {
 		
+			resumeDelegators(); //Fixing bug date: 2019.08.11 by Loc Nguyen. Resume all delegators first.
 			super.resume();
-			resumeDelegators();
 			createTimer();
 			
 			fireStatusEvent(new ServerStatusEvent(this, Status.resumed));

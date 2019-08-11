@@ -5,11 +5,15 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
+import java.util.List;
 
+import net.hudup.core.Util;
 import net.hudup.core.client.ProtocolImpl;
 import net.hudup.core.client.Request;
 import net.hudup.core.client.Response;
+import net.hudup.core.client.ServerConfig;
 import net.hudup.core.data.DataConfig;
+import net.hudup.core.logistic.RemoteRunner;
 import net.hudup.core.logistic.Runner;
 import net.hudup.core.logistic.RunnerThread;
 
@@ -52,12 +56,26 @@ public abstract class AbstractDelegator extends ProtocolImpl implements Runner {
 	
 	
 	/**
+	 * List of internal runners.
+	 */
+	protected List<Object> runners = Util.newList();
+	
+	
+	/**
+	 * Socket configuration.
+	 */
+	protected ServerConfig socketConfig = null;
+	
+	
+	/**
 	 * Default constructor with specified socket.
 	 * The specified socket is assigned to the internal variable {@link #socket}.
 	 * @param socket specified Java socket for receiving (reading) requests from client and sending back (writing) responses to client via input / output streams.
+	 * @param socketConfig socket configuration.
 	 */
-	public AbstractDelegator(Socket socket) {
+	public AbstractDelegator(Socket socket, ServerConfig socketConfig) {
 		this.socket = socket;
+		this.socketConfig = socketConfig;
 	}
 	
 	
@@ -88,6 +106,7 @@ public abstract class AbstractDelegator extends ProtocolImpl implements Runner {
 			
 			userSession.clear();
 			String requestText = null;
+//			while ( (!socket.isClosed()) && (requestText = in.readLine()) != null ) {
 			while (!socket.isClosed()) {
 				try {
 					requestText = in.readLine(); //Wait here.
@@ -176,6 +195,9 @@ public abstract class AbstractDelegator extends ProtocolImpl implements Runner {
 			started = false;
 			paused = false;
 			
+			//Clearing extra data. It is possible to write a clearing method to clear other data.
+			stopInternalRunners(); socketConfig = null;
+			
 			notifyAll();
 		}
 		
@@ -259,6 +281,7 @@ public abstract class AbstractDelegator extends ProtocolImpl implements Runner {
 			logger.error("Delegator fail to pause, causes error " + e.getMessage());
 		}
 			
+		pauseInternalRunners();
 	}
 	
 	
@@ -267,6 +290,8 @@ public abstract class AbstractDelegator extends ProtocolImpl implements Runner {
 		if (!isStarted() || !isPaused())
 			return;
 		
+		resumeInternalRunners();
+
 		paused = false;
 		notifyAll();
 	}
@@ -300,6 +325,7 @@ public abstract class AbstractDelegator extends ProtocolImpl implements Runner {
 			logger.error("Delegator fail to stop, causes error " + e.getMessage());
 		}
 		
+		stopInternalRunners();
 	}
 	
 	
@@ -321,6 +347,93 @@ public abstract class AbstractDelegator extends ProtocolImpl implements Runner {
 	}
 
 
+	/**
+	 * Add runner.
+	 * @param runner runnable object.
+	 */
+	protected void addRunner(Object runner) {
+		if (!(runner instanceof Runner) || !(runner instanceof RemoteRunner))
+			return;
+		
+		synchronized (runners) {
+			runners.add(runner);
+		}
+	}
+	
+	
+	/**
+	 * Remove runner.
+	 * @param runner runnable object.
+	 */
+	protected void removeRunner(Object runner) {
+		synchronized (runners) {
+			runners.remove(runner);
+		}
+	}
+	
+	
+	/**
+	 * Pause internal runners.
+	 */
+	protected void pauseInternalRunners() {
+		synchronized (runners) {
+			for (Object runner : runners) {
+				try {
+					if (runner instanceof Runner)
+						((Runner)runner).pause();
+					else if (runner instanceof RemoteRunner)
+						((RemoteRunner)runner).remotePause();
+				}
+				catch (Throwable e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+	
+	
+	/**
+	 * Resume internal runners.
+	 */
+	protected void resumeInternalRunners() {
+		synchronized (runners) {
+			for (Object runner : runners) {
+				try {
+					if (runner instanceof Runner)
+						((Runner)runner).resume();
+					else if (runner instanceof RemoteRunner)
+						((RemoteRunner)runner).remoteResume();
+				}
+				catch (Throwable e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+
+	
+	/**
+	 * Stop internal runners.
+	 */
+	protected void stopInternalRunners() {
+		synchronized (runners) {
+			for (Object runner : runners) {
+				try {
+					if (runner instanceof Runner)
+						((Runner)runner).stop();
+					else if (runner instanceof RemoteRunner)
+						((RemoteRunner)runner).remoteStop();
+				}
+				catch (Throwable e) {
+					e.printStackTrace();
+				}
+			}
+			
+			runners.clear();
+		}
+	}
+
+	
 	/**
 	 * Parsing request in text format into {@link Request} object.
 	 * It is called by {@link #run()} method.

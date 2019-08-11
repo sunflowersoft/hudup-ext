@@ -208,7 +208,7 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
     	
     	trans.lockWrite();
     	try {
-    		logger.info("Server is initializing to start, please waiting...");
+    		logger.info("Server is initializing to start, please wait...");
 			doWhenStart();
 			activeMeasure.reset();
 

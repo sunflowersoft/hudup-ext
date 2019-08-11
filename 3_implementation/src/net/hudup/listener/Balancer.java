@@ -86,7 +86,7 @@ public class Balancer extends Listener {
 			BindServer bindServer = bindServerList.getIdleServer();
 			if (bindServer != null) {
 				PowerServer server = bindServer.getServer();
-				return new Delegator(socket, server);
+				return new Delegator(server, socket, config);
 			}
 			else
 				return null;

@@ -691,6 +691,7 @@ public class ProtocolImpl implements Protocol {
 	public Request createGetEvaluatorRequest(String evaluatorName) {
 		// TODO Auto-generated method stub
 		Request request = new Request();
+		request.notJsonParsing = true;
 		request.action = GET_EVALUATOR;
 		request.evaluatorName = evaluatorName;
 		

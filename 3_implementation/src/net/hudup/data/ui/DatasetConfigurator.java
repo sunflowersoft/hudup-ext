@@ -385,10 +385,10 @@ public class DatasetConfigurator extends JDialog {
 			}
 		});
 		//
-		txtUsername = new JTextField();
+		txtUsername = new JTextField("admin");
 		attValues.add(txtUsername);
 		//
-		txtPassword = new JPasswordField();
+		txtPassword = new JPasswordField("admin");
 		attValues.add(txtPassword);
 
 		pane = new JPanel();

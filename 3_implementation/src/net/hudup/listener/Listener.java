@@ -208,8 +208,8 @@ public class Listener extends SocketServer implements ServerStatusListener, Gate
 		synchronized (bindServerList) {
 			
 			if (bindServerList.size() > 0)
-				return new Delegator(
-						socket, bindServerList.get().getServer());
+				return new Delegator(bindServerList.get().getServer(),
+						socket, config);
 			else
 				return null;
 		}

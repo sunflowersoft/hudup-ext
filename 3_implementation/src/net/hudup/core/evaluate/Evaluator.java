@@ -10,6 +10,7 @@ import net.hudup.core.RegisterTable;
 import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.SetupAlgListener;
 import net.hudup.core.data.DatasetPool;
+import net.hudup.core.logistic.RemoteRunner;
 
 /**
  * {@code Evaluator} is one of main objects of Hudup framework, which is responsible for executing and evaluation algorithms according to built-in and user-defined metrics.
@@ -76,7 +77,7 @@ import net.hudup.core.data.DatasetPool;
  * @version 10.0
  *
  */
-public interface Evaluator extends Remote, SetupAlgListener {
+public interface Evaluator extends Remote, RemoteRunner, SetupAlgListener {
 
 	
 	/**
@@ -88,27 +89,6 @@ public interface Evaluator extends Remote, SetupAlgListener {
 	 */
 	void remoteStart(List<Alg> algList, DatasetPool pool, Serializable parameter) throws RemoteException;
 
-	
-	/**
-	 * Evaluator pauses.
-	 * @throws RemoteException if any error raises.
-	 */
-	void remotePause() throws RemoteException;
-
-	
-	/**
-	 * Evaluator resumes
-	 * @throws RemoteException if any error raises.
-	 */
-	void remoteResume() throws RemoteException;
-
-	
-	/**
-	 * Evaluator stops.
-	 * @throws RemoteException if any error raises.
-	 */
-	void remoteStop() throws RemoteException;
-	
 	
 	/**
 	 * Evaluator forces to stop.

@@ -53,6 +53,12 @@ public class Request extends ProtocolParam {
 	
 	
 	/**
+	 * Flag to indicate that not JSON parsing.
+	 */
+	public boolean                          notJsonParsing                = false;
+
+	
+	/**
 	 * Action of request. For example, the request that user requires a list of recommended items has action &quot;recommend_user&quot;.
 	 * This public variable is the most important one.
 	 */

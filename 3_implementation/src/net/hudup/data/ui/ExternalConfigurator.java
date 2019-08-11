@@ -47,6 +47,7 @@ import net.hudup.data.ProviderImpl;
 
 
 /**
+ * This class represents the main graphic user interface (GUI) allowing users to select the configuration of dataset.This class represents the main graphic user interface (GUI) allowing users to select the configuration of external data.
  * 
  * @author Loc Nguyen
  * @version 10.0
@@ -189,10 +190,10 @@ public class ExternalConfigurator extends JDialog {
 			}
 		});
 		//
-		txtUsername = new JTextField();
+		txtUsername = new JTextField("admin");
 		attValues.add(txtUsername);
 		//
-		txtPassword = new JPasswordField();
+		txtPassword = new JPasswordField("admin");
 		attValues.add(txtPassword);
 
 		pane = new JPanel();

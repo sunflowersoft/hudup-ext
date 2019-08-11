@@ -23,6 +23,7 @@ import net.hudup.core.logistic.ui.UIUtil;
  * @author Loc Nguyen
  * @version 10.0
  */
+@Deprecated
 public class SimpleDatasetChooser extends JDialog {
 
 	

@@ -724,6 +724,23 @@ public abstract class AbstractEvaluator extends AbstractRunner implements Evalua
 
 
 	@Override
+	public void remoteStart(Serializable... parameters) throws RemoteException {
+		// TODO Auto-generated method stub
+		if (parameters == null || parameters.length < 2
+				|| !(parameters[0] instanceof List<?>)
+				|| !(parameters[1] instanceof DatasetPool))
+			return;
+		
+		@SuppressWarnings("unchecked")
+		List<Alg> algList = (List<Alg>)(parameters[0]);
+		DatasetPool pool = (DatasetPool)(parameters[1]);
+		Serializable parameter = parameters.length > 2? parameters[2] : null;
+		
+		evaluate(algList, pool, parameter);
+	}
+
+
+	@Override
 	public void remoteStart(List<Alg> algList, DatasetPool pool, Serializable parameter) throws RemoteException {
 		// TODO Auto-generated method stub
 		evaluate(algList, pool, parameter);

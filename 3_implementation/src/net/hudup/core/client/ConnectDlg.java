@@ -5,18 +5,22 @@ import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
+import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
+import javax.swing.text.NumberFormatter;
 
 import net.hudup.core.Constants;
 import net.hudup.core.logistic.NetUtil;
@@ -70,9 +74,9 @@ public abstract class ConnectDlg extends JDialog {
 	
 	
 	/**
-	 * {@link JTextField} to fill remote port.
+	 * {@link JFormattedTextField} to fill remote port.
 	 */
-	protected JTextField txtRemotePort = null;
+	protected JFormattedTextField txtRemotePort = null;
 	
 	
 	/**
@@ -126,12 +130,30 @@ public abstract class ConnectDlg extends JDialog {
 		cmbConnectType = new JComboBox<String>(new String[] {
 				SERVER_CONNECT, RMI_SERVICE_CONNECT, SOCKET_SERVICE_CONNECT
 			});
+		cmbConnectType.addItemListener(new ItemListener() {
+			
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				// TODO Auto-generated method stub
+				if (e.getStateChange() == ItemEvent.SELECTED)
+					return;
+				
+				String connectType = cmbConnectType.getSelectedItem().toString();
+				if (connectType.equals(SERVER_CONNECT))
+					txtRemotePort.setValue(Constants.DEFAULT_SERVER_PORT);
+				else if (connectType.equals(RMI_SERVICE_CONNECT))
+					txtRemotePort.setValue(Constants.DEFAULT_SERVER_PORT);
+				else if (connectType.equals(SOCKET_SERVICE_CONNECT))
+					txtRemotePort.setValue(Constants.DEFAULT_LISTENER_PORT);
+			}
+		});
 		right.add(cmbConnectType);
 		
 		txtRemoteHost = new JTextField("localhost");
 		right.add(txtRemoteHost);
 		
-		txtRemotePort = new JTextField("" + Constants.DEFAULT_SERVER_PORT);
+		txtRemotePort = new JFormattedTextField(new NumberFormatter());
+		txtRemotePort.setValue(Constants.DEFAULT_SERVER_PORT);
 		right.add(txtRemotePort);
 		
 		txtRemoteUsername = new JTextField("admin");
@@ -149,7 +171,7 @@ public abstract class ConnectDlg extends JDialog {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
-				connect();
+				connect0();
 			}
 		});
 		footer.add(connect);
@@ -270,9 +292,7 @@ public abstract class ConnectDlg extends JDialog {
 			protected void connect0() {
 				// TODO Auto-generated method stub
 				String remoteHost = txtRemoteHost.getText().trim();
-				String remotePort_s = txtRemotePort.getText().trim();
-				int remotePort = -1;
-				if (!remotePort_s.isEmpty()) remotePort = Integer.parseInt(remotePort_s);
+				int remotePort = txtRemotePort.getValue() instanceof Number ? ( (Number) txtRemotePort.getValue()).intValue() : -1; 
 				
 				String connectType = cmbConnectType.getSelectedItem().toString();
 				if (connectType.equals(SERVER_CONNECT))
@@ -288,8 +308,8 @@ public abstract class ConnectDlg extends JDialog {
 					JOptionPane.showMessageDialog(
 						this, "Can't connect to server", "Can't connect to server", JOptionPane.ERROR_MESSAGE);
 				}
-				
-				dispose();
+				else
+					dispose();
 			}
 		};
 		
