@@ -9,6 +9,8 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 
+import net.hudup.core.data.AutoCloseable;
+
 /**
  * This class extends directly {@link SocketWrapper} class and so it is also a service that sends request to server and then receives response (result) from server, according to socket interaction.
  * However, in the same session, it can send many requests and receive many responses (from server) whereas {@link SocketWrapper} can send/receive only one request/response to/from server at one time.
@@ -18,7 +20,7 @@ import java.net.Socket;
  * @version 10.0
  *
  */
-public class SocketConnection extends SocketWrapper {
+public class SocketConnection extends SocketWrapper implements AutoCloseable {
 
 
 	/**
@@ -104,7 +106,7 @@ public class SocketConnection extends SocketWrapper {
 				return Response.parse(in);
 			}
 			else {
-				BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+				BufferedReader reader = new BufferedReader(new InputStreamReader(in));
 				String responseText = reader.readLine();
 				if (responseText == null)
 					return null;
@@ -124,6 +126,7 @@ public class SocketConnection extends SocketWrapper {
 	/**
 	 * Closing this socket connection together its session.
 	 */
+	@Override
 	public void close() {
 		try {
 			if (in != null) {
@@ -158,6 +161,22 @@ public class SocketConnection extends SocketWrapper {
 			logger.error("Socket connection fail to close socket, causes error " + e.getMessage());
 		}
 	}
+
+
+	@Override
+	protected void finalize() throws Throwable {
+		// TODO Auto-generated method stub
+		super.finalize();
+		
+		try {
+			close();
+		}
+		catch (Throwable e) {
+			e.printStackTrace();
+		}
+	}
+	
+	
 	
 	
 }

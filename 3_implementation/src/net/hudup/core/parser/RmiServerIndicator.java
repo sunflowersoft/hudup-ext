@@ -2,7 +2,7 @@ package net.hudup.core.parser;
 
 
 import net.hudup.core.alg.Alg;
-import net.hudup.core.client.DriverManager;
+import net.hudup.core.client.ClientUtil;
 import net.hudup.core.client.Service;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.DataDriver;
@@ -55,7 +55,7 @@ public class RmiServerIndicator extends Indicator {
 		xURI uri = config.getStoreUri();
 		
 		try {
-			Service service = DriverManager.getRemoteService(
+			Service service = ClientUtil.getRemoteService(
 					uri.getHost(),
 					uri.getPort(),
 					config.getStoreAccount(), 

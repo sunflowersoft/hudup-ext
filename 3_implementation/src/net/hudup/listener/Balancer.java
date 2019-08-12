@@ -6,7 +6,6 @@ import java.awt.SystemTray;
 import java.awt.TrayIcon;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.net.Socket;
 import java.rmi.RemoteException;
 
 import net.hudup.core.client.PowerServer;
@@ -80,14 +79,12 @@ public class Balancer extends Listener {
 
 	
 	@Override
-	protected AbstractDelegator delegate(Socket socket) {
+	protected PowerServer getBindServer() {
 		// TODO Auto-generated method stub
 		synchronized (bindServerList) {
 			BindServer bindServer = bindServerList.getIdleServer();
-			if (bindServer != null) {
-				PowerServer server = bindServer.getServer();
-				return new Delegator(server, socket, this);
-			}
+			if (bindServer != null)
+				return bindServer.getServer();
 			else
 				return null;
 		}
@@ -102,6 +99,12 @@ public class Balancer extends Listener {
 		}
 		catch (Throwable e) {
 			e.printStackTrace();
+			
+			/*
+			 * It is possible that current Java environment does not support GUI.
+			 * Use of GraphicsEnvironment.isHeadless() tests Java GUI.
+			 * Hence, create control panel with console here.
+			 */
 		}
 	}
 

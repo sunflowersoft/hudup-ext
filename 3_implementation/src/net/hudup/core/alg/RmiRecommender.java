@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.util.Set;
 
-import net.hudup.core.client.DriverManager;
+import net.hudup.core.client.ClientUtil;
 import net.hudup.core.client.Service;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Dataset;
@@ -80,7 +80,7 @@ public class RmiRecommender extends ServiceRecommender implements RmiAlg {
 		unsetup();
 		
 		xURI uri = dataset.getConfig().getStoreUri(); 
-		service = DriverManager.getRemoteService(
+		service = ClientUtil.getRemoteService(
 				uri.getHost(),
 				uri.getPort(),
 				dataset.getConfig().getStoreAccount(), 

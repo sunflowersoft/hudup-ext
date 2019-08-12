@@ -44,6 +44,12 @@ public class ServerConfig extends SysConfig {
 
 	
 	/**
+	 * Control port field.
+	 */
+	public final static String CONTROL_PORT_FIELD = changeCase("control_port");
+
+	
+	/**
 	 * Default constructor.
 	 */
 	public ServerConfig() {
@@ -70,6 +76,9 @@ public class ServerConfig extends SysConfig {
 		setServerPort(Constants.DEFAULT_SERVER_PORT);
 		setServerTimeout(Constants.DEFAULT_SERVER_TIMEOUT);
 		setServerTasksPeriod(Constants.DEFAULT_SERVER_TASKS_PERIOD);
+		
+		setControlPort(Constants.DEFAULT_CONTROL_PORT);
+		addReadOnly(CONTROL_PORT_FIELD);
 	}
 
 	
@@ -90,6 +99,24 @@ public class ServerConfig extends SysConfig {
 		return getAsInt(SERVER_PORT_FIELD);
 	}
 	
+	
+	/**
+	 * Setting control port by specified port.
+	 * @param port specified port.
+	 */
+	public void setControlPort(int port) {
+		put(CONTROL_PORT_FIELD, port);
+	}
+	
+	
+	/**
+	 * Getting control port.
+	 * @return control port
+	 */
+	public int getControlPort() {
+		return getAsInt(CONTROL_PORT_FIELD);
+	}
+
 	
 	/**
 	 * Setting server task period in miliseconds.

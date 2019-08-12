@@ -146,9 +146,14 @@ public final class Constants {
 	public final static int     DEFAULT_BALANCER_EXPORT_PORT  = DEFAULT_SERVER_PORT + 4;
 	
 	/**
+	 * Default port for control server or listener..
+	 */
+	public final static int     DEFAULT_CONTROL_PORT          = DEFAULT_SERVER_PORT + 5;
+
+	/**
 	 * The graphic user interface (GUI) allowing users to control Hudup server is called control panel. Control panel uses this port to connect with Hudup server instead of using {@link #DEFAULT_SERVER_PORT}.
 	 */
-	public final static int     DEFAULT_CONTROL_PANEL_PORT    = DEFAULT_SERVER_PORT + 5;
+	public final static int     DEFAULT_CONTROL_PANEL_PORT    = DEFAULT_SERVER_PORT + 6;
 	
 	/**
 	 * When Hudup server, listener, or balancer starts, it uses firstly the port {@link #DEFAULT_SERVER_PORT}. If this constant is {@code true}, many random ports are tried until success.

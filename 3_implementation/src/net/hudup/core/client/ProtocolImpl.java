@@ -32,6 +32,17 @@ public class ProtocolImpl implements Protocol {
 
 	
 	@Override
+	public Request createControlRequest(String controlCommand) {
+		// TODO Auto-generated method stub
+		Request request = new Request();
+		request.action = CONTROL;
+		request.control_command = controlCommand;
+		
+		return request;
+	}
+
+
+	@Override
 	public Request createEstimateRequest(RecommendParam param, Set<Integer> queryIds) {
 		Request request = new Request();
 		request.action = ESTIMATE;

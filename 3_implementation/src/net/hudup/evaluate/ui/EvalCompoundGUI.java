@@ -32,6 +32,7 @@ import net.hudup.core.PluginStorage;
 import net.hudup.core.RegisterTable;
 import net.hudup.core.client.ConnectDlg;
 import net.hudup.core.client.Service;
+import net.hudup.core.client.SocketConnection;
 import net.hudup.core.evaluate.AbstractEvaluator;
 import net.hudup.core.evaluate.Evaluator;
 import net.hudup.core.evaluate.EvaluatorConfig;
@@ -458,6 +459,9 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 						final Evaluator ev = finalService.getEvaluator(evName);
 						dispose();
 						if (oldGUI != null) oldGUI.dispose();
+						
+						if (finalService instanceof SocketConnection)
+							((SocketConnection)finalService).close();
 						
 						ev.getPluginStorage().assignToSystem(); //This code line is very important for initializing plug-in storage.
 						run(ev, finalConnectDlg.getBindUri(), null);

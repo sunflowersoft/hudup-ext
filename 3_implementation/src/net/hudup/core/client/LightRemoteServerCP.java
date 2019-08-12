@@ -8,6 +8,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.Console;
 import java.rmi.RemoteException;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -19,8 +20,10 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
+import net.hudup.core.Constants;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.ui.PropPane;
+import net.hudup.core.logistic.NextUpdate;
 import net.hudup.core.logistic.ui.UIUtil;
 
 
@@ -32,6 +35,7 @@ import net.hudup.core.logistic.ui.UIUtil;
  * @version 10.0
  *
  */
+@NextUpdate
 public class LightRemoteServerCP extends JFrame {
 
 	
@@ -377,8 +381,10 @@ public class LightRemoteServerCP extends JFrame {
 	/**
 	 * Update all controls (components) in this control panel according to current server status.
 	 * Please see {@link ServerStatusEvent#status} for more details about server statuses.
+	 * This method currently hide pause/resume button because of error remote lock. The next version will be improve this method.
 	 * @throws RemoteException if any error raises.
 	 */
+	@NextUpdate
 	private synchronized void updateControls() throws RemoteException {
 		if (server == null)
 			return;
@@ -387,7 +393,7 @@ public class LightRemoteServerCP extends JFrame {
 			enableControls(false);
 
 			btnStart.setEnabled(false);
-			btnPauseResume.setEnabled(false);
+			btnPauseResume.setEnabled(true);
 			btnPauseResume.setText("Pause");
 			btnStop.setEnabled(true);
 			
@@ -400,7 +406,7 @@ public class LightRemoteServerCP extends JFrame {
 			enableControls(false);
 
 			btnStart.setEnabled(false);
-			btnPauseResume.setEnabled(false);
+			btnPauseResume.setEnabled(true);
 			btnPauseResume.setText("Resume");
 			btnStop.setEnabled(true);
 			
@@ -429,6 +435,13 @@ public class LightRemoteServerCP extends JFrame {
 		catch (Throwable e) {
 			e.printStackTrace();
 		}
+		
+		
+		/**
+		 * This method currently hide pause/resume button because of error remote lock. The next version will be improve this method.
+		 * So the following code lines need to be removed.
+		 */
+		btnPauseResume.setVisible(false);
 	}
 	
 	
@@ -451,44 +464,39 @@ public class LightRemoteServerCP extends JFrame {
 //	 * @version 10.0
 //	 *
 //	 */
+//	@Deprecated
+//	@SuppressWarnings("unused")
 //	private static class ConnectServerDlg extends JDialog {
 //
-//		
 //		/**
 //		 * Serial version UID for serializable class. 
 //		 */
 //		private static final long serialVersionUID = 1L;
-//		
 //		
 //		/**
 //		 * {@link JTextField} to fill remote host.
 //		 */
 //		protected JTextField txtHost = null;
 //		
-//		
 //		/**
 //		 * {@link JTextField} to fill remote port.
 //		 */
 //		protected JTextField txtPort = null;
-//		
 //		
 //		/**
 //		 * {@link JTextField} to fill remote user name.
 //		 */
 //		protected JTextField txtUsername = null;
 //		
-//		
 //		/**
 //		 * {@link JPasswordField} to fill remote password.
 //		 */
 //		protected JPasswordField txtPassword = null;
 //		
-//		
 //		/**
 //		 * Connected result as remote server.
 //		 */
 //		protected Server connServer = null;
-//		
 //		
 //		/**
 //		 * Constructor with parent component.
@@ -561,7 +569,6 @@ public class LightRemoteServerCP extends JFrame {
 //			setVisible(true);
 //		}
 //		
-//		
 //		@SuppressWarnings("deprecation")
 //		private void connect() {
 //			String host = txtHost.getText().trim();
@@ -579,7 +586,6 @@ public class LightRemoteServerCP extends JFrame {
 //			else
 //				dispose();
 //		}
-//		
 //		
 //		/**
 //		 * Getting the connected server as the result of this dialog.
@@ -599,13 +605,93 @@ public class LightRemoteServerCP extends JFrame {
 	 * @param args argument parameter of main method. It contains command line arguments.
 	 */
 	public static void main(String[] args) {
-		ConnectDlg dlg = ConnectDlg.connect();
-		
-		Server server = dlg.getServer();
-		if (server != null)
-			new LightRemoteServerCP(server);
+		boolean console = args != null && args.length >= 1 
+				&& args[0] != null && args[0].toLowerCase().equals("console");
+		if (console)
+			console();
+		else {
+			ConnectDlg dlg = ConnectDlg.connect();
+			
+			Server server = dlg.getServer();
+			if (server != null)
+				new LightRemoteServerCP(server);
+		}
 	}
 	 
 	
+	/**
+	 * Remote control panel via console.
+	 */
+	public static void console() {
+		Console console = System.console();
+		
+		System.out.println();
+		
+		System.out.print("Enter server host (\"localhost\" default): ");
+		String serverHost = console.readLine();
+		if (serverHost == null || serverHost.isEmpty())
+			serverHost = "localhost";
+		System.out.println("You select server host \"" + serverHost + "\"\n");
+		
+		System.out.print("Enter server port (\"" + Constants.DEFAULT_SERVER_PORT + "\" default): ");
+		String serverPortText = console.readLine();
+		int serverPort = -1;
+		try {
+			serverPort = Integer.parseInt(serverPortText);
+		}
+		catch (Exception e) {
+			serverPort = -1;
+		}
+		serverPort = serverPort == -1? Constants.DEFAULT_SERVER_PORT : serverPort;
+		System.out.println("You use port " + serverPort + "\n");
+		
+		System.out.print("Enter user name (\"admin\" default): ");
+		String username = console.readLine();
+		if (username == null || username.isEmpty())
+			username = "admin";
+		System.out.println("User name is \"" + username + "\"\n");
+
+		System.out.print("Enter password (\"admin\" default): ");
+		String password = new String(console.readPassword());
+		if (password == null || password.isEmpty())
+			password = "admin";
+		System.out.println();
+		
+//		System.out.print("Enter command (start|stop|pause|resume|exit): ");
+		System.out.print("Enter command (" + Request.START_CONTROL_COMMAND + "|" + Request.STOP_CONTROL_COMMAND+ "): ");
+		String command = console.readLine();
+		if (command == null || command.isEmpty())
+			command = Request.START_CONTROL_COMMAND;
+		System.out.println("Your command is \"" + command + "\"\n");
+
+		
+		boolean connected = true;
+		try {
+			Server server = ClientUtil.getRemoteServer(serverHost, serverPort, username, password);
+			if (server == null) {
+				System.out.println("Cannot connect RMI server");
+				connected = false;
+			}
+			else if (command.equals(Request.START_CONTROL_COMMAND))
+				server.start();
+			else if (command.equals(Request.STOP_CONTROL_COMMAND))
+				server.stop();
+			else
+				connected = false;
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			connected = false;
+		}
+		
+		String result = "Control command \"" + command 
+				+ "\" to server \"" + serverHost + "\" at port \"" + serverPort + "\"";
+		if (connected)
+			result = result + " is successful.";
+		else
+			result = result + " is failed.";
+
+		System.out.println(result);
+	}
 	
 }

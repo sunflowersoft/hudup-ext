@@ -92,6 +92,11 @@ public interface Protocol {
 	static final String QUIT =                              "quit";
 	
 	/**
+	 * Control action request created by method {@link #createControlRequest(String)}..
+	 */
+	static final String CONTROL =                           "control";
+
+	/**
 	 * Action of reading file request.
 	 */
 	static final String READ_FILE =                         "read_file";
@@ -403,6 +408,14 @@ public interface Protocol {
 	 */
 	static final String GET_EVALUATOR_NAMES =               "get_evaluator_names";
 
+	
+	/**
+	 * Create control request.
+	 * @param controlCommand command such as start and stop.
+	 * @return control request.
+	 */
+	Request createControlRequest(String controlCommand);
+	
 	
 	/**
 	 * Creating estimation request based on specified recommendation parameter and specified set of identifiers (IDs).

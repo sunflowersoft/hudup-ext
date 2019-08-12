@@ -63,6 +63,21 @@ public class SocketWrapper extends ProtocolImpl implements Service {
 	}
 	
 	
+	/**
+	 * Remote control to socket server
+	 * @param controlCommand control commands such as &quot;start&quot; and &quot;stop&quot;. 
+	 * @return true if control command is successful and false if control command is failed.  
+	 */
+	public boolean control(String controlCommand) {
+		Request request = createControlRequest(controlCommand);
+		Response response = sendRequest(request);
+		if (response == null)
+			return false;
+		
+		return response.booleanResult.get();
+	}
+	
+	
 	@Override
 	public RatingVector estimate(RecommendParam param, Set<Integer> queryIds) throws RemoteException {
 		Request request = createEstimateRequest(param, queryIds);

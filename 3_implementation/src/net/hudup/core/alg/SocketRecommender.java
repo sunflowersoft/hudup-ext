@@ -7,7 +7,7 @@ import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.util.Set;
 
-import net.hudup.core.client.DriverManager;
+import net.hudup.core.client.ClientUtil;
 import net.hudup.core.client.SocketConnection;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Dataset;
@@ -91,7 +91,7 @@ public class SocketRecommender extends ServiceRecommender implements SocketAlg {
 		String username = dataset.getConfig().getStoreAccount();
 		HiddenText password = dataset.getConfig().getStorePassword();
 		
-		connection = DriverManager.getSocketConnection(serverUri, username, password.getText()); 
+		connection = ClientUtil.getSocketConnection(serverUri, username, password.getText()); 
 	}
 
 	

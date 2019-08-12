@@ -15,6 +15,7 @@ import java.rmi.server.UnicastRemoteObject;
 
 import net.hudup.core.Constants;
 import net.hudup.core.client.Gateway;
+import net.hudup.core.client.PowerServer;
 import net.hudup.core.client.Protocol;
 import net.hudup.core.client.Server;
 import net.hudup.core.client.ServerStatusEvent;
@@ -205,17 +206,25 @@ public class Listener extends SocketServer implements ServerStatusListener, Gate
 	@Override
 	protected AbstractDelegator delegate(Socket socket) {
 		// TODO Auto-generated method stub
+		return new Delegator(getBindServer(), socket, this);
+	}
+
+
+	/**
+	 * Getting bound server.
+	 * @return bound server.
+	 */
+	protected PowerServer getBindServer() {
 		synchronized (bindServerList) {
 			
 			if (bindServerList.size() > 0)
-				return new Delegator(bindServerList.get().getServer(),
-						socket, this);
+				return bindServerList.get().getServer();
 			else
 				return null;
 		}
 	}
-
-
+	
+	
 	@Override
 	protected void serverTasks() {
 		rebind();
@@ -244,6 +253,17 @@ public class Listener extends SocketServer implements ServerStatusListener, Gate
 			bindServerList.prune();
 			break;
 		}
+	}
+
+
+	@Override
+	public boolean validateAccount(String account, String password, int privileges) {
+		// TODO Auto-generated method stub
+		PowerServer bindServer = getBindServer();
+		if (bindServer == null)
+			return false;
+		else
+			return validateAccount(account, password, privileges);
 	}
 
 
@@ -377,6 +397,12 @@ public class Listener extends SocketServer implements ServerStatusListener, Gate
 		}
 		catch (Throwable e) {
 			e.printStackTrace();
+			
+			/*
+			 * It is possible that current Java environment does not support GUI.
+			 * Use of GraphicsEnvironment.isHeadless() tests Java GUI.
+			 * Hence, create control panel with console here.
+			 */
 		}
 	}
 

@@ -325,6 +325,12 @@ public class DefaultServer extends PowerServerImpl {
 		catch (Throwable e) {
 			e.printStackTrace();
 			logger.error("Server fail to show control panel, caused by " + e.getMessage());
+			
+			/*
+			 * It is possible that current Java environment does not support GUI.
+			 * Use of GraphicsEnvironment.isHeadless() tests Java GUI.
+			 * Hence, create control panel with console here.
+			 */
 		}
 	}
 	

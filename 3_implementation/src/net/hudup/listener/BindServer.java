@@ -1,6 +1,6 @@
 package net.hudup.listener;
 
-import net.hudup.core.client.DriverManager;
+import net.hudup.core.client.ClientUtil;
 import net.hudup.core.client.PowerServer;
 import net.hudup.core.client.Server;
 import net.hudup.core.client.ServerStatusListener;
@@ -133,7 +133,7 @@ public class BindServer {
 			ServerStatusListener bind) {
 		
 		try {
-			Server server = (Server) DriverManager.getRemoteServer(
+			Server server = (Server) ClientUtil.getRemoteServer(
 					host, 
 					port, 
 					account, 

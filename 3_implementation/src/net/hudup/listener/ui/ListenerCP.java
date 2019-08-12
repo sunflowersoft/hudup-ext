@@ -8,6 +8,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.Console;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -21,11 +22,14 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
-import net.hudup.core.client.ConnectDlg;
+import net.hudup.core.Constants;
+import net.hudup.core.client.ClientUtil;
+import net.hudup.core.client.Request;
 import net.hudup.core.client.Server;
 import net.hudup.core.client.ServerStatusEvent;
 import net.hudup.core.client.ServerStatusEvent.Status;
 import net.hudup.core.client.ServerStatusListener;
+import net.hudup.core.client.SocketConnection;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.ui.SysConfigPane;
 import net.hudup.core.logistic.xURI;
@@ -692,18 +696,102 @@ public class ListenerCP extends JFrame implements ServerStatusListener {
 	 * @param args The argument parameter of main method. It contains command line arguments.
 	 */
 	public static void main(String[] args) {
-		ConnectDlg dlg = ConnectDlg.connect();
-		Image image = UIUtil.getImage("listener-32x32.png");
-        if (image != null)
-        	dlg.setIconImage(image);
-		
-		Server server = dlg.getServer();
-		if (server != null)
-			new ListenerCP(server, dlg.getBindUri(), true);
+		console();
+
+//		boolean console = args != null && args.length >= 1 
+//				&& args[0] != null && args[0].toLowerCase().equals("console");
+//		if (console)
+//			console();
+//		else {
+//			ConnectDlg dlg = ConnectDlg.connect();
+//			Image image = UIUtil.getImage("listener-32x32.png");
+//	        if (image != null)
+//	        	dlg.setIconImage(image);
+//			
+//			Server server = dlg.getServer();
+//			if (server != null)
+//				new ListenerCP(server, dlg.getBindUri(), true);
+//		}
 	}
 
 
-	
+	/**
+	 * Remote control panel via console.
+	 */
+	public static void console() {
+		Console console = System.console();
+		
+		System.out.println();
+		
+		System.out.print("Enter listener host (\"localhost\" default): ");
+		String listenerHost = console.readLine();
+		if (listenerHost == null || listenerHost.isEmpty())
+			listenerHost = "localhost";
+		System.out.println("You select listener host \"" + listenerHost + "\"\n");
+		
+		System.out.print("Enter listener port (\"" + Constants.DEFAULT_LISTENER_PORT + "\" default): ");
+		String listenerPortText = console.readLine();
+		int listenerPort = -1;
+		try {
+			listenerPort = Integer.parseInt(listenerPortText);
+		}
+		catch (Exception e) {
+			listenerPort = -1;
+		}
+		listenerPort = listenerPort == -1? Constants.DEFAULT_LISTENER_PORT : listenerPort;
+		System.out.println("You use port " + listenerPort + "\n");
+		
+		System.out.print("Enter user name (\"admin\" default): ");
+		String username = console.readLine();
+		if (username == null || username.isEmpty())
+			username = "admin";
+		System.out.println("User name is \"" + username + "\"\n");
+
+		System.out.print("Enter password (\"admin\" default): ");
+		String password = new String(console.readPassword());
+		if (password == null || password.isEmpty())
+			password = "admin";
+		System.out.println();
+		
+//		System.out.print("Enter command (start|stop|pause|resume|exit): ");
+		System.out.print("Enter command (" + Request.PAUSE_CONTROL_COMMAND + "|" + Request.RESUME_CONTROL_COMMAND+ "): ");
+		String command = console.readLine();
+		if (command == null || command.isEmpty())
+			command = Request.PAUSE_CONTROL_COMMAND;
+		System.out.println("Your command is \"" + command + "\"\n");
+
+		
+		boolean connected = true;
+		SocketConnection remoteListener = null;
+		try {
+			remoteListener = ClientUtil.getSocketConnection(listenerHost, listenerPort, username, password);
+			
+			if (command.equals(Request.PAUSE_CONTROL_COMMAND))
+				connected = remoteListener.control(Request.PAUSE_CONTROL_COMMAND);
+			else if (command.equals(Request.RESUME_CONTROL_COMMAND))
+				connected = remoteListener.control(Request.RESUME_CONTROL_COMMAND);
+			else
+				connected = false;
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			connected = false;
+		}
+		finally {
+			if (remoteListener != null)
+				remoteListener.close();
+			remoteListener = null;
+		}
+		
+		String result = "Control command \"" + command 
+				+ "\" to server \"" + listenerHost + "\" at port \"" + listenerPort + "\"";
+		if (connected)
+			result = result + " is successful.";
+		else
+			result = result + " is failed.";
+
+		System.out.println(result);
+	}
 	
 	
 }

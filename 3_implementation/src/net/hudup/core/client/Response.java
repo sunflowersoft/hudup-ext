@@ -53,6 +53,17 @@ public class Response extends ProtocolParam {
 	private static final long serialVersionUID = 1L;
 	
 	
+//	/**
+//	 * Successful response. 
+//	 */
+//	public final static String SUCCESS                   = "success";
+//	
+//	/**
+//	 * Failed response. 
+//	 */
+//	public final static String FAILED                    = "failed";
+
+	
 	/**
 	 * Result as attribute list.
 	 * Note, attribute list contains many attributes. Attribute represented by {@code Attribute} class indicates the data type, which is also a wrapper of data type.

@@ -7,7 +7,6 @@ import java.net.Socket;
 import java.rmi.RemoteException;
 import java.util.EventListener;
 import java.util.List;
-import java.util.Map;
 
 import javax.swing.event.EventListenerList;
 
@@ -126,59 +125,7 @@ public class Delegator extends AbstractDelegator {
 	
 	@Override
 	protected Request parseRequest(String requestText) {
-		Request request = null;
-		try {
-			String triple = requestText.substring(0, Math.min(3, requestText.length()));
-			triple = triple.toUpperCase();
-			
-			if (triple.equals("GET")) {
-				int fileType = HttpUtil.getFileType(requestText);
-				
-				if (fileType == UNKNOWN_FILE_TYPE) {
-					Map<String, String> params = HttpUtil.getParameters(requestText);
-					String action = HttpUtil.getAction(requestText);
-					if (action != null)
-						params.put("action", action);
-					else
-						params.put("action", Protocol.READ_FILE);
-					
-					request = Request.parse(params);
-					request.protocol = HTTP_PROTOCOL;
-					request.file_type = fileType;
-					
-					String path = HttpUtil.getPath(requestText);
-					if (path != null) {
-						UriAdapter adapter = new UriAdapter();
-						request.file_path = adapter.newPath(path).toString();
-						adapter.close();
-					}
-				}
-				else {
-					request = new Request();
-					request.protocol = HTTP_PROTOCOL;
-					request.action = Protocol.READ_FILE;
-					request.file_type = fileType;
-					
-					String path = HttpUtil.getPath(requestText);
-					if (path != null) {
-						UriAdapter adapter = new UriAdapter();
-						request.file_path = adapter.newPath(path).toString();
-						adapter.close();
-					}
-				}
-			}
-			else {
-				request = Request.parse(requestText);
-			}
-		}
-		catch (Throwable e) {
-			e.printStackTrace();
-			request = null;
-			
-			logger.error("Delegator fail to parse request, causes error " + e.getMessage());
-		}
-		
-		return request;
+		return parseRequest0(requestText);
 	}
 	
 	
@@ -401,7 +348,7 @@ public class Delegator extends AbstractDelegator {
 
 	
 	@Override
-	protected boolean validateAccount(String account, String password, int privileges) {
+	public boolean validateAccount(String account, String password, int privileges) {
 		
 		try {
 			return remoteServer.validateAccount(account, password, privileges);
@@ -841,13 +788,14 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluatorProgr
 		// TODO Auto-generated method stub
 		synchronized (remoteExported) {
 			if (remoteExported) {
+				this.remoteStop(); //It is possible to stop this evaluator because its is delegated evaluator.
+				
 				remoteEvaluator.removeEvaluatorListener(this);
 				remoteEvaluator.removeProgressListener(this);
 				remoteEvaluator.removeSetupAlgListener(this);
 				remoteEvaluator.remoteUnexport();
 				
 				socketServer.removeRunner(this);
-				this.remoteStop(); //It is possible to stop this evaluator because its is delegated evaluator.
 				NetUtil.RegistryRemote.unexport(this);
 				stub = null;
 				remoteServer.decRequest();

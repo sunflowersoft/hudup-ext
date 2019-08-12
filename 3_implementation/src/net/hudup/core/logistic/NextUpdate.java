@@ -16,7 +16,7 @@ import java.lang.annotation.Target;
  *
  */
 @Documented
-@Target ( {ElementType.TYPE, ElementType.METHOD, ElementType.CONSTRUCTOR} )
+@Target ( {ElementType.TYPE, ElementType.METHOD, ElementType.CONSTRUCTOR, ElementType.FIELD, ElementType.LOCAL_VARIABLE, ElementType.PARAMETER} )
 @Retention(RetentionPolicy.RUNTIME)
 public @interface NextUpdate {
 	

@@ -267,6 +267,8 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 	@Override
 	public synchronized void resume()  throws RemoteException {
 		// TODO Auto-generated method stub
+		//Which thread locked server can unlock server. This feature is used for security of service.
+		//However, this feature causes trouble in remote control.
 		if (!trans.isWriteLockedByCurrentThread())
 			return;
 			
@@ -290,6 +292,8 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 			return;
 		
 		if (isPaused()) {
+			//Which thread locked server can unlock server. This feature is used for security of service.
+			//However, this feature causes trouble in remote control.
 			if (!trans.isWriteLockedByCurrentThread())
 				return;
 			
@@ -741,6 +745,20 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 			return gateway.getRemoteService(account, password);
 		}
 		
+	}
+
+
+	@Override
+	protected void finalize() throws Throwable {
+		// TODO Auto-generated method stub
+		super.finalize();
+		
+		try {
+			shutdown();
+		}
+		catch (Throwable e) {
+			e.printStackTrace();
+		}
 	}
 
 	

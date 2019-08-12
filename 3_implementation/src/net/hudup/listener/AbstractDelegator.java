@@ -5,13 +5,16 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
+import java.util.Map;
 
+import net.hudup.core.client.Protocol;
 import net.hudup.core.client.ProtocolImpl;
 import net.hudup.core.client.Request;
 import net.hudup.core.client.Response;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.logistic.Runner;
 import net.hudup.core.logistic.RunnerThread;
+import net.hudup.core.logistic.UriAdapter;
 
 
 /**
@@ -24,7 +27,7 @@ import net.hudup.core.logistic.RunnerThread;
  * @version 10.0
  *
  */
-public abstract class AbstractDelegator extends ProtocolImpl implements Runner {
+public abstract class AbstractDelegator extends ProtocolImpl implements Runner, AccountValidater {
 
 	
 	/**
@@ -92,7 +95,8 @@ public abstract class AbstractDelegator extends ProtocolImpl implements Runner {
 			
 			notifyAll();
 		}
-			
+		
+		
 		try {
 			
 			userSession.clear();
@@ -115,20 +119,21 @@ public abstract class AbstractDelegator extends ProtocolImpl implements Runner {
 					break;
 				
 				synchronized (this) {
-					Request request = parseRequest(requestText);
+					final Request request = parseRequest(requestText);
 					if (request == null || request.isQuitRequest()) {
-						Response empty = Response.createEmpty(request.protocol);
+						Response empty = request == null? Response.createEmpty(Protocol.HDP_PROTOCOL) : Response.createEmpty(request.protocol);
 						out.write( (empty.toJson() + "\n").getBytes());
 						break;
 					}
 
 					
-					if (!initUserSession(request)) {
+					if (!initUserSession(this, userSession, request)) {
 						Response empty = Response.createEmpty(request.protocol);
 						out.write( (empty.toJson() + "\n").getBytes());
 						break;
 					}
 					
+
 					boolean handled = handleRequest(request, out);
 					if (request.protocol == HTTP_PROTOCOL)
 						break;
@@ -154,6 +159,7 @@ public abstract class AbstractDelegator extends ProtocolImpl implements Runner {
 			userSession.clear();
 		}
 		
+
 		synchronized (this) {
 			try {
 				if (in != null)
@@ -198,11 +204,13 @@ public abstract class AbstractDelegator extends ProtocolImpl implements Runner {
 	/**
 	 * Initializing user session by specified request.
 	 * User session is used for storing user information such as account name, password, privileges.
+	 * @param accountValidater account validater.
+	 * @param userSession user session.
 	 * @param request specified request.
 	 * @return whether user session initialized successfully.
 	 */
-	protected boolean initUserSession(Request request) {
-		if (request.protocol != HDP_PROTOCOL)
+	public static boolean initUserSession(AccountValidater accountValidater, UserSession userSession, Request request) {
+		if (request.protocol != Protocol.HDP_PROTOCOL)
 			return true;
 		
 		if (userSession.size() == 0) {
@@ -214,8 +222,8 @@ public abstract class AbstractDelegator extends ProtocolImpl implements Runner {
 			if (account == null || password ==  null || privileges <= 0)
 				return false;
 			
-			if (  ((privileges & DataConfig.ACCOUNT_ACCESS_PRIVILEGE) == 0) ||
-				  (!validateAccount(account, password, privileges))  ) {
+			if (  ((privileges & DataConfig.ACCOUNT_ACCESS_PRIVILEGE) != DataConfig.ACCOUNT_ACCESS_PRIVILEGE) ||
+				  (!accountValidater.validateAccount(account, password, privileges))  ) {
 				
 				return false;
 			}
@@ -228,15 +236,14 @@ public abstract class AbstractDelegator extends ProtocolImpl implements Runner {
 		}
 		else {
 			int priv = userSession.getPriv();
-			if ( (priv & DataConfig.ACCOUNT_ACCESS_PRIVILEGE) == 0) {
+			if ( (priv & DataConfig.ACCOUNT_ACCESS_PRIVILEGE) != DataConfig.ACCOUNT_ACCESS_PRIVILEGE) {
 				return false;
 			}
 			
 			return true;
 		}
-	
 	}
-	
+
 	
 	@Override
 	public synchronized void start() {
@@ -357,13 +364,65 @@ public abstract class AbstractDelegator extends ProtocolImpl implements Runner {
 	
 	
 	/**
-	 * Checking whether an account is valid with regard to specified password and specified privileges.
-	 * @param account specified account.
-	 * @param password specified password.
-	 * @param privileges specified privileges.
-	 * @return whether account is valid.
+	 * Parsing request from specified text.
+	 * @param requestText specified request text.
+	 * @return request parsed from specified text.
 	 */
-	protected abstract boolean validateAccount(String account, String password, int privileges);
-	
+	protected static Request parseRequest0(String requestText) {
+		Request request = null;
+		try {
+			String triple = requestText.substring(0, Math.min(3, requestText.length()));
+			triple = triple.toUpperCase();
+			
+			if (triple.equals("GET")) {
+				int fileType = HttpUtil.getFileType(requestText);
+				
+				if (fileType == UNKNOWN_FILE_TYPE) {
+					Map<String, String> params = HttpUtil.getParameters(requestText);
+					String action = HttpUtil.getAction(requestText);
+					if (action != null)
+						params.put("action", action);
+					else
+						params.put("action", Protocol.READ_FILE);
+					
+					request = Request.parse(params);
+					request.protocol = HTTP_PROTOCOL;
+					request.file_type = fileType;
+					
+					String path = HttpUtil.getPath(requestText);
+					if (path != null) {
+						UriAdapter adapter = new UriAdapter();
+						request.file_path = adapter.newPath(path).toString();
+						adapter.close();
+					}
+				}
+				else {
+					request = new Request();
+					request.protocol = HTTP_PROTOCOL;
+					request.action = Protocol.READ_FILE;
+					request.file_type = fileType;
+					
+					String path = HttpUtil.getPath(requestText);
+					if (path != null) {
+						UriAdapter adapter = new UriAdapter();
+						request.file_path = adapter.newPath(path).toString();
+						adapter.close();
+					}
+				}
+			}
+			else {
+				request = Request.parse(requestText);
+			}
+		}
+		catch (Throwable e) {
+			e.printStackTrace();
+			request = null;
+			
+			logger.error("Delegator fail to parse request, causes error " + e.getMessage());
+		}
+		
+		return request;
+	}
+
 	
 }

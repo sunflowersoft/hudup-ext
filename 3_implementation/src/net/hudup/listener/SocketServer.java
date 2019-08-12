@@ -1,5 +1,8 @@
 package net.hudup.listener;
 
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.rmi.RemoteException;
@@ -11,6 +14,9 @@ import javax.swing.event.EventListenerList;
 
 import net.hudup.core.Constants;
 import net.hudup.core.Util;
+import net.hudup.core.client.Protocol;
+import net.hudup.core.client.Request;
+import net.hudup.core.client.Response;
 import net.hudup.core.client.Server;
 import net.hudup.core.client.ServerConfig;
 import net.hudup.core.client.ServerStatusEvent;
@@ -21,6 +27,7 @@ import net.hudup.core.data.DataConfig;
 import net.hudup.core.logistic.AbstractRunner;
 import net.hudup.core.logistic.I18nUtil;
 import net.hudup.core.logistic.NetUtil;
+import net.hudup.core.logistic.NextUpdate;
 import net.hudup.core.logistic.RemoteRunner;
 import net.hudup.core.logistic.Runner;
 import net.hudup.core.logistic.RunnerThread;
@@ -34,7 +41,7 @@ import net.hudup.core.logistic.RunnerThread;
  * @version 10.0
  *
  */
-public abstract class SocketServer extends AbstractRunner implements Server {
+public abstract class SocketServer extends AbstractRunner implements Server, AccountValidater {
 
 	
 	/**
@@ -48,6 +55,12 @@ public abstract class SocketServer extends AbstractRunner implements Server {
 	 */
 	protected ServerSocket serverSocket = null;
 
+	
+	/**
+	 * Control socket for control commands such as start, stop, pause and resume.
+	 */
+	protected ServerSocket controlSocket = null;
+	
 	
 	/**
 	 * List of event listeners of this socket server. Popular listeners are server status listeners represented by {@link ServerStatusListener} interface.
@@ -96,6 +109,8 @@ public abstract class SocketServer extends AbstractRunner implements Server {
 	public SocketServer(ServerConfig config) {
 		this.config = config;
 		
+		setupControlSocket();
+		
 		Runtime.getRuntime().addShutdownHook(new Thread() {
 
 			@Override
@@ -139,46 +154,127 @@ public abstract class SocketServer extends AbstractRunner implements Server {
 			socket = null;
 			logger.error("Socket server fail to connect to client, caused by " + e.getMessage());
 		}
+		if (socket == null) return;
 
-		if (socket != null) {
-			try {
-				socket.setSoTimeout(config.getServerTimeout());
-				
-				AbstractDelegator delegator = delegate(socket);
-				if (delegator != null) {
-					delegator.start();
-				}
-				else {
-					try {
-						socket.close();
-					} 
-					catch (Throwable e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-						logger.error("Socket server fail to close socket, caused by " + e.getMessage());
-					}
-					logger.error("Socket server fail to create delegator (null delegator)");
-				}
-			} 
-			catch (Throwable e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				
+		try {
+			socket.setSoTimeout(config.getServerTimeout());
+			
+			AbstractDelegator delegator = delegate(socket);
+			if (delegator != null) {
+				delegator.start();
+			}
+			else {
 				try {
 					socket.close();
 				} 
-				catch (Throwable e1) {
+				catch (Throwable e) {
 					// TODO Auto-generated catch block
-					e1.printStackTrace();
+					e.printStackTrace();
 					logger.error("Socket server fail to close socket, caused by " + e.getMessage());
 				}
-				logger.error("Socket server fail to connect to client, caused by " + e.getMessage());
+				logger.error("Socket server fail to create delegator (null delegator)");
+			}
+		} 
+		catch (Throwable e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			
+			try {
+				socket.close();
+			} 
+			catch (Throwable e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+				logger.error("Socket server fail to close socket, caused by " + e.getMessage());
+			}
+			logger.error("Socket server fail to connect to client, caused by " + e.getMessage());
+		}
+			
+	}
+
+	
+	/**
+	 * Processing control commands such as start, stop, pause, resume.
+	 */
+	protected void controlTask() {
+		if (controlSocket == null) return;
+		
+		Socket socket = null;
+		DataOutputStream out = null;
+		BufferedReader in = null;
+		try {
+			socket = controlSocket.accept();
+			socket.setSoTimeout(config.getServerTimeout());
+			
+			out = new DataOutputStream(socket.getOutputStream());
+			in = new BufferedReader(
+					new InputStreamReader(socket.getInputStream()));
+
+			String requestText = null;
+			while ( (!socket.isClosed()) && (requestText = in.readLine()) != null ) {
+				Request request = AbstractDelegator.parseRequest0(requestText);
+				
+				if (request == null || !request.action.equals(Protocol.CONTROL)) {
+					Response empty = Response.createEmpty(Protocol.HDP_PROTOCOL);
+					out.write( (empty.toJson() + "\n").getBytes());
+					break;
+				}
+				
+				UserSession userSession = new UserSession();
+				if (!AbstractDelegator.initUserSession(this, userSession, request)) {
+					Response empty = Response.createEmpty(request.protocol);
+					out.write( (empty.toJson() + "\n").getBytes());
+					break;
+				}
+				
+				if ((userSession.getPriv() & DataConfig.ACCOUNT_ACCESS_PRIVILEGE) != DataConfig.ACCOUNT_ACCESS_PRIVILEGE)
+					break;
+				
+				//Client always receives successful response for control command. This is a work-around solution.
+				@NextUpdate
+				Response success = Response.create(true);
+				out.write( (success.toJson() + "\n").getBytes());
+
+				if (request.control_command.equals(Request.PAUSE_CONTROL_COMMAND))
+					this.pause();
+				if (request.control_command.equals(Request.RESUME_CONTROL_COMMAND))
+					this.resume();
 			}
 			
-				
+		} 
+		catch (Throwable e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-		
+		finally {
+			
+			try {
+				if (in != null) in.close();
+			}
+			catch (Throwable e) {
+				e.printStackTrace();
+			}
+			
+			try {
+				if (out != null) out.close();
+			}
+			catch (Throwable e) {
+				e.printStackTrace();
+			}
+
+			try {
+				if (socket != null && !socket.isClosed())
+					socket.close();
+			}
+			catch (Throwable e) {
+				e.printStackTrace();
+			}
+		}
+			
+				
 	}
+	
+	
 
 	
 	@Override
@@ -246,7 +342,7 @@ public abstract class SocketServer extends AbstractRunner implements Server {
 		if (!isStarted())
 			return;
 		
-		logger.info("Socket server prepare to stop, please waiting...");
+		logger.info("Socket server prepares to stop, please waiting...");
 		
 		stopInternalRunners(); //Added date 2019.09.11 by Loc Nguyen
 		stopDelegators();
@@ -272,14 +368,17 @@ public abstract class SocketServer extends AbstractRunner implements Server {
 	 * Shutting down this socket server. After shut down, the server is discarded and cannot be re-started.
 	 */
 	protected synchronized void shutdown() throws RemoteException {
-		if (config == null)
+		if (config == null) //The configuration is like a flag.
 			return;
 		
 		stop();
+		
+		destroyControlSocket();
+		
 		config.save();
 		config = null;
-		logger.info("Socket server shutdown");
 		
+		logger.info("Socket server shutdown");
 		fireStatusEvent(new ServerStatusEvent(this, Status.exit));
 	}
 
@@ -410,6 +509,25 @@ public abstract class SocketServer extends AbstractRunner implements Server {
 	
 	
 	/**
+	 * Destroying the control socket.
+	 */
+	private void destroyControlSocket() {
+		if (controlSocket != null && !controlSocket.isClosed()) {
+			try {
+				controlSocket.close();
+			} 
+			catch (Throwable e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				logger.error("Socket server fail to close control socket, caused by " + e.getMessage());
+			}
+		}
+		
+		controlSocket = null;
+	}
+
+	
+	/**
 	 * Setting up (initializing) the internal socket {@link #serverSocket}.
 	 */
 	private void setupServerSocket() {
@@ -429,6 +547,31 @@ public abstract class SocketServer extends AbstractRunner implements Server {
 				e.printStackTrace();
 				logger.error("Socket server fail to create server socket, caused by " + e.getMessage());
 				destroyServerSocket();
+			}
+		}
+	}
+
+	
+	/**
+	 * Setting up (initializing) the control socket.
+	 */
+	private void setupControlSocket() {
+		if (controlSocket == null || controlSocket.isClosed()) {
+		
+			try {
+				int port = NetUtil.getPort(config.getControlPort(), Constants.TRY_RANDOM_PORT);
+				if (port < 0)
+					throw new Exception("Invalid port number");
+				config.setControlPort(port);
+
+				controlSocket = new ServerSocket(port);
+				controlSocket.setSoTimeout(config.getServerTimeout());
+			}
+			catch (Throwable e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				logger.error("Socket server fail to create server socket, caused by " + e.getMessage());
+				destroyControlSocket();
 			}
 		}
 	}
@@ -764,6 +907,20 @@ public abstract class SocketServer extends AbstractRunner implements Server {
 	protected boolean getFlag() {
 		synchronized (flag) {
 			return flag;
+		}
+	}
+
+
+	@Override
+	protected void finalize() throws Throwable {
+		// TODO Auto-generated method stub
+		super.finalize();
+		
+		try {
+			shutdown();
+		}
+		catch (Throwable e) {
+			e.printStackTrace();
 		}
 	}
 	

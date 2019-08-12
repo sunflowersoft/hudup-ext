@@ -53,6 +53,27 @@ public class Request extends ProtocolParam {
 	
 	
 	/**
+	 * Start control command. 
+	 */
+	public final static String START_CONTROL_COMMAND                      = "start";
+	
+	/**
+	 * Stop control command. 
+	 */
+	public final static String STOP_CONTROL_COMMAND                       = "stop";
+
+	/**
+	 * Pause control command. 
+	 */
+	public final static String PAUSE_CONTROL_COMMAND                      = "pause";
+	
+	/**
+	 * Resume control command. 
+	 */
+	public final static String RESUME_CONTROL_COMMAND                     = "resume";
+
+	
+	/**
 	 * Flag to indicate that not JSON parsing.
 	 */
 	public boolean                          notJsonParsing                = false;
@@ -64,6 +85,11 @@ public class Request extends ProtocolParam {
 	 */
 	public String                           action                        = null;
 	
+	/**
+	 * Control commands: &quot;start&quot;, &quot;stop&quot;.
+	 */
+	public String                           control_command               = null;
+
 	/**
 	 * Account name. Note, account is the information of a user who has access to Hudup server with her/his privileges. Account is modeled and stored in framework database as profile. 
 	 * Account is the information of a user who has access to the server with her/his privileges. Account is modeled and stored in framework database as profile. 

@@ -23,6 +23,7 @@ import javax.swing.JPanel;
 import net.hudup.core.client.ServerStatusEvent.Status;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.ui.PropPane;
+import net.hudup.core.logistic.NextUpdate;
 import net.hudup.core.logistic.xURI;
 import net.hudup.core.logistic.ui.UIUtil;
 
@@ -43,6 +44,7 @@ import net.hudup.core.logistic.ui.UIUtil;
  * @version 10.0
  *
  */
+@NextUpdate
 public class RemoteServerCP extends JFrame implements ServerStatusListener {
 
 	
@@ -452,16 +454,18 @@ public class RemoteServerCP extends JFrame implements ServerStatusListener {
 	/**
 	 * Update all controls (components) in this control panel according to current server status.
 	 * Please see {@link ServerStatusEvent#status} for more details about server statuses.
+	 * This method currently hide pause/resume button because of error remote lock. The next version will be improve this method.
 	 * @param status server current status.
 	 * @throws RemoteException if any error raises.
 	 */
+	@NextUpdate
 	private void updateControls(ServerStatusEvent.Status status) throws RemoteException {
 		
 		if (status == Status.started || status == Status.resumed) {
 			enableControls(false);
 
 			btnStart.setEnabled(false);
-			btnPauseResume.setEnabled(false);
+			btnPauseResume.setEnabled(true);
 			btnPauseResume.setText("Pause");
 			btnStop.setEnabled(true);
 			
@@ -480,7 +484,7 @@ public class RemoteServerCP extends JFrame implements ServerStatusListener {
 			enableControls(false);
 
 			btnStart.setEnabled(false);
-			btnPauseResume.setEnabled(false);
+			btnPauseResume.setEnabled(true);
 			btnPauseResume.setText("Resume");
 			btnStop.setEnabled(true);
 			
@@ -508,6 +512,12 @@ public class RemoteServerCP extends JFrame implements ServerStatusListener {
 			dispose();
 		}
 		
+		
+		/**
+		 * This method currently hide pause/resume button because of error remote lock. The next version will be improve this method.
+		 * So the following code lines need to be removed.
+		 */
+		btnPauseResume.setVisible(false);
 	}
 
 	

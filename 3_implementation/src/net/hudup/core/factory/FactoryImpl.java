@@ -77,7 +77,7 @@ public class FactoryImpl implements Factory {
 		else if (dataDriver.isHudupServer()) {
 			xURI uri = config.getStoreUri();
 			if (dataDriver.getType() == DataType.hudup_rmi) {
-				Service service = net.hudup.core.client.DriverManager.getRemoteService(
+				Service service = net.hudup.core.client.ClientUtil.getRemoteService(
 						uri.getHost(),
 						uri.getPort(),
 						config.getStoreAccount(), 
@@ -87,7 +87,7 @@ public class FactoryImpl implements Factory {
 					providerAssoc = new HudupProviderAssoc(config);
 			}
 			else if (dataDriver.getType() == DataType.hudup_socket) {
-				SocketConnection connection = net.hudup.core.client.DriverManager.getSocketConnection(
+				SocketConnection connection = net.hudup.core.client.ClientUtil.getSocketConnection(
 						uri,
 						config.getStoreAccount(), 
 						config.getStorePassword().getText());

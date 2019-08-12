@@ -263,6 +263,17 @@ public abstract class ConnectDlg extends JDialog {
 	
 	
 	/**
+	 * Disconnecting.
+	 */
+	public void disconnect() {
+		if ((connector != null) && (connector instanceof SocketConnection))
+			((SocketConnection)connector).close();
+		
+		connector = null;
+	}
+	
+	
+	/**
 	 * Creating the binded URI for the control panel. In current implementation, it is &quot;rmi://localhost:&lt;port&gt;/connect&quot;
 	 * @return binded URI.
 	 */
@@ -296,11 +307,11 @@ public abstract class ConnectDlg extends JDialog {
 				
 				String connectType = cmbConnectType.getSelectedItem().toString();
 				if (connectType.equals(SERVER_CONNECT))
-					connector = DriverManager.getRemoteServer(remoteHost, remotePort, txtRemoteUsername.getText(), txtRemotePassword.getText());
+					connector = ClientUtil.getRemoteServer(remoteHost, remotePort, txtRemoteUsername.getText(), txtRemotePassword.getText());
 				else if (connectType.equals(RMI_SERVICE_CONNECT))
-					connector = DriverManager.getRemoteService(remoteHost, remotePort, txtRemoteUsername.getText(), txtRemotePassword.getText());
+					connector = ClientUtil.getRemoteService(remoteHost, remotePort, txtRemoteUsername.getText(), txtRemotePassword.getText());
 				else if (connectType.equals(SOCKET_SERVICE_CONNECT))
-					connector = DriverManager.getSocketConnection(remoteHost, remotePort, txtRemoteUsername.getText(), txtRemotePassword.getText());
+					connector = ClientUtil.getSocketConnection(remoteHost, remotePort, txtRemoteUsername.getText(), txtRemotePassword.getText());
 				else
 					connector = null;
 				

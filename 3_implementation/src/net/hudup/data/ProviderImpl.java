@@ -1152,7 +1152,7 @@ public class ProviderImpl implements Provider {
 			return false;
 		
 		int priv = profile.getValueAsInt(DataConfig.ACCOUNT_PRIVILEGES_FIELD);
-		if ( (priv & privileges) == 0)
+		if ( (priv & privileges) != privileges)
 			return false;
 		
 		return true;
