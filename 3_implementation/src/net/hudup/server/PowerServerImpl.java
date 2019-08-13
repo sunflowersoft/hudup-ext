@@ -52,7 +52,7 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 	/**
 	 * Server policy file.
 	 */
-	public final static String  SERVER_POLICY = Constants.ROOT_PACKAGE + "hudup_server.policy";
+	public final static String  SERVER_POLICY = Constants.RESOURCES_PACKAGE + "hudup_server.policy";
 	
 	
 	/**

@@ -77,33 +77,45 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 
 	
 	/**
+	 * Name of cosine + Jaccard measure.
+	 */
+	public static final String COSINEJ = "cosinej";
+
+	
+	/**
 	 * Name of Pearson measure.
 	 */
 	public static final String PEARSON = "pearson";
 
 	
 	/**
-	 * Name of adjusted cosine measure.
+	 * Name of Pearson + Jaccard measure.
 	 */
-	public static final String ACOS = "acos";
+	public static final String PEARSONJ = "pearsonj";
 
 	
 	/**
-	 * Name of constrained Pearson correlation coefficient measure.
+	 * Name of adjusted cosine measure.
 	 */
-	public static final String CPCC = "cpcc";
+	public static final String COD = "cod";
+
+	
+	/**
+	 * Name of constrained Pearson correlation coefficient measure. It is also cosine normalized (CON) measure.
+	 */
+	public static final String CPC = "cpc";
 	
 	
 	/**
 	 * Name of weighted Pearson correlation coefficient measure.
 	 */
-	public static final String WPCC = "wpcc";
+	public static final String WPC = "wpc";
 	
 	
 	/**
 	 * Name of sigmoid Pearson correlation coefficient measure.
 	 */
-	public static final String SPCC = "spcc";
+	public static final String SPC = "spc";
 
 	
 	/**
@@ -461,11 +473,13 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 		// TODO Auto-generated method stub
 		Set<String> mSet = Util.newSet();
 		mSet.add(COSINE);
+		mSet.add(COSINEJ);
 		mSet.add(PEARSON);
-		mSet.add(ACOS);
-		mSet.add(CPCC);
-		mSet.add(WPCC);
-		mSet.add(SPCC);
+		mSet.add(PEARSONJ);
+		mSet.add(COD);
+		mSet.add(CPC);
+		mSet.add(WPC);
+		mSet.add(SPC);
 		mSet.add(JACCARD);
 		mSet.add(JACCARD2);
 		mSet.add(MSD);
@@ -541,16 +555,20 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 		
 		if (measure.equals(COSINE))
 			return cosine(vRating1, vRating2, profile1, profile2);
+		if (measure.equals(COSINEJ))
+			return cosine(vRating1, vRating2, profile1, profile2) * jaccard(vRating1, vRating2, profile1, profile2);
 		else if (measure.equals(PEARSON))
 			return corr(vRating1, vRating2, profile1, profile2);
-		else if (measure.equals(ACOS))
-			return acos(vRating1, vRating2, profile1, profile2);
-		else if (measure.equals(CPCC))
-			return cpcc(vRating1, vRating2, profile1, profile2);
-		else if (measure.equals(WPCC))
-			return wpcc(vRating1, vRating2, profile1, profile2);
-		else if (measure.equals(SPCC))
-			return spcc(vRating1, vRating2, profile1, profile2);
+		else if (measure.equals(PEARSONJ))
+			return corr(vRating1, vRating2, profile1, profile2) * jaccard(vRating1, vRating2, profile1, profile2);
+		else if (measure.equals(COD))
+			return cod(vRating1, vRating2, profile1, profile2);
+		else if (measure.equals(CPC))
+			return cpc(vRating1, vRating2, profile1, profile2);
+		else if (measure.equals(WPC))
+			return wpc(vRating1, vRating2, profile1, profile2);
+		else if (measure.equals(SPC))
+			return spc(vRating1, vRating2, profile1, profile2);
 		else if (measure.equals(JACCARD))
 			return jaccard(vRating1, vRating2, profile1, profile2);
 		else if (measure.equals(JACCARD2))
@@ -738,7 +756,7 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 
 	
 	/**
-	 * Calculating the ACOS (adjusted cosine) measure between two pairs.
+	 * Calculating the COD (adjusted cosine) measure between two pairs.
 	 * The first pair includes the first rating vector and the first profile.
 	 * The second pair includes the second rating vector and the second profile.
 	 * 
@@ -748,18 +766,18 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 	 * @param profile2 second profile.
 	 * @return ACOS measure between both two rating vectors.
 	 */
-	public abstract double acos(RatingVector vRating1, RatingVector vRating2,
+	public abstract double cod(RatingVector vRating1, RatingVector vRating2,
 			Profile profile1, Profile profile2);
 	
 
 	/**
-	 * Calculating the ACOS (adjusted cosine) measure between two rating vectors.
+	 * Calculating the COD (adjusted cosine) measure between two rating vectors.
 	 * @param vRating1 the first rating vectors.
 	 * @param vRating2 the second rating vectors.
 	 * @param fieldMeans mean value of field ratings.
 	 * @return ACOS (adjusted cosine) measure between two rating vectors.
 	 */
-	public static double acos(RatingVector vRating1, RatingVector vRating2, Map<Integer, Double> fieldMeans) {
+	public static double cod(RatingVector vRating1, RatingVector vRating2, Map<Integer, Double> fieldMeans) {
 		Set<Integer> common = commonFieldIds(vRating1, vRating2);
 		if (common.size() == 0) return Constants.UNUSED;
 
@@ -783,7 +801,8 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 
 	
 	/**
-	 * Calculating the CPCC (constrained Pearson correlation coefficient) measure between two pairs.
+	 * Calculating the CPC (constrained Pearson correlation) measure between two pairs.
+	 * It is also cosine normalized (CON) measure.
 	 * The first pair includes the first rating vector and the first profile.
 	 * The second pair includes the second rating vector and the second profile.
 	 * 
@@ -791,9 +810,9 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 	 * @param vRating2 second rating vector.
 	 * @param profile1 first profile.
 	 * @param profile2 second profile.
-	 * @return CPCC measure between both two rating vectors.
+	 * @return CPC measure between both two rating vectors.
 	 */
-	public double cpcc(
+	public double cpc(
 			RatingVector vRating1, RatingVector vRating2,
 			Profile profile1, Profile profile2) {
 		Set<Integer> common = commonFieldIds(vRating1, vRating2);
@@ -818,7 +837,7 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 	
 	
 	/**
-	 * Calculating the WPCC (weighted Pearson correlation coefficient) measure between two pairs. SMTP is developed by Yung-Shen Lin, Jung-Yi Jiang, Shie-Jue Lee, and implemented by Loc Nguyen.
+	 * Calculating the WPC (weighted Pearson correlation) measure between two pairs. SMTP is developed by Yung-Shen Lin, Jung-Yi Jiang, Shie-Jue Lee, and implemented by Loc Nguyen.
 	 * The first pair includes the first rating vector and the first profile.
 	 * The second pair includes the second rating vector and the second profile.
 	 * 
@@ -828,7 +847,7 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 	 * @param profile2 second profile.
 	 * @return WPCC measure between both two rating vectors.
 	 */
-	public double wpcc(
+	public double wpc(
 			RatingVector vRating1, RatingVector vRating2,
 			Profile profile1, Profile profile2) {
 		Set<Integer> common = commonFieldIds(vRating1, vRating2);
@@ -841,7 +860,7 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 	
 	
 	/**
-	 * Calculating the WPCC (weighted Pearson correlation coefficient) measure between two pairs. SMTP is developed by Yung-Shen Lin, Jung-Yi Jiang, Shie-Jue Lee, and implemented by Loc Nguyen.
+	 * Calculating the WPC (weighted Pearson correlation) measure between two pairs. SMTP is developed by Yung-Shen Lin, Jung-Yi Jiang, Shie-Jue Lee, and implemented by Loc Nguyen.
 	 * The first pair includes the first rating vector and the first profile.
 	 * The second pair includes the second rating vector and the second profile.
 	 * 
@@ -849,9 +868,9 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 	 * @param vRating2 second rating vector.
 	 * @param profile1 first profile.
 	 * @param profile2 second profile.
-	 * @return WPCC measure between both two rating vectors.
+	 * @return WPC measure between both two rating vectors.
 	 */
-	public double spcc(
+	public double spc(
 			RatingVector vRating1, RatingVector vRating2,
 			Profile profile1, Profile profile2) {
 		Set<Integer> common = commonFieldIds(vRating1, vRating2);

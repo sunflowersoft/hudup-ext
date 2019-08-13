@@ -3,6 +3,7 @@
  */
 package net.hudup.core;
 
+import static net.hudup.core.Constants.RESOURCES_PACKAGE;
 import static net.hudup.core.Constants.ROOT_PACKAGE;
 
 import java.io.File;
@@ -41,6 +42,44 @@ import net.hudup.core.security.CipherImpl;
  */
 public final class Util {
 
+	
+	/**
+	 * System properties
+	 */
+	private final static Properties props = new Properties();
+	
+	
+	/**
+	 * Loading system properties.
+	 */
+	static {
+		try {
+			InputStream in = Util.class.getResourceAsStream(RESOURCES_PACKAGE + "hudup.properties");
+			if (in != null) {
+				props.load(in);
+				in.close();
+			}
+		}
+		catch (Throwable e) {
+			e.printStackTrace();
+		}
+
+		
+		try {
+			Properties userProps = new Properties();
+			InputStream in = Util.class.getResourceAsStream(ROOT_PACKAGE + "user.properties");
+			if (in != null) {
+				userProps.load(in);
+				in.close();
+				props.putAll(userProps);
+			}
+		}
+		catch (Throwable e) {
+			e.printStackTrace();
+		}
+		
+	}
+	
 	
 	/**
 	 * Creating a new {@link Vector}.
@@ -243,17 +282,7 @@ public final class Util {
 	 * @return property of specified key in Hudup property &quot;hudup.properties&quot;.
 	 */
 	public static String getHudupProperty(String key) {
-		try {
-			Properties props = new Properties();
-			InputStream in = Util.class.getResourceAsStream(ROOT_PACKAGE + "hudup.properties");		
-			props.load(in);
-			return props.getProperty(key);
-		}
-		catch (Throwable e) {
-			e.printStackTrace();
-		}
-		
-		return null;
+		return props.getProperty(key);
 	}
 
 	

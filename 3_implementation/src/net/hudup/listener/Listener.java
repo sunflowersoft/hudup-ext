@@ -24,6 +24,7 @@ import net.hudup.core.client.ServerStatusListener;
 import net.hudup.core.client.ServerTrayIcon;
 import net.hudup.core.client.Service;
 import net.hudup.core.data.DataConfig;
+import net.hudup.core.data.HiddenText;
 import net.hudup.core.logistic.NetUtil;
 import net.hudup.core.logistic.xURI;
 import net.hudup.core.logistic.ui.HelpContent;
@@ -159,7 +160,9 @@ public class Listener extends SocketServer implements ServerStatusListener, Gate
 		
 		super.stop();
 		
-		bindServerList.unbindAll();
+		synchronized (bindServerList) {
+			bindServerList.unbindAll();
+		}
 	}
 	
 	
@@ -250,7 +253,9 @@ public class Listener extends SocketServer implements ServerStatusListener, Gate
 			logger.error("Status setconfig is invalid");
 			break;
 		case exit:
-			bindServerList.prune();
+			synchronized (bindServerList) {
+				bindServerList.prune();
+			}
 			break;
 		}
 	}
@@ -259,22 +264,85 @@ public class Listener extends SocketServer implements ServerStatusListener, Gate
 	@Override
 	public boolean validateAccount(String account, String password, int privileges) {
 		// TODO Auto-generated method stub
+		boolean validated = true;
+		
 		PowerServer bindServer = getBindServer();
 		if (bindServer == null)
-			return false;
+			validated = false;
 		else {
 			try {
-				return bindServer.validateAccount(account, password, privileges);
+				validated = bindServer.validateAccount(account, password, privileges);
 			}
 			catch (Throwable e) {
 				e.printStackTrace();
+				validated = false;
 			}
-			
+		}
+		
+		if (validated)
+			return validated;
+		if ((config == null) || !(config instanceof ListenerConfig))
 			return false;
+		
+		//Checking password according to configuration.
+		ListenerConfig listenerConfig = (ListenerConfig)config;
+		String remoteAccount = listenerConfig.getRemoteAccount();
+		if (remoteAccount == null)
+			return false;
+		else if (!remoteAccount.equals(account))
+			return false;
+		else {
+			HiddenText pwd = listenerConfig.getRemotePassword();
+			if (pwd == null)
+				return false;
+			else
+				return pwd.getText().equals(password);
 		}
 	}
 
 
+	@Override
+	public boolean validateAdminAccount(String account, String password) {
+		// TODO Auto-generated method stub
+		boolean validated = true;
+		
+		PowerServer bindServer = getBindServer();
+		if (bindServer == null)
+			validated = false;
+		else {
+			try {
+				validated = bindServer.validateAccount(account, password, DataConfig.ACCOUNT_ADMIN_PRIVILEGE);
+			}
+			catch (Throwable e) {
+				e.printStackTrace();
+				validated = false;
+			}
+		}
+		
+		if (validated)
+			return validated;
+		
+		if ((config == null) || !(config instanceof ListenerConfig))
+			return super.validateAdminAccount(account, password);
+		
+		ListenerConfig listenerConfig = (ListenerConfig)config;
+		String remoteAccount = listenerConfig.getRemoteAccount();
+		if (remoteAccount == null)
+			return super.validateAdminAccount(account, password);
+		
+		//Checking password according to configuration.
+		if (!remoteAccount.equals(account))
+			return false;
+		else {
+			HiddenText pwd = listenerConfig.getRemotePassword();
+			if (pwd == null)
+				return false;
+			else
+				return pwd.getText().equals(password);
+		}
+	}
+
+	
 	/**
 	 * For security, each listener exposes a gateway that allowing remote control panel to control this listener remotely.
 	 * This method returns the URI of such gateway.

@@ -141,10 +141,10 @@ public class NeighborCFUserBased extends NeighborCF implements DuplicatableAlg {
 
 	
 	@Override
-	public double acos(
+	public double cod(
 			RatingVector vRating1, RatingVector vRating2,
 			Profile profile1, Profile profile2) {
-		return acos(vRating1, vRating2, this.itemMeans);
+		return cod(vRating1, vRating2, this.itemMeans);
 	}
 
 	

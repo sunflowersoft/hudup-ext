@@ -59,7 +59,7 @@ public class Evaluator implements AccessPoint {
 	@Override
 	public void run(String[] args) {
 		// TODO Auto-generated method stub
-		System.out.println("Sytax: java net.hudup.Evaluator \"EvaluatorName\" \"batch.script\"");
+		logger.info("Sytax: java net.hudup.Evaluator \"EvaluatorName\" \"batch.script\"");
 		new Firer();
 		
 		if (args == null || args.length == 0) {
@@ -92,7 +92,7 @@ public class Evaluator implements AccessPoint {
 			}
 		}
 		if (ev == null) {
-			System.out.println("Not evaluator class name or evaluator name");
+			logger.error("Not evaluator class name or evaluator name");
 			return;
 		}
 		
@@ -110,13 +110,13 @@ public class Evaluator implements AccessPoint {
 			reader.close();
 			adapter.close();
 			if (script == null) {
-				System.out.println("Invalid path of batch script");
+				logger.error("Invalid path of batch script");
 				return;
 			}
 			
 			List<Alg> algList = PluginStorage.getNormalAlgReg().getAlgList(script.getAlgNameList());
 			if (algList.size() == 0) {
-				System.out.println("Algorithms in batch script are not suitable to this evaluator");
+				logger.error("Algorithms in batch script are not suitable to this evaluator");
 				return;
 			}
 			
@@ -149,8 +149,8 @@ public class Evaluator implements AccessPoint {
 							
 							long endTime = System.currentTimeMillis();
 							double elapsedHours = (double)(endTime - beginTime) / 1000.0 / 60.0 / 60.0;
-							System.out.println("Evaluation finished successfully in " + MathUtil.format(elapsedHours) + " hours.");
-							System.out.println("Analyzed result was stored in \"" + analyzeDir.toString() + "\"");
+							logger.info("Evaluation finished successfully in " + MathUtil.format(elapsedHours) + " hours.");
+							logger.info("Analyzed result was stored in \"" + analyzeDir.toString() + "\"");
 						}
 					}
 					catch (Exception e) {
@@ -160,7 +160,7 @@ public class Evaluator implements AccessPoint {
 			});
 			
 			DatasetPool pool = script.getPool();
-			System.out.println("Evaluation is running...");
+			logger.info("Evaluation is running...");
 			ev.remoteStart(algList, pool, beginTime);
 		}
 		catch (Exception e) {

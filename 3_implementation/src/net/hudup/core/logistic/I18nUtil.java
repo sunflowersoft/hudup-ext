@@ -59,7 +59,7 @@ public final class I18nUtil {
 	 * The base of the bundle of I18n messages within the class path.
 	 * For example, given the base &quot;/net/hudup/hudup_messages&quot;, the bundle of I18n messages with English language (US) is located at &quot;/net/hudup/hudup_messages_en_US.properties&quot;.
 	 */
-	public static String DEFAULT_BUNDLE_BASE_NAME   = Constants.ROOT_PACKAGE + DEFAULT_MESSAGE_NAME;
+	public static String DEFAULT_BUNDLE_BASE_NAME   = Constants.RESOURCES_PACKAGE + DEFAULT_MESSAGE_NAME;
 	
 	
 	/**

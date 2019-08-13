@@ -50,7 +50,7 @@ public abstract class AbstractDelegator extends ProtocolImpl implements Runner, 
 	/**
 	 * User session for storing user information such as account name, password, privileges.
 	 */
-	protected UserSession userSession = new UserSession();
+	protected volatile UserSession userSession = new UserSession();
 	
 	
 	/**
@@ -220,7 +220,7 @@ public abstract class AbstractDelegator extends ProtocolImpl implements Runner, 
 			}
 			
 			userSession.putAccount(account);
-			userSession.putPassword(password);
+			//userSession.putPassword(password); //Do not store password
 			userSession.putPriv(privileges);
 			
 			return true;

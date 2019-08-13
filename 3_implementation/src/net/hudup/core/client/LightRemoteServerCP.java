@@ -615,6 +615,10 @@ public class LightRemoteServerCP extends JFrame {
 			Server server = dlg.getServer();
 			if (server != null)
 				new LightRemoteServerCP(server);
+			else {
+				JOptionPane.showMessageDialog(
+						null, "Can't retrieve remote server", "Retrieval to server failed", JOptionPane.ERROR_MESSAGE);
+			}
 		}
 	}
 	 
@@ -625,25 +629,35 @@ public class LightRemoteServerCP extends JFrame {
 	public static void console() {
 		Console console = System.console();
 		
-		System.out.println();
+		System.out.print("\nEnter connection type (rmi|socket): ");
+		String connectType = console.readLine();
+		if (connectType == null || connectType.isEmpty())
+			connectType = "rmi";
+		System.out.println("You select connection type \"" + connectType + "\"\n");
+
+		System.out.print("Enter remote host (\"localhost\" default): ");
+		String host = console.readLine();
+		if (host == null || host.isEmpty())
+			host = "localhost";
+		System.out.println("You select remote host \"" + host + "\"\n");
 		
-		System.out.print("Enter server host (\"localhost\" default): ");
-		String serverHost = console.readLine();
-		if (serverHost == null || serverHost.isEmpty())
-			serverHost = "localhost";
-		System.out.println("You select server host \"" + serverHost + "\"\n");
-		
-		System.out.print("Enter server port (\"" + Constants.DEFAULT_SERVER_PORT + "\" default): ");
-		String serverPortText = console.readLine();
-		int serverPort = -1;
+		if (connectType.equals("rmi"))
+			System.out.print("Enter remote port (\"" + Constants.DEFAULT_SERVER_PORT + "\" default): ");
+		else
+			System.out.print("Enter remote port (\"" + Constants.DEFAULT_SOCKET_CONTROL_PORT + "\" default): ");
+		String portText = console.readLine();
+		int port = -1;
 		try {
-			serverPort = Integer.parseInt(serverPortText);
+			port = Integer.parseInt(portText);
 		}
 		catch (Exception e) {
-			serverPort = -1;
+			port = -1;
 		}
-		serverPort = serverPort == -1? Constants.DEFAULT_SERVER_PORT : serverPort;
-		System.out.println("You use port " + serverPort + "\n");
+		if (connectType.equals("rmi"))
+			port = port == -1? Constants.DEFAULT_SERVER_PORT : port;
+		else
+			port = port == -1? Constants.DEFAULT_SOCKET_CONTROL_PORT : port;
+		System.out.println("You use remote port " + port + "\n");
 		
 		System.out.print("Enter user name (\"admin\" default): ");
 		String username = console.readLine();
@@ -657,6 +671,7 @@ public class LightRemoteServerCP extends JFrame {
 			password = "admin";
 		System.out.println();
 		
+		
 //		System.out.print("Enter command (start|stop|pause|resume|exit): ");
 		System.out.print("Enter command (" + Request.START_CONTROL_COMMAND + "|" + Request.STOP_CONTROL_COMMAND+ "): ");
 		String command = console.readLine();
@@ -666,26 +681,56 @@ public class LightRemoteServerCP extends JFrame {
 
 		
 		boolean connected = true;
-		try {
-			Server server = ClientUtil.getRemoteServer(serverHost, serverPort, username, password);
-			if (server == null) {
-				System.out.println("Cannot connect RMI server");
+		if (connectType.equals("rmi")) {
+			try {
+				Server server = ClientUtil.getRemoteServer(host, port, username, password);
+				if (server == null) {
+					System.out.println("Cannot connect RMI server");
+					connected = false;
+				}
+				else if (command.equals(Request.START_CONTROL_COMMAND))
+					server.start();
+				else if (command.equals(Request.STOP_CONTROL_COMMAND))
+					server.stop();
+				else
+					connected = false;
+			}
+			catch (Exception e) {
+				e.printStackTrace();
 				connected = false;
 			}
-			else if (command.equals(Request.START_CONTROL_COMMAND))
-				server.start();
-			else if (command.equals(Request.STOP_CONTROL_COMMAND))
-				server.stop();
-			else
-				connected = false;
 		}
-		catch (Exception e) {
-			e.printStackTrace();
+		else if (connectType.equals("socket")) {
+			SocketConnection connector = null;
+			try {
+				connector = ClientUtil.getSocketConnection(host, port, username, password);
+				if (connector == null) {
+					System.out.println("Cannot connect socket server");
+					connected = false;
+				}
+				if (command.equals(Request.START_CONTROL_COMMAND))
+					connected = connector.control(Request.START_CONTROL_COMMAND);
+				else if (command.equals(Request.STOP_CONTROL_COMMAND))
+					connected = connector.control(Request.STOP_CONTROL_COMMAND);
+				else
+					connected = false;
+			}
+			catch (Exception e) {
+				e.printStackTrace();
+				connected = false;
+			}
+			finally {
+				if (connector != null)
+					connector.close();
+			}
+		}
+		else {
+			System.out.println("Connection type \"" + connectType + "\" not supported");
 			connected = false;
 		}
 		
 		String result = "Control command \"" + command 
-				+ "\" to server \"" + serverHost + "\" at port \"" + serverPort + "\"";
+				+ "\" to remote host \"" + host + "\" at remote port \"" + port + "\"";
 		if (connected)
 			result = result + " is successful.";
 		else

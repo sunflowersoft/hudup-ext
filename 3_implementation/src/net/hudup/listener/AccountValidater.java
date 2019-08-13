@@ -20,4 +20,13 @@ interface AccountValidater {
 	boolean validateAccount(String account, String password, int privileges);
 	
 	
+	/**
+	 * Validating administration account. Note, administration can be stored in properties file.
+	 * @param account specified account.
+	 * @param password specified password.
+	 * @return whether account is valid.
+	 */
+	boolean validateAdminAccount(String account, String password);
+
+	
 }

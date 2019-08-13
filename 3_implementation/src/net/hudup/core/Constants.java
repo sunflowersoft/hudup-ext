@@ -3,9 +3,6 @@
  */
 package net.hudup.core;
 
-import java.io.InputStream;
-import java.util.Properties;
-
 /**
  * This utility final class defines essential constants used over Hudup framework.
  * @author Loc Nguyen
@@ -148,7 +145,7 @@ public final class Constants {
 	/**
 	 * Default port for control server or listener..
 	 */
-	public final static int     DEFAULT_SOCKET_CONTROL_PORT          = DEFAULT_SERVER_PORT + 5;
+	public final static int     DEFAULT_SOCKET_CONTROL_PORT   = DEFAULT_SERVER_PORT + 5;
 
 	/**
 	 * The graphic user interface (GUI) allowing users to control Hudup server is called control panel. Control panel uses this port to connect with Hudup server instead of using {@link #DEFAULT_SERVER_PORT}.
@@ -159,7 +156,7 @@ public final class Constants {
 	 * When Hudup server, listener, or balancer starts, it uses firstly the port {@link #DEFAULT_SERVER_PORT}. If this constant is {@code true}, many random ports are tried until success.
 	 * By default, this constant is {@code false}, which means that there is no such randomization. 
 	 */
-	public static final boolean TRY_RANDOM_PORT               = true;
+	public static boolean TRY_RANDOM_PORT                      = true;
 	
 	/**
 	 * This is the period in miliseconds that the Hudup server does periodically internal tasks such as data mining and learning knowledge base.
@@ -190,15 +187,21 @@ public final class Constants {
 	 */
 	static {
 		try {
-			Properties props = new Properties();
-			InputStream in = Util.class.getResourceAsStream(ROOT_PACKAGE + "hudup.properties");		
-			props.load(in);
-			String decimal = props.getProperty("decimal_precision");
+			String decimal = Util.getHudupProperty("decimal_precision");
 			if (decimal != null)
 				DECIMAL_PRECISION = Integer.parseInt(decimal);
 		}
 		catch (Throwable e) {
 			System.out.println("Error when parsing decimal decision");
+		}
+		
+		try {
+			String tryRandomPort = Util.getHudupProperty("try_random_port");
+			if (tryRandomPort != null)
+				TRY_RANDOM_PORT = Boolean.parseBoolean(tryRandomPort);
+		}
+		catch (Throwable e) {
+			System.out.println("Error when parsing try random port");
 		}
 	}
 	

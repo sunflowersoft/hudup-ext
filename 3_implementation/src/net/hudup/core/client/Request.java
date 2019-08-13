@@ -103,6 +103,11 @@ public class Request extends ProtocolParam {
 	public String                           account_password              = null;
 	
 	/**
+	 * Indicator to encrypted password password by internal mechanism. 
+	 */
+	public boolean                          account_password_encrypted    = false;
+
+	/**
 	 * Privileges of account. Note, account is the information of a user who has access to Hudup server with her/his privileges. Account is modeled and stored in framework database as profile. 
 	 * Account is the information of a user who has access to the server with her/his privileges. Account is modeled and stored in framework database as profile. 
 	 */

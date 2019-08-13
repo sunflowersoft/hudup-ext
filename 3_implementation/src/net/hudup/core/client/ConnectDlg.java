@@ -19,10 +19,13 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.text.NumberFormatter;
 
 import net.hudup.core.Constants;
+import net.hudup.core.Util;
 import net.hudup.core.logistic.NetUtil;
 import net.hudup.core.logistic.xURI;
 import net.hudup.core.logistic.ui.UIUtil;
@@ -217,7 +220,7 @@ public abstract class ConnectDlg extends JDialog {
 		super((JFrame)null, "Remote connection", true);
 		
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-		setSize(400, 200);
+		setSize(400, 300);
 		setLocationRelativeTo(null);
 		setLayout(new BorderLayout());
 		
@@ -270,7 +273,28 @@ public abstract class ConnectDlg extends JDialog {
 
 		txtRemotePassword = new JPasswordField("admin");
 		right.add(txtRemotePassword);
+		String pwd = Util.getHudupProperty("admin");
+		if (pwd == null) txtRemotePassword.setText(pwd);
 
+		
+		JPanel body = new JPanel(new BorderLayout());
+		add(body, BorderLayout.CENTER);
+		
+		JTextArea txtInfo = new JTextArea();
+		body.add(new JScrollPane(txtInfo), BorderLayout.CENTER);
+		txtInfo.setEditable(false);
+		txtInfo.setWrapStyleWord(true);
+		txtInfo.setLineWrap(true);
+		txtInfo.setText(
+			  "Server serves at default port (RMI) " + Constants.DEFAULT_SERVER_PORT + ".\n\n"
+			+ "Listener serves at default port (RMI) " + Constants.DEFAULT_LISTENER_PORT + ".\n"
+			+ "Listener exports at default port (RMI) " + Constants.DEFAULT_LISTENER_EXPORT_PORT + " for control connection.\n\n"
+			+ "Balancer serves at default port (RMI) " + Constants.DEFAULT_BALANCER_PORT + ".\n"
+			+ "Balancer exports at default port (RMI) " + Constants.DEFAULT_BALANCER_EXPORT_PORT + " for control connection.\n\n"
+			+ "Default socket control port is (Socket) " + Constants.DEFAULT_SOCKET_CONTROL_PORT + ".\n\n"
+			+ "Default control panel port is (RMI) " + Constants.DEFAULT_CONTROL_PANEL_PORT + ".\n\n");
+
+		
 		JPanel footer = new JPanel();
 		add(footer, BorderLayout.SOUTH);
 		
@@ -370,13 +394,11 @@ public abstract class ConnectDlg extends JDialog {
 	
 	
 	/**
-	 * Disconnecting.
+	 * Disconnecting specified connector.
 	 */
-	public void disconnect() {
+	public static void disconnect(Remote connector) {
 		if ((connector != null) && (connector instanceof SocketConnection))
 			((SocketConnection)connector).close();
-		
-		connector = null;
 	}
 	
 	
@@ -384,7 +406,7 @@ public abstract class ConnectDlg extends JDialog {
 	 * Creating the binded URI for the control panel. In current implementation, it is &quot;rmi://localhost:&lt;port&gt;/connect&quot;
 	 * @return binded URI.
 	 */
-	public xURI getBindUri() {
+	public static xURI getBindUri() {
 		int port = NetUtil.getPort(Constants.DEFAULT_CONTROL_PANEL_PORT, true);
 		if (port < 0)
 			return null;

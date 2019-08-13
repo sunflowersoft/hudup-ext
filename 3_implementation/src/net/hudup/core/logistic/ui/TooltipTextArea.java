@@ -1,6 +1,6 @@
 package net.hudup.core.logistic.ui;
 
-import static net.hudup.core.Constants.ROOT_PACKAGE;
+import static net.hudup.core.Constants.RESOURCES_PACKAGE;
 import static net.hudup.core.Constants.VERSION;
 
 import java.io.BufferedReader;
@@ -48,7 +48,7 @@ public class TooltipTextArea extends JTextArea {
 		setLineWrap(true);
 		
 		try {
-			InputStream is = getClass().getResourceAsStream(ROOT_PACKAGE + README);
+			InputStream is = getClass().getResourceAsStream(RESOURCES_PACKAGE + README);
 			StringBuffer textBuffer = new StringBuffer();
 			
 			if (is != null) {

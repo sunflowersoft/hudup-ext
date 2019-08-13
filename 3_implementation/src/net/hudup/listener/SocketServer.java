@@ -27,7 +27,6 @@ import net.hudup.core.data.DataConfig;
 import net.hudup.core.logistic.AbstractRunner;
 import net.hudup.core.logistic.I18nUtil;
 import net.hudup.core.logistic.NetUtil;
-import net.hudup.core.logistic.NextUpdate;
 import net.hudup.core.logistic.RemoteRunner;
 import net.hudup.core.logistic.Runner;
 import net.hudup.core.logistic.RunnerThread;
@@ -61,6 +60,12 @@ public abstract class SocketServer extends AbstractRunner implements Server, Acc
 	 */
 	protected volatile ServerSocket controlSocket = null;
 	
+	
+//	/**
+//	 * User control session for storing user information such as account name, password, privileges.
+//	 */
+//	protected volatile UserSessions userControlSessions = new UserSessions();
+
 	
 	/**
 	 * List of event listeners of this socket server. Popular listeners are server status listeners represented by {@link ServerStatusListener} interface.
@@ -202,6 +207,7 @@ public abstract class SocketServer extends AbstractRunner implements Server, Acc
 		
 		DataOutputStream out = null;
 		BufferedReader in = null;
+		UserSession userSession = new UserSession();
 		try {
 			socket.setSoTimeout(config.getServerTimeout());
 			
@@ -220,23 +226,39 @@ public abstract class SocketServer extends AbstractRunner implements Server, Acc
 					out.write((empty.toJson() + "\n").getBytes());
 				}
 				else if (request.action.equals(Protocol.VALIDATE_ACCOUNT)) { //Not store user name and password in session.
-					Response response = Response.create(validateAccount(
-							request.account_name, request.account_password, request.account_privileges));
-					out.write((response.toJson() + "\n").getBytes());
+					String account = userSession.getAccount();
+					if (account == null || !account.equals(request.account_name)) {
+						userSession.clear();
+						
+						boolean validated = validateAdminAccount(request.account_name, request.account_password);
+						Response response = Response.create(validated);
+						out.write((response.toJson() + "\n").getBytes());
+						
+						if (validated) {
+							userSession.putAccount(request.account_name);
+							//userSession.putPassword(request.account_password); //Do not store password.
+							userSession.putPriv(DataConfig.ACCOUNT_ADMIN_PRIVILEGE);
+						}
+					}
+					else if ( (userSession.getPriv() & DataConfig.ACCOUNT_ACCESS_PRIVILEGE) == DataConfig.ACCOUNT_ACCESS_PRIVILEGE)
+						out.write((Response.create(true).toJson() + "\n").getBytes());
+					else
+						out.write((Response.create(false).toJson() + "\n").getBytes());
 				}
 				else if (request.action.equals(Protocol.CONTROL)) {
-					if (request.control_command.equals(Request.PAUSE_CONTROL_COMMAND))
-						this.pause();
-					if (request.control_command.equals(Request.RESUME_CONTROL_COMMAND))
-						this.resume();
-
-					@NextUpdate
-					Response success = Response.create(true);
-					out.write((success.toJson() + "\n").getBytes());
+					if (userSession.size() > 0) {
+						if (request.control_command.equals(Request.START_CONTROL_COMMAND))
+							this.start();
+						if (request.control_command.equals(Request.STOP_CONTROL_COMMAND))
+							this.stop();
+	
+						out.write((Response.create(true).toJson() + "\n").getBytes());
+					}
+					else
+						out.write((Response.create(false).toJson() + "\n").getBytes());
 				}
 				else {
-					Response empty = Response.createEmpty(request.protocol);
-					out.write((empty.toJson() + "\n").getBytes());
+					out.write((Response.createEmpty(request.protocol) + "\n").getBytes());
 				}
 				
 			} //End while
@@ -269,6 +291,8 @@ public abstract class SocketServer extends AbstractRunner implements Server, Acc
 			catch (Throwable e) {
 				e.printStackTrace();
 			}
+			
+			userSession.clear();
 		}
 			
 	}
@@ -293,7 +317,7 @@ public abstract class SocketServer extends AbstractRunner implements Server, Acc
 
 		fireStatusEvent(new ServerStatusEvent(this, Status.started));
 		logger.info("Socket server started at port " + config.getServerPort());
-		logger.info("Its socket control port is " + config.getSocketControlPort());
+		logger.info("Socket server has socket control port " + config.getSocketControlPort());
 	}
 	
 	
@@ -719,6 +743,21 @@ public abstract class SocketServer extends AbstractRunner implements Server, Acc
 	}
 
 	
+	@Override
+	public boolean validateAdminAccount(String account, String password) {
+		// TODO Auto-generated method stub
+		if (!account.equals("admin"))
+			return false;
+		
+		//Checking Hudup properties.
+		String pwd = Util.getHudupProperty(account);
+		if (pwd == null)
+			return false;
+		else
+			return pwd.equals(password);
+	}
+
+
 	/**
 	 * Getting running delegators of this server.
 	 * Note, a delegator when is responsible for handling and processing incoming request that server dispatches to it.

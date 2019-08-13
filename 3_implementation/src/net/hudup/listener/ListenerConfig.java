@@ -89,9 +89,17 @@ public class ListenerConfig extends ServerConfig {
 		
 		setRemoteHost("localhost");
 		setRemotePort(Constants.DEFAULT_SERVER_PORT);
-		setRemoteAccount("admin");
-		setRemotePassword(new HiddenText("admin"));
-		
+		try {
+			String pwd = Util.getHudupProperty("admin");
+			if (pwd != null) {
+				setRemoteAccount("admin");
+				setRemotePassword(new HiddenText(pwd));
+			}
+		}
+		catch (Throwable e) {
+			remove(REMOTE_ACCOUNT_FIELD);
+			remove(REMOTE_PASSWORD_FIELD);
+		}
 		setExportPort(Constants.DEFAULT_LISTENER_EXPORT_PORT);
 	}
 	

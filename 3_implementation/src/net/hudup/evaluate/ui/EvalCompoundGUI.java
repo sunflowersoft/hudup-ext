@@ -442,7 +442,6 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 			}
 			
 			final Service finalService = service;
-			final ConnectDlg finalConnectDlg = connectDlg;
 			final StartDlg dlgEvStarter = new StartDlg((JFrame)null, "List of evaluators") {
 				
 				/**
@@ -450,17 +449,21 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 				 */
 				private static final long serialVersionUID = 1L;
 
+				/**
+				 * Internal service.
+				 */
+				protected Service service = finalService;
+				
 				@Override
 				protected void start() {
 					// TODO Auto-generated method stub
 					String evName = (String) getItemControl().getSelectedItem();
 					try {
-						final Evaluator ev = finalService.getEvaluator(evName);
+						final Evaluator ev = service.getEvaluator(evName);
 						dispose();
 						if (oldGUI != null) oldGUI.dispose();
 						
-						xURI bindUri = finalConnectDlg.getBindUri();
-						finalConnectDlg.disconnect();
+						xURI bindUri = ConnectDlg.getBindUri();
 						
 						ev.getPluginStorage().assignToSystem(); //This code line is very important for initializing plug-in storage.
 						run(ev, bindUri, null);
@@ -485,6 +488,17 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 					toolkit.setEditable(false);
 					return toolkit;
 				}
+
+				@Override
+				public void dispose() {
+					// TODO Auto-generated method stub
+					super.dispose();
+					
+					if (service != null)
+						ConnectDlg.disconnect(service);
+					service = null;
+				}
+				
 			};
 			
 			if (initialEvName != null)

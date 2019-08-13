@@ -1083,7 +1083,11 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 		
 		Server server = dlg.getServer();
 		if (server != null)
-			new PowerServerCP((PowerServer)server, dlg.getBindUri(), true);
+			new PowerServerCP((PowerServer)server, ConnectDlg.getBindUri(), true);
+		else {
+			JOptionPane.showMessageDialog(
+					null, "Can't retrieve server", "Can't retrieve server", JOptionPane.ERROR_MESSAGE);
+		}
 	}
 	
 	

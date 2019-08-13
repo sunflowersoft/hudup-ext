@@ -33,6 +33,38 @@ public class UserSession implements Serializable {
 
 	
 	/**
+	 * Default constructor.
+	 */
+	public UserSession() {
+		
+	}
+	
+	
+	/**
+	 * Constructor with account name, password, and privileges.
+	 * @param account account name.
+	 * @param password password.
+	 * @param priv privileges.
+	 */
+	public UserSession(String account, String password, int priv) {
+		putAccount(account);
+		putPassword(password);
+		putPriv(priv);
+	}
+	
+	
+	/**
+	 * Constructor with account name and privileges.
+	 * @param account account name.
+	 * @param priv privileges.
+	 */
+	public UserSession(String account, int priv) {
+		putAccount(account);
+		putPriv(priv);
+	}
+
+	
+	/**
 	 * Getting the size of this session.
 	 * @return size of this session which is the size of the internal map {@link #userSession}.
 	 */

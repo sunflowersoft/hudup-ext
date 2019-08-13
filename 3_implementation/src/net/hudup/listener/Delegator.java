@@ -12,6 +12,7 @@ import javax.swing.event.EventListenerList;
 
 import net.hudup.core.PluginStorageWrapper;
 import net.hudup.core.RegisterTable;
+import net.hudup.core.Util;
 import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.SetupAlgEvent;
 import net.hudup.core.alg.SetupAlgListener;
@@ -20,6 +21,7 @@ import net.hudup.core.client.Protocol;
 import net.hudup.core.client.Request;
 import net.hudup.core.client.Response;
 import net.hudup.core.client.Service;
+import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.DatasetPool;
 import net.hudup.core.data.MemFetcher;
 import net.hudup.core.evaluate.Evaluator;
@@ -358,6 +360,25 @@ public class Delegator extends AbstractDelegator {
 		}
 		
 		return false;
+	}
+
+
+	@Override
+	public boolean validateAdminAccount(String account, String password) {
+		// TODO Auto-generated method stub
+		boolean validated = validateAccount(account, password, DataConfig.ACCOUNT_ADMIN_PRIVILEGE);
+		if (validated)
+			return true;
+		else if (!account.equals("admin"))
+			return false;
+		else {
+			//Checking Hudup properties.
+			String pwd = Util.getHudupProperty(account);
+			if (pwd == null)
+				return false;
+			else
+				return pwd.equals(password);
+		}
 	}
 
 	
