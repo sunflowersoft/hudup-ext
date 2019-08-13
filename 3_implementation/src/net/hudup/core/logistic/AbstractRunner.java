@@ -50,16 +50,21 @@ public abstract class AbstractRunner implements Runner {
 			
 			try {
 				task();
-				
-				synchronized (this) {
-					while (paused) {
-						notifyAll();
-						wait();
-					}
-				}
 			}
 			catch (Throwable e) {
 				e.printStackTrace();
+			}
+
+			synchronized (this) {
+				while (paused) {
+					notifyAll();
+					try {
+						wait();
+					}
+					catch (Throwable e) {
+						e.printStackTrace();
+					}
+				}
 			}
 		}
 		

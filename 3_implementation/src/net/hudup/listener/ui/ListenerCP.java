@@ -24,6 +24,8 @@ import javax.swing.JTabbedPane;
 
 import net.hudup.core.Constants;
 import net.hudup.core.client.ClientUtil;
+import net.hudup.core.client.ConnectDlg;
+import net.hudup.core.client.ConnectDlg.ConnectType;
 import net.hudup.core.client.Request;
 import net.hudup.core.client.Server;
 import net.hudup.core.client.ServerStatusEvent;
@@ -696,22 +698,22 @@ public class ListenerCP extends JFrame implements ServerStatusListener {
 	 * @param args The argument parameter of main method. It contains command line arguments.
 	 */
 	public static void main(String[] args) {
-		console();
+//		console();
 
-//		boolean console = args != null && args.length >= 1 
-//				&& args[0] != null && args[0].toLowerCase().equals("console");
-//		if (console)
-//			console();
-//		else {
-//			ConnectDlg dlg = ConnectDlg.connect();
-//			Image image = UIUtil.getImage("listener-32x32.png");
-//	        if (image != null)
-//	        	dlg.setIconImage(image);
-//			
-//			Server server = dlg.getServer();
-//			if (server != null)
-//				new ListenerCP(server, dlg.getBindUri(), true);
-//		}
+		boolean console = args != null && args.length >= 1 
+				&& args[0] != null && args[0].toLowerCase().equals("console");
+		if (console)
+			console();
+		else {
+			ConnectDlg dlg = ConnectDlg.connect(ConnectType.server, Constants.DEFAULT_LISTENER_EXPORT_PORT);
+			Image image = UIUtil.getImage("listener-32x32.png");
+	        if (image != null)
+	        	dlg.setIconImage(image);
+			
+			Server server = dlg.getServer();
+			if (server != null)
+				new ListenerCP(server, dlg.getBindUri(), true);
+		}
 	}
 
 
@@ -729,7 +731,7 @@ public class ListenerCP extends JFrame implements ServerStatusListener {
 			listenerHost = "localhost";
 		System.out.println("You select listener host \"" + listenerHost + "\"\n");
 		
-		System.out.print("Enter listener port (\"" + Constants.DEFAULT_LISTENER_PORT + "\" default): ");
+		System.out.print("Enter listener port (\"" + Constants.DEFAULT_SOCKET_CONTROL_PORT + "\" default): ");
 		String listenerPortText = console.readLine();
 		int listenerPort = -1;
 		try {
@@ -738,7 +740,7 @@ public class ListenerCP extends JFrame implements ServerStatusListener {
 		catch (Exception e) {
 			listenerPort = -1;
 		}
-		listenerPort = listenerPort == -1? Constants.DEFAULT_LISTENER_PORT : listenerPort;
+		listenerPort = listenerPort == -1? Constants.DEFAULT_SOCKET_CONTROL_PORT : listenerPort;
 		System.out.println("You use port " + listenerPort + "\n");
 		
 		System.out.print("Enter user name (\"admin\" default): ");

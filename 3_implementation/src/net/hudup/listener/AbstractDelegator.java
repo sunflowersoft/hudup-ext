@@ -2,7 +2,6 @@ package net.hudup.listener;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
 import java.util.Map;
@@ -33,19 +32,19 @@ public abstract class AbstractDelegator extends ProtocolImpl implements Runner, 
 	/**
 	 * The Java network socket for receiving (reading) requests from client and sending back (writing) responses to client via input / output streams. 
 	 */
-	protected Socket socket = null;
+	protected volatile Socket socket = null;
 	
 	
 	/**
 	 * Flag variable indicates whether or not this delegator started.
 	 */
-	protected boolean started = false;
+	protected volatile boolean started = false;
 	
 	
 	/**
 	 * Flag variable indicates whether or not this delegator paused.
 	 */
-	protected boolean paused = false;
+	protected volatile boolean paused = false;
 	
 	
 	/**
@@ -79,7 +78,6 @@ public abstract class AbstractDelegator extends ProtocolImpl implements Runner, 
 		
 		DataOutputStream out = null;
 		BufferedReader in = null;
-		
 		synchronized (this) {
 			try {
 				started = true;
@@ -97,70 +95,63 @@ public abstract class AbstractDelegator extends ProtocolImpl implements Runner, 
 		}
 		
 		
-		try {
-			
-			userSession.clear();
-			String requestText = null;
-//			while ( (!socket.isClosed()) && (requestText = in.readLine()) != null ) {
-			while (!socket.isClosed()) {
-				try {
-					requestText = in.readLine(); //Wait here.
-				}
-				catch (IOException e) {
-					if (!socket.isClosed())
-						e.printStackTrace();
-					else
-						logger.info("Error by socket interupted.");
-					
-					requestText = null;
-					break;
-				}
-				if (requestText == null)
-					break;
-				
-				synchronized (this) {
-					final Request request = parseRequest(requestText);
-					if (request == null || request.isQuitRequest()) {
-						Response empty = request == null? Response.createEmpty(Protocol.HDP_PROTOCOL) : Response.createEmpty(request.protocol);
-						out.write( (empty.toJson() + "\n").getBytes());
-						break;
-					}
+		userSession.clear();
+		String requestText = null;
+		while (socket != null && !socket.isClosed()) {
+			try {
+				requestText = in.readLine(); //Wait here.
+				if (requestText == null) break;
 
-					
-					if (!initUserSession(this, userSession, request)) {
-						Response empty = Response.createEmpty(request.protocol);
-						out.write( (empty.toJson() + "\n").getBytes());
-						break;
-					}
-					
-
+				Request request = parseRequest(requestText);
+				if (request == null || request.isQuitRequest()) {
+					Response empty = request == null? Response.createEmpty(Protocol.HDP_PROTOCOL) : Response.createEmpty(request.protocol);
+					out.write( (empty.toJson() + "\n").getBytes());
+				}
+				else if (!initUserSession(this, userSession, request)) { //Also handle validate account action.
+					Response empty = Response.createEmpty(request.protocol);
+					out.write( (empty.toJson() + "\n").getBytes());
+				}
+				else {
 					boolean handled = handleRequest(request, out);
-					if (request.protocol == HTTP_PROTOCOL)
-						break;
-					else if (!handled) {
+					if (!handled) {
 						Response empty = Response.createEmpty(request.protocol);
 						out.write( (empty.toJson() + "\n").getBytes());
 					}
-					
-					while (paused) {
-						notifyAll();
+				}
+			}
+			catch (Throwable e) {
+				e.printStackTrace();
+				logger.info("Error by writing data to client.");
+				
+				try {
+					socket.close();
+				}
+				catch (Throwable e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				socket = null;
+			}
+			
+			synchronized (this) {
+				while (paused) {
+					notifyAll();
+					try {
 						wait();
 					}
-					
-				} // synchronized (this)
-				
-			} // End while
-		}
-		catch (Throwable e) {
-			e.printStackTrace();
-			logger.error("Delegator interrupted by error: " + e.getMessage());
-		}
-		finally {
-			userSession.clear();
-		}
+					catch (Throwable e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			}
+			
+		} // End while
 		
 
 		synchronized (this) {
+			userSession.clear();
+
 			try {
 				if (in != null)
 					in.close();

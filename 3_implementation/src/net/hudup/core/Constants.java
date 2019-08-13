@@ -148,7 +148,7 @@ public final class Constants {
 	/**
 	 * Default port for control server or listener..
 	 */
-	public final static int     DEFAULT_CONTROL_PORT          = DEFAULT_SERVER_PORT + 5;
+	public final static int     DEFAULT_SOCKET_CONTROL_PORT          = DEFAULT_SERVER_PORT + 5;
 
 	/**
 	 * The graphic user interface (GUI) allowing users to control Hudup server is called control panel. Control panel uses this port to connect with Hudup server instead of using {@link #DEFAULT_SERVER_PORT}.

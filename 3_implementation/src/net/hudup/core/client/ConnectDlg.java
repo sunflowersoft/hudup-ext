@@ -46,25 +46,138 @@ public abstract class ConnectDlg extends JDialog {
 	/**
 	 * Server connection.
 	 */
-	protected final static String SERVER_CONNECT = "Server";
+	public final static String SERVER_CONNECT = "Server";
 	
 	
 	/**
 	 * RMI service connection.
 	 */
-	protected final static String RMI_SERVICE_CONNECT = "RMI service";
+	public final static String SERVICE_CONNECT = "Service";
 
 	
 	/**
 	 * Socket service connection.
 	 */
-	protected final static String SOCKET_SERVICE_CONNECT = "Socket service";
+	public final static String SOCKET_SERVICE_CONNECT = "Socket service";
 
+	
+	/**
+	 * This type represents connection type
+	 * @author Loc Nguyen
+	 * @version 1.0
+	 */
+	public enum ConnectType {
+		server,
+		service,
+		socket_service
+	}
+	
+	
+	/**
+	 * This class represent description of a connection type.
+	 * @author Loc Nguyen
+	 * @version 1.0
+	 */
+	public static class ConnectTypeDesc {
+		
+		/**
+		 * Connection type.
+		 */
+		private ConnectType type = ConnectType.server;
+		
+		/**
+		 * Description of connection type.
+		 */
+		private String desc = SERVER_CONNECT;
+		
+		/**
+		 * Default port.
+		 */
+		private int defaultPort = Constants.DEFAULT_SERVER_PORT;
+		
+		/**
+		 * Constructor with connection type.
+		 * @param type connection type.
+		 */
+		public ConnectTypeDesc(ConnectType type) {
+			this.type = type;
+			
+			if (type == ConnectType.server) {
+				this.desc = SERVER_CONNECT;
+				this.defaultPort = Constants.DEFAULT_SERVER_PORT;
+			}
+			else if (type == ConnectType.service) {
+				this.desc = SERVICE_CONNECT;
+				this.defaultPort = Constants.DEFAULT_SERVER_PORT;
+			}
+			else if (type == ConnectType.socket_service) {
+				this.desc = SOCKET_SERVICE_CONNECT;
+				this.defaultPort = Constants.DEFAULT_LISTENER_PORT;
+			}
+		}
+	
+		/**
+		 * Getting connection type.
+		 * @return connection type.
+		 */
+		public ConnectType getType() {
+			return type;
+		}
+		
+		/**
+		 * Getting description of connection type.
+		 * @return description of connection type.
+		 */
+		public String getDesc() {
+			return desc;
+		}
+		
+		/**
+		 * Getting default port.
+		 * @return default port.
+		 */
+		public int getDefaultPort() {
+			return defaultPort;
+		}
+		
+		/**
+		 * Defining default connection types.
+		 * @return default connection types.
+		 */
+		public static ConnectTypeDesc[] defaultTypes() {
+			return new ConnectTypeDesc[] {
+				new ConnectTypeDesc(ConnectType.server),
+				new ConnectTypeDesc(ConnectType.service),
+				new ConnectTypeDesc(ConnectType.socket_service)
+			};
+		}
+
+		@Override
+		public String toString() {
+			// TODO Auto-generated method stub
+			return desc;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			// TODO Auto-generated method stub
+			if (obj == null)
+				return false;
+			else if (obj instanceof ConnectType)
+				return this.type == (ConnectType)obj;
+			else if (obj instanceof ConnectTypeDesc)
+				return this.type == ((ConnectTypeDesc)obj).type;
+			else
+				return false;
+		}
+		
+	}
+	
 	
 	/**
 	 * Connection type.
 	 */
-	protected JComboBox<String> cmbConnectType = null;
+	protected JComboBox<ConnectTypeDesc> cmbConnectType = null;
 	
 	
 	/**
@@ -127,24 +240,17 @@ public abstract class ConnectDlg extends JDialog {
 		JPanel right = new JPanel(new GridLayout(0, 1));
 		header.add(right, BorderLayout.CENTER);
 		
-		cmbConnectType = new JComboBox<String>(new String[] {
-				SERVER_CONNECT, RMI_SERVICE_CONNECT, SOCKET_SERVICE_CONNECT
-			});
+		ConnectTypeDesc[] connectTypes = ConnectTypeDesc.defaultTypes();
+		cmbConnectType = new JComboBox<ConnectTypeDesc>(connectTypes);
 		cmbConnectType.addItemListener(new ItemListener() {
 			
 			@Override
 			public void itemStateChanged(ItemEvent e) {
 				// TODO Auto-generated method stub
-				if (e.getStateChange() == ItemEvent.SELECTED)
-					return;
-				
-				String connectType = cmbConnectType.getSelectedItem().toString();
-				if (connectType.equals(SERVER_CONNECT))
-					txtRemotePort.setValue(Constants.DEFAULT_SERVER_PORT);
-				else if (connectType.equals(RMI_SERVICE_CONNECT))
-					txtRemotePort.setValue(Constants.DEFAULT_SERVER_PORT);
-				else if (connectType.equals(SOCKET_SERVICE_CONNECT))
-					txtRemotePort.setValue(Constants.DEFAULT_LISTENER_PORT);
+				if (e.getStateChange() == ItemEvent.SELECTED) {
+					ConnectTypeDesc connectType = (ConnectTypeDesc)cmbConnectType.getSelectedItem();
+					txtRemotePort.setValue(connectType.getDefaultPort());
+				}
 			}
 		});
 		right.add(cmbConnectType);
@@ -153,7 +259,10 @@ public abstract class ConnectDlg extends JDialog {
 		right.add(txtRemoteHost);
 		
 		txtRemotePort = new JFormattedTextField(new NumberFormatter());
-		txtRemotePort.setValue(Constants.DEFAULT_SERVER_PORT);
+		if (connectTypes.length > 0) {
+			cmbConnectType.setSelectedItem(connectTypes[0]);
+			txtRemotePort.setValue(connectTypes[0].getDefaultPort());
+		}
 		right.add(txtRemotePort);
 		
 		txtRemoteUsername = new JTextField("admin");
@@ -186,8 +295,6 @@ public abstract class ConnectDlg extends JDialog {
 			}
 		});
 		footer.add(close);
-		
-		setVisible(true);
 	}
 	
 	
@@ -287,11 +394,13 @@ public abstract class ConnectDlg extends JDialog {
 	
 	
 	/**
-	 * Connecting to server or service.
+	 * Connecting to server or service with hint connect type and port.
+	 * @param hintConnectType hint connection type.
+	 * @param hintPort hint port.
 	 * @return connection dialog.
 	 */
-	public static ConnectDlg connect() {
-		return new ConnectDlg() {
+	public static ConnectDlg connect(ConnectType hintConnectType, int hintPort) {
+		ConnectDlg connectDlg = new ConnectDlg() {
 			
 			/**
 			 * Default serial version UID.
@@ -308,7 +417,7 @@ public abstract class ConnectDlg extends JDialog {
 				String connectType = cmbConnectType.getSelectedItem().toString();
 				if (connectType.equals(SERVER_CONNECT))
 					connector = ClientUtil.getRemoteServer(remoteHost, remotePort, txtRemoteUsername.getText(), txtRemotePassword.getText());
-				else if (connectType.equals(RMI_SERVICE_CONNECT))
+				else if (connectType.equals(SERVICE_CONNECT))
 					connector = ClientUtil.getRemoteService(remoteHost, remotePort, txtRemoteUsername.getText(), txtRemotePassword.getText());
 				else if (connectType.equals(SOCKET_SERVICE_CONNECT))
 					connector = ClientUtil.getSocketConnection(remoteHost, remotePort, txtRemoteUsername.getText(), txtRemotePassword.getText());
@@ -324,9 +433,46 @@ public abstract class ConnectDlg extends JDialog {
 			}
 		};
 		
+		if (hintConnectType != null)
+			connectDlg.cmbConnectType.setSelectedItem(new ConnectTypeDesc(hintConnectType));
+		
+		if (hintPort > 0)
+			connectDlg.txtRemotePort.setValue(hintPort);
+		
+		connectDlg.setVisible(true);
+		
+		return connectDlg;
 	}
 	
 	
 
+	/**
+	 * Connecting to server or service with hint connect type.
+	 * @param hintConnectType hint connection type.
+	 * @return connection dialog.
+	 */
+	public static ConnectDlg connect(ConnectType hintConnectType) {
+		return connect(hintConnectType, -1);
+	}
 	
+	
+	/**
+	 * Connecting to server or service with hint port.
+	 * @param hintPort hint port.
+	 * @return connection dialog.
+	 */
+	public static ConnectDlg connect(int hintPort) {
+		return connect(null, hintPort);
+	}
+	
+	
+	/**
+	 * Connecting to server or service.
+	 * @return connection dialog.
+	 */
+	public static ConnectDlg connect() {
+		return connect(null, -1);
+	}
+
+
 }

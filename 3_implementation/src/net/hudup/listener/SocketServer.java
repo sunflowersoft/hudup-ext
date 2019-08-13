@@ -59,7 +59,7 @@ public abstract class SocketServer extends AbstractRunner implements Server, Acc
 	/**
 	 * Control socket for control commands such as start, stop, pause and resume.
 	 */
-	protected ServerSocket controlSocket = null;
+	protected volatile ServerSocket controlSocket = null;
 	
 	
 	/**
@@ -99,7 +99,7 @@ public abstract class SocketServer extends AbstractRunner implements Server, Acc
 	/**
 	 * Flag for some uses.
 	 */
-	protected Boolean flag = false;
+	protected volatile Boolean flag = false;
 	
 	
 	/**
@@ -194,16 +194,15 @@ public abstract class SocketServer extends AbstractRunner implements Server, Acc
 
 	
 	/**
-	 * Processing control commands such as start, stop, pause, resume.
+	 * Processing socket control commands such as start, stop, pause, resume.
+	 * @param socket socket of control task.
 	 */
-	protected void controlTask() {
-		if (controlSocket == null) return;
+	protected void controlSocketTask(Socket socket) {
+		if (socket == null) return;
 		
-		Socket socket = null;
 		DataOutputStream out = null;
 		BufferedReader in = null;
 		try {
-			socket = controlSocket.accept();
 			socket.setSoTimeout(config.getServerTimeout());
 			
 			out = new DataOutputStream(socket.getOutputStream());
@@ -211,35 +210,36 @@ public abstract class SocketServer extends AbstractRunner implements Server, Acc
 					new InputStreamReader(socket.getInputStream()));
 
 			String requestText = null;
-			while ( (!socket.isClosed()) && (requestText = in.readLine()) != null ) {
+			while ( (socket != null) && (!socket.isClosed()) 
+					&& ((requestText = in.readLine()) != null) ) {
+				
 				Request request = AbstractDelegator.parseRequest0(requestText);
 				
-				if (request == null || !request.action.equals(Protocol.CONTROL)) {
-					Response empty = Response.createEmpty(Protocol.HDP_PROTOCOL);
-					out.write( (empty.toJson() + "\n").getBytes());
-					break;
+				if (request == null || request.isQuitRequest()) {
+					Response empty = request == null? Response.createEmpty(Protocol.HDP_PROTOCOL) : Response.createEmpty(request.protocol);
+					out.write((empty.toJson() + "\n").getBytes());
 				}
-				
-				UserSession userSession = new UserSession();
-				if (!AbstractDelegator.initUserSession(this, userSession, request)) {
-					Response empty = Response.createEmpty(request.protocol);
-					out.write( (empty.toJson() + "\n").getBytes());
-					break;
+				else if (request.action.equals(Protocol.VALIDATE_ACCOUNT)) { //Not store user name and password in session.
+					Response response = Response.create(validateAccount(
+							request.account_name, request.account_password, request.account_privileges));
+					out.write((response.toJson() + "\n").getBytes());
 				}
-				
-				if ((userSession.getPriv() & DataConfig.ACCOUNT_ACCESS_PRIVILEGE) != DataConfig.ACCOUNT_ACCESS_PRIVILEGE)
-					break;
-				
-				//Client always receives successful response for control command. This is a work-around solution.
-				@NextUpdate
-				Response success = Response.create(true);
-				out.write( (success.toJson() + "\n").getBytes());
+				else if (request.action.equals(Protocol.CONTROL)) {
+					if (request.control_command.equals(Request.PAUSE_CONTROL_COMMAND))
+						this.pause();
+					if (request.control_command.equals(Request.RESUME_CONTROL_COMMAND))
+						this.resume();
 
-				if (request.control_command.equals(Request.PAUSE_CONTROL_COMMAND))
-					this.pause();
-				if (request.control_command.equals(Request.RESUME_CONTROL_COMMAND))
-					this.resume();
-			}
+					@NextUpdate
+					Response success = Response.create(true);
+					out.write((success.toJson() + "\n").getBytes());
+				}
+				else {
+					Response empty = Response.createEmpty(request.protocol);
+					out.write((empty.toJson() + "\n").getBytes());
+				}
+				
+			} //End while
 			
 		} 
 		catch (Throwable e) {
@@ -271,11 +271,8 @@ public abstract class SocketServer extends AbstractRunner implements Server, Acc
 			}
 		}
 			
-				
 	}
 	
-	
-
 	
 	@Override
 	public synchronized void start() {
@@ -296,7 +293,7 @@ public abstract class SocketServer extends AbstractRunner implements Server, Acc
 
 		fireStatusEvent(new ServerStatusEvent(this, Status.started));
 		logger.info("Socket server started at port " + config.getServerPort());
-		
+		logger.info("Its socket control port is " + config.getSocketControlPort());
 	}
 	
 	
@@ -512,18 +509,20 @@ public abstract class SocketServer extends AbstractRunner implements Server, Acc
 	 * Destroying the control socket.
 	 */
 	private void destroyControlSocket() {
-		if (controlSocket != null && !controlSocket.isClosed()) {
+		if (controlSocket == null || controlSocket.isClosed())
+			return;
+		
+		synchronized (controlSocket) {
 			try {
 				controlSocket.close();
 			} 
 			catch (Throwable e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-				logger.error("Socket server fail to close control socket, caused by " + e.getMessage());
 			}
+			
+			controlSocket = null;
 		}
-		
-		controlSocket = null;
 	}
 
 	
@@ -556,24 +555,52 @@ public abstract class SocketServer extends AbstractRunner implements Server, Acc
 	 * Setting up (initializing) the control socket.
 	 */
 	private void setupControlSocket() {
-		if (controlSocket == null || controlSocket.isClosed()) {
-		
-			try {
-				int port = NetUtil.getPort(config.getControlPort(), Constants.TRY_RANDOM_PORT);
-				if (port < 0)
-					throw new Exception("Invalid port number");
-				config.setControlPort(port);
+		if (controlSocket != null && !controlSocket.isClosed())
+			return;
+			
+		try {
+			int port = NetUtil.getPort(config.getSocketControlPort(), Constants.TRY_RANDOM_PORT);
+			if (port < 0)
+				throw new Exception("Invalid port number");
+			config.setSocketControlPort(port);
 
-				controlSocket = new ServerSocket(port);
-				controlSocket.setSoTimeout(config.getServerTimeout());
-			}
-			catch (Throwable e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				logger.error("Socket server fail to create server socket, caused by " + e.getMessage());
+			controlSocket = new ServerSocket(port);
+			controlSocket.setSoTimeout(config.getServerTimeout());
+		}
+		catch (Throwable e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			logger.error("Socket server fail to create server socket, caused by " + e.getMessage());
+			destroyControlSocket();
+			return;
+		}
+		
+		
+		new Thread() {
+
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+				super.run();
+				
+				while (controlSocket != null && !controlSocket.isClosed()) {
+					Socket socket = null;
+					try {
+						socket = controlSocket.accept();
+					}
+					catch (Throwable e) {
+						e.printStackTrace();
+						socket = null;
+					}
+					
+					if (socket != null)
+						controlSocketTask(socket);
+				}
+				
 				destroyControlSocket();
 			}
-		}
+			
+		}.start();
 	}
 
 	

@@ -46,7 +46,7 @@ public class ServerConfig extends SysConfig {
 	/**
 	 * Control port field.
 	 */
-	public final static String CONTROL_PORT_FIELD = changeCase("control_port");
+	public final static String SOCKET_CONTROL_PORT_FIELD = changeCase("socket_control_port");
 
 	
 	/**
@@ -77,8 +77,8 @@ public class ServerConfig extends SysConfig {
 		setServerTimeout(Constants.DEFAULT_SERVER_TIMEOUT);
 		setServerTasksPeriod(Constants.DEFAULT_SERVER_TASKS_PERIOD);
 		
-		setControlPort(Constants.DEFAULT_CONTROL_PORT);
-		addReadOnly(CONTROL_PORT_FIELD);
+		setSocketControlPort(Constants.DEFAULT_SOCKET_CONTROL_PORT);
+		addReadOnly(SOCKET_CONTROL_PORT_FIELD);
 	}
 
 	
@@ -101,20 +101,20 @@ public class ServerConfig extends SysConfig {
 	
 	
 	/**
-	 * Setting control port by specified port.
+	 * Setting socket control port by specified port.
 	 * @param port specified port.
 	 */
-	public void setControlPort(int port) {
-		put(CONTROL_PORT_FIELD, port);
+	public void setSocketControlPort(int port) {
+		put(SOCKET_CONTROL_PORT_FIELD, port);
 	}
 	
 	
 	/**
-	 * Getting control port.
-	 * @return control port
+	 * Getting socket control port.
+	 * @return socket control port
 	 */
-	public int getControlPort() {
-		return getAsInt(CONTROL_PORT_FIELD);
+	public int getSocketControlPort() {
+		return getAsInt(SOCKET_CONTROL_PORT_FIELD);
 	}
 
 	

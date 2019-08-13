@@ -262,8 +262,16 @@ public class Listener extends SocketServer implements ServerStatusListener, Gate
 		PowerServer bindServer = getBindServer();
 		if (bindServer == null)
 			return false;
-		else
-			return validateAccount(account, password, privileges);
+		else {
+			try {
+				return bindServer.validateAccount(account, password, privileges);
+			}
+			catch (Throwable e) {
+				e.printStackTrace();
+			}
+			
+			return false;
+		}
 	}
 
 
