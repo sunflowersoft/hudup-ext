@@ -673,7 +673,14 @@ public class LightRemoteServerCP extends JFrame {
 		
 		
 //		System.out.print("Enter command (start|stop|pause|resume|exit): ");
-		System.out.print("Enter command (" + Request.START_CONTROL_COMMAND + "|" + Request.STOP_CONTROL_COMMAND+ "): ");
+		if (connectType.equals("rmi"))
+			System.out.print("Enter command (" + Request.START_CONTROL_COMMAND
+				+ "|" + Request.STOP_CONTROL_COMMAND + "): ");
+		else
+			System.out.print("Enter command (" + Request.START_CONTROL_COMMAND 
+				+ "|" + Request.STOP_CONTROL_COMMAND
+				+ "|" + Request.PAUSE_CONTROL_COMMAND
+				+ "|" + Request.RESUME_CONTROL_COMMAND + "): ");
 		String command = console.readLine();
 		if (command == null || command.isEmpty())
 			command = Request.START_CONTROL_COMMAND;
@@ -692,6 +699,10 @@ public class LightRemoteServerCP extends JFrame {
 					server.start();
 				else if (command.equals(Request.STOP_CONTROL_COMMAND))
 					server.stop();
+//				else if (command.equals(Request.PAUSE_CONTROL_COMMAND))
+//					server.pause();
+//				else if (command.equals(Request.RESUME_CONTROL_COMMAND))
+//					server.resume();
 				else
 					connected = false;
 			}
@@ -712,6 +723,10 @@ public class LightRemoteServerCP extends JFrame {
 					connected = connector.control(Request.START_CONTROL_COMMAND);
 				else if (command.equals(Request.STOP_CONTROL_COMMAND))
 					connected = connector.control(Request.STOP_CONTROL_COMMAND);
+				else if (command.equals(Request.PAUSE_CONTROL_COMMAND))
+					connected = connector.control(Request.PAUSE_CONTROL_COMMAND);
+				else if (command.equals(Request.RESUME_CONTROL_COMMAND))
+					connected = connector.control(Request.RESUME_CONTROL_COMMAND);
 				else
 					connected = false;
 			}

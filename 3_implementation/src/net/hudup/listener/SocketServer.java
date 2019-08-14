@@ -249,8 +249,12 @@ public abstract class SocketServer extends AbstractRunner implements Server, Acc
 					if (userSession.size() > 0) {
 						if (request.control_command.equals(Request.START_CONTROL_COMMAND))
 							this.start();
-						if (request.control_command.equals(Request.STOP_CONTROL_COMMAND))
+						else if (request.control_command.equals(Request.STOP_CONTROL_COMMAND))
 							this.stop();
+						else if (request.control_command.equals(Request.PAUSE_CONTROL_COMMAND))
+							this.pause();
+						else if (request.control_command.equals(Request.RESUME_CONTROL_COMMAND))
+							this.resume();
 	
 						out.write((Response.create(true).toJson() + "\n").getBytes());
 					}

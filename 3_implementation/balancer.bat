@@ -2,14 +2,14 @@ call .\env.bat
 
 @echo off
 
-if "%1" == "noconsole" goto noconsole
-goto console
+if "%1" == "service" goto service
+goto normal
 
-:noconsole
-%JAVAW_CMD% net.hudup.Balancer
+:service
+start %JAVAW_CMD% net.hudup.Balancer
 goto end
 
-:console
+:normal
 %JAVA_CMD% net.hudup.Balancer
 goto end
 

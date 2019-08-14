@@ -1,8 +1,8 @@
 ./env.sh
 
-if [ "$1" == "noconsole" ]
+if [ "$1" == "service" ]
 then
-	$JAVAW_CMD net.hudup.Balancer
+	$JAVAW_CMD net.hudup.Balancer &
 else
 	$JAVA_CMD net.hudup.Balancer
 fi

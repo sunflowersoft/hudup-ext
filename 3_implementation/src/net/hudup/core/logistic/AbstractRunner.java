@@ -118,11 +118,17 @@ public abstract class AbstractRunner implements Runner {
 	}
 	
 	
+	/*
+	 * It is possible that the method is not synchronized so that a active thread / application can resume this runner which was paused by other active thread / application.
+	 * However, another risked can be issued when start/stop/pause can intervene right after the line code &quot;paused = false&quot;.
+	 */
 	@Override
+	@NextUpdate
 	public synchronized void resume() {
 		if (isPaused()) {
 		
 			paused = false;
+			//Risked can be issued when start/stop/pause can intervene right here if the method is not synchronized.
 			notifyAll();
 		}
 	}
