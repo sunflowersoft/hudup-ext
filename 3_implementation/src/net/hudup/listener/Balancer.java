@@ -10,6 +10,7 @@ import java.rmi.RemoteException;
 
 import net.hudup.core.client.PowerServer;
 import net.hudup.core.client.ServerTrayIcon;
+import net.hudup.core.logistic.I18nUtil;
 import net.hudup.core.logistic.xURI;
 import net.hudup.core.logistic.ui.HelpContent;
 import net.hudup.core.logistic.ui.UIUtil;
@@ -118,7 +119,7 @@ public class Balancer extends Listener {
 		try {
             PopupMenu popup = new PopupMenu();
 
-            MenuItem cp = new MenuItem(getMessage("control_panel"));
+            MenuItem cp = new MenuItem(I18nUtil.message("control_panel"));
             cp.addActionListener(new ActionListener() {
 				
 				@Override
@@ -131,7 +132,7 @@ public class Balancer extends Listener {
             
             popup.addSeparator();
 
-            MenuItem helpContent = new MenuItem(getMessage("help_content"));
+            MenuItem helpContent = new MenuItem(I18nUtil.message("help_content"));
             helpContent.addActionListener(new ActionListener() {
 				
 				@Override
@@ -148,7 +149,7 @@ public class Balancer extends Listener {
 			});
             popup.add(helpContent);
 
-            MenuItem exit = new MenuItem(getMessage("exit"));
+            MenuItem exit = new MenuItem(I18nUtil.message("exit"));
             exit.addActionListener(new ActionListener() {
 				
 				@Override
@@ -171,7 +172,7 @@ public class Balancer extends Listener {
             		UIUtil.getImage("balancer-16x16.png"), 
             		UIUtil.getImage("balancer-paused-16x16.png"), 
             		UIUtil.getImage("balancer-stopped-16x16.png"), 
-            		getMessage("hudup_balancer"), 
+            		I18nUtil.message("hudup_balancer"), 
             		popup); 
             trayIcon.addActionListener(new ActionListener() {
 				

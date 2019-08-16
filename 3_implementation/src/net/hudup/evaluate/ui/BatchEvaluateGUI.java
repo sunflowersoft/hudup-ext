@@ -48,6 +48,7 @@ import net.hudup.core.evaluate.EvaluatorProgressEvent;
 import net.hudup.core.evaluate.Metrics;
 import net.hudup.core.evaluate.MetricsUtil;
 import net.hudup.core.logistic.ClipboardUtil;
+import net.hudup.core.logistic.I18nUtil;
 import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.xURI;
 import net.hudup.core.logistic.ui.UIUtil;
@@ -281,7 +282,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 		JPanel paneAlg = new JPanel();
 		up.add(paneAlg);
 		
-		paneAlg.add(new JLabel(getMessage("algorithms") + ":"));
+		paneAlg.add(new JLabel(I18nUtil.message("algorithms") + ":"));
 		
 		this.lbAlgs = new AlgListBox(false);
 		this.lbAlgs.update(algRegTable.getAlgList());
@@ -321,8 +322,8 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 		this.btnConfigAlgs = UIUtil.makeIconButton(
 			"config-16x16.png", 
 			"config", 
-			getMessage("config"), 
-			getMessage("config"), 
+			I18nUtil.message("config"), 
+			I18nUtil.message("config"), 
 				
 			new ActionListener() {
 				
@@ -458,7 +459,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 		JPanel toolGrp1 = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		tool.add(toolGrp1, BorderLayout.WEST);
 		
-		this.btnAddDataset = new JButton(getMessage("add"));
+		this.btnAddDataset = new JButton(I18nUtil.message("add"));
 		this.btnAddDataset.addActionListener(new ActionListener() {
 			
 			@Override
@@ -469,7 +470,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 		});
 		toolGrp1.add(this.btnAddDataset);
 		
-		this.btnLoadBatchScript = new JButton(getMessage("load_script"));
+		this.btnLoadBatchScript = new JButton(I18nUtil.message("load_script"));
 		this.btnLoadBatchScript.addActionListener(new ActionListener() {
 			
 			@Override
@@ -486,8 +487,8 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 		this.btnRefresh = UIUtil.makeIconButton(
 			"refresh-16x16.png", 
 			"refresh", 
-			getMessage("refresh"), 
-			getMessage("refresh"), 
+			I18nUtil.message("refresh"), 
+			I18nUtil.message("refresh"), 
 				
 			new ActionListener() {
 				
@@ -503,8 +504,8 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 		this.btnClear = UIUtil.makeIconButton(
 			"clear-16x16.png", 
 			"clear", 
-			getMessage("clear"), 
-			getMessage("clear"), 
+			I18nUtil.message("clear"), 
+			I18nUtil.message("clear"), 
 				
 			new ActionListener() {
 				
@@ -520,9 +521,9 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 
 		this.btnForceStop = UIUtil.makeIconButton(
 			"forcestop-16x16.png", 
-			getMessage("force_stop"), 
-			getMessage("force_stop_tooltip"), 
-			getMessage("force_stop"), 
+			I18nUtil.message("force_stop"), 
+			I18nUtil.message("force_stop_tooltip"), 
+			I18nUtil.message("force_stop"), 
 				
 			new ActionListener() {
 				
@@ -551,7 +552,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 		JPanel paneControl = new JPanel();
 		body.add(paneControl, BorderLayout.NORTH);
 		
-		this.btnRun = new JButton(getMessage("run"));
+		this.btnRun = new JButton(I18nUtil.message("run"));
 		this.btnRun.addActionListener(new ActionListener() {
 			
 			@Override
@@ -562,7 +563,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 		});
 		paneControl.add(this.btnRun);
 		
-		this.btnPauseResume = new JButton(getMessage("pause"));
+		this.btnPauseResume = new JButton(I18nUtil.message("pause"));
 		this.btnPauseResume.addActionListener(new ActionListener() {
 			
 			@Override
@@ -574,7 +575,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 		});
 		paneControl.add(this.btnPauseResume);
 
-		this.btnStop = new JButton(getMessage("stop"));
+		this.btnStop = new JButton(I18nUtil.message("stop"));
 		this.btnStop.addActionListener(new ActionListener() {
 			
 			@Override
@@ -604,7 +605,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 		this.txtSaveBrowse = new JTextField();
 		this.txtSaveBrowse.setEditable(false);
 		pane.add(this.txtSaveBrowse, BorderLayout.CENTER);
-		this.chkSave = new JCheckBox(getMessage("save"));
+		this.chkSave = new JCheckBox(I18nUtil.message("save"));
 		this.chkSave.addActionListener(new ActionListener() {
 			
 			@Override
@@ -638,7 +639,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 		JPanel buttons = new JPanel();
 		tool.add(buttons, BorderLayout.EAST);
 
-		this.chkDisplay = new JCheckBox(new AbstractAction(getMessage("display")) {
+		this.chkDisplay = new JCheckBox(new AbstractAction(I18nUtil.message("display")) {
 
 			/**
 			 * Serial version UID for serializable class. 
@@ -657,8 +658,8 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 		this.btnMetricsOption = UIUtil.makeIconButton(
 			"option-16x16.png", 
 			"metrics_option", 
-			getMessage("metrics_option"), 
-			getMessage("metrics_option"), 
+			I18nUtil.message("metrics_option"), 
+			I18nUtil.message("metrics_option"), 
 				
 			new ActionListener() {
 				
@@ -674,7 +675,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 				
 		this.prgRunning = new JProgressBar();
 		this.prgRunning.setStringPainted(true);
-		this.prgRunning.setToolTipText(getMessage("evaluation_progress"));
+		this.prgRunning.setToolTipText(I18nUtil.message("evaluation_progress"));
 		this.prgRunning.setMaximum(0);
 		this.prgRunning.setValue(0);
 		this.prgRunning.setVisible(false);
@@ -701,7 +702,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 		JPanel toolbar = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 		this.paneResult.add(toolbar, BorderLayout.SOUTH);
 		
-		this.btnAnalyzeResult = new JButton(getMessage("analyze_result"));
+		this.btnAnalyzeResult = new JButton(I18nUtil.message("analyze_result"));
 		this.btnAnalyzeResult.addActionListener(new ActionListener() {
 			
 			@Override
@@ -725,8 +726,8 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 		this.btnCopyResult = UIUtil.makeIconButton(
 			"copy-16x16.png", 
 			"copy_result_to_clipboard", 
-			getMessage("copy_result_to_clipboard"), 
-			getMessage("copy_result_to_clipboard"), 
+			I18nUtil.message("copy_result_to_clipboard"), 
+			I18nUtil.message("copy_result_to_clipboard"), 
 				
 			new ActionListener() {
 
@@ -1085,7 +1086,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			
 			this.statusBar.setTextPane0( 
 					evaluator.getName() + " - " + 
-					(chkDisplay.isSelected() ? getMessage("display") : getMessage("undisplay"))
+					(chkDisplay.isSelected() ? I18nUtil.message("display") : I18nUtil.message("undisplay"))
 				);
 		}
 		catch (Throwable e) {
@@ -1239,20 +1240,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			if (evaluator.remoteIsStarted() || this.lbAlgs.getAlgList().size() == 0)
 				return;
 			
-			new AddingDatasetDlg(this, pool, this.lbAlgs.getAlgList(), evaluator.getMainUnit()) {
-
-				/**
-				 * Default serial version UID.
-				 */
-				private static final long serialVersionUID = 1L;
-
-				@Override
-				protected String getMessage(String key) {
-					// TODO Auto-generated method stub
-					return getThisGUI().getMessage(key);
-				}
-				
-			};
+			new AddingDatasetDlg(this, pool, this.lbAlgs.getAlgList(), evaluator.getMainUnit());
 			this.tblDatasetPool.update(this.pool);
 			
 			clearResult();

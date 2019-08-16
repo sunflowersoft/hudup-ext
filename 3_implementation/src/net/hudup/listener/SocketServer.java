@@ -25,7 +25,6 @@ import net.hudup.core.client.ServerStatusListener;
 import net.hudup.core.client.SocketWrapper;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.logistic.AbstractRunner;
-import net.hudup.core.logistic.I18nUtil;
 import net.hudup.core.logistic.NetUtil;
 import net.hudup.core.logistic.RemoteRunner;
 import net.hudup.core.logistic.Runner;
@@ -857,16 +856,6 @@ public abstract class SocketServer extends AbstractRunner implements Server, Acc
 		
 	}
 	
-	
-	/**
-	 * Getting the message (value) associated with the specified key from the server configuration.
-	 * @param key specified key.
-	 * @return message (value) associated with the specified key from the server configuration.
-	 */
-	protected String getMessage(String key) {
-		return I18nUtil.getMessage(config, key);
-	}
-
 	
 	//Added date 2019.09.11 by Loc Nguyen
 	/**

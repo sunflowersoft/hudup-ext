@@ -1,6 +1,3 @@
-/**
- * 
- */
 package net.hudup.core;
 
 import static net.hudup.core.Constants.RESOURCES_PACKAGE;
@@ -67,7 +64,7 @@ public final class Util {
 		
 		try {
 			Properties userProps = new Properties();
-			InputStream in = Util.class.getResourceAsStream(ROOT_PACKAGE + "user.properties");
+			InputStream in = Util.class.getResourceAsStream(ROOT_PACKAGE + "hudup.properties");
 			if (in != null) {
 				userProps.load(in);
 				in.close();

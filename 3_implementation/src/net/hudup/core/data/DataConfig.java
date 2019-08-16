@@ -645,7 +645,7 @@ public class DataConfig extends PropList {
 		else if (unitType.equals(DataConfig.SAMPLE_UNIT))
 			setSampleUnit(unit);
 		else
-			logger.info("DataConfig#setUnit not valid with inexistent #unitType " + unitType);
+			System.out.println("Error: DataConfig#setUnit not valid with inexistent #unitType " + unitType);
 	}
 
 	

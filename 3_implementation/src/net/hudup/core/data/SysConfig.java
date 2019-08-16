@@ -3,7 +3,6 @@
  */
 package net.hudup.core.data;
 
-import net.hudup.core.logistic.I18nUtil;
 import net.hudup.core.logistic.xURI;
 
 
@@ -119,8 +118,8 @@ public abstract class SysConfig extends DataConfig {
 	public void reset() {
 		clear();
 		
-		put(I18nUtil.LANGUAGE, I18nUtil.DEFAULT_LANGUAGE);
-		put(I18nUtil.COUNTRY, I18nUtil.DEFAULT_COUNTRY);
+//		put(I18nUtil.LANGUAGE, I18nUtil.DEFAULT_LANGUAGE);
+//		put(I18nUtil.COUNTRY, I18nUtil.DEFAULT_COUNTRY);
 	}
 	
 	

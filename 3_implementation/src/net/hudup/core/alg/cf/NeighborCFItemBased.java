@@ -22,6 +22,8 @@ import net.hudup.core.data.RatingVector;
  * There are many authors who contributed measure to this class.<br/>
  * Authors Haifeng Liu, Zheng Hu, Ahmad Mian, Hui Tian, Xuzhen Zhu contributed PSS measures and NHSM measure.<br>
  * Authors Bidyut Kr. Patra, Raimo Launonen, Ville Ollikainen, Sukumar Nandi contributed BC and BCF measures.<br>
+ * Author Hyung Jun Ahn contributed PIP measure.<br>
+ * Authors Keunho Choi and Yongmoo Suh contributed PC measure.<br>
  * 
  * @author Loc Nguyen
  * @version 10.0
@@ -104,7 +106,7 @@ public class NeighborCFItemBased extends NeighborCF implements DuplicatableAlg {
 					Profile itemProfile2 = hybrid ? cf.dataset.getItemProfile(thatItem.id()) : null;
 					
 					// computing similarity
-					double sim = cf.similar(thisItem, thatItem, itemProfile1, itemProfile2);
+					double sim = cf.similar(thisItem, thatItem, itemProfile1, itemProfile2, thisUser.id());
 					if (!Util.isUsed(sim)) continue;
 					
 					double thatValue = thatItem.get(thisUser.id()).value;
@@ -150,6 +152,13 @@ public class NeighborCFItemBased extends NeighborCF implements DuplicatableAlg {
 
 	
 	@Override
+	public double pip(RatingVector vRating1, RatingVector vRating2, Profile profile1, Profile profile2) {
+		// TODO Auto-generated method stub
+		return pip(vRating1, vRating2, this.userMeans);
+	}
+
+
+	@Override
 	public double pss(RatingVector vRating1, RatingVector vRating2,
 			Profile profile1, Profile profile2) {
 		return pss(vRating1, vRating2, this.ratingMedian, this.userMeans);
@@ -157,7 +166,15 @@ public class NeighborCFItemBased extends NeighborCF implements DuplicatableAlg {
 	
 	
 	@Override
-	protected RatingVector bcfGetColumnRating(int columnId) {
+	public double pc(RatingVector vRating1, RatingVector vRating2, Profile profile1,
+			Profile profile2, int fixedColumnId) {
+		// TODO Auto-generated method stub
+		return pc(vRating1, vRating2, fixedColumnId, this.userMeans);
+	}
+
+
+	@Override
+	protected RatingVector getColumnRating(int columnId) {
 		// TODO Auto-generated method stub
 		return this.dataset.getUserRating(columnId);
 	}

@@ -152,9 +152,9 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 //		body.add(getMessage("evaluate"), evaluateGUI);
 		
 		batchEvaluateGUI = new BatchEvaluateGUI(evaluator, bindUri);
-		body.add(getMessage("evaluate_batch"), batchEvaluateGUI);
+		body.add(I18nUtil.message("evaluate_batch"), batchEvaluateGUI);
 		
-		setTitle(getMessage("evaluator"));
+		setTitle(I18nUtil.message("evaluator"));
 		setVisible(true);
 	}
 	
@@ -169,27 +169,17 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 	
 	
 	/**
-	 * Getting localized message by specified key.
-	 * @param key specified key.
-	 * @return message according to key.
-	 */
-	protected String getMessage(String key) {
-		return I18nUtil.getMessage(thisConfig, key);
-	}
-
-	
-	/**
 	 * Creating main menu bar.
 	 * @return main menu bar as {@link JMenuBar}.
 	 */
 	private JMenuBar createMenuBar() {
 		JMenuBar mnBar = new JMenuBar();
 		
-		JMenu mnTools = new JMenu(getMessage("tool"));
+		JMenu mnTools = new JMenu(I18nUtil.message("tool"));
 		mnBar.add(mnTools);
 		
 		JMenuItem mniSysConfig = new JMenuItem(
-			new AbstractAction(getMessage("system_configure")) {
+			new AbstractAction(I18nUtil.message("system_configure")) {
 
 				/**
 				 * Serial version UID for serializable class. 
@@ -206,7 +196,7 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 		mnTools.add(mniSysConfig);
 
 		JMenuItem mniSwitchEvaluator = new JMenuItem(
-			new AbstractAction(getMessage("switch_evaluator")) {
+			new AbstractAction(I18nUtil.message("switch_evaluator")) {
 
 				/**
 				 * Serial version UID for serializable class. 
@@ -222,11 +212,11 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 		mnTools.add(mniSwitchEvaluator);
 			
 
-		JMenu mnHelp = new JMenu(getMessage("help"));
+		JMenu mnHelp = new JMenu(I18nUtil.message("help"));
 		mnBar.add(mnHelp);
 		
 		JMenuItem mniHelpContent = new JMenuItem(
-			new AbstractAction(getMessage("help_content")) {
+			new AbstractAction(I18nUtil.message("help_content")) {
 
 				/**
 				 * Serial version UID for serializable class. 
@@ -289,7 +279,7 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 			return;
 		}
 		
-		SysConfigDlgExt cfg = new SysConfigDlgExt(this, getMessage("system_configure"), this);
+		SysConfigDlgExt cfg = new SysConfigDlgExt(this, I18nUtil.message("system_configure"), this);
 		cfg.update(thisConfig);
 		cfg.setVisible(true);
 	}

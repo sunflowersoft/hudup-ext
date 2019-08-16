@@ -69,7 +69,7 @@ public class NeighborCF2dDeprecated extends NeighborCFUserBased {
 					Profile thisProfile = hybrid ? param.profile : null;
 					Profile userProfile = hybrid ? dataset.getUserProfile(user.id()) : null;
 					
-					double userSim = similar(param.ratingVector, user, thisProfile, userProfile);
+					double userSim = similar(param.ratingVector, user, thisProfile, userProfile, queryId);
 					
 					try {
 						while (vItemRatings.next()) {
@@ -92,7 +92,7 @@ public class NeighborCF2dDeprecated extends NeighborCFUserBased {
 							
 							double itemSim = 0;
 							if (fieldItem != null)
-								itemSim = similar(fieldItem, item, fieldProfile, itemProfile);
+								itemSim = similar(fieldItem, item, fieldProfile, itemProfile, user.id());
 									
 							double gravity = Math.sqrt(userSim * userSim + itemSim * itemSim);
 							if (!Util.isUsed(gravity))

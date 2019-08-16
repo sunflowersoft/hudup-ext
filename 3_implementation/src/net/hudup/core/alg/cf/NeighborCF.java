@@ -44,6 +44,8 @@ import net.hudup.core.parser.TextParserUtil;
  * There are many authors who contributed measure to this class.<br/>
  * Authors Haifeng Liu, Zheng Hu, Ahmad Mian, Hui Tian, Xuzhen Zhu contributed PSS measures and NHSM measure.<br>
  * Authors Bidyut Kr. Patra, Raimo Launonen, Ville Ollikainen, Sukumar Nandi contributed BC and BCF measures.<br>
+ * Author Hyung Jun Ahn contributed PIP measure.<br>
+ * Authors Keunho Choi and Yongmoo Suh contributed PC measure.<br>
  * 
  * @author Loc Nguyen
  * @version 10.0
@@ -63,6 +65,18 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 	 */
 	public static final String MEASURE = "measure";
 	
+	
+	/**
+	 * Value bins.
+	 */
+	public static final String VALUE_BINS_FIELD = "value_bins";
+
+	
+	/**
+	 * Default value bins.
+	 */
+	public static final String VALUE_BINS_DEFAULT = "1, 2, 3, 4, 5";
+
 	
 	/**
 	 * Name of hybrid measure.
@@ -143,6 +157,12 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 
 	
 	/**
+	 * Name of SRC measure.
+	 */
+	public static final String SRC = "src";
+
+	
+	/**
 	 * Name of PSS measure.
 	 */
 	public static final String PSS = "pss";
@@ -167,6 +187,18 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 
 	
 	/**
+	 * Name of PIP measure.
+	 */
+	public static final String PIP = "pip";
+
+	
+	/**
+	 * Name of PC measure.
+	 */
+	public static final String PC = "pc";
+
+	
+	/**
 	 * Cosine normalized mode.
 	 */
 	public static final String COSINE_NORMALIZED_FIELD = "cos_normalized";
@@ -176,18 +208,6 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 	 * Default cosine normalized mode.
 	 */
 	public static final boolean COSINE_NORMALIZED_DEFAULT = false;
-
-	
-	/**
-	 * Value bins.
-	 */
-	public static final String BCF_VALUE_BINS_FIELD = "bcf_value_bins";
-
-	
-	/**
-	 * Default value bins.
-	 */
-	public static final String BCF_VALUE_BINS_DEFAULT = "1, 2, 3, 4, 5";
 
 	
 	/**
@@ -205,7 +225,7 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 	/**
 	 * Threshold for WPCC (weight weighted Pearson correlation coefficient).
 	 */
-	public static final double WPCC_THRESHOLD = 50;
+	public static final double WPC_THRESHOLD = 50;
 
 	
 	/**
@@ -281,22 +301,34 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 
 
 	/**
+	 * Column similarity cache.
+	 */
+	protected Map<Integer, Map<Integer, Object>> columnSimCache = Util.newMap();
+
+	
+	/**
+	 * Row module (row vector length) cache.
+	 */
+	protected Map<Integer, Object> rowModuleCache = Util.newMap();
+
+	
+	/**
+	 * Column module (column vector length) cache.
+	 */
+	protected Map<Integer, Object> columnModuleCache = Util.newMap();
+
+	
+	/**
 	 * Value bins.
 	 */
 	protected List<Double> valueBins = Util.newList();
 	
 	
 	/**
-	 * BCF column similarity cache.
+	 * Rank bins.
 	 */
-	protected Map<Integer, Object> bcfColumnModuleCache = Util.newMap();
-
+	protected Map<Double, Integer> rankBins = Util.newMap();
 	
-	/**
-	 * Column BC cache.
-	 */
-	protected Map<Integer, Map<Integer, Object>> bcColumnCache = Util.newMap();
-
 	
 	/**
 	 * Default constructor.
@@ -317,11 +349,13 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 		this.ratingMedian = (this.maxRating + this.minRating) / 2.0;
 		
 		this.rowSimCache.clear();
+		this.columnSimCache.clear();
+		this.rowModuleCache.clear();
+		this.columnModuleCache.clear();
 
 		this.valueBins = extractConfigValueBins();
-		this.bcfColumnModuleCache.clear();
-		this.bcColumnCache.clear();
-
+		this.rankBins = convertValueBinsToRankBins(this.valueBins);
+		
 		updateUserMeanVars(dataset);
 		updateItemMeanVars(dataset);
 	}
@@ -347,10 +381,12 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 		this.userIds.clear();
 		
 		this.rowSimCache.clear();
+		this.columnSimCache.clear();
+		this.rowModuleCache.clear();
+		this.columnModuleCache.clear();
 		
+		this.rankBins.clear();
 		this.valueBins.clear();
-		this.bcfColumnModuleCache.clear();
-		this.bcColumnCache.clear();
 	}
 
 
@@ -484,10 +520,13 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 		mSet.add(JACCARD2);
 		mSet.add(MSD);
 		mSet.add(MSDJ);
+		mSet.add(SRC);
 		mSet.add(PSS);
 		mSet.add(NHSM);
 		mSet.add(BCF);
 		mSet.add(BCFJ);
+		mSet.add(PIP);
+		mSet.add(PC);
 		
 		List<String> measures = Util.newList();
 		measures.clear();
@@ -519,9 +558,10 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 	 * @param vRating2 second rating vector.
 	 * @param profile1 first profile.
 	 * @param profile2 second profile.
+	 * @param param extra parameter.
 	 * @return similarity between both two {@link RatingVector} (s) and two {@link Profile} (s).
 	 */
-	public double similar(RatingVector vRating1, RatingVector vRating2, Profile profile1, Profile profile2) {
+	public double similar(RatingVector vRating1, RatingVector vRating2, Profile profile1, Profile profile2, Object param) {
 		String measure = config.getAsString(MEASURE);
 		if (measure == null) return Constants.UNUSED;
 
@@ -529,7 +569,7 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 			
 			@Override
 			public Object perform(Object...params) {
-				return similarAsUsual(measure, vRating1, vRating2, profile1, profile2);
+				return similarAsUsual(measure, vRating1, vRating2, profile1, profile2, param);
 			}
 		};
 		
@@ -544,9 +584,10 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 	 * @param vRating2 second rating vector.
 	 * @param profile1 first profile.
 	 * @param profile2 second profile.
+	 * @param param extra parameter.
 	 * @return similarity between both two {@link RatingVector} (s) and two {@link Profile} (s) as usual.
 	 */
-	protected double similarAsUsual(String measure, RatingVector vRating1, RatingVector vRating2, Profile profile1, Profile profile2) {
+	protected double similarAsUsual(String measure, RatingVector vRating1, RatingVector vRating2, Profile profile1, Profile profile2, Object param) {
 		boolean hybrid = config.getAsBoolean(HYBRID);
 		if (!hybrid) {
 			profile1 = null;
@@ -576,7 +617,9 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 		else if (measure.equals(MSD))
 			return msd(vRating1, vRating2, profile1, profile2);
 		else if (measure.equals(MSDJ))
-			return msdj(vRating1, vRating2, profile1, profile2);
+			return msd(vRating1, vRating2, profile1, profile2) * jaccard(vRating1, vRating2, profile1, profile2);
+		else if (measure.equals(SRC))
+			return src(vRating1, vRating2, profile1, profile2);
 		else if (measure.equals(PSS))
 			return pss(vRating1, vRating2, profile1, profile2);
 		else if (measure.equals(NHSM))
@@ -585,9 +628,18 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 			return bcf(vRating1, vRating2, profile1, profile2);
 		else if (measure.equals(BCFJ))
 			return bcfj(vRating1, vRating2, profile1, profile2);
+		else if (measure.equals(PIP))
+			return pip(vRating1, vRating2, profile1, profile2);
+		else if (measure.equals(PC)) {
+			if ((param == null) || !(param instanceof Number))
+				return Constants.UNUSED;
+			else {
+				int fixedColumnId = ((Number)param).intValue();
+				return pc(vRating1, vRating2, profile1, profile2, fixedColumnId);
+			}
+		}
 		else
 			return Constants.UNUSED;
-			
 	}
 	
 	
@@ -852,8 +904,8 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 			Profile profile1, Profile profile2) {
 		Set<Integer> common = commonFieldIds(vRating1, vRating2);
 		double N = common.size();
-		if (N <= WPCC_THRESHOLD)
-			return corr(vRating1, vRating2, profile1, profile2) * (N/WPCC_THRESHOLD);
+		if (N <= WPC_THRESHOLD)
+			return corr(vRating1, vRating2, profile1, profile2) * (N/WPC_THRESHOLD);
 		else
 			return corr(vRating1, vRating2, profile1, profile2);
 	}
@@ -924,6 +976,42 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 		return (double)common.size() / (double)(ratedIds1.size()*ratedIds2.size());
 	}
 
+	
+	/**
+	 * Calculating the Spearman&apos; Rank Correlation (SRC) measure between two pairs.
+	 * The first pair includes the first rating vector and the first profile.
+	 * The second pair includes the second rating vector and the second profile.
+	 * 
+	 * @param vRating1 first rating vector.
+	 * @param vRating2 second rating vector.
+	 * @param profile1 first profile.
+	 * @param profile2 second profile.
+	 * @return Spearman&apos; Rank Correlation (SRC) measure between both two rating vectors and profiles.
+	 */
+	public double src(RatingVector vRating1, RatingVector vRating2,
+			Profile profile1, Profile profile2) {
+		Map<Double, Integer> bins = rankBins;
+		if (bins.isEmpty())
+			bins = extractRankBins(vRating1, vRating2);
+
+		Set<Integer> common = commonFieldIds(vRating1, vRating2);
+		if (common.size() == 0) return Constants.UNUSED;
+		
+		double sum = 0;
+		for (int id : common) {
+			double v1 = vRating1.get(id).value;
+			int r1 = bins.get(v1);
+			double v2 = vRating2.get(id).value;
+			int r2 = bins.get(v2);
+			
+			int d = r1 - r2;
+			sum += d*d;
+		}
+		
+		double n = common.size();
+		return 1.0 - 6*sum/(n*(n*n-1));
+	}
+	
 	
 	/**
 	 * Calculating the PSS measure between two pairs. PSS measure is developed by Haifeng Liu, Zheng Hu, Ahmad Mian, Hui Tian, Xuzhen Zhu, and implemented by Loc Nguyen.
@@ -1027,23 +1115,6 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 	
 	
 	/**
-	 * Calculating the MSDJ (MSD + Jaccard) measure between two pairs.
-	 * The first pair includes the first rating vector and the first profile.
-	 * The second pair includes the second rating vector and the second profile.
-	 * 
-	 * @param vRating1 first rating vector.
-	 * @param vRating2 second rating vector.
-	 * @param profile1 first profile.
-	 * @param profile2 second profile.
-	 * @return MSDJ measure between both two rating vectors and profiles.
-	 */
-	public double msdj(RatingVector vRating1, RatingVector vRating2,
-			Profile profile1, Profile profile2) {
-		return msd(vRating1, vRating2, profile1, profile2) * jaccard(vRating1, vRating2, profile1, profile2);
-	}
-	
-	
-	/**
 	 * Calculate the Bhattacharyya measure from specified rating vectors. BC measure is modified by Bidyut Kr. Patra, Raimo Launonen, Ville Ollikainen, Sukumar Nandi, and implemented by Loc Nguyen.
 	 * @param vRating1 first rating vector.
 	 * @param vRating2 second rating vector.
@@ -1085,7 +1156,7 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 			}
 		};
 		
-		return (double)cacheTask(vRating1.id(), vRating2.id(), this.bcColumnCache, task);
+		return (double)cacheTask(vRating1.id(), vRating2.id(), this.columnSimCache, task);
 	}
 
 	
@@ -1110,14 +1181,14 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 		double bcSum = 0;
 		boolean medianMode = getConfig().getAsBoolean(BCF_MEDIAN_MODE_FIELD);
 		for (int columnId1 : columnIds1) {
-			RatingVector columnVector1 = bcfGetColumnRating(columnId1);
+			RatingVector columnVector1 = getColumnRating(columnId1);
 			if (columnVector1 == null) continue;
 			double columnModule1 = bcfCalcColumnModule(columnVector1);
 			if (!Util.isUsed(columnModule1) || columnModule1 == 0) continue;
 			
 			double value1 = medianMode? vRating1.get(columnId1).value-this.ratingMedian : vRating1.get(columnId1).value-vRating1.mean();
 			for (int columnId2 : columnIds2) {
-				RatingVector columnVector2 = columnId2 == columnId1 ? columnVector1 : bcfGetColumnRating(columnId2);
+				RatingVector columnVector2 = columnId2 == columnId1 ? columnVector1 : getColumnRating(columnId2);
 				if (columnVector2 == null) continue;
 				double columnModule2 = bcfCalcColumnModule(columnVector2);
 				if (!Util.isUsed(columnModule2) || columnModule2 == 0) continue;
@@ -1155,14 +1226,6 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 	
 	
 	/**
-	 * Getting rating vector given column ID (item ID or user ID) for BCF measure.
-	 * @param columnId specified column ID (item ID or user ID).
-	 * @return rating vector given column ID (item ID or user ID).
-	 */
-	protected abstract RatingVector bcfGetColumnRating(int columnId);
-	
-	
-	/**
 	 * Calculating module (length) of column rating vector for BCF measure.
 	 * @param columnVector specified column rating vector.
 	 * @return module (length) of column rating vector.
@@ -1187,9 +1250,139 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 			}
 		};
 		
-		return (double)cacheTask(columnVector.id(), this.bcfColumnModuleCache, task);
+		return (double)cacheTask(columnVector.id(), this.columnModuleCache, task);
 	}
 
+	
+	/**
+	 * Calculating the PIP measure between two pairs. PIP measure is developed by Hyung Jun Ahn, and implemented by Loc Nguyen.
+	 * The first pair includes the first rating vector and the first profile.
+	 * The second pair includes the second rating vector and the second profile.
+	 * 
+	 * @param vRating1 first rating vector.
+	 * @param vRating2 second rating vector.
+	 * @param profile1 first profile.
+	 * @param profile2 second profile.
+	 * @author Hyung Jun Ahn.
+	 * @return NHSM measure between both two rating vectors and profiles.
+	 */
+	public abstract double pip(RatingVector vRating1, RatingVector vRating2,
+			Profile profile1, Profile profile2);
+	
+	
+	/**
+	 * Calculating the PIP measure between two rating vectors. PIP measure is developed by Hyung Jun Ahn and implemented by Loc Nguyen.
+	 * @param vRating1 first rating vector.
+	 * @param vRating2 second rating vector.
+	 * @param ratingMedian general mean.
+	 * @param fieldMeans map of field means.
+	 * @author Hyung Jun Ahn.
+	 * @return PIP measure between two rating vectors.
+	 */
+	protected double pip(RatingVector vRating1, RatingVector vRating2, Map<Integer, Double> fieldMeans) {
+		Set<Integer> common = commonFieldIds(vRating1, vRating2);
+		if (common.size() == 0) return Constants.UNUSED;
+		
+		double pip = 0.0;
+		for (int id : common) {
+			double r1 = vRating1.get(id).value;
+			double r2 = vRating2.get(id).value;
+			boolean agreed = agree(r1, r2);
+			
+			double d = agreed ? Math.abs(r1-r2) : 2*Math.abs(r1-r2);
+			double pro = (2*(maxRating-minRating)+1) - d;
+			pro = pro*pro;
+			
+			double impact = (Math.abs(r1-ratingMedian)+1) * (Math.abs(r2-ratingMedian)+1);
+			if (!agreed)
+				impact = 1 / impact;
+			
+			double mean = fieldMeans.get(id);
+			double pop = 1;
+			if ((r1 > mean && r2 > mean) || (r1 < mean && r2 < mean)) {
+				double bias = (r1+r2)/2 - mean;
+				pop = 1 + bias*bias;
+			}
+			
+			pip += pro * impact * pop;
+		}
+		
+		return pip;
+	}
+
+	
+	/**
+	 * Calculating the PC measure between two rating vectors. PC measure is developed by Keunho Choi and Yongmoo Suh. It implemented by Loc Nguyen.
+	 * The first pair includes the first rating vector and the first profile.
+	 * The second pair includes the second rating vector and the second profile.
+	 * 
+	 * @param vRating1 first rating vector.
+	 * @param vRating2 second rating vector.
+	 * @param profile1 first profile.
+	 * @param profile2 second profile.
+	 * @param fixedColumnId fixed column identifier.
+	 * @author Hyung Jun Ahn.
+	 * @return PC measure between both two rating vectors and profiles.
+	 */
+	public abstract double pc(RatingVector vRating1, RatingVector vRating2,
+			Profile profile1, Profile profile2, int fixedColumnId);
+	
+	
+	/**
+	 * Calculating the PC measure between two rating vectors. PC measure is developed by Keunho Choi and Yongmoo Suh. It implemented by Loc Nguyen.
+	 * @param vRating1 the first rating vectors.
+	 * @param vRating2 the second rating vectors.
+	 * @param fixedFieldId fixed field (column) identifier.
+	 * @param fieldMeans mean value of field ratings.
+	 * @author Keunho Choi, Yongmoo Suh
+	 * @return PC measure between two rating vectors.
+	 */
+	protected double pc(RatingVector vRating1, RatingVector vRating2, int fixedFieldId, Map<Integer, Double> fieldMeans) {
+		Set<Integer> common = commonFieldIds(vRating1, vRating2);
+		if (common.size() == 0) return Constants.UNUSED;
+
+		double vx = 0, vy = 0;
+		double vxy = 0;
+		for (int fieldId : common) {
+			double mean = fieldMeans.get(fieldId);
+			double d1 = vRating1.get(fieldId).value - mean;
+			double d2 = vRating2.get(fieldId).value - mean;
+			
+			Task columnSimTask = new Task() {
+				
+				@Override
+				public Object perform(Object...params) {
+					RatingVector fixedColumnVector = getColumnRating(fixedFieldId);
+					RatingVector columnVector = getColumnRating(fieldId);
+					
+					if (fixedColumnVector == null || columnVector == null)
+						return Constants.UNUSED;
+					else
+						return fixedColumnVector.corr(columnVector);
+				}
+			};
+			double columnSim = (double)cacheTask(fixedFieldId, fieldId, this.columnSimCache, columnSimTask);
+			columnSim = columnSim * columnSim;
+			
+			vx  += d1 * d1 * columnSim;
+			vy  += d2 * d2 * columnSim;
+			vxy += d1 * d2 * columnSim;
+		}
+		
+		if (vx == 0 || vy == 0)
+			return Constants.UNUSED;
+		else
+			return vxy / Math.sqrt(vx * vy);
+	}
+
+	
+	/**
+	 * Getting rating vector given column ID (item ID or user ID) for BCF measure.
+	 * @param columnId specified column ID (item ID or user ID).
+	 * @return rating vector given column ID (item ID or user ID).
+	 */
+	protected abstract RatingVector getColumnRating(int columnId);
+	
 	
 	@Override
 	public Object cacheTask(int id1, int id2, Map<Integer, Map<Integer, Object>> cache, Task task, Object...params) {
@@ -1216,6 +1409,20 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 		getConfig().put(SupportCacheAlg.SUPPORT_CACHE_FIELD, cached);
 	}
 
+	
+	/**
+	 * Checking whether two ratings are agreed.
+	 * @param rating1 first rating.
+	 * @param rating2 second rating.
+	 * @return true if two ratings are agreed.
+	 */
+	protected boolean agree(double rating1, double rating2) {
+		if ( (rating1 > this.ratingMedian && rating2 < this.ratingMedian) || (rating1 < this.ratingMedian && rating2 > this.ratingMedian) )
+			return false;
+		else
+			return true;
+	}
+	
 	
 	/**
 	 * Computing common field IDs of two rating vectors.
@@ -1246,6 +1453,25 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 
 	
 	/**
+	 * Converting value bins into rank bins.
+	 * @param valueBins value bins
+	 * @return rank bins.
+	 */
+	protected static Map<Double, Integer> convertValueBinsToRankBins(List<Double> valueBins) {
+		if (valueBins == null || valueBins.size() == 0)
+			return Util.newMap();
+		
+		Collections.sort(valueBins);
+		Map<Double, Integer> rankBins = Util.newMap();
+		for (int i = 0; i < valueBins.size(); i++) {
+			rankBins.put(valueBins.get(i), i+1);
+		}
+		
+		return rankBins;
+	}
+	
+	
+	/**
 	 * Extracting value bins from two specified rating vectors.
 	 * @param vRating1 first rating vector.
 	 * @param vRating2 second rating vector.
@@ -1273,19 +1499,41 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 	
 	
 	/**
+	 * Extracting rank bins from two specified rating vectors.
+	 * @param vRating1 first rating vector.
+	 * @param vRating2 second rating vector.
+	 * @return Extracted rank bins from two specified rating vectors.
+	 */
+	protected static Map<Double, Integer> extractRankBins(RatingVector vRating1, RatingVector vRating2) {
+		List<Double> valueBins = extractValueBins(vRating1, vRating2);
+		return convertValueBinsToRankBins(valueBins);
+	}
+	
+	
+	/**
 	 * Extracting value bins from configuration.
 	 * @return extracted value bins from configuration.
 	 */
 	protected List<Double> extractConfigValueBins() {
-		if (!getConfig().containsKey(BCF_VALUE_BINS_FIELD))
+		if (!getConfig().containsKey(VALUE_BINS_FIELD))
 			return Util.newList();
 		
 		return TextParserUtil.parseListByClass(
-				getConfig().getAsString(BCF_VALUE_BINS_FIELD),
+				getConfig().getAsString(VALUE_BINS_FIELD),
 				Double.class,
 				",");
 	}
 	
+	
+	/**
+	 * Extracting rank bins from configuration.
+	 * @return extracted SRC rank bins from configuration.
+	 */
+	protected Map<Double, Integer> extractConfigRankBins() {
+		List<Double> valueBins = extractConfigValueBins();
+		return convertValueBinsToRankBins(valueBins);
+	}
+
 	
 	@Override
 	public DataConfig createDefaultConfig() {
@@ -1294,7 +1542,7 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 		tempConfig.put(DataConfig.MAX_RATING_FIELD, DataConfig.MAX_RATING_DEFAULT);
 		tempConfig.put(MEASURE, getDefaultSimilarMeasure());
 		tempConfig.put(COSINE_NORMALIZED_FIELD, COSINE_NORMALIZED_DEFAULT);
-		tempConfig.put(BCF_VALUE_BINS_FIELD, BCF_VALUE_BINS_DEFAULT);
+		tempConfig.put(VALUE_BINS_FIELD, VALUE_BINS_DEFAULT);
 		tempConfig.put(BCF_MEDIAN_MODE_FIELD, BCF_MEDIAN_MODE_DEFAULT);
 		tempConfig.put(SUPPORT_CACHE_FIELD, SUPPORT_CACHE_DEFAULT);
 

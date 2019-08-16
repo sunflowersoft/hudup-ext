@@ -20,7 +20,6 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import org.apache.log4j.Logger;
 import org.w3c.dom.CDATASection;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -58,10 +57,10 @@ public class PropList implements TextParsable, Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
 
 
-	/**
-	 * Logger of this class.
-	 */
-	protected final static Logger logger = Logger.getLogger(PropList.class);
+//	/**
+//	 * Logger of this class. Because PropList is serializable, it should not have logger.
+//	 */
+//	protected final static Logger logger = Logger.getLogger(PropList.class);
 
 	
 	/**
@@ -242,7 +241,7 @@ public class PropList implements TextParsable, Serializable, Cloneable {
 		value = preprocessValue(key, value);
 		
 		if(!validate(key, value)) {
-			logger.error("Key \"" + key + "\" invalidate");
+			System.out.println("Error: Key \"" + key + "\" invalidate");
 			return;
 		}
 		
@@ -415,10 +414,13 @@ public class PropList implements TextParsable, Serializable, Cloneable {
 	 * @return Value as string
 	 */
 	public String getAsString(String key) {
-		if (containsKey(key))
-			return propMap.get(key).toString();
+		if (!containsKey(key)) return null;
+
+		Serializable value = propMap.get(key);
+		if (value instanceof String)
+			return (String)value;
 		else
-			return null;
+			return value.toString();
 	}
 	
 	

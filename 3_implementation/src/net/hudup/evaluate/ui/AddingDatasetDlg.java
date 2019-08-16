@@ -22,6 +22,7 @@ import net.hudup.core.data.DatasetPool;
 import net.hudup.core.data.DatasetUtil;
 import net.hudup.core.data.Pointer;
 import net.hudup.core.data.ui.DataConfigTextField;
+import net.hudup.core.logistic.I18nUtil;
 import net.hudup.core.logistic.ui.UIUtil;
 import net.hudup.data.DatasetUtil2;
 
@@ -80,7 +81,7 @@ public class AddingDatasetDlg extends JDialog {
 	 */
 	public AddingDatasetDlg(Component comp, DatasetPool pool, List<Alg> algList, String mainUnit) {
 		super(UIUtil.getFrameForComponent(comp), "Add datasets", true);
-		this.setTitle(getMessage("add_datasets"));
+		this.setTitle(I18nUtil.message("add_datasets"));
 		this.pool = pool;
 		this.algList = algList;
 		
@@ -97,7 +98,7 @@ public class AddingDatasetDlg extends JDialog {
 		header.add(left, BorderLayout.WEST);
 		
 		
-		btnTrainingBrowse = new JButton(getMessage("training_set"));
+		btnTrainingBrowse = new JButton(I18nUtil.message("training_set"));
 		btnTrainingBrowse.addActionListener(new ActionListener() {
 			
 			@Override
@@ -108,7 +109,7 @@ public class AddingDatasetDlg extends JDialog {
 		});
 		left.add(btnTrainingBrowse);
 		
-		btnTestingBrowse = new JButton(getMessage("testing_set"));
+		btnTestingBrowse = new JButton(I18nUtil.message("testing_set"));
 		btnTestingBrowse.addActionListener(new ActionListener() {
 			
 			@Override
@@ -135,7 +136,7 @@ public class AddingDatasetDlg extends JDialog {
 		JPanel footer = new JPanel();
 		add(footer, BorderLayout.SOUTH);
 		
-		JButton btnAdd = new JButton(getMessage("add_dataset"));
+		JButton btnAdd = new JButton(I18nUtil.message("add_dataset"));
 		btnAdd.addActionListener(new ActionListener() {
 			
 			@Override
@@ -146,7 +147,7 @@ public class AddingDatasetDlg extends JDialog {
 		});
 		footer.add(btnAdd);
 		
-		JButton btnClose = new JButton(getMessage("close"));
+		JButton btnClose = new JButton(I18nUtil.message("close"));
 		btnClose.addActionListener(new ActionListener() {
 			
 			@Override
@@ -172,15 +173,15 @@ public class AddingDatasetDlg extends JDialog {
 		
 		MethodologyType type = AlgDesc.getTypeOf(this.algList);
 		if (type == MethodologyType.memorybased)
-			btnTrainingBrowse.setText(getMessage("training_set"));
+			btnTrainingBrowse.setText(I18nUtil.message("training_set"));
 		else if (type == MethodologyType.modelbased)
-			btnTrainingBrowse.setText(getMessage("training_set_kbase"));
+			btnTrainingBrowse.setText(I18nUtil.message("training_set_kbase"));
 		else if (type == MethodologyType.composite)
-			btnTrainingBrowse.setText(getMessage("any_source"));
+			btnTrainingBrowse.setText(I18nUtil.message("any_source"));
 		else if (type == MethodologyType.service)
-			btnTrainingBrowse.setText(getMessage("service_pointer"));
+			btnTrainingBrowse.setText(I18nUtil.message("service_pointer"));
 		else
-			btnTrainingBrowse.setText(getMessage("training_set"));
+			btnTrainingBrowse.setText(I18nUtil.message("training_set"));
 	}
 	
 	
@@ -349,14 +350,4 @@ public class AddingDatasetDlg extends JDialog {
 	}
 	
 	
-	/**
-	 * Getting message by specified key.
-	 * @param key specified key.
-	 * @return message according to key.
-	 */
-	protected String getMessage(String key) {
-		return key;
-	}
-
-
 }

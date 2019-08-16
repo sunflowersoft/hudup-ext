@@ -142,35 +142,6 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 		this.evaluator = evaluator;
 		this.counterClock = new CounterClock();
 		
-		//Internationalization utility.
-		try {
-			this.i18n = new I18nUtil(this.evaluator.getConfig());
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-			logger.error("Error in getting evaluator configuration");
-			this.i18n = null;
-		}
-	}
-	
-	
-	/**
-	 * Getting message by specified key.
-	 * @param key specified key.
-	 * @return message according to key.
-	 */
-	protected String getMessage(String key) {
-		try {
-			if (this.i18n != null)
-				return this.i18n.getMessage(key);
-			else
-				return key;
-		}
-		catch (Throwable e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return key;
 	}
 	
 	

@@ -25,6 +25,7 @@ import net.hudup.core.client.ServerTrayIcon;
 import net.hudup.core.client.Service;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.HiddenText;
+import net.hudup.core.logistic.I18nUtil;
 import net.hudup.core.logistic.NetUtil;
 import net.hudup.core.logistic.xURI;
 import net.hudup.core.logistic.ui.HelpContent;
@@ -386,7 +387,7 @@ public class Listener extends SocketServer implements ServerStatusListener, Gate
 		try {
             PopupMenu popup = new PopupMenu();
 
-            MenuItem cp = new MenuItem(getMessage("control_panel"));
+            MenuItem cp = new MenuItem(I18nUtil.message("control_panel"));
             cp.addActionListener(new ActionListener() {
 				
 				@Override
@@ -399,7 +400,7 @@ public class Listener extends SocketServer implements ServerStatusListener, Gate
             
             popup.addSeparator();
 
-            MenuItem helpContent = new MenuItem(getMessage("help_content"));
+            MenuItem helpContent = new MenuItem(I18nUtil.message("help_content"));
             helpContent.addActionListener(new ActionListener() {
 				
 				@Override
@@ -417,7 +418,7 @@ public class Listener extends SocketServer implements ServerStatusListener, Gate
             popup.add(helpContent);
 
             
-            MenuItem exit = new MenuItem(getMessage("exit"));
+            MenuItem exit = new MenuItem(I18nUtil.message("exit"));
             exit.addActionListener(new ActionListener() {
 				
 				@Override
@@ -440,7 +441,7 @@ public class Listener extends SocketServer implements ServerStatusListener, Gate
             		UIUtil.getImage("listener-16x16.png"), 
             		UIUtil.getImage("listener-paused-16x16.png"), 
             		UIUtil.getImage("listener-stopped-16x16.png"), 
-            		getMessage("hudup_listener"), 
+            		I18nUtil.message("hudup_listener"), 
             		popup); 
             trayIcon.addActionListener(new ActionListener() {
 				

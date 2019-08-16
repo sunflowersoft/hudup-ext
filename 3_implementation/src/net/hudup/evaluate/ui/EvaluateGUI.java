@@ -53,6 +53,7 @@ import net.hudup.core.evaluate.EvaluatorProgressEvent;
 import net.hudup.core.evaluate.Metrics;
 import net.hudup.core.evaluate.MetricsUtil;
 import net.hudup.core.logistic.ClipboardUtil;
+import net.hudup.core.logistic.I18nUtil;
 import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.xURI;
 import net.hudup.core.logistic.ui.UIUtil;
@@ -180,7 +181,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 	 * @return {@link JPanel} as header.
 	 */
 	private JPanel createHeader() {
-		this.btnTrainingBrowse = new JButton(getMessage("training_set"));
+		this.btnTrainingBrowse = new JButton(I18nUtil.message("training_set"));
 
 		JPanel header = new JPanel(new BorderLayout(2, 2));
 		
@@ -190,7 +191,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 
 		JPanel paneAlg = new JPanel();
 		up.add(paneAlg);
-		paneAlg.add(new JLabel(getMessage("algorithm") + ":"));
+		paneAlg.add(new JLabel(I18nUtil.message("algorithm") + ":"));
 		this.cmbAlgs = new AlgComboBox(algRegTable.getAlgList());
 		this.cmbAlgs.addItemListener(new ItemListener() {
 			
@@ -211,8 +212,8 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 		this.btnConfig = UIUtil.makeIconButton(
 			"config-16x16.png", 
 			"config", 
-			getMessage("config"), 
-			getMessage("config"), 
+			I18nUtil.message("config"), 
+			I18nUtil.message("config"), 
 				
 			new ActionListener() {
 				
@@ -244,7 +245,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 		});
 		left.add(this.btnTrainingBrowse);
 		
-		this.btnTestingBrowse = new JButton(getMessage("testing_set"));
+		this.btnTestingBrowse = new JButton(I18nUtil.message("testing_set"));
 		this.btnTestingBrowse.addActionListener(new ActionListener() {
 			
 			@Override
@@ -275,8 +276,8 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 		this.btnRefresh = UIUtil.makeIconButton(
 			"refresh-16x16.png", 
 			"refresh", 
-			getMessage("refresh"), 
-			getMessage("refresh"), 
+			I18nUtil.message("refresh"), 
+			I18nUtil.message("refresh"), 
 				
 			new ActionListener() {
 				
@@ -293,8 +294,8 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 		this.btnClear = UIUtil.makeIconButton(
 			"clear-16x16.png", 
 			"clear", 
-			getMessage("clear"), 
-			getMessage("clear"), 
+			I18nUtil.message("clear"), 
+			I18nUtil.message("clear"), 
 				
 			new ActionListener() {
 				
@@ -311,8 +312,8 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 		this.btnForceStop = UIUtil.makeIconButton(
 			"forcestop-16x16.png", 
 			"force_stop", 
-			getMessage("force_stop_tooltip"), 
-			getMessage("force_stop"), 
+			I18nUtil.message("force_stop_tooltip"), 
+			I18nUtil.message("force_stop"), 
 				
 			new ActionListener() {
 				
@@ -339,23 +340,23 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			return;
 		
 		if (alg instanceof ModelBasedAlg) {
-			btnTrainingBrowse.setText(getMessage("training_set_kbase"));
+			btnTrainingBrowse.setText(I18nUtil.message("training_set_kbase"));
 			Dataset dataset = txtTrainingBrowse.getDataset();
 			if (dataset != null && (dataset instanceof Pointer))
 				txtTrainingBrowse.setDataset(null);
 		}
 		else if (alg instanceof CompositeAlg) {
-			btnTrainingBrowse.setText(getMessage("any_source"));
+			btnTrainingBrowse.setText(I18nUtil.message("any_source"));
 			Dataset dataset = txtTrainingBrowse.getDataset();
 			if (dataset != null && (dataset instanceof Pointer))
 				txtTrainingBrowse.setDataset(null);
 		}
 		else if (alg instanceof ServiceAlg) {
-			btnTrainingBrowse.setText(getMessage("service_pointer"));
+			btnTrainingBrowse.setText(I18nUtil.message("service_pointer"));
 			txtTrainingBrowse.setDataset(null);
 		}
 		else
-			btnTrainingBrowse.setText(getMessage("training_set"));
+			btnTrainingBrowse.setText(I18nUtil.message("training_set"));
 		
 		DatasetUtil2.validateTrainingset(getThisGUI(), txtTrainingBrowse.getDataset(), new Alg[] { alg });
 		updateMode();
@@ -372,7 +373,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 		JPanel paneControl = new JPanel();
 		body.add(paneControl, BorderLayout.NORTH);
 		
-		this.btnRun = new JButton(getMessage("run"));
+		this.btnRun = new JButton(I18nUtil.message("run"));
 		this.btnRun.addActionListener(new ActionListener() {
 			
 			@Override
@@ -384,7 +385,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 		});
 		paneControl.add(this.btnRun);
 		
-		this.btnPauseResume = new JButton(getMessage("pause"));
+		this.btnPauseResume = new JButton(I18nUtil.message("pause"));
 		this.btnPauseResume.addActionListener(new ActionListener() {
 			
 			@Override
@@ -396,7 +397,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 		});
 		paneControl.add(this.btnPauseResume);
 
-		this.btnStop = new JButton(getMessage("stop"));
+		this.btnStop = new JButton(I18nUtil.message("stop"));
 		this.btnStop.addActionListener(new ActionListener() {
 			
 			@Override
@@ -426,7 +427,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 		this.txtSaveBrowse = new JTextField();
 		this.txtSaveBrowse.setEditable(false);
 		pane.add(this.txtSaveBrowse, BorderLayout.CENTER);
-		this.chkSave = new JCheckBox(getMessage("save"));
+		this.chkSave = new JCheckBox(I18nUtil.message("save"));
 		this.chkSave.addActionListener(new ActionListener() {
 			
 			@Override
@@ -461,7 +462,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 		JPanel buttons = new JPanel();
 		tool.add(buttons, BorderLayout.EAST);
 		
-		this.chkDisplay = new JCheckBox(new AbstractAction(getMessage("display")) {
+		this.chkDisplay = new JCheckBox(new AbstractAction(I18nUtil.message("display")) {
 
 			/**
 			 * Serial version UID for serializable class. 
@@ -480,8 +481,8 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 		this.btnMetricsOption = UIUtil.makeIconButton(
 			"option-16x16.png", 
 			"metrics_option", 
-			getMessage("metrics_option"), 
-			getMessage("metrics_option"), 
+			I18nUtil.message("metrics_option"), 
+			I18nUtil.message("metrics_option"), 
 				
 			new ActionListener() {
 				
@@ -497,7 +498,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 
 		this.prgRunning = new JProgressBar();
 		this.prgRunning.setStringPainted(true);
-		this.prgRunning.setToolTipText(getMessage("evaluation_progress"));
+		this.prgRunning.setToolTipText(I18nUtil.message("evaluation_progress"));
 		this.prgRunning.setVisible(false);
 		this.prgRunning.setMaximum(0);
 		this.prgRunning.setValue(0);
@@ -524,7 +525,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 		JPanel toolbar = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 		this.paneResult.add(toolbar, BorderLayout.SOUTH);
 		
-		this.btnAnalyzeResult = new JButton(getMessage("analyze_result"));
+		this.btnAnalyzeResult = new JButton(I18nUtil.message("analyze_result"));
 		this.btnAnalyzeResult.addActionListener(new ActionListener() {
 			
 			@Override
@@ -547,8 +548,8 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 		this.btnCopyResult = UIUtil.makeIconButton(
 				"copy-16x16.png", 
 				"copy_result_to_clipboard", 
-				getMessage("copy_result_to_clipboard"), 
-				getMessage("copy_result_to_clipboard"), 
+				I18nUtil.message("copy_result_to_clipboard"), 
+				I18nUtil.message("copy_result_to_clipboard"), 
 					
 				new ActionListener() {
 
@@ -1042,7 +1043,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 					setInternalEnable(false);
 					setResultVisible(false);
 					
-					btnPauseResume.setText(getMessage("pause"));
+					btnPauseResume.setText(I18nUtil.message("pause"));
 					btnPauseResume.setEnabled(true);
 					btnStop.setEnabled(true);
 					btnForceStop.setEnabled(true);
@@ -1054,7 +1055,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 					setInternalEnable(false);
 					setResultVisible(true);
 					
-					btnPauseResume.setText(getMessage("resume"));
+					btnPauseResume.setText(I18nUtil.message("resume"));
 					btnPauseResume.setEnabled(true);
 					btnStop.setEnabled(true);
 					btnForceStop.setEnabled(true);
@@ -1069,7 +1070,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 				setInternalEnable(true);
 				setResultVisible(true);
 				
-				btnPauseResume.setText(getMessage("pause"));
+				btnPauseResume.setText(I18nUtil.message("pause"));
 				btnPauseResume.setEnabled(false);
 				btnStop.setEnabled(false);
 				btnForceStop.setEnabled(false);
@@ -1089,7 +1090,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			
 			this.statusBar.setTextPane0( 
 					evaluator.getName() + " - " +
-					(chkDisplay.isSelected() ? getMessage("display") : getMessage("undisplay"))
+					(chkDisplay.isSelected() ? I18nUtil.message("display") : I18nUtil.message("undisplay"))
 				);
 		}
 		catch (Throwable e) {

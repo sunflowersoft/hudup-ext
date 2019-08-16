@@ -102,7 +102,7 @@ public class NeighborCF2d extends NeighborCFUserBased {
 					Profile userProfile2 = hybrid ? dataset.getUserProfile(thatUser.id()) : null;
 					
 					// computing similarity
-					double sim = similar(thisUser, thatUser, userProfile1, userProfile2);
+					double sim = similar(thisUser, thatUser, userProfile1, userProfile2, itemId);
 					if (!Util.isUsed(sim)) continue;
 					
 					double thatValue = thatUser.get(itemId).value;
@@ -138,7 +138,7 @@ public class NeighborCF2d extends NeighborCFUserBased {
 						Profile profile2 = hybrid ? dataset.getItemProfile(thatItem.id()) : null;
 						
 						// computing similarity
-						double sim = itemBasedCF.similar(thisItem, thatItem, profile1, profile2);
+						double sim = itemBasedCF.similar(thisItem, thatItem, profile1, profile2, thisUser.id());
 						if (!Util.isUsed(sim)) continue;
 						
 						double thatValue = thatItem.get(thisUser.id()).value;

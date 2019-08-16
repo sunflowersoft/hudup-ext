@@ -216,16 +216,6 @@ public class DefaultServer extends PowerServerImpl {
 
 
 	/**
-	 * Getting message given key.
-	 * @param key given key.
-	 * @return message according to key.
-	 */
-	protected String getMessage(String key) {
-		return I18nUtil.getMessage(config, key);
-	}
-
-	
-	/**
 	 * Create system tray.
 	 * @return whether create system tray successfully.
 	 */
@@ -236,7 +226,7 @@ public class DefaultServer extends PowerServerImpl {
 		try {
             PopupMenu popup = new PopupMenu();
 
-            MenuItem cp = new MenuItem(getMessage("control_panel"));
+            MenuItem cp = new MenuItem(I18nUtil.message("control_panel"));
             cp.addActionListener(new ActionListener() {
 				
 				@Override
@@ -249,7 +239,7 @@ public class DefaultServer extends PowerServerImpl {
             
             popup.addSeparator();
 
-            MenuItem helpContent = new MenuItem(getMessage("help_content"));
+            MenuItem helpContent = new MenuItem(I18nUtil.message("help_content"));
             helpContent.addActionListener(new ActionListener() {
 				
 				@Override
@@ -266,7 +256,7 @@ public class DefaultServer extends PowerServerImpl {
 			});
             popup.add(helpContent);
 
-            MenuItem exit = new MenuItem(getMessage("exit"));
+            MenuItem exit = new MenuItem(I18nUtil.message("exit"));
             exit.addActionListener(new ActionListener() {
 				
 				@Override
@@ -289,7 +279,7 @@ public class DefaultServer extends PowerServerImpl {
             		UIUtil.getImage("server-16x16.png"), 
             		UIUtil.getImage("server-paused-16x16.png"), 
             		UIUtil.getImage("server-stopped-16x16.png"), 
-            		getMessage("hudup_recommendation_server"), 
+            		I18nUtil.message("hudup_recommendation_server"), 
             		popup); 
             		
             trayIcon.addActionListener(new ActionListener() {

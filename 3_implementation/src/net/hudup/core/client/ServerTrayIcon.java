@@ -36,31 +36,31 @@ public class ServerTrayIcon extends TrayIcon implements ServerStatusListener {
 	/**
 	 * Reference to remote server.
 	 */
-	protected Server server;
+	protected Server server = null;
 	
 	
 	/**
 	 * Icon image when server is running.
 	 */
-	protected Image runningImage;
+	protected Image runningImage = null;
 	
 	
 	/**
 	 * Icon image when server paused.
 	 */
-	protected Image pausedImage;
+	protected Image pausedImage = null;
 
 	
 	/**
 	 * Icon image when server stopped.
 	 */
-	protected Image stoppedImage;
+	protected Image stoppedImage = null;
 
 	
 	/**
 	 * The tool-tip shows explanation text for server.
 	 */
-	protected String tooltip;
+	protected String tooltip = null;
 	
 	
 	/**
@@ -113,15 +113,15 @@ public class ServerTrayIcon extends TrayIcon implements ServerStatusListener {
 		try {
 			if (server.isRunning()) {
 				setImage(runningImage);
-				setToolTip(tooltip + " (" + getMessage("run") + ")");
+				setToolTip(tooltip + " (" + I18nUtil.message("run") + ")");
 			}
 			else if (server.isPaused()) {
 				setImage(pausedImage);
-				setToolTip(tooltip + " (" + getMessage("pause") + ")");
+				setToolTip(tooltip + " (" + I18nUtil.message("pause") + ")");
 			}
 			else {
 				setImage(stoppedImage);
-				setToolTip(tooltip + " (" + getMessage("stop") + ")");
+				setToolTip(tooltip + " (" + I18nUtil.message("stop") + ")");
 			}
 		}
 		catch (Throwable e) {
@@ -138,22 +138,22 @@ public class ServerTrayIcon extends TrayIcon implements ServerStatusListener {
 	}
 
 	
-	/**
-	 * Getting a value (called message) of the specified key in server configuration.
-	 * This method also supports internationalization (I18n) and so the returned message is localized according to the pre-defined language.
-	 * @param key specified key.
-	 * @return message according to key.
-	 */
-	protected String getMessage(String key) {
-		try {
-			return I18nUtil.getMessage(server.getConfig(), key);
-		}
-		catch (Throwable e) {
-			e.printStackTrace();
-		}
-		
-		return key;
-	}
+//	/**
+//	 * Getting a value (called message) of the specified key in server configuration.
+//	 * This method also supports internationalization (I18n) and so the returned message is localized according to the pre-defined language.
+//	 * @param key specified key.
+//	 * @return message according to key.
+//	 */
+//	protected String getMessage(String key) {
+//		try {
+//			return I18nUtil.getMessage(server.getConfig(), key);
+//		}
+//		catch (Throwable e) {
+//			e.printStackTrace();
+//		}
+//		
+//		return key;
+//	}
 	
 	
 }
