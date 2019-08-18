@@ -148,7 +148,7 @@ public class SvdGradientCF extends ModelBasedCF {
 		}
 		
 		if (maxRecommend > 0 && pairs.size() > maxRecommend)
-			pairs.remove(pairs.size() - 1);
+			pairs.remove(pairs.size() - 1); //Remove the redundant recommended item.
 		if (pairs.size() == 0)
 			return null;
 		

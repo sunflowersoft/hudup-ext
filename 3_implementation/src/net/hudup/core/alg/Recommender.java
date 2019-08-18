@@ -96,7 +96,7 @@ public abstract class Recommender extends AbstractAlg {
 	 * The output result is a set of predictive or estimated rating values of items (users) specified by the second input parameter.
 	 * @param param recommendation parameter. Please see {@link RecommendParam} for more details of this parameter.
 	 * @param queryIds set of identifications (IDs) of items that need to be estimated their rating values.
-	 * @return rating vector contains estimated rating values of the specified set of IDs of items (users).
+	 * @return rating vector contains estimated rating values of the specified set of IDs of items (users). Return null if cannot estimate.
 	 * @throws RemoteException if any error raises.
 	 */
 	public abstract RatingVector estimate(RecommendParam param, Set<Integer> queryIds) throws RemoteException;
@@ -109,7 +109,7 @@ public abstract class Recommender extends AbstractAlg {
 	 * The output result is a list of recommended items (users) which is provided to the user (item).
 	 * @param param recommendation parameter. Please see {@link RecommendParam} for more details of this parameter.
 	 * @param maxRecommend the maximum recommended items (users) in the returned rating vector.
-	 * @return list of recommended items (users) which is provided to the user (item), represented by {@link RatingVector} class. The number of items (users) of such list is specified by the the maximum number.
+	 * @return list of recommended items (users) which is provided to the user (item), represented by {@link RatingVector} class. The number of items (users) of such list is specified by the the maximum number. Return null if cannot estimate.
 	 * @throws RemoteException if any error raises.
 	 */
 	public abstract RatingVector recommend(RecommendParam param, int maxRecommend) throws RemoteException;
@@ -118,7 +118,7 @@ public abstract class Recommender extends AbstractAlg {
 	/**
 	 * Pre-processing the specified recommendation parameter.
 	 * For example, if this recommendation parameter only has user identifier (user ID) but it has no ratings then, this method fills in ratings by reading such ratings from framework database.
-	 * @param param recommendation parameter. Please see {@link RecommendParam} for more details of this parameter.
+	 * @param param recommendation parameter. Please see {@link RecommendParam} for more details of this parameter. Return null if cannot pre-processing.
 	 * @return new recommendation parameter that is processed from the specified recommendation parameter.
 	 */
 	protected RecommendParam recommendPreprocess(RecommendParam param) {

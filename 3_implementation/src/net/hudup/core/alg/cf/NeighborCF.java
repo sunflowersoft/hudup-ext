@@ -12,6 +12,7 @@ import javax.swing.JOptionPane;
 
 import net.hudup.core.Constants;
 import net.hudup.core.Util;
+import net.hudup.core.alg.RecommendParam;
 import net.hudup.core.alg.SupportCacheAlg;
 import net.hudup.core.data.Attribute;
 import net.hudup.core.data.Attribute.Type;
@@ -295,6 +296,12 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 	
 	
 	/**
+	 * User rating cache (user id, item id, rating value).
+	 */
+	protected Map<Integer, Map<Integer, Object>> userRatingCache = Util.newMap();
+	
+	
+	/**
 	 * Row similarity cache.
 	 */
 	protected Map<Integer, Map<Integer, Object>> rowSimCache = Util.newMap();
@@ -348,6 +355,7 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 		this.maxRating = getMaxRating();
 		this.ratingMedian = (this.maxRating + this.minRating) / 2.0;
 		
+		this.userRatingCache.clear();
 		this.rowSimCache.clear();
 		this.columnSimCache.clear();
 		this.rowModuleCache.clear();
@@ -380,6 +388,7 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 		this.itemVars.clear();
 		this.userIds.clear();
 		
+		this.userRatingCache.clear();
 		this.rowSimCache.clear();
 		this.columnSimCache.clear();
 		this.rowModuleCache.clear();
@@ -546,6 +555,95 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 
 	
 	/**
+	 * Getting the similarity measure.
+	 * @return similar measure.
+	 */
+	public String getSimilarMeasure() {
+		String measure = config.getAsString(MEASURE);
+		if (measure == null)
+			return getDefaultSimilarMeasure();
+		else
+			return measure;
+	}
+	
+	
+	@Override
+	public RatingVector estimate(RecommendParam param, Set<Integer> queryIds) throws RemoteException {
+		// TODO Auto-generated method stub
+		if (!isCached())
+			return estimate0(param, queryIds);
+		if (param.ratingVector == null) //Consider not estimating yet.
+			return null;
+		
+		int userId = param.ratingVector.id();
+		if (this.userRatingCache.containsKey(userId)) { //Already estimated
+			Map<Integer, Object> ratingMap = this.userRatingCache.get(userId);
+			if (ratingMap == null) {
+				ratingMap = Util.newMap();
+				this.userRatingCache.put(userId, ratingMap);
+			}
+				
+			RatingVector result = param.ratingVector.newInstance(true);
+			Set<Integer> queryIds2 = Util.newSet();
+			queryIds2.addAll(queryIds);
+			if (ratingMap.size() > 0) {
+				for (int itemId : queryIds) {
+					if (!ratingMap.containsKey(itemId))
+						continue;
+					
+					queryIds2.remove(itemId);
+					double ratingValue = (double)ratingMap.get(itemId); //cache can store unused rating value.
+					if (Util.isUsed(ratingValue))
+						result.put(itemId, ratingValue);
+				}
+				if (queryIds2.size() == 0)
+					return result.size() == 0 ? null : result;
+			}
+			
+			RatingVector result2 = estimate0(param, queryIds2);
+			if (result2 == null || result2.size() == 0) {
+				for (int itemId : queryIds2) {
+					ratingMap.put(itemId, Constants.UNUSED); //Consider estimated.
+				}
+				return result.size() == 0 ? null : result;
+			}
+			
+			Set<Integer> itemIds = result2.fieldIds(); //Resulted items are always rated.
+			for (int itemId : itemIds) {
+				double value = result2.get(itemId).value;
+				ratingMap.put(itemId, value);
+				result.put(itemId, value);
+			}
+			return result.size() == 0 ? null : result;
+		}
+		
+		RatingVector result = estimate0(param, queryIds);
+		Map<Integer, Object> ratingMap = Util.newMap();
+		userRatingCache.put(userId, ratingMap); //Consider estimated.
+		if (result == null) return null;
+		
+		Set<Integer> itemIds = result.fieldIds(); //Resulted items are always rated.
+		for (int itemId : itemIds) {
+			double value = result.get(itemId).value;
+			ratingMap.put(itemId, value);
+		}
+		return result.size() == 0 ? null : result;
+	}
+	
+	
+	/**
+	 * This method is very important, which is used to estimate rating values of given items (users) without caching. Any class that extends this abstract class must implement this method.
+	 * Note that the role of user and the role of item are exchangeable. Rating vector can be user rating vector or item rating vector. Please see {@link RatingVector} for more details. 
+	 * The input parameters are a recommendation parameter and a set of item (user) identifiers.
+	 * The output result is a set of predictive or estimated rating values of items (users) specified by the second input parameter.
+	 * @param param recommendation parameter. Please see {@link RecommendParam} for more details of this parameter.
+	 * @param queryIds set of identifications (IDs) of items that need to be estimated their rating values.
+	 * @return rating vector contains estimated rating values of the specified set of IDs of items (users). Return null if cannot estimate.
+	 */
+	protected abstract RatingVector estimate0(RecommendParam param, Set<Integer> queryIds);
+	
+	
+	/**
 	 * Calculating the similarity measure between two pairs.
 	 * The first pair includes the first rating vector and the first profile.
 	 * The second pair includes the second rating vector and the second profile.
@@ -558,18 +656,17 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 	 * @param vRating2 second rating vector.
 	 * @param profile1 first profile.
 	 * @param profile2 second profile.
-	 * @param param extra parameter.
+	 * @param parameters extra parameters.
 	 * @return similarity between both two {@link RatingVector} (s) and two {@link Profile} (s).
 	 */
-	public double similar(RatingVector vRating1, RatingVector vRating2, Profile profile1, Profile profile2, Object param) {
-		String measure = config.getAsString(MEASURE);
-		if (measure == null) return Constants.UNUSED;
+	public double similar(RatingVector vRating1, RatingVector vRating2, Profile profile1, Profile profile2, Object...parameters) {
+		String measure = getSimilarMeasure();
 
 		Task task = new Task() {
 			
 			@Override
 			public Object perform(Object...params) {
-				return similarAsUsual(measure, vRating1, vRating2, profile1, profile2, param);
+				return similarAsUsual(measure, vRating1, vRating2, profile1, profile2, parameters);
 			}
 		};
 		
@@ -584,10 +681,10 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 	 * @param vRating2 second rating vector.
 	 * @param profile1 first profile.
 	 * @param profile2 second profile.
-	 * @param param extra parameter.
+	 * @param params extra parameter.
 	 * @return similarity between both two {@link RatingVector} (s) and two {@link Profile} (s) as usual.
 	 */
-	protected double similarAsUsual(String measure, RatingVector vRating1, RatingVector vRating2, Profile profile1, Profile profile2, Object param) {
+	protected double similarAsUsual(String measure, RatingVector vRating1, RatingVector vRating2, Profile profile1, Profile profile2, Object...params) {
 		boolean hybrid = config.getAsBoolean(HYBRID);
 		if (!hybrid) {
 			profile1 = null;
@@ -631,10 +728,10 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 		else if (measure.equals(PIP))
 			return pip(vRating1, vRating2, profile1, profile2);
 		else if (measure.equals(PC)) {
-			if ((param == null) || !(param instanceof Number))
+			if ((params == null) || (params.length < 1) || !(params[0] instanceof Number))
 				return Constants.UNUSED;
 			else {
-				int fixedColumnId = ((Number)param).intValue();
+				int fixedColumnId = ((Number)(params[0])).intValue();
 				return pc(vRating1, vRating2, profile1, profile2, fixedColumnId);
 			}
 		}
@@ -1332,12 +1429,12 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 	 * Calculating the PC measure between two rating vectors. PC measure is developed by Keunho Choi and Yongmoo Suh. It implemented by Loc Nguyen.
 	 * @param vRating1 the first rating vectors.
 	 * @param vRating2 the second rating vectors.
-	 * @param fixedFieldId fixed field (column) identifier.
+	 * @param fixedColumnId fixed field (column) identifier.
 	 * @param fieldMeans mean value of field ratings.
 	 * @author Keunho Choi, Yongmoo Suh
 	 * @return PC measure between two rating vectors.
 	 */
-	protected double pc(RatingVector vRating1, RatingVector vRating2, int fixedFieldId, Map<Integer, Double> fieldMeans) {
+	protected double pc(RatingVector vRating1, RatingVector vRating2, int fixedColumnId, Map<Integer, Double> fieldMeans) {
 		Set<Integer> common = commonFieldIds(vRating1, vRating2);
 		if (common.size() == 0) return Constants.UNUSED;
 
@@ -1352,7 +1449,7 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 				
 				@Override
 				public Object perform(Object...params) {
-					RatingVector fixedColumnVector = getColumnRating(fixedFieldId);
+					RatingVector fixedColumnVector = getColumnRating(fixedColumnId);
 					RatingVector columnVector = getColumnRating(fieldId);
 					
 					if (fixedColumnVector == null || columnVector == null)
@@ -1361,7 +1458,7 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 						return fixedColumnVector.corr(columnVector);
 				}
 			};
-			double columnSim = (double)cacheTask(fixedFieldId, fieldId, this.columnSimCache, columnSimTask);
+			double columnSim = (double)cacheTask(fixedColumnId, fieldId, this.columnSimCache, columnSimTask);
 			columnSim = columnSim * columnSim;
 			
 			vx  += d1 * d1 * columnSim;

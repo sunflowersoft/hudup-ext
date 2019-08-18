@@ -171,6 +171,9 @@ public class RecommendEvaluator extends AbstractEvaluator {
 							continue;
 						
 						RecommendParam param = new RecommendParam(testingUserId);
+						RatingVector vTesting = testing.getUserRating(testingUserId); //Added date: 2019.08.18 by Loc Nguyen.
+						maxRecommend = (maxRecommend <= 0 && vTesting != null) ? vTesting.size() : maxRecommend; //Added date: 2019.08.18 by Loc Nguyen.
+						maxRecommend = maxRecommend <= 0 ? 10 : maxRecommend; //Added date: 2019.08.18 by Loc Nguyen.
 						//
 						long beginRecommendTime = System.currentTimeMillis();
 						RatingVector recommended = recommender.recommend(param, maxRecommend);
@@ -185,7 +188,6 @@ public class RecommendEvaluator extends AbstractEvaluator {
 								new Object[] { recommendElapsed / 1000.0f }
 							); // calculating time speed metric
 						
-						RatingVector vTesting = testing.getUserRating(testingUserId); 
 						fireEvaluatorEvent(new EvaluatorEvent(
 								this, 
 								Type.doing, 

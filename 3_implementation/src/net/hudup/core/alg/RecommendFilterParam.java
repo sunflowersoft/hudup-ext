@@ -26,7 +26,7 @@ public class RecommendFilterParam implements Serializable {
 	
 	
 	/**
-	 * Item identifier (item ID).
+	 * Item identifiers (item IDs).
 	 */
 	public Integer itemId = null;
 

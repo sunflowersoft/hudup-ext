@@ -33,9 +33,9 @@ public class EvaluatorConfig extends SysConfig {
 
 	
 	/**
-	 * The maximum number of items in recommended list. By default, it is 10.
+	 * The maximum number of items in recommended list. By default, it is 0 which means that it is size of testing vector.
 	 */
-	public final static int DEFAULT_MAX_RECOMMEND_FIELD = 10;
+	public final static int DEFAULT_MAX_RECOMMEND = 0;
 
 	
 	/**
@@ -61,7 +61,7 @@ public class EvaluatorConfig extends SysConfig {
 	public void reset() {
 		super.reset();
 		
-		put(DataConfig.MAX_RECOMMEND_FIELD, DEFAULT_MAX_RECOMMEND_FIELD);
+		put(DataConfig.MAX_RECOMMEND_FIELD, DEFAULT_MAX_RECOMMEND);
 	}
 
 	

@@ -97,6 +97,58 @@ public abstract class MemoryBasedCF extends MemoryBasedRecommender {
 	@Override
 	public RatingVector recommend(RecommendParam param, int maxRecommend) throws RemoteException {
 		param = recommendPreprocess(param);
+		if (param == null) return null;
+		
+		filterList.prepare(param);
+		
+		Set<Integer> queryIds = Util.newSet();
+		Fetcher<RatingVector> items = dataset.fetchItemRatings();
+		try {
+			while (items.next()) {
+				RatingVector v = items.pick();
+				if (v == null || v.size() == 0)
+					continue;
+				
+				int itemId = v.id();
+				if(filterList.filter(dataset, RecommendFilterParam.create(itemId)))
+					queryIds.add(itemId);
+			}
+		}
+		catch (Throwable e) {
+			e.printStackTrace();
+		}
+		finally {
+			try {
+				if (items != null) items.close();
+			} 
+			catch (Throwable e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+		}
+		
+		RatingVector predict = estimate(param, queryIds);
+		if (predict == null) return null;
+		
+		List<Pair> pairs = Pair.toPairList(predict);
+		Pair.sort(pairs, true, maxRecommend);
+		RatingVector rec = param.ratingVector.newInstance(true);
+		Pair.fillRatingVector(rec, pairs);
+		return rec.size() == 0 ? null : rec;
+	}
+
+	
+	/**
+	 * This is backup recommendation method. It is not used in current implementation.
+	 * @param param recommendation parameter. Please see {@link RecommendParam} for more details of this parameter.
+	 * @param maxRecommend the maximum recommended items (users) in the returned rating vector.
+	 * @return list of recommended items (users) which is provided to the user (item), represented by {@link RatingVector} class. The number of items (users) of such list is specified by the the maximum number. Return null if cannot estimate.
+	 * @throws RemoteException if any error raises.
+	 */
+	@SuppressWarnings("unused")
+	private RatingVector recommend0(RecommendParam param, int maxRecommend) throws RemoteException {
+		param = recommendPreprocess(param);
 		if (param == null)
 			return null;
 		
@@ -151,7 +203,7 @@ public abstract class MemoryBasedCF extends MemoryBasedRecommender {
 	
 			
 			if (maxRecommend > 0 && pairs.size() > maxRecommend)
-				pairs.remove(pairs.size() - 1);
+				pairs.remove(pairs.size() - 1); //Remove the redundant recommended item.
 		}
 		catch (Throwable e) {
 			e.printStackTrace();

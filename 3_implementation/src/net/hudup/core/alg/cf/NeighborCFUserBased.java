@@ -3,7 +3,6 @@
  */
 package net.hudup.core.alg.cf;
 
-import java.rmi.RemoteException;
 import java.util.Set;
 
 import net.hudup.core.Util;
@@ -50,23 +49,23 @@ public class NeighborCFUserBased extends NeighborCF implements DuplicatableAlg {
 
 
 	@Override
-	public RatingVector estimate(RecommendParam param, Set<Integer> queryIds) throws RemoteException {
+	protected RatingVector estimate0(RecommendParam param, Set<Integer> queryIds) {
 		// TODO Auto-generated method stub
-		return estimate(this, param, queryIds);
+		return estimate0(this, param, queryIds);
 	}
 
 
 	/**
-	 * This method is very important, which is used to estimate rating values of given items (users). Any class that extends this abstract class must implement this method.
+	 * This method is very important, which is used to estimate rating values of given items (users) without caching. Any class that extends this abstract class must implement this method.
 	 * Note that the role of user and the role of item are exchangeable. Rating vector can be user rating vector or item rating vector. Please see {@link RatingVector} for more details. 
 	 * The input parameters are a recommendation parameter and a set of item (user) identifiers.
 	 * The output result is a set of predictive or estimated rating values of items (users) specified by the second input parameter.
 	 * @param cf current neighbor algorithm.
 	 * @param param recommendation parameter. Please see {@link RecommendParam} for more details of this parameter.
 	 * @param queryIds set of identifications (IDs) of items that need to be estimated their rating values.
-	 * @return rating vector contains estimated rating values of the specified set of IDs of items (users).
+	 * @return rating vector contains estimated rating values of the specified set of IDs of items (users). Return null if cannot estimate.
 	 */
-	public static RatingVector estimate(NeighborCF cf, RecommendParam param, Set<Integer> queryIds) {
+	public static RatingVector estimate0(NeighborCF cf, RecommendParam param, Set<Integer> queryIds) {
 		if (param.ratingVector == null) return null;
 		RatingVector thisUser = param.ratingVector;
 		RatingVector innerUser = cf.dataset.getUserRating(thisUser.id());

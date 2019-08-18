@@ -1041,7 +1041,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 					result = null;
 					tblMetrics.clear();
 					txtRunInfo.setText("");
-					btnPauseResume.setText("Pause");
+					btnPauseResume.setText(I18nUtil.message("pause"));
 					btnPauseResume.setEnabled(true);
 					btnStop.setEnabled(true);
 					btnForceStop.setEnabled(true);
@@ -1052,7 +1052,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 					setInternalEnable(false);
 					setResultVisible(true);
 					
-					btnPauseResume.setText("Resume");
+					btnPauseResume.setText(I18nUtil.message("resume"));
 					btnPauseResume.setEnabled(true);
 					btnStop.setEnabled(true);
 					btnForceStop.setEnabled(true);
@@ -1067,7 +1067,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 				setInternalEnable(true);
 				setResultVisible(true);
 				
-				btnPauseResume.setText("Pause");
+				btnPauseResume.setText(I18nUtil.message("pause"));
 				btnPauseResume.setEnabled(false);
 				btnStop.setEnabled(false);
 				btnForceStop.setEnabled(false);
