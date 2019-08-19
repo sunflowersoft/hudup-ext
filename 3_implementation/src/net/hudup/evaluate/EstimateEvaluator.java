@@ -10,7 +10,7 @@ import net.hudup.core.data.Dataset;
 import net.hudup.core.data.DatasetPair;
 import net.hudup.core.data.Fetcher;
 import net.hudup.core.data.RatingVector;
-import net.hudup.core.evaluate.EstimatedQueryRecallMetric;
+import net.hudup.core.evaluate.QueryRecallMetric;
 import net.hudup.core.evaluate.EvaluatorEvent;
 import net.hudup.core.evaluate.EvaluatorEvent.Type;
 import net.hudup.core.evaluate.EvaluatorProgressEvent;
@@ -95,8 +95,8 @@ public class EstimateEvaluator extends RecommendEvaluator {
 					int vCurrentTotal = testingUserIds.getMetadata().getSize();
 					int vCurrentCount = 0; //Total vector count for Hudup recall metric.
 					int vEstimatedCount = 0; //Estimated vector count for Hudup recall metric.
-					int queryIdCurrentCount = 0; //Total vector count for query ID recall metric.
-					int queryIdEstimatedCount = 0; //Estimated vector count for query ID recall metric.
+					int queryIdTotal = 0; //Total vector count for query ID recall metric.
+					int queryIdCount = 0; //Estimated vector count for query ID recall metric.
 					while (testingUserIds.next() && current == thread) {
 						
 						progressStep++;
@@ -117,14 +117,16 @@ public class EstimateEvaluator extends RecommendEvaluator {
 						Set<Integer> queryIds = setupQueryIds(unratedCount, vQuery);
 						if (queryIds.size() == 0)
 							continue;
-						queryIdCurrentCount += queryIds.size(); //Increase total query ID count.
 						
 						RecommendParam param = new RecommendParam(vQuery, testing.getUserProfile(testingUserId));
+						queryIdTotal += queryIds.size(); //Increase total query ID count.
+						
 						//
 						long beginRecommendTime = System.currentTimeMillis();
 						RatingVector estimated = recommender.estimate(param, queryIds);
 						long endRecommendTime = System.currentTimeMillis();
 						//
+						
 						param.clear();
 						long recommendElapsed = endRecommendTime - beginRecommendTime;
 						Metrics speedMetrics = result.recalc(
@@ -151,7 +153,7 @@ public class EstimateEvaluator extends RecommendEvaluator {
 								); // calculating recommendation metric
 							
 							vEstimatedCount++;
-							queryIdEstimatedCount += estimated.size(); //Increase estimated query ID count.
+							queryIdCount += estimated.size(); //Increase estimated query ID count.
 							
 							fireEvaluatorEvent(new EvaluatorEvent(
 									this, 
@@ -179,13 +181,13 @@ public class EstimateEvaluator extends RecommendEvaluator {
 						);
 					fireEvaluatorEvent(new EvaluatorEvent(this, Type.doing, hudupRecallMetrics));
 					
-					Metrics estimateRecallMetrics = result.recalc(
+					Metrics queryRecallMetrics = result.recalc(
 							recommender.getName(), 
 							datasetId, 
-							EstimatedQueryRecallMetric.class, 
-							new Object[] { new FractionMetricValue(queryIdEstimatedCount, queryIdCurrentCount) }
+							QueryRecallMetric.class, 
+							new Object[] { new FractionMetricValue(queryIdCount, queryIdTotal) }
 						);
-					fireEvaluatorEvent(new EvaluatorEvent(this, Type.doing, estimateRecallMetrics));
+					fireEvaluatorEvent(new EvaluatorEvent(this, Type.doing, queryRecallMetrics));
 
 					Metrics doneOneMetrics = result.gets(recommender.getName(), datasetId);
 					fireEvaluatorEvent(new EvaluatorEvent(this, Type.done_one, doneOneMetrics));
@@ -275,8 +277,8 @@ public class EstimateEvaluator extends RecommendEvaluator {
 		HudupRecallMetric hudupRecall = new HudupRecallMetric();
 		metricList.add(hudupRecall);
 		
-		EstimatedQueryRecallMetric estimatedRecall = new EstimatedQueryRecallMetric();
-		metricList.add(estimatedRecall);
+		QueryRecallMetric queryRecall = new QueryRecallMetric();
+		metricList.add(queryRecall);
 
 		MAE mae = new MAE();
 		metricList.add(mae);

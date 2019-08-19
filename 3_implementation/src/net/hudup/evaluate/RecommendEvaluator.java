@@ -15,6 +15,7 @@ import net.hudup.core.data.Fetcher;
 import net.hudup.core.data.Profile;
 import net.hudup.core.data.RatingVector;
 import net.hudup.core.evaluate.AbstractEvaluator;
+import net.hudup.core.evaluate.QueryRecallMetric;
 import net.hudup.core.evaluate.EvaluatorEvent;
 import net.hudup.core.evaluate.EvaluatorEvent.Type;
 import net.hudup.core.evaluate.EvaluatorProgressEvent;
@@ -155,6 +156,8 @@ public class RecommendEvaluator extends AbstractEvaluator {
 					int vCurrentTotal = testingUserIds.getMetadata().getSize();
 					int vCurrentCount = 0;
 					int vRecommendedCount = 0;
+					int queryIdTotal = 0; //Total vector count for query ID recall metric.
+					int queryIdCount = 0; //Recommended vector count for query ID recall metric.
 					while (testingUserIds.next() && current == thread) {
 						
 						progressStep++;
@@ -174,11 +177,14 @@ public class RecommendEvaluator extends AbstractEvaluator {
 						RatingVector vTesting = testing.getUserRating(testingUserId); //Added date: 2019.08.18 by Loc Nguyen.
 						maxRecommend = (maxRecommend <= 0 && vTesting != null) ? vTesting.size() : maxRecommend; //Added date: 2019.08.18 by Loc Nguyen.
 						maxRecommend = maxRecommend <= 0 ? 10 : maxRecommend; //Added date: 2019.08.18 by Loc Nguyen.
+						queryIdTotal += maxRecommend; //Increase total query ID count.
+						
 						//
 						long beginRecommendTime = System.currentTimeMillis();
 						RatingVector recommended = recommender.recommend(param, maxRecommend);
 						long endRecommendTime = System.currentTimeMillis();
 						//
+						
 						param.clear();
 						long recommendElapsed = endRecommendTime - beginRecommendTime;
 						Metrics speedMetrics = result.recalc(
@@ -205,6 +211,7 @@ public class RecommendEvaluator extends AbstractEvaluator {
 								); // calculating recommendation metric
 							
 							vRecommendedCount++;
+							queryIdCount += recommended.size(); //Increase recommended query ID count.
 							
 							fireEvaluatorEvent(new EvaluatorEvent(
 									this, 
@@ -232,6 +239,14 @@ public class RecommendEvaluator extends AbstractEvaluator {
 						);
 					fireEvaluatorEvent(new EvaluatorEvent(this, Type.doing, hudupRecallMetrics));
 					
+					Metrics queryRecallMetrics = result.recalc(
+							recommender.getName(), 
+							datasetId, 
+							QueryRecallMetric.class, 
+							new Object[] { new FractionMetricValue(queryIdCount, queryIdTotal) }
+						);
+					fireEvaluatorEvent(new EvaluatorEvent(this, Type.doing, queryRecallMetrics));
+
 					Metrics doneOneMetrics = result.gets(recommender.getName(), datasetId);
 					fireEvaluatorEvent(new EvaluatorEvent(this, Type.done_one, doneOneMetrics));
 					
@@ -299,17 +314,20 @@ public class RecommendEvaluator extends AbstractEvaluator {
 		HudupRecallMetric hudupRecall = new HudupRecallMetric();
 		metricList.add(hudupRecall);
 		
+		QueryRecallMetric queryRecall = new QueryRecallMetric();
+		metricList.add(queryRecall);
+
 		MAE mae = new MAE();
 		metricList.add(mae);
 
-		NMAE nmae = new NMAE();
-		metricList.add(nmae);
+//		NMAE nmae = new NMAE();
+//		metricList.add(nmae);
 		
 		MSE mse = new MSE();
 		metricList.add(mse);
 
-		NMSE nmse = new NMSE();
-		metricList.add(nmse);
+//		NMSE nmse = new NMSE();
+//		metricList.add(nmse);
 		
 //		//Meta metric is not supported from August 6, 2019. Fix date August 6, 2019 by Loc Nguyen.
 //		RMSE rmse = new RMSE();
@@ -335,11 +353,11 @@ public class RecommendEvaluator extends AbstractEvaluator {
 		Pearson pearson = new Pearson();
 		metricList.add(pearson);
 		
-		Spearman pearman = new Spearman();
-		metricList.add(pearman);
+//		Spearman pearman = new Spearman();
+//		metricList.add(pearman);
 		
-		ARHR arhr = new ARHR();
-		metricList.add(arhr);
+//		ARHR arhr = new ARHR();
+//		metricList.add(arhr);
 
 		return metricList;
 	}

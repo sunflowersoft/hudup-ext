@@ -15,7 +15,7 @@ import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.SetupAlgEvent;
 import net.hudup.core.alg.SetupAlgListener;
 import net.hudup.core.alg.SupportCacheAlg;
-import net.hudup.core.alg.TestingAlg;
+import net.hudup.core.alg.ExecutableAlg;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.DatasetPair;
@@ -260,8 +260,8 @@ public abstract class AbstractEvaluator extends AbstractRunner implements Evalua
 					// Adding default metrics to metric result
 					result.add( alg.getName(), datasetId, datasetUri, ((NoneWrapperMetricList)metricList.clone()).sort().list() );
 					
-					if (alg instanceof TestingAlg)
-						((TestingAlg)alg).addSetupListener(this);
+					if (alg instanceof ExecutableAlg)
+						((ExecutableAlg)alg).addSetupListener(this);
 					
 					long beginSetupTime = System.currentTimeMillis();
 					//
@@ -277,8 +277,8 @@ public abstract class AbstractEvaluator extends AbstractRunner implements Evalua
 						); // calculating setup time metric
 					fireEvaluatorEvent(new EvaluatorEvent(this, Type.doing, setupMetrics)); // firing setup time metric
 					
-					if (alg instanceof TestingAlg)
-						((TestingAlg)alg).removeSetupListener(this);
+					if (alg instanceof ExecutableAlg)
+						((ExecutableAlg)alg).removeSetupListener(this);
 
 					
 					testingFetcher = fetchTesting(testing);

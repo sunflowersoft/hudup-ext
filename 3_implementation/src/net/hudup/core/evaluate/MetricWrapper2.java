@@ -1,7 +1,7 @@
 package net.hudup.core.evaluate;
 
 import net.hudup.core.alg.Alg;
-import net.hudup.core.alg.TestingAlg;
+import net.hudup.core.alg.ExecutableAlg;
 import net.hudup.core.logistic.BaseClass;
 import net.hudup.core.logistic.xURI;
 
@@ -97,7 +97,7 @@ public class MetricWrapper2 extends MetricWrapper {
 			return null;
 		
 		MetricWrapper2 wrapper = new MetricWrapper2();
-		String algDesc = (alg instanceof TestingAlg) ? ((TestingAlg)alg).getDescription() : "";
+		String algDesc = (alg instanceof ExecutableAlg) ? ((ExecutableAlg)alg).getDescription() : "";
 		wrapper.setup(metric, alg.getName(), datasetId, algDesc);
 		wrapper.setDatasetUri(datasetUri);
 		

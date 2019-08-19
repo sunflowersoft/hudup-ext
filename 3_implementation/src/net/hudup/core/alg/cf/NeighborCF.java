@@ -1560,8 +1560,9 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 		
 		Collections.sort(valueBins);
 		Map<Double, Integer> rankBins = Util.newMap();
-		for (int i = 0; i < valueBins.size(); i++) {
-			rankBins.put(valueBins.get(i), i+1);
+		int n = valueBins.size();
+		for (int i = 0; i < n; i++) {
+			rankBins.put(valueBins.get(i), n-i);
 		}
 		
 		return rankBins;

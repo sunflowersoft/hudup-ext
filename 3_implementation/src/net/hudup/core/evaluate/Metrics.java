@@ -9,7 +9,7 @@ import java.util.Set;
 
 import net.hudup.core.Util;
 import net.hudup.core.alg.Alg;
-import net.hudup.core.alg.TestingAlg;
+import net.hudup.core.alg.ExecutableAlg;
 import net.hudup.core.logistic.xURI;
 
 /**
@@ -175,9 +175,9 @@ public class Metrics implements Serializable {
 		Metrics result = recalc(alg.getName(), datasetId, metricClass, params);
 
 		//if (alg instanceof TestingAlg) { //This code line makes program run redundantly.
-		if ((alg instanceof TestingAlg) && (metricClass != null) && (metricClass.isAssignableFrom(SetupTimeMetric.class))) {
+		if ((alg instanceof ExecutableAlg) && (metricClass != null) && (metricClass.isAssignableFrom(SetupTimeMetric.class))) {
 			String algName = alg.getName();
-			String algDesc = ((TestingAlg)alg).getDescription();
+			String algDesc = ((ExecutableAlg)alg).getDescription();
 			algDesc = algDesc == null ? "" : algDesc;
 			
 			Map<Integer, String> descMap = null;

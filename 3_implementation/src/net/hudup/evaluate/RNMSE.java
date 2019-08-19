@@ -11,17 +11,17 @@ import net.hudup.core.evaluate.RealMetricValue;
 import net.hudup.core.logistic.NextUpdate;
 
 /**
- * This class represents root mean squared error for evaluating recommendation algorithm.
+ * This class represents NRMSE metric for recommendation algorithms. It is now deprecated.
  * 
  * @author Loc Nguyen
- * @version 1.0
+ * @version 10.0
  *
  */
-public class RMSE extends MSE {
+public class RNMSE extends NMSE {
 
 	
 	/**
-	 * Serial version UID for serializable class.
+	 * Default serial version UID.
 	 */
 	private static final long serialVersionUID = 1L;
 
@@ -29,7 +29,7 @@ public class RMSE extends MSE {
 	/**
 	 * Default constructor.
 	 */
-	public RMSE() {
+	public RNMSE() {
 		// TODO Auto-generated constructor stub
 	}
 
@@ -57,18 +57,18 @@ public class RMSE extends MSE {
 			};
 	}
 
-
+	
 	@Override
 	public String getName() {
 		// TODO Auto-generated method stub
-		return "RMSE.recommend";
+		return "RNMSE.recommend";
 	}
 
 	
 	@Override
 	public String getDesc() {
 		// TODO Auto-generated method stub
-		return "Root Mean Squared Error for recommendation algorithm";
+		return "Root Normalized Mean Squared Error for recommendation algorithm";
 	}
 
 	
@@ -78,21 +78,20 @@ public class RMSE extends MSE {
 		return "Predictive accuracy";
 	}
 
-
+	
 	@Override
 	public Alg newInstance() {
 		// TODO Auto-generated method stub
-		return new RMSE();
+		return new RNMSE();
 	}
-	
-	
+
+
 }
 
 
 
 /**
- * This class represents root mean squared error for evaluating recommendation algorithm.
- * It is now deprecated.
+ * This class represents NRMSE metric for recommendation algorithms. It is now deprecated.
  * 
  * @author Loc Nguyen
  * @version 10.0
@@ -100,11 +99,11 @@ public class RMSE extends MSE {
  */
 @NextUpdate
 @Deprecated
-class RMSEDeprecated extends MetaMetric {
+class NRMSEDeprecated extends MetaMetric {
 
 	
 	/**
-	 * Serial version UID for serializable class.
+	 * Serial version UID for serializable class. 
 	 */
 	private static final long serialVersionUID = 1L;
 
@@ -112,32 +111,32 @@ class RMSEDeprecated extends MetaMetric {
 	/**
 	 * Default constructor.
 	 */
-	public RMSEDeprecated() {
+	public NRMSEDeprecated() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
 
 	
 	/**
-	 * Setting up this RMSE by internal MSE.
-	 * @param mse internal MSE.
+	 * Setting up this metric with other metric MSE.
+	 * @param nmse specified other metric MSE.
 	 */
-	public void setup(MSE mse) {
-		super.setup( new Object[] { mse } );
+	public void setup(NMSE nmse) {
+		super.setup( new Object[] { nmse } );
 	}
 	
 	
 	@Override
 	public String getName() {
 		// TODO Auto-generated method stub
-		return "RMSE.recommend.deprecated";
+		return "RNMSE.recommend.deprecated";
 	}
 
 	
 	@Override
 	public String getDesc() {
 		// TODO Auto-generated method stub
-		return "Root Mean Squared Error (deprecated) for recommendation algorithm";
+		return "Root Normalized Mean Squared Error (deprecated) for recommendation algorithm";
 	}
 
 	
@@ -152,17 +151,17 @@ class RMSEDeprecated extends MetaMetric {
 	public boolean recalc(Object... params) throws Exception {
 		// TODO Auto-generated method stub
 		if ( meta == null || meta.length < 1 || meta[0] == null || 
-				(!(meta[0] instanceof MSE)) )
+				(!(meta[0] instanceof NMSE)) )
 			return false;
 		
-		MSE mse = (MSE)meta[0];
-		if (!mse.isValid() || !mse.getCurrentValue().isUsed() || !mse.getAccumValue().isUsed())
+		NMSE nmse = (NMSE)meta[0];
+		if (!nmse.isValid() || !nmse.getCurrentValue().isUsed() || !nmse.getAccumValue().isUsed())
 			return false;
 		
-		double currentValue = MetricValue.extractRealValue(mse.getCurrentValue());
+		double currentValue = MetricValue.extractRealValue(nmse.getCurrentValue());
 		this.currentValue = new RealMetricValue(Math.sqrt(currentValue));
 		
-		double accumValue = MetricValue.extractRealValue(mse.getAccumValue());
+		double accumValue = MetricValue.extractRealValue(nmse.getAccumValue());
 		this.accumValue = new RealMetricValue(Math.sqrt(accumValue));
 		
 		return true;
@@ -172,7 +171,7 @@ class RMSEDeprecated extends MetaMetric {
 	@Override
 	public Alg newInstance() {
 		// TODO Auto-generated method stub
-		return new RMSEDeprecated();
+		return new NRMSEDeprecated();
 	}
 
 

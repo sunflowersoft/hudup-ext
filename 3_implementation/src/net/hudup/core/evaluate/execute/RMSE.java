@@ -1,8 +1,6 @@
-package net.hudup.evaluate;
+package net.hudup.core.evaluate.execute;
 
 import net.hudup.core.alg.Alg;
-import net.hudup.core.data.Dataset;
-import net.hudup.core.data.RatingVector;
 import net.hudup.core.evaluate.FractionMetricValue;
 import net.hudup.core.evaluate.MetaMetric;
 import net.hudup.core.evaluate.MetricValue;
@@ -11,7 +9,7 @@ import net.hudup.core.evaluate.RealMetricValue;
 import net.hudup.core.logistic.NextUpdate;
 
 /**
- * This class represents root mean squared error for evaluating recommendation algorithm.
+ * This class represents root mean squared error for evaluating dual regression expectation maximization (EM) algorithm.
  * 
  * @author Loc Nguyen
  * @version 1.0
@@ -21,7 +19,7 @@ public class RMSE extends MSE {
 
 	
 	/**
-	 * Serial version UID for serializable class.
+	 * Default serial version UID.
 	 */
 	private static final long serialVersionUID = 1L;
 
@@ -33,11 +31,31 @@ public class RMSE extends MSE {
 		// TODO Auto-generated constructor stub
 	}
 
+	@Override
+	public String getName() {
+		// TODO Auto-generated method stub
+		return "RMSE.test";
+	}
+	
 	
 	@Override
-	protected MetricValue calc(RatingVector recommended, RatingVector vTesting, Dataset testing) {
+	public String getDesc() {
 		// TODO Auto-generated method stub
-		FractionMetricValue fraction = (FractionMetricValue)super.calc(recommended, vTesting, testing);
+		return "Root Mean Squared Error for testing algorithms";
+	}
+
+	
+	@Override
+	public String getTypeName() {
+		// TODO Auto-generated method stub
+		return "Accuracy";
+	}
+	
+	
+	@Override
+	protected MetricValue calc(double resultedValue, double testingValue) {
+		// TODO Auto-generated method stub
+		FractionMetricValue fraction = (FractionMetricValue)super.calc(resultedValue, testingValue);
 		
 		if (fraction == null)
 			return null;
@@ -54,48 +72,28 @@ public class RMSE extends MSE {
 					// TODO Auto-generated method stub
 					return Math.sqrt(value);
 				}
+				
 			};
 	}
 
-
-	@Override
-	public String getName() {
-		// TODO Auto-generated method stub
-		return "RMSE.recommend";
-	}
-
 	
-	@Override
-	public String getDesc() {
-		// TODO Auto-generated method stub
-		return "Root Mean Squared Error for recommendation algorithm";
-	}
-
-	
-	@Override
-	public String getTypeName() {
-		// TODO Auto-generated method stub
-		return "Predictive accuracy";
-	}
-
-
 	@Override
 	public Alg newInstance() {
 		// TODO Auto-generated method stub
 		return new RMSE();
 	}
-	
+
 	
 }
 
 
 
 /**
- * This class represents root mean squared error for evaluating recommendation algorithm.
+ * This class represents root mean squared error for evaluating dual regression expectation maximization (EM) algorithm.
  * It is now deprecated.
  * 
  * @author Loc Nguyen
- * @version 10.0
+ * @version 1.0
  *
  */
 @NextUpdate
@@ -110,10 +108,9 @@ class RMSEDeprecated extends MetaMetric {
 
 	
 	/**
-	 * Default constructor.
+	 * Default constructor
 	 */
 	public RMSEDeprecated() {
-		super();
 		// TODO Auto-generated constructor stub
 	}
 
@@ -130,28 +127,28 @@ class RMSEDeprecated extends MetaMetric {
 	@Override
 	public String getName() {
 		// TODO Auto-generated method stub
-		return "RMSE.recommend.deprecated";
+		return "RMSE.test.deprecated";
 	}
-
+	
 	
 	@Override
 	public String getDesc() {
 		// TODO Auto-generated method stub
-		return "Root Mean Squared Error (deprecated) for recommendation algorithm";
+		return "Root Mean Squared Error (deprecated) for testing algorithms";
 	}
 
 	
 	@Override
 	public String getTypeName() {
 		// TODO Auto-generated method stub
-		return "Predictive accuracy";
+		return "Accuracy";
 	}
-
+	
 	
 	@Override
 	public boolean recalc(Object... params) throws Exception {
 		// TODO Auto-generated method stub
-		if ( meta == null || meta.length < 1 || meta[0] == null || 
+		if ( meta == null || meta.length < 1 || meta[0] == null ||
 				(!(meta[0] instanceof MSE)) )
 			return false;
 		
@@ -175,5 +172,5 @@ class RMSEDeprecated extends MetaMetric {
 		return new RMSEDeprecated();
 	}
 
-
+	
 }

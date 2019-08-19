@@ -25,13 +25,13 @@ public class FractionMetricValue implements MetricValue {
 	/**
 	 * Numerator of the fraction.
 	 */
-	private double a = 0;
+	protected double a = 0;
 	
 	
 	/**
 	 * Denominator of the fraction.
 	 */
-	private double b = 0;
+	protected double b = 0;
 	
 	
 	/**
