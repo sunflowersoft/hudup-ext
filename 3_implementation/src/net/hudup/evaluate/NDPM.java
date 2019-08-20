@@ -19,6 +19,7 @@ import net.hudup.core.logistic.NextUpdate;
  *
  */
 @NextUpdate
+@Deprecated
 public class NDPM extends CorrelationAccuracy {
 
 	
