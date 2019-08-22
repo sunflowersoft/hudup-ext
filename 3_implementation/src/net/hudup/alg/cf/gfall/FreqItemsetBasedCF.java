@@ -35,6 +35,7 @@ import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.Pair;
 import net.hudup.core.data.RatingVector;
+import net.hudup.core.evaluate.recommend.Accuracy;
 import net.hudup.core.logistic.DSUtil;
 import net.hudup.core.logistic.LineProcessor;
 import net.hudup.core.logistic.MinMax;
@@ -119,7 +120,7 @@ public abstract class FreqItemsetBasedCF extends ModelBasedCF {
 
 	
 	@Override
-	public RatingVector estimate(RecommendParam param, Set<Integer> queryIds) throws RemoteException {
+	public synchronized RatingVector estimate(RecommendParam param, Set<Integer> queryIds) throws RemoteException {
 		if (param == null)
 			return null;
 		
@@ -193,7 +194,7 @@ public abstract class FreqItemsetBasedCF extends ModelBasedCF {
 
 	
 	@Override
-	public RatingVector recommend(RecommendParam param, int maxRecommend) throws RemoteException {
+	public synchronized RatingVector recommend(RecommendParam param, int maxRecommend) throws RemoteException {
 		// maxRecommend = 0: get All
 		param = recommendPreprocess(param);
 		if (param == null)
@@ -210,7 +211,8 @@ public abstract class FreqItemsetBasedCF extends ModelBasedCF {
 			@Override
 			public boolean accept(double ratingValue, double referredRatingValue) {
 				// TODO Auto-generated method stub
-				return ratingValue >= referredRatingValue;
+				//Fixing date: 2019.08.21 by Loc Nguyen.
+				return Accuracy.isRelevant(ratingValue, referredRatingValue); /*ratingValue >= referredRatingValue;*/
 			}
 			
 		});

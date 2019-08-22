@@ -4,6 +4,7 @@ import java.util.Set;
 
 import net.hudup.core.alg.Recommender;
 import net.hudup.core.data.Dataset;
+import net.hudup.core.evaluate.execute.Accuracy;
 
 /**
  * Currently, two default metrics inherited from {@link DefaultMetric} class are {@link TimeMetric} class and {@link Accuracy} class.

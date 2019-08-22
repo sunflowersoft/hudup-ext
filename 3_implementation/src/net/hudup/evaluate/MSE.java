@@ -7,6 +7,7 @@ import net.hudup.core.data.Dataset;
 import net.hudup.core.data.RatingVector;
 import net.hudup.core.evaluate.FractionMetricValue;
 import net.hudup.core.evaluate.MetricValue;
+import net.hudup.core.evaluate.recommend.PredictiveAccuracy;
 
 /**
  * This class represents mean squared error for evaluating recommendation algorithm.

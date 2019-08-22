@@ -1,21 +1,24 @@
 package net.hudup.core.evaluate;
 
 import java.io.Serializable;
+import java.io.Writer;
 import java.rmi.RemoteException;
+import java.util.Date;
 import java.util.EventListener;
 import java.util.List;
 
 import javax.swing.event.EventListenerList;
 
+import net.hudup.core.Constants;
 import net.hudup.core.PluginStorage;
 import net.hudup.core.PluginStorageWrapper;
 import net.hudup.core.RegisterTable;
 import net.hudup.core.RegisterTable.AlgFilter;
 import net.hudup.core.alg.Alg;
+import net.hudup.core.alg.ExecutableAlg;
 import net.hudup.core.alg.SetupAlgEvent;
 import net.hudup.core.alg.SetupAlgListener;
 import net.hudup.core.alg.SupportCacheAlg;
-import net.hudup.core.alg.ExecutableAlg;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.DatasetPair;
@@ -26,6 +29,7 @@ import net.hudup.core.evaluate.EvaluatorEvent.Type;
 import net.hudup.core.logistic.AbstractRunner;
 import net.hudup.core.logistic.NetUtil;
 import net.hudup.core.logistic.SystemUtil;
+import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.xURI;
 import net.hudup.core.logistic.ui.ProgressEvent;
 import net.hudup.core.logistic.ui.ProgressListener;
@@ -285,7 +289,7 @@ public abstract class AbstractEvaluator extends AbstractRunner implements Evalua
 					int vCurrentTotal = testingFetcher.getMetadata().getSize();
 					int vCurrentCount = 0;
 					int vExecutedCount = 0;
-					while (testingFetcher.next() && current == thread) {
+					while (current == thread && testingFetcher.next()) {
 						progressStep++;
 						vCurrentCount++;
 						EvaluatorProgressEvent progressEvt = new EvaluatorProgressEvent(this, progressTotal, progressStep);
@@ -363,6 +367,7 @@ public abstract class AbstractEvaluator extends AbstractRunner implements Evalua
 					try {
 						if (testingFetcher != null)
 							testingFetcher.close();
+						testingFetcher = null;
 					} 
 					catch (Throwable e) {
 						// TODO Auto-generated catch block
@@ -381,9 +386,10 @@ public abstract class AbstractEvaluator extends AbstractRunner implements Evalua
 		synchronized (this) {
 			thread = null;
 			paused = false;
-			clear();
-
+			
 			fireEvaluatorEvent(new EvaluatorEvent(this, Type.done, result));
+			
+			clear();
 
 			notifyAll();
 		}
@@ -595,9 +601,7 @@ public abstract class AbstractEvaluator extends AbstractRunner implements Evalua
      * @param evt event from this evaluator.
      */
     protected void fireEvaluatorEvent(EvaluatorEvent evt) {
-    	
 		EvaluatorListener[] listeners = getEvaluatorListeners();
-		
 		for (EvaluatorListener listener : listeners) {
 			try {
 				listener.receivedEvaluation(evt);
@@ -606,7 +610,28 @@ public abstract class AbstractEvaluator extends AbstractRunner implements Evalua
 				e.printStackTrace();
 			}
 		}
-	
+		
+		if (evt.getType() != Type.done && evt.getType() != Type.done_one)
+			return;
+		if (this.result == null || this.algList == null)
+			return;
+		
+		try {
+			xURI backupDir = xURI.create(Constants.BACKUP_DIRECTORY);
+			UriAdapter backupAdapter = new UriAdapter(backupDir);
+			if (backupAdapter.exists(backupDir))
+				backupAdapter.create(backupDir, true);
+			xURI analyzeBackupFile = backupDir.concat("evaluator-analyze-backup-" + new Date().getTime() + "." + Constants.DEFAULT_EXT);
+			
+			MetricsUtil util = new MetricsUtil(this.result, new RegisterTable(this.algList));
+			Writer writer = backupAdapter.getWriter(analyzeBackupFile, false);
+			writer.write(util.createPlainText());
+			writer.close();
+			backupAdapter.close();
+		}
+		catch (Throwable e) {
+			e.printStackTrace();
+		}
     }
 
     

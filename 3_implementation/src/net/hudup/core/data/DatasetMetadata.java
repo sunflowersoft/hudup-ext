@@ -146,6 +146,20 @@ public class DatasetMetadata implements Serializable, TextParsable, Cloneable {
 	
 	
 	/**
+	 * Assigning from other meta-data.
+	 * @param other other meta-data.
+	 */
+	protected void assignFrom(DatasetMetadata other) {
+		this.minRating = other.minRating;
+		this.maxRating = other.maxRating;
+		this.numberOfUsers = other.numberOfUsers;
+		this.numberOfUserRatings = other.numberOfUserRatings;
+		this.numberOfItems = other.numberOfItems;
+		this.numberOfItemRatings = other.numberOfItemRatings;
+	}
+	
+	
+	/**
 	 * Extracting meta-data about specific dataset.
 	 * @param dataset Specific dataset
 	 * @return {@link DatasetMetadata}
@@ -237,4 +251,185 @@ public class DatasetMetadata implements Serializable, TextParsable, Cloneable {
 	}
 	
 	
+}
+
+
+
+/**
+ * This class is an extension of dataset meta-data. Please see {@link DatasetMetadata}.
+ * 
+ * @author Loc Nguyen
+ * @version 1.0
+ *
+ */
+@Deprecated
+class DatasetMetadata2 extends DatasetMetadata {
+
+	
+	/**
+	 * Default serial version UID.
+	 */
+	private static final long serialVersionUID = 1L;
+
+	
+	/**
+	 * Minimum number of user ratings
+	 */
+	public int userMinNumberOfRatings = 0;
+
+	
+	/**
+	 * Maximum number of user ratings
+	 */
+	public int userMaxNumberOfRatings = 0;
+	
+	
+	/**
+	 * Minimum number of item ratings
+	 */
+	public int itemMinNumberOfRatings = 0;
+
+	
+	/**
+	 * Maximum number of item ratings
+	 */
+	public int itemMaxNumberOfRatings = 0;
+
+	
+	/**
+	 * Default constructor.
+	 */
+	protected DatasetMetadata2() {
+		// TODO Auto-generated constructor stub
+	}
+
+
+	@Override
+	public String toText() {
+		// TODO Auto-generated method stub
+		return minRating + "," + 
+				maxRating + ", " + 
+				numberOfUsers + ", " + 
+				numberOfUserRatings +
+				numberOfItems + ", " + 
+				numberOfItemRatings + ", " + 
+				userMinNumberOfRatings + ", " + 
+				userMaxNumberOfRatings + ", " + 
+				itemMinNumberOfRatings + ", " + 
+				itemMaxNumberOfRatings;
+	}
+
+
+	@Override
+	public void parseText(String spec) {
+		// TODO Auto-generated method stub
+		List<String> textList = TextParserUtil.split(spec, ",", null);
+		minRating = Integer.parseInt(textList.get(0));
+		maxRating = Integer.parseInt(textList.get(1));
+		numberOfUsers = Integer.parseInt(textList.get(2));
+		numberOfUserRatings = Integer.parseInt(textList.get(3));
+		numberOfItems = Integer.parseInt(textList.get(4));
+		numberOfItemRatings = Integer.parseInt(textList.get(5));
+		userMinNumberOfRatings = Integer.parseInt(textList.get(6));
+		userMaxNumberOfRatings = Integer.parseInt(textList.get(7));
+		itemMinNumberOfRatings = Integer.parseInt(textList.get(8));
+		itemMaxNumberOfRatings = Integer.parseInt(textList.get(9));
+	}
+	
+	
+	@Override
+	public Object clone() {
+		// TODO Auto-generated method stub
+		DatasetMetadata2 metadata2 = new DatasetMetadata2();
+		metadata2.assignFrom(this);
+		metadata2.userMinNumberOfRatings = this.userMinNumberOfRatings;
+		metadata2.userMaxNumberOfRatings = this.userMaxNumberOfRatings;
+		metadata2.itemMinNumberOfRatings = this.itemMinNumberOfRatings;
+		metadata2.itemMaxNumberOfRatings = this.itemMaxNumberOfRatings;
+
+		return metadata2;
+	}
+
+
+	/** 
+	 * Extracting meta-data about specific dataset.
+	 * @param dataset Specific dataset
+	 * @return {@link DatasetMetadata2}
+	 */
+	public static DatasetMetadata2 create(Dataset dataset) {
+		
+		DatasetMetadata metadata = DatasetMetadata.create(dataset);
+		DatasetMetadata2 metadata2 = new DatasetMetadata2();
+		metadata2.assignFrom(metadata);
+		
+		Fetcher<RatingVector> users = null;
+		try {
+			users = dataset.fetchUserRatings();
+			int min = Integer.MAX_VALUE;
+			int max = Integer.MIN_VALUE;
+			while (users.next()) {
+				RatingVector user = users.pick();
+				if (user == null) continue;
+				
+				int count = user.count(true);
+				if (count < min) min = count;
+				if (count > max) max = count;
+			}
+			
+			if (min != Integer.MAX_VALUE)
+				metadata2.userMinNumberOfRatings = min;
+			if (max != Integer.MIN_VALUE)
+				metadata2.userMaxNumberOfRatings = max;
+		}
+		catch (Throwable e) {
+			e.printStackTrace();
+		}
+		finally {
+			try {
+				if (users != null)
+					users.close();
+			} 
+			catch (Throwable e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+
+		Fetcher<RatingVector> items = null;
+		try {
+			items = dataset.fetchItemRatings();
+			int min = Integer.MAX_VALUE;
+			int max = Integer.MIN_VALUE;
+			while (items.next()) {
+				RatingVector item = items.pick();
+				if (item == null) continue;
+				
+				int count = item.count(true);
+				if (count < min) min = count;
+				if (count > max) max = count;
+			}
+			
+			if (min != Integer.MAX_VALUE)
+				metadata2.userMinNumberOfRatings = min;
+			if (max != Integer.MIN_VALUE)
+				metadata2.userMaxNumberOfRatings = max;
+		}
+		catch (Throwable e) {
+			e.printStackTrace();
+		}
+		finally {
+			try {
+				if (items != null)
+					items.close();
+			} 
+			catch (Throwable e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+		return metadata2;
+	}
+
+
 }

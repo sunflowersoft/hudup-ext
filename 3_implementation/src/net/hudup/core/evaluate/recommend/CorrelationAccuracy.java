@@ -1,4 +1,4 @@
-package net.hudup.evaluate;
+package net.hudup.core.evaluate.recommend;
 
 import java.util.Set;
 
@@ -30,19 +30,19 @@ import net.hudup.core.evaluate.TimeMetric;
  * @version 10.0
  *
  */
-public abstract class ClassificationAccuracy extends Accuracy {
+public abstract class CorrelationAccuracy extends Accuracy {
 
 	
 	/**
-	 * Serial version UID for serializable class. 
+	 * Serial version UID for serializable class.
 	 */
 	private static final long serialVersionUID = 1L;
 
-
+	
 	/**
 	 * Default constructor.
 	 */
-	public ClassificationAccuracy() {
+	public CorrelationAccuracy() {
 		super();
 		// TODO Auto-generated constructor stub
 	}

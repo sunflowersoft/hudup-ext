@@ -9,6 +9,7 @@ import net.hudup.core.data.RatingVector;
 import net.hudup.core.evaluate.MetaMetric;
 import net.hudup.core.evaluate.MetricValue;
 import net.hudup.core.evaluate.RealMetricValue;
+import net.hudup.core.evaluate.recommend.ClassificationAccuracy;
 import net.hudup.core.logistic.NextUpdate;
 
 

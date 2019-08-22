@@ -15,7 +15,6 @@ import net.hudup.core.data.Fetcher;
 import net.hudup.core.data.Profile;
 import net.hudup.core.data.RatingVector;
 import net.hudup.core.evaluate.AbstractEvaluator;
-import net.hudup.core.evaluate.QueryRecallMetric;
 import net.hudup.core.evaluate.EvaluatorEvent;
 import net.hudup.core.evaluate.EvaluatorEvent.Type;
 import net.hudup.core.evaluate.EvaluatorProgressEvent;
@@ -23,8 +22,10 @@ import net.hudup.core.evaluate.FractionMetricValue;
 import net.hudup.core.evaluate.HudupRecallMetric;
 import net.hudup.core.evaluate.Metrics;
 import net.hudup.core.evaluate.NoneWrapperMetricList;
+import net.hudup.core.evaluate.QueryRecallMetric;
 import net.hudup.core.evaluate.SetupTimeMetric;
 import net.hudup.core.evaluate.SpeedMetric;
+import net.hudup.core.evaluate.recommend.Accuracy;
 import net.hudup.core.logistic.SystemUtil;
 import net.hudup.core.logistic.xURI;
 
@@ -107,7 +108,6 @@ public class RecommendEvaluator extends AbstractEvaluator {
 	
 	@Override
 	protected void run0() {
-		int maxRecommend = config.getAsInt(DataConfig.MAX_RECOMMEND_FIELD);
 		int progressStep = 0;
 		int progressTotal = pool.getTotalTestingUserNumber() * algList.size();
 		result = new Metrics();
@@ -125,7 +125,7 @@ public class RecommendEvaluator extends AbstractEvaluator {
 			
 			for (int j = 0; current == thread && pool != null && j < pool.size(); j++) {
 				
-				Fetcher<Integer> testingUserIds = null;
+				Fetcher<RatingVector> testingUsers = null;
 				try {
 					DatasetPair dsPair = pool.get(j);
 					Dataset     training = dsPair.getTraining();
@@ -152,13 +152,11 @@ public class RecommendEvaluator extends AbstractEvaluator {
 					
 					fireEvaluatorEvent(new EvaluatorEvent(this, Type.doing, setupMetrics)); // firing setup time metric
 					
-					testingUserIds = testing.fetchUserIds();
-					int vCurrentTotal = testingUserIds.getMetadata().getSize();
+					testingUsers = testing.fetchUserRatings();
+					int vCurrentTotal = testingUsers.getMetadata().getSize();
 					int vCurrentCount = 0;
 					int vRecommendedCount = 0;
-					int queryIdTotal = 0; //Total vector count for query ID recall metric.
-					int queryIdCount = 0; //Recommended vector count for query ID recall metric.
-					while (testingUserIds.next() && current == thread) {
+					while (current == thread && testingUsers.next()) {
 						
 						progressStep++;
 						vCurrentCount++;
@@ -169,15 +167,15 @@ public class RecommendEvaluator extends AbstractEvaluator {
 						progressEvt.setCurrentTotal(vCurrentTotal);
 						fireProgressEvent(progressEvt);
 						
-						Integer testingUserId = testingUserIds.pick();
-						if (testingUserId == null || testingUserId < 0)
+						RatingVector testingUser = testingUsers.pick();
+						if (testingUser == null || testingUser.size() == 0)
+							continue;
+						int relevantCount = Accuracy.countForRelevant(testingUser, true, testing);
+						if (relevantCount == 0)
 							continue;
 						
-						RecommendParam param = new RecommendParam(testingUserId);
-						RatingVector vTesting = testing.getUserRating(testingUserId); //Added date: 2019.08.18 by Loc Nguyen.
-						maxRecommend = (maxRecommend <= 0 && vTesting != null) ? vTesting.size() : maxRecommend; //Added date: 2019.08.18 by Loc Nguyen.
-						maxRecommend = maxRecommend <= 0 ? 10 : maxRecommend; //Added date: 2019.08.18 by Loc Nguyen.
-						queryIdTotal += maxRecommend; //Increase total query ID count.
+						RecommendParam param = new RecommendParam(testingUser.id());
+						int maxRecommend = setupMaxRecommend(recommender, relevantCount);
 						
 						//
 						long beginRecommendTime = System.currentTimeMillis();
@@ -199,7 +197,7 @@ public class RecommendEvaluator extends AbstractEvaluator {
 								Type.doing, 
 								speedMetrics,
 								recommended, 
-								vTesting)); // firing time speed metric
+								testingUser)); // firing time speed metric
 						
 						
 						if (recommended != null) { // successful recommendation
@@ -211,14 +209,13 @@ public class RecommendEvaluator extends AbstractEvaluator {
 								); // calculating recommendation metric
 							
 							vRecommendedCount++;
-							queryIdCount += recommended.size(); //Increase recommended query ID count.
 							
 							fireEvaluatorEvent(new EvaluatorEvent(
 									this, 
 									Type.doing, 
 									recommendedMetrics, 
 									recommended, 
-									vTesting)); // firing recommendation metric
+									testingUser)); // firing recommendation metric
 						}
 						
 						
@@ -239,14 +236,6 @@ public class RecommendEvaluator extends AbstractEvaluator {
 						);
 					fireEvaluatorEvent(new EvaluatorEvent(this, Type.doing, hudupRecallMetrics));
 					
-					Metrics queryRecallMetrics = result.recalc(
-							recommender.getName(), 
-							datasetId, 
-							QueryRecallMetric.class, 
-							new Object[] { new FractionMetricValue(queryIdCount, queryIdTotal) }
-						);
-					fireEvaluatorEvent(new EvaluatorEvent(this, Type.doing, queryRecallMetrics));
-
 					Metrics doneOneMetrics = result.gets(recommender.getName(), datasetId);
 					fireEvaluatorEvent(new EvaluatorEvent(this, Type.done_one, doneOneMetrics));
 					
@@ -256,8 +245,9 @@ public class RecommendEvaluator extends AbstractEvaluator {
 				}
 				finally {
 					try {
-						if (testingUserIds != null)
-							testingUserIds.close();
+						if (testingUsers != null)
+							testingUsers.close();
+						testingUsers = null;
 					} 
 					catch (Throwable e) {
 						// TODO Auto-generated catch block
@@ -283,9 +273,10 @@ public class RecommendEvaluator extends AbstractEvaluator {
 		synchronized (this) {
 			thread = null;
 			paused = false;
-			clear();
-
+			
 			fireEvaluatorEvent(new EvaluatorEvent(this, Type.done, result));
+			
+			clear();
 
 			notifyAll();
 		}
@@ -293,6 +284,28 @@ public class RecommendEvaluator extends AbstractEvaluator {
 	}
 
 
+	/**
+	 * Defining the number of maximum recommended items.
+	 * @param recommender recommendation algorithm.
+	 * @param relevantCount count of relevant ratings.
+	 * @return the number of maximum recommended items.
+	 */
+	protected int setupMaxRecommend(Recommender recommender, int relevantCount) {
+		int MAX_RECOMMEND = config.getAsInt(DataConfig.MAX_RECOMMEND_FIELD);
+		if (MAX_RECOMMEND <= 0) return 0;
+		
+		double minRating = recommender.getMinRating();
+		double maxRating = recommender.getMaxRating();
+		double medianRating = (minRating + maxRating) / 2.0;
+		int maxRecommend = (int)(maxRating-medianRating+0.5) * relevantCount;
+		
+		if (maxRecommend <= 0)
+			return MAX_RECOMMEND;
+		else
+			return maxRecommend > MAX_RECOMMEND ? MAX_RECOMMEND : maxRecommend;
+	}
+	
+	
 	@Override
 	public String getName() throws RemoteException {
 		// TODO Auto-generated method stub

@@ -85,6 +85,11 @@ public final class Constants {
 	public final static String  DATABASE_DIRECTORY       = WORKING_DIRECTORY + "/db";
 	
 	/**
+	 * Backup directory.
+	 */
+	public final static String  BACKUP_DIRECTORY         = WORKING_DIRECTORY + "/backup";
+
+	/**
 	 * The root package (root directory) of all classes.
 	 */
 	public final static String  ROOT_PACKAGE             = "/net/hudup/";

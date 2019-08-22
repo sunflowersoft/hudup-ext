@@ -1,4 +1,4 @@
-package net.hudup.evaluate;
+package net.hudup.core.evaluate.recommend;
 
 import java.util.Set;
 

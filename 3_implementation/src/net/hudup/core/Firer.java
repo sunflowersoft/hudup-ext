@@ -101,6 +101,10 @@ public class Firer implements PluginManager {
 			xURI db = xURI.create(Constants.DATABASE_DIRECTORY);
 			if (!adapter.exists(db))
 				adapter.create(db, true);
+			
+			xURI backup = xURI.create(Constants.BACKUP_DIRECTORY);
+			if (!adapter.exists(backup))
+				adapter.create(backup, true);
 		}
 		catch (Throwable e) {
 			e.printStackTrace();

@@ -1,4 +1,7 @@
-package net.hudup.core.evaluate;
+package net.hudup.core.evaluate.execute;
+
+import net.hudup.core.evaluate.DefaultMetric;
+import net.hudup.core.evaluate.MetricValue;
 
 /**
  * This abstract class represents any metric to evaluate an algorithm.

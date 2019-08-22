@@ -3,8 +3,10 @@
  */
 package net.hudup.core.alg.cf;
 
+import java.util.Map;
 import java.util.Set;
 
+import net.hudup.core.Constants;
 import net.hudup.core.Util;
 import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.DuplicatableAlg;
@@ -81,11 +83,12 @@ public class NeighborCFUserBased extends NeighborCF implements DuplicatableAlg {
 		if (thisUser.size() == 0) return null;
 		
 		RatingVector result = thisUser.newInstance(true);
-		boolean hybrid = cf.getConfig().getAsBoolean(HYBRID);
-		Profile userProfile1 = hybrid ? param.profile : null;
+//		boolean hybrid = cf.getConfig().getAsBoolean(HYBRID);
+//		Profile userProfile1 = hybrid ? param.profile : null;
 		double minValue = cf.dataset.getConfig().getMinRating();
 		double maxValue = cf.dataset.getConfig().getMaxRating();
 		double thisMean = thisUser.mean();
+		Map<Integer, Double> localUserSimCache = Util.newMap();
 		Fetcher<RatingVector> userRatings = cf.dataset.fetchUserRatings();
 		for (int itemId : queryIds) {
 			if (thisUser.isRated(itemId)) {
@@ -102,10 +105,20 @@ public class NeighborCFUserBased extends NeighborCF implements DuplicatableAlg {
 					if (thatUser == null || thatUser.id()== thisUser.id() || !thatUser.isRated(itemId))
 						continue;
 					
-					Profile userProfile2 = hybrid ? cf.dataset.getUserProfile(thatUser.id()) : null;
+//					Profile userProfile2 = hybrid ? cf.dataset.getUserProfile(thatUser.id()) : null;
 					
 					// computing similarity
-					double sim = cf.similar(thisUser, thatUser, userProfile1, userProfile2, itemId);
+					double sim = Constants.UNUSED;
+					if (cf.isCached() && thisUser.id() < 0) { //Local caching
+						if (localUserSimCache.containsKey(thatUser.id()))
+							sim = localUserSimCache.get(thatUser.id());
+						else {
+							sim = cf.similar(thisUser, thatUser, null/*userProfile1*/, null/*userProfile2*/, itemId);
+							localUserSimCache.put(thatUser.id(), sim);
+						}
+					}
+					else
+						sim = cf.similar(thisUser, thatUser, null/*userProfile1*/, null/*userProfile2*/, itemId);
 					if (!Util.isUsed(sim)) continue;
 					
 					double thatValue = thatUser.get(itemId).value;
@@ -136,13 +149,14 @@ public class NeighborCFUserBased extends NeighborCF implements DuplicatableAlg {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		localUserSimCache.clear();
 		
 		return result.size() == 0 ? null : result;
 	}
 
 	
 	@Override
-	public double cod(
+	protected double cod(
 			RatingVector vRating1, RatingVector vRating2,
 			Profile profile1, Profile profile2) {
 		return cod(vRating1, vRating2, this.itemMeans);
@@ -150,21 +164,21 @@ public class NeighborCFUserBased extends NeighborCF implements DuplicatableAlg {
 
 	
 	@Override
-	public double pip(RatingVector vRating1, RatingVector vRating2, Profile profile1, Profile profile2) {
+	protected double pip(RatingVector vRating1, RatingVector vRating2, Profile profile1, Profile profile2) {
 		// TODO Auto-generated method stub
 		return pip(vRating1, vRating2, this.itemMeans);
 	}
 
 
 	@Override
-	public double pss(RatingVector vRating1, RatingVector vRating2, Profile profile1, Profile profile2) {
+	protected double pss(RatingVector vRating1, RatingVector vRating2, Profile profile1, Profile profile2) {
 		// TODO Auto-generated method stub
 		return pss(vRating1, vRating2, this.ratingMedian, this.itemMeans);
 	}
 
 
 	@Override
-	public double pc(RatingVector vRating1, RatingVector vRating2, Profile profile1,
+	protected double pc(RatingVector vRating1, RatingVector vRating2, Profile profile1,
 			Profile profile2, int fixedColumnId) {
 		// TODO Auto-generated method stub
 		return pc(vRating1, vRating2, fixedColumnId, this.itemMeans);

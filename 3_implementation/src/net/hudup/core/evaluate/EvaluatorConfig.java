@@ -33,9 +33,9 @@ public class EvaluatorConfig extends SysConfig {
 
 	
 	/**
-	 * The maximum number of items in recommended list. By default, it is 0 which means that it is size of testing vector.
+	 * The maximum number of items in recommended list. By default, it is 10. If it is 0, it will be size of testing vector.
 	 */
-	public final static int DEFAULT_MAX_RECOMMEND = 0;
+	public final static int DEFAULT_MAX_RECOMMEND = 10;
 
 	
 	/**

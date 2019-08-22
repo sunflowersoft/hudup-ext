@@ -10,7 +10,6 @@ import net.hudup.core.data.Dataset;
 import net.hudup.core.data.DatasetPair;
 import net.hudup.core.data.Fetcher;
 import net.hudup.core.data.RatingVector;
-import net.hudup.core.evaluate.QueryRecallMetric;
 import net.hudup.core.evaluate.EvaluatorEvent;
 import net.hudup.core.evaluate.EvaluatorEvent.Type;
 import net.hudup.core.evaluate.EvaluatorProgressEvent;
@@ -18,6 +17,7 @@ import net.hudup.core.evaluate.FractionMetricValue;
 import net.hudup.core.evaluate.HudupRecallMetric;
 import net.hudup.core.evaluate.Metrics;
 import net.hudup.core.evaluate.NoneWrapperMetricList;
+import net.hudup.core.evaluate.QueryRecallMetric;
 import net.hudup.core.evaluate.SetupTimeMetric;
 import net.hudup.core.evaluate.SpeedMetric;
 import net.hudup.core.logistic.xURI;
@@ -52,7 +52,7 @@ public class EstimateEvaluator extends RecommendEvaluator {
 		result = new Metrics();
 		
 		Thread current = Thread.currentThread();
-		for (int i = 0; i < algList.size() && current == thread; i++) {
+		for (int i = 0; current == thread && algList != null && i < algList.size(); i++) {
 			try {
 				if (!acceptAlg(algList.get(i))) continue;
 			} catch (Throwable e) {
@@ -62,9 +62,9 @@ public class EstimateEvaluator extends RecommendEvaluator {
 			}
 			Recommender recommender = (Recommender)algList.get(i);
 			
-			for (int j = 0; j < pool.size() && current == thread; j++) {
+			for (int j = 0; current == thread && pool != null && j < pool.size(); j++) {
 				
-				Fetcher<Integer> testingUserIds = null;
+				Fetcher<RatingVector> testingUsers = null;
 				try {
 					DatasetPair dsPair = pool.get(j);
 					Dataset     training = dsPair.getTraining();
@@ -91,13 +91,13 @@ public class EstimateEvaluator extends RecommendEvaluator {
 					
 					fireEvaluatorEvent(new EvaluatorEvent(this, Type.doing, setupMetrics)); // firing setup time metric
 
-					testingUserIds = testing.fetchUserIds();
-					int vCurrentTotal = testingUserIds.getMetadata().getSize();
+					testingUsers = testing.fetchUserRatings();
+					int vCurrentTotal = testingUsers.getMetadata().getSize();
 					int vCurrentCount = 0; //Total vector count for Hudup recall metric.
 					int vEstimatedCount = 0; //Estimated vector count for Hudup recall metric.
 					int queryIdTotal = 0; //Total vector count for query ID recall metric.
 					int queryIdCount = 0; //Estimated vector count for query ID recall metric.
-					while (testingUserIds.next() && current == thread) {
+					while (current == thread && testingUsers.next()) {
 						
 						progressStep++;
 						vCurrentCount++;
@@ -108,17 +108,16 @@ public class EstimateEvaluator extends RecommendEvaluator {
 						progressEvt.setCurrentTotal(vCurrentTotal);
 						fireProgressEvent(progressEvt);
 						
-						Integer testingUserId = testingUserIds.pick();
-						if (testingUserId == null || testingUserId < 0)
+						RatingVector testingUser = testingUsers.pick();
+						if (testingUser == null || testingUser.size() == 0)
 							continue;
 						
-						RatingVector vTesting = testing.getUserRating(testingUserId); 
-						RatingVector vQuery = (RatingVector) vTesting.clone();
+						RatingVector vQuery = (RatingVector) testingUser.clone();
 						Set<Integer> queryIds = setupQueryIds(unratedCount, vQuery);
 						if (queryIds.size() == 0)
 							continue;
 						
-						RecommendParam param = new RecommendParam(vQuery, testing.getUserProfile(testingUserId));
+						RecommendParam param = new RecommendParam(vQuery, testing.getUserProfile(testingUser.id()));
 						queryIdTotal += queryIds.size(); //Increase total query ID count.
 						
 						//
@@ -141,7 +140,7 @@ public class EstimateEvaluator extends RecommendEvaluator {
 								Type.doing, 
 								speedMetrics,
 								estimated, 
-								vTesting)); // firing time speed metric
+								testingUser)); // firing time speed metric
 						
 						
 						if (estimated != null) { // successful recommendation
@@ -149,7 +148,7 @@ public class EstimateEvaluator extends RecommendEvaluator {
 							Metrics recommendedMetrics = result.recalc(
 									recommender.getName(), 
 									datasetId,
-									new Object[] { estimated, vTesting, testing }
+									new Object[] { estimated, testingUser, testing }
 								); // calculating recommendation metric
 							
 							vEstimatedCount++;
@@ -160,7 +159,7 @@ public class EstimateEvaluator extends RecommendEvaluator {
 									Type.doing, 
 									recommendedMetrics, 
 									estimated, 
-									testing.getUserRating(testingUserId))); // firing recommendation metric
+									testingUser)); // firing recommendation metric
 						}
 						
 						
@@ -198,8 +197,9 @@ public class EstimateEvaluator extends RecommendEvaluator {
 				}
 				finally {
 					try {
-						if (testingUserIds != null)
-							testingUserIds.close();
+						if (testingUsers != null)
+							testingUsers.close();
+						testingUsers = null;
 					} 
 					catch (Throwable e) {
 						// TODO Auto-generated catch block
@@ -224,13 +224,13 @@ public class EstimateEvaluator extends RecommendEvaluator {
 		synchronized (this) {
 			thread = null;
 			paused = false;
+			
+			fireEvaluatorEvent(new EvaluatorEvent(this, Type.done, result));
+			
 			clear();
 			
 			notifyAll();
-			
 		}
-		fireEvaluatorEvent(new EvaluatorEvent(this, Type.done, result));
-		
 	}
 
 	

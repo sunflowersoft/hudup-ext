@@ -67,7 +67,7 @@ public abstract class StatCF extends ModelBasedCF {
 
 
 	@Override
-	public RatingVector recommend(RecommendParam param, int maxRecommend) throws RemoteException {
+	public synchronized RatingVector recommend(RecommendParam param, int maxRecommend) throws RemoteException {
 		// TODO Auto-generated method stub
 		param = recommendPreprocess(param);
 		if (param == null)

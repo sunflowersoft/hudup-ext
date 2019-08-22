@@ -37,16 +37,16 @@ public final class BitDataUtil {
 	 */
 	@Deprecated
 	public static Dataset transform(BitData bitData) {
-		List<RatingTriple> ratList = Util.newList();
+		List<RatingTriple> ratingList = Util.newList();
 		Collection<BitItem> items = bitData.gets();
 		
 		for (BitItem item : items) {
-			RatingVector vRat = item.toItemRating(bitData);
+			RatingVector vRating = item.toItemRating(bitData);
 			
-			ratList.addAll(RatingTriple.getItemRatings(vRat));
+			ratingList.addAll(RatingTriple.getItemRatings(vRating));
 		}
 		
-		Dataset dataset = SnapshotImpl.create(ratList, new DatasetMetadata()); 
+		Dataset dataset = SnapshotImpl.create(ratingList, new DatasetMetadata()); 
 		return dataset;
 	}
 

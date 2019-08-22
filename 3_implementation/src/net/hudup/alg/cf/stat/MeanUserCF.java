@@ -35,7 +35,7 @@ public class MeanUserCF extends StatCF {
 
 	
 	@Override
-	public RatingVector estimate(RecommendParam param, Set<Integer> queryIds) throws RemoteException {
+	public synchronized RatingVector estimate(RecommendParam param, Set<Integer> queryIds) throws RemoteException {
 		// TODO Auto-generated method stub
 		StatKB sKb = (StatKB)kb;
 		

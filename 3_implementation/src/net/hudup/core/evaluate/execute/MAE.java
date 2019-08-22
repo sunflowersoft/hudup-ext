@@ -1,7 +1,6 @@
 package net.hudup.core.evaluate.execute;
 
 import net.hudup.core.alg.Alg;
-import net.hudup.core.evaluate.Accuracy;
 import net.hudup.core.evaluate.FractionMetricValue;
 import net.hudup.core.evaluate.MetricValue;
 
