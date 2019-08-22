@@ -137,7 +137,7 @@ public class RatingMatrixPane extends JPanel {
 	
 	
 	/**
-	 * 
+	 * Clearing panel.
 	 */
 	public void clear() {
 		paneRating.clear();
@@ -252,8 +252,8 @@ class RatingPane extends JPanel {
 	
 	
 	/**
-	 * 
-	 * @return this rating matrix pane
+	 * Getting this panel.
+	 * @return this rating matrix pane.
 	 */
 	private RatingPane getThis() {
 		return this;
@@ -297,8 +297,8 @@ class RatingPane extends JPanel {
 	
 	
 	/**
-	 * 
-	 * @return whether values are valid
+	 * Validating values.
+	 * @return whether values are valid.
 	 */
 	protected boolean validateValues() {
 		Object ratedValue = txtValue.getValue();
@@ -324,7 +324,7 @@ class RatingPane extends JPanel {
 	
 	
 	/**
-	 * 
+	 * Checking whether rating is editable.
 	 * @return whether rating is editable
 	 */
 	public boolean isEditable() {
@@ -333,8 +333,8 @@ class RatingPane extends JPanel {
 	
 	
 	/**
-	 * 
-	 * @param editable
+	 * Setting whether rating is editable.
+	 * @param editable editable flag.
 	 */
 	public void setEditable(boolean editable) {
 		this.editable = editable;
@@ -344,7 +344,6 @@ class RatingPane extends JPanel {
 		tblContextList.setEnabled(editable);
 		toolbar.setVisible(editable);
 	}
-	
 	
 	
 }

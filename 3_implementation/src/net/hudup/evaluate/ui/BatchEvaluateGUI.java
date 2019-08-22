@@ -1272,7 +1272,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 	 * Update (repaint) all controls.
 	 */
 	private void updateGUI() {
-		validate();
+		validate(); //This code line can be removed.
 		updateUI();
 	}
 	

@@ -19,7 +19,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import net.hudup.core.data.Dataset;
-import net.hudup.core.data.DatasetMetadata;
+import net.hudup.core.data.DatasetMetadata2;
 import net.hudup.core.data.ui.ProfileTable;
 import net.hudup.core.logistic.ui.UIUtil;
 import net.hudup.data.ctx.ui.CTSviewer;
@@ -166,6 +166,7 @@ public class DatasetViewer extends JDialog {
 					body.add(paneSample, BorderLayout.CENTER);
 				}
 				
+				//body.validate(); //Added date: 2019.08.22 by Loc Nguyen. This code line can be removed.
 				body.updateUI();
 			}
 			
@@ -178,11 +179,12 @@ public class DatasetViewer extends JDialog {
 		JLabel summary = new JLabel("Summary");
 		footer.add(summary, BorderLayout.NORTH);
 
-		DatasetMetadataTable tblMetadata = new DatasetMetadataTable();
-		DatasetMetadata metadata = DatasetMetadata.create(dataset);
-		tblMetadata.update(metadata);
-		tblMetadata.setPreferredScrollableViewportSize(new Dimension(50, 50));
-		footer.add(new JScrollPane(tblMetadata), BorderLayout.CENTER);
+		//Added date: 2019.08.22 by Loc Nguyen.
+		DatasetMetadata2Table tblMetadata2 = new DatasetMetadata2Table();
+		DatasetMetadata2 metadata2 = DatasetMetadata2.create(dataset);
+		tblMetadata2.update(metadata2);
+		tblMetadata2.setPreferredScrollableViewportSize(new Dimension(50, 50));
+		footer.add(new JScrollPane(tblMetadata2), BorderLayout.CENTER);
 		
 		JPanel buttons = new JPanel();
 		footer.add(buttons, BorderLayout.SOUTH);
@@ -204,6 +206,9 @@ public class DatasetViewer extends JDialog {
 				
 				body.removeAll();
 				unitList.getSelectionModel().addSelectionInterval(0, 0);
+				
+				//body.validate(); //Added date: 2019.08.22 by Loc Nguyen. This code line can be removed.
+				body.updateUI();
 			}
 		});
 		buttons.add(refresh);
@@ -237,7 +242,7 @@ public class DatasetViewer extends JDialog {
 	
 	
 	/**
-	 * 
+	 * Create user profile panel.
 	 * @return user profile panel.
 	 */
 	private JPanel createUserProfilePane() {
@@ -252,7 +257,7 @@ public class DatasetViewer extends JDialog {
 	
 
 	/**
-	 * 
+	 * Create user external record panel.
 	 * @return user external record panel
 	 */
 	private JPanel createUserExternalPane() {
@@ -267,8 +272,8 @@ public class DatasetViewer extends JDialog {
 
 
 	/**
-	 * 
-	 * @return item profile panel
+	 * Create item profile panel.
+	 * @return item profile panel.
 	 */
 	private JPanel createItemProfilePane() {
 		JPanel main = new JPanel(new BorderLayout());
@@ -282,8 +287,8 @@ public class DatasetViewer extends JDialog {
 	
 
 	/**
-	 * 
-	 * @return item external panel
+	 * Creating item external panel.
+	 * @return item external panel.
 	 */
 	private JPanel createItemExternalPane() {
 		JPanel main = new JPanel(new BorderLayout());
@@ -324,6 +329,9 @@ public class DatasetViewer extends JDialog {
 	}
 
 	
+	/**
+	 * Clearing UI.
+	 */
 	private void clear() {
 		if (paneRatingMatrix != null)
 			paneRatingMatrix.clear();

@@ -17,7 +17,7 @@ import net.hudup.core.evaluate.FractionMetricValue;
 import net.hudup.core.evaluate.HudupRecallMetric;
 import net.hudup.core.evaluate.Metrics;
 import net.hudup.core.evaluate.NoneWrapperMetricList;
-import net.hudup.core.evaluate.QueryRecallMetric;
+import net.hudup.core.evaluate.ExactRecallMetric;
 import net.hudup.core.evaluate.SetupTimeMetric;
 import net.hudup.core.evaluate.SpeedMetric;
 import net.hudup.core.logistic.xURI;
@@ -87,16 +87,16 @@ public class EstimateEvaluator extends RecommendEvaluator {
 							SetupTimeMetric.class, 
 							new Object[] { setupElapsed / 1000.0f }
 						); // calculating setup time metric
-							
-					
+					//Fire doing event with setup time metric.
 					fireEvaluatorEvent(new EvaluatorEvent(this, Type.doing, setupMetrics)); // firing setup time metric
 
 					testingUsers = testing.fetchUserRatings();
 					int vCurrentTotal = testingUsers.getMetadata().getSize();
-					int vCurrentCount = 0; //Total vector count for Hudup recall metric.
+					int vCurrentCount = 0; //Vector count for Hudup recall metric.
 					int vEstimatedCount = 0; //Estimated vector count for Hudup recall metric.
-					int queryIdTotal = 0; //Total vector count for query ID recall metric.
-					int queryIdCount = 0; //Estimated vector count for query ID recall metric.
+					//
+					int vExactCurrentTotal = 0; //Exact total (query IDs) count for exact recall metric.
+					int vExactEstimatedCount = 0; //Exact estimated (query IDs) count for exact recall metric.
 					while (current == thread && testingUsers.next()) {
 						
 						progressStep++;
@@ -106,6 +106,7 @@ public class EstimateEvaluator extends RecommendEvaluator {
 						progressEvt.setDatasetId(datasetId);
 						progressEvt.setCurrentCount(vCurrentCount);
 						progressEvt.setCurrentTotal(vCurrentTotal);
+						//Fire progress event.
 						fireProgressEvent(progressEvt);
 						
 						RatingVector testingUser = testingUsers.pick();
@@ -118,7 +119,7 @@ public class EstimateEvaluator extends RecommendEvaluator {
 							continue;
 						
 						RecommendParam param = new RecommendParam(vQuery, testing.getUserProfile(testingUser.id()));
-						queryIdTotal += queryIds.size(); //Increase total query ID count.
+						vExactCurrentTotal += queryIds.size(); //Increase exact total (query IDs) count.
 						
 						//
 						long beginRecommendTime = System.currentTimeMillis();
@@ -135,6 +136,7 @@ public class EstimateEvaluator extends RecommendEvaluator {
 								new Object[] { recommendElapsed / 1000.0f }
 							); // calculating time speed metric
 						
+						//Fire doing event with speed metric.
 						fireEvaluatorEvent(new EvaluatorEvent(
 								this, 
 								Type.doing, 
@@ -152,8 +154,9 @@ public class EstimateEvaluator extends RecommendEvaluator {
 								); // calculating recommendation metric
 							
 							vEstimatedCount++;
-							queryIdCount += estimated.size(); //Increase estimated query ID count.
+							vExactEstimatedCount += estimated.size(); //Increase exact estimated (query IDs) count.
 							
+							//Fire doing event with most of accuracy metrics.
 							fireEvaluatorEvent(new EvaluatorEvent(
 									this, 
 									Type.doing, 
@@ -172,6 +175,7 @@ public class EstimateEvaluator extends RecommendEvaluator {
 						
 					} // User id iterate
 					
+					//Fire Hudup recall metric.
 					Metrics hudupRecallMetrics = result.recalc(
 							recommender.getName(), 
 							datasetId, 
@@ -180,14 +184,16 @@ public class EstimateEvaluator extends RecommendEvaluator {
 						);
 					fireEvaluatorEvent(new EvaluatorEvent(this, Type.doing, hudupRecallMetrics));
 					
-					Metrics queryRecallMetrics = result.recalc(
+					//Fire exact recall metric.
+					Metrics exactRecallMetrics = result.recalc(
 							recommender.getName(), 
 							datasetId, 
-							QueryRecallMetric.class, 
-							new Object[] { new FractionMetricValue(queryIdCount, queryIdTotal) }
+							ExactRecallMetric.class, 
+							new Object[] { new FractionMetricValue(vExactEstimatedCount, vExactCurrentTotal) }
 						);
-					fireEvaluatorEvent(new EvaluatorEvent(this, Type.doing, queryRecallMetrics));
+					fireEvaluatorEvent(new EvaluatorEvent(this, Type.doing, exactRecallMetrics));
 
+					//Fire done-one event (1 algorithm is finished with 1 dataset).
 					Metrics doneOneMetrics = result.gets(recommender.getName(), datasetId);
 					fireEvaluatorEvent(new EvaluatorEvent(this, Type.done_one, doneOneMetrics));
 					
@@ -225,6 +231,7 @@ public class EstimateEvaluator extends RecommendEvaluator {
 			thread = null;
 			paused = false;
 			
+			//Fire evaluation finished event (done event).
 			fireEvaluatorEvent(new EvaluatorEvent(this, Type.done, result));
 			
 			clear();
@@ -277,8 +284,8 @@ public class EstimateEvaluator extends RecommendEvaluator {
 		HudupRecallMetric hudupRecall = new HudupRecallMetric();
 		metricList.add(hudupRecall);
 		
-		QueryRecallMetric queryRecall = new QueryRecallMetric();
-		metricList.add(queryRecall);
+		ExactRecallMetric exactRecall = new ExactRecallMetric();
+		metricList.add(exactRecall);
 
 		MAE mae = new MAE();
 		metricList.add(mae);

@@ -16,7 +16,8 @@ import net.hudup.core.logistic.ui.UIUtil;
 
 
 /**
- * 
+ * This is Java table to show meta-data of dataset.
+ *  
  * @author Loc Nguyen
  * @version 10.0
  *
@@ -31,7 +32,7 @@ public class DatasetMetadataTable extends JTable {
 
 
 	/**
-	 * 
+	 * Default constructor.
 	 */
 	public DatasetMetadataTable() {
 		// TODO Auto-generated constructor stub
@@ -40,8 +41,8 @@ public class DatasetMetadataTable extends JTable {
 
 	
 	/**
-	 * 
-	 * @param metadata
+	 * Update this table with specified dataset meta-data.
+	 * @param metadata specified dataset meta-data.
 	 */
 	public void update(DatasetMetadata metadata) {
 		getDatasetMetadataTM().update(metadata);
@@ -49,8 +50,8 @@ public class DatasetMetadataTable extends JTable {
 
 	
 	/**
-	 * 
-	 * @return {@link DatasetMetadataTM}
+	 * Getting table model of dataset meta-data.
+	 * @return table model of dataset meta-data.
 	 */
 	public DatasetMetadataTM getDatasetMetadataTM() {
 		return (DatasetMetadataTM)getModel();
@@ -59,9 +60,9 @@ public class DatasetMetadataTable extends JTable {
 	
 	
 	/**
-	 * 
-	 * @param comp
-	 * @param dataset
+	 * Showing dialog containing table of dataset meta-data.
+	 * @param comp parent component.
+	 * @param dataset specified dataset.
 	 */
 	public static void showDlg(Component comp, Dataset dataset) {
 		JDialog dlg = new JDialog(UIUtil.getFrameForComponent(comp), "Dataset metadata", true);
@@ -83,12 +84,12 @@ public class DatasetMetadataTable extends JTable {
 	}
 	
 	
-	
 }
 
 
 
 /**
+ * This class implements table model of dataset meta-data.
  * 
  * @author Loc Nguyen
  * @version 10.0
@@ -113,8 +114,8 @@ class DatasetMetadataTM extends DefaultTableModel {
 
 
 	/**
-	 * 
-	 * @param metrics
+	 * Updating table model by dataset meta-data.
+	 * @param metadata dataset meta-data.
 	 */
 	public void update(DatasetMetadata metadata) {
 		if (metadata == null) {
@@ -126,18 +127,17 @@ class DatasetMetadataTM extends DefaultTableModel {
 				{"Min rating", metadata.minRating},
 				{"Max rating", metadata.maxRating},
 				{"Number of users", metadata.numberOfUsers},
-				{"Number of user rating vectors", metadata.numberOfUserRatings},
+				{"Number of rating users", metadata.numberOfRatingUsers},
 				{"Number of items", metadata.numberOfItems},
-				{"Number of item rating vectors", metadata.numberOfItemRatings},
+				{"Number of rated items", metadata.numberOfRatedItems},
 			}, 
 			createColumns());
 		
 	}
 	
 	
-	
 	/**
-	 * 
+	 * Clearing table model.
 	 */
 	public void clear() {
 		
@@ -146,8 +146,8 @@ class DatasetMetadataTM extends DefaultTableModel {
 	
 	
 	/**
-	 * 
-	 * @return vector of column names
+	 * Creating column names.
+	 * @return vector of column names.
 	 */
 	private Object[] createColumns() {
 		return new Object[] { "Attribute", "Value"};

@@ -144,9 +144,9 @@ public class RatingMatrixMetadata implements Serializable, TextParsable, Cloneab
 		metadata.maxRating = datasetMetadata.maxRating;
 		metadata.isUser = isUser;
 		metadata.numberOfUsers = datasetMetadata.numberOfUsers;
-		metadata.numberOfUserRatings = datasetMetadata.numberOfUserRatings;
+		metadata.numberOfUserRatings = datasetMetadata.numberOfRatingUsers;
 		metadata.numberOfItems = datasetMetadata.numberOfItems;
-		metadata.numberOfItemRatings = datasetMetadata.numberOfItemRatings;
+		metadata.numberOfItemRatings = datasetMetadata.numberOfRatedItems;
 		
 		return metadata;
 	}
@@ -163,9 +163,9 @@ public class RatingMatrixMetadata implements Serializable, TextParsable, Cloneab
 		metadata.minRating = this.minRating;
 		metadata.maxRating = this.maxRating;
 		metadata.numberOfUsers = this.numberOfUsers;
-		metadata.numberOfUserRatings = this.numberOfUserRatings;
+		metadata.numberOfRatingUsers = this.numberOfUserRatings;
 		metadata.numberOfItems = this.numberOfItems;
-		metadata.numberOfItemRatings = this.numberOfItemRatings;
+		metadata.numberOfRatedItems = this.numberOfItemRatings;
 		
 		return metadata;
 	}

@@ -22,7 +22,7 @@ import net.hudup.core.evaluate.FractionMetricValue;
 import net.hudup.core.evaluate.HudupRecallMetric;
 import net.hudup.core.evaluate.Metrics;
 import net.hudup.core.evaluate.NoneWrapperMetricList;
-import net.hudup.core.evaluate.QueryRecallMetric;
+import net.hudup.core.evaluate.ExactRecallMetric;
 import net.hudup.core.evaluate.SetupTimeMetric;
 import net.hudup.core.evaluate.SpeedMetric;
 import net.hudup.core.evaluate.recommend.Accuracy;
@@ -148,14 +148,16 @@ public class RecommendEvaluator extends AbstractEvaluator {
 							SetupTimeMetric.class, 
 							new Object[] { setupElapsed / 1000.0f }
 						); // calculating setup time metric
-							
-					
+					//Fire doing event with setup time metric.
 					fireEvaluatorEvent(new EvaluatorEvent(this, Type.doing, setupMetrics)); // firing setup time metric
 					
 					testingUsers = testing.fetchUserRatings();
 					int vCurrentTotal = testingUsers.getMetadata().getSize();
-					int vCurrentCount = 0;
-					int vRecommendedCount = 0;
+					int vCurrentCount = 0; //Vector count for Hudup recall metric.
+					int vRecommendedCount = 0; //Recommended vector count for Hudup recall metric.
+					//
+					int vExactCurrentTotal = 0; //Exact total vector count for exact recall metric.
+					int vExactRecommendedCount = 0; //Exact recommended vector count for exact recall metric.
 					while (current == thread && testingUsers.next()) {
 						
 						progressStep++;
@@ -165,6 +167,7 @@ public class RecommendEvaluator extends AbstractEvaluator {
 						progressEvt.setDatasetId(datasetId);
 						progressEvt.setCurrentCount(vCurrentCount);
 						progressEvt.setCurrentTotal(vCurrentTotal);
+						//Fire progress event.
 						fireProgressEvent(progressEvt);
 						
 						RatingVector testingUser = testingUsers.pick();
@@ -176,6 +179,7 @@ public class RecommendEvaluator extends AbstractEvaluator {
 						
 						RecommendParam param = new RecommendParam(testingUser.id());
 						int maxRecommend = setupMaxRecommend(recommender, relevantCount);
+						vExactCurrentTotal++; //Increase exact total vector count.
 						
 						//
 						long beginRecommendTime = System.currentTimeMillis();
@@ -192,6 +196,7 @@ public class RecommendEvaluator extends AbstractEvaluator {
 								new Object[] { recommendElapsed / 1000.0f }
 							); // calculating time speed metric
 						
+						//Fire doing event with speed metric.
 						fireEvaluatorEvent(new EvaluatorEvent(
 								this, 
 								Type.doing, 
@@ -209,7 +214,9 @@ public class RecommendEvaluator extends AbstractEvaluator {
 								); // calculating recommendation metric
 							
 							vRecommendedCount++;
+							vExactRecommendedCount++; //Increase exact recommended count.
 							
+							//Fire doing event with most of accuracy metrics.
 							fireEvaluatorEvent(new EvaluatorEvent(
 									this, 
 									Type.doing, 
@@ -228,6 +235,7 @@ public class RecommendEvaluator extends AbstractEvaluator {
 						
 					} // User id iterate
 					
+					//Fire Hudup recall.
 					Metrics hudupRecallMetrics = result.recalc(
 							recommender.getName(), 
 							datasetId, 
@@ -236,6 +244,16 @@ public class RecommendEvaluator extends AbstractEvaluator {
 						);
 					fireEvaluatorEvent(new EvaluatorEvent(this, Type.doing, hudupRecallMetrics));
 					
+					//Fire exact recall.
+					Metrics exactRecallMetrics = result.recalc(
+							recommender.getName(), 
+							datasetId, 
+							ExactRecallMetric.class, 
+							new Object[] { new FractionMetricValue(vExactRecommendedCount, vExactCurrentTotal) }
+						);
+					fireEvaluatorEvent(new EvaluatorEvent(this, Type.doing, exactRecallMetrics));
+
+					//Fire done-one event (1 algorithm is finished with 1 dataset).
 					Metrics doneOneMetrics = result.gets(recommender.getName(), datasetId);
 					fireEvaluatorEvent(new EvaluatorEvent(this, Type.done_one, doneOneMetrics));
 					
@@ -274,6 +292,7 @@ public class RecommendEvaluator extends AbstractEvaluator {
 			thread = null;
 			paused = false;
 			
+			//Fire evaluation finished event (done event).
 			fireEvaluatorEvent(new EvaluatorEvent(this, Type.done, result));
 			
 			clear();
@@ -327,8 +346,8 @@ public class RecommendEvaluator extends AbstractEvaluator {
 		HudupRecallMetric hudupRecall = new HudupRecallMetric();
 		metricList.add(hudupRecall);
 		
-		QueryRecallMetric queryRecall = new QueryRecallMetric();
-		metricList.add(queryRecall);
+		ExactRecallMetric exactRecall = new ExactRecallMetric();
+		metricList.add(exactRecall);
 
 		MAE mae = new MAE();
 		metricList.add(mae);

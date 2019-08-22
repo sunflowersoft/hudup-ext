@@ -10,7 +10,7 @@ import net.hudup.core.alg.Alg;
  * @version 1.0
  *
  */
-public class QueryRecallMetric extends DefaultMetric {
+public class ExactRecallMetric extends DefaultMetric {
 
 	
 	/**
@@ -22,7 +22,7 @@ public class QueryRecallMetric extends DefaultMetric {
 	/**
 	 * Default constructor.
 	 */
-	public QueryRecallMetric() {
+	public ExactRecallMetric() {
 		// TODO Auto-generated constructor stub
 	}
 
@@ -30,7 +30,7 @@ public class QueryRecallMetric extends DefaultMetric {
 	@Override
 	public String getDesc() {
 		// TODO Auto-generated method stub
-		return "Query recall";
+		return "Exact recall";
 	}
 
 	
@@ -58,14 +58,14 @@ public class QueryRecallMetric extends DefaultMetric {
 	@Override
 	public String getName() {
 		// TODO Auto-generated method stub
-		return "Query recall";
+		return "Exact recall";
 	}
 
 
 	@Override
 	public Alg newInstance() {
 		// TODO Auto-generated method stub
-		return new QueryRecallMetric();
+		return new ExactRecallMetric();
 	}
 
 

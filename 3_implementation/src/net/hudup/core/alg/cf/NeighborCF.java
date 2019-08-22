@@ -637,10 +637,10 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 	@Override
 	public synchronized RatingVector estimate(RecommendParam param, Set<Integer> queryIds) throws RemoteException {
 		// TODO Auto-generated method stub
-		if (!isCached())
-			return estimate0(param, queryIds);
 		if (param.ratingVector == null) //Consider not estimating yet.
 			return null;
+		if (!isCached())
+			return estimate0(param, queryIds);
 		
 		int userId = param.ratingVector.id();
 		if (userId < 0) //user is not stored in database.
