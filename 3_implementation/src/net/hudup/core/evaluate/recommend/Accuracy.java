@@ -101,31 +101,15 @@ public abstract class Accuracy extends DefaultMetric {
 
 	/**
 	 * Testing whether the specified rating value is relevant.
-	 * Note, a rating value is relevant if it is larger than the average rating (rating mean).
-	 * The average rating is a half of the sum {@link Recommender#getMinRating()} and {@link Recommender#getMaxRating()}. 
+	 * Note, a rating value is relevant if it is larger than the threshold.
 	 * @param rating specified rating value.
-	 * @param recommender recommendation algorithm.
+	 * @param threshold specified threshold.
 	 * @return {@code true} if specified rating value is relevant. Otherwise, specified rating value is irrelevant.
 	 */
-	public static boolean isRelevant(double rating, Recommender recommender) {
-		return isRelevant(rating, recommender.getMinRating(), recommender.getMaxRating());
+	public static boolean isRelevant(double rating, double threshold) {
+		return rating > threshold;
 	}
-	
-	
-	/**
-	 * Testing whether the specified rating value is relevant.
-	 * Note, a rating value is relevant if it is larger than the average rating (rating mean).
-	 * The average rating is a half of the sum {@code {@link DataConfig#getMaxRating()} + {@link DataConfig#getMinRating()}}.
-	 * Such {@link DataConfig} is configuration of the specified testing dataset.
-	 * @param rating specified rating value.
-	 * @param testing specified testing dataset whose maximum rating value and minium rating value are used to calculate the rating average. 
-	 * @return {@code true} if specified rating value is relevant. Otherwise, specified rating value is irrelevant.
-	 */
-	public static boolean isRelevant(double rating, Dataset testing) {
-		DataConfig config = testing.getConfig();
-		return isRelevant(rating, config.getMinRating(), config.getMaxRating());
-	}
-	
+
 	
 	/**
 	 * Testing whether the specified rating value is relevant.
@@ -144,13 +128,74 @@ public abstract class Accuracy extends DefaultMetric {
 	
 	/**
 	 * Testing whether the specified rating value is relevant.
-	 * Note, a rating value is relevant if it is larger than the threshold.
+	 * Note, a rating value is relevant if it is larger than the average rating (rating mean).
 	 * @param rating specified rating value.
-	 * @param threshold specified threshold.
+	 * @param dataset specified dataset whose maximum rating value and minimum rating value are used to calculate the rating average. 
 	 * @return {@code true} if specified rating value is relevant. Otherwise, specified rating value is irrelevant.
 	 */
-	public static boolean isRelevant(double rating, double threshold) {
-		return rating > threshold;
+	public static boolean isRelevant(double rating, Dataset dataset) {
+		DataConfig config = dataset.getConfig();
+		return isRelevant(rating, config.getMinRating(), config.getMaxRating());
+	}
+
+	
+	/**
+	 * Testing whether the specified rating value is relevant.
+	 * Note, a rating value is relevant if it is larger than the average rating (rating mean).
+	 * The average rating is a half of the sum {@link Recommender#getMinRating()} and {@link Recommender#getMaxRating()}. 
+	 * @param rating specified rating value.
+	 * @param recommender recommendation algorithm.
+	 * @return {@code true} if specified rating value is relevant. Otherwise, specified rating value is irrelevant.
+	 */
+	public static boolean isRelevant(double rating, Recommender recommender) {
+		return isRelevant(rating, recommender.getConfig().getMinRating(), recommender.getConfig().getMaxRating());
+	}
+	
+	
+	/**
+	 * Counting relevant (irrelevant) ratings from the specified rating vector.
+	 * @param vRating specified rating vector from which relevant (irrelevant) ratings are counted.
+	 * @param relevant if {@code true}, the result is the count of relevant ratings. Otherwise, the result is the count of irrelevant ratings.
+	 * @param minRating minimum rating.
+	 * @param maxRating maximum rating.
+	 * @return number of relevant (irrelevant) ratings.
+	 */
+	public static int countForRelevant(RatingVector vRating, boolean relevant, double minRating, double maxRating) {
+		
+		Set<Integer> fieldIds = vRating.fieldIds(true);
+		int count = 0;
+		for (int fieldId : fieldIds) {
+			double rating = vRating.get(fieldId).value;
+			if (isRelevant(rating, minRating, maxRating) == relevant)
+				count ++;
+		}
+		
+		return count;
+	}
+	
+	
+	/**
+	 * Counting relevant (irrelevant) ratings from the specified rating vector.
+	 * @param vRating specified rating vector from which relevant (irrelevant) ratings are counted.
+	 * @param relevant if {@code true}, the result is the count of relevant ratings. Otherwise, the result is the count of irrelevant ratings.
+	 * @param dataset specified dataset whose maximum rating value and minimum rating value are used to calculate the rating average for relevant testing in method {@link #isRelevant(double, Dataset)}.
+	 * @return number of relevant (irrelevant) ratings.
+	 */
+	public static int countForRelevant(RatingVector vRating, boolean relevant, Dataset dataset) {
+		DataConfig config = dataset.getConfig();
+		return countForRelevant(vRating, relevant, config.getMinRating(), config.getMaxRating());
+	}
+	
+	
+	/**
+	 * Counting relevant (irrelevant) ratings from the specified rating vector.
+	 * @param vRating specified rating vector from which relevant (irrelevant) ratings are counted.
+	 * @param relevant if {@code true}, the result is the count of relevant ratings. Otherwise, the result is the count of irrelevant ratings.
+	 * @param recommender specified recommender algorithm whose maximum rating value and minimum rating value are used to calculate the rating average for relevant testing in method {@link #isRelevant(double, Recommender)}.
+	 * @return number of relevant (irrelevant) ratings.
+	 */
+	public static int countForRelevant(RatingVector vRating, boolean relevant, Recommender recommender) {
+		return countForRelevant(vRating, relevant, recommender.getConfig().getMinRating(), recommender.getConfig().getMaxRating());
 	}
 
 	
@@ -159,16 +204,16 @@ public abstract class Accuracy extends DefaultMetric {
 	 * This method calls {@link #isRelevant(double, Dataset)} method to test whether a rating value is relevant.
 	 * @param vRating specified rating vector from which relevant (irrelevant) ratings are extracted.
 	 * @param relevant if {@code true}, the result is vector of relevant ratings. Otherwise, the result is a vector of irrelevant ratings.
-	 * @param testing specified testing dataset whose maximum rating value and minium rating value are used to calculate the rating average for relevant testing in method {@link #isRelevant(double, Dataset)}.
+	 * @param dataset specified dataset whose maximum rating value and minium rating value are used to calculate the rating average for relevant testing in method {@link #isRelevant(double, Dataset)}.
 	 * @return new rating vector with relevant (irrelevant) ratings.
 	 */
-	public static RatingVector extractRelevant(RatingVector vRating, boolean relevant, Dataset testing) {
+	public static RatingVector extractRelevant(RatingVector vRating, boolean relevant, Dataset dataset) {
 		RatingVector newRating = vRating.newInstance();
 		
 		Set<Integer> fieldIds = vRating.fieldIds(true);
 		for (int fieldId : fieldIds) {
 			double rating = vRating.get(fieldId).value;
-			if (isRelevant(rating, testing) == relevant)
+			if (isRelevant(rating, dataset) == relevant)
 				newRating.put(fieldId, rating);
 		}
 		
@@ -180,61 +225,17 @@ public abstract class Accuracy extends DefaultMetric {
 	
 	
 	/**
-	 * Counting relevant (irrelevant) ratings from the specified rating vector. Such relevant (irrelevant) ratings form a new rating vector as a result.
-	 * This method calls {@link #isRelevant(double, Dataset)} method to test whether a rating value is relevant.
-	 * @param vRating specified rating vector from which relevant (irrelevant) ratings are counted.
-	 * @param relevant if {@code true}, the result is the count of relevant ratings. Otherwise, the result is the count of irrelevant ratings.
-	 * @param testing specified testing dataset whose maximum rating value and minimum rating value are used to calculate the rating average for relevant testing in method {@link #isRelevant(double, Dataset)}.
-	 * @return number of relevant (irrelevant) ratings.
-	 */
-	public static int countForRelevant(RatingVector vRating, boolean relevant, Dataset testing) {
-		
-		Set<Integer> fieldIds = vRating.fieldIds(true);
-		int count = 0;
-		for (int fieldId : fieldIds) {
-			double rating = vRating.get(fieldId).value;
-			if (isRelevant(rating, testing) == relevant)
-				count ++;
-		}
-		
-		return count;
-	}
-	
-	
-	/**
-	 * Counting relevant (irrelevant) ratings from the specified rating vector. Such relevant (irrelevant) ratings form a new rating vector as a result.
-	 * This method calls {@link #isRelevant(double, Recommender)} method to test whether a rating value is relevant.
-	 * @param vRating specified rating vector from which relevant (irrelevant) ratings are counted.
-	 * @param relevant if {@code true}, the result is the count of relevant ratings. Otherwise, the result is the count of irrelevant ratings.
-	 * @param recommender specified recommender algorithm whose maximum rating value and minimum rating value are used to calculate the rating average for relevant testing in method {@link #isRelevant(double, Recommender)}.
-	 * @return number of relevant (irrelevant) ratings.
-	 */
-	public static int countForRelevant(RatingVector vRating, boolean relevant, Recommender recommender) {
-		
-		Set<Integer> fieldIds = vRating.fieldIds(true);
-		int count = 0;
-		for (int fieldId : fieldIds) {
-			double rating = vRating.get(fieldId).value;
-			if (isRelevant(rating, recommender) == relevant)
-				count ++;
-		}
-		
-		return count;
-	}
-
-	
-	/**
-	 * This method prunes the specified recommended vector by removing items from this vector if such items are not rated in the specified testing dataset. 
+	 * This method prunes the specified recommended (user) vector by removing items from this vector if such items are not rated in the specified dataset. 
 	 * @param recommended specified recommended vector of ratings.
-	 * @param testing specified testing dataset.
+	 * @param dataset specified dataset.
 	 * @return new rating vector whose items are rated in the specified testing dataset.
 	 */
-	protected static RatingVector pruneUnrated(RatingVector recommended, Dataset testing) {
+	protected static RatingVector pruneUnrated(RatingVector recommended, Dataset dataset) {
 		
 		RatingVector prune = recommended.newInstance();
 		Set<Integer> fieldIds = recommended.fieldIds(true);
 		for (int fieldId : fieldIds) {
-			RatingVector vRating = testing.getItemRating(fieldId);
+			RatingVector vRating = dataset.getItemRating(fieldId);
 			if (vRating != null && vRating.size() > 0)
 				prune.put(fieldId, recommended.get(fieldId));
 		}

@@ -289,18 +289,6 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 
 	
 	/**
-	 * Minimum rating value
-	 */
-	protected double minRating = DataConfig.MIN_RATING_DEFAULT;
-
-	
-	/**
-	 * Maximum rating value
-	 */
-	protected double maxRating = DataConfig.MAX_RATING_DEFAULT;
-	
-	
-	/**
 	 * Rating median.
 	 */
 	protected double ratingMedian = (DataConfig.MIN_RATING_DEFAULT + DataConfig.MAX_RATING_DEFAULT) / 2.0;
@@ -404,9 +392,7 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 		// TODO Auto-generated method stub
 		super.setup(dataset, params);
 		
-		this.minRating = getMinRating();
-		this.maxRating = getMaxRating();
-		this.ratingMedian = (this.maxRating + this.minRating) / 2.0;
+		this.ratingMedian = (this.config.getMinRating() + this.config.getMaxRating()) / 2.0;
 		
 		this.userRatingCache.clear();
 		this.rowSimCache.clear();
@@ -426,10 +412,7 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 		// TODO Auto-generated method stub
 		super.unsetup();
 		
-		this.minRating = DataConfig.MIN_RATING_DEFAULT;
-		this.maxRating = DataConfig.MAX_RATING_DEFAULT;
-		this.ratingMedian = (this.minRating + this.maxRating) / 2.0;
-		
+		this.ratingMedian = Constants.UNUSED;
 		this.ratingMean = Constants.UNUSED;
 		this.ratingVar = Constants.UNUSED;
 		this.userMeans.clear();
@@ -593,7 +576,7 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 		mSet.add(TRIANGLE);
 //		mSet.add(TJM);
 		mSet.add(FENG);
-//		mSet.add(MU);
+		mSet.add(MU);
 		
 		List<String> measures = Util.newList();
 		measures.clear();
@@ -633,6 +616,30 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 		config.put(MEASURE, measure);
 	}
 	
+	
+	/**
+	 * Checking whether the similarity measure requires to declare discrete bins in configuration ({@link #VALUE_BINS_FIELD}).
+	 * @return true if the similarity measure requires to declare discrete bins in configuration ({@link #VALUE_BINS_FIELD}). Otherwise, return false.
+	 */
+	public boolean requireDiscreteRatingBins() {
+		return requireDiscreteRatingBins(getSimilarMeasure());
+	}
+	
+	
+	/**
+	 * Given specified measure, checking whether the similarity measure requires to declare discrete bins in configuration ({@link #VALUE_BINS_FIELD}).
+	 * @param measure specified measure.
+	 * @return true if the similarity measure requires to declare discrete bins in configuration ({@link #VALUE_BINS_FIELD}). Otherwise, return false.
+	 */
+	protected boolean requireDiscreteRatingBins(String measure) {
+		if (measure == null)
+			return false;
+		else if (measure.equals(BCF) || measure.equals(BCFJ) ||  measure.equals(MMD))
+			return true;
+		else
+			return false;
+	}
+
 	
 	@Override
 	public synchronized RatingVector estimate(RecommendParam param, Set<Integer> queryIds) throws RemoteException {
@@ -1354,7 +1361,7 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 		
 		double sum = 0;
 		for (int id : common) {
-			double d = (vRating1.get(id).value - vRating2.get(id).value) / this.maxRating;
+			double d = (vRating1.get(id).value - vRating2.get(id).value) / this.config.getMaxRating();
 			sum += d*d;
 		}
 		
@@ -1541,7 +1548,7 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 			boolean agreed = agree(r1, r2);
 			
 			double d = agreed ? Math.abs(r1-r2) : 2*Math.abs(r1-r2);
-			double pro = (2*(maxRating-minRating)+1) - d;
+			double pro = (2*(config.getMaxRating()-config.getMinRating())+1) - d;
 			pro = pro*pro;
 			
 			double impact = (Math.abs(r1-ratingMedian)+1) * (Math.abs(r2-ratingMedian)+1);
@@ -1748,6 +1755,7 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 		double alpha = config.getAsReal(MU_ALPHA_FIELD);
 		double pearson = corr(vRating1, vRating2, profile1, profile2);
 		double hg = 1 - bc(vRating1, vRating2, profile1, profile2);
+//		double hg = bc(vRating1, vRating2, profile1, profile2);
 		double jaccard = jaccard(vRating1, vRating2, profile1, profile2);
 		
 		return alpha*pearson + (1-alpha)*(hg+jaccard);
@@ -1917,8 +1925,6 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 	@Override
 	public DataConfig createDefaultConfig() {
 		DataConfig tempConfig = super.createDefaultConfig();
-		tempConfig.put(DataConfig.MIN_RATING_FIELD, DataConfig.MIN_RATING_DEFAULT);
-		tempConfig.put(DataConfig.MAX_RATING_FIELD, DataConfig.MAX_RATING_DEFAULT);
 		tempConfig.put(MEASURE, getDefaultSimilarMeasure());
 		tempConfig.put(COSINE_NORMALIZED_FIELD, COSINE_NORMALIZED_DEFAULT);
 		tempConfig.put(VALUE_BINS_FIELD, VALUE_BINS_DEFAULT);

@@ -22,10 +22,10 @@ public interface SupportCacheAlg extends Alg {
 
 	
 	/**
-	 * The default setting of whether to support cache. By default cache mode is false because recommendation task should not run in cache mode.
+	 * The default setting of whether to support cache. By default cache mode is true because fast recommendation task should run in cache mode.
 	 * Cache is used to accelerate estimation process in which the user rating vector in recommendation parameter is made to be empty.
 	 */
-	final static boolean SUPPORT_CACHE_DEFAULT = false;
+	final static boolean SUPPORT_CACHE_DEFAULT = true;
 	
 	
 	/**

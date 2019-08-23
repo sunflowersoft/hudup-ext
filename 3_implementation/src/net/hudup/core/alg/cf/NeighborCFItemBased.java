@@ -69,11 +69,11 @@ public class NeighborCFItemBased extends NeighborCF implements DuplicatableAlg {
 		RatingVector result = param.ratingVector.newInstance(true);
 //		boolean hybrid = cf.getConfig().getAsBoolean(HYBRID);
 		RatingVector thisUser = param.ratingVector;
-		double minValue = cf.dataset.getConfig().getMinRating();
-		double maxValue = cf.dataset.getConfig().getMaxRating();
-		Fetcher<RatingVector> itemRatings = cf.dataset.fetchItemRatings();
+		double minValue = cf.getConfig().getMinRating();
+		double maxValue = cf.getConfig().getMaxRating();
+		Fetcher<RatingVector> itemRatings = cf.getDataset().fetchItemRatings();
 		for (int itemId : queryIds) {
-			RatingVector thisItem = cf.dataset.getItemRating(itemId);
+			RatingVector thisItem = cf.getDataset().getItemRating(itemId);
 			if (thisItem == null) continue; //This item is not empty and has no unrated if it is not null because it is retrieved from dataset.
 			if (thisUser.isRated(itemId) && !thisItem.isRated(thisUser.id())) {
 				thisItem = (RatingVector)thisItem.clone();

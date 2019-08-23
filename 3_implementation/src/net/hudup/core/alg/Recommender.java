@@ -4,8 +4,6 @@ import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.util.Set;
 
-import net.hudup.core.Util;
-import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.Profile;
 import net.hudup.core.data.RatingVector;
@@ -126,8 +124,8 @@ public abstract class Recommender extends AbstractAlg {
 			return null;
 		
 		// Pay attention following lines
-		Dataset dataset = getDataset();
-		int userId = param.ratingVector.id();
+		Dataset dataset = getDataset(); //This is training dataset.
+		int userId = param.ratingVector.id(); //If the user id is negative (< 0), param.ratingVector is not stored in database. 
 		RatingVector vRating = dataset.getUserRating(userId);
 		if (param.ratingVector.size() == 0) {
 			if (vRating == null || vRating.size() == 0)
@@ -154,28 +152,28 @@ public abstract class Recommender extends AbstractAlg {
 	}
 	
 	
-	/**
-	 * Getting minimum rating.
-	 * @return minimum rating.
-	 */
-	public double getMinRating() {
-		double minRating = getDataset().getConfig().getMinRating();
-		if (!Util.isUsed(minRating))
-			minRating = getConfig().getAsReal(DataConfig.MIN_RATING_FIELD);
-		return minRating; 
-	}
-
-	
-	/**
-	 * Getting maximum rating.
-	 * @return maximum rating.
-	 */
-	public double getMaxRating() {
-		double maxRating = getDataset().getConfig().getMaxRating();
-		if (!Util.isUsed(maxRating))
-			maxRating = getConfig().getAsReal(DataConfig.MAX_RATING_FIELD);
-		return maxRating; 
-	}
+//	/**
+//	 * Getting minimum rating.
+//	 * @return minimum rating.
+//	 */
+//	public double getMinRating() {
+//		double minRatisng = getDataset().getConfig().getMinRating();
+//		if (!Util.isUsed(minRating))
+//			minRating = getConfig().getAsReal(DataConfig.MIN_RATING_FIELD);
+//		return minRating; 
+//	}
+//
+//	
+//	/**
+//	 * Getting maximum rating.
+//	 * @return maximum rating.
+//	 */
+//	public double getMaxRating() {
+//		double maxRating = getDataset().getConfig().getMaxRating();
+//		if (!Util.isUsed(maxRating))
+//			maxRating = getConfig().getAsReal(DataConfig.MAX_RATING_FIELD);
+//		return maxRating; 
+//	}
 	
 
 	@Override

@@ -70,7 +70,7 @@ public class NeighborCFUserBased extends NeighborCF implements DuplicatableAlg {
 	public static RatingVector estimate0(NeighborCF cf, RecommendParam param, Set<Integer> queryIds) {
 		if (param.ratingVector == null) return null;
 		RatingVector thisUser = param.ratingVector;
-		RatingVector innerUser = cf.dataset.getUserRating(thisUser.id());
+		RatingVector innerUser = cf.getDataset().getUserRating(thisUser.id());
 		if (innerUser != null) {
 			Set<Integer> itemIds = innerUser.fieldIds(true);
 			itemIds.removeAll(thisUser.fieldIds(true));
@@ -85,11 +85,11 @@ public class NeighborCFUserBased extends NeighborCF implements DuplicatableAlg {
 		RatingVector result = thisUser.newInstance(true);
 //		boolean hybrid = cf.getConfig().getAsBoolean(HYBRID);
 //		Profile userProfile1 = hybrid ? param.profile : null;
-		double minValue = cf.dataset.getConfig().getMinRating();
-		double maxValue = cf.dataset.getConfig().getMaxRating();
+		double minValue = cf.getConfig().getMinRating();
+		double maxValue = cf.getConfig().getMaxRating();
 		double thisMean = thisUser.mean();
 		Map<Integer, Double> localUserSimCache = Util.newMap();
-		Fetcher<RatingVector> userRatings = cf.dataset.fetchUserRatings();
+		Fetcher<RatingVector> userRatings = cf.getDataset().fetchUserRatings();
 		for (int itemId : queryIds) {
 			if (thisUser.isRated(itemId)) {
 				result.put(itemId, thisUser.get(itemId));

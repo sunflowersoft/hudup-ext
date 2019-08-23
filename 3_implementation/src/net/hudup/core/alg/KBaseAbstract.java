@@ -43,7 +43,7 @@ public abstract class KBaseAbstract implements KBase {
 
 	
 	/**
-	 * The configuration used to customize this knowledge base.
+	 * The configuration used to customize this knowledge base. The configuration is shared the same with algorithm.
 	 */
 	protected DataConfig config = null;
 	

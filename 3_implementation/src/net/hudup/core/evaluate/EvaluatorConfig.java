@@ -1,7 +1,5 @@
 package net.hudup.core.evaluate;
 
-import java.io.Serializable;
-
 import net.hudup.core.Constants;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.SysConfig;
@@ -33,9 +31,9 @@ public class EvaluatorConfig extends SysConfig {
 
 	
 	/**
-	 * The maximum number of items in recommended list. By default, it is 10. If it is 0, it will be size of testing vector.
+	 * By default, do not recommend all items.
 	 */
-	public final static int DEFAULT_MAX_RECOMMEND = 10;
+	public final static boolean RECOMMEND_ALL_DEFAULT = false;
 
 	
 	/**
@@ -61,21 +59,28 @@ public class EvaluatorConfig extends SysConfig {
 	public void reset() {
 		super.reset();
 		
-		put(DataConfig.MAX_RECOMMEND_FIELD, DEFAULT_MAX_RECOMMEND);
+		put(DataConfig.RECOMMEND_ALL_FIELD, RECOMMEND_ALL_DEFAULT);
 	}
 
 	
-	
-	@Override
-	public boolean validate(String key, Serializable value) {
-		
-		if (key.equals(DataConfig.MAX_RECOMMEND_FIELD))
-			return ((Number)value).intValue() >= 0;
-		else
-			return super.validate(key, value);
+	/**
+	 * Checking whether to recommend all.
+	 * @return whether to recommend all.
+	 */
+	public boolean isRecommendAll() {
+		return getAsBoolean(DataConfig.RECOMMEND_ALL_FIELD);
 	}
-
-
+	
+	
+	/**
+	 * Setting whether to recommend all.
+	 * @param all true if recommending all.
+	 */
+	public void setRecommendAll(boolean all) {
+		put(DataConfig.RECOMMEND_ALL_FIELD, all);
+	}
+	
+	
 	@Override
 	public Object clone() {
 		// TODO Auto-generated method stub

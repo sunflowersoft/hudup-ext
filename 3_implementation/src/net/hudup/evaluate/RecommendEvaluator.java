@@ -8,7 +8,6 @@ import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.RecommendParam;
 import net.hudup.core.alg.Recommender;
 import net.hudup.core.alg.SetupAlgEvent;
-import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.DatasetPair;
 import net.hudup.core.data.Fetcher;
@@ -18,14 +17,15 @@ import net.hudup.core.evaluate.AbstractEvaluator;
 import net.hudup.core.evaluate.EvaluatorEvent;
 import net.hudup.core.evaluate.EvaluatorEvent.Type;
 import net.hudup.core.evaluate.EvaluatorProgressEvent;
+import net.hudup.core.evaluate.ExactRecallMetric;
 import net.hudup.core.evaluate.FractionMetricValue;
 import net.hudup.core.evaluate.HudupRecallMetric;
 import net.hudup.core.evaluate.Metrics;
 import net.hudup.core.evaluate.NoneWrapperMetricList;
-import net.hudup.core.evaluate.ExactRecallMetric;
 import net.hudup.core.evaluate.SetupTimeMetric;
 import net.hudup.core.evaluate.SpeedMetric;
 import net.hudup.core.evaluate.recommend.Accuracy;
+import net.hudup.core.logistic.NextUpdate;
 import net.hudup.core.logistic.SystemUtil;
 import net.hudup.core.logistic.xURI;
 
@@ -151,6 +151,10 @@ public class RecommendEvaluator extends AbstractEvaluator {
 					//Fire doing event with setup time metric.
 					fireEvaluatorEvent(new EvaluatorEvent(this, Type.doing, setupMetrics)); // firing setup time metric
 					
+					//Initializing parameters for setting up maximum recommendation number by binomial distribution. Added date: 2019.08.23 by Loc Nguyen.
+					double relevantSparseRatio = calcRelevantSparseRatio(training);
+					int totalRatedCount = countRatedItems(training);
+
 					testingUsers = testing.fetchUserRatings();
 					int vCurrentTotal = testingUsers.getMetadata().getSize();
 					int vCurrentCount = 0; //Vector count for Hudup recall metric.
@@ -171,14 +175,19 @@ public class RecommendEvaluator extends AbstractEvaluator {
 						fireProgressEvent(progressEvt);
 						
 						RatingVector testingUser = testingUsers.pick();
-						if (testingUser == null || testingUser.size() == 0)
-							continue;
+						if (testingUser == null) continue;
 						int relevantCount = Accuracy.countForRelevant(testingUser, true, testing);
-						if (relevantCount == 0)
-							continue;
+						if (relevantCount == 0) continue;
 						
 						RecommendParam param = new RecommendParam(testingUser.id());
-						int maxRecommend = setupMaxRecommend(recommender, relevantCount);
+						//Setting up maximum recommendation number by binomial distribution. Added date: 2019.08.23 by Loc Nguyen.
+						int maxRecommend = 0;
+						if (!config.isRecommendAll()) {
+							int ratedCount = 0;
+							RatingVector trainingUser = training.getUserRating(testingUser.id());
+							if (trainingUser != null) ratedCount = trainingUser.count(true); 
+							maxRecommend = (int)(relevantSparseRatio*(totalRatedCount-ratedCount)+0.5);
+						}
 						vExactCurrentTotal++; //Increase exact total vector count.
 						
 						//
@@ -304,24 +313,113 @@ public class RecommendEvaluator extends AbstractEvaluator {
 
 
 	/**
-	 * Defining the number of maximum recommended items.
-	 * @param recommender recommendation algorithm.
-	 * @param relevantCount count of relevant ratings.
-	 * @return the number of maximum recommended items.
+	 * Calculating relevant ratio in specified training dataset.
+	 * @param training specified training dataset.
+	 * @return relevant ratio in specified training dataset.
 	 */
-	protected int setupMaxRecommend(Recommender recommender, int relevantCount) {
-		int MAX_RECOMMEND = config.getAsInt(DataConfig.MAX_RECOMMEND_FIELD);
-		if (MAX_RECOMMEND <= 0) return 0;
+	private double calcRelevantSparseRatio(Dataset training) {
+		int rateCount = 0;
+		int relevantRateCount = 0;
+		int nUsers = 0;
+		Fetcher<RatingVector> users = null;
+		try {
+			double minRating = training.getConfig().getMinRating();
+			double maxRating = training.getConfig().getMaxRating();
+			users = training.fetchUserRatings();
+			while (users.next()) {
+				RatingVector user = users.pick();
+				if (user == null) continue;
+				int count = user.count(true);
+				if (count == 0) continue;
+				
+				nUsers++;
+				rateCount += count;
+
+				int relevantCount = Accuracy.countForRelevant(user, true, minRating, maxRating);
+				relevantRateCount += relevantCount;
+			}
+			
+		}
+		catch (Throwable e) {
+			e.printStackTrace();
+			return 0;
+		}
+		finally {
+			try {
+				if (users != null)
+					users.close();
+			} 
+			catch (Throwable e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+
+		int nItems = countRatedItems(training);
 		
-		double minRating = recommender.getMinRating();
-		double maxRating = recommender.getMaxRating();
-		double medianRating = (minRating + maxRating) / 2.0;
-		int maxRecommend = (int)(maxRating-medianRating+0.5) * relevantCount;
+		return ((double)relevantRateCount/rateCount) * ((double)rateCount/(nUsers*nItems));
+	}
+	
+	
+	/**
+	 * Counting rated items in specified dataset.
+	 * @param training specified training dataset.
+	 * @return the number of rated items in specified dataset.
+	 */
+	@NextUpdate
+	private int countRatedItems(Dataset training) {
+		Fetcher<RatingVector> items = null;
+		int nRatedItems = 0;
+		try {
+			items = training.fetchItemRatings();
+			nRatedItems = items.getMetadata().getSize(); //For fast retrieval.
+		} 
+		catch (Throwable e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			nRatedItems = 0;
+		}
+		finally {
+			try {
+				if (items != null)
+					items.close();
+			} 
+			catch (Throwable e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		return nRatedItems;
 		
-		if (maxRecommend <= 0)
-			return MAX_RECOMMEND;
-		else
-			return maxRecommend > MAX_RECOMMEND ? MAX_RECOMMEND : maxRecommend;
+//		int nRatedItems = 0;
+//		Fetcher<RatingVector> items = null;
+//		try {
+//			items = training.fetchItemRatings();
+//			while (items.next()) {
+//				RatingVector item = items.pick();
+//				if (item == null) continue;
+//				int ratedCount = item.count(true);
+//				if (ratedCount == 0) continue;
+//				
+//				nRatedItems++;
+//			}
+//		}
+//		catch (Throwable e) {
+//			e.printStackTrace();
+//			nRatedItems = 0;
+//		}
+//		finally {
+//			try {
+//				if (items != null)
+//					items.close();
+//			} 
+//			catch (Throwable e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//		}
+//		
+//		return nRatedItems;
 	}
 	
 	

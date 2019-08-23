@@ -5,7 +5,6 @@ import java.util.Set;
 
 import net.hudup.core.alg.RecommendParam;
 import net.hudup.core.alg.Recommender;
-import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.DatasetPair;
 import net.hudup.core.data.Fetcher;
@@ -13,13 +12,14 @@ import net.hudup.core.data.RatingVector;
 import net.hudup.core.evaluate.EvaluatorEvent;
 import net.hudup.core.evaluate.EvaluatorEvent.Type;
 import net.hudup.core.evaluate.EvaluatorProgressEvent;
+import net.hudup.core.evaluate.ExactRecallMetric;
 import net.hudup.core.evaluate.FractionMetricValue;
 import net.hudup.core.evaluate.HudupRecallMetric;
 import net.hudup.core.evaluate.Metrics;
 import net.hudup.core.evaluate.NoneWrapperMetricList;
-import net.hudup.core.evaluate.ExactRecallMetric;
 import net.hudup.core.evaluate.SetupTimeMetric;
 import net.hudup.core.evaluate.SpeedMetric;
+import net.hudup.core.logistic.SystemUtil;
 import net.hudup.core.logistic.xURI;
 
 
@@ -46,7 +46,7 @@ public class EstimateEvaluator extends RecommendEvaluator {
 	@Override
 	protected void run0() {
 		// TODO Auto-generated method stub
-		int unratedCount = config.getAsInt(DataConfig.MAX_RECOMMEND_FIELD);
+		//int unratedCount = config.getAsInt(DataConfig.MAX_RECOMMEND_FIELD);
 		int progressStep = 0;
 		int progressTotal = pool.getTotalTestingUserNumber() * algList.size();
 		result = new Metrics();
@@ -114,7 +114,7 @@ public class EstimateEvaluator extends RecommendEvaluator {
 							continue;
 						
 						RatingVector vQuery = (RatingVector) testingUser.clone();
-						Set<Integer> queryIds = setupQueryIds(unratedCount, vQuery);
+						Set<Integer> queryIds = setupQueryIds(vQuery);
 						if (queryIds.size() == 0)
 							continue;
 						
@@ -221,6 +221,7 @@ public class EstimateEvaluator extends RecommendEvaluator {
 					}
 				}
 				
+				SystemUtil.enhanceAuto();
 				
 			} // dataset iterate
 			
@@ -243,11 +244,10 @@ public class EstimateEvaluator extends RecommendEvaluator {
 	
 	/**
 	 * Setting up the set of query item id (s)
-	 * @param unratedCount
 	 * @param outQuery
 	 * @return the set of query item id (s)
 	 */
-    protected static Set<Integer> setupQueryIds(int unratedCount, RatingVector outQuery) {
+    protected static Set<Integer> setupQueryIds(/*int unratedCount,*/ RatingVector outQuery) {
 		
 //		List<Integer> ratedList = Util.newList();
 //		ratedList.addAll(outQuery.fieldIds(true) );
@@ -263,7 +263,8 @@ public class EstimateEvaluator extends RecommendEvaluator {
 //		
 //		return result;
 		
-    	//Estimating all internal item of the rating vector. Fix: 2019.07.08
+    	//Estimating all internal item of the rating vector. Fix: 2019.07.08 by Loc Nguyen.
+    	////If outQuery.id() is negative (< 0), outQuery is not stored in database. 
 		Set<Integer> queryIds = outQuery.fieldIds(true);
 		outQuery.clear();
 		return queryIds;

@@ -79,8 +79,8 @@ public class NeighborCF2d extends NeighborCFUserBased {
 		RatingVector result = thisUser.newInstance(true);
 //		boolean hybrid = config.getAsBoolean(HYBRID);
 //		Profile userProfile1 = hybrid ? param.profile : null;
-		double minValue = getMinRating();
-		double maxValue = getMaxRating();
+		double minValue = config.getMinRating();
+		double maxValue = config.getMaxRating();
 		Fetcher<RatingVector> userRatings = dataset.fetchUserRatings();
 		Fetcher<RatingVector> itemRatings = dataset.fetchItemRatings();
 		for (int itemId : queryIds) {
