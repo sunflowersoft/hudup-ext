@@ -22,10 +22,8 @@ import net.hudup.core.data.Dataset;
 import net.hudup.core.data.Fetcher;
 import net.hudup.core.data.Profile;
 import net.hudup.core.data.RatingVector;
-import net.hudup.core.logistic.DSUtil;
 import net.hudup.core.logistic.NextUpdate;
 import net.hudup.core.logistic.Vector;
-import net.hudup.core.parser.TextParserUtil;
 
 
 /**
@@ -44,14 +42,7 @@ import net.hudup.core.parser.TextParserUtil;
  * Hybrid measure means that profile is merged into rating vector as a unified vector for calculating Pearson measure or cosine measure.<br/>
  * <br/>
  * There are many authors who contributed measure to this class.<br/>
- * Authors Haifeng Liu, Zheng Hu, Ahmad Mian, Hui Tian, Xuzhen Zhu contributed PSS measures and NHSM measure.<br>
- * Authors Bidyut Kr. Patra, Raimo Launonen, Ville Ollikainen, Sukumar Nandi contributed BC and BCF measures.<br>
- * Author Hyung Jun Ahn contributed PIP measure.<br>
- * Authors Keunho Choi and Yongmoo Suh contributed PC measure.<br>
- * Authors Suryakant and Tripti Mahara contributed MMD measure and CjacMD measure.<br>
  * Authors Shuang-Bo Sun, Zhi-Heng Zhang, Xin-Ling Dong, Heng-Ru Zhang, Tong-Jun Li, Lin Zhang, and Fan Min contributed Triangle measure and TJM measure.<br>
- * Authors Junmei Feng, Xiaoyi Fengs, Ning Zhang, and Jinye Peng contributed Feng model.<br>
- * Authors Yi Mua, Nianhao Xiao, Ruichun Tang, Liang Luo, and Xiaohan Yin contributed Mu measure.<br>
  * 
  * @author Loc Nguyen
  * @version 10.0
@@ -71,18 +62,6 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 	 */
 	public static final String MEASURE = "measure";
 	
-	
-	/**
-	 * Value bins.
-	 */
-	public static final String VALUE_BINS_FIELD = "value_bins";
-
-	
-	/**
-	 * Default value bins.
-	 */
-	public static final String VALUE_BINS_DEFAULT = "1, 2, 3, 4, 5";
-
 	
 //	/**
 //	 * Name of hybrid measure.
@@ -169,57 +148,9 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 
 	
 	/**
-	 * Name of PSS measure.
+	 * Name of URP measure.
 	 */
-	public static final String PSS = "pss";
-
-	
-	/**
-	 * Name of NHSM measure.
-	 */
-	public static final String NHSM = "nhsm";
-
-	
-	/**
-	 * Name of BCF measure.
-	 */
-	public static final String BCF = "bcf";
-
-	
-	/**
-	 * Name of BCFJ measure (BCF + Jaccard).
-	 */
-	public static final String BCFJ = "bcfj";
-
-	
-	/**
-	 * Name of SRC measure.
-	 */
-	public static final String SRC = "src";
-
-	
-	/**
-	 * Name of PIP measure.
-	 */
-	public static final String PIP = "pip";
-
-	
-	/**
-	 * Name of PC measure.
-	 */
-	public static final String PC = "pc";
-
-	
-	/**
-	 * Name of MMD measure.
-	 */
-	public static final String MMD = "mmd";
-
-	
-	/**
-	 * Name of CjacMD measure which is developed by Suryakant and Tripti Mahara.
-	 */
-	public static final String CJACMD = "mmd";
+	public static final String URP = "urp";
 
 	
 	/**
@@ -235,18 +166,6 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 
 	
 	/**
-	 * Name of Feng measure.
-	 */
-	public static final String FENG = "feng";
-
-	
-	/**
-	 * Name of Mu measure.
-	 */
-	public static final String MU = "mu";
-
-	
-	/**
 	 * Cosine normalized mode.
 	 */
 	public static final String COSINE_NORMALIZED_FIELD = "cos_normalized";
@@ -259,27 +178,15 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 
 	
 	/**
-	 * BCF median mode.
+	 * MSD fraction mode.
 	 */
-	public static final String BCF_MEDIAN_MODE_FIELD = "bcf_median";
+	public static final String MSD_FRACTION_FIELD = "msd_fraction";
 
 	
 	/**
-	 * Default BCF median mode.
+	 * Default MSD fraction mode.
 	 */
-	public static final boolean BCF_MEDIAN_MODE_DEFAULT = true;
-
-	
-	/**
-	 * Mu alpha field.
-	 */
-	public static final String MU_ALPHA_FIELD = "mu_alpha";
-
-	
-	/**
-	 * Default Mu alpha.
-	 */
-	public static final double MU_ALPHA_DEFAULT = 0.5;
+	public static final boolean MSD_FRACTION_DEFAULT = false;
 
 	
 	/**
@@ -291,7 +198,7 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 	/**
 	 * Rating median.
 	 */
-	protected double ratingMedian = (DataConfig.MIN_RATING_DEFAULT + DataConfig.MAX_RATING_DEFAULT) / 2.0;
+	protected double ratingMedian = Constants.UNUSED;
 
 	
 	/**
@@ -361,24 +268,6 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 
 	
 	/**
-	 * Column module (column vector length) cache.
-	 */
-	protected Map<Integer, Object> bcfColumnModuleCache = Util.newMap();
-
-	
-	/**
-	 * Value bins.
-	 */
-	protected List<Double> valueBins = Util.newList();
-	
-	
-	/**
-	 * Rank bins.
-	 */
-	protected Map<Double, Integer> rankBins = Util.newMap();
-	
-	
-	/**
 	 * Default constructor.
 	 */
 	public NeighborCF() {
@@ -397,11 +286,7 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 		this.userRatingCache.clear();
 		this.rowSimCache.clear();
 		this.columnSimCache.clear();
-		this.bcfColumnModuleCache.clear();
 
-		this.valueBins = extractConfigValueBins();
-		this.rankBins = convertValueBinsToRankBins(this.valueBins);
-		
 		updateUserMeanVars(dataset);
 		updateItemMeanVars(dataset);
 	}
@@ -426,10 +311,6 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 		this.userRatingCache.clear();
 		this.rowSimCache.clear();
 		this.columnSimCache.clear();
-		this.bcfColumnModuleCache.clear();
-		
-		this.rankBins.clear();
-		this.valueBins.clear();
 	}
 
 
@@ -564,19 +445,9 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 		mSet.add(JACCARD2);
 		mSet.add(MSD);
 //		mSet.add(MSDJ);
-		mSet.add(PSS);
-//		mSet.add(NHSM);
-		mSet.add(BCF);
-//		mSet.add(BCFJ);
-		mSet.add(SRC);
-		mSet.add(PIP);
-		mSet.add(PC);
-		mSet.add(MMD);
-//		mSet.add(CJACMD);
+		mSet.add(URP);
 		mSet.add(TRIANGLE);
 //		mSet.add(TJM);
-		mSet.add(FENG);
-		mSet.add(MU);
 		
 		List<String> measures = Util.newList();
 		measures.clear();
@@ -616,30 +487,6 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 		config.put(MEASURE, measure);
 	}
 	
-	
-	/**
-	 * Checking whether the similarity measure requires to declare discrete bins in configuration ({@link #VALUE_BINS_FIELD}).
-	 * @return true if the similarity measure requires to declare discrete bins in configuration ({@link #VALUE_BINS_FIELD}). Otherwise, return false.
-	 */
-	public boolean requireDiscreteRatingBins() {
-		return requireDiscreteRatingBins(getSimilarMeasure());
-	}
-	
-	
-	/**
-	 * Given specified measure, checking whether the similarity measure requires to declare discrete bins in configuration ({@link #VALUE_BINS_FIELD}).
-	 * @param measure specified measure.
-	 * @return true if the similarity measure requires to declare discrete bins in configuration ({@link #VALUE_BINS_FIELD}). Otherwise, return false.
-	 */
-	protected boolean requireDiscreteRatingBins(String measure) {
-		if (measure == null)
-			return false;
-		else if (measure.equals(BCF) || measure.equals(BCFJ) ||  measure.equals(MMD))
-			return true;
-		else
-			return false;
-	}
-
 	
 	@Override
 	public synchronized RatingVector estimate(RecommendParam param, Set<Integer> queryIds) throws RemoteException {
@@ -794,38 +641,12 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 			return msd(vRating1, vRating2, profile1, profile2);
 		else if (measure.equals(MSDJ))
 			return msd(vRating1, vRating2, profile1, profile2) * jaccard(vRating1, vRating2, profile1, profile2);
-		else if (measure.equals(PSS))
-			return pss(vRating1, vRating2, profile1, profile2);
-		else if (measure.equals(NHSM))
-			return nhsm(vRating1, vRating2, profile1, profile2);
-		else if (measure.equals(BCF))
-			return bcf(vRating1, vRating2, profile1, profile2);
-		else if (measure.equals(BCFJ))
-			return bcfj(vRating1, vRating2, profile1, profile2);
-		else if (measure.equals(SRC))
-			return src(vRating1, vRating2, profile1, profile2);
-		else if (measure.equals(PIP))
-			return pip(vRating1, vRating2, profile1, profile2);
-		else if (measure.equals(PC)) {
-			if ((params == null) || (params.length < 1) || !(params[0] instanceof Number))
-				return Constants.UNUSED;
-			else {
-				int fixedColumnId = ((Number)(params[0])).intValue();
-				return pc(vRating1, vRating2, profile1, profile2, fixedColumnId);
-			}
-		}
-		else if (measure.equals(MMD))
-			return mmd(vRating1, vRating2, profile1, profile2);
-		else if (measure.equals(CJACMD))
-			return cosine(vRating1, vRating2, profile1, profile2) + mmd(vRating1, vRating2, profile1, profile2) + jaccard(vRating1, vRating2, profile1, profile2);
+		else if (measure.equals(URP))
+			return urp(vRating1, vRating2, profile1, profile2);
 		else if (measure.equals(TRIANGLE))
 			return triangle(vRating1, vRating2, profile1, profile2);
 		else if (measure.equals(TJM))
 			return triangle(vRating1, vRating2, profile1, profile2) * jaccard(vRating1, vRating2, profile1, profile2);
-		else if (measure.equals(FENG))
-			return feng(vRating1, vRating2, profile1, profile2);
-		else if (measure.equals(MU))
-			return mu(vRating1, vRating2, profile1, profile2);
 		else
 			return Constants.UNUSED;
 	}
@@ -859,6 +680,51 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 //		Vector vector2 = vectors[1];
 //		
 //		return normalized ? vector1.cosine(vector2, this.ratingMedian) : vector1.cosine(vector2);
+	}
+
+	
+	/**
+	 * Calculating the COD (adjusted cosine) measure between two pairs.
+	 * The first pair includes the first rating vector and the first profile.
+	 * The second pair includes the second rating vector and the second profile.
+	 * 
+	 * @param vRating1 first rating vector.
+	 * @param vRating2 second rating vector.
+	 * @param profile1 first profile.
+	 * @param profile2 second profile.
+	 * @return ACOS measure between both two rating vectors.
+	 */
+	protected abstract double cod(RatingVector vRating1, RatingVector vRating2,
+			Profile profile1, Profile profile2);
+	
+
+	/**
+	 * Calculating the COD (adjusted cosine) measure between two rating vectors.
+	 * @param vRating1 the first rating vectors.
+	 * @param vRating2 the second rating vectors.
+	 * @param fieldMeans mean value of field ratings.
+	 * @return ACOS (adjusted cosine) measure between two rating vectors.
+	 */
+	protected double cod(RatingVector vRating1, RatingVector vRating2, Map<Integer, Double> fieldMeans) {
+		Set<Integer> common = commonFieldIds(vRating1, vRating2);
+		if (common.size() == 0) return Constants.UNUSED;
+
+		double VX = 0, VY = 0;
+		double VXY = 0;
+		for (int fieldId : common) {
+			double mean = fieldMeans.get(fieldId);
+			double deviate1 = vRating1.get(fieldId).value - mean;
+			double deviate2 = vRating2.get(fieldId).value - mean;
+			
+			VX  += deviate1 * deviate1;
+			VY  += deviate2 * deviate2;
+			VXY += deviate1 * deviate2;
+		}
+		
+		if (VX == 0 || VY == 0)
+			return Constants.UNUSED;
+		else
+			return VXY / Math.sqrt(VX * VY);
 	}
 
 	
@@ -1047,51 +913,6 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 
 	
 	/**
-	 * Calculating the COD (adjusted cosine) measure between two pairs.
-	 * The first pair includes the first rating vector and the first profile.
-	 * The second pair includes the second rating vector and the second profile.
-	 * 
-	 * @param vRating1 first rating vector.
-	 * @param vRating2 second rating vector.
-	 * @param profile1 first profile.
-	 * @param profile2 second profile.
-	 * @return ACOS measure between both two rating vectors.
-	 */
-	protected abstract double cod(RatingVector vRating1, RatingVector vRating2,
-			Profile profile1, Profile profile2);
-	
-
-	/**
-	 * Calculating the COD (adjusted cosine) measure between two rating vectors.
-	 * @param vRating1 the first rating vectors.
-	 * @param vRating2 the second rating vectors.
-	 * @param fieldMeans mean value of field ratings.
-	 * @return ACOS (adjusted cosine) measure between two rating vectors.
-	 */
-	public static double cod(RatingVector vRating1, RatingVector vRating2, Map<Integer, Double> fieldMeans) {
-		Set<Integer> common = commonFieldIds(vRating1, vRating2);
-		if (common.size() == 0) return Constants.UNUSED;
-
-		double VX = 0, VY = 0;
-		double VXY = 0;
-		for (int fieldId : common) {
-			double mean = fieldMeans.get(fieldId);
-			double deviate1 = vRating1.get(fieldId).value - mean;
-			double deviate2 = vRating2.get(fieldId).value - mean;
-			
-			VX  += deviate1 * deviate1;
-			VY  += deviate2 * deviate2;
-			VXY += deviate1 * deviate2;
-		}
-		
-		if (VX == 0 || VY == 0)
-			return Constants.UNUSED;
-		else
-			return VXY / Math.sqrt(VX * VY);
-	}
-
-	
-	/**
 	 * Calculating the CPC (constrained Pearson correlation) measure between two pairs.
 	 * It is also cosine normalized (CON) measure.
 	 * The first pair includes the first rating vector and the first profile.
@@ -1217,7 +1038,7 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 
 	
 	/**
-	 * Calculating the Spearman&apos; Rank Correlation (SRC) measure between two pairs.
+	 * Calculating the MSD measure between two pairs.
 	 * The first pair includes the first rating vector and the first profile.
 	 * The second pair includes the second rating vector and the second profile.
 	 * 
@@ -1225,103 +1046,28 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 	 * @param vRating2 second rating vector.
 	 * @param profile1 first profile.
 	 * @param profile2 second profile.
-	 * @return Spearman&apos; Rank Correlation (SRC) measure between both two rating vectors and profiles.
+	 * @return MSD measure between both two rating vectors and profiles.
 	 */
-	protected double src(RatingVector vRating1, RatingVector vRating2,
+	protected double msd(RatingVector vRating1, RatingVector vRating2,
 			Profile profile1, Profile profile2) {
-		Map<Double, Integer> bins = rankBins;
-		if (bins.isEmpty())
-			bins = extractRankBins(vRating1, vRating2);
-
 		Set<Integer> common = commonFieldIds(vRating1, vRating2);
 		if (common.size() == 0) return Constants.UNUSED;
 		
 		double sum = 0;
+		double maxRating = this.config.getMaxRating();
 		for (int id : common) {
-			double v1 = vRating1.get(id).value;
-			int r1 = bins.get(v1);
-			double v2 = vRating2.get(id).value;
-			int r2 = bins.get(v2);
-			
-			int d = r1 - r2;
+			double d = (vRating1.get(id).value - vRating2.get(id).value);
 			sum += d*d;
 		}
 		
-		double n = common.size();
-		return 1.0 - 6*sum/(n*(n*n-1));
+		boolean fraction = config.getAsBoolean(MSD_FRACTION_FIELD);
+		if (fraction)
+			return 1 / (1 + sum/common.size());
+		else
+			return 1.0 - sum/(common.size()*maxRating*maxRating);
 	}
 	
 	
-	/**
-	 * Calculating the PSS measure between two pairs. PSS measure is developed by Haifeng Liu, Zheng Hu, Ahmad Mian, Hui Tian, Xuzhen Zhu, and implemented by Loc Nguyen.
-	 * The first pair includes the first rating vector and the first profile.
-	 * The second pair includes the second rating vector and the second profile.
-	 * 
-	 * @param vRating1 first rating vector.
-	 * @param vRating2 second rating vector.
-	 * @param profile1 first profile.
-	 * @param profile2 second profile.
-	 * @author Haifeng Liu, Zheng Hu, Ahmad Mian, Hui Tian, Xuzhen Zhu.
-	 * @return PSS measure between both two rating vectors and profiles.
-	 */
-	protected abstract double pss(RatingVector vRating1, RatingVector vRating2,
-			Profile profile1, Profile profile2);
-
-
-	/**
-	 * Calculating the PSS measure between two rating vectors. PSS measure is developed by Haifeng Liu, Zheng Hu, Ahmad Mian, Hui Tian, Xuzhen Zhu, and implemented by Loc Nguyen.
-	 * @param vRating1 first rating vector.
-	 * @param vRating2 second rating vector.
-	 * @param ratingMedian general mean.
-	 * @param fieldMeans map of field means.
-	 * @author Haifeng Liu, Zheng Hu, Ahmad Mian, Hui Tian, Xuzhen Zhu.
-	 * @return PSS measure between two rating vectors.
-	 */
-	public static double pss(RatingVector vRating1, RatingVector vRating2, double ratingMedian, Map<Integer, Double> fieldMeans) {
-		Set<Integer> common = commonFieldIds(vRating1, vRating2);
-		if (common.size() == 0) return Constants.UNUSED;
-		
-		double pss = 0.0;
-		for (int id : common) {
-			double r1 = vRating1.get(id).value;
-			double r2 = vRating2.get(id).value;
-			
-			double pro = 1.0 - 1.0 / (1.0 + Math.exp(-Math.abs(r1-r2)));
-			//Note: I think that it is better to use mean instead of median for significant.
-			//At the worst case, median is always approximate to mean given symmetric distribution like normal distribution.
-			//Moreover, in fact, general user mean is equal to general item mean.
-			//However, I still use rating median because of respecting authors' ideas.
-			double sig = 1.0 / (1.0 + Math.exp(
-					-Math.abs(r1-ratingMedian)*Math.abs(r2-ratingMedian)));
-			double singular = 1.0 - 1.0 / (1.0 + Math.exp(-Math.abs((r1+r2)/2.0 - fieldMeans.get(id))));
-			
-			pss += pro * sig * singular;
-		}
-		
-		return pss;
-	}
-	
-	
-	/**
-	 * Calculating the NHSM measure between two pairs. NHSM measure is developed by Haifeng Liu, Zheng Hu, Ahmad Mian, Hui Tian, Xuzhen Zhu, and implemented by Loc Nguyen.
-	 * The first pair includes the first rating vector and the first profile.
-	 * The second pair includes the second rating vector and the second profile.
-	 * 
-	 * @param vRating1 first rating vector.
-	 * @param vRating2 second rating vector.
-	 * @param profile1 first profile.
-	 * @param profile2 second profile.
-	 * @author Haifeng Liu, Zheng Hu, Ahmad Mian, Hui Tian, Xuzhen Zhu.
-	 * @return NHSM measure between both two rating vectors and profiles.
-	 */
-	protected double nhsm(RatingVector vRating1, RatingVector vRating2,
-			Profile profile1, Profile profile2) {
-		double urp = urp(vRating1, vRating2, profile1, profile2);
-		double jaccard2 = jaccard2(vRating1, vRating2, profile1, profile2);
-		return pss(vRating1, vRating2, profile1, profile2) * jaccard2 * urp;
-	}
-
-
 	/**
 	 * Calculating the URP measure between two pairs.
 	 * The first pair includes the first rating vector and the first profile.
@@ -1344,352 +1090,6 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 
 	
 	/**
-	 * Calculating the MSD measure between two pairs.
-	 * The first pair includes the first rating vector and the first profile.
-	 * The second pair includes the second rating vector and the second profile.
-	 * 
-	 * @param vRating1 first rating vector.
-	 * @param vRating2 second rating vector.
-	 * @param profile1 first profile.
-	 * @param profile2 second profile.
-	 * @return MSD measure between both two rating vectors and profiles.
-	 */
-	protected double msd(RatingVector vRating1, RatingVector vRating2,
-			Profile profile1, Profile profile2) {
-		Set<Integer> common = commonFieldIds(vRating1, vRating2);
-		if (common.size() == 0) return Constants.UNUSED;
-		
-		double sum = 0;
-		for (int id : common) {
-			double d = (vRating1.get(id).value - vRating2.get(id).value) / this.config.getMaxRating();
-			sum += d*d;
-		}
-		
-		return 1.0 - sum / common.size();
-	}
-	
-	
-	/**
-	 * Calculate the Bhattacharyya measure from specified rating vectors. BC measure is modified by Bidyut Kr. Patra, Raimo Launonen, Ville Ollikainen, Sukumar Nandi, and implemented by Loc Nguyen.
-	 * @param vRating1 first rating vector.
-	 * @param vRating2 second rating vector.
-	 * @author Bidyut Kr. Patra, Raimo Launonen, Ville Ollikainen, Sukumar Nandi.
-	 * @return Bhattacharyya measure from specified rating vectors.
-	 */
-	@NextUpdate
-	protected double bc(RatingVector vRating1, RatingVector vRating2,
-			Profile profile1, Profile profile2) {
-		Task task = new Task() {
-			
-			@Override
-			public Object perform(Object...params) {
-				List<Double> bins = valueBins;
-				if (bins.isEmpty())
-					bins = extractValueBins(vRating1, vRating2);
-				
-				Set<Integer> ids1 = vRating1.fieldIds(true);
-				Set<Integer> ids2 = vRating2.fieldIds(true);
-				int n1 = ids1.size();
-				int n2 = ids2.size();
-				if (n1 == 0 || n2 == 0) return Constants.UNUSED;
-				
-				double bc = 0;
-				for (double bin : bins) {
-					int count1 = 0, count2 = 0;
-					for (int id1 : ids1) {
-						if (vRating1.get(id1).value == bin)
-							count1++;
-					}
-					for (int id2 : ids2) {
-						if (vRating2.get(id2).value == bin)
-							count2++;
-					}
-					
-					bc += Math.sqrt( ((double)count1/(double)n1) * ((double)count2/(double)n2) ); 
-				}
-				
-				return bc;
-			}
-		};
-		
-		return (double)cacheTask(vRating1.id(), vRating2.id(), this.columnSimCache, task);
-	}
-
-	
-	/**
-	 * Calculating the advanced BCF measure between two pairs. BCF measure is developed by Bidyut Kr. Patra, Raimo Launonen, Ville Ollikainen, Sukumar Nandi, and implemented by Loc Nguyen.
-	 * The first pair includes the first rating vector and the first profile.
-	 * The second pair includes the second rating vector and the second profile.
-	 * @param vRating1 first rating vector.
-	 * @param vRating2 second rating vector.
-	 * @param profile1 first profile.
-	 * @param profile2 second profile.
-	 * @author Bidyut Kr. Patra, Raimo Launonen, Ville Ollikainen, Sukumar Nandi.
-	 * @return BCF measure between both two rating vectors and profiles.
-	 */
-	@NextUpdate
-	protected double bcf(RatingVector vRating1, RatingVector vRating2,
-			Profile profile1, Profile profile2) {
-		
-		Set<Integer> columnIds1 = vRating1.fieldIds(true);
-		Set<Integer> columnIds2 = vRating2.fieldIds(true);
-		if (columnIds1.size() == 0 || columnIds2.size() == 0)
-			return Constants.UNUSED;
-		
-		double bcSum = 0;
-		boolean medianMode = getConfig().getAsBoolean(BCF_MEDIAN_MODE_FIELD);
-		for (int columnId1 : columnIds1) {
-			RatingVector columnVector1 = getColumnRating(columnId1);
-			if (columnVector1 == null) continue;
-			double columnModule1 = bcfCalcColumnModule(columnVector1);
-			if (!Util.isUsed(columnModule1) || columnModule1 == 0) continue;
-			
-			double value1 = medianMode? vRating1.get(columnId1).value-this.ratingMedian : vRating1.get(columnId1).value-vRating1.mean();
-			for (int columnId2 : columnIds2) {
-				RatingVector columnVector2 = columnId2 == columnId1 ? columnVector1 : getColumnRating(columnId2);
-				if (columnVector2 == null) continue;
-				double columnModule2 = bcfCalcColumnModule(columnVector2);
-				if (!Util.isUsed(columnModule2) || columnModule2 == 0) continue;
-				
-				double bc = bc(columnVector1, columnVector2, profile1, profile2);
-				if (!Util.isUsed(bc)) continue;
-
-				double value2 = medianMode? vRating2.get(columnId2).value-this.ratingMedian : vRating2.get(columnId2).value-vRating2.mean();
-				double loc = value1 * value2 / (columnModule1*columnModule2);
-				if (!Util.isUsed(loc)) continue;
-				
-				bcSum += bc * loc;
-			}
-		}
-		
-		return bcSum;
-	}
-
-	
-	/**
-	 * Calculating the advanced BCFJ measure (BCF + Jaccard) between two pairs. BCF measure is developed by Bidyut Kr. Patra, Raimo Launonen, Ville Ollikainen, Sukumar Nandi, and implemented by Loc Nguyen.
-	 * The first pair includes the first rating vector and the first profile.
-	 * The second pair includes the second rating vector and the second profile.
-	 * @param vRating1 first rating vector.
-	 * @param vRating2 second rating vector.
-	 * @param profile1 first profile.
-	 * @param profile2 second profile.
-	 * @author Bidyut Kr. Patra, Raimo Launonen, Ville Ollikainen, Sukumar Nandi.
-	 * @return BCFJ measure between both two rating vectors and profiles.
-	 */
-	protected double bcfj(RatingVector vRating1, RatingVector vRating2,
-			Profile profile1, Profile profile2) {
-		return bcf(vRating1, vRating2, profile1, profile2) + jaccard(vRating1, vRating2, profile1, profile2);
-	}
-	
-	
-	/**
-	 * Calculating module (length) of column rating vector for BCF measure.
-	 * @param columnVector specified column rating vector.
-	 * @return module (length) of column rating vector.
-	 */
-	protected double bcfCalcColumnModule(RatingVector columnVector) {
-		double ratingMedian = this.ratingMedian;
-		Task task = new Task() {
-			
-			@Override
-			public Object perform(Object...params) {
-				if (columnVector == null) return Constants.UNUSED;
-				
-				Set<Integer> fieldIds = columnVector.fieldIds(true);
-				double columnModule = 0;
-				boolean medianMode = getConfig().getAsBoolean(BCF_MEDIAN_MODE_FIELD);
-				for (int fieldId : fieldIds) {
-					double deviate = medianMode ? columnVector.get(fieldId).value-ratingMedian : columnVector.get(fieldId).value;
-					columnModule += deviate * deviate;
-				}
-				
-				return Math.sqrt(columnModule);
-			}
-		};
-		
-		return (double)cacheTask(columnVector.id(), this.bcfColumnModuleCache, task);
-	}
-
-	
-	/**
-	 * Calculating the PIP measure between two pairs. PIP measure is developed by Hyung Jun Ahn, and implemented by Loc Nguyen.
-	 * The first pair includes the first rating vector and the first profile.
-	 * The second pair includes the second rating vector and the second profile.
-	 * 
-	 * @param vRating1 first rating vector.
-	 * @param vRating2 second rating vector.
-	 * @param profile1 first profile.
-	 * @param profile2 second profile.
-	 * @author Hyung Jun Ahn.
-	 * @return NHSM measure between both two rating vectors and profiles.
-	 */
-	protected abstract double pip(RatingVector vRating1, RatingVector vRating2,
-			Profile profile1, Profile profile2);
-	
-	
-	/**
-	 * Calculating the PIP measure between two rating vectors. PIP measure is developed by Hyung Jun Ahn and implemented by Loc Nguyen.
-	 * @param vRating1 first rating vector.
-	 * @param vRating2 second rating vector.
-	 * @param ratingMedian general mean.
-	 * @param fieldMeans map of field means.
-	 * @author Hyung Jun Ahn.
-	 * @return PIP measure between two rating vectors.
-	 */
-	protected double pip(RatingVector vRating1, RatingVector vRating2, Map<Integer, Double> fieldMeans) {
-		Set<Integer> common = commonFieldIds(vRating1, vRating2);
-		if (common.size() == 0) return Constants.UNUSED;
-		
-		double pip = 0.0;
-		for (int id : common) {
-			double r1 = vRating1.get(id).value;
-			double r2 = vRating2.get(id).value;
-			boolean agreed = agree(r1, r2);
-			
-			double d = agreed ? Math.abs(r1-r2) : 2*Math.abs(r1-r2);
-			double pro = (2*(config.getMaxRating()-config.getMinRating())+1) - d;
-			pro = pro*pro;
-			
-			double impact = (Math.abs(r1-ratingMedian)+1) * (Math.abs(r2-ratingMedian)+1);
-			if (!agreed)
-				impact = 1 / impact;
-			
-			double mean = fieldMeans.get(id);
-			double pop = 1;
-			if ((r1 > mean && r2 > mean) || (r1 < mean && r2 < mean)) {
-				double bias = (r1+r2)/2 - mean;
-				pop = 1 + bias*bias;
-			}
-			
-			pip += pro * impact * pop;
-		}
-		
-		return pip;
-	}
-
-	
-	/**
-	 * Calculating the PC measure between two rating vectors. PC measure is developed by Keunho Choi and Yongmoo Suh. It implemented by Loc Nguyen.
-	 * The first pair includes the first rating vector and the first profile.
-	 * The second pair includes the second rating vector and the second profile.
-	 * 
-	 * @param vRating1 first rating vector.
-	 * @param vRating2 second rating vector.
-	 * @param profile1 first profile.
-	 * @param profile2 second profile.
-	 * @param fixedColumnId fixed column identifier.
-	 * @author Hyung Jun Ahn.
-	 * @return PC measure between both two rating vectors and profiles.
-	 */
-	protected abstract double pc(RatingVector vRating1, RatingVector vRating2,
-			Profile profile1, Profile profile2, int fixedColumnId);
-	
-	
-	/**
-	 * Calculating the PC measure between two rating vectors. PC measure is developed by Keunho Choi and Yongmoo Suh. It implemented by Loc Nguyen.
-	 * @param vRating1 the first rating vectors.
-	 * @param vRating2 the second rating vectors.
-	 * @param fixedColumnId fixed field (column) identifier.
-	 * @param fieldMeans mean value of field ratings.
-	 * @author Keunho Choi, Yongmoo Suh
-	 * @return PC measure between two rating vectors.
-	 */
-	protected double pc(RatingVector vRating1, RatingVector vRating2, int fixedColumnId, Map<Integer, Double> fieldMeans) {
-		Set<Integer> common = commonFieldIds(vRating1, vRating2);
-		if (common.size() == 0) return Constants.UNUSED;
-
-		double vx = 0, vy = 0;
-		double vxy = 0;
-		for (int fieldId : common) {
-			double mean = fieldMeans.get(fieldId);
-			double d1 = vRating1.get(fieldId).value - mean;
-			double d2 = vRating2.get(fieldId).value - mean;
-			
-			Task columnSimTask = new Task() {
-				
-				@Override
-				public Object perform(Object...params) {
-					RatingVector fixedColumnVector = getColumnRating(fixedColumnId);
-					RatingVector columnVector = getColumnRating(fieldId);
-					
-					if (fixedColumnVector == null || columnVector == null)
-						return Constants.UNUSED;
-					else
-						return fixedColumnVector.corr(columnVector);
-				}
-			};
-			double columnSim = (double)cacheTask(fixedColumnId, fieldId, this.columnSimCache, columnSimTask);
-			columnSim = columnSim * columnSim;
-			
-			vx  += d1 * d1 * columnSim;
-			vy  += d2 * d2 * columnSim;
-			vxy += d1 * d2 * columnSim;
-		}
-		
-		if (vx == 0 || vy == 0)
-			return Constants.UNUSED;
-		else
-			return vxy / Math.sqrt(vx * vy);
-	}
-
-	
-	/**
-	 * Calculating the Mean Measure of Divergence (MMD) measure between two pairs.
-	 * Suryakant and Tripti Mahara proposed use of MMD for collaborative filtering. Loc Nguyen implements it.
-	 * The first pair includes the first rating vector and the first profile.
-	 * The second pair includes the second rating vector and the second profile.
-	 * @param vRating1 first rating vector.
-	 * @param vRating2 second rating vector.
-	 * @param profile1 first profile.
-	 * @param profile2 second profile.
-	 * @author Suryakant, Tripti Mahara
-	 * @return MMD measure between both two rating vectors and profiles.
-	 */
-	protected double mmd(RatingVector vRating1, RatingVector vRating2,
-			Profile profile1, Profile profile2) {
-		Set<Integer> ids1 = vRating1.fieldIds(true);
-		Set<Integer> ids2 = vRating2.fieldIds(true);
-		int N1 = ids1.size();
-		int N2 = ids2.size();
-		if (N1 == 0 || N2 == 0) return Constants.UNUSED;
-		
-		List<Double> bins = valueBins;
-		if (bins.isEmpty())
-			bins = extractValueBins(vRating1, vRating2);
-		double sum = 0;
-		for (double bin : bins) {
-			int n1 = 0, n2 = 0;
-			for (int id1 : ids1) {
-				if (vRating1.get(id1).value == bin)
-					n1++;
-			}
-			for (int id2 : ids2) {
-				if (vRating2.get(id2).value == bin)
-					n2++;
-			}
-			
-			double thetaBias = mmdTheta(n1, N1) - mmdTheta(n2, N2);
-			sum += thetaBias*thetaBias - 1/(0.5+n1) - 1/(0.5+n2); 
-		}
-		
-		return 1 / (1 + sum/bins.size());
-	}
-	
-	
-	/**
-	 * Theta transformation of Mean Measure of Divergence (MMD) measure.
-	 * The default implementation is Grewal&apos; transformation.
-	 * @param n number of observations having a trait.
-	 * @param N number of observations
-	 * @return Theta transformation of Mean Measure of Devergence (MMD) measure.
-	 */
-	protected double mmdTheta(int n, int N) {
-		return 1 / Math.sin(1-2*(n/N));
-	}
-	
-	
-	/**
 	 * Calculating the Triangle measure between two pairs.
 	 * Shuang-Bo Sun, Zhi-Heng Zhang, Xin-Ling Dong, Heng-Ru Zhang, Tong-Jun Li, Lin Zhang, and Fan Min developed the Triangle measure. Loc Nguyen implements it.
 	 * The first pair includes the first rating vector and the first profile.
@@ -1706,69 +1106,6 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 		return 1 - vRating1.distance(vRating2) / (vRating1.module()+vRating2.module());
 	}
 	
-	
-	/**
-	 * Calculating the Feng measure between two pairs.
-	 * Junmei Feng, Xiaoyi Fengs, Ning Zhang, and Jinye Peng developed the Triangle measure. Loc Nguyen implements it.
-	 * The first pair includes the first rating vector and the first profile.
-	 * The second pair includes the second rating vector and the second profile.
-	 * @param vRating1 first rating vector.
-	 * @param vRating2 second rating vector.
-	 * @param profile1 first profile.
-	 * @param profile2 second profile.
-	 * @author Junmei Feng, Xiaoyi Fengs, Ning Zhang, Jinye Peng
-	 * @return Feng measure between both two rating vectors and profiles.
-	 */
-	protected double feng(RatingVector vRating1, RatingVector vRating2,
-			Profile profile1, Profile profile2) {
-		
-		double s1 = coj(vRating1, vRating2, profile1, profile2);
-
-		Set<Integer> ids1 = vRating1.fieldIds(true);
-		Set<Integer> ids2 = vRating2.fieldIds(true);
-		Set<Integer> common = Util.newSet();
-		common.addAll(ids1);
-		common.retainAll(ids2);
-		double s2 = 1 / ( 1 + Math.exp(-common.size()*common.size()/(ids1.size()*ids2.size())) );
-		
-		double s3 = urp(vRating1, vRating2, profile1, profile2);
-		
-		return s1 * s2 * s3;
-	}
-	
-	
-	/**
-	 * Calculating the Mu measure between two pairs.
-	 * Yi Mua, Nianhao Xiao, Ruichun Tang, Liang Luo, and Xiaohan Yin developed Mu measure. Loc Nguyen implements it.
-	 * The first pair includes the first rating vector and the first profile.
-	 * The second pair includes the second rating vector and the second profile.
-	 * @param vRating1 first rating vector.
-	 * @param vRating2 second rating vector.
-	 * @param profile1 first profile.
-	 * @param profile2 second profile.
-	 * @author Yi Mua, Nianhao Xiao, Ruichun Tang, Liang Luo, Xiaohan Yin
-	 * @return Mu measure between both two rating vectors and profiles.
-	 */
-	@NextUpdate
-	protected double mu(RatingVector vRating1, RatingVector vRating2,
-			Profile profile1, Profile profile2) {
-		double alpha = config.getAsReal(MU_ALPHA_FIELD);
-		double pearson = corr(vRating1, vRating2, profile1, profile2);
-		double hg = 1 - bc(vRating1, vRating2, profile1, profile2);
-//		double hg = bc(vRating1, vRating2, profile1, profile2);
-		double jaccard = jaccard(vRating1, vRating2, profile1, profile2);
-		
-		return alpha*pearson + (1-alpha)*(hg+jaccard);
-	}
-	
-	
-	/**
-	 * Getting rating vector given column ID (item ID or user ID) for BCF measure.
-	 * @param columnId specified column ID (item ID or user ID).
-	 * @return rating vector given column ID (item ID or user ID).
-	 */
-	protected abstract RatingVector getColumnRating(int columnId);
-
 	
 	@Override
 	public Object cacheTask(int id1, int id2, Map<Integer, Map<Integer, Object>> cache, Task task, Object...params) {
@@ -1795,20 +1132,6 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 		getConfig().put(SupportCacheAlg.SUPPORT_CACHE_FIELD, cached);
 	}
 
-	
-	/**
-	 * Checking whether two ratings are agreed.
-	 * @param rating1 first rating.
-	 * @param rating2 second rating.
-	 * @return true if two ratings are agreed.
-	 */
-	protected boolean agree(double rating1, double rating2) {
-		if ( (rating1 > this.ratingMedian && rating2 < this.ratingMedian) || (rating1 < this.ratingMedian && rating2 > this.ratingMedian) )
-			return false;
-		else
-			return true;
-	}
-	
 	
 	/**
 	 * Computing common field IDs of two rating vectors.
@@ -1838,99 +1161,13 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 	}
 
 	
-	/**
-	 * Converting value bins into rank bins.
-	 * @param valueBins value bins
-	 * @return rank bins.
-	 */
-	protected static Map<Double, Integer> convertValueBinsToRankBins(List<Double> valueBins) {
-		if (valueBins == null || valueBins.size() == 0)
-			return Util.newMap();
-		
-		Collections.sort(valueBins);
-		Map<Double, Integer> rankBins = Util.newMap();
-		int n = valueBins.size();
-		for (int i = 0; i < n; i++) {
-			rankBins.put(valueBins.get(i), n-i);
-		}
-		
-		return rankBins;
-	}
-	
-	
-	/**
-	 * Extracting value bins from two specified rating vectors.
-	 * @param vRating1 first rating vector.
-	 * @param vRating2 second rating vector.
-	 * @return Extracted value bins from two specified rating vectors.
-	 */
-	protected static List<Double> extractValueBins(RatingVector vRating1, RatingVector vRating2) {
-		Set<Double> values = Util.newSet();
-		
-		Set<Integer> ids1 = vRating1.fieldIds(true);
-		for (int id1 : ids1) {
-			double value1 = vRating1.get(id1).value;
-			values.add(value1);
-		}
-		
-		Set<Integer> ids2 = vRating2.fieldIds(true);
-		for (int id2 : ids2) {
-			double value2 = vRating2.get(id2).value;
-			values.add(value2);
-		}
-		
-		List<Double> bins = DSUtil.toDoubleList(values);
-		Collections.sort(bins);
-		return bins;
-	}
-	
-	
-	/**
-	 * Extracting rank bins from two specified rating vectors.
-	 * @param vRating1 first rating vector.
-	 * @param vRating2 second rating vector.
-	 * @return Extracted rank bins from two specified rating vectors.
-	 */
-	protected static Map<Double, Integer> extractRankBins(RatingVector vRating1, RatingVector vRating2) {
-		List<Double> valueBins = extractValueBins(vRating1, vRating2);
-		return convertValueBinsToRankBins(valueBins);
-	}
-	
-	
-	/**
-	 * Extracting value bins from configuration.
-	 * @return extracted value bins from configuration.
-	 */
-	protected List<Double> extractConfigValueBins() {
-		if (!getConfig().containsKey(VALUE_BINS_FIELD))
-			return Util.newList();
-		
-		return TextParserUtil.parseListByClass(
-				getConfig().getAsString(VALUE_BINS_FIELD),
-				Double.class,
-				",");
-	}
-	
-	
-	/**
-	 * Extracting rank bins from configuration.
-	 * @return extracted SRC rank bins from configuration.
-	 */
-	protected Map<Double, Integer> extractConfigRankBins() {
-		List<Double> valueBins = extractConfigValueBins();
-		return convertValueBinsToRankBins(valueBins);
-	}
-
-	
 	@Override
 	public DataConfig createDefaultConfig() {
 		DataConfig tempConfig = super.createDefaultConfig();
+		tempConfig.put(SUPPORT_CACHE_FIELD, SUPPORT_CACHE_DEFAULT);
 		tempConfig.put(MEASURE, getDefaultSimilarMeasure());
 		tempConfig.put(COSINE_NORMALIZED_FIELD, COSINE_NORMALIZED_DEFAULT);
-		tempConfig.put(VALUE_BINS_FIELD, VALUE_BINS_DEFAULT);
-		tempConfig.put(BCF_MEDIAN_MODE_FIELD, BCF_MEDIAN_MODE_DEFAULT);
-		tempConfig.put(MU_ALPHA_FIELD, MU_ALPHA_DEFAULT);
-		tempConfig.put(SUPPORT_CACHE_FIELD, SUPPORT_CACHE_DEFAULT);
+		tempConfig.put(MSD_FRACTION_FIELD, MSD_FRACTION_DEFAULT);
 
 		DataConfig config = new DataConfig() {
 

@@ -19,10 +19,7 @@ import net.hudup.core.data.RatingVector;
  * This class is completed because it defines the {@link #estimate(RecommendParam, Set)} method.<br/>
  * <br/>
  * There are many authors who contributed measure to this class.<br/>
- * Authors Haifeng Liu, Zheng Hu, Ahmad Mian, Hui Tian, Xuzhen Zhu contributed PSS measures and NHSM measure.<br>
- * Authors Bidyut Kr. Patra, Raimo Launonen, Ville Ollikainen, Sukumar Nandi contributed BC and BCF measures.<br>
- * Author Hyung Jun Ahn contributed PIP measure.<br>
- * Authors Keunho Choi and Yongmoo Suh contributed PC measure.<br>
+ * Authors Shuang-Bo Sun, Zhi-Heng Zhang, Xin-Ling Dong, Heng-Ru Zhang, Tong-Jun Li, Lin Zhang, and Fan Min contributed Triangle measure and TJM measure.<br>
  * 
  * @author Loc Nguyen
  * @version 10.0
@@ -147,35 +144,6 @@ public class NeighborCFItemBased extends NeighborCF implements DuplicatableAlg {
 			RatingVector vRating1, RatingVector vRating2,
 			Profile profile1, Profile profile2) {
 		return cod(vRating1, vRating2, this.userMeans);
-	}
-
-	
-	@Override
-	protected double pip(RatingVector vRating1, RatingVector vRating2, Profile profile1, Profile profile2) {
-		// TODO Auto-generated method stub
-		return pip(vRating1, vRating2, this.userMeans);
-	}
-
-
-	@Override
-	protected double pss(RatingVector vRating1, RatingVector vRating2,
-			Profile profile1, Profile profile2) {
-		return pss(vRating1, vRating2, this.ratingMedian, this.userMeans);
-	}
-	
-	
-	@Override
-	protected double pc(RatingVector vRating1, RatingVector vRating2, Profile profile1,
-			Profile profile2, int fixedColumnId) {
-		// TODO Auto-generated method stub
-		return pc(vRating1, vRating2, fixedColumnId, this.userMeans);
-	}
-
-
-	@Override
-	protected RatingVector getColumnRating(int columnId) {
-		// TODO Auto-generated method stub
-		return this.dataset.getUserRating(columnId);
 	}
 
 	
