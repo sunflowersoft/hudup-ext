@@ -214,7 +214,7 @@ public class RecommendEvaluator extends AbstractEvaluator {
 								testingUser)); // firing time speed metric
 						
 						
-						if (recommended != null) { // successful recommendation
+						if (recommended != null && recommended.size() > 0) { // successful recommendation
 							
 							Metrics recommendedMetrics = result.recalc(
 									recommender.getName(), 

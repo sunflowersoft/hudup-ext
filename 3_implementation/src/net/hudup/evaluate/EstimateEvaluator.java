@@ -145,7 +145,7 @@ public class EstimateEvaluator extends RecommendEvaluator {
 								testingUser)); // firing time speed metric
 						
 						
-						if (estimated != null) { // successful recommendation
+						if (estimated != null && estimated.size() > 0) { // successful recommendation
 							
 							Metrics recommendedMetrics = result.recalc(
 									recommender.getName(), 
