@@ -1,7 +1,5 @@
 package net.hudup.server;
 
-import static net.hudup.core.Constants.ROOT_PACKAGE;
-
 import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.util.Collections;
@@ -1442,7 +1440,7 @@ public class DefaultService implements Service, AutoCloseable {
 		
 		trans.lockWrite();
 		try {
-			List<Evaluator> evList = SystemUtil.getInstances(ROOT_PACKAGE, Evaluator.class);
+			List<Evaluator> evList = SystemUtil.getInstances(Evaluator.class);
 			for (Evaluator ev : evList) {
 				if (ev.getName().equals(evaluatorName)) {
 					evaluator = ev;
@@ -1479,7 +1477,7 @@ public class DefaultService implements Service, AutoCloseable {
 		
 		trans.lockRead();
 		try {
-			List<Evaluator> evList = SystemUtil.getInstances(ROOT_PACKAGE, Evaluator.class);
+			List<Evaluator> evList = SystemUtil.getInstances(Evaluator.class);
 			for (Evaluator ev : evList) {
 				evaluatorNames.add(ev.getName());
 			}

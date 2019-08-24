@@ -24,6 +24,7 @@ import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.xURI;
 import net.hudup.core.parser.JsonParser;
 import net.hudup.core.parser.JsonParserImpl;
+import net.hudup.core.parser.TextParserUtil;
 import net.hudup.core.security.Cipher;
 import net.hudup.core.security.CipherImpl;
 
@@ -41,17 +42,21 @@ public final class Util {
 
 	
 	/**
-	 * System properties
+	 * System properties.
 	 */
 	private final static Properties props = new Properties();
 	
+	/**
+	 * Hudup properties name.
+	 */
+	private final static String hudupPropName = "hudup.properties";
 	
 	/**
 	 * Loading system properties.
 	 */
 	static {
 		try {
-			InputStream in = Util.class.getResourceAsStream(RESOURCES_PACKAGE + "hudup.properties");
+			InputStream in = Util.class.getResourceAsStream(RESOURCES_PACKAGE + hudupPropName);
 			if (in != null) {
 				props.load(in);
 				in.close();
@@ -64,7 +69,7 @@ public final class Util {
 		
 		try {
 			Properties userProps = new Properties();
-			InputStream in = Util.class.getResourceAsStream(ROOT_PACKAGE + "hudup.properties");
+			InputStream in = Util.class.getResourceAsStream(ROOT_PACKAGE + hudupPropName);
 			if (in != null) {
 				userProps.load(in);
 				in.close();
@@ -75,6 +80,19 @@ public final class Util {
 			e.printStackTrace();
 		}
 		
+		try {
+			Properties userProps = new Properties();
+			InputStream in = Util.class.getResourceAsStream("/" + hudupPropName);
+			if (in != null) {
+				userProps.load(in);
+				in.close();
+				props.putAll(userProps);
+			}
+		}
+		catch (Throwable e) {
+			e.printStackTrace();
+		}
+
 	}
 	
 	
@@ -342,5 +360,29 @@ public final class Util {
 		return new JsonParserImpl();
 	}
 
+	
+	/**
+	 * Getting array of loadable packages.
+	 * @return array of loadable packages.
+	 */
+	public static String[] getLoadablePackages() {
+		List<String> prefixList = Util.newList();
+		String rootPackage = UriAdapter.packageSlashToDot(Constants.ROOT_PACKAGE);
+		prefixList.add(rootPackage);
+		
+		//Load additional packages.
+		String pkgProp = getHudupProperty("additional_packages");
+		if (pkgProp != null) {
+			List<String> pkgs = TextParserUtil.split(pkgProp, ",", null);
+			for (String pkg : pkgs) {
+				pkg = UriAdapter.packageSlashToDot(pkg);
+				if (pkg != null && !pkg.isEmpty() && !pkg.equals(rootPackage))
+					prefixList.add(pkg);
+			}
+		}
+		
+		return prefixList.toArray(new String[] {});
+	}
+	
 	
 }

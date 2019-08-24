@@ -20,9 +20,9 @@ public interface PluginManager {
 	
 	/**
 	 * The main method discovers automatically all algorithms via their names at the booting time.
-	 * @param prefix text string of root path to discover algorithms, for example, &quot;/net/hudup/&quot;.
+	 * @param prefixList list of text strings of root paths to discover algorithms, for example, &quot;/net/hudup/&quot;.
 	 */
-	void discover(String prefix);
+	void discover(String...prefixList);
 	
 	
 }

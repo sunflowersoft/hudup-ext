@@ -8,6 +8,7 @@ import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.RecommendParam;
 import net.hudup.core.alg.Recommender;
 import net.hudup.core.alg.SetupAlgEvent;
+import net.hudup.core.alg.TempAlg;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.DatasetPair;
 import net.hudup.core.data.Fetcher;
@@ -538,7 +539,7 @@ public class RecommendEvaluator extends AbstractEvaluator {
 	@Override
 	public boolean acceptAlg(Alg alg) throws RemoteException {
 		// TODO Auto-generated method stub
-		return alg instanceof Recommender;
+		return (alg instanceof Recommender) && (!(alg instanceof TempAlg));
 	}
 
 

@@ -1,7 +1,5 @@
 package net.hudup.evaluate.ui;
 
-import static net.hudup.core.Constants.ROOT_PACKAGE;
-
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Image;
@@ -316,7 +314,7 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 	 * @param oldGUI old GUI.
 	 */
 	public static void switchEvaluator(String selectedEvName, Window oldGUI) {
-		List<Evaluator> evList = SystemUtil.getInstances(ROOT_PACKAGE, Evaluator.class);
+		List<Evaluator> evList = SystemUtil.getInstances(Evaluator.class);
 		if (evList.size() == 0) {
 			JOptionPane.showMessageDialog(
 					null, 

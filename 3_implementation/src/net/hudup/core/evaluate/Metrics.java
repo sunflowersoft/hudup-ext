@@ -174,10 +174,14 @@ public class Metrics implements Serializable {
 			Object[] params) {
 		Metrics result = recalc(alg.getName(), datasetId, metricClass, params);
 
-		//if (alg instanceof TestingAlg) { //This code line makes program run redundantly.
+		//if (alg instanceof ExecutableAlg) { //This code line makes program run redundantly.
 		if ((alg instanceof ExecutableAlg) && (metricClass != null) && (metricClass.isAssignableFrom(SetupTimeMetric.class))) {
 			String algName = alg.getName();
-			String algDesc = ((ExecutableAlg)alg).getDescription();
+			String algDesc = "";
+			try {
+				algDesc = ((ExecutableAlg)alg).remoteGetDescription();
+			}
+			catch (Exception e) { e.printStackTrace(); }
 			algDesc = algDesc == null ? "" : algDesc;
 			
 			Map<Integer, String> descMap = null;

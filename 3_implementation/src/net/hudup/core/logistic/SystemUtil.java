@@ -145,15 +145,26 @@ public final class SystemUtil {
 	
 	
 	/**
-	 * Getting a list of instances from specified package and referred class.
+	 * Getting a list of instances from referred class.
 	 * @param <T> type of returned instances.
-	 * @param prefix specified package.
 	 * @param referredClass referred class.
 	 * @return list of instances from specified package and referred class.
 	 */
-	public static <T> List<T> getInstances(String prefix, Class<T> referredClass) {
-		prefix = UriAdapter.packageSlashToDot(prefix);		
-		Reflections reflections = new Reflections(prefix);
+	public static <T> List<T> getInstances(Class<T> referredClass) {
+		String[] prefixList = Util.getLoadablePackages();
+		Reflections reflections = null;
+		for (String prefix : prefixList) {
+			try {
+				Reflections tempReflections = new Reflections(prefix);
+				if (reflections == null)
+					reflections = tempReflections;
+				else
+					reflections.merge(tempReflections);
+			}
+			catch (Exception e) {e.printStackTrace();}
+		}
+		if (reflections == null) return Util.newList();
+		
 		Set<Class<? extends T>> apClasses = reflections.getSubTypesOf(referredClass);
 		List<T> instances = Util.newList();
 		for (Class<? extends T> apClass : apClasses) {

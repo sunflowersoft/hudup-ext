@@ -24,7 +24,6 @@ import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.UriAdapter.AdapterWriter;
 import net.hudup.core.logistic.xURI;
 import net.hudup.core.parser.DatasetParser;
-import net.hudup.core.parser.TextParserUtil;
 
 /**
  * This class is the full implementation of {@link PluginManager}.
@@ -135,6 +134,18 @@ public class Firer implements PluginManager {
 		}
 
 		
+		discover(Util.getLoadablePackages());
+	}
+	
+	
+	@Override
+	public void discover(String...prefixList) {
+		if (prefixList == null || prefixList.length == 0) {
+			logger.error("Cannot discover classes because of empty packages list.");
+			return;
+		}
+		
+		
 		AdapterWriter nextUpdateLog = null;
 		try {
 			nextUpdateLog = new AdapterWriter(xURI.create(Constants.LOGS_DIRECTORY +"/nextupdate.log"), false);
@@ -143,45 +154,27 @@ public class Firer implements PluginManager {
 			e.printStackTrace();
 		}
 
-		//Load root package.
-		String rootPackage = UriAdapter.packageSlashToDot(Constants.ROOT_PACKAGE);
-		discover(rootPackage);
 		
-		//Load additional packages.
-		String pkgProp = Util.getHudupProperty("additional_packages");
-		if (pkgProp != null) {
-			List<String> pkgs = TextParserUtil.split(pkgProp, ",", null);
-			for (String pkg : pkgs) {
-				pkg = UriAdapter.packageSlashToDot(pkg);
-				if (pkg.isEmpty() || pkg.equals(rootPackage)) continue;
-				
-				try {
-					discover(pkg);
-				}
-				catch (Exception e) {
-					e.printStackTrace();
-				}
+		Reflections reflections = null;
+		for (String prefix : prefixList) {
+			try {
+				Reflections tempReflections = new Reflections(prefix);
+				if (reflections == null)
+					reflections = tempReflections;
+				else
+					reflections.merge(tempReflections);
 			}
+			catch (Exception e) {e.printStackTrace();}
 		}
-		
-		try {
-			if (nextUpdateLog != null) nextUpdateLog.close();
-			nextUpdateLog = null;
+		if (reflections == null) {
+			logger.error("Null reflection for discovering classes.");
+			return;
 		}
-		catch (Throwable e) {
-			e.printStackTrace();
-		}
-	}
-	
-	
-	@Override
-	public void discover(String prefix) {
 		
 		List<Class<? extends Alg>> compositeAlgClassList = Util.newList();
-		try {
-			Reflections reflections = new Reflections(prefix);
-			Set<Class<? extends Alg>> algClasses = reflections.getSubTypesOf(Alg.class);
-			for (Class<? extends Alg> algClass : algClasses) {
+		Set<Class<? extends Alg>> algClasses = reflections.getSubTypesOf(Alg.class);
+		for (Class<? extends Alg> algClass : algClasses) {
+			try {
 				if (algClass.isInterface() || algClass.isMemberClass() || algClass.isAnonymousClass())
 					continue;
 				
@@ -200,7 +193,7 @@ public class Firer implements PluginManager {
 				Alg alg = Util.newInstance(algClass);
 				if (alg == null)
 					continue;
-
+	
 				NextUpdate nextUpdate = algClass.getAnnotation(NextUpdate.class);
 				if (nextUpdate != null) {
 					PluginStorage.getNextUpdateList().add(alg);
@@ -214,19 +207,26 @@ public class Firer implements PluginManager {
 			
 				registerAlg(alg);
 			}
+			catch (Exception e) {e.printStackTrace();}
+		}
 			
+		for (Class<? extends Alg> compositeAlgClass : compositeAlgClassList) {
+			try {
+				Alg compositeAlg = Util.newInstance(compositeAlgClass);
+				if (compositeAlg != null)
+					registerAlg(compositeAlg);
+			}
+			catch (Exception e) {e.printStackTrace();}
+		}
+		
+		
+		try {
+			if (nextUpdateLog != null) nextUpdateLog.close();
+			nextUpdateLog = null;
 		}
 		catch (Throwable e) {
 			e.printStackTrace();
 		}
-
-		for (Class<? extends Alg> compositeAlgClass : compositeAlgClassList) {
-			Alg compositeAlg = Util.newInstance(compositeAlgClass);
-			if (compositeAlg != null)
-				registerAlg(compositeAlg);
-		}
-		
-		
 	}
 	
 	

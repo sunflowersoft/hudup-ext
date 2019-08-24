@@ -97,7 +97,11 @@ public class MetricWrapper2 extends MetricWrapper {
 			return null;
 		
 		MetricWrapper2 wrapper = new MetricWrapper2();
-		String algDesc = (alg instanceof ExecutableAlg) ? ((ExecutableAlg)alg).getDescription() : "";
+		String algDesc = "";
+		try {
+			algDesc = (alg instanceof ExecutableAlg) ? ((ExecutableAlg)alg).remoteGetDescription() : "";
+		}
+		catch (Exception e) { e.printStackTrace(); algDesc = ""; }
 		wrapper.setup(metric, alg.getName(), datasetId, algDesc);
 		wrapper.setDatasetUri(datasetUri);
 		

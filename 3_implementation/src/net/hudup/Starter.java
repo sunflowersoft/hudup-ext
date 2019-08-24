@@ -1,7 +1,5 @@
 package net.hudup;
 
-import static net.hudup.core.Constants.ROOT_PACKAGE;
-
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -38,7 +36,7 @@ public class Starter {
 	 */
 	public static void main(final String[] args) {
 		// TODO Auto-generated method stub
-		List<AccessPoint> apList = SystemUtil.getInstances(ROOT_PACKAGE, AccessPoint.class);
+		List<AccessPoint> apList = SystemUtil.getInstances(AccessPoint.class);
 		if (apList.size() == 0) {
 			JOptionPane.showMessageDialog(
 					null, 

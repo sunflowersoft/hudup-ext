@@ -9,7 +9,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
 import net.hudup.core.alg.Alg;
-import net.hudup.core.alg.ExecutableAlg;
+import net.hudup.core.logistic.Inspectable;
 import net.hudup.core.logistic.ui.UIUtil;
 
 
@@ -50,14 +50,14 @@ public final class AlgListUIUtil {
 		ctxMenu.add(miConfig);
 		
 		//Showing description of the algorithm
-		if (alg instanceof ExecutableAlg) {
+		if (alg instanceof Inspectable) {
 			JMenuItem miManifest = new JMenuItem("Manifest");
 			miManifest.addActionListener( 
 				new ActionListener() {
 					
 					@Override
 					public void actionPerformed(ActionEvent e) {
-						((ExecutableAlg)alg).manifest();
+						((Inspectable)alg).manifest();
 					}
 				});
 			ctxMenu.add(miManifest);

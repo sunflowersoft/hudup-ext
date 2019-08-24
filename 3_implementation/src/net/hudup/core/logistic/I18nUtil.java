@@ -68,6 +68,11 @@ public final class I18nUtil {
 	 */
 	private static String DEFAULT_BUNDLE_BASE_NAME2   = Constants.ROOT_PACKAGE + DEFAULT_MESSAGE_NAME;
 	
+	/**
+	 * The third base of the bundle of I18n messages within the class path.
+	 */
+	private static String DEFAULT_BUNDLE_BASE_NAME3   = "/" + DEFAULT_MESSAGE_NAME;
+	
 	
 	/**
 	 * System i18n properties list.
@@ -238,6 +243,7 @@ public final class I18nUtil {
 		Properties temp = new Properties();
 		loadMessages0(DEFAULT_BUNDLE_BASE_NAME, temp, language, country);
 		loadMessages0(DEFAULT_BUNDLE_BASE_NAME2, temp, language, country);
+		loadMessages0(DEFAULT_BUNDLE_BASE_NAME3, temp, language, country);
 		
 		properties.putAll(temp);
 		temp.clear();
@@ -253,14 +259,14 @@ public final class I18nUtil {
 	 */
 	private static void loadMessages0(String baseName, Properties properties, String language, String country) {
 		try {
-			ResourceBundle bundle0 = getMessageBundle(baseName, language, country);
-			if (bundle0 == null) return;
+			ResourceBundle bundle = getMessageBundle(baseName, language, country);
+			if (bundle == null) return;
 			
-			Enumeration<String> keys = bundle0.getKeys();
+			Enumeration<String> keys = bundle.getKeys();
 			
 			while (keys.hasMoreElements()) {
 				String key = keys.nextElement();
-				String value = bundle0.getString(key);
+				String value = bundle.getString(key);
 				if (value != null && !value.isEmpty())
 					properties.put(key, value);
 			}

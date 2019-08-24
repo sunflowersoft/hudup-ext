@@ -13,18 +13,16 @@ import net.hudup.core.data.AttributeList;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.Fetcher;
 import net.hudup.core.data.Profile;
-import net.hudup.core.logistic.NextUpdate;
 import net.hudup.core.logistic.ui.DescriptionDlg;
 import net.hudup.core.logistic.ui.UIUtil;
 
 /**
- * This is the most abstract class for testing algorithm.
+ * This is the most abstract class for executable algorithm.
  * 
  * @author Loc Nguyen
  * @version 1.0
  */
-@NextUpdate
-public abstract class AbstractExecutableAlg extends AbstractAlg implements ExecutableAlg {
+public abstract class AbstractExecutableAlg extends AbstractAlg implements ExecutableAlg2 {
 
 
 	/**
@@ -63,7 +61,7 @@ public abstract class AbstractExecutableAlg extends AbstractAlg implements Execu
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public synchronized void setup(Dataset dataset, Serializable...info) throws RemoteException {
+	public synchronized void setup(Dataset dataset, Object...info) throws Exception {
 		// TODO Auto-generated method stub
 		unsetup();
 		this.dataset = dataset;
@@ -72,13 +70,7 @@ public abstract class AbstractExecutableAlg extends AbstractAlg implements Execu
 		else
 			this.sample = dataset.fetchSample();
 		
-		try {
-			learn();
-		}
-		catch (Exception e) {
-			// TODO Auto-generated catch block
-			throw new RemoteException(e.getMessage(), e);
-		}
+		learn();
 		
 		SetupAlgEvent evt = new SetupAlgEvent(
 				this,
@@ -91,9 +83,21 @@ public abstract class AbstractExecutableAlg extends AbstractAlg implements Execu
 
 	
 	@Override
-	public void setup(Fetcher<Profile> sample, Serializable...info) throws RemoteException {
+	public void remoteSetup(Dataset dataset, Serializable...info) throws RemoteException {
 		// TODO Auto-generated method stub
-		List<Serializable> additionalInfo = Util.newList();
+		try {
+			setup(dataset, (Object[])info);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			throw new RemoteException(e.getMessage(), e);
+		}
+	}
+
+
+	@Override
+	public void setup(Fetcher<Profile> sample, Object...info) throws Exception {
+		// TODO Auto-generated method stub
+		List<Object> additionalInfo = Util.newList();
 		additionalInfo.add(sample);
 		additionalInfo.addAll(Arrays.asList(info));
 
@@ -102,7 +106,19 @@ public abstract class AbstractExecutableAlg extends AbstractAlg implements Execu
 
 
 	@Override
-	public synchronized void unsetup() throws RemoteException {
+	public void remoteSetup(Fetcher<Profile> sample, Serializable... info) throws RemoteException {
+		// TODO Auto-generated method stub
+		try {
+			setup(sample, (Object[])info);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			throw new RemoteException(e.getMessage(), e);
+		}
+	}
+
+
+	@Override
+	public synchronized void unsetup() {
 		try {
 			if (dataset != null && sample != null)
 				sample.close();
@@ -121,6 +137,31 @@ public abstract class AbstractExecutableAlg extends AbstractAlg implements Execu
 
 	
 	@Override
+	public void remoteUnsetup() throws RemoteException {
+		// TODO Auto-generated method stub
+		unsetup();
+	}
+
+
+	@Override
+	public Serializable remoteExecute(Serializable input) throws RemoteException {
+		// TODO Auto-generated method stub
+		Object result = execute(input);
+		if (result instanceof Serializable)
+			return (Serializable)result;
+		else
+			throw new RemoteException("Executed result is not serializable");
+	}
+
+
+	@Override
+	public String remoteGetDescription() throws RemoteException {
+		// TODO Auto-generated method stub
+		return getDescription();
+	}
+
+
+	@Override
 	public synchronized void manifest() {
 		// TODO Auto-generated method stub
 		new DescriptionDlg(UIUtil.getFrameForComponent(null), "Manifest", getDescription()).setVisible(true);;
@@ -128,7 +169,7 @@ public abstract class AbstractExecutableAlg extends AbstractAlg implements Execu
 
 	
 	@Override
-	public void addSetupListener(SetupAlgListener listener) {
+	public void addSetupListener(SetupAlgListener listener) throws RemoteException {
 		// TODO Auto-generated method stub
 		synchronized (listenerList) {
 			listenerList.add(SetupAlgListener.class, listener);
@@ -137,7 +178,7 @@ public abstract class AbstractExecutableAlg extends AbstractAlg implements Execu
 
 
 	@Override
-	public void removeSetupListener(SetupAlgListener listener) {
+	public void removeSetupListener(SetupAlgListener listener) throws RemoteException {
 		// TODO Auto-generated method stub
 		synchronized (listenerList) {
 			listenerList.remove(SetupAlgListener.class, listener);

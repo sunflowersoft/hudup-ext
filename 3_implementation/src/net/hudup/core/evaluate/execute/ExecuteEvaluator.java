@@ -5,6 +5,7 @@ import java.rmi.RemoteException;
 
 import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.ExecutableAlg;
+import net.hudup.core.alg.TempAlg;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.Fetcher;
@@ -39,7 +40,7 @@ public abstract class ExecuteEvaluator extends AbstractEvaluator {
 	protected void setupAlg(Alg alg, Dataset training) {
 		// TODO Auto-generated method stub
 		try {
-			((ExecutableAlg)alg).setup(training);
+			((ExecutableAlg)alg).remoteSetup(training);
 		}
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
@@ -52,7 +53,7 @@ public abstract class ExecuteEvaluator extends AbstractEvaluator {
 	protected void unsetupAlg(Alg alg) {
 		// TODO Auto-generated method stub
 		try {
-			((ExecutableAlg)alg).unsetup();
+			((ExecutableAlg)alg).remoteUnsetup();
 		}
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
@@ -78,7 +79,14 @@ public abstract class ExecuteEvaluator extends AbstractEvaluator {
 	@Override
 	protected Serializable executeAlg(Alg alg, Profile param) {
 		// TODO Auto-generated method stub
-		return ((ExecutableAlg)alg).execute(param);
+		try {
+			return ((ExecutableAlg)alg).remoteExecute(param);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return null;
 	}
 
 	
@@ -126,7 +134,7 @@ public abstract class ExecuteEvaluator extends AbstractEvaluator {
 	@Override
 	public boolean acceptAlg(Alg alg) throws RemoteException {
 		// TODO Auto-generated method stub
-		return (alg instanceof ExecutableAlg);
+		return (alg instanceof ExecutableAlg) && (!(alg instanceof TempAlg));
 	}
 
 	

@@ -42,6 +42,7 @@ import net.hudup.core.logistic.NextUpdate;
  */
 @BaseClass //This class is not really a base class but the notation "BaseClass" makes it not registered in plug-in storage.
 @NextUpdate
+//@Deprecated //This class should be annotated as deprecated class instead of being annotated as base class so that it is easy to improve it.
 public class RecommendContextPrefilter extends CompositeRecommender {
 
 	

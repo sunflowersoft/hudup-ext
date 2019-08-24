@@ -1,7 +1,5 @@
 package net.hudup;
 
-import static net.hudup.core.Constants.ROOT_PACKAGE;
-
 import java.io.Reader;
 import java.io.Writer;
 import java.rmi.RemoteException;
@@ -77,7 +75,7 @@ public class Evaluator implements AccessPoint {
 			ev = null;
 		}
 		if (ev == null) {
-			List<net.hudup.core.evaluate.Evaluator> tempEvList = SystemUtil.getInstances(ROOT_PACKAGE, net.hudup.core.evaluate.Evaluator.class);
+			List<net.hudup.core.evaluate.Evaluator> tempEvList = SystemUtil.getInstances(net.hudup.core.evaluate.Evaluator.class);
 			for (net.hudup.core.evaluate.Evaluator tempEv : tempEvList) {
 				try {
 					if (tempEv.getName().equals(args[0])) {
