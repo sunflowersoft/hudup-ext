@@ -8,6 +8,7 @@ import net.hudup.core.alg.cf.NeighborCFItemBased;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.logistic.Composite;
+import net.hudup.core.logistic.NextUpdate;
 import net.hudup.core.logistic.xURI;
 
 
@@ -21,6 +22,7 @@ import net.hudup.core.logistic.xURI;
  *
  */
 @Composite
+@NextUpdate
 public abstract class CompositeRecommender extends Recommender implements CompositeAlg {
 
 	
@@ -74,7 +76,7 @@ public abstract class CompositeRecommender extends Recommender implements Compos
 
 
 	@Override
-	public void setup(Dataset dataset, Serializable... params) throws RemoteException {
+	public synchronized void setup(Dataset dataset, Serializable... params) throws RemoteException {
 		// TODO Auto-generated method stub
 		unsetup();
 		
@@ -87,7 +89,7 @@ public abstract class CompositeRecommender extends Recommender implements Compos
 
 
 	@Override
-	public void unsetup() throws RemoteException {
+	public synchronized void unsetup() throws RemoteException {
 		// TODO Auto-generated method stub
 		super.unsetup();
 		

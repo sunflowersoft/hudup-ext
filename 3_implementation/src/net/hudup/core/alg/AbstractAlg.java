@@ -56,13 +56,13 @@ public abstract class AbstractAlg implements Alg {
 	 * Setting the configuration of this algorithm by specified configuration.
 	 * @param config specified configuration.
 	 */
-	public void setConfig(DataConfig config) {
+	public synchronized void setConfig(DataConfig config) {
 		this.config = config;
 	}
 	
 	
 	@Override
-	public void resetConfig() {
+	public synchronized void resetConfig() {
 		// TODO Auto-generated method stub
 		config.clear();
 		config.putAll(createDefaultConfig());

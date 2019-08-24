@@ -3,6 +3,7 @@ package net.hudup.core.alg;
 import java.io.Serializable;
 
 import net.hudup.core.data.Dataset;
+import net.hudup.core.logistic.NextUpdate;
 
 
 /**
@@ -25,6 +26,7 @@ import net.hudup.core.data.Dataset;
  * @version 10.0
  *
  */
+@NextUpdate
 public interface RecommendFilter extends Serializable {
 	
 	

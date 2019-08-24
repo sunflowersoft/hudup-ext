@@ -106,7 +106,7 @@ public class NeighborCFUserBased extends NeighborCF implements DuplicatableAlg {
 					
 					// computing similarity
 					double sim = Constants.UNUSED;
-					if (cf.isCached() && thisUser.id() < 0) { //Local caching
+					if (cf.isCached() && cf.isCachedMeasure() && thisUser.id() < 0) { //Local caching
 						if (localUserSimCache.containsKey(thatUser.id()))
 							sim = localUserSimCache.get(thatUser.id());
 						else {

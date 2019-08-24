@@ -80,7 +80,7 @@ public class SocketRecommender extends ServiceRecommender implements SocketAlg {
 
 
 	@Override
-	public void setup(Dataset dataset, Serializable... params) throws RemoteException {
+	public synchronized void setup(Dataset dataset, Serializable... params) throws RemoteException {
 		// TODO Auto-generated method stub
 		unsetup();
 		
@@ -96,7 +96,7 @@ public class SocketRecommender extends ServiceRecommender implements SocketAlg {
 
 	
 	@Override
-	public void unsetup() throws RemoteException {
+	public synchronized void unsetup() throws RemoteException {
 		try {
 			if (connection != null) {
 				connection.close();
@@ -112,7 +112,7 @@ public class SocketRecommender extends ServiceRecommender implements SocketAlg {
 
 	
 	@Override
-	public RatingVector estimate(RecommendParam param, Set<Integer> queryIds) throws RemoteException {
+	public synchronized RatingVector estimate(RecommendParam param, Set<Integer> queryIds) throws RemoteException {
 		// TODO Auto-generated method stub
 		
 		if (connection == null)
@@ -131,7 +131,7 @@ public class SocketRecommender extends ServiceRecommender implements SocketAlg {
 
 	
 	@Override
-	public RatingVector recommend(RecommendParam param, int maxRecommend) throws RemoteException {
+	public synchronized RatingVector recommend(RecommendParam param, int maxRecommend) throws RemoteException {
 		// TODO Auto-generated method stub
 		
 		if (connection == null)

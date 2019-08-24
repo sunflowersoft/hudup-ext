@@ -75,7 +75,7 @@ public class RmiRecommender extends ServiceRecommender implements RmiAlg {
 
 
 	@Override
-	public void setup(Dataset dataset, Serializable... params) throws RemoteException {
+	public synchronized void setup(Dataset dataset, Serializable... params) throws RemoteException {
 		// TODO Auto-generated method stub
 		unsetup();
 		
@@ -89,7 +89,7 @@ public class RmiRecommender extends ServiceRecommender implements RmiAlg {
 
 	
 	@Override
-	public void unsetup() throws RemoteException {
+	public synchronized void unsetup() throws RemoteException {
 		// TODO Auto-generated method stub
 		service = null;
 
@@ -98,7 +98,7 @@ public class RmiRecommender extends ServiceRecommender implements RmiAlg {
 
 
 	@Override
-	public RatingVector estimate(RecommendParam param, Set<Integer> queryIds) throws RemoteException {
+	public synchronized RatingVector estimate(RecommendParam param, Set<Integer> queryIds) throws RemoteException {
 		// TODO Auto-generated method stub
 		
 		try {
@@ -113,7 +113,7 @@ public class RmiRecommender extends ServiceRecommender implements RmiAlg {
 
 	
 	@Override
-	public RatingVector recommend(RecommendParam param, int maxRecommend) throws RemoteException {
+	public synchronized RatingVector recommend(RecommendParam param, int maxRecommend) throws RemoteException {
 		// TODO Auto-generated method stub
 
 		try {

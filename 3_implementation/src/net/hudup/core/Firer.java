@@ -24,6 +24,7 @@ import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.UriAdapter.AdapterWriter;
 import net.hudup.core.logistic.xURI;
 import net.hudup.core.parser.DatasetParser;
+import net.hudup.core.parser.TextParserUtil;
 
 /**
  * This class is the full implementation of {@link PluginManager}.
@@ -51,6 +52,12 @@ public class Firer implements PluginManager {
 	 */
 	protected final static Logger logger = Logger.getLogger(Firer.class);
 
+	
+	/**
+	 * Logger of next-update classes.
+	 */
+	protected AdapterWriter nextUpdateLog = null;
+	
 	
 	/**
 	 * This default constructor calls the method {@link #fire()} to initialize important system information.
@@ -127,12 +134,6 @@ public class Firer implements PluginManager {
 			
 		}
 
-		discover(UriAdapter.packageSlashToDot(Constants.ROOT_PACKAGE));
-	}
-	
-	
-	@Override
-	public void discover(String prefix) {
 		
 		AdapterWriter nextUpdateLog = null;
 		try {
@@ -141,6 +142,40 @@ public class Firer implements PluginManager {
 		catch (Throwable e) {
 			e.printStackTrace();
 		}
+
+		//Load root package.
+		String rootPackage = UriAdapter.packageSlashToDot(Constants.ROOT_PACKAGE);
+		discover(rootPackage);
+		
+		//Load additional packages.
+		String pkgProp = Util.getHudupProperty("additional_packages");
+		if (pkgProp != null) {
+			List<String> pkgs = TextParserUtil.split(pkgProp, ",", null);
+			for (String pkg : pkgs) {
+				pkg = UriAdapter.packageSlashToDot(pkg);
+				if (pkg.isEmpty() || pkg.equals(rootPackage)) continue;
+				
+				try {
+					discover(pkg);
+				}
+				catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		
+		try {
+			if (nextUpdateLog != null) nextUpdateLog.close();
+			nextUpdateLog = null;
+		}
+		catch (Throwable e) {
+			e.printStackTrace();
+		}
+	}
+	
+	
+	@Override
+	public void discover(String prefix) {
 		
 		List<Class<? extends Alg>> compositeAlgClassList = Util.newList();
 		try {
@@ -191,14 +226,6 @@ public class Firer implements PluginManager {
 				registerAlg(compositeAlg);
 		}
 		
-		try {
-			if (nextUpdateLog != null)
-				nextUpdateLog.close();
-			nextUpdateLog = null;
-		}
-		catch (Throwable e) {
-			e.printStackTrace();
-		}
 		
 	}
 	

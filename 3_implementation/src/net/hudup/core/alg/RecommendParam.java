@@ -8,6 +8,7 @@ import net.hudup.core.data.Profile;
 import net.hudup.core.data.RatingVector;
 import net.hudup.core.data.UserRating;
 import net.hudup.core.data.ctx.ContextList;
+import net.hudup.core.logistic.NextUpdate;
 import net.hudup.core.parser.TextParsable;
 import net.hudup.core.parser.TextParserUtil;
 
@@ -30,6 +31,7 @@ import net.hudup.core.parser.TextParserUtil;
  * @version 10.0
  *
  */
+@NextUpdate
 public class RecommendParam implements Serializable, Cloneable, TextParsable {
 	
 	

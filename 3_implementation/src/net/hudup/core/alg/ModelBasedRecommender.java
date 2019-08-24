@@ -65,7 +65,7 @@ public abstract class ModelBasedRecommender extends Recommender implements Model
 
 
 	@Override
-	public void setup(Dataset dataset, Serializable... params) throws RemoteException {
+	public synchronized void setup(Dataset dataset, Serializable... params) throws RemoteException {
 		// TODO Auto-generated method stub
 		unsetup();
 		
@@ -81,7 +81,7 @@ public abstract class ModelBasedRecommender extends Recommender implements Model
 
 	
 	@Override
-	public void unsetup() throws RemoteException {
+	public synchronized void unsetup() throws RemoteException {
 		// TODO Auto-generated method stub
 		super.unsetup();
 		if (kb != null)

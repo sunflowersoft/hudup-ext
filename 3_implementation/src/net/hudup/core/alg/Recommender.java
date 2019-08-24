@@ -59,7 +59,7 @@ public abstract class Recommender extends AbstractAlg {
 	 * Unset this recommender. After this method is called, this recommender cannot be used unless the method {@link #setup(Dataset, Object...)} is called again.
 	 * @throws RemoteException if any error raises.
 	 */
-	public void unsetup() throws RemoteException {
+	public synchronized void unsetup() throws RemoteException {
 		filterList.clear();
 		Dataset dataset = getDataset();
 		if (dataset != null && dataset.isExclusive())

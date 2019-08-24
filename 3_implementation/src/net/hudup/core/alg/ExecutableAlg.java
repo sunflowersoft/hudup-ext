@@ -6,6 +6,7 @@ import java.rmi.RemoteException;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.Fetcher;
 import net.hudup.core.data.Profile;
+import net.hudup.core.logistic.NextUpdate;
 
 /**
  * This interface represents any executable algorithm.
@@ -14,6 +15,7 @@ import net.hudup.core.data.Profile;
  * @version 1.0
  *
  */
+@NextUpdate
 public interface ExecutableAlg extends Alg {
 	
 	

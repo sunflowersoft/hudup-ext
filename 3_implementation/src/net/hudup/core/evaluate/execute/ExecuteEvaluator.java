@@ -14,6 +14,7 @@ import net.hudup.core.evaluate.HudupRecallMetric;
 import net.hudup.core.evaluate.NoneWrapperMetricList;
 import net.hudup.core.evaluate.SetupTimeMetric;
 import net.hudup.core.evaluate.SpeedMetric;
+import net.hudup.core.logistic.NextUpdate;
 
 /**
  * Abstract evaluator for evaluating testing algorithm.
@@ -22,6 +23,7 @@ import net.hudup.core.evaluate.SpeedMetric;
  * @version 1.0
  *
  */
+@NextUpdate
 public abstract class ExecuteEvaluator extends AbstractEvaluator {
 
 	

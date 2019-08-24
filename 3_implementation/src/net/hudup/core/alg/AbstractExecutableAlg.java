@@ -13,6 +13,7 @@ import net.hudup.core.data.AttributeList;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.Fetcher;
 import net.hudup.core.data.Profile;
+import net.hudup.core.logistic.NextUpdate;
 import net.hudup.core.logistic.ui.DescriptionDlg;
 import net.hudup.core.logistic.ui.UIUtil;
 
@@ -22,6 +23,7 @@ import net.hudup.core.logistic.ui.UIUtil;
  * @author Loc Nguyen
  * @version 1.0
  */
+@NextUpdate
 public abstract class AbstractExecutableAlg extends AbstractAlg implements ExecutableAlg {
 
 

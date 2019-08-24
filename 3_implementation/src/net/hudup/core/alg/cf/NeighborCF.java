@@ -283,10 +283,6 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 		
 		this.ratingMedian = (this.config.getMinRating() + this.config.getMaxRating()) / 2.0;
 		
-		this.userRatingCache.clear();
-		this.rowSimCache.clear();
-		this.columnSimCache.clear();
-
 		updateUserMeanVars(dataset);
 		updateItemMeanVars(dataset);
 	}
@@ -298,6 +294,7 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 		super.unsetup();
 		
 		this.ratingMedian = Constants.UNUSED;
+		
 		this.ratingMean = Constants.UNUSED;
 		this.ratingVar = Constants.UNUSED;
 		this.userMeans.clear();
@@ -483,8 +480,17 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 	 * Setting the similarity measure.
 	 * @param measure the similarity measure.
 	 */
-	public void setSimilarMeasure(String measure) {
+	public synchronized void setSimilarMeasure(String measure) {
 		config.put(MEASURE, measure);
+	}
+	
+	
+	/**
+	 * Checking whether the supported similar measure can be cached.
+	 * @return true if the supported similar measure can be cached.
+	 */
+	protected boolean isCachedMeasure() {
+		return true;
 	}
 	
 	
@@ -585,7 +591,9 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 	 */
 	public synchronized double similar(RatingVector vRating1, RatingVector vRating2, Profile profile1, Profile profile2, Object...parameters) {
 		String measure = getSimilarMeasure();
-
+		if (!isCachedMeasure())
+			return similarAsUsual(measure, vRating1, vRating2, profile1, profile2, parameters);
+		
 		Task task = new Task() {
 			
 			@Override

@@ -2,6 +2,7 @@ package net.hudup.core.alg;
 
 import java.io.Serializable;
 
+import net.hudup.core.logistic.NextUpdate;
 
 
 /**
@@ -16,6 +17,7 @@ import java.io.Serializable;
  * @version 10.0
  *
  */
+@NextUpdate
 public class RecommendFilterParam implements Serializable {
 
 	

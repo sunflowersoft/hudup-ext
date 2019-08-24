@@ -10,6 +10,7 @@ import net.hudup.core.data.Rating;
 import net.hudup.core.data.RatingVector;
 import net.hudup.core.data.ctx.ContextList;
 import net.hudup.core.logistic.BaseClass;
+import net.hudup.core.logistic.NextUpdate;
 
 
 /**
@@ -39,7 +40,8 @@ import net.hudup.core.logistic.BaseClass;
  * @version 10.0
  *
  */
-@BaseClass
+@BaseClass //This class is not really a base class but the notation "BaseClass" makes it not registered in plug-in storage.
+@NextUpdate
 public class RecommendContextPrefilter extends CompositeRecommender {
 
 	
@@ -88,7 +90,7 @@ public class RecommendContextPrefilter extends CompositeRecommender {
 	
 	
 	@Override
-	public void setup(Dataset dataset, Serializable... params) throws RemoteException {
+	public synchronized void setup(Dataset dataset, Serializable... params) throws RemoteException {
 		// TODO Auto-generated method stub
 		unsetup();
 		
@@ -126,7 +128,7 @@ public class RecommendContextPrefilter extends CompositeRecommender {
 	
 	
 	@Override
-	public void unsetup() throws RemoteException {
+	public synchronized void unsetup() throws RemoteException {
 		// TODO Auto-generated method stub
 		super.unsetup();
 		
@@ -174,7 +176,7 @@ public class RecommendContextPrefilter extends CompositeRecommender {
 	
 	
 	@Override
-	public RatingVector estimate(RecommendParam param, Set<Integer> queryIds) throws RemoteException {
+	public synchronized RatingVector estimate(RecommendParam param, Set<Integer> queryIds) throws RemoteException {
 		// TODO Auto-generated method stub
 		
 		try {
@@ -192,7 +194,7 @@ public class RecommendContextPrefilter extends CompositeRecommender {
 
 	
 	@Override
-	public RatingVector recommend(RecommendParam param, int maxRecommend) throws RemoteException {
+	public synchronized RatingVector recommend(RecommendParam param, int maxRecommend) throws RemoteException {
 		// TODO Auto-generated method stub
 
 		try {
