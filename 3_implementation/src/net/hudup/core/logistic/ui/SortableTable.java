@@ -60,6 +60,7 @@ import javax.swing.table.TableColumnModel;
  * @author Original Author:  David Gilbert (for Object Refinery Limited), Nobuo Tamemasa.<br>
  * @version 2.1
  */
+@Deprecated
 public class SortableTable extends JTable {
 	
 	/**
@@ -138,6 +139,7 @@ public class SortableTable extends JTable {
  * @version 2.1
  *
  */
+@Deprecated
 class SortableTableHeaderListener implements MouseListener, MouseMotionListener {
 
     /** A reference to the table model. */
@@ -285,6 +287,7 @@ class SortableTableHeaderListener implements MouseListener, MouseMotionListener 
  * @version 2.1
  *
  */
+@Deprecated
 class SortButtonRenderer implements TableCellRenderer {
 
     /**

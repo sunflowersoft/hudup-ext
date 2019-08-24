@@ -124,8 +124,8 @@ public class MetricsUtil {
 		if (algNameList.size() == 0 || datasetIdList.size() == 0)
 			return null;
 		
-		int curves = datasetIdList.size();
-		int points = algNameList.size();
+		int curves = datasetIdList.size(); //Datasets are curves
+		int points = algNameList.size(); //Algorithms are points on horizontal axis (x axis).
 		int n = Math.max(points, 3);
 		double[][] data = PlotGraph.data(curves, n);
 		
@@ -135,7 +135,7 @@ public class MetricsUtil {
 			int curveIdx = 2*i;
 			for (int j = 0; j < points; j++) {
 				Metric metric = this.metrics.get(metricName, algNameList.get(j), datasetId);
-				data[curveIdx][j] = j;
+				data[curveIdx][j] = j; //x value of the curveIdx curve. 
 				
 				double value = 0;
 				if (metric != null && metric.isValid() && metric.getAccumValue().isUsed()) {
@@ -153,7 +153,7 @@ public class MetricsUtil {
 								algNameList.get(j) + "\" and dataset \"" + datasetId + "\"";
 					System.out.println(info);
 				}
-				data[curveIdx + 1][j] = value;
+				data[curveIdx + 1][j] = value; //y value of the curveIdx curve. 
 			}
 			
 		}
@@ -166,6 +166,7 @@ public class MetricsUtil {
 				int curveIdx = 2*i;
 				for (int j = points; j < n; j++) {
 					data[curveIdx][j] = j;
+					//Redundant Y values are the same with the last points.
 					data[curveIdx + 1][j] = data[curveIdx + 1][points - 1];
 				}
 			}
