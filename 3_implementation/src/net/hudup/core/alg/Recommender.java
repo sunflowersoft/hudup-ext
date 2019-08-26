@@ -20,7 +20,7 @@ import net.hudup.core.data.RatingVector;
  * @author Loc Nguyen
  * @version 10.0
  */
-public abstract class Recommender extends AbstractAlg {
+public abstract class Recommender extends AbstractAlg implements RemoteAlg {
 
 	
 	/**

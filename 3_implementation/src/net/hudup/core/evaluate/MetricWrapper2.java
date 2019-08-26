@@ -99,7 +99,7 @@ public class MetricWrapper2 extends MetricWrapper {
 		MetricWrapper2 wrapper = new MetricWrapper2();
 		String algDesc = "";
 		try {
-			algDesc = (alg instanceof ExecutableAlg) ? ((ExecutableAlg)alg).remoteGetDescription() : "";
+			algDesc = (alg instanceof ExecutableAlg) ? ((ExecutableAlg)alg).getDescription() : "";
 		}
 		catch (Exception e) { e.printStackTrace(); algDesc = ""; }
 		wrapper.setup(metric, alg.getName(), datasetId, algDesc);

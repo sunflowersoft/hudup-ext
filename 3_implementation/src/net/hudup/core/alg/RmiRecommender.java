@@ -58,6 +58,13 @@ public class RmiRecommender extends ServiceRecommender implements RmiAlg {
 
 	
 	@Override
+	public String getDescription() throws RemoteException {
+		// TODO Auto-generated method stub
+		return "Recommendation algorithm by calling RMI service";
+	}
+
+
+	@Override
 	public Dataset getDataset() {
 		// TODO Auto-generated method stub
 		try {

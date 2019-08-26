@@ -1,5 +1,7 @@
 package net.hudup.core.alg;
 
+import java.rmi.RemoteException;
+
 import org.apache.log4j.Logger;
 
 import net.hudup.core.data.DataConfig;
@@ -15,7 +17,7 @@ import net.hudup.core.data.DataConfig;
  * @author Loc Nguyen
  * @version 10.0
  */
-public abstract class AbstractAlg implements Alg {
+public abstract class AbstractAlg implements Alg, RemoteAlg {
 
 	
 	/**
@@ -46,12 +48,26 @@ public abstract class AbstractAlg implements Alg {
 
 	
 	@Override
+	public String remoteGetName() throws RemoteException {
+		// TODO Auto-generated method stub
+		return getName();
+	}
+
+
+	@Override
 	public DataConfig getConfig() {
 		// TODO Auto-generated method stub
 		return config;
 	}
 
 	
+	@Override
+	public DataConfig remoteGetConfig() throws RemoteException {
+		// TODO Auto-generated method stub
+		return getConfig();
+	}
+
+
 	/**
 	 * Setting the configuration of this algorithm by specified configuration.
 	 * @param config specified configuration.

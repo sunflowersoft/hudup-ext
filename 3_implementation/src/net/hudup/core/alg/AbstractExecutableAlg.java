@@ -1,6 +1,5 @@
 package net.hudup.core.alg;
 
-import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.util.Arrays;
 import java.util.List;
@@ -22,7 +21,7 @@ import net.hudup.core.logistic.ui.UIUtil;
  * @author Loc Nguyen
  * @version 1.0
  */
-public abstract class AbstractExecutableAlg extends AbstractAlg implements ExecutableAlg2 {
+public abstract class AbstractExecutableAlg extends AbstractAlg implements ExecutableAlg {
 
 
 	/**
@@ -61,7 +60,7 @@ public abstract class AbstractExecutableAlg extends AbstractAlg implements Execu
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public synchronized void setup(Dataset dataset, Object...info) throws Exception {
+	public synchronized void setup(Dataset dataset, Object...info) throws RemoteException {
 		// TODO Auto-generated method stub
 		unsetup();
 		this.dataset = dataset;
@@ -83,19 +82,7 @@ public abstract class AbstractExecutableAlg extends AbstractAlg implements Execu
 
 	
 	@Override
-	public void remoteSetup(Dataset dataset, Serializable...info) throws RemoteException {
-		// TODO Auto-generated method stub
-		try {
-			setup(dataset, (Object[])info);
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			throw new RemoteException(e.getMessage(), e);
-		}
-	}
-
-
-	@Override
-	public void setup(Fetcher<Profile> sample, Object...info) throws Exception {
+	public void setup(Fetcher<Profile> sample, Object...info) throws RemoteException {
 		// TODO Auto-generated method stub
 		List<Object> additionalInfo = Util.newList();
 		additionalInfo.add(sample);
@@ -105,20 +92,17 @@ public abstract class AbstractExecutableAlg extends AbstractAlg implements Execu
 	}
 
 
-	@Override
-	public void remoteSetup(Fetcher<Profile> sample, Serializable... info) throws RemoteException {
-		// TODO Auto-generated method stub
-		try {
-			setup(sample, (Object[])info);
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			throw new RemoteException(e.getMessage(), e);
-		}
-	}
+	/**
+	 * Main method to learn parameters. As usual, it is called by {@link #remoteSetup(Dataset, Object...)}.
+	 * @param info additional parameter.
+	 * @return the parameter to be learned. Return null if learning is failed.
+	 * @exception RemoteException if any error occurs.
+	 */
+	protected abstract Object learn(Object...info) throws RemoteException;
 
-
+	
 	@Override
-	public synchronized void unsetup() {
+	public synchronized void unsetup() throws RemoteException {
 		try {
 			if (dataset != null && sample != null)
 				sample.close();
@@ -136,35 +120,53 @@ public abstract class AbstractExecutableAlg extends AbstractAlg implements Execu
 	}
 
 	
-	@Override
-	public void remoteUnsetup() throws RemoteException {
-		// TODO Auto-generated method stub
-		unsetup();
-	}
-
-
-	@Override
-	public Serializable remoteExecute(Serializable input) throws RemoteException {
-		// TODO Auto-generated method stub
-		Object result = execute(input);
-		if (result instanceof Serializable)
-			return (Serializable)result;
-		else
-			throw new RemoteException("Executed result is not serializable");
-	}
-
-
-	@Override
-	public String remoteGetDescription() throws RemoteException {
-		// TODO Auto-generated method stub
-		return getDescription();
-	}
+//	/**
+//	 * Getting parameter of the algorithm. Actually, this method call {@link #getParameter()}.
+//	 * @return parameter of the algorithm. Return null if the algorithm does not run yet or run failed. 
+//	 */
+//	protected Object queryParameter() {
+//		try {
+//			return getParameter();
+//		} catch (Throwable e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//		
+//		return null;
+//	}
+	
+	
+//    /**
+//	 * Getting description of this algorithm.
+//	 * This is remote method.
+//	 * @return text form of this model.
+//	 */
+//	protected String getDescription0() {
+//		// TODO Auto-generated method stub
+//		try {
+//			return getDescription();
+//		} catch (Exception e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//		
+//		return "";
+//	}
 
 
 	@Override
 	public synchronized void manifest() {
 		// TODO Auto-generated method stub
-		new DescriptionDlg(UIUtil.getFrameForComponent(null), "Manifest", getDescription()).setVisible(true);;
+		String desc = "";
+		try {
+			desc = getDescription();
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		desc = desc == null ? "" : desc;
+		
+		new DescriptionDlg(UIUtil.getFrameForComponent(null), "Manifest", desc).setVisible(true);;
 	}
 
 	

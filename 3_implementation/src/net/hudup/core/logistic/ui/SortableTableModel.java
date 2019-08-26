@@ -46,7 +46,6 @@ import javax.swing.table.DefaultTableModel;
  * @author David Gilbert (for Object Refinery Limited), Nobuo Tamemasa
  * @version 2.1
  */
-@Deprecated
 public class SortableTableModel extends DefaultTableModel {
 
 	/**

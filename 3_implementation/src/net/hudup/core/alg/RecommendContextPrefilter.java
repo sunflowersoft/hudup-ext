@@ -242,6 +242,13 @@ public class RecommendContextPrefilter extends CompositeRecommender {
 
 	
 	@Override
+	public String getDescription() throws RemoteException {
+		// TODO Auto-generated method stub
+		return "Recommendation algorithm based on context prefilter";
+	}
+
+
+	@Override
 	public Alg newInstance() {
 		// TODO Auto-generated method stub
 		return new RecommendContextPrefilter();

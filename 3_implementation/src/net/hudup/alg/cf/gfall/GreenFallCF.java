@@ -3,6 +3,8 @@
  */
 package net.hudup.alg.cf.gfall;
 
+import java.rmi.RemoteException;
+
 import net.hudup.core.alg.Alg;
 
 
@@ -38,6 +40,13 @@ public class GreenFallCF extends FreqItemsetBasedCF {
 	}
 
 	
+	@Override
+	public String getDescription() throws RemoteException {
+		// TODO Auto-generated method stub
+		return "Green Fall algorithm";
+	}
+
+
 	@Override
 	protected FreqItemsetFinder createFreqItemsetFinder() {
 		YRoller yroller = new YRoller();

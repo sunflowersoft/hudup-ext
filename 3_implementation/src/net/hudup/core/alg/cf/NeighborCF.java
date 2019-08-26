@@ -426,7 +426,7 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 	 * Getting the list of supported similar measures in names.
 	 * @return supported similar measures.
 	 */
-	public List<String> getSupportedSimilarMeasures() {
+	public List<String> getSupportedMeasures() {
 		// TODO Auto-generated method stub
 		Set<String> mSet = Util.newSet();
 		mSet.add(COSINE);
@@ -458,7 +458,7 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 	 * Getting the default similarity measure.
 	 * @return default similar measure.
 	 */
-	protected String getDefaultSimilarMeasure() {
+	protected String getDefaultMeasure() {
 		return COSINE;
 	}
 
@@ -467,10 +467,10 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 	 * Getting the similarity measure.
 	 * @return similar measure.
 	 */
-	public String getSimilarMeasure() {
+	public String getMeasure() {
 		String measure = config.getAsString(MEASURE);
 		if (measure == null)
-			return getDefaultSimilarMeasure();
+			return getDefaultMeasure();
 		else
 			return measure;
 	}
@@ -480,16 +480,17 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 	 * Setting the similarity measure.
 	 * @param measure the similarity measure.
 	 */
-	public synchronized void setSimilarMeasure(String measure) {
+	public synchronized void setMeasure(String measure) {
 		config.put(MEASURE, measure);
 	}
 	
 	
 	/**
-	 * Checking whether the supported similar measure can be cached.
-	 * @return true if the supported similar measure can be cached.
+	 * Checking whether the supported similarity can be cached.
+	 * In current version of this class, the method always returns true.
+	 * @return true if the supported similarity can be cached.
 	 */
-	protected boolean isCachedMeasure() {
+	protected boolean isCachedSim() {
 		return true;
 	}
 	
@@ -574,7 +575,7 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 	
 	
 	/**
-	 * Calculating the similarity measure between two pairs.
+	 * Calculating the similarity between two pairs.
 	 * The first pair includes the first rating vector and the first profile.
 	 * The second pair includes the second rating vector and the second profile.
 	 * If you only want to calculate the similarity between two rating vectors, two in put profiles are set to be null.
@@ -589,16 +590,16 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 	 * @param parameters extra parameters.
 	 * @return similarity between both two {@link RatingVector} (s) and two {@link Profile} (s).
 	 */
-	public synchronized double similar(RatingVector vRating1, RatingVector vRating2, Profile profile1, Profile profile2, Object...parameters) {
-		String measure = getSimilarMeasure();
-		if (!isCachedMeasure())
-			return similarAsUsual(measure, vRating1, vRating2, profile1, profile2, parameters);
+	public synchronized double sim(RatingVector vRating1, RatingVector vRating2, Profile profile1, Profile profile2, Object...parameters) {
+		String measure = getMeasure();
+		if (!isCachedSim())
+			return sim0(measure, vRating1, vRating2, profile1, profile2, parameters);
 		
 		Task task = new Task() {
 			
 			@Override
 			public Object perform(Object...params) {
-				return similarAsUsual(measure, vRating1, vRating2, profile1, profile2, parameters);
+				return sim0(measure, vRating1, vRating2, profile1, profile2, parameters);
 			}
 		};
 		
@@ -616,7 +617,7 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 	 * @param params extra parameter.
 	 * @return similarity between both two {@link RatingVector} (s) and two {@link Profile} (s) as usual.
 	 */
-	protected double similarAsUsual(String measure, RatingVector vRating1, RatingVector vRating2, Profile profile1, Profile profile2, Object...params) {
+	protected double sim0(String measure, RatingVector vRating1, RatingVector vRating2, Profile profile1, Profile profile2, Object...params) {
 //		boolean hybrid = config.getAsBoolean(HYBRID);
 //		if (!hybrid) {
 //			profile1 = null;
@@ -1173,7 +1174,7 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 	public DataConfig createDefaultConfig() {
 		DataConfig tempConfig = super.createDefaultConfig();
 		tempConfig.put(SUPPORT_CACHE_FIELD, SUPPORT_CACHE_DEFAULT);
-		tempConfig.put(MEASURE, getDefaultSimilarMeasure());
+		tempConfig.put(MEASURE, getDefaultMeasure());
 		tempConfig.put(COSINE_NORMALIZED_FIELD, COSINE_NORMALIZED_DEFAULT);
 		tempConfig.put(MSD_FRACTION_FIELD, MSD_FRACTION_DEFAULT);
 
@@ -1189,14 +1190,14 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 				// TODO Auto-generated method stub
 				if (key.equals(MEASURE)) {
 					String measure = getAsString(MEASURE);
-					measure = measure == null ? getDefaultSimilarMeasure() : measure;
+					measure = measure == null ? getDefaultMeasure() : measure;
 					return (Serializable) JOptionPane.showInputDialog(
 							comp, 
 							"Please choose one similar measure", 
 							"Choosing similar measure", 
 							JOptionPane.INFORMATION_MESSAGE, 
 							null, 
-							getSupportedSimilarMeasures().toArray(), 
+							getSupportedMeasures().toArray(), 
 							measure);
 				}
 				else 

@@ -101,7 +101,7 @@ public class NeighborCF2d extends NeighborCFUserBased {
 //					Profile userProfile2 = hybrid ? dataset.getUserProfile(thatUser.id()) : null;
 					
 					// computing similarity
-					double sim = similar(thisUser, thatUser, null, null, itemId);
+					double sim = sim(thisUser, thatUser, null, null, itemId);
 					if (!Util.isUsed(sim)) continue;
 					
 					double thatValue = thatUser.get(itemId).value;
@@ -137,7 +137,7 @@ public class NeighborCF2d extends NeighborCFUserBased {
 //						Profile profile2 = hybrid ? dataset.getItemProfile(thatItem.id()) : null;
 						
 						// computing similarity
-						double sim = itemBasedCF.similar(thisItem, thatItem, null/*profile1*/, null/*profile2*/, thisUser.id());
+						double sim = itemBasedCF.sim(thisItem, thatItem, null/*profile1*/, null/*profile2*/, thisUser.id());
 						if (!Util.isUsed(sim)) continue;
 						
 						double thatValue = thatItem.get(thisUser.id()).value;
@@ -180,6 +180,13 @@ public class NeighborCF2d extends NeighborCFUserBased {
 			return name;
 		else
 			return "neighborcf_2d";
+	}
+
+
+	@Override
+	public String getDescription() throws RemoteException {
+		// TODO Auto-generated method stub
+		return "Two-dimension collaborative filtering algorithm";
 	}
 
 
@@ -253,7 +260,7 @@ class NeighborCF2dDeprecated extends NeighborCFUserBased {
 //					Profile thisProfile = hybrid ? param.profile : null;
 //					Profile userProfile = hybrid ? dataset.getUserProfile(user.id()) : null;
 					
-					double userSim = similar(param.ratingVector, user, null, null, queryId);
+					double userSim = sim(param.ratingVector, user, null, null, queryId);
 					
 					try {
 						while (vItemRatings.next()) {

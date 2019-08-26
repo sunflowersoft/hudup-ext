@@ -3,6 +3,7 @@
  */
 package net.hudup.core.alg.cf;
 
+import java.rmi.RemoteException;
 import java.util.Map;
 import java.util.Set;
 
@@ -106,16 +107,16 @@ public class NeighborCFUserBased extends NeighborCF implements DuplicatableAlg {
 					
 					// computing similarity
 					double sim = Constants.UNUSED;
-					if (cf.isCached() && cf.isCachedMeasure() && thisUser.id() < 0) { //Local caching
+					if (cf.isCached() && cf.isCachedSim() && thisUser.id() < 0) { //Local caching
 						if (localUserSimCache.containsKey(thatUser.id()))
 							sim = localUserSimCache.get(thatUser.id());
 						else {
-							sim = cf.similar(thisUser, thatUser, null/*userProfile1*/, null/*userProfile2*/, itemId);
+							sim = cf.sim(thisUser, thatUser, null/*userProfile1*/, null/*userProfile2*/, itemId);
 							localUserSimCache.put(thatUser.id(), sim);
 						}
 					}
 					else
-						sim = cf.similar(thisUser, thatUser, null/*userProfile1*/, null/*userProfile2*/, itemId);
+						sim = cf.sim(thisUser, thatUser, null/*userProfile1*/, null/*userProfile2*/, itemId);
 					if (!Util.isUsed(sim)) continue;
 					
 					double thatValue = thatUser.get(itemId).value;
@@ -178,6 +179,13 @@ public class NeighborCFUserBased extends NeighborCF implements DuplicatableAlg {
 	}
 	
 	
+	@Override
+	public String getDescription() throws RemoteException {
+		// TODO Auto-generated method stub
+		return "User-based nearest neighbors collaborative filtering algorithm";
+	}
+
+
 	@Override
 	public Alg newInstance() {
 		// TODO Auto-generated method stub

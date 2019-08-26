@@ -1,14 +1,20 @@
 package net.hudup.core.alg.ui;
 
+import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
 import javax.swing.JDialog;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import javax.swing.WindowConstants;
 
 import net.hudup.core.alg.Alg;
+import net.hudup.core.alg.NoteAlg;
 import net.hudup.core.data.ui.PropPane;
 import net.hudup.core.logistic.ui.UIUtil;
 
@@ -42,6 +48,18 @@ public class AlgConfigDlg extends JDialog {
 	
 	
 	/**
+	 * Note panel.
+	 */
+	protected JPanel paneNote = null;
+	
+	
+	/**
+	 * Note text area.
+	 */
+	JTextArea txtNote = null;
+
+	
+	/**
 	 * Constructor with parent component and specified algorithm.
 	 * @param comp parent component.
 	 * @param alg specified algorithm whose configuration is edited.
@@ -53,6 +71,8 @@ public class AlgConfigDlg extends JDialog {
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		setSize(600, 400);
 		setLocationRelativeTo(UIUtil.getFrameForComponent(comp));
+		setLayout(new BorderLayout());
+		
 		addWindowListener(new WindowAdapter() {
 
 			@Override
@@ -122,9 +142,27 @@ public class AlgConfigDlg extends JDialog {
 
 		}; 
 		paneCfg.setToolbarVisible(true);
-		
-		add(paneCfg);
+		add(paneCfg, BorderLayout.CENTER);
 
+		
+		paneNote = new JPanel(new BorderLayout());
+		paneNote.setVisible(false);
+		add(paneNote, BorderLayout.SOUTH);
+		paneNote.add(new JLabel("Note: "), BorderLayout.WEST);
+		txtNote = new JTextArea();
+		txtNote.setEditable(false);
+		txtNote.setLineWrap(true);
+		txtNote.setWrapStyleWord(true);
+		txtNote.setRows(3);
+		paneNote.add(new JScrollPane(txtNote), BorderLayout.CENTER);
+		if (alg instanceof NoteAlg) {
+			String note = ((NoteAlg)alg).note();
+			txtNote.setText(note);
+			txtNote.setToolTipText("Please pay attention to this algorithm note.");
+			txtNote.setCaretPosition(0);
+			paneNote.setVisible(true);
+		}
+		
 		update(alg);
 	}
 
@@ -136,6 +174,19 @@ public class AlgConfigDlg extends JDialog {
 	public void update(Alg alg) {
 		this.thisAlg = alg;
 		this.paneCfg.update(alg.getConfig());
+		
+		paneNote.setVisible(false);
+		if (alg instanceof NoteAlg) {
+			String note = ((NoteAlg)alg).note();
+			txtNote.setText(note);
+			txtNote.setToolTipText("Please pay attention to this algorithm note.");
+			txtNote.setCaretPosition(0);
+			paneNote.setVisible(true);
+		}
+		else {
+			txtNote.setText("");
+			txtNote.setToolTipText(null);
+		}
 	}
 
 	

@@ -19,11 +19,11 @@ import net.hudup.core.logistic.ui.UIUtil;
 
 
 /**
+ * This class shows a simple dialog to allow users to load dataset.
  * 
  * @author Loc Nguyen
  * @version 10.0
  */
-@Deprecated
 public class DatasetLoader extends JDialog {
 
 	
@@ -34,29 +34,50 @@ public class DatasetLoader extends JDialog {
 
 	
 	/**
-	 * 
+	 * Main unit.
+	 */
+	protected String mainUnit = null;
+	
+	
+	/**
+	 * Browse button
 	 */
 	protected JButton btnBrowse = null;
 	
 	
+	/**
+	 * Configuration text field.
+	 */
 	protected DataConfigTextField txtBrowse = null;
 
 	
 	/**
-	 * 
+	 * Returned dataset.
 	 */
 	protected Dataset dataset = null;
 	
 	
 	/**
-	 * 
-	 * @param comp
+	 * Constructor with specified parent component.
+	 * @param comp parent component.
 	 */
 	public DatasetLoader(Component comp) {
+		this(comp, null);
+	}
+
+	
+	/**
+	 * Constructor with specified main unit and parent component.
+	 * @param mainUnit specified main unit.
+	 * @param comp parent component.
+	 */
+	public DatasetLoader(Component comp, String mainUnit) {
 		super(UIUtil.getFrameForComponent(comp), "Dataset loader", true);
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		setSize(600, 200);
 		setLocationRelativeTo(UIUtil.getFrameForComponent(comp));
+		
+		this.mainUnit = mainUnit;
 		
 		setLayout(new BorderLayout(10, 10));
 		
@@ -119,10 +140,14 @@ public class DatasetLoader extends JDialog {
 	
 	
 	/**
-	 * 
+	 * Browse dataset configuration.
 	 */
 	private void onBrowse() {
-		DataConfig config = net.hudup.data.DatasetUtil2.chooseConfig(this, null);
+		DataConfig defaultCfg = new DataConfig();
+		if (mainUnit != null && !mainUnit.isEmpty())
+			defaultCfg.setMainUnit(mainUnit);
+		
+		DataConfig config = net.hudup.data.DatasetUtil2.chooseConfig(this, defaultCfg);
 		
 		if (config == null) {
 			JOptionPane.showMessageDialog(
@@ -138,7 +163,7 @@ public class DatasetLoader extends JDialog {
 	
 	
 	/**
-	 * 
+	 * Loading dataset.
 	 */
 	private void onLoad() {
 		this.dataset = null;
@@ -178,5 +203,12 @@ public class DatasetLoader extends JDialog {
 	}
 	
 	
+	/**
+	 * Getting return dataset.
+	 * @return dataset.
+	 */
+	public Dataset getDataset() {
+		return dataset;
+	}
 	
 }

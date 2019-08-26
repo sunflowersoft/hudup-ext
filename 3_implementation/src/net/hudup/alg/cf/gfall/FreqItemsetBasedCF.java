@@ -274,6 +274,8 @@ public abstract class FreqItemsetBasedCF extends ModelBasedCF {
 	
 	@Override
 	public DataConfig createDefaultConfig() {
+		DataConfig tempConfig = super.createDefaultConfig();
+		
 		DataConfig config = new DataConfig() {
 
 			/**
@@ -290,11 +292,12 @@ public abstract class FreqItemsetBasedCF extends ModelBasedCF {
 			}
 			
 		};
+//		xURI store = xURI.create(Constants.KNOWLEDGE_BASE_DIRECTORY).concat(getName());
+//		config.setStoreUri(store);
+		config.putAll(tempConfig);
+		
 		config.put(FreqItemsetFinder.MIN_SUP, FreqItemsetFinder.DEFAULT_MIN_SUP);
-		
-		xURI store = xURI.create(Constants.KNOWLEDGE_BASE_DIRECTORY).concat(getName());
-		config.setStoreUri(store);
-		
+
 		return config;
 	}
 

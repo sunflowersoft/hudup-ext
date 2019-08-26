@@ -22,6 +22,8 @@ import net.hudup.core.evaluate.Metrics;
 import net.hudup.core.evaluate.MetricsUtil;
 import net.hudup.core.logistic.ClipboardUtil;
 import net.hudup.core.logistic.ui.DescriptionDlg;
+import net.hudup.core.logistic.ui.SortableTable;
+import net.hudup.core.logistic.ui.SortableTableModel;
 import net.hudup.core.logistic.ui.UIUtil;
 
 
@@ -32,7 +34,7 @@ import net.hudup.core.logistic.ui.UIUtil;
  * @version 10.0
  *
  */
-public class MetricsTable extends JTable {
+public class MetricsTable extends SortableTable {
 
 	
 	/**
@@ -149,6 +151,7 @@ public class MetricsTable extends JTable {
 		
 		getMetricsTM().update(metrics);
 		
+		init();
 		if (getColumnCount() > 0)
 			getColumnModel().getColumn(0).setMaxWidth(50);
 	}
@@ -191,7 +194,7 @@ public class MetricsTable extends JTable {
  * @version 10.0
  *
  */
-class MetricsTM extends DefaultTableModel {
+class MetricsTM extends SortableTableModel {
 
 	
 	/**
@@ -307,6 +310,13 @@ class MetricsTM extends DefaultTableModel {
 	}
 
 
+	@Override
+	public boolean isSortable(int column) {
+		// TODO Auto-generated method stub
+		return true;
+	}
+	
+	
 	/**
 	 * Getting metrics.
 	 * @return {@link Metrics}.
@@ -327,8 +337,7 @@ class MetricsTM extends DefaultTableModel {
  * @version 10.0
  *
  */
-@Deprecated
-class MetricsTable2 extends net.hudup.core.logistic.ui.SortableTable {
+class MetricsTable2 extends JTable {
 
 	
 	/**
@@ -445,7 +454,6 @@ class MetricsTable2 extends net.hudup.core.logistic.ui.SortableTable {
 		
 		getMetricsTM().update(metrics);
 		
-		init();
 		if (getColumnCount() > 0)
 			getColumnModel().getColumn(0).setMaxWidth(50);
 	}
@@ -488,8 +496,7 @@ class MetricsTable2 extends net.hudup.core.logistic.ui.SortableTable {
  * @version 10.0
  *
  */
-@Deprecated
-class MetricsTM2 extends net.hudup.core.logistic.ui.SortableTableModel {
+class MetricsTM2 extends DefaultTableModel {
 
 	
 	/**
@@ -605,13 +612,6 @@ class MetricsTM2 extends net.hudup.core.logistic.ui.SortableTableModel {
 	}
 
 
-	@Override
-	public boolean isSortable(int column) {
-		// TODO Auto-generated method stub
-		return true;
-	}
-	
-	
 	/**
 	 * Getting metrics.
 	 * @return {@link Metrics}.
@@ -622,3 +622,6 @@ class MetricsTM2 extends net.hudup.core.logistic.ui.SortableTableModel {
 	
 	
 }
+
+
+

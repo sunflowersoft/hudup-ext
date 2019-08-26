@@ -1,5 +1,6 @@
 package net.hudup.core.alg.cf;
 
+import java.rmi.RemoteException;
 import java.util.Set;
 
 import net.hudup.core.Util;
@@ -102,7 +103,7 @@ public class NeighborCFItemBased extends NeighborCF implements DuplicatableAlg {
 //					Profile itemProfile2 = hybrid ? cf.dataset.getItemProfile(thatItem.id()) : null;
 					
 					// computing similarity
-					double sim = cf.similar(thisItem, thatItem, null/*itemProfile1*/, null/*itemProfile2*/, thisUser.id());
+					double sim = cf.sim(thisItem, thatItem, null/*itemProfile1*/, null/*itemProfile2*/, thisUser.id());
 					if (!Util.isUsed(sim)) continue;
 					
 					double thatValue = thatItem.get(thisUser.id()).value;
@@ -155,6 +156,13 @@ public class NeighborCFItemBased extends NeighborCF implements DuplicatableAlg {
 			return name;
 		else
 			return "neighborcf_itembased";
+	}
+
+
+	@Override
+	public String getDescription() throws RemoteException {
+		// TODO Auto-generated method stub
+		return "Item-based nearest neighbors collaborative filtering algorithm";
 	}
 
 

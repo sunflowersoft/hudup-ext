@@ -23,6 +23,8 @@ import net.hudup.core.alg.Alg;
 import net.hudup.core.evaluate.MetaMetric;
 import net.hudup.core.evaluate.Metric;
 import net.hudup.core.evaluate.MetricWrapper;
+import net.hudup.core.logistic.ui.SortableTable;
+import net.hudup.core.logistic.ui.SortableTableModel;
 import net.hudup.core.logistic.ui.UIUtil;
 
 
@@ -154,7 +156,7 @@ public class MetricsOptionDlg extends JDialog {
  * @version 10.0
  *
  */
-class MetricsOptionTable extends JTable {
+class MetricsOptionTable extends SortableTable {
 
 	
 	/**
@@ -171,6 +173,19 @@ class MetricsOptionTable extends JTable {
 	}
 
 
+	@Override
+	protected void init() {
+		// TODO Auto-generated method stub
+		super.init();
+		
+		if (getColumnCount() > 4) {
+			TableColumn tc = getColumn(getColumnName(4)); 
+			tc.setMinWidth(0);
+			tc.setMaxWidth(0);
+		}
+	}
+	
+	
 	/**
 	 * Updating table by default selected metrics.
 	 * 
@@ -178,12 +193,7 @@ class MetricsOptionTable extends JTable {
 	 */
 	public void update(List<Metric> selectedMetricList) {
 		getMetricsOptionTM().update(selectedMetricList);
-
-		if (getColumnCount() > 4) {
-			TableColumn tc = getColumn(getColumnName(4)); 
-			tc.setMinWidth(0);
-			tc.setMaxWidth(0);
-		}
+		init();
 	}
 
 	
@@ -291,7 +301,7 @@ class MetricsOptionTable extends JTable {
  * @version 10.0
  *
  */
-class MetricsOptionTM extends DefaultTableModel {
+class MetricsOptionTM extends SortableTableModel {
 
 	
 	/**
@@ -392,6 +402,13 @@ class MetricsOptionTM extends DefaultTableModel {
 
 
 	@Override
+	public boolean isSortable(int column) {
+		// TODO Auto-generated method stub
+		return true;
+	}
+
+
+	@Override
 	public boolean isCellEditable(int row, int column) {
 		// TODO Auto-generated method stub
 		return column == 3;
@@ -410,7 +427,7 @@ class MetricsOptionTM extends DefaultTableModel {
  *
  */
 @Deprecated
-class MetricsOptionTable2 extends net.hudup.core.logistic.ui.SortableTable {
+class MetricsOptionTable2 extends JTable {
 
 	
 	/**
@@ -427,19 +444,6 @@ class MetricsOptionTable2 extends net.hudup.core.logistic.ui.SortableTable {
 	}
 
 
-	@Override
-	protected void init() {
-		// TODO Auto-generated method stub
-		super.init();
-		
-		if (getColumnCount() > 4) {
-			TableColumn tc = getColumn(getColumnName(4)); 
-			tc.setMinWidth(0);
-			tc.setMaxWidth(0);
-		}
-	}
-	
-	
 	/**
 	 * Updating table by default selected metrics.
 	 * 
@@ -447,7 +451,12 @@ class MetricsOptionTable2 extends net.hudup.core.logistic.ui.SortableTable {
 	 */
 	public void update(List<Metric> selectedMetricList) {
 		getMetricsOptionTM().update(selectedMetricList);
-		init();
+
+		if (getColumnCount() > 4) {
+			TableColumn tc = getColumn(getColumnName(4)); 
+			tc.setMinWidth(0);
+			tc.setMaxWidth(0);
+		}
 	}
 
 	
@@ -556,7 +565,7 @@ class MetricsOptionTable2 extends net.hudup.core.logistic.ui.SortableTable {
  *
  */
 @Deprecated
-class MetricsOptionTM2 extends net.hudup.core.logistic.ui.SortableTableModel {
+class MetricsOptionTM2 extends DefaultTableModel {
 
 	
 	/**
@@ -657,13 +666,6 @@ class MetricsOptionTM2 extends net.hudup.core.logistic.ui.SortableTableModel {
 
 
 	@Override
-	public boolean isSortable(int column) {
-		// TODO Auto-generated method stub
-		return true;
-	}
-
-
-	@Override
 	public boolean isCellEditable(int row, int column) {
 		// TODO Auto-generated method stub
 		return column == 3;
@@ -671,4 +673,6 @@ class MetricsOptionTM2 extends net.hudup.core.logistic.ui.SortableTableModel {
 	
 	
 }
+
+
 

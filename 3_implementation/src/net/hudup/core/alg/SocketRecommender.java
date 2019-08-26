@@ -63,6 +63,13 @@ public class SocketRecommender extends ServiceRecommender implements SocketAlg {
 
 	
 	@Override
+	public String getDescription() throws RemoteException {
+		// TODO Auto-generated method stub
+		return "Recommendation algorithm by calling socket service";
+	}
+
+
+	@Override
 	public Dataset getDataset() {
 		// TODO Auto-generated method stub
 		try {

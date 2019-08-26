@@ -91,6 +91,14 @@ public class JCheckList<E> extends JList<CheckListItem<E>> {
 	 * @return list of checked objects.
 	 */
 	public List<E> getCheckedItemList() {
+//		List<CheckListItem<E>> checkedListItemList = getSelectedValuesList();
+//		List<E> checkedItemList = Util.newList();
+//		for (int i = 0; i < checkedListItemList.size(); i++) {
+//			checkedItemList.add(checkedListItemList.get(i).getItem());
+//		}
+//		
+//		return checkedItemList;
+
 		List<E> checkedItemList = Util.newList();
 		int size = getModel().getSize();
 		for (int i = 0; i < size; i++) {

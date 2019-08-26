@@ -3,6 +3,7 @@
  */
 package net.hudup.alg.cf.gfall;
 
+import java.rmi.RemoteException;
 import java.util.BitSet;
 import java.util.List;
 import java.util.Set;
@@ -46,6 +47,13 @@ public class GreenFallMaxiPreciseCF extends GreenFallMaxiCF {
 	@Override
 	public String getName() {
 		return "gfallmaxi_precise";
+	}
+
+
+	@Override
+	public String getDescription() throws RemoteException {
+		// TODO Auto-generated method stub
+		return "Precise maximal Green Fall algorithm";
 	}
 
 

@@ -5,7 +5,6 @@ import java.rmi.RemoteException;
 import java.util.List;
 import java.util.Set;
 
-import net.hudup.core.Constants;
 import net.hudup.core.Util;
 import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.KBase;
@@ -18,7 +17,6 @@ import net.hudup.core.data.Pair;
 import net.hudup.core.data.RatingMatrix;
 import net.hudup.core.data.RatingVector;
 import net.hudup.core.evaluate.recommend.Accuracy;
-import net.hudup.core.logistic.xURI;
 
 
 /**
@@ -245,6 +243,13 @@ public class SvdGradientCF extends ModelBasedCF {
 
 	
 	@Override
+	public String getDescription() throws RemoteException {
+		// TODO Auto-generated method stub
+		return "SVD algorithm";
+	}
+
+
+	@Override
 	public Alg newInstance() {
 		// TODO Auto-generated method stub
 		return new SvdGradientCF();
@@ -253,6 +258,8 @@ public class SvdGradientCF extends ModelBasedCF {
 	
 	@Override
 	public DataConfig createDefaultConfig() {
+		DataConfig tempConfig = super.createDefaultConfig();
+
 		DataConfig config = new DataConfig() {
 
 			/**
@@ -275,8 +282,9 @@ public class SvdGradientCF extends ModelBasedCF {
 			
 		};
 		
-		xURI store = xURI.create(Constants.KNOWLEDGE_BASE_DIRECTORY).concat(getName());
-		config.setStoreUri(store);
+//		xURI store = xURI.create(Constants.KNOWLEDGE_BASE_DIRECTORY).concat(getName());
+//		config.setStoreUri(store);
+		config.putAll(tempConfig);
 		
 		if (kb != null)
 			config.putAll( ((KBaseRecommendIntegrated) kb).getDefaultParameters() );

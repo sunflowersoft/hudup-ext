@@ -151,6 +151,13 @@ public class ExternalServerRecommender extends CompositeRecommender {
 
 	
 	@Override
+	public String getDescription() throws RemoteException {
+		// TODO Auto-generated method stub
+		return "Recommendation algorithm by calling other external algorithm";
+	}
+
+
+	@Override
 	public Alg newInstance() {
 		// TODO Auto-generated method stub
 		return new ExternalServerRecommender();

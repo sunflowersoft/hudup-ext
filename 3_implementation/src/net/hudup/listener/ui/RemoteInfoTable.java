@@ -10,6 +10,8 @@ import javax.swing.table.TableCellRenderer;
 
 import net.hudup.core.Util;
 import net.hudup.core.data.HiddenText;
+import net.hudup.core.logistic.ui.SortableTable;
+import net.hudup.core.logistic.ui.SortableTableModel;
 import net.hudup.listener.RemoteInfo;
 import net.hudup.listener.RemoteInfoList;
 
@@ -23,7 +25,7 @@ import net.hudup.listener.RemoteInfoList;
  * @version 10.0
  *
  */
-public class RemoteInfoTable extends JTable {
+public class RemoteInfoTable extends SortableTable {
 
 	
 	/**
@@ -53,12 +55,21 @@ public class RemoteInfoTable extends JTable {
 	}
 	
 	
+	@Override
+	protected void init() {
+		// TODO Auto-generated method stub
+		super.init();
+		
+	}
+
+	
 	/**
 	 * Update this table by the specified list of remote information.
 	 * @param rInfoList specified {@link RemoteInfoList}.
 	 */
 	public void update(RemoteInfoList rInfoList) {
 		getRemoteInfoTM().update(rInfoList);
+		init();
 	}
 	
 	
@@ -155,6 +166,7 @@ public class RemoteInfoTable extends JTable {
 }
 
 
+
 /**
  * This is model of the table ({@link RemoteInfoTable}) for showing remote information.
  * Note, {@link RemoteInfoTable} allows users to modify such remote information.
@@ -164,7 +176,7 @@ public class RemoteInfoTable extends JTable {
  * @version 10.0
  *
  */
-class RemoteInfoTM extends DefaultTableModel {
+class RemoteInfoTM extends SortableTableModel {
 
 	
 	/**
@@ -295,6 +307,13 @@ class RemoteInfoTM extends DefaultTableModel {
 	}
 
 
+	@Override
+	public boolean isSortable(int column) {
+		// TODO Auto-generated method stub
+		return true;
+	}
+
+
 }
 
 
@@ -309,7 +328,7 @@ class RemoteInfoTM extends DefaultTableModel {
  *
  */
 @Deprecated
-class RemoteInfoTable2 extends net.hudup.core.logistic.ui.SortableTable {
+class RemoteInfoTable2 extends JTable {
 
 	
 	/**
@@ -339,21 +358,12 @@ class RemoteInfoTable2 extends net.hudup.core.logistic.ui.SortableTable {
 	}
 	
 	
-	@Override
-	protected void init() {
-		// TODO Auto-generated method stub
-		super.init();
-		
-	}
-
-	
 	/**
 	 * Update this table by the specified list of remote information.
 	 * @param rInfoList specified {@link RemoteInfoList}.
 	 */
 	public void update(RemoteInfoList rInfoList) {
 		getRemoteInfoTM().update(rInfoList);
-		init();
 	}
 	
 	
@@ -460,7 +470,7 @@ class RemoteInfoTable2 extends net.hudup.core.logistic.ui.SortableTable {
  *
  */
 @Deprecated
-class RemoteInfoTM2 extends net.hudup.core.logistic.ui.SortableTableModel {
+class RemoteInfoTM2 extends DefaultTableModel {
 
 	
 	/**
@@ -591,12 +601,7 @@ class RemoteInfoTM2 extends net.hudup.core.logistic.ui.SortableTableModel {
 	}
 
 
-	@Override
-	public boolean isSortable(int column) {
-		// TODO Auto-generated method stub
-		return true;
-	}
-
-
 }
+
+
 

@@ -19,11 +19,18 @@ import javax.swing.JTable;
 import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
 
+import net.hudup.core.PluginStorage;
+import net.hudup.core.alg.Alg;
+import net.hudup.core.alg.KBase;
+import net.hudup.core.alg.ModelBasedRecommender;
+import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.DatasetPair;
 import net.hudup.core.data.DatasetPool;
+import net.hudup.core.data.KBasePointer;
 import net.hudup.core.data.Pointer;
 import net.hudup.core.logistic.ClipboardUtil;
+import net.hudup.core.logistic.xURI;
 import net.hudup.core.logistic.ui.UIUtil;
 
 /**
@@ -215,22 +222,22 @@ public class DatasetPoolTable extends JTable {
 		
 		final Dataset dataset = ds;
 		if (dataset != null) {
-			contextMenu.addSeparator();
-			
-			JMenuItem miMetadata = UIUtil.makeMenuItem((String)null, "View metadata", 
-				new ActionListener() {
-					
-					public void actionPerformed(ActionEvent e) {
-						
-						DatasetMetadataTable.showDlg(getThis(), dataset);
-						
-					} // end action
-					
-				});
-			
-			contextMenu.add(miMetadata);
-			
 			if (!(dataset instanceof Pointer) ) {
+				contextMenu.addSeparator();
+				
+				JMenuItem miMetadata = UIUtil.makeMenuItem((String)null, "View metadata", 
+					new ActionListener() {
+						
+						public void actionPerformed(ActionEvent e) {
+							
+							DatasetMetadataTable.showDlg(getThis(), dataset);
+							
+						} // end action
+						
+					});
+				
+				contextMenu.add(miMetadata);
+
 				JMenuItem miData = UIUtil.makeMenuItem((String)null, "View data", 
 					new ActionListener() {
 						
@@ -248,6 +255,56 @@ public class DatasetPoolTable extends JTable {
 					});
 				
 				contextMenu.add(miData);
+			}
+			else if (dataset instanceof KBasePointer) {
+				contextMenu.addSeparator();
+
+				JMenuItem miData = UIUtil.makeMenuItem((String)null, "View knowledge base", 
+					new ActionListener() {
+						
+						public void actionPerformed(ActionEvent e) {
+							int confirm = JOptionPane.showConfirmDialog(
+									getThis(), 
+									"Be careful, out of memory in case of huge knowledge base", 
+									"Out of memory in case of huge dataset", 
+									JOptionPane.OK_CANCEL_OPTION, 
+									JOptionPane.WARNING_MESSAGE);
+							if (confirm != JOptionPane.OK_OPTION)
+								return;
+							
+							try {
+								DataConfig config = (DataConfig) dataset.getConfig().clone(); 
+								xURI store = config.getStoreUri();
+								xURI cfgUri = store.concat(KBase.KBASE_CONFIG);
+								config.load(cfgUri);
+								
+								String kbaseName = config.getAsString(KBase.KBASE_NAME);
+								if (kbaseName == null)
+									throw new Exception("KBase not viewed");
+								
+								Alg alg = PluginStorage.getNormalAlgReg().query(kbaseName);
+								if (alg == null || !(alg instanceof ModelBasedRecommender))
+									throw new Exception("KBase not viewed");
+								
+								ModelBasedRecommender recommender = (ModelBasedRecommender) alg.newInstance();
+								KBase kbase = recommender.newKBase(dataset);
+								kbase.view(getThis());
+								kbase.close();
+							}
+							catch (Throwable ex) {
+								ex.printStackTrace();
+								JOptionPane.showMessageDialog(
+										getThis(), 
+										"KBase not viewed", 
+										"KBase not viewed", 
+										JOptionPane.ERROR_MESSAGE);
+							} // end try-catch
+								
+						} //end actionPerformed
+						
+					}); //end ActionListener
+				contextMenu.add(miData);
+				
 			}
 		}
 		
@@ -427,7 +484,7 @@ public class DatasetPoolTable extends JTable {
 	
 	
 	/**
-	 * 
+	 * Save data.
 	 */
 	public void save() {
 		JOptionPane.showMessageDialog(this, 
@@ -436,8 +493,8 @@ public class DatasetPoolTable extends JTable {
 
 	
 	/**
-	 * 
-	 * @param enabled
+	 * Setting optionally enabled flag.
+	 * @param enabled optionally enabled flag.
 	 */
 	public void setEnabled2(boolean enabled) {
 		// TODO Auto-generated method stub
@@ -446,8 +503,8 @@ public class DatasetPoolTable extends JTable {
 
 	
 	/**
-	 * 
-	 * @return whether enabled
+	 * Getting optionally enabled flag.
+	 * @return whether optionally enabled.
 	 */
 	public boolean isEnabled2() {
 		// TODO Auto-generated method stub

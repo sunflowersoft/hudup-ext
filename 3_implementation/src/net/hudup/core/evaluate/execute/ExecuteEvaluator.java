@@ -5,7 +5,7 @@ import java.rmi.RemoteException;
 
 import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.ExecutableAlg;
-import net.hudup.core.alg.TempAlg;
+import net.hudup.core.alg.TestAlg;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.Fetcher;
@@ -40,7 +40,7 @@ public abstract class ExecuteEvaluator extends AbstractEvaluator {
 	protected void setupAlg(Alg alg, Dataset training) {
 		// TODO Auto-generated method stub
 		try {
-			((ExecutableAlg)alg).remoteSetup(training);
+			((ExecutableAlg)alg).setup(training);
 		}
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
@@ -53,7 +53,7 @@ public abstract class ExecuteEvaluator extends AbstractEvaluator {
 	protected void unsetupAlg(Alg alg) {
 		// TODO Auto-generated method stub
 		try {
-			((ExecutableAlg)alg).remoteUnsetup();
+			((ExecutableAlg)alg).unsetup();
 		}
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
@@ -80,7 +80,11 @@ public abstract class ExecuteEvaluator extends AbstractEvaluator {
 	protected Serializable executeAlg(Alg alg, Profile param) {
 		// TODO Auto-generated method stub
 		try {
-			return ((ExecutableAlg)alg).remoteExecute(param);
+			Object result = ((ExecutableAlg)alg).execute(param);
+			if (result instanceof Serializable)
+				return (Serializable) result;
+			else
+				return null;
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -134,7 +138,7 @@ public abstract class ExecuteEvaluator extends AbstractEvaluator {
 	@Override
 	public boolean acceptAlg(Alg alg) throws RemoteException {
 		// TODO Auto-generated method stub
-		return (alg instanceof ExecutableAlg) && (!(alg instanceof TempAlg));
+		return (alg instanceof ExecutableAlg) && (!(alg instanceof TestAlg));
 	}
 
 	

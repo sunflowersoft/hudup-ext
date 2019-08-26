@@ -38,6 +38,12 @@ public class JRadioList<E> extends JPanel {
 	
 	
 	/**
+	 * Button group.
+	 */
+	protected ButtonGroup bg = new ButtonGroup();
+	
+	
+	/**
 	 * Constructor with a specified list of attached object. Each object is attached with a radion button {@link JRadioButton}.
 	 * @param listData specified list of attached object.
 	 * @param listName name of this {@link JRadioList}.
@@ -53,7 +59,22 @@ public class JRadioList<E> extends JPanel {
 					BorderFactory.createEtchedBorder(), listName) );
 		}
 		
-		ButtonGroup bg = new ButtonGroup();
+		setListData(listData);
+	}
+	
+	
+	/**
+	 * Setting radio list with data list.
+	 * @param listData data list.
+	 */
+	public void setListData(List<E> listData) {
+		for (Object[] pair : radioList) {
+			JRadioButton rb = (JRadioButton)pair[0];
+			bg.remove(rb);
+			remove(rb);
+		}
+		radioList.clear();
+		
 		for (E e : listData) {
 			String text = e.toString();
 			JRadioButton rb = new JRadioButton(TextParserUtil.split(text, TextParserUtil.LINK_SEP, null).get(0));
@@ -62,6 +83,8 @@ public class JRadioList<E> extends JPanel {
 			
 			radioList.add(new Object[] { rb, e});
 		}
+		
+		updateUI();
 	}
 	
 	

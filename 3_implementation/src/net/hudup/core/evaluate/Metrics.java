@@ -179,7 +179,7 @@ public class Metrics implements Serializable {
 			String algName = alg.getName();
 			String algDesc = "";
 			try {
-				algDesc = ((ExecutableAlg)alg).remoteGetDescription();
+				algDesc = ((ExecutableAlg)alg).getDescription();
 			}
 			catch (Exception e) { e.printStackTrace(); }
 			algDesc = algDesc == null ? "" : algDesc;

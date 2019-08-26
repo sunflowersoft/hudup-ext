@@ -3,6 +3,8 @@
  */
 package net.hudup.alg.cf.gfall;
 
+import java.rmi.RemoteException;
+
 import net.hudup.core.alg.Alg;
 import net.hudup.core.logistic.NextUpdate;
 
@@ -40,6 +42,13 @@ public class GreenFallMaxiCF extends GreenFallCF {
 	}
 
 	
+	@Override
+	public String getDescription() throws RemoteException {
+		// TODO Auto-generated method stub
+		return "Maximal Green Fall algorithm";
+	}
+
+
 	@Override
 	protected FreqItemsetFinder createFreqItemsetFinder() {
 		YRollerMaxi yrollermaxi = new YRollerMaxi();

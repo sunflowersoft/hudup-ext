@@ -5,13 +5,19 @@ import java.rmi.RemoteException;
 
 import net.hudup.core.Constants;
 import net.hudup.core.alg.Alg;
+import net.hudup.core.alg.KBase;
+import net.hudup.core.alg.ModelBasedRecommender;
 import net.hudup.core.alg.RecommendParam;
 import net.hudup.core.alg.Recommender;
 import net.hudup.core.alg.SetupAlgEvent;
-import net.hudup.core.alg.TempAlg;
+import net.hudup.core.alg.TestAlg;
+import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.DatasetPair;
+import net.hudup.core.data.DatasetUtil;
 import net.hudup.core.data.Fetcher;
+import net.hudup.core.data.KBasePointer;
+import net.hudup.core.data.Pointer;
 import net.hudup.core.data.Profile;
 import net.hudup.core.data.RatingVector;
 import net.hudup.core.evaluate.AbstractEvaluator;
@@ -137,6 +143,14 @@ public class RecommendEvaluator extends AbstractEvaluator {
 					// Adding default metrics to metric result
 					result.add( recommender.getName(), datasetId, datasetUri, ((NoneWrapperMetricList)metricList.clone()).sort().list() );
 					
+					
+					//Setting store URI of model-based recommender according to store URI of KBasePointer training.
+					//Following code line is very important.
+					//However, in client-server mechanism, the client (GUI) must assure that the server (this evaluator) can access the store URI, so the local file system does not work except that client and server run on the same machine.
+					if ((recommender instanceof ModelBasedRecommender) && (training instanceof KBasePointer)) {
+						recommender.getConfig().setStoreUri(training.getConfig().getStoreUri());
+					}
+					
 					long beginSetupTime = System.currentTimeMillis();
 					//
 					recommender.setup(training);
@@ -153,9 +167,36 @@ public class RecommendEvaluator extends AbstractEvaluator {
 					fireEvaluatorEvent(new EvaluatorEvent(this, Type.doing, setupMetrics)); // firing setup time metric
 					
 					//Initializing parameters for setting up maximum recommendation number by binomial distribution. Added date: 2019.08.23 by Loc Nguyen.
-					double relevantSparseRatio = calcRelevantSparseRatio(training);
-					int totalRatedCount = countRatedItems(training);
-
+					double relevantSparseRatio = 0;
+					int totalRatedCount = 0;
+					Dataset trainingData = null; //It is not pointer.
+					if (!config.isRecommendAll()) {
+						if (training instanceof Pointer) {
+							if (training instanceof KBasePointer) {
+								try {
+									DataConfig trainingCfg = (DataConfig) training.getConfig().clone(); 
+									trainingCfg.load(trainingCfg.getStoreUri().concat(KBase.KBASE_CONFIG));
+									
+									String dsUriText = trainingCfg.getAsString(KBase.DATASOURCE_URI);
+									if (dsUriText != null && !dsUriText.isEmpty())
+										trainingData = DatasetUtil.loadDataset(DataConfig.create(xURI.create(dsUriText)));
+								}
+								catch (Throwable e) {
+									e.printStackTrace();
+									trainingData = null;
+								}
+							}
+							else
+								trainingData = null;
+						}
+						else
+							trainingData = training;
+						trainingData = trainingData != null ? trainingData : testing; //This is work-around solution, using testing for estimating recommendation number.
+						relevantSparseRatio = calcRelevantSparseRatio(trainingData);
+						totalRatedCount = countRatedItems(trainingData);
+					}
+					
+					
 					testingUsers = testing.fetchUserRatings();
 					int vCurrentTotal = testingUsers.getMetadata().getSize();
 					int vCurrentCount = 0; //Vector count for Hudup recall metric.
@@ -183,11 +224,14 @@ public class RecommendEvaluator extends AbstractEvaluator {
 						RecommendParam param = new RecommendParam(testingUser.id());
 						//Setting up maximum recommendation number by binomial distribution. Added date: 2019.08.23 by Loc Nguyen.
 						int maxRecommend = 0;
-						if (!config.isRecommendAll()) {
+						if ((!config.isRecommendAll()) && (trainingData != null)) {
 							int ratedCount = 0;
-							RatingVector trainingUser = training.getUserRating(testingUser.id());
+							RatingVector trainingUser = trainingData.getUserRating(testingUser.id());
 							if (trainingUser != null) ratedCount = trainingUser.count(true); 
 							maxRecommend = (int)(relevantSparseRatio*(totalRatedCount-ratedCount)+0.5);
+							
+							if (trainingData != training) trainingData.clear();
+							trainingData = null;
 						}
 						vExactCurrentTotal++; //Increase exact total vector count.
 						
@@ -314,19 +358,19 @@ public class RecommendEvaluator extends AbstractEvaluator {
 
 
 	/**
-	 * Calculating relevant ratio in specified training dataset.
-	 * @param training specified training dataset.
-	 * @return relevant ratio in specified training dataset.
+	 * Calculating relevant ratio in specified dataset.
+	 * @param dataset specified dataset.
+	 * @return relevant ratio in specified dataset.
 	 */
-	private double calcRelevantSparseRatio(Dataset training) {
+	private double calcRelevantSparseRatio(Dataset dataset) {
 		int rateCount = 0;
 		int relevantRateCount = 0;
 		int nUsers = 0;
 		Fetcher<RatingVector> users = null;
 		try {
-			double minRating = training.getConfig().getMinRating();
-			double maxRating = training.getConfig().getMaxRating();
-			users = training.fetchUserRatings();
+			double minRating = dataset.getConfig().getMinRating();
+			double maxRating = dataset.getConfig().getMaxRating();
+			users = dataset.fetchUserRatings();
 			while (users.next()) {
 				RatingVector user = users.pick();
 				if (user == null) continue;
@@ -356,23 +400,26 @@ public class RecommendEvaluator extends AbstractEvaluator {
 			}
 		}
 
-		int nItems = countRatedItems(training);
+		int nItems = countRatedItems(dataset);
 		
-		return ((double)relevantRateCount/rateCount) * ((double)rateCount/(nUsers*nItems));
+		if (nUsers == 0 || nItems == 0)
+			return 0;
+		else
+			return ((double)relevantRateCount/rateCount) * ((double)rateCount/(nUsers*nItems));
 	}
 	
 	
 	/**
 	 * Counting rated items in specified dataset.
-	 * @param training specified training dataset.
+	 * @param dataset specified dataset.
 	 * @return the number of rated items in specified dataset.
 	 */
 	@NextUpdate
-	private int countRatedItems(Dataset training) {
+	private int countRatedItems(Dataset dataset) {
 		Fetcher<RatingVector> items = null;
 		int nRatedItems = 0;
 		try {
-			items = training.fetchItemRatings();
+			items = dataset.fetchItemRatings();
 			nRatedItems = items.getMetadata().getSize(); //For fast retrieval.
 		} 
 		catch (Throwable e) {
@@ -390,12 +437,13 @@ public class RecommendEvaluator extends AbstractEvaluator {
 				e.printStackTrace();
 			}
 		}
+		
 		return nRatedItems;
 		
 //		int nRatedItems = 0;
 //		Fetcher<RatingVector> items = null;
 //		try {
-//			items = training.fetchItemRatings();
+//			items = dataset.fetchItemRatings();
 //			while (items.next()) {
 //				RatingVector item = items.pick();
 //				if (item == null) continue;
@@ -539,7 +587,7 @@ public class RecommendEvaluator extends AbstractEvaluator {
 	@Override
 	public boolean acceptAlg(Alg alg) throws RemoteException {
 		// TODO Auto-generated method stub
-		return (alg instanceof Recommender) && (!(alg instanceof TempAlg));
+		return (alg instanceof Recommender) && (!(alg instanceof TestAlg));
 	}
 
 

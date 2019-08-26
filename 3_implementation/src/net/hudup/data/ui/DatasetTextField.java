@@ -92,20 +92,22 @@ public class DatasetTextField extends TagTextField {
 			});
 		contextMenu.add(miCopyURI);
 		
-		contextMenu.addSeparator();
-		
-		JMenuItem miMetadata = UIUtil.makeMenuItem((String)null, "View metadata", 
-			new ActionListener() {
-				
-				public void actionPerformed(ActionEvent e) {
-					DatasetMetadataTable.showDlg(getThis(), getDataset());
-				}
-			});
-		contextMenu.add(miMetadata);
 
 		final Dataset dataset = getDataset();
 		if (dataset != null) {
 			if (!(dataset instanceof Pointer) ) {
+				contextMenu.addSeparator();
+				
+				JMenuItem miMetadata = UIUtil.makeMenuItem((String)null, "View metadata", 
+					new ActionListener() {
+						
+						@Override
+						public void actionPerformed(ActionEvent e) {
+							DatasetMetadataTable.showDlg(getThis(), dataset);
+						}
+					});
+				contextMenu.add(miMetadata);
+
 				JMenuItem miData = UIUtil.makeMenuItem((String)null, "View data", 
 						new ActionListener() {
 							
@@ -124,6 +126,8 @@ public class DatasetTextField extends TagTextField {
 				contextMenu.add(miData);
 			}
 			else if (dataset instanceof KBasePointer) {
+				contextMenu.addSeparator();
+
 				JMenuItem miData = UIUtil.makeMenuItem((String)null, "View knowledge base", 
 					new ActionListener() {
 						

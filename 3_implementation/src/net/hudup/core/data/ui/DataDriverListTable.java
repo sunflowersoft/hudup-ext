@@ -15,17 +15,20 @@ import javax.swing.table.TableCellRenderer;
 import net.hudup.core.Util;
 import net.hudup.core.data.DataDriver;
 import net.hudup.core.data.DataDriverList;
+import net.hudup.core.logistic.ui.SortableTable;
+import net.hudup.core.logistic.ui.SortableTableModel;
 import net.hudup.core.logistic.ui.UIUtil;
 
 
 /**
  * This graphic user interface (GUI) component as a table shows a list of data drivers ({@link DataDriverList}).
+ * This table, called data driver table, can be sorted because it extends the {@link SortableTable} class.
  * 
  * @author Loc Nguyen
  * @version 10.0
  *
  */
-public class DataDriverListTable extends JTable {
+public class DataDriverListTable extends SortableTable {
 
 	
 	/**
@@ -48,6 +51,7 @@ public class DataDriverListTable extends JTable {
 	 */
 	public void update(DataDriverList dataDriverList) {
 		getDataDriverListTM().update(dataDriverList);
+		init();
 	}
 	
 	
@@ -116,13 +120,13 @@ public class DataDriverListTable extends JTable {
 
 
 /**
- * This class is the data model of {@link DataDriverListTable}.
+ * This class is the data model of {@link DataDriverListTable2}.
  * 
  * @author Loc Nguyen
  * @version 10.0
  *
  */
-class DataDriverListTM extends DefaultTableModel {
+class DataDriverListTM extends SortableTableModel {
 
 	
 	/**
@@ -165,7 +169,7 @@ class DataDriverListTM extends DefaultTableModel {
 	
 	
 	/**
-	 * Creating header names (column names) of the {@link DataDriverListTable}.
+	 * Creating header names (column names) of the {@link DataDriverListTable2}.
 	 * @return {@link Vector} of header names. 
 	 */
 	protected Vector<String> toColumns() {
@@ -194,6 +198,13 @@ class DataDriverListTM extends DefaultTableModel {
 
 	
 	@Override
+	public boolean isSortable(int column) {
+		// TODO Auto-generated method stub
+		return true;
+	}
+
+	
+	@Override
 	public boolean isCellEditable(int row, int column) {
 		// TODO Auto-generated method stub
 		return false;
@@ -203,16 +214,16 @@ class DataDriverListTM extends DefaultTableModel {
 }
 
 
+
 /**
  * This graphic user interface (GUI) component as a table shows a list of data drivers ({@link DataDriverList}).
- * This table, called data driver table, can be sorted because it extends the {@link SortableTable} class.
  * 
  * @author Loc Nguyen
  * @version 10.0
  *
  */
 @Deprecated
-class DataDriverListTable2 extends net.hudup.core.logistic.ui.SortableTable {
+class DataDriverListTable2 extends JTable {
 
 	
 	/**
@@ -235,7 +246,6 @@ class DataDriverListTable2 extends net.hudup.core.logistic.ui.SortableTable {
 	 */
 	public void update(DataDriverList dataDriverList) {
 		getDataDriverListTM().update(dataDriverList);
-		init();
 	}
 	
 	
@@ -311,7 +321,7 @@ class DataDriverListTable2 extends net.hudup.core.logistic.ui.SortableTable {
  *
  */
 @Deprecated
-class DataDriverListTM2 extends net.hudup.core.logistic.ui.SortableTableModel {
+class DataDriverListTM2 extends DefaultTableModel {
 
 	
 	/**
@@ -379,13 +389,6 @@ class DataDriverListTM2 extends net.hudup.core.logistic.ui.SortableTableModel {
 		Object value = getValueAt(row, column);
 		
 		return value.getClass();
-	}
-
-	
-	@Override
-	public boolean isSortable(int column) {
-		// TODO Auto-generated method stub
-		return true;
 	}
 
 	

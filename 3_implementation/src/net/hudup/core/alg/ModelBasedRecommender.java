@@ -7,6 +7,7 @@ import java.io.Serializable;
 import java.rmi.RemoteException;
 
 import net.hudup.core.Constants;
+import net.hudup.core.Util;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.Datasource;
@@ -129,7 +130,19 @@ public abstract class ModelBasedRecommender extends Recommender implements Model
 	public DataConfig createDefaultConfig() {
 		DataConfig config = new DataConfig();
 		
+		boolean fixedStore = false;
+		try {
+			String fixedText = Util.getHudupProperty("kb_fixedstore");
+			if (fixedText != null && !fixedText.isEmpty())
+				fixedStore = Boolean.parseBoolean(fixedText);
+		}
+		catch (Exception e) {
+			fixedStore= false;
+		}
+		
 		xURI store = xURI.create(Constants.KNOWLEDGE_BASE_DIRECTORY).concat(getName());
+		if (!fixedStore)
+			store = xURI.create(Constants.KNOWLEDGE_BASE_DIRECTORY).concat(getName()).concat("" + new java.util.Date().getTime());
 		config.setStoreUri(store);
 		
 		return config;
