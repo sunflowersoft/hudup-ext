@@ -11,7 +11,7 @@ import net.hudup.core.data.DataConfig;
  * @version 1.0
  *
  */
-public abstract class AbstractSupportCacheAlg extends AbstractAlg implements SupportCacheAlg {
+public abstract class SupportCacheAlgAbstract extends AlgAbstract implements SupportCacheAlg {
 
 	
 	/**
@@ -23,7 +23,7 @@ public abstract class AbstractSupportCacheAlg extends AbstractAlg implements Sup
 	/**
 	 * Default constructor.
 	 */
-	public AbstractSupportCacheAlg() {
+	public SupportCacheAlgAbstract() {
 		// TODO Auto-generated constructor stub
 	}
 

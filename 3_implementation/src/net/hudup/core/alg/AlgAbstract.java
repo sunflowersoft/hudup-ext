@@ -1,8 +1,11 @@
 package net.hudup.core.alg;
 
+import java.rmi.RemoteException;
+
 import org.apache.log4j.Logger;
 
 import net.hudup.core.data.DataConfig;
+import net.hudup.core.logistic.NetUtil;
 
 
 /**
@@ -15,7 +18,7 @@ import net.hudup.core.data.DataConfig;
  * @author Loc Nguyen
  * @version 10.0
  */
-public abstract class AbstractAlg implements Alg {
+public abstract class AlgAbstract implements Alg, AlgRemote {
 
 	
 	/**
@@ -27,7 +30,7 @@ public abstract class AbstractAlg implements Alg {
 	/**
 	 * Logger of this class.
 	 */
-	protected final static Logger logger = Logger.getLogger(AbstractAlg.class);
+	protected final static Logger logger = Logger.getLogger(AlgAbstract.class);
 
 	
 	/**
@@ -38,9 +41,15 @@ public abstract class AbstractAlg implements Alg {
 
 	
 	/**
+	 * Exported flag.
+	 */
+	protected Boolean exported = false;
+
+	
+	/**
 	 * Default constructor.
 	 */
-	public AbstractAlg() {
+	public AlgAbstract() {
 		this.config = createDefaultConfig();
 	}
 
@@ -81,6 +90,44 @@ public abstract class AbstractAlg implements Alg {
 	@Override
 	public String toString() {
 		return getName();
+	}
+
+
+	@Override
+	public synchronized void export(int serverPort) throws RemoteException {
+		// TODO Auto-generated method stub
+		synchronized (exported) {
+			if (!exported) {
+				NetUtil.RegistryRemote.export(this, serverPort);
+				exported = true;
+			}
+		}
+	}
+
+
+	@Override
+	public synchronized void unexport() throws RemoteException {
+		// TODO Auto-generated method stub
+		synchronized (exported) {
+			if (exported) {
+				NetUtil.RegistryRemote.unexport(this);
+				exported = false;
+			}
+		}
+	}
+
+	
+	@Override
+	protected void finalize() throws Throwable {
+		// TODO Auto-generated method stub
+		super.finalize();
+		
+		try {
+			unexport();
+		}
+		catch (Throwable e) {
+			e.printStackTrace();
+		}
 	}
 
 

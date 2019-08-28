@@ -14,7 +14,6 @@ import net.hudup.core.data.Dataset;
 import net.hudup.core.data.Fetcher;
 import net.hudup.core.data.Profile;
 import net.hudup.core.logistic.Inspector;
-import net.hudup.core.logistic.NetUtil;
 import net.hudup.core.logistic.ui.DescriptionDlg;
 import net.hudup.core.logistic.ui.UIUtil;
 
@@ -24,7 +23,7 @@ import net.hudup.core.logistic.ui.UIUtil;
  * @author Loc Nguyen
  * @version 1.0
  */
-public abstract class AbstractExecutableAlg extends AbstractAlg implements ExecutableAlg {
+public abstract class ExecutableAlgAbstract extends AlgAbstract implements ExecutableAlg {
 
 
 	/**
@@ -53,15 +52,9 @@ public abstract class AbstractExecutableAlg extends AbstractAlg implements Execu
     
 
 	/**
-	 * Exported flag.
-	 */
-	protected Boolean exported = false;
-
-	
-	/**
      * Default constructor.
      */
-    public AbstractExecutableAlg() {
+    public ExecutableAlgAbstract() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
@@ -268,30 +261,6 @@ public abstract class AbstractExecutableAlg extends AbstractAlg implements Execu
 
 
 	@Override
-	public synchronized void export(int serverPort) throws RemoteException {
-		// TODO Auto-generated method stub
-		synchronized (exported) {
-			if (!exported) {
-				NetUtil.RegistryRemote.export(this, serverPort);
-				exported = true;
-			}
-		}
-	}
-
-
-	@Override
-	public synchronized void unexport() throws RemoteException {
-		// TODO Auto-generated method stub
-		synchronized (exported) {
-			if (exported) {
-				NetUtil.RegistryRemote.unexport(this);
-				exported = false;
-			}
-		}
-	}
-
-	
-	@Override
 	protected void finalize() throws Throwable {
 		// TODO Auto-generated method stub
 		super.finalize();
@@ -303,12 +272,6 @@ public abstract class AbstractExecutableAlg extends AbstractAlg implements Execu
 			e.printStackTrace();
 		}
 		
-		try {
-			unexport();
-		}
-		catch (Throwable e) {
-			e.printStackTrace();
-		}
 	}
 
 

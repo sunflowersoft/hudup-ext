@@ -8,7 +8,6 @@ import net.hudup.core.data.Dataset;
 import net.hudup.core.data.Profile;
 import net.hudup.core.data.RatingVector;
 import net.hudup.core.logistic.Inspector;
-import net.hudup.core.logistic.NetUtil;
 import net.hudup.core.logistic.ui.DescriptionDlg;
 import net.hudup.core.logistic.ui.UIUtil;
 
@@ -20,7 +19,7 @@ import net.hudup.core.logistic.ui.UIUtil;
  * @version 10.0
  * 
  */
-public abstract class RecommenderAbstract extends AbstractAlg implements Recommender {
+public abstract class RecommenderAbstract extends AlgAbstract implements Recommender {
 
 	
 	/**
@@ -28,12 +27,6 @@ public abstract class RecommenderAbstract extends AbstractAlg implements Recomme
 	 */
 	private static final long serialVersionUID = 1L;
 	
-	
-	/**
-	 * Exported flag.
-	 */
-	protected Boolean exported = false;
-
 	
 	/**
 	 * The filter list contains of filters. Filter specifies tasks which be performed before any actual recommendation tasks.
@@ -156,30 +149,6 @@ public abstract class RecommenderAbstract extends AbstractAlg implements Recomme
 
 
 	@Override
-	public synchronized void export(int serverPort) throws RemoteException {
-		// TODO Auto-generated method stub
-		synchronized (exported) {
-			if (!exported) {
-				NetUtil.RegistryRemote.export(this, serverPort);
-				exported = true;
-			}
-		}
-	}
-
-
-	@Override
-	public synchronized void unexport() throws RemoteException {
-		// TODO Auto-generated method stub
-		synchronized (exported) {
-			if (exported) {
-				NetUtil.RegistryRemote.unexport(this);
-				exported = false;
-			}
-		}
-	}
-
-	
-	@Override
 	protected void finalize() throws Throwable {
 		// TODO Auto-generated method stub
 		super.finalize();
@@ -191,12 +160,6 @@ public abstract class RecommenderAbstract extends AbstractAlg implements Recomme
 			e.printStackTrace();
 		}
 		
-		try {
-			unexport();
-		}
-		catch (Throwable e) {
-			e.printStackTrace();
-		}
 	}
 	
 	

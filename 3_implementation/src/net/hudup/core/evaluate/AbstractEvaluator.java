@@ -639,6 +639,18 @@ public abstract class AbstractEvaluator extends AbstractRunner implements Evalua
 			}
 		}
 		
+		boolean backup = false;
+		try {
+			String bkText = Util.getHudupProperty("evaluator_analyze_backup");
+			if (bkText != null && !bkText.isEmpty())
+				backup = Boolean.parseBoolean(bkText);
+		}
+		catch (Throwable e) {
+			e.printStackTrace();
+			backup = false;
+		}
+		if (!backup) return;
+		
 		if (evt.getType() != Type.done && evt.getType() != Type.done_one)
 			return;
 		if (this.result == null || this.algList == null)
@@ -906,4 +918,10 @@ public abstract class AbstractEvaluator extends AbstractRunner implements Evalua
 	}
 			
 
+//	@Override
+//	public void testRMI() {
+//		System.out.println("Test RMI without remote exception");
+//	}
+	
+	
 }

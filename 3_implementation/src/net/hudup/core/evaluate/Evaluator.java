@@ -266,4 +266,10 @@ public interface Evaluator extends Remote, RemoteRunner, SetupAlgListener, AutoC
     void remoteUnexport() throws RemoteException;
     
     
+//    /**
+//     * Testing RMI call without remote exception.
+//     */
+//    void testRMI();
+    
+    
 }
