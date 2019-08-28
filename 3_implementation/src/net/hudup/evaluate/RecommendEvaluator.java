@@ -5,8 +5,6 @@ import java.rmi.RemoteException;
 
 import net.hudup.core.Constants;
 import net.hudup.core.alg.Alg;
-import net.hudup.core.alg.KBase;
-import net.hudup.core.alg.ModelBasedRecommender;
 import net.hudup.core.alg.RecommendParam;
 import net.hudup.core.alg.Recommender;
 import net.hudup.core.alg.SetupAlgEvent;
@@ -14,10 +12,7 @@ import net.hudup.core.alg.TestAlg;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.DatasetPair;
-import net.hudup.core.data.DatasetUtil;
 import net.hudup.core.data.Fetcher;
-import net.hudup.core.data.KBasePointer;
-import net.hudup.core.data.Pointer;
 import net.hudup.core.data.Profile;
 import net.hudup.core.data.RatingVector;
 import net.hudup.core.evaluate.AbstractEvaluator;
@@ -144,16 +139,9 @@ public class RecommendEvaluator extends AbstractEvaluator {
 					result.add( recommender.getName(), datasetId, datasetUri, ((NoneWrapperMetricList)metricList.clone()).sort().list() );
 					
 					
-					//Setting store URI of model-based recommender according to store URI of KBasePointer training.
-					//Following code line is very important.
-					//However, in client-server mechanism, the client (GUI) must assure that the server (this evaluator) can access the store URI, so the local file system does not work except that client and server run on the same machine.
-					if ((recommender instanceof ModelBasedRecommender) && (training instanceof KBasePointer)) {
-						recommender.getConfig().setStoreUri(training.getConfig().getStoreUri());
-					}
-					
 					long beginSetupTime = System.currentTimeMillis();
 					//
-					recommender.setup(training);
+					setupAlg(recommender, training);
 					//
 					long endSetupTime = System.currentTimeMillis();
 					long setupElapsed = endSetupTime - beginSetupTime;
@@ -169,28 +157,8 @@ public class RecommendEvaluator extends AbstractEvaluator {
 					//Initializing parameters for setting up maximum recommendation number by binomial distribution. Added date: 2019.08.23 by Loc Nguyen.
 					double relevantSparseRatio = 0;
 					int totalRatedCount = 0;
-					Dataset trainingData = null; //It is not pointer.
+					Dataset trainingData = recommender.getDataset(); //It is not pointer.
 					if (!config.isRecommendAll()) {
-						if (training instanceof Pointer) {
-							if (training instanceof KBasePointer) {
-								try {
-									DataConfig trainingCfg = (DataConfig) training.getConfig().clone(); 
-									trainingCfg.load(trainingCfg.getStoreUri().concat(KBase.KBASE_CONFIG));
-									
-									String dsUriText = trainingCfg.getAsString(KBase.DATASOURCE_URI);
-									if (dsUriText != null && !dsUriText.isEmpty())
-										trainingData = DatasetUtil.loadDataset(DataConfig.create(xURI.create(dsUriText)));
-								}
-								catch (Throwable e) {
-									e.printStackTrace();
-									trainingData = null;
-								}
-							}
-							else
-								trainingData = null;
-						}
-						else
-							trainingData = training;
 						trainingData = trainingData != null ? trainingData : testing; //This is work-around solution, using testing for estimating recommendation number.
 						relevantSparseRatio = calcRelevantSparseRatio(trainingData);
 						totalRatedCount = countRatedItems(trainingData);
@@ -224,13 +192,11 @@ public class RecommendEvaluator extends AbstractEvaluator {
 						RecommendParam param = new RecommendParam(testingUser.id());
 						//Setting up maximum recommendation number by binomial distribution. Added date: 2019.08.23 by Loc Nguyen.
 						int maxRecommend = 0;
-						if ((!config.isRecommendAll()) && (trainingData != null)) {
+						if (!config.isRecommendAll() && trainingData != null) {
 							int ratedCount = 0;
 							RatingVector trainingUser = trainingData.getUserRating(testingUser.id());
 							if (trainingUser != null) ratedCount = trainingUser.count(true); 
 							maxRecommend = (int)(relevantSparseRatio*(totalRatedCount-ratedCount)+0.5);
-							
-							if (trainingData != training) trainingData.clear();
 							trainingData = null;
 						}
 						vExactCurrentTotal++; //Increase exact total vector count.
@@ -326,13 +292,7 @@ public class RecommendEvaluator extends AbstractEvaluator {
 						e.printStackTrace();
 					}
 					
-					try {
-						recommender.unsetup();
-					}
-					catch (Throwable e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
+					unsetupAlg(recommender);
 				}
 				
 				SystemUtil.enhanceAuto();
@@ -529,8 +489,8 @@ public class RecommendEvaluator extends AbstractEvaluator {
 //		f1.setup(precision, recall);
 //		metricList.add(f1);
 		
-		Pearson pearson = new Pearson();
-		metricList.add(pearson);
+		R r = new R();
+		metricList.add(r);
 		
 //		Spearman pearman = new Spearman();
 //		metricList.add(pearman);
@@ -545,14 +505,32 @@ public class RecommendEvaluator extends AbstractEvaluator {
 	@Override
 	protected void setupAlg(Alg alg, Dataset training) {
 		// TODO Auto-generated method stub
-		throw new RuntimeException("Do not support this method");
+		try {
+			((Recommender)alg).setup(training);
+		}
+		catch (Throwable e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 
 	@Override
 	protected void unsetupAlg(Alg alg) {
 		// TODO Auto-generated method stub
-		throw new RuntimeException("Do not support this method");
+		try {
+			if (!alg.getConfig().getAsBoolean(DataConfig.DELAY_UNSETUP))
+				((Recommender)alg).unsetup();
+			else {
+				synchronized (delayUnsetupAlgs) {
+					delayUnsetupAlgs.add(alg);
+				}
+			}
+		}
+		catch (Throwable e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 

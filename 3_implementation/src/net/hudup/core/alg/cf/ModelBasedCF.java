@@ -8,9 +8,9 @@ import net.hudup.core.alg.Recommender;
 
 
 /**
- * Note, the abstract class {@code Recommender} represents all recommendation algorithm.
- * Two typical inherited classes of {@link Recommender} are {@code MemoryBasedRecomender} and {@code ModelBasedRecommender}
- * which in turn are abstract classes for memory-based recommendation algorithm and model-based recommendation algorithm.
+ * Note, the interface {@code Recommender} represents all recommendation algorithm.
+ * Two typical inherited interfaces of {@link Recommender} are {@code MemoryBasedRecomender} and {@code ModelBasedRecommender}
+ * which in turn are interfaces for memory-based recommendation algorithm and model-based recommendation algorithm.
  * There are two common trends: content-base filtering (CBF) and collaborative filtering (CF) in building up a recommendation algorithms as follows:
  * <ul>
  * <li>
@@ -22,10 +22,10 @@ import net.hudup.core.alg.Recommender;
  * </ul>
  * Both CBF and CF have their own strong and weak points.
  * <br>
- * This abstract class represents the model-based recommendation algorithm with collaborative filtering (CF), called {@code model-based CF recommender}.
+ * This interface represents the model-based recommendation algorithm with collaborative filtering (CF), called {@code model-based CF recommender}.
  * As mentioned, two main methods of any recommender are {@code estimate(...)} and {@code recommend(...)}.
- * This class does not implement such two methods. It almost do nothing.
- * Therefore it is a flag that any class extends it must define such two methods with use of knowledge base represented by {@code KBase} class for collaborative filtering in recommendation task. 
+ * This interface does not implement such two methods. It almost do nothing.
+ * Therefore it is a flag that any class implements it must define such two methods with use of knowledge base represented by {@code KBase} class for collaborative filtering in recommendation task. 
  * In general, {@code model-based CF recommender} uses {@code KBase} to produce a list of recommended items based on collaborative filtering (CF).
  * 
  * @author Loc Nguyen
@@ -33,22 +33,7 @@ import net.hudup.core.alg.Recommender;
  *
  */
 @CFAnnotation
-public abstract class ModelBasedCF extends ModelBasedRecommender {
-
-
-	/**
-	 * Serial version UID for serializable class. 
-	 */
-	private static final long serialVersionUID = 1L;
-
-
-	/**
-	 * Default constructor.
-	 */
-	public ModelBasedCF() {
-		super();
-		// TODO Auto-generated constructor stub
-	}
+public interface ModelBasedCF extends ModelBasedRecommender {
 
 
 }

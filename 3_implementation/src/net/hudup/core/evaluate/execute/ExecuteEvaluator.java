@@ -53,7 +53,13 @@ public abstract class ExecuteEvaluator extends AbstractEvaluator {
 	protected void unsetupAlg(Alg alg) {
 		// TODO Auto-generated method stub
 		try {
-			((ExecutableAlg)alg).unsetup();
+			if (!alg.getConfig().getAsBoolean(DataConfig.DELAY_UNSETUP))
+				((ExecutableAlg)alg).unsetup();
+			else {
+				synchronized (delayUnsetupAlgs) {
+					delayUnsetupAlgs.add(alg);
+				}
+			}
 		}
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
@@ -128,8 +134,8 @@ public abstract class ExecuteEvaluator extends AbstractEvaluator {
 		ErrorRange errorRange = new ErrorRange();
 		metricList.add(errorRange);
 		
-		Pearson pearson = new Pearson();
-		metricList.add(pearson);
+		R r = new R();
+		metricList.add(r);
 		
 		return metricList;
 	}

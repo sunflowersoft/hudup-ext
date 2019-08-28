@@ -11,12 +11,14 @@ import net.hudup.core.alg.KBase;
 import net.hudup.core.alg.KBaseRecommendIntegrated;
 import net.hudup.core.alg.RecommendFilterParam;
 import net.hudup.core.alg.RecommendParam;
-import net.hudup.core.alg.cf.ModelBasedCF;
+import net.hudup.core.alg.cf.ModelBasedCFAbstract;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Pair;
 import net.hudup.core.data.RatingMatrix;
 import net.hudup.core.data.RatingVector;
 import net.hudup.core.evaluate.recommend.Accuracy;
+import net.hudup.core.logistic.Inspector;
+import net.hudup.evaluate.ui.EvaluateGUI;
 
 
 /**
@@ -26,7 +28,7 @@ import net.hudup.core.evaluate.recommend.Accuracy;
  * @version 10.0
  *
  */
-public class SvdGradientCF extends ModelBasedCF {
+public class SvdGradientCF extends ModelBasedCFAbstract {
 
 	
 	/**
@@ -249,6 +251,13 @@ public class SvdGradientCF extends ModelBasedCF {
 	}
 
 
+	@Override
+	public Inspector getInspector() {
+		// TODO Auto-generated method stub
+		return EvaluateGUI.createInspector(this);
+	}
+
+	
 	@Override
 	public Alg newInstance() {
 		// TODO Auto-generated method stub

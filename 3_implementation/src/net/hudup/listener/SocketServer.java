@@ -91,7 +91,7 @@ public abstract class SocketServer extends AbstractRunner implements Server, Acc
 	 * shutdownHookStatus = false;<br>
 	 * </code> 
 	 */
-	protected boolean shutdownHookStatus = false;
+	protected volatile boolean shutdownHookStatus = false;
 	
 	
 	/**
@@ -139,7 +139,7 @@ public abstract class SocketServer extends AbstractRunner implements Server, Acc
 	
 	
 	@Override
-	public void task() {
+	protected void task() {
 		// TODO Auto-generated method stub
 		if (serverSocket == null || paused)
 			return;
@@ -408,7 +408,7 @@ public abstract class SocketServer extends AbstractRunner implements Server, Acc
 
 	
 	@Override
-	protected synchronized void clear() {
+	protected void clear() {
 		// TODO Auto-generated method stub
 		destroyServerSocket();
 		

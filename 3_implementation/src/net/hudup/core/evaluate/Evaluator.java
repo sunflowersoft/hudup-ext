@@ -9,6 +9,7 @@ import net.hudup.core.PluginStorageWrapper;
 import net.hudup.core.RegisterTable;
 import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.SetupAlgListener;
+import net.hudup.core.data.AutoCloseable;
 import net.hudup.core.data.DatasetPool;
 import net.hudup.core.logistic.RemoteRunner;
 
@@ -77,7 +78,7 @@ import net.hudup.core.logistic.RemoteRunner;
  * @version 10.0
  *
  */
-public interface Evaluator extends Remote, RemoteRunner, SetupAlgListener {
+public interface Evaluator extends Remote, RemoteRunner, SetupAlgListener, AutoCloseable {
 
 	
 	/**
@@ -265,5 +266,4 @@ public interface Evaluator extends Remote, RemoteRunner, SetupAlgListener {
     void remoteUnexport() throws RemoteException;
     
     
-
 }

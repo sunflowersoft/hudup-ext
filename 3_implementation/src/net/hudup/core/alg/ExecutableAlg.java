@@ -14,7 +14,7 @@ import net.hudup.core.logistic.Inspectable;
  * @version 1.0
  *
  */
-public interface ExecutableAlg extends RemoteAlg, Inspectable {
+public interface ExecutableAlg extends Alg, Inspectable {
 	
 	
 	/**
@@ -38,8 +38,9 @@ public interface ExecutableAlg extends RemoteAlg, Inspectable {
 
 	
 	/**
-	 * Unset up this testing algorithm, which release resources used by the {@link #remoteSetup(Dataset, Object...)} method.
-	 * Exceptionally, for testing algorithm, after this method is called, this algorithm can be used (dependent on specific application).
+	 * Unset up this testing algorithm, which release resources used by the {@link #setup(Dataset, Object...)} method.
+	 * Exceptionally, for some algorithm, after this method is called, this algorithm can be used (dependent on specific application).
+	 * So this unsetup method of executable algorithm should not clear parameter.
 	 * @throws RemoteException if any error raises.
 	 */
 	public void unsetup() throws RemoteException;
@@ -88,6 +89,21 @@ public interface ExecutableAlg extends RemoteAlg, Inspectable {
 	 * @throws RemoteException if any error raises.
 	 */
     void removeSetupListener(SetupAlgListener listener) throws RemoteException;
+
+
+    /**
+     * Remote exporting this recommendation.
+     * @param serverPort server port.
+     * @throws RemoteException if any error raises.
+     */
+    void export(int serverPort) throws RemoteException;
+    
+    
+    /**
+     * Remote unexporting this recommendation.
+     * @throws RemoteException if any error raises.
+     */
+    void unexport() throws RemoteException;
 
 
 }

@@ -330,7 +330,7 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	
 			unsetupListeners(this.evaluator);
 			
-			this.evaluator.remoteUnexport();
+			this.evaluator.close(); //The close() method also unexports evaluator.
 			
 			if (this.registry != null) {
 				NetUtil.RegistryRemote.unregisterUnexport(this.registry.getRegistry(), this);

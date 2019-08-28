@@ -48,7 +48,7 @@ import net.hudup.core.logistic.Vector;
  * @version 10.0
  *
  */
-public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAlg {
+public abstract class NeighborCF extends MemoryBasedCFAbstract implements SupportCacheAlg {
 
 	
 	/**
@@ -277,7 +277,7 @@ public abstract class NeighborCF extends MemoryBasedCF implements SupportCacheAl
 
 
 	@Override
-	public synchronized void setup(Dataset dataset, Serializable... params) throws RemoteException {
+	public synchronized void setup(Dataset dataset, Object...params) throws RemoteException {
 		// TODO Auto-generated method stub
 		super.setup(dataset, params);
 		

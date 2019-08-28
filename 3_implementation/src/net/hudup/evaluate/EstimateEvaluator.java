@@ -3,13 +3,11 @@ package net.hudup.evaluate;
 import java.rmi.RemoteException;
 import java.util.Set;
 
-import net.hudup.core.alg.ModelBasedRecommender;
 import net.hudup.core.alg.RecommendParam;
 import net.hudup.core.alg.Recommender;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.DatasetPair;
 import net.hudup.core.data.Fetcher;
-import net.hudup.core.data.KBasePointer;
 import net.hudup.core.data.RatingVector;
 import net.hudup.core.evaluate.EvaluatorEvent;
 import net.hudup.core.evaluate.EvaluatorEvent.Type;
@@ -78,16 +76,9 @@ public class EstimateEvaluator extends RecommendEvaluator {
 					result.add( recommender.getName(), datasetId, datasetUri, ((NoneWrapperMetricList)metricList.clone()).sort().list() );
 					
 					
-					//Setting store URI of model-based recommender according to store URI of KBasePointer training.
-					//Following code line is very important.
-					//However, in client-server mechanism, the client (GUI) must assure that the server (this evaluator) can access the store URI, so the local file system does not work except that client and server run on the same machine.
-					if ((recommender instanceof ModelBasedRecommender) && (training instanceof KBasePointer)) {
-						recommender.getConfig().setStoreUri(training.getConfig().getStoreUri());
-					}
-
 					long beginSetupTime = System.currentTimeMillis();
 					//
-					recommender.setup(training);
+					setupAlg(recommender, training);
 					//
 					long endSetupTime = System.currentTimeMillis();
 					long setupElapsed = endSetupTime - beginSetupTime;
@@ -222,13 +213,7 @@ public class EstimateEvaluator extends RecommendEvaluator {
 						e.printStackTrace();
 					}
 					
-					try {
-						recommender.unsetup();
-					}
-					catch (Throwable e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
+					unsetupAlg(recommender);
 				}
 				
 				SystemUtil.enhanceAuto();
@@ -309,7 +294,7 @@ public class EstimateEvaluator extends RecommendEvaluator {
 //		rmse.setup(mse);
 //		metricList.add(rmse);
 
-		Pearson pearson = new Pearson();
+		R pearson = new R();
 		metricList.add(pearson);
 
 		return metricList;

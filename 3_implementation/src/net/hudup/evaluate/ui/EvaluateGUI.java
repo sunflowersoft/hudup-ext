@@ -7,12 +7,15 @@ import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Frame;
 import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.nio.ByteBuffer;
 import java.nio.channels.ByteChannel;
 import java.rmi.RemoteException;
@@ -24,6 +27,8 @@ import java.util.Set;
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -36,6 +41,7 @@ import net.hudup.core.Util;
 import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.CompositeAlg;
 import net.hudup.core.alg.ModelBasedAlg;
+import net.hudup.core.alg.Recommender;
 import net.hudup.core.alg.ServiceAlg;
 import net.hudup.core.alg.SetupAlgEvent;
 import net.hudup.core.alg.ui.AlgComboBox;
@@ -54,6 +60,7 @@ import net.hudup.core.evaluate.Metrics;
 import net.hudup.core.evaluate.MetricsUtil;
 import net.hudup.core.logistic.ClipboardUtil;
 import net.hudup.core.logistic.I18nUtil;
+import net.hudup.core.logistic.Inspector;
 import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.xURI;
 import net.hudup.core.logistic.ui.UIUtil;
@@ -61,6 +68,7 @@ import net.hudup.data.DatasetUtil2;
 import net.hudup.data.ui.DatasetTextField;
 import net.hudup.data.ui.StatusBar;
 import net.hudup.data.ui.TxtOutput;
+import net.hudup.evaluate.RecommendEvaluator;
 
 /**
  * This class represents a graphic user interface (GUI) for {@link AbstractEvaluator} with a pair of training dataset and testing dataset.
@@ -69,7 +77,6 @@ import net.hudup.data.ui.TxtOutput;
  * @author Loc Nguyen
  * @version 10.0
  */
-@Deprecated
 public class EvaluateGUI extends AbstractEvaluateGUI {
 	
 
@@ -131,12 +138,48 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 	public EvaluateGUI(Evaluator evaluator, xURI bindUri) {
 		super(evaluator, bindUri);
 		try {
-			algRegTable.copy(evaluator.extractAlgFromPluginStorage());
+			RegisterTable algRegTable = evaluator.extractAlgFromPluginStorage();
+			init(algRegTable, true);
 		}
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	
+	
+	/**
+	 * Constructor with specified evaluator.
+	 * @param evaluator specified evaluator.
+	 * @param bindUri bound URI.
+	 */
+	private EvaluateGUI(Evaluator evaluator, Recommender recommeder) {
+		super(evaluator, null);
+		try {
+			if (evaluator.acceptAlg(recommeder)) {
+				RegisterTable algRegTable = new RegisterTable(Arrays.asList(recommeder));
+				init(algRegTable, false);
+			}
+		}
+		catch (Throwable e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	
+	/**
+	 * Initializing the evaluator.
+	 * @param algRegTable registered table of algorithm.
+	 * @param cloneAlgs true if creating (cloning) instances of algorithms in the specified table.
+	 */
+	private void init(RegisterTable algRegTable, boolean cloneAlgs) {
+		if (algRegTable == null) return;
+		
+		if (cloneAlgs)
+			this.algRegTable.copy(algRegTable);
+		else
+			this.algRegTable.register(algRegTable.getAlgList());
 		
 		setLayout(new BorderLayout(2, 2));
 		
@@ -152,7 +195,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 		algChanged();
 		setDisplay(false);
 	}
-	
+
 	
 	/**
 	 * Getting this evaluator GUI.
@@ -173,6 +216,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 		}
 		catch (Throwable e) {
 			e.printStackTrace();
+			updateMode();
 		}
 	}
 	
@@ -1206,6 +1250,80 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 		catch (Throwable e) {
 			e.printStackTrace();
 		}
+	}
+	
+	
+	/**
+	 * Creating inspector for recommendation algorithm.
+	 * @param recommender specified recommendation algorithm.
+	 * @return inspector for recommendation algorithm.
+	 */
+	public static Inspector createInspector(Recommender recommender) {
+		if (recommender == null) return null;
+		
+		try {
+			RecommendEvaluator evaluator = new RecommendEvaluator();
+			evaluator.getConfig().setSaveAbility(false);
+			
+			return new RecommenderInspector(evaluator, recommender);
+		}
+		catch (Throwable e) {
+			e.printStackTrace();
+		}
+		
+		return null;
+	}
+	
+	
+	/**
+	 * Inspector of recommendation algorithm.
+	 * @author Loc Nguyen
+	 * @version 1.0
+	 */
+	private static class RecommenderInspector extends JDialog implements Inspector {
+		
+		/**
+		 * Default serial version UID.
+		 */
+		private static final long serialVersionUID = 1L;
+
+		/**
+		 * Instructor with specified evaluator and bound URI.
+		 * @param evaluator specified evaluator.
+		 * @param recommender recommendation algorithm.
+		 */
+		private RecommenderInspector(Evaluator evaluator, Recommender recommender) {
+			super((Frame)null,
+					"Inspector of the recommender \"" + recommender.getName() + "\"", true);
+			setSize(600, 400);
+			setLocationRelativeTo(null);
+			
+			EvaluateGUI evaluateGUI = new EvaluateGUI(evaluator, recommender);
+
+			setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+			addWindowListener(new WindowAdapter() {
+
+				@Override
+				public void windowClosed(WindowEvent e) {
+					// TODO Auto-generated method stub
+					super.windowClosed(e);
+					
+					evaluateGUI.dispose();
+				}
+
+			});
+			
+			setLayout(new BorderLayout(2, 2));
+			
+			add(evaluateGUI, BorderLayout.CENTER);
+		}
+
+		@Override
+		public void inspect() {
+			// TODO Auto-generated method stub
+			setVisible(true);
+		}
+		
 	}
 	
 	

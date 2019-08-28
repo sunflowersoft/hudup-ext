@@ -9,9 +9,12 @@ import javax.swing.event.EventListenerList;
 import net.hudup.core.Util;
 import net.hudup.core.alg.SetupAlgEvent.Type;
 import net.hudup.core.data.AttributeList;
+import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.Fetcher;
 import net.hudup.core.data.Profile;
+import net.hudup.core.logistic.Inspector;
+import net.hudup.core.logistic.NetUtil;
 import net.hudup.core.logistic.ui.DescriptionDlg;
 import net.hudup.core.logistic.ui.UIUtil;
 
@@ -49,7 +52,13 @@ public abstract class AbstractExecutableAlg extends AbstractAlg implements Execu
     protected EventListenerList listenerList = new EventListenerList();
     
 
-    /**
+	/**
+	 * Exported flag.
+	 */
+	protected Boolean exported = false;
+
+	
+	/**
      * Default constructor.
      */
     public AbstractExecutableAlg() {
@@ -155,18 +164,14 @@ public abstract class AbstractExecutableAlg extends AbstractAlg implements Execu
 
 
 	@Override
-	public synchronized void manifest() {
+	public synchronized Inspector getInspector() {
 		// TODO Auto-generated method stub
 		String desc = "";
 		try {
 			desc = getDescription();
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-		}
-		desc = desc == null ? "" : desc;
+		} catch (Exception e) {e.printStackTrace();}
 		
-		new DescriptionDlg(UIUtil.getFrameForComponent(null), "Manifest", desc).setVisible(true);;
+		return new DescriptionDlg(UIUtil.getFrameForComponent(null), "Inspector", desc);
 	}
 
 	
@@ -249,12 +254,57 @@ public abstract class AbstractExecutableAlg extends AbstractAlg implements Execu
 	
 	
 	@Override
+	public String queryName() throws RemoteException {
+		// TODO Auto-generated method stub
+		return getName();
+	}
+
+
+	@Override
+	public DataConfig queryConfig() throws RemoteException {
+		// TODO Auto-generated method stub
+		return getConfig();
+	}
+
+
+	@Override
+	public synchronized void export(int serverPort) throws RemoteException {
+		// TODO Auto-generated method stub
+		synchronized (exported) {
+			if (!exported) {
+				NetUtil.RegistryRemote.export(this, serverPort);
+				exported = true;
+			}
+		}
+	}
+
+
+	@Override
+	public synchronized void unexport() throws RemoteException {
+		// TODO Auto-generated method stub
+		synchronized (exported) {
+			if (exported) {
+				NetUtil.RegistryRemote.unexport(this);
+				exported = false;
+			}
+		}
+	}
+
+	
+	@Override
 	protected void finalize() throws Throwable {
 		// TODO Auto-generated method stub
 		super.finalize();
 		
 		try {
 			unsetup();
+		}
+		catch (Throwable e) {
+			e.printStackTrace();
+		}
+		
+		try {
+			unexport();
 		}
 		catch (Throwable e) {
 			e.printStackTrace();

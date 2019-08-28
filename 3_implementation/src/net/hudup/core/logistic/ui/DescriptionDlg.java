@@ -12,6 +12,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
+import net.hudup.core.logistic.Inspector;
+
 
 /**
  * This class represents a description dialog.
@@ -20,7 +22,7 @@ import javax.swing.JTextArea;
  * @version 1.0
  *
  */
-public class DescriptionDlg extends JDialog {
+public class DescriptionDlg extends JDialog implements Inspector {
 
 	
 	/**
@@ -64,6 +66,13 @@ public class DescriptionDlg extends JDialog {
 			}
 		});
 		footer.add(btnOK);
+	}
+
+
+	@Override
+	public void inspect() {
+		// TODO Auto-generated method stub
+		setVisible(true);
 	}
 
 	

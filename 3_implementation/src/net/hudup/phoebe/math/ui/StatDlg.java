@@ -21,6 +21,7 @@ import javax.swing.table.DefaultTableModel;
 import flanagan.analysis.Stat;
 import flanagan.math.Fmath;
 import flanagan.plot.PlotGraph;
+import net.hudup.core.Constants;
 import net.hudup.core.logistic.ClipboardUtil;
 import net.hudup.core.logistic.DSUtil;
 import net.hudup.core.logistic.MathUtil;
@@ -98,7 +99,7 @@ public class StatDlg extends JDialog {
 
 					@Override
 					public void actionPerformed(ActionEvent e) {
-						ClipboardUtil.util.setText(TextParserUtil.toColumnText(data).toString());
+						ClipboardUtil.util.setText(TextParserUtil.toColumnText(data, Constants.DECIMAL_PRECISION).toString());
 					}
 			});
 		btnCopy.setMargin(new Insets(0, 0 , 0, 0));

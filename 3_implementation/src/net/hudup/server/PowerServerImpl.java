@@ -64,13 +64,13 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 	/**
 	 * Starting flag.
 	 */
-	protected boolean started = false;
+	protected volatile boolean started = false;
 	
 	
 	/**
 	 * Pausing flag.
 	 */
-	protected boolean paused = false;
+	protected volatile boolean paused = false;
 	
 	
 	/**
@@ -118,7 +118,7 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 	/**
 	 * Shutdown hook status.
 	 */
-	protected boolean shutdownHookStatus = false;
+	protected volatile boolean shutdownHookStatus = false;
 	
 	
 	/**

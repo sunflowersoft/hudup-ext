@@ -20,7 +20,7 @@ import net.hudup.core.logistic.Vector;
  * @version 10.0
  *
  */
-public class Pearson extends CorrelationAccuracy {
+public class R extends CorrelationAccuracy {
 
 	
 	/**
@@ -32,7 +32,7 @@ public class Pearson extends CorrelationAccuracy {
 	/**
 	 * Default constructor.
 	 */
-	public Pearson() {
+	public R() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
@@ -41,7 +41,7 @@ public class Pearson extends CorrelationAccuracy {
 	@Override
 	public String getName() {
 		// TODO Auto-generated method stub
-		return "Pearson.recommend";
+		return "R.recommend";
 	}
 
 	
@@ -96,7 +96,7 @@ public class Pearson extends CorrelationAccuracy {
 	@Override
 	public Alg newInstance() {
 		// TODO Auto-generated method stub
-		return new Pearson();
+		return new R();
 	}
 
 

@@ -827,12 +827,24 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluatorProgr
 
 
 	@Override
+	public void close() throws Exception {
+		// TODO Auto-generated method stub
+		try {
+			remoteUnexport();
+		}
+		catch (Throwable e) {
+			e.printStackTrace();
+		}
+	}
+
+
+	@Override
 	protected void finalize() throws Throwable {
 		// TODO Auto-generated method stub
 		super.finalize();
 		
 		try {
-			remoteUnexport();
+			close();
 		}
 		catch (Throwable e) {
 			e.printStackTrace();

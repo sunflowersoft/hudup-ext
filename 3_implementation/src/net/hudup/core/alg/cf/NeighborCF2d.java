@@ -1,6 +1,5 @@
 package net.hudup.core.alg.cf;
 
-import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.util.Set;
 
@@ -44,7 +43,7 @@ public class NeighborCF2d extends NeighborCFUserBased {
 
 	
 	@Override
-	public synchronized void setup(Dataset dataset, Serializable... params) throws RemoteException {
+	public synchronized void setup(Dataset dataset, Object...params) throws RemoteException {
 		// TODO Auto-generated method stub
 		super.setup(dataset, params);
 		this.itemBasedCF.setup(dataset, params);

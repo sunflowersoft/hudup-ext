@@ -16,7 +16,7 @@ import net.hudup.core.logistic.Vector;
  * @version 1.0
  *
  */
-public class Pearson extends TwoArrayMetric {
+public class R extends TwoArrayMetric {
 
 	
 	/**
@@ -28,7 +28,7 @@ public class Pearson extends TwoArrayMetric {
 	/**
 	 * Default constructor.
 	 */
-	public Pearson() {
+	public R() {
 		// TODO Auto-generated constructor stub
 	}
 
@@ -55,7 +55,7 @@ public class Pearson extends TwoArrayMetric {
 	@Override
 	public String getName() {
 		// TODO Auto-generated method stub
-		return "R.test";
+		return "R.execute";
 	}
 	
 	
@@ -76,7 +76,7 @@ public class Pearson extends TwoArrayMetric {
 	@Override
 	public Alg newInstance() {
 		// TODO Auto-generated method stub
-		return new Pearson();
+		return new R();
 	}
 
 

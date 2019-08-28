@@ -29,12 +29,13 @@ public abstract class AbstractRunner implements Runner {
 	
 	/**
 	 * Built-in thread which is the base of this runner to run.
+	 * This is also so a flag of whether this runner is starting.
 	 */
 	protected volatile RunnerThread thread = null;
 	
 	
 	/**
-	 * This variable is a flag of whether this runner paused.
+	 * This variable is a flag of whether this runner is pause.
 	 * Note, a runner paused if the variable {@link #thread} is not null and this variable is true.
 	 */
 	protected volatile boolean paused = false;
@@ -81,11 +82,11 @@ public abstract class AbstractRunner implements Runner {
 	/**
 	 * The actual tasks (works) which are performed when runner is running. This method should not be synchronized because it is called inside the loop of run method.
 	 */
-	public abstract void task();
+	protected abstract void task();
 	
 	
 	/**
-	 * Clearing all resources after runner run (stopped). This method should be synchronized so as to prevent calling it unexpectedly.
+	 * Clearing all resources after runner run (stopped). This method should not be synchronized because it is called inside the loop of run method.
 	 */
 	protected abstract void clear();
 	
@@ -188,18 +189,27 @@ public abstract class AbstractRunner implements Runner {
 	}
 
 	
+	/*
+	 * This method is not synchronized because thread and paused are volatile variables.
+	 */
 	@Override
 	public boolean isStarted() {
 		return thread != null;
 	}
 	
 	
+	/*
+	 * This method is not synchronized because thread and paused are volatile variables.
+	 */
 	@Override
 	public boolean isPaused() {
 		return thread != null && paused;
 	}
 	
 	
+	/*
+	 * This method is not synchronized because thread and paused are volatile variables.
+	 */
 	@Override
 	public boolean isRunning() {
 		return thread != null && !paused;

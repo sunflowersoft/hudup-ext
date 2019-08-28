@@ -12,30 +12,37 @@ package net.hudup.core.logistic;
 public interface Runner extends Runnable {
 	
 	
+	/*
+	 * This method will not be synchronized because it is not called directly. Method start() is called instead.
+	 */
 	@Override
 	void run();
 
 	
 	/**
 	 * Runner starts running.
+	 * This method will be synchronized.
 	 */
 	public void start();
 
 	
 	/**
 	 * Runner pauses.
+	 * This method will be synchronized.
 	 */
 	void pause();
 	
 	
 	/**
 	 * Runner resumes after runner pauses.
+	 * This method will be synchronized.
 	 */
 	public void resume();
 	
 	
 	/**
 	 * Runner stops. If runner wants to run again, runner must start again.
+	 * This method will be synchronized.
 	 */
 	void stop();
 	

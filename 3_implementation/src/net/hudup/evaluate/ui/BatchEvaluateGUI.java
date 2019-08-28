@@ -222,13 +222,30 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 		super(evaluator, bindUri);
 		// TODO Auto-generated constructor stub
 		try {
-			algRegTable.copy(evaluator.extractAlgFromPluginStorage());
+			RegisterTable algRegTable = evaluator.extractAlgFromPluginStorage();
+			init(algRegTable, true);
 		}
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		pool = new DatasetPool();
+	}
+
+	
+	/**
+	 * Initializing the evaluator.
+	 * @param algRegTable registered table of algorithm.
+	 * @param cloneAlgs true if creating (cloning) instances of algorithms in the specified table.
+	 */
+	private void init(RegisterTable algRegTable, boolean cloneAlgs) {
+		if (algRegTable == null) return;
+		
+		if (cloneAlgs)
+			this.algRegTable.copy(algRegTable);
+		else
+			this.algRegTable.register(algRegTable.getAlgList());
+		
+		this.pool = new DatasetPool();
 		
 		setLayout(new BorderLayout(2, 2));
 		
@@ -243,7 +260,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 		
 		setDisplay(false);
 	}
-
+	
 	
 	/**
 	 * Returning this batch evaluator.
@@ -264,6 +281,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 		}
 		catch (Throwable e) {
 			e.printStackTrace();
+			updateMode();
 		}
 	}
 

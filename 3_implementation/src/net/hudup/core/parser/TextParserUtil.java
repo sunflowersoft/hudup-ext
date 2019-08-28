@@ -18,6 +18,7 @@ import java.util.Set;
 
 import net.hudup.core.Constants;
 import net.hudup.core.Util;
+import net.hudup.core.logistic.MathUtil;
 import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.xURI;
 
@@ -359,6 +360,28 @@ public final class TextParserUtil {
 
 			double value = array[i];
 			buffer.append(value);
+		}
+		
+		return buffer;
+	}
+
+	
+	/**
+	 * Converting a specified array of double numbers into a column list of strings with default format.
+	 * Words in such returned string are connected by the character specified by the parameter {@code sep}. 
+	 * @param array Specified array of objects.
+	 * @param decimalPrecision format decimal precision.
+	 * @return Column list of strings given the specified array of double numbers. 
+	 */
+	public static StringBuffer toColumnText(double[] array, int decimalPrecision) {
+		StringBuffer buffer = new StringBuffer();
+		
+		for (int i = 0; i < array.length; i++) {
+			if ( i > 0)
+				buffer.append("\n");
+
+			double value = array[i];
+			buffer.append(MathUtil.format(value, decimalPrecision));
 		}
 		
 		return buffer;

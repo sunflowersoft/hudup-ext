@@ -75,7 +75,7 @@ public class CounterClock extends AbstractRunner {
 	
 	
 	@Override
-	public void task() {
+	protected void task() {
 		// TODO Auto-generated method stub
 		if (startedTime == 0)
 			return;
@@ -88,7 +88,7 @@ public class CounterClock extends AbstractRunner {
 
 	
 	@Override
-	protected synchronized void clear() {
+	protected void clear() {
 		// TODO Auto-generated method stub
 		
 	}

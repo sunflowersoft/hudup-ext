@@ -14,6 +14,7 @@ import net.hudup.core.PluginStorage;
 import net.hudup.core.PluginStorageWrapper;
 import net.hudup.core.RegisterTable;
 import net.hudup.core.RegisterTable.AlgFilter;
+import net.hudup.core.Util;
 import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.ExecutableAlg;
 import net.hudup.core.alg.SetupAlgEvent;
@@ -123,6 +124,12 @@ public abstract class AbstractEvaluator extends AbstractRunner implements Evalua
     
     
     /**
+     * List of unsetup algorithms that are evaluated by this evaluator. This list is not important.
+     */
+    protected List<Alg> delayUnsetupAlgs = Util.newList();
+
+    
+    /**
      * This {@code dataset pool} contains many training and testing datasets, which is fed to evaluator, which allows evaluator assesses algorithm on many testing datasets.
      */
     protected DatasetPool pool = null;
@@ -164,6 +171,7 @@ public abstract class AbstractEvaluator extends AbstractRunner implements Evalua
 		catch (Exception e) {
 			e.printStackTrace();
 		}
+		
 	}
 	
 	
@@ -181,6 +189,8 @@ public abstract class AbstractEvaluator extends AbstractRunner implements Evalua
 			logger.error("Evaluator is running and so evaluation is not run");
 			return;
 		}
+		
+		unsetupAlgs(); //This code line is important.
 		
 		this.algList = algList;
 		this.pool = pool;
@@ -373,6 +383,7 @@ public abstract class AbstractEvaluator extends AbstractRunner implements Evalua
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
+					
 					unsetupAlg(alg);
 				}
 				
@@ -399,6 +410,7 @@ public abstract class AbstractEvaluator extends AbstractRunner implements Evalua
 	
 	/**
 	 * Setting up specified algorithm based on training dataset and additional parameters.
+	 * This method is always called by another method and so it is not synchronozed.
 	 * @param alg specified algorithm.
 	 * @param training training dataset.
 	 */
@@ -407,10 +419,26 @@ public abstract class AbstractEvaluator extends AbstractRunner implements Evalua
 	
 	/**
 	 * Unsetting up specified algorithm based on training dataset and additional parameters.
+	 * This method is always called by another method and so it is not synchronized.
 	 * @param alg specified algorithm.
 	 */
 	protected abstract void unsetupAlg(Alg alg);
 	
+	
+	/**
+	 * Clearing unsetting up algorithms.
+	 * This method is not synchronized because it is also called by another method as {@link #close()} method.
+	 */
+	protected void unsetupAlgs() {
+		synchronized (delayUnsetupAlgs) {
+			for (Alg alg : delayUnsetupAlgs) {
+				unsetupAlg(alg);
+			}
+			
+			delayUnsetupAlgs.clear();
+		}
+	}
+
 	
 	/**
 	 * Fetching profiles from the specified testing dataset.
@@ -528,7 +556,7 @@ public abstract class AbstractEvaluator extends AbstractRunner implements Evalua
 
 
 	@Override
-	protected synchronized void clear() {
+	protected void clear() {
 		// TODO Auto-generated method stub
 		this.algList = null;
 		this.pool = null;
@@ -537,7 +565,7 @@ public abstract class AbstractEvaluator extends AbstractRunner implements Evalua
 
 	
 	@Override
-	public void task() {
+	protected void task() {
 		// TODO Auto-generated method stub
 		logger.info("Evaluator#task not used because overriding Evaluator#run");
 	}
@@ -846,12 +874,31 @@ public abstract class AbstractEvaluator extends AbstractRunner implements Evalua
 
 
 	@Override
+	public synchronized void close() throws Exception {
+		// TODO Auto-generated method stub
+		try {
+			unsetupAlgs();
+		}
+		catch (Throwable e) {
+			e.printStackTrace();
+		}
+		
+		try {
+			remoteUnexport();
+		}
+		catch (Throwable e) {
+			e.printStackTrace();
+		}
+	}
+
+
+	@Override
 	protected void finalize() throws Throwable {
 		// TODO Auto-generated method stub
 		super.finalize();
 		
 		try {
-			remoteUnexport();
+			close();
 		}
 		catch (Throwable e) {
 			e.printStackTrace();

@@ -6,10 +6,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 
 import net.hudup.core.alg.Alg;
 import net.hudup.core.logistic.Inspectable;
+import net.hudup.core.logistic.Inspector;
 import net.hudup.core.logistic.ui.UIUtil;
 
 
@@ -51,16 +53,26 @@ public final class AlgListUIUtil {
 		
 		//Showing description of the algorithm
 		if (alg instanceof Inspectable) {
-			JMenuItem miManifest = new JMenuItem("Manifest");
-			miManifest.addActionListener( 
+			JMenuItem miInspect = new JMenuItem("Inspect");
+			miInspect.addActionListener( 
 				new ActionListener() {
 					
 					@Override
 					public void actionPerformed(ActionEvent e) {
-						((Inspectable)alg).manifest();
+						Inspector inspector = null;
+						try {
+							inspector = ((Inspectable)alg).getInspector();
+							if (inspector != null) inspector.inspect();
+						} catch (Exception ex) {
+							// TODO Auto-generated catch block
+							ex.printStackTrace();
+							inspector = null;
+						}
+						if (inspector == null)
+							JOptionPane.showMessageDialog(UIUtil.getFrameForComponent((Component)ui), "Cannot retrieve inspector", "Cannot retrieve inspector", JOptionPane.ERROR_MESSAGE);
 					}
 				});
-			ctxMenu.add(miManifest);
+			ctxMenu.add(miInspect);
 		}
 		
 		return ctxMenu;

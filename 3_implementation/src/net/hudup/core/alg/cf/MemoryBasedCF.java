@@ -9,9 +9,9 @@ import net.hudup.core.alg.Recommender;
 
 
 /**
- * Note, the abstract class {@code Recommender} represents all recommendation algorithm.
- * Two typical inherited classes of {@link Recommender} are {@code MemoryBasedRecomender} and {@code ModelBasedRecommender}
- * which in turn are abstract classes for memory-based recommendation algorithm and model-based recommendation algorithm.
+ * Note, the interface {@code Recommender} represents all recommendation algorithm.
+ * Two typical inherited interfaces of {@link Recommender} are {@code MemoryBasedRecomender} and {@code ModelBasedRecommender}
+ * which in turn are interfaces for memory-based recommendation algorithm and model-based recommendation algorithm.
  * There are two common trends: content-base filtering (CBF) and collaborative filtering (CF) in building up a recommendation algorithms as follows:
  * <ul>
  * <li>
@@ -23,32 +23,16 @@ import net.hudup.core.alg.Recommender;
  * </ul>
  * Both CBF and CF have their own strong and weak points.
  * <br>
- * This abstract class represents the memory-based recommendation algorithm with collaborative filtering (CF), called {@code memory-based CF recommender}.
+ * This interface represents the memory-based recommendation algorithm with collaborative filtering (CF), called {@code memory-based CF recommender}.
  * {@code Memory-based CF recommender} uses rating matrix (as a part of the internal dataset {@link #dataset}) stored in memory for filtering task in recommendation.
  * As mentioned, two main methods of any recommender are {@code estimate(...)} and {@code recommend(...)}.
- * This class only defines method {@code recommend(...)} so that classes that extend it must defines the other one {@code estimate(...)}.
  * 
  * @author Loc Nguyen
  * @version 10.0
  *
  */
 @CFAnnotation
-public abstract class MemoryBasedCF extends MemoryBasedRecommender {
+public interface MemoryBasedCF extends MemoryBasedRecommender {
 
 	
-	/**
-	 * Serial version UID for serializable class. 
-	 */
-	private static final long serialVersionUID = 1L;
-
-	
-	/**
-	 * Default constructor.
-	 */
-	public MemoryBasedCF() {
-		super();
-		// TODO Auto-generated constructor stub
-	}
-
-
 }

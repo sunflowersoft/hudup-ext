@@ -332,6 +332,11 @@ public class DataConfig extends PropList {
 	 */
 	public final static String MAIN_UNIT                     = changeCase("hdp_main");
 
+	/**
+	 * When unsetup delay mode is established, evaluator will not unsetup algorithms after evaluating it.
+	 */
+	public final static String DELAY_UNSETUP                 = changeCase("delay_unsetup");
+
 	
 	/**
 	 * Normal user privilege for access account

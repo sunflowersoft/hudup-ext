@@ -11,6 +11,7 @@ import java.net.URL;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenuItem;
 
 import net.hudup.core.Constants;
@@ -125,6 +126,19 @@ public final class UIUtil {
 
 	
 	/**
+	 * Creating a check-box menu item with icon.
+	 * @param iconName icon file name.
+	 * The directory of icon is specified by constants {@link Constants#IMAGES_PACKAGE}.
+	 * @param text text of menu item.
+	 * @param listener action listener for this menu item.
+	 * @return {@link JCheckBoxMenuItem} with icon.
+	 */
+	public static JCheckBoxMenuItem makeCheckBoxMenuItem(String iconName, String text, ActionListener listener) {
+		return (JCheckBoxMenuItem)makeMenuItem(getImageUrl(iconName), text, listener, true);
+	}
+
+	
+	/**
 	 * Creating a menu item with icon.
 	 * @param iconName icon file name.
 	 * The directory of icon is specified by constants {@link Constants#IMAGES_PACKAGE}.
@@ -133,19 +147,25 @@ public final class UIUtil {
 	 * @return {@link JMenuItem} with icon.
 	 */
 	public static JMenuItem makeMenuItem(String iconName, String text, ActionListener listener) {
-		return makeMenuItem(getImageUrl(iconName), text, listener);
+		return makeMenuItem(getImageUrl(iconName), text, listener, false);
 	}
 	
 	
 	/**
 	 * Creating a menu item with icon.
-	 * @param iconURL {@link URL} of icon. URL, abbreviation of Uniform Resource Locator, locates any resource on internet.
+	 * @param iconURL {@link URL} of icon. URL, abbreviation of Uniform Resource Locator, locates any resource on Internet.
 	 * @param text text of menu item.
 	 * @param listener action listener for this menu item.
+	 * @param isCheckbox true if this is check-box menu item.
 	 * @return {@link JMenuItem} with icon.
 	 */
-	private static JMenuItem makeMenuItem(URL iconURL, String text, ActionListener listener) {
-		JMenuItem item = new JMenuItem(text);
+	private static JMenuItem makeMenuItem(URL iconURL, String text, ActionListener listener, boolean isCheckbox) {
+		JMenuItem item = null;
+		if (isCheckbox)
+			item = new JCheckBoxMenuItem(text);
+		else
+			item = new JMenuItem(text);
+		
 		item.addActionListener(listener);
 		
 		try {
@@ -160,7 +180,6 @@ public final class UIUtil {
 	    return item;
 	}
 
-	
 	
 	/**
 	 * Getting the parent window {@link Window} of the specified component.

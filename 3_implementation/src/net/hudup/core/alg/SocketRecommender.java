@@ -3,7 +3,6 @@
  */
 package net.hudup.core.alg;
 
-import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.util.Set;
 
@@ -24,7 +23,7 @@ import net.hudup.core.logistic.xURI;
  * @version 10.0
  *
  */
-public class SocketRecommender extends ServiceRecommender implements SocketAlg {
+public class SocketRecommender extends ServiceRecommenderAbstract implements SocketAlg {
 
 	
 	/**
@@ -87,7 +86,7 @@ public class SocketRecommender extends ServiceRecommender implements SocketAlg {
 
 
 	@Override
-	public synchronized void setup(Dataset dataset, Serializable... params) throws RemoteException {
+	public synchronized void setup(Dataset dataset, Object...params) throws RemoteException {
 		// TODO Auto-generated method stub
 		unsetup();
 		

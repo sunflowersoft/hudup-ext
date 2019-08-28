@@ -30,13 +30,14 @@ import net.hudup.core.alg.KBase;
 import net.hudup.core.alg.KBaseAbstract;
 import net.hudup.core.alg.RecommendFilterParam;
 import net.hudup.core.alg.RecommendParam;
-import net.hudup.core.alg.cf.ModelBasedCF;
+import net.hudup.core.alg.cf.ModelBasedCFAbstract;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.Pair;
 import net.hudup.core.data.RatingVector;
 import net.hudup.core.evaluate.recommend.Accuracy;
 import net.hudup.core.logistic.DSUtil;
+import net.hudup.core.logistic.Inspector;
 import net.hudup.core.logistic.LineProcessor;
 import net.hudup.core.logistic.MinMax;
 import net.hudup.core.logistic.RatingFilter;
@@ -50,6 +51,7 @@ import net.hudup.data.bit.BitDataUtil;
 import net.hudup.data.bit.BitItem;
 import net.hudup.data.bit.BitItemset;
 import net.hudup.data.ui.FreqItemsetListTable;
+import net.hudup.evaluate.ui.EvaluateGUI;
 
 /**
  * This abstract class is the abstract model of any collaborative filtering (CF) algorithm based on mining frequent itemsets.
@@ -59,7 +61,7 @@ import net.hudup.data.ui.FreqItemsetListTable;
  * @version 10.0
  * 
  */
-public abstract class FreqItemsetBasedCF extends ModelBasedCF {
+public abstract class FreqItemsetBasedCF extends ModelBasedCFAbstract {
 
 	
 	/**
@@ -271,6 +273,13 @@ public abstract class FreqItemsetBasedCF extends ModelBasedCF {
 	 */
 	protected abstract FreqItemsetFinder createFreqItemsetFinder();
 	
+	
+	@Override
+	public Inspector getInspector() {
+		// TODO Auto-generated method stub
+		return EvaluateGUI.createInspector(this);
+	}
+
 	
 	@Override
 	public DataConfig createDefaultConfig() {

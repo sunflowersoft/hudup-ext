@@ -1,8 +1,10 @@
 package net.hudup.core.alg;
 
 import java.io.Serializable;
+import java.rmi.Remote;
 
 import net.hudup.core.alg.AlgDesc.MethodologyType;
+import net.hudup.core.logistic.Inspectable;
 
 /**
  * This interface declares the most powerful algorithm and such algorithm is atomic.
@@ -13,7 +15,7 @@ import net.hudup.core.alg.AlgDesc.MethodologyType;
  * @version 1.0
  *
  */
-public interface Aug extends RemoteAlg, ExecutableAlg, ModelBasedAlg, SupportCacheAlg, NoteAlg, Serializable {
+public interface Aug extends ExecutableAlg, ModelBasedAlg, SupportCacheAlg, NoteAlg, Inspectable, Remote, Serializable {
 
 	
 }

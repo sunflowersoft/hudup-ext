@@ -1,6 +1,5 @@
 package net.hudup.server.external;
 
-import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.util.Set;
 
@@ -9,7 +8,7 @@ import net.hudup.core.Constants;
 import net.hudup.core.Util;
 import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.AlgList;
-import net.hudup.core.alg.CompositeRecommender;
+import net.hudup.core.alg.CompositeRecommenderAbstract;
 import net.hudup.core.alg.RecommendFilter;
 import net.hudup.core.alg.RecommendFilterParam;
 import net.hudup.core.alg.RecommendParam;
@@ -27,8 +26,8 @@ import net.hudup.core.logistic.BaseClass;
  * @version 10.0
  *
  */
-@BaseClass
-public class ExternalServerRecommender extends CompositeRecommender {
+@BaseClass //This is not base class. The base class annotation is used for update this algorithm because it will be registered in plugin.
+public class ExternalServerRecommender extends CompositeRecommenderAbstract {
 
 	
 	/**
@@ -50,7 +49,7 @@ public class ExternalServerRecommender extends CompositeRecommender {
 
 	
 	@Override
-	public void setup(Dataset dataset, Serializable... params) throws RemoteException {
+	public void setup(Dataset dataset, Object...params) throws RemoteException {
 		// TODO Auto-generated method stub
 		super.setup(dataset, params);
 		

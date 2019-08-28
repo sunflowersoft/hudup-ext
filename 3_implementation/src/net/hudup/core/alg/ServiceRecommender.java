@@ -1,6 +1,5 @@
 package net.hudup.core.alg;
 
-
 /**
  * This is not real recommender (recommendation algorithm). Actually, it points to another real recommender.
  * This service recommender is very useful in client-server architecture.
@@ -10,20 +9,7 @@ package net.hudup.core.alg;
  * @version 10.0
  *
  */
-public abstract class ServiceRecommender extends Recommender implements ServiceAlg {
+public interface ServiceRecommender extends Recommender, ServiceAlg {
 
 	
-	/**
-	 * Serial version UID for serializable class. 
-	 */
-	private static final long serialVersionUID = 1L;
-
-	
-	/**
-	 * Default constructor
-	 */
-	public ServiceRecommender() {
-		// TODO Auto-generated constructor stub
-	}
-
 }
