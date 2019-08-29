@@ -267,9 +267,12 @@ public interface Evaluator extends Remote, RemoteRunner, SetupAlgListener, AutoC
     
     
 //    /**
-//     * Testing RMI call without remote exception.
+//     * Testing RMI call.
+//     * @param o parameter.
+//     * @return an object.
+//     * @throws RemoteException if any error raises.
 //     */
-//    void testRMI();
+//    Object ping(Object o) throws RemoteException;
     
     
 }

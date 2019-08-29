@@ -44,9 +44,9 @@ public class NeighborCFItemBased extends NeighborCF implements DuplicatableAlg {
 
 	
 	@Override
-	protected RatingVector estimate0(RecommendParam param, Set<Integer> queryIds) {
+	public RatingVector estimate(RecommendParam param, Set<Integer> queryIds) {
 		// TODO Auto-generated method stub
-		return estimate0(this, param, queryIds);
+		return estimate(this, param, queryIds);
 	}
 
 
@@ -60,7 +60,7 @@ public class NeighborCFItemBased extends NeighborCF implements DuplicatableAlg {
 	 * @param queryIds set of identifications (IDs) of items that need to be estimated their rating values.
 	 * @return rating vector contains estimated rating values of the specified set of IDs of items (users). Return null if cannot estimate.
 	 */
-	public static RatingVector estimate0(NeighborCF cf, RecommendParam param, Set<Integer> queryIds) {
+	public static RatingVector estimate(NeighborCF cf, RecommendParam param, Set<Integer> queryIds) {
 		// TODO Auto-generated method stub
 		if (param.ratingVector == null) return null;
 		

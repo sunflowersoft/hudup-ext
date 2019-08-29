@@ -49,9 +49,9 @@ public class NeighborCFUserBased extends NeighborCF implements DuplicatableAlg {
 
 
 	@Override
-	protected RatingVector estimate0(RecommendParam param, Set<Integer> queryIds) {
+	public RatingVector estimate(RecommendParam param, Set<Integer> queryIds) throws RemoteException {
 		// TODO Auto-generated method stub
-		return estimate0(this, param, queryIds);
+		return estimate(this, param, queryIds);
 	}
 
 
@@ -65,7 +65,13 @@ public class NeighborCFUserBased extends NeighborCF implements DuplicatableAlg {
 	 * @param queryIds set of identifications (IDs) of items that need to be estimated their rating values.
 	 * @return rating vector contains estimated rating values of the specified set of IDs of items (users). Return null if cannot estimate.
 	 */
-	public static RatingVector estimate0(NeighborCF cf, RecommendParam param, Set<Integer> queryIds) {
+	public static RatingVector estimate(NeighborCF cf, RecommendParam param, Set<Integer> queryIds) {
+		/*
+		 * There are two cases of param.ratingVector:
+		 * 1. Its id is < 0, which indicates it is not stored in database.
+		 * 2. Its id is >= 0, then it must be empty or the same to the existing one in dataset. If it is empty, it will be fulfilled as the same to the existing one in dataset. 
+		 */
+		
 		if (param.ratingVector == null) return null;
 		RatingVector thisUser = param.ratingVector;
 		RatingVector innerUser = cf.getDataset().getUserRating(thisUser.id());

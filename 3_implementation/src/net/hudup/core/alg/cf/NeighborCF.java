@@ -12,7 +12,6 @@ import javax.swing.JOptionPane;
 
 import net.hudup.core.Constants;
 import net.hudup.core.Util;
-import net.hudup.core.alg.RecommendParam;
 import net.hudup.core.alg.SupportCacheAlg;
 import net.hudup.core.data.Attribute;
 import net.hudup.core.data.Attribute.Type;
@@ -249,10 +248,10 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 	protected Map<Integer, Double> itemVars = Util.newMap();
 	
 	
-	/**
-	 * User rating cache (user id, item id, rating value).
-	 */
-	protected Map<Integer, Map<Integer, Object>> userRatingCache = Util.newMap();
+//	/**
+//	 * User rating cache (user id, item id, rating value).
+//	 */
+//	protected Map<Integer, Map<Integer, Object>> userRatingCache = Util.newMap();
 	
 	
 	/**
@@ -305,7 +304,7 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 		this.itemVars.clear();
 		this.userIds.clear();
 		
-		this.userRatingCache.clear();
+//		this.userRatingCache.clear();
 		this.rowSimCache.clear();
 		this.columnSimCache.clear();
 	}
@@ -486,7 +485,7 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 	
 	
 	/**
-	 * Checking whether the supported similarity can be cached.
+	 * Checking whether the supported similarity can be cached. In some case, the algorithm is cached but the similarity measure is not cached.
 	 * In current version of this class, the method always returns true.
 	 * @return true if the supported similarity can be cached.
 	 */
@@ -495,83 +494,83 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 	}
 	
 	
-	@Override
-	public synchronized RatingVector estimate(RecommendParam param, Set<Integer> queryIds) throws RemoteException {
-		// TODO Auto-generated method stub
-		if (param.ratingVector == null) //Consider not estimating yet.
-			return null;
-		if (!isCached())
-			return estimate0(param, queryIds);
-		
-		int userId = param.ratingVector.id();
-		if (userId < 0) //user is not stored in database.
-			return estimate0(param, queryIds);
-			
-		if (this.userRatingCache.containsKey(userId)) { //Already estimated
-			Map<Integer, Object> ratingMap = this.userRatingCache.get(userId);
-			if (ratingMap == null) {
-				ratingMap = Util.newMap();
-				this.userRatingCache.put(userId, ratingMap);
-			}
-				
-			RatingVector result = param.ratingVector.newInstance(true);
-			Set<Integer> queryIds2 = Util.newSet();
-			queryIds2.addAll(queryIds);
-			if (ratingMap.size() > 0) {
-				for (int itemId : queryIds) {
-					if (!ratingMap.containsKey(itemId))
-						continue;
-					
-					queryIds2.remove(itemId);
-					double ratingValue = (double)ratingMap.get(itemId); //cache can store unused rating value.
-					if (Util.isUsed(ratingValue))
-						result.put(itemId, ratingValue);
-				}
-				if (queryIds2.size() == 0)
-					return result.size() == 0 ? null : result;
-			}
-			
-			RatingVector result2 = estimate0(param, queryIds2);
-			if (result2 == null || result2.size() == 0) {
-				for (int itemId : queryIds2) {
-					ratingMap.put(itemId, Constants.UNUSED); //Consider estimated.
-				}
-				return result.size() == 0 ? null : result;
-			}
-			
-			Set<Integer> itemIds = result2.fieldIds(); //Resulted items are always rated.
-			for (int itemId : itemIds) {
-				double value = result2.get(itemId).value;
-				ratingMap.put(itemId, value);
-				result.put(itemId, value);
-			}
-			return result.size() == 0 ? null : result;
-		}
-		
-		RatingVector result = estimate0(param, queryIds);
-		Map<Integer, Object> ratingMap = Util.newMap();
-		userRatingCache.put(userId, ratingMap); //Consider estimated.
-		if (result == null) return null;
-		
-		Set<Integer> itemIds = result.fieldIds(); //Resulted items are always rated.
-		for (int itemId : itemIds) {
-			double value = result.get(itemId).value;
-			ratingMap.put(itemId, value);
-		}
-		return result.size() == 0 ? null : result;
-	}
-	
-	
-	/**
-	 * This method is very important, which is used to estimate rating values of given items (users) without caching. Any class that extends this abstract class must implement this method.
-	 * Note that the role of user and the role of item are exchangeable. Rating vector can be user rating vector or item rating vector. Please see {@link RatingVector} for more details. 
-	 * The input parameters are a recommendation parameter and a set of item (user) identifiers.
-	 * The output result is a set of predictive or estimated rating values of items (users) specified by the second input parameter.
-	 * @param param recommendation parameter. Please see {@link RecommendParam} for more details of this parameter.
-	 * @param queryIds set of identifications (IDs) of items that need to be estimated their rating values.
-	 * @return rating vector contains estimated rating values of the specified set of IDs of items (users). Return null if cannot estimate.
-	 */
-	protected abstract RatingVector estimate0(RecommendParam param, Set<Integer> queryIds);
+//	@Override
+//	public synchronized RatingVector estimate(RecommendParam param, Set<Integer> queryIds) throws RemoteException {
+//		// TODO Auto-generated method stub
+//		if (param.ratingVector == null) //Consider not estimating yet.
+//			return null;
+//		if (!isCached())
+//			return estimate0(param, queryIds);
+//		
+//		int userId = param.ratingVector.id();
+//		if (userId < 0) //user is not stored in database.
+//			return estimate0(param, queryIds);
+//			
+//		if (this.userRatingCache.containsKey(userId)) { //Already estimated
+//			Map<Integer, Object> ratingMap = this.userRatingCache.get(userId);
+//			if (ratingMap == null) {
+//				ratingMap = Util.newMap();
+//				this.userRatingCache.put(userId, ratingMap);
+//			}
+//				
+//			RatingVector result = param.ratingVector.newInstance(true);
+//			Set<Integer> queryIds2 = Util.newSet();
+//			queryIds2.addAll(queryIds);
+//			if (ratingMap.size() > 0) {
+//				for (int itemId : queryIds) {
+//					if (!ratingMap.containsKey(itemId))
+//						continue;
+//					
+//					queryIds2.remove(itemId);
+//					double ratingValue = (double)ratingMap.get(itemId); //cache can store unused rating value.
+//					if (Util.isUsed(ratingValue))
+//						result.put(itemId, ratingValue);
+//				}
+//				if (queryIds2.size() == 0)
+//					return result.size() == 0 ? null : result;
+//			}
+//			
+//			RatingVector result2 = estimate0(param, queryIds2);
+//			if (result2 == null || result2.size() == 0) {
+//				for (int itemId : queryIds2) {
+//					ratingMap.put(itemId, Constants.UNUSED); //Consider estimated.
+//				}
+//				return result.size() == 0 ? null : result;
+//			}
+//			
+//			Set<Integer> itemIds = result2.fieldIds(); //Resulted items are always rated.
+//			for (int itemId : itemIds) {
+//				double value = result2.get(itemId).value;
+//				ratingMap.put(itemId, value);
+//				result.put(itemId, value);
+//			}
+//			return result.size() == 0 ? null : result;
+//		}
+//		
+//		RatingVector result = estimate0(param, queryIds);
+//		Map<Integer, Object> ratingMap = Util.newMap();
+//		userRatingCache.put(userId, ratingMap); //Consider estimated.
+//		if (result == null) return null;
+//		
+//		Set<Integer> itemIds = result.fieldIds(); //Resulted items are always rated.
+//		for (int itemId : itemIds) {
+//			double value = result.get(itemId).value;
+//			ratingMap.put(itemId, value);
+//		}
+//		return result.size() == 0 ? null : result;
+//	}
+//	
+//	
+//	/**
+//	 * This method is very important, which is used to estimate rating values of given items (users) without caching. Any class that extends this abstract class must implement this method.
+//	 * Note that the role of user and the role of item are exchangeable. Rating vector can be user rating vector or item rating vector. Please see {@link RatingVector} for more details. 
+//	 * The input parameters are a recommendation parameter and a set of item (user) identifiers.
+//	 * The output result is a set of predictive or estimated rating values of items (users) specified by the second input parameter.
+//	 * @param param recommendation parameter. Please see {@link RecommendParam} for more details of this parameter.
+//	 * @param queryIds set of identifications (IDs) of items that need to be estimated their rating values.
+//	 * @return rating vector contains estimated rating values of the specified set of IDs of items (users). Return null if cannot estimate.
+//	 */
+//	protected abstract RatingVector estimate0(RecommendParam param, Set<Integer> queryIds) throws RemoteException;
 	
 	
 	/**
@@ -582,6 +581,7 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 	 * If you only want to calculate the similarity between two profiles, two in put rating vectors are set to be null.
 	 * In current implementation, only three similarity measures are supported such as Pearson, cosine, and hybrid.
 	 * Hybrid measure means that profile is merged into rating vector as a unified vector for calculating Pearson measure or cosine measure.
+	 * In current implementation, hybrid measure is not supported.
 	 * 
 	 * @param vRating1 first rating vector.
 	 * @param vRating2 second rating vector.
@@ -592,7 +592,7 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 	 */
 	public synchronized double sim(RatingVector vRating1, RatingVector vRating2, Profile profile1, Profile profile2, Object...parameters) {
 		String measure = getMeasure();
-		if (!isCachedSim())
+		if (!isCachedSim()) //In some case, the algorithm is cached but the similarity measure is not cached.
 			return sim0(measure, vRating1, vRating2, profile1, profile2, parameters);
 		
 		Task task = new Task() {

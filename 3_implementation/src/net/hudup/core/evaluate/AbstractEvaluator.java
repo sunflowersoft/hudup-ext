@@ -916,12 +916,13 @@ public abstract class AbstractEvaluator extends AbstractRunner implements Evalua
 			e.printStackTrace();
 		}
 	}
-			
+
 
 //	@Override
-//	public void testRMI() {
-//		System.out.println("Test RMI without remote exception");
+//	public Object ping(Object o) throws RemoteException {
+//		// TODO Auto-generated method stub
+//		return "Ping sucessful: " + o.toString() + " " + o.toString();
 //	}
-	
-	
+			
+
 }

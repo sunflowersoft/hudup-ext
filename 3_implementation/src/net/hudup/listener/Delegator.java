@@ -852,4 +852,11 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluatorProgr
 	}
 			
 
+//	@Override
+//	public Object ping(Object o) throws RemoteException {
+//		// TODO Auto-generated method stub
+//		return "Ping sucessful: " + o.toString() + " " + o.toString();
+//	}
+			
+
 }
