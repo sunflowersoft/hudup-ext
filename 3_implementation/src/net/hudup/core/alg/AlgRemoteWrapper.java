@@ -4,6 +4,7 @@ import java.rmi.RemoteException;
 
 import org.apache.log4j.Logger;
 
+import net.hudup.core.data.AutoCloseable;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.logistic.BaseClass;
 
@@ -18,7 +19,7 @@ import net.hudup.core.logistic.BaseClass;
  *
  */
 @BaseClass //The annotation is very important which prevent Firer to instantiate the wrapper without referred remote object. This wrapper is not normal algorithm.
-public class AlgRemoteWrapper implements Alg, AlgRemote {
+public class AlgRemoteWrapper implements Alg, AlgRemote, AutoCloseable {
 
 	
 	/**
@@ -152,12 +153,24 @@ public class AlgRemoteWrapper implements Alg, AlgRemote {
 
 	
 	@Override
+	public void close() throws Exception {
+		// TODO Auto-generated method stub
+		try {
+			unexport();
+		}
+		catch (Throwable e) {
+			e.printStackTrace();
+		}
+	}
+
+
+	@Override
 	protected void finalize() throws Throwable {
 		// TODO Auto-generated method stub
 		super.finalize();
 		
 		try {
-			unexport();
+			close();
 		}
 		catch (Throwable e) {
 			e.printStackTrace();

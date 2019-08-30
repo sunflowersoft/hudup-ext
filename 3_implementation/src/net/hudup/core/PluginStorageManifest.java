@@ -20,6 +20,7 @@ import javax.swing.table.DefaultTableModel;
 import net.hudup.core.RegisterTableList.RegisterTableItem;
 import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.AlgList;
+import net.hudup.core.logistic.ui.SortableTable;
 import net.hudup.core.logistic.ui.UIUtil;
 
 
@@ -31,13 +32,14 @@ import net.hudup.core.logistic.ui.UIUtil;
  * Later on, {@link PluginChangedListener} can do some tasks in its method {@link PluginChangedListener#pluginChanged(PluginChangedEvent)}.
  * Please pay attention that such {@link PluginChangedListener} must be registered with {@link PluginStorageManifest} before to receive {@link PluginChangedEvent}.
  * <br> 
- * As a convention, this class is called {@code plug-in storage manifest}.
+ * As a convention, this class is called {@code plug-in storage manifest}, which is really a sortable table represented by {@link SortableTable}.
+ * Note, {@link SortableTable} written by David Gilbert and Nobuo Tamemasa allows users to create and show a table which can be sorted its rows according its columns.
  * 
  * @author Loc Nguyen
  * @version 10.0
  *
  */
-public class PluginStorageManifest extends JTable {
+public class PluginStorageManifest extends net.hudup.core.logistic.ui.SortableTable {
 
 	
 	/**
@@ -66,6 +68,7 @@ public class PluginStorageManifest extends JTable {
 	 */
 	private void update() {
 		getRegisterTM().update();
+		init();
 		
 		if (getColumnModel().getColumnCount() > 3) {
 			getColumnModel().getColumn(3).setMaxWidth(0);
@@ -323,7 +326,7 @@ public class PluginStorageManifest extends JTable {
  * @version 10.0
  *
  */
-class RegisterTM extends DefaultTableModel {
+class RegisterTM extends net.hudup.core.logistic.ui.SortableTableModel {
 
 	
 	/**
@@ -445,6 +448,13 @@ class RegisterTM extends DefaultTableModel {
 
 	
 	@Override
+	public boolean isSortable(int column) {
+		// TODO Auto-generated method stub
+		return true;
+	}
+
+
+	@Override
 	public boolean isCellEditable(int row, int column) {
 		// TODO Auto-generated method stub
 		return column == 4;
@@ -463,15 +473,13 @@ class RegisterTM extends DefaultTableModel {
  * Later on, {@link PluginChangedListener} can do some tasks in its method {@link PluginChangedListener#pluginChanged(PluginChangedEvent)}.
  * Please pay attention that such {@link PluginChangedListener} must be registered with {@link PluginStorageManifest2} before to receive {@link PluginChangedEvent}.
  * <br> 
- * As a convention, this class is called {@code plug-in storage manifest}, which is really a sortable table represented by {@link SortableTable}.
- * Note, {@link SortableTable} written by David Gilbert and Nobuo Tamemasa allows users to create and show a table which can be sorted its rows according its columns.
+ * As a convention, this class is called {@code plug-in storage manifest}.
  * 
  * @author Loc Nguyen
  * @version 10.0
  *
  */
-@Deprecated
-class PluginStorageManifest2 extends net.hudup.core.logistic.ui.SortableTable {
+class PluginStorageManifest2 extends JTable {
 
 	
 	/**
@@ -500,7 +508,6 @@ class PluginStorageManifest2 extends net.hudup.core.logistic.ui.SortableTable {
 	 */
 	private void update() {
 		getRegisterTM().update();
-		init();
 		
 		if (getColumnModel().getColumnCount() > 3) {
 			getColumnModel().getColumn(3).setMaxWidth(0);
@@ -758,8 +765,7 @@ class PluginStorageManifest2 extends net.hudup.core.logistic.ui.SortableTable {
  * @version 10.0
  *
  */
-@Deprecated
-class RegisterTM2 extends net.hudup.core.logistic.ui.SortableTableModel {
+class RegisterTM2 extends DefaultTableModel {
 
 	
 	/**
@@ -881,13 +887,6 @@ class RegisterTM2 extends net.hudup.core.logistic.ui.SortableTableModel {
 
 	
 	@Override
-	public boolean isSortable(int column) {
-		// TODO Auto-generated method stub
-		return true;
-	}
-
-
-	@Override
 	public boolean isCellEditable(int row, int column) {
 		// TODO Auto-generated method stub
 		return column == 4;
@@ -895,4 +894,6 @@ class RegisterTM2 extends net.hudup.core.logistic.ui.SortableTableModel {
 	
 	
 }
+
+
 

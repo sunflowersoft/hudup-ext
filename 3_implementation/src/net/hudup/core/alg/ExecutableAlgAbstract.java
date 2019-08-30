@@ -95,7 +95,7 @@ public abstract class ExecutableAlgAbstract extends AlgAbstract implements Execu
 
 
 	/**
-	 * Main method to learn parameters. As usual, it is called by {@link #remoteSetup(Dataset, Object...)}.
+	 * Main method to learn parameters. As usual, it is called by {@link #setup(Dataset, Object...)}.
 	 * @param info additional parameter.
 	 * @return the parameter to be learned. Return null if learning is failed.
 	 * @exception RemoteException if any error occurs.

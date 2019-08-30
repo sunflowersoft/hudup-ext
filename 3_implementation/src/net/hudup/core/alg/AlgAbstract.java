@@ -117,18 +117,4 @@ public abstract class AlgAbstract implements Alg, AlgRemote {
 	}
 
 	
-	@Override
-	protected void finalize() throws Throwable {
-		// TODO Auto-generated method stub
-		super.finalize();
-		
-		try {
-			unexport();
-		}
-		catch (Throwable e) {
-			e.printStackTrace();
-		}
-	}
-
-
 }
