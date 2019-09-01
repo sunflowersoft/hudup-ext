@@ -7,6 +7,7 @@ import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.rmi.RemoteException;
 import java.util.Collections;
 import java.util.List;
 
@@ -61,8 +62,9 @@ public class MetricsAnalyzeDlg extends JDialog {
 	 * @param comp parent component.
 	 * @param metrics specified metrics.
 	 * @param algTable specified registered table of algorithms.
+	 * @throws RemoteException if any error raises.
 	 */
-	public MetricsAnalyzeDlg(final Component comp, final Metrics metrics, final RegisterTable algTable) {
+	public MetricsAnalyzeDlg(final Component comp, final Metrics metrics, final RegisterTable algTable) throws RemoteException {
 		super(UIUtil.getFrameForComponent(comp), "Metrics viewer", true);
 		this.metrics = metrics;
 		this.algTable = algTable;
@@ -145,7 +147,9 @@ public class MetricsAnalyzeDlg extends JDialog {
 					@Override
 					public void actionPerformed(ActionEvent e) {
 						// TODO Auto-generated method stub
-						zoomMetrics(datasetId);
+						try {
+							zoomMetrics(datasetId);
+						} catch (Exception ex) {ex.printStackTrace();}
 					}
 				});
 			zoom.setMargin(new Insets(0, 0 , 0, 0));
@@ -237,7 +241,9 @@ public class MetricsAnalyzeDlg extends JDialog {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
-				new MetricsGraphDlg(comp, metrics, algTable);
+				try {
+					new MetricsGraphDlg(comp, metrics, algTable);
+				} catch (Exception ex) {ex.printStackTrace();}
 			}
 		});
 		footer.add(viewResults);
@@ -260,8 +266,9 @@ public class MetricsAnalyzeDlg extends JDialog {
 	/**
 	 * Zooming evaluation of specified dataset ID.
 	 * @param datasetId specified dataset ID.
+	 * @throws RemoteException if any error raises.
 	 */
-	private void zoomMetrics(int datasetId) {
+	private void zoomMetrics(int datasetId) throws RemoteException {
 		final JDialog zoomDlg = new JDialog(this, 
 				"Zoom for " + " dataset \"" + datasetId + "\"", false);
 		zoomDlg.setDefaultCloseOperation(DISPOSE_ON_CLOSE);

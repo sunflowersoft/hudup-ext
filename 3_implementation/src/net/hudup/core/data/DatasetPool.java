@@ -357,6 +357,35 @@ public class DatasetPool implements Serializable {
     /**
      * Every dataset (training dataset, testing dataset, or whole dataset) can has a URI pointing to where such dataset is stored.
      * Such URI is called identified URI (ID URI) of dataset.
+     * This method looks up a dataset pair in this pool so that such dataset pair contains the training dataset specified by training ID URI.
+     * Note that URI, abbreviation of Uniform Resource Identifier, is the string of characters used to identify a resource on Internet. URI in Hudup framework is represented by {@link xURI} class.
+     * 
+     * @param trainingId identified URI (ID URI) of training dataset.
+     * @return dataset pair contains the training dataset specified by training ID URI.
+     */
+    public DatasetPair findTraining(xURI trainingId) {
+    	if (trainingId == null)
+    		return null;
+    	
+    	DatasetPair found = null;
+		for (DatasetPair pair : dspList) {
+			Dataset training = pair.getTraining();
+			
+			DataConfig trainingCfg = training.getConfig();
+			
+			if (trainingCfg.getUriId().equals(trainingId)) {
+				found = pair;
+				break;
+			}
+		}
+		
+		return found;
+    }
+
+    
+    /**
+     * Every dataset (training dataset, testing dataset, or whole dataset) can has a URI pointing to where such dataset is stored.
+     * Such URI is called identified URI (ID URI) of dataset.
      * This method looks up a dataset pair in this pool so that such dataset pair contains the whole (entire) dataset specified by whole ID URI.
      * Note that URI, abbreviation of Uniform Resource Identifier, is the string of characters used to identify a resource on Internet. URI in Hudup framework is represented by {@link xURI} class.
      * 

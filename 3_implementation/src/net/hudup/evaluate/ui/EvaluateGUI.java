@@ -577,14 +577,21 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
-				if (result != null)
-					new MetricsAnalyzeDlg(getThisGUI(), result, new RegisterTable(Arrays.asList(getAlg())));
-				else {
+				if (result != null) {
+					try {
+						new MetricsAnalyzeDlg(getThisGUI(), result, new RegisterTable(Arrays.asList(getAlg())));
+					} catch (Exception ex) {
+						ex.printStackTrace();
+						result = null;
+					}
+				}
+				
+				if (result == null) {
 					JOptionPane.showMessageDialog(
-							getThisGUI(), 
-							"No result", 
-							"No result", 
-							JOptionPane.WARNING_MESSAGE);
+						getThisGUI(), 
+						"No result", 
+						"No result", 
+						JOptionPane.WARNING_MESSAGE);
 				}
 			}
 		});
@@ -601,9 +608,10 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 
 					@Override
 					public void actionPerformed(ActionEvent e) {
-						
 						if (result != null) {
-							ClipboardUtil.util.setText(result.translate());
+							try {
+								ClipboardUtil.util.setText(result.translate());
+							} catch (Exception ex) {ex.printStackTrace();}
 						}
 					}
 			});

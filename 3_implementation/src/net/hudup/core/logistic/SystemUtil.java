@@ -58,7 +58,7 @@ public final class SystemUtil {
 	public final static void enhanceAuto() {
 		try {
 			enhance();
-			logger.info("SystemUtil#enhanceAuto automatically calls system enhancement at thread " + Thread.currentThread());
+			logger.info("SystemUtil#enhanceAuto() automatically calls system enhancement at thread " + Thread.currentThread());
 		}
 		catch (Throwable e) {
 			e.printStackTrace();

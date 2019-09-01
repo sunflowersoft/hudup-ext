@@ -1,5 +1,7 @@
 package net.hudup.core.evaluate;
 
+import java.rmi.RemoteException;
+
 /**
  * This abstract class represents any metric having one internal array for calculate evaluation value such as error range.
  * 
@@ -25,7 +27,7 @@ public abstract class ArrayMetric extends DefaultMetric {
 
 
 	@Override
-	public void setup(Object... params) {
+	public void setup(Object... params) throws RemoteException {
 		// TODO Auto-generated method stub
 		super.setup(params);
 		if (params == null || params.length < 1 || params[0] == null || !(params[0] instanceof ArrayMetricValue))
@@ -35,7 +37,7 @@ public abstract class ArrayMetric extends DefaultMetric {
 
 
 	@Override
-	public boolean recalc(Object... params) throws Exception {
+	public boolean recalc(Object... params) throws RemoteException {
 		// TODO Auto-generated method stub
 		if (params == null || params.length < 1)
 			return false;

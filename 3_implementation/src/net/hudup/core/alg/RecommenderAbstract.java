@@ -3,7 +3,6 @@ package net.hudup.core.alg;
 import java.rmi.RemoteException;
 import java.util.Set;
 
-import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.Profile;
 import net.hudup.core.data.RatingVector;
@@ -134,20 +133,6 @@ public abstract class RecommenderAbstract extends AlgAbstract implements Recomme
 	}
 
 	
-	@Override
-	public String queryName() throws RemoteException {
-		// TODO Auto-generated method stub
-		return getName();
-	}
-
-
-	@Override
-	public DataConfig queryConfig() throws RemoteException {
-		// TODO Auto-generated method stub
-		return getConfig();
-	}
-
-
 	@Override
 	protected void finalize() throws Throwable {
 		// TODO Auto-generated method stub

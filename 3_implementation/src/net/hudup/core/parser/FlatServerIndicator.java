@@ -35,7 +35,7 @@ public class FlatServerIndicator extends Indicator {
 
 	
 	/**
-	 * 
+	 * Default constructor.
 	 */
 	public FlatServerIndicator() {
 		super();

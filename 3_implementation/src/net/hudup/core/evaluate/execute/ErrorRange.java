@@ -1,5 +1,6 @@
 package net.hudup.core.evaluate.execute;
 
+import java.rmi.RemoteException;
 import java.util.List;
 
 import net.hudup.core.Util;
@@ -44,14 +45,14 @@ public class ErrorRange extends ArrayMetric {
 	
 	
 	@Override
-	public String getTypeName() {
+	public String getTypeName() throws RemoteException {
 		// TODO Auto-generated method stub
 		return "Accuracy";
 	}
 
 
 	@Override
-	public String getDesc() {
+	public String getDescription() throws RemoteException {
 		// TODO Auto-generated method stub
 		return "Error range for testing algorithms";
 	}

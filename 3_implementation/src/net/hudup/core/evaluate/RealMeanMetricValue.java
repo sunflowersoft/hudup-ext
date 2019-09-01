@@ -1,5 +1,7 @@
 package net.hudup.core.evaluate;
 
+import java.rmi.RemoteException;
+
 import net.hudup.core.Util;
 
 
@@ -60,7 +62,7 @@ public class RealMeanMetricValue extends MeanMetricValue {
 
 	
 	@Override
-	public void accum(MetricValue metricValue) throws Exception {
+	public void accum(MetricValue metricValue) throws RemoteException {
 		// TODO Auto-generated method stub
 		if (metricValue == null || !metricValue.isUsed() || 
 				!(metricValue instanceof RealMeanMetricValue))

@@ -1,5 +1,6 @@
 package net.hudup.core.evaluate;
 
+import java.rmi.RemoteException;
 import java.util.List;
 
 import net.hudup.core.Util;
@@ -69,7 +70,7 @@ public abstract class ArrayMetricValue implements MetricValue {
 
 	
 	@Override
-	public void accum(MetricValue metricValue) throws Exception {
+	public void accum(MetricValue metricValue) throws RemoteException {
 		// TODO Auto-generated method stub
 		if (metricValue == null || !metricValue.isUsed())
 			return;

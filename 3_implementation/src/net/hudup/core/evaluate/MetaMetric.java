@@ -1,5 +1,6 @@
 package net.hudup.core.evaluate;
 
+import java.rmi.RemoteException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -46,7 +47,7 @@ public abstract class MetaMetric extends DefaultMetric {
 	
 	
 	@Override
-	public void setup(Object... params) {
+	public void setup(Object... params) throws RemoteException {
 		List<Metric> list = Util.newList();
 		for (Object param : params) {
 			if (param != null && param instanceof Metric)

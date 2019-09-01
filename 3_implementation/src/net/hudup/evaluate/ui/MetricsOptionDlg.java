@@ -327,28 +327,31 @@ class MetricsOptionTM extends SortableTableModel {
 		
 		List<Alg> metricList = PluginStorage.getMetricReg().getAlgList(); 
 		for (int i = 0; i < metricList.size(); i++) {
-			Metric metric = (Metric) metricList.get(i);
-			
-			Vector<Object> row = Util.newVector();
-			row.add(i + 1);
-			row.add(metric.getName());
-			row.add(metric.getTypeName());
-			
-			boolean found = false;
-			for (Metric selectedMetric : selectedMetricList) {
-				if (selectedMetric.getName().equals(metric.getName())) {
-					found = true;
-					break;
+			try {
+				Metric metric = (Metric) metricList.get(i);
+				
+				Vector<Object> row = Util.newVector();
+				row.add(i + 1);
+				row.add(metric.getName());
+				row.add(metric.getTypeName());
+				
+				boolean found = false;
+				for (Metric selectedMetric : selectedMetricList) {
+					if (selectedMetric.getName().equals(metric.getName())) {
+						found = true;
+						break;
+					}
 				}
+				if (found)
+					row.add(true);
+				else
+					row.add(false);
+				
+				row.add(metric);
+				
+				data.add(row);
 			}
-			if (found)
-				row.add(true);
-			else
-				row.add(false);
-			
-			row.add(metric);
-			
-			data.add(row);
+			catch (Throwable e) {e.printStackTrace();}
 		}
 		
 		setDataVector(data, createColumns());
@@ -591,28 +594,31 @@ class MetricsOptionTM2 extends DefaultTableModel {
 		
 		List<Alg> metricList = PluginStorage.getMetricReg().getAlgList(); 
 		for (int i = 0; i < metricList.size(); i++) {
-			Metric metric = (Metric) metricList.get(i);
-			
-			Vector<Object> row = Util.newVector();
-			row.add(i + 1);
-			row.add(metric.getName());
-			row.add(metric.getTypeName());
-			
-			boolean found = false;
-			for (Metric selectedMetric : selectedMetricList) {
-				if (selectedMetric.getName().equals(metric.getName())) {
-					found = true;
-					break;
+			try {
+				Metric metric = (Metric) metricList.get(i);
+				
+				Vector<Object> row = Util.newVector();
+				row.add(i + 1);
+				row.add(metric.getName());
+				row.add(metric.getTypeName());
+				
+				boolean found = false;
+				for (Metric selectedMetric : selectedMetricList) {
+					if (selectedMetric.getName().equals(metric.getName())) {
+						found = true;
+						break;
+					}
 				}
+				if (found)
+					row.add(true);
+				else
+					row.add(false);
+				
+				row.add(metric);
+				
+				data.add(row);
 			}
-			if (found)
-				row.add(true);
-			else
-				row.add(false);
-			
-			row.add(metric);
-			
-			data.add(row);
+			catch (Throwable e) {e.printStackTrace();}
 		}
 		
 		setDataVector(data, createColumns());

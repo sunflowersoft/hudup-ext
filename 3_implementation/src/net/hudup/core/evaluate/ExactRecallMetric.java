@@ -1,5 +1,7 @@
 package net.hudup.core.evaluate;
 
+import java.rmi.RemoteException;
+
 import net.hudup.core.alg.Alg;
 
 
@@ -28,21 +30,21 @@ public class ExactRecallMetric extends DefaultMetric {
 
 	
 	@Override
-	public String getDesc() {
+	public String getDescription() throws RemoteException {
 		// TODO Auto-generated method stub
 		return "Exact recall";
 	}
 
 	
 	@Override
-	public String getTypeName() {
+	public String getTypeName() throws RemoteException {
 		// TODO Auto-generated method stub
 		return "Hudup";
 	}
 
 	
 	@Override
-	public boolean recalc(Object... params) throws Exception {
+	public boolean recalc(Object... params) throws RemoteException {
 		// TODO Auto-generated method stub
 		if (params == null || params.length != 1 || !(params[0] instanceof FractionMetricValue))
 			return false;

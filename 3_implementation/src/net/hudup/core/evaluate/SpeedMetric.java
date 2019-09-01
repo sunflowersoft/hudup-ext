@@ -1,5 +1,7 @@
 package net.hudup.core.evaluate;
 
+import java.rmi.RemoteException;
+
 import net.hudup.core.alg.Alg;
 
 
@@ -34,14 +36,14 @@ public class SpeedMetric extends TimeMetric {
 
 	
 	@Override
-	public String getDesc() {
+	public String getDescription() throws RemoteException {
 		// TODO Auto-generated method stub
 		return "Speed (in seconds)";
 	}
 
 
 	@Override
-	public String getTypeName() {
+	public String getTypeName() throws RemoteException {
 		// TODO Auto-generated method stub
 		return "Time";
 	}

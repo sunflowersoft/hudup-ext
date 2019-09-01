@@ -1,5 +1,7 @@
 package net.hudup.core.evaluate.execute;
 
+import java.rmi.RemoteException;
+
 import net.hudup.core.alg.Alg;
 import net.hudup.core.evaluate.MetricValue;
 import net.hudup.core.evaluate.RealMetricValue;
@@ -60,14 +62,14 @@ public class R extends TwoArrayMetric {
 	
 	
 	@Override
-	public String getTypeName() {
+	public String getTypeName() throws RemoteException {
 		// TODO Auto-generated method stub
 		return "Correlation";
 	}
 	
 	
 	@Override
-	public String getDesc() {
+	public String getDescription() throws RemoteException {
 		// TODO Auto-generated method stub
 		return "Pearson correlation (R) for testing algorithms";
 	}

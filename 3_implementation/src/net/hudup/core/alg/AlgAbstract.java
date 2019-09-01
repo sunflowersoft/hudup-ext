@@ -94,6 +94,20 @@ public abstract class AlgAbstract implements Alg, AlgRemote {
 
 
 	@Override
+	public String queryName() throws RemoteException {
+		// TODO Auto-generated method stub
+		return getName();
+	}
+
+
+	@Override
+	public DataConfig queryConfig() throws RemoteException {
+		// TODO Auto-generated method stub
+		return getConfig();
+	}
+
+
+	@Override
 	public synchronized void export(int serverPort) throws RemoteException {
 		// TODO Auto-generated method stub
 		synchronized (exported) {

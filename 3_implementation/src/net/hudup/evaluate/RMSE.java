@@ -1,5 +1,7 @@
 package net.hudup.evaluate;
 
+import java.rmi.RemoteException;
+
 import net.hudup.core.alg.Alg;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.RatingVector;
@@ -66,14 +68,14 @@ public class RMSE extends MSE {
 
 	
 	@Override
-	public String getDesc() {
+	public String getDescription() throws RemoteException {
 		// TODO Auto-generated method stub
 		return "Root Mean Squared Error for recommendation algorithm";
 	}
 
 	
 	@Override
-	public String getTypeName() {
+	public String getTypeName() throws RemoteException {
 		// TODO Auto-generated method stub
 		return "Predictive accuracy";
 	}
@@ -121,8 +123,9 @@ class RMSEDeprecated extends MetaMetric {
 	/**
 	 * Setting up this RMSE by internal MSE.
 	 * @param mse internal MSE.
+	 * @throws RemoteException if any error raises.
 	 */
-	public void setup(MSE mse) {
+	public void setup(MSE mse) throws RemoteException {
 		super.setup( new Object[] { mse } );
 	}
 	
@@ -135,21 +138,21 @@ class RMSEDeprecated extends MetaMetric {
 
 	
 	@Override
-	public String getDesc() {
+	public String getDescription() throws RemoteException {
 		// TODO Auto-generated method stub
 		return "Root Mean Squared Error (deprecated) for recommendation algorithm";
 	}
 
 	
 	@Override
-	public String getTypeName() {
+	public String getTypeName() throws RemoteException {
 		// TODO Auto-generated method stub
 		return "Predictive accuracy";
 	}
 
 	
 	@Override
-	public boolean recalc(Object... params) throws Exception {
+	public boolean recalc(Object... params) throws RemoteException {
 		// TODO Auto-generated method stub
 		if ( meta == null || meta.length < 1 || meta[0] == null || 
 				(!(meta[0] instanceof MSE)) )

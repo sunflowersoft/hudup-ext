@@ -160,7 +160,7 @@ public class AddingDatasetDlg extends JDialog {
 		
 		algChanged(); //Update GUI according to algorithm.
 		
-		setVisible(true);
+		//setVisible(true);
 	}
 
 	

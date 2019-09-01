@@ -1,5 +1,7 @@
 package net.hudup.core.evaluate;
 
+import java.rmi.RemoteException;
+
 import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.ExecutableAlg;
 import net.hudup.core.logistic.BaseClass;
@@ -37,7 +39,7 @@ public class MetricWrapper2 extends MetricWrapper {
 	
 	
 	@Override
-	public void setup(Object... params) {
+	public void setup(Object... params) throws RemoteException {
 		// TODO Auto-generated method stub
 		super.setup(params);
 		if (params != null && params.length >= 4) 
@@ -51,8 +53,9 @@ public class MetricWrapper2 extends MetricWrapper {
 	 * @param algName specified algorithm name.
 	 * @param datasetId specified dataset identifier.
 	 * @param algDesc description of algorithm.
+	 * @throws RemoteException if any error raises.
 	 */
-	public void setup(Metric metric, String algName, int datasetId, String algDesc) {
+	public void setup(Metric metric, String algName, int datasetId, String algDesc) throws RemoteException {
 		setup( new Object[] { metric, algName, new Integer(datasetId), algDesc } );
 	}
 
@@ -91,8 +94,9 @@ public class MetricWrapper2 extends MetricWrapper {
 	 * @param datasetId specified identifier (ID) of the dataset used to evaluate the algorithm.
 	 * @param datasetUri specified URI of the dataset used to evaluate the algorithm.
 	 * @return new metric wrapper with specified internal metric, algorithm name, identifier of dataset, and URI of dataset.
+	 * @throws RemoteException if any error raises.
 	 */
-	public static MetricWrapper2 create(Metric metric, Alg alg, int datasetId, xURI datasetUri) {
+	public static MetricWrapper2 create(Metric metric, Alg alg, int datasetId, xURI datasetUri) throws RemoteException {
 		if (metric == null || alg == null || datasetId == -1)
 			return null;
 		

@@ -1,6 +1,7 @@
 package net.hudup.core.evaluate;
 
 import java.io.Serializable;
+import java.rmi.RemoteException;
 import java.util.Collections;
 import java.util.EventObject;
 import java.util.List;
@@ -169,8 +170,9 @@ public class EvaluatorEvent extends EventObject {
 	/**
 	 * Translating this event into text for all algorithm and all datasets.
 	 * @return translated text of this event for all datasets.
+	 * @throws RemoteException if any error raises.
 	 */
-	public String translate() {
+	public String translate() throws RemoteException {
 		return translate(null, -1);
 	}
 	
@@ -180,8 +182,9 @@ public class EvaluatorEvent extends EventObject {
 	 * @param fAlgName specified algorithm name.
 	 * @param fDatasetId specified dataset identifier.
 	 * @return translated text of this event.
+	 * @throws RemoteException if any error raises.
 	 */
-	public String translate(String fAlgName, int fDatasetId) {
+	public String translate(String fAlgName, int fDatasetId) throws RemoteException {
 		// TODO Auto-generated method stub
 		StringBuffer buffer = new StringBuffer();
 		if (this.metrics == null)

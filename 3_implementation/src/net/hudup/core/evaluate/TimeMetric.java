@@ -1,5 +1,6 @@
 package net.hudup.core.evaluate;
 
+import java.rmi.RemoteException;
 import java.util.Set;
 
 import net.hudup.core.alg.Recommender;
@@ -48,7 +49,7 @@ public abstract class TimeMetric extends DefaultMetric  {
 
 
 	@Override
-	public boolean recalc(Object... params) throws Exception {
+	public boolean recalc(Object... params) throws RemoteException {
 		// TODO Auto-generated method stub
 		if (params == null || params.length != 1 || !(params[0] instanceof Number))
 			return false;

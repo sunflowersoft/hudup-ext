@@ -1,5 +1,6 @@
 package net.hudup.evaluate;
 
+import java.rmi.RemoteException;
 import java.util.List;
 import java.util.Set;
 
@@ -47,14 +48,14 @@ public class NDPM extends CorrelationAccuracy {
 
 	
 	@Override
-	public String getTypeName() {
+	public String getTypeName() throws RemoteException {
 		// TODO Auto-generated method stub
 		return "Correlation accuracy";
 	}
 
 
 	@Override
-	public String getDesc() {
+	public String getDescription() throws RemoteException {
 		// TODO Auto-generated method stub
 		return "Normalized distance-based performance for recommendation algorithm";
 	}

@@ -1,5 +1,6 @@
 package net.hudup.evaluate;
 
+import java.rmi.RemoteException;
 import java.util.Set;
 
 import net.hudup.core.Util;
@@ -46,14 +47,14 @@ public class F1 extends ClassificationAccuracy {
 
 	
 	@Override
-	public String getTypeName() {
+	public String getTypeName() throws RemoteException {
 		// TODO Auto-generated method stub
 		return "Classification accuracy";
 	}
 
 
 	@Override
-	public String getDesc() {
+	public String getDescription() throws RemoteException {
 		// TODO Auto-generated method stub
 		return "F1 for recommendation algorithm";
 	}
@@ -131,8 +132,9 @@ class F1Deprecated extends MetaMetric {
 	 * Setting up F1 metric with precision metric and recall metric.
 	 * @param precision precision metric.
 	 * @param recall recall metric.
+	 * @throws RemoteException if any error raises.
 	 */
-	public void setup(Precision precision, Recall recall) {
+	public void setup(Precision precision, Recall recall) throws RemoteException {
 		// TODO Auto-generated method stub
 		super.setup(new Object[] { precision, recall });
 	}
@@ -146,21 +148,21 @@ class F1Deprecated extends MetaMetric {
 
 	
 	@Override
-	public String getTypeName() {
+	public String getTypeName() throws RemoteException {
 		// TODO Auto-generated method stub
 		return "Classification accuracy";
 	}
 
 	
 	@Override
-	public String getDesc() {
+	public String getDescription() throws RemoteException {
 		// TODO Auto-generated method stub
 		return "F1 (deprecated) for recommendation algorithm";
 	}
 
 	
 	@Override
-	public boolean recalc(Object... params) throws Exception {
+	public boolean recalc(Object... params) throws RemoteException {
 		// TODO Auto-generated method stub
 		
 		if ( meta == null || meta.length < 2 || meta[0] == null || meta[1] == null || 
@@ -193,9 +195,9 @@ class F1Deprecated extends MetaMetric {
 
 
 	@Override
-	protected boolean recalc0(MetricValue metricValue) throws Exception {
+	protected boolean recalc0(MetricValue metricValue) throws RemoteException {
 		// TODO Auto-generated method stub
-		throw new Exception("Not implement this method");
+		throw new RemoteException("Not implement this method");
 	}
 
 

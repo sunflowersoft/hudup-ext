@@ -1,5 +1,6 @@
 package net.hudup.core.evaluate.execute;
 
+import java.rmi.RemoteException;
 import java.util.List;
 
 import net.hudup.core.Util;
@@ -35,14 +36,14 @@ public class MAEVector extends VectorMetric {
 
 	
 	@Override
-	public String getDesc() {
+	public String getDescription() throws RemoteException {
 		// TODO Auto-generated method stub
 		return "Vector of Mean Absolute Errors for testing algorithms";
 	}
 
 	
 	@Override
-	public String getTypeName() {
+	public String getTypeName() throws RemoteException {
 		// TODO Auto-generated method stub
 		return "Accuracy";
 	}

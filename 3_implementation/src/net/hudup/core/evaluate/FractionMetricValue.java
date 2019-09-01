@@ -1,5 +1,7 @@
 package net.hudup.core.evaluate;
 
+import java.rmi.RemoteException;
+
 import net.hudup.core.Constants;
 import net.hudup.core.Util;
 import net.hudup.core.logistic.MathUtil;
@@ -70,7 +72,7 @@ public class FractionMetricValue implements MetricValue {
 	
 	
 	@Override
-	public void accum(MetricValue metricValue) throws Exception {
+	public void accum(MetricValue metricValue) throws RemoteException {
 		// TODO Auto-generated method stub
 		if (metricValue == null || !metricValue.isUsed() || 
 				!(metricValue instanceof FractionMetricValue))

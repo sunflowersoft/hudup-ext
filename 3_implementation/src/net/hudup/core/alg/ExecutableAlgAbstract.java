@@ -9,7 +9,6 @@ import javax.swing.event.EventListenerList;
 import net.hudup.core.Util;
 import net.hudup.core.alg.SetupAlgEvent.Type;
 import net.hudup.core.data.AttributeList;
-import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.Fetcher;
 import net.hudup.core.data.Profile;
@@ -246,20 +245,6 @@ public abstract class ExecutableAlgAbstract extends AlgAbstract implements Execu
 	}
 	
 	
-	@Override
-	public String queryName() throws RemoteException {
-		// TODO Auto-generated method stub
-		return getName();
-	}
-
-
-	@Override
-	public DataConfig queryConfig() throws RemoteException {
-		// TODO Auto-generated method stub
-		return getConfig();
-	}
-
-
 	@Override
 	protected void finalize() throws Throwable {
 		// TODO Auto-generated method stub

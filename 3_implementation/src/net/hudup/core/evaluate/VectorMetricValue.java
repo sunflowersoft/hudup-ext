@@ -1,5 +1,6 @@
 package net.hudup.core.evaluate;
 
+import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.List;
 
@@ -70,7 +71,7 @@ public class VectorMetricValue implements MetricValue {
 
 	
 	@Override
-	public void accum(MetricValue metricValue) throws Exception {
+	public void accum(MetricValue metricValue) throws RemoteException {
 		// TODO Auto-generated method stub
 		if (metricValue == null || !metricValue.isUsed() || 
 				!(metricValue instanceof VectorMetricValue))

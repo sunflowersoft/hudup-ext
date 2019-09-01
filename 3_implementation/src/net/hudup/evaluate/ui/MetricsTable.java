@@ -69,7 +69,9 @@ public class MetricsTable extends SortableTable {
 							
 							@Override
 							public void actionPerformed(ActionEvent e) {
-								ClipboardUtil.util.setText(metrics.translate());
+								try {
+									ClipboardUtil.util.setText(metrics.translate());
+								} catch (Exception ex) {ex.printStackTrace();}
 							}
 						});
 					contextMenu.add(miCopyToClipboard);
@@ -235,27 +237,30 @@ class MetricsTM extends SortableTableModel {
 		Vector<Vector<Object>> data = new Vector<Vector<Object>>();
 		int no = 0;
 		for (int i = 0; i < this.metrics.size(); i++) {
-			MetricWrapper wrapper = this.metrics.get(i);
-			if (!wrapper.isValid())
-				continue;
-			
-			Metric metric = wrapper.getMetric();
-			
-			Vector<Object> row = Util.newVector();
-			
-			row.add(++no);
-			row.add(wrapper.getAlgName());
-			row.add(wrapper.getDatasetId());
-			row.add(metric.getName());
-			row.add(metric.getTypeName());
-			
-			MetricValue metricValue = wrapper.getAccumValue();
-			if (metricValue != null)
-				row.add(metricValue);
-			else
-				row.add("");
+			try {
+				MetricWrapper wrapper = this.metrics.get(i);
+				if (!wrapper.isValid())
+					continue;
 				
-			data.add(row);
+				Metric metric = wrapper.getMetric();
+				
+				Vector<Object> row = Util.newVector();
+				
+				row.add(++no);
+				row.add(wrapper.getAlgName());
+				row.add(wrapper.getDatasetId());
+				row.add(metric.getName());
+				row.add(metric.getTypeName());
+				
+				MetricValue metricValue = wrapper.getAccumValue();
+				if (metricValue != null)
+					row.add(metricValue);
+				else
+					row.add("");
+					
+				data.add(row);
+			}
+			catch (Throwable e) {e.printStackTrace();}
 		}
 		
 		
@@ -372,7 +377,9 @@ class MetricsTable2 extends JTable {
 							
 							@Override
 							public void actionPerformed(ActionEvent e) {
-								ClipboardUtil.util.setText(metrics.translate());
+								try {
+									ClipboardUtil.util.setText(metrics.translate());
+								} catch (Exception ex) {ex.printStackTrace();}
 							}
 						});
 					contextMenu.add(miCopyToClipboard);
@@ -537,27 +544,30 @@ class MetricsTM2 extends DefaultTableModel {
 		Vector<Vector<Object>> data = new Vector<Vector<Object>>();
 		int no = 0;
 		for (int i = 0; i < this.metrics.size(); i++) {
-			MetricWrapper wrapper = this.metrics.get(i);
-			if (!wrapper.isValid())
-				continue;
-			
-			Metric metric = wrapper.getMetric();
-			
-			Vector<Object> row = Util.newVector();
-			
-			row.add(++no);
-			row.add(wrapper.getAlgName());
-			row.add(wrapper.getDatasetId());
-			row.add(metric.getName());
-			row.add(metric.getTypeName());
-			
-			MetricValue metricValue = wrapper.getAccumValue();
-			if (metricValue != null)
-				row.add(metricValue);
-			else
-				row.add("");
+			try {
+				MetricWrapper wrapper = this.metrics.get(i);
+				if (!wrapper.isValid())
+					continue;
 				
-			data.add(row);
+				Metric metric = wrapper.getMetric();
+				
+				Vector<Object> row = Util.newVector();
+				
+				row.add(++no);
+				row.add(wrapper.getAlgName());
+				row.add(wrapper.getDatasetId());
+				row.add(metric.getName());
+				row.add(metric.getTypeName());
+				
+				MetricValue metricValue = wrapper.getAccumValue();
+				if (metricValue != null)
+					row.add(metricValue);
+				else
+					row.add("");
+					
+				data.add(row);
+			}
+			catch (Throwable e) {e.printStackTrace();}
 		}
 		
 		

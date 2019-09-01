@@ -50,75 +50,7 @@ import net.hudup.core.alg.Alg;
  * @version 10.0
  *
  */
-public interface Metric extends Alg, Serializable {
+public interface Metric extends MetricRemote, Alg, Serializable {
 
-	
-	/**
-	 * Getting description of metric.
-	 * @return description of metric.
-	 */
-	String getDesc();
-
-	
-	/**
-	 * Getting the type of this metric, for example, &quot;Time&quot;, &quot;Predictive Accuracy&quot;, and &quot;Classification Accuracy&quot; 
-	 * @return metric type name
-	 */
-	String getTypeName();
-	
-	
-	/**
-	 * Setting up (Initializing) this metric based on an array of objects known as parameters
-	 * @param params specified array of objects known as parameters. The parameters should be serializable.
-	 */
-	void setup(Object... params);
-	
-	
-	/**
-	 * Methods {@link #getAccumValue()} and {@link #getAccumValue()} return accumulative value and current value of metric.
-	 * After each time {@code metric} is re-calculated by {@link #recalc(Object...)} method, accumulative value and current value can be changed.
-	 * For example, a sample {@code metric} receives values 3, 1, 2 at the first, second, and third calculations.
-	 * At the fourth calculation if {@link #recalc(Object...)} produces value 2, the {@link #getCurrentValue()} will return 2 and the {@link #getAccumValue()} will return 3 + 1 + 2 + 2 = 8.
-	 * Methods {@link #getAccumValue()} and {@link #getCurrentValue()} can return any thing and so their returned value is represented by {@link MetricValue} interface.
-	 * How to implement {@code MetricValue} is dependent on concrete application.
-	 * @return current {@link MetricValue}
-	 */
-	MetricValue getCurrentValue();
-	
-	
-	/**
-	 * Methods {@link #getAccumValue()} and {@link #getAccumValue()} return accumulative value and current value of metric.
-	 * After each time {@code metric} is re-calculated by {@link #recalc(Object...)} method, accumulative value and current value can be changed.
-	 * For example, a sample {@code metric} receives values 3, 1, 2 at the first, second, and third calculations.
-	 * At the fourth calculation if {@link #recalc(Object...)} produces value 2, the {@link #getCurrentValue()} will return 2 and the {@link #getAccumValue()} will return 3 + 1 + 2 + 2 = 8.
-	 * Methods {@link #getAccumValue()} and {@link #getCurrentValue()} can return any thing and so their returned value is represented by {@link MetricValue} interface.
-	 * How to implement {@code MetricValue} is dependent on concrete application.
-	 * @return accumulated {@link MetricValue}
-	 */
-	MetricValue getAccumValue();
-
-	
-	/**
-	 * This is the most important method expressing how to re-calculate a concrete {@code metric} according to specified parameters.
-	 * @param params specified array of objects known as parameters. Such parameters varied according to concrete metric.
-	 * The parameters should be serializable.
-	 * @return whether calculating successfully
-	 * @throws Exception if any error raises.
-	 */
-	boolean recalc(Object... params) throws Exception;
-	
-	
-	/**
-	 * Reseting this metric, which makes this metric in original status.
-	 */
-	void reset();
-	
-	
-	/**
-	 * Testing whether or not this metric is valid.
-	 * @return whether or not this metric is valid.
-	 */
-	boolean isValid();
-	
 	
 }

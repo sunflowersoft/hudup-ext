@@ -1,6 +1,7 @@
 package net.hudup.core.evaluate;
 
 import java.io.Serializable;
+import java.rmi.RemoteException;
 
 import net.hudup.core.Cloneable;
 import net.hudup.core.Constants;
@@ -36,9 +37,9 @@ public interface MetricValue extends Serializable, Cloneable {
 	 * Taking the accumulative operator. For example, the accumulative addition operator will add this {@code MetricValue} to the specified {@code MetricValue} and then,
 	 * the result is set back to this {@code MetricValue}. 
 	 * @param metricValue specified {@code MetricValue}.
-	 * @throws Exception if any error raises.
+	 * @throws RemoteException if any error raises.
 	 */
-	void accum(MetricValue metricValue) throws Exception;
+	void accum(MetricValue metricValue) throws RemoteException;
 	
 	
 	/**

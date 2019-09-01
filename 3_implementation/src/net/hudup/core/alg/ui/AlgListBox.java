@@ -112,7 +112,7 @@ public class AlgListBox extends JList<Alg> implements AlgListUI {
      * 
      * @param contextMenu specified context menu.
      */
-    private void addToContextMenu(JPopupMenu contextMenu) {
+    protected void addToContextMenu(JPopupMenu contextMenu) {
     	final int selectedRow = getSelectedIndex();
     	if (selectedRow == -1) return;
 		

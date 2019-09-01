@@ -1,5 +1,6 @@
 package net.hudup.core.evaluate;
 
+import java.rmi.RemoteException;
 import java.util.List;
 
 import net.hudup.core.alg.Alg;
@@ -35,8 +36,9 @@ public class MeanMetaMetric extends MetaMetric {
 	/**
 	 * Setup internal metric.
 	 * @param point specified internal metric.
+	 * @throws RemoteException if any error raises.
 	 */
-	public void setup(Metric point) {
+	public void setup(Metric point) throws RemoteException {
 		// TODO Auto-generated method stub
 		super.setup(new Object[] { point });
 	}
@@ -50,21 +52,21 @@ public class MeanMetaMetric extends MetaMetric {
 
 	
 	@Override
-	public String getDesc() {
+	public String getDescription() throws RemoteException {
 		// TODO Auto-generated method stub
-		return meta[0].getDesc();
+		return meta[0].getDescription();
 	}
 
 	
 	@Override
-	public String getTypeName() {
+	public String getTypeName() throws RemoteException {
 		// TODO Auto-generated method stub
 		return meta[0].getTypeName();
 	}
 
 	
 	@Override
-	public boolean recalc(Object... params) throws Exception {
+	public boolean recalc(Object... params) throws RemoteException {
 		// TODO Auto-generated method stub
 		if ( params == null || params.length < 1 || !(params[0] instanceof Metric) )
 			return false;

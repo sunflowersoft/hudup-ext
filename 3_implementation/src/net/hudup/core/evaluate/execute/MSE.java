@@ -1,5 +1,7 @@
 package net.hudup.core.evaluate.execute;
 
+import java.rmi.RemoteException;
+
 import net.hudup.core.alg.Alg;
 import net.hudup.core.evaluate.FractionMetricValue;
 import net.hudup.core.evaluate.MetricValue;
@@ -36,14 +38,14 @@ public class MSE extends Accuracy {
 	
 	
 	@Override
-	public String getTypeName() {
+	public String getTypeName() throws RemoteException {
 		// TODO Auto-generated method stub
 		return "Accuracy";
 	}
 	
 	
 	@Override
-	public String getDesc() {
+	public String getDescription() throws RemoteException {
 		// TODO Auto-generated method stub
 		return "Mean Squared Error for testing algorithms";
 	}

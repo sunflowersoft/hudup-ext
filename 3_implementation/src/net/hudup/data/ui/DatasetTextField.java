@@ -192,8 +192,13 @@ public class DatasetTextField extends TagTextField {
 		tag = dataset;
 		if (dataset == null)
 			setText("");
-		else
-			setText(dataset.getConfig().getUriId().toString());
+		else {
+			xURI uriId = dataset.getConfig() != null ? dataset.getConfig().getUriId() : null;
+			if (uriId == null) //Null pointer
+				setText("(null pointer)");
+			else
+				setText(uriId.toString());
+		}
 	}
 	
 	

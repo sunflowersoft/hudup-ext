@@ -1,5 +1,7 @@
 package net.hudup.core.evaluate;
 
+import java.rmi.RemoteException;
+
 import net.hudup.core.alg.Alg;
 import net.hudup.core.logistic.BaseClass;
 import net.hudup.core.logistic.xURI;
@@ -27,7 +29,7 @@ import net.hudup.core.logistic.xURI;
  *
  */
 @BaseClass
-public class MetricWrapper extends AbstractMetric {
+public class MetricWrapper extends MetricAbstract {
 
 	
 	/**
@@ -69,7 +71,7 @@ public class MetricWrapper extends AbstractMetric {
 	
 	
 	@Override
-	public void setup(Object... params) {
+	public void setup(Object... params) throws RemoteException {
 		// TODO Auto-generated method stub
 		
 		if (params != null && params.length >= 3 && 
@@ -90,8 +92,9 @@ public class MetricWrapper extends AbstractMetric {
 	 * @param metric specified metric.
 	 * @param algName specified algorithm name.
 	 * @param datasetId specified dataset identifier.
+	 * @throws RemoteException if any error raises.
 	 */
-	public void setup(Metric metric, String algName, int datasetId) {
+	public void setup(Metric metric, String algName, int datasetId) throws RemoteException {
 		setup( new Object[] { metric, algName, new Integer(datasetId) } );
 	}
 	
@@ -104,15 +107,15 @@ public class MetricWrapper extends AbstractMetric {
 
 
 	@Override
-	public String getDesc() {
+	public String getDescription() throws RemoteException {
 		// TODO Auto-generated method stub
-		return metric.getDesc();
+		return metric.getDescription();
 	}
 
 
 
 	@Override
-	public String getTypeName() {
+	public String getTypeName() throws RemoteException {
 		// TODO Auto-generated method stub
 		return metric.getTypeName();
 	}
@@ -120,7 +123,7 @@ public class MetricWrapper extends AbstractMetric {
 
 
 	@Override
-	public MetricValue getCurrentValue() {
+	public MetricValue getCurrentValue() throws RemoteException {
 		// TODO Auto-generated method stub
 		return metric.getCurrentValue();
 	}
@@ -128,28 +131,28 @@ public class MetricWrapper extends AbstractMetric {
 
 
 	@Override
-	public MetricValue getAccumValue() {
+	public MetricValue getAccumValue() throws RemoteException {
 		// TODO Auto-generated method stub
 		return metric.getAccumValue();
 	}
 
 
 	@Override
-	public boolean recalc(Object... params) throws Exception {
+	public boolean recalc(Object... params) throws RemoteException {
 		// TODO Auto-generated method stub
 		return metric.recalc(params);
 	}
 
 
 	@Override
-	public void reset() {
+	public void reset() throws RemoteException {
 		// TODO Auto-generated method stub
 		metric.reset();
 	}
 
 	
 	@Override
-	public boolean isValid() {
+	public boolean isValid() throws RemoteException {
 		// TODO Auto-generated method stub
 		return metric.isValid();
 	}
@@ -215,9 +218,11 @@ public class MetricWrapper extends AbstractMetric {
 	 * @param datasetId specified identifier (ID) of the dataset used to evaluate the algorithm.
 	 * @param datasetUri specified URI of the dataset used to evaluate the algorithm.
 	 * @return new metric wrapper with specified internal metric, algorithm name, identifier of dataset, and URI of dataset.
+	 * @throws RemoteException if any error raises.
 	 */
-	public static MetricWrapper create(Metric metric, String algName, int datasetId, xURI datasetUri) {
+	public static MetricWrapper create(Metric metric, String algName, int datasetId, xURI datasetUri) throws RemoteException {
 		if (metric == null || algName == null || algName.isEmpty() || datasetId == -1)
+		//if (metric == null || algName == null || algName.isEmpty() || datasetId == -1 || datasetUri == null)
 			return null;
 		
 		MetricWrapper wrapper = new MetricWrapper();
@@ -236,9 +241,9 @@ public class MetricWrapper extends AbstractMetric {
 	 * @param algName specified name of the algorithm on which the internal metric evaluates.
 	 * @param datasetId specified identifier (ID) of the dataset used to evaluate the algorithm.
 	 * @return new metric wrapper with specified internal metric, algorithm name, and identifier of dataset.
+	 * @throws RemoteException if any error raises.
 	 */
-	public static MetricWrapper create(Metric metric, String algName, int datasetId) {
-		
+	public static MetricWrapper create(Metric metric, String algName, int datasetId) throws RemoteException {
 		return create(metric, algName, datasetId, null);
 	}
 	

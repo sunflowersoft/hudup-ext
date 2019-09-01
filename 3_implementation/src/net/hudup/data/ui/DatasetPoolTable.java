@@ -571,8 +571,13 @@ class DatasetPoolTableModel extends DefaultTableModel {
 				row.add("");
 			
 			Dataset testingSet = pair.getTesting();
-			if (testingSet != null)
-				row.add(testingSet.getConfig().getUriId().toString());
+			if (testingSet != null) {
+				xURI uriId = testingSet.getConfig() != null ? testingSet.getConfig().getUriId() : null;
+				if (uriId == null) //Null pointer
+					row.add("(null pointer)");
+				else
+					row.add(uriId.toString());
+			}
 			else
 				row.add("");
 			

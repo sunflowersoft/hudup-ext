@@ -25,8 +25,10 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
@@ -40,6 +42,7 @@ import net.hudup.core.alg.ui.AlgListChooser;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.DatasetPair;
 import net.hudup.core.data.DatasetPool;
+import net.hudup.core.data.NullPointer;
 import net.hudup.core.evaluate.AbstractEvaluator;
 import net.hudup.core.evaluate.Evaluator;
 import net.hudup.core.evaluate.EvaluatorEvent;
@@ -303,7 +306,35 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 		
 		paneAlg.add(new JLabel(I18nUtil.message("algorithms") + ":"));
 		
-		this.lbAlgs = new AlgListBox(false);
+		this.lbAlgs = new AlgListBox(false) {
+
+			/**
+			 * Default serial version UID.
+			 */
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			protected void addToContextMenu(JPopupMenu contextMenu) {
+				// TODO Auto-generated method stub
+				super.addToContextMenu(contextMenu);
+				
+		    	final int selectedRow = getSelectedIndex();
+		    	if (selectedRow == -1) return;
+				
+		    	contextMenu.addSeparator();
+		    	
+				JMenuItem miTraining = UIUtil.makeMenuItem((String)null, "Training", 
+					new ActionListener() {
+						
+						@Override
+						public void actionPerformed(ActionEvent e) {
+							addDataset(true);
+						}
+					});
+				contextMenu.add(miTraining);
+			}
+			
+		};
 		this.lbAlgs.update(algRegTable.getAlgList());
 		this.lbAlgs.setVisibleRowCount(3);
 		this.lbAlgs.addAlgListChangedListener(new AlgListBox.AlgListChangedListener() {
@@ -484,7 +515,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
-				addDataset();
+				addDataset(false);
 			}
 		});
 		toolGrp1.add(this.btnAddDataset);
@@ -728,9 +759,17 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
-				if (result != null)
-					new MetricsAnalyzeDlg(getThisGUI(), result, new RegisterTable(lbAlgs.getAlgList()));
-				else {
+				if (result != null) {
+					try {
+						new MetricsAnalyzeDlg(getThisGUI(), result, new RegisterTable(lbAlgs.getAlgList()));
+					}
+					catch (Exception ex) {
+						ex.printStackTrace();
+						result = null;
+					}
+				}
+				
+				if (result == null) {
 					JOptionPane.showMessageDialog(
 							getThisGUI(), 
 							"No result", 
@@ -753,9 +792,10 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					
 					if (result != null) {
-						ClipboardUtil.util.setText(result.translate());
+						try {
+							ClipboardUtil.util.setText(result.translate());
+						} catch (Exception ex) {ex.printStackTrace();}
 					}
 				}
 				
@@ -1254,13 +1294,17 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 	
 	/**
 	 * Adding dataset.
+	 * @param nullTesting true if add null testing dataset {@link NullPointer}.
 	 */
-	protected void addDataset() {
+	protected void addDataset(boolean nullTesting) {
 		try {
 			if (evaluator.remoteIsStarted() || this.lbAlgs.getAlgList().size() == 0)
 				return;
 			
-			new AddingDatasetDlg(this, pool, this.lbAlgs.getAlgList(), evaluator.getMainUnit());
+			if (nullTesting)
+				new AddingTrainingDatasetNullTestingDatasetDlg(this, pool, this.lbAlgs.getAlgList(), evaluator.getMainUnit()).setVisible(true);
+			else
+				new AddingDatasetDlg(this, pool, this.lbAlgs.getAlgList(), evaluator.getMainUnit()).setVisible(true);
 			this.tblDatasetPool.update(this.pool);
 			
 			clearResult();
@@ -1268,6 +1312,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 		}
 		catch (Throwable e) {
 			e.printStackTrace();
+			updateMode();
 		}
 	}
 

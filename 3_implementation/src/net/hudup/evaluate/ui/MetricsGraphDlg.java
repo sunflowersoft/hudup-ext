@@ -6,6 +6,7 @@ import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.rmi.RemoteException;
 import java.util.Collections;
 import java.util.List;
 
@@ -25,6 +26,7 @@ import net.hudup.core.logistic.ui.UIUtil;
 
 
 /**
+ * This class represents a dialog to show graphs of metrics.
  * 
  * @author Loc Nguyen
  * @version 10.0
@@ -39,24 +41,25 @@ public class MetricsGraphDlg extends JDialog {
 
 	
 	/**
-	 * 
+	 * Metrics
 	 */
 	private Metrics metrics = null;
 	
 	
 	/**
-	 * 
+	 * Algorithm table.
 	 */
 	private RegisterTable algTable = null;
 
 	
 	/**
-	 * 
-	 * @param comp
-	 * @param metrics
-	 * @param algTable
+	 * Constructor with metrics and algorithm table.
+	 * @param comp parent component.
+	 * @param metrics metrics.
+	 * @param algTable algorithm table.
+	 * @throws RemoteException if any error raises.
 	 */
-	public MetricsGraphDlg(final Component comp, final Metrics metrics, final RegisterTable algTable) {
+	public MetricsGraphDlg(final Component comp, final Metrics metrics, final RegisterTable algTable) throws RemoteException {
 		super(UIUtil.getFrameForComponent(comp), "Metrics graph viewer", true);
 		this.metrics = metrics;
 		this.algTable = algTable;
@@ -147,11 +150,17 @@ public class MetricsGraphDlg extends JDialog {
 							JDialog dlg = new JDialog(
 									UIUtil.getFrameForComponent(comp), 
 									"Graph for metric \"" + metricName + "\"", true);
-							dlg.setSize(400, 400);
-							dlg.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-							dlg.setLayout(new BorderLayout());
-							dlg.add(util.createPlotGraph(metricName), BorderLayout.CENTER);
-							dlg.setVisible(true);
+							try {
+								dlg.setSize(400, 400);
+								dlg.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+								dlg.setLayout(new BorderLayout());
+								dlg.add(util.createPlotGraph(metricName), BorderLayout.CENTER);
+								dlg.setVisible(true);
+							}
+							catch (Exception ex) {
+								ex.printStackTrace();
+								dlg.dispose();
+							}
 						}
 					});
 				zoom.setMargin(new Insets(0, 0 , 0, 0));
@@ -187,7 +196,9 @@ public class MetricsGraphDlg extends JDialog {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
-				new MetricsAnalyzeDlg(comp, metrics, algTable);
+				try {
+					new MetricsAnalyzeDlg(comp, metrics, algTable);
+				} catch (Exception ex) {ex.printStackTrace();}
 			}
 		});
 		footer.add(viewResults);

@@ -133,7 +133,7 @@ public class RecommendEvaluator extends AbstractEvaluator {
 					Dataset     training = dsPair.getTraining();
 					Dataset     testing = dsPair.getTesting();
 					int         datasetId = j + 1;
-					xURI        datasetUri = testing.getConfig().getUriId();
+					xURI        datasetUri = testing.getConfig() != null ? testing.getConfig().getUriId() : null;
 					
 					// Adding default metrics to metric result
 					result.add( recommender.getName(), datasetId, datasetUri, ((NoneWrapperMetricList)metricList.clone()).sort().list() );

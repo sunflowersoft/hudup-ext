@@ -1,6 +1,7 @@
 package net.hudup.core.evaluate;
 
 import java.io.Serializable;
+import java.rmi.RemoteException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -62,8 +63,9 @@ public class Metrics implements Serializable {
 	
 	/**
 	 * Reseting all metrics.
+	 * @throws RemoteException if any error raises.
 	 */
-	public void reset() {
+	public void reset() throws RemoteException {
 		for (MetricWrapper metricWrapper : metricWrapperList) {
 			metricWrapper.reset();
 		}
@@ -601,8 +603,9 @@ public class Metrics implements Serializable {
 	 * So there are many metrics that have the same kind and we calculate their mean.
 	 * @param algName specified algorithm name.
 	 * @return mean {@link Metrics}.
+	 * @throws RemoteException if any error raises.
 	 */
-	public Metrics mean(String algName) {
+	public Metrics mean(String algName) throws RemoteException {
 		List<MetricWrapper> wrapperList = getDistinctMetricList();
 		
 		Metrics result = new Metrics();
@@ -701,8 +704,9 @@ public class Metrics implements Serializable {
 	 * @param datasetUri specified dataset URI.
 	 * @param metric specified metric.
 	 * @return whether adding successfully.
+	 * @throws RemoteException if any error raises.
 	 */
-	public boolean add(String algName, int datasetId, xURI datasetUri, Metric metric) {
+	public boolean add(String algName, int datasetId, xURI datasetUri, Metric metric) throws RemoteException {
 		MetricWrapper wrapper = MetricWrapper.create(metric, algName, datasetId, datasetUri);
 		if (wrapper == null)
 			return false;
@@ -721,8 +725,9 @@ public class Metrics implements Serializable {
 	 * @param datasetId specified dataset identifier.
 	 * @param metric specified metric.
 	 * @return whether adding successfully.
+	 * @throws RemoteException if any error raises.
 	 */
-	public boolean add(String algName, int datasetId, Metric metric) {
+	public boolean add(String algName, int datasetId, Metric metric) throws RemoteException {
 		return add(algName, datasetId, null, metric);
 	}
 
@@ -734,8 +739,9 @@ public class Metrics implements Serializable {
 	 * @param datasetUri specified dataset URI.
 	 * @param defaultMetricList specified list of metrics.
 	 * @return whether adding successfully.
+	 * @throws RemoteException if any error raises.
 	 */
-	public boolean add(String algName, int datasetId, xURI datasetUri, List<Metric> defaultMetricList) {
+	public boolean add(String algName, int datasetId, xURI datasetUri, List<Metric> defaultMetricList) throws RemoteException {
 		for (Metric metric : defaultMetricList) {
 			add(algName, datasetId, datasetUri, metric);
 		}
@@ -749,9 +755,10 @@ public class Metrics implements Serializable {
 	 * @param algName specified algorithm name.
 	 * @param datasetId specified dataset identifier.
 	 * @param defaultMetricList specified list of metrics.
-	 * @return whether adding successfully
+	 * @return whether adding successfully.
+	 * @throws RemoteException if any error raises.
 	 */
-	public boolean add(String algName, int datasetId, List<Metric> defaultMetricList) {
+	public boolean add(String algName, int datasetId, List<Metric> defaultMetricList) throws RemoteException {
 		return add(algName, datasetId, null, defaultMetricList);
 	}
 
@@ -873,8 +880,9 @@ public class Metrics implements Serializable {
 	/**
 	 * Translating this metric list into text.
 	 * @return translated text of this metric list.
+	 * @throws RemoteException if any error raises.
 	 */
-	public String translate() {
+	public String translate() throws RemoteException {
 		// TODO Auto-generated method stub
 		StringBuffer buffer = new StringBuffer();
 		

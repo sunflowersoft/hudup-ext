@@ -49,8 +49,10 @@ public class AlgComboBox extends JComboBox<Alg> implements AlgListUI {
 				
 				if(SwingUtilities.isRightMouseButton(e) ) {
 					JPopupMenu contextMenu = AlgListUIUtil.createContextMenu(getThis());
-					if(contextMenu != null) 
-						contextMenu.show((Component)e.getSource(), e.getX(), e.getY());
+					if(contextMenu == null) return;
+					
+					addToContextMenu(contextMenu);
+					contextMenu.show((Component)e.getSource(), e.getX(), e.getY());
 				}
 				else if (e.getClickCount() >= 2) {
 					AlgListUIUtil.config(getThis());
@@ -253,4 +255,13 @@ public class AlgComboBox extends JComboBox<Alg> implements AlgListUI {
 	}
 	
 	
+    /**
+     * Adding the context menu to this list.
+     * @param contextMenu specified context menu.
+     */
+    protected void addToContextMenu(JPopupMenu contextMenu) {
+    	
+    }
+
+    
 }

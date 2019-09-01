@@ -1,5 +1,7 @@
 package net.hudup.core.evaluate.execute;
 
+import java.rmi.RemoteException;
+
 import net.hudup.core.evaluate.DefaultMetric;
 import net.hudup.core.evaluate.MetricValue;
 
@@ -27,7 +29,7 @@ public abstract class Accuracy extends DefaultMetric {
 
 	
 	@Override
-	public boolean recalc(Object... params) throws Exception {
+	public boolean recalc(Object... params) throws RemoteException {
 		// TODO Auto-generated method stub
 		if (params == null || params.length < 2)
 			return false;

@@ -169,8 +169,11 @@ public class NoneWrapperMetricList implements Cloneable, Serializable {
 				}
 			}
 			if (metaList.size() == metaNameList.length) {
-				newMetaMetric.setup(metaList.toArray());
-				result.add(newMetaMetric);
+				try {
+					newMetaMetric.setup(metaList.toArray());
+					result.add(newMetaMetric);
+				}
+				catch (Exception e) {e.printStackTrace();}
 			}
 			
 			

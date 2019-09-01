@@ -1,6 +1,8 @@
 package net.hudup.core.evaluate;
 
-import net.hudup.core.data.DataConfig;
+import java.rmi.RemoteException;
+
+import net.hudup.core.alg.AlgAbstract;
 
 
 /**
@@ -11,7 +13,7 @@ import net.hudup.core.data.DataConfig;
  * @version 10.0
  *
  */
-public abstract class AbstractMetric implements Metric {
+public abstract class MetricAbstract extends AlgAbstract implements Metric {
 
 	
 	/**
@@ -21,45 +23,18 @@ public abstract class AbstractMetric implements Metric {
 	
 	
 	/**
-	 * Configuration of metric because metric is also an algorithm represented by {@code Alg} interface.
-	 */
-	protected DataConfig config = null;
-	
-	
-	/**
 	 * Default constructor.
 	 */
-	public AbstractMetric() {
+	public MetricAbstract() {
 		// TODO Auto-generated constructor stub
-		this.config = createDefaultConfig();
+		super();
 	}
 
 	
 	@Override
-	public void setup(Object... params) {
+	public void setup(Object... params) throws RemoteException {
 		// TODO Auto-generated method stub
-		
 	}
 
 	
-	@Override
-	public DataConfig getConfig() {
-		return config;
-	}
-	
-
-	@Override
-	public void resetConfig() {
-		config.clear();
-		config.putAll(createDefaultConfig());
-	}
-
-
-	@Override
-	public DataConfig createDefaultConfig() {
-		// TODO Auto-generated method stub
-		return new DataConfig();
-	}
-
-
 }

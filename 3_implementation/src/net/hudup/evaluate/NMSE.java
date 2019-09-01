@@ -1,5 +1,6 @@
 package net.hudup.evaluate;
 
+import java.rmi.RemoteException;
 import java.util.Set;
 
 import net.hudup.core.alg.Alg;
@@ -44,14 +45,14 @@ public class NMSE extends PredictiveAccuracy {
 
 	
 	@Override
-	public String getTypeName() {
+	public String getTypeName() throws RemoteException {
 		// TODO Auto-generated method stub
 		return "Predictive accuracy";
 	}
 
 
 	@Override
-	public String getDesc() {
+	public String getDescription() throws RemoteException {
 		// TODO Auto-generated method stub
 		return "Normalized Mean Squared Error for recommendation algorithm";
 	}

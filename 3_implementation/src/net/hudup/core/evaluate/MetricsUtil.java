@@ -4,6 +4,7 @@ import java.awt.Component;
 import java.io.OutputStream;
 import java.io.Serializable;
 import java.io.Writer;
+import java.rmi.RemoteException;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Date;
@@ -75,8 +76,9 @@ public class MetricsUtil {
 	 * The key of inner map is metric names.
 	 * @param datasetId specified dataset identifier.
 	 * @return map of map of metric values. The keys of outermost map is algorithm names. The key of inner map is metric names.
+	 * @throws RemoteException if any error raises.
 	 */
-	private Map<String, Map<String, MetricValue>> parseMetrics(int datasetId) {
+	private Map<String, Map<String, MetricValue>> parseMetrics(int datasetId) throws RemoteException {
 		
 		Map<String, Map<String, MetricValue>> values = Util.newMap();
 		
@@ -112,9 +114,10 @@ public class MetricsUtil {
 	/**
 	 * Creating plot graph to show metrics.
 	 * @param metricName plot graph to show metrics.
-	 * @return {@link PlotGraph} to show metrics.
+	 * @return plot graph to show metrics.
+	 * @throws RemoteException if any error raises.
 	 */
-	public PlotGraph createPlotGraph(String metricName) {
+	public PlotGraph createPlotGraph(String metricName) throws RemoteException {
 		List<Integer> datasetIdList = this.metrics.getDatasetIdList();
 		Collections.sort(datasetIdList);
 		
@@ -185,9 +188,10 @@ public class MetricsUtil {
 	/**
 	 * Creating metrics evaluation by dataset.
 	 * @param datasetId specified dataset identifier.
-	 * @return {@link JTable} as metrics evaluation by dataset.
+	 * @return table as metrics evaluation by dataset.
+	 * @throws RemoteException if any error raises.
 	 */
-	public JTable createDatasetTable(int datasetId) {
+	public JTable createDatasetTable(int datasetId) throws RemoteException {
 		List<String> algNameList = this.metrics.getAlgNameList();
 		Collections.sort(algNameList);
 		
@@ -240,9 +244,10 @@ public class MetricsUtil {
 	
 	/**
 	 * Create metrics evaluation by all datasets.
-	 * @return {@link JTable} as metrics evaluation by all datasets.
+	 * @return table as metrics evaluation by all datasets.
+	 * @throws RemoteException if any error raises.
 	 */
-	public JTable createDatasetTable() {
+	public JTable createDatasetTable() throws RemoteException {
 		return createDatasetTable(-1);
 	}
 	
@@ -250,9 +255,10 @@ public class MetricsUtil {
 	/**
 	 * Create metrics evaluation by metric name.
 	 * @param metricName specified metric name.
-	 * @return {@link JTable} metrics evaluation by metric name.
+	 * @return table metrics evaluation by metric name.
+	 * @throws RemoteException if any error raises.
 	 */
-	public JTable createMetricTable(String metricName) {
+	public JTable createMetricTable(String metricName) throws RemoteException {
 		List<String> algNameList = this.metrics.getAlgNameList();
 		Collections.sort(algNameList);
 		
@@ -938,8 +944,9 @@ public class MetricsUtil {
 	/**
 	 * Create plain text for metrics evaluation.
 	 * @return plain text of {@link Metrics} evaluation.
+	 * @throws RemoteException if any error raises.
 	 */
-	public String createPlainText() {
+	public String createPlainText() throws RemoteException {
 		StringBuffer buffer = new StringBuffer();
 		
 

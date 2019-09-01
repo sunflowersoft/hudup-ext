@@ -1,6 +1,6 @@
 package net.hudup.core.evaluate;
 
-
+import java.rmi.RemoteException;
 
 /**
  * 
@@ -19,7 +19,7 @@ package net.hudup.core.evaluate;
  * @version 10.0
  *
  */
-public abstract class DefaultMetric extends AbstractMetric {
+public abstract class DefaultMetric extends MetricAbstract {
 
 	
 	/**
@@ -50,21 +50,21 @@ public abstract class DefaultMetric extends AbstractMetric {
 
 
 	@Override
-	public MetricValue getCurrentValue() {
+	public MetricValue getCurrentValue() throws RemoteException {
 		// TODO Auto-generated method stub
 		return currentValue;
 	}
 
 	
 	@Override
-	public MetricValue getAccumValue() {
+	public MetricValue getAccumValue() throws RemoteException {
 		// TODO Auto-generated method stub
 		return accumValue;
 	}
 
 	
 	@Override
-	public void reset() {
+	public void reset() throws RemoteException {
 		// TODO Auto-generated method stub
 		currentValue = null;
 		accumValue = null;
@@ -77,9 +77,9 @@ public abstract class DefaultMetric extends AbstractMetric {
 	 *  
 	 * @param metricValue specified metric value.
 	 * @return whether calculating successfully.
-	 * @throws Exception if any error raises.
+	 * @throws RemoteException if any error raises.
 	 */
-	protected boolean recalc0(MetricValue metricValue) throws Exception {
+	protected boolean recalc0(MetricValue metricValue) throws RemoteException {
 		if (metricValue == null)
 			return false;
 		
@@ -94,7 +94,7 @@ public abstract class DefaultMetric extends AbstractMetric {
 
 
 	@Override
-	public boolean isValid() {
+	public boolean isValid() throws RemoteException {
 		// TODO Auto-generated method stub
 		return currentValue != null && accumValue != null;
 	}

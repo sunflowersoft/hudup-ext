@@ -1,5 +1,6 @@
 package net.hudup.evaluate;
 
+import java.rmi.RemoteException;
 import java.util.Set;
 
 import net.hudup.core.Util;
@@ -44,14 +45,14 @@ public class Precision extends ClassificationAccuracy {
 
 	
 	@Override
-	public String getTypeName() {
+	public String getTypeName() throws RemoteException {
 		// TODO Auto-generated method stub
 		return "Classification accuracy";
 	}
 
 
 	@Override
-	public String getDesc() {
+	public String getDescription() throws RemoteException {
 		// TODO Auto-generated method stub
 		return "Precision for recommendation algorithm";
 	}

@@ -34,7 +34,7 @@ public interface AlgRemote extends Remote {
 	/**
 	 * Getting description of this inspectable object.
 	 * @return text form of this inspectable object.
-	 * @throws RemoteException if any error raises
+	 * @throws RemoteException if any error raises.
 	 */
 	String getDescription() throws RemoteException;
 
