@@ -226,6 +226,25 @@ public final class DatasetUtil2 {
 
 	
 	/**
+	 * Opening choosing dialog for constructing a data configuration of whole dataset from default configuration.
+	 * @param comp parent component.
+	 * @param defaultConfig default configuration.
+	 * @return {@link DataConfig} of whole dataset from default configuration.
+	 */
+	public static DataConfig chooseWholeConfig(Component comp, DataConfig defaultConfig) {
+		
+		List<Alg> parserList = ((RegisterTable) PluginStorage.getParserReg().clone()).getAlgList();
+		List<Alg> newParserList = Util.newList();
+		for (Alg parser : parserList) {
+			if (parser instanceof SnapshotParser || parser instanceof ScannerParser)
+				newParserList.add(parser);
+		}
+		
+		return chooseConfig(comp, newParserList, DataDriverList.list(), defaultConfig);
+	}
+
+	
+	/**
 	 * Opening choosing dialog for constructing a data configuration of server from initial configuration.
 	 * @param comp parent component.
 	 * @param initConfig initial configuration.

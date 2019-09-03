@@ -105,7 +105,7 @@ public class DatasetMetadata2 extends DatasetMetadata {
 	/**
 	 * Sparse ratio.
 	 */
-	public double sparseRatio = 0;
+	public double ratingCoverRatio = 0;
 	
 	
 	/**
@@ -129,7 +129,7 @@ public class DatasetMetadata2 extends DatasetMetadata {
 	/**
 	 * Relevant ratio.
 	 */
-	public double relevantRatio = 0;
+	public double ratingRelevantRatio = 0;
 	
 	
 	/**
@@ -142,6 +142,30 @@ public class DatasetMetadata2 extends DatasetMetadata {
 	 * Relevant rating standard deviation.
 	 */
 	public double relevantRatingSd = 0;
+
+	
+	/**
+	 * Sample row count.
+	 */
+	public int sampleRowCount = 0;
+
+	
+	/**
+	 * Sample column count.
+	 */
+	public int sampleColumnCount = 0;
+
+	
+	/**
+	 * Sample cell count.
+	 */
+	public int sampleCellCount = 0;
+
+	
+	/**
+	 * Sample sparse ratio.
+	 */
+	public double sampleCoverRatio = 0;
 
 	
 	/**
@@ -174,13 +198,17 @@ public class DatasetMetadata2 extends DatasetMetadata {
 				MathUtil.format(itemAverageRatingCount) + ", " + 
 				MathUtil.format(itemAverageRelevantRatingCount) + ", " + 
 				numberOfRatings + ", " + 
-				MathUtil.format(sparseRatio) + ", " + 
+				MathUtil.format(ratingCoverRatio) + ", " + 
 				MathUtil.format(ratingMean) + ", " + 
 				MathUtil.format(ratingSd) + ", " + 
 				numberOfRelevantRatings + ", " + 
-				MathUtil.format(relevantRatio) + ", " + 
+				MathUtil.format(ratingRelevantRatio) + ", " + 
 				MathUtil.format(relevantRatingMean) + ", " + 
 				MathUtil.format(relevantRatingSd) + ", " + 
+				sampleRowCount + ", " + 
+				sampleColumnCount + ", " + 
+				sampleCellCount + ", " + 
+				MathUtil.format(sampleCoverRatio) + ", " + 
 				"";
 	}
 
@@ -208,13 +236,17 @@ public class DatasetMetadata2 extends DatasetMetadata {
 		itemAverageRatingCount = Double.parseDouble(textList.get(16));
 		itemAverageRelevantRatingCount = Double.parseDouble(textList.get(17));
 		numberOfRatings = Integer.parseInt(textList.get(18));
-		sparseRatio = Double.parseDouble(textList.get(19));
+		ratingCoverRatio = Double.parseDouble(textList.get(19));
 		ratingMean = Double.parseDouble(textList.get(20));
 		ratingSd = Double.parseDouble(textList.get(21));
 		numberOfRelevantRatings = Integer.parseInt(textList.get(22));
-		relevantRatio = Integer.parseInt(textList.get(23));
+		ratingRelevantRatio = Integer.parseInt(textList.get(23));
 		relevantRatingMean = Double.parseDouble(textList.get(24));
 		relevantRatingSd = Double.parseDouble(textList.get(25));
+		sampleRowCount = Integer.parseInt(textList.get(26));
+		sampleColumnCount = Integer.parseInt(textList.get(27));
+		sampleCellCount = Integer.parseInt(textList.get(28));
+		sampleCoverRatio = Double.parseDouble(textList.get(29));
 	}
 	
 	
@@ -236,13 +268,17 @@ public class DatasetMetadata2 extends DatasetMetadata {
 		metadata2.itemAverageRatingCount = this.itemAverageRatingCount;
 		metadata2.itemAverageRelevantRatingCount = this.itemAverageRelevantRatingCount;
 		metadata2.numberOfRatings = this.numberOfRatings;
-		metadata2.sparseRatio = this.sparseRatio;
+		metadata2.ratingCoverRatio = this.ratingCoverRatio;
 		metadata2.ratingMean = this.ratingMean;
 		metadata2.ratingSd = this.ratingSd;
 		metadata2.numberOfRelevantRatings = this.numberOfRelevantRatings;
-		metadata2.relevantRatio = this.relevantRatio;
+		metadata2.ratingRelevantRatio = this.ratingRelevantRatio;
 		metadata2.relevantRatingMean = this.relevantRatingMean;
 		metadata2.relevantRatingSd = this.relevantRatingSd;
+		metadata2.sampleRowCount = this.sampleRowCount;
+		metadata2.sampleColumnCount = this.sampleColumnCount;
+		metadata2.sampleCellCount = this.sampleCellCount;
+		metadata2.sampleCoverRatio = this.sampleCoverRatio;
 
 		return metadata2;
 	}
@@ -258,6 +294,7 @@ public class DatasetMetadata2 extends DatasetMetadata {
 		DatasetMetadata metadata = DatasetMetadata.create(dataset);
 		DatasetMetadata2 metadata2 = new DatasetMetadata2();
 		metadata2.assignFrom(metadata);
+		
 		
 		Fetcher<RatingVector> users = null;
 		try {
@@ -317,7 +354,7 @@ public class DatasetMetadata2 extends DatasetMetadata {
 
 			metadata2.numberOfRatings = rateCount;
 			if (metadata2.numberOfRatingUsers != 0 && metadata2.numberOfRatedItems != 0)
-				metadata2.sparseRatio = (double)rateCount / (metadata2.numberOfRatingUsers*metadata2.numberOfRatedItems);
+				metadata2.ratingCoverRatio = (double)rateCount / (metadata2.numberOfRatingUsers*metadata2.numberOfRatedItems);
 			if (rateCount != 0) {
 				metadata2.ratingMean = (double)rateSum / rateCount;
 				
@@ -338,7 +375,7 @@ public class DatasetMetadata2 extends DatasetMetadata {
 			}
 			
 			metadata2.numberOfRelevantRatings = relevantRateCount;
-			metadata2.relevantRatio = (double)relevantRateCount / rateCount;
+			metadata2.ratingRelevantRatio = (double)relevantRateCount / rateCount;
 			if (relevantRateCount != 0) {
 				metadata2.relevantRatingMean = (double)relevantRateSum / relevantRateCount;
 				
@@ -363,7 +400,7 @@ public class DatasetMetadata2 extends DatasetMetadata {
 		}
 		catch (Throwable e) {
 			e.printStackTrace();
-			metadata2 = new DatasetMetadata2();
+			//metadata2 = new DatasetMetadata2();
 		}
 		finally {
 			try {
@@ -376,6 +413,7 @@ public class DatasetMetadata2 extends DatasetMetadata {
 			}
 		}
 
+		
 		Fetcher<RatingVector> items = null;
 		try {
 			items = dataset.fetchItemRatings();
@@ -422,7 +460,7 @@ public class DatasetMetadata2 extends DatasetMetadata {
 		}
 		catch (Throwable e) {
 			e.printStackTrace();
-			metadata2 = new DatasetMetadata2();
+			//metadata2 = new DatasetMetadata2();
 		}
 		finally {
 			try {
@@ -434,6 +472,46 @@ public class DatasetMetadata2 extends DatasetMetadata {
 				e.printStackTrace();
 			}
 		}
+		
+		
+		Fetcher<Profile> samples = null;
+		try {
+			samples = dataset.fetchSample();
+			AttributeList attList = null;
+			while (samples.next()) {
+				Profile sample = samples.pick();
+				if (sample == null) continue;
+				
+				if (attList == null) attList = sample.getAttRef();
+				
+				metadata2.sampleRowCount++;
+				
+				for (int i = 0; i < sample.getAttCount(); i++) {
+					if (sample.getValue(i) != null)
+						metadata2.sampleCellCount++;
+				}
+			}
+			
+			if (attList != null)
+				metadata2.sampleColumnCount = attList.size();
+			if (metadata2.sampleRowCount != 0 && metadata2.sampleColumnCount != 0)
+				metadata2.sampleCoverRatio = (double)metadata2.sampleCellCount / (metadata2.sampleRowCount*metadata2.sampleColumnCount);
+		}
+		catch (Throwable e) {
+			e.printStackTrace();
+			//metadata2 = new DatasetMetadata2();
+		}
+		finally {
+			try {
+				if (samples != null)
+					samples.close();
+			} 
+			catch (Throwable e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+
 		
 		return metadata2;
 	}

@@ -25,7 +25,7 @@ import net.hudup.core.data.ctx.CTSMultiProfiles;
  * @version 10.0
  *
  */
-public abstract class Snapshot extends AbstractDataset {
+public abstract class Snapshot extends DatasetAbstract {
 
 	
 	/**

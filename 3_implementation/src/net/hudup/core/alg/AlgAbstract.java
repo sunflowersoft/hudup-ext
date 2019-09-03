@@ -2,6 +2,8 @@ package net.hudup.core.alg;
 
 import java.rmi.RemoteException;
 
+import javax.swing.event.EventListenerList;
+
 import org.apache.log4j.Logger;
 
 import net.hudup.core.data.DataConfig;
@@ -40,12 +42,19 @@ public abstract class AlgAbstract implements Alg, AlgRemote {
 	protected DataConfig config = null;
 
 	
+    /**
+     * Stub as remote algorithm.
+     */
+    protected AlgRemote stub = null;
+    
+    
 	/**
-	 * Exported flag.
+	 * Holding a list of listeners.
+	 * 
 	 */
-	protected Boolean exported = false;
+    protected EventListenerList listenerList = new EventListenerList();
+    
 
-	
 	/**
 	 * Default constructor.
 	 */
@@ -108,27 +117,97 @@ public abstract class AlgAbstract implements Alg, AlgRemote {
 
 
 	@Override
-	public synchronized void export(int serverPort) throws RemoteException {
+	public void addSetupListener(SetupAlgListener listener) throws RemoteException {
 		// TODO Auto-generated method stub
-		synchronized (exported) {
-			if (!exported) {
-				NetUtil.RegistryRemote.export(this, serverPort);
-				exported = true;
+		synchronized (listenerList) {
+			listenerList.add(SetupAlgListener.class, listener);
+		}
+	}
+
+
+	@Override
+	public void removeSetupListener(SetupAlgListener listener) throws RemoteException {
+		// TODO Auto-generated method stub
+		synchronized (listenerList) {
+			listenerList.remove(SetupAlgListener.class, listener);
+		}
+	}
+
+
+	/**
+	 * Getting an array of listeners for this EM.
+	 * @return array of listeners for this EM.
+	 */
+	protected SetupAlgListener[] getSetupListeners() {
+		// TODO Auto-generated method stub
+		synchronized (listenerList) {
+			return listenerList.getListeners(SetupAlgListener.class);
+		}
+	}
+
+
+	@Override
+	public void fireSetupEvent(SetupAlgEvent evt) throws RemoteException {
+		// TODO Auto-generated method stub
+		SetupAlgListener[] listeners = getSetupListeners();
+		for (SetupAlgListener listener : listeners) {
+			try {
+				listener.receivedSetup(evt);
+			}
+			catch (Throwable e) {
+				e.printStackTrace();
 			}
 		}
 	}
 
 
 	@Override
+	public void receivedSetup(SetupAlgEvent evt) throws RemoteException {
+		// TODO Auto-generated method stub
+		fireSetupEvent(evt);
+	}
+
+
+	@Override
+	public synchronized AlgRemote export(int serverPort) throws RemoteException {
+		// TODO Auto-generated method stub
+		if (stub == null)
+			stub = (AlgRemote) NetUtil.RegistryRemote.export(this, serverPort);
+	
+		return stub;
+	}
+
+
+	@Override
 	public synchronized void unexport() throws RemoteException {
 		// TODO Auto-generated method stub
-		synchronized (exported) {
-			if (exported) {
-				NetUtil.RegistryRemote.unexport(this);
-				exported = false;
-			}
+		if (stub != null) {
+			NetUtil.RegistryRemote.unexport(this);
+			stub = null;
 		}
 	}
 
+	
+	/**
+	 * Getting stub as remote algorithm.
+	 * @return stub as remote algorithm.
+	 */
+	public AlgRemote getStubAlg() {
+		return (AlgRemote)stub;
+	}
+
+
+	@Override
+	protected void finalize() throws Throwable {
+		// TODO Auto-generated method stub
+		super.finalize();
+		
+		try {
+			unexport();
+		}
+		catch (Throwable e) {e.printStackTrace();}
+		
+	}
+	
 	
 }

@@ -252,7 +252,7 @@ public class DatasetPair implements Serializable {
 			training = DatasetUtil.loadDataset(config);
 		}
 		
-		if (testing != null) {
+		if ( (testing != null) && !(testing instanceof NullPointer) ) {
 			config = (DataConfig) testing.getConfig().clone();
 			testing.clear();
 			testing = DatasetUtil.loadDataset(config);

@@ -31,10 +31,10 @@ public class SysConfigDlg extends JDialog {
 
 	
 	/**
-	 * 
-	 * @param comp
-	 * @param title
-	 * @param vars
+	 * Constructor with variables.
+	 * @param comp parent component.
+	 * @param title title.
+	 * @param vars specified variables.
 	 */
 	public SysConfigDlg(Component comp, String title, Object...vars) {
 		super(UIUtil.getFrameForComponent(comp), title, true);

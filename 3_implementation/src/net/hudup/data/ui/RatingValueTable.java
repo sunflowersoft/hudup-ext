@@ -34,9 +34,11 @@ import net.hudup.data.MapVector;
 
 
 /**
+ * This is table to show rating matrix.
  * 
  * @author Loc Nguyen
  * @version 10.0
+ * 
  */
 public class RatingValueTable extends JTable {
 
@@ -48,8 +50,7 @@ public class RatingValueTable extends JTable {
 
 	
 	/**
-	 * 
-	 * 
+	 * Default constructor.
 	 */
 	public RatingValueTable() {
 		super();
@@ -75,9 +76,9 @@ public class RatingValueTable extends JTable {
 	
 	
 	/**
-	 * 
-	 * @param dataset
-	 * @param moreIds
+	 * Update table by dataset and additional field identifiers.
+	 * @param dataset specified dataset.
+	 * @param moreIds additional field identifiers.
 	 */
 	public void update(Dataset dataset, Collection<Integer> moreIds) {
 		RatingValueTM model = getRatingValueTM();
@@ -87,9 +88,9 @@ public class RatingValueTable extends JTable {
 	
 	
 	/**
-	 * 
-	 * @param matrix
-	 * @param moreIds
+	 * Update table by rating matrix and additional field identifiers.
+	 * @param matrix rating matrix.
+	 * @param moreIds additional field identifiers.
 	 */
 	public void update(RatingMatrix matrix, Collection<Integer> moreIds) {
 		RatingValueTM model = getRatingValueTM();
@@ -99,7 +100,7 @@ public class RatingValueTable extends JTable {
 
 	
 	/**
-	 * 
+	 * Clearing table.
 	 */
 	public void clear() {
 		RatingValueTM model = getRatingValueTM();
@@ -109,8 +110,8 @@ public class RatingValueTable extends JTable {
 	
 	
 	/**
-	 * 
-	 * @return {@link RatingValueTM}
+	 * Getting model of this table.
+	 * @return {@link RatingValueTM}.
 	 */
 	public RatingValueTM getRatingValueTM() {
 		return (RatingValueTM)super.getModel();
@@ -118,8 +119,8 @@ public class RatingValueTable extends JTable {
 	
 	
 	/**
-	 * 
-	 * @return {@link RatingValueTM}
+	 * Create model of this table.
+	 * @return {@link RatingValueTM}.
 	 */
 	public RatingValueTM newTableModel() {
 		return new RatingValueTM();
@@ -127,10 +128,10 @@ public class RatingValueTable extends JTable {
 	
 	
 	/**
-	 * 
-	 * @return {@link JPopupMenu}
+	 * Creating context menu.
+	 * @return context menu.
 	 */
-	private JPopupMenu createContextMenu() {
+	protected JPopupMenu createContextMenu() {
 		JPopupMenu contextMenu = new JPopupMenu();
 		
 		JMenuItem miViewRow = UIUtil.makeMenuItem((String)null, "View row", 
@@ -147,7 +148,7 @@ public class RatingValueTable extends JTable {
 	
 	
 	/**
-	 * 
+	 * Viewing selected row.
 	 */
 	protected void viewRow() {
 		int selIdx = getSelectedRow();
@@ -252,9 +253,9 @@ public class RatingValueTable extends JTable {
 
 	
 	/**
-	 * 
-	 * @param comp
-	 * @param modal
+	 * Showing dialog containing rating value table.
+	 * @param comp parent component.
+	 * @param modal rating value table.
 	 */
 	public void showDlg(Component comp, boolean modal) {
 		JDialog dlg = new JDialog(UIUtil.getFrameForComponent(comp), "Rating matrix dialog", modal);

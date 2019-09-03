@@ -87,8 +87,12 @@ public class RecommenderRemoteWrapper extends AlgRemoteWrapper implements Recomm
 	@Override
 	public Dataset getDataset() {
 		// TODO Auto-generated method stub
-		logger.error("getDataset() not supported");
-		return null;
+		if (remoteAlg instanceof Recommender)
+			return ((Recommender)remoteAlg).getDataset();
+		else {
+			logger.error("getDataset() not supported");
+			return null;
+		}
 	}
 
 	
@@ -107,6 +111,18 @@ public class RecommenderRemoteWrapper extends AlgRemoteWrapper implements Recomm
 
 
 	@Override
+	public Alg newInstance() {
+		// TODO Auto-generated method stub
+		if (remoteAlg instanceof Recommender) {
+			Recommender newRecommender = (Recommender) ((Recommender)remoteAlg).newInstance();
+			return new RecommenderRemoteWrapper(newRecommender, exclusive);
+		}
+		else
+			return super.newInstance();
+	}
+
+	
+	@Override
 	public synchronized void unexport() throws RemoteException {
 		// TODO Auto-generated method stub
 		if (exclusive && remoteAlg != null) {
@@ -117,4 +133,13 @@ public class RecommenderRemoteWrapper extends AlgRemoteWrapper implements Recomm
 	}
 
 	
+	/**
+	 * Getting stub as remote recommender.
+	 * @return stub as remote recommender.
+	 */
+	public RecommenderRemote getStubRecommender() {
+		return (RecommenderRemote)stub;
+	}
+
+
 }

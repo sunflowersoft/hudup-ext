@@ -2,11 +2,14 @@ package net.hudup.core.alg;
 
 import java.rmi.RemoteException;
 
+import javax.swing.event.EventListenerList;
+
 import org.apache.log4j.Logger;
 
 import net.hudup.core.data.AutoCloseable;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.logistic.BaseClass;
+import net.hudup.core.logistic.NetUtil;
 
 /**
  * The class is a wrapper of remote algorithm. This is a trick to use RMI object but not to break the defined programming architecture.
@@ -35,6 +38,12 @@ public class AlgRemoteWrapper implements Alg, AlgRemote, AutoCloseable {
 	protected final static Logger logger = Logger.getLogger(AlgRemoteWrapper.class);
 
 
+    /**
+     * Stub as remote algorithm. It must be serializable.
+     */
+    protected AlgRemote stub = null;
+
+	
 	/**
 	 * Exclusive mode.
 	 */
@@ -42,11 +51,18 @@ public class AlgRemoteWrapper implements Alg, AlgRemote, AutoCloseable {
 	
 	
 	/**
-	 * Internal remote executable algorithm.
+	 * Internal remote algorithm. It must be serializable.
 	 */
 	protected AlgRemote remoteAlg = null;
 	
 	
+	/**
+	 * Holding a list of listeners.
+	 * 
+	 */
+    protected EventListenerList listenerList = new EventListenerList();
+    
+
 	/**
 	 * Constructor with specified remote algorithm.
 	 * @param remoteAlg remote algorithm.
@@ -59,7 +75,7 @@ public class AlgRemoteWrapper implements Alg, AlgRemote, AutoCloseable {
 	
 	/**
 	 * Constructor with specified remote algorithm and exclusive mode.
-	 * @param ExecutableAlg remote algorithm.
+	 * @param remoteAlg remote algorithm.
 	 * @param exclusive exclusive mode.
 	 */
 	public AlgRemoteWrapper(AlgRemote remoteAlg, boolean exclusive) {
@@ -72,14 +88,14 @@ public class AlgRemoteWrapper implements Alg, AlgRemote, AutoCloseable {
 	@Override
 	public String queryName() throws RemoteException {
 		// TODO Auto-generated method stub
-		return ((ExecutableAlgRemote)remoteAlg).queryName();
+		return remoteAlg.queryName();
 	}
 
 	
 	@Override
 	public DataConfig queryConfig() throws RemoteException {
 		// TODO Auto-generated method stub
-		return ((ExecutableAlgRemote)remoteAlg).queryConfig();
+		return remoteAlg.queryConfig();
 	}
 
 	
@@ -97,15 +113,22 @@ public class AlgRemoteWrapper implements Alg, AlgRemote, AutoCloseable {
 	@Override
 	public void resetConfig() {
 		// TODO Auto-generated method stub
-		logger.error("resetConfig() not supported");
+		if (remoteAlg instanceof AlgAbstract)
+			((AlgAbstract)remoteAlg).resetConfig();
+		else
+			logger.error("resetConfig() not supported");
 	}
 
 	
 	@Override
 	public DataConfig createDefaultConfig() {
 		// TODO Auto-generated method stub
-		logger.warn("createDefaultConfig() not supported");
-		return null;
+		if (remoteAlg instanceof AlgAbstract)
+			return ((AlgAbstract)remoteAlg).createDefaultConfig();
+		else {
+			logger.warn("createDefaultConfig() not supported");
+			return null;
+		}
 	}
 
 	
@@ -123,32 +146,85 @@ public class AlgRemoteWrapper implements Alg, AlgRemote, AutoCloseable {
 	@Override
 	public String getDescription() throws RemoteException {
 		// TODO Auto-generated method stub
-		return ((ExecutableAlgRemote)remoteAlg).getDescription();
+		return remoteAlg.getDescription();
 	}
 
 	
 	@Override
 	public Alg newInstance() {
 		// TODO Auto-generated method stub
-		logger.warn("newInstance() returns itselfs and so does not return new object");
-		return this;
+		if (remoteAlg instanceof AlgAbstract) {
+			AlgAbstract newAlg = (AlgAbstract) ((AlgAbstract)remoteAlg).newInstance();
+			return new AlgRemoteWrapper(newAlg, exclusive);
+		}
+		else {
+			logger.warn("newInstance() returns itselfs and so does not return new object");
+			return this;
+		}
 	}
 
 	
 	@Override
-	public void export(int serverPort) throws RemoteException {
+	public void addSetupListener(SetupAlgListener listener) throws RemoteException {
 		// TODO Auto-generated method stub
-		logger.error("export() rnot supported");
+		remoteAlg.addSetupListener(listener);
 	}
 
 
 	@Override
-	public void unexport() throws RemoteException {
+	public void removeSetupListener(SetupAlgListener listener) throws RemoteException {
+		// TODO Auto-generated method stub
+		remoteAlg.removeSetupListener(listener);
+	}
+
+
+	@Override
+	public void fireSetupEvent(SetupAlgEvent evt) throws RemoteException {
+		// TODO Auto-generated method stub
+		remoteAlg.fireSetupEvent(evt);
+	}
+
+
+	@Override
+	public void receivedSetup(SetupAlgEvent evt) throws RemoteException {
+		// TODO Auto-generated method stub
+		remoteAlg.receivedSetup(evt);
+	}
+
+
+	@Override
+	public synchronized AlgRemote export(int serverPort) throws RemoteException {
+		//Remote wrapper can export itself because this function is useful when the wrapper as remote algorithm can be called remotely by remote evaluator via Evaluator.remoteStart method.
+		if (stub == null)
+			stub = (AlgRemote) NetUtil.RegistryRemote.export(this, serverPort);
+	
+		return stub;
+	}
+
+
+	@Override
+	public synchronized void unexport() throws RemoteException {
 		// TODO Auto-generated method stub
 		if (exclusive && remoteAlg != null) {
-			remoteAlg.unexport();
-			remoteAlg = null;
+			try {
+				remoteAlg.unexport();
+			} catch (Exception e) {e.printStackTrace();}
 		}
+		remoteAlg = null;
+		
+		if (stub != null) {
+			NetUtil.RegistryRemote.unexport(this);
+			stub = null;
+		}
+	}
+
+	
+	/**
+	 * Getting stub as remote algorithm.
+	 * @return stub as remote algorithm.
+	 */
+	public AlgRemote getStubAlg() {
+		return (AlgRemote)stub;
 	}
 
 	

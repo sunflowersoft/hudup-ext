@@ -51,10 +51,10 @@ public class SysConfigDlgExt extends SysConfigDlg {
 
 	
 	/**
-	 * 
-	 * @param comp
-	 * @param title
-	 * @param vars
+	 * Constructor with variables.
+	 * @param comp parent component.
+	 * @param title title.
+	 * @param vars specified variables.
 	 */
 	public SysConfigDlgExt(Component comp, String title, Object...vars) {
 		super(comp, title, vars);

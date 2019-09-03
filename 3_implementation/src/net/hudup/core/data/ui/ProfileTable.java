@@ -1,13 +1,18 @@
 package net.hudup.core.data.ui;
 
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.Collection;
 import java.util.List;
 import java.util.Vector;
 
+import javax.swing.JPopupMenu;
 import javax.swing.JTable;
+import javax.swing.SwingUtilities;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
@@ -76,7 +81,23 @@ public class ProfileTable extends JTable {
 	protected void initGUI() {
 		this.getProfileTableModel().setEditable(false);
 
-		setAutoResizeMode(AUTO_RESIZE_OFF);
+		//setAutoResizeMode(AUTO_RESIZE_OFF);
+		
+		this.addMouseListener(new MouseAdapter() {
+
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if(SwingUtilities.isRightMouseButton(e) ) {
+					JPopupMenu contextMenu = createContextMenu();
+					if(contextMenu != null) 
+						contextMenu.show((Component)e.getSource(), e.getX(), e.getY());
+				}
+				else if (e.getClickCount() >= 2) {
+					viewRow();
+				}
+			}
+		});
+
 		
 		this.addKeyListener(new KeyAdapter() {
 
@@ -153,6 +174,23 @@ public class ProfileTable extends JTable {
 	}
 	
 	
+	/**
+	 * Creating context menu.
+	 * @return context menu.
+	 */
+	protected JPopupMenu createContextMenu() {
+		return null;
+	}
+	
+	
+	/**
+	 * Viewing selected row.
+	 */
+	protected void viewRow() {
+		
+	}
+	
+
 	/**
 	 * Performing action.
 	 * @param e action event.

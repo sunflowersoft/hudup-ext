@@ -16,7 +16,7 @@ import net.hudup.core.RegisterTable;
 import net.hudup.core.RegisterTable.AlgFilter;
 import net.hudup.core.Util;
 import net.hudup.core.alg.Alg;
-import net.hudup.core.alg.ExecutableAlg;
+import net.hudup.core.alg.AlgRemote;
 import net.hudup.core.alg.SetupAlgEvent;
 import net.hudup.core.alg.SetupAlgListener;
 import net.hudup.core.alg.SupportCacheAlg;
@@ -101,7 +101,7 @@ import net.hudup.core.logistic.ui.ProgressListener;
  * @version 10.0
  *
  */
-public abstract class AbstractEvaluator extends AbstractRunner implements Evaluator {
+public abstract class EvaluatorAbstract extends AbstractRunner implements Evaluator {
 
 	
 	/**
@@ -154,15 +154,15 @@ public abstract class AbstractEvaluator extends AbstractRunner implements Evalua
 
 	
 	/**
-	 * Exported flag.
+	 * Exported stub as remote evaluator.
 	 */
-	protected Boolean remoteExported = false;
+	protected Evaluator stub = null;
 	
 	
     /**
 	 * Default constructor.
 	 */
-	public AbstractEvaluator() {
+	public EvaluatorAbstract() {
 		try {
 			this.config = new EvaluatorConfig(xURI.create(EvaluatorConfig.evalConfig));
 			metricList = defaultMetrics();
@@ -274,8 +274,11 @@ public abstract class AbstractEvaluator extends AbstractRunner implements Evalua
 					// Adding default metrics to metric result
 					result.add( alg.getName(), datasetId, datasetUri, ((NoneWrapperMetricList)metricList.clone()).sort().list() );
 					
-					if (alg instanceof ExecutableAlg)
-						((ExecutableAlg)alg).addSetupListener(this);
+					if (alg instanceof AlgRemote) {
+						((AlgRemote)alg).addSetupListener(this);
+						SetupAlgEvent setupEvt = new SetupAlgEvent(new Integer(-1), SetupAlgEvent.Type.doing, null, null, "not supported yet");
+						fireSetupAlgEvent(setupEvt);
+					}
 					
 					long beginSetupTime = System.currentTimeMillis();
 					//
@@ -291,9 +294,11 @@ public abstract class AbstractEvaluator extends AbstractRunner implements Evalua
 						); // calculating setup time metric
 					fireEvaluatorEvent(new EvaluatorEvent(this, Type.doing, setupMetrics)); // firing setup time metric
 					
-					if (alg instanceof ExecutableAlg)
-						((ExecutableAlg)alg).removeSetupListener(this);
-
+					if (alg instanceof AlgRemote) {
+						SetupAlgEvent setupEvt = new SetupAlgEvent(new Integer(-1), SetupAlgEvent.Type.done, null, null, "not supported yet");
+						fireSetupAlgEvent(setupEvt);
+						((AlgRemote)alg).removeSetupListener(this);
+					}
 					
 					testingFetcher = fetchTesting(testing);
 					int vCurrentTotal = testingFetcher.getMetadata().getSize();
@@ -862,25 +867,21 @@ public abstract class AbstractEvaluator extends AbstractRunner implements Evalua
 
 
 	@Override
-	public synchronized void remoteExport(int serverPort) throws RemoteException {
+	public synchronized Evaluator remoteExport(int serverPort) throws RemoteException {
 		// TODO Auto-generated method stub
-		synchronized (remoteExported) {
-			if (!remoteExported) {
-				NetUtil.RegistryRemote.export(this, serverPort);
-				remoteExported = true;
-			}
-		}
+		if (stub == null)
+			stub = (Evaluator) NetUtil.RegistryRemote.export(this, serverPort);
+		
+		return stub;
 	}
 
 
 	@Override
 	public synchronized void remoteUnexport() throws RemoteException {
 		// TODO Auto-generated method stub
-		synchronized (remoteExported) {
-			if (remoteExported) {
-				NetUtil.RegistryRemote.unexport(this);
-				remoteExported = false;
-			}
+		if (stub != null) {
+			NetUtil.RegistryRemote.unexport(this);
+			stub = null;
 		}
 	}
 

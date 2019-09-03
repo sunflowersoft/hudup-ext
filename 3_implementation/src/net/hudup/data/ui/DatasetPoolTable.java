@@ -28,8 +28,10 @@ import net.hudup.core.data.Dataset;
 import net.hudup.core.data.DatasetPair;
 import net.hudup.core.data.DatasetPool;
 import net.hudup.core.data.KBasePointer;
+import net.hudup.core.data.NullPointer;
 import net.hudup.core.data.Pointer;
 import net.hudup.core.logistic.ClipboardUtil;
+import net.hudup.core.logistic.I18nUtil;
 import net.hudup.core.logistic.xURI;
 import net.hudup.core.logistic.ui.UIUtil;
 
@@ -49,7 +51,7 @@ public class DatasetPoolTable extends JTable {
 
 	
 	/**
-	 * 
+	 * Enabled flag.
 	 */
 	protected boolean enabled = true;
 	
@@ -395,8 +397,8 @@ public class DatasetPoolTable extends JTable {
 	
 	
 	/**
-	 * 
-	 * @return whether remove successfully
+	 * Removing selected rows.
+	 * @return whether remove successfully.
 	 */
 	public boolean removeSelectedRows() {
 		int[] idxes = this.getSelectedRows();
@@ -420,8 +422,8 @@ public class DatasetPoolTable extends JTable {
 	
 	
 	/**
-	 * 
-	 * @param rowIndex
+	 * Moving the row having specified index to the first.
+	 * @param rowIndex specified row index.
 	 */
 	private void moveRowFirst(int rowIndex) {
 		if (rowIndex == 0 || getRowCount() == 0)
@@ -432,8 +434,8 @@ public class DatasetPoolTable extends JTable {
 
 	
 	/**
-	 * 
-	 * @param rowIndex
+	 * Moving the row having specified index to up level.
+	 * @param rowIndex specified row index.
 	 */
 	private void moveRowUp(int rowIndex) {
 		if (rowIndex == 0 || getRowCount() == 0)
@@ -552,9 +554,9 @@ class DatasetPoolTableModel extends DefaultTableModel {
 		
 		Vector<String> columns = new Vector<String>();
 		columns.add("No");
-		columns.add("Training set");
-		columns.add("Testing set");
-		columns.add("Whole set");
+		columns.add(I18nUtil.message("training_set"));
+		columns.add(I18nUtil.message("testing_set"));
+		columns.add(I18nUtil.message("whole_set"));
 		
 		Vector<Vector<Object>> data = new Vector<Vector<Object>>();
 		for (int i = 0; i < pool.size(); i++) {
@@ -574,7 +576,7 @@ class DatasetPoolTableModel extends DefaultTableModel {
 			if (testingSet != null) {
 				xURI uriId = testingSet.getConfig() != null ? testingSet.getConfig().getUriId() : null;
 				if (uriId == null) //Null pointer
-					row.add("(null pointer)");
+					row.add(NullPointer.NULL_POINTER);
 				else
 					row.add(uriId.toString());
 			}

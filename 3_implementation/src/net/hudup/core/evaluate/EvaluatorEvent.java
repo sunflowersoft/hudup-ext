@@ -7,6 +7,7 @@ import java.util.EventObject;
 import java.util.List;
 
 import net.hudup.core.data.RatingVector;
+import net.hudup.core.logistic.NextUpdate;
 import net.hudup.core.parser.TextParsable;
 
 
@@ -73,9 +74,10 @@ public class EvaluatorEvent extends EventObject {
 	 * @param evaluator reference to an {@link Evaluator}. This evaluator is invalid in remote call.
 	 * @param type type of this event.
 	 */
+	@NextUpdate
 	public EvaluatorEvent(Evaluator evaluator, Type type) {
-		super(evaluator);
-		// TODO Auto-generated constructor stub
+//		super(evaluator); //Test different hosts for RMI, evaluator wrapper can solve.
+		super(new Integer(1)); //Not use evaluator because of improving network speed.
 		
 		this.type = type;
 	}
@@ -89,7 +91,6 @@ public class EvaluatorEvent extends EventObject {
 	 */
 	public EvaluatorEvent(Evaluator evaluator, Type type, Metrics metrics) {
 		this(evaluator, type);
-		// TODO Auto-generated constructor stub
 		
 		setMetrics(metrics);
 	}
@@ -104,7 +105,6 @@ public class EvaluatorEvent extends EventObject {
 	 */
 	public EvaluatorEvent(Evaluator evaluator, Type type, Metrics metrics, Serializable... params) {
 		this(evaluator, type, metrics);
-		// TODO Auto-generated constructor stub
 		
 		setParams(params);
 	}
@@ -117,7 +117,11 @@ public class EvaluatorEvent extends EventObject {
 	@SuppressWarnings("unused")
 	@Deprecated
 	private Evaluator getEvaluator() {
-		return (Evaluator) getSource();
+		Object source = getSource();
+		if (source instanceof Evaluator)
+			return (Evaluator)source;
+		else
+			return null;
 	}
 	
 	

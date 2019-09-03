@@ -105,16 +105,14 @@ public class ExecutableAlgRemoteWrapper extends AlgRemoteWrapper implements Exec
 
 	
 	@Override
-	public void addSetupListener(SetupAlgListener listener) throws RemoteException {
+	public Alg newInstance() {
 		// TODO Auto-generated method stub
-		((ExecutableAlgRemote)remoteAlg).addSetupListener(listener);
-	}
-
-	
-	@Override
-	public void removeSetupListener(SetupAlgListener listener) throws RemoteException {
-		// TODO Auto-generated method stub
-		((ExecutableAlgRemote)remoteAlg).removeSetupListener(listener);
+		if (remoteAlg instanceof ExecutableAlg) {
+			ExecutableAlg newAlg = (ExecutableAlg) ((ExecutableAlg)remoteAlg).newInstance();
+			return new ExecutableAlgRemoteWrapper(newAlg, exclusive);
+		}
+		else
+			return super.newInstance();
 	}
 
 
@@ -129,5 +127,13 @@ public class ExecutableAlgRemoteWrapper extends AlgRemoteWrapper implements Exec
 	}
 
 	
+	/**
+	 * Getting stub as remote executable algorithm.
+	 * @return stub as remote executable algorithm.
+	 */
+	public ExecutableAlgRemote getStubExecutableAlg() {
+		return (ExecutableAlgRemote)stub;
+	}
 
+	
 }

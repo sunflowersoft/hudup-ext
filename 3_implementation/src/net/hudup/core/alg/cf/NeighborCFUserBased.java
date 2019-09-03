@@ -88,8 +88,8 @@ public class NeighborCFUserBased extends NeighborCF implements DuplicatableAlg {
 		if (thisUser.size() == 0) return null;
 		
 		RatingVector result = thisUser.newInstance(true);
-//		boolean hybrid = cf.getConfig().getAsBoolean(HYBRID);
-//		Profile userProfile1 = hybrid ? param.profile : null;
+		boolean hybrid = cf.getConfig().getAsBoolean(HYBRID);
+		Profile userProfile1 = hybrid ? param.profile : null;
 		double minValue = cf.getConfig().getMinRating();
 		double maxValue = cf.getConfig().getMaxRating();
 		double thisMean = thisUser.mean();
@@ -110,7 +110,7 @@ public class NeighborCFUserBased extends NeighborCF implements DuplicatableAlg {
 					if (thatUser == null || thatUser.id()== thisUser.id() || !thatUser.isRated(itemId))
 						continue;
 					
-//					Profile userProfile2 = hybrid ? cf.dataset.getUserProfile(thatUser.id()) : null;
+					Profile userProfile2 = hybrid ? cf.getDataset().getUserProfile(thatUser.id()) : null;
 					
 					// computing similarity
 					double sim = Constants.UNUSED;
@@ -118,12 +118,12 @@ public class NeighborCFUserBased extends NeighborCF implements DuplicatableAlg {
 						if (localUserSimCache.containsKey(thatUser.id()))
 							sim = localUserSimCache.get(thatUser.id());
 						else {
-							sim = cf.sim(thisUser, thatUser, null/*userProfile1*/, null/*userProfile2*/, itemId);
+							sim = cf.sim(thisUser, thatUser, userProfile1, userProfile2, itemId);
 							localUserSimCache.put(thatUser.id(), sim);
 						}
 					}
 					else
-						sim = cf.sim(thisUser, thatUser, null/*userProfile1*/, null/*userProfile2*/, itemId);
+						sim = cf.sim(thisUser, thatUser, userProfile1, userProfile2, itemId);
 					if (!Util.isUsed(sim)) continue;
 					
 					double thatValue = thatUser.get(itemId).value;

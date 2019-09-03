@@ -28,6 +28,7 @@ import net.hudup.data.ctx.ui.ContextListTable;
 
 
 /**
+ * This is the panel to show rating matrix.
  * 
  * @author Loc Nguyen
  * @version 10.0
@@ -43,7 +44,7 @@ public class RatingMatrixPane extends JPanel {
 
 	
 	/**
-	 * 
+	 * Internal dataset.
 	 */
 	protected Dataset dataset = null;
 	

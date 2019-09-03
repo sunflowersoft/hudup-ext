@@ -30,7 +30,7 @@ import net.hudup.core.PluginStorage;
 import net.hudup.core.RegisterTable;
 import net.hudup.core.client.ConnectDlg;
 import net.hudup.core.client.Service;
-import net.hudup.core.evaluate.AbstractEvaluator;
+import net.hudup.core.evaluate.EvaluatorAbstract;
 import net.hudup.core.evaluate.Evaluator;
 import net.hudup.core.evaluate.EvaluatorConfig;
 import net.hudup.core.evaluate.MetaMetric;
@@ -99,7 +99,7 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 	
 	/**
 	 * Constructor with specified evaluator.
-	 * @param evaluator specified {@link AbstractEvaluator}.
+	 * @param evaluator specified {@link EvaluatorAbstract}.
 	 * @param bindUri bound URI.
 	 */
 	public EvalCompoundGUI(Evaluator evaluator, xURI bindUri) {

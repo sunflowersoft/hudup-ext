@@ -71,22 +71,4 @@ public interface ExecutableAlgRemote extends AlgRemote {
     String parameterToShownText(Object parameter, Object...info) throws RemoteException;
     
     
-	/**
-	 * Add the specified setting up listener to the end of listener list.
-	 * This is remote method.
-	 * @param listener specified setting up listener
-	 * @throws RemoteException if any error raises.
-	 */
-	void addSetupListener(SetupAlgListener listener) throws RemoteException;
-
-	
-	/**
-	 * Remove the specified setting up listener from the listener list.
-	 * This is remote method.
-	 * @param listener specified setting up listener.
-	 * @throws RemoteException if any error raises.
-	 */
-    void removeSetupListener(SetupAlgListener listener) throws RemoteException;
-
-
 }

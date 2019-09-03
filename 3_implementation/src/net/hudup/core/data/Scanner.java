@@ -27,7 +27,7 @@ package net.hudup.core.data;
  * @version 10.0
  *
  */
-public abstract class Scanner extends AbstractDataset {
+public abstract class Scanner extends DatasetAbstract {
 
 	
 	/**

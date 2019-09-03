@@ -5,6 +5,7 @@ import java.util.Set;
 
 import net.hudup.core.alg.RecommendParam;
 import net.hudup.core.alg.Recommender;
+import net.hudup.core.alg.SetupAlgEvent;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.DatasetPair;
 import net.hudup.core.data.Fetcher;
@@ -75,6 +76,9 @@ public class EstimateEvaluator extends RecommendEvaluator {
 					// Adding default metrics to metric result
 					result.add( recommender.getName(), datasetId, datasetUri, ((NoneWrapperMetricList)metricList.clone()).sort().list() );
 					
+					recommender.addSetupListener(this);
+					SetupAlgEvent setupEvt = new SetupAlgEvent(new Integer(-1), SetupAlgEvent.Type.doing, null, null, "not supported yet");
+					fireSetupAlgEvent(setupEvt);
 					
 					long beginSetupTime = System.currentTimeMillis();
 					//
@@ -90,6 +94,10 @@ public class EstimateEvaluator extends RecommendEvaluator {
 						); // calculating setup time metric
 					//Fire doing event with setup time metric.
 					fireEvaluatorEvent(new EvaluatorEvent(this, Type.doing, setupMetrics)); // firing setup time metric
+
+					setupEvt = new SetupAlgEvent(new Integer(-1), SetupAlgEvent.Type.done, null, null, "not supported yet");
+					fireSetupAlgEvent(setupEvt);
+					recommender.removeSetupListener(this);
 
 					testingUsers = testing.fetchUserRatings();
 					int vCurrentTotal = testingUsers.getMetadata().getSize();

@@ -10,7 +10,7 @@ import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.Fetcher;
 import net.hudup.core.data.Profile;
-import net.hudup.core.evaluate.AbstractEvaluator;
+import net.hudup.core.evaluate.EvaluatorAbstract;
 import net.hudup.core.evaluate.HudupRecallMetric;
 import net.hudup.core.evaluate.NoneWrapperMetricList;
 import net.hudup.core.evaluate.SetupTimeMetric;
@@ -25,7 +25,7 @@ import net.hudup.core.logistic.NextUpdate;
  *
  */
 @NextUpdate
-public abstract class ExecuteEvaluator extends AbstractEvaluator {
+public abstract class ExecuteEvaluator extends EvaluatorAbstract {
 
 	
 	/**

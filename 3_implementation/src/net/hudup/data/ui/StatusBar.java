@@ -7,10 +7,11 @@ import javax.swing.JPanel;
 
 
 /**
+ * This class is the status bar.
  * 
  * @author Loc Nguyen
- *
  * @version 10.0
+ * 
  */
 public class StatusBar extends JPanel {
 
@@ -22,13 +23,13 @@ public class StatusBar extends JPanel {
 
 	
 	/**
-	 * 
+	 * List of labels.
 	 */
 	private JLabel[] paneList = new JLabel[5];
 	
 	
 	/**
-	 * 
+	 * Default constructor.
 	 */
 	public StatusBar() {
 		super();
@@ -41,13 +42,12 @@ public class StatusBar extends JPanel {
 			add(paneList[i]);
 		}
 		
-		
 	}
 	
 
 	/**
-	 * 
-	 * @param text
+	 * Setting text for panel 0.
+	 * @param text text for panel 0.
 	 */
 	public void setTextPane0(String text) {
 		paneList[0].setText(text);
@@ -55,8 +55,8 @@ public class StatusBar extends JPanel {
 	
 	
 	/**
-	 * 
-	 * @param text
+	 * Setting text for panel 1.
+	 * @param text text for panel 1.
 	 */
 	public void setTextPane1(String text) {
 		paneList[1].setText(text);
@@ -64,8 +64,8 @@ public class StatusBar extends JPanel {
 	
 	
 	/**
-	 * 
-	 * @param text
+	 * Setting text for panel 2.
+	 * @param text text for panel 2.
 	 */
 	public void setTextPane2(String text) {
 		paneList[2].setText(text);
@@ -73,8 +73,8 @@ public class StatusBar extends JPanel {
 
 	
 	/**
-	 * 
-	 * @param text
+	 * Setting text for panel 3.
+	 * @param text text for panel 3.
 	 */
 	public void setTextPane3(String text) {
 		paneList[3].setText(text);
@@ -82,8 +82,8 @@ public class StatusBar extends JPanel {
 
 	
 	/**
-	 * 
-	 * @param text
+	 * Setting text for panel 4.
+	 * @param text text for panel 4.
 	 */
 	public void setTextPane4(String text) {
 		paneList[4].setText(text);
@@ -91,8 +91,8 @@ public class StatusBar extends JPanel {
 
 	
 	/**
-	 * 
-	 * @param text
+	 * Setting text for last panel.
+	 * @param text text for last panel.
 	 */
 	public void setTextPaneLast(String text) {
 		setTextPane4(text);
@@ -100,7 +100,7 @@ public class StatusBar extends JPanel {
 	
 	
 	/**
-	 * 
+	 * Clearing text.
 	 */
 	public void clearText() {
 		for (JLabel textPane : paneList) {
@@ -110,8 +110,8 @@ public class StatusBar extends JPanel {
 	
 	
 	/**
-	 * 
-	 * @return pane 0
+	 * Getting pane 0.
+	 * @return pane 0.
 	 */
 	public JLabel getPane0() {
 		return paneList[0];
@@ -119,8 +119,8 @@ public class StatusBar extends JPanel {
 	
 	
 	/**
-	 * 
-	 * @return pane 1
+	 * Getting pane 1.
+	 * @return pane 1.
 	 */
 	public JLabel getPane1() {
 		return paneList[1];
@@ -128,8 +128,8 @@ public class StatusBar extends JPanel {
 
 
 	/**
-	 * 
-	 * @return pane 2
+	 * Getting pane 2.
+	 * @return pane 2.
 	 */
 	public JLabel getPane2() {
 		return paneList[2];
@@ -137,8 +137,8 @@ public class StatusBar extends JPanel {
 
 
 	/**
-	 * 
-	 * @return pane 3
+	 * Getting pane 3.
+	 * @return pane 3.
 	 */
 	public JLabel getPane3() {
 		return paneList[3];
@@ -146,8 +146,8 @@ public class StatusBar extends JPanel {
 	
 	
 	/**
-	 * 
-	 * @return pane 4
+	 * Getting pane 4.
+	 * @return pane 4.
 	 */
 	public JLabel getPane4() {
 		return paneList[4];
@@ -155,13 +155,12 @@ public class StatusBar extends JPanel {
 	
 	
 	/**
-	 * 
-	 * @return last pane
+	 * Getting last pane.
+	 * @return last pane.
 	 */
 	public JLabel getLastPane() {
 		return getPane4();
 	}
 
-	
 	
 }

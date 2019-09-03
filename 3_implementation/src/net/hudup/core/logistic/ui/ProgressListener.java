@@ -1,5 +1,6 @@
 package net.hudup.core.logistic.ui;
 
+import java.rmi.RemoteException;
 import java.util.EventListener;
 
 
@@ -20,6 +21,7 @@ public interface ProgressListener extends EventListener {
 	/**
 	 * The main method that programmer must implement to define some tasks.
 	 * @param evt the event specified by {@link ProgressEvent}, issued by the application and then, passed to a progress listener.
+	 * @throws RemoteException if any error raises.
 	 */
 	void receiveProgress(ProgressEvent evt);
 

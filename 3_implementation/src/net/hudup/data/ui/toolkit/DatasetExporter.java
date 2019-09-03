@@ -22,6 +22,7 @@ import net.hudup.data.ui.DatasetConfigurator;
 
 
 /**
+ * This utility class allows users to export dataset.
  * 
  * @author Loc Nguyen
  * @version 10.0
@@ -35,23 +36,44 @@ public class DatasetExporter extends JPanel implements ProgressListener, Dispose
 	 */
 	private static final long serialVersionUID = 1L;
 	
-	private JButton btnSource = null;
+	/**
+	 * Source button.
+	 */
+	protected JButton btnSource = null;
 
-	private DataConfigTextField txtSource = null;
+	/**
+	 * Source text field.
+	 */
+	protected DataConfigTextField txtSource = null;
 	
-	private JButton btnDestination = null;
+	/**
+	 * Destination button.
+	 */
+	protected JButton btnDestination = null;
 	
-	private DataConfigTextField txtDestination = null;
+	/**
+	 * Destination text field.
+	 */
+	protected DataConfigTextField txtDestination = null;
 	
-	private JButton btnExport = null;
+	/**
+	 * Exporting button.
+	 */
+	protected JButton btnExport = null;
 	
+	/**
+	 * Progressing bar.
+	 */
 	protected JProgressBar prgRunning = null;
 	
+	/**
+	 * Running thread.
+	 */
 	protected volatile Thread runningThread = null;
 	
 	
 	/**
-	 * 
+	 * Default constructor.
 	 */
 	public DatasetExporter() {
 		super();
@@ -83,7 +105,7 @@ public class DatasetExporter extends JPanel implements ProgressListener, Dispose
 				DataConfig config = chooser.getResultedConfig();
 				if (config == null || config.size() == 0) {
 					JOptionPane.showMessageDialog(
-							getThis(), 
+							getThisExporter(), 
 							"Configuration empty", 
 							"Configuration empty", 
 							JOptionPane.ERROR_MESSAGE);
@@ -105,7 +127,7 @@ public class DatasetExporter extends JPanel implements ProgressListener, Dispose
 				// TODO Auto-generated method stub
 				
 				DatasetConfigurator chooser = new DatasetConfigurator(
-						getThis(),
+						getThisExporter(),
 						PluginStorage.getParserReg().getAlgList(),
 						DataDriverList.list(),
 						null);
@@ -113,7 +135,7 @@ public class DatasetExporter extends JPanel implements ProgressListener, Dispose
 				DataConfig config = chooser.getResultedConfig();
 				if (config == null || config.size() == 0) {
 					JOptionPane.showMessageDialog(
-							getThis(), 
+							getThisExporter(), 
 							"Configuration empty", 
 							"Configuration empty", 
 							JOptionPane.ERROR_MESSAGE);
@@ -168,19 +190,19 @@ public class DatasetExporter extends JPanel implements ProgressListener, Dispose
 
 	
 	/**
-	 * 
+	 * Getting this export GUI.
 	 * @return this {@link DatasetExporter}
 	 */
-	private DatasetExporter getThis() {
+	protected DatasetExporter getThisExporter() {
 		return this;
 	}
 	
 	
 	/**
-	 * 
-	 * @param flag
+	 * Enabling control according to flag.
+	 * @param flag enable flag.
 	 */
-	private void enableControls(boolean flag) {
+	protected void enableControls(boolean flag) {
 		DataConfig srcConfig = (DataConfig) txtSource.getConfig();
 		DataConfig destConfig = (DataConfig) txtDestination.getConfig();
 		boolean flag2 = srcConfig != null && destConfig != null;
@@ -196,9 +218,9 @@ public class DatasetExporter extends JPanel implements ProgressListener, Dispose
 	
 	
 	/**
-	 * 
+	 * Exporting data.
 	 */
-	private void exportData() {
+	protected void exportData() {
 		final DataConfig srcConfig = (DataConfig) txtSource.getConfig();
 		final DataConfig destConfig = (DataConfig) txtDestination.getConfig();
 		
@@ -235,11 +257,11 @@ public class DatasetExporter extends JPanel implements ProgressListener, Dispose
 				super.run();
 				
 				Provider provider = new ProviderImpl(destConfig);
-				provider.importData(srcConfig, true, getThis());
+				provider.importData(srcConfig, true, getThisExporter());
 				provider.close();
 				
 				JOptionPane.showMessageDialog(
-						getThis(), 
+						getThisExporter(), 
 						"Export successfully", 
 						"Export successfully", 
 						JOptionPane.INFORMATION_MESSAGE);

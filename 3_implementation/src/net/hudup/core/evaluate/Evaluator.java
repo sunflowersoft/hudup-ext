@@ -254,9 +254,10 @@ public interface Evaluator extends Remote, RemoteRunner, SetupAlgListener, AutoC
     /**
      * Remote exporting this evaluator.
      * @param serverPort server port.
+     * @return stub as remote evaluator.
      * @throws RemoteException if any error raises.
      */
-    void remoteExport(int serverPort) throws RemoteException;
+    Evaluator remoteExport(int serverPort) throws RemoteException;
     
     
     /**

@@ -21,6 +21,7 @@ import net.hudup.core.alg.ModelBasedRecommender;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.KBasePointer;
+import net.hudup.core.data.NullPointer;
 import net.hudup.core.data.Pointer;
 import net.hudup.core.logistic.ClipboardUtil;
 import net.hudup.core.logistic.xURI;
@@ -195,7 +196,7 @@ public class DatasetTextField extends TagTextField {
 		else {
 			xURI uriId = dataset.getConfig() != null ? dataset.getConfig().getUriId() : null;
 			if (uriId == null) //Null pointer
-				setText("(null pointer)");
+				setText(NullPointer.NULL_POINTER);
 			else
 				setText(uriId.toString());
 		}

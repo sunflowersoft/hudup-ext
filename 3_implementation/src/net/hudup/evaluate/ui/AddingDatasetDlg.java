@@ -62,6 +62,11 @@ public class AddingDatasetDlg extends JDialog {
 	protected JButton btnTestingBrowse = null;
 	
 	/**
+	 * Button for browsing whole dataset.
+	 */
+	protected JButton btnWholeBrowse = null;
+	
+	/**
 	 * Text field to show training dataset.
 	 */
 	protected DataConfigTextField txtTrainingBrowse = null;
@@ -70,6 +75,11 @@ public class AddingDatasetDlg extends JDialog {
 	 * Text field to show testing dataset.
 	 */
 	protected DataConfigTextField txtTestingBrowse = null;
+	
+	/**
+	 * Text field to show testing dataset.
+	 */
+	protected DataConfigTextField txtWholeBrowse = null;
 	
 	
 	/**
@@ -120,10 +130,22 @@ public class AddingDatasetDlg extends JDialog {
 		});
 		left.add(btnTestingBrowse);
 
+		btnWholeBrowse = new JButton(I18nUtil.message("whole_set"));
+		btnWholeBrowse.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				openWholeSet(mainUnit);
+			}
+		});
+		btnWholeBrowse.setVisible(false);
+		left.add(btnWholeBrowse);
+
+		
 		JPanel right = new JPanel(new GridLayout(0, 1));
 		header.add(right, BorderLayout.CENTER);
 		
-
 		txtTrainingBrowse = new DataConfigTextField();
 		txtTrainingBrowse.setEditable(false);
 		right.add(txtTrainingBrowse);
@@ -132,6 +154,10 @@ public class AddingDatasetDlg extends JDialog {
 		txtTestingBrowse.setEditable(false);
 		right.add(txtTestingBrowse);
 		
+		txtWholeBrowse = new DataConfigTextField();
+		txtWholeBrowse.setEditable(false);
+		txtWholeBrowse.setVisible(false);
+		right.add(txtWholeBrowse);
 		
 		JPanel footer = new JPanel();
 		add(footer, BorderLayout.SOUTH);
@@ -254,11 +280,41 @@ public class AddingDatasetDlg extends JDialog {
 	
 	
 	/**
+	 * Open testing set.
+	 * @param mainUnit main unit.
+	 */
+	protected void openWholeSet(String mainUnit) {
+		
+		DataConfig defaultCfg = txtWholeBrowse.getConfig();
+		if (defaultCfg == null)
+			defaultCfg = new DataConfig();
+		if (mainUnit != null) {
+			defaultCfg = (DataConfig)defaultCfg.clone();
+			defaultCfg.setMainUnit(mainUnit);
+		}
+		
+		DataConfig config = DatasetUtil2.chooseWholeConfig(this, defaultCfg);
+			
+		if (config == null) {
+			JOptionPane.showMessageDialog(
+				this, 
+				"Not open whole set", 
+				"Not open whole set", 
+				JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+		
+		txtWholeBrowse.setConfig(config);
+	}
+
+	
+	/**
 	 * Clearing text fields of configurations of training dataset and testing dataset.
 	 */
 	protected void clear() {
 		txtTrainingBrowse.setConfig(null);
 		txtTestingBrowse.setConfig(null);
+		txtWholeBrowse.setConfig(null);
 	}
 	
 	
@@ -336,7 +392,30 @@ public class AddingDatasetDlg extends JDialog {
 		}
 		
 		
-		DatasetPair pair = new DatasetPair(trainingSet, testingSet, null);
+		Dataset wholeSet = null;
+		DataConfig wholeCfg = txtWholeBrowse.getConfig();
+		if (wholeCfg != null) {
+			wholeSet = DatasetUtil.loadDataset(wholeCfg);
+			if (wholeSet == null) {
+				JOptionPane.showMessageDialog(
+						this, 
+						"Whole dataset is null", 
+						"Invalid whole dataset", 
+						JOptionPane.WARNING_MESSAGE);
+			}
+			if (wholeSet instanceof Pointer) {
+				JOptionPane.showMessageDialog(
+						this, 
+						"Whole dataset is pointer", 
+						"Invalid whole dataset", 
+						JOptionPane.ERROR_MESSAGE);
+				
+				wholeSet = null;
+			}
+		}
+		
+
+		DatasetPair pair = new DatasetPair(trainingSet, testingSet, wholeSet);
 		pool.add(pair);
 		
 		JOptionPane.showMessageDialog(

@@ -429,12 +429,6 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluatorProgr
 	
 	
 	/**
-	 * Exported flag.
-	 */
-	protected Boolean remoteExported = false;
-	
-	
-	/**
 	 * Constructor with evaluator and socket server.
 	 * @param delegator internal delegator.
 	 * @param remoteEvaluator remote evaluator.
@@ -786,42 +780,42 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluatorProgr
 
 
 	@Override
-	public synchronized void remoteExport(int serverPort) throws RemoteException {
+	public synchronized Evaluator remoteExport(int serverPort) throws RemoteException {
 		// TODO Auto-generated method stub
-		synchronized (remoteExported) {
-			if (!remoteExported) {
-				stub = (Evaluator)NetUtil.RegistryRemote.export(this, serverPort);
+		if (stub == null) {
+			stub = (Evaluator)NetUtil.RegistryRemote.export(this, serverPort);
 
+			try {
 				remoteEvaluator.addEvaluatorListener(this);
 				remoteEvaluator.addProgressListener(this);
 				remoteEvaluator.addSetupAlgListener(this);
-				
-				socketServer.addRunner(this);
-				remoteServer.incRequest();
-				remoteExported = true;
-			}
+			} catch (Exception e) {e.printStackTrace();}
+			
+			socketServer.addRunner(this);
+			remoteServer.incRequest();
 		}
+		
+		return stub;
 	}
 
 
 	@Override
 	public synchronized void remoteUnexport() throws RemoteException {
 		// TODO Auto-generated method stub
-		synchronized (remoteExported) {
-			if (remoteExported) {
-				this.remoteStop(); //It is possible to stop this evaluator because its is delegated evaluator.
-				
+		if (stub != null) {
+			this.remoteStop(); //It is possible to stop this evaluator because its is delegated evaluator.
+			
+			try {
 				remoteEvaluator.removeEvaluatorListener(this);
 				remoteEvaluator.removeProgressListener(this);
 				remoteEvaluator.removeSetupAlgListener(this);
 				remoteEvaluator.remoteUnexport();
-				
-				socketServer.removeRunner(this);
-				NetUtil.RegistryRemote.unexport(this);
-				stub = null;
-				remoteServer.decRequest();
-				remoteExported = false;
-			}
+			} catch (Exception e) {e.printStackTrace();}
+			
+			socketServer.removeRunner(this);
+			NetUtil.RegistryRemote.unexport(this);
+			stub = null;
+			remoteServer.decRequest();
 		}
 	}
 

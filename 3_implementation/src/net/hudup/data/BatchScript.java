@@ -11,6 +11,7 @@ import net.hudup.core.data.Dataset;
 import net.hudup.core.data.DatasetPair;
 import net.hudup.core.data.DatasetPool;
 import net.hudup.core.data.DatasetUtil;
+import net.hudup.core.data.NullPointer;
 import net.hudup.core.data.PropList;
 import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.xURI;
@@ -93,11 +94,14 @@ public class BatchScript implements Serializable {
 					trainingSet.getConfig().getParser().getName()  + 
 					(trainingSet.getConfig().getDataDriverName() != null ? TextParserUtil.EXTRA_SEP + trainingSet.getConfig().getDataDriverName() : "")
 				);
-			testings.add(
-					testingSet.getConfig().getUriId().toString() + TextParserUtil.EXTRA_SEP +
-					testingSet.getConfig().getParser().getName() +
-					(testingSet.getConfig().getDataDriverName() != null ? TextParserUtil.EXTRA_SEP + testingSet.getConfig().getDataDriverName() : "")
-				);
+			if (testingSet instanceof NullPointer)
+				testings.add(NullPointer.NULL_POINTER);
+			else
+				testings.add(
+						testingSet.getConfig().getUriId().toString() + TextParserUtil.EXTRA_SEP +
+						testingSet.getConfig().getParser().getName() +
+						(testingSet.getConfig().getDataDriverName() != null ? TextParserUtil.EXTRA_SEP + testingSet.getConfig().getDataDriverName() : "")
+					);
 			
 			Dataset wholeSet = pair.getWhole();
 			if (wholeSet != null)
@@ -245,19 +249,27 @@ public class BatchScript implements Serializable {
 	    			continue;
 	    		
     			List<String> testingParts = TextParserUtil.split(testing, TextParserUtil.EXTRA_SEP, null);
-    			if (testingParts.size() < 2)
+    			if (testingParts.size() == 0) 
     				continue;
-    			xURI testingUri = xURI.create(testingParts.get(0)); 
-    			UriAdapter testingAdapter = new UriAdapter(testingUri);
-    			DataConfig testingCfg = testingAdapter.makeFlatDataConfig(testingUri, mainUnit);
-    			testingAdapter.close();
-    			testingCfg.setParser(testingParts.get(1));
-    			if (testingParts.size() > 2)
-    				testingCfg.setDataDriverName(testingParts.get(2));
-	    		testingSet = DatasetUtil.loadDataset(testingCfg);
-	    		if (testingSet == null)
-	    			continue;
-	    		
+    			else if (testingParts.size() == 1) {
+    				if (testingParts.get(0).toLowerCase().equals(NullPointer.NULL_POINTER.toLowerCase()))
+    					testingSet = new NullPointer();
+    				else
+    					continue;
+    			}
+    			else {
+	    			xURI testingUri = xURI.create(testingParts.get(0)); 
+	    			UriAdapter testingAdapter = new UriAdapter(testingUri);
+	    			DataConfig testingCfg = testingAdapter.makeFlatDataConfig(testingUri, mainUnit);
+	    			testingAdapter.close();
+	    			testingCfg.setParser(testingParts.get(1));
+	    			if (testingParts.size() > 2)
+	    				testingCfg.setDataDriverName(testingParts.get(2));
+		    		testingSet = DatasetUtil.loadDataset(testingCfg);
+		    		if (testingSet == null)
+		    			continue;
+    			}
+    			
 	    		if (wholeList.size() > 0) {
 	    			String whole = wholeList.get(i);
 	    			

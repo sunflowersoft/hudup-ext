@@ -2,6 +2,7 @@ package net.hudup.core.evaluate;
 
 import java.rmi.RemoteException;
 
+import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.AlgRemoteWrapper;
 import net.hudup.core.logistic.BaseClass;
 
@@ -89,6 +90,27 @@ public class MetricRemoteWrapper extends AlgRemoteWrapper implements Metric {
 	public boolean isValid() throws RemoteException {
 		// TODO Auto-generated method stub
 		return ((MetricRemote)remoteAlg).isValid();
+	}
+
+
+	@Override
+	public Alg newInstance() {
+		// TODO Auto-generated method stub
+		if (remoteAlg instanceof Metric) {
+			Metric newMetric = (Metric) ((Metric)remoteAlg).newInstance();
+			return new MetricRemoteWrapper(newMetric, exclusive);
+		}
+		else
+			return super.newInstance();
+	}
+
+
+	/**
+	 * Getting stub as remote metric.
+	 * @return stub as remote metric.
+	 */
+	public MetricRemote getStubMetric() {
+		return (MetricRemote)stub;
 	}
 
 

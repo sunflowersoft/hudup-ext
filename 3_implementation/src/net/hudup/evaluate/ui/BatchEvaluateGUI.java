@@ -43,7 +43,7 @@ import net.hudup.core.data.Dataset;
 import net.hudup.core.data.DatasetPair;
 import net.hudup.core.data.DatasetPool;
 import net.hudup.core.data.NullPointer;
-import net.hudup.core.evaluate.AbstractEvaluator;
+import net.hudup.core.evaluate.EvaluatorAbstract;
 import net.hudup.core.evaluate.Evaluator;
 import net.hudup.core.evaluate.EvaluatorEvent;
 import net.hudup.core.evaluate.EvaluatorEvent.Type;
@@ -55,6 +55,7 @@ import net.hudup.core.logistic.I18nUtil;
 import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.xURI;
 import net.hudup.core.logistic.ui.UIUtil;
+import net.hudup.core.logistic.ui.WaitPanel;
 import net.hudup.data.BatchScript;
 import net.hudup.data.DatasetUtil2;
 import net.hudup.data.ui.DatasetPoolTable;
@@ -63,7 +64,7 @@ import net.hudup.data.ui.TxtOutput;
 
 
 /**
- * This class represents a graphic user interface (GUI) for {@link AbstractEvaluator} with many pairs of training dataset and testing dataset.
+ * This class represents a graphic user interface (GUI) for {@link EvaluatorAbstract} with many pairs of training dataset and testing dataset.
  * @author Loc Nguyen
  * @version 10.0
  */
@@ -214,7 +215,13 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 	 * Status bar.
 	 */
 	protected StatusBar statusBar = null;
+//	protected StatusBar2 statusBar = null;
 	
+	/**
+	 * Waiting panel which is the alternative of testing result panel.
+	 */
+	protected WaitPanel paneWait = null; //Added date: 2019.09.03 by Loc Nguyen.
+
 	
 	/**
 	 * Constructor with specified evaluator.
@@ -803,9 +810,20 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 		this.btnCopyResult.setMargin(new Insets(0, 0 , 0, 0));
 		toolbar.add(this.btnCopyResult);
 
+		
+		JPanel statusPane = new JPanel(new BorderLayout());
+		footer.add(statusPane, BorderLayout.SOUTH);
+		
 		this.statusBar = new StatusBar();
-		this.counterClock.setTimeLabel(this.statusBar.getLastPane());
-		footer.add(statusBar, BorderLayout.SOUTH);
+		this.counterClock.setTimeTextPane(this.statusBar.getLastPane());
+		statusPane.add(this.statusBar, BorderLayout.CENTER);
+
+		//Added date: 2019.09.03 by Loc Nguyen.
+		this.paneWait = new WaitPanel();
+		statusPane.add(this.paneWait, BorderLayout.SOUTH);
+		this.paneWait.setWaitText(I18nUtil.message("setting_up_algorithm_please_wait"));
+		this.paneWait.setVisible(false);
+
 
 		return footer;
 		
@@ -986,8 +1004,8 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 		}
 		
 		
-		//this.result = evt.getEvaluator().getResult();
-		this.result = evaluator.getResult(); //Fix bug date: 2019.08.06 by Loc Nguyen.
+		//this.result = evaluator.getResult();
+		this.result = evt.getMetrics(); //Fix bug date: 2019.09.04 by Loc Nguyen.
 		if (evt.getType() == Type.done) {
 			counterClock.stop();
 			updateMode();
@@ -1012,17 +1030,23 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			this.prgRunning.setValue(progressStep);
 		
 		statusBar.setTextPane1(
-				"Algorithm '" + algName + "' " +
-				"dataset '" + datasetId + "': " + 
+				I18nUtil.message("algorithm") + " '" + algName + "' " +
+				I18nUtil.message("dataset") + " '" + datasetId + "': " + 
 				vCurrentCount + "/" + vCurrentTotal);
 		
-		statusBar.setTextPane2("Total: " + progressStep + "/" + progressTotal);
+		statusBar.setTextPane2(I18nUtil.message("total") + ": " + progressStep + "/" + progressTotal);
 	}
 
 	
 	@Override
 	public void receivedSetup(SetupAlgEvent evt) throws RemoteException {
 		// TODO Auto-generated method stub
+		if (evt.getType() == SetupAlgEvent.Type.doing)
+			this.paneWait.setVisible(true);
+		else if (evt.getType() == SetupAlgEvent.Type.done)
+			this.paneWait.setVisible(false);
+		
+		
 		Alg alg = evt.getAlg();
 		if (alg == null) return;
 		
@@ -1152,6 +1176,9 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 		catch (Throwable e) {
 			e.printStackTrace();
 		}
+		
+		//Added date: 2019.09.03 by Loc Nguyen.
+		this.paneWait.setVisible(false);
 	}
 	
 	
@@ -1209,6 +1236,14 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 		paneResult.setVisible(visible);
 		btnAnalyzeResult.setEnabled(visible);
 		btnCopyResult.setEnabled(visible);
+		
+		//Added date: 2019.09.03 by Loc Nguyen.
+		try {
+			//paneWait.setVisible(!visible && evaluator.remoteIsStarted());
+		} catch (Exception e) {
+			e.printStackTrace();
+			paneWait.setVisible(false);
+		}
 	}
 
 	

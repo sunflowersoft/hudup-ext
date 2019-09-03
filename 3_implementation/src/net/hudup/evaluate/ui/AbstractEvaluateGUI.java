@@ -1,6 +1,3 @@
-/**
- * 
- */
 package net.hudup.evaluate.ui;
 
 import java.io.IOException;
@@ -18,7 +15,7 @@ import net.hudup.core.Util;
 import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.Recommender;
 import net.hudup.core.alg.SetupAlgListener;
-import net.hudup.core.evaluate.AbstractEvaluator;
+import net.hudup.core.evaluate.EvaluatorAbstract;
 import net.hudup.core.evaluate.Evaluator;
 import net.hudup.core.evaluate.EvaluatorListener;
 import net.hudup.core.evaluate.EvaluatorProgressListener;
@@ -33,7 +30,7 @@ import net.hudup.core.logistic.ui.CounterClock;
 
 
 /**
- * This abstract class represents an abstract GUI to allow users to interact with {@link AbstractEvaluator}.
+ * This abstract class represents an abstract GUI to allow users to interact with {@link EvaluatorAbstract}.
  * 
  * @author Loc Nguyen
  * @version 10.0
@@ -124,7 +121,7 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	 */
 	protected I18nUtil i18n = null;
 	
-	
+
 	/**
 	 * Constructor with specified evaluator.
 	 * @param evaluator specified evaluator.
@@ -145,7 +142,6 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 		
 		this.evaluator = evaluator;
 		this.counterClock = new CounterClock();
-		
 	}
 	
 	
@@ -422,8 +418,8 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 			e.printStackTrace();
 		}
 	}
-	
-	
+
+
 }
 
 

@@ -30,8 +30,10 @@ import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
@@ -51,7 +53,7 @@ import net.hudup.core.data.Dataset;
 import net.hudup.core.data.DatasetPool;
 import net.hudup.core.data.DatasetUtil;
 import net.hudup.core.data.Pointer;
-import net.hudup.core.evaluate.AbstractEvaluator;
+import net.hudup.core.evaluate.EvaluatorAbstract;
 import net.hudup.core.evaluate.Evaluator;
 import net.hudup.core.evaluate.EvaluatorEvent;
 import net.hudup.core.evaluate.EvaluatorEvent.Type;
@@ -64,6 +66,7 @@ import net.hudup.core.logistic.Inspector;
 import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.xURI;
 import net.hudup.core.logistic.ui.UIUtil;
+import net.hudup.core.logistic.ui.WaitPanel;
 import net.hudup.data.DatasetUtil2;
 import net.hudup.data.ui.DatasetTextField;
 import net.hudup.data.ui.StatusBar;
@@ -71,7 +74,7 @@ import net.hudup.data.ui.TxtOutput;
 import net.hudup.evaluate.RecommendEvaluator;
 
 /**
- * This class represents a graphic user interface (GUI) for {@link AbstractEvaluator} with a pair of training dataset and testing dataset.
+ * This class represents a graphic user interface (GUI) for {@link EvaluatorAbstract} with a pair of training dataset and testing dataset.
  * This class is deprecated because it is less useful than the batch evaluator.
  * 
  * @author Loc Nguyen
@@ -128,6 +131,11 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 	protected JButton btnCopyResult = null;
 	
 	protected StatusBar statusBar = null;
+//	protected StatusBar2 statusBar = null;
+	/**
+	 * Waiting panel which is the alternative of testing result panel.
+	 */
+	protected WaitPanel paneWait = null; //Added date: 2019.09.03 by Loc Nguyen.
 
 	
 	/**
@@ -237,7 +245,32 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 		JPanel paneAlg = new JPanel();
 		up.add(paneAlg);
 		paneAlg.add(new JLabel(I18nUtil.message("algorithm") + ":"));
-		this.cmbAlgs = new AlgComboBox(algRegTable.getAlgList());
+		this.cmbAlgs = new AlgComboBox(algRegTable.getAlgList()) {
+
+			/**
+			 * Default serial version UID.
+			 */
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			protected void addToContextMenu(JPopupMenu contextMenu) {
+				// TODO Auto-generated method stub
+				super.addToContextMenu(contextMenu);
+
+				contextMenu.addSeparator();
+		    	
+				JMenuItem miTraining = UIUtil.makeMenuItem((String)null, "Training", 
+					new ActionListener() {
+						
+						@Override
+						public void actionPerformed(ActionEvent e) {
+							addTrainingSet();
+						}
+					});
+				contextMenu.add(miTraining);
+			}
+			
+		};
 		this.cmbAlgs.addItemListener(new ItemListener() {
 			
 			@Override
@@ -618,9 +651,19 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 		this.btnCopyResult.setMargin(new Insets(0, 0 , 0, 0));
 		toolbar.add(this.btnCopyResult);
 
+		
+		JPanel statusPane = new JPanel(new BorderLayout());
+		footer.add(statusPane, BorderLayout.SOUTH);
+
 		this.statusBar = new StatusBar();
-		this.counterClock.setTimeLabel(this.statusBar.getLastPane());
-		footer.add(statusBar, BorderLayout.SOUTH);
+		this.counterClock.setTimeTextPane(this.statusBar.getLastPane());
+		statusPane.add(this.statusBar, BorderLayout.CENTER);
+
+		//Added date: 2019.09.03 by Loc Nguyen.
+		this.paneWait = new WaitPanel();
+		statusPane.add(this.paneWait, BorderLayout.SOUTH);
+		this.paneWait.setWaitText(I18nUtil.message("setting_up_algorithm_please_wait"));
+		this.paneWait.setVisible(false);
 
 		return footer;
 	}
@@ -722,9 +765,42 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			updateMode();
 		}
 	}
 	
+	
+	/**
+	 * Adding training dataset.
+	 */
+	protected void addTrainingSet() {
+		try {
+			if (evaluator.remoteIsStarted())
+				return;
+			
+			DatasetPool pool = new DatasetPool();
+			new AddingTrainingDatasetNullTestingDatasetDlg(this, pool, Arrays.asList(getAlg()), evaluator.getMainUnit()).setVisible(true);
+			if (pool.size() == 0) {
+				JOptionPane.showMessageDialog(
+						this, 
+						"Training set not parsed", 
+						"Training set not parsed", 
+						JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+			
+			this.txtTrainingBrowse.setDataset(pool.get(0).getTraining());
+			this.txtTestingBrowse.setDataset(pool.get(0).getTesting());
+			
+			clearResult();
+			updateMode();
+		}
+		catch (Throwable e) {
+			e.printStackTrace();
+			updateMode();
+		}
+	}
+
 	
 	/**
 	 * Opening testing dataset.
@@ -802,6 +878,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			updateMode();
 		}
 	}
 
@@ -978,8 +1055,8 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 		}
 		
 		
-		//this.result = evt.getEvaluator().getResult();
-		this.result = evaluator.getResult(); //Fix bug date: 2019.08.06 by Loc Nguyen.
+		//this.result = evaluator.getResult();
+		this.result = evt.getMetrics(); //Fix bug date: 2019.09.04 by Loc Nguyen.
 		if (evt.getType() == Type.done) {
 			counterClock.stop();
 			updateMode();
@@ -1005,17 +1082,23 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			this.prgRunning.setValue(progressStep);
 		
 		statusBar.setTextPane1(
-				"Algorithm '" + algName + "' " +
-				"dataset '" + datasetId + "': " + 
+				I18nUtil.message("algorithm") + " '" + algName + "' " +
+				I18nUtil.message("dataset") + " '" + datasetId + "': " + 
 				vCurrentCount + "/" + vCurrentTotal);
-		
-		statusBar.setTextPane2("Total: " + progressStep + "/" + progressTotal);
+
+		statusBar.setTextPane2(I18nUtil.message("total") + ": " + progressStep + "/" + progressTotal);
 	}
 
 
 	@Override
 	public void receivedSetup(SetupAlgEvent evt) throws RemoteException {
 		// TODO Auto-generated method stub
+		if (evt.getType() == SetupAlgEvent.Type.doing)
+			this.paneWait.setVisible(true);
+		else if (evt.getType() == SetupAlgEvent.Type.done)
+			this.paneWait.setVisible(false);
+
+		
 		Alg alg = evt.getAlg();
 		if (alg == null) return;
 		
@@ -1150,6 +1233,9 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 		catch (Throwable e) {
 			e.printStackTrace();
 		}
+		
+		//Added date: 2019.09.03 by Loc Nguyen.
+		this.paneWait.setVisible(false);
 	}
 	
 	

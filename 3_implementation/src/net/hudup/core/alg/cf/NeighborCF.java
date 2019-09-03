@@ -62,10 +62,10 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 	public static final String MEASURE = "measure";
 	
 	
-//	/**
-//	 * Name of hybrid measure.
-//	 */
-//	public static final String HYBRID = "hybrid";
+	/**
+	 * Name of hybrid measure.
+	 */
+	public static final String HYBRID = "hybrid";
 
 	
 	/**
@@ -1175,6 +1175,7 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 		DataConfig tempConfig = super.createDefaultConfig();
 		tempConfig.put(SUPPORT_CACHE_FIELD, SUPPORT_CACHE_DEFAULT);
 		tempConfig.put(MEASURE, getDefaultMeasure());
+		tempConfig.put(HYBRID, false);tempConfig.addReadOnly(HYBRID);
 		tempConfig.put(COSINE_NORMALIZED_FIELD, COSINE_NORMALIZED_DEFAULT);
 		tempConfig.put(MSD_FRACTION_FIELD, MSD_FRACTION_DEFAULT);
 

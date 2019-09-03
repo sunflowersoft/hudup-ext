@@ -3,6 +3,7 @@ package net.hudup.core.logistic.ui;
 import javax.swing.JLabel;
 
 import net.hudup.core.logistic.AbstractRunner;
+import net.hudup.core.logistic.I18nUtil;
 
 
 /**
@@ -19,7 +20,7 @@ public class CounterClock extends AbstractRunner {
 	/**
 	 * The text form of this counter clock &quot;hours: minutes: seconds&quot;.
 	 */
-	public static final String TIME_FORMAT = "Time %d:%d:%d";
+	public static final String TIME_FORMAT = I18nUtil.message("time") + " %d:%d:%d";
 	
 	
 	/**
@@ -29,9 +30,9 @@ public class CounterClock extends AbstractRunner {
 	
 	
 	/**
-	 * The label to show the counter in text form &quot;hours: minutes: seconds&quot;.
+	 * The text pane to show the counter in text form &quot;hours: minutes: seconds&quot;.
 	 */
-	protected JLabel lblTime = null;
+	protected JLabel txtTime = null;
 	
 	
 	/**
@@ -55,22 +56,22 @@ public class CounterClock extends AbstractRunner {
 	
 	
 	/**
-	 * Constructor with the specified label for showing the counter in text form &quot;hours: minutes: seconds&quot;.
-	 * @param lblTime specified label.
+	 * Constructor with the specified text pane for showing the counter in text form &quot;hours: minutes: seconds&quot;.
+	 * @param txtTime specified text pane.
 	 */
-	public CounterClock(JLabel lblTime) {
+	public CounterClock(JLabel txtTime) {
 		this();
 		
-		setTimeLabel(lblTime);
+		setTimeTextPane(txtTime);
 	}
 	
 	
 	/**
-	 * Setting the label for showing the counter in text form &quot;hours: minutes: seconds&quot;.
-	 * @param lblTime label for showing the counter in text form &quot;hours: minutes: seconds&quot;.
+	 * Setting the text pane for showing the counter in text form &quot;hours: minutes: seconds&quot;.
+	 * @param txtTime text pane for showing the counter in text form &quot;hours: minutes: seconds&quot;.
 	 */
-	public void setTimeLabel(JLabel lblTime) {
-		this.lblTime = lblTime;
+	public void setTimeTextPane(JLabel txtTime) {
+		this.txtTime = txtTime;
 	}
 	
 	
@@ -147,7 +148,7 @@ public class CounterClock extends AbstractRunner {
 	 * clearing the text of elapsed time as empty text.
 	 */
 	public synchronized void clearText() {
-		lblTime.setText("");
+		txtTime.setText("");
 	}
 	
 	
@@ -165,7 +166,7 @@ public class CounterClock extends AbstractRunner {
 		long seconds = (timeSum % 3600) % 60;
 		String text = String.format(TIME_FORMAT, hours, minutes, seconds);
 		
-		lblTime.setText(text);
+		txtTime.setText(text);
 	}
 	
 	

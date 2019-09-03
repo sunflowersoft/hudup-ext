@@ -23,6 +23,12 @@ public class NullPointer extends Pointer {
 
 	
 	/**
+	 * Null pointer name.
+	 */
+	public final static String NULL_POINTER = "(null)";
+	
+	
+	/**
 	 * Default constructor.
 	 */
 	public NullPointer() {

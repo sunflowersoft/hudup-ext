@@ -28,7 +28,7 @@ import net.hudup.core.data.ctx.ContextTemplateSchema;
  * @version 10.0
  *
  */
-public abstract class Pointer extends AbstractDataset {
+public abstract class Pointer extends DatasetAbstract {
 
 	
 	/**

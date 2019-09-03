@@ -15,7 +15,7 @@ import net.hudup.core.data.DatasetPair;
 import net.hudup.core.data.Fetcher;
 import net.hudup.core.data.Profile;
 import net.hudup.core.data.RatingVector;
-import net.hudup.core.evaluate.AbstractEvaluator;
+import net.hudup.core.evaluate.EvaluatorAbstract;
 import net.hudup.core.evaluate.EvaluatorEvent;
 import net.hudup.core.evaluate.EvaluatorEvent.Type;
 import net.hudup.core.evaluate.EvaluatorProgressEvent;
@@ -33,7 +33,7 @@ import net.hudup.core.logistic.xURI;
 
 
 /**
- * {@link AbstractEvaluator} is one of main classes of Hudup framework, which is responsible for executing and evaluation algorithms according to built-in and user-defined metrics.
+ * {@link EvaluatorAbstract} is one of main classes of Hudup framework, which is responsible for executing and evaluation algorithms according to built-in and user-defined metrics.
  * Such metrics implement by {@code Metric} interface. As an evaluator of any recommendation algorithm, {@code Evaluator} is the bridge between {@code Dataset} and {@code Recommender} and it has six roles:
  * <ol>
  * <li>
@@ -97,7 +97,7 @@ import net.hudup.core.logistic.xURI;
  * @version 10.0
  *
  */
-public class RecommendEvaluator extends AbstractEvaluator {
+public class RecommendEvaluator extends EvaluatorAbstract {
 
 	
     /**
@@ -138,6 +138,9 @@ public class RecommendEvaluator extends AbstractEvaluator {
 					// Adding default metrics to metric result
 					result.add( recommender.getName(), datasetId, datasetUri, ((NoneWrapperMetricList)metricList.clone()).sort().list() );
 					
+					recommender.addSetupListener(this);
+					SetupAlgEvent setupEvt = new SetupAlgEvent(new Integer(-1), SetupAlgEvent.Type.doing, null, null, "not supported yet");
+					fireSetupAlgEvent(setupEvt);
 					
 					long beginSetupTime = System.currentTimeMillis();
 					//
@@ -153,6 +156,10 @@ public class RecommendEvaluator extends AbstractEvaluator {
 						); // calculating setup time metric
 					//Fire doing event with setup time metric.
 					fireEvaluatorEvent(new EvaluatorEvent(this, Type.doing, setupMetrics)); // firing setup time metric
+					
+					setupEvt = new SetupAlgEvent(new Integer(-1), SetupAlgEvent.Type.done, null, null, "not supported yet");
+					fireSetupAlgEvent(setupEvt);
+					recommender.removeSetupListener(this);
 					
 					//Initializing parameters for setting up maximum recommendation number by binomial distribution. Added date: 2019.08.23 by Loc Nguyen.
 					double relevantSparseRatio = 0;
@@ -569,11 +576,4 @@ public class RecommendEvaluator extends AbstractEvaluator {
 	}
 
 
-	@Override
-	public void receivedSetup(SetupAlgEvent evt) throws RemoteException {
-		// TODO Auto-generated method stub
-		throw new RuntimeException("Do not support this method");
-	}
-	
-	
 }

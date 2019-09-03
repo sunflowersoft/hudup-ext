@@ -12,16 +12,21 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
+import javax.swing.WindowConstants;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.DatasetMetadata2;
+import net.hudup.core.data.Provider;
 import net.hudup.core.data.ui.ProfileTable;
 import net.hudup.core.logistic.ui.UIUtil;
+import net.hudup.data.ProviderImpl;
 import net.hudup.data.ctx.ui.CTSviewer;
 
 
@@ -213,6 +218,39 @@ public class DatasetViewer extends JDialog {
 		});
 		buttons.add(refresh);
 		
+		JButton export = new JButton("Export");
+		export.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				JDialog exportDlg = new JDialog(UIUtil.getFrameForComponent(comp), "Export", true);
+				exportDlg.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+				exportDlg.setSize(500, 300);
+				exportDlg.setLocationRelativeTo(UIUtil.getFrameForComponent(comp));
+				
+				DatasetExporter exporter = new DatasetExporter();
+				exportDlg.addWindowListener(new WindowAdapter() {
+
+					@Override
+					public void windowClosing(WindowEvent e) {
+						// TODO Auto-generated method stub
+						try {
+							exporter.dispose();
+						}
+						catch (Throwable ex) {
+							ex.printStackTrace();
+						}
+					}
+					
+				});
+				exportDlg.add(exporter);
+				
+				exportDlg.setVisible(true);
+			}
+		});
+		buttons.add(export);
+
 		JButton close = new JButton("Close");
 		close.addActionListener(new ActionListener() {
 			
@@ -335,6 +373,103 @@ public class DatasetViewer extends JDialog {
 	private void clear() {
 		if (paneRatingMatrix != null)
 			paneRatingMatrix.clear();
+	}
+	
+	
+	/**
+	 * This class shows a GUI which allows users to export dataset.
+	 * @author Loc Nguyen
+	 * @version 12.0
+	 */
+	private class DatasetExporter extends net.hudup.data.ui.toolkit.DatasetExporter {
+
+		/**
+		 * Default serial version UID.
+		 */
+		private static final long serialVersionUID = 1L;
+
+		/**
+		 * Default constructor.
+		 */
+		DatasetExporter() {
+			super();
+			btnSource.setVisible(false);
+			
+			txtSource.setConfig(dataset.getConfig());
+			txtSource.setVisible(false);
+		}
+		
+		@Override
+		protected void enableControls(boolean flag) {
+			DataConfig destConfig = (DataConfig) txtDestination.getConfig();
+			boolean flag2 = destConfig != null;
+			
+			btnSource.setEnabled(flag);
+			txtSource.setEnabled(flag);
+			btnDestination.setEnabled(flag);
+			txtDestination.setEnabled(flag);
+			btnExport.setEnabled(flag && flag2);
+			prgRunning.setEnabled(flag && flag2);
+			
+		}
+
+		
+		@Override
+		protected void exportData() {
+			// TODO Auto-generated method stub
+			final DataConfig destConfig = (DataConfig) txtDestination.getConfig();
+			
+			if (destConfig == null) {
+				JOptionPane.showMessageDialog(
+						this, 
+						"There is no configuration", 
+						"No config", 
+						JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+			
+			if (dataset.getConfig().getUriId().equals(destConfig.getUriId())) {
+				JOptionPane.showMessageDialog(
+						this, 
+						"Source and destination are the same place", 
+						"Source and destination are the same place", 
+						JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+			
+			destConfig.fillUnitList(DataConfig.getDefaultUnitList());
+			
+			enableControls(false);
+			prgRunning.setValue(0);
+			prgRunning.setVisible(true);
+			runningThread = new Thread() {
+
+				@Override
+				public void run() {
+					// TODO Auto-generated method stub
+					super.run();
+					
+					Provider provider = new ProviderImpl(destConfig);
+					provider.importData(dataset, true, getThisExporter());
+					provider.close();
+					
+					JOptionPane.showMessageDialog(
+							getThisExporter(), 
+							"Export successfully", 
+							"Export successfully", 
+							JOptionPane.INFORMATION_MESSAGE);
+					
+					enableControls(true);
+					prgRunning.setVisible(false);
+					
+					runningThread = null;
+				}
+				
+			};
+			
+			runningThread.start();
+		}
+		
 	}
 	
 	

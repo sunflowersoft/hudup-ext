@@ -2,6 +2,8 @@ package net.hudup.core.evaluate;
 
 import java.util.EventObject;
 
+import net.hudup.core.logistic.NextUpdate;
+
 
 /**
  * This class represents an event for monitoring the progress of evaluation task in evaluator.
@@ -22,7 +24,7 @@ public class EvaluatorProgressEvent extends EventObject {
 	/**
 	 * Referred evaluator.
 	 */
-	protected AbstractEvaluator evaluator = null;
+	protected Evaluator evaluator = null;
 
 	
 	/**
@@ -67,9 +69,10 @@ public class EvaluatorProgressEvent extends EventObject {
 	 * @param progressTotal total number of steps in progress.
 	 * @param progressStep current step.
 	 */
-	public EvaluatorProgressEvent(AbstractEvaluator evaluator, int progressTotal, int progressStep) {
-		super(evaluator);
-		// TODO Auto-generated constructor stub
+	@NextUpdate
+	public EvaluatorProgressEvent(Evaluator evaluator, int progressTotal, int progressStep) {
+//		super(evaluator); //Test different hosts for RMI, evaluator wrapper can solve.
+		super(new Integer(1)); //Not use evaluator because of improving network speed.
 		
 		this.progressTotal = progressTotal;
 		this.progressStep = progressStep;
@@ -78,10 +81,16 @@ public class EvaluatorProgressEvent extends EventObject {
 	
 	/**
 	 * Getting evaluator.
-	 * @return {@link AbstractEvaluator}.
+	 * @return evaluator.
 	 */
-	public AbstractEvaluator getEvaluator() {
-		return (AbstractEvaluator)getSource();
+	@SuppressWarnings("unused")
+	@Deprecated
+	private Evaluator getEvaluator() {
+		Object source = getSource();
+		if (source instanceof Evaluator)
+			return (Evaluator)source;
+		else
+			return null;
 	}
 	
 	

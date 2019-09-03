@@ -4,8 +4,6 @@ import java.rmi.RemoteException;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.swing.event.EventListenerList;
-
 import net.hudup.core.Util;
 import net.hudup.core.alg.SetupAlgEvent.Type;
 import net.hudup.core.data.AttributeList;
@@ -43,13 +41,6 @@ public abstract class ExecutableAlgAbstract extends AlgAbstract implements Execu
 	protected Fetcher<Profile> sample = null;
 	
 	
-	/**
-	 * Holding a list of listeners.
-	 * 
-	 */
-    protected EventListenerList listenerList = new EventListenerList();
-    
-
 	/**
      * Default constructor.
      */
@@ -121,40 +112,6 @@ public abstract class ExecutableAlgAbstract extends AlgAbstract implements Execu
 	}
 
 	
-//	/**
-//	 * Getting parameter of the algorithm. Actually, this method call {@link #getParameter()}.
-//	 * @return parameter of the algorithm. Return null if the algorithm does not run yet or run failed. 
-//	 */
-//	protected Object queryParameter() {
-//		try {
-//			return getParameter();
-//		} catch (Throwable e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-//		
-//		return null;
-//	}
-	
-	
-//    /**
-//	 * Getting description of this algorithm.
-//	 * This is remote method.
-//	 * @return text form of this model.
-//	 */
-//	protected String getDescription0() {
-//		// TODO Auto-generated method stub
-//		try {
-//			return getDescription();
-//		} catch (Exception e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-//		
-//		return "";
-//	}
-
-
 	@Override
 	public synchronized Inspector getInspector() {
 		// TODO Auto-generated method stub
@@ -167,54 +124,6 @@ public abstract class ExecutableAlgAbstract extends AlgAbstract implements Execu
 	}
 
 	
-	@Override
-	public void addSetupListener(SetupAlgListener listener) throws RemoteException {
-		// TODO Auto-generated method stub
-		synchronized (listenerList) {
-			listenerList.add(SetupAlgListener.class, listener);
-		}
-	}
-
-
-	@Override
-	public void removeSetupListener(SetupAlgListener listener) throws RemoteException {
-		// TODO Auto-generated method stub
-		synchronized (listenerList) {
-			listenerList.remove(SetupAlgListener.class, listener);
-		}
-	}
-
-
-	/**
-	 * Getting an array of listeners for this EM.
-	 * @return array of listeners for this EM.
-	 */
-	protected SetupAlgListener[] getSetupListeners() {
-		// TODO Auto-generated method stub
-		synchronized (listenerList) {
-			return listenerList.getListeners(SetupAlgListener.class);
-		}
-	}
-
-
-    /**
-     * Firing (issuing) an event from this EM to all listeners. 
-     * @param evt event from this EM.
-     */
-	protected void fireSetupEvent(SetupAlgEvent evt) {
-		// TODO Auto-generated method stub
-		SetupAlgListener[] listeners = getSetupListeners();
-		for (SetupAlgListener listener : listeners) {
-			try {
-				listener.receivedSetup(evt);
-			}
-			catch (Throwable e) {
-				e.printStackTrace();
-			}
-		}
-	}
-
-
 	/**
 	 * Getting attribute list of sample.
 	 * @param sample specified sample.
@@ -244,6 +153,15 @@ public abstract class ExecutableAlgAbstract extends AlgAbstract implements Execu
 		return attList;
 	}
 	
+	
+	/**
+	 * Getting stub as remote executable algorithm.
+	 * @return stub as remote executable algorithm.
+	 */
+	public ExecutableAlgRemote getStubExecutableAlg() {
+		return (ExecutableAlgRemote)stub;
+	}
+
 	
 	@Override
 	protected void finalize() throws Throwable {

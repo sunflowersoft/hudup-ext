@@ -1448,7 +1448,7 @@ public class ProviderImpl implements Provider {
 			ProgressListener registeredListener) {
 		// TODO Auto-generated method stub
 		
-		int progressTotal = 6;
+		int progressTotal = 7;
 		int progressStep = 0;
 		
 		boolean result = true;
@@ -1461,13 +1461,13 @@ public class ProviderImpl implements Provider {
 		}
 		else {
 			
-			// Importing context template schema
-			try {
-				this.ctsManager.importCTSchema(src.getCTSManager());
-			}
-			catch (Throwable e) {
-				e.printStackTrace();
-			}
+//			// Importing context template schema
+//			try {
+//				this.ctsManager.importCTSchema(src.getCTSManager());
+//			}
+//			catch (Throwable e) {
+//				e.printStackTrace();
+//			}
 			
 			// Importing user and item attributes
 			try {
@@ -1702,7 +1702,19 @@ public class ProviderImpl implements Provider {
 				new ProgressEvent(this, progressTotal, ++progressStep, "Ratings inserted"));
 
 		
-		// 6. Inserting samples
+		// 6. Importing context template schema
+		try {
+			this.ctsManager.importCTSchema(src.getCTSManager());
+		}
+		catch (Throwable e) {
+			e.printStackTrace();
+		}
+		if (registeredListener != null)
+			registeredListener.receiveProgress(
+				new ProgressEvent(this, progressTotal, ++progressStep, "Context template schema imported"));
+
+		
+		// 7. Inserting samples
 		Fetcher<Profile> sampleProfiles = src.getProfiles(srcConfig.getSampleUnit(), null);
 		try {
 			deleteUnitData(thisConfig.getSampleUnit());
@@ -1748,7 +1760,7 @@ public class ProviderImpl implements Provider {
 		if (src instanceof Pointer)
 			return importData(new ProviderImpl(src.getConfig()), create, registeredListener);
 		
-		int progressTotal = 5;
+		int progressTotal = 7;
 		int progressStep = 0;
 		
 		boolean result = true;
@@ -1761,13 +1773,13 @@ public class ProviderImpl implements Provider {
 		}
 		else {
 			
-			// Importing context template schema
-			try {
-				this.ctsManager.importCTSchema(src);
-			}
-			catch (Throwable e) {
-				e.printStackTrace();
-			}
+//			// Importing context template schema
+//			try {
+//				this.ctsManager.importCTSchema(src);
+//			}
+//			catch (Throwable e) {
+//				e.printStackTrace();
+//			}
 			
 			// Importing user and item attributes
 			try {
@@ -2013,7 +2025,19 @@ public class ProviderImpl implements Provider {
 				new ProgressEvent(this, progressTotal, ++progressStep, "Ratings inserted"));
 
 		
-		// 6. Inserting samples
+		// 6. Importing context template schema
+		try {
+			this.ctsManager.importCTSchema(src);
+		}
+		catch (Throwable e) {
+			e.printStackTrace();
+		}
+		if (registeredListener != null)
+			registeredListener.receiveProgress(
+				new ProgressEvent(this, progressTotal, ++progressStep, "Context template schema imported"));
+
+		
+		// 7. Inserting samples
 		Fetcher<Profile> sampleProfiles = src.fetchSample();
 		try {
 			deleteUnitData(thisConfig.getSampleUnit());

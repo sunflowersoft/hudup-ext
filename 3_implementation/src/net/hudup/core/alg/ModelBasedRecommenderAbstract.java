@@ -92,8 +92,14 @@ public abstract class ModelBasedRecommenderAbstract extends RecommenderAbstract 
 		KBase kb = createKB();
 		kb.setConfig((DataConfig)config.clone());
 		
-		if (dataset instanceof KBasePointer)
+		if (dataset instanceof KBasePointer) {
+			xURI pointerStoreUri = dataset.getConfig().getStoreUri();
+			if (pointerStoreUri != null && !pointerStoreUri.equals(kb.getConfig().getStoreUri())) {
+				kb.getConfig().setStoreUri(pointerStoreUri); //Also affect store URI of algorithm.
+			}
+
 			kb.load();
+		}
 		else if (!(dataset instanceof Pointer))
 			kb.learn(dataset, this);
 		

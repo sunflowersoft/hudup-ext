@@ -178,6 +178,11 @@ public final class SystemUtil {
 			if ( (modifiers & Modifier.ABSTRACT) != 0 || (modifiers & Modifier.PUBLIC) == 0)
 				continue;
 			
+			if (apClass.getAnnotation(BaseClass.class) != null || 
+					apClass.getAnnotation(Deprecated.class) != null) {
+				continue;
+			}
+
 			try {
 				T instance = Util.newInstance(apClass);
 				instances.add(instance);

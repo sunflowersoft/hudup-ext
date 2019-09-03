@@ -96,7 +96,7 @@ public class CTSviewer extends JXTreeTable {
 	 */
 	private JPopupMenu createContextMenu() {
 		final ContextTemplate template = getSelectedTemplate();
-		if (template.getProfileAttributes().size() == 0)
+		if (template == null || template.getProfileAttributes().size() == 0)
 			return null;
 		
 		JPopupMenu contextMenu = new JPopupMenu();

@@ -133,6 +133,15 @@ public abstract class RecommenderAbstract extends AlgAbstract implements Recomme
 	}
 
 	
+	/**
+	 * Getting stub as remote recommender.
+	 * @return stub as remote recommender.
+	 */
+	public RecommenderRemote getStubRecommender() {
+		return (RecommenderRemote)stub;
+	}
+
+	
 	@Override
 	protected void finalize() throws Throwable {
 		// TODO Auto-generated method stub
