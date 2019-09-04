@@ -1,5 +1,7 @@
 package net.hudup.server.external;
 
+import java.rmi.RemoteException;
+
 import net.hudup.core.alg.Alg;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Dataset;
@@ -31,7 +33,7 @@ public class SemiScannerParserExt extends SemiScannerParser {
 
 	
 	@Override
-	public Dataset parse(DataConfig config) {
+	public Dataset parse(DataConfig config) throws RemoteException {
 		// TODO Auto-generated method stub
 		
 		config.setParser(this);

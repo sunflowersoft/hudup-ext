@@ -290,7 +290,7 @@ public class DatasetPoolTable extends JTable {
 								
 								ModelBasedRecommender recommender = (ModelBasedRecommender) alg.newInstance();
 								KBase kbase = recommender.newKBase(dataset);
-								kbase.view(getThis());
+								kbase.getInspector().inspect();
 								kbase.close();
 							}
 							catch (Throwable ex) {

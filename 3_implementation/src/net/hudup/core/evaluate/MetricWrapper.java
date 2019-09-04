@@ -51,13 +51,13 @@ public class MetricWrapper extends MetricAbstract {
 	
 	
 	/**
-	 * Identifier (ID) referred by {@link #datasetId} of the dataset used to evaluate the algorithm.
+	 * Identifier (ID) referred by {@link #datasetId} of (testing) dataset used to evaluate the algorithm.
 	 */
 	protected int datasetId = -1;
 	
 	
 	/**
-	 * URI (referred by {@link #datasetUri}) of the dataset used to evaluate the algorithm.
+	 * URI (referred by {@link #datasetUri}) of (testing) dataset used to evaluate the algorithm.
 	 */
 	protected xURI datasetUri = null;
 	
@@ -91,7 +91,7 @@ public class MetricWrapper extends MetricAbstract {
 	 * Setting up this meta metric with specified metric, algorithm name, and dataset identifier.
 	 * @param metric specified metric.
 	 * @param algName specified algorithm name.
-	 * @param datasetId specified dataset identifier.
+	 * @param datasetId specified (testing) dataset identifier.
 	 * @throws RemoteException if any error raises.
 	 */
 	public void setup(Metric metric, String algName, int datasetId) throws RemoteException {
@@ -177,7 +177,7 @@ public class MetricWrapper extends MetricAbstract {
 	
 	
 	/**
-	 * Getting identifier of the dataset used to evaluate the algorithm.
+	 * Getting identifier of (testing) dataset used to evaluate the algorithm.
 	 * @return dataset id.
 	 */
 	public int getDatasetId() {
@@ -186,8 +186,8 @@ public class MetricWrapper extends MetricAbstract {
 	
 	
 	/**
-	 * Getting URI of the dataset used to evaluate the algorithm.
-	 * @return URI of the dataset used to evaluate the algorithm.
+	 * Getting URI of (testing) dataset used to evaluate the algorithm.
+	 * @return URI of (testing) dataset used to evaluate the algorithm.
 	 */
 	public xURI getDatasetUri() {
 		return datasetUri;
@@ -195,7 +195,7 @@ public class MetricWrapper extends MetricAbstract {
 	
 	
 	/**
-	 * Setting URI of the dataset used to evaluate the algorithm.
+	 * Setting URI of (testing) dataset used to evaluate the algorithm.
 	 * @param uri specified URI.
 	 */
 	public void setDatasetUri(xURI uri) {
@@ -211,13 +211,13 @@ public class MetricWrapper extends MetricAbstract {
 
 
 	/**
-	 * Creating a metric wrapper with specified internal metric, algorithm name, identifier of dataset, and URI of dataset.
+	 * Creating a metric wrapper with specified internal metric, algorithm name, identifier of (testing) dataset, and URI of (testing) dataset.
 	 * This method is used to construct a metric wrapper. 
 	 * @param metric specified internal metric actually calculates measure for evaluating an algorithm.
 	 * @param algName specified name of the algorithm on which the internal metric evaluates.
-	 * @param datasetId specified identifier (ID) of the dataset used to evaluate the algorithm.
-	 * @param datasetUri specified URI of the dataset used to evaluate the algorithm.
-	 * @return new metric wrapper with specified internal metric, algorithm name, identifier of dataset, and URI of dataset.
+	 * @param datasetId specified identifier (ID) of (testing) dataset used to evaluate the algorithm.
+	 * @param datasetUri specified URI of (testing) dataset used to evaluate the algorithm.
+	 * @return new metric wrapper with specified internal metric, algorithm name, identifier of (testing) dataset, and URI of (testing) dataset.
 	 * @throws RemoteException if any error raises.
 	 */
 	public static MetricWrapper create(Metric metric, String algName, int datasetId, xURI datasetUri) throws RemoteException {
@@ -235,12 +235,12 @@ public class MetricWrapper extends MetricAbstract {
 	
 	/**
 	 * 
-	 * Creating a metric wrapper with specified internal metric, algorithm name, and identifier of dataset.
+	 * Creating a metric wrapper with specified internal metric, algorithm name, and identifier of (testing) dataset.
 	 * This method is used to construct a metric wrapper. 
 	 * @param metric specified internal metric actually calculates measure for evaluating an algorithm.
 	 * @param algName specified name of the algorithm on which the internal metric evaluates.
-	 * @param datasetId specified identifier (ID) of the dataset used to evaluate the algorithm.
-	 * @return new metric wrapper with specified internal metric, algorithm name, and identifier of dataset.
+	 * @param datasetId specified identifier (ID) of (testing) dataset used to evaluate the algorithm.
+	 * @return new metric wrapper with specified internal metric, algorithm name, and identifier of (testing) dataset.
 	 * @throws RemoteException if any error raises.
 	 */
 	public static MetricWrapper create(Metric metric, String algName, int datasetId) throws RemoteException {

@@ -27,7 +27,7 @@ public interface MetricRemote extends AlgRemote {
 	 * @param params specified array of objects known as parameters. The parameters should be serializable.
 	 * @throws RemoteException if any error raises.
 	 */
-	void setup(Object... params) throws RemoteException;
+	void setup(Object...params) throws RemoteException;
 	
 	
 	/**
@@ -63,7 +63,7 @@ public interface MetricRemote extends AlgRemote {
 	 * @return whether calculating successfully
 	 * @throws RemoteException if any error raises.
 	 */
-	boolean recalc(Object... params) throws RemoteException;
+	boolean recalc(Object...params) throws RemoteException;
 	
 	
 	/**

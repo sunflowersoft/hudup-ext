@@ -65,9 +65,11 @@ public class DataDriverComboBox extends JComboBox<DataDriver> {
 		this.removeAllItems();
 		
 		for (int i = 0; i < dataDriverList.size(); i++) {
-			DataDriver dataDriver = dataDriverList.get(i);
-			if (parser == null || parser.support(dataDriver))
-				this.addItem(dataDriver);
+			try {
+				DataDriver dataDriver = dataDriverList.get(i);
+				if (parser == null || parser.support(dataDriver))
+					this.addItem(dataDriver);
+			} catch (Throwable e) {e.printStackTrace();}
 		}
 		
 	}

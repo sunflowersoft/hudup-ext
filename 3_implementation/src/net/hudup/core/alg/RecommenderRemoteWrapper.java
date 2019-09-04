@@ -117,11 +117,22 @@ public class RecommenderRemoteWrapper extends AlgRemoteWrapper implements Recomm
 			Recommender newRecommender = (Recommender) ((Recommender)remoteAlg).newInstance();
 			return new RecommenderRemoteWrapper(newRecommender, exclusive);
 		}
-		else
-			return super.newInstance();
+		else {
+			logger.warn("newInstance() returns itselfs and so does not return new object");
+			return this;
+		}
 	}
 
 	
+	/**
+	 * Getting exported recommender.
+	 * @return exported recommender.
+	 */
+	public RecommenderRemote getExportedRecommender() {
+		return (RecommenderRemote)exportedStub;
+	}
+
+
 	@Override
 	public synchronized void unexport() throws RemoteException {
 		// TODO Auto-generated method stub
@@ -133,13 +144,4 @@ public class RecommenderRemoteWrapper extends AlgRemoteWrapper implements Recomm
 	}
 
 	
-	/**
-	 * Getting stub as remote recommender.
-	 * @return stub as remote recommender.
-	 */
-	public RecommenderRemote getStubRecommender() {
-		return (RecommenderRemote)stub;
-	}
-
-
 }

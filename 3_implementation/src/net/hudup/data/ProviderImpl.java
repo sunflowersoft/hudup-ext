@@ -2089,8 +2089,14 @@ public class ProviderImpl implements Provider {
 			return importData(provider, create, registeredListener);
 		}
 		else {
-			Dataset dataset = parser.parse(src);
-			return importData(dataset, create, registeredListener);
+			try {
+				Dataset dataset = parser.parse(src);
+				return importData(dataset, create, registeredListener);
+			}
+			catch (Throwable e) {
+				e.printStackTrace();
+				return false;
+			}
 		}
 	}
 

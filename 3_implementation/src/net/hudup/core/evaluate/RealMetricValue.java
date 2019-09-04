@@ -48,7 +48,7 @@ public class RealMetricValue implements MetricValue {
 
 	
 	@Override
-	public void accum(MetricValue metricValue)  throws RemoteException {
+	public void accum(MetricValue metricValue) throws RemoteException {
 		// TODO Auto-generated method stub
 		if (metricValue == null || !metricValue.isUsed())
 			return;

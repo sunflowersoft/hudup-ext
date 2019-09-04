@@ -1,6 +1,7 @@
 package net.hudup.parser;
 
 import java.io.BufferedReader;
+import java.rmi.RemoteException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.List;
@@ -25,6 +26,7 @@ import net.hudup.core.data.Rating;
 import net.hudup.core.data.RatingVector;
 import net.hudup.core.data.UserRating;
 import net.hudup.core.data.ctx.CTSMemMultiProfiles;
+import net.hudup.core.data.ctx.ContextTemplateSchemaImpl;
 import net.hudup.core.logistic.DSUtil;
 import net.hudup.core.logistic.LineProcessor;
 import net.hudup.core.logistic.UriAdapter;
@@ -33,7 +35,6 @@ import net.hudup.core.parser.SnapshotParser;
 import net.hudup.core.parser.TextParserUtil;
 import net.hudup.data.DatasetUtil2;
 import net.hudup.data.SnapshotImpl;
-import net.hudup.data.ctx.ContextTemplateSchemaImpl;
 
 
 /**
@@ -61,7 +62,7 @@ public class MovielensParser extends SnapshotParser {
 	
 	
 	@Override
-	public Dataset parse(DataConfig config) {
+	public Dataset parse(DataConfig config) throws RemoteException {
 		
 		Map<Integer, RatingVector> userRatingMap = Util.newMap();
 		Map<Integer, RatingVector> itemRatingMap = Util.newMap();
@@ -124,7 +125,7 @@ public class MovielensParser extends SnapshotParser {
 
 	
 	@Override
-	public boolean support(DataDriver driver) {
+	public boolean support(DataDriver driver) throws RemoteException {
 		// TODO Auto-generated method stub
 		
 		return driver.isFlatServer();
@@ -699,12 +700,17 @@ public class MovielensParser extends SnapshotParser {
 	
 
 	@Override
+	public String getDescription() throws RemoteException {
+		// TODO Auto-generated method stub
+		return "Movielens parser";
+	}
+
+
+	@Override
 	public Alg newInstance() {
 		// TODO Auto-generated method stub
 		return new MovielensParser();
 	}
 
-	
-	
 	
 }

@@ -16,9 +16,11 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.WindowConstants;
@@ -54,6 +56,24 @@ public class DatasetConfigurator extends JDialog {
 	 * Serial version UID for serializable class. 
 	 */
 	private static final long serialVersionUID = 1L;
+	
+	
+	/**
+	 * Setting array.
+	 */
+	protected static final Object[][] settings = {
+			{DataConfig.ACCOUNT_UNIT, "Set account", true},
+			{DataConfig.ATTRIBUTE_MAP_UNIT, "Set attribute", true},
+			{DataConfig.CONFIG_UNIT, "Set config", true},
+			{DataConfig.CONTEXT_UNIT, "Set context", true},
+			{DataConfig.CONTEXT_TEMPLATE_UNIT, "Set ctx template", true},
+			{DataConfig.ITEM_UNIT, "Set item", true},
+			{DataConfig.NOMINAL_UNIT, "Set nominal", true},
+			{DataConfig.RATING_UNIT, "Set rating", true},
+			{DataConfig.USER_UNIT, "Set user", true},
+			{DataConfig.SAMPLE_UNIT, "Set sample", true},
+		};
+	
 	
 	/**
 	 * Host text field.
@@ -190,126 +210,57 @@ public class DatasetConfigurator extends JDialog {
 		body.add(left, BorderLayout.WEST);
 		
 		left.add(new JLabel("List of units"), BorderLayout.NORTH);
-		lbUnits = new UnitListBox();
+		lbUnits = new UnitListBoxExt() {
+
+			/**
+			 * Default serial version UID.
+			 */
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			protected JPopupMenu createContextMenu() {
+				// TODO Auto-generated method stub
+				if (config == null || getSelectedValue() == null) return null;
+				
+				JPopupMenu ctxMenu = new JPopupMenu();
+				for (int i = 0; i < settings.length; i++) {
+					final int index = i;
+					JMenuItem mi = UIUtil.makeMenuItem((String)null, (String)settings[index][1], 
+							new ActionListener() {
+								
+								@Override
+								public void actionPerformed(ActionEvent e) {
+									setUnit((String)settings[index][0]);
+								}
+							});
+					ctxMenu.add(mi);
+				}
+				
+				return ctxMenu;
+			}
+			
+		};
 		left.add(new JScrollPane(lbUnits), BorderLayout.CENTER);
 		
 		JPanel buttons = new JPanel();
 		buttons.setLayout(new GridLayout(0, 1));
 		left.add(buttons, BorderLayout.EAST);
 		
-		JButton setAccount = new JButton("Set account");
-		setAccount.addActionListener(new ActionListener() {
+		for (int i = 0; i < settings.length; i++) {
+			final int index = i;
+			if (!(boolean)settings[index][2]) continue;
 			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
-				setUnit(DataConfig.ACCOUNT_UNIT);
-			}
-		});
-		buttons.add(setAccount);
-
-
-		JButton setAttributeMap = new JButton("Set attribute");
-		setAttributeMap.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
-				setUnit(DataConfig.ATTRIBUTE_MAP_UNIT);
-			}
-		});
-		buttons.add(setAttributeMap);
-
-		
-		JButton setConfig = new JButton("Set config");
-		setConfig.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
-				setUnit(DataConfig.CONFIG_UNIT);
-			}
-		});
-		buttons.add(setConfig);
-		
-		JButton setContext = new JButton("Set context");
-		setContext.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
-				setUnit(DataConfig.CONTEXT_UNIT);
-			}
-		});
-		buttons.add(setContext);
-
-		JButton setContextTemplate = new JButton("Set ctx template");
-		setContextTemplate.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
-				setUnit(DataConfig.CONTEXT_TEMPLATE_UNIT);
-			}
-		});
-		buttons.add(setContextTemplate);
-
-		JButton setItems = new JButton("Set item");
-		setItems.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
-				setUnit(DataConfig.ITEM_UNIT);
-			}
-		});
-		buttons.add(setItems);
-		
-		JButton setNominal = new JButton("Set nominal");
-		setNominal.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
-				setUnit(DataConfig.NOMINAL_UNIT);
-			}
-		});
-		buttons.add(setNominal);
-
-		JButton setRating = new JButton("Set rating");
-		setRating.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
-				setUnit(DataConfig.RATING_UNIT);
-			}
-		});
-		buttons.add(setRating);
-
-		
-		JButton setUser = new JButton("Set user");
-		setUser.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
-				setUnit(DataConfig.USER_UNIT);
-			}
-		});
-		buttons.add(setUser);
-
-		
-		JButton setSample = new JButton("Set sample");
-		setSample.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
-				setUnit(DataConfig.SAMPLE_UNIT);
-			}
-		});
-		buttons.add(setSample);
+			JButton button = new JButton((String)settings[index][1]);
+			button.addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					// TODO Auto-generated method stub
+					setUnit((String)settings[index][0]);
+				}
+			});
+			buttons.add(button);
+		}
 		
 		
 		JPanel right = new JPanel(new BorderLayout());

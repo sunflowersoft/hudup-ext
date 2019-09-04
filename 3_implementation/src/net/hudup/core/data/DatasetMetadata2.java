@@ -375,7 +375,8 @@ public class DatasetMetadata2 extends DatasetMetadata {
 			}
 			
 			metadata2.numberOfRelevantRatings = relevantRateCount;
-			metadata2.ratingRelevantRatio = (double)relevantRateCount / rateCount;
+			if (rateCount != 0)
+				metadata2.ratingRelevantRatio = (double)relevantRateCount / rateCount;
 			if (relevantRateCount != 0) {
 				metadata2.relevantRatingMean = (double)relevantRateSum / relevantRateCount;
 				

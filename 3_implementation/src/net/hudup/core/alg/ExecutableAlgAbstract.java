@@ -155,11 +155,11 @@ public abstract class ExecutableAlgAbstract extends AlgAbstract implements Execu
 	
 	
 	/**
-	 * Getting stub as remote executable algorithm.
-	 * @return stub as remote executable algorithm.
+	 * Getting exported executable algorithm.
+	 * @return exported executable algorithm.
 	 */
-	public ExecutableAlgRemote getStubExecutableAlg() {
-		return (ExecutableAlgRemote)stub;
+	public ExecutableAlgRemote getExportedExecutableAlg() {
+		return (ExecutableAlgRemote)exportedStub;
 	}
 
 	

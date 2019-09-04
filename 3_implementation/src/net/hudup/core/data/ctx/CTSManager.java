@@ -1,6 +1,5 @@
 package net.hudup.core.data.ctx;
 
-import java.awt.Component;
 import java.io.Serializable;
 
 import net.hudup.core.alg.Alg;
@@ -9,6 +8,7 @@ import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.Profile;
 import net.hudup.core.data.Profiles;
+import net.hudup.core.logistic.Inspectable;
 
 /**
  * This is a very important class which is responsible for managing contexts ({@link Context}) and context templates ({@link ContextTemplate}).
@@ -29,7 +29,7 @@ import net.hudup.core.data.Profiles;
  * @version 10.0
  *
  */
-public interface CTSManager extends Alg, AutoCloseable {
+public interface CTSManager extends Alg, Inspectable, AutoCloseable {
 
 	
 	/**
@@ -148,9 +148,4 @@ public interface CTSManager extends Alg, AutoCloseable {
 	void defaultCTSchema();
 	
 	
-	/**
-	 * Showing a graphic user interface (GUI) for controlling CTS manager. Such GUI is called CTS control panel.
-	 * @param comp the component working as a parent of such CTS control panel.
-	 */
-	void controlPanel(Component comp);
 }

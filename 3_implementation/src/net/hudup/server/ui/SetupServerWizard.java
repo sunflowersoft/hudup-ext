@@ -500,7 +500,7 @@ public class SetupServerWizard extends JDialog {
 						"Do you want to configure context template?", 
 						"Configure context template", JOptionPane.YES_NO_OPTION);
 				if (response == JOptionPane.YES_OPTION) {
-					provider.getCTSManager().controlPanel(getWizard());
+					provider.getCTSManager().getInspector().inspect();
 					provider.getCTSManager().reload();
 					unitList.connectUpdate(config);
 					unitList.clearSelection();
@@ -697,7 +697,7 @@ public class SetupServerWizard extends JDialog {
 	private boolean createModifyUnit(String newUnit) {
 		String ctxTemplateUnit = config.getContextTemplateUnit();
 		if (ctxTemplateUnit != null && newUnit != null && newUnit.equals(ctxTemplateUnit)) {
-			provider.getCTSManager().controlPanel(this);
+			provider.getCTSManager().getInspector().inspect();
 			provider.getCTSManager().reload();
 			return true;
 		}

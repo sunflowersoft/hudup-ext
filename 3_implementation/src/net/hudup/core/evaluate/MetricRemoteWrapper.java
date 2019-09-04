@@ -100,17 +100,19 @@ public class MetricRemoteWrapper extends AlgRemoteWrapper implements Metric {
 			Metric newMetric = (Metric) ((Metric)remoteAlg).newInstance();
 			return new MetricRemoteWrapper(newMetric, exclusive);
 		}
-		else
-			return super.newInstance();
+		else {
+			logger.warn("newInstance() returns itselfs and so does not return new object");
+			return this;
+		}
 	}
 
 
 	/**
-	 * Getting stub as remote metric.
-	 * @return stub as remote metric.
+	 * Getting exported metric.
+	 * @return exported metric.
 	 */
-	public MetricRemote getStubMetric() {
-		return (MetricRemote)stub;
+	public MetricRemote getExportedMetric() {
+		return (MetricRemote)exportedStub;
 	}
 
 

@@ -3,6 +3,8 @@
  */
 package net.hudup.parser;
 
+import java.rmi.RemoteException;
+
 import net.hudup.core.data.DataDriver;
 import net.hudup.core.parser.SnapshotParser;
 
@@ -60,7 +62,7 @@ public abstract class JesterjokeParser extends SnapshotParser {
 	
 	
 	@Override
-	public boolean support(DataDriver driver) {
+	public boolean support(DataDriver driver) throws RemoteException {
 		// TODO Auto-generated method stub
 		
 		return driver.isFlatServer();

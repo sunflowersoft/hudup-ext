@@ -43,6 +43,7 @@ import net.hudup.data.ui.UnitListBoxExt;
 
 
 /**
+ * This class provides a utility GUI allowing users to create dataset.
  * 
  * @author Loc Nguyen
  * @version 10.0
@@ -85,7 +86,7 @@ public class DatasetCreator extends JPanel implements Dispose {
 
 	
 	/**
-	 * 
+	 * Default constructor.
 	 */
 	public DatasetCreator(DataConfig config) {
 		super();
@@ -322,13 +323,11 @@ public class DatasetCreator extends JPanel implements Dispose {
 		
 		final UnitListBoxExt unitList = new UnitListBoxExt() {
 
-			
 			/**
 			 * Serial version UID for serializable class. 
 			 */
 			private static final long serialVersionUID = 1L;
 
-			
 			@Override
 			public void clearData() {
 				// TODO Auto-generated method stub
@@ -338,7 +337,6 @@ public class DatasetCreator extends JPanel implements Dispose {
 						"Not support this method", 
 						JOptionPane.INFORMATION_MESSAGE);
 			}
-
 
 			@Override
 			public void modify() {
@@ -373,7 +371,6 @@ public class DatasetCreator extends JPanel implements Dispose {
 				clearSelection();
 				attTable.clear();
 			}
-
 
 			@Override
 			public void drop() {
@@ -452,7 +449,7 @@ public class DatasetCreator extends JPanel implements Dispose {
 						"Do you want to configure context template?", 
 						"Configure context template", JOptionPane.YES_NO_OPTION);
 				if (response == JOptionPane.YES_OPTION) {
-					provider.getCTSManager().controlPanel(getCreator());
+					provider.getCTSManager().getInspector().inspect();
 					provider.getCTSManager().reload();
 					unitList.connectUpdate(config);
 					unitList.clearSelection();
@@ -631,7 +628,7 @@ public class DatasetCreator extends JPanel implements Dispose {
 	private boolean createModifyUnit(String newUnit) {
 		String ctxTemplateUnit = config.getContextTemplateUnit();
 		if (ctxTemplateUnit != null && newUnit != null && newUnit.equals(ctxTemplateUnit)) {
-			provider.getCTSManager().controlPanel(this);
+			provider.getCTSManager().getInspector().inspect();
 			provider.getCTSManager().reload();
 			return true;
 		}

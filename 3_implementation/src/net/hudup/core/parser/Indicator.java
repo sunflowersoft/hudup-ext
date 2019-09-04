@@ -22,7 +22,7 @@ import net.hudup.core.data.DataConfig;
  * @version 10.0
  *
  */
-public abstract class Indicator extends BasicDatasetParser {
+public abstract class Indicator extends DatasetParserAbstract {
 
 	
 	/**

@@ -1,7 +1,6 @@
 package net.hudup.core.alg;
 
 import java.io.Serializable;
-import java.rmi.Remote;
 
 import net.hudup.core.alg.AlgDesc.MethodologyType;
 import net.hudup.core.logistic.Inspectable;
@@ -15,7 +14,7 @@ import net.hudup.core.logistic.Inspectable;
  * @version 1.0
  *
  */
-public interface Aug extends ExecutableAlg, ModelBasedAlg, SupportCacheAlg, NoteAlg, Inspectable, Remote, Serializable {
+public interface Aug extends ExecutableAlg, ModelBasedAlg, SupportCacheAlg, NoteAlg, Inspectable, Serializable {
 
 	
 }

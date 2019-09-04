@@ -111,11 +111,22 @@ public class ExecutableAlgRemoteWrapper extends AlgRemoteWrapper implements Exec
 			ExecutableAlg newAlg = (ExecutableAlg) ((ExecutableAlg)remoteAlg).newInstance();
 			return new ExecutableAlgRemoteWrapper(newAlg, exclusive);
 		}
-		else
-			return super.newInstance();
+		else {
+			logger.warn("newInstance() returns itselfs and so does not return new object");
+			return this;
+		}
 	}
 
 
+	/**
+	 * Getting exported executable algorithm.
+	 * @return exported executable algorithm.
+	 */
+	public ExecutableAlgRemote getExportedExecutableAlg() {
+		return (ExecutableAlgRemote)exportedStub;
+	}
+
+	
 	@Override
 	public synchronized void unexport() throws RemoteException {
 		// TODO Auto-generated method stub
@@ -124,15 +135,6 @@ public class ExecutableAlgRemoteWrapper extends AlgRemoteWrapper implements Exec
 		}
 
 		super.unexport();
-	}
-
-	
-	/**
-	 * Getting stub as remote executable algorithm.
-	 * @return stub as remote executable algorithm.
-	 */
-	public ExecutableAlgRemote getStubExecutableAlg() {
-		return (ExecutableAlgRemote)stub;
 	}
 
 	

@@ -61,7 +61,7 @@ public class UnitListBoxExt extends UnitListBox {
 	 * Create context menu.
 	 * @return context menu.
 	 */
-	private JPopupMenu createContextMenu() {
+	protected JPopupMenu createContextMenu() {
 		if (config == null)
 			return null;
 		
@@ -73,6 +73,7 @@ public class UnitListBoxExt extends UnitListBox {
 		JMenuItem miClearData = UIUtil.makeMenuItem((String)null, "Clear data", 
 			new ActionListener() {
 				
+				@Override
 				public void actionPerformed(ActionEvent e) {
 					clearData();
 				}
@@ -84,6 +85,7 @@ public class UnitListBoxExt extends UnitListBox {
 		JMenuItem miModify = UIUtil.makeMenuItem((String)null, "Modify structure", 
 			new ActionListener() {
 				
+				@Override
 				public void actionPerformed(ActionEvent e) {
 					modify();
 				}
@@ -95,6 +97,7 @@ public class UnitListBoxExt extends UnitListBox {
 		JMenuItem miDrop = UIUtil.makeMenuItem((String)null, "Drop", 
 			new ActionListener() {
 				
+				@Override
 				public void actionPerformed(ActionEvent e) {
 					drop();
 				}

@@ -1,13 +1,21 @@
 package net.hudup.alg.cf.mf;
 
-import java.awt.Component;
+import java.awt.BorderLayout;
+import java.awt.Frame;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.BufferedReader;
 import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.Writer;
 import java.util.List;
 
-import javax.swing.JOptionPane;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.WindowConstants;
 
 import net.hudup.core.Constants;
 import net.hudup.core.Util;
@@ -18,6 +26,7 @@ import net.hudup.core.data.Dataset;
 import net.hudup.core.data.PropList;
 import net.hudup.core.data.RatingMatrix;
 import net.hudup.core.data.RatingMatrixMetadata;
+import net.hudup.core.logistic.Inspector;
 import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.Vector;
 import net.hudup.core.logistic.xURI;
@@ -564,24 +573,70 @@ public abstract class SvdGradientKB extends KBaseRecommendIntegrated {
 	
 	
 	@Override
-	public void view(Component comp) {
+	public Inspector getInspector() {
 		// TODO Auto-generated method stub
-		
-		RatingMatrix ratingMatrix = createUserRatingMatrix();
-		if (ratingMatrix == null) {
-			JOptionPane.showMessageDialog(
-					comp, 
-					"Knowledge base empty", 
-					"Knowledge base empty", 
-					JOptionPane.INFORMATION_MESSAGE);
-			return;
-		}
-		
-		RatingValueTable tblRatingMatrix = new RatingValueTable();
-		tblRatingMatrix.update(ratingMatrix, null);
-		tblRatingMatrix.showDlg(comp, true);
+		return new SvdGradientInspector();
 	}
 
+
+	/**
+	 * Inspector for SVD Gradiend knowledge base.
+	 * @author Admin
+	 * @version 12.0
+	 */
+	protected class SvdGradientInspector extends JDialog implements Inspector {
+
+		/**
+		 * Default serial version UID.
+		 */
+		private static final long serialVersionUID = 1L;
+
+		/**
+		 * Default constructor.
+		 */
+		public SvdGradientInspector() {
+			super((Frame)null, "Knowledge base viewer", true);
+			setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+			setSize(600, 400);
+			setLocationRelativeTo(null);
+			setLayout(new BorderLayout());
+
+			RatingMatrix ratingMatrix = createUserRatingMatrix();
+			if (ratingMatrix == null) {
+				JLabel empty = new JLabel("Empty knowledge base");
+				add(empty, BorderLayout.CENTER);
+			}
+			else {
+				RatingValueTable tblRatingMatrix = new RatingValueTable();
+				tblRatingMatrix.update(ratingMatrix, null);
+				add(new JScrollPane(tblRatingMatrix), BorderLayout.CENTER);
+			}
+			
+			JPanel footer = new JPanel();
+			add(footer, BorderLayout.SOUTH);
+			
+			JButton btnClose = new JButton("Close");
+			btnClose.addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					// TODO Auto-generated method stub
+					dispose();
+				}
+			});
+			footer.add(btnClose);
+		}
+
+		
+		@Override
+		public void inspect() {
+			// TODO Auto-generated method stub
+			setVisible(true);
+		}
+		
+	}
+	
+	
 	
 	/**
 	 * Create user rating matrix from this knowledge base.

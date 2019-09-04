@@ -1,4 +1,4 @@
-package net.hudup.data.ctx;
+package net.hudup.core.data.ctx;
 
 import java.util.List;
 
@@ -7,11 +7,6 @@ import net.hudup.core.data.Attribute;
 import net.hudup.core.data.Attribute.Type;
 import net.hudup.core.data.AttributeList;
 import net.hudup.core.data.DataConfig;
-import net.hudup.core.data.ctx.CTProcessor;
-import net.hudup.core.data.ctx.CTProcessorAbstract;
-import net.hudup.core.data.ctx.ContextTemplate;
-import net.hudup.core.data.ctx.ContextTemplateList;
-import net.hudup.core.data.ctx.HierContextTemplate;
 
 /**
  * This class is the default implementation of hierarchical context template.

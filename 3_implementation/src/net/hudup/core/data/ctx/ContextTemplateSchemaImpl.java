@@ -1,4 +1,4 @@
-package net.hudup.data.ctx;
+package net.hudup.core.data.ctx;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -8,13 +8,11 @@ import net.hudup.core.data.Attribute;
 import net.hudup.core.data.Attribute.Type;
 import net.hudup.core.data.AttributeList;
 import net.hudup.core.data.DataConfig;
-import net.hudup.core.data.ctx.ContextTemplate;
-import net.hudup.core.data.ctx.ContextTemplateList;
-import net.hudup.core.data.ctx.ContextTemplateSchema;
-import net.hudup.core.data.ctx.HierContextTemplate;
 
 
 /**
+ * This class is default implementation of context template schema (CTS).
+ * 
  * @author Loc Nguyen
  * @version 10.0
  */

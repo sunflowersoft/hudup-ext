@@ -69,9 +69,14 @@ public abstract class RecommenderAbstract extends AlgAbstract implements Recomme
 			return null;
 		
 		// Pay attention following lines
+		RatingVector vRating = null;
 		Dataset dataset = getDataset(); //This is training dataset.
-		int userId = param.ratingVector.id(); //If the user id is negative (< 0), param.ratingVector is not stored in database. 
-		RatingVector vRating = dataset.getUserRating(userId);
+		if (dataset == null)
+			logger.warn("Training dataset is null. This is acceptable because some model-based algorithms do not store dataset");
+		else {
+			int userId = param.ratingVector.id(); //If the user id is negative (< 0), param.ratingVector is not stored in database. 
+			vRating = dataset.getUserRating(userId);
+		}
 		if (param.ratingVector.size() == 0) {
 			if (vRating == null || vRating.size() == 0)
 				return null;
@@ -134,11 +139,11 @@ public abstract class RecommenderAbstract extends AlgAbstract implements Recomme
 
 	
 	/**
-	 * Getting stub as remote recommender.
-	 * @return stub as remote recommender.
+	 * Getting exported recommender.
+	 * @return exported recommender.
 	 */
-	public RecommenderRemote getStubRecommender() {
-		return (RecommenderRemote)stub;
+	public RecommenderRemote getExportedRecommender() {
+		return (RecommenderRemote)exportedStub;
 	}
 
 	

@@ -3,16 +3,13 @@
  */
 package net.hudup.core.alg;
 
-import java.awt.Component;
-
-import javax.swing.JOptionPane;
-
 import org.apache.log4j.Logger;
 
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.Datasource;
 import net.hudup.core.data.Pointer;
+import net.hudup.core.logistic.Inspector;
 import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.UriFilter;
 import net.hudup.core.logistic.xURI;
@@ -208,15 +205,22 @@ public abstract class KBaseAbstract implements KBase {
 
 
 	@Override
-	public void view(Component comp) {
+	public Inspector getInspector() {
 		// TODO Auto-generated method stub
-		
-		JOptionPane.showMessageDialog(
-				comp, 
-				"Not implemented yet", 
-				"Not implemented yet", 
-				JOptionPane.INFORMATION_MESSAGE);
+		return new Inspector.NullInspector();
 	}
+
+
+//	@Override
+//	public void view(Component comp) {
+//		// TODO Auto-generated method stub
+//		
+//		JOptionPane.showMessageDialog(
+//				comp, 
+//				"Not implemented yet", 
+//				"Not implemented yet", 
+//				JOptionPane.INFORMATION_MESSAGE);
+//	}
 	
 	
 }

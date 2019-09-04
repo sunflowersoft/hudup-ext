@@ -43,9 +43,9 @@ public abstract class AlgAbstract implements Alg, AlgRemote {
 
 	
     /**
-     * Stub as remote algorithm.
+     * Exported algorithm must be serializable.
      */
-    protected AlgRemote stub = null;
+    protected AlgRemote exportedStub = null;
     
     
 	/**
@@ -171,29 +171,29 @@ public abstract class AlgAbstract implements Alg, AlgRemote {
 	@Override
 	public synchronized AlgRemote export(int serverPort) throws RemoteException {
 		// TODO Auto-generated method stub
-		if (stub == null)
-			stub = (AlgRemote) NetUtil.RegistryRemote.export(this, serverPort);
+		if (exportedStub == null)
+			exportedStub = (AlgRemote) NetUtil.RegistryRemote.export(this, serverPort);
 	
-		return stub;
+		return exportedStub;
 	}
 
 
 	@Override
 	public synchronized void unexport() throws RemoteException {
 		// TODO Auto-generated method stub
-		if (stub != null) {
+		if (exportedStub != null) {
 			NetUtil.RegistryRemote.unexport(this);
-			stub = null;
+			exportedStub = null;
 		}
 	}
 
 	
 	/**
-	 * Getting stub as remote algorithm.
-	 * @return stub as remote algorithm.
+	 * Getting exported algorithm.
+	 * @return exported algorithm.
 	 */
-	public AlgRemote getStubAlg() {
-		return (AlgRemote)stub;
+	public AlgRemote getExportedAlg() {
+		return (AlgRemote)exportedStub;
 	}
 
 

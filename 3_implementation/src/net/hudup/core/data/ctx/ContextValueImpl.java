@@ -1,4 +1,4 @@
-package net.hudup.data.ctx;
+package net.hudup.core.data.ctx;
 
 import java.io.Serializable;
 
@@ -8,10 +8,9 @@ import net.hudup.core.data.Attribute;
 import net.hudup.core.data.Attribute.Type;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Profile;
-import net.hudup.core.data.ctx.ContextValue;
-
 
 /**
+ * This class is default implementation of context value.
  * 
  * @author Loc Nguyen
  * @version 10.0
@@ -27,20 +26,21 @@ public class ContextValueImpl implements ContextValue {
 
 	
 	/**
-	 * 
+	 * Internal value.
 	 */
 	private Serializable value = null;
 			
 	
 	/**
-	 * 
+	 * Internal quantized value.
 	 */
 	private double quantizedValue = Constants.UNUSED;
 	
 	
 	/**
-	 * 
-	 * @param value
+	 * Constructor with value and quantized value.
+	 * @param value specified value.
+	 * @param quantizedValue quantized value.
 	 */
 	private ContextValueImpl(Serializable value, double quantizedValue) {
 		this.value = value;
@@ -100,10 +100,10 @@ public class ContextValueImpl implements ContextValue {
 	
 	
 	/**
-	 * 
-	 * @param attribute
-	 * @param value
-	 * @return {@link ContextValue}
+	 * Create context value from attribute and specified value.
+	 * @param attribute specified attribute.
+	 * @param value specified value.
+	 * @return context value from attribute and specified value.
 	 */
 	public static ContextValue create(Attribute attribute, Serializable value) {
 		

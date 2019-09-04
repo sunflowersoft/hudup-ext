@@ -1,5 +1,6 @@
 package net.hudup.core.alg;
 
+import java.io.Serializable;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
@@ -12,7 +13,7 @@ import net.hudup.core.data.DataConfig;
  * @version 1.0
  *
  */
-public interface AlgRemote extends Remote, SetupAlgListener {
+public interface AlgRemote extends Remote, SetupAlgListener, Serializable {
 
 	
 	/**

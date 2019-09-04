@@ -3,6 +3,8 @@
  */
 package net.hudup.core.parser;
 
+import java.rmi.RemoteException;
+
 import net.hudup.core.alg.Alg;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.DataDriver;
@@ -47,7 +49,7 @@ public class KBaseIndicator extends Indicator {
 
 
 	@Override
-	public Dataset parse(DataConfig config) {
+	public Dataset parse(DataConfig config) throws RemoteException {
 		// TODO Auto-generated method stub
 		
 		KBasePointer kbasePointer = new KBasePointer();
@@ -66,7 +68,13 @@ public class KBaseIndicator extends Indicator {
 	}
 
 	
-	
+	@Override
+	public String getDescription() throws RemoteException {
+		// TODO Auto-generated method stub
+		return "Knowledge base indicator";
+	}
+
+
 	@Override
 	public DataConfig createDefaultConfig() {
 		// TODO Auto-generated method stub
@@ -76,7 +84,7 @@ public class KBaseIndicator extends Indicator {
 	
 	
 	@Override
-	public boolean support(DataDriver driver) {
+	public boolean support(DataDriver driver) throws RemoteException {
 		// TODO Auto-generated method stub
 		
 		return driver.isFlatServer();

@@ -1,8 +1,15 @@
 package net.hudup.core.logistic;
 
+import java.awt.BorderLayout;
+import java.awt.Frame;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.Serializable;
 
+import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.WindowConstants;
 
 /**
  * This interface represents GUI which allows users to inspect an object.
@@ -20,5 +27,51 @@ public interface Inspector extends Serializable {
 	 */
 	void inspect();
 	
+	
+	/**
+	 * Null inspector.
+	 * @author Loc Nguyen
+	 * @version 12.0
+	 */
+	static class NullInspector extends JDialog implements Inspector {
+
+		/**
+		 * Default serial version UID.
+		 */
+		private static final long serialVersionUID = 1L;
+
+		/**
+		 * Default constructor.
+		 */
+		public NullInspector() {
+			super((Frame)null, "Null inspector", true);
+			
+			setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+			setSize(300, 200);
+			setLocationRelativeTo(null);
+			setLayout(new BorderLayout());
+			
+			JLabel info = new JLabel("Null inspector");
+			add(info, BorderLayout.CENTER);
+			
+			JButton close = new JButton("Close");
+			close.addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					// TODO Auto-generated method stub
+					dispose();
+				}
+			});
+			add(close, BorderLayout.SOUTH);
+		}
+		
+		@Override
+		public void inspect() {
+			// TODO Auto-generated method stub
+			setVisible(true);
+		}
+		
+	}
 	
 }

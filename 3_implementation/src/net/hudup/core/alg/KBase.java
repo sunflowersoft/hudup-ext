@@ -3,12 +3,12 @@
  */
 package net.hudup.core.alg;
 
-import java.awt.Component;
 import java.io.Serializable;
 
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.Datasource;
+import net.hudup.core.logistic.Inspectable;
 import net.hudup.core.parser.TextParserUtil;
 
 
@@ -57,13 +57,15 @@ import net.hudup.core.parser.TextParserUtil;
  * </ul>
  * Methods of model-based recommender always using {@code KBase} are {@code ModelBasedRecommender.setup()}, {@code ModelBasedRecommender.createKB()}, {@code ModelBasedRecommender.estimate(...)} and {@code ModelBasedRecommender.recommend(...)}.
  * Especially, it is mandatory that {@code setup()} method of model-based recommender calls method {@code KBase.learn(...)} or {@code KBase.load()}.
- * Conversely, the association between memory-based recommender represented by {@code MemoryBasedRecommender} class and dataset indicates that all memory-based algorithms use dataset for recommendation task.
- * 
+ * Conversely, the association between memory-based recommender represented by {@code MemoryBasedRecommender} class and dataset indicates that all memory-based algorithms use dataset for recommendation task.<br>
+ * <br>
+ * {@code KBase} does not support remote call because of three reasons: 1. Security. 2. {@code KBase} is always owned by model-based algorithm and so making a remote model-based algorithm is to create indirectly a remote {@code KBase}.
+ * 3. {@code KBase} is too flexible to establish a remote interface (it does not have specific methods). 
  * @author Loc Nguyen
  * @version 10.0
  *
  */
-public interface KBase extends Serializable {
+public interface KBase extends Inspectable, Serializable {
 	
 	
 	/**
@@ -168,14 +170,6 @@ public interface KBase extends Serializable {
 	 * @return datasource of the dataset that KBase is learned or loaded.
 	 */
 	Datasource getDatasource();
-	
-	
-	/**
-	 * KBase (knowledge base) can be viewed in visual manner.
-	 * This method shows a graphic user interface (GUI) to see and exploit KBase.
-	 * @param comp the component works as parent of the graphic user interface (GUI) to see and exploit KBase.
-	 */
-	void view(Component comp);
 	
 	
 }

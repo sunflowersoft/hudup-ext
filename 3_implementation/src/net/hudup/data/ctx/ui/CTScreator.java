@@ -25,18 +25,20 @@ import net.hudup.core.data.Provider;
 import net.hudup.core.data.ctx.CTSManager;
 import net.hudup.core.data.ctx.ContextTemplate;
 import net.hudup.core.data.ctx.ContextTemplateSchema;
+import net.hudup.core.logistic.Inspector;
 import net.hudup.core.logistic.ui.UIUtil;
 import net.hudup.data.ProviderImpl;
 import net.hudup.data.ui.AttributeListTable;
 
 
 /**
+ * This class implements a GUI allowing users to create context template schema (CTS).
  * 
  * @author Loc Nguyen
  * @version 10.0
  *
  */
-public class CTScreator extends JDialog {
+public class CTScreator extends JDialog implements Inspector {
 
 	
 	/**
@@ -46,21 +48,21 @@ public class CTScreator extends JDialog {
 
 	
 	/**
-	 * 
+	 * Table of context template schema (CTS).
 	 */
 	protected CTStable tblCTS = null;
 	
 	
 	/**
-	 * 
+	 * Context template schema (CTS) manager.
 	 */
 	protected CTSManager ctsManager = null;
 	
 	
 	/**
-	 * 
-	 * @param comp
-	 * @param ctxManager
+	 * Constructor with specified context template schema (CTS) manager.
+	 * @param comp parent component.
+	 * @param ctxManager Context template schema (CTS) manager.
 	 */
 	public CTScreator(Component comp, CTSManager ctxManager) {
 		super(UIUtil.getFrameForComponent(comp), "Context creator", true);
@@ -86,13 +88,14 @@ public class CTScreator extends JDialog {
 			}
 			
 		});
-		setVisible(true);
+		
+		//setVisible(true);
 	}
 	
 	
 	/**
-	 * 
-	 * @return header panel
+	 * Create header panel.
+	 * @return header panel.
 	 */
 	private JPanel createHeader() {
 		JPanel main = new JPanel(new BorderLayout());
@@ -102,8 +105,8 @@ public class CTScreator extends JDialog {
 	
 	
 	/**
-	 * 
-	 * @return body panel
+	 * Create body panel.
+	 * @return body panel.
 	 */
 	private JPanel createBody() {
 		JPanel main = new JPanel(new BorderLayout());
@@ -201,8 +204,8 @@ public class CTScreator extends JDialog {
 	
 	
 	/**
-	 * 
-	 * @return footer panel
+	 * Create footer panel.
+	 * @return footer panel.
 	 */
 	private JPanel createFooter() {
 		JPanel main = new JPanel(new BorderLayout());
@@ -251,7 +254,7 @@ public class CTScreator extends JDialog {
 	
 	
 	/**
-	 * 
+	 * Saving context template schema.
 	 */
 	private void saveSchema() {
 		boolean committed = ctsManager.commitCTSchema();
@@ -265,7 +268,7 @@ public class CTScreator extends JDialog {
 	
 	
 	/**
-	 * 
+	 * Create default context template schema.
 	 */
 	private void defaultCTSchema() {
 		ctsManager.defaultCTSchema();
@@ -275,7 +278,7 @@ public class CTScreator extends JDialog {
 	
 	
 	/**
-	 * 
+	 * Committing the context template schema.
 	 */
 	private void commit() {
 		if (tblCTS.isModified) {
@@ -291,18 +294,25 @@ public class CTScreator extends JDialog {
 	
 	
 	/**
-	 * 
-	 * @return whether schema is committed
+	 * Testing whether context template schema is committed.
+	 * @return whether schema is committed.
 	 */
 	public boolean isSaved() {
 		return !tblCTS.isModified();
 	}
 	
 	
+	@Override
+	public void inspect() {
+		// TODO Auto-generated method stub
+		setVisible(true);
+	}
+
+
 	/**
-	 * 
-	 * @param comp
-	 * @param config
+	 * Create the context template schema creator with configuration.
+	 * @param comp parent schema.
+	 * @param config specified configuration.
 	 */
 	public static void create(Component comp, DataConfig config) {
 		Provider provider = new ProviderImpl(config);

@@ -1,12 +1,12 @@
 package net.hudup.core.alg;
 
+import java.io.Serializable;
 import java.rmi.RemoteException;
 
 import javax.swing.event.EventListenerList;
 
 import org.apache.log4j.Logger;
 
-import net.hudup.core.data.AutoCloseable;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.logistic.BaseClass;
 import net.hudup.core.logistic.NetUtil;
@@ -22,7 +22,7 @@ import net.hudup.core.logistic.NetUtil;
  *
  */
 @BaseClass //The annotation is very important which prevent Firer to instantiate the wrapper without referred remote object. This wrapper is not normal algorithm.
-public class AlgRemoteWrapper implements Alg, AlgRemote, AutoCloseable {
+public class AlgRemoteWrapper implements Alg, AlgRemote, Serializable {
 
 	
 	/**
@@ -39,9 +39,9 @@ public class AlgRemoteWrapper implements Alg, AlgRemote, AutoCloseable {
 
 
     /**
-     * Stub as remote algorithm. It must be serializable.
+     * Exported algorithm must be serializable.
      */
-    protected AlgRemote stub = null;
+    protected AlgRemote exportedStub = null;
 
 	
 	/**
@@ -195,10 +195,10 @@ public class AlgRemoteWrapper implements Alg, AlgRemote, AutoCloseable {
 	@Override
 	public synchronized AlgRemote export(int serverPort) throws RemoteException {
 		//Remote wrapper can export itself because this function is useful when the wrapper as remote algorithm can be called remotely by remote evaluator via Evaluator.remoteStart method.
-		if (stub == null)
-			stub = (AlgRemote) NetUtil.RegistryRemote.export(this, serverPort);
+		if (exportedStub == null)
+			exportedStub = (AlgRemote) NetUtil.RegistryRemote.export(this, serverPort);
 	
-		return stub;
+		return exportedStub;
 	}
 
 
@@ -212,41 +212,29 @@ public class AlgRemoteWrapper implements Alg, AlgRemote, AutoCloseable {
 		}
 		remoteAlg = null;
 		
-		if (stub != null) {
+		if (exportedStub != null) {
 			NetUtil.RegistryRemote.unexport(this);
-			stub = null;
+			exportedStub = null;
 		}
 	}
 
 	
 	/**
-	 * Getting stub as remote algorithm.
-	 * @return stub as remote algorithm.
+	 * Getting exported algorithm.
+	 * @return exported algorithm.
 	 */
-	public AlgRemote getStubAlg() {
-		return (AlgRemote)stub;
+	public AlgRemote getExportedAlg() {
+		return (AlgRemote)exportedStub;
 	}
 
 	
-	@Override
-	public void close() throws Exception {
-		// TODO Auto-generated method stub
-		try {
-			unexport();
-		}
-		catch (Throwable e) {
-			e.printStackTrace();
-		}
-	}
-
-
 	@Override
 	protected void finalize() throws Throwable {
 		// TODO Auto-generated method stub
 		super.finalize();
 		
 		try {
-			close();
+			unexport();
 		}
 		catch (Throwable e) {
 			e.printStackTrace();

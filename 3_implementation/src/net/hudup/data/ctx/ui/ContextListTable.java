@@ -31,8 +31,8 @@ import net.hudup.core.data.ctx.ContextList;
 import net.hudup.core.data.ctx.ContextTemplate;
 import net.hudup.core.data.ctx.ContextTemplateSchema;
 import net.hudup.core.data.ctx.ContextValue;
+import net.hudup.core.data.ctx.ContextValueImpl;
 import net.hudup.core.logistic.ui.UIUtil;
-import net.hudup.data.ctx.ContextValueImpl;
 import net.hudup.data.ui.AttributeListTable.TypeCellEditor;
 
 

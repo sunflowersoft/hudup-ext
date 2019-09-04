@@ -51,7 +51,7 @@ public class SocketServerIndicator extends Indicator {
 
 
 	@Override
-	public Dataset parse(DataConfig config) {
+	public Dataset parse(DataConfig config) throws RemoteException {
 		// TODO Auto-generated method stub
 		String account = config.getStoreAccount();
 		String password = config.getStorePassword().getText();
@@ -89,7 +89,14 @@ public class SocketServerIndicator extends Indicator {
 
 	
 	@Override
-	public boolean support(DataDriver driver) {
+	public String getDescription() throws RemoteException {
+		// TODO Auto-generated method stub
+		return "Socket server indicator";
+	}
+
+
+	@Override
+	public boolean support(DataDriver driver) throws RemoteException {
 		// TODO Auto-generated method stub
 		return driver.getType() == DataType.hudup_socket;
 	}

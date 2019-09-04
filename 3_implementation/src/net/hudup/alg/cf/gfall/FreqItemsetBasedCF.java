@@ -4,7 +4,7 @@
 package net.hudup.alg.cf.gfall;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
+import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
@@ -43,7 +43,6 @@ import net.hudup.core.logistic.MinMax;
 import net.hudup.core.logistic.RatingFilter;
 import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.xURI;
-import net.hudup.core.logistic.ui.UIUtil;
 import net.hudup.core.parser.TextParsable;
 import net.hudup.core.parser.TextParserUtil;
 import net.hudup.data.bit.BitData;
@@ -626,39 +625,65 @@ abstract class FreqItemsetKB extends KBaseAbstract {
 	}
 
 	
-	@Override
-	public void view(Component comp) {
-		// TODO Auto-generated method stub
-		final JDialog view = new JDialog(
-				UIUtil.getFrameForComponent(comp), "Knowledge base viewer", true);
-		view.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-		view.setSize(600, 400);
-		view.setLocationRelativeTo(UIUtil.getFrameForComponent(comp));
-		view.setLayout(new BorderLayout());
-		
-		FreqItemsetListTable tblFreqItemset = new FreqItemsetListTable();
-		List<BitItemset> itemsetList = Util.newList();
-		for (FreqResult freqResult : freqResults) {
-			itemsetList.add(freqResult.itemset);
-		}
-		tblFreqItemset.update(itemsetList, bitItemMap);
-		view.add(new JScrollPane(tblFreqItemset), BorderLayout.CENTER);
-		
-		JPanel footer = new JPanel();
-		view.add(footer, BorderLayout.SOUTH);
-		
-		JButton btnClose = new JButton("Close");
-		btnClose.addActionListener(new ActionListener() {
+	/**
+	 * Inspector for showing frequent itemset knowedge base.
+	 * @author Loc Nguyen
+	 * @version 12.0
+	 */
+	protected class FreqItemsetInspector extends JDialog implements Inspector {
+
+		/**
+		 * Default serial version UID.
+		 */
+		private static final long serialVersionUID = 1L;
+
+		/**
+		 * Default constructor.
+		 */
+		public FreqItemsetInspector() {
+			super((Frame)null, "Knowledge base viewer", true);
+			setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+			setSize(600, 400);
+			setLocationRelativeTo(null);
+			setLayout(new BorderLayout());
 			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
-				view.dispose();
+			FreqItemsetListTable tblFreqItemset = new FreqItemsetListTable();
+			List<BitItemset> itemsetList = Util.newList();
+			for (FreqResult freqResult : freqResults) {
+				itemsetList.add(freqResult.itemset);
 			}
-		});
-		footer.add(btnClose);
+			tblFreqItemset.update(itemsetList, bitItemMap);
+			add(new JScrollPane(tblFreqItemset), BorderLayout.CENTER);
+			
+			JPanel footer = new JPanel();
+			add(footer, BorderLayout.SOUTH);
+			
+			JButton btnClose = new JButton("Close");
+			btnClose.addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					// TODO Auto-generated method stub
+					dispose();
+				}
+			});
+			footer.add(btnClose);
+		}
 		
-		view.setVisible(true);
+		
+		@Override
+		public void inspect() {
+			// TODO Auto-generated method stub
+			setVisible(true);
+		}
+		
+	}
+	
+	
+	@Override
+	public Inspector getInspector() {
+		// TODO Auto-generated method stub
+		return new FreqItemsetInspector();
 	}
 
 

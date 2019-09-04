@@ -3,6 +3,8 @@
  */
 package net.hudup.core.parser;
 
+import java.rmi.RemoteException;
+
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.DataDriver;
 
@@ -22,7 +24,7 @@ import net.hudup.core.data.DataDriver;
  * @version 10.0
  *
  */
-public abstract class SnapshotParser extends BasicDatasetParser {
+public abstract class SnapshotParser extends DatasetParserAbstract {
 
 	
 	/**
@@ -48,7 +50,7 @@ public abstract class SnapshotParser extends BasicDatasetParser {
 
 	
 	@Override
-	public boolean support(DataDriver driver) {
+	public boolean support(DataDriver driver) throws RemoteException {
 		// TODO Auto-generated method stub
 		return !driver.isHudupServer();
 	}

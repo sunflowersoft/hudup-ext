@@ -1,6 +1,8 @@
 package net.hudup.core.parser;
 
 
+import java.rmi.RemoteException;
+
 import net.hudup.core.alg.Alg;
 import net.hudup.core.client.ClientUtil;
 import net.hudup.core.client.Service;
@@ -50,7 +52,7 @@ public class RmiServerIndicator extends Indicator {
 
 
 	@Override
-	public Dataset parse(DataConfig config) {
+	public Dataset parse(DataConfig config) throws RemoteException {
 		// TODO Auto-generated method stub
 		xURI uri = config.getStoreUri();
 		
@@ -92,9 +94,15 @@ public class RmiServerIndicator extends Indicator {
 	}
 
 	
-	
 	@Override
-	public boolean support(DataDriver driver) {
+	public String getDescription() throws RemoteException {
+		// TODO Auto-generated method stub
+		return "RMI server indicator";
+	}
+
+
+	@Override
+	public boolean support(DataDriver driver) throws RemoteException {
 		// TODO Auto-generated method stub
 		return driver.getType() == DataType.hudup_rmi;
 	}

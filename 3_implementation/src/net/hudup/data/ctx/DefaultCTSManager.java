@@ -1,6 +1,7 @@
 package net.hudup.data.ctx;
 
 import java.io.Serializable;
+import java.rmi.RemoteException;
 import java.util.Map;
 
 import net.hudup.core.Util;
@@ -19,14 +20,19 @@ import net.hudup.core.data.ProviderAssoc;
 import net.hudup.core.data.UnitList;
 import net.hudup.core.data.ctx.CTProcessorAbstract;
 import net.hudup.core.data.ctx.CTSManager;
+import net.hudup.core.data.ctx.CTSManagerAbstract;
 import net.hudup.core.data.ctx.Context;
 import net.hudup.core.data.ctx.ContextList;
 import net.hudup.core.data.ctx.ContextTemplate;
+import net.hudup.core.data.ctx.ContextTemplateImpl;
 import net.hudup.core.data.ctx.ContextTemplateList;
 import net.hudup.core.data.ctx.ContextTemplateSchema;
+import net.hudup.core.data.ctx.ContextTemplateSchemaImpl;
 import net.hudup.core.data.ctx.ContextValue;
 import net.hudup.core.data.ctx.HierContextTemplate;
+import net.hudup.core.logistic.Inspector;
 import net.hudup.core.parser.TextParserUtil;
+import net.hudup.data.ctx.ui.CTScreator;
 
 
 /**
@@ -78,8 +84,8 @@ public class DefaultCTSManager extends CTSManagerAbstract {
 			e.printStackTrace();
 		}
 		
-		assoc = Util.getFactory().createProviderAssoc(config);
-		ctSchema = ContextTemplateSchemaImpl.create();
+		this.assoc = Util.getFactory().createProviderAssoc(config);
+		this.ctSchema = ContextTemplateSchemaImpl.create();
 		reload();
 
 	}
@@ -580,6 +586,20 @@ public class DefaultCTSManager extends CTSManagerAbstract {
 
 	
 	@Override
+	public String getDescription() throws RemoteException {
+		// TODO Auto-generated method stub
+		return "Default context template manager";
+	}
+
+
+	@Override
+	public Inspector getInspector() {
+		// TODO Auto-generated method stub
+		return new CTScreator(null, this);
+	}
+
+
+	@Override
 	public Alg newInstance() {
 		// TODO Auto-generated method stub
 		return new DefaultCTSManager();
@@ -602,6 +622,14 @@ public class DefaultCTSManager extends CTSManagerAbstract {
 		if (ctSchema != null)
 			ctSchema.clear();
 		ctSchema = null;
+		
+		try {
+			unexport();
+		}
+		catch (Throwable e) {
+			e.printStackTrace();
+		}
+		
 	}
 
 	

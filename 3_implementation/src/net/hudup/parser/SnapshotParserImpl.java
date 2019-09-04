@@ -3,6 +3,8 @@
  */
 package net.hudup.parser;
 
+import java.rmi.RemoteException;
+
 import net.hudup.core.alg.Alg;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Dataset;
@@ -35,7 +37,7 @@ public class SnapshotParserImpl extends SnapshotParser {
 
 
 	@Override
-	public Dataset parse(DataConfig config) {
+	public Dataset parse(DataConfig config) throws RemoteException {
 		// TODO Auto-generated method stub
 		
 		config.setParser(this);
@@ -57,4 +59,11 @@ public class SnapshotParserImpl extends SnapshotParser {
 	}
 
 	
+	@Override
+	public String getDescription() throws RemoteException {
+		// TODO Auto-generated method stub
+		return "Snapshot parser";
+	}
+
+
 }

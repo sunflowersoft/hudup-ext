@@ -9,6 +9,7 @@ import net.hudup.core.data.Profiles;
 
 
 /**
+ * This class represents the memory profiles of context templates.
  * 
  * @author Loc Nguyen
  * @version 10.0
@@ -24,13 +25,13 @@ public class CTSMemMultiProfiles implements CTSMultiProfiles {
 	
 	
 	/**
-	 * 
+	 * Internal map of profiles.
 	 */
 	protected Map<Integer, Profiles> map = Util.newMap();
 	
 	
 	/**
-	 * 
+	 * Default constructor.
 	 */
 	private CTSMemMultiProfiles() {
 		
@@ -130,8 +131,8 @@ public class CTSMemMultiProfiles implements CTSMultiProfiles {
 
 
 	/**
-	 * 
-	 * @return {@link CTSMemMultiProfiles}
+	 * Create the empty memory profiles of context templates.
+	 * @return empty memory profiles of context templates.
 	 */
 	public static CTSMemMultiProfiles create() {
 		return new CTSMemMultiProfiles();

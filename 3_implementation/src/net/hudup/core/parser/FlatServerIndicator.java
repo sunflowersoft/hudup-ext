@@ -1,5 +1,7 @@
 package net.hudup.core.parser;
 
+import java.rmi.RemoteException;
+
 import net.hudup.core.alg.Alg;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.DataDriver;
@@ -44,7 +46,7 @@ public class FlatServerIndicator extends Indicator {
 
 
 	@Override
-	public Dataset parse(DataConfig config) {
+	public Dataset parse(DataConfig config) throws RemoteException {
 		// TODO Auto-generated method stub
 		Pointer pointer = new ServerPointer();
 		config.setParser(this);
@@ -62,7 +64,14 @@ public class FlatServerIndicator extends Indicator {
 
 	
 	@Override
-	public boolean support(DataDriver driver) {
+	public String getDescription() throws RemoteException {
+		// TODO Auto-generated method stub
+		return "Flat structure server indicator";
+	}
+
+
+	@Override
+	public boolean support(DataDriver driver) throws RemoteException {
 		// TODO Auto-generated method stub
 		return driver.isFlatServer();
 	}
