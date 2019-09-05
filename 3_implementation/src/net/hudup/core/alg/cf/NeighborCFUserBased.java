@@ -64,8 +64,9 @@ public class NeighborCFUserBased extends NeighborCF implements DuplicatableAlg {
 	 * @param param recommendation parameter. Please see {@link RecommendParam} for more details of this parameter.
 	 * @param queryIds set of identifications (IDs) of items that need to be estimated their rating values.
 	 * @return rating vector contains estimated rating values of the specified set of IDs of items (users). Return null if cannot estimate.
+	 * @throws RemoteException if any error raises.
 	 */
-	public static RatingVector estimate(NeighborCF cf, RecommendParam param, Set<Integer> queryIds) {
+	public static RatingVector estimate(NeighborCF cf, RecommendParam param, Set<Integer> queryIds) throws RemoteException {
 		/*
 		 * There are three cases of param.ratingVector:
 		 * 1. Its id is < 0, which indicates it is not stored in training dataset then, caching does not work even though this is cached algorithm.

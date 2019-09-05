@@ -1,6 +1,7 @@
 package net.hudup.core.evaluate;
 
 import java.io.Serializable;
+import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.List;
 
@@ -130,7 +131,7 @@ public class EvaluatorWrapper implements Evaluator, Serializable {
 		}
 		remoteEvaluator = null;
 		
-		remoteUnexport();
+		unexport();
 	}
 
 	
@@ -275,7 +276,7 @@ public class EvaluatorWrapper implements Evaluator, Serializable {
 
 	
 	@Override
-	public Evaluator remoteExport(int serverPort) throws RemoteException {
+	public Remote export(int serverPort) throws RemoteException {
 		// TODO Auto-generated method stub
 		if (stub == null)
 			stub = (Evaluator) NetUtil.RegistryRemote.export(this, serverPort);
@@ -285,11 +286,11 @@ public class EvaluatorWrapper implements Evaluator, Serializable {
 
 	
 	@Override
-	public void remoteUnexport() throws RemoteException {
+	public void unexport() throws RemoteException {
 		// TODO Auto-generated method stub
 		if (exclusive && remoteEvaluator != null) {
 			try {
-				remoteEvaluator.remoteUnexport();
+				remoteEvaluator.unexport();
 			} catch (Exception e) {e.printStackTrace();}
 		}
 		remoteEvaluator = null;

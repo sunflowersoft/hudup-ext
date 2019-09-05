@@ -11,6 +11,7 @@ import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.SetupAlgListener;
 import net.hudup.core.data.AutoCloseable;
 import net.hudup.core.data.DatasetPool;
+import net.hudup.core.data.Exportable;
 import net.hudup.core.logistic.RemoteRunner;
 
 /**
@@ -78,7 +79,7 @@ import net.hudup.core.logistic.RemoteRunner;
  * @version 10.0
  *
  */
-public interface Evaluator extends Remote, RemoteRunner, SetupAlgListener, AutoCloseable {
+public interface Evaluator extends Remote, RemoteRunner, SetupAlgListener, Exportable, AutoCloseable {
 
 	
 	/**
@@ -250,22 +251,6 @@ public interface Evaluator extends Remote, RemoteRunner, SetupAlgListener, AutoC
 	 */
     void removeSetupAlgListener(SetupAlgListener listener) throws RemoteException;
 
-    
-    /**
-     * Remote exporting this evaluator.
-     * @param serverPort server port.
-     * @return stub as remote evaluator.
-     * @throws RemoteException if any error raises.
-     */
-    Evaluator remoteExport(int serverPort) throws RemoteException;
-    
-    
-    /**
-     * Remote unexporting this evaluator.
-     * @throws RemoteException if any error raises.
-     */
-    void remoteUnexport() throws RemoteException;
-    
     
 //    /**
 //     * Testing RMI call.

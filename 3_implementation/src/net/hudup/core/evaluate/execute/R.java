@@ -57,7 +57,7 @@ public class R extends TwoArrayMetric {
 	@Override
 	public String getName() {
 		// TODO Auto-generated method stub
-		return "R.execute";
+		return "R.exe";
 	}
 	
 	
@@ -71,7 +71,7 @@ public class R extends TwoArrayMetric {
 	@Override
 	public String getDescription() throws RemoteException {
 		// TODO Auto-generated method stub
-		return "Pearson correlation (R) for testing algorithms";
+		return "Pearson correlation (R) for executable algorithms";
 	}
 
 

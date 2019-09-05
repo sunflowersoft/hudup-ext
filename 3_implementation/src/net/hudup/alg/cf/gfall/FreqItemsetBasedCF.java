@@ -79,7 +79,7 @@ public abstract class FreqItemsetBasedCF extends ModelBasedCFAbstract {
 
 
 	@Override
-	public KBase createKB() {
+	public KBase createKB() throws RemoteException {
 		return FreqItemsetKB.create(this);
 	}
 
@@ -145,8 +145,9 @@ public abstract class FreqItemsetBasedCF extends ModelBasedCFAbstract {
 	 * @param referredRatingValue referred rating value.
 	 * @param ratingFilter specified rating filter specified by {@link RatingFilter}.
 	 * @return {@link Estimate}
+	 * @throws RemoteException if any error raises.
 	 */
-	protected Estimate estimate(RecommendParam param, Set<Integer> queryIds, double referredRatingValue, RatingFilter ratingFilter) {
+	protected Estimate estimate(RecommendParam param, Set<Integer> queryIds, double referredRatingValue, RatingFilter ratingFilter) throws RemoteException {
 		if (param == null || param.ratingVector == null)
 			return null;
 		

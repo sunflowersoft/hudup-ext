@@ -154,15 +154,6 @@ public abstract class ExecutableAlgAbstract extends AlgAbstract implements Execu
 	}
 	
 	
-	/**
-	 * Getting exported executable algorithm.
-	 * @return exported executable algorithm.
-	 */
-	public ExecutableAlgRemote getExportedExecutableAlg() {
-		return (ExecutableAlgRemote)exportedStub;
-	}
-
-	
 	@Override
 	protected void finalize() throws Throwable {
 		// TODO Auto-generated method stub

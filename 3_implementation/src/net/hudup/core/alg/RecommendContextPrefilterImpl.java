@@ -115,7 +115,7 @@ public class RecommendContextPrefilterImpl extends CompositeRecommenderAbstract 
 
 
 	@Override
-	public Dataset getDataset() {
+	public Dataset getDataset() throws RemoteException {
 		// TODO Auto-generated method stub
 		return dataset == null ? filteredDataset : dataset;
 	}

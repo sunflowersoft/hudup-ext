@@ -75,13 +75,4 @@ public class DatasetParserRemoteWrapper extends AlgRemoteWrapper implements Data
 	}
 
 
-	/**
-	 * Getting exported dataset parser.
-	 * @return exported dataset parser.
-	 */
-	public DatasetParserRemote getExportedDatasetParser() {
-		return (DatasetParserRemote)exportedStub;
-	}
-
-	
 }

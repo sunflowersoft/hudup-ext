@@ -64,19 +64,12 @@ public class RmiRecommender extends ServiceRecommenderAbstract implements RmiAlg
 
 
 	@Override
-	public Dataset getDataset() {
+	public Dataset getDataset() throws RemoteException {
 		// TODO Auto-generated method stub
-		try {
-			if (service == null)
-				return null;
-			else
-				return service.getSnapshot();
-		} 
-		catch (Throwable e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		if (service == null)
 			return null;
-		}
+		else
+			return service.getSnapshot();
 	}
 
 

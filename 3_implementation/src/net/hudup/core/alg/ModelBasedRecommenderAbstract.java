@@ -45,9 +45,12 @@ public abstract class ModelBasedRecommenderAbstract extends RecommenderAbstract 
 		super();
 		// TODO Auto-generated constructor stub
 		
-		if (kb == null)
-			kb = createKB();
-		kb.setConfig(config); //This code line is important.
+		try {
+			if (kb == null)
+				kb = createKB();
+			kb.setConfig(config); //This code line is important.
+		}
+		catch (Throwable e) {e.printStackTrace();}
 	}
 
 
@@ -82,13 +85,13 @@ public abstract class ModelBasedRecommenderAbstract extends RecommenderAbstract 
 
 	
 	@Override
-	public KBase getKBase() {
+	public KBase getKBase() throws RemoteException {
 		return kb;
 	}
 
 	
 	@Override
-	public KBase newKBase(Dataset dataset) {
+	public KBase newKBase(Dataset dataset) throws RemoteException {
 		KBase kb = createKB();
 		kb.setConfig((DataConfig)config.clone());
 		
@@ -108,7 +111,7 @@ public abstract class ModelBasedRecommenderAbstract extends RecommenderAbstract 
 	
 	
 	@Override
-	public Dataset getDataset() {
+	public Dataset getDataset() throws RemoteException {
 		// TODO Auto-generated method stub
 		Datasource datasource = kb.getDatasource();
 		if (datasource != null)

@@ -38,7 +38,7 @@ public class MAEVector extends VectorMetric {
 	@Override
 	public String getDescription() throws RemoteException {
 		// TODO Auto-generated method stub
-		return "Vector of Mean Absolute Errors for testing algorithms";
+		return "Vector of Mean Absolute Errors for executable algorithms";
 	}
 
 	
@@ -52,7 +52,7 @@ public class MAEVector extends VectorMetric {
 	@Override
 	public String getName() {
 		// TODO Auto-generated method stub
-		return "MAEVector.test";
+		return "MAEVector.exe";
 	}
 
 	

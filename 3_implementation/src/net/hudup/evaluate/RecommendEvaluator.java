@@ -100,6 +100,12 @@ import net.hudup.core.logistic.xURI;
 public class RecommendEvaluator extends EvaluatorAbstract {
 
 	
+	/**
+	 * Default serial version UID.
+	 */
+	private static final long serialVersionUID = 1L;
+
+	
     /**
 	 * Default constructor.
 	 */
@@ -149,7 +155,7 @@ public class RecommendEvaluator extends EvaluatorAbstract {
 					long endSetupTime = System.currentTimeMillis();
 					long setupElapsed = endSetupTime - beginSetupTime;
 					Metrics setupMetrics = result.recalc(
-							recommender.getName(), 
+							recommender, 
 							datasetId, 
 							SetupTimeMetric.class, 
 							new Object[] { setupElapsed / 1000.0f }
@@ -157,7 +163,7 @@ public class RecommendEvaluator extends EvaluatorAbstract {
 					//Fire doing event with setup time metric.
 					fireEvaluatorEvent(new EvaluatorEvent(this, Type.doing, setupMetrics)); // firing setup time metric
 					
-					setupEvt = new SetupAlgEvent(new Integer(-1), SetupAlgEvent.Type.done, null, null, "not supported yet");
+					setupEvt = new SetupAlgEvent(new Integer(1), SetupAlgEvent.Type.done, null, null, "not supported yet");
 					fireSetupAlgEvent(setupEvt);
 					recommender.removeSetupListener(this);
 					

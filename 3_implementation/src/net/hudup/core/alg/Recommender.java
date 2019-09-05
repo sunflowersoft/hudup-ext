@@ -1,5 +1,6 @@
 package net.hudup.core.alg;
 
+import java.rmi.RemoteException;
 import java.util.Set;
 
 import net.hudup.core.data.Dataset;
@@ -25,8 +26,9 @@ public abstract interface Recommender extends Alg, RecommenderRemote, Inspectabl
 	 * Some recommender (s) store internal dataset but others only have references to dataset.
 	 * Anyway, such reference always exists.
 	 * @return reference to dataset.
+	 * @throws RemoteException if any error raises.
 	 */
-	Dataset getDataset();
+	Dataset getDataset() throws RemoteException;
 	
 	
 }

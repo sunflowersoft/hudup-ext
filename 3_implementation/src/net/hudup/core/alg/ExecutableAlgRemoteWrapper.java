@@ -118,15 +118,6 @@ public class ExecutableAlgRemoteWrapper extends AlgRemoteWrapper implements Exec
 	}
 
 
-	/**
-	 * Getting exported executable algorithm.
-	 * @return exported executable algorithm.
-	 */
-	public ExecutableAlgRemote getExportedExecutableAlg() {
-		return (ExecutableAlgRemote)exportedStub;
-	}
-
-	
 	@Override
 	public synchronized void unexport() throws RemoteException {
 		// TODO Auto-generated method stub

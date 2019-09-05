@@ -107,13 +107,4 @@ public class MetricRemoteWrapper extends AlgRemoteWrapper implements Metric {
 	}
 
 
-	/**
-	 * Getting exported metric.
-	 * @return exported metric.
-	 */
-	public MetricRemote getExportedMetric() {
-		return (MetricRemote)exportedStub;
-	}
-
-
 }

@@ -73,7 +73,7 @@ public abstract class MemoryBasedRecommenderAbstract extends RecommenderAbstract
 
 	
 	@Override
-	public Dataset getDataset() {
+	public Dataset getDataset() throws RemoteException {
 		return dataset;
 	}
 	
@@ -311,4 +311,5 @@ public abstract class MemoryBasedRecommenderAbstract extends RecommenderAbstract
 //		return rec.size() == 0 ? null : rec;
 //	}
 
+	
 }

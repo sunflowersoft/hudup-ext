@@ -10,7 +10,7 @@ import java.util.Set;
 
 import net.hudup.core.Util;
 import net.hudup.core.alg.Alg;
-import net.hudup.core.alg.ExecutableAlg;
+import net.hudup.core.alg.AlgRemote;
 import net.hudup.core.logistic.xURI;
 
 /**
@@ -176,15 +176,14 @@ public class Metrics implements Serializable {
 			Object[] params) {
 		Metrics result = recalc(alg.getName(), datasetId, metricClass, params);
 
-		//if (alg instanceof ExecutableAlg) { //This code line makes program run redundantly.
-		if ((alg instanceof ExecutableAlg) && (metricClass != null) && (metricClass.isAssignableFrom(SetupTimeMetric.class))) {
+		//if (alg instanceof AlgRemote) { //This code line makes program run redundantly.
+		if ((alg instanceof AlgRemote) && (metricClass != null) && (metricClass.isAssignableFrom(SetupTimeMetric.class))) {
 			String algName = alg.getName();
 			String algDesc = "";
 			try {
-				algDesc = ((ExecutableAlg)alg).getDescription();
+				algDesc = ((AlgRemote)alg).getDescription();
 			}
 			catch (Exception e) { e.printStackTrace(); }
-			algDesc = algDesc == null ? "" : algDesc;
 			
 			Map<Integer, String> descMap = null;
 			if (this.algDatasetDescMap.containsKey(algName))

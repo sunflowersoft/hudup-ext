@@ -33,7 +33,7 @@ public class MSE extends Accuracy {
 	@Override
 	public String getName() {
 		// TODO Auto-generated method stub
-		return "MSE.test";
+		return "MSE.exe";
 	}
 	
 	
@@ -47,7 +47,7 @@ public class MSE extends Accuracy {
 	@Override
 	public String getDescription() throws RemoteException {
 		// TODO Auto-generated method stub
-		return "Mean Squared Error for testing algorithms";
+		return "Mean Squared Error for executable algorithms";
 	}
 
 	

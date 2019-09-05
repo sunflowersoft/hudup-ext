@@ -36,14 +36,14 @@ public class RMSE extends MSE {
 	@Override
 	public String getName() {
 		// TODO Auto-generated method stub
-		return "RMSE.test";
+		return "RMSE.exe";
 	}
 	
 	
 	@Override
 	public String getDescription() throws RemoteException {
 		// TODO Auto-generated method stub
-		return "Root Mean Squared Error for testing algorithms";
+		return "Root Mean Squared Error for executable algorithms";
 	}
 
 	

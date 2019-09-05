@@ -1,5 +1,6 @@
 package net.hudup.core.alg;
 
+import java.rmi.Remote;
 import java.rmi.RemoteException;
 
 import javax.swing.event.EventListenerList;
@@ -169,7 +170,7 @@ public abstract class AlgAbstract implements Alg, AlgRemote {
 
 
 	@Override
-	public synchronized AlgRemote export(int serverPort) throws RemoteException {
+	public synchronized Remote export(int serverPort) throws RemoteException {
 		// TODO Auto-generated method stub
 		if (exportedStub == null)
 			exportedStub = (AlgRemote) NetUtil.RegistryRemote.export(this, serverPort);

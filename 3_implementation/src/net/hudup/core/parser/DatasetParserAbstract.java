@@ -33,13 +33,4 @@ public abstract class DatasetParserAbstract extends AlgAbstract implements Datas
 	}
 
 
-	/**
-	 * Getting exported dataset parser.
-	 * @return exported dataset parser.
-	 */
-	public DatasetParserRemote getExportedDatasetParser() {
-		return (DatasetParserRemote)exportedStub;
-	}
-
-
 }

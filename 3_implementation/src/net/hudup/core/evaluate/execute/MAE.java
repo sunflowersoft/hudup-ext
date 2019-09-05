@@ -33,7 +33,7 @@ public class MAE extends Accuracy {
 	@Override
 	public String getDescription() throws RemoteException {
 		// TODO Auto-generated method stub
-		return "Mean Absolute Error for testing algorithms";
+		return "Mean Absolute Error for executable algorithms";
 	}
 
 	
@@ -47,7 +47,7 @@ public class MAE extends Accuracy {
 	@Override
 	public String getName() {
 		// TODO Auto-generated method stub
-		return "MAE.test";
+		return "MAE.exe";
 	}
 
 	

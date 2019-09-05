@@ -210,17 +210,34 @@ public abstract class KBaseAbstract implements KBase {
 		return new Inspector.NullInspector();
 	}
 
-
-//	@Override
-//	public void view(Component comp) {
-//		// TODO Auto-generated method stub
-//		
-//		JOptionPane.showMessageDialog(
-//				comp, 
-//				"Not implemented yet", 
-//				"Not implemented yet", 
-//				JOptionPane.INFORMATION_MESSAGE);
-//	}
 	
+	/**
+	 * Create empty knowledge base.
+	 * @param kbaseName knowledge base name.
+	 * @return empty knowledge base.
+	 */
+	public static KBase emptyKBase(String kbaseName) {
+		return new KBaseAbstract() {
+			
+			/**
+			 * Default serial version UID.
+			 */
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public boolean isEmpty() {
+				// TODO Auto-generated method stub
+				return true;
+			}
+			
+			@Override
+			public String getName() {
+				// TODO Auto-generated method stub
+				return (kbaseName != null && !kbaseName.isEmpty()) ? kbaseName : "empty_kbase";
+			}
+			
+		};
+	}
+
 	
 }

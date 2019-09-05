@@ -5,7 +5,6 @@ import java.io.Serializable;
 import net.hudup.core.Transfer;
 
 
-
 /**
  * {@link ContextTemplateSchema} class represents a scheme of context templates.
  * By default, it includes a set of root templates; each root template is a tree or a set, which in turn, have many templates

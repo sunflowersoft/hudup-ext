@@ -44,7 +44,7 @@ public class NeighborCFItemBased extends NeighborCF implements DuplicatableAlg {
 
 	
 	@Override
-	public RatingVector estimate(RecommendParam param, Set<Integer> queryIds) {
+	public RatingVector estimate(RecommendParam param, Set<Integer> queryIds) throws RemoteException {
 		// TODO Auto-generated method stub
 		return estimate(this, param, queryIds);
 	}
@@ -59,8 +59,9 @@ public class NeighborCFItemBased extends NeighborCF implements DuplicatableAlg {
 	 * @param param recommendation parameter. Please see {@link RecommendParam} for more details of this parameter.
 	 * @param queryIds set of identifications (IDs) of items that need to be estimated their rating values.
 	 * @return rating vector contains estimated rating values of the specified set of IDs of items (users). Return null if cannot estimate.
+	 * @throws RemoteException if any error raises.
 	 */
-	public static RatingVector estimate(NeighborCF cf, RecommendParam param, Set<Integer> queryIds) {
+	public static RatingVector estimate(NeighborCF cf, RecommendParam param, Set<Integer> queryIds) throws RemoteException {
 		// TODO Auto-generated method stub
 		/*
 		 * There are three cases of param.ratingVector:

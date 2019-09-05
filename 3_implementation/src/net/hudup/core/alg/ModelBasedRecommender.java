@@ -3,6 +3,8 @@
  */
 package net.hudup.core.alg;
 
+import java.rmi.RemoteException;
+
 import net.hudup.core.data.Dataset;
 
 
@@ -34,8 +36,9 @@ public interface ModelBasedRecommender extends Recommender, ModelBasedAlg {
 	 * For example, if model-based recommender uses frequent purchase pattern to make recommendation, the new {@code KBase} contains such pattern.
 	 * @param dataset specified dataset.
 	 * @return new instance of {@link KBase}.
+	 * @throws RemoteException if any error raises.
 	 */
-	KBase newKBase(Dataset dataset);
+	KBase newKBase(Dataset dataset) throws RemoteException;
 	
 	
 }

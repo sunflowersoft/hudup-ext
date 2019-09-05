@@ -5,6 +5,7 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 
 import net.hudup.core.data.DataConfig;
+import net.hudup.core.data.Exportable;
 
 /**
  * This interface represents a remote algorithm.
@@ -13,7 +14,7 @@ import net.hudup.core.data.DataConfig;
  * @version 1.0
  *
  */
-public interface AlgRemote extends Remote, SetupAlgListener, Serializable {
+public interface AlgRemote extends Remote, SetupAlgListener, Exportable, Serializable {
 
 	
 	/**
@@ -59,27 +60,11 @@ public interface AlgRemote extends Remote, SetupAlgListener, Serializable {
 
 
     /**
-     * Firing (issuing) an event from this EM to all listeners. 
-     * @param evt event from this EM.
+     * Firing (issuing) an event from this algorithm to all listeners. 
+     * @param evt event from this algorithm.
 	 * @throws RemoteException if any error raises.
      */
 	void fireSetupEvent(SetupAlgEvent evt) throws RemoteException;
 
 	
-	/**
-     * Remote exporting this remote algorithm.
-     * @param serverPort server port.
-     * @return stub as remote algorithm. Return null if exporting fails.
-     * @throws RemoteException if any error raises.
-     */
-    AlgRemote export(int serverPort) throws RemoteException;
-    
-    
-    /**
-     * Remote unexporting remote algorithm.
-     * @throws RemoteException if any error raises.
-     */
-    void unexport() throws RemoteException;
-
-
 }

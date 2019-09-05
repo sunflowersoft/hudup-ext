@@ -85,7 +85,7 @@ public class RecommenderRemoteWrapper extends AlgRemoteWrapper implements Recomm
 
 	
 	@Override
-	public Dataset getDataset() {
+	public Dataset getDataset() throws RemoteException {
 		// TODO Auto-generated method stub
 		if (remoteAlg instanceof Recommender)
 			return ((Recommender)remoteAlg).getDataset();
@@ -124,15 +124,6 @@ public class RecommenderRemoteWrapper extends AlgRemoteWrapper implements Recomm
 	}
 
 	
-	/**
-	 * Getting exported recommender.
-	 * @return exported recommender.
-	 */
-	public RecommenderRemote getExportedRecommender() {
-		return (RecommenderRemote)exportedStub;
-	}
-
-
 	@Override
 	public synchronized void unexport() throws RemoteException {
 		// TODO Auto-generated method stub

@@ -132,7 +132,7 @@ public class ExternalServerRecommender extends CompositeRecommenderAbstract {
 
 	
 	@Override
-	public Dataset getDataset() {
+	public Dataset getDataset() throws RemoteException {
 		// TODO Auto-generated method stub
 		AlgList innerRecommenders = getInnerRecommenders();
 		if (innerRecommenders.size() > 0)

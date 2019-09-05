@@ -25,7 +25,7 @@ public class MAERatio extends Accuracy {
 	@Override
 	public String getDescription() throws RemoteException {
 		// TODO Auto-generated method stub
-		return "Ratio Mean Absolute Error for testing algorithms";
+		return "Ratio Mean Absolute Error for executable algorithms";
 	}
 
 	
@@ -39,7 +39,7 @@ public class MAERatio extends Accuracy {
 	@Override
 	public String getName() {
 		// TODO Auto-generated method stub
-		return "MAERatio.test";
+		return "MAERatio.exe";
 	}
 
 	

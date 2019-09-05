@@ -40,7 +40,7 @@ public class ErrorRange extends ArrayMetric {
 	@Override
 	public String getName() {
 		// TODO Auto-generated method stub
-		return "ErrorRange.test";
+		return "ErrorRange.exe";
 	}
 	
 	
@@ -54,7 +54,7 @@ public class ErrorRange extends ArrayMetric {
 	@Override
 	public String getDescription() throws RemoteException {
 		// TODO Auto-generated method stub
-		return "Error range for testing algorithms";
+		return "Error range for executable algorithms";
 	}
 	
 

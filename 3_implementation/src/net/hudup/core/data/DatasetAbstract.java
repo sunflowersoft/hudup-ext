@@ -49,7 +49,7 @@ public abstract class DatasetAbstract implements Dataset, DatasetRemote {
     /**
      * Stub as remote dataset.
      */
-    protected DatasetRemote stub = null;
+    protected DatasetRemote exportedStub = null;
 
     
     @Override
@@ -95,11 +95,11 @@ public abstract class DatasetAbstract implements Dataset, DatasetRemote {
 
 
 	/**
-	 * Getting stub as remote dataset.
-	 * @return stub as remote dataset.
+	 * Getting exported dataset.
+	 * @return exported dataset.
 	 */
-	public DatasetRemote getStubDataset() {
-		return (DatasetRemote)stub;
+	public DatasetRemote getExportedDataset() {
+		return (DatasetRemote)exportedStub;
 	}
 
 	
@@ -309,19 +309,19 @@ public abstract class DatasetAbstract implements Dataset, DatasetRemote {
 	@Override
 	public synchronized DatasetRemote remoteExport(int serverPort) throws RemoteException {
 		//Remote wrapper can export itself because this function is useful when the wrapper as remote algorithm can be called remotely by remote evaluator via Evaluator.remoteStart method.
-		if (stub == null)
-			stub = (DatasetRemote) NetUtil.RegistryRemote.export(this, serverPort);
+		if (exportedStub == null)
+			exportedStub = (DatasetRemote) NetUtil.RegistryRemote.export(this, serverPort);
 	
-		return stub;
+		return exportedStub;
 	}
 
 
 	@Override
 	public synchronized void remoteUnexport() throws RemoteException {
 		// TODO Auto-generated method stub
-		if (stub != null) {
+		if (exportedStub != null) {
 			NetUtil.RegistryRemote.unexport(this);
-			stub = null;
+			exportedStub = null;
 		}
 	}
 

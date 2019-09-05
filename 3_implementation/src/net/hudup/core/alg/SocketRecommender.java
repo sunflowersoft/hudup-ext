@@ -69,19 +69,12 @@ public class SocketRecommender extends ServiceRecommenderAbstract implements Soc
 
 
 	@Override
-	public Dataset getDataset() {
+	public Dataset getDataset() throws RemoteException {
 		// TODO Auto-generated method stub
-		try {
-			if (connection == null)
-				return null;
-			else
-				return connection.getSnapshot();
-		} 
-		catch (Throwable e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		if (connection == null)
 			return null;
-		}
+		else
+			return connection.getSnapshot();
 	}
 
 

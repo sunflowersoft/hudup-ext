@@ -2,6 +2,7 @@ package net.hudup.core.evaluate;
 
 import java.io.Serializable;
 import java.io.Writer;
+import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.Date;
 import java.util.EventListener;
@@ -105,6 +106,12 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 
 	
 	/**
+	 * Default serial version UID.
+	 */
+	private static final long serialVersionUID = 1L;
+
+
+	/**
 	 * Configuration of this evaluator.
 	 */
 	protected EvaluatorConfig config = null;
@@ -156,7 +163,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 	/**
 	 * Exported stub as remote evaluator.
 	 */
-	protected Evaluator stub = null;
+	protected Evaluator exportedStub = null;
 	
 	
     /**
@@ -295,7 +302,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 					fireEvaluatorEvent(new EvaluatorEvent(this, Type.doing, setupMetrics)); // firing setup time metric
 					
 					if (alg instanceof AlgRemote) {
-						SetupAlgEvent setupEvt = new SetupAlgEvent(new Integer(-1), SetupAlgEvent.Type.done, null, null, "not supported yet");
+						SetupAlgEvent setupEvt = new SetupAlgEvent(new Integer(1), SetupAlgEvent.Type.done, null, null, "not supported yet");
 						fireSetupAlgEvent(setupEvt);
 						((AlgRemote)alg).removeSetupListener(this);
 					}
@@ -794,6 +801,59 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 
 
 	@Override
+	public synchronized Remote export(int serverPort) throws RemoteException {
+		// TODO Auto-generated method stub
+		if (exportedStub == null)
+			exportedStub = (Evaluator) NetUtil.RegistryRemote.export(this, serverPort);
+		
+		return exportedStub;
+	}
+
+
+	@Override
+	public synchronized void unexport() throws RemoteException {
+		// TODO Auto-generated method stub
+		if (exportedStub != null) {
+			NetUtil.RegistryRemote.unexport(this);
+			exportedStub = null;
+		}
+	}
+
+
+	@Override
+	public synchronized void close() throws Exception {
+		// TODO Auto-generated method stub
+		try {
+			unsetupAlgs();
+		}
+		catch (Throwable e) {
+			e.printStackTrace();
+		}
+		
+		try {
+			unexport();
+		}
+		catch (Throwable e) {
+			e.printStackTrace();
+		}
+	}
+
+
+	@Override
+	protected void finalize() throws Throwable {
+		// TODO Auto-generated method stub
+		super.finalize();
+		
+		try {
+			close();
+		}
+		catch (Throwable e) {
+			e.printStackTrace();
+		}
+	}
+
+	
+	@Override
 	public void remoteStart(Serializable... parameters) throws RemoteException {
 		// TODO Auto-generated method stub
 		if (parameters == null || parameters.length < 2
@@ -863,59 +923,6 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 	public boolean remoteIsRunning() throws RemoteException {
 		// TODO Auto-generated method stub
 		return isRunning();
-	}
-
-
-	@Override
-	public synchronized Evaluator remoteExport(int serverPort) throws RemoteException {
-		// TODO Auto-generated method stub
-		if (stub == null)
-			stub = (Evaluator) NetUtil.RegistryRemote.export(this, serverPort);
-		
-		return stub;
-	}
-
-
-	@Override
-	public synchronized void remoteUnexport() throws RemoteException {
-		// TODO Auto-generated method stub
-		if (stub != null) {
-			NetUtil.RegistryRemote.unexport(this);
-			stub = null;
-		}
-	}
-
-
-	@Override
-	public synchronized void close() throws Exception {
-		// TODO Auto-generated method stub
-		try {
-			unsetupAlgs();
-		}
-		catch (Throwable e) {
-			e.printStackTrace();
-		}
-		
-		try {
-			remoteUnexport();
-		}
-		catch (Throwable e) {
-			e.printStackTrace();
-		}
-	}
-
-
-	@Override
-	protected void finalize() throws Throwable {
-		// TODO Auto-generated method stub
-		super.finalize();
-		
-		try {
-			close();
-		}
-		catch (Throwable e) {
-			e.printStackTrace();
-		}
 	}
 
 

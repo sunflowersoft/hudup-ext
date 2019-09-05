@@ -29,6 +29,12 @@ public abstract class ExecuteEvaluator extends EvaluatorAbstract {
 
 	
 	/**
+	 * Default serial version UID.
+	 */
+	private static final long serialVersionUID = 1L;
+
+	
+	/**
 	 * Default constructor.
 	 */
 	public ExecuteEvaluator() {

@@ -4,6 +4,7 @@ import java.io.DataOutputStream;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.net.Socket;
+import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.EventListener;
 import java.util.List;
@@ -334,7 +335,7 @@ public class Delegator extends AbstractDelegator {
 				if (remoteEvaluator == null)
 					return null;
 				DelegatorEvaluator evaluator = new DelegatorEvaluator(this, remoteEvaluator);
-				return Response.create(evaluator.stub);
+				return Response.create(evaluator.exportedStub);
 			}
 			
 			else if (action.equals(GET_EVALUATOR_NAMES))
@@ -397,6 +398,12 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluatorProgr
 
 	
 	/**
+	 * Default serial version UID.
+	 */
+	private static final long serialVersionUID = 1L;
+
+	
+	/**
 	 * Holding a list of {@link EventListener} (s)
 	 * 
 	 */
@@ -425,7 +432,7 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluatorProgr
 	/**
 	 * Stub object of this evaluator which is serialized to client.
 	 */
-	protected Evaluator stub = null;
+	protected Evaluator exportedStub = null;
 	
 	
 	/**
@@ -439,7 +446,7 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluatorProgr
 			this.socketServer = delegator.socketServer;
 			this.remoteEvaluator = remoteEvaluator;
 			
-			remoteExport(delegator.socketServer.getConfig().getAsInt(ListenerConfig.EXPORT_PORT_FIELD));
+			export(delegator.socketServer.getConfig().getAsInt(ListenerConfig.EXPORT_PORT_FIELD));
 		}
 		catch (Exception e) {
 			e.printStackTrace();
@@ -780,10 +787,10 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluatorProgr
 
 
 	@Override
-	public synchronized Evaluator remoteExport(int serverPort) throws RemoteException {
+	public synchronized Remote export(int serverPort) throws RemoteException {
 		// TODO Auto-generated method stub
-		if (stub == null) {
-			stub = (Evaluator)NetUtil.RegistryRemote.export(this, serverPort);
+		if (exportedStub == null) {
+			exportedStub = (Evaluator)NetUtil.RegistryRemote.export(this, serverPort);
 
 			try {
 				remoteEvaluator.addEvaluatorListener(this);
@@ -795,26 +802,26 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluatorProgr
 			remoteServer.incRequest();
 		}
 		
-		return stub;
+		return exportedStub;
 	}
 
 
 	@Override
-	public synchronized void remoteUnexport() throws RemoteException {
+	public synchronized void unexport() throws RemoteException {
 		// TODO Auto-generated method stub
-		if (stub != null) {
+		if (exportedStub != null) {
 			this.remoteStop(); //It is possible to stop this evaluator because its is delegated evaluator.
 			
 			try {
 				remoteEvaluator.removeEvaluatorListener(this);
 				remoteEvaluator.removeProgressListener(this);
 				remoteEvaluator.removeSetupAlgListener(this);
-				remoteEvaluator.remoteUnexport();
+				remoteEvaluator.unexport();
 			} catch (Exception e) {e.printStackTrace();}
 			
 			socketServer.removeRunner(this);
 			NetUtil.RegistryRemote.unexport(this);
-			stub = null;
+			exportedStub = null;
 			remoteServer.decRequest();
 		}
 	}
@@ -824,7 +831,7 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluatorProgr
 	public void close() throws Exception {
 		// TODO Auto-generated method stub
 		try {
-			remoteUnexport();
+			unexport();
 		}
 		catch (Throwable e) {
 			e.printStackTrace();

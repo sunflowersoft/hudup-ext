@@ -169,6 +169,13 @@ public class AlgDesc implements Serializable, net.hudup.core.Cloneable {
 			return MethodologyType.composite;
 		else if (alg instanceof ServiceAlg)
 			return MethodologyType.service;
+		else if (alg instanceof AlgRemoteWrapper) {
+			AlgRemote remoteAlg = ((AlgRemoteWrapper)alg).getRemoteAlg();
+			if (remoteAlg instanceof Alg)
+				return getTypeOf((Alg)remoteAlg);
+			else
+				return MethodologyType.unknown;
+		}
 		else
 			return MethodologyType.unknown;
 	}

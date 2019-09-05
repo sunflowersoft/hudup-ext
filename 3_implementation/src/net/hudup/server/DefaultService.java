@@ -203,8 +203,15 @@ public class DefaultService implements Service, AutoCloseable {
 	 * @return scanner inside recommender algorithm.
 	 */
 	protected Dataset getDataset() {
-		if (isOpened())
-			return recommender.getDataset();
+		if (isOpened()) {
+			try {
+				return recommender.getDataset();
+			}
+			catch (Throwable e) {
+				e.printStackTrace();
+				return null;
+			}
+		}
 		else
 			return null;
 	}
@@ -1449,7 +1456,7 @@ public class DefaultService implements Service, AutoCloseable {
 			}
 			
 			if (evaluator != null) {
-				evaluator.remoteExport(serverConfig.getServerPort());
+				evaluator.export(serverConfig.getServerPort());
 				
 				//Getting evaluator configuration here is not best solution. Update later.
 				if (this.evaluatorConfig == null)

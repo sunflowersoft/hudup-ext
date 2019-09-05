@@ -1,5 +1,7 @@
 package net.hudup.core.alg;
 
+import java.rmi.RemoteException;
+
 /**
  * This interface indicates an algorithm that learns and uses knowledge base to execute.
  * 
@@ -14,8 +16,9 @@ public interface ModelBasedAlg extends Alg {
 	 * Getting the internal knowledge base represented by {@link KBase} interface.
 	 * For example, if model-based recommender uses frequent purchase pattern to make recommendation, the internal {@code KBase} contains such pattern.
 	 * @return knowledge base {@link KBase}
+	 * @throws RemoteException if any error raises.
 	 */
-	KBase getKBase();
+	KBase getKBase() throws RemoteException;
 	
 	
 	/**
@@ -23,8 +26,9 @@ public interface ModelBasedAlg extends Alg {
 	 * Normally, {@code KBase} is created from dataset.
 	 * For example, if model-based recommender uses frequent purchase pattern to make recommendation, the new {@code KBase} contains such pattern.
 	 * @return knowledge base {@link KBase}
+	 * @throws RemoteException if any error raises.
 	 */
-	public abstract KBase createKB();
+	public abstract KBase createKB() throws RemoteException;
 	
 	
 }

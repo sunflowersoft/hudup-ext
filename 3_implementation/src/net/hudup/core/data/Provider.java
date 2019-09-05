@@ -727,6 +727,7 @@ public interface Provider extends AutoCloseable, Cloneable, Serializable {
 	/**
 	 * Closing provider, in which CTS manager and provider associator are closed too. All resources are released.
 	 */
+	@Override
 	void close();
 
 	

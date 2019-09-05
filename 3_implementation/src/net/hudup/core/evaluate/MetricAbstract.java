@@ -37,13 +37,4 @@ public abstract class MetricAbstract extends AlgAbstract implements Metric {
 	}
 
 	
-	/**
-	 * Getting exported metric.
-	 * @return exported metric.
-	 */
-	public MetricRemote getExportedMetric() {
-		return (MetricRemote)exportedStub;
-	}
-
-
 }
