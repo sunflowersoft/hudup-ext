@@ -11,6 +11,7 @@ import net.hudup.core.data.ExternalRecord;
 import net.hudup.core.data.Fetcher;
 
 /**
+ * This class is Java table for external record.
  * 
  * @author Loc Nguyen
  * @version 10.0
@@ -26,7 +27,8 @@ public class ExternalRecordTable extends JTable {
 
 	
 	/**
-	 * 
+	 * Constructor with user-item flag.
+	 * @param user user-item flag. If true, the record is user external record.
 	 */
 	public ExternalRecordTable(boolean user) {
 		super(new ExternalRecordTableModel(user));
@@ -34,8 +36,8 @@ public class ExternalRecordTable extends JTable {
 	
 	
 	/**
-	 * 
-	 * @param dataset
+	 * Update the table with specified dataset.
+	 * @param dataset specified dataset.
 	 */
 	public void update(Dataset dataset) {
 		getExternalRecordTableModel().update(dataset);
@@ -43,13 +45,12 @@ public class ExternalRecordTable extends JTable {
 	
 	
 	/**
-	 * 
-	 * @return table model
+	 * Getting the model of this table.
+	 * @return external record table model of this table.
 	 */
 	ExternalRecordTableModel getExternalRecordTableModel() {
 		return (ExternalRecordTableModel) getModel();
 	}
-	
 	
 	
 }
@@ -57,6 +58,7 @@ public class ExternalRecordTable extends JTable {
 
 
 /**
+ * This class is table model for external record.
  * 
  * @author Loc Nguyen
  * @version 10.0
@@ -72,13 +74,14 @@ class ExternalRecordTableModel extends DefaultTableModel {
 
 	
 	/**
-	 * 
+	 * User-item flag. If it is true, this is user table model.
 	 */
 	protected boolean user = false;
 	
 	
 	/**
-	 * 
+	 * Constructor with user-item flag.
+	 * @param user User-item flag. If it is true, this is user table model.
 	 */
 	public ExternalRecordTableModel(boolean user) {
 		super();
@@ -88,8 +91,8 @@ class ExternalRecordTableModel extends DefaultTableModel {
 	
 	
 	/**
-	 * 
-	 * @param dataset
+	 * Updating this model with specified dataset.
+	 * @param dataset specified dataset.
 	 */
 	public void update(Dataset dataset) {
 		Vector<Vector<Object>> data = Util.newVector();
@@ -133,8 +136,6 @@ class ExternalRecordTableModel extends DefaultTableModel {
 	}
 	
 	
-	
-	
 	@Override
 	public boolean isCellEditable(int row, int column) {
 		// TODO Auto-generated method stub
@@ -143,9 +144,9 @@ class ExternalRecordTableModel extends DefaultTableModel {
 
 
 	/**
-	 * 
-	 * @param user
-	 * @return column identifier
+	 * Converting this external record into to vector of texts.
+	 * @param user User-item flag. If it is true, this is user table model.
+	 * @return vector of texts.
 	 */
 	static Vector<String> toColumn(boolean user) {
 		Vector<String> columns = Util.newVector();
@@ -156,7 +157,6 @@ class ExternalRecordTableModel extends DefaultTableModel {
 		
 		return columns;
 	}
-	
 	
 	
 }

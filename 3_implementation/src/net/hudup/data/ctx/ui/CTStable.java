@@ -37,7 +37,8 @@ import net.hudup.data.ui.AttributeListTable.TypeCellEditor;
 
 
 /**
- * 
+ * This class is GUI table of context template schema.
+ *  
  * @author Loc Nguyen
  * @version 10.0
  *
@@ -52,14 +53,14 @@ public class CTStable extends JXTreeTable {
 
 	
 	/**
-	 * 
+	 * Modifying flag.
 	 */
 	protected boolean isModified = false;
 	
 	
 	/**
-	 * 
-	 * @param cts
+	 * Constructor with context template schema.
+	 * @param cts context template schema.
 	 */
 	public CTStable(ContextTemplateSchema cts) {
 		super(new CTSTableModel(cts));
@@ -82,8 +83,8 @@ public class CTStable extends JXTreeTable {
 	
 	
 	/**
-	 * 
-	 * @return {@link JPopupMenu}
+	 * Create context menu.
+	 * @return context menu.
 	 */
 	private JPopupMenu createContextMenu() {
 		JPopupMenu contextMenu = new JPopupMenu();
@@ -122,7 +123,7 @@ public class CTStable extends JXTreeTable {
 	
 	
 	/**
-	 * 
+	 * Adding default template.
 	 */
 	public void addDefaultTemplate() {
 		CTSTableModel model = getCTSTableModel();
@@ -158,7 +159,7 @@ public class CTStable extends JXTreeTable {
 	
 	
 	/**
-	 * 
+	 * Adding top-most template.
 	 */
 	public void addTopMostTemplate() {
 		CTSTableModel model = getCTSTableModel();
@@ -171,7 +172,7 @@ public class CTStable extends JXTreeTable {
 	
 	
 	/**
-	 * 
+	 * Remove selected template.
 	 */
 	public void removeSelectedTemplate() {
 		int selectedRow = getSelectedRow();
@@ -213,7 +214,7 @@ public class CTStable extends JXTreeTable {
 	
 	
 	/**
-	 * 
+	 * COnfiguring profile.
 	 */
 	public void configProfile() {
 		int selectedRow = getSelectedRow();
@@ -293,8 +294,8 @@ public class CTStable extends JXTreeTable {
 	
 	
 	/**
-	 * 
-	 * @return {@link CTSTableModel}
+	 * Getting model of context template schema table.
+	 * @return context template schema table.
 	 */
 	public CTSTableModel getCTSTableModel() {
 		return (CTSTableModel) getTreeTableModel();
@@ -302,7 +303,7 @@ public class CTStable extends JXTreeTable {
 	
 	
 	/**
-	 * 
+	 * Reload the table.
 	 */
 	public void reload() {
 		int selectedRow = getSelectedRow();
@@ -317,8 +318,8 @@ public class CTStable extends JXTreeTable {
 	
 	
 	/**
-	 * 
-	 * @return whether model is modified
+	 * Checking whether model is modified.
+	 * @return whether model is modified.
 	 */
 	public boolean isModified() {
 		return isModified;
@@ -326,8 +327,8 @@ public class CTStable extends JXTreeTable {
 	
 	
 	/**
-	 * 
-	 * @param isModified
+	 * Setting whether model is modified.
+	 * @param isModified true if model is modified.
 	 */
 	public void setModified(boolean isModified) {
 		this.isModified = isModified;
@@ -338,6 +339,7 @@ public class CTStable extends JXTreeTable {
 
 
 /**
+ * This class is model of context template schema table.
  * 
  * @author Loc Nguyen
  * @version 10.0
@@ -347,8 +349,8 @@ class CTSTableModel extends AbstractTreeTableModel {
 
 	
 	/**
-	 * 
-	 * @param cts
+	 * Constructor with specified context template schema as root.
+	 * @param cts specified context template schema.
 	 */
 	public CTSTableModel(ContextTemplateSchema cts) {
 		super(cts);
@@ -356,8 +358,8 @@ class CTSTableModel extends AbstractTreeTableModel {
 	
 	
 	/**
-	 * 
-	 * @param cts
+	 * Setting root as specified context template schema.
+	 * @param cts specified context template schema.
 	 */
 	public void setRoot(ContextTemplateSchema cts) {
 		this.root = cts;
@@ -366,8 +368,8 @@ class CTSTableModel extends AbstractTreeTableModel {
 	
 	
 	/**
-	 * 
-	 * @return {@link ContextTemplateSchema}
+	 * Getting root as specified context template schema.
+	 * @return root as specified context template schema.
 	 */
 	public ContextTemplateSchema cts() {
 		return (ContextTemplateSchema)root;
@@ -376,9 +378,9 @@ class CTSTableModel extends AbstractTreeTableModel {
 	
 	
 	/**
-	 * 
-	 * @param node
-	 * @return whether node is {@link ContextTemplate}
+	 * Checking whether a specified node is context template.
+	 * @param node specified node.
+	 * @return whether a specified node is context template.
 	 */
 	private boolean isContextTemplate(Object node) {
 		if (node instanceof ContextTemplate)
@@ -389,8 +391,8 @@ class CTSTableModel extends AbstractTreeTableModel {
 	
 	
 	/**
-	 * 
-	 * @return {@link TreeModelSupport}
+	 * Getting model support.
+	 * @return model support.
 	 */
 	public TreeModelSupport getModelSupport() {
 		return modelSupport;
@@ -510,10 +512,10 @@ class CTSTableModel extends AbstractTreeTableModel {
 
 	
 	/**
-	 * 
-	 * @param row
-	 * @param column
-	 * @return class of column
+	 * Getting class of specified row and column.
+	 * @param row specified row.
+	 * @param column specified column.
+	 * @return class of specified row and column.
 	 */
 	public Class<?> getColumnClass(int row, int column) {
 		Object value = getValueAt(row, column);
@@ -547,7 +549,4 @@ class CTSTableModel extends AbstractTreeTableModel {
 	}
 
 
-	
-	
-	
 }

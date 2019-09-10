@@ -29,8 +29,8 @@ public abstract class MetaFetcher<U extends Serializable, V extends Serializable
 
 
 	/**
-	 * 
-	 * @param fetcher
+	 * Constructor with specified fetcher as internal fetcher.
+	 * @param fetcher specified fetcher as internal fetcher.
 	 */
 	public MetaFetcher(Fetcher<U> fetcher) {
 		super();
@@ -83,9 +83,9 @@ public abstract class MetaFetcher<U extends Serializable, V extends Serializable
 	
 	
 	/**
-	 * 
-	 * @param u
-	 * @return created element
+	 * Creating element with specified key.
+	 * @param u specified key.
+	 * @return created element with specified key.
 	 */
 	public abstract V create(U u);
 	

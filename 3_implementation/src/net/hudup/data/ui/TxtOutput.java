@@ -21,6 +21,8 @@ import net.hudup.core.logistic.xURI;
 import net.hudup.core.logistic.ui.UIUtil;
 
 /**
+ * This class is an extension of Java text field to show text.
+ * 
  * @author Loc Nguyen
  * @version 10.0
  */
@@ -34,7 +36,7 @@ public class TxtOutput extends JTextArea {
 
 	
 	/**
-	 * 
+	 * Default constructor.
 	 */
 	public TxtOutput() {
 		super();
@@ -57,7 +59,7 @@ public class TxtOutput extends JTextArea {
 
 	
 	/**
-	 * 
+	 * Copying text output to clip-board.
 	 */
 	protected void copyOutputToClipboard() {
 		
@@ -66,7 +68,7 @@ public class TxtOutput extends JTextArea {
 	
 	
 	/**
-	 * 
+	 * Saving the text.
 	 */
 	protected void save() {
 		UriAdapter adapter = new UriAdapter(); 
@@ -96,8 +98,8 @@ public class TxtOutput extends JTextArea {
 
 	
 	/**
-	 * 
-	 * @return {@link JPopupMenu}
+	 * Creating context menu.
+	 * @return context menu as {@link JPopupMenu}.
 	 */
 	protected JPopupMenu createOutputContextMenu() {
 		JPopupMenu contextMenu = new JPopupMenu();
@@ -138,13 +140,11 @@ public class TxtOutput extends JTextArea {
 	
 	
 	/**
-	 * 
+	 * Clearing text.
 	 */
-	
 	private void clear() {
 		setText("");
 	}
-	
 	
 	
 }

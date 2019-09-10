@@ -100,13 +100,11 @@ public class DatasetToolkit extends JFrame {
 		
 		datasetCreator = new DatasetCreator(new SysConfig() {
 
-			
 			/**
 			 * Serial version UID for serializable class. 
 			 */
 			private static final long serialVersionUID = 1L;
 
-			
 			@Override
 			public void reset() {
 				// TODO Auto-generated method stub

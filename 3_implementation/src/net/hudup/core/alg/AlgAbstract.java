@@ -5,8 +5,6 @@ import java.rmi.RemoteException;
 
 import javax.swing.event.EventListenerList;
 
-import org.apache.log4j.Logger;
-
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.logistic.NetUtil;
 
@@ -29,12 +27,6 @@ public abstract class AlgAbstract implements Alg, AlgRemote {
 	 */
 	private static final long serialVersionUID = 1L;
 	
-	
-	/**
-	 * Logger of this class.
-	 */
-	protected final static Logger logger = Logger.getLogger(AlgAbstract.class);
-
 	
 	/**
 	 * This variable represents configuration of algorithm. It is returned value of {@link #getConfig()} method.

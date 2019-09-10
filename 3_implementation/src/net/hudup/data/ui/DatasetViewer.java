@@ -45,25 +45,39 @@ public class DatasetViewer extends JDialog {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	
+	/**
+	 * Rating matrix name.
+	 */
 	protected final static String VIEW_RATING_MATRIX = "Rating matrix";
 	
-	
+	/**
+	 * User profile name.
+	 */
 	protected final static String VIEW_USER_PROFILE = "User profile";
 
-	
+	/**
+	 * User external name.
+	 */
 	protected final static String VIEW_USER_EXTERNAL_RECORD = "User external";
 
-	
+	/**
+	 * Item profile name.
+	 */
 	protected final static String VIEW_ITEM_PROFILE = "Item profile";
 
-	
+	/**
+	 * Item external record name.
+	 */
 	protected final static String VIEW_ITEM_EXTERNAL_RECORD = "Item external";
 
-	
+	/**
+	 * Context template name.
+	 */
 	protected final static String VIEW_CTS = "Context template";
 
-	
+	/**
+	 * Sample name.
+	 */
 	protected final static String VIEW_SAMPLE = "Sample";
 
 	
@@ -73,18 +87,39 @@ public class DatasetViewer extends JDialog {
 	protected Dataset dataset = null;
 	
 	
+	/**
+	 * Rating matrix panel
+	 */
 	private RatingMatrixPane paneRatingMatrix = null;
 	
+	/**
+	 * User profile panel
+	 */
 	private JPanel paneUserProfile = null;
 
+	/**
+	 * User external panel
+	 */
 	private JPanel paneUserExternal = null;
 	
+	/**
+	 * Item profile panel.
+	 */
 	private JPanel paneItemProfile = null;
 
+	/**
+	 * External item panel.
+	 */
 	private JPanel paneItemExternal = null;
 
+	/**
+	 * Context template schema panel.
+	 */
 	private JPanel paneCTS = null;
 	
+	/**
+	 * Sample panel.
+	 */
 	private JPanel paneSample = null;
 	
 	
@@ -413,7 +448,6 @@ public class DatasetViewer extends JDialog {
 			
 		}
 
-		
 		@Override
 		protected void exportData() {
 			// TODO Auto-generated method stub

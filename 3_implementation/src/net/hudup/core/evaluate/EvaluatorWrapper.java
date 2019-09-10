@@ -5,8 +5,6 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.List;
 
-import org.apache.log4j.Logger;
-
 import net.hudup.core.PluginStorageWrapper;
 import net.hudup.core.RegisterTable;
 import net.hudup.core.alg.Alg;
@@ -33,12 +31,6 @@ public class EvaluatorWrapper implements Evaluator, Serializable {
 	private static final long serialVersionUID = 1L;
 
 	
-	/**
-	 * Logger of this class.
-	 */
-	protected final static Logger logger = Logger.getLogger(EvaluatorWrapper.class);
-
-
     /**
      * Stub as remote evaluator. It must be serializable.
      */

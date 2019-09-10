@@ -49,7 +49,7 @@ public class DatasetPoolDlg extends JDialog {
 
 	
 	/**
-	 * Main unitl
+	 * List of algorithms.
 	 */
 	protected List<Alg> algList = Util.newList();
 	

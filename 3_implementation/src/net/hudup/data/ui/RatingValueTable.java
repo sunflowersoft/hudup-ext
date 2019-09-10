@@ -203,7 +203,6 @@ public class RatingValueTable extends JTable {
 		
 		DefaultTableModel dm = new DefaultTableModel(data, columnNames) {
 
-			
 			/**
 			 * Serial version UID for serializable class. 
 			 */
@@ -274,6 +273,7 @@ public class RatingValueTable extends JTable {
 
 
 /**
+ * This class is model of rating value table.
  * 
  * @author Loc Nguyen
  * @version 10.0
@@ -289,25 +289,25 @@ class RatingValueTM extends DefaultTableModel {
 
 
 	/**
-	 * 
+	 * Column identifiers.
 	 */
 	protected List<Integer> columnIds = Util.newList();
 	
 	
 	/**
-	 * 
+	 * Map of row indices.
 	 */
 	protected Map<Integer, Integer> rowIndexes = Util.newMap();
 		
 	
 	/**
-	 * 
+	 * Map of column indices.
 	 */
 	protected Map<Integer, Integer> columnIndexes = Util.newMap();
 
 	
 	/**
-	 * 
+	 * Default constructor.
 	 */
 	public RatingValueTM() {
 		super();
@@ -315,8 +315,8 @@ class RatingValueTM extends DefaultTableModel {
 	
 	
 	/**
-	 * 
-	 * @return row name
+	 * Getting row name.
+	 * @return row name.
 	 */
 	public String getRowName() {
 		return "User";
@@ -324,8 +324,8 @@ class RatingValueTM extends DefaultTableModel {
 	
 	
 	/**
-	 * 
-	 * @return column name
+	 * Getting column name.
+	 * @return column name.
 	 */
 	public String getColumnName() {
 		return "Item";
@@ -333,9 +333,9 @@ class RatingValueTM extends DefaultTableModel {
 	
 	
 	/**
-	 * 
-	 * @param vRating
-	 * @return a row from {@link RatingVector}
+	 * Converting the specified rating vector into a vector.
+	 * @param vRating specified rating vector.
+	 * @return a row from {@link RatingVector}.
 	 */
 	public Vector<Object> toRow(RatingVector vRating) {
 		Vector<Object> row = new Vector<Object>();
@@ -358,10 +358,10 @@ class RatingValueTM extends DefaultTableModel {
 
 	
 	/**
-	 * 
-	 * @param matrix
-	 * @param rowId
-	 * @return row vector
+	 * Converting a row at specified index in rating matrix into a vector.
+	 * @param matrix specified rating matrix.
+	 * @param rowId specified row index.
+	 * @return row vector converted from a row at specified index in rating matrix.
 	 */
 	public Vector<Object> toRow(RatingMatrix matrix, int rowId) {
 		Vector<Object> row = new Vector<Object>();
@@ -380,7 +380,7 @@ class RatingValueTM extends DefaultTableModel {
 	
 	
 	/**
-	 * 
+	 * Creating a empty row.
 	 * @return empty row
 	 */
 	protected Vector<Object> toRowEmpty() {
@@ -395,7 +395,7 @@ class RatingValueTM extends DefaultTableModel {
 
 	
 	/**
-	 * 
+	 * Creating column names.
 	 * @return column names by column id (s)
 	 */
 	public Vector<String> toColumns() {
@@ -409,8 +409,8 @@ class RatingValueTM extends DefaultTableModel {
 	
 	
 	/**
-	 * 
-	 * @return list of column id (s)
+	 * Getting column identifiers.
+	 * @return list of column id (s).
 	 */
 	public List<Integer> getColumnIds(){
 		return columnIds;
@@ -418,9 +418,9 @@ class RatingValueTM extends DefaultTableModel {
 	
 	
 	/**
-	 * 
-	 * @param dataset
-	 * @param moreColumnIds
+	 * Updating this model with specified dataset and column identifiers.
+	 * @param dataset specified dataset.
+	 * @param moreColumnIds column identifiers.
 	 */
 	public void update(Dataset dataset, Collection<Integer> moreColumnIds) {
 		this.rowIndexes.clear();
@@ -459,9 +459,9 @@ class RatingValueTM extends DefaultTableModel {
 	
 	
 	/**
-	 * 
-	 * @param matrix
-	 * @param moreColumnIds
+	 * Updating this model with specified rating matrix and column identifiers.
+	 * @param matrix specified rating matrix.
+	 * @param moreColumnIds column identifiers.
 	 */
 	public void update(RatingMatrix matrix, Collection<Integer> moreColumnIds) {
 		this.rowIndexes.clear();
@@ -499,7 +499,7 @@ class RatingValueTM extends DefaultTableModel {
 	
 	
 	/**
-	 * 
+	 * Clearing this model.
 	 */
 	public void clear() {
 		update((Dataset)null, null);
@@ -507,22 +507,22 @@ class RatingValueTM extends DefaultTableModel {
 	
 	
 	/**
-	 * 
-	 * @param vRat
-	 * @param unused
+	 * Setting additional rating vector.
+	 * @param vRating rating vector.
+	 * @param unused reserved set of identifiers (not used in current version).
 	 */
-	public void setMoreRatingVector(RatingVector vRat, Set<Integer> unused) {
-		Integer rowIndex = this.rowIndexes.get(vRat.id());
+	public void setMoreRatingVector(RatingVector vRating, Set<Integer> unused) {
+		Integer rowIndex = this.rowIndexes.get(vRating.id());
 		Object value = null;
 		if (rowIndex == null) 
 			return;		
 		
-		Set<Integer> fieldIds = vRat.fieldIds();
+		Set<Integer> fieldIds = vRating.fieldIds();
 		for (int fieldId : fieldIds) {
 			Integer columnIndex = columnIndexes.get(fieldId);
 			if (columnIndex == null)
 				continue;
-			value = "[" + vRat.get(fieldId) + "]";
+			value = "[" + vRating.get(fieldId) + "]";
 				
 			setValueAt(value, rowIndex , columnIndex);
 		}
@@ -530,9 +530,9 @@ class RatingValueTM extends DefaultTableModel {
 	
 	
 	/**
-	 * 
-	 * @param rowIdx
-	 * @return a row as list of {@link MapVector}
+	 * Getting row at specified index.
+	 * @param rowIdx specified index.
+	 * @return a row as list of {@link MapVector} at specified index.
 	 */
 	public List<MapVector<Object>> getRow(int rowIdx) {
 		

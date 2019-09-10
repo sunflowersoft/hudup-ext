@@ -2,6 +2,7 @@ package net.hudup.data.ui;
 
 
 /**
+ * This class is Java table to show rating value with YRoller (Yellow Roller) algorithm.
  * 
  * @author Loc Nguyen
  * @version 10.0
@@ -16,6 +17,9 @@ public class YRollerDatasetTable extends RatingValueTable {
 	private static final long serialVersionUID = 1L;
 
 	
+	/**
+	 * Default constructor.
+	 */
 	public YRollerDatasetTable() {
 		super();
 		// TODO Auto-generated constructor stub
@@ -33,6 +37,7 @@ public class YRollerDatasetTable extends RatingValueTable {
 
 
 /**
+ * This class is table model of {@link YRollerDatasetTable} for YRoller (Yellow Roller) algorithm.
  * @author Loc Nguyen
  * @version 10.0
  */
@@ -46,7 +51,7 @@ class YRollerDatasetTM extends RatingValueTM {
 
 	
 	/**
-	 * 
+	 * Default constructor.
 	 */
 	public YRollerDatasetTM() {
 		super();

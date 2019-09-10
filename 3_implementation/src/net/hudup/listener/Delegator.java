@@ -34,6 +34,7 @@ import net.hudup.core.evaluate.EvaluatorProgressListener;
 import net.hudup.core.evaluate.Metric;
 import net.hudup.core.evaluate.Metrics;
 import net.hudup.core.evaluate.NoneWrapperMetricList;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.NetUtil;
 import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.xURI;
@@ -92,7 +93,7 @@ public class Delegator extends AbstractDelegator {
 			e.printStackTrace();
 			this.remoteService = null;
 			
-			logger.error("Delegator fail to be constructed in constructor method, causes error " + e.getMessage());
+			LogUtil.error("Delegator fail to be constructed in constructor method, causes error " + e.getMessage());
 		}
 	}
 	
@@ -106,7 +107,7 @@ public class Delegator extends AbstractDelegator {
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			logger.error("Delegator fail to increase server request, causes error " + e.getMessage());
+			LogUtil.error("Delegator fail to increase server request, causes error " + e.getMessage());
 		}
 		
 		super.run();
@@ -117,7 +118,7 @@ public class Delegator extends AbstractDelegator {
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			logger.error("Delegator fail to decrease server request, causes error " + e.getMessage());
+			LogUtil.error("Delegator fail to decrease server request, causes error " + e.getMessage());
 		}
 		
 		//Clear extra data.
@@ -190,7 +191,7 @@ public class Delegator extends AbstractDelegator {
 		}
 		catch (Throwable e) {
 			e.printStackTrace();
-			logger.error("Delegator fail to handle request, error is " + e.getMessage());
+			LogUtil.error("Delegator fail to handle request, error is " + e.getMessage());
 		}
 		
 		return false;
@@ -343,7 +344,7 @@ public class Delegator extends AbstractDelegator {
 		}
 		catch (Throwable e) {
 			e.printStackTrace();
-			logger.error("Delegator fail to process request, error is " + e.getMessage());
+			LogUtil.error("Delegator fail to process request, error is " + e.getMessage());
 		}
 		
 		return null;

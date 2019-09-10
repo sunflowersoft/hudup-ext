@@ -8,6 +8,7 @@ import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.DataDriver;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.logistic.BaseClass;
+import net.hudup.core.logistic.LogUtil;
 
 /**
  * This class is wrapper of remote dataset parser.
@@ -69,7 +70,7 @@ public class DatasetParserRemoteWrapper extends AlgRemoteWrapper implements Data
 			return new DatasetParserRemoteWrapper(newDatasetParser, exclusive);
 		}
 		else {
-			logger.warn("newInstance() returns itselfs and so does not return new object");
+			LogUtil.warn("newInstance() returns itselfs and so does not return new object");
 			return this;
 		}
 	}

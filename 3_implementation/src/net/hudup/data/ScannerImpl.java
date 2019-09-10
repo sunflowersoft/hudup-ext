@@ -26,6 +26,7 @@ import net.hudup.core.data.Scanner;
 import net.hudup.core.data.ctx.Context;
 import net.hudup.core.data.ctx.ContextList;
 import net.hudup.core.data.ctx.ContextTemplateSchema;
+import net.hudup.core.logistic.LogUtil;
 
 
 /**
@@ -410,7 +411,7 @@ public class ScannerImpl extends Scanner {
 		semiScanner.userRatingMap = RatingVector.select(semiScanner.userRatingMap, contexts);
 		semiScanner.itemRatingMap = RatingVector.select(semiScanner.itemRatingMap, contexts);
 		
-		logger.info("ScannerImpl@selectByContexts@557: Because context structure is complex, " +
+		LogUtil.info("ScannerImpl@selectByContexts@557: Because context structure is complex, " +
 				"it consumes a lot of redundant operations to select context via database instead of via memory. " +
 				"So it isn't a perfect solution but very good in this case");
 		

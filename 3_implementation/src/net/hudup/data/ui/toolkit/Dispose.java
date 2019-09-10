@@ -12,14 +12,14 @@ public interface Dispose {
 	
 	
 	/**
-	 * 
+	 * Disposing object.
 	 */
 	void dispose();
 	
 	
 	/**
-	 * 
-	 * @return whether running
+	 * Testing whether running.
+	 * @return whether running.
 	 */
 	boolean isRunning();
 	

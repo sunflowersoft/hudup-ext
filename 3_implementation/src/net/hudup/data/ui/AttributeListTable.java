@@ -28,6 +28,7 @@ import net.hudup.core.logistic.ui.UIUtil;
 
 
 /**
+ * This class is Java table to show attribute list.
  * 
  * @author Loc Nguyen
  * @version 10.0
@@ -43,7 +44,7 @@ public class AttributeListTable extends JTable {
 
 
 	/**
-	 * 
+	 * Supported attribute type.
 	 */
 	private final static Type SUPPORT_TYPE [] = {
 		Type.bit, Type.nominal, Type.integer, Type.real, Type.string, Type.date};
@@ -92,8 +93,8 @@ public class AttributeListTable extends JTable {
 
 	
 	/**
-	 * 
-	 * @return {@link AttributeListTM}
+	 * Getting table model of attribute list.
+	 * @return {@link AttributeListTM} as table model of attribute list.
 	 */
 	public AttributeListTM getAttributeListTM() {
 		return (AttributeListTM)getModel();
@@ -101,8 +102,8 @@ public class AttributeListTable extends JTable {
 	
 	
 	/**
-	 * 
-	 * @param attList
+	 * Getting attribute list.
+	 * @param attList specified attribute list.
 	 */
 	public void set(AttributeList attList) {
 		getAttributeListTM().set(attList);
@@ -127,8 +128,8 @@ public class AttributeListTable extends JTable {
 	
 	
 	/**
-	 * 
-	 * @return {@link AttributeList}
+	 * Getting attribute list.
+	 * @return {@link AttributeList} as attribute list.
 	 */
 	public AttributeList getAttributeList() {
 		return getAttributeListTM().getAttributeList();
@@ -136,7 +137,7 @@ public class AttributeListTable extends JTable {
 	
 	
 	/**
-	 * 
+	 * Applying attribute list to this table mode.
 	 * @return whether apply action is successfully
 	 */
 	public boolean apply() {
@@ -221,7 +222,7 @@ public class AttributeListTable extends JTable {
 
 	
 	/**
-	 * 
+	 * Adding a row.
 	 */
 	protected void addRow() {
 		Vector<Object> emptyRow = getAttributeListTM().emptyRow();
@@ -231,7 +232,7 @@ public class AttributeListTable extends JTable {
 	
 	
 	/**
-	 * 
+	 * Inserting a row.
 	 */
 	protected void insertRow() {
 		int selectedRow = getSelectedRow();
@@ -244,7 +245,7 @@ public class AttributeListTable extends JTable {
 
 	
 	/**
-	 * 
+	 * Clearing a row.
 	 */
 	protected void clearRow() {
 		int selectedRow = getSelectedRow();
@@ -259,7 +260,7 @@ public class AttributeListTable extends JTable {
 
 	
 	/**
-	 * 
+	 * Removing selected row.
 	 */
 	protected void removeRow() {
 		int selectedRow = getSelectedRow();
@@ -279,32 +280,29 @@ public class AttributeListTable extends JTable {
 
 	
 	/**
-	 * 
+	 * Cell editor of attribute type.
 	 * @author Loc Nguyen
 	 * @version 10.0
 	 *
 	 */
 	public static class TypeCellEditor extends DefaultCellEditor {
 
-		
 		/**
 		 * Serial version UID for serializable class. 
 		 */
 		private static final long serialVersionUID = 1L;
 
-		
 		/**
-		 * 
+		 * Default constructor.
 		 */
 		public TypeCellEditor() {
 			super(createComboBox());
 			
 		}
 		
-		
 		/**
-		 * 
-		 * @return {@link JComboBox}
+		 * Creating Java combo-box of attribute type.
+		 * @return {@link JComboBox} as Java combo-box of attribute type.
 		 */
 		private static JComboBox<Type> createComboBox() {
 			JComboBox<Type> comb = new JComboBox<Type>();
@@ -322,7 +320,7 @@ public class AttributeListTable extends JTable {
 
 
 /**
- * 
+ * This class is table model of attribute list. 
  * @author Loc Nguyen
  * @version 10.0
  *
@@ -337,25 +335,25 @@ class AttributeListTM extends DefaultTableModel {
 	
 	
 	/**
-	 * 
+	 * Maximum size.
 	 */
 	public final static int MAX_SIZE = 10;
 	
 	
 	/**
-	 * 
+	 * Attribute list.
 	 */
 	protected AttributeList attList = null;
 	
 	
 	/**
-	 * 
+	 * Enabled flag.
 	 */
 	protected boolean enabled = true;
 
 	
 	/**
-	 * 
+	 * Default constructor.
 	 */
 	public AttributeListTM() {
 		super();
@@ -364,8 +362,8 @@ class AttributeListTM extends DefaultTableModel {
 	
 	
 	/**
-	 * 
-	 * @param attList
+	 * Setting attribute list.
+	 * @param attList attribute list.
 	 */
 	public void set(AttributeList attList) {
 		this.attList = attList;
@@ -375,8 +373,8 @@ class AttributeListTM extends DefaultTableModel {
 	
 	
 	/**
-	 * 
-	 * @return column names
+	 * Creating column names.
+	 * @return column names.
 	 */
 	private Vector<String> createColumns() {
 		Vector<String> columns = Util.newVector();
@@ -391,8 +389,8 @@ class AttributeListTM extends DefaultTableModel {
 	
 	
 	/**
-	 * 
-	 * @return empty row
+	 * Creating empty row.
+	 * @return empty row.
 	 */
 	public Vector<Object> emptyRow() {
 		Vector<Object> row = Util.newVector();
@@ -406,7 +404,7 @@ class AttributeListTM extends DefaultTableModel {
 	
 	
 	/**
-	 * 
+	 * Refreshing this table model.
 	 */
 	public void refresh() {
 		Vector<String> columns = createColumns();
@@ -435,10 +433,10 @@ class AttributeListTM extends DefaultTableModel {
 	
 
 	/**
-	 * 
-	 * @param row
-	 * @param column
-	 * @return class of column
+	 * Getting class at specified row and column.
+	 * @param row specified row
+	 * @param column specified column.
+	 * @return class at specified row and column.
 	 */
 	public Class<?> getColumnClass(int row, int column) {
 		Object value = getValueAt(row, column);
@@ -450,7 +448,7 @@ class AttributeListTM extends DefaultTableModel {
 	
 	
 	/**
-	 * 
+	 * Clearing Java table model.
 	 */
 	public void clear() {
 		
@@ -468,8 +466,8 @@ class AttributeListTM extends DefaultTableModel {
 	
 	
 	/**
-	 * 
-	 * @return {@link AttributeList}
+	 * Getting attribute list.
+	 * @return {@link AttributeList} as attribute list.
 	 */
 	public AttributeList getAttributeList() {
 		return attList;
@@ -477,8 +475,8 @@ class AttributeListTM extends DefaultTableModel {
 	
 	
 	/**
-	 * 
-	 * @param enabled
+	 * Setting enabled flag.
+	 * @param enabled enabled flag.
 	 */
 	public void setEnabled(boolean enabled) {
 		this.enabled = enabled;
@@ -493,8 +491,8 @@ class AttributeListTM extends DefaultTableModel {
 
 	
 	/**
-	 * 
-	 * @return whether apply action successfully
+	 * Applying the internal attribute list into this model.
+	 * @return whether apply action successfully.
 	 */
 	public boolean apply() {
 		

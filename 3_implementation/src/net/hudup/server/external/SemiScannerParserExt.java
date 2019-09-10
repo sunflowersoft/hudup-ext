@@ -9,6 +9,7 @@ import net.hudup.parser.SemiScannerParser;
 
 
 /**
+ * This class is parser to parse extended semi-scanner.
  * 
  * @author Loc Nguyen
  * @version 10.0
@@ -24,7 +25,7 @@ public class SemiScannerParserExt extends SemiScannerParser {
 
 	
 	/**
-	 * 
+	 * Default constructor.
 	 */
 	public SemiScannerParserExt() {
 		super();

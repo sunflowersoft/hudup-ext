@@ -52,6 +52,7 @@ import net.hudup.core.evaluate.Metrics;
 import net.hudup.core.evaluate.MetricsUtil;
 import net.hudup.core.logistic.ClipboardUtil;
 import net.hudup.core.logistic.I18nUtil;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.xURI;
 import net.hudup.core.logistic.ui.UIUtil;
@@ -927,7 +928,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 		}
 		catch (Throwable e) {
 			e.printStackTrace();
-			logger.error("Error in evaluation");
+			LogUtil.error("Error in evaluation");
 			updateMode(); //Added date: 2019.08.12 by Loc Nguyen
 		}
 	}

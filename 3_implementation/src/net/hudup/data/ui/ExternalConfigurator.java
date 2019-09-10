@@ -62,34 +62,67 @@ public class ExternalConfigurator extends JDialog {
 	private static final long serialVersionUID = 1L;
 
 	
+	/**
+	 * Data driver combo-box.
+	 */
 	private DataDriverComboBox  cmbDataDrivers = null;
 	
+	/**
+	 * Host text field.
+	 */
 	private JTextField txtHost = null;
 	
+	/**
+	 * Port text field.
+	 */
 	private JFormattedTextField txtPort = null;
 	
+	/**
+	 * Path text field.
+	 */
 	private JTextField txtPath = null;
 
+	/**
+	 * Path button.
+	 */
 	private JButton btnPath = null;
 	
+	/**
+	 * User name text field.
+	 */
 	private JTextField txtUsername = null;
 	
+	/**
+	 * Password text field.
+	 */
 	private JPasswordField txtPassword = null;
 
+	/**
+	 * Unit list box.
+	 */
 	private UnitListBox lbUnits = null;
 	
+	/**
+	 * Properties table.
+	 */
 	private PropTable tblConfig = null;
 
+	/**
+	 * External configuration.
+	 */
 	private ExternalConfig externalConfig = null;
 
+	/**
+	 * The returned configuration.
+	 */
 	private ExternalConfig config = null;
 	
 	
 	/**
-	 * 
-	 * @param comp
-	 * @param dataDriverList
-	 * @param defaultConfig
+	 * Constructor with specified data driver list.
+	 * @param comp parent component.
+	 * @param dataDriverList specified data driver list.
+	 * @param defaultConfig default configuration.
 	 */
 	public ExternalConfigurator(
 			Component comp, 
@@ -304,7 +337,7 @@ public class ExternalConfigurator extends JDialog {
 	
 	
 	/**
-	 * 
+	 * Getting this external configirator.
 	 * @return this {@link ExternalConfigurator}
 	 */
 	private ExternalConfigurator getThis() {
@@ -313,8 +346,8 @@ public class ExternalConfigurator extends JDialog {
 
 	
 	/**
-	 * 
-	 * @param defaultCfg
+	 * Update by default configuration.
+	 * @param defaultCfg default configuration.
 	 */
 	private void updateDefaultConfig(ExternalConfig defaultCfg) {
 		if (defaultCfg == null)
@@ -372,7 +405,7 @@ public class ExternalConfigurator extends JDialog {
 	
 	
 	/**
-	 * 
+	 * Event-driven method by data driver changed.
 	 */
 	private void dataDriverChanged() {
 		DataDriver driver = (DataDriver)cmbDataDrivers.getSelectedItem();
@@ -406,8 +439,8 @@ public class ExternalConfigurator extends JDialog {
 	
 
 	/**
-	 * 
-	 * @param aFlag
+	 * Setting information connecting control panel by visible flag.
+	 * @param aFlag visible flag.
 	 */
 	private void setConnectInfoControlVisible(boolean aFlag) {
 		txtHost.setVisible(aFlag);
@@ -420,8 +453,8 @@ public class ExternalConfigurator extends JDialog {
 
 
 	/**
-	 * 
-	 * @return {@link DataDriver}
+	 * Getting data driver.
+	 * @return {@link DataDriver}.
 	 */
 	private DataDriver getDataDriver() {
 		return (DataDriver)cmbDataDrivers.getSelectedItem();
@@ -429,7 +462,7 @@ public class ExternalConfigurator extends JDialog {
 
 
 	/**
-	 * 
+	 * Event-drive method of OK button.
 	 */
 	private void onOk() {
 		if (externalConfig == null || externalConfig.size() == 0 || externalConfig.getStoreUri() == null) {
@@ -523,8 +556,8 @@ public class ExternalConfigurator extends JDialog {
 
 	
 	/**
-	 * 
-	 * @return {@link ExternalConfig}
+	 * Getting resulted external configuration.
+	 * @return {@link ExternalConfig} as result.
 	 */
 	public ExternalConfig getResult() {
 		return config;
@@ -532,8 +565,8 @@ public class ExternalConfigurator extends JDialog {
 
 	
 	/**
-	 * 
-	 * @param unitType
+	 * Setting unit type.
+	 * @param unitType unit type.
 	 */
 	private void setUnit(String unitType) {
 		if (externalConfig == null || externalConfig.size() == 0 || externalConfig.getStoreUri() == null) {
@@ -630,8 +663,8 @@ public class ExternalConfigurator extends JDialog {
 	
 	
 	/**
-	 * 
-	 * @param path
+	 * Normalizing path by replacing all backward slashes by forward slashes.
+	 * @param path specified path.
 	 * @return normalized path, remove all back slash
 	 */
 	private String normalizePath(String path) {
@@ -643,6 +676,7 @@ public class ExternalConfigurator extends JDialog {
 
 
 /**
+ * This class shows dialog allowing users to map external columns to internal columns.
  * 
  * @author Loc Nguyen
  * @version 10.0
@@ -659,21 +693,23 @@ class MappingColumnDlg extends JDialog {
 	
 	
 	/**
-	 * 
+	 * Mapping table.
 	 */
 	protected MappingTable tblMapping = null;
 	
 	
 	/**
-	 * 
+	 * Resulted external configuration.
 	 */
 	protected ExternalConfig result = new ExternalConfig();
 	
 	
 	/**
-	 * 
-	 * @param attributes
-	 * @param mappingFields
+	 * Constructors with external configuration, mapping fields, and unit.
+	 * @param comp parent component.
+	 * @param externalConfig external configuration.
+	 * @param mappingFields mapping fields.
+	 * @param unit specified unit.
 	 */
 	public MappingColumnDlg(final Component comp, ExternalConfig externalConfig, final List<String> mappingFields, String unit) {
 		super(UIUtil.getFrameForComponent(comp), "Mapping fields", true);
@@ -741,8 +777,8 @@ class MappingColumnDlg extends JDialog {
 	
 	
 	/**
-	 * 
-	 * @return mapping configuration
+	 * Getting resulted configuration.
+	 * @return mapping configuration as result.
 	 */
 	public ExternalConfig getResult() {
 		return result;
@@ -754,6 +790,7 @@ class MappingColumnDlg extends JDialog {
 
 
 /**
+ * This class shows dialog allowing users to map external columns to internal columns.
  * 
  * @author Loc Nguyen
  * @version 10.0
@@ -769,33 +806,35 @@ class MappingColumnDlg2 extends JDialog {
 	
 	
 	/**
-	 * 
+	 * External SQL field.
 	 */
 	protected JTextArea txtExternalSql = null;
 	
 	
 	/**
-	 * 
+	 * Mapping table.
 	 */
 	protected MappingTable tblMapping = null;
 	
 	
 	/**
-	 * 
+	 * Resulted external configuration.
 	 */
 	protected ExternalConfig result = new ExternalConfig();
 	
 	
 	/**
-	 * 
+	 * External provider.
 	 */
 	protected Provider externalProvider = null;
 	
 	
 	/**
-	 * 
-	 * @param unit
-	 * @param mappingFields
+	 * Constructors with external configuration, mapping fields, and unit.
+	 * @param comp parent component.
+	 * @param externalConfig external configuration.
+	 * @param mappingFields mapping fields.
+	 * @param unit specified unit.
 	 */
 	public MappingColumnDlg2(final Component comp, final ExternalConfig externalConfig, final List<String> mappingFields, String unit) {
 		super(UIUtil.getFrameForComponent(comp), "Mapping fields", true);
@@ -884,8 +923,8 @@ class MappingColumnDlg2 extends JDialog {
 	
 	
 	/**
-	 * 
-	 * @return mapping configuration
+	 * Getting mapping configuration as result.
+	 * @return mapping configuration.
 	 */
 	public ExternalConfig getResult() {
 		return result;
@@ -893,8 +932,8 @@ class MappingColumnDlg2 extends JDialog {
 
 	
 	/**
-	 * 
-	 * @return select SQL
+	 * Getting select SQL.
+	 * @return select SQL.
 	 */
 	public String getSelectSql() {
 		return txtExternalSql.getText().trim();
@@ -912,12 +951,11 @@ class MappingColumnDlg2 extends JDialog {
 	}
 	
 	
-	
-	
 }
 
 
 /**
+ * This class is Java table for mapping external columns and internal columns.
  * 
  * @author Loc Nguyen
  * @version 10.0
@@ -933,7 +971,7 @@ class MappingTable extends JTable {
 	
 	
 	/**
-	 * 
+	 * Default constructor.
 	 */
 	public MappingTable() {
 		super(new MappingTM());
@@ -942,9 +980,9 @@ class MappingTable extends JTable {
 	
 	
 	/**
-	 * 
-	 * @param attributes
-	 * @param mappingFields
+	 * Constructors with attribute list and mapping fields.
+	 * @param attributes attribute list.
+	 * @param mappingFields mapping fields.
 	 */
 	public MappingTable(AttributeList attributes, List<String> mappingFields) {
 		super(new MappingTM(attributes, mappingFields));
@@ -953,9 +991,9 @@ class MappingTable extends JTable {
 
 
 	/**
-	 * 
-	 * @param attributes
-	 * @param mappingFields
+	 * Update table with attribute list and mapping fields.
+	 * @param attributes attribute list.
+	 * @param mappingFields mapping fields.
 	 */
 	public void update(AttributeList attributes, List<String> mappingFields) {
 		getMappingTM().update(attributes, mappingFields);
@@ -963,8 +1001,8 @@ class MappingTable extends JTable {
 	
 	
 	/**
-	 * 
-	 * @return mapping table
+	 * Getting mapping table.
+	 * @return mapping table.
 	 */
 	public MappingTM getMappingTM() {
 		return (MappingTM) getModel();
@@ -972,7 +1010,7 @@ class MappingTable extends JTable {
 	
 	
 	/**
-	 * 
+	 * Clearing table model.
 	 */
 	public void clear() {
 		getMappingTM().clear();
@@ -984,6 +1022,7 @@ class MappingTable extends JTable {
 
 
 /**
+ * This class is table model of external-internal mapping.
  * 
  * @author Loc Nguyen
  * @version 10.0
@@ -999,7 +1038,7 @@ class MappingTM extends DefaultTableModel {
 	
 	
 	/**
-	 * 
+	 * Default constructor.
 	 */
 	public MappingTM() {
 		
@@ -1007,9 +1046,9 @@ class MappingTM extends DefaultTableModel {
 	
 	
 	/**
-	 * 
-	 * @param attributes
-	 * @param mappingFields
+	 * Constructor with attribute list and mapping fields.
+	 * @param attributes attribute list.
+	 * @param mappingFields mapping fields.
 	 */
 	public MappingTM(AttributeList attributes, List<String> mappingFields) {
 		update(attributes, mappingFields);
@@ -1017,9 +1056,9 @@ class MappingTM extends DefaultTableModel {
 
 	
 	/**
-	 * 
-	 * @param attributes
-	 * @param mappingFields
+	 * Update table with attribute list and mapping fields.
+	 * @param attributes attribute list.
+	 * @param mappingFields mapping fields.
 	 */
 	public void update(AttributeList attributes, List<String> mappingFields) {
 		Vector<Vector<Object>> data = Util.newVector();
@@ -1057,9 +1096,9 @@ class MappingTM extends DefaultTableModel {
 
 
 	/**
-	 * 
-	 * @param attributes
-	 * @return column identifiers
+	 * Converting attribute list to vector of column identifiers.
+	 * @param attributes specified attribute list.
+	 * @return vector of column identifiers.
 	 */
 	static Vector<String> toColumns(AttributeList attributes) {
 		Vector<String> columns = Util.newVector();
@@ -1072,7 +1111,6 @@ class MappingTM extends DefaultTableModel {
 		
 		return columns;
 	}
-	
 	
 	
 	@Override
@@ -1096,8 +1134,8 @@ class MappingTM extends DefaultTableModel {
 
 
 	/**
-	 * 
-	 * @return result {@link ExternalConfig}
+	 * Extracting resulted external configuration.
+	 * @return resulted {@link ExternalConfig}
 	 */
 	public ExternalConfig extractResult() {
 		ExternalConfig config = new ExternalConfig();
@@ -1127,7 +1165,7 @@ class MappingTM extends DefaultTableModel {
 	
 	
 	/**
-	 * 
+	 * Clearing this table model.
 	 */
 	public void clear() {
 		Vector<Vector<Object>> data = Util.newVector();
@@ -1135,8 +1173,6 @@ class MappingTM extends DefaultTableModel {
 		
 		setDataVector(data, columns);
 	}
-	
-	
 	
 	
 }

@@ -25,6 +25,7 @@ import net.hudup.core.data.RatingVector;
 import net.hudup.core.data.Snapshot;
 import net.hudup.core.data.UserRating;
 import net.hudup.core.evaluate.Evaluator;
+import net.hudup.core.logistic.LogUtil;
 
 
 /**
@@ -751,7 +752,7 @@ public class SocketWrapper extends ProtocolImpl implements Service {
 			e.printStackTrace();
 			responseText = null;
 			
-			logger.error("Socket warapper fail to send request to server, caused by " + e.getMessage());
+			LogUtil.error("Socket warapper fail to send request to server, caused by " + e.getMessage());
 			
 		}
 		finally {
@@ -761,7 +762,7 @@ public class SocketWrapper extends ProtocolImpl implements Service {
 				}
 				catch (Throwable e) {
 					e.printStackTrace();
-					logger.error("Socket wrapper fail to close output stream, causes error " + e.getMessage());
+					LogUtil.error("Socket wrapper fail to close output stream, causes error " + e.getMessage());
 				}
 			}
 			
@@ -771,7 +772,7 @@ public class SocketWrapper extends ProtocolImpl implements Service {
 				}
 				catch (Throwable e) {
 					e.printStackTrace();
-					logger.error("Socket wrapper fail to close input stream, causes error " + e.getMessage());
+					LogUtil.error("Socket wrapper fail to close input stream, causes error " + e.getMessage());
 				}
 			}
 
@@ -781,7 +782,7 @@ public class SocketWrapper extends ProtocolImpl implements Service {
 				}
 				catch (Throwable e) {
 					e.printStackTrace();
-					logger.error("Socket wrapper fail to close socket, causes error " + e.getMessage());
+					LogUtil.error("Socket wrapper fail to close socket, causes error " + e.getMessage());
 				}
 			}
 			

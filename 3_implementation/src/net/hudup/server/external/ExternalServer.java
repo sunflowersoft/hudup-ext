@@ -7,6 +7,7 @@ import javax.swing.JOptionPane;
 
 import net.hudup.core.data.ExternalConfig;
 import net.hudup.core.data.ExternalQuery;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.xURI;
 import net.hudup.core.logistic.ui.UIUtil;
 import net.hudup.data.DefaultExternalQuery;
@@ -16,7 +17,9 @@ import net.hudup.server.external.ui.SetupExternalServerWizard;
 
 
 /**
- * 
+ * This class is  a powerful server that supports external mapping.
+ * It is an extension of default server.
+ *  
  * @author Loc Nguyen
  * @version 10.0
  *
@@ -31,8 +34,8 @@ public class ExternalServer extends DefaultServer {
 
 	
 	/**
-	 * 
-	 * @param config
+	 * Constructor with specified external server configuration.
+	 * @param config external server configuration.
 	 */
 	public ExternalServer(ExternalServerConfig config) {
 		super(config);
@@ -58,11 +61,11 @@ public class ExternalServer extends DefaultServer {
 			query.importData(null);
 			query.close();
 			
-			logger.info("External server imported external data successfully (in server tasks)");
+			LogUtil.info("External server imported external data successfully (in server tasks)");
 		}
 		catch (Throwable e) {
 			e.printStackTrace();
-			logger.error("External server fail to import external data (in server tasks), caused by " + e.getMessage());
+			LogUtil.error("External server fail to import external data (in server tasks), caused by " + e.getMessage());
 			
 		}
 		finally {
@@ -80,7 +83,7 @@ public class ExternalServer extends DefaultServer {
 		}
 		catch (Throwable e) {
 			e.printStackTrace();
-			logger.error("External server fail to show control panel, caused by " + e.getMessage());
+			LogUtil.error("External server fail to show control panel, caused by " + e.getMessage());
 			
 			/*
 			 * It is possible that current Java environment does not support GUI.
@@ -92,7 +95,7 @@ public class ExternalServer extends DefaultServer {
 
 	
 	/**
-	 * 
+	 * Creating external server.
 	 * @return {@link ExternalServer}
 	 */
 	public static ExternalServer create() {
@@ -101,9 +104,9 @@ public class ExternalServer extends DefaultServer {
 
 	
 	/**
-	 * 
-	 * @param srvConfigUri
-	 * @return {@link ExternalServer}
+	 * Creating external server by configuration URI.
+	 * @param srvConfigUri configuration URI.
+	 * @return external server by configuration URI.
 	 */
 	public static ExternalServer create(xURI srvConfigUri) {
 		boolean require = requireSetup(srvConfigUri);
@@ -121,7 +124,7 @@ public class ExternalServer extends DefaultServer {
 					image == null ? null : new ImageIcon(image));
 			
 			if (confirm != JOptionPane.OK_OPTION) {
-				logger.info("External server not created");
+				LogUtil.info("External server not created");
 				return null;
 			}
 			
@@ -129,13 +132,13 @@ public class ExternalServer extends DefaultServer {
 			SetupExternalServerWizard dlg = new SetupExternalServerWizard(null, config);
 			
 			if (!dlg.isFinished()) {
-				logger.info("External server not created");
+				LogUtil.info("External server not created");
 				return null;
 			}
 			
 			require = requireSetup(srvConfigUri);
 			if (require) {
-				logger.info("External server not created");
+				LogUtil.info("External server not created");
 				return null;
 			}
 			
@@ -143,8 +146,6 @@ public class ExternalServer extends DefaultServer {
 		}
 		
 	}
-	
-	
 	
 	
 }

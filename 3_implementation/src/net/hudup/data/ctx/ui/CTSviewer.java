@@ -27,6 +27,7 @@ import net.hudup.data.ui.AttributeListTable;
 
 
 /**
+ * This class is viewer (tree table) of context template schema.
  * 
  * @author Loc Nguyen
  * @version 10.0
@@ -42,8 +43,8 @@ public class CTSviewer extends JXTreeTable {
 
 	
 	/**
-	 * 
-	 * @param cts
+	 * Constructor with specified context template schema as root.
+	 * @param cts specified context template schema as root.
 	 */
 	public CTSviewer(ContextTemplateSchema cts) {
 		super(new CTSViewerModel(cts));
@@ -64,7 +65,7 @@ public class CTSviewer extends JXTreeTable {
 	
 	
 	/**
-	 * 
+	 * Getting this context template viewer.
 	 * @return this viewer
 	 */
 	private CTSviewer getThis() {
@@ -73,7 +74,7 @@ public class CTSviewer extends JXTreeTable {
 	
 	
 	/**
-	 * 
+	 * Getting selected template.
 	 * @return selected template
 	 */
 	public ContextTemplate getSelectedTemplate() {
@@ -91,8 +92,8 @@ public class CTSviewer extends JXTreeTable {
 	
 	
 	/**
-	 * 
-	 * @return {@link JPopupMenu}
+	 * Creating context menu.
+	 * @return context menu.
 	 */
 	private JPopupMenu createContextMenu() {
 		final ContextTemplate template = getSelectedTemplate();
@@ -126,12 +127,12 @@ public class CTSviewer extends JXTreeTable {
 	}
 	
 	
-	
 }
 
 
 
 /**
+ * This class is model of context template schema viewer (table).
  * 
  * @author Loc Nguyen
  * @version 10.0
@@ -141,8 +142,8 @@ class CTSViewerModel extends AbstractTreeTableModel {
 
 	
 	/**
-	 * 
-	 * @param cts
+	 * Constructor with specified context template schema as root.
+	 * @param cts specified context template schema as root.
 	 */
 	public CTSViewerModel(ContextTemplateSchema cts) {
 		super(cts);
@@ -150,8 +151,8 @@ class CTSViewerModel extends AbstractTreeTableModel {
 	
 	
 	/**
-	 * 
-	 * @param cts
+	 * Setting root as specified context template schema.
+	 * @param cts specified context template schema.
 	 */
 	public void setRoot(ContextTemplateSchema cts) {
 		this.root = cts;
@@ -160,8 +161,8 @@ class CTSViewerModel extends AbstractTreeTableModel {
 	
 	
 	/**
-	 * 
-	 * @return {@link ContextTemplateSchema}
+	 * Getting root as specified context template schema.
+	 * @return root as specified context template schema.
 	 */
 	public ContextTemplateSchema cts() {
 		return (ContextTemplateSchema)root;
@@ -170,9 +171,9 @@ class CTSViewerModel extends AbstractTreeTableModel {
 	
 	
 	/**
-	 * 
-	 * @param node
-	 * @return whether node is {@link ContextTemplate}
+	 * Checking whether a specified node is context template.
+	 * @param node specified node.
+	 * @return whether a specified node is context template.
 	 */
 	private boolean isContextTemplate(Object node) {
 		if (node instanceof ContextTemplate)
@@ -183,10 +184,10 @@ class CTSViewerModel extends AbstractTreeTableModel {
 	
 	
 	/**
-	 * 
-	 * @return {@link TreeModelSupport}
+	 * Getting model support.
+	 * @return model support.
 	 */
-	public TreeModelSupport getModelSupport() {
+	protected TreeModelSupport getModelSupport() {
 		return modelSupport;
 	}
 	
@@ -304,10 +305,10 @@ class CTSViewerModel extends AbstractTreeTableModel {
 
 	
 	/**
-	 * 
-	 * @param row
-	 * @param column
-	 * @return class of column
+	 * Getting class of specified row and column.
+	 * @param row specified row.
+	 * @param column specified column.
+	 * @return class of specified row and column.
 	 */
 	public Class<?> getColumnClass(int row, int column) {
 		Object value = getValueAt(row, column);
@@ -320,7 +321,6 @@ class CTSViewerModel extends AbstractTreeTableModel {
 		// TODO Auto-generated method stub
 		return false;
 	}
-
 
 
 }

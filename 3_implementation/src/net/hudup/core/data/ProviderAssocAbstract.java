@@ -1,9 +1,5 @@
 package net.hudup.core.data;
 
-
-import org.apache.log4j.Logger;
-
-
 /**
  * This abstract class implements partially the {@link ProviderAssoc} interface.
  * It add the internal configuration {@link #config} for {@link ProviderAssoc}.
@@ -14,12 +10,6 @@ import org.apache.log4j.Logger;
  *
  */
 public abstract class ProviderAssocAbstract implements ProviderAssoc {
-
-	
-	/**
-	 * Logger of this class.
-	 */
-	protected final static Logger logger = Logger.getLogger(ProviderAssoc.class);
 
 	
 	/**

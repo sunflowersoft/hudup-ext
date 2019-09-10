@@ -9,19 +9,18 @@ import java.util.Set;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-import org.apache.log4j.Logger;
-
 import net.hudup.core.Util;
 import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.Recommender;
 import net.hudup.core.alg.SetupAlgListener;
-import net.hudup.core.evaluate.EvaluatorAbstract;
 import net.hudup.core.evaluate.Evaluator;
+import net.hudup.core.evaluate.EvaluatorAbstract;
 import net.hudup.core.evaluate.EvaluatorListener;
 import net.hudup.core.evaluate.EvaluatorProgressListener;
 import net.hudup.core.evaluate.Metric;
 import net.hudup.core.evaluate.Metrics;
 import net.hudup.core.logistic.I18nUtil;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.NetUtil;
 import net.hudup.core.logistic.NetUtil.RegistryRemote;
 import net.hudup.core.logistic.UriAdapter.AdapterWriteChannel;
@@ -42,12 +41,6 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	 * Serial version UID for serializable class. 
 	 */
 	private static final long serialVersionUID = 1L;
-
-	
-	/**
-	 * Logger of this class.
-	 */
-	protected final static Logger logger = Logger.getLogger(AbstractEvaluateGUI.class);
 
 	
 	/**
@@ -135,7 +128,7 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 //			} catch (RemoteException e) {e.printStackTrace();}
 			
 			this.registry = NetUtil.RegistryRemote.registerExport(this, bindUri);
-			logger.info("Evaluator GUI exported at port " + bindUri.getPort());
+			LogUtil.info("Evaluator GUI exported at port " + bindUri.getPort());
 		}
 
 		setupListeners(evaluator);
@@ -363,7 +356,7 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	protected void metricsOption() {
 		try {
 			if (evaluator.remoteIsStarted()) {
-				logger.error("Evaluator started, it is impossible to set up metric list");
+				LogUtil.error("Evaluator started, it is impossible to set up metric list");
 				return;
 			}
 
@@ -383,7 +376,7 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			logger.error("Error in setting metrics");
+			LogUtil.error("Error in setting metrics");
 		}
 	}
 	

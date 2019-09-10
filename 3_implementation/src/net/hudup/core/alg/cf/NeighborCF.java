@@ -32,15 +32,15 @@ import net.hudup.core.logistic.Vector;
  * <br>
  * The most important feature of any Neighbor CF algorithm is how to calculate the similarity between two rating vectors or between two profiles so as to find out the nearest neighbor.
  * The nearest neighbor is the one who has highest similar measure with the active user (active item).
- * This class provides the method {@link #similar(RatingVector, RatingVector, Profile, Profile)} to calculate the similarity measure between two pairs.
+ * This class provides the method {@link #sim(RatingVector, RatingVector, Profile, Profile, Object...)} to calculate the similarity measure between two pairs.
  * The first pair includes the first rating vector and the first profile.
  * The second pair includes the second rating vector and the second profile.
  * If you only want to calculate the similarity between two rating vectors, two in put profiles are set to be null.
  * If you only want to calculate the similarity between two profiles, two in put rating vectors are set to be null.
  * In current implementation, only three similarity measures are supported such as Pearson, cosine, and hybrid.
- * Hybrid measure means that profile is merged into rating vector as a unified vector for calculating Pearson measure or cosine measure.<br/>
- * <br/>
- * There are many authors who contributed measure to this class.<br/>
+ * Hybrid measure means that profile is merged into rating vector as a unified vector for calculating Pearson measure or cosine measure.<br>
+ * <br>
+ * There are many authors who contributed measure to this class.<br>
  * Authors Shuang-Bo Sun, Zhi-Heng Zhang, Xin-Ling Dong, Heng-Ru Zhang, Tong-Jun Li, Lin Zhang, and Fan Min contributed Triangle measure and TJM measure.<br>
  * 
  * @author Loc Nguyen

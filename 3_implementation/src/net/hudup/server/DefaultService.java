@@ -6,8 +6,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
-
+import net.hudup.core.Firer;
 import net.hudup.core.Util;
 import net.hudup.core.alg.RecommendParam;
 import net.hudup.core.alg.Recommender;
@@ -33,8 +32,8 @@ import net.hudup.core.data.Scanner;
 import net.hudup.core.data.Snapshot;
 import net.hudup.core.evaluate.Evaluator;
 import net.hudup.core.evaluate.EvaluatorConfig;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.NextUpdate;
-import net.hudup.core.logistic.SystemUtil;
 import net.hudup.data.ProviderImpl;
 import net.hudup.data.SnapshotImpl;
 
@@ -50,12 +49,6 @@ import net.hudup.data.SnapshotImpl;
 public class DefaultService implements Service, AutoCloseable {
 
 
-	/**
-	 * Logger of this class.
-	 */
-	protected final static Logger logger = Logger.getLogger(Service.class);
-
-	
 	/**
 	 * Server configuration.
 	 */
@@ -127,7 +120,7 @@ public class DefaultService implements Service, AutoCloseable {
 			close();
 			opened = false;
 			
-			logger.error("Service fail to open, caused by " + e.getMessage());
+			LogUtil.error("Service fail to open, caused by " + e.getMessage());
 		}
 		
 		return opened;
@@ -188,7 +181,7 @@ public class DefaultService implements Service, AutoCloseable {
 			e.printStackTrace();
 			result = false;
 			
-			logger.error("Service fail to transfer to target service, caused by " + e.getMessage());
+			LogUtil.error("Service fail to transfer to target service, caused by " + e.getMessage());
 		}
 		finally {
 			trans.unlockWrite();
@@ -288,7 +281,7 @@ public class DefaultService implements Service, AutoCloseable {
 			e.printStackTrace();
 			result = null;
 			
-			logger.error("Service fail to estimate, caused by " + e.getMessage());
+			LogUtil.error("Service fail to estimate, caused by " + e.getMessage());
 		}
 		finally {
 			trans.unlockRead();
@@ -312,7 +305,7 @@ public class DefaultService implements Service, AutoCloseable {
 			e.printStackTrace();
 			result = null;
 			
-			logger.error("Service fail to recommend, caused by " + e.getMessage());
+			LogUtil.error("Service fail to recommend, caused by " + e.getMessage());
 		}
 		finally {
 			trans.unlockRead();
@@ -338,7 +331,7 @@ public class DefaultService implements Service, AutoCloseable {
 			e.printStackTrace();
 			result = null;
 			
-			logger.error("Service fail to recommend first time, caused by " + e.getMessage());
+			LogUtil.error("Service fail to recommend first time, caused by " + e.getMessage());
 		}
 		finally {
 			trans.unlockRead();
@@ -358,7 +351,7 @@ public class DefaultService implements Service, AutoCloseable {
 				e.printStackTrace();
 				result = null;
 				
-				logger.error("Service fail to recommend second time, caused by " + e.getMessage());
+				LogUtil.error("Service fail to recommend second time, caused by " + e.getMessage());
 			}
 			finally {
 				trans.unlockRead();
@@ -394,7 +387,7 @@ public class DefaultService implements Service, AutoCloseable {
 			catch (Throwable e) {
 				e.printStackTrace();
 				
-				logger.error("Service fail to update rating when recommending net.hudup.core.client.Recommendlet, caused by " + e.getMessage());
+				LogUtil.error("Service fail to update rating when recommending net.hudup.core.client.Recommendlet, caused by " + e.getMessage());
 			}
 			finally {
 				trans.unlockWrite();
@@ -435,7 +428,7 @@ public class DefaultService implements Service, AutoCloseable {
 			e.printStackTrace();
 			result = null;
 			
-			logger.error("Service fail to recommend net.hudup.core.client.Recommendlet, caused by " + e.getMessage());
+			LogUtil.error("Service fail to recommend net.hudup.core.client.Recommendlet, caused by " + e.getMessage());
 		}
 		finally {
 			trans.unlockRead();
@@ -458,7 +451,7 @@ public class DefaultService implements Service, AutoCloseable {
 			e.printStackTrace();
 			result = false;
 			
-			logger.error("Service fail to update rating, caused by " + e.getMessage());
+			LogUtil.error("Service fail to update rating, caused by " + e.getMessage());
 		}
 		finally {
 			trans.unlockWrite();
@@ -481,7 +474,7 @@ public class DefaultService implements Service, AutoCloseable {
 			e.printStackTrace();
 			result = false;
 			
-			logger.error("Service fail to update rating, caused by " + e.getMessage());
+			LogUtil.error("Service fail to update rating, caused by " + e.getMessage());
 		}
 		finally {
 			trans.unlockWrite();
@@ -503,7 +496,7 @@ public class DefaultService implements Service, AutoCloseable {
 			e.printStackTrace();
 			result = false;
 			
-			logger.error("Service fail to delete rating, caused by " + e.getMessage());
+			LogUtil.error("Service fail to delete rating, caused by " + e.getMessage());
 		}
 		finally {
 			trans.unlockWrite();
@@ -527,7 +520,7 @@ public class DefaultService implements Service, AutoCloseable {
 			e.printStackTrace();
 			fetcher = MemFetcher.createEmpty();
 			
-			logger.error("Service fail to get user id (s), caused by " + e.getMessage());
+			LogUtil.error("Service fail to get user id (s), caused by " + e.getMessage());
 		}
 		finally {
 			trans.unlockRead();
@@ -549,7 +542,7 @@ public class DefaultService implements Service, AutoCloseable {
 			e.printStackTrace();
 			result = null;
 			
-			logger.error("Service fail to get user rating, caused by " + e.getMessage());
+			LogUtil.error("Service fail to get user rating, caused by " + e.getMessage());
 		}
 		finally {
 			trans.unlockRead();
@@ -572,7 +565,7 @@ public class DefaultService implements Service, AutoCloseable {
 			e.printStackTrace();
 			fetcher = MemFetcher.createEmpty();
 			
-			logger.error("Service fail to get user rating (s), caused by " + e.getMessage());
+			LogUtil.error("Service fail to get user rating (s), caused by " + e.getMessage());
 		}
 		finally {
 			trans.unlockRead();
@@ -594,7 +587,7 @@ public class DefaultService implements Service, AutoCloseable {
 			e.printStackTrace();
 			result = false;
 			
-			logger.error("Service fail to delete user rating, caused by " + e.getMessage());
+			LogUtil.error("Service fail to delete user rating, caused by " + e.getMessage());
 		}
 		finally {
 			trans.unlockWrite();
@@ -618,7 +611,7 @@ public class DefaultService implements Service, AutoCloseable {
 			e.printStackTrace();
 			user = null;
 			
-			logger.error("Service fail to get user profile, caused by " + e.getMessage());
+			LogUtil.error("Service fail to get user profile, caused by " + e.getMessage());
 		}
 		finally {
 			trans.unlockRead();
@@ -645,7 +638,7 @@ public class DefaultService implements Service, AutoCloseable {
 			e.printStackTrace();
 			user = null;
 			
-			logger.error("Service fail to get user profile by external, caused by " + e.getMessage());
+			LogUtil.error("Service fail to get user profile by external, caused by " + e.getMessage());
 		}
 		finally {
 			trans.unlockRead();
@@ -667,7 +660,7 @@ public class DefaultService implements Service, AutoCloseable {
 			e.printStackTrace();
 			fetcher = MemFetcher.createEmpty();
 			
-			logger.error("Service fail to get user profiles, caused by " + e.getMessage());
+			LogUtil.error("Service fail to get user profiles, caused by " + e.getMessage());
 		}
 		finally {
 			trans.unlockRead();
@@ -691,7 +684,7 @@ public class DefaultService implements Service, AutoCloseable {
 			e.printStackTrace();
 			result = false;
 			
-			logger.error("Service fail to update user profile, caused by " + e.getMessage());
+			LogUtil.error("Service fail to update user profile, caused by " + e.getMessage());
 		}
 		finally {
 			trans.unlockWrite();
@@ -714,7 +707,7 @@ public class DefaultService implements Service, AutoCloseable {
 			e.printStackTrace();
 			result = false;
 			
-			logger.error("Service fail to delete user profile, caused by " + e.getMessage());
+			LogUtil.error("Service fail to delete user profile, caused by " + e.getMessage());
 		}
 		finally {
 			trans.unlockWrite();
@@ -739,7 +732,7 @@ public class DefaultService implements Service, AutoCloseable {
 			e.printStackTrace();
 			attributeList = null;
 			
-			logger.error("Service fail to get user attribute list, caused by " + e.getMessage());
+			LogUtil.error("Service fail to get user attribute list, caused by " + e.getMessage());
 		}
 		finally {
 			trans.unlockRead();
@@ -764,7 +757,7 @@ public class DefaultService implements Service, AutoCloseable {
 			e.printStackTrace();
 			externalRecord = null;
 			
-			logger.error("Service fail to get user external record, caused by " + e.getMessage());
+			LogUtil.error("Service fail to get user external record, caused by " + e.getMessage());
 		}
 		finally {
 			trans.unlockRead();
@@ -787,7 +780,7 @@ public class DefaultService implements Service, AutoCloseable {
 			e.printStackTrace();
 			fetcher = MemFetcher.createEmpty();
 			
-			logger.error("Service fail to get item id (s), caused by " + e.getMessage());
+			LogUtil.error("Service fail to get item id (s), caused by " + e.getMessage());
 		}
 		finally {
 			trans.unlockRead();
@@ -809,7 +802,7 @@ public class DefaultService implements Service, AutoCloseable {
 			e.printStackTrace();
 			result = null;
 			
-			logger.error("Service fail to get item rating, caused by " + e.getMessage());
+			LogUtil.error("Service fail to get item rating, caused by " + e.getMessage());
 		}
 		finally {
 			trans.unlockRead();
@@ -834,7 +827,7 @@ public class DefaultService implements Service, AutoCloseable {
 			e.printStackTrace();
 			fetcher = MemFetcher.createEmpty();
 			
-			logger.error("Service fail to get item rating (s), caused by " + e.getMessage());
+			LogUtil.error("Service fail to get item rating (s), caused by " + e.getMessage());
 		}
 		finally {
 			trans.unlockRead();
@@ -856,7 +849,7 @@ public class DefaultService implements Service, AutoCloseable {
 			e.printStackTrace();
 			result = false;
 			
-			logger.error("Service fail to delete item rating, caused by " + e.getMessage());
+			LogUtil.error("Service fail to delete item rating, caused by " + e.getMessage());
 		}
 		finally {
 			trans.unlockWrite();
@@ -880,7 +873,7 @@ public class DefaultService implements Service, AutoCloseable {
 			e.printStackTrace();
 			item = null;
 			
-			logger.error("Service fail to get item profile, caused by " + e.getMessage());
+			LogUtil.error("Service fail to get item profile, caused by " + e.getMessage());
 		}
 		finally {
 			trans.unlockRead();
@@ -907,7 +900,7 @@ public class DefaultService implements Service, AutoCloseable {
 			e.printStackTrace();
 			item = null;
 			
-			logger.error("Service fail to get item profile by external, caused by " + e.getMessage());
+			LogUtil.error("Service fail to get item profile by external, caused by " + e.getMessage());
 		}
 		finally {
 			trans.unlockRead();
@@ -929,7 +922,7 @@ public class DefaultService implements Service, AutoCloseable {
 			e.printStackTrace();
 			fetcher = MemFetcher.createEmpty();
 			
-			logger.error("Service fail to get item profiles, caused by " + e.getMessage());
+			LogUtil.error("Service fail to get item profiles, caused by " + e.getMessage());
 		}
 		finally {
 			trans.unlockRead();
@@ -954,7 +947,7 @@ public class DefaultService implements Service, AutoCloseable {
 			e.printStackTrace();
 			result = false;
 			
-			logger.error("Service fail to update item profile, caused by " + e.getMessage());
+			LogUtil.error("Service fail to update item profile, caused by " + e.getMessage());
 		}
 		finally {
 			trans.unlockWrite();
@@ -977,7 +970,7 @@ public class DefaultService implements Service, AutoCloseable {
 			e.printStackTrace();
 			result = false;
 			
-			logger.error("Service fail to delete item profile, caused by " + e.getMessage());
+			LogUtil.error("Service fail to delete item profile, caused by " + e.getMessage());
 		}
 		finally {
 			trans.unlockWrite();
@@ -1002,7 +995,7 @@ public class DefaultService implements Service, AutoCloseable {
 			e.printStackTrace();
 			attributeList = null;
 			
-			logger.error("Service fail to get item attribute list, caused by " + e.getMessage());
+			LogUtil.error("Service fail to get item attribute list, caused by " + e.getMessage());
 		}
 		finally {
 			trans.unlockRead();
@@ -1027,7 +1020,7 @@ public class DefaultService implements Service, AutoCloseable {
 			e.printStackTrace();
 			externalRecord = null;
 			
-			logger.error("Service fail to item external record, caused by " + e.getMessage());
+			LogUtil.error("Service fail to item external record, caused by " + e.getMessage());
 		}
 		finally {
 			trans.unlockRead();
@@ -1050,7 +1043,7 @@ public class DefaultService implements Service, AutoCloseable {
 			e.printStackTrace();
 			nominalList = null;
 			
-			logger.error("Service fail to get nominal, caused by " + e.getMessage());
+			LogUtil.error("Service fail to get nominal, caused by " + e.getMessage());
 		}
 		finally {
 			trans.unlockRead();
@@ -1075,7 +1068,7 @@ public class DefaultService implements Service, AutoCloseable {
 			e.printStackTrace();
 			result = false;
 			
-			logger.error("Service fail to update nominal, caused by " + e.getMessage());
+			LogUtil.error("Service fail to update nominal, caused by " + e.getMessage());
 		}
 		finally {
 			trans.unlockWrite();
@@ -1097,7 +1090,7 @@ public class DefaultService implements Service, AutoCloseable {
 			e.printStackTrace();
 			result = false;
 			
-			logger.error("Service fail to delete nominal, caused by " + e.getMessage());
+			LogUtil.error("Service fail to delete nominal, caused by " + e.getMessage());
 		}
 		finally {
 			trans.unlockWrite();
@@ -1123,7 +1116,7 @@ public class DefaultService implements Service, AutoCloseable {
 			e.printStackTrace();
 			externalRecord = null;
 			
-			logger.error("Service fail to get external record, caused by " + e.getMessage());
+			LogUtil.error("Service fail to get external record, caused by " + e.getMessage());
 		}
 		finally {
 			trans.unlockRead();
@@ -1148,7 +1141,7 @@ public class DefaultService implements Service, AutoCloseable {
 			e.printStackTrace();
 			result = false;
 			
-			logger.error("Service fail to update external record, caused by " + e.getMessage());
+			LogUtil.error("Service fail to update external record, caused by " + e.getMessage());
 		}
 		finally {
 			trans.unlockWrite();
@@ -1171,7 +1164,7 @@ public class DefaultService implements Service, AutoCloseable {
 			e.printStackTrace();
 			result = false;
 			
-			logger.error("Service fail to delete external record, caused by " + e.getMessage());
+			LogUtil.error("Service fail to delete external record, caused by " + e.getMessage());
 		}
 		finally {
 			trans.unlockWrite();
@@ -1202,7 +1195,7 @@ public class DefaultService implements Service, AutoCloseable {
 			e.printStackTrace();
 			profile = null;
 			
-			logger.error("Service fail to get profile, caused by " + e.getMessage());
+			LogUtil.error("Service fail to get profile, caused by " + e.getMessage());
 		}
 		finally {
 			trans.unlockRead();
@@ -1226,7 +1219,7 @@ public class DefaultService implements Service, AutoCloseable {
 			e.printStackTrace();
 			attributeList = null;
 			
-			logger.error("Service fail to get profile attribute list, caused by " + e.getMessage());
+			LogUtil.error("Service fail to get profile attribute list, caused by " + e.getMessage());
 		}
 		finally {
 			trans.unlockRead();
@@ -1250,7 +1243,7 @@ public class DefaultService implements Service, AutoCloseable {
 			e.printStackTrace();
 			result = false;
 			
-			logger.error("Service fail to update profile, caused by " + e.getMessage());
+			LogUtil.error("Service fail to update profile, caused by " + e.getMessage());
 		}
 		finally {
 			trans.unlockWrite();
@@ -1275,7 +1268,7 @@ public class DefaultService implements Service, AutoCloseable {
 			e.printStackTrace();
 			result = false;
 			
-			logger.error("Service fail to delete profile, caused by " + e.getMessage());
+			LogUtil.error("Service fail to delete profile, caused by " + e.getMessage());
 		}
 		finally {
 			trans.unlockWrite();
@@ -1299,7 +1292,7 @@ public class DefaultService implements Service, AutoCloseable {
 			e.printStackTrace();
 			profile = null;
 			
-			logger.error("Service fail to get profile, caused by " + e.getMessage());
+			LogUtil.error("Service fail to get profile, caused by " + e.getMessage());
 		}
 		finally {
 			trans.unlockRead();
@@ -1323,7 +1316,7 @@ public class DefaultService implements Service, AutoCloseable {
 			e.printStackTrace();
 			attributeList = null;
 			
-			logger.error("Service fail to get profile attribute list, caused by " + e.getMessage());
+			LogUtil.error("Service fail to get profile attribute list, caused by " + e.getMessage());
 		}
 		finally {
 			trans.unlockRead();
@@ -1349,7 +1342,7 @@ public class DefaultService implements Service, AutoCloseable {
 			e.printStackTrace();
 			result = false;
 			
-			logger.error("Service fail to update profile, caused by " + e.getMessage());
+			LogUtil.error("Service fail to update profile, caused by " + e.getMessage());
 		}
 		finally {
 			trans.unlockWrite();
@@ -1376,7 +1369,7 @@ public class DefaultService implements Service, AutoCloseable {
 			e.printStackTrace();
 			result = false;
 			
-			logger.error("Service fail to delete profile, caused by " + e.getMessage());
+			LogUtil.error("Service fail to delete profile, caused by " + e.getMessage());
 		}
 		finally {
 			trans.unlockWrite();
@@ -1401,7 +1394,7 @@ public class DefaultService implements Service, AutoCloseable {
 			e.printStackTrace();
 			serverConfig = null;
 			
-			logger.error("Service fail to get server configuration, caused by " + e.getMessage());
+			LogUtil.error("Service fail to get server configuration, caused by " + e.getMessage());
 		}
 		finally {
 			trans.unlockRead();
@@ -1429,7 +1422,7 @@ public class DefaultService implements Service, AutoCloseable {
 			e.printStackTrace();
 			snapshot = null;
 			
-			logger.error("Service fail to get snapshot, caused by " + e.getMessage());
+			LogUtil.error("Service fail to get snapshot, caused by " + e.getMessage());
 		}
 		finally {
 			trans.unlockRead();
@@ -1447,7 +1440,7 @@ public class DefaultService implements Service, AutoCloseable {
 		
 		trans.lockWrite();
 		try {
-			List<Evaluator> evList = SystemUtil.getInstances(Evaluator.class);
+			List<Evaluator> evList = Firer.getInstances(Evaluator.class);
 			for (Evaluator ev : evList) {
 				if (ev.getName().equals(evaluatorName)) {
 					evaluator = ev;
@@ -1467,7 +1460,7 @@ public class DefaultService implements Service, AutoCloseable {
 			e.printStackTrace();
 			evaluator = null;
 			
-			logger.error("Service fail to get evaluator, caused by " + e.getMessage());
+			LogUtil.error("Service fail to get evaluator, caused by " + e.getMessage());
 		}
 		finally {
 			trans.unlockWrite();
@@ -1484,14 +1477,14 @@ public class DefaultService implements Service, AutoCloseable {
 		
 		trans.lockRead();
 		try {
-			List<Evaluator> evList = SystemUtil.getInstances(Evaluator.class);
+			List<Evaluator> evList = Firer.getInstances(Evaluator.class);
 			for (Evaluator ev : evList) {
 				evaluatorNames.add(ev.getName());
 			}
 		}
 		catch (Throwable e) {
 			e.printStackTrace();
-			logger.error("Service fail to get evaluator, caused by " + e.getMessage());
+			LogUtil.error("Service fail to get evaluator, caused by " + e.getMessage());
 		}
 		finally {
 			trans.unlockRead();

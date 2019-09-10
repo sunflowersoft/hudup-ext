@@ -25,6 +25,7 @@ import net.hudup.core.client.ServerStatusListener;
 import net.hudup.core.client.SocketWrapper;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.logistic.AbstractRunner;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.NetUtil;
 import net.hudup.core.logistic.RemoteRunner;
 import net.hudup.core.logistic.Runner;
@@ -130,7 +131,7 @@ public abstract class SocketServer extends AbstractRunner implements Server, Acc
 				catch (Throwable e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
-			        logger.error("Socket server fail to shutdown, caused by " + e.getMessage());
+					LogUtil.error("Socket server fail to shutdown, caused by " + e.getMessage());
 				}
 			}
 			
@@ -156,7 +157,7 @@ public abstract class SocketServer extends AbstractRunner implements Server, Acc
 		catch (Throwable e) {
 			e.printStackTrace();
 			socket = null;
-			logger.error("Socket server fail to connect to client, caused by " + e.getMessage());
+			LogUtil.error("Socket server fail to connect to client, caused by " + e.getMessage());
 		}
 		if (socket == null) return;
 
@@ -174,9 +175,9 @@ public abstract class SocketServer extends AbstractRunner implements Server, Acc
 				catch (Throwable e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
-					logger.error("Socket server fail to close socket, caused by " + e.getMessage());
+					LogUtil.error("Socket server fail to close socket, caused by " + e.getMessage());
 				}
-				logger.error("Socket server fail to create delegator (null delegator)");
+				LogUtil.error("Socket server fail to create delegator (null delegator)");
 			}
 		} 
 		catch (Throwable e) {
@@ -189,9 +190,9 @@ public abstract class SocketServer extends AbstractRunner implements Server, Acc
 			catch (Throwable e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
-				logger.error("Socket server fail to close socket, caused by " + e.getMessage());
+				LogUtil.error("Socket server fail to close socket, caused by " + e.getMessage());
 			}
-			logger.error("Socket server fail to connect to client, caused by " + e.getMessage());
+			LogUtil.error("Socket server fail to connect to client, caused by " + e.getMessage());
 		}
 			
 	}
@@ -307,11 +308,11 @@ public abstract class SocketServer extends AbstractRunner implements Server, Acc
 		if (isStarted())
 			return;
 		
-		logger.info("Socket server is initializing to start, please wait...");
+		LogUtil.info("Socket server is initializing to start, please wait...");
 		setupServerSocket();
 		if (!testServerSocket()) {
 			fireStatusEvent(new ServerStatusEvent(this, Status.stopped));
-			logger.error("Socket server fail to start");
+			LogUtil.error("Socket server fail to start");
 			return;
 		}
 		
@@ -319,8 +320,8 @@ public abstract class SocketServer extends AbstractRunner implements Server, Acc
 		createTimer();
 
 		fireStatusEvent(new ServerStatusEvent(this, Status.started));
-		logger.info("Socket server started at port " + config.getServerPort());
-		logger.info("Socket server has socket control port " + config.getSocketControlPort());
+		LogUtil.info("Socket server started at port " + config.getServerPort());
+		LogUtil.info("Socket server has socket control port " + config.getSocketControlPort());
 	}
 	
 	
@@ -338,7 +339,7 @@ public abstract class SocketServer extends AbstractRunner implements Server, Acc
 			super.pause();
 			
 			fireStatusEvent(new ServerStatusEvent(this, Status.paused));
-			logger.info("Socket server paused");
+			LogUtil.info("Socket server paused");
 		}
 	}
 
@@ -355,7 +356,7 @@ public abstract class SocketServer extends AbstractRunner implements Server, Acc
 			createTimer();
 			
 			fireStatusEvent(new ServerStatusEvent(this, Status.resumed));
-			logger.info("Socket server resumed");
+			LogUtil.info("Socket server resumed");
 		}
 	}
 
@@ -366,7 +367,7 @@ public abstract class SocketServer extends AbstractRunner implements Server, Acc
 		if (!isStarted())
 			return;
 		
-		logger.info("Socket server prepares to stop, please waiting...");
+		LogUtil.info("Socket server prepares to stop, please waiting...");
 		
 		stopInternalRunners(); //Added date 2019.09.11 by Loc Nguyen
 		stopDelegators();
@@ -377,7 +378,7 @@ public abstract class SocketServer extends AbstractRunner implements Server, Acc
 		super.stop();
 		
 		fireStatusEvent(new ServerStatusEvent(this, Status.stopped));
-		logger.info("Socket server stopped");
+		LogUtil.info("Socket server stopped");
 	}
 
 
@@ -390,6 +391,7 @@ public abstract class SocketServer extends AbstractRunner implements Server, Acc
 	
 	/**
 	 * Shutting down this socket server. After shut down, the server is discarded and cannot be re-started.
+	 * @throws RemoteException if any error raises.
 	 */
 	protected synchronized void shutdown() throws RemoteException {
 		if (config == null) //The configuration is like a flag.
@@ -402,7 +404,7 @@ public abstract class SocketServer extends AbstractRunner implements Server, Acc
 		config.save();
 		config = null;
 		
-		logger.info("Socket server shutdown");
+		LogUtil.info("Socket server shutdown");
 		fireStatusEvent(new ServerStatusEvent(this, Status.exit));
 	}
 
@@ -454,11 +456,11 @@ public abstract class SocketServer extends AbstractRunner implements Server, Acc
 				milisec, 
 				milisec);
 			
-			logger.info("Socket server create internal timer, executing periodly " + milisec + " miliseconds");
+			LogUtil.info("Socket server create internal timer, executing periodly " + milisec + " miliseconds");
 		}
 		catch (Throwable e) {
 			e.printStackTrace();
-			logger.error("Socket server fail to create internal timer, caused by " + e.getMessage());
+			LogUtil.error("Socket server fail to create internal timer, caused by " + e.getMessage());
 		}
 	}
 
@@ -474,11 +476,11 @@ public abstract class SocketServer extends AbstractRunner implements Server, Acc
 		
 		try {
 			serverTasks();
-			logger.info("Socket server finished server tasks");
+			LogUtil.info("Socket server finished server tasks");
 		}
 		catch (Throwable e) {
 			e.printStackTrace();
-			logger.error("Socket server fail to call server tasks, caused by " + e.getMessage());
+			LogUtil.error("Socket server fail to call server tasks, caused by " + e.getMessage());
 			
 		}
 		
@@ -503,11 +505,11 @@ public abstract class SocketServer extends AbstractRunner implements Server, Acc
 				timer.cancel();
 				timer = null;
 				
-				logger.info("Socket server destroyed internal timer");
+				LogUtil.info("Socket server destroyed internal timer");
 			}
 			catch (Throwable e) {
 				e.printStackTrace();
-				logger.error("Socket server fail to destroy internal timer, caused by " + e.getMessage());
+				LogUtil.error("Socket server fail to destroy internal timer, caused by " + e.getMessage());
 			}
 		}
 	}
@@ -524,7 +526,7 @@ public abstract class SocketServer extends AbstractRunner implements Server, Acc
 			catch (Throwable e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-				logger.error("Socket server fail to close server socket, caused by " + e.getMessage());
+				LogUtil.error("Socket server fail to close server socket, caused by " + e.getMessage());
 			}
 		}
 		
@@ -571,7 +573,7 @@ public abstract class SocketServer extends AbstractRunner implements Server, Acc
 			catch (Throwable e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-				logger.error("Socket server fail to create server socket, caused by " + e.getMessage());
+				LogUtil.error("Socket server fail to create server socket, caused by " + e.getMessage());
 				destroyServerSocket();
 			}
 		}
@@ -597,7 +599,7 @@ public abstract class SocketServer extends AbstractRunner implements Server, Acc
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			logger.error("Socket server fail to create server socket, caused by " + e.getMessage());
+			LogUtil.error("Socket server fail to create server socket, caused by " + e.getMessage());
 			destroyControlSocket();
 			return;
 		}
@@ -647,12 +649,12 @@ public abstract class SocketServer extends AbstractRunner implements Server, Acc
 		synchronized(listenerList) {
 			try {
 		        listenerList.add(ServerStatusListener.class, listener);
-		        logger.info("Socket server add successfully status listener " + listener.getClass());
+		        LogUtil.info("Socket server add successfully status listener " + listener.getClass());
 		        return true;
 			}
 			catch (Throwable e) {
 				e.printStackTrace();
-				logger.error("Socket server fail to add status listener, caused by " + e.getMessage());
+				LogUtil.error("Socket server fail to add status listener, caused by " + e.getMessage());
 			}
 			
 			return false;
@@ -676,12 +678,12 @@ public abstract class SocketServer extends AbstractRunner implements Server, Acc
 		synchronized(listenerList) {
 			try {
 				listenerList.remove(ServerStatusListener.class, listener);
-				logger.info("Socket server remove successfully status listener " + listener.getClass());
+				LogUtil.info("Socket server remove successfully status listener " + listener.getClass());
 				return true;
 			}
 			catch (Throwable e) {
 				e.printStackTrace();
-				logger.error("Socket server fail to remove status listener, caused by " + e.getMessage());
+				LogUtil.error("Socket server fail to remove status listener, caused by " + e.getMessage());
 			}
 			
 			return false;
@@ -715,11 +717,11 @@ public abstract class SocketServer extends AbstractRunner implements Server, Acc
 			try {
 				evt.setShutdownHookStatus(shutdownHookStatus);
 				listener.statusChanged(evt);
-		        logger.info("Socket server fire successfully status event " + evt + " to listener " + listener.getClass());
+				LogUtil.info("Socket server fire successfully status event " + evt + " to listener " + listener.getClass());
 			}
 			catch (Throwable e) {
 				e.printStackTrace();
-		        logger.error("Socket server fail to fire status event " + evt + " to listener " + listener.getClass());
+				LogUtil.error("Socket server fail to fire status event " + evt + " to listener " + listener.getClass());
 			}
 		}
 		
@@ -742,7 +744,7 @@ public abstract class SocketServer extends AbstractRunner implements Server, Acc
 		if (this.config != config)
 			this.config.putAll(config);
 		fireStatusEvent(new ServerStatusEvent(this, Status.setconfig));
-		logger.info("Socket server set configuration successfully");
+		LogUtil.info("Socket server set configuration successfully");
 	}
 
 	
@@ -803,7 +805,7 @@ public abstract class SocketServer extends AbstractRunner implements Server, Acc
 			}
 			catch (Throwable e) {
 				e.printStackTrace();
-		        logger.error("Socket server fail to stop dlegator, caused by " + e.getMessage());
+				LogUtil.error("Socket server fail to stop dlegator, caused by " + e.getMessage());
 			}
 		}
 		
@@ -829,7 +831,7 @@ public abstract class SocketServer extends AbstractRunner implements Server, Acc
 					}
 					catch (Throwable e) {
 						e.printStackTrace();
-				        logger.error("Socket server fail to pause delegator, caused by " + e.getMessage());
+						LogUtil.error("Socket server fail to pause delegator, caused by " + e.getMessage());
 					}
 				}
 			}
@@ -850,7 +852,7 @@ public abstract class SocketServer extends AbstractRunner implements Server, Acc
 			}
 			catch (Throwable e) {
 				e.printStackTrace();
-		        logger.error("Socket server fail to resume delegator, caused by " + e.getMessage());
+				LogUtil.error("Socket server fail to resume delegator, caused by " + e.getMessage());
 			}
 		}
 		

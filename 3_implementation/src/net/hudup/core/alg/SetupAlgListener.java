@@ -19,6 +19,7 @@ public interface SetupAlgListener extends EventListener, Remote {
 	 * In other words, evaluator often implements this method but any class can implement this method.
 	 * In general, any class that implement this interface must implement this method to define respective tasks.
 	 * @param evt setting up event issued by algorithm.
+	 * @throws RemoteException if any error raises.
 	 */
 	void receivedSetup(SetupAlgEvent evt) throws RemoteException;
 	

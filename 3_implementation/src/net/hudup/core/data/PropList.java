@@ -57,12 +57,6 @@ public class PropList implements TextParsable, Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
 
 
-//	/**
-//	 * Logger of this class. Because PropList is serializable, it should not have logger.
-//	 */
-//	protected final static Logger logger = Logger.getLogger(PropList.class);
-
-	
 	/**
 	 * The name of the key whose values are other read-only keys.
 	 * For example, if the value associated of READ_ONLY_KEYS is &quot;minRating, maxRating&quot;,

@@ -29,6 +29,7 @@ import net.hudup.core.data.Fetcher;
 import net.hudup.core.data.Profile;
 import net.hudup.core.evaluate.EvaluatorEvent.Type;
 import net.hudup.core.logistic.AbstractRunner;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.NetUtil;
 import net.hudup.core.logistic.SystemUtil;
 import net.hudup.core.logistic.UriAdapter;
@@ -189,11 +190,10 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 	 * @param algList specified list of algorithms. It must be serializable in remote call.
 	 * @param pool specified dataset pool containing many training datasets and testing datasets. It must be serializable in remote call.
 	 * @param parameter additional parameter.
-	 * @throws RemoteException if any error raises.
 	 */
 	public synchronized void evaluate(List<Alg> algList, DatasetPool pool, Serializable parameter) {
 		if (isStarted() || this.algList != null || this.pool != null) {
-			logger.error("Evaluator is running and so evaluation is not run");
+			LogUtil.error("Evaluator is running and so evaluation is not run");
 			return;
 		}
 		
@@ -225,7 +225,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 			}
 		}
 		catch (Throwable e) {
-			logger.error("Error in setting support cache mode");
+			LogUtil.error("Error in setting support cache mode");
 		}
 	}
 	
@@ -521,7 +521,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 	@Override
 	public synchronized void setMetricList(List<Metric> metricList) throws RemoteException {
 		if (isStarted()) {
-			logger.error("Evaluator is started and so it is impossible to set up metric list");
+			LogUtil.error("Evaluator is started and so it is impossible to set up metric list");
 			return;
 		}
 		
@@ -579,7 +579,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 	@Override
 	protected void task() {
 		// TODO Auto-generated method stub
-		logger.info("Evaluator#task not used because overriding Evaluator#run");
+		LogUtil.info("Evaluator#task not used because overriding Evaluator#run");
 	}
 
 	

@@ -101,6 +101,7 @@ public class RemoteInfoList implements Serializable, Cloneable, TextParsable {
 	 * Setting the specified remote information at specified index.
 	 * @param index specified index.
 	 * @param rInfo specified {@link RemoteInfo}.
+	 * @return the previous remote information that replaced by the specified remote information.
 	 */
 	public RemoteInfo set(int index, RemoteInfo rInfo) {
 		int idx = indexOf(rInfo.host, rInfo.port);

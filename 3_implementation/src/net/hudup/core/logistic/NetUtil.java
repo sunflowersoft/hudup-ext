@@ -364,7 +364,6 @@ public class NetUtil {
 		/**
 		 * Register, export, and naming remote object.
 		 * @param remote remote object.
-		 * @param port registered port.
 		 * @param bindUri bind URI.
 		 * @return registry and stub.
 		 */
@@ -435,7 +434,5 @@ public class NetUtil {
 		
 	}
 	
-	
-
 	
 }

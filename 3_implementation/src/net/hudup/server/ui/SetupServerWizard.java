@@ -127,6 +127,8 @@ public class SetupServerWizard extends JDialog {
 	
 	/**
 	 * Constructor with server configuration.
+	 * @param comp parent component.
+	 * @param srvConfig server configuration.
 	 */
 	public SetupServerWizard(Component comp, PowerServerConfig srvConfig) {
 		super(UIUtil.getFrameForComponent(comp), "Setup server", true);

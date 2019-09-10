@@ -39,12 +39,12 @@ public interface RecommendContextPrefilter extends CompositeRecommender {
 
 	
 	/**
-	 * Setting up the original dataset {@link #dataset} and the filtered dataset {@link #filteredDataset} based on the specified dataset and context list.
+	 * Setting up the original dataset and the filtered dataset based on the specified dataset and context list.
 	 * Actually, this method uses the specified list of contexts to filter the original dataset so as to achieve the filtered dataset which belongings to the context list.
 	 * 
 	 * @param dataset specified dataset.
 	 * @param contextList specified context list.
-	 * @throws Exception if any error raises.
+	 * @throws RemoteException if any error raises.
 	 */
 	void setup(Dataset dataset, ContextList contextList) throws RemoteException;
 

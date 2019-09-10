@@ -24,7 +24,7 @@ import net.hudup.core.alg.Recommender;
  * Both CBF and CF have their own strong and weak points.
  * <br>
  * This interface represents the memory-based recommendation algorithm with collaborative filtering (CF), called {@code memory-based CF recommender}.
- * {@code Memory-based CF recommender} uses rating matrix (as a part of the internal dataset {@link #dataset}) stored in memory for filtering task in recommendation.
+ * {@code Memory-based CF recommender} uses rating matrix (as a part of the internal dataset  stored in memory for filtering task in recommendation.
  * As mentioned, two main methods of any recommender are {@code estimate(...)} and {@code recommend(...)}.
  * 
  * @author Loc Nguyen

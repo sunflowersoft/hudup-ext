@@ -6,10 +6,9 @@ import java.rmi.RemoteException;
 
 import javax.swing.event.EventListenerList;
 
-import org.apache.log4j.Logger;
-
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.logistic.BaseClass;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.NetUtil;
 
 /**
@@ -30,13 +29,6 @@ public class AlgRemoteWrapper implements Alg, AlgRemote, Serializable {
 	 * Defautl serial version UID.
 	 */
 	private static final long serialVersionUID = 1L;
-
-	
-	
-	/**
-	 * Logger of this class.
-	 */
-	protected final static Logger logger = Logger.getLogger(AlgRemoteWrapper.class);
 
 
     /**
@@ -117,7 +109,7 @@ public class AlgRemoteWrapper implements Alg, AlgRemote, Serializable {
 		if (remoteAlg instanceof AlgAbstract)
 			((AlgAbstract)remoteAlg).resetConfig();
 		else
-			logger.error("resetConfig() not supported");
+			LogUtil.error("resetConfig() not supported");
 	}
 
 	
@@ -127,7 +119,7 @@ public class AlgRemoteWrapper implements Alg, AlgRemote, Serializable {
 		if (remoteAlg instanceof AlgAbstract)
 			return ((AlgAbstract)remoteAlg).createDefaultConfig();
 		else {
-			logger.warn("createDefaultConfig() not supported");
+			LogUtil.warn("createDefaultConfig() not supported");
 			return null;
 		}
 	}
@@ -159,7 +151,7 @@ public class AlgRemoteWrapper implements Alg, AlgRemote, Serializable {
 			return new AlgRemoteWrapper(newAlg, exclusive);
 		}
 		else {
-			logger.warn("newInstance() returns itselfs and so does not return new object");
+			LogUtil.warn("newInstance() returns itselfs and so does not return new object");
 			return this;
 		}
 	}

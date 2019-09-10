@@ -566,7 +566,7 @@ public class RemoteServerCP extends JFrame implements ServerStatusListener {
 
 
 	/**
-	 * The main method shows the {@link ConnectServerDlg} for users to enter authenticated information to connect server.
+	 * The main method shows the {@link ConnectDlg} for users to enter authenticated information to connect server.
 	 * Later on this method shows the this control panel for users to start, stop, pause and configure sever remotely.
 	 * @param args argument parameter of main method. It contains command line arguments.
 	 */

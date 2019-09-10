@@ -3,8 +3,6 @@ package net.hudup.core.data;
 import java.io.Serializable;
 import java.rmi.RemoteException;
 
-import org.apache.log4j.Logger;
-
 import net.hudup.core.data.ctx.Context;
 import net.hudup.core.data.ctx.ContextList;
 import net.hudup.core.data.ctx.ContextTemplateSchema;
@@ -28,12 +26,6 @@ public abstract class DatasetAbstract implements Dataset, DatasetRemote {
 	private static final long serialVersionUID = 1L;
 
 
-	/**
-	 * Logger of this class.
-	 */
-	protected final static Logger logger = Logger.getLogger(Dataset.class);
-
-	
 	/**
 	 * The configuration of dataset.
 	 */

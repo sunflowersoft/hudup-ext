@@ -13,8 +13,6 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.filechooser.FileFilter;
 
-import org.apache.log4j.Logger;
-
 import de.schlichtherle.truezip.file.TFile;
 import de.schlichtherle.truezip.file.swing.TFileChooser;
 import de.schlichtherle.truezip.nio.file.TPath;
@@ -36,6 +34,7 @@ import net.hudup.core.data.ProviderAssocAbstract;
 import net.hudup.core.data.UnitList;
 import net.hudup.core.data.ui.ProfileTable;
 import net.hudup.core.data.ui.UnitTable;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.UriAssoc;
 import net.hudup.core.logistic.UriAssocAbstract;
 import net.hudup.core.logistic.xURI;
@@ -515,12 +514,6 @@ class DBUnitTable extends DBTable implements UnitTable {
 
 	
 	/**
-	 * Logger of this class.
-	 */
-	protected final static Logger logger = Logger.getLogger(UnitTable.class);
-
-	
-	/**
 	 * Holding a list of event listeners.
 	 * 
 	 */
@@ -589,7 +582,7 @@ class DBUnitTable extends DBTable implements UnitTable {
 			return;
 		
 		if (! (providerAssoc instanceof DbProviderAssoc) ) {
-			logger.error("UnitTable currently not support none-database provider");
+			LogUtil.error("UnitTable currently not support none-database provider");
 			return;
 		}
 		

@@ -29,6 +29,7 @@ import net.hudup.core.data.ctx.CTSMemMultiProfiles;
 import net.hudup.core.data.ctx.ContextTemplateSchemaImpl;
 import net.hudup.core.logistic.DSUtil;
 import net.hudup.core.logistic.LineProcessor;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.xURI;
 import net.hudup.core.parser.SnapshotParser;
@@ -173,7 +174,7 @@ public class MovielensParser extends SnapshotParser {
 							value = Double.parseDouble(arr.get(2));
 						}
 						else {
-							logger.error("Rating column count is < 3");
+							LogUtil.error("Rating column count is < 3");
 						}
 						
 						if (rowId == -1 || colId == -1)
@@ -181,7 +182,7 @@ public class MovielensParser extends SnapshotParser {
 					}
 					catch (NumberFormatException e) {
 						e.printStackTrace();
-						logger.error("Processing rating line causes error " + e.getMessage());
+						LogUtil.error("Processing rating line causes error " + e.getMessage());
 						return;
 					}
 					

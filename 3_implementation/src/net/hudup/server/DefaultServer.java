@@ -24,6 +24,7 @@ import net.hudup.core.data.Provider;
 import net.hudup.core.data.UnitList;
 import net.hudup.core.evaluate.EvaluatorConfig;
 import net.hudup.core.logistic.I18nUtil;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.NextUpdate;
 import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.xURI;
@@ -137,12 +138,12 @@ public class DefaultServer extends PowerServerImpl {
 		try {
 			DataDriver driver = DataDriver.create(config.getStoreUri());
 			if (driver != null && driver.isDbServer())
-				Class.forName(driver.getInnerClassName());
+				driver.loadDriver();
 		} 
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			logger.error("Server fail to initialize storage system, error is " + e.getMessage());
+			LogUtil.error("Server fail to initialize storage system, error is " + e.getMessage());
 		}
 	}
 
@@ -162,12 +163,12 @@ public class DefaultServer extends PowerServerImpl {
 				if (e instanceof SQLException) {
 					if (! ((SQLException)e).getSQLState().equals("XJ015") ) {
 						e.printStackTrace();
-						logger.error("Server fail to destroy storage system (shutdown Derby engine), error is " + e.getMessage());
+						LogUtil.error("Server fail to destroy storage system (shutdown Derby engine), error is " + e.getMessage());
 					}
 				}
 				else {
 					e.printStackTrace();
-					logger.error("Server fail to destroy storage system (shutdown Derby engine), error is " + e.getMessage());
+					LogUtil.error("Server fail to destroy storage system (shutdown Derby engine), error is " + e.getMessage());
 				}
 			}
 		}
@@ -298,7 +299,7 @@ public class DefaultServer extends PowerServerImpl {
 		}
 		catch (Throwable e) {
 			e.printStackTrace();
-			logger.error("Server fail to create system tray fail, caused by" + e.getMessage());
+			LogUtil.error("Server fail to create system tray fail, caused by" + e.getMessage());
 		}
 		
 		return false;
@@ -314,7 +315,7 @@ public class DefaultServer extends PowerServerImpl {
 		}
 		catch (Throwable e) {
 			e.printStackTrace();
-			logger.error("Server fail to show control panel, caused by " + e.getMessage());
+			LogUtil.error("Server fail to show control panel, caused by " + e.getMessage());
 			
 			/*
 			 * It is possible that current Java environment does not support GUI.
@@ -356,7 +357,7 @@ public class DefaultServer extends PowerServerImpl {
 					image == null ? null : new ImageIcon(image));
 			
 			if (confirm != JOptionPane.OK_OPTION) {
-				logger.info("Server not created");
+				LogUtil.info("Server not created");
 				return null;
 			}
 			
@@ -365,13 +366,13 @@ public class DefaultServer extends PowerServerImpl {
 			SetupServerWizard dlg = new SetupServerWizard(null, config);
 			
 			if (!dlg.isFinished()) {
-				logger.info("Server not created");
+				LogUtil.info("Server not created");
 				return null;
 			}
 			
 			require = requireSetup(srvConfigUri);
 			if (require) {
-				logger.info("Server not created");
+				LogUtil.info("Server not created");
 				return null;
 			}
 			
@@ -420,7 +421,7 @@ public class DefaultServer extends PowerServerImpl {
 		}
 		catch (Throwable e) {
 			e.printStackTrace();
-			logger.error("Server require set up cause error " + e.getMessage());
+			LogUtil.error("Server require set up cause error " + e.getMessage());
 			return true;
 		}
 		

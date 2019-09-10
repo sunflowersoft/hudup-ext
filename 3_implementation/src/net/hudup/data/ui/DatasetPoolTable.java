@@ -446,8 +446,8 @@ public class DatasetPoolTable extends JTable {
 
 	
 	/**
-	 * 
-	 * @param rowIndex
+	 * Move the row at specified index down.
+	 * @param rowIndex specified index.
 	 */
 	private void moveRowDown(int rowIndex) {
 		if (rowIndex == getRowCount() - 1 || getRowCount() == 0)
@@ -458,8 +458,8 @@ public class DatasetPoolTable extends JTable {
 	
 	
 	/**
-	 * 
-	 * @param rowIndex
+	 * Move the row at specified to last.
+	 * @param rowIndex specified index.
 	 */
 	private void moveRowLast(int rowIndex) {
 		if (rowIndex == getRowCount() - 1 || getRowCount() == 0)
@@ -470,10 +470,10 @@ public class DatasetPoolTable extends JTable {
 
 	
 	/**
-	 * 
-	 * @param start
-	 * @param end
-	 * @param to
+	 * Move rows (from specified starting index and ending index) to specified location.
+	 * @param start specified starting index.
+	 * @param end specified ending index.
+	 * @param to specified location.
 	 */
 	private void moveRow(int start, int end, int to) {
 		DatasetPoolTableModel model = getPoolTableModel();
@@ -519,6 +519,8 @@ public class DatasetPoolTable extends JTable {
 
 
 /**
+ * This class is Java table model of dataset pool.
+ * 
  * @author Loc Nguyen
  * @version 10.0
  */
@@ -532,13 +534,13 @@ class DatasetPoolTableModel extends DefaultTableModel {
 
 	
 	/**
-	 * 
+	 * Internal dataset pool.
 	 */
 	protected DatasetPool pool = null;
 	
 	
 	/**
-	 * 
+	 * Default constructor.
 	 */
 	public DatasetPoolTableModel() {
 		super();
@@ -546,8 +548,8 @@ class DatasetPoolTableModel extends DefaultTableModel {
 	
 	
 	/**
-	 * 
-	 * @param pool
+	 * Update this model by specified dataset pool.
+	 * @param pool specified dataset pool.
 	 */
 	public void update(DatasetPool pool) {
 		this.pool = pool;
@@ -604,8 +606,8 @@ class DatasetPoolTableModel extends DefaultTableModel {
 	
 	
 	/**
-	 * 
-	 * @return {@link DatasetPool}
+	 * Getting dataset pool.
+	 * @return {@link DatasetPool} as dataset pool.
 	 */
 	public DatasetPool getPool() {
 		return pool;

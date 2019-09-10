@@ -52,7 +52,7 @@ Email: ng_phloc@yahoo.com,
 Tel: 84-975250362
 
 ---
-P/S: Current version of JRE and JDK is 1.8.0. Current version of Hudup is 11. The last built date is June 22, 2018.
+P/S: Current version of JRE and JDK is 1.8.0. Current version of Hudup is 12. The last built date is September 5, 2019.
 
 	   
 --------------------
@@ -89,7 +89,7 @@ Java Community Process (JCP) Program provided Java Specification Requests (JSRs)
 
 Kent Beck, Erich Gamma, David Saff, and Mike Clark are developers of JUnit - A unit testing framework for the Java programming language.
 
-Alex Lynch provided JXL library for processing Excel file available at http://jxl.sourceforge.net.
+Andy Khan provided JXL library for processing Excel file available at http://jexcelapi.sourceforge.net.
 
 OneMind provided Java scripted page (Jxp) which is a script-processor that processes JSP-like files, available at http://jxp.sourceforge.net.
 

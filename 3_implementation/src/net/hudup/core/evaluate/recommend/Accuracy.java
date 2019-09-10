@@ -143,7 +143,7 @@ public abstract class Accuracy extends DefaultMetric {
 	/**
 	 * Testing whether the specified rating value is relevant.
 	 * Note, a rating value is relevant if it is larger than the average rating (rating mean).
-	 * The average rating is a half of the sum {@link Recommender#getMinRating()} and {@link Recommender#getMaxRating()}. 
+	 * The average rating is a half of the sum minimum rating value and maximum rating value. 
 	 * @param rating specified rating value.
 	 * @param recommender recommendation algorithm.
 	 * @return {@code true} if specified rating value is relevant. Otherwise, specified rating value is irrelevant.

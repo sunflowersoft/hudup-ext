@@ -322,6 +322,4 @@ public class ExternalServerCP extends PowerServerCP {
 	}
 
 	
-	
-	
 }

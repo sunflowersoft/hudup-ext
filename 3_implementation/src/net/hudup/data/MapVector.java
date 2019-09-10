@@ -81,8 +81,8 @@ public class MapVector<T> implements Serializable {
 	
 	/**
 	 * Method is used to get rating at the key
-	 * @param fieldId
-	 * @return key contain in the map
+	 * @param fieldId field identifier.
+	 * @return key contain in the map.
 	 */
 	public T get(int fieldId) {
 		return map.get(fieldId);

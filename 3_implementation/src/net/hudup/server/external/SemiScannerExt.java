@@ -14,6 +14,7 @@ import net.hudup.data.SemiScanner;
 
 
 /**
+ * This class is an extension of semi-scanner ({@link SemiScanner}) which supports external mapping.
  * 
  * @author Loc Nguyen
  * @version 10.0
@@ -29,26 +30,26 @@ public class SemiScannerExt extends SemiScanner {
 
 
 	/**
-	 * 
+	 * External user record mapping
 	 */
 	protected Map<Integer, ExternalRecord> externalUserRecordMap;
 
 	
 	/**
-	 * 
+	 * External item record mapping
 	 */
 	protected Map<Integer, ExternalRecord> externalItemRecordMap;
 
 	
 	/**
-	 * 
+	 * Profiles of items.
 	 */
 	protected MemProfiles itemProfiles;
 
 	
 	/**
-	 * 
-	 * @param config
+	 * Constructor with specified configuration.
+	 * @param config specified configuration.
 	 */
 	public SemiScannerExt(DataConfig config) {
 		super(config);
@@ -153,7 +154,6 @@ public class SemiScannerExt extends SemiScanner {
 		externalItemRecordMap.clear();
 		itemProfiles.clear();
 	}
-	
 	
 	
 }

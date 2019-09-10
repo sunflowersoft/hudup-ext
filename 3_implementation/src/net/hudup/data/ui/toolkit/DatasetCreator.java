@@ -59,34 +59,79 @@ public class DatasetCreator extends JPanel implements Dispose {
 
 	
 	/**
-	 * 
+	 * Steps to create dataset.
 	 * @author Loc Nguyen
 	 * @version 10.0
-	 *
 	 */
-	protected enum Step {config, create_schema, import_data, finished}
+	protected enum Step {
+		
+		/**
+		 * Configuration step.
+		 */
+		config,
+		
+		/**
+		 * Create schema step.
+		 */
+		create_schema,
+		
+		/**
+		 * Importing data step.
+		 */
+		import_data,
+		
+		/**
+		 * Finished step.
+		 */
+		finished
+	}
 	
 	
+	/**
+	 * Current step.
+	 */
 	protected Step currentStep = Step.config;
 	
+	/**
+	 * Back button.
+	 */
 	protected JButton btnBack = null;
 	
+	/**
+	 * Next button.
+	 */
 	protected JButton btnNext = null;
 	
+	/**
+	 * Finished button.
+	 */
 	protected JButton btnFinished = null;
 	
+	/**
+	 * Canceling button.
+	 */
 	protected JButton btnCancel = null;
 	
+	/**
+	 * Main panel.
+	 */
 	protected JPanel main = null;
 
 	
+	/**
+	 * Configuration.
+	 */
 	protected DataConfig config = null;
 	
+	/**
+	 * Provider.
+	 */
 	protected Provider provider = null;
 
 	
 	/**
-	 * Default constructor.
+	 * Default constructor with specified configuration.
+	 * @param config specified configuration.
 	 */
 	public DatasetCreator(DataConfig config) {
 		super();
@@ -107,8 +152,8 @@ public class DatasetCreator extends JPanel implements Dispose {
 	
 	
 	/**
-	 * 
-	 * @return this
+	 * Getting this creator.
+	 * @return this creator.
 	 */
 	protected DatasetCreator getCreator() {
 		return this;
@@ -116,8 +161,8 @@ public class DatasetCreator extends JPanel implements Dispose {
 	
 	
 	/**
-	 * 
-	 * @return {@link JPanel}
+	 * Creating footer panel.
+	 * @return footer panel.
 	 */
 	private JPanel createFooter() {
 		JPanel footer = new JPanel();
@@ -175,7 +220,7 @@ public class DatasetCreator extends JPanel implements Dispose {
 	
 	
 	/**
-	 * 
+	 * Creating provider.
 	 */
 	private void createProvider() {
 		if (this.provider != null) {
@@ -188,8 +233,8 @@ public class DatasetCreator extends JPanel implements Dispose {
 
 	
 	/**
-	 * 
-	 * @return {@link JPanel}
+	 * Creating configuration panel.
+	 * @return configuration panel.
 	 */
 	protected JPanel createConfigPane() {
 		JPanel main = new JPanel(new BorderLayout());
@@ -304,8 +349,8 @@ public class DatasetCreator extends JPanel implements Dispose {
 
 	
 	/**
-	 * 
-	 * @return {@link JPanel}
+	 * Create schema panel.
+	 * @return creating schema panel.
 	 */
 	private JPanel createCreateSchemaPane() {
 		JPanel main = new JPanel(new BorderLayout());
@@ -530,8 +575,8 @@ public class DatasetCreator extends JPanel implements Dispose {
 
 	
 	/**
-	 * 
-	 * @return whether create schema successfully
+	 * Creating schema.
+	 * @return whether create schema successfully.
 	 */
 	private boolean createSchema() {
 		final JDialog createAttDlg = new JDialog(
@@ -622,8 +667,8 @@ public class DatasetCreator extends JPanel implements Dispose {
 	
 	
 	/**
-	 * 
-	 * @return whether create extra unit successfully
+	 * Modifying extra unit.
+	 * @return whether create extra unit successfully.
 	 */
 	private boolean createModifyUnit(String newUnit) {
 		String ctxTemplateUnit = config.getContextTemplateUnit();
@@ -747,8 +792,8 @@ public class DatasetCreator extends JPanel implements Dispose {
 
 	
 	/**
-	 * 
-	 * @return {@link JPanel}
+	 * Creating importing data panel.
+	 * @return importing data panel.
 	 */
 	protected JPanel createImportDataPane() {
 		JPanel main = new JPanel(new BorderLayout());
@@ -931,8 +976,8 @@ public class DatasetCreator extends JPanel implements Dispose {
 	
 	
 	/**
-	 * 
-	 * @return {@link JPanel}
+	 * Creating finished panel.
+	 * @return finished panel.
 	 */
 	private JPanel createFinishedPane() {
 		JPanel main = new JPanel(new BorderLayout());
@@ -950,8 +995,8 @@ public class DatasetCreator extends JPanel implements Dispose {
 
 	
 	/**
-	 * 
-	 * @param flag
+	 * Setting visible controls.
+	 * @param flag visible flag.
 	 */
 	private void setVisibleControls(boolean flag) {
 		btnBack.setVisible(flag);
@@ -962,7 +1007,7 @@ public class DatasetCreator extends JPanel implements Dispose {
 	
 	
 	/**
-	 * 
+	 * Backing step.
 	 */
 	private void back() {
 		switch (currentStep) {
@@ -990,7 +1035,7 @@ public class DatasetCreator extends JPanel implements Dispose {
 	
 	
 	/**
-	 * 
+	 * Going next step.
 	 */
 	private void next() {
 		switch (currentStep) {
@@ -1035,7 +1080,7 @@ public class DatasetCreator extends JPanel implements Dispose {
 	
 	
 	/**
-	 * 
+	 * Updating step.
 	 */
 	private void updateStep() {
 		main.removeAll();
@@ -1073,7 +1118,7 @@ public class DatasetCreator extends JPanel implements Dispose {
 	
 	
 	/**
-	 * 
+	 * Finishing step.
 	 */
 	private void finished() {
 		if (config instanceof SysConfig)
@@ -1083,7 +1128,7 @@ public class DatasetCreator extends JPanel implements Dispose {
 	
 	
 	/**
-	 * 
+	 * Canceling.
 	 */
 	private void cancel() {
 		if (provider == null) {
@@ -1133,8 +1178,8 @@ public class DatasetCreator extends JPanel implements Dispose {
 
 
 	/**
-	 * 
-	 * @return whether finished
+	 * Testing whether creating finished.
+	 * @return whether finished.
 	 */
 	public boolean isFinished() {
 		return currentStep == Step.finished;
@@ -1142,18 +1187,12 @@ public class DatasetCreator extends JPanel implements Dispose {
 	
 	
 	/**
-	 * 
-	 * @return {@link DataConfig}
+	 * Getting configuration.
+	 * @return {@link DataConfig} as configuration.
 	 */
 	public DataConfig getConfig() {
 		return config;
 	}
-	
-	
-	
-	
-	
-	
 	
 	
 }

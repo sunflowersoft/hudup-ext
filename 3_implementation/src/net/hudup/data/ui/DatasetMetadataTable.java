@@ -58,7 +58,6 @@ public class DatasetMetadataTable extends JTable {
 	}
 	
 	
-	
 	/**
 	 * Showing dialog containing table of dataset meta-data.
 	 * @param comp parent component.

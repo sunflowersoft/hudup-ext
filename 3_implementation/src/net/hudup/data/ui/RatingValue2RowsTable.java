@@ -15,6 +15,7 @@ import net.hudup.data.MapVector;
 
 
 /**
+ * This class is an extension of rating value table.
  * 
  * @author Loc Nguyen
  * @version 10.0
@@ -41,6 +42,7 @@ public class RatingValue2RowsTable extends RatingValueTable {
 
 
 /**
+ * This class is model of {@link RatingValue2RowsTable}.
  * 
  * @author Loc Nguyen
  * @version 10.0
@@ -155,7 +157,8 @@ class RatingTwoRowsTableModel extends RatingValueTM {
 
 
 	/**
-	 * 
+	 * Getting row at specified index.
+	 * @param rowIdx row index.
 	 */
 	public List<MapVector<Object>> getRow(int rowIdx) {
 		int row = (rowIdx % 2 == 0) ? rowIdx : rowIdx - 1;

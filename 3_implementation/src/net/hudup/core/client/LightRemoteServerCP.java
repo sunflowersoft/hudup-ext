@@ -600,8 +600,8 @@ public class LightRemoteServerCP extends JFrame {
 	
 	
 	/**
-	 * The main method shows the {@link ConnectServerDlg} for users to enter authenticated information to connect server.
-	 * Later on this method shows the {@link LightRemoteServerCP} for users to start, stop, pause and configure sever remotely.
+	 * The main method shows the {@link ConnectDlg} for users to enter authenticated information to connect server.
+	 * Later on this method shows this light remote control panel for users to start, stop, pause and configure sever remotely.
 	 * @param args argument parameter of main method. It contains command line arguments.
 	 */
 	public static void main(String[] args) {

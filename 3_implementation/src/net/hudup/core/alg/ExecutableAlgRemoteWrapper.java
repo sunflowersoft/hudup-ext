@@ -7,6 +7,7 @@ import net.hudup.core.data.Fetcher;
 import net.hudup.core.data.Profile;
 import net.hudup.core.logistic.BaseClass;
 import net.hudup.core.logistic.Inspector;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.ui.DescriptionDlg;
 import net.hudup.core.logistic.ui.UIUtil;
 
@@ -112,7 +113,7 @@ public class ExecutableAlgRemoteWrapper extends AlgRemoteWrapper implements Exec
 			return new ExecutableAlgRemoteWrapper(newAlg, exclusive);
 		}
 		else {
-			logger.warn("newInstance() returns itselfs and so does not return new object");
+			LogUtil.warn("newInstance() returns itselfs and so does not return new object");
 			return this;
 		}
 	}

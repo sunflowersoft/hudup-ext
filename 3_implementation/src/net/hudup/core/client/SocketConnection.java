@@ -10,6 +10,7 @@ import java.io.PrintWriter;
 import java.net.Socket;
 
 import net.hudup.core.data.AutoCloseable;
+import net.hudup.core.logistic.LogUtil;
 
 /**
  * This class extends directly {@link SocketWrapper} class and so it is also a service that sends request to server and then receives response (result) from server, according to socket interaction.
@@ -75,7 +76,7 @@ public class SocketConnection extends SocketWrapper implements AutoCloseable {
 		catch (Throwable e) {
 			e.printStackTrace();
 			close();
-			logger.error("Socket connects to server fail caused by error " + e.getMessage());
+			LogUtil.error("Socket connects to server fail caused by error " + e.getMessage());
 		}
 		
 		return false;
@@ -94,7 +95,7 @@ public class SocketConnection extends SocketWrapper implements AutoCloseable {
 	@Override
 	protected Response sendRequest(Request request) {
 		if (!isConnected()) {
-			logger.error("Socket not connected");
+			LogUtil.error("Socket not connected");
 			return null;
 		}
 		
@@ -116,7 +117,7 @@ public class SocketConnection extends SocketWrapper implements AutoCloseable {
 		}
 		catch (Exception e) {
 			e.printStackTrace();
-			logger.error("Socket sends request to server, causes error " + e.getMessage());
+			LogUtil.error("Socket sends request to server, causes error " + e.getMessage());
 		}
 		
 		return null;
@@ -136,7 +137,7 @@ public class SocketConnection extends SocketWrapper implements AutoCloseable {
 		}
 		catch (Throwable e) {
 			e.printStackTrace();
-			logger.error("Socket connection fail to close input stream, causes error " + e.getMessage());
+			LogUtil.error("Socket connection fail to close input stream, causes error " + e.getMessage());
 		}
 		
 		try {
@@ -147,7 +148,7 @@ public class SocketConnection extends SocketWrapper implements AutoCloseable {
 		}
 		catch (Throwable e) {
 			e.printStackTrace();
-			logger.error("Socket connection fail to close output stream, causes error " + e.getMessage());
+			LogUtil.error("Socket connection fail to close output stream, causes error " + e.getMessage());
 		}
 
 		try {
@@ -158,7 +159,7 @@ public class SocketConnection extends SocketWrapper implements AutoCloseable {
 		}
 		catch (Throwable e) {
 			e.printStackTrace();
-			logger.error("Socket connection fail to close socket, causes error " + e.getMessage());
+			LogUtil.error("Socket connection fail to close socket, causes error " + e.getMessage());
 		}
 	}
 

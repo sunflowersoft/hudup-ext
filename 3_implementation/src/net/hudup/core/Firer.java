@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
 import org.reflections.Reflections;
 
 import net.hudup.core.alg.Alg;
@@ -19,6 +18,7 @@ import net.hudup.core.data.ctx.CTSManager;
 import net.hudup.core.evaluate.Metric;
 import net.hudup.core.logistic.BaseClass;
 import net.hudup.core.logistic.Composite;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.NextUpdate;
 import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.UriAdapter.AdapterWriter;
@@ -35,7 +35,7 @@ import net.hudup.core.parser.DatasetParser;
  * Method {@link #fire()} creates default directories such as working directory and directory of knowledge base.
  * </li>
  * <li>
- * Method {@link #fire()} continues to call method {@link #discover(String)} to discover and register all algorithms (from class path and libaray of Hudup framework) into {@link PluginStorage}.
+ * Method {@link #fire()} continues to call method {@link #discover(String...)} to discover and register all algorithms (from class path and libaray of Hudup framework) into {@link PluginStorage}.
  * </li>
  * </ol> 
  * 
@@ -44,12 +44,6 @@ import net.hudup.core.parser.DatasetParser;
  *
  */
 public class Firer implements PluginManager {
-
-	
-	/**
-	 * Logger of this class.
-	 */
-	protected final static Logger logger = Logger.getLogger(Firer.class);
 
 	
 	/**
@@ -75,7 +69,7 @@ public class Firer implements PluginManager {
 	 * Method {@link #fire()} creates default directories such as working directory and directory of knowledge base.
 	 * </li>
 	 * <li>
-	 * Method {@link #fire()} continues to call method {@link #discover(String)} to discover and register all algorithms (from class path and libaray of Hudup framework) into {@link PluginStorage}.
+	 * Method {@link #fire()} continues to call method {@link #discover(String...)} to discover and register all algorithms (from class path and libaray of Hudup framework) into {@link PluginStorage}.
 	 * </li>
 	 * </ol>
 	 */
@@ -124,11 +118,11 @@ public class Firer implements PluginManager {
 		for (int i = 0; i < dataDriverList.size(); i++) {
 			DataDriver dataDriver = dataDriverList.get(i);
 			try {
-				Class.forName( dataDriver.getInnerClassName() );
-				logger.info("Loaded data driver class: " + dataDriver.getInnerClassName());
+				dataDriver.loadDriver();
+				LogUtil.info("Loaded data driver class: " + dataDriver.getInnerClassName());
 			}
 			catch (Throwable e) {
-				logger.error("Can not load data driver \"" + dataDriver.getInnerClassName() + "\"" + " error is " + e.getMessage());
+				LogUtil.error("Can not load data driver \"" + dataDriver.getInnerClassName() + "\"" + " error is " + e.getMessage());
 			}
 			
 		}
@@ -141,7 +135,7 @@ public class Firer implements PluginManager {
 	@Override
 	public void discover(String...prefixList) {
 		if (prefixList == null || prefixList.length == 0) {
-			logger.error("Cannot discover classes because of empty packages list.");
+			LogUtil.error("Cannot discover classes because of empty packages list.");
 			return;
 		}
 		
@@ -167,7 +161,7 @@ public class Firer implements PluginManager {
 			catch (Exception e) {e.printStackTrace();}
 		}
 		if (reflections == null) {
-			logger.error("Null reflection for discovering classes.");
+			LogUtil.error("Null reflection for discovering classes.");
 			return;
 		}
 		
@@ -258,8 +252,61 @@ public class Firer implements PluginManager {
 			registered = normalAlgReg.register(alg);
 
 		if (registered)
-			logger.info("Registered algorithm: " + alg.getName());
+			LogUtil.info("Registered algorithm: " + alg.getName());
 	}
 	
 	
+	/**
+	 * Getting a list of instances from referred class.
+	 * @param <T> type of returned instances.
+	 * @param referredClass referred class.
+	 * @return list of instances from specified package and referred class.
+	 */
+	public static <T> List<T> getInstances(Class<T> referredClass) {
+		String[] prefixList = Util.getLoadablePackages();
+		Reflections reflections = null;
+		for (String prefix : prefixList) {
+			try {
+				Reflections tempReflections = new Reflections(prefix);
+				if (reflections == null)
+					reflections = tempReflections;
+				else
+					reflections.merge(tempReflections);
+			}
+			catch (Exception e) {e.printStackTrace();}
+		}
+		if (reflections == null) return Util.newList();
+		
+		Set<Class<? extends T>> apClasses = reflections.getSubTypesOf(referredClass);
+		List<T> instances = Util.newList();
+		for (Class<? extends T> apClass : apClasses) {
+			if (!referredClass.isAssignableFrom(apClass))
+				continue;
+			
+			if (apClass.isInterface() || apClass.isMemberClass() || apClass.isAnonymousClass())
+				continue;
+			
+			int modifiers = apClass.getModifiers();
+			if ( (modifiers & Modifier.ABSTRACT) != 0 || (modifiers & Modifier.PUBLIC) == 0)
+				continue;
+			
+			if (apClass.getAnnotation(BaseClass.class) != null || 
+					apClass.getAnnotation(Deprecated.class) != null) {
+				continue;
+			}
+
+			try {
+				T instance = Util.newInstance(apClass);
+				instances.add(instance);
+			}
+			catch (Exception e) {
+				e.printStackTrace();
+			}
+			
+		}
+		
+		return instances;
+	}
+
+
 }

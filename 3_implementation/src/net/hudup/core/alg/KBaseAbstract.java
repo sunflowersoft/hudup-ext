@@ -3,8 +3,6 @@
  */
 package net.hudup.core.alg;
 
-import org.apache.log4j.Logger;
-
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.Datasource;
@@ -31,12 +29,6 @@ public abstract class KBaseAbstract implements KBase {
 	 * Serial version UID for serializable class. 
 	 */
 	private static final long serialVersionUID = 1L;
-
-	
-	/**
-	 * Logger of this class.
-	 */
-	protected final static Logger logger = Logger.getLogger(KBase.class);
 
 	
 	/**

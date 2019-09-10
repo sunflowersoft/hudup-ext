@@ -20,6 +20,7 @@ import net.hudup.server.PowerServerConfig;
 
 
 /**
+ * This class is configuration of external server.
  * 
  * @author Loc Nguyen
  * @version 10.0
@@ -35,25 +36,25 @@ public class ExternalServerConfig extends PowerServerConfig {
 
 	
 	/**
-	 * 
+	 * Default server recommender.
 	 */
 	public final static Class<? extends Recommender> DEFAULT_SERVER_RECOMMENDER = ExternalServerRecommender.class;
 	
 	
 	/**
-	 * 
+	 * Default server parser.
 	 */
 	public final static Class<? extends DatasetParser> DEFAULT_SERVER_PARSER = SemiScannerParserExt.class;
 
 	
 	/**
-	 * 
+	 * External query configuration.
 	 */
 	public static final String EXTERNAL_QUERY_CONFIG = DataConfig.changeCase("external_query_config");
 	
 	
 	/**
-	 * 
+	 * Default constructor.
 	 */
 	public ExternalServerConfig() {
 		// TODO Auto-generated constructor stub
@@ -62,8 +63,8 @@ public class ExternalServerConfig extends PowerServerConfig {
 
 	
 	/**
-	 * 
-	 * @param uri
+	 * Constructor with specified URI.
+	 * @param uri specified URI.
 	 */
 	public ExternalServerConfig(xURI uri) {
 		super(uri);
@@ -85,7 +86,7 @@ public class ExternalServerConfig extends PowerServerConfig {
 	
 	
 	/**
-	 * 
+	 * Getting external configuration.
 	 * @return {@link ExternalConfig}
 	 */
 	public ExternalConfig getExternalConfig() {
@@ -103,8 +104,8 @@ public class ExternalServerConfig extends PowerServerConfig {
 	
 	
 	/**
-	 * 
-	 * @param externalConfig
+	 * Setting external configuration.
+	 * @param externalConfig external configuration.
 	 */
 	public void setExternalConfig(ExternalConfig externalConfig) {
 		if (externalConfig == null)
@@ -163,5 +164,4 @@ public class ExternalServerConfig extends PowerServerConfig {
 	}
 	
 	
-
 }

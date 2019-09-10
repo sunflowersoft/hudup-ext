@@ -7,6 +7,7 @@ import net.hudup.core.data.Dataset;
 import net.hudup.core.data.RatingVector;
 import net.hudup.core.logistic.BaseClass;
 import net.hudup.core.logistic.Inspector;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.ui.DescriptionDlg;
 import net.hudup.core.logistic.ui.UIUtil;
 
@@ -90,7 +91,7 @@ public class RecommenderRemoteWrapper extends AlgRemoteWrapper implements Recomm
 		if (remoteAlg instanceof Recommender)
 			return ((Recommender)remoteAlg).getDataset();
 		else {
-			logger.error("getDataset() not supported");
+			LogUtil.error("getDataset() not supported");
 			return null;
 		}
 	}
@@ -118,7 +119,7 @@ public class RecommenderRemoteWrapper extends AlgRemoteWrapper implements Recomm
 			return new RecommenderRemoteWrapper(newRecommender, exclusive);
 		}
 		else {
-			logger.warn("newInstance() returns itselfs and so does not return new object");
+			LogUtil.warn("newInstance() returns itselfs and so does not return new object");
 			return this;
 		}
 	}

@@ -36,6 +36,7 @@ import net.hudup.core.data.Profile;
 import net.hudup.core.data.ProviderAssocAbstract;
 import net.hudup.core.data.Unit;
 import net.hudup.core.data.UnitList;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.xURI;
 import net.hudup.core.parser.TextParsable;
 import net.hudup.core.parser.TextParserUtil;
@@ -1876,7 +1877,7 @@ class DbProviderAssoc extends ProviderAssocAbstract {
 		}
 		catch (Throwable e) {
 			e.printStackTrace();
-			logger.error("Get database metadata error: " + e.getMessage());
+			LogUtil.error("Get database metadata error: " + e.getMessage());
 		}
 		
 		return tblList;
@@ -2580,9 +2581,10 @@ class DbProviderAssoc extends ProviderAssocAbstract {
 	
 
 	/**
+	 * This class is fetcher of database table.
+	 * @param <E> type of elements.
 	 * @author Loc Nguyen
 	 * @version 10.0
-	 *
 	 */
 	static abstract class DbFetcher<E extends Serializable> implements Fetcher<E> {
 		
@@ -2592,18 +2594,18 @@ class DbProviderAssoc extends ProviderAssocAbstract {
 		private static final long serialVersionUID = 1L;
 
 		/**
-		 * 
+		 * Internal record set.
 		 */
 		protected ResultSet rs = null;
 		
 		/**
-		 * 
+		 * Fetcher meta-data.
 		 */
 		protected FetcherMetadata metadata = null;
 		
 		/**
-		 * 
-		 * @param rs
+		 * Constructor with specified result set.
+		 * @param rs specified result set.
 		 */
 		public DbFetcher(ResultSet rs) {
 			this.rs = rs;
@@ -2618,7 +2620,7 @@ class DbProviderAssoc extends ProviderAssocAbstract {
 			catch (Throwable e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-				logger.error("DbFetcher initialized fail, error " + e.getMessage());
+				LogUtil.error("DbFetcher initialized fail, error " + e.getMessage());
 			}
 		}
 		
@@ -2687,9 +2689,9 @@ class DbProviderAssoc extends ProviderAssocAbstract {
 		}
 
 		/**
-		 * 
-		 * @param rs
-		 * @return created element
+		 * Creating a element with specified result set.
+		 * @param rs specified result set.
+		 * @return element created from specified result set.
 		 */
 		public abstract E create(ResultSet rs);
 		
@@ -2744,10 +2746,10 @@ class DbProviderAssoc extends ProviderAssocAbstract {
 	
 	
 	/**
-	 * 
+	 * This class is fetcher of database table, which support RMI calls.
 	 * @author Loc Nguyen
 	 * @version 10.0
-	 * @param <E>
+	 * @param <E> type of elements.
 	 */
 	static abstract class RmiDbFetcher<E extends Serializable> extends DbFetcher<E> {
 		
@@ -2757,8 +2759,8 @@ class DbProviderAssoc extends ProviderAssocAbstract {
 		private static final long serialVersionUID = 1L;
 
 		/**
-		 * 
-		 * @param rs
+		 * Constructor with record set.
+		 * @param rs specified record set.
 		 */
 		public RmiDbFetcher(ResultSet rs) {
 			super(rs);
@@ -2783,7 +2785,7 @@ class DbProviderAssoc extends ProviderAssocAbstract {
 				catch (NoSuchObjectException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
-					logger.error("No such object exported, error " + e.getMessage());
+					LogUtil.error("No such object exported, error " + e.getMessage());
 				}
 			}
 			

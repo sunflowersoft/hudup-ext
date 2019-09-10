@@ -9,6 +9,7 @@ import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.Profile;
 import net.hudup.core.data.Profiles;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.parser.TextParserUtil;
 
 
@@ -128,7 +129,7 @@ public abstract class CTSManagerAbstract extends AlgAbstract implements CTSManag
 	@Override
 	public void resetConfig() {
 		// TODO Auto-generated method stub
-		logger.warn("CTSManager.resetConfig() not supported");
+		LogUtil.warn("CTSManager.resetConfig() not supported");
 	}
 
 

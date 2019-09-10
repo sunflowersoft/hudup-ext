@@ -26,6 +26,7 @@ import net.hudup.core.client.Service;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.HiddenText;
 import net.hudup.core.logistic.I18nUtil;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.NetUtil;
 import net.hudup.core.logistic.xURI;
 import net.hudup.core.logistic.ui.HelpContent;
@@ -106,7 +107,7 @@ public class Listener extends SocketServer implements ServerStatusListener, Gate
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-	        logger.error("Listener/Balancer fail to be constructed in constructor method, caused by " + e.getMessage());
+			LogUtil.error("Listener/Balancer fail to be constructed in constructor method, caused by " + e.getMessage());
 			System.exit(0);
 		}
 
@@ -127,12 +128,12 @@ public class Listener extends SocketServer implements ServerStatusListener, Gate
 				bindServerList.bind(
 						((ListenerConfig)config).getRemoteInfo(), this);
 				
-		        logger.info("Listener bind remote server successfully");
+				LogUtil.info("Listener bind remote server successfully");
 			} 
 			catch (Throwable e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-				logger.error("Listener fail to bind remote server, caused by " + e.getMessage());
+				LogUtil.error("Listener fail to bind remote server, caused by " + e.getMessage());
 			}
 			
 		}
@@ -149,7 +150,7 @@ public class Listener extends SocketServer implements ServerStatusListener, Gate
 		super.start();
 		
 		rebind();
-		logger.info("Listener/Balancer export at port " + ((ListenerConfig)config).getExportPort());
+		LogUtil.info("Listener/Balancer export at port " + ((ListenerConfig)config).getExportPort());
 	}
 	
 	
@@ -184,11 +185,11 @@ public class Listener extends SocketServer implements ServerStatusListener, Gate
     	}
     	catch (Throwable e) {
     		e.printStackTrace();
-			logger.error("Listener/Balancer fail to shutdown, caused by" + e.getMessage());
+    		LogUtil.error("Listener/Balancer fail to shutdown, caused by" + e.getMessage());
     	}
 
 		config.save();
-		logger.info("Listener/Balancer shutdown");
+		LogUtil.info("Listener/Balancer shutdown");
 		config = null;
 		
 		fireStatusEvent(new ServerStatusEvent(this, Status.exit));
@@ -251,7 +252,7 @@ public class Listener extends SocketServer implements ServerStatusListener, Gate
 			stopDelegators();
 			break;
 		case setconfig:
-			logger.error("Status setconfig is invalid");
+			LogUtil.error("Status setconfig is invalid");
 			break;
 		case exit:
 			synchronized (bindServerList) {
@@ -457,7 +458,7 @@ public class Listener extends SocketServer implements ServerStatusListener, Gate
 			return true;
 		}
 		catch (Exception e) {
-			logger.error("Listener/Balancer fail to create system tray, caused by" + e.getMessage());
+			LogUtil.error("Listener/Balancer fail to create system tray, caused by" + e.getMessage());
 		}
 		
 		return false;

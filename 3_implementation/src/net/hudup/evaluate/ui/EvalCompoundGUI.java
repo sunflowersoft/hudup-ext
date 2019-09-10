@@ -21,23 +21,22 @@ import javax.swing.JOptionPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 
-import org.apache.log4j.Logger;
-
 import net.hudup.core.Constants;
+import net.hudup.core.Firer;
 import net.hudup.core.PluginChangedEvent;
 import net.hudup.core.PluginChangedListener;
 import net.hudup.core.PluginStorage;
 import net.hudup.core.RegisterTable;
 import net.hudup.core.client.ConnectDlg;
 import net.hudup.core.client.Service;
-import net.hudup.core.evaluate.EvaluatorAbstract;
 import net.hudup.core.evaluate.Evaluator;
+import net.hudup.core.evaluate.EvaluatorAbstract;
 import net.hudup.core.evaluate.EvaluatorConfig;
 import net.hudup.core.evaluate.MetaMetric;
 import net.hudup.core.evaluate.Metric;
 import net.hudup.core.evaluate.NoneWrapperMetricList;
 import net.hudup.core.logistic.I18nUtil;
-import net.hudup.core.logistic.SystemUtil;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.xURI;
 import net.hudup.core.logistic.ui.HelpContent;
 import net.hudup.core.logistic.ui.StartDlg;
@@ -59,12 +58,6 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	
-	/**
-	 * Logger of this class.
-	 */
-	protected final static Logger logger = Logger.getLogger(EvalCompoundGUI.class);
-	
 	
 	/**
 	 * Evaluation configuration.
@@ -111,7 +104,7 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			logger.error("Error in getting evaluator configuration");
+			LogUtil.error("Error in getting evaluator configuration");
 		}
 		this.bindUri = bindUri;
 		
@@ -314,7 +307,7 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 	 * @param oldGUI old GUI.
 	 */
 	public static void switchEvaluator(String selectedEvName, Window oldGUI) {
-		List<Evaluator> evList = SystemUtil.getInstances(Evaluator.class);
+		List<Evaluator> evList = Firer.getInstances(Evaluator.class);
 		if (evList.size() == 0) {
 			JOptionPane.showMessageDialog(
 					null, 
@@ -537,7 +530,7 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 				
 				boolean registered = metricReg.register(metric);
 				if (registered)
-					logger.info("Registered algorithm: " + metricList.get(i).getName());
+					LogUtil.info("Registered algorithm: " + metricList.get(i).getName());
 			}
 
 			if (oldGUI != null) oldGUI.dispose();

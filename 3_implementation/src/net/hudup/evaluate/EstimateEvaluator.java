@@ -253,7 +253,7 @@ public class EstimateEvaluator extends RecommendEvaluator {
 	
 	/**
 	 * Setting up the set of query item id (s)
-	 * @param outQuery
+	 * @param outQuery rating vector as input for estimating.
 	 * @return the set of query item id (s)
 	 */
     protected static Set<Integer> setupQueryIds(/*int unratedCount,*/ RatingVector outQuery) {

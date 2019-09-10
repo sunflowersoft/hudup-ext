@@ -71,7 +71,10 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 	private static final long serialVersionUID = 1L;
 	
 	
-	//protected JButton btnExternalConfig = null;
+//	/**
+//	 * External configuration button.
+//	 */
+//	protected JButton btnExternalConfig = null;
 
 	/**
 	 * System configuration pane.
@@ -252,6 +255,7 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 	
 	/**
 	 * Binding remote server.
+	 * @throws RemoteException if any error raises.
 	 */
 	protected void bindServer() throws RemoteException {
 		boolean result = false;
@@ -880,6 +884,7 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 	/**
 	 * Update current controls when receiving specified remote status.
 	 * @param state specified remote status.
+	 * @throws RemoteException if any error raises.
 	 */
 	protected void updateControls(ServerStatusEvent.Status state)
 			throws RemoteException {
@@ -999,6 +1004,7 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 	
 	/**
 	 * Update controls.
+	 * @throws RemoteException if any error raises.
 	 */
 	protected void updateControls() throws RemoteException {
 		if (server == null)

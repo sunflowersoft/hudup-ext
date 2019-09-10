@@ -11,6 +11,7 @@ import java.rmi.RemoteException;
 import net.hudup.core.client.PowerServer;
 import net.hudup.core.client.ServerTrayIcon;
 import net.hudup.core.logistic.I18nUtil;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.xURI;
 import net.hudup.core.logistic.ui.HelpContent;
 import net.hudup.core.logistic.ui.UIUtil;
@@ -67,12 +68,12 @@ public class Balancer extends Listener {
 				bindServerList.bind(
 						((BalancerConfig)config).getRemoteInfoList(), this);
 				
-		        logger.info("Balancer bind list of remote servers successfully");
+				LogUtil.info("Balancer bind list of remote servers successfully");
 			} 
 			catch (Throwable e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-				logger.error("Balancer fail to bind list of remote servers, caused by " + e.getMessage());
+				LogUtil.error("Balancer fail to bind list of remote servers, caused by " + e.getMessage());
 			}
 			
 		}
@@ -188,7 +189,7 @@ public class Balancer extends Listener {
 			return true;
 		}
 		catch (Exception e) {
-			logger.error("Balancer fail to create system tray fail, caused by" + e.getMessage());
+			LogUtil.error("Balancer fail to create system tray fail, caused by" + e.getMessage());
 		}
 		
 		return false;

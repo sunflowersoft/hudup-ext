@@ -7,6 +7,7 @@ import net.hudup.core.data.Dataset;
 import net.hudup.core.data.Profile;
 import net.hudup.core.data.RatingVector;
 import net.hudup.core.logistic.Inspector;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.ui.DescriptionDlg;
 import net.hudup.core.logistic.ui.UIUtil;
 
@@ -80,7 +81,7 @@ public abstract class RecommenderAbstract extends AlgAbstract implements Recomme
 		
 		RatingVector vRating = null;
 		if (dataset == null)
-			logger.warn("Training dataset is null. This is acceptable because some model-based algorithms do not store dataset");
+			LogUtil.warn("Training dataset is null. This is acceptable because some model-based algorithms do not store dataset");
 		else {
 			int userId = param.ratingVector.id(); //If the user id is negative (< 0), param.ratingVector is not stored in database. 
 			vRating = dataset.getUserRating(userId);

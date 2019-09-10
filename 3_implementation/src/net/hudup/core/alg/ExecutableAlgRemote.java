@@ -17,7 +17,7 @@ public interface ExecutableAlgRemote extends AlgRemote {
 
 	/**
 	 * Setting up this testing algorithm based on specified dataset.
-	 * In this current version, this method initializes the data sample for learning parameter and then calls {@link #learn(Object...)} method.
+	 * In this current version, this method initializes the data sample for learning parameter and then calls learning method.
 	 * @param dataset specified dataset.
 	 * @param info additional parameters to set up this algorithm. This parameter is really an array of sub-parameters.
 	 * @throws RemoteException if any error raises.
@@ -27,7 +27,7 @@ public interface ExecutableAlgRemote extends AlgRemote {
 	
 	/**
 	 * Setting up this testing algorithm based on specified sample.
-	 * In this current version, this method calls {@link #learn(Object...)} method.
+	 * In this current version, this method calls learning method.
 	 * @param sample specified sample.
 	 * @param info additional parameters to set up this algorithm. This parameter is really an array of sub-parameters.
 	 * @throws RemoteException if any error raises.

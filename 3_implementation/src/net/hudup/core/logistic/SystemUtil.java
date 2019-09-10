@@ -3,15 +3,8 @@
  */
 package net.hudup.core.logistic;
 
-import java.lang.reflect.Modifier;
-import java.util.List;
 import java.util.Properties;
-import java.util.Set;
 
-import org.apache.log4j.Logger;
-import org.reflections.Reflections;
-
-import net.hudup.core.Util;
 import net.hudup.core.data.PropList;
 
 /**
@@ -22,12 +15,6 @@ import net.hudup.core.data.PropList;
  *
  */
 public final class SystemUtil {
-
-	
-	/**
-	 * Logger of this class.
-	 */
-	protected final static Logger logger = Logger.getLogger(SystemUtil.class);
 
 	
 	/**
@@ -58,7 +45,7 @@ public final class SystemUtil {
 	public final static void enhanceAuto() {
 		try {
 			enhance();
-			logger.info("SystemUtil#enhanceAuto() automatically calls system enhancement at thread " + Thread.currentThread());
+			LogUtil.info("SystemUtil#enhanceAuto() automatically calls system enhancement at thread " + Thread.currentThread());
 		}
 		catch (Throwable e) {
 			e.printStackTrace();
@@ -144,57 +131,6 @@ public final class SystemUtil {
 	}
 	
 	
-	/**
-	 * Getting a list of instances from referred class.
-	 * @param <T> type of returned instances.
-	 * @param referredClass referred class.
-	 * @return list of instances from specified package and referred class.
-	 */
-	public static <T> List<T> getInstances(Class<T> referredClass) {
-		String[] prefixList = Util.getLoadablePackages();
-		Reflections reflections = null;
-		for (String prefix : prefixList) {
-			try {
-				Reflections tempReflections = new Reflections(prefix);
-				if (reflections == null)
-					reflections = tempReflections;
-				else
-					reflections.merge(tempReflections);
-			}
-			catch (Exception e) {e.printStackTrace();}
-		}
-		if (reflections == null) return Util.newList();
-		
-		Set<Class<? extends T>> apClasses = reflections.getSubTypesOf(referredClass);
-		List<T> instances = Util.newList();
-		for (Class<? extends T> apClass : apClasses) {
-			if (!referredClass.isAssignableFrom(apClass))
-				continue;
-			
-			if (apClass.isInterface() || apClass.isMemberClass() || apClass.isAnonymousClass())
-				continue;
-			
-			int modifiers = apClass.getModifiers();
-			if ( (modifiers & Modifier.ABSTRACT) != 0 || (modifiers & Modifier.PUBLIC) == 0)
-				continue;
-			
-			if (apClass.getAnnotation(BaseClass.class) != null || 
-					apClass.getAnnotation(Deprecated.class) != null) {
-				continue;
-			}
-
-			try {
-				T instance = Util.newInstance(apClass);
-				instances.add(instance);
-			}
-			catch (Exception e) {
-				e.printStackTrace();
-			}
-			
-		}
-		
-		return instances;
-	}
 	
 	
 }

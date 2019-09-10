@@ -3,11 +3,6 @@
  */
 package net.hudup.core.logistic;
 
-import org.apache.log4j.Logger;
-
-
-
-
 /**
  * This class is a {@code runner} that implements partially the interface {@link Runner}.
  * Most necessary methods are implemented except that any completed class which extends this class must defines method {@link #task()} and method {@link #clear()}.
@@ -19,12 +14,6 @@ import org.apache.log4j.Logger;
  *
  */
 public abstract class AbstractRunner implements Runner {
-	
-	
-	/**
-	 * Logger of this class.
-	 */
-	protected final static Logger logger = Logger.getLogger(Runner.class);
 	
 	
 	/**
@@ -173,7 +162,7 @@ public abstract class AbstractRunner implements Runner {
 				thread.stop();
 		}
 		catch (Throwable e) {
-			logger.error("Calling thread destroy() in AbstractRunner#forceStop causes error " + e.getMessage());
+			LogUtil.error("Calling thread destroy() in AbstractRunner#forceStop causes error " + e.getMessage());
 		}
 		
 		thread = null;
@@ -184,7 +173,7 @@ public abstract class AbstractRunner implements Runner {
 			notifyAll();
 		}
 		catch (Throwable e) {
-			logger.error("Calling notifyAll in Evaluator#forceStop causes error " + e.getMessage());
+			LogUtil.error("Calling notifyAll() in Evaluator#forceStop causes error " + e.getMessage());
 		}
 	}
 

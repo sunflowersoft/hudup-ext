@@ -22,6 +22,7 @@ import net.hudup.data.ui.ExternalConfigurator;
 
 
 /**
+ * This class is external importing panel.
  * 
  * @author Loc Nguyen
  * @version 10.0
@@ -35,23 +36,45 @@ public class ExternalImporter extends JPanel implements ProgressListener, Dispos
 	 */
 	private static final long serialVersionUID = 1L;
 
+	
+	/**
+	 * Internal configuration button.
+	 */
 	protected JButton btnInternalConfig = null;
 	
+	/**
+	 * Internal configuration text field.
+	 */
 	protected DataConfigTextField txtInternalConfig = null;
 
+	/**
+	 * External configuration button.
+	 */
 	protected JButton btnExternalConfig = null;
 	
+	/**
+	 * External configuration text field.
+	 */
 	protected DataConfigTextField txtExternalConfig = null;
 
+	/**
+	 * Importing button.
+	 */
 	protected JButton btnImport = null;
 	
+	/**
+	 * Running progress bar.
+	 */
 	protected JProgressBar prgRunning = null;
 
+	/**
+	 * Running thread.
+	 */
 	protected volatile Thread runningThread = null;
 
 	
 	/**
-	 * 
+	 * Default constructor.
 	 */
 	public ExternalImporter() {
 		super();
@@ -131,8 +154,8 @@ public class ExternalImporter extends JPanel implements ProgressListener, Dispos
 	
 	
 	/**
-	 * 
-	 * @return {@link ExternalImporter}
+	 * Getting this importer.
+	 * @return this importer.
 	 */
 	private ExternalImporter getThis() {
 		return this;
@@ -140,7 +163,7 @@ public class ExternalImporter extends JPanel implements ProgressListener, Dispos
 	
 	
 	/**
-	 * 
+	 * Making internal configuration.
 	 */
 	protected void internalConfig() {
 		
@@ -162,7 +185,7 @@ public class ExternalImporter extends JPanel implements ProgressListener, Dispos
 	
 	
 	/**
-	 * 
+	 * Making external configuration.
 	 */
 	protected void externalConfig() {
 		
@@ -187,7 +210,7 @@ public class ExternalImporter extends JPanel implements ProgressListener, Dispos
 	
 	
 	/**
-	 * 
+	 * Importing data.
 	 */
 	protected void importData() {
 		final DataConfig internalConfig = txtInternalConfig.getConfig();
@@ -251,8 +274,8 @@ public class ExternalImporter extends JPanel implements ProgressListener, Dispos
 	
 	
 	/**
-	 * 
-	 * @param flag
+	 * Enabling controls.
+	 * @param flag enabled flag.
 	 */
 	private void enableControls(boolean flag) {
 		DataConfig internalConfig = txtInternalConfig.getConfig();
@@ -305,6 +328,7 @@ public class ExternalImporter extends JPanel implements ProgressListener, Dispos
 		
 		return runningThread != null;
 	}
+	
 	
 }
 

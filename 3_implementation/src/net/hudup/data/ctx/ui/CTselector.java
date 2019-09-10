@@ -17,6 +17,7 @@ import net.hudup.core.logistic.ui.UIUtil;
 
 
 /**
+ * This class show a dialog allowing users to select template.
  * 
  * @author Loc Nguyen
  * @version 10.0
@@ -32,14 +33,15 @@ public class CTselector extends JDialog {
 
 	
 	/**
-	 * 
+	 * Selected template.
 	 */
 	private ContextTemplate selectedTemplate = null;
 	
 	
 	/**
-	 * 
-	 * @param cts
+	 * Constructor with specified context template schema.
+	 * @param comp parent component.
+	 * @param cts specified context template schema.
 	 */
 	public CTselector(Component comp, ContextTemplateSchema cts) {
 		super(UIUtil.getFrameForComponent(comp), "Context template selector", true);
@@ -98,8 +100,8 @@ public class CTselector extends JDialog {
 	
 	
 	/**
-	 * 
-	 * @return selected template
+	 * Getting selected template.
+	 * @return selected template.
 	 */
 	public ContextTemplate getSelectedTemplate() {
 		return selectedTemplate;

@@ -6,8 +6,6 @@ import java.rmi.RemoteException;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.log4j.Logger;
-
 import net.hudup.core.AccessPoint;
 import net.hudup.core.Constants;
 import net.hudup.core.Firer;
@@ -19,8 +17,8 @@ import net.hudup.core.evaluate.EvaluatorEvent;
 import net.hudup.core.evaluate.EvaluatorEvent.Type;
 import net.hudup.core.evaluate.EvaluatorListener;
 import net.hudup.core.evaluate.MetricsUtil;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.MathUtil;
-import net.hudup.core.logistic.SystemUtil;
 import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.xURI;
 import net.hudup.data.BatchScript;
@@ -38,12 +36,6 @@ public class Evaluator implements AccessPoint {
 
 	
 	/**
-	 * Logger of this class.
-	 */
-	protected final static Logger logger = Logger.getLogger(Evaluator.class);
-	
-	
-	/**
 	 * The main method to start evaluator.
 	 * @param args The argument parameter of main method. It contains command line arguments.
 	 * @throws Exception if there is any error.
@@ -57,7 +49,7 @@ public class Evaluator implements AccessPoint {
 	@Override
 	public void run(String[] args) {
 		// TODO Auto-generated method stub
-		logger.info("Sytax: java net.hudup.Evaluator \"EvaluatorName\" \"batch.script\"");
+		LogUtil.info("Sytax: java net.hudup.Evaluator \"EvaluatorName\" \"batch.script\"");
 		new Firer();
 		
 		if (args == null || args.length == 0) {
@@ -75,7 +67,7 @@ public class Evaluator implements AccessPoint {
 			ev = null;
 		}
 		if (ev == null) {
-			List<net.hudup.core.evaluate.Evaluator> tempEvList = SystemUtil.getInstances(net.hudup.core.evaluate.Evaluator.class);
+			List<net.hudup.core.evaluate.Evaluator> tempEvList = Firer.getInstances(net.hudup.core.evaluate.Evaluator.class);
 			for (net.hudup.core.evaluate.Evaluator tempEv : tempEvList) {
 				try {
 					if (tempEv.getName().equals(args[0])) {
@@ -90,7 +82,7 @@ public class Evaluator implements AccessPoint {
 			}
 		}
 		if (ev == null) {
-			logger.error("Not evaluator class name or evaluator name");
+			LogUtil.error("Not evaluator class name or evaluator name");
 			return;
 		}
 		
@@ -108,13 +100,13 @@ public class Evaluator implements AccessPoint {
 			reader.close();
 			adapter.close();
 			if (script == null) {
-				logger.error("Invalid path of batch script");
+				LogUtil.error("Invalid path of batch script");
 				return;
 			}
 			
 			List<Alg> algList = PluginStorage.getNormalAlgReg().getAlgList(script.getAlgNameList());
 			if (algList.size() == 0) {
-				logger.error("Algorithms in batch script are not suitable to this evaluator");
+				LogUtil.error("Algorithms in batch script are not suitable to this evaluator");
 				return;
 			}
 			
@@ -147,8 +139,8 @@ public class Evaluator implements AccessPoint {
 							
 							long endTime = System.currentTimeMillis();
 							double elapsedHours = (double)(endTime - beginTime) / 1000.0 / 60.0 / 60.0;
-							logger.info("Evaluation finished successfully in " + MathUtil.format(elapsedHours) + " hours.");
-							logger.info("Analyzed result was stored in \"" + analyzeDir.toString() + "\"");
+							LogUtil.info("Evaluation finished successfully in " + MathUtil.format(elapsedHours) + " hours.");
+							LogUtil.info("Analyzed result was stored in \"" + analyzeDir.toString() + "\"");
 						}
 					}
 					catch (Exception e) {
@@ -158,7 +150,7 @@ public class Evaluator implements AccessPoint {
 			});
 			
 			DatasetPool pool = script.getPool();
-			logger.info("Evaluation is running...");
+			LogUtil.info("Evaluation is running...");
 			ev.remoteStart(algList, pool, beginTime);
 		}
 		catch (Exception e) {

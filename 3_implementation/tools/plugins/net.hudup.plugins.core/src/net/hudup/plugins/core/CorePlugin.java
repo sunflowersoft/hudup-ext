@@ -26,26 +26,19 @@ import org.java.plugin.registry.PluginRegistry;
 import org.java.plugin.util.ExtendedProperties;
 
 /**
+ * This is an example of recommendation plug-in.
+ * 
  * @author Loc Nguyen
+ * @version 1.0
  *
  */
-/**
-*
-* @version $Id: CorePlugin.java,v 1.1 2007/03/04 13:00:56 ddimon Exp $
-*/
 public final class CorePlugin extends ApplicationPlugin implements Application {
 
 	
 	/**
-	 * 
+	 * Plug-in identifier.
 	 */
 	public static final String PLUGIN_ID = "net.hudup.plugins.core";
-
-	
-	/**
-	 * Logger of this class.
-	 */
-	protected final static Logger logger = Logger.getLogger(CorePlugin.class);
 
 	
 	@Override
@@ -68,7 +61,7 @@ public final class CorePlugin extends ApplicationPlugin implements Application {
 
    
 	/**
-	 * 
+	 * Starting application.
 	 */
 	public void startApplication() {
 		initYourPlugins();
@@ -76,7 +69,7 @@ public final class CorePlugin extends ApplicationPlugin implements Application {
    
 	
 	/**
-	 * 
+	 * Initializing the plug-ins.
 	 */
 	private void initYourPlugins() {
 		PluginManager pm = getManager();
@@ -130,17 +123,10 @@ public final class CorePlugin extends ApplicationPlugin implements Application {
 	        }
 			
 				
-				
-            
-        
         } // End extension
         
 				
 	}
 	
 	
-	
-   
-   
-   
 }

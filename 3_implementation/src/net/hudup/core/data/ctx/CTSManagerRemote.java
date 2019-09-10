@@ -76,7 +76,7 @@ public interface CTSManagerRemote extends AlgRemote, AutoCloseable {
 	/**
 	 * Getting remotely {@link Profile} of each template with regard to its value {@link ContextValue}.
 	 * The specified context contains such template and such value.
-	 * This method is the same to {@link #profileOf(int, ContextValue)}
+	 * This method is the same to {@link #remoteProfileOf(int, ContextValue)}.
 	 * @param context specified context.
 	 * @return profile of the specified context.
 	 * @throws RemoteException if any error raises.

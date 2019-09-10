@@ -18,42 +18,45 @@
 
 	<property name="doctype" value="*.txt, *.pdf, *.doc, *.docx"/>
 	<property name="product" value="hudup"/>
-	<property name="version" value="v11"/>
+	<property name="version" value="v12"/>
 
 
 	<!--
-	Function:
-	Affected packages, classes:
+	Function: Commons IO is a library of utilities to assist with developing IO functionality.
+	Affected packages, classes: net.hudup.core.parser.JsonParserImpl
 	Referred jars:
-	Source: 
-	Vendor:
-	Archive:
-	Status:
+	Source: https://commons.apache.org/proper/commons-io
+	Vendor: Apache
+	Archive: newtech-research/database-storagesystem/io-programming/apache-commons-io, newtech-research/prog-language/java/apache-commons/commons-io
+	Version: 2012
+	Status: using
 	Note:
 	-->
 	<property name="common-io.jar" value="${lib.home}/commons-io-2.4.jar"/>
 
 
 	<!--
-	Function:
-	Affected packages, classes:
+	Function: The Logging package is an ultra-thin bridge between different logging implementations. It is used by Apache Logging Services (log4j.jar)
+	Affected packages, classes: Apache Logging Services (log4j.jar)
 	Referred jars:
-	Source: 
-	Vendor:
-	Archive:
-	Status:
+	Source: https://commons.apache.org/proper/commons-logging
+	Vendor: Apache
+	Archive: newtech-research/prog-language/java/apache-commons/commons-logging
+	Version: 1.2 Release - July 2014
+	Status: using. Used by log4j.jar
 	Note:
 	-->
-	<property name="commons-logging.jar" value="${lib.home}/commons-logging.jar"/>
+	<property name="commons-logging.jar" value="${lib.home}/commons-logging-1.2.jar"/>
 
 
 	<!--
 	Function: Derby DBMS JDBC driver
-	Affected packages, classes: net.hudup.core.data.Provider
+	Affected packages, classes: net.hudup.core.data.DataDriver, net.hudup.core.Firer, net.hudup.server.DefaultServer
 	Referred jars:
 	Source: http://db.apache.org/derby
 	Vendor: Apache Derby, Apache DB Project
 	Archive: newtech-research/database-storagesystem/dbms/derby, newtech-research/prog-language/java/persistence/jdbc/derby
+	Version: 10.9.1.0, build 2012
 	Status: using
 	Note: The derby.jar contains embedded driver "org.apache.derby.jdbc.EmbeddedDriver" which is included automatically in Java 7. The derbyclient.jar contains JDBC client driver which must be included
 	-->
@@ -62,78 +65,84 @@
 
 
 	<!--
-	Function:
-	Affected packages, classes:
+	Function: Flexible XML framework for Java
+	Affected packages, classes: reflections.jar
 	Referred jars:
-	Source: 
-	Vendor:
-	Archive:
-	Status:
+	Source: https://dom4j.github.io
+	Vendor: GitHub
+	Archive: newtech-research/data-structure-alg/xml/dom4j, newtech-research/utility/xml/dom4j
+	Version: 1.6.1, build 2012
+	Status: using. Hudup framework uses xml-apis.jar is used for XML parsing but reflections.jar uses dom4j and xml-apis.jar for XML parsing.
 	Note:
 	-->
 	<property name="dom4j.jar" value="${lib.home}/dom4j-1.6.1.jar"/>
 
 
 	<!--
-	Function:
-	Affected packages, classes:
+	Function: Java Scientific Library, especially for statistics and plot graph.
+	Affected packages, classes: net.hudup.core.evaluate.MetricsUtil, net.hudup.phoebe.math.FlanaganStat, net.hudup.phoebe.math.ui.StatDlg
 	Referred jars:
-	Source: 
-	Vendor:
-	Archive:
-	Status:
+	Source: https://www.ee.ucl.ac.uk/~mflanaga/java
+	Vendor: Michael Thomas Flanagan (m.flanagan@ucl.ac.uk)
+	Archive: newtech-research/data-structure-alg/FLANAGAN-JavaScientificLibrary
+	Version: 2012
+	Status: using
 	Note:
 	-->
-	<property name="flanagan.jar" value="${lib.home}/flanagan.jar"/>
+	<property name="flanagan.jar" value="${lib.home}/flanagan-2012.jar"/>
 
 
 	<!--
 	Function: Parsing JSON format
-	Affected packages, classes: net.hudup.core.parser.JsonUtil
-	Referred jars: google-gson
+	Affected packages, classes: reflections.jar
+	Referred jars:
 	Source: http://code.google.com/p/google-gson, https://github.com/google/gson
 	Vendor: google-gson
 	Archive: newtech-research/data-structure-alg/json/java/gson
-	Status: using
-	Note: used for plain text parsing. The json.jar is more important
+	Version: 2.2.2, build 2012
+	Status: using. Used by reflections.jar
+	Note: reflections.jar uses gson.jar for plain text parsing but Hudup framework uses json-io.jar instead.
 	-->
 	<property name="gson.jar" value="${lib.home}/gson-2.2.2.jar"/>
 
 
 	<!--
-	Function:
-	Affected packages, classes:
+	Function: Google Guava is an open-source set of common libraries for Java, mainly developed by Google engineers.
+	Affected packages, classes: reflections.jar
 	Referred jars:
-	Source: 
-	Vendor:
-	Archive:
-	Status:
+	Source: https://github.com/google/guava, https://en.wikipedia.org/wiki/Google_Guava
+	Vendor: Google
+	Archive: newtech-research/prog-language/java/Google/guava
+	Version: 11.0.2, build 2012
+	Status: using. Used by reflections.jar
 	Note:
 	-->
 	<property name="guava.jar" value="${lib.home}/guava-11.0.2.jar"/>
 
 
 	<!--
-	Function:
-	Affected packages, classes:
+	Function: The same great CSV reader and writer are now available for Java 1.4+.
+	Affected packages, classes: net.hudup.core.factory.FlatProviderAssoc
 	Referred jars:
-	Source: https://www.csvreader.com/java_csv.php
+	Source: https://www.csvreader.com/java_csv.php, https://sourceforge.net/projects/javacsv
 	Vendor: Java CSV
-	Archive:
-	Status:
+	Archive: newtech-research/data-structure-alg/cvs-process/cvsreader
+	Version: 2.1, build 2011
+	Status: using, very important
 	Note:
 	-->
-	<property name="javacsv.jar" value="${lib.home}/javacsv.jar"/>
+	<property name="javacsv.jar" value="${lib.home}/javacsv-2.1.jar"/>
 
 
 	<!--
-	Function:
-	Affected packages, classes:
+	Function: Javassist (Java Programming Assistant) makes Java bytecode manipulation simple. It is a class library for editing bytecodes in Java; it enables Java programs to define a new class at runtime and to modify a class file when the JVM loads it.
+	Affected packages, classes: reflections.jar
 	Referred jars:
-	Source: http://jboss-javassist.github.io/javassist
+	Source: http://jboss-javassist.github.io/javassist, https://github.com/jboss-javassist/javassist
 	Vendor: JBoss 
-	Archive:
-	Status:
+	Archive: newtech-research/prog-language/java/javassist
+	Version: 3.12.1, build 2012
+	Status: using. Used by reflections.jar
 	Note:
 	-->
 	<property name="javassist.jar" value="${lib.home}/javassist-3.12.1.GA.jar"/>
@@ -141,38 +150,41 @@
 
 	<!--
 	Function: Parsing JSON format
-	Affected packages, classes: net.hudup.core.parser.JsonUtil
+	Affected packages, classes:
 	Referred jars:
-	Source: http://www.json.org/java
+	Source: http://www.json.org, https://github.com/stleary/JSON-java
 	Vendor: json.org,  JavaScript Programming Language-Standard ECMA-262 3rd Edition-December 1999
 	Archive: newtech-research/data-structure-alg/json/java/www.json.org$java
+	Version: 2012
 	Status: not using
 	Note: removed in next version
+	<property name="json.jar" value="${lib.home}/json-2012.jar"/>
 	-->
-	<property name="json.jar" value="${lib.home}/json.jar"/>
 
 
 	<!--
 	Function: Parsing JSON format
-	Affected packages, classes: net.hudup.core.client.Request, net.hudup.core.client.Response, net.hudup.core.data.PropList, net.hudup.core.parser.JsonUtil, net.hudup.listener.Delegator
+	Affected packages, classes: net.hudup.core.parser.JsonParserImpl
 	Referred jars:
 	Source: http://code.google.com/p/json-io
-	Vendor: json-io, John DeRegnaucourt
+	Vendor: John DeRegnaucourt (jdereg@gmail.com)
 	Archive: newtech-research/data-structure-alg/json/java/json-io
+	Version: 2.2.30 build 2013
 	Status: using
-	Note: more important than gson.jar
+	Note: Hudup framework uses json-io.jar whereas reflections.jar uses gson.jar
 	-->
 	<property name="json-io.jar" value="${lib.home}/json-io-2.2.30.jar"/>
 
 
 	<!--
-	Function:
-	Affected packages, classes:
+	Function: JSR 305: Annotations for Software Defect Detection in Java. This JSR will work to develop standard annotations (such as @NonNull) that can be applied to Java programs to assist tools that detect software defects.
+	Affected packages, classes: reflections.jar
 	Referred jars:
-	Source: 
-	Vendor:
-	Archive:
-	Status:
+	Source: https://jcp.org/en/jsr/detail?id=305, https://code.google.com/archive/p/jsr-305, https://groups.google.com/forum/#!forum/jsr-305, http://www.java2s.com/Code/JarDownload/jsr/jsr-305.jar.zip
+	Vendor: Java Community Process (JCP)
+	Archive: newtech-research/prog-language/java/jsr/jsr305
+	Version: 1.3.9 build 2012
+	Status: using. Used by reflections.jar
 	Note:
 	-->
 	<property name="jsr305.jar" value="${lib.home}/jsr305-1.3.9.jar"/>
@@ -180,37 +192,40 @@
 
 	<!--
 	Function: Processing Excel files.
-	Affected packages, classes:
+	Affected packages, classes: net.hudup.core.evaluate.MetricsUtil
 	Referred jars:
-	Source: http://jxl.sourceforge.net
-	Vendor: Alex Lynch 
-	Archive:
-	Status:
+	Source: http://jexcelapi.sourceforge.net, https://sourceforge.net/projects/jexcelapi
+	Vendor: Andy Khan 
+	Archive: newtech-research/data-structure-alg/excel-processor/jexcelapi, newtech-research/utility/excel-processor/jexcelapi, newtech-research/prog-language/java/tips/excel-processor/jexcelapi
+	Version: 2.6.12 build 2009.10.26
+	Status: using
 	Note:
 	-->
-	<property name="jxl.jar" value="${lib.home}/jxl-2.6.jar"/>
+	<property name="jxl.jar" value="${lib.home}/jxl-2.6.12.jar"/>
 
 
 	<!--
 	Function: Apache Logging Services (log4j)
-	Affected packages, classes:
-	Referred jars:
+	Affected packages, classes: Classes that support logging.
+	Referred jars: commons-logging.jar
 	Source: https://logging.apache.org/log4j
 	Vendor: Apache Software Foundation 
-	Archive:
-	Status:
+	Archive: newtech-research/prog-language/java/log4j
+	Version: 1.2.16 build 2012
+	Status: using
 	Note:
 	-->
-	<property name="log4j.jar" value="${lib.home}/log4j.jar"/>
+	<property name="log4j.jar" value="${lib.home}/log4j-1.2.16.jar"/>
 
 
 	<!--
 	Function: MySQL DBMS JDBC driver
-	Affected packages, classes: net.hudup.core.data.Provider
+	Affected packages, classes: net.hudup.core.data.DataDriver, net.hudup.core.Firer, net.hudup.server.DefaultServer
 	Referred jars:
 	Source: http://dev.mysql.com/downloads/connector/j/
 	Vendor: MySQL - Oracle Corporation
 	Archive: newtech-research/prog-language/java/persistence/jdbc/mysql
+	Version: 5.1.46 build 2018
 	Status: using
 	-->
 	<property name="mysql-connector-java.jar" value="${lib.home}/mysql-connector-java-5.1.46-bin.jar"/>
@@ -218,38 +233,41 @@
 
 	<!--
 	Function: QuickTable component which is a complete java table component for processing database table.
-	Affected packages, classes:
+	Affected packages, classes: net.hudup.core.factory.FactoryImpl
 	Referred jars:
 	Source: http://quicktablejava.appspot.com
 	Vendor: QuickTable Team
-	Archive:
-	Status:
+	Archive: newtech-research/ui/java/QuickTable, newtech-research/prog-language/java/ui/QuickTable
+	Version: 2 build 2010
+	Status: using
 	Note:
 	-->
-	<property name="quicktable.jar" value="${lib.home}/quicktable2swing11design.jar"/>
+	<property name="quicktable.jar" value="${lib.home}/quicktable2swing11design-2010.jar"/>
 
 
 	<!--
 	Function: Reflections package which is a Java runtime metadata analysis which allows users to scan and collection metadata about Java classes and packages in Java projects.
-	Affected packages, classes:
-	Referred jars:
+	Affected packages, classes: net.hudup.core.Firer
+	Referred jars: dom4j.jar, gson.jar, guava.jar, javassist.jar, jsr305.jar, slf4j-api.jar, slf4j-simple.jar, xml-apis.jar
 	Source: https://github.com/ronmamo/reflections
 	Vendor: Sam Hocevar
-	Archive:
-	Status:
-	Note:
+	Archive: newtech-research/prog-language/java/reflection/Reflections
+	Version: 0.9.8 build 2012
+	Status: using, very important.
+	Note: Read more: class cloader (newtech-research/prog-language/java/class-loader), javassist (newtech-research/prog-language/java/javassist)
 	-->
 	<property name="reflections.jar" value="${lib.home}/reflections-0.9.8.jar"/>
 
 
 	<!--
 	Function: The Simple Logging Facade for Java (SLF4J) serves as a simple facade or abstraction for various logging frameworks
-	Affected packages, classes:
-	Referred jars:
+	Affected packages, classes: reflections.jar
+	Referred jars: 
 	Source: https://www.slf4j.org
 	Vendor: Quality Open Software
-	Archive:
-	Status:
+	Archive: newtech-research/prog-language/java/logging/slf4j
+	Version: 1.6.1 build 2017.11.22
+	Status: using. Used by reflections.jar
 	Note:
 	-->
 	<property name="slf4j-api.jar" value="${lib.home}/slf4j-api-1.6.1.jar"/>
@@ -258,12 +276,13 @@
 
 	<!--
 	Function: SwingX is a library of components and utilities extending the Java Swing library
-	Affected packages, classes:
+	Affected packages, classes: net.hudup.data.ctx.ui.CTStable, net.hudup.data.ctx.ui.CTSviewer
 	Referred jars:
 	Source: https://github.com/tmyroadctfig/swingx
 	Vendor: swingLabs
-	Archive:
-	Status:
+	Archive: newtech-research/ui/java/SWINGX, newtech-research/prog-language/java/ui/SWINGX
+	Version: 1.6.4 build 2012
+	Status: using
 	Note:
 	-->
 	<property name="swingx-all.jar" value="${lib.home}/swingx-all-1.6.4.jar"/>
@@ -271,40 +290,44 @@
 
 	<!--
 	Function: creating a table whose rows can be sorted according to columns
-	Affected packages, classes: net.hudup.core.logistic.ui.SortableTable
+	Affected packages, classes: net.hudup.core.logistic.ui.SortableTable, net.hudup.core.logistic.ui.SortableTableModel
 	Referred jars:
 	Source: http://www.java2s.com/Code/Java/Swing-JFC/AsimpleextensionofJTablethatsupportstheuseofaSortableTableModel.htm
 	Vendor: David Gilbert and Nobuo Tamemasa - Object Refinery Limited
-	Archive: newtech-research/ui/java/SORTABLETABLE
+	Archive: newtech-research/ui/java/SORTABLETABLE, newtech-research/prog-language/java/ui/SORTABLETABLE
+	Version: 1.5 build 2005.11.16
 	Status: using
 	Note:
 	-->
 	<property name="SortableTable.class" value="${bin.home}/net/hudup/core/logistic/ui/SortableTable.class"/>
+	<property name="SortableTableModel.class" value="${bin.home}/net/hudup/core/logistic/ui/SortableTableModel.class"/>
 
 
 	<!--
 	Function: storaging via many protocol such as file, compressed file (zip, jar), http
-	Affected packages, classes: net.hudup.core.UriAssocDefault
+	Affected packages, classes: net.hudup.core.factory.FactoryImpl (UriAssocTrueZip)
 	Referred jars:
-	Source: http://truezip.java.net, https://christian-schlichtherle.bitbucket.io/truezip/
+	Source: http://truezip.java.net, https://christian-schlichtherle.bitbucket.io/truezip, http://repo1.maven.org/maven2/de/schlichtherle/truezip
 	Vendor: TrueZip - Schlichtherle IT Services
 	Archive: newtech-research/database-storagesystem/io-programming/TrueZip
-	Status: using
+	Version: 7.7.4 build 2013.09.28
+	Status: using, very important
 	-->
 	<property name="truezip.jar" value="${lib.home}/truezip-samples-7.7.4-jar-with-dependencies.jar"/>
 
 
 	<!--
-	Function: Parsing XML file.
-	Affected packages, classes:
+	Function: Parsing XML file. This is standard library for XML processing.
+	Affected packages, classes: net.hudup.core.data.PropList, reflections.jar
 	Referred jars:
-	Source: https://mvnrepository.com/artifact/xml-apis, https://xerces.apache.org/xml-commons
-	Vendor: The Apache Software Foundation
-	Archive:
-	Status:
+	Source: https://repo1.maven.org/maven2/xml-apis/xml-apis
+	Vendor: Maven
+	Archive: newtech-research/data-structure-alg/xml/xml-apis (standard), newtech-research/utility/xml/xml-apis (standard)
+	Version: 2.0.2 build 2005.09.20
+	Status: using
 	Note:
 	-->
-	<property name="xml-apis.jar" value="${lib.home}/xml-apis-1.0.b2.jar"/>
+	<property name="xml-apis.jar" value="${lib.home}/xml-apis-2.0.2.jar"/>
 
 
 	<!--
@@ -313,13 +336,39 @@
 	Referred jars:
 	Source: http://zql.sourceforge.net
 	Vendor: Pierre-Yves Gibello
-	Archive:
-	Status:
+	Archive: newtech-research/database-storagesystem/sql-parser/Zql
+	Version: 2011.08.26
+	Status: not using
 	Note:
-	-->
 	<property name="zql.jar" value="${lib.home}/zql-20110826.jar"/>
+	-->
 
 
+	<!--
+	List of classes and packages which use libraries:
+	
+	net.hudup.data.ctx.ui.CTStable: swingx-all.jar
+	net.hudup.data.ctx.ui.CTSviewer: swingx-all.jar
+	net.hudup.core.data.DataDriver: derby.jar, derbyclient.jar, mysql-connector-java.jar
+	net.hudup.core.data.PropList: xml-apis.jar
+	net.hudup.core.evaluate.MetricsUtil: flanagan.jar, jxl.jar
+	net.hudup.core.factory.FactoryImpl: quicktable.jar
+	net.hudup.core.factory.FactoryImpl (UriAssocTrueZip): truezip.jar
+	net.hudup.core.factory.FlatProviderAssoc: javacsv.jar
+	net.hudup.core.Firer: reflections.jar
+	net.hudup.core.logistic.LogUtil: log4j.jar
+	net.hudup.core.logistic.ui.SortableTable: SortableTable.class
+	net.hudup.core.logistic.ui.SortableTableModel: SortableTableModel.class
+	net.hudup.core.parser.JsonParserImpl: common-io.jar, json-io.jar
+	net.hudup.core.logistic.ui.SortableTable: SortableTable.class
+	net.hudup.phoebe.math.FlanaganStat: flanagan.jar
+	net.hudup.phoebe.math.ui.StatDlg: flanagan.jar
+	
+	log4j.jar: commons-logging.jar
+	relections.jar: dom4j.jar, gson.jar, guava.jar, javassist.jar, jsr305.jar, slf4j-api.jar, slf4j-simple.jar, xml-apis.jar
+	-->
+	
+	
 	<path id="build.class.path">
 		<pathelement path="${bin.home}"/>
 		<fileset dir="${lib.home}">
@@ -341,7 +390,6 @@
 		<copy todir="${bin.home}">
 			<fileset dir="${src.home}" excludes="**/*.java"/>
 		</copy>
-		
 	</target>
 
 
@@ -478,6 +526,10 @@
 		</copy>
 
 		<zip destfile="${archive.home}/${product}-${version}-core.zip" basedir="${archive.home}"/>
+		
+		<delete quiet="true" includeEmptyDirs="true">
+			<fileset dir="${archive.home}" includes="**" excludes="${product}-${version}-core.zip"/>
+		</delete>
 	</target>
 
 
@@ -523,10 +575,14 @@
 		</if>
 
 		<copy todir="${archive.home}">
-			<fileset dir="." includes="${doctype}, env.*, listener.*, balancer.*"/>
+			<fileset dir="." includes="${doctype}, env*.*, listener*.*, balancer*.*"/>
 		</copy>
 		
 		<zip destfile="${archive.home}/${product}-${version}-listener.zip" basedir="${archive.home}"/>
+		
+		<delete quiet="true" includeEmptyDirs="true">
+			<fileset dir="${archive.home}" includes="**" excludes="${product}-${version}-listener.zip"/>
+		</delete>
 	</target>
 
 
@@ -572,10 +628,14 @@
 		</if>
 
 		<copy todir="${archive.home}">
-			<fileset dir="." includes="${doctype}, env.*, evaluator.*, batch-sample.script"/>
+			<fileset dir="." includes="${doctype}, env*.*, evaluator*.*, batch-sample.script"/>
 		</copy>
 
 		<zip destfile="${archive.home}/${product}-${version}-evaluator.zip" basedir="${archive.home}"/>
+		
+		<delete quiet="true" includeEmptyDirs="true">
+			<fileset dir="${archive.home}" includes="**" excludes="${product}-${version}-evaluator.zip"/>
+		</delete>
 	</target>
 
 
@@ -621,10 +681,14 @@
 		</if>
 
 		<copy todir="${archive.home}">
-			<fileset dir="." includes="${doctype}, env.*, listener.*, balancer.*, server.*"/>
+			<fileset dir="." includes="${doctype}, env*.*, listener*.*, balancer*.*, server*.*"/>
 		</copy>
 
 		<zip destfile="${archive.home}/${product}-${version}-server.zip" basedir="${archive.home}"/>
+		
+		<delete quiet="true" includeEmptyDirs="true">
+			<fileset dir="${archive.home}" includes="**" excludes="${product}-${version}-server.zip"/>
+		</delete>
 	</target>
 
 
@@ -670,10 +734,14 @@
 		</if>
 
 		<copy todir="${archive.home}">
-			<fileset dir="." includes="${doctype}, env.*, toolkit.*"/>
+			<fileset dir="." includes="${doctype}, env*.*, toolkit*.*"/>
 		</copy>
 
 		<zip destfile="${archive.home}/${product}-${version}-toolkit.zip" basedir="${archive.home}"/>
+		
+		<delete quiet="true" includeEmptyDirs="true">
+			<fileset dir="${archive.home}" includes="**" excludes="${product}-${version}-toolkit.zip"/>
+		</delete>
 	</target>
 
 
@@ -719,17 +787,66 @@
 		</if>
 		
 		<copy todir="${archive.home}">
-			<fileset dir="." includes="${doctype}, *.bat, *.sh, *.script"/>
+			<fileset dir="." includes="${doctype}, *.bat, *.sh, *.script" excludes="build.*"/>
 		</copy>
 		
 		<zip destfile="${archive.home}/${product}-${version}.zip" basedir="${archive.home}"/>
+		
+		<delete quiet="true" includeEmptyDirs="true">
+			<fileset dir="${archive.home}" includes="**" excludes="${product}-${version}.zip"/>
+		</delete>
+	</target>
+
+
+	<target name="jar-all-src" depends="compile" description="Packing all sources">
+		<mkdir dir="${archive.home}"/>
+		<antcall target="clean-archive" />
+		
+		<if>
+		<equals arg1="${include-runtime-lib-src}" arg2="embed" />
+		<then>
+			<jar destfile="${archive.home}/${product}-src.jar">
+	    		<fileset dir="${src.home}"/>
+	    		<restrict>
+	     			<name name="**"/>
+					<archives>
+						<zips>
+							<fileset dir="${lib.home}/src" includes="*.jar, *.zip"/>
+						</zips>
+					</archives>
+	    		</restrict>
+			</jar>
+		</then>
+		<else>
+			<if>
+			<equals arg1="${include-runtime-lib-src}" arg2="normal" />
+			<then>
+				<antcall target="jar-runtime-lib-src" />
+			</then>
+			</if>
+
+			<jar destfile="${archive.home}/${product}-src.jar">
+	    		<fileset dir="${src.home}"/>
+			</jar>
+		</else>
+		</if>
+		
+		<copy todir="${archive.home}">
+			<fileset dir="." includes="${doctype}, *.bat, *.sh, *.xml, *.script"/>
+		</copy>
+		
+		<zip destfile="${archive.home}/${product}-${version}-src.zip" basedir="${archive.home}"/>
+		
+		<delete quiet="true" includeEmptyDirs="true">
+			<fileset dir="${archive.home}" includes="**" excludes="${product}-${version}-src.zip"/>
+		</delete>
 	</target>
 
 
 	<target name="jar-runtime-lib" depends="compile" description="Create runtime library">
 		<mkdir dir="${archive.home}"/>
 
-		<jar destfile="${archive.home}/runtime-lib.jar" update="true">
+		<jar destfile="${archive.home}/${product}-runtime-lib.jar" update="true">
     		<restrict>
      			<name name="**"/>
 				<archives>
@@ -740,7 +857,22 @@
     		</restrict>
     		
 		</jar>
+	</target>
 
+
+	<target name="jar-runtime-lib-src" depends="compile" description="Packing runtime library source">
+		<mkdir dir="${archive.home}"/>
+
+		<jar destfile="${archive.home}/${product}-runtime-lib-src.jar" update="true">
+    		<restrict>
+     			<name name="**"/>
+				<archives>
+					<zips>
+						<fileset dir="${lib.home}/src" includes="*.jar, *.zip"/>
+					</zips>
+				</archives>
+    		</restrict>
+		</jar>
 	</target>
 
 
@@ -748,7 +880,6 @@
 		<jar destfile="${archive.home}/${package}.jar" update="true">
     		<fileset dir="${bin.home}"/>
 		</jar>
-
 	</target>
 
 

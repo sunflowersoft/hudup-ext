@@ -23,6 +23,7 @@ import net.hudup.core.data.Profile;
 import net.hudup.core.data.ProviderAssocAbstract;
 import net.hudup.core.data.Unit;
 import net.hudup.core.data.UnitList;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.NextUpdate;
 import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.xURI;
@@ -118,7 +119,7 @@ class FlatProviderAssoc extends ProviderAssocAbstract {
 		}
 		catch (Throwable e) {
 			e.printStackTrace();
-			logger.error("Get file system metadata error: " + e.getMessage());
+			LogUtil.error("Get file system metadata error: " + e.getMessage());
 		}
 		
 		return tblList;

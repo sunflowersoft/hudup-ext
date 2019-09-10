@@ -9,6 +9,7 @@ import net.hudup.core.data.Rating;
 import net.hudup.core.data.RatingVector;
 import net.hudup.core.data.ctx.ContextList;
 import net.hudup.core.logistic.BaseClass;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.NextUpdate;
 
 
@@ -60,7 +61,7 @@ public class RecommendContextPrefilterImpl extends CompositeRecommenderAbstract 
 			recommender = (Recommender) Class.forName(INNER_RECOMMENDER).newInstance();
 		}
 		catch (Throwable e) {
-			logger.info("Inner recommender " + INNER_RECOMMENDER + " initiated " + this.getClass() + " not exist");
+			LogUtil.info("Inner recommender " + INNER_RECOMMENDER + " initiated " + this.getClass() + " not exist");
 			recommender = null;
 		}
 		

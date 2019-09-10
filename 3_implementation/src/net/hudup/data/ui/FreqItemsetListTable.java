@@ -36,6 +36,8 @@ import net.hudup.data.bit.BitDataUtil;
 import net.hudup.data.bit.BitItemset;
 
 /**
+ * This is Java table to show list of frequent itemsets.
+ * 
  * @author Loc Nguyen
  * @version 10.0
  */
@@ -49,8 +51,7 @@ public class FreqItemsetListTable extends JTable {
 
 	
     /**
-	 * 
-	 * 
+	 * Default constructor.
 	 */
 	public FreqItemsetListTable() {
 		super();
@@ -77,9 +78,9 @@ public class FreqItemsetListTable extends JTable {
 	
 	
 	/**
-	 * 
-	 * @param itemsetList
-	 * @param bitData
+	 * Updating this table with specified list of bit itemsets and bit data.
+	 * @param itemsetList list of bit itemsets.
+	 * @param bitData bit data.
 	 */
 	public void update(List<BitItemset> itemsetList, BitData bitData) {
 		FreqItemsetListTM model = getTableModel();
@@ -88,8 +89,8 @@ public class FreqItemsetListTable extends JTable {
 	
 	
 	/**
-	 * 
-	 * @param itemsetList
+	 * Updating this table with specified list of bit itemsets and bit item map.
+	 * @param itemsetList list of bit itemsets.
 	 * @param bitItemMap has: key is bit item id and value is Pair (real id, rating value)
 	 */
 	public void update(List<BitItemset> itemsetList, Map<Integer, Pair> bitItemMap) {
@@ -99,7 +100,7 @@ public class FreqItemsetListTable extends JTable {
 
 	
 	/**
-	 * 
+	 * Clearing content of this table.
 	 */
 	public void clear() {
 		FreqItemsetListTM model = getTableModel();
@@ -109,8 +110,8 @@ public class FreqItemsetListTable extends JTable {
 	
 	
 	/**
-	 * 
-	 * @return {@link FreqItemsetListTM}
+	 * Getting model of this table.
+	 * @return {@link FreqItemsetListTM} as model of this table.
 	 */
 	public FreqItemsetListTM getTableModel() {
 		return (FreqItemsetListTM)super.getModel();
@@ -118,7 +119,7 @@ public class FreqItemsetListTable extends JTable {
 	
 	
 	/**
-	 * 
+	 * Getting list of bit itemsets.
 	 * @return list of {@link BitItemset}
 	 */
 	public List<BitItemset> getItemsetList() {
@@ -128,8 +129,8 @@ public class FreqItemsetListTable extends JTable {
 	
 	
 	/**
-	 * 
-	 * @return {@link JPopupMenu}
+	 * Creating context menu.
+	 * @return {@link JPopupMenu} as context menu.
 	 */
 	private JPopupMenu createContextMenu() {
 		JPopupMenu contextMenu = new JPopupMenu();
@@ -148,7 +149,7 @@ public class FreqItemsetListTable extends JTable {
 	
 	
 	/**
-	 * 
+	 * Viewing a row.
 	 */
 	protected void viewRow() {
 		int selIdx = getSelectedRow();
@@ -180,7 +181,6 @@ public class FreqItemsetListTable extends JTable {
 		
 		DefaultTableModel dm = new DefaultTableModel(data, columnNames) {
 
-			
 			/**
 			 * Serial version UID for serializable class. 
 			 */
@@ -230,6 +230,8 @@ public class FreqItemsetListTable extends JTable {
 
 
 /**
+ * This class is frequent itemset list model the {@link FreqItemsetListTable}.
+ * 
  * @author Loc Nguyen
  * @version 10.0
  */
@@ -243,25 +245,25 @@ class FreqItemsetListTM extends DefaultTableModel {
 
 	
 	/**
-	 * 
+	 * List of itemsets.
 	 */
 	protected List<BitItemset> itemsetList = Util.newList();
 	
 	
 	/**
-	 * 
+	 * List of column identifiers.
 	 */
 	protected List<Integer> columnIds = Util.newList();
 	
 			
 	/**
-	 * 
+	 * Map of column indices.
 	 */
 	protected Map<Integer, Integer> columnIndexes = Util.newMap();
 
 	
 	/**
-	 * 
+	 * Default constructor.
 	 */
 	public FreqItemsetListTM() {
 		super();
@@ -270,9 +272,9 @@ class FreqItemsetListTM extends DefaultTableModel {
 	
 	
 	/**
-	 * 
-	 * @param columnIds
-	 * @return column names
+	 * Converting column identifiers into vector of texts.
+	 * @param columnIds column identifiers.
+	 * @return vector of column names.
 	 */
 	public static Vector<String> toColumns(List<Integer> columnIds) {
 		Vector<String> columns = new Vector<String>();
@@ -286,12 +288,12 @@ class FreqItemsetListTM extends DefaultTableModel {
 
 	
 	/**
-	 * 
-	 * @param idx
-	 * @param itemset
-	 * @param columnIds
-	 * @param bitData
-	 * @return a row
+	 * Converting an itemset into vector.
+	 * @param idx specified index.
+	 * @param itemset specified itemset.
+	 * @param columnIds column identifiers.
+	 * @param bitData bit data.
+	 * @return a row as object vector of itemset.
 	 */
 	public static Vector<Object> toRow(
 			int idx,
@@ -321,12 +323,12 @@ class FreqItemsetListTM extends DefaultTableModel {
 	
 	
 	/**
-	 * 
-	 * @param idx
-	 * @param itemset
-	 * @param columnIds
+	 * Converting an itemset into vector.
+	 * @param idx specified index.
+	 * @param itemset specified itemset.
+	 * @param columnIds column identifiers.
 	 * @param bitItemMap has: key is bit item id and value is Pair (real id, rating value)
-	 * @return
+	 * @return object vector of itemset.
 	 */
 	public static Vector<Object> toRow(
 			int idx,
@@ -364,9 +366,9 @@ class FreqItemsetListTM extends DefaultTableModel {
 
 	
 	/**
-	 * 
-	 * @param itemsetList
-	 * @param bitData
+	 * Updating this model with list of bit itemsets and bit data.
+	 * @param itemsetList list of bit itemsets.
+	 * @param bitData bit data.
 	 */
 	public void update(List<BitItemset> itemsetList, BitData bitData) {
 		this.itemsetList.clear();
@@ -410,8 +412,8 @@ class FreqItemsetListTM extends DefaultTableModel {
 	
 	
 	/**
-	 * 
-	 * @param itemsetList
+	 * Updating this model with list of bit itemsets and bit item map.
+	 * @param itemsetList list of bit itemsets.
 	 * @param bitItemMap has: key is bit item id and value is Pair (real id, rating value)
 	 */
 	public void update(List<BitItemset> itemsetList, Map<Integer, Pair> bitItemMap) {
@@ -456,18 +458,17 @@ class FreqItemsetListTM extends DefaultTableModel {
 
 	
 	/**
-	 * 
+	 * Clearing this model.
 	 */
 	public void clear() {
 		update(null, (BitData) null);
 	}
 	
 	
-	
 	/**
-	 * 
-	 * @param row
-	 * @return a {@link MapVector}
+	 * Getting map vector at specified row.
+	 * @param row specified row.
+	 * @return {@link MapVector} as map vector at specified row.
 	 */
 	public MapVector<Object> getRow(int row) {
 		MapVector<Object> vector = new MapVector<Object>(row + 1);
@@ -496,7 +497,7 @@ class FreqItemsetListTM extends DefaultTableModel {
 
 	
 	/**
-	 * 
+	 * Getting list of bit itemsets.
 	 * @return list of {@link BitItemset}
 	 */
 	public List<BitItemset> getItemsetList() {

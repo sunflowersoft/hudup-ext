@@ -18,6 +18,7 @@ import net.hudup.logistic.SystemPropertiesPane;
 
 
 /**
+ * This class is extended dialog allowing users to modifying system configuration.
  * 
  * @author Loc Nguyen
  * @version 10.0
@@ -33,19 +34,19 @@ public class SysConfigDlgExt extends SysConfigDlg {
 
 	
 	/**
-	 * 
+	 * Registering panel.
 	 */
 	protected JPanel paneRegister = null;
 
 	
 	/**
-	 * 
+	 * Data driver list panel.
 	 */
 	protected JPanel paneDataDriverList = null;
 
 	
 	/**
-	 * 
+	 * System properties panel.
 	 */
 	protected JPanel paneSystemProperties = null;
 

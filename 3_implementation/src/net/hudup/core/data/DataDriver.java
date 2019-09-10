@@ -6,10 +6,9 @@ package net.hudup.core.data;
 
 import java.io.Serializable;
 
-import org.apache.log4j.Logger;
-
 import net.hudup.core.Cloneable;
 import net.hudup.core.Constants;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.xSubURI;
 import net.hudup.core.logistic.xURI;
 
@@ -35,12 +34,6 @@ public final class DataDriver implements Cloneable, Serializable {
 	private static final long serialVersionUID = 1L;
 
 
-	/**
-	 * Logger of this class.
-	 */
-	protected final static Logger logger = Logger.getLogger(DataDriver.class);
-
-	
 	/**
 	 * Driver class name associated with Derby database.
 	 */
@@ -309,10 +302,18 @@ public final class DataDriver implements Cloneable, Serializable {
 		} 
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
-			logger.error("Data driver can not load inner class " + getInnerClassName() + ", caused by " + e.getMessage());
+			LogUtil.error("Data driver can not load inner class " + getInnerClassName() + ", caused by " + e.getMessage());
 		}
 		
 		return null;
+	}
+	
+	
+	/**
+	 * Loading driver which is its inner class name. In current implementation, it call {@link #getInnerClass()} method.
+	 */
+	public void loadDriver() {
+		getInnerClass();
 	}
 	
 	

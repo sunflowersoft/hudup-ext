@@ -268,7 +268,7 @@ public interface DatasetRemote extends Remote {
 	/**
 	 * Checking remotely whether or not this {@code Dataset} is exclusive.
 	 * {@code Dataset} is often loaded and feed to the {@code Recommender} algorithm via method {@code Recommender#setup(Dataset, Object...)}.
-	 * If this {@code Dataset} is in exclusive mode, it is clear (method {@link #clear()} is called)
+	 * If this {@code Dataset} is in exclusive mode, it is clear (method clear()} is called)
 	 * when method {@code Recommender#unsetup()} is called ({@code Recommender} algorithm is stopped).
 	 * @return Whether or not this {@code Dataset} is exclusive
 	 * @throws RemoteException if any error raises.

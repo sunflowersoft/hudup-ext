@@ -32,8 +32,8 @@ public final class BitDataUtil {
 	
 	/**
 	 * Transform {@link BitData} to {@link Dataset} 
+	 * @param bitData specified bit data.
 	 * @return {@link Dataset}
-	 * 
 	 */
 	@Deprecated
 	public static Dataset transform(BitData bitData) {

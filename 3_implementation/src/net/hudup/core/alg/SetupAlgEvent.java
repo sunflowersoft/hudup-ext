@@ -67,6 +67,7 @@ public class SetupAlgEvent extends EventObject {
 	/**
 	 * Constructor with a source of event, algorithm, training dataset, and setting up result.
 	 * @param source source of event. Usually, it is an evaluator.
+	 * @param type type of event.
 	 * @param alg algorithm issues the setup result.
 	 * @param trainingDataset training dataset.
 	 * @param setupResult specified result.

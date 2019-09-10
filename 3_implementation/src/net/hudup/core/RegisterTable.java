@@ -26,7 +26,7 @@ import net.hudup.core.alg.Alg;
  * {@link RegisterTable} provides two important methods as follows:
  * <ul>
  * <li>
- * Method {@link #register(Alg)} registers a given algorithm. This method is called by {@link PluginManager#discover(String)} at starting time of Hudup.
+ * Method {@link #register(Alg)} registers a given algorithm. This method is called by {@link PluginManager#discover(String...)} at starting time of Hudup.
  * A algorithm which is registered in {@link RegisterTable} will be added in the internal map {@link #algMap}.
  * </li>
  * <li>
@@ -56,12 +56,6 @@ public final class RegisterTable implements Cloneable, Serializable {
 	private static final long serialVersionUID = 1L;
 
 
-//	/**
-//	 * Logger of this class.
-//	 */
-//	protected final static Logger logger = Logger.getLogger(RegisterTable.class);
-
-	
 	/**
 	 * Map of registered algorithms. Each algorithm is associated by an string key which is the name of this algorithm.
 	 * This map must be serializable in remote call.

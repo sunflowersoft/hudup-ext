@@ -16,9 +16,8 @@ import net.hudup.data.bit.BitData;
 import net.hudup.data.bit.BitItem;
 
 
-
-
 /**
+ * This class is Java table of bit dataset.
  * 
  * @author Loc Nguyen
  * @version 10.0
@@ -32,6 +31,9 @@ public class BitDatasetTable extends RatingValueTable {
 	private static final long serialVersionUID = 1L;
 
 	
+	/**
+	 * Default constructor.
+	 */
 	public BitDatasetTable() {
 		super();
 		// TODO Auto-generated constructor stub
@@ -46,9 +48,9 @@ public class BitDatasetTable extends RatingValueTable {
 
 
 	/**
-	 * 
-	 * @param bitData
-	 * @param moreIds
+	 * Update this table with specified bit data and additional (item) identifiers.
+	 * @param bitData specified bit data.
+	 * @param moreIds additional (item) identifiers.
 	 */
 	public void update(BitData bitData, Collection<Integer> moreIds) {
 		// TODO Auto-generated method stub
@@ -58,14 +60,12 @@ public class BitDatasetTable extends RatingValueTable {
 	}
 
 	
-
-
-	
 }
 
 
 
 /**
+ * This class is table model of bit dataset.
  * 
  * @author Loc Nguyen
  * @version 10.0
@@ -80,13 +80,13 @@ class BitDatasetTableModel extends RatingValueTM {
 
 	
 	/**
-	 * 
+	 * Internal bit data.
 	 */
 	protected BitData bitData = null;
 	
 	
 	/**
-	 * 
+	 * Default constructor.
 	 */
 	public BitDatasetTableModel() {
 		super();
@@ -105,9 +105,9 @@ class BitDatasetTableModel extends RatingValueTM {
 	
 	
 	/**
-	 * 
-	 * @param bitData
-	 * @param notUsed
+	 * Updating this model with specified bit data and not used (item) identifiers.
+	 * @param bitData specified bit data.
+	 * @param notUsed not used (item) identifiers.
 	 */
 	public void update(BitData bitData, Collection<Integer> notUsed) {
 		this.rowIndexes.clear();
@@ -163,9 +163,9 @@ class BitDatasetTableModel extends RatingValueTM {
 
 	
 	/**
-	 * 
-	 * @param bitColumnIds
-	 * @return bit column names
+	 * Converting bit column (item) identifiers into vector.
+	 * @param bitColumnIds bit column (item) identifiers.
+	 * @return vector of bit column (item) identifiers.
 	 */
 	public static Vector<String> toBitColumns(List<Integer> bitColumnIds, BitData bitData) {
 		Vector<String> columns = Util.newVector();
@@ -226,5 +226,6 @@ class BitDatasetTableModel extends RatingValueTM {
 		
 		return result;
 	}
+	
 	
 }

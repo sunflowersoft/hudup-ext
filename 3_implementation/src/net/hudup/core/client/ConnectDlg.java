@@ -395,6 +395,7 @@ public abstract class ConnectDlg extends JDialog {
 	
 	/**
 	 * Disconnecting specified connector.
+	 * @param connector the remote connector returned by connecting method.
 	 */
 	public static void disconnect(Remote connector) {
 		if ((connector != null) && (connector instanceof SocketConnection))

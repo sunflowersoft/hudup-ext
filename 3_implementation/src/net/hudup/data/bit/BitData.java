@@ -161,9 +161,9 @@ public class BitData implements Cloneable, net.hudup.core.data.AutoCloseable, Se
 	/**
 	 * Finding bit item id of original (real) item id with its value 
 	 * (Example: item 2 rated value 5 has bit id 10)
-	 * @param originItemId
-	 * @param ratingValue
-	 * @return bit item id
+	 * @param originItemId original item identifier.
+	 * @param ratingValue rating value.
+	 * @return bit item identifier.
 	 */
 	public int findBitItemIdOf(int originItemId, double ratingValue) {
 		Set<Integer> bitItemIds = bitItemMap.keySet();
@@ -191,10 +191,10 @@ public class BitData implements Cloneable, net.hudup.core.data.AutoCloseable, Se
 	
 	
 	/**
-	 * Getting a list of original items based on bit bit set.
+	 * Getting a list of original items based on bit set.
 	 * Each {@link Pair} represents a original item with its value.
 	 * Each {@link BitSet} represents an list of rated bit items
-	 * @param bs
+	 * @param bs specified bit set.
 	 * @return list of {@link Pair}
 	 */
 	public List<Pair> toItemPairList(BitSet bs) {

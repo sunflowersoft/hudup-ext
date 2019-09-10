@@ -11,18 +11,18 @@ public interface Cipher {
 	
 	
 	/**
-	 * Encrypting specified text data by symmetric cipher algorithm whose name is specified by constants {@link #CALG}.
+	 * Encrypting specified text data by symmetric cipher algorithm.
 	 * @param data specified text data
-	 * @return encrypted text by symmetric cipher algorithm whose name is specified by constants {@link #CALG}.
+	 * @return encrypted text by symmetric cipher algorithm.
 	 */
 	String encrypt(String data);
 
 	
 	/**
-	 * Decrypting the specified encrypted data by symmetric cipher algorithm whose name is specified by constants {@link #CALG}.
+	 * Decrypting the specified encrypted data by symmetric cipher algorithm.
 	 * 
 	 * @param encrypted specified encrypted data
-	 * @return plain text decrypted from specified encrypted data by symmetric cipher algorithm whose name is specified by constants {@link #CALG}.
+	 * @return plain text decrypted from specified encrypted data by symmetric cipher algorithm.
 	 */
 	String decrypt(String encrypted);
 	

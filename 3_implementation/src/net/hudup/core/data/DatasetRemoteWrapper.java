@@ -3,11 +3,10 @@ package net.hudup.core.data;
 import java.io.Serializable;
 import java.rmi.RemoteException;
 
-import org.apache.log4j.Logger;
-
 import net.hudup.core.data.ctx.Context;
 import net.hudup.core.data.ctx.ContextList;
 import net.hudup.core.data.ctx.ContextTemplateSchema;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.NetUtil;
 
 public class DatasetRemoteWrapper implements Dataset, DatasetRemote {
@@ -19,12 +18,6 @@ public class DatasetRemoteWrapper implements Dataset, DatasetRemote {
 	private static final long serialVersionUID = 1L;
 
 	
-	/**
-	 * Logger of this class.
-	 */
-	protected final static Logger logger = Logger.getLogger(DatasetRemoteWrapper.class);
-
-
     /**
      * Stub as remote dataset.
      */
@@ -84,7 +77,7 @@ public class DatasetRemoteWrapper implements Dataset, DatasetRemote {
 			((DatasetAbstract)remoteDataset).setConfig(config);
 		}
 		else {
-			logger.warn("DatasetRemoteWrapper.setConfig() not supported");
+			LogUtil.warn("DatasetRemoteWrapper.setConfig() not supported");
 		}
 	}
 
@@ -360,7 +353,7 @@ public class DatasetRemoteWrapper implements Dataset, DatasetRemote {
 			return new DatasetRemoteWrapper(newDataset, exclusive);
 		}
 		else {
-			logger.warn("DatasetRemoteWrapper.clone() returns itself");
+			LogUtil.warn("DatasetRemoteWrapper.clone() returns itself");
 			return this;
 		}
 	}
@@ -409,7 +402,7 @@ public class DatasetRemoteWrapper implements Dataset, DatasetRemote {
 			((DatasetAbstract)remoteDataset).setExclusive(exclusive);
 		}
 		else {
-			logger.warn("DatasetRemoteWrapper.setExclusive(boolean) not supported");
+			LogUtil.warn("DatasetRemoteWrapper.setExclusive(boolean) not supported");
 		}
 	}
 
@@ -433,7 +426,7 @@ public class DatasetRemoteWrapper implements Dataset, DatasetRemote {
 			return ((DatasetAbstract)remoteDataset).getProvider();
 		}
 		else {
-			logger.warn("DatasetRemoteWrapper.getProvider() not supported");
+			LogUtil.warn("DatasetRemoteWrapper.getProvider() not supported");
 			return null;
 		}
 	}

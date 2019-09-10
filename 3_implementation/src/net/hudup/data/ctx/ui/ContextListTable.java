@@ -37,6 +37,7 @@ import net.hudup.data.ui.AttributeListTable.TypeCellEditor;
 
 
 /**
+ * This class is Java table to show context list.
  * 
  * @author Loc Nguyen
  * @version 10.0
@@ -52,8 +53,8 @@ public class ContextListTable extends JTable {
 
 	
 	/**
-	 * 
-	 * @param cts
+	 * Constructor with specified context template schema.
+	 * @param cts specified context template schema.
 	 */
 	public ContextListTable(ContextTemplateSchema cts) {
 		super(new ContextListTM(cts));
@@ -96,7 +97,7 @@ public class ContextListTable extends JTable {
 	
 	
 	/**
-	 * 
+	 * Getting model of context list.
 	 * @return {@link ContextListTM}
 	 */
 	public ContextListTM getContextListTM() {
@@ -105,8 +106,8 @@ public class ContextListTable extends JTable {
 	
 	
 	/**
-	 * 
-	 * @param ctxList
+	 * Setting context list.
+	 * @param ctxList specified context list.
 	 */
 	public void set(ContextList ctxList) {
 		getContextListTM().set(ctxList);
@@ -123,7 +124,7 @@ public class ContextListTable extends JTable {
 	
 	
 	/**
-	 * 
+	 * Clearing content (context list).
 	 */
 	public void clear() {
 		getContextListTM().clear();
@@ -131,7 +132,7 @@ public class ContextListTable extends JTable {
 	
 	
 	/**
-	 * 
+	 * Getting context list.
 	 * @return {@link ContextList}
 	 */
 	public ContextList getContextList() {
@@ -140,7 +141,7 @@ public class ContextListTable extends JTable {
 	
 	
 	/**
-	 * 
+	 * Applying context list to the model.
 	 * @return whether apply action is successfully
 	 */
 	public boolean apply() {
@@ -181,7 +182,7 @@ public class ContextListTable extends JTable {
 	
 
 	/**
-	 * 
+	 * Creating context menu.
 	 * @return {@link JPopupMenu}
 	 */
 	private JPopupMenu createContextMenu() {
@@ -241,7 +242,7 @@ public class ContextListTable extends JTable {
 
 	
 	/**
-	 * 
+	 * Adding row.
 	 */
 	protected void addRow() {
 		Vector<Object> emptyRow = getContextListTM().emptyRow();
@@ -251,7 +252,7 @@ public class ContextListTable extends JTable {
 	
 	
 	/**
-	 * 
+	 * Inserting selected row.
 	 */
 	protected void insertRow() {
 		int selectedRow = getSelectedRow();
@@ -264,7 +265,7 @@ public class ContextListTable extends JTable {
 
 	
 	/**
-	 * 
+	 * Clearing content of selected row.
 	 */
 	protected void clearRow() {
 		int selectedRow = getSelectedRow();
@@ -278,7 +279,7 @@ public class ContextListTable extends JTable {
 	
 	
 	/**
-	 * 
+	 * Removing selected row.
 	 */
 	protected void removeRow() {
 		int selectedRow = getSelectedRow();
@@ -298,7 +299,7 @@ public class ContextListTable extends JTable {
 
 	
 	/**
-	 * 
+	 * Selecting template.
 	 */
 	protected void selectTemplate() {
 		int selectedRow = getSelectedRow();
@@ -315,32 +316,28 @@ public class ContextListTable extends JTable {
 
 	
 	/**
-	 * 
+	 * Editor class of context template.
 	 * @author Loc Nguyen
 	 * @version 10.0
-	 *
 	 */
 	public static class ContextTemplateCellEditor extends DefaultCellEditor {
-
 		
 		/**
 		 * Serial version UID for serializable class. 
 		 */
 		private static final long serialVersionUID = 1L;
 
-		
 		/**
-		 * 
+		 * Constructor with specified context template schema.
+		 * @param cts specified context template schema.
 		 */
 		public ContextTemplateCellEditor(ContextTemplateSchema cts) {
 			super(createComboBox(cts));
-			
 		}
 		
-		
 		/**
-		 * 
-		 * @return {@link JComboBox}
+		 * Create Java combo-box for context template schema.
+		 * @return {@link JComboBox} for context template schema.
 		 */
 		private static JComboBox<ContextTemplate> createComboBox(ContextTemplateSchema cts) {
 			ContextTemplate[] templates = cts.getAllTemplates();
@@ -361,13 +358,12 @@ public class ContextListTable extends JTable {
 	}
 
 	
-	
 }
 
 
 
 /**
- * 
+ * This class is model of context list.
  * @author Loc Nguyen
  * @version 10.0
  *
@@ -382,31 +378,32 @@ class ContextListTM extends DefaultTableModel {
 	
 	
 	/**
-	 * 
+	 * Maximum size.
 	 */
 	public final static int MAX_SIZE = 10;
 
 	
 	/**
-	 * 
+	 * Internal context list.
 	 */
 	protected ContextList ctxList = null;
 	
 	
 	/**
-	 * 
+	 * Context template schema.
 	 */
 	protected ContextTemplateSchema cts = null;
 	
 	
 	/**
-	 * 
+	 * Enabled flag.
 	 */
 	protected boolean enabled = true;
 
 	
 	/**
-	 * 
+	 * Constructor with context template schema.
+	 * @param cts specified context template schema.
 	 */
 	public ContextListTM(ContextTemplateSchema cts) {
 		super();
@@ -417,8 +414,8 @@ class ContextListTM extends DefaultTableModel {
 	
 	
 	/**
-	 * 
-	 * @param ctxList
+	 * Setting context list.
+	 * @param ctxList specified context list. 
 	 */
 	public void set(ContextList ctxList) {
 		this.ctxList = ctxList;
@@ -428,8 +425,8 @@ class ContextListTM extends DefaultTableModel {
 	
 	
 	/**
-	 * 
-	 * @return column names
+	 * Creating column names.
+	 * @return column names.
 	 */
 	private Vector<String> createColumns() {
 		Vector<String> columns = Util.newVector();
@@ -443,8 +440,8 @@ class ContextListTM extends DefaultTableModel {
 	
 	
 	/**
-	 * 
-	 * @return empty row
+	 * Creating empty row.
+	 * @return empty row.
 	 */
 	public Vector<Object> emptyRow() {
 		Vector<Object> row = Util.newVector();
@@ -457,7 +454,7 @@ class ContextListTM extends DefaultTableModel {
 	
 	
 	/**
-	 * 
+	 * Refreshing the model.
 	 */
 	public void refresh() {
 		Vector<String> columns = createColumns();
@@ -493,10 +490,10 @@ class ContextListTM extends DefaultTableModel {
 	
 
 	/**
-	 * 
-	 * @param row
-	 * @param column
-	 * @return class of column
+	 * Getting class at specified row and column.
+	 * @param row specified row.
+	 * @param column specified column.
+	 * @return class at specified row and column.
 	 */
 	public Class<?> getColumnClass(int row, int column) {
 		Object value = getValueAt(row, column);
@@ -508,7 +505,7 @@ class ContextListTM extends DefaultTableModel {
 	
 	
 	/**
-	 * 
+	 * Clearing model.
 	 */
 	public void clear() {
 		
@@ -527,8 +524,8 @@ class ContextListTM extends DefaultTableModel {
 	
 	
 	/**
-	 * 
-	 * @return {@link ContextList}
+	 * Getting internal context list.
+	 * @return {@link ContextList} internal context list.
 	 */
 	public ContextList getContextList() {
 		return ctxList;
@@ -536,7 +533,7 @@ class ContextListTM extends DefaultTableModel {
 	
 	
 	/**
-	 * 
+	 * Getting context template schema.
 	 * @return {@link ContextTemplateSchema}
 	 */
 	public ContextTemplateSchema getCTS() {
@@ -545,8 +542,8 @@ class ContextListTM extends DefaultTableModel {
 	
 	
 	/**
-	 * 
-	 * @param enabled
+	 * Setting enabled flag.
+	 * @param enabled enabled flag.
 	 */
 	public void setEnabled(boolean enabled) {
 		this.enabled = enabled;
@@ -561,8 +558,8 @@ class ContextListTM extends DefaultTableModel {
 
 	
 	/**
-	 * 
-	 * @return whether apply action successfully
+	 * Apply the internal context list to this model.
+	 * @return whether apply action successfully.
 	 */
 	public boolean apply() {
 		

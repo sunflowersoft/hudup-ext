@@ -50,20 +50,20 @@ public class RatingMatrixPane extends JPanel {
 	
 	
 	/**
-	 * 
+	 * Rating value table.
 	 */
 	protected RatingValueTable tblRatingValue = null;
 	
 	
 	/**
-	 * 
+	 * Rating panel.
 	 */
 	protected RatingPane paneRating = null;
 	
 	
 	/**
-	 * 
-	 * @param dataset
+	 * Constructor with specified dataset.
+	 * @param dataset specified dataset.
 	 */
 	public RatingMatrixPane(Dataset dataset) {
 		super();
@@ -166,22 +166,40 @@ class RatingPane extends JPanel {
 	private static final long serialVersionUID = 1L;
 
 	
+	/**
+	 * Editable flag.
+	 */
 	boolean editable = false;
 	
+	/**
+	 * Rating.
+	 */
 	Rating rating = null;
 	
+	/**
+	 * Value text field.
+	 */
 	JFormattedTextField txtValue = null;
 	
+	/**
+	 * Date text field.
+	 */
 	JFormattedTextField txtDate = null;
 	
+	/**
+	 * Table of context list.
+	 */
 	ContextListTable tblContextList = null;
 	
+	/**
+	 * Tool bar.
+	 */
 	JPanel toolbar = null;
 	
 	
 	/**
-	 * 
-	 * @param cts
+	 * Constructor with specified context template schema.
+	 * @param cts specified context template schema.
 	 */
 	public RatingPane(ContextTemplateSchema cts) {
 		super(new BorderLayout());
@@ -263,7 +281,7 @@ class RatingPane extends JPanel {
 	
 	/**
 	 * Setting rating panel.
-	 * @param rating
+	 * @param rating the specified rating.
 	 */
 	public void set(Rating rating) {
 		clear();

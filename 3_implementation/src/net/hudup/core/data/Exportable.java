@@ -6,7 +6,7 @@ import java.rmi.RemoteException;
 
 /**
  * This interface represents exportable object which has {@link #export(int)} method and {@link #unexport()} method.
- * An exportable object is similar to {@link AutoCloseable} object except that the {@link #finalize()} method of exportable object should call its {@link #unexport()} method (instead of calling {@link AutoCloseable#close()} method).
+ * An exportable object is similar to {@link AutoCloseable} object except that the #finalize() method of exportable object should call its {@link #unexport()} method (instead of calling {@link AutoCloseable#close()} method).
  * 
  * @author Loc Nguyen
  * @version 12.0

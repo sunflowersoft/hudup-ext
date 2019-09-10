@@ -141,7 +141,6 @@ public class DatasetInput extends JPanel implements Dispose {
 			 */
 			private static final long serialVersionUID = 1L;
 
-			
 			@Override
 			public void clearData() {
 				// TODO Auto-generated method stub
@@ -149,7 +148,6 @@ public class DatasetInput extends JPanel implements Dispose {
 				unitTable.clear();
 			}
 
-			
 			@Override
 			public void modify() {
 				// TODO Auto-generated method stub
@@ -160,7 +158,6 @@ public class DatasetInput extends JPanel implements Dispose {
 						JOptionPane.INFORMATION_MESSAGE);
 			}
 
-			
 			@Override
 			public void drop() {
 				// TODO Auto-generated method stub
@@ -208,8 +205,8 @@ public class DatasetInput extends JPanel implements Dispose {
 
 
 	/**
-	 * 
-	 * @param config
+	 * Updating configuration.
+	 * @param config specified configuration.
 	 */
 	private void update(DataConfig config) {
 		if (config == null)

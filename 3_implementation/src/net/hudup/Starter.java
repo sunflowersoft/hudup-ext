@@ -10,7 +10,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 
 import net.hudup.core.AccessPoint;
-import net.hudup.core.logistic.SystemUtil;
+import net.hudup.core.Firer;
 import net.hudup.core.logistic.ui.StartDlg;
 import net.hudup.core.logistic.ui.TooltipTextArea;
 
@@ -36,7 +36,7 @@ public class Starter {
 	 */
 	public static void main(final String[] args) {
 		// TODO Auto-generated method stub
-		List<AccessPoint> apList = SystemUtil.getInstances(AccessPoint.class);
+		List<AccessPoint> apList = Firer.getInstances(AccessPoint.class);
 		if (apList.size() == 0) {
 			JOptionPane.showMessageDialog(
 					null, 

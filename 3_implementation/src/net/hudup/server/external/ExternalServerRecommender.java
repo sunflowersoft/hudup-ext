@@ -21,6 +21,7 @@ import net.hudup.core.logistic.BaseClass;
 
 
 /**
+ * This class representts external server recommendation algorithm.
  * 
  * @author Loc Nguyen
  * @version 10.0
@@ -37,7 +38,7 @@ public class ExternalServerRecommender extends CompositeRecommenderAbstract {
 
 	
 	/**
-	 * 
+	 * Default constructor.
 	 */
 	public ExternalServerRecommender() {
 		super();

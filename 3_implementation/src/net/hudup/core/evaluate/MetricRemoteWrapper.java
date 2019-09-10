@@ -5,6 +5,7 @@ import java.rmi.RemoteException;
 import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.AlgRemoteWrapper;
 import net.hudup.core.logistic.BaseClass;
+import net.hudup.core.logistic.LogUtil;
 
 /**
  * This class is wrapper of remote metric.
@@ -101,7 +102,7 @@ public class MetricRemoteWrapper extends AlgRemoteWrapper implements Metric {
 			return new MetricRemoteWrapper(newMetric, exclusive);
 		}
 		else {
-			logger.warn("newInstance() returns itselfs and so does not return new object");
+			LogUtil.warn("newInstance() returns itselfs and so does not return new object");
 			return this;
 		}
 	}

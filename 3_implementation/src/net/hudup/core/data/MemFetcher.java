@@ -160,6 +160,7 @@ public class MemFetcher<E extends Serializable> implements Fetcher<E> {
 	
 	/**
 	 * This static method creates an empty memory fetcher which has no element.
+	 * @param <E> type of data elements.
 	 * @return empty memory fetcher.
 	 */
 	public static <E extends Serializable> MemFetcher<E> createEmpty() {
