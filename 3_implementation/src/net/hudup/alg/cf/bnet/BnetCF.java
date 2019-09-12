@@ -473,10 +473,8 @@ abstract class BnetKB extends KBaseAbstract {
 				int[] aCase = new int[valueList.size()];
 				for (int i = 0; i < aCase.length; i++) {
 					double value = valueList.get(i);
-					if (Util.isUsed(value)) {
-						int realValue = (int)(value + 0.5);
-						aCase[i] = DatasetUtil2.zeroBasedRatingValueOf(realValue, minRating);
-					}
+					if (Util.isUsed(value))
+						aCase[i] = DatasetUtil2.zeroBasedRatingValueOf(value, minRating);
 					else
 						aCase[i] = -1; //Missing value.
 				}

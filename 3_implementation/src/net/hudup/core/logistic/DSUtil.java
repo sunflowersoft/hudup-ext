@@ -505,6 +505,7 @@ public final class DSUtil {
 	 * @param start start position of the specified range.
 	 * @param end end position of the specified range.
 	 * @param to specified position where elements in specified range are moved to.
+	 * @author Someone on Internet
 	 */
 	public static <T> void moveRow(List<T> list, int start, int end, int to) {
 		
@@ -539,6 +540,19 @@ public final class DSUtil {
 		list.clear();
 		list.addAll(newList);
 		newList.clear();
+	}
+	
+	
+	/**
+	 * Shorten verbal name.
+	 * @param name verbal name.
+	 * @return verbal name shortened.
+	 */
+	public static String shortenVerbalName(String name) {
+		if (name.length() > Constants.MAX_VERBAL_NAME_LENGTH)
+			name = name.substring(0, Constants.MAX_VERBAL_NAME_LENGTH) + "...";
+		return name;
+		
 	}
 	
 	

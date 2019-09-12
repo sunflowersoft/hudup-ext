@@ -6,6 +6,7 @@ import java.rmi.RemoteException;
 import javax.swing.event.EventListenerList;
 
 import net.hudup.core.data.DataConfig;
+import net.hudup.core.logistic.DSUtil;
 import net.hudup.core.logistic.NetUtil;
 
 
@@ -91,7 +92,7 @@ public abstract class AlgAbstract implements Alg, AlgRemote {
 	
 	@Override
 	public String toString() {
-		return getName();
+		return DSUtil.shortenVerbalName(getName());
 	}
 
 

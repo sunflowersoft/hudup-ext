@@ -84,98 +84,104 @@ public class DatasetTextField extends TagTextField {
 	private JPopupMenu createContextMenu() {
 		JPopupMenu contextMenu = new JPopupMenu();
 		
-		JMenuItem miCopyURI = UIUtil.makeMenuItem((String)null, "Copy URL", 
-			new ActionListener() {
-				
-				public void actionPerformed(ActionEvent e) {
-					ClipboardUtil.util.setText(getThis().getText());
-				}
-			});
-		contextMenu.add(miCopyURI);
-		
+		String uriText = getText();
+		uriText = uriText == null ? "" : uriText;
+		if (!uriText.isEmpty()) {
+			JMenuItem miCopyURI = UIUtil.makeMenuItem((String)null, "Copy URL", 
+				new ActionListener() {
+					
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						ClipboardUtil.util.setText(getThis().getText());
+					}
+				});
+			contextMenu.add(miCopyURI);
+		}
 
 		final Dataset dataset = getDataset();
-		if (dataset != null) {
-			if (!(dataset instanceof Pointer) ) {
-				contextMenu.addSeparator();
-				
-				JMenuItem miMetadata = UIUtil.makeMenuItem((String)null, "View metadata", 
+		if (dataset == null) return contextMenu;
+		
+		if (!(dataset instanceof Pointer) ) {
+			if (!uriText.isEmpty()) contextMenu.addSeparator();
+			
+			JMenuItem miMetadata = UIUtil.makeMenuItem((String)null, "View metadata", 
+				new ActionListener() {
+					
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						DatasetMetadataTable.showDlg(getThis(), dataset);
+					}
+				});
+			contextMenu.add(miMetadata);
+
+			JMenuItem miData = UIUtil.makeMenuItem((String)null, "View data", 
 					new ActionListener() {
 						
 						@Override
 						public void actionPerformed(ActionEvent e) {
-							DatasetMetadataTable.showDlg(getThis(), dataset);
-						}
-					});
-				contextMenu.add(miMetadata);
-
-				JMenuItem miData = UIUtil.makeMenuItem((String)null, "View data", 
-						new ActionListener() {
-							
-							public void actionPerformed(ActionEvent e) {
-								int confirm = JOptionPane.showConfirmDialog(
-										getThis(), 
-										"Be careful, out of memory in case of huge dataset", 
-										"Out of memory in case of huge dataset", 
-										JOptionPane.OK_CANCEL_OPTION, 
-										JOptionPane.WARNING_MESSAGE);
-								
-								if (confirm == JOptionPane.OK_OPTION)
-									new DatasetViewer(getThis(), dataset);
-							}
-						});
-				contextMenu.add(miData);
-			}
-			else if (dataset instanceof KBasePointer) {
-				contextMenu.addSeparator();
-
-				JMenuItem miData = UIUtil.makeMenuItem((String)null, "View knowledge base", 
-					new ActionListener() {
-						
-						public void actionPerformed(ActionEvent e) {
 							int confirm = JOptionPane.showConfirmDialog(
 									getThis(), 
-									"Be careful, out of memory in case of huge knowledge base", 
+									"Be careful, out of memory in case of huge dataset", 
 									"Out of memory in case of huge dataset", 
 									JOptionPane.OK_CANCEL_OPTION, 
 									JOptionPane.WARNING_MESSAGE);
-							if (confirm != JOptionPane.OK_OPTION)
-								return;
 							
-							try {
-								DataConfig config = (DataConfig) dataset.getConfig().clone(); 
-								xURI store = config.getStoreUri();
-								xURI cfgUri = store.concat(KBase.KBASE_CONFIG);
-								config.load(cfgUri);
-								
-								String kbaseName = config.getAsString(KBase.KBASE_NAME);
-								if (kbaseName == null)
-									throw new Exception("KBase not viewed");
-								
-								Alg alg = PluginStorage.getNormalAlgReg().query(kbaseName);
-								if (alg == null || !(alg instanceof ModelBasedRecommender))
-									throw new Exception("KBase not viewed");
-								
-								ModelBasedRecommender recommender = (ModelBasedRecommender) alg.newInstance();
-								KBase kbase = recommender.newKBase(dataset);
-								kbase.getInspector().inspect();
-								kbase.close();
-							}
-							catch (Throwable ex) {
-								ex.printStackTrace();
-								JOptionPane.showMessageDialog(
-										getThis(), 
-										"KBase not viewed", 
-										"KBase not viewed", 
-										JOptionPane.ERROR_MESSAGE);
-							} // end try-catch
-								
-						} //end actionPerformed
+							if (confirm == JOptionPane.OK_OPTION)
+								new DatasetViewer(getThis(), dataset);
+						}
+					});
+			contextMenu.add(miData);
+		}
+		else if (dataset instanceof KBasePointer) {
+			if (!uriText.isEmpty()) contextMenu.addSeparator();
+
+			JMenuItem miData = UIUtil.makeMenuItem((String)null, "View knowledge base", 
+				new ActionListener() {
+					
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						int confirm = JOptionPane.showConfirmDialog(
+								getThis(), 
+								"Be careful, out of memory in case of huge knowledge base", 
+								"Out of memory in case of huge dataset", 
+								JOptionPane.OK_CANCEL_OPTION, 
+								JOptionPane.WARNING_MESSAGE);
+						if (confirm != JOptionPane.OK_OPTION)
+							return;
 						
-					}); //end ActionListener
-				contextMenu.add(miData);
-				
-			}
+						try {
+							DataConfig config = (DataConfig) dataset.getConfig().clone(); 
+							xURI store = config.getStoreUri();
+							xURI cfgUri = store.concat(KBase.KBASE_CONFIG);
+							config.load(cfgUri);
+							
+							String kbaseName = config.getAsString(KBase.KBASE_NAME);
+							if (kbaseName == null)
+								throw new Exception("KBase not viewed");
+							
+							Alg alg = PluginStorage.getNormalAlgReg().query(kbaseName);
+							if (alg == null || !(alg instanceof ModelBasedRecommender))
+								throw new Exception("KBase not viewed");
+							
+							ModelBasedRecommender recommender = (ModelBasedRecommender) alg.newInstance();
+							KBase kbase = recommender.newKBase(dataset);
+							kbase.getInspector().inspect();
+							kbase.close();
+						}
+						catch (Throwable ex) {
+							ex.printStackTrace();
+							JOptionPane.showMessageDialog(
+									getThis(), 
+									"KBase not viewed", 
+									"KBase not viewed", 
+									JOptionPane.ERROR_MESSAGE);
+						} // end try-catch
+							
+					} //end actionPerformed
+					
+				}); //end ActionListener
+			contextMenu.add(miData);
+			
 		}
 		
 		return contextMenu;

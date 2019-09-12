@@ -36,6 +36,7 @@ public class GreenFallCF extends FreqItemsetBasedCF {
 
 	@Override
 	public String getName() {
+//		return "gfall vsaaadfaTEYYYYYYYYYYYYYYYYYYYYYYYYYYY fsgs hhdshs hdsghdsh hh gfall vsaaadfaTEYYYYYYYYYYYYYYYYYYYYYYYYYYY fsgs hhdshs hdsghdsh hh";
 		return "gfall";
 	}
 

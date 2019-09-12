@@ -583,8 +583,7 @@ public final class DatasetUtil2 {
 	public static int[] zeroBasedRatingValueOf(double[] realValues, double minRating) {
 		int[] inner = new int[realValues.length];
 		for (int i = 0; i < realValues.length; i++) {
-			int realValue = (int)(realValues[i] + 0.5);
-			inner[i] = zeroBasedRatingValueOf(realValue, minRating);
+			inner[i] = zeroBasedRatingValueOf(realValues[i], minRating);
 		}
 		
 		return inner;
@@ -593,7 +592,7 @@ public final class DatasetUtil2 {
 	
 	/**
 	 * Converting real rating value to integer rating value based on zero.
-	 * @param realValue real rating value.s
+	 * @param realValue real rating value.
 	 * @param minRating minimum rating value.
 	 * @return zero-based value
 	 */

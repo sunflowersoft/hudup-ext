@@ -29,6 +29,7 @@ import net.hudup.core.data.Fetcher;
 import net.hudup.core.data.Profile;
 import net.hudup.core.evaluate.EvaluatorEvent.Type;
 import net.hudup.core.logistic.AbstractRunner;
+import net.hudup.core.logistic.DSUtil;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.NetUtil;
 import net.hudup.core.logistic.SystemUtil;
@@ -799,7 +800,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		return evaluatorName;
+		return DSUtil.shortenVerbalName(evaluatorName);
 	}
 
 

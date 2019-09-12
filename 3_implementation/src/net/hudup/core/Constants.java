@@ -14,7 +14,7 @@ public final class Constants {
 	/**
 	 * Current version of Hudup framework.
 	 */
-	public final static String  VERSION            = "v11";
+	public final static String  VERSION            = "v12";
 	
 	/**
 	 * Unused double number.
@@ -50,6 +50,11 @@ public final class Constants {
 	 * Default date format.
 	 */
 	public final static String  DATE_FORMAT            = "yyyy-MM-dd HH-mm-ss";
+	
+	/**
+	 * Maximum verbal name length.
+	 */
+	public static final int MAX_VERBAL_NAME_LENGTH     = 32;
 	
 	
 	/**

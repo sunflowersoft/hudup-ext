@@ -193,23 +193,31 @@ public class BnetUtil {
 	 * @param userRating user rating vector.
 	 * @return item configuration.
 	 */
-	public static Configuration createItemConfiguration(
+	private static Configuration createItemConfiguration(
 			NodeList nodeList, 
 			RatingVector userRating, 
 			double minRating) {
 		Vector<FiniteStates> vars = new Vector<FiniteStates>();
 		Vector<Integer> vals = new Vector<Integer>();
 		
+		for (int i = 0; i < nodeList.size(); i++) { //Added date: 2019.09.12 by Loc Nguyen.
+			FiniteStates node = (FiniteStates)nodeList.elementAt(i);
+			vars.add(node);
+			vals.add(-1);
+		}
+		
+		
 		List<RatingTriple> triples = RatingTriple.getUserRatings(userRating);
 		for (RatingTriple triple : triples) {
 			int itemId = triple.itemId();
 			String nodeName = createItemNodeName(itemId);
-			if (nodeList.getId(nodeName) == -1)
+			int nodePos = nodeList.getId(nodeName);
+			if (nodePos == -1)
 				continue;
 			
 			FiniteStates node = (FiniteStates)nodeList.getNode(nodeName);
 			
-			int value = (int)DatasetUtil2.zeroBasedRatingValueOf(triple.getRating().value, minRating);
+			int value = DatasetUtil2.zeroBasedRatingValueOf(triple.getRating().value, minRating);
 			String svalue = String.valueOf(value);
 			
 			String[] states = node.getStringStates();
@@ -222,8 +230,9 @@ public class BnetUtil {
 			}
 			
 			if (found != -1) {
-				vars.addElement(node);
-				vals.add(value);
+//				vars.addElement(node);
+//				vals.add(value);
+				vals.set(nodePos, value); //Added date: 2019.09.12 by Loc Nguyen.
 			}
 		}
 		
@@ -242,18 +251,21 @@ public class BnetUtil {
 			RatingVector userRating,
 			double minRating) {
 		Configuration conf = createItemConfiguration(nodeList, userRating, minRating);
-		Evidence evidence = new Evidence();
-		
-		Vector<?> vars = conf.getVariables();
-		Vector<?> vals = conf.getValues();
-		
-		for (int i = 0; i < vars.size(); i++) {
-			FiniteStates node = (FiniteStates)vars.get(i);
-			int value = (Integer)vals.get(i);
-			evidence.insert(node, value);
-		}
-		
-		return evidence;
+		return new Evidence(conf);
+
+//		Configuration conf = createItemConfiguration(nodeList, userRating, minRating);
+//		Evidence evidence = new Evidence();
+//		
+//		Vector<?> vars = conf.getVariables();
+//		Vector<?> vals = conf.getValues();
+//		
+//		for (int i = 0; i < vars.size(); i++) {
+//			FiniteStates node = (FiniteStates)vars.get(i);
+//			int value = (Integer)vals.get(i);
+//			evidence.insert(node, value);
+//		}
+//		
+//		return evidence;
 	}
 
 

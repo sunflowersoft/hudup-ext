@@ -61,6 +61,7 @@ import net.hudup.core.evaluate.EvaluatorProgressEvent;
 import net.hudup.core.evaluate.Metrics;
 import net.hudup.core.evaluate.MetricsUtil;
 import net.hudup.core.logistic.ClipboardUtil;
+import net.hudup.core.logistic.DSUtil;
 import net.hudup.core.logistic.I18nUtil;
 import net.hudup.core.logistic.Inspector;
 import net.hudup.core.logistic.LogUtil;
@@ -122,7 +123,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 	protected JCheckBox chkSave = null;
 	protected JProgressBar prgRunning = null;
 	
-	protected JCheckBox chkDisplay = null;
+	protected JCheckBox chkVerbal = null;
 	protected JButton btnMetricsOption = null;
 
 	protected JPanel paneResult = null;
@@ -202,7 +203,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 		add(footer, BorderLayout.SOUTH);
 		
 		algChanged();
-		setDisplay(false);
+		setVerbal(false);
 	}
 
 	
@@ -505,6 +506,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 		this.paneRunSave.add(pane, BorderLayout.NORTH);
 		this.txtSaveBrowse = new JTextField();
 		this.txtSaveBrowse.setEditable(false);
+		this.txtSaveBrowse.setToolTipText(I18nUtil.message("save_place"));;
 		pane.add(this.txtSaveBrowse, BorderLayout.CENTER);
 		this.chkSave = new JCheckBox(I18nUtil.message("save"));
 		this.chkSave.addActionListener(new ActionListener() {
@@ -534,6 +536,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 				updateMode();
 			}
 		});
+		this.chkSave.setToolTipText(I18nUtil.message("save_tooltip"));
 		pane.add(this.chkSave, BorderLayout.WEST);
 		
 		JPanel tool = new JPanel(new BorderLayout());
@@ -541,7 +544,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 		JPanel buttons = new JPanel();
 		tool.add(buttons, BorderLayout.EAST);
 		
-		this.chkDisplay = new JCheckBox(new AbstractAction(I18nUtil.message("display")) {
+		this.chkVerbal = new JCheckBox(new AbstractAction(I18nUtil.message("verbal")) {
 
 			/**
 			 * Serial version UID for serializable class. 
@@ -551,11 +554,12 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
-				boolean display = chkDisplay.isSelected();
-				setDisplay(display);
+				boolean verbal = chkVerbal.isSelected();
+				setVerbal(verbal);
 			}
 		});
-		buttons.add(this.chkDisplay);
+		this.chkVerbal.setToolTipText(I18nUtil.message("verbal_tooltip"));
+		buttons.add(this.chkVerbal);
 		
 		this.btnMetricsOption = UIUtil.makeIconButton(
 			"option-16x16.png", 
@@ -650,6 +654,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 					}
 			});
 		this.btnCopyResult.setMargin(new Insets(0, 0 , 0, 0));
+		this.btnCopyResult.setVisible(false); //Added date: 2019.09.13 by Loc Nguyen
 		toolbar.add(this.btnCopyResult);
 
 		
@@ -670,10 +675,10 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 
 	
 	/**
-	 * Setting whether testing results are displayed.
-	 * @param display if true, testing results are displayed.
+	 * Setting whether testing results are verbalized.
+	 * @param verbal if true, testing results are verbalized.
 	 */
-	private void setDisplay(boolean display) {
+	private void setVerbal(boolean verbal) {
 		
 		Container container = this.paneRunSave.getParent();
 		if (container == null)
@@ -681,15 +686,15 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 		
 		container.remove(this.paneRunInfo);
 		container.remove(this.paneRunSave);
-		if (display)
+		if (verbal)
 			container.add(this.paneRunInfo);
 		else
 			container.add(this.paneRunSave);
 			
-		this.paneRunInfo.setVisible(display);
-		this.paneRunSave.setVisible(!display);
+		this.paneRunInfo.setVisible(verbal);
+		this.paneRunSave.setVisible(!verbal);
 		
-		this.chkDisplay.setSelected(display);
+		this.chkVerbal.setSelected(verbal);
 		
 		updateMode();
 	}
@@ -995,7 +1000,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 		if (evt.getMetrics() == null)
 			return;
 		
-		if (chkDisplay.isSelected()) {
+		if (chkVerbal.isSelected()) {
 			String info = evt.translate() + "\n\n\n\n";
 			this.txtRunInfo.insert(info, 0);
 			this.txtRunInfo.setCaretPosition(0);
@@ -1082,7 +1087,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			this.prgRunning.setValue(progressStep);
 		
 		statusBar.setTextPane1(
-				I18nUtil.message("algorithm") + " '" + algName + "' " +
+				I18nUtil.message("algorithm") + " '" + DSUtil.shortenVerbalName(algName) + "' " +
 				I18nUtil.message("dataset") + " '" + datasetId + "': " + 
 				vCurrentCount + "/" + vCurrentTotal);
 
@@ -1098,7 +1103,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 		String algName = alg.getName();
 
 		if (evt.getType() == SetupAlgEvent.Type.doing) {
-			this.paneWait.setWaitText(I18nUtil.message("setting_up_algorithm") + " '" + algName + "'. " + I18nUtil.message("please_wait") + "...");
+			this.paneWait.setWaitText(I18nUtil.message("setting_up_algorithm") + " '" + DSUtil.shortenVerbalName(algName) + "'. " + I18nUtil.message("please_wait") + "...");
 			this.paneWait.setVisible(true);
 		}
 		else if (evt.getType() == SetupAlgEvent.Type.done) {
@@ -1110,7 +1115,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 		String info = "========== Algorithm \"" + algName + "\" ==========\n";
 		info = info + evt.translate() + "\n\n\n\n";
 		
-		if (chkDisplay.isSelected()) {
+		if (chkVerbal.isSelected()) {
 			this.txtRunInfo.insert(info, 0);
 			this.txtRunInfo.setCaretPosition(0);
 		}
@@ -1203,7 +1208,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 					btnForceStop.setEnabled(true);
 					txtRunInfo.setEnabled(true);
 					chkSave.setEnabled(true);
-					chkDisplay.setEnabled(true);
+					chkVerbal.setEnabled(true);
 					
 					tblMetrics.update(result);
 				}
@@ -1230,10 +1235,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			if (result == null)
 				statusBar.clearText();
 			
-			this.statusBar.setTextPane0( 
-					evaluator.getName() + " - " +
-					(chkDisplay.isSelected() ? I18nUtil.message("display") : I18nUtil.message("undisplay"))
-				);
+			this.statusBar.setTextPane0(DSUtil.shortenVerbalName(evaluator.getName()));
 		}
 		catch (Throwable e) {
 			e.printStackTrace();
@@ -1306,7 +1308,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 				trainingSet != null && 
 				testingSet != null);
 
-		this.chkDisplay.setEnabled(flag);
+		this.chkVerbal.setEnabled(flag);
 		this.btnMetricsOption.setEnabled(flag);
 		
 		this.btnAnalyzeResult.setEnabled(

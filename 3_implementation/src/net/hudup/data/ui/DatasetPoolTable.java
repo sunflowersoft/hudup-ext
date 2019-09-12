@@ -66,11 +66,13 @@ public class DatasetPoolTable extends JTable {
 
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				int row = getSelectedRow();
-				if(SwingUtilities.isRightMouseButton(e) && row != -1) {
+				DatasetPool pool = getPoolTableModel().getPool();
+				if(SwingUtilities.isRightMouseButton(e) && pool != null && pool.size() > 0) {
 					JPopupMenu contextMenu = createContextMenu();
-					if(contextMenu != null) 
+					if(contextMenu != null) {
+						addToContextMenu(contextMenu);
 						contextMenu.show((Component)e.getSource(), e.getX(), e.getY());
+					}
 				}
 			}
 		});
@@ -145,66 +147,37 @@ public class DatasetPoolTable extends JTable {
 	 */
 	private JPopupMenu createContextMenu() {
 		JPopupMenu contextMenu = new JPopupMenu();
-		final int selectedRow = getSelectedRow();
-		final int selectedColumn = getSelectedColumn();
-		
-		if (isEnabled2()) {
-			JMenuItem miRemoveRow = UIUtil.makeMenuItem((String)null, "Remove selected row(s)", 
-				new ActionListener() {
-					
-					public void actionPerformed(ActionEvent e) {
-						removeSelectedRows();
-					}
-				});
-			contextMenu.add(miRemoveRow);
-		}
-		
-		contextMenu.addSeparator();
 		
 		JMenuItem miSave = UIUtil.makeMenuItem((String)null, "Save script", 
 			new ActionListener() {
 				
+				@Override
 				public void actionPerformed(ActionEvent e) {
 					save();
 				}
 			});
 		contextMenu.add(miSave);
 
-		contextMenu.addSeparator();
-
-		JMenuItem miCopyURI = UIUtil.makeMenuItem((String)null, "Copy URL", 
-			new ActionListener() {
-				
-				public void actionPerformed(ActionEvent e) {
-					int row = getSelectedRow();
-					if (row == -1) {
-						JOptionPane.showMessageDialog(
-							getThis(), 
-							"No selected row", 
-							"No selected row", 
-							JOptionPane.WARNING_MESSAGE);
-						return;
-					}
+		final int selectedRow = getSelectedRow();
+		final int selectedColumn = getSelectedColumn();
+		if (selectedRow == -1) return contextMenu;
+		
+		Object cellValue = selectedColumn == -1 ? null : getValueAt(selectedRow, selectedColumn);
+		if (cellValue != null && !cellValue.toString().isEmpty()) {
+			contextMenu.addSeparator();
+			JMenuItem miCopyURI = UIUtil.makeMenuItem((String)null, "Copy URL", 
+				new ActionListener() {
 					
-					int column = getSelectedColumn();
-					if (column == -1) {
-						JOptionPane.showMessageDialog(
-							getThis(), 
-							"No selected column", 
-							"No selected column", 
-							JOptionPane.WARNING_MESSAGE);
-						return;
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						ClipboardUtil.util.setText(cellValue.toString());
 					}
-					
-					Object value = getThis().getValueAt(row, column);
-					if (value != null)
-						ClipboardUtil.util.setText(value.toString());
-				}
-			});
-		contextMenu.add(miCopyURI);
-
+				});
+			contextMenu.add(miCopyURI);
+		}
+		
 		Dataset ds = null;
-		if (selectedRow != -1 && selectedColumn != -1) {
+		if (selectedColumn != -1) {
 			DatasetPoolTableModel model = getPoolTableModel();
 			DatasetPool pool = model.getPool();
 			DatasetPair pair = pool.get(selectedRow);
@@ -311,13 +284,27 @@ public class DatasetPoolTable extends JTable {
 		}
 		
 
-		if (getRowCount() > 1 && isEnabled2()) {
+		if (!isEnabled2()) return contextMenu;
+		
+		contextMenu.addSeparator();
+		JMenuItem miRemoveRow = UIUtil.makeMenuItem((String)null, "Remove selected row(s)", 
+			new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					removeSelectedRows();
+				}
+			});
+		contextMenu.add(miRemoveRow);
+		
+		if (getRowCount() > 1) {
 			contextMenu.addSeparator();
 			
 			if (selectedRow == 0) {
 				JMenuItem miMoveDown = UIUtil.makeMenuItem((String)null, "Move down", 
 					new ActionListener() {
 						
+						@Override
 						public void actionPerformed(ActionEvent e) {
 							moveRowDown(selectedRow);
 						}
@@ -327,6 +314,7 @@ public class DatasetPoolTable extends JTable {
 				JMenuItem miMoveLast = UIUtil.makeMenuItem((String)null, "Move last", 
 					new ActionListener() {
 						
+						@Override
 						public void actionPerformed(ActionEvent e) {
 							moveRowLast(selectedRow);
 						}
@@ -337,6 +325,7 @@ public class DatasetPoolTable extends JTable {
 				JMenuItem miMoveFirst = UIUtil.makeMenuItem((String)null, "Move first", 
 					new ActionListener() {
 						
+						@Override
 						public void actionPerformed(ActionEvent e) {
 							moveRowFirst(selectedRow);
 						}
@@ -346,6 +335,7 @@ public class DatasetPoolTable extends JTable {
 				JMenuItem miMoveUp = UIUtil.makeMenuItem((String)null, "Move up", 
 					new ActionListener() {
 						
+						@Override
 						public void actionPerformed(ActionEvent e) {
 							moveRowUp(selectedRow);
 						}
@@ -356,6 +346,7 @@ public class DatasetPoolTable extends JTable {
 				JMenuItem miMoveFirst = UIUtil.makeMenuItem((String)null, "Move first", 
 					new ActionListener() {
 						
+						@Override
 						public void actionPerformed(ActionEvent e) {
 							moveRowFirst(selectedRow);
 						}
@@ -365,6 +356,7 @@ public class DatasetPoolTable extends JTable {
 				JMenuItem miMoveUp = UIUtil.makeMenuItem((String)null, "Move up", 
 					new ActionListener() {
 						
+						@Override
 						public void actionPerformed(ActionEvent e) {
 							moveRowUp(selectedRow);
 						}
@@ -374,6 +366,7 @@ public class DatasetPoolTable extends JTable {
 				JMenuItem miMoveDown = UIUtil.makeMenuItem((String)null, "Move down", 
 					new ActionListener() {
 						
+						@Override
 						public void actionPerformed(ActionEvent e) {
 							moveRowDown(selectedRow);
 						}
@@ -383,6 +376,7 @@ public class DatasetPoolTable extends JTable {
 				JMenuItem miMoveLast = UIUtil.makeMenuItem((String)null, "Move last", 
 					new ActionListener() {
 						
+						@Override
 						public void actionPerformed(ActionEvent e) {
 							moveRowLast(selectedRow);
 						}
@@ -393,6 +387,15 @@ public class DatasetPoolTable extends JTable {
 		}
 
 		return contextMenu;
+	}
+	
+	
+	/**
+	 * Adding menu items to context menu.
+	 * @param contextMenu context menu.
+	 */
+	protected void addToContextMenu(JPopupMenu contextMenu) {
+		
 	}
 	
 	
