@@ -283,7 +283,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 					
 					if (alg instanceof AlgRemote) {
 						((AlgRemote)alg).addSetupListener(this);
-						SetupAlgEvent setupEvt = new SetupAlgEvent(new Integer(-1), SetupAlgEvent.Type.doing, null, null, "not supported yet");
+						SetupAlgEvent setupEvt = new SetupAlgEvent(new Integer(-1), SetupAlgEvent.Type.doing, alg, null, "not supported yet");
 						fireSetupAlgEvent(setupEvt);
 					}
 					
@@ -302,11 +302,14 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 					fireEvaluatorEvent(new EvaluatorEvent(this, Type.doing, setupMetrics)); // firing setup time metric
 					
 					if (alg instanceof AlgRemote) {
-						SetupAlgEvent setupEvt = new SetupAlgEvent(new Integer(1), SetupAlgEvent.Type.done, null, null, "not supported yet");
+						SetupAlgEvent setupEvt = new SetupAlgEvent(new Integer(1), SetupAlgEvent.Type.done, alg, null, "not supported yet");
 						fireSetupAlgEvent(setupEvt);
 						((AlgRemote)alg).removeSetupListener(this);
 					}
 					
+					//Auto enhancement after setting up algorithm.
+					SystemUtil.enhanceAuto();
+
 					testingFetcher = fetchTesting(testing);
 					int vCurrentTotal = testingFetcher.getMetadata().getSize();
 					int vCurrentCount = 0;

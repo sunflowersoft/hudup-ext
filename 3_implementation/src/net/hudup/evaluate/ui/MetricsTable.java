@@ -315,13 +315,6 @@ class MetricsTM extends SortableTableModel {
 	}
 
 
-	@Override
-	public boolean isSortable(int column) {
-		// TODO Auto-generated method stub
-		return true;
-	}
-	
-	
 	/**
 	 * Getting metrics.
 	 * @return {@link Metrics}.

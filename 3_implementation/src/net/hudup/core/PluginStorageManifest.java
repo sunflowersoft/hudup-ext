@@ -21,6 +21,7 @@ import net.hudup.core.RegisterTableList.RegisterTableItem;
 import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.AlgList;
 import net.hudup.core.logistic.ui.SortableTable;
+import net.hudup.core.logistic.ui.SortableTableModel;
 import net.hudup.core.logistic.ui.UIUtil;
 
 
@@ -326,7 +327,7 @@ public class PluginStorageManifest extends net.hudup.core.logistic.ui.SortableTa
  * @version 10.0
  *
  */
-class RegisterTM extends net.hudup.core.logistic.ui.SortableTableModel {
+class RegisterTM extends SortableTableModel {
 
 	
 	/**
@@ -447,13 +448,6 @@ class RegisterTM extends net.hudup.core.logistic.ui.SortableTableModel {
 	}
 
 	
-	@Override
-	public boolean isSortable(int column) {
-		// TODO Auto-generated method stub
-		return true;
-	}
-
-
 	@Override
 	public boolean isCellEditable(int row, int column) {
 		// TODO Auto-generated method stub

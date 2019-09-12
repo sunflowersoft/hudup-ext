@@ -19,11 +19,11 @@ import net.hudup.core.parser.TextParserUtil;
  * Actually, these data elements are stored in its internal collection {@link #data}.
  * As a convention, it is called memory fetcher. 
  *  
- * @param <E> type of data elements iterated by this memory fetcher.
+ * @param <E> type of data elements iterated by this memory fetcher, which should be serializable.
  * @author Loc Nguyen
  * @version 10.0
  */
-public class MemFetcher<E extends Serializable> implements Fetcher<E> {
+public class MemFetcher<E /*extends Serializable*/> implements Fetcher<E> {
 	
 	
 	/**

@@ -307,13 +307,6 @@ class RemoteInfoTM extends SortableTableModel {
 	}
 
 
-	@Override
-	public boolean isSortable(int column) {
-		// TODO Auto-generated method stub
-		return true;
-	}
-
-
 }
 
 

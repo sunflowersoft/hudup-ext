@@ -663,7 +663,6 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 		//Added date: 2019.09.03 by Loc Nguyen.
 		this.paneWait = new WaitPanel();
 		statusPane.add(this.paneWait, BorderLayout.SOUTH);
-		this.paneWait.setWaitText(I18nUtil.message("setting_up_algorithm_please_wait"));
 		this.paneWait.setVisible(false);
 
 		return footer;
@@ -1094,16 +1093,21 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 	@Override
 	public void receivedSetup(SetupAlgEvent evt) throws RemoteException {
 		// TODO Auto-generated method stub
-		if (evt.getType() == SetupAlgEvent.Type.doing)
-			this.paneWait.setVisible(true);
-		else if (evt.getType() == SetupAlgEvent.Type.done)
-			this.paneWait.setVisible(false);
-
-		
 		Alg alg = evt.getAlg();
 		if (alg == null) return;
+		String algName = alg.getName();
+
+		if (evt.getType() == SetupAlgEvent.Type.doing) {
+			this.paneWait.setWaitText(I18nUtil.message("setting_up_algorithm") + " '" + algName + "'. " + I18nUtil.message("please_wait") + "...");
+			this.paneWait.setVisible(true);
+		}
+		else if (evt.getType() == SetupAlgEvent.Type.done) {
+			this.paneWait.setWaitText(WaitPanel.WAIT_TEXT);
+			this.paneWait.setVisible(false);
+		}
+
 		
-		String info = "========== Algorithm \"" + alg.getName() + "\" ==========\n";
+		String info = "========== Algorithm \"" + algName + "\" ==========\n";
 		info = info + evt.translate() + "\n\n\n\n";
 		
 		if (chkDisplay.isSelected()) {
@@ -1123,7 +1127,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 					adapter.create(store, true);
 				adapter.close();
 				
-				String key = alg.getName();
+				String key = algName;
 				if (evt.getType() == SetupAlgEvent.Type.doing)
 					key += SETUP_DOING_FILE_EXTENSION;
 				else

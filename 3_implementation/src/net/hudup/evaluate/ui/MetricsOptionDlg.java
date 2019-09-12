@@ -405,13 +405,6 @@ class MetricsOptionTM extends SortableTableModel {
 
 
 	@Override
-	public boolean isSortable(int column) {
-		// TODO Auto-generated method stub
-		return true;
-	}
-
-
-	@Override
 	public boolean isCellEditable(int row, int column) {
 		// TODO Auto-generated method stub
 		return column == 3;

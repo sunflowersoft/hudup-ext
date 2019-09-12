@@ -79,6 +79,20 @@
 
 
 	<!--
+	Function: The main goal of the project was the construction of an environment that serve, on the one hand, as a benchwork for the investigation of new methods and algorithms of probabilistic reasoning and, on the other hand, as a tool for the implementation of Bayesian expert systems. In Sim project, Elvira is used to build Bayesian network.
+	Affected packages, classes: net.hudup.alg.cf.bnet.BnetUtil, net.hudup.alg.cf.bnet.BnetLearner, net.hudup.alg.cf.bnet.BnetCF
+	Referred jars:
+	Source: http://www.ia.uned.es/~elvira/index-en.html
+	Vendor: CICYT (a Spanish research agency)
+	Archive: newtech-research/bayesian-network/ELVIRA
+	Version: 2 build 2005
+	Status: using
+	Note:
+	-->
+	<property name="elvira.jar" value="${lib.home}/elvira2-2005.jar"/>
+
+
+	<!--
 	Function: Java Scientific Library, especially for statistics and plot graph.
 	Affected packages, classes: net.hudup.core.evaluate.MetricsUtil, net.hudup.phoebe.math.FlanaganStat, net.hudup.phoebe.math.ui.StatDlg
 	Referred jars:
@@ -450,6 +464,10 @@
 		</javadoc>
 
 		<zip destfile="${archive.home}/${product}-${version}-doc.zip" basedir="${archive.home}"/>
+		
+		<delete quiet="true" includeEmptyDirs="true">
+			<fileset dir="${archive.home}" includes="**" excludes="${product}-${version}-doc.zip"/>
+		</delete>
 	</target>
 
 

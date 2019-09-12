@@ -1,6 +1,5 @@
 package net.hudup.core.factory;
 
-import java.io.Serializable;
 import java.rmi.NoSuchObjectException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
@@ -2586,7 +2585,7 @@ class DbProviderAssoc extends ProviderAssocAbstract {
 	 * @author Loc Nguyen
 	 * @version 10.0
 	 */
-	static abstract class DbFetcher<E extends Serializable> implements Fetcher<E> {
+	static abstract class DbFetcher<E /*extends Serializable*/> implements Fetcher<E> {
 		
 		/**
 		 * Default serial version UID.
@@ -2751,7 +2750,7 @@ class DbProviderAssoc extends ProviderAssocAbstract {
 	 * @version 10.0
 	 * @param <E> type of elements.
 	 */
-	static abstract class RmiDbFetcher<E extends Serializable> extends DbFetcher<E> {
+	static abstract class RmiDbFetcher<E /*extends Serializable*/> extends DbFetcher<E> {
 		
 		/**
 		 * Default serial version UID.

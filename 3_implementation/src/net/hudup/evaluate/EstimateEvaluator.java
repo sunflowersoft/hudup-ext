@@ -83,7 +83,7 @@ public class EstimateEvaluator extends RecommendEvaluator {
 					result.add( recommender.getName(), datasetId, datasetUri, ((NoneWrapperMetricList)metricList.clone()).sort().list() );
 					
 					recommender.addSetupListener(this);
-					SetupAlgEvent setupEvt = new SetupAlgEvent(new Integer(-1), SetupAlgEvent.Type.doing, null, null, "not supported yet");
+					SetupAlgEvent setupEvt = new SetupAlgEvent(new Integer(-1), SetupAlgEvent.Type.doing, recommender, null, "not supported yet");
 					fireSetupAlgEvent(setupEvt);
 					
 					long beginSetupTime = System.currentTimeMillis();
@@ -101,9 +101,12 @@ public class EstimateEvaluator extends RecommendEvaluator {
 					//Fire doing event with setup time metric.
 					fireEvaluatorEvent(new EvaluatorEvent(this, Type.doing, setupMetrics)); // firing setup time metric
 
-					setupEvt = new SetupAlgEvent(new Integer(1), SetupAlgEvent.Type.done, null, null, "not supported yet");
+					setupEvt = new SetupAlgEvent(new Integer(1), SetupAlgEvent.Type.done, recommender, null, "not supported yet");
 					fireSetupAlgEvent(setupEvt);
 					recommender.removeSetupListener(this);
+
+					//Auto enhancement after setting up algorithm.
+					SystemUtil.enhanceAuto();
 
 					testingUsers = testing.fetchUserRatings();
 					int vCurrentTotal = testingUsers.getMetadata().getSize();

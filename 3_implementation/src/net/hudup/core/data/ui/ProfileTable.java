@@ -81,7 +81,8 @@ public class ProfileTable extends JTable {
 	protected void initGUI() {
 		this.getProfileTableModel().setEditable(false);
 
-		//setAutoResizeMode(AUTO_RESIZE_OFF);
+		setAutoResizeMode(AUTO_RESIZE_OFF); //Allowing horizontal scroll bar when putting it in JScrollPane.
+		setAutoCreateRowSorter(true); //Allowing sorting
 		
 		this.addMouseListener(new MouseAdapter() {
 

@@ -150,7 +150,7 @@ public class SortableTableModel extends DefaultTableModel {
      */
     public boolean isSortable(final int column) {
     	
-        return false;
+        return true; //Added date: 2019.09.11
     }
 }
 

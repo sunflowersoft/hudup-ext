@@ -18,11 +18,11 @@ import net.hudup.core.parser.TextParsable;
  * }<br>
  * fetcher.close();
  * </code>
- * @param <E> type of elements that the fetcher iterates over.<br>
+ * @param <E> type of elements that the fetcher iterates over, which should be serializable.
  * @author Loc Nguyen
  * @version 10.0
  */
-public interface Fetcher<E extends Serializable> extends Remote, AutoCloseable, TextParsable, Serializable {
+public interface Fetcher<E /*extends Serializable*/> extends Remote, AutoCloseable, TextParsable, Serializable {
 
 	
 	/**

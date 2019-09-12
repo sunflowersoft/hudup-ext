@@ -1,6 +1,5 @@
 package net.hudup.core.data;
 
-import java.io.Serializable;
 import java.rmi.RemoteException;
 
 
@@ -13,7 +12,7 @@ import java.rmi.RemoteException;
  * @param <U> Key type.
  * @param <V> Value type.
  */
-public abstract class MetaFetcher<U extends Serializable, V extends Serializable> implements Fetcher<V> {
+public abstract class MetaFetcher<U /*extends Serializable*/, V /*extends Serializable*/> implements Fetcher<V> {
 
 	
 	/**

@@ -56,5 +56,6 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="lib" path="lib/xml-apis-2.0.2.jar" sourcepath="lib/src/xml-apis-2.0.2-sources.jar"/>
+	<classpathentry kind="lib" path="lib/elvira2-2005.jar" sourcepath="lib/src/elvira2-2005-src.zip"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

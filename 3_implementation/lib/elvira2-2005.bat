@@ -1,0 +1,1 @@
+java -cp elvira2-2005.jar elvira.Elvira -l ae 
