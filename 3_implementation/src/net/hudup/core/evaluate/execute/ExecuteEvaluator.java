@@ -59,18 +59,9 @@ public abstract class ExecuteEvaluator extends EvaluatorAbstract {
 	protected void unsetupAlg(Alg alg) {
 		// TODO Auto-generated method stub
 		try {
-			if (!alg.getConfig().getAsBoolean(DataConfig.DELAY_UNSETUP))
-				((ExecutableAlg)alg).unsetup();
-			else {
-				synchronized (delayUnsetupAlgs) {
-					delayUnsetupAlgs.add(alg);
-				}
-			}
+			((ExecutableAlg)alg).unsetup();
 		}
-		catch (Throwable e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		catch (Throwable e) {e.printStackTrace();}
 	}
 
 	

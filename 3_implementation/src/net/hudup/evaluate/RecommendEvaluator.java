@@ -9,7 +9,6 @@ import net.hudup.core.alg.RecommendParam;
 import net.hudup.core.alg.Recommender;
 import net.hudup.core.alg.SetupAlgEvent;
 import net.hudup.core.alg.TestAlg;
-import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.DatasetPair;
 import net.hudup.core.data.Fetcher;
@@ -308,7 +307,7 @@ public class RecommendEvaluator extends EvaluatorAbstract {
 						e.printStackTrace();
 					}
 					
-					unsetupAlg(recommender);
+					unsetupAlgSupportDelay(recommender);
 				}
 				
 				SystemUtil.enhanceAuto();
@@ -532,18 +531,9 @@ public class RecommendEvaluator extends EvaluatorAbstract {
 	protected void unsetupAlg(Alg alg) {
 		// TODO Auto-generated method stub
 		try {
-			if (!alg.getConfig().getAsBoolean(DataConfig.DELAY_UNSETUP))
-				((Recommender)alg).unsetup();
-			else {
-				synchronized (delayUnsetupAlgs) {
-					delayUnsetupAlgs.add(alg);
-				}
-			}
+			((Recommender)alg).unsetup();
 		}
-		catch (Throwable e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		catch (Throwable e) {e.printStackTrace();}
 	}
 
 

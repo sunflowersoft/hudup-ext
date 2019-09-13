@@ -12,6 +12,7 @@ import net.hudup.core.alg.ModelBasedRecommenderAbstract;
  * @version 10.0
  *
  */
+@CFAnnotation
 public abstract class ModelBasedCFAbstract extends ModelBasedRecommenderAbstract implements ModelBasedCF {
 
 

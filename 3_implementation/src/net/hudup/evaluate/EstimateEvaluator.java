@@ -230,7 +230,7 @@ public class EstimateEvaluator extends RecommendEvaluator {
 						e.printStackTrace();
 					}
 					
-					unsetupAlg(recommender);
+					unsetupAlgSupportDelay(recommender);
 				}
 				
 				SystemUtil.enhanceAuto();

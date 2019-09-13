@@ -9,6 +9,8 @@ import java.io.Serializable;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
 
 /**
@@ -51,9 +53,16 @@ public interface Inspector extends Serializable {
 			setLocationRelativeTo(null);
 			setLayout(new BorderLayout());
 			
-			JLabel info = new JLabel("Null inspector");
-			add(info, BorderLayout.CENTER);
+			JPanel body = new JPanel(new BorderLayout());
+			add(body, BorderLayout.CENTER);
 			
+			JLabel info = new JLabel("Null inspector");
+			info.setHorizontalAlignment(SwingConstants.CENTER);
+			body.add(info, BorderLayout.CENTER);
+			
+			JPanel footer = new JPanel();
+			add(footer, BorderLayout.SOUTH);
+
 			JButton close = new JButton("Close");
 			close.addActionListener(new ActionListener() {
 				
@@ -63,7 +72,7 @@ public interface Inspector extends Serializable {
 					dispose();
 				}
 			});
-			add(close, BorderLayout.SOUTH);
+			footer.add(close);
 		}
 		
 		@Override

@@ -5,6 +5,7 @@ import java.io.Serializable;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingConstants;
 
 /**
  * This class shows a waiting panel.
@@ -42,6 +43,7 @@ public class WaitPanel extends JPanel implements Serializable {
 		setLayout(new BorderLayout());
 		
 		lblWait = new JLabel(WAIT_TEXT);
+		lblWait.setHorizontalAlignment(SwingConstants.CENTER);
 		add(lblWait, BorderLayout.CENTER);
 	}
 

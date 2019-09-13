@@ -66,6 +66,12 @@ public class PropList implements TextParsable, Serializable, Cloneable {
 
 	
 	/**
+	 * The name of the key whose values are other invisible keys.
+	 */
+	private static final String INVISIBLE_KEYS = "invisiblekeys";
+
+	
+	/**
 	 * Name of root element of this properties list in XML format.
 	 * Root element has many parameter elements.
 	 */
@@ -126,6 +132,12 @@ public class PropList implements TextParsable, Serializable, Cloneable {
 	
 	
 	/**
+	 * The set of invisible keys.
+	 */
+	private Set<String> invisibleKeys = Util.newSet();
+
+	
+	/**
 	 * Specifying extended types of values in {@link PropList}.
 	 * <ul>
 	 * <li>{@code hidden}: {@link HiddenText}</li>
@@ -150,7 +162,7 @@ public class PropList implements TextParsable, Serializable, Cloneable {
 	 * Default constructor.
 	 */
 	public PropList() {
-		if (!(propMap instanceof Serializable) || !(readOnlyKeys instanceof Serializable) )
+		if (!(propMap instanceof Serializable) || !(readOnlyKeys instanceof Serializable)  || !(invisibleKeys instanceof Serializable))
 			throw new RuntimeException("Not serializable class");
 	}
 	
@@ -173,6 +185,7 @@ public class PropList implements TextParsable, Serializable, Cloneable {
 	public void clear() {
 		propMap.clear();
 		readOnlyKeys.clear();
+		invisibleKeys.clear();
 	}
 	
 	
@@ -254,6 +267,7 @@ public class PropList implements TextParsable, Serializable, Cloneable {
 		}
 		
 		readOnlyKeys.addAll(propList.readOnlyKeys);
+		invisibleKeys.addAll(propList.invisibleKeys);
 	}
 	
 	
@@ -271,6 +285,11 @@ public class PropList implements TextParsable, Serializable, Cloneable {
 		for (String key : propList.readOnlyKeys) {
 			if (containsKey(key))
 				readOnlyKeys.add(key);
+		}
+		
+		for (String key : propList.invisibleKeys) {
+			if (containsKey(key))
+				invisibleKeys.add(key);
 		}
 	}
 
@@ -298,7 +317,6 @@ public class PropList implements TextParsable, Serializable, Cloneable {
 			List<String> textList = TextParserUtil.parseListByClass(readonly, String.class, ",");
 			Set<String> thisKeys = keySet();
 			for (String text : textList) {
-				
 				boolean found = false;
 				for (String thisKey : thisKeys) {
 					if (thisKey.equals(text)) {
@@ -306,9 +324,24 @@ public class PropList implements TextParsable, Serializable, Cloneable {
 						break;
 					}
 				}
-				
-				if (found)
-					readOnlyKeys.add(text);
+				if (found) readOnlyKeys.add(text);
+			}
+		}
+		
+		//if the Specific Java {@link Properties} list contains key with name {@link #INVISIBLE_KEYS}, this list will keep its values as read-only entries.
+		if (properties.contains(INVISIBLE_KEYS)) {
+			String invisible = properties.get(INVISIBLE_KEYS).toString();
+			List<String> textList = TextParserUtil.parseListByClass(invisible, String.class, ",");
+			Set<String> thisKeys = keySet();
+			for (String text : textList) {
+				boolean found = false;
+				for (String thisKey : thisKeys) {
+					if (thisKey.equals(text)) {
+						found = true;
+						break;
+					}
+				}
+				if (found) invisibleKeys.add(text);
 			}
 		}
 		
@@ -782,6 +815,44 @@ public class PropList implements TextParsable, Serializable, Cloneable {
 	
 	
 	/**
+	 * Marking a key as invisible key.
+	 * @param key Specified key
+	 */
+	public void addInvisible(String key) {
+		invisibleKeys.add(key);
+	}
+	
+	
+	/**
+	 * Removing invisible mark on the specified key.
+	 * @param key Specified key
+	 */
+	public void removeInvisible(String key) {
+		invisibleKeys.remove(key);
+	}
+	
+	
+	/**
+	 * Checking whether this property list contains invisible key specified by the input parameter.
+	 * @param key Specified key
+	 * @return whether this property list contains the invisible key specified by the input parameter.
+	 */
+	public boolean containsInvisible(String key) {
+		return invisibleKeys.contains(key);
+	}
+	
+	
+	/**
+	 * After this method is called, there is no invisible entry.
+	 * Exactly, invisible entries become normal entries.
+	 * In other words, collection variable {@link #invisibleKeys} becomes empty.
+	 */
+	public void clearInvisible() {
+		invisibleKeys.clear();
+	}
+
+	
+	/**
 	 * Loading configuration settings from specified URI.
 	 * @param uri Specified URI. URI is represented by {@link xURI}.
 	 * @return whether loading successfully
@@ -953,6 +1024,10 @@ public class PropList implements TextParsable, Serializable, Cloneable {
 			if (key.equals(READ_ONLY_KEYS)) {
 				List<String> list = TextParserUtil.parseListByClass(value, String.class, ",");
 				rootPropList.readOnlyKeys.addAll(list);
+			}
+			else if (key.equals(INVISIBLE_KEYS)) {
+				List<String> list = TextParserUtil.parseListByClass(value, String.class, ",");
+				rootPropList.invisibleKeys.addAll(list);
 			}
 			else if(type.equals(Attribute.toTypeString(Type.bit)))
 				rootPropList.put(key, Boolean.parseBoolean(value));
@@ -1189,6 +1264,12 @@ public class PropList implements TextParsable, Serializable, Cloneable {
 		readOnlyKeysElement.setAttribute(ELEMENT_TYPE, Attribute.toTypeString(Type.string));
 		readOnlyKeysElement.setAttribute(ELEMENT_VALUE, TextParserUtil.toText(readOnlyKeys, ","));
 		rootElement.appendChild(readOnlyKeysElement);
+		
+		Element invisibleKeysElement = doc.createElement(ELEMENT_PARAM);
+		invisibleKeysElement.setAttribute(ELEMENT_KEY, INVISIBLE_KEYS);
+		invisibleKeysElement.setAttribute(ELEMENT_TYPE, Attribute.toTypeString(Type.string));
+		invisibleKeysElement.setAttribute(ELEMENT_VALUE, TextParserUtil.toText(invisibleKeys, ","));
+		rootElement.appendChild(invisibleKeysElement);
 	}
 	
 	
@@ -1232,6 +1313,7 @@ public class PropList implements TextParsable, Serializable, Cloneable {
 		}
 		
 		properties.put(READ_ONLY_KEYS, TextParserUtil.toText(readOnlyKeys, ","));
+		properties.put(INVISIBLE_KEYS, TextParserUtil.toText(invisibleKeys, ","));
 		return properties;
 	}
 	
@@ -1472,8 +1554,7 @@ public class PropList implements TextParsable, Serializable, Cloneable {
 		clear();
 		
 		List<String> list = TextParserUtil.parseTextList(spec, TextParserUtil.EXTRA_SEP);
-		if (list.size() == 0)
-			return;
+		if (list.size() == 0) return;
 		
 		
 		List<String> list2 = TextParserUtil.parseTextList(list.get(0), ",");
@@ -1484,10 +1565,16 @@ public class PropList implements TextParsable, Serializable, Cloneable {
 			
 			put(TextParserUtil.decryptReservedChars(pair.get(0)), TextParserUtil.decryptReservedChars(pair.get(1)));
 		}
+		if (list.size() < 2) return;
 		
 		
 		List<String> readOnlyList = TextParserUtil.parseTextList(list.get(1), ",");
 		readOnlyKeys.addAll(TextParserUtil.decryptReservedChars(readOnlyList));
+		if (list.size() < 3) return;
+		
+		
+		List<String> invisibleList = TextParserUtil.parseTextList(list.get(2), ",");
+		invisibleKeys.addAll(TextParserUtil.decryptReservedChars(invisibleList));
 	}
 	
 	
@@ -1512,13 +1599,22 @@ public class PropList implements TextParsable, Serializable, Cloneable {
 			k++;
 		}
 		
+		
 		buffer.append(TextParserUtil.EXTRA_SEP);
 		List<String> readOnlyList = Util.newList();
 		for (String key : readOnlyKeys) {
 			readOnlyList.add(key);
 		}
-		buffer.append(
-			TextParserUtil.toText(TextParserUtil.encryptReservedChars(readOnlyList), ","));
+		buffer.append(TextParserUtil.toText(TextParserUtil.encryptReservedChars(readOnlyList), ","));
+		
+		
+		buffer.append(TextParserUtil.EXTRA_SEP);
+		List<String> invisibleList = Util.newList();
+		for (String key : invisibleKeys) {
+			invisibleList.add(key);
+		}
+		buffer.append(TextParserUtil.toText(TextParserUtil.encryptReservedChars(invisibleList), ","));
+
 		
 		return buffer.toString();
 	}

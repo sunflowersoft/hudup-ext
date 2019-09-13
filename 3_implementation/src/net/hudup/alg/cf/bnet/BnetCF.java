@@ -1,6 +1,7 @@
 package net.hudup.alg.cf.bnet;
 
 import java.awt.Component;
+import java.awt.Frame;
 import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.util.Collection;
@@ -8,15 +9,20 @@ import java.util.List;
 import java.util.Set;
 import java.util.Vector;
 
+import javax.swing.JDialog;
 import javax.swing.JOptionPane;
+import javax.swing.WindowConstants;
 
 import elvira.Bnet;
 import elvira.CaseListMem;
 import elvira.Evidence;
 import elvira.NodeList;
 import elvira.database.DataBaseCases;
+import elvira.gui.ElviraDesktopPane;
+import elvira.gui.NetworkFrame;
 import elvira.learning.BICLearning;
 import elvira.learning.K2Learning;
+import elvira.learning.LPLearning;
 import elvira.learning.Learning;
 import net.hudup.core.Util;
 import net.hudup.core.alg.Alg;
@@ -27,6 +33,7 @@ import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.Fetcher;
 import net.hudup.core.data.RatingVector;
+import net.hudup.core.logistic.Inspector;
 import net.hudup.core.logistic.NextUpdate;
 import net.hudup.core.logistic.RatingFilter;
 import net.hudup.core.logistic.UriAdapter;
@@ -142,7 +149,10 @@ public class BnetCF extends BnetAbstractCF {
 	public DataConfig createDefaultConfig() {
 		DataConfig superConfig = super.createDefaultConfig();
 		superConfig.put(BnetKB.K2_MAX_PARENTS, new Integer(BnetKB.K2_MAX_PARENTS_DEFAULT));
+		superConfig.addInvisible(BnetKB.K2_MAX_PARENTS);
+		
 		superConfig.put(BnetKB.LEARNING_METHOD_FIELD, BnetKB.K2);
+		superConfig.addInvisible(BnetKB.LEARNING_METHOD_FIELD);
 		
 		DataConfig config = new DataConfig() {
 
@@ -195,7 +205,6 @@ public class BnetCF extends BnetAbstractCF {
  * @version 10.0
  *
  */
-@NextUpdate
 abstract class BnetKB extends KBaseAbstract {
 
 	
@@ -311,7 +320,7 @@ abstract class BnetKB extends KBaseAbstract {
 		Learning bnetLearner = null;
 		String method = config.getAsString(LEARNING_METHOD_FIELD);
 		if (method.equals(BIC)) {
-			bnetLearner = new BICLearning(dbc);
+			bnetLearner = new BICLearning(dbc); //BIC learning not working. Fixing later.
 			bnetLearner.learning();
 		}
 		else {
@@ -321,8 +330,8 @@ abstract class BnetKB extends KBaseAbstract {
 			bnetLearner.learning();
 		}
 		
-//		DELearning de = new DELearning(dbc, bnetLearner.getOutput());
-//	    de.learning();
+		bnetLearner = new LPLearning(dbc, bnetLearner.getOutput());
+		bnetLearner.learning();
 	    Bnet bnet = bnetLearner.getOutput();
 		bnetList.add(bnet);
 		
@@ -368,6 +377,60 @@ abstract class BnetKB extends KBaseAbstract {
 		return bnetList;
 	}
 	
+	
+	@NextUpdate
+	@Override
+	public Inspector getInspector() {
+		// TODO Auto-generated method stub
+		if (bnetList.size() == 0)
+			return super.getInspector();
+		else
+			return super.getInspector();
+	}
+
+
+	/**
+	 * Inspector for Bayesian network knowledge base.
+	 * @author Loc Nguyen
+	 * @version 12
+	 */
+	@NextUpdate
+	public class BnetInspector extends JDialog implements Inspector {
+
+		/**
+		 * Default serial version UID.
+		 */
+		private static final long serialVersionUID = 1L;
+
+		/**
+		 * Constructor with specified Bayesian network.
+		 * @param bnet specified Bayesian network.
+		 */
+		public BnetInspector(Bnet bnet) {
+			// TODO Auto-generated constructor stub
+			super((Frame)null, "Inspector for Bayesian network knowledge base", true);
+			
+			setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+			setSize(600, 400);
+			setLocationRelativeTo(null);
+			
+			ElviraDesktopPane desktopPane = new ElviraDesktopPane();
+			setContentPane(desktopPane);
+			
+			NetworkFrame networkFrame = new NetworkFrame();
+			networkFrame.setVisible(true);
+			desktopPane.add(networkFrame);
+			networkFrame.getEditorPanel().setBayesNet(bnet);
+		}
+
+		@Override
+		public void inspect() {
+			// TODO Auto-generated method stub
+			setVisible(true);
+		}
+
+	}
+
 	
 	/**
 	 * Creating knowledge base from collaborative filtering algorithm based on Bayesian network.

@@ -82,6 +82,8 @@ public class DatasetPoolTable extends JTable {
 			@Override
 			public void keyPressed(KeyEvent e) {
 				// TODO Auto-generated method stub
+				if (!isEnabled2()) return;
+				
 				if (e.getKeyCode() == KeyEvent.VK_DELETE)
 					removeSelectedRows();
 			}
@@ -200,7 +202,7 @@ public class DatasetPoolTable extends JTable {
 			if (!(dataset instanceof Pointer) ) {
 				contextMenu.addSeparator();
 				
-				JMenuItem miMetadata = UIUtil.makeMenuItem((String)null, "View metadata", 
+				JMenuItem miViewMetadata = UIUtil.makeMenuItem((String)null, "View metadata", 
 					new ActionListener() {
 						
 						public void actionPerformed(ActionEvent e) {
@@ -211,11 +213,12 @@ public class DatasetPoolTable extends JTable {
 						
 					});
 				
-				contextMenu.add(miMetadata);
+				contextMenu.add(miViewMetadata);
 
-				JMenuItem miData = UIUtil.makeMenuItem((String)null, "View data", 
+				JMenuItem miViewData = UIUtil.makeMenuItem((String)null, "View data", 
 					new ActionListener() {
 						
+						@Override
 						public void actionPerformed(ActionEvent e) {
 							int confirm = JOptionPane.showConfirmDialog(
 									getThis(), 
@@ -229,14 +232,16 @@ public class DatasetPoolTable extends JTable {
 						}
 					});
 				
-				contextMenu.add(miData);
+				contextMenu.add(miViewData);
+				
 			}
 			else if (dataset instanceof KBasePointer) {
 				contextMenu.addSeparator();
 
-				JMenuItem miData = UIUtil.makeMenuItem((String)null, "View knowledge base", 
+				JMenuItem miViewKB = UIUtil.makeMenuItem((String)null, "View knowledge base", 
 					new ActionListener() {
 						
+						@Override
 						public void actionPerformed(ActionEvent e) {
 							int confirm = JOptionPane.showConfirmDialog(
 									getThis(), 
@@ -278,7 +283,7 @@ public class DatasetPoolTable extends JTable {
 						} //end actionPerformed
 						
 					}); //end ActionListener
-				contextMenu.add(miData);
+				contextMenu.add(miViewKB);
 				
 			}
 		}

@@ -263,20 +263,16 @@ public class PropTable extends JTable {
 	
 	/**
 	 * Render of hidden text represented by {@link HiddenText} guides how to show a hidden text.
-	 * 
 	 * @author Loc Nguyen
 	 * @version 10.0
-	 *
 	 */
 	private class HiddenTextCellRenderer extends DefaultTableCellRenderer.UIResource {
 
-		
 		/**
 		 * Serial version UID for serializable class. 
 		 */
 		private static final long serialVersionUID = 1L;
 
-		
 		/**
 		 * Default constructor.
 		 */
@@ -284,7 +280,6 @@ public class PropTable extends JTable {
 			super();
 			// TODO Auto-generated constructor stub
 		}
-		
 		
 		/**
 		 * Setting value (hidden text) into the cell.
@@ -307,20 +302,16 @@ public class PropTable extends JTable {
 	
 	/**
 	 * Editor of hidden text represented by {@link HiddenText} guides how to edit a hidden text.
-	 * 
 	 * @author Loc Nguyen
 	 * @version 10.0
-	 *
 	 */
 	private class HiddenTextCellEditor extends DefaultCellEditor {
 
-		
 		/**
 		 * Serial version UID for serializable class. 
 		 */
 		private static final long serialVersionUID = 1L;
 
-		
 		/**
 		 * Default constructor. HiddenText is encrypted.
 		 */
@@ -328,11 +319,9 @@ public class PropTable extends JTable {
 			super(new JPasswordField());
 		}
 		
-		
 	}
 	
 	
-
 }
 
 
@@ -404,6 +393,8 @@ class PropTableModel extends DefaultTableModel {
 		
 		Vector<Vector<Serializable>> data = Util.newVector();
 		for (String key : keys) {
+			if (propList.containsInvisible(key)) continue;
+			
 			Vector<Serializable> row = Util.newVector();
 			
 			row.add(key);

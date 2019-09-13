@@ -198,7 +198,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 			return;
 		}
 		
-		unsetupAlgs(); //This code line is important.
+		clearDelayUnsetupAlgs(); //This code line is important.
 		
 		this.algList = algList;
 		this.pool = pool;
@@ -400,7 +400,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 						e.printStackTrace();
 					}
 					
-					unsetupAlg(alg);
+					unsetupAlgSupportDelay(alg);
 				}
 				
 				SystemUtil.enhanceAuto();
@@ -434,7 +434,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 	
 	
 	/**
-	 * Unsetting up specified algorithm based on training dataset and additional parameters.
+	 * Unsetting up specified algorithm.
 	 * This method is always called by another method and so it is not synchronized.
 	 * @param alg specified algorithm.
 	 */
@@ -442,10 +442,26 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 	
 	
 	/**
-	 * Clearing unsetting up algorithms.
+	 * Unsetting up specified algorithm with support delaying.
+	 * This method is always called by another method and so it is not synchronized.
+	 * @param alg specified algorithm.
+	 */
+	protected void unsetupAlgSupportDelay(Alg alg) {
+		if (!alg.getConfig().getAsBoolean(DataConfig.DELAY_UNSETUP))
+			unsetupAlg(alg);
+		else {
+			synchronized (delayUnsetupAlgs) {
+				delayUnsetupAlgs.add(alg);
+			}
+		}
+	}
+	
+	
+	/**
+	 * Clearing delay unsetting up algorithms.
 	 * This method is not synchronized because it is also called by another method as {@link #close()} method.
 	 */
-	protected void unsetupAlgs() {
+	protected void clearDelayUnsetupAlgs() {
 		synchronized (delayUnsetupAlgs) {
 			for (Alg alg : delayUnsetupAlgs) {
 				unsetupAlg(alg);
@@ -828,7 +844,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 	public synchronized void close() throws Exception {
 		// TODO Auto-generated method stub
 		try {
-			unsetupAlgs();
+			clearDelayUnsetupAlgs();
 		}
 		catch (Throwable e) {
 			e.printStackTrace();

@@ -332,7 +332,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 				
 		    	contextMenu.addSeparator();
 		    	
-				JMenuItem miTraining = UIUtil.makeMenuItem((String)null, "Training", 
+				JMenuItem miTraining = UIUtil.makeMenuItem((String)null, "Add training", 
 					new ActionListener() {
 						
 						@Override
@@ -508,36 +508,6 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 		        }
 			}
 
-			@Override
-			protected void addToContextMenu(JPopupMenu contextMenu) {
-				// TODO Auto-generated method stub
-				super.addToContextMenu(contextMenu);
-				if (!isEnabled2() || contextMenu == null)
-						return;
-				
-				contextMenu.addSeparator();
-				
-				JMenuItem miRefresh = UIUtil.makeMenuItem((String)null, "Refresh", 
-					new ActionListener() {
-						
-						@Override
-						public void actionPerformed(ActionEvent e) {
-							refresh();
-						}
-					});
-				contextMenu.add(miRefresh);
-				
-				JMenuItem miClear = UIUtil.makeMenuItem((String)null, "Clear", 
-						new ActionListener() {
-							
-							@Override
-							public void actionPerformed(ActionEvent e) {
-								clear();
-							}
-						});
-				contextMenu.add(miClear);
-			}
-			
 		};
 		this.tblDatasetPool.setPreferredScrollableViewportSize(new Dimension(200, 80));
 		down.add(new JScrollPane(this.tblDatasetPool), BorderLayout.CENTER);
@@ -588,7 +558,6 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 				}
 			});
 		this.btnRefresh.setMargin(new Insets(0, 0 , 0, 0));
-		this.btnRefresh.setVisible(false); //Added date: 2019.09.13 by Loc Nguyen
 		toolGrp2.add(this.btnRefresh);
 
 		this.btnClear = UIUtil.makeIconButton(
@@ -607,7 +576,6 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 				
 			});
 		this.btnClear.setMargin(new Insets(0, 0 , 0, 0));
-		this.btnClear.setVisible(false); //Added date: 2019.09.13 by Loc Nguyen
 		toolGrp2.add(this.btnClear);
 
 		this.btnForceStop = UIUtil.makeIconButton(

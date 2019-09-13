@@ -72,7 +72,8 @@ public interface KBase extends Inspectable, Serializable {
 	 * Every KBase always has a configuration represented by {@link DataConfig} class.
 	 * This constant defines the default file (archive) name of such configuration.
 	 */
-	public final static String KBASE_CONFIG = "kbase" + TextParserUtil.CONNECT_SEP + "cfg";
+	public final static String KBASE_CONFIG = "kbase" + TextParserUtil.CONNECT_SEP + "cfg"; //Use JSON format
+	//public final static String KBASE_CONFIG = "kbase" + TextParserUtil.CONNECT_SEP + "cfg.xml"; //Use XML format
 	
 	
 	/**

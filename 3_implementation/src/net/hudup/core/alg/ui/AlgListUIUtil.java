@@ -10,6 +10,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 
 import net.hudup.core.alg.Alg;
+import net.hudup.core.alg.KBase;
+import net.hudup.core.alg.ModelBasedAlg;
 import net.hudup.core.logistic.Inspectable;
 import net.hudup.core.logistic.Inspector;
 import net.hudup.core.logistic.ui.UIUtil;
@@ -51,7 +53,7 @@ public final class AlgListUIUtil {
 			});
 		ctxMenu.add(miConfig);
 		
-		//Showing description of the algorithm
+		//Showing inspector of the algorithm
 		if (alg instanceof Inspectable) {
 			JMenuItem miInspect = new JMenuItem("Inspect");
 			miInspect.addActionListener( 
@@ -64,7 +66,6 @@ public final class AlgListUIUtil {
 							inspector = ((Inspectable)alg).getInspector();
 							if (inspector != null) inspector.inspect();
 						} catch (Exception ex) {
-							// TODO Auto-generated catch block
 							ex.printStackTrace();
 							inspector = null;
 						}
@@ -74,6 +75,32 @@ public final class AlgListUIUtil {
 				});
 			ctxMenu.add(miInspect);
 		}
+		
+		//Showing inspector of the algorithm
+		if (alg instanceof ModelBasedAlg) {
+			JMenuItem miViewKB = new JMenuItem("View knowledge base");
+			miViewKB.addActionListener( 
+				new ActionListener() {
+					
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						Inspector inspector = null;
+						try {
+							KBase kbase = ((ModelBasedAlg)alg).getKBase();
+							if (kbase != null && !kbase.isEmpty())
+								inspector = kbase.getInspector();
+							if (inspector != null) inspector.inspect();
+						} catch (Exception ex) {
+							ex.printStackTrace();
+							inspector = null;
+						}
+						if (inspector == null)
+							JOptionPane.showMessageDialog(UIUtil.getFrameForComponent((Component)ui), "Cannot view knowledge base", "Cannot view knowledge base", JOptionPane.ERROR_MESSAGE);
+					}
+				});
+			ctxMenu.add(miViewKB);
+		}
+
 		
 		return ctxMenu;
 	}

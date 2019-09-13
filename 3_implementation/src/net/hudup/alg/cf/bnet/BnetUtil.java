@@ -200,19 +200,11 @@ public class BnetUtil {
 		Vector<FiniteStates> vars = new Vector<FiniteStates>();
 		Vector<Integer> vals = new Vector<Integer>();
 		
-		for (int i = 0; i < nodeList.size(); i++) { //Added date: 2019.09.12 by Loc Nguyen.
-			FiniteStates node = (FiniteStates)nodeList.elementAt(i);
-			vars.add(node);
-			vals.add(-1);
-		}
-		
-		
 		List<RatingTriple> triples = RatingTriple.getUserRatings(userRating);
 		for (RatingTriple triple : triples) {
 			int itemId = triple.itemId();
 			String nodeName = createItemNodeName(itemId);
-			int nodePos = nodeList.getId(nodeName);
-			if (nodePos == -1)
+			if (nodeList.getId(nodeName) == -1)
 				continue;
 			
 			FiniteStates node = (FiniteStates)nodeList.getNode(nodeName);
@@ -230,9 +222,8 @@ public class BnetUtil {
 			}
 			
 			if (found != -1) {
-//				vars.addElement(node);
-//				vals.add(value);
-				vals.set(nodePos, value); //Added date: 2019.09.12 by Loc Nguyen.
+				vars.addElement(node);
+				vals.add(value);
 			}
 		}
 		

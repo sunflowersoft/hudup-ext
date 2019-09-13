@@ -14,6 +14,7 @@ import net.hudup.core.alg.MemoryBasedRecommenderAbstract;
  * @version 10.0
  *
  */
+@CFAnnotation
 public abstract class MemoryBasedCFAbstract extends MemoryBasedRecommenderAbstract implements MemoryBasedCF {
 
 	
