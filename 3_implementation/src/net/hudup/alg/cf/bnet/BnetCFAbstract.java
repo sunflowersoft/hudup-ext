@@ -30,7 +30,7 @@ import net.hudup.evaluate.ui.EvaluateGUI;
  * @version 10.0
  *
  */
-public abstract class BnetAbstractCF extends ModelBasedCFAbstract {
+public abstract class BnetCFAbstract extends ModelBasedCFAbstract {
 
 	
 	/**
@@ -42,7 +42,7 @@ public abstract class BnetAbstractCF extends ModelBasedCFAbstract {
 	/**
 	 * Default constructor.
 	 */
-	public BnetAbstractCF() {
+	public BnetCFAbstract() {
 		super();
 	}
 	

@@ -221,11 +221,22 @@ public final class Util {
 		
 		Object instance = null;
 		try {
-			instance = Class.forName(className).newInstance();
+			if (className.contains("$")) {
+				try {
+					instance = Class.forName(className).newInstance();
+				}
+				catch (Throwable e) {
+					System.out.println("Cannot instantiate inner class " + className);
+					instance = null;
+				}
+			}
+			else
+				instance = Class.forName(className).newInstance();
 		} 
-		catch (Exception e) {
+		catch (Throwable e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			instance = null;
 		}
 		
 		return instance;

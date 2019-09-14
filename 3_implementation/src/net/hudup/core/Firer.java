@@ -207,8 +207,20 @@ public class Firer implements PluginManager {
 		for (Class<? extends Alg> compositeAlgClass : compositeAlgClassList) {
 			try {
 				Alg compositeAlg = Util.newInstance(compositeAlgClass);
-				if (compositeAlg != null)
-					registerAlg(compositeAlg);
+				if (compositeAlg == null) continue;
+				
+				NextUpdate nextUpdate = compositeAlgClass.getAnnotation(NextUpdate.class);
+				if (nextUpdate != null) {
+					PluginStorage.getNextUpdateList().add(compositeAlg);
+					if (nextUpdateLog != null) {
+						nextUpdateLog.write("\n\n");
+						nextUpdateLog.write(compositeAlgClass.toString() + "\n\tNote: " + nextUpdate.note());
+					}
+					
+					continue;
+				}
+
+				registerAlg(compositeAlg);
 			}
 			catch (Exception e) {e.printStackTrace();}
 		}

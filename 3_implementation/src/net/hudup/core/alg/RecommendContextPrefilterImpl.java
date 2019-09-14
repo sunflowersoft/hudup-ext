@@ -8,7 +8,6 @@ import net.hudup.core.data.Dataset;
 import net.hudup.core.data.Rating;
 import net.hudup.core.data.RatingVector;
 import net.hudup.core.data.ctx.ContextList;
-import net.hudup.core.logistic.BaseClass;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.NextUpdate;
 
@@ -20,7 +19,7 @@ import net.hudup.core.logistic.NextUpdate;
  * @version 10.0
  *
  */
-@BaseClass //This class is not really a base class but the notation "BaseClass" makes it not registered in plug-in storage.
+//@BaseClass //This class is not really a base class but the notation "BaseClass" makes it not registered in plug-in storage.
 @NextUpdate
 //@Deprecated //This class should be annotated as deprecated class instead of being annotated as base class so that it is easy to improve it.
 public class RecommendContextPrefilterImpl extends CompositeRecommenderAbstract implements RecommendContextPrefilter {

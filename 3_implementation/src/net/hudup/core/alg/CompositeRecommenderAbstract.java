@@ -3,6 +3,7 @@ package net.hudup.core.alg;
 import java.rmi.RemoteException;
 
 import net.hudup.core.Constants;
+import net.hudup.core.Util;
 import net.hudup.core.alg.cf.NeighborCFItemBased;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Dataset;
@@ -48,7 +49,20 @@ public abstract class CompositeRecommenderAbstract extends RecommenderAbstract i
 	public DataConfig createDefaultConfig() {
 		// TODO Auto-generated method stub
 		DataConfig config = super.createDefaultConfig();
+		
+		boolean fixedStore = false;
+		try {
+			String fixedText = Util.getHudupProperty("kb_fixedstore");
+			if (fixedText != null && !fixedText.isEmpty())
+				fixedStore = Boolean.parseBoolean(fixedText);
+		}
+		catch (Exception e) {
+			fixedStore= false;
+		}
+		
 		xURI store = xURI.create(Constants.KNOWLEDGE_BASE_DIRECTORY).concat(getName());
+		if (!fixedStore)
+			store = xURI.create(Constants.KNOWLEDGE_BASE_DIRECTORY).concat(getName()).concat("" + new java.util.Date().getTime());
 		config.setStoreUri(store);
 		
 		try {

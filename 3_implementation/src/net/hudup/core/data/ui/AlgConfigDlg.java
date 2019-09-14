@@ -203,7 +203,7 @@ class AlgConfigDlg extends JDialog {
 		});
 		footer.add(btnApply);
 
-		JButton btnOk = new JButton("Ok");
+		JButton btnOk = new JButton("OK");
 		btnOk.addActionListener(new ActionListener(){
 
 			@Override

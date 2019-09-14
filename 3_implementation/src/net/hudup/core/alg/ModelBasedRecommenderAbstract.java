@@ -64,9 +64,9 @@ public abstract class ModelBasedRecommenderAbstract extends RecommenderAbstract 
 			if (pointerStoreUri != null && !pointerStoreUri.equals(kb.getConfig().getStoreUri())) {
 				kb.getConfig().setStoreUri(pointerStoreUri); //Also affect store URI of algorithm.
 			}
-			boolean delayUnsetup = kb.getConfig().getAsBoolean(DataConfig.DELAY_UNSETUP);
+			//boolean delayUnsetup = kb.getConfig().getAsBoolean(DataConfig.DELAY_UNSETUP);
 			kb.load();
-			kb.getConfig().put(DataConfig.DELAY_UNSETUP, delayUnsetup); //Restore delay unsetup property.
+			//kb.getConfig().put(DataConfig.DELAY_UNSETUP, delayUnsetup); //Restore delay unsetup property.
 			
 			dataset.getConfig().putAll(kb.getConfig());
 		}

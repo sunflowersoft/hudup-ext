@@ -86,6 +86,7 @@ public abstract class AlgAbstract implements Alg, AlgRemote {
 		// TODO Auto-generated method stub
 		DataConfig config = new DataConfig();
 		config.put(DataConfig.DELAY_UNSETUP, false); //Please pay attention to this code line.
+//		config.addUnsaved(DataConfig.DELAY_UNSETUP);
 		return config;
 	}
 

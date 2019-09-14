@@ -10,6 +10,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.Serializable;
 import java.util.List;
+import java.util.Set;
 import java.util.Vector;
 
 import javax.swing.DefaultCellEditor;
@@ -501,8 +502,15 @@ class PropTableModel extends DefaultTableModel {
 	 */
 	public boolean apply() {
 		PropList newPropList = getModelPropList();
-		propList.clear();
+		//propList.clear(); //Fixed date: 2019.09.14 by Loc Nguyen.
 		propList.putAll(newPropList);
+		
+		Set<String> keys = Util.newSet();
+		keys.addAll(propList.keySet());
+		for (String key : keys) {
+			if (!newPropList.containsKey(key) && !propList.containsInvisible(key))
+				propList.remove(key); //Allow to remove keys on GUI.
+		}
 		
 		modified = false;
 		return true;

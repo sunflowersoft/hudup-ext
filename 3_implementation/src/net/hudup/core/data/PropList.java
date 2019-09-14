@@ -58,7 +58,7 @@ public class PropList implements TextParsable, Serializable, Cloneable {
 
 
 	/**
-	 * The name of the key whose values are other read-only keys.
+	 * The name of the key whose values are read-only keys.
 	 * For example, if the value associated of READ_ONLY_KEYS is &quot;minRating, maxRating&quot;,
 	 * the values of two keys &quot;minRating&quot;, &quot;maxRating&quot; are read-only.
 	 */
@@ -66,9 +66,15 @@ public class PropList implements TextParsable, Serializable, Cloneable {
 
 	
 	/**
-	 * The name of the key whose values are other invisible keys.
+	 * The name of the key whose values are invisible keys.
 	 */
 	private static final String INVISIBLE_KEYS = "invisiblekeys";
+
+	
+//	/**
+//	 * The name of the key whose values are unsaved.
+//	 */
+//	private static final String UNSAVED_KEYS = "unsavedkeys";
 
 	
 	/**
@@ -137,6 +143,12 @@ public class PropList implements TextParsable, Serializable, Cloneable {
 	private Set<String> invisibleKeys = Util.newSet();
 
 	
+//	/**
+//	 * The set of unsaved keys.
+//	 */
+//	private Set<String> unsavedKeys = Util.newSet();
+
+	
 	/**
 	 * Specifying extended types of values in {@link PropList}.
 	 * <ul>
@@ -162,7 +174,10 @@ public class PropList implements TextParsable, Serializable, Cloneable {
 	 * Default constructor.
 	 */
 	public PropList() {
-		if (!(propMap instanceof Serializable) || !(readOnlyKeys instanceof Serializable)  || !(invisibleKeys instanceof Serializable))
+		if (!(propMap instanceof Serializable) || !(readOnlyKeys instanceof Serializable)
+				|| !(invisibleKeys instanceof Serializable)
+//				|| !(unsavedKeys instanceof Serializable)
+			)
 			throw new RuntimeException("Not serializable class");
 	}
 	
@@ -186,6 +201,7 @@ public class PropList implements TextParsable, Serializable, Cloneable {
 		propMap.clear();
 		readOnlyKeys.clear();
 		invisibleKeys.clear();
+//		unsavedKeys.clear();
 	}
 	
 	
@@ -268,6 +284,7 @@ public class PropList implements TextParsable, Serializable, Cloneable {
 		
 		readOnlyKeys.addAll(propList.readOnlyKeys);
 		invisibleKeys.addAll(propList.invisibleKeys);
+//		unsavedKeys.addAll(propList.unsavedKeys);
 	}
 	
 	
@@ -291,6 +308,11 @@ public class PropList implements TextParsable, Serializable, Cloneable {
 			if (containsKey(key))
 				invisibleKeys.add(key);
 		}
+		
+//		for (String key : propList.unsavedKeys) {
+//			if (containsKey(key))
+//				unsavedKeys.add(key);
+//		}
 	}
 
 	
@@ -312,41 +334,43 @@ public class PropList implements TextParsable, Serializable, Cloneable {
 		}
 		
 		//if the Specific Java {@link Properties} list contains key with name {@link #READ_ONLY_KEYS}, this list will keep its values as read-only entries.
-		if (properties.contains(READ_ONLY_KEYS)) {
-			String readonly = properties.get(READ_ONLY_KEYS).toString();
-			List<String> textList = TextParserUtil.parseListByClass(readonly, String.class, ",");
-			Set<String> thisKeys = keySet();
-			for (String text : textList) {
-				boolean found = false;
-				for (String thisKey : thisKeys) {
-					if (thisKey.equals(text)) {
-						found = true;
-						break;
-					}
-				}
-				if (found) readOnlyKeys.add(text);
-			}
-		}
+		addSpecialKeys(properties, READ_ONLY_KEYS, readOnlyKeys);
 		
-		//if the Specific Java {@link Properties} list contains key with name {@link #INVISIBLE_KEYS}, this list will keep its values as read-only entries.
-		if (properties.contains(INVISIBLE_KEYS)) {
-			String invisible = properties.get(INVISIBLE_KEYS).toString();
-			List<String> textList = TextParserUtil.parseListByClass(invisible, String.class, ",");
-			Set<String> thisKeys = keySet();
-			for (String text : textList) {
-				boolean found = false;
-				for (String thisKey : thisKeys) {
-					if (thisKey.equals(text)) {
-						found = true;
-						break;
-					}
-				}
-				if (found) invisibleKeys.add(text);
-			}
-		}
+		//if the Specific Java {@link Properties} list contains key with name {@link #INVISIBLE_KEYS}, this list will keep its values as invisible entries.
+		addSpecialKeys(properties, INVISIBLE_KEYS, invisibleKeys);
 		
+//		//if the Specific Java {@link Properties} list contains key with name {@link #NOTSAVED_KEYS}, this list will keep its values as unsaved entries.
+//		addSpecialKeys(properties, UNSAVED_KEYS, unsavedKeys);
 	}
 	
+	
+	/**
+	 * Adding special keys like read-only keys, invisible keys, unsaved keys.
+	 * @param properties given properties.
+	 * @param keySetName name of key set.
+	 * @param keySet given key set.
+	 */
+	private void addSpecialKeys(Properties properties, String keySetName, Set<String> keySet) {
+		if (properties.contains(keySetName)) {
+			String keySetValue = properties.get(keySetName).toString();
+			addSpecialKeys(keySetValue, keySet);
+		}
+	}
+	
+	
+	/**
+	 * Adding special keys like read-only keys, invisible keys, unsaved keys.
+	 * @param keySetValue key set value.
+	 * @param keySet given key set.
+	 */
+	private void addSpecialKeys(String keySetValue, Set<String> keySet) {
+		List<String> textList = TextParserUtil.parseListByClass(keySetValue, String.class, ",");
+		Set<String> thisKeys = keySet();
+		for (String text : textList) {
+			if (thisKeys.contains(text)) keySet.add(text);
+		}
+	}
+
 	
 	/**
 	 * Getting value associated with specific key.
@@ -363,8 +387,15 @@ public class PropList implements TextParsable, Serializable, Cloneable {
 	 * @param key Specific key
 	 */
 	public void remove(String key) {
-		if (propMap.containsKey(key))
-			propMap.remove(key);
+		if (!propMap.containsKey(key)) return;
+
+		propMap.remove(key);
+		
+		try {
+			removeReadOnly(key);
+			removeInvisible(key);
+//			removeUnsaved(key);
+		} catch (Throwable e) {e.printStackTrace();}
 	}
 	
 	
@@ -851,6 +882,44 @@ public class PropList implements TextParsable, Serializable, Cloneable {
 		invisibleKeys.clear();
 	}
 
+
+//	/**
+//	 * Marking a key as unsaved key.
+//	 * @param key Specified key
+//	 */
+//	public void addUnsaved(String key) {
+//		unsavedKeys.add(key);
+//	}
+//	
+//	
+//	/**
+//	 * Removing unsaved mark on the specified key.
+//	 * @param key Specified key
+//	 */
+//	public void removeUnsaved(String key) {
+//		unsavedKeys.remove(key);
+//	}
+//	
+//	
+//	/**
+//	 * Checking whether this property list contains unsaved key specified by the input parameter.
+//	 * @param key Specified key
+//	 * @return whether this property list contains the unsaved key specified by the input parameter.
+//	 */
+//	public boolean containsUnsaved(String key) {
+//		return unsavedKeys.contains(key);
+//	}
+//	
+//	
+//	/**
+//	 * After this method is called, there is no unsaved entry.
+//	 * Exactly, unsaved entries become normal entries.
+//	 * In other words, collection variable {@link #unsavedKeys} becomes empty.
+//	 */
+//	public void clearUnsaved() {
+//		unsavedKeys.clear();
+//	}
+
 	
 	/**
 	 * Loading configuration settings from specified URI.
@@ -1029,6 +1098,10 @@ public class PropList implements TextParsable, Serializable, Cloneable {
 				List<String> list = TextParserUtil.parseListByClass(value, String.class, ",");
 				rootPropList.invisibleKeys.addAll(list);
 			}
+//			else if (key.equals(UNSAVED_KEYS)) {
+//				List<String> list = TextParserUtil.parseListByClass(value, String.class, ",");
+//				rootPropList.unsavedKeys.addAll(list);
+//			}
 			else if(type.equals(Attribute.toTypeString(Type.bit)))
 				rootPropList.put(key, Boolean.parseBoolean(value));
 			else if(type.equals(Attribute.toTypeString(Type.integer)))
@@ -1143,7 +1216,7 @@ public class PropList implements TextParsable, Serializable, Cloneable {
 	 * @param rootElement The XML root element to be completed. It is the output parameter but it is also the input parameter. When it is put in this method as an input parameter, it is empty.
 	 * @param rootPropList Specified properties list from which the XML root element is created.
 	 */
-	private void createXml(Document doc, Element rootElement, PropList rootPropList) {
+	private static void createXml(Document doc, Element rootElement, PropList rootPropList) {
 		
 		Set<String> keys = rootPropList.keySet();
 		for (String key : keys) {
@@ -1259,17 +1332,31 @@ public class PropList implements TextParsable, Serializable, Cloneable {
 		} // end for
 		
 		
-		Element readOnlyKeysElement = doc.createElement(ELEMENT_PARAM);
-		readOnlyKeysElement.setAttribute(ELEMENT_KEY, READ_ONLY_KEYS);
-		readOnlyKeysElement.setAttribute(ELEMENT_TYPE, Attribute.toTypeString(Type.string));
-		readOnlyKeysElement.setAttribute(ELEMENT_VALUE, TextParserUtil.toText(readOnlyKeys, ","));
+		Element readOnlyKeysElement =createSpecialElement(doc, READ_ONLY_KEYS, rootPropList.readOnlyKeys);
 		rootElement.appendChild(readOnlyKeysElement);
 		
-		Element invisibleKeysElement = doc.createElement(ELEMENT_PARAM);
-		invisibleKeysElement.setAttribute(ELEMENT_KEY, INVISIBLE_KEYS);
-		invisibleKeysElement.setAttribute(ELEMENT_TYPE, Attribute.toTypeString(Type.string));
-		invisibleKeysElement.setAttribute(ELEMENT_VALUE, TextParserUtil.toText(invisibleKeys, ","));
+		Element invisibleKeysElement =createSpecialElement(doc, INVISIBLE_KEYS, rootPropList.invisibleKeys);
 		rootElement.appendChild(invisibleKeysElement);
+		
+//		Element unsavedKeysElement =createSpecialElement(doc, UNSAVED_KEYS, rootPropList.unsavedKeys);
+//		rootElement.appendChild(unsavedKeysElement);
+	}
+	
+	
+	/**
+	 * Create special element for special keys like read-only keys, invisible keys, unsaved keys.
+	 * @param doc XML document.
+	 * @param keySetName special key set name.
+	 * @param keySet special key set.
+	 * @return special element for special keys.
+	 */
+	private static Element createSpecialElement(Document doc, String keySetName, Set<String> keySet) {
+		Element specialElement = doc.createElement(ELEMENT_PARAM);
+		specialElement.setAttribute(ELEMENT_KEY, keySetName);
+		specialElement.setAttribute(ELEMENT_TYPE, Attribute.toTypeString(Type.string));
+		specialElement.setAttribute(ELEMENT_VALUE, TextParserUtil.toText(keySet, ","));
+		
+		return specialElement;
 	}
 	
 	
@@ -1314,6 +1401,7 @@ public class PropList implements TextParsable, Serializable, Cloneable {
 		
 		properties.put(READ_ONLY_KEYS, TextParserUtil.toText(readOnlyKeys, ","));
 		properties.put(INVISIBLE_KEYS, TextParserUtil.toText(invisibleKeys, ","));
+//		properties.put(UNSAVED_KEYS, TextParserUtil.toText(unsavedKeys, ","));
 		return properties;
 	}
 	
@@ -1367,15 +1455,17 @@ public class PropList implements TextParsable, Serializable, Cloneable {
 	 * @param src Original properties list.
 	 * @param dst Converted properties list after browsing all entries and doing some specific task on each entry.
 	 */
-	private void browseBeforeSave(PropList src, PropList dst) {
+	private static void browseBeforeSave(PropList src, PropList dst) {
 		Set<String> keys = src.keySet();
 		for (String key : keys) {
 			Serializable value = src.get(key);
 			if (value == null)
 				continue;
+//			else if (src.containsUnsaved(key))
+//				continue;
 			else if (value instanceof HiddenText) {
 				HiddenText hidden = new HiddenText();
-				hidden.setText(encrypt((HiddenText)value));
+				hidden.setText(src.encrypt((HiddenText)value));
 				
 				dst.put(key, hidden);
 			}
@@ -1420,7 +1510,8 @@ public class PropList implements TextParsable, Serializable, Cloneable {
 				dst.put(key, value);
 		}
 		
-		
+		dst.readOnlyKeys.addAll(src.readOnlyKeys);
+		dst.invisibleKeys.addAll(src.invisibleKeys);
 	}
 	
 	
@@ -1450,14 +1541,24 @@ public class PropList implements TextParsable, Serializable, Cloneable {
 	 * @param src The list loaded before.
 	 * @param dst The converted list.
 	 */
-	private void browseAfterLoad(PropList src, PropList dst) {
+	private static void browseAfterLoad(PropList src, PropList dst) {
+		String readOnlyKeyText = null;
+		String invisibleKeyText = null;
+//		String unsavedKeyText = null;
+		
 		Set<String> keys = src.keySet();
 		for (String key : keys) {
 			Serializable value = src.get(key);
 			if (value == null)
 				continue;
+			else if (key.equals(READ_ONLY_KEYS))
+				readOnlyKeyText = value.toString();
+			else if (key.equals(INVISIBLE_KEYS))
+				invisibleKeyText = value.toString();
+//			else if (key.equals(UNSAVED_KEYS))
+//				unsavedKeyText = value.toString();
 			else if (value instanceof HiddenText) {
-				HiddenText hidden = decrypt( ((HiddenText)value).getText() ) ;
+				HiddenText hidden = src.decrypt( ((HiddenText)value).getText() ) ;
 				dst.put(key, hidden);
 			}
 			else if (value instanceof AlgDesc) {
@@ -1494,6 +1595,16 @@ public class PropList implements TextParsable, Serializable, Cloneable {
 				dst.put(key, value);
 		}
 		
+		dst.readOnlyKeys.addAll(src.readOnlyKeys);
+		dst.invisibleKeys.addAll(src.invisibleKeys);
+//		dst.unsavedKeys.addAll(src.unsavedKeys);
+		
+		if (readOnlyKeyText != null)
+			dst.addSpecialKeys(readOnlyKeyText, dst.readOnlyKeys);
+		if (invisibleKeyText != null)
+			dst.addSpecialKeys(invisibleKeyText, dst.invisibleKeys);
+//		if (unsavedKeyText != null)
+//			dst.addSpecialKeys(unsavedKeyText, dst.unsavedKeys);
 	}
 
 	
@@ -1575,6 +1686,10 @@ public class PropList implements TextParsable, Serializable, Cloneable {
 		
 		List<String> invisibleList = TextParserUtil.parseTextList(list.get(2), ",");
 		invisibleKeys.addAll(TextParserUtil.decryptReservedChars(invisibleList));
+//		if (list.size() < 4) return;
+//		
+//		List<String> unsavedList = TextParserUtil.parseTextList(list.get(3), ",");
+//		unsavedKeys.addAll(TextParserUtil.decryptReservedChars(unsavedList));
 	}
 	
 	
@@ -1614,6 +1729,14 @@ public class PropList implements TextParsable, Serializable, Cloneable {
 			invisibleList.add(key);
 		}
 		buffer.append(TextParserUtil.toText(TextParserUtil.encryptReservedChars(invisibleList), ","));
+
+		
+//		buffer.append(TextParserUtil.EXTRA_SEP);
+//		List<String> unsavedList = Util.newList();
+//		for (String key : unsavedKeys) {
+//			unsavedList.add(key);
+//		}
+//		buffer.append(TextParserUtil.toText(TextParserUtil.encryptReservedChars(unsavedList), ","));
 
 		
 		return buffer.toString();

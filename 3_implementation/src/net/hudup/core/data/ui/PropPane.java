@@ -292,8 +292,9 @@ public class PropPane extends JPanel {
 			}
 		}
 		
-		PropList propList = tblProp.getPropTableModel().getModelPropList();
-		propList.save(uri);
+//		PropList propList = tblProp.getPropTableModel().getModelPropList();
+//		propList.save(uri);
+		tblProp.getPropTableModel().save(uri); //Fixed date: 2019.09.14 by Loc Nguyen
 		
 		JOptionPane.showMessageDialog(
 				this, 
