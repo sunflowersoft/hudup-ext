@@ -4,11 +4,14 @@
 package net.hudup.core;
 
 import java.lang.reflect.Modifier;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 
 import org.reflections.Reflections;
+import org.reflections.util.ConfigurationBuilder;
 
 import net.hudup.core.alg.Alg;
 import net.hudup.core.data.DataDriver;
@@ -289,6 +292,57 @@ public class Firer implements PluginManager {
 		}
 		if (reflections == null) return Util.newList();
 		
+		return getInstances(referredClass, reflections);
+	}
+
+
+	/**
+	 * Getting a list of instances from JAR list and referred class.
+	 * @param <T> type of returned instances.
+	 * @param referredClass referred class.
+	 * @param jarUriList list of JAR URI (s).
+	 * @return list of instances from specified package and referred class.
+	 */
+	public static <T> List<T> getInstances(Class<T> referredClass, xURI...jarUriList) {
+		List<URL> formalJarUrlList = Util.newList(jarUriList.length);
+		for (xURI jarUri : jarUriList) {
+			try {
+				URL formalJarUrl = new URL("jar", "", jarUri.toURL() + "!/");
+				formalJarUrlList.add(formalJarUrl);
+			}
+			catch (Throwable e) {
+				e.printStackTrace();
+			}
+		}
+		
+		URLClassLoader classLoader = new URLClassLoader(
+				formalJarUrlList.toArray(new URL[] {}));
+//		try {
+//			URL c = classLoader.findResource("net.hudup.em.AbstractEM");
+//			classLoader.getClass().forName("net.hudup.Balancer");
+//		} catch (ClassNotFoundException e1) {
+//			// TODO Auto-generated catch block
+//			e1.printStackTrace();
+//		}
+		ConfigurationBuilder cfgBuilder = new ConfigurationBuilder().addUrls(classLoader.getResource("/"));
+		Reflections reflections = new Reflections(cfgBuilder);
+		
+		List<T> instances = getInstances(referredClass, reflections);
+		try {
+			classLoader.close();
+		} catch (Throwable e) {e.printStackTrace();}
+		return instances;
+	}
+
+
+	/**
+	 * Getting a list of instances from reflections and referred class.
+	 * @param <T> type of returned instances.
+	 * @param referredClass referred class.
+	 * @param reflections specified reflections. 
+	 * @return list of instances from specified package and referred class.
+	 */
+	private static <T> List<T> getInstances(Class<T> referredClass, Reflections reflections) {
 		Set<Class<? extends T>> apClasses = reflections.getSubTypesOf(referredClass);
 		List<T> instances = Util.newList();
 		for (Class<? extends T> apClass : apClasses) {
@@ -319,6 +373,15 @@ public class Firer implements PluginManager {
 		
 		return instances;
 	}
-
-
+	
+	
+	/**
+	 * Demonstration main method.
+	 * @param args arguments.
+	 */
+	public static void main(String[] args) {
+		getInstances(Alg.class, xURI.create("/E:/em-v1.jar"));
+	}
+	
+	
 }

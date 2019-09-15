@@ -35,7 +35,7 @@ public class SvdGradientPlusCF extends SvdGradientCF {
 
 	
 	@Override
-	public KBase createKB() throws RemoteException {
+	public KBase newKB() throws RemoteException {
 		// TODO Auto-generated method stub
 		return SvdGradientPlusKB.create(this);
 	}

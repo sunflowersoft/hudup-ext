@@ -502,24 +502,22 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 	 */
 	public static void run(Evaluator evaluator, xURI bindUri, Window oldGUI) {
 		try {
-			RegisterTable algReg = evaluator.extractAlgFromPluginStorage();
-			if (algReg == null || algReg.size() == 0) {
-				JOptionPane.showMessageDialog(null, 
-						"There is no registered algorithm.\nProgramm not run", 
-						"No algorithm", JOptionPane.INFORMATION_MESSAGE);
-				return;
-			}
+//			RegisterTable algReg = evaluator.extractAlgFromPluginStorage();
+//			if (algReg == null || algReg.size() == 0) {
+//				JOptionPane.showMessageDialog(null, 
+//						"WARNING: There is no registered algorithm.\n Program cannot run.", 
+//						"No registered algorithm", JOptionPane.ERROR_MESSAGE);
+//				return;
+//			}
 			
-			//PluginStorageWrapper.assignToSystem() must be called before.
 			RegisterTable parserReg = PluginStorage.getParserReg();
 			if (parserReg.size() == 0) {
 				JOptionPane.showMessageDialog(null, 
-						"There is no registered dataset parser.\n Programm not run", 
-						"No dataset parser", JOptionPane.INFORMATION_MESSAGE);
+						"There is no registered dataset parser.\n Program cannot run.", 
+						"No dataset parser", JOptionPane.ERROR_MESSAGE);
 				return;
 			}
 			
-			//PluginStorageWrapper.assignToSystem() must be called before.
 			RegisterTable metricReg = PluginStorage.getMetricReg();
 			NoneWrapperMetricList metricList = evaluator.defaultMetrics();
 			for (int i = 0; i < metricList.size(); i++) {

@@ -170,9 +170,9 @@ public abstract class KBaseAbstract implements KBase {
 		config.remove(KBASE_NAME);
 		config.remove(DATASOURCE_URI);
 		
-		config.removeReadOnly(DataConfig.MIN_RATING_FIELD);
-		config.removeReadOnly(DataConfig.MAX_RATING_FIELD);
-		config.removeReadOnly(KBASE_NAME);
+//		config.removeReadOnly(DataConfig.MIN_RATING_FIELD);
+//		config.removeReadOnly(DataConfig.MAX_RATING_FIELD);
+//		config.removeReadOnly(KBASE_NAME);
 	}
 
 

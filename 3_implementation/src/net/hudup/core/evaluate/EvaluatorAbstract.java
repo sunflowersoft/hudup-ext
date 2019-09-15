@@ -856,6 +856,13 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 		catch (Throwable e) {
 			e.printStackTrace();
 		}
+		
+		try {
+			PluginStorage.releaseAllRegisteredAlgs();
+		}
+		catch (Throwable e) {
+			e.printStackTrace();
+		}
 	}
 
 

@@ -13,6 +13,7 @@ import java.util.TimerTask;
 import javax.swing.event.EventListenerList;
 
 import net.hudup.core.Constants;
+import net.hudup.core.PluginStorage;
 import net.hudup.core.Util;
 import net.hudup.core.client.Protocol;
 import net.hudup.core.client.Request;
@@ -406,6 +407,9 @@ public abstract class SocketServer extends AbstractRunner implements Server, Acc
 		
 		LogUtil.info("Socket server shutdown");
 		fireStatusEvent(new ServerStatusEvent(this, Status.exit));
+		
+		//Added date: 2019.09.15 by Loc Nguyen
+		PluginStorage.releaseAllRegisteredAlgs();
 	}
 
 	

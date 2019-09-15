@@ -1,9 +1,11 @@
 package net.hudup.core;
 
 import java.io.Serializable;
+import java.util.List;
 
 import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.AlgList;
+import net.hudup.core.data.Exportable;
 import net.hudup.core.data.ExternalQuery;
 import net.hudup.core.data.ctx.CTSManager;
 import net.hudup.core.evaluate.Metric;
@@ -270,6 +272,49 @@ public final class PluginStorage implements Serializable {
 		else
 			return NORMAL_ALG;
 	
+	}
+	
+	
+	/**
+	 * Releasing all registered algorithms.
+	 */
+	public final static void releaseAllRegisteredAlgs() {
+		try {
+			synchronized (NORMAL_ALG) {
+				RegisterTableList tableList = getRegisterTableList();
+				for (int i = 0; i < tableList.size(); i++) {
+					RegisterTable registeredTable = tableList.get(i).getRegisterTable();
+					List<Alg> algList = registeredTable.getAlgList();
+					for (Alg alg : algList) {
+						try {
+							if (alg instanceof Exportable)
+								((Exportable)alg).unexport();
+						}
+						catch (Throwable e) {e.printStackTrace();}
+					}
+					
+					registeredTable.clear();
+				}
+				
+			}
+		}
+		catch (Throwable e) {e.printStackTrace();}
+	}
+
+	
+	/**
+	 * Adding shutdown hook to release all registered algorithms.
+	 */
+	static {
+		Runtime.getRuntime().addShutdownHook(new Thread() {
+
+			@Override
+			public void run() {
+				releaseAllRegisteredAlgs(); //This code line is redundant because all programs and servers call this method before shutting down.
+			}
+			
+		});
+		
 	}
 	
 	

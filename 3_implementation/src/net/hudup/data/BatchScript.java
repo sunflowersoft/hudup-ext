@@ -52,7 +52,7 @@ public class BatchScript implements Serializable {
 	
 	
 	/**
-	 * Constructor with default pool and list of algorithm names.
+	 * Constructor with default pool, list of algorithm names, and main unit.
 	 * @param pool specified dataset pool.
 	 * @param algNameList specified list of algorithm names.
 	 * @param mainUnit main unit  which is the key of main unit in configuration. It can be null.
@@ -147,8 +147,7 @@ public class BatchScript implements Serializable {
 		
 		String algNames = propList.getAsString("algorithms");
 		List<String> algNameList = TextParserUtil.split(algNames, ",", null);
-		if (algNameList.size() == 0)
-			return null;
+//		if (algNameList.size() == 0) return null;
 		
 		DatasetPool pool = readPropList(propList, mainUnit);
 		if (pool == null)

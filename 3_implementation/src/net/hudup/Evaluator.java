@@ -76,7 +76,6 @@ public class Evaluator implements AccessPoint {
 					}
 				}
 				catch (Throwable e) {
-					// TODO Auto-generated catch block
 					ev = null;
 				}
 			}

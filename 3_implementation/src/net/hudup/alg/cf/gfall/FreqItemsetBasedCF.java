@@ -79,7 +79,7 @@ public abstract class FreqItemsetBasedCF extends ModelBasedCFAbstract {
 
 
 	@Override
-	public KBase createKB() throws RemoteException {
+	public KBase newKB() throws RemoteException {
 		return FreqItemsetKB.create(this);
 	}
 

@@ -125,6 +125,11 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 	 */
 	protected JButton btnLoadBatchScript = null;
 	
+	/**
+	 * Saving batch script button.
+	 */
+	protected JButton btnSaveBatchScript = null;
+	
 	
 	/**
 	 * Run button.
@@ -166,12 +171,12 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 	/**
 	 * Text field to show place of saving running information.
 	 */
-	protected JTextField txtSaveBrowse = null;
+	protected JTextField txtRunSaveBrowse = null;
 	
 	/**
 	 * Check box for whether or not to save running information.
 	 */
-	protected JCheckBox chkSave = null;
+	protected JCheckBox chkRunSave = null;
 	
 	
 	/**
@@ -441,71 +446,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			
 			@Override
 			public void save() {
-				UriAdapter adapter = new UriAdapter(); 
-		        xURI uri = adapter.chooseUri(
-						this, 
-						false, 
-						new String[] {"properties", "script", "hudup"}, 
-						new String[] {"Properties URI (s)", "Script files", "Hudup URI (s)"},
-						null,
-						null);
-		        adapter.close();
-		        
-		        if (uri == null) {
-					JOptionPane.showMessageDialog(
-							this, 
-							"URI not save", 
-							"URI not save", 
-							JOptionPane.WARNING_MESSAGE);
-					return;
-		        }
-		        
-				adapter = new UriAdapter(uri);
-				boolean existed = adapter.exists(uri);
-				adapter.close();
-		        if (existed) {
-		        	int ret = JOptionPane.showConfirmDialog(
-		        			this, 
-		        			"URI exist. Do you want to override it?", 
-		        			"URI exist", 
-		        			JOptionPane.YES_NO_OPTION, 
-		        			JOptionPane.QUESTION_MESSAGE);
-		        	if (ret == JOptionPane.NO_OPTION)
-		        		return;
-		        }
-				
-				adapter = null;
-        		Writer writer = null;
-		        try {
-					adapter = new UriAdapter(uri);
-	        		writer = adapter.getWriter(uri, false);
-	        		
-					BatchScript script = BatchScript.assign(
-							pool, lbAlgs.getAlgNameList(), evaluator.getMainUnit());
-					
-					script.save(writer);
-	        		writer.flush();
-	        		writer.close();
-	        		writer = null;
-			        
-		        	JOptionPane.showMessageDialog(this, 
-		        			"URI saved successfully", "URI saved successfully", JOptionPane.INFORMATION_MESSAGE);
-		        }
-				catch(Exception e) {
-					e.printStackTrace();
-				}
-		        finally {
-		        	try {
-		        		if (writer != null)
-		        			writer.close();
-		        	}
-		        	catch (Exception e) {
-		        		e.printStackTrace();
-		        	}
-		        	
-		        	if (adapter != null)
-		        		adapter.close();
-		        }
+				saveBatchScript();
 			}
 
 		};
@@ -577,6 +518,23 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			});
 		this.btnClear.setMargin(new Insets(0, 0 , 0, 0));
 		toolGrp2.add(this.btnClear);
+
+		this.btnSaveBatchScript = UIUtil.makeIconButton(
+			"save-16x16.png", 
+			"save", 
+			I18nUtil.message("save_script"), 
+			I18nUtil.message("save_script"), 
+				
+			new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					saveBatchScript();
+				}
+				
+			});
+		this.btnSaveBatchScript.setMargin(new Insets(0, 0 , 0, 0));
+		toolGrp2.add(this.btnSaveBatchScript);
 
 		this.btnForceStop = UIUtil.makeIconButton(
 			"forcestop-16x16.png", 
@@ -661,17 +619,17 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 		main.add(this.paneRunSave);
 		JPanel pane = new JPanel(new BorderLayout(2, 2));
 		this.paneRunSave.add(pane, BorderLayout.NORTH);
-		this.txtSaveBrowse = new JTextField();
-		this.txtSaveBrowse.setEditable(false);
-		this.txtSaveBrowse.setToolTipText(I18nUtil.message("save_place"));;
-		pane.add(this.txtSaveBrowse, BorderLayout.CENTER);
-		this.chkSave = new JCheckBox(I18nUtil.message("save"));
-		this.chkSave.addActionListener(new ActionListener() {
+		this.txtRunSaveBrowse = new JTextField();
+		this.txtRunSaveBrowse.setEditable(false);
+		this.txtRunSaveBrowse.setToolTipText(I18nUtil.message("save_evaluate_place"));;
+		pane.add(this.txtRunSaveBrowse, BorderLayout.CENTER);
+		this.chkRunSave = new JCheckBox(I18nUtil.message("save_evaluate"));
+		this.chkRunSave.addActionListener(new ActionListener() {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
-				if(chkSave.isSelected()) {
+				if(chkRunSave.isSelected()) {
 					UriAdapter adapter = new UriAdapter();
 					xURI store = adapter.chooseStore(getThisGUI());
 					adapter.close();
@@ -683,24 +641,24 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 							JOptionPane.WARNING_MESSAGE);
 					}
 					else
-						txtSaveBrowse.setText(store.toString());
+						txtRunSaveBrowse.setText(store.toString());
 				}
 				else {
-					txtSaveBrowse.setText("");
+					txtRunSaveBrowse.setText("");
 				}
 				updateMode();
 			}
 			
 		});
-		this.chkSave.setToolTipText(I18nUtil.message("save_tooltip"));
-		pane.add(this.chkSave, BorderLayout.WEST);
+		this.chkRunSave.setToolTipText(I18nUtil.message("save_evaluate_tooltip"));
+		pane.add(this.chkRunSave, BorderLayout.WEST);
 
-		JPanel tool = new JPanel(new BorderLayout());
-		body.add(tool, BorderLayout.SOUTH);
-		JPanel buttons = new JPanel();
-		tool.add(buttons, BorderLayout.EAST);
-
-		this.chkVerbal = new JCheckBox(new AbstractAction(I18nUtil.message("verbal")) {
+		JPanel toolbar = new JPanel(new BorderLayout());
+		body.add(toolbar, BorderLayout.SOUTH);
+		
+		JPanel leftButtons = new JPanel();
+		toolbar.add(leftButtons, BorderLayout.WEST);
+		this.chkVerbal = new JCheckBox(new AbstractAction(I18nUtil.message("verbal_evaluate")) {
 
 			/**
 			 * Serial version UID for serializable class. 
@@ -714,9 +672,11 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 				setVerbal(verbal);
 			}
 		});
-		this.chkVerbal.setToolTipText(I18nUtil.message("verbal_tooltip"));
-		buttons.add(this.chkVerbal);
+		this.chkVerbal.setToolTipText(I18nUtil.message("verbal_evaluate_tooltip"));
+		leftButtons.add(this.chkVerbal);
 		
+		JPanel rightButtons = new JPanel();
+		toolbar.add(rightButtons, BorderLayout.EAST);
 		this.btnMetricsOption = UIUtil.makeIconButton(
 			"option-16x16.png", 
 			"metrics_option", 
@@ -733,7 +693,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 				
 			});
 		this.btnMetricsOption.setMargin(new Insets(0, 0 , 0, 0));
-		buttons.add(this.btnMetricsOption);
+		rightButtons.add(this.btnMetricsOption);
 				
 		this.prgRunning = new JProgressBar();
 		this.prgRunning.setStringPainted(true);
@@ -741,7 +701,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 		this.prgRunning.setMaximum(0);
 		this.prgRunning.setValue(0);
 		this.prgRunning.setVisible(false);
-		tool.add(this.prgRunning, BorderLayout.CENTER);
+		toolbar.add(this.prgRunning, BorderLayout.CENTER);
 
 		return body;
 	}
@@ -909,7 +869,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 		}
 	}
 	
-
+	
 	@Override
 	protected void run() {
 		try {
@@ -948,8 +908,8 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			this.txtRunInfo.insert(info, 0);
 			this.txtRunInfo.setCaretPosition(0);
 		}
-		else if (chkSave.isSelected()){
-			String storePath = this.txtSaveBrowse.getText().trim();
+		else if (chkRunSave.isSelected()){
+			String storePath = this.txtRunSaveBrowse.getText().trim();
 			if (storePath.length() == 0)
 				return;
 			
@@ -1069,8 +1029,8 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			this.txtRunInfo.insert(info, 0);
 			this.txtRunInfo.setCaretPosition(0);
 		}
-		else if (chkSave.isSelected()) {
-			String storePath = this.txtSaveBrowse.getText().trim();
+		else if (chkRunSave.isSelected()) {
+			String storePath = this.txtRunSaveBrowse.getText().trim();
 			if (storePath.length() == 0)
 				return;
 			
@@ -1110,7 +1070,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 				setInternalEnable(false);
 				setResultVisible(false);
 				
-				btnConfigAlgs.setEnabled(true);
+				btnConfigAlgs.setEnabled(algRegTable.size() > 0);
 				
 				prgRunning.setMaximum(0);
 				prgRunning.setValue(0);
@@ -1153,11 +1113,13 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 					btnStop.setEnabled(true);
 					btnForceStop.setEnabled(true);
 					txtRunInfo.setEnabled(true);
-					chkSave.setEnabled(true);
+					chkRunSave.setEnabled(true);
 					chkVerbal.setEnabled(true);
 					
 					tblMetrics.update(result);
 				}
+				
+				btnSaveBatchScript.setEnabled(true);
 			}
 			else {
 				setInternalEnable(true);
@@ -1174,8 +1136,8 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 				prgRunning.setVisible(false);
 			}
 			
-			if (chkSave.isSelected() && (txtSaveBrowse.getText() == null || txtSaveBrowse.getText().isEmpty()))
-				chkSave.setSelected(false);
+			if (chkRunSave.isSelected() && (txtRunSaveBrowse.getText() == null || txtRunSaveBrowse.getText().isEmpty()))
+				chkRunSave.setSelected(false);
 	
 			if (result == null)
 				statusBar.clearText();
@@ -1196,11 +1158,14 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 	 * @param flag flag to / disable internal controls.
 	 */
 	private void setInternalEnable(boolean flag) {
+		flag = flag && algRegTable.size() > 0;
+		
 		this.btnConfigAlgs.setEnabled(flag);
 		this.lbAlgs.setEnabled(flag);
 		this.tblDatasetPool.setEnabled2(flag && pool.size() > 0);
 		this.btnAddDataset.setEnabled(flag);
 		this.btnLoadBatchScript.setEnabled(flag);
+		this.btnSaveBatchScript.setEnabled(flag && pool.size() > 0);
 		
 		this.btnRefresh.setEnabled(flag && pool.size() > 0);
 		
@@ -1216,11 +1181,11 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 
 		this.txtRunInfo.setEnabled(flag && pool.size() > 0);
 		
-		this.chkSave.setEnabled(flag && pool.size() > 0);
+		this.chkRunSave.setEnabled(flag && pool.size() > 0);
 
-		this.chkSave.setEnabled(flag && pool.size() > 0);
+		this.chkRunSave.setEnabled(flag && pool.size() > 0);
 
-		this.txtSaveBrowse.setEnabled(flag && pool.size() > 0);
+		this.txtRunSaveBrowse.setEnabled(flag && pool.size() > 0);
 
 		this.chkVerbal.setEnabled(flag);
 		
@@ -1303,12 +1268,11 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 				JOptionPane.showMessageDialog(
 						this, 
 						"Algorithms in batch script are not suitable to this evaluator",
-						"Batch script not suitable", 
-						JOptionPane.ERROR_MESSAGE);
-				return;
+						"Batch script has unsuitable algorithms", 
+						JOptionPane.WARNING_MESSAGE);
 			}
-			
-			this.lbAlgs.update(batchAlgList);
+			else
+				this.lbAlgs.update(batchAlgList);
 			
 			this.pool.clear();
 			DatasetPool scriptPool = script.getPool();
@@ -1333,6 +1297,87 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			e.printStackTrace();
 		}
 			
+	}
+	
+	
+	/**
+	 * Saving batch script.
+	 */
+	protected void saveBatchScript() {
+		if (pool.size() == 0) {
+			JOptionPane.showMessageDialog(
+					this, 
+					"Pool empty",
+					"Pool empty", 
+					JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+
+		UriAdapter adapter = new UriAdapter();
+        xURI uri = adapter.chooseUri(
+				this, 
+				false, 
+				new String[] {"properties", "script", "hudup"}, 
+				new String[] {"Properties URI (s)", "Script files", "Hudup URI (s)"},
+				null,
+				null);
+        adapter.close();
+        
+        if (uri == null) {
+			JOptionPane.showMessageDialog(
+					this, 
+					"URI not save", 
+					"URI not save", 
+					JOptionPane.WARNING_MESSAGE);
+			return;
+        }
+        
+		adapter = new UriAdapter(uri);
+		boolean existed = adapter.exists(uri);
+		adapter.close();
+        if (existed) {
+        	int ret = JOptionPane.showConfirmDialog(
+        			this, 
+        			"URI exist. Do you want to override it?", 
+        			"URI exist", 
+        			JOptionPane.YES_NO_OPTION, 
+        			JOptionPane.QUESTION_MESSAGE);
+        	if (ret == JOptionPane.NO_OPTION)
+        		return;
+        }
+		
+		adapter = null;
+		Writer writer = null;
+        try {
+			adapter = new UriAdapter(uri);
+    		writer = adapter.getWriter(uri, false);
+    		
+			BatchScript script = BatchScript.assign(
+					pool, lbAlgs.getAlgNameList(), evaluator.getMainUnit());
+			
+			script.save(writer);
+    		writer.flush();
+    		writer.close();
+    		writer = null;
+	        
+        	JOptionPane.showMessageDialog(this, 
+        			"URI saved successfully", "URI saved successfully", JOptionPane.INFORMATION_MESSAGE);
+        }
+		catch(Exception e) {
+			e.printStackTrace();
+		}
+        finally {
+        	try {
+        		if (writer != null)
+        			writer.close();
+        	}
+        	catch (Exception e) {
+        		e.printStackTrace();
+        	}
+        	
+        	if (adapter != null)
+        		adapter.close();
+        }
 	}
 	
 	

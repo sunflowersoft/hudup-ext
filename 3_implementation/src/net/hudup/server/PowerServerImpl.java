@@ -12,6 +12,7 @@ import java.util.TimerTask;
 import javax.swing.event.EventListenerList;
 
 import net.hudup.core.Constants;
+import net.hudup.core.PluginStorage;
 import net.hudup.core.client.ActiveMeasure;
 import net.hudup.core.client.Gateway;
 import net.hudup.core.client.PowerServer;
@@ -361,7 +362,7 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
         	
         	destroyStorageSystem();
 			
-			registry = null;
+    		registry = null;
     		config.save();
 		} 
     	catch (Throwable e) {
@@ -376,6 +377,9 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 		LogUtil.info("Server shutdown");
     	
 		fireStatusEvent(new ServerStatusEvent(this, Status.exit));
+		
+		//Added date: 2019.09.15 by Loc Nguyen
+		PluginStorage.releaseAllRegisteredAlgs();
 	}
 
 	

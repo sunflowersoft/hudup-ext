@@ -45,7 +45,7 @@ public abstract class AugAbstract extends ExecutableAlgAbstract implements Aug {
 		// TODO Auto-generated constructor stub
 		try {
 			if (kb == null)
-				kb = createKB();
+				kb = newKB();
 			kb.setConfig(config); //This code line is important.
 		}
 		catch (Throwable e) {e.printStackTrace();}
@@ -109,8 +109,8 @@ public abstract class AugAbstract extends ExecutableAlgAbstract implements Aug {
 
 
 	@Override
-	public KBase newKBase(Dataset dataset) throws RemoteException {
-		KBase kb = createKB();
+	public KBase createKBase(Dataset dataset) throws RemoteException {
+		KBase kb = newKB();
 		kb.setConfig((DataConfig)config.clone());
 		
 		if (dataset instanceof KBasePointer) {

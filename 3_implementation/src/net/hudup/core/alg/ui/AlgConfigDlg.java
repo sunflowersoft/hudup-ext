@@ -96,13 +96,11 @@ public class AlgConfigDlg extends JDialog {
 		
 		paneCfg = new PropPane() {
 			
-			
 			/**
 			 * Serial version UID for serializable class. 
 			 */
 			private static final long serialVersionUID = 1L;
 
-			
 			@Override
 			public void close() {
 				// TODO Auto-generated method stub
@@ -120,7 +118,6 @@ public class AlgConfigDlg extends JDialog {
 				dispose();
 			}
 
-			
 			@Override
 			public void reset() {
 				// TODO Auto-generated method stub
@@ -132,7 +129,6 @@ public class AlgConfigDlg extends JDialog {
 						"Apply successfully", 
 						JOptionPane.INFORMATION_MESSAGE);
 			}
-
 			
 			@Override
 			public boolean apply() {
@@ -195,8 +191,8 @@ public class AlgConfigDlg extends JDialog {
 		if (flag && thisAlg.getConfig().size() == 0) {
 			JOptionPane.showMessageDialog(
 					this, 
-					"Config empty", 
-					"Config empty", 
+					"Configuration empty", 
+					"Configuration empty", 
 					JOptionPane.INFORMATION_MESSAGE);
 			return;
 		}

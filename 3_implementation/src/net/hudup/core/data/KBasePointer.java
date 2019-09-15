@@ -3,7 +3,11 @@
  */
 package net.hudup.core.data;
 
+import net.hudup.core.PluginStorage;
+import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.KBase;
+import net.hudup.core.alg.ModelBasedAlg;
+import net.hudup.core.logistic.xURI;
 
 /**
  * There are two typical {@link Dataset} such as {@link Snapshot} and {@link Scanner}.
@@ -44,4 +48,53 @@ public class KBasePointer extends Pointer {
 	}
 
 
+	/**
+	 * Create knowledge base from specified dataset.
+	 * @param dataset specified dataset. It is often {@link KBasePointer}.
+	 * @return knowledge base from dataset.
+	 */
+	public static KBase createKB(Dataset dataset) {
+		DataConfig config = loadKBaseConfig(dataset);
+		if (config == null) return null;
+		String kbaseName = config.getAsString(KBase.KBASE_NAME);
+		if (kbaseName == null) return null;
+		
+		KBase kbase = null;
+		Alg alg = PluginStorage.getNormalAlgReg().query(kbaseName);
+		if (alg != null && (alg instanceof ModelBasedAlg)) {
+			try {
+				kbase = ((ModelBasedAlg)alg).createKBase(dataset);
+			}
+			catch (Throwable e) {
+				e.printStackTrace();
+				kbase = null;
+			}
+		}
+		
+		if (kbase != null && kbase.isEmpty()) {
+			kbase.close();
+			kbase = null;
+		}
+		
+		return kbase;
+	}
+	
+	
+	/**
+	 * Loading configuration of knowledge base from specified dataset.
+	 * @param dataset specified dataset. It is often {@link KBasePointer}.
+	 * @return configuration of knowledge base from specified dataset.
+	 */
+	public static DataConfig loadKBaseConfig(Dataset dataset) {
+		DataConfig config = (DataConfig) dataset.getConfig().clone();
+		xURI storeUri = config.getStoreUri();
+		if (storeUri == null) return null;
+		xURI configUri = storeUri.concat(KBase.KBASE_CONFIG);
+		config.load(configUri);
+		
+		return config;
+	}
+	
+	
+	
 }

@@ -34,7 +34,7 @@ public interface Aug extends AugRemote, ExecutableAlg, ModelBasedAlg, SupportCac
 	 * @return new instance of knowledge base.
 	 * @throws RemoteException if any error raises.
 	 */
-	KBase newKBase(Dataset dataset) throws RemoteException;
+	KBase createKBase(Dataset dataset) throws RemoteException;
 
 
 }

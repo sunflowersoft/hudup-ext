@@ -64,7 +64,7 @@ public class BnetCF extends BnetCFAbstract {
 
 
 	@Override
-	public KBase createKB() throws RemoteException {
+	public KBase newKB() throws RemoteException {
 		// TODO Auto-generated method stub
 		return BnetKB.create(this);
 	}

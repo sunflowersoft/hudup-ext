@@ -50,7 +50,7 @@ public class SvdGradientCF extends ModelBasedCFAbstract {
 
 	
 	@Override
-	public KBase createKB() throws RemoteException {
+	public KBase newKB() throws RemoteException {
 		// TODO Auto-generated method stub
 		return SvdGradientKB.create(this);
 	}

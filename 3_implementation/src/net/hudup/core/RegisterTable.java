@@ -89,7 +89,11 @@ public final class RegisterTable implements Cloneable, Serializable {
 	 * @return {@code true} if registration is successful.
 	 */
 	public boolean register(Alg alg) {
-		if (!canRegister(alg)) {
+		if (alg == null) {
+			System.out.println("ERROR: registering null algorithm");
+			return false;
+		}
+		else if (!canRegister(alg)) {
 			System.out.println("Algorithm \"" + alg.getName() + "\" existed");
 			return false;
 		}

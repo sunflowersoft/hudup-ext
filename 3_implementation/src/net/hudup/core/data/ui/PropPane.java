@@ -173,6 +173,8 @@ public class PropPane extends JPanel {
 
 		btnCancel = new JButton("Cancel");
 		btnCancel.addActionListener(new ActionListener() {
+			
+			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				close();
 			}
@@ -214,7 +216,7 @@ public class PropPane extends JPanel {
 	 * Loading property list from chosen URI and then updating this {@link PropPane}.
 	 * Of course this method shows a dialog for users to choose source URI.
 	 */
-	private void onLoad() {
+	protected void onLoad() {
 		UriAdapter adapter = new UriAdapter();
 		xURI uri = adapter.chooseUri(
 				this, 
@@ -243,7 +245,7 @@ public class PropPane extends JPanel {
 	/**
 	 * Saving property list to chosen URI. Of course this method shows a dialog for users to choose target URI.
 	 */
-	private void onSave() {
+	protected void onSave() {
 		UriAdapter adapter = new UriAdapter();
 
 		xURI uri = adapter.chooseUri(
@@ -308,7 +310,7 @@ public class PropPane extends JPanel {
 	 * This is event-driven method which asking for user whether applying changes into property list.
 	 * If user agrees, this method applies changes from graphic user interface (GUI) into the internal property list by calling {@link #apply()}.
 	 */
-	private void onApply() {
+	protected void onApply() {
 		boolean apply = apply();
 		if (!apply) {
 			JOptionPane.showMessageDialog(
@@ -404,6 +406,14 @@ public class PropPane extends JPanel {
 	public void hideOkCancel() {
 		btnOk.setVisible(false);
 		btnCancel.setVisible(false);
+	}
+	
+	
+	/**
+	 * Allowing inherited classes to customize controls.
+	 */
+	public void customizeControls() {
+		
 	}
 	
 	

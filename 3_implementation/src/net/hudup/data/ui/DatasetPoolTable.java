@@ -19,10 +19,8 @@ import javax.swing.JTable;
 import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
 
-import net.hudup.core.PluginStorage;
-import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.KBase;
-import net.hudup.core.alg.ModelBasedRecommender;
+import net.hudup.core.alg.ui.KBaseConfigDlg;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.DatasetPair;
@@ -252,39 +250,45 @@ public class DatasetPoolTable extends JTable {
 							if (confirm != JOptionPane.OK_OPTION)
 								return;
 							
-							try {
-								DataConfig config = (DataConfig) dataset.getConfig().clone(); 
-								xURI store = config.getStoreUri();
-								xURI cfgUri = store.concat(KBase.KBASE_CONFIG);
-								config.load(cfgUri);
-								
-								String kbaseName = config.getAsString(KBase.KBASE_NAME);
-								if (kbaseName == null)
-									throw new Exception("KBase not viewed");
-								
-								Alg alg = PluginStorage.getNormalAlgReg().query(kbaseName);
-								if (alg == null || !(alg instanceof ModelBasedRecommender))
-									throw new Exception("KBase not viewed");
-								
-								ModelBasedRecommender recommender = (ModelBasedRecommender) alg.newInstance();
-								KBase kbase = recommender.newKBase(dataset);
-								kbase.getInspector().inspect();
-								kbase.close();
-							}
-							catch (Throwable ex) {
-								ex.printStackTrace();
+							KBase kbase = KBasePointer.createKB(dataset);
+							if (kbase == null) {
 								JOptionPane.showMessageDialog(
 										getThis(), 
 										"KBase not viewed", 
 										"KBase not viewed", 
 										JOptionPane.ERROR_MESSAGE);
-							} // end try-catch
-								
+								return;
+							}
+							
+							kbase.getInspector().inspect();
+							kbase.close();
+							
 						} //end actionPerformed
 						
 					}); //end ActionListener
 				contextMenu.add(miViewKB);
-				
+
+				JMenuItem miConfigKB = UIUtil.makeMenuItem((String)null, "Configure knowledge base", 
+					new ActionListener() {
+						
+						@Override
+						public void actionPerformed(ActionEvent e) {
+							DataConfig kbaseConfig = KBasePointer.loadKBaseConfig(dataset);
+							if (kbaseConfig == null) {
+								JOptionPane.showMessageDialog(
+										getThis(), 
+										"KBase not configured", 
+										"KBase not configured", 
+										JOptionPane.ERROR_MESSAGE);
+								return;
+							}
+							
+							KBaseConfigDlg dlgKBase = new KBaseConfigDlg(UIUtil.getFrameForComponent(getThis()), kbaseConfig);
+							dlgKBase.setVisible(true);
+						} //end actionPerformed
+						
+					}); //end ActionListener
+				contextMenu.add(miConfigKB);
 			}
 		}
 		

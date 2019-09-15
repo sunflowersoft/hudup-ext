@@ -78,27 +78,45 @@ public final class AlgListUIUtil {
 		
 		//Showing inspector of the algorithm
 		if (alg instanceof ModelBasedAlg) {
-			JMenuItem miViewKB = new JMenuItem("View knowledge base");
-			miViewKB.addActionListener( 
-				new ActionListener() {
-					
-					@Override
-					public void actionPerformed(ActionEvent e) {
-						Inspector inspector = null;
-						try {
-							KBase kbase = ((ModelBasedAlg)alg).getKBase();
-							if (kbase != null && !kbase.isEmpty())
+			KBase kb = null;
+			try {
+				kb = ((ModelBasedAlg)alg).getKBase();
+			} catch (Throwable e) {e.printStackTrace();}
+			
+			final KBase kbase = kb;
+			if (kbase != null && !kbase.isEmpty()) {
+				JMenuItem miViewKB = new JMenuItem("View knowledge base");
+				miViewKB.addActionListener( 
+					new ActionListener() {
+						
+						@Override
+						public void actionPerformed(ActionEvent e) {
+							Inspector inspector = null;
+							try {
 								inspector = kbase.getInspector();
-							if (inspector != null) inspector.inspect();
-						} catch (Exception ex) {
-							ex.printStackTrace();
-							inspector = null;
+								if (inspector != null) inspector.inspect();
+							} catch (Exception ex) {
+								ex.printStackTrace();
+								inspector = null;
+							}
+							if (inspector == null)
+								JOptionPane.showMessageDialog(UIUtil.getFrameForComponent((Component)ui), "Cannot view knowledge base", "Cannot view knowledge base", JOptionPane.ERROR_MESSAGE);
 						}
-						if (inspector == null)
-							JOptionPane.showMessageDialog(UIUtil.getFrameForComponent((Component)ui), "Cannot view knowledge base", "Cannot view knowledge base", JOptionPane.ERROR_MESSAGE);
-					}
-				});
-			ctxMenu.add(miViewKB);
+					});
+				ctxMenu.add(miViewKB);
+				
+				JMenuItem miConfigureKB = new JMenuItem("Configure knowledge base");
+				miConfigureKB.addActionListener( 
+					new ActionListener() {
+						
+						@Override
+						public void actionPerformed(ActionEvent e) {
+							KBaseConfigDlg dlgKBase = new KBaseConfigDlg(UIUtil.getFrameForComponent((Component)ui), kbase);
+							dlgKBase.setVisible(true);
+						}
+					});
+				ctxMenu.add(miConfigureKB);
+			}
 		}
 
 		

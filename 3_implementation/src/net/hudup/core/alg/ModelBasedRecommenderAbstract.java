@@ -39,7 +39,7 @@ public abstract class ModelBasedRecommenderAbstract extends RecommenderAbstract 
 	
 
 	/**
-	 * Default constructor, which always call {@link #createKB()} to create knowledge base.
+	 * Default constructor, which always call {@link #newKB()} to create knowledge base.
 	 */
 	public ModelBasedRecommenderAbstract() {
 		super();
@@ -47,7 +47,7 @@ public abstract class ModelBasedRecommenderAbstract extends RecommenderAbstract 
 		
 		try {
 			if (kb == null)
-				kb = createKB();
+				kb = newKB();
 			kb.setConfig(config); //This code line is important.
 		}
 		catch (Throwable e) {e.printStackTrace();}
@@ -64,9 +64,7 @@ public abstract class ModelBasedRecommenderAbstract extends RecommenderAbstract 
 			if (pointerStoreUri != null && !pointerStoreUri.equals(kb.getConfig().getStoreUri())) {
 				kb.getConfig().setStoreUri(pointerStoreUri); //Also affect store URI of algorithm.
 			}
-			//boolean delayUnsetup = kb.getConfig().getAsBoolean(DataConfig.DELAY_UNSETUP);
 			kb.load();
-			//kb.getConfig().put(DataConfig.DELAY_UNSETUP, delayUnsetup); //Restore delay unsetup property.
 			
 			dataset.getConfig().putAll(kb.getConfig());
 		}
@@ -93,8 +91,8 @@ public abstract class ModelBasedRecommenderAbstract extends RecommenderAbstract 
 
 	
 	@Override
-	public KBase newKBase(Dataset dataset) throws RemoteException {
-		KBase kb = createKB();
+	public KBase createKBase(Dataset dataset) throws RemoteException {
+		KBase kb = newKB();
 		kb.setConfig((DataConfig)config.clone());
 		
 		if (dataset instanceof KBasePointer) {

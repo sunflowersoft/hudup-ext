@@ -101,39 +101,138 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 	 * Algorithm combo-box.
 	 */
 	protected AlgComboBox cmbAlgs = null;
+	
+	/**
+	 * Configuration button.
+	 */
 	protected JButton btnConfig = null;
+	
+	/**
+	 * Refreshing button.
+	 */
 	protected JButton btnRefresh = null;
+	
+	/**
+	 * Clearing button
+	 */
 	protected JButton btnClear = null;
 	
+	
+	/**
+	 * Training browse button.
+	 */
 	protected JButton btnTrainingBrowse = null;
+	
+	/**
+	 * Training browse text field.
+	 */
 	protected DatasetTextField txtTrainingBrowse = null;
+	
+	/**
+	 * Testing browse button.
+	 */
 	protected JButton btnTestingBrowse = null;
+	
+	/**
+	 * Testing browse field.
+	 */
 	protected DatasetTextField txtTestingBrowse = null;
 	
+	
+	/**
+	 * Run button.
+	 */
 	protected JButton btnRun = null;
+	
+	/**
+	 * Pause/resume button.
+	 */
 	protected JButton btnPauseResume = null;
+	
+	/**
+	 * Stop button.
+	 */
 	protected JButton btnStop = null;
+	
+	/**
+	 * Force stop button.
+	 */
 	protected JButton btnForceStop = null;
 
+	
+	/**
+	 * Running info panel.
+	 */
 	protected JPanel paneRunInfo = null;
+	
+	/**
+	 * Running information text field.
+	 */
 	protected TxtOutput txtRunInfo = null;
 	
-	protected JPanel paneRunSave = null;
-	protected JTextField txtSaveBrowse = null;
-	protected JCheckBox chkSave = null;
-	protected JProgressBar prgRunning = null;
 	
+	/**
+	 * Saving running information panel.
+	 */
+	protected JPanel paneRunSave = null;
+	
+	/**
+	 * Text field to show place of saving running information.
+	 */
+	protected JTextField txtRunSaveBrowse = null;
+	
+	/**
+	 * Check box for whether or not to save running information.
+	 */
+	protected JCheckBox chkRunSave = null;
+	
+	
+	/**
+	 * Verbal check box.
+	 */
 	protected JCheckBox chkVerbal = null;
+	
+	/**
+	 * Metric options button.
+	 */
 	protected JButton btnMetricsOption = null;
 
+	
+	/**
+	 * Testing result panel.
+	 */
 	protected JPanel paneResult = null;
+	
+	/**
+	 * Table of listing metrics.
+	 */
 	protected MetricsTable tblMetrics = null;
 //	protected MetricsTable2 tblMetrics = null; //MetricsTable2 (normal JTable, not sortable) avoids out of array index error.
+	
+	/**
+	 * Button to analyze testing results.
+	 */
 	protected JButton btnAnalyzeResult = null;
+	
+	/**
+	 * Copying resulting to clipboard button.
+	 */
 	protected JButton btnCopyResult = null;
 	
+	
+	/**
+	 * Running progress bar
+	 */
+	protected JProgressBar prgRunning = null;
+
+	
+	/**
+	 * Status bar.
+	 */
 	protected StatusBar statusBar = null;
 //	protected StatusBar2 statusBar = null;
+	
+	
 	/**
 	 * Waiting panel which is the alternative of testing result panel.
 	 */
@@ -504,17 +603,17 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 		main.add(this.paneRunSave);
 		JPanel pane = new JPanel(new BorderLayout(2, 2));
 		this.paneRunSave.add(pane, BorderLayout.NORTH);
-		this.txtSaveBrowse = new JTextField();
-		this.txtSaveBrowse.setEditable(false);
-		this.txtSaveBrowse.setToolTipText(I18nUtil.message("save_place"));;
-		pane.add(this.txtSaveBrowse, BorderLayout.CENTER);
-		this.chkSave = new JCheckBox(I18nUtil.message("save"));
-		this.chkSave.addActionListener(new ActionListener() {
+		this.txtRunSaveBrowse = new JTextField();
+		this.txtRunSaveBrowse.setEditable(false);
+		this.txtRunSaveBrowse.setToolTipText(I18nUtil.message("save_evaluate_place"));;
+		pane.add(this.txtRunSaveBrowse, BorderLayout.CENTER);
+		this.chkRunSave = new JCheckBox(I18nUtil.message("save_evaluate"));
+		this.chkRunSave.addActionListener(new ActionListener() {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
-				if(chkSave.isSelected()) {
+				if(chkRunSave.isSelected()) {
 					
 					UriAdapter adapter = new UriAdapter();
 					xURI store = adapter.chooseStore(getThisGUI());
@@ -528,23 +627,24 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 							JOptionPane.WARNING_MESSAGE);
 					}
 					else
-						txtSaveBrowse.setText(store.toString());
+						txtRunSaveBrowse.setText(store.toString());
 				}
 				else {
-					txtSaveBrowse.setText("");
+					txtRunSaveBrowse.setText("");
 				}
 				updateMode();
 			}
 		});
-		this.chkSave.setToolTipText(I18nUtil.message("save_tooltip"));
-		pane.add(this.chkSave, BorderLayout.WEST);
+		this.chkRunSave.setToolTipText(I18nUtil.message("save_evaluate_tooltip"));
+		pane.add(this.chkRunSave, BorderLayout.WEST);
 		
-		JPanel tool = new JPanel(new BorderLayout());
-		body.add(tool, BorderLayout.SOUTH);
-		JPanel buttons = new JPanel();
-		tool.add(buttons, BorderLayout.EAST);
+		JPanel toolbar = new JPanel(new BorderLayout());
+		body.add(toolbar, BorderLayout.SOUTH);
 		
-		this.chkVerbal = new JCheckBox(new AbstractAction(I18nUtil.message("verbal")) {
+		JPanel leftButtons = new JPanel();
+		toolbar.add(leftButtons, BorderLayout.WEST);
+		
+		this.chkVerbal = new JCheckBox(new AbstractAction(I18nUtil.message("verbal_evaluate")) {
 
 			/**
 			 * Serial version UID for serializable class. 
@@ -558,9 +658,11 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 				setVerbal(verbal);
 			}
 		});
-		this.chkVerbal.setToolTipText(I18nUtil.message("verbal_tooltip"));
-		buttons.add(this.chkVerbal);
+		this.chkVerbal.setToolTipText(I18nUtil.message("verbal_evaluate_tooltip"));
+		leftButtons.add(this.chkVerbal);
 		
+		JPanel rightButtons = new JPanel();
+		toolbar.add(rightButtons, BorderLayout.EAST);
 		this.btnMetricsOption = UIUtil.makeIconButton(
 			"option-16x16.png", 
 			"metrics_option", 
@@ -577,7 +679,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 				}
 			});
 		this.btnMetricsOption.setMargin(new Insets(0, 0 , 0, 0));
-		buttons.add(this.btnMetricsOption);
+		rightButtons.add(this.btnMetricsOption);
 
 		this.prgRunning = new JProgressBar();
 		this.prgRunning.setStringPainted(true);
@@ -585,7 +687,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 		this.prgRunning.setVisible(false);
 		this.prgRunning.setMaximum(0);
 		this.prgRunning.setValue(0);
-		tool.add(this.prgRunning, BorderLayout.CENTER);
+		toolbar.add(this.prgRunning, BorderLayout.CENTER);
 		
 		return body;
 	}
@@ -1005,8 +1107,8 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			this.txtRunInfo.insert(info, 0);
 			this.txtRunInfo.setCaretPosition(0);
 		}
-		else if (chkSave.isSelected()) {
-			String storePath = this.txtSaveBrowse.getText().trim();
+		else if (chkRunSave.isSelected()) {
+			String storePath = this.txtRunSaveBrowse.getText().trim();
 			if (storePath.length() == 0)
 				return;
 
@@ -1119,8 +1221,8 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			this.txtRunInfo.insert(info, 0);
 			this.txtRunInfo.setCaretPosition(0);
 		}
-		else if (chkSave.isSelected()) {
-			String storePath = this.txtSaveBrowse.getText().trim();
+		else if (chkRunSave.isSelected()) {
+			String storePath = this.txtRunSaveBrowse.getText().trim();
 			if (storePath.length() == 0)
 				return;
 
@@ -1164,8 +1266,6 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 				setInternalEnable(false);
 				setResultVisible(false);
 				
-				cmbAlgs.setEnabled(true);
-				
 				prgRunning.setMaximum(0);
 				prgRunning.setValue(0);
 				prgRunning.setVisible(false);
@@ -1207,7 +1307,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 					btnStop.setEnabled(true);
 					btnForceStop.setEnabled(true);
 					txtRunInfo.setEnabled(true);
-					chkSave.setEnabled(true);
+					chkRunSave.setEnabled(true);
 					chkVerbal.setEnabled(true);
 					
 					tblMetrics.update(result);
@@ -1229,8 +1329,8 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 				
 			}
 			
-			if (chkSave.isSelected() && (txtSaveBrowse.getText() == null || txtSaveBrowse.getText().isEmpty()))
-				chkSave.setSelected(false);
+			if (chkRunSave.isSelected() && (txtRunSaveBrowse.getText() == null || txtRunSaveBrowse.getText().isEmpty()))
+				chkRunSave.setSelected(false);
 			
 			if (result == null)
 				statusBar.clearText();
@@ -1251,6 +1351,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 	 * @param flag flag to enable / disable internal controls.
 	 */
 	private void setInternalEnable(boolean flag) {
+		flag = flag && algRegTable.size() > 0;
 		
 		this.cmbAlgs.setEnabled(flag);
 		this.btnConfig.setEnabled(flag);
@@ -1298,12 +1399,12 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			trainingSet != null && 
 			testingSet != null);
 		
-		this.chkSave.setEnabled(
+		this.chkRunSave.setEnabled(
 				flag && 
 				trainingSet != null && 
 				testingSet != null);
 		
-		this.txtSaveBrowse.setEnabled(
+		this.txtRunSaveBrowse.setEnabled(
 				flag && 
 				trainingSet != null && 
 				testingSet != null);
