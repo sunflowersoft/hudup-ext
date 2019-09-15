@@ -465,9 +465,9 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 				@Override
 				protected JTextArea createHelp() {
 					// TODO Auto-generated method stub
-					JTextArea toolkit = new JTextArea("Thank you for choosing evaluators");
-					toolkit.setEditable(false);
-					return toolkit;
+					JTextArea helper = new JTextArea("Thank you for choosing evaluators");
+					helper.setEditable(false);
+					return helper;
 				}
 
 				@Override

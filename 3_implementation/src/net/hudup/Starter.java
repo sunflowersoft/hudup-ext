@@ -87,9 +87,9 @@ public class Starter {
 			@Override
 			protected JTextArea createHelp() {
 				// TODO Auto-generated method stub
-				TooltipTextArea toolkit = new TooltipTextArea();
-				toolkit.setEditable(false);
-				return toolkit;
+				TooltipTextArea tooltip = new TooltipTextArea();
+				tooltip.setEditable(false);
+				return tooltip;
 			}
 		};
 		

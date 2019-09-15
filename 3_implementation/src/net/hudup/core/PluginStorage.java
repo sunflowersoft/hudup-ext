@@ -296,6 +296,14 @@ public final class PluginStorage implements Serializable {
 					registeredTable.clear();
 				}
 				
+				for (int i = 0; i < nextUpdateList.size(); i++) {
+					Alg alg = nextUpdateList.get(i);
+					try {
+						if (alg instanceof Exportable)
+							((Exportable)alg).unexport();
+					}
+					catch (Throwable e) {e.printStackTrace();}
+				}
 			}
 		}
 		catch (Throwable e) {e.printStackTrace();}

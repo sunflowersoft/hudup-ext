@@ -8,11 +8,13 @@ import java.util.List;
 import java.util.Vector;
 
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.JTextArea;
 import javax.swing.WindowConstants;
 import javax.swing.event.EventListenerList;
 import javax.swing.table.DefaultTableModel;
@@ -22,6 +24,7 @@ import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.AlgList;
 import net.hudup.core.logistic.ui.SortableTable;
 import net.hudup.core.logistic.ui.SortableTableModel;
+import net.hudup.core.logistic.ui.StartDlg;
 import net.hudup.core.logistic.ui.UIUtil;
 
 
@@ -40,7 +43,7 @@ import net.hudup.core.logistic.ui.UIUtil;
  * @version 10.0
  *
  */
-public class PluginStorageManifest extends net.hudup.core.logistic.ui.SortableTable {
+public class PluginStorageManifest extends SortableTable {
 
 	
 	/**
@@ -240,11 +243,14 @@ public class PluginStorageManifest extends net.hudup.core.logistic.ui.SortableTa
 			tblRegister.addPluginChangedListener(listener);
 		body.add(new JScrollPane(tblRegister), BorderLayout.CENTER);
 		
-		JPanel footer = new JPanel();
+		JPanel footer = new JPanel(new BorderLayout());
 		result.add(footer, BorderLayout.SOUTH);
 
+		JPanel buttonGrp1 = new JPanel();
+		footer.add(buttonGrp1, BorderLayout.CENTER);
+		
 		JButton apply = new JButton("Apply");
-		footer.add(apply);
+		buttonGrp1.add(apply);
 		apply.addActionListener(new ActionListener() {
 			
 			@Override
@@ -254,7 +260,7 @@ public class PluginStorageManifest extends net.hudup.core.logistic.ui.SortableTa
 					
 					JOptionPane.showMessageDialog(
 							UIUtil.getFrameForComponent(tblRegister), 
-							"Apply successfully. Algorithms are registered", 
+							"Apply successfully. Algorithms are registered / unregistered", 
 							"Apply successfully", 
 							JOptionPane.INFORMATION_MESSAGE);
 				}
@@ -269,9 +275,8 @@ public class PluginStorageManifest extends net.hudup.core.logistic.ui.SortableTa
 			}
 		});
 		
-		
 		JButton selectAll = new JButton("Select all");
-		footer.add(selectAll);
+		buttonGrp1.add(selectAll);
 		selectAll.addActionListener(new ActionListener() {
 			
 			@Override
@@ -281,9 +286,8 @@ public class PluginStorageManifest extends net.hudup.core.logistic.ui.SortableTa
 			}
 		});
 
-		
 		JButton unselectAll = new JButton("Unselect all");
-		footer.add(unselectAll);
+		buttonGrp1.add(unselectAll);
 		unselectAll.addActionListener(new ActionListener() {
 			
 			@Override
@@ -294,7 +298,210 @@ public class PluginStorageManifest extends net.hudup.core.logistic.ui.SortableTa
 		});
 
 		
+		JPanel buttonGrp2 = new JPanel();
+		footer.add(buttonGrp2, BorderLayout.EAST);
+		
+		JButton importAlg = new JButton("Import");
+		buttonGrp2.add(importAlg);
+		importAlg.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				final String jar = "jar";
+				final String server = "server";
+				
+				StartDlg dlgStart = new StartDlg(tblRegister, "Select jar file or remote service") {
+					
+					/**
+					 * Default serial version UID.
+					 */
+					private static final long serialVersionUID = 1L;
+					
+					@Override
+					protected void start() {
+						// TODO Auto-generated method stub
+						String selectedItem = getItemControl().getSelectedItem().toString();
+						if (selectedItem.equals(jar))
+							new JarImportAlgDlag(tblRegister);
+						else
+							new ServerImportAlgDlag(tblRegister);
+						
+						dispose();
+					}
+					
+					@Override
+					protected JComboBox<?> createItemControl() {
+						// TODO Auto-generated method stub
+						return new JComboBox<>(new String[] {jar, server});
+					}
+					
+					@Override
+					protected JTextArea createHelp() {
+						// TODO Auto-generated method stub
+						JTextArea tooltip = new JTextArea("You select import from jar file or from Hudup server/service");
+						tooltip.setWrapStyleWord(true);
+						tooltip.setLineWrap(true);
+						tooltip.setEditable(false);
+						return tooltip;
+					}
+					
+				};
+				
+				dlgStart.setSize(300, 200);
+				dlgStart.setVisible(true);
+				
+				tblRegister.update();
+			}
+		});
+		importAlg.setVisible(false);
+		
+		
 		return result;
+	}
+	
+	
+	/**
+	 * This is GUI allowing users to import/register dynamically algorithms from jar files.
+	 * @author Loc Nguyen
+	 * @version 12.0
+	 */
+	protected static class JarImportAlgDlag extends JDialog {
+		
+		/**
+		 * Default serial version UID.
+		 */
+		private static final long serialVersionUID = 1L;
+
+		/**
+		 * Constructor with parent component.
+		 * @param comp parent component.
+		 */
+		public JarImportAlgDlag(Component comp) {
+			super(UIUtil.getFrameForComponent(comp), "Import algorithms from jar file", true);
+			
+			setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+			setSize(600, 400);
+			setLocationRelativeTo(UIUtil.getFrameForComponent(comp));
+			
+			setLayout(new BorderLayout());
+			
+			JPanel header = new JPanel(new BorderLayout());
+			add(header, BorderLayout.NORTH);
+			
+			
+			JPanel body = new JPanel(new BorderLayout());
+			add(body, BorderLayout.CENTER);
+
+			
+			JPanel footer = new JPanel();
+			add(footer, BorderLayout.SOUTH);
+
+			JButton ok = new JButton("OK");
+			footer.add(ok);
+			ok.addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					// TODO Auto-generated method stub
+					onOk();
+				}
+			});
+			
+			JButton cancel = new JButton("Cancel");
+			footer.add(cancel);
+			cancel.addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					// TODO Auto-generated method stub
+					dispose();
+				}
+			});
+
+			
+			setVisible(true);
+		}
+		
+		/**
+		 * Event-driven method response to OK button command.
+		 */
+		protected void onOk() {
+			dispose();
+		}
+		
+	}
+	
+	
+	/**
+	 * This is GUI allowing users to import/register dynamically and remotely algorithms from Hudup server/service.
+	 * @author Loc Nguyen
+	 * @version 12.0
+	 */
+	protected static class ServerImportAlgDlag extends JDialog {
+		
+		/**
+		 * Default serial version UID.
+		 */
+		private static final long serialVersionUID = 1L;
+
+		/**
+		 * Constructor with parent component.
+		 * @param comp parent component.
+		 */
+		public ServerImportAlgDlag(Component comp) {
+			super(UIUtil.getFrameForComponent(comp), "Import remotely algorithms from Hudup server/service", true);
+			
+			setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+			setSize(600, 400);
+			setLocationRelativeTo(UIUtil.getFrameForComponent(comp));
+			
+			setLayout(new BorderLayout());
+			
+			JPanel header = new JPanel(new BorderLayout());
+			add(header, BorderLayout.NORTH);
+			
+			
+			JPanel body = new JPanel(new BorderLayout());
+			add(body, BorderLayout.CENTER);
+
+			
+			JPanel footer = new JPanel();
+			add(footer, BorderLayout.SOUTH);
+
+			JButton ok = new JButton("OK");
+			footer.add(ok);
+			ok.addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					// TODO Auto-generated method stub
+					onOk();
+				}
+			});
+			
+			JButton cancel = new JButton("Cancel");
+			footer.add(cancel);
+			cancel.addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					// TODO Auto-generated method stub
+					dispose();
+				}
+			});
+
+			
+			setVisible(true);
+		}
+		
+		/**
+		 * Event-driven method response to OK button command.
+		 */
+		protected void onOk() {
+			dispose();
+		}
+		
 	}
 	
 	

@@ -77,7 +77,8 @@ public abstract class StartDlg extends JDialog {
         add(body, BorderLayout.CENTER);
         
         JTextArea txtHelp = createHelp();
-        body.add(new JScrollPane(txtHelp), BorderLayout.CENTER);
+        if (txtHelp != null)
+        	body.add(new JScrollPane(txtHelp), BorderLayout.CENTER);
 	}
 
 
