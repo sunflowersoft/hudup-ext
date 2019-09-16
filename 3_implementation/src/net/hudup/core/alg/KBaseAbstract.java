@@ -203,6 +203,17 @@ public abstract class KBaseAbstract implements KBase {
 	}
 
 	
+	@Override
+	protected void finalize() throws Throwable {
+		// TODO Auto-generated method stub
+		super.finalize();
+		
+		try {
+			if (!isEmpty()) close();
+		} catch (Throwable e) {e.printStackTrace();}
+	}
+
+
 	/**
 	 * Create empty knowledge base.
 	 * @param kbaseName knowledge base name.

@@ -1,4 +1,5 @@
 net.hudup
+net.hudup.alg.cf.bnet
 net.hudup.alg.cf.gfall
 net.hudup.alg.cf.mf
 net.hudup.core
@@ -29,6 +30,8 @@ net.hudup.evaluate.ui
 net.hudup.listener
 net.hudup.listener.ui
 net.hudup.logistic
+net.hudup.logistic.math
+net.hudup.logistic.math.ui
 net.hudup.parser
 net.hudup.phoebe.math
 net.hudup.phoebe.math.ui

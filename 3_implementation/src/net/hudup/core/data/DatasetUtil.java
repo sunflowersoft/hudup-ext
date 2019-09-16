@@ -1,5 +1,8 @@
 package net.hudup.core.data;
 
+import java.util.Set;
+
+import net.hudup.core.Util;
 import net.hudup.core.parser.DatasetParser;
 
 
@@ -39,5 +42,59 @@ public final class DatasetUtil {
 		return null;
 	}
 
+	
+	/**
+	 * Getting rating user identifiers from dataset.
+	 * @param dataset specified dataset.
+	 * @return rating user identifiers from dataset.
+	 */
+	public final static Set<Integer> getRatingUserIds(Dataset dataset) {
+		Fetcher<RatingVector> fetcher = dataset.fetchUserRatings();
+		return getIds(fetcher, true);
+	}
+	
+	
+	/**
+	 * Getting rated item identifiers from dataset.
+	 * @param dataset specified dataset.
+	 * @return rated item identifiers from dataset.
+	 */
+	public final static Set<Integer> getRatedItemIds(Dataset dataset) {
+		Fetcher<RatingVector> fetcher = dataset.fetchItemRatings();
+		return getIds(fetcher, true);
+	}
+	
+	
+	/**
+	 * Getting identifiers from fetcher of rating vectors.
+	 * @param fetcher fetcher of rating vectors.
+	 * @param autoClose if true, fetcher is closed automatically.
+	 * @return set of identifiers.
+	 */
+	private final static Set<Integer> getIds(Fetcher<RatingVector> fetcher, boolean autoClose) {
+		Set<Integer> ids = Util.newSet();
+		if (fetcher == null) return ids;
+		
+		try {
+			while (fetcher.next()) {
+				RatingVector vRating = fetcher.pick();
+				if (vRating == null) continue;
+				
+				int count = vRating.count(true);
+				if (count > 0) ids.add(vRating.id());
+			}
+		}
+		catch (Throwable e) {e.printStackTrace();}
+		
+		if (autoClose) {
+			try {
+				fetcher.close();
+			}
+			catch (Throwable e) {e.printStackTrace();}
+		}
+		
+		return ids;
+	}
+	
 	
 }

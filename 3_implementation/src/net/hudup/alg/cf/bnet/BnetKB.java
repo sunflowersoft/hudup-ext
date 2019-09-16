@@ -335,6 +335,7 @@ public abstract class BnetKB extends KBaseAbstract {
 
 	/**
 	 * Saving list of Bayesian networks to specified store.
+	 * @param adapter URI adapter.
 	 * @param bnetList list of Bayesian networks.
 	 * @param store specified store (directory) where to store Bayesian networks.
 	 * @param prefixName prefix of names of files.

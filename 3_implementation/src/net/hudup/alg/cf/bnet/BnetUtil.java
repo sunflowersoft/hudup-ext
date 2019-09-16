@@ -235,6 +235,7 @@ public class BnetUtil {
 	 * Create item evidence.
 	 * @param nodeList list of nodes.
 	 * @param userRating user rating vector.
+	 * @param minRating minimum rating value.
 	 * @return item evidence.
 	 */
 	public static Evidence createItemEvidence(

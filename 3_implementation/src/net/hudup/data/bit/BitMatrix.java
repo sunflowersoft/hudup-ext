@@ -9,7 +9,7 @@ import java.util.List;
 import net.hudup.core.Util;
 
 /**
- * This class represent a bit rating matrix.
+ * This class represent a bit rating matrix (binary rating matrix).
  * 
  * @author Loc Nguyen
  * @version 10.0

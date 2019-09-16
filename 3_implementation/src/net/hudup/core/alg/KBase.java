@@ -5,6 +5,7 @@ package net.hudup.core.alg;
 
 import java.io.Serializable;
 
+import net.hudup.core.data.AutoCloseable;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.Datasource;
@@ -65,7 +66,7 @@ import net.hudup.core.parser.TextParserUtil;
  * @version 10.0
  *
  */
-public interface KBase extends Inspectable, Serializable {
+public interface KBase extends Inspectable, Serializable, AutoCloseable {
 	
 	
 	/**
@@ -129,13 +130,14 @@ public interface KBase extends Inspectable, Serializable {
 	
 	
 	/**
-	 * Cleaning out {@code KBase}. After this method is called, KBase becomes empty, which means that method {@link #isEmpty()} returns {@code true} but KBase can be re-learned by calling the method {@link #learn(Dataset, Alg)} again.
+	 * Cleaning out {@code KBase}. This method is stronger than method {@link #close()} because it firstly deletes all storage and then calls {@link #close()}.
+	 * Using this method should be careful.
 	 */
 	void clear();
 	
 	
 	/**
-	 * Close this KBase. After this method is called, KBase cannot be re-learned. It becomes garbage for system garbage collector.
+	 * Close this KBase. After this method is called, KBase becomes empty, which means that method {@link #isEmpty()} returns {@code true} but KBase can be re-learned by calling the method {@link #learn(Dataset, Alg)} again.
 	 */
 	void close();
 	

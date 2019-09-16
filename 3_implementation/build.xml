@@ -80,7 +80,7 @@
 
 	<!--
 	Function: The main goal of the project was the construction of an environment that serve, on the one hand, as a benchwork for the investigation of new methods and algorithms of probabilistic reasoning and, on the other hand, as a tool for the implementation of Bayesian expert systems. In Sim project, Elvira is used to build Bayesian network.
-	Affected packages, classes: net.hudup.alg.cf.bnet.BnetUtil, net.hudup.alg.cf.bnet.BnetLearner, net.hudup.alg.cf.bnet.BnetCF
+	Affected packages, classes: net.hudup.alg.cf.bnet.BnetUtil, net.hudup.alg.cf.bnet.BnetLearner, net.hudup.alg.cf.bnet.BnetCF, net.hudup.alg.cf.bnet.BnetKB
 	Referred jars:
 	Source: http://www.ia.uned.es/~elvira/index-en.html
 	Vendor: CICYT (a Spanish research agency)

@@ -22,6 +22,7 @@ import javax.swing.table.DefaultTableModel;
 import net.hudup.core.RegisterTableList.RegisterTableItem;
 import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.AlgList;
+import net.hudup.core.logistic.NextUpdate;
 import net.hudup.core.logistic.ui.SortableTable;
 import net.hudup.core.logistic.ui.SortableTableModel;
 import net.hudup.core.logistic.ui.StartDlg;
@@ -366,6 +367,7 @@ public class PluginStorageManifest extends SortableTable {
 	 * @author Loc Nguyen
 	 * @version 12.0
 	 */
+	@NextUpdate
 	protected static class JarImportAlgDlag extends JDialog {
 		
 		/**
@@ -438,6 +440,7 @@ public class PluginStorageManifest extends SortableTable {
 	 * @author Loc Nguyen
 	 * @version 12.0
 	 */
+	@NextUpdate
 	protected static class ServerImportAlgDlag extends JDialog {
 		
 		/**

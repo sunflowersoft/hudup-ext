@@ -447,6 +447,8 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 						xURI bindUri = ConnectDlg.getBindUri();
 						
 						ev.getPluginStorage().assignToSystem(); //This code line is very important for initializing plug-in storage.
+//						PluginStorageWrapper wrapper = ev.getPluginStorage();
+//						wrapper.assignToSystem(); //This code line is very important for initializing plug-in storage.
 						run(ev, bindUri, null);
 					}
 					catch (Exception e) {

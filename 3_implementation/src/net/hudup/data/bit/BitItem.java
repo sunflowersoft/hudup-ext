@@ -15,7 +15,7 @@ import net.hudup.core.data.Pair;
 import net.hudup.core.data.RatingVector;
 
 /**
- * This class represents a bit item.
+ * This class represents a bit item (binary item).
  * 
  * @author Loc Nguyen
  * @version 10.0

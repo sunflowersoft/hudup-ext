@@ -23,7 +23,7 @@ import net.hudup.core.data.RatingVector;
 import net.hudup.core.logistic.MinMax;
 
 /**
- * This class represents a rating matrix in bit form. It is also a bit dataset.
+ * This class represents a rating matrix in bit form. It is also a bit dataset or binary dataset.
  * @author Loc Nguyen
  * @version 10.0
  *
@@ -40,13 +40,13 @@ public class BitData implements Cloneable, net.hudup.core.data.AutoCloseable, Se
 	/**
 	 * Items are translated into bit items. 
 	 * For example: item 1 with rating 4 is translated into 9.
-	 * So each key is the bit item id (is 9). 
+	 * So each key is the bit item id (is 9) and each value is a bit item {@link BitItem}.
 	 */
 	private Map<Integer, BitItem> bitItemMap = Util.newMap();
 
 	
 	/**
-	 * Profiles of bit items.s
+	 * Profiles of bit items.
 	 */
 	private Profiles bitItemProfiles = MemProfiles.createEmpty();
 	

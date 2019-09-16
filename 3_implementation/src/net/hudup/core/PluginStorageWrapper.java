@@ -85,9 +85,11 @@ public final class PluginStorageWrapper implements Serializable {
 	
 	
 	/**
-	 * Assigning to system plug-in storage: this = PluginStorage.
+	 * Assigning to system plug-in storage: this = PluginStorage. Using this method carefully.
 	 */
 	public void assignToSystem() {
+		PluginStorage.releaseAllRegisteredAlgs();
+		
 		PluginStorage.normalAlgReg = this.normalAlgReg;
 		PluginStorage.parserReg = this.parserReg;
 		PluginStorage.metricReg = this.metricReg;
