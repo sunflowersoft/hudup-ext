@@ -1,3 +1,10 @@
+/**
+ * HUDUP: A FRAMEWORK OF E-COMMERCIAL RECOMMENDATION ALGORITHMS
+ * (C) Copyright by Loc Nguyen's Academic Network
+ * Project homepage: http://www.locnguyen.net/st/products/hudup
+ * Email: ng_phloc@yahoo.com
+ * Phone: +84-975250362
+ */
 package net.hudup.server.external;
 
 import java.util.Map;
@@ -11,7 +18,6 @@ import net.hudup.core.data.Fetcher;
 import net.hudup.core.data.MemProfiles;
 import net.hudup.core.data.Profile;
 import net.hudup.data.SemiScanner;
-
 
 /**
  * This class is an extension of semi-scanner ({@link SemiScanner}) which supports external mapping.

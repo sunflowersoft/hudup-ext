@@ -1,3 +1,10 @@
+/**
+ * HUDUP: A FRAMEWORK OF E-COMMERCIAL RECOMMENDATION ALGORITHMS
+ * (C) Copyright by Loc Nguyen's Academic Network
+ * Project homepage: http://www.locnguyen.net/st/products/hudup
+ * Email: ng_phloc@yahoo.com
+ * Phone: +84-975250362
+ */
 package net.hudup.core.logistic;
 
 import java.awt.Component;
@@ -19,7 +26,6 @@ import net.hudup.core.Util;
 import net.hudup.core.data.AutoCloseable;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.UnitList;
-
 
 /**
  * This class is also a URI associator because it implements the interface {@link UriAssoc} but it hides all physical systems and protocols (file system, compressed file, HTTP, database, etc.).

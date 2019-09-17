@@ -1,3 +1,10 @@
+/**
+ * HUDUP: A FRAMEWORK OF E-COMMERCIAL RECOMMENDATION ALGORITHMS
+ * (C) Copyright by Loc Nguyen's Academic Network
+ * Project homepage: http://www.locnguyen.net/st/products/hudup
+ * Email: ng_phloc@yahoo.com
+ * Phone: +84-975250362
+ */
 package net.hudup.core.logistic;
 
 import java.net.DatagramSocket;
@@ -13,7 +20,6 @@ import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.Enumeration;
 import java.util.Random;
-
 
 /**
  * This final class provides utility static methods for network programming. Some methods in this class are available on internet.

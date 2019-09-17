@@ -1,3 +1,10 @@
+/**
+ * HUDUP: A FRAMEWORK OF E-COMMERCIAL RECOMMENDATION ALGORITHMS
+ * (C) Copyright by Loc Nguyen's Academic Network
+ * Project homepage: http://www.locnguyen.net/st/products/hudup
+ * Email: ng_phloc@yahoo.com
+ * Phone: +84-975250362
+ */
 package net.hudup.data.ui;
 
 import java.awt.BorderLayout;
@@ -30,7 +37,6 @@ import net.hudup.core.logistic.ui.UIUtil;
 import net.hudup.data.BatchScript;
 import net.hudup.data.DatasetUtil2;
 import net.hudup.evaluate.ui.AddingDatasetDlg;
-
 
 /**
  * This class is the dialog to process dataset pool.

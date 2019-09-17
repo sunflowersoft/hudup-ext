@@ -1,6 +1,3 @@
-/**
- * 
- */
 package net.hudup.core.logistic.ui;
 
 import java.util.Collections;

@@ -1,3 +1,10 @@
+/**
+ * HUDUP: A FRAMEWORK OF E-COMMERCIAL RECOMMENDATION ALGORITHMS
+ * (C) Copyright by Loc Nguyen's Academic Network
+ * Project homepage: http://www.locnguyen.net/st/products/hudup
+ * Email: ng_phloc@yahoo.com
+ * Phone: +84-975250362
+ */
 package net.hudup.core.factory;
 
 import net.hudup.core.data.DataConfig;
@@ -5,7 +12,6 @@ import net.hudup.core.data.ProviderAssoc;
 import net.hudup.core.data.ui.UnitTable;
 import net.hudup.core.logistic.UriAssoc;
 import net.hudup.core.logistic.xURI;
-
 
 /**
  * This interface defines factory utility for creating suitable provider associator {@link ProviderAssoc}.

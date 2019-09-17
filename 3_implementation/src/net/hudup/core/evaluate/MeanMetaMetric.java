@@ -1,3 +1,10 @@
+/**
+ * HUDUP: A FRAMEWORK OF E-COMMERCIAL RECOMMENDATION ALGORITHMS
+ * (C) Copyright by Loc Nguyen's Academic Network
+ * Project homepage: http://www.locnguyen.net/st/products/hudup
+ * Email: ng_phloc@yahoo.com
+ * Phone: +84-975250362
+ */
 package net.hudup.core.evaluate;
 
 import java.rmi.RemoteException;
@@ -6,7 +13,6 @@ import java.util.List;
 import net.hudup.core.alg.Alg;
 import net.hudup.core.logistic.BaseClass;
 import net.hudup.core.logistic.DSUtil;
-
 
 /**
  * Meta-metric with mean value.

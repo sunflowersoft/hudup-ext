@@ -1,3 +1,10 @@
+/**
+ * HUDUP: A FRAMEWORK OF E-COMMERCIAL RECOMMENDATION ALGORITHMS
+ * (C) Copyright by Loc Nguyen's Academic Network
+ * Project homepage: http://www.locnguyen.net/st/products/hudup
+ * Email: ng_phloc@yahoo.com
+ * Phone: +84-975250362
+ */
 package net.hudup.core.data.ctx;
 
 import java.io.Serializable;
@@ -7,7 +14,6 @@ import net.hudup.core.Cloneable;
 import net.hudup.core.Transfer;
 import net.hudup.core.data.Profile;
 import net.hudup.core.data.Profiles;
-
 
 /**
  * Every context template represented by {@code ContextTemplate} interface owns a profile table and each value represented by {@link ContextValue} of template corresponds to a row in this table.

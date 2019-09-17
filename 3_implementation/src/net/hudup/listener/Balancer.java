@@ -1,3 +1,10 @@
+/**
+ * HUDUP: A FRAMEWORK OF E-COMMERCIAL RECOMMENDATION ALGORITHMS
+ * (C) Copyright by Loc Nguyen's Academic Network
+ * Project homepage: http://www.locnguyen.net/st/products/hudup
+ * Email: ng_phloc@yahoo.com
+ * Phone: +84-975250362
+ */
 package net.hudup.listener;
 
 import java.awt.MenuItem;
@@ -16,7 +23,6 @@ import net.hudup.core.logistic.xURI;
 import net.hudup.core.logistic.ui.HelpContent;
 import net.hudup.core.logistic.ui.UIUtil;
 import net.hudup.listener.ui.BalancerCP;
-
 
 /**
  * Because server supports many clients, it is more effective if deploying server on different platforms.

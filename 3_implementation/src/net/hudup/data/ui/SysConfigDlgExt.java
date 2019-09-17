@@ -1,3 +1,10 @@
+/**
+ * HUDUP: A FRAMEWORK OF E-COMMERCIAL RECOMMENDATION ALGORITHMS
+ * (C) Copyright by Loc Nguyen's Academic Network
+ * Project homepage: http://www.locnguyen.net/st/products/hudup
+ * Email: ng_phloc@yahoo.com
+ * Phone: +84-975250362
+ */
 package net.hudup.data.ui;
 
 import java.awt.BorderLayout;
@@ -15,7 +22,6 @@ import net.hudup.core.data.DataDriverList;
 import net.hudup.core.data.ui.DataDriverListTable;
 import net.hudup.core.data.ui.SysConfigPane;
 import net.hudup.logistic.SystemPropertiesPane;
-
 
 /**
  * This class is extended dialog allowing users to modifying system configuration.

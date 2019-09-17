@@ -1,3 +1,10 @@
+/**
+ * HUDUP: A FRAMEWORK OF E-COMMERCIAL RECOMMENDATION ALGORITHMS
+ * (C) Copyright by Loc Nguyen's Academic Network
+ * Project homepage: http://www.locnguyen.net/st/products/hudup
+ * Email: ng_phloc@yahoo.com
+ * Phone: +84-975250362
+ */
 package net.hudup.core.client;
 
 import java.io.IOException;
@@ -17,7 +24,6 @@ import net.hudup.core.data.Profile;
 import net.hudup.core.data.RatingVector;
 import net.hudup.core.data.Snapshot;
 import net.hudup.core.evaluate.Evaluator;
-
 
 /**
  * {@code Response} class represents result of Hudup services such as recommendation task, updating database, information retrieval.

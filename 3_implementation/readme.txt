@@ -1,8 +1,11 @@
-Hudup - A framework of e-commercial recommendation algorithms
+                  HUDUP: A FRAMEWORK OF E-COMMERCIAL RECOMMENDATION ALGORITHMS
+
+                                     --------------------
 
 Owners:
-       Prof. Dr. Bich-Ngoc Tran, Sunflower Soft Company, Vietnam
+       Prof. Dr. Bich-Ngoc Tran, Loc Nguyen's Academic Network, Vietnam
        Prof. Dr. Thu-Hang Thi Ho, Vinh Long General Hospital, Vietnam
+
 Authors:
        Prof. Dr. Loc Nguyen
        Prof. Dr. Minh-Phung Thi Do
@@ -40,7 +43,7 @@ Hudup software also provides 10 developing packages:
 - hudup-${version}-toolkit.zip: contains hudup-toolkit.jar which is Toolkit module
 - hudup-runtime-lib.jar: contains libraries Hudup framework used
 
-When you uncompress hudup-${version}-*.zip, there are a respective hudup-*.jar module and shell command files used to execute such jar module. You should copy runtime-lib.jar to the same directory with such jar module for running successfully. You can copy these jar modules to your application's library directory in order to develop new software.
+When you uncompress hudup-${version}-*.zip, there are a respective hudup-*.jar module and shell command files used to execute such jar module. You should copy hudup-runtime-lib.jar to the same directory with such jar module for running successfully. You can copy these jar modules to your application's library directory in order to develop new software.
 
 Thank you for enjoying product.
 Best regards,

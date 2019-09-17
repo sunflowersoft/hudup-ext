@@ -1,3 +1,10 @@
+/**
+ * HUDUP: A FRAMEWORK OF E-COMMERCIAL RECOMMENDATION ALGORITHMS
+ * (C) Copyright by Loc Nguyen's Academic Network
+ * Project homepage: http://www.locnguyen.net/st/products/hudup
+ * Email: ng_phloc@yahoo.com
+ * Phone: +84-975250362
+ */
 package net.hudup.core.logistic;
 
 import java.io.Serializable;
@@ -9,7 +16,6 @@ import net.hudup.core.Cloneable;
 import net.hudup.core.Constants;
 import net.hudup.core.Util;
 import net.hudup.core.data.RatingVector;
-
 
 /**
  * This class represents a triple which has one integer key {@link #key} and two double values such as {@link #value1} and {@link #value2}.

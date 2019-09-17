@@ -1,10 +1,16 @@
+/**
+ * HUDUP: A FRAMEWORK OF E-COMMERCIAL RECOMMENDATION ALGORITHMS
+ * (C) Copyright by Loc Nguyen's Academic Network
+ * Project homepage: http://www.locnguyen.net/st/products/hudup
+ * Email: ng_phloc@yahoo.com
+ * Phone: +84-975250362
+ */
 package net.hudup.listener;
 
 import net.hudup.core.client.ClientUtil;
 import net.hudup.core.client.PowerServer;
 import net.hudup.core.client.Server;
 import net.hudup.core.client.ServerStatusListener;
-
 
 /**
  * This class is the model of remote power server together with remote information (host, port, access account, access password, etc.) that are bound to listener or balancer.

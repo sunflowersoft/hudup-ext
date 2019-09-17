@@ -1,3 +1,10 @@
+/**
+ * HUDUP: A FRAMEWORK OF E-COMMERCIAL RECOMMENDATION ALGORITHMS
+ * (C) Copyright by Loc Nguyen's Academic Network
+ * Project homepage: http://www.locnguyen.net/st/products/hudup
+ * Email: ng_phloc@yahoo.com
+ * Phone: +84-975250362
+ */
 package net.hudup.listener;
 
 import java.io.BufferedReader;
@@ -15,7 +22,6 @@ import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.Runner;
 import net.hudup.core.logistic.RunnerThread;
 import net.hudup.core.logistic.UriAdapter;
-
 
 /**
  * This is abstract class of delegator.

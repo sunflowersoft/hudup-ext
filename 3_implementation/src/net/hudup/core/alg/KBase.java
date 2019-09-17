@@ -1,4 +1,11 @@
 /**
+ * HUDUP: A FRAMEWORK OF E-COMMERCIAL RECOMMENDATION ALGORITHMS
+ * (C) Copyright by Loc Nguyen's Academic Network
+ * Project homepage: http://www.locnguyen.net/st/products/hudup
+ * Email: ng_phloc@yahoo.com
+ * Phone: +84-975250362
+ */
+/**
  * 
  */
 package net.hudup.core.alg;
@@ -110,14 +117,17 @@ public interface KBase extends Inspectable, Serializable, AutoCloseable {
 	
 	
 	/**
-	 * This method is used to write {@code KBase} to storage system. Storage system can be files, database, etc.
+	 * This method is used to write {@code KBase} to storage system according to internal configuration. Storage system can be files, database, etc.
+	 * This method in turn calls {@link #export(DataConfig)} method.
 	 */
 	void save();
 	
 	
 	/**
-	 * Getting the configuration of KBase by copying (exporting) the internal configuration to the specified configuration. 
-	 * @param storeConfig specified configuration where the internal configuration is copied.
+	 * This method is used to write {@code KBase} to storage system according to the specified configuration.
+	 * It is possible to store knowledge base anywhere according to the specified configuration.
+	 * This method is called by {@link #save()} method.
+	 * @param storeConfig specified configuration where to store knowledge base.
 	 */
 	void export(DataConfig storeConfig);
 	
@@ -170,6 +180,7 @@ public interface KBase extends Inspectable, Serializable, AutoCloseable {
 	 * Data source represented by {@link Datasource} class is a special class used to point to a dataset. Of course it contains a URI of such dataset. Note that URI, abbreviation of Uniform Resource Identifier, is the string of characters used to identify a resource on Internet.
 	 * As usual and for convenience, data source also contains dataset. We can considered data source as a wrapper of dataset with additional information about dataset.
 	 * This method returns the datasource of the dataset that KBase is learned or loaded.
+	 * In current implementation, datasource contains dataset but it is possible that datasource does not contains dataset.
 	 * @return datasource of the dataset that KBase is learned or loaded.
 	 */
 	Datasource getDatasource();

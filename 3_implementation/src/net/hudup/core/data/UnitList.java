@@ -1,3 +1,10 @@
+/**
+ * HUDUP: A FRAMEWORK OF E-COMMERCIAL RECOMMENDATION ALGORITHMS
+ * (C) Copyright by Loc Nguyen's Academic Network
+ * Project homepage: http://www.locnguyen.net/st/products/hudup
+ * Email: ng_phloc@yahoo.com
+ * Phone: +84-975250362
+ */
 package net.hudup.core.data;
 
 import java.util.Collection;
@@ -5,7 +12,6 @@ import java.util.List;
 
 import net.hudup.core.Util;
 import net.hudup.core.data.ui.UnitListBox;
-
 
 /**
  * This class represents a list of many units. As a convention, it is called unit list.

@@ -1,3 +1,10 @@
+/**
+ * HUDUP: A FRAMEWORK OF E-COMMERCIAL RECOMMENDATION ALGORITHMS
+ * (C) Copyright by Loc Nguyen's Academic Network
+ * Project homepage: http://www.locnguyen.net/st/products/hudup
+ * Email: ng_phloc@yahoo.com
+ * Phone: +84-975250362
+ */
 package net.hudup.core.evaluate;
 
 import java.io.Serializable;
@@ -6,7 +13,6 @@ import java.rmi.RemoteException;
 import net.hudup.core.Cloneable;
 import net.hudup.core.Constants;
 import net.hudup.core.logistic.MathUtil;
-
 
 /**
  * This interface represents value of a metric, called {@code metric value}. It can be anything but in current implementation, it only reflects real number (double number) via the method {@link #value()}.

@@ -1,10 +1,16 @@
+/**
+ * HUDUP: A FRAMEWORK OF E-COMMERCIAL RECOMMENDATION ALGORITHMS
+ * (C) Copyright by Loc Nguyen's Academic Network
+ * Project homepage: http://www.locnguyen.net/st/products/hudup
+ * Email: ng_phloc@yahoo.com
+ * Phone: +84-975250362
+ */
 package net.hudup.core.data.ui;
 
 import javax.swing.JPanel;
 
 import net.hudup.core.data.PropList;
 import net.hudup.core.data.SysConfig;
-
 
 /**
  * The graphic user interface (GUI) component as panel {@link JPanel} shows a system properties list represented by {@link SysConfig}.

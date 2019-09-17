@@ -1,4 +1,4 @@
-                  HUDUP - A FRAMEWORK OF E-COMMERCIAL RECOMMENDATION ALGORITHMS
+                  HUDUP: A FRAMEWORK OF E-COMMERCIAL RECOMMENDATION ALGORITHMS
 
                                      --------------------
 

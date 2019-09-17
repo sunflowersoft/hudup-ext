@@ -1,3 +1,10 @@
+/**
+ * HUDUP: A FRAMEWORK OF E-COMMERCIAL RECOMMENDATION ALGORITHMS
+ * (C) Copyright by Loc Nguyen's Academic Network
+ * Project homepage: http://www.locnguyen.net/st/products/hudup
+ * Email: ng_phloc@yahoo.com
+ * Phone: +84-975250362
+ */
 package net.hudup.server;
 
 import java.io.Serializable;
@@ -36,7 +43,6 @@ import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.NextUpdate;
 import net.hudup.data.ProviderImpl;
 import net.hudup.data.SnapshotImpl;
-
 
 /**
  * {@link DefaultService} class is default implementation of {@link Service} interface. {@link DefaultService} uses {@link Recommender} and {@link Provider} for processing recommendation request and update request, respectively.

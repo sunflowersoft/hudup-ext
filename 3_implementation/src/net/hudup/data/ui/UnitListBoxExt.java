@@ -1,3 +1,10 @@
+/**
+ * HUDUP: A FRAMEWORK OF E-COMMERCIAL RECOMMENDATION ALGORITHMS
+ * (C) Copyright by Loc Nguyen's Academic Network
+ * Project homepage: http://www.locnguyen.net/st/products/hudup
+ * Email: ng_phloc@yahoo.com
+ * Phone: +84-975250362
+ */
 package net.hudup.data.ui;
 
 import java.awt.Component;
@@ -17,7 +24,6 @@ import net.hudup.core.data.UnitList;
 import net.hudup.core.data.ui.UnitListBox;
 import net.hudup.core.logistic.ui.UIUtil;
 import net.hudup.data.ProviderImpl;
-
 
 /**
  * The graphic user interface (GUI) component as list box shows the {@link UnitList}.

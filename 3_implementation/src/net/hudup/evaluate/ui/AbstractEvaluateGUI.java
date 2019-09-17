@@ -1,3 +1,10 @@
+/**
+ * HUDUP: A FRAMEWORK OF E-COMMERCIAL RECOMMENDATION ALGORITHMS
+ * (C) Copyright by Loc Nguyen's Academic Network
+ * Project homepage: http://www.locnguyen.net/st/products/hudup
+ * Email: ng_phloc@yahoo.com
+ * Phone: +84-975250362
+ */
 package net.hudup.evaluate.ui;
 
 import java.io.IOException;
@@ -26,7 +33,6 @@ import net.hudup.core.logistic.NetUtil.RegistryRemote;
 import net.hudup.core.logistic.UriAdapter.AdapterWriteChannel;
 import net.hudup.core.logistic.xURI;
 import net.hudup.core.logistic.ui.CounterClock;
-
 
 /**
  * This abstract class represents an abstract GUI to allow users to interact with {@link EvaluatorAbstract}.

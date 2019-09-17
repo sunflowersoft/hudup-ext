@@ -1,5 +1,9 @@
 /**
- * 
+ * HUDUP: A FRAMEWORK OF E-COMMERCIAL RECOMMENDATION ALGORITHMS
+ * (C) Copyright by Loc Nguyen's Academic Network
+ * Project homepage: http://www.locnguyen.net/st/products/hudup
+ * Email: ng_phloc@yahoo.com
+ * Phone: +84-975250362
  */
 package net.hudup.core.client;
 
@@ -13,7 +17,6 @@ import net.hudup.core.data.Nominal;
 import net.hudup.core.data.Profile;
 import net.hudup.core.data.Rating;
 import net.hudup.core.data.RatingVector;
-
 
 /**
  * {@code Protocol} interface specifies methods to create request represented by {@link Request} of Hudup client-server network in many possible cases.

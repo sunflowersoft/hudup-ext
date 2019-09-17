@@ -1,3 +1,10 @@
+/**
+ * HUDUP: A FRAMEWORK OF E-COMMERCIAL RECOMMENDATION ALGORITHMS
+ * (C) Copyright by Loc Nguyen's Academic Network
+ * Project homepage: http://www.locnguyen.net/st/products/hudup
+ * Email: ng_phloc@yahoo.com
+ * Phone: +84-975250362
+ */
 package net.hudup.core;
 
 import static net.hudup.core.Constants.RESOURCES_PACKAGE;
@@ -27,7 +34,6 @@ import net.hudup.core.parser.JsonParserImpl;
 import net.hudup.core.parser.TextParserUtil;
 import net.hudup.core.security.Cipher;
 import net.hudup.core.security.CipherImpl;
-
 
 /**
  * This final class provides important static utility methods to create and initialize essential data structures used over Hudup framework such as {@link Vector}, {@link List}, {@link Set}, {@link Map}, and {@link Queue}.

@@ -1,3 +1,10 @@
+/**
+ * HUDUP: A FRAMEWORK OF E-COMMERCIAL RECOMMENDATION ALGORITHMS
+ * (C) Copyright by Loc Nguyen's Academic Network
+ * Project homepage: http://www.locnguyen.net/st/products/hudup
+ * Email: ng_phloc@yahoo.com
+ * Phone: +84-975250362
+ */
 package net.hudup.core.alg;
 
 import java.io.Serializable;
@@ -5,7 +12,6 @@ import java.util.Collection;
 
 import net.hudup.core.Util;
 import net.hudup.core.data.DataConfig;
-
 
 /**
  * This class represents description of an algorithm. In current version, it includes algorithm class name and configuration of such algorithm.

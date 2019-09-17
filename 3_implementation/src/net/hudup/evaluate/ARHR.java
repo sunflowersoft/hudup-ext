@@ -1,3 +1,10 @@
+/**
+ * HUDUP: A FRAMEWORK OF E-COMMERCIAL RECOMMENDATION ALGORITHMS
+ * (C) Copyright by Loc Nguyen's Academic Network
+ * Project homepage: http://www.locnguyen.net/st/products/hudup
+ * Email: ng_phloc@yahoo.com
+ * Phone: +84-975250362
+ */
 package net.hudup.evaluate;
 
 import java.rmi.RemoteException;
@@ -11,7 +18,6 @@ import net.hudup.core.data.RatingVector;
 import net.hudup.core.evaluate.MetricValue;
 import net.hudup.core.evaluate.RealMeanMetricValue;
 import net.hudup.core.evaluate.recommend.CorrelationAccuracy;
-
 
 /**
  * ARHR metric for recommendation algorithm.

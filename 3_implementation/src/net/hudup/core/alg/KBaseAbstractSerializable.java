@@ -1,3 +1,10 @@
+/**
+ * HUDUP: A FRAMEWORK OF E-COMMERCIAL RECOMMENDATION ALGORITHMS
+ * (C) Copyright by Loc Nguyen's Academic Network
+ * Project homepage: http://www.locnguyen.net/st/products/hudup
+ * Email: ng_phloc@yahoo.com
+ * Phone: +84-975250362
+ */
 package net.hudup.core.alg;
 
 import java.io.ObjectInputStream;
@@ -8,7 +15,9 @@ import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.xURI;
 
 /**
- * This abstract class represents a knowledge base that contains serialized nut.
+ * This abstract class represents a knowledge base that contains serialized nut called KBase nut.
+ * You uses the nut to wrapper data structure, knowledge base, etc. without regarding how to store such data structure and knowledge base
+ * because the nut is serialized and deserialized from file. The weak point of KBase node is not to interchange knowledge base among non-Java applications
  * 
  * @author Loc Nguyen
  * @version 12.0
@@ -30,7 +39,8 @@ public abstract class KBaseAbstractSerializable extends KBaseAbstract {
 	
 	
 	/**
-	 * Serialized nut.
+	 * Serialized nut. You uses the nut to wrapper data structure, knowledge base, etc. without regarding how to store such data structure and knowledge base
+	 * because the nut is serialized and deserialized from file.
 	 */
 	protected KBaseSerializedNut nut = null;
 	
@@ -100,6 +110,7 @@ public abstract class KBaseAbstractSerializable extends KBaseAbstract {
 			
 			xURI nutUri = config.getStoreUri().concat(getName() + KBASE_NUT_EXT);
 			UriAdapter adapter = new UriAdapter(nutUri);
+			if (!adapter.exists(nutUri)) return false;
 			
 			ObjectInputStream input = new ObjectInputStream(adapter.getInputStream(nutUri));
 			nut = (KBaseSerializedNut)input.readObject();

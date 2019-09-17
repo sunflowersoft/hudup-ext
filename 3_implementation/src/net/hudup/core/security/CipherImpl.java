@@ -1,3 +1,10 @@
+/**
+ * HUDUP: A FRAMEWORK OF E-COMMERCIAL RECOMMENDATION ALGORITHMS
+ * (C) Copyright by Loc Nguyen's Academic Network
+ * Project homepage: http://www.locnguyen.net/st/products/hudup
+ * Email: ng_phloc@yahoo.com
+ * Phone: +84-975250362
+ */
 package net.hudup.core.security;
 
 import java.math.BigInteger;
@@ -13,7 +20,6 @@ import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.xURI;
 import sun.misc.BASE64Decoder;
 import sun.misc.BASE64Encoder;
-
 
 /**
  * This utility class provides methods of encryption and decryption. Methods here are available on internet.

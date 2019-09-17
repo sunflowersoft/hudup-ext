@@ -1,3 +1,10 @@
+/**
+ * HUDUP: A FRAMEWORK OF E-COMMERCIAL RECOMMENDATION ALGORITHMS
+ * (C) Copyright by Loc Nguyen's Academic Network
+ * Project homepage: http://www.locnguyen.net/st/products/hudup
+ * Email: ng_phloc@yahoo.com
+ * Phone: +84-975250362
+ */
 package net.hudup.listener.ui;
 
 import java.awt.BorderLayout;
@@ -12,7 +19,6 @@ import javax.swing.JPanel;
 import net.hudup.core.logistic.ui.UIUtil;
 import net.hudup.listener.RemoteInfo;
 import net.hudup.listener.RemoteInfoList;
-
 
 /**
  * This graphic user interface (GUI) is the dialog for showing remote information {@link RemoteInfo}.

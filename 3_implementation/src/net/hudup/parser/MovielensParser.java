@@ -1,3 +1,10 @@
+/**
+ * HUDUP: A FRAMEWORK OF E-COMMERCIAL RECOMMENDATION ALGORITHMS
+ * (C) Copyright by Loc Nguyen's Academic Network
+ * Project homepage: http://www.locnguyen.net/st/products/hudup
+ * Email: ng_phloc@yahoo.com
+ * Phone: +84-975250362
+ */
 package net.hudup.parser;
 
 import java.io.BufferedReader;
@@ -36,7 +43,6 @@ import net.hudup.core.parser.SnapshotParser;
 import net.hudup.core.parser.TextParserUtil;
 import net.hudup.data.DatasetUtil2;
 import net.hudup.data.SnapshotImpl;
-
 
 /**
  * This parser is used to parse original Movielens database into snapshot.

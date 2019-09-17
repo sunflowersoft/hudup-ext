@@ -1,3 +1,10 @@
+/**
+ * HUDUP: A FRAMEWORK OF E-COMMERCIAL RECOMMENDATION ALGORITHMS
+ * (C) Copyright by Loc Nguyen's Academic Network
+ * Project homepage: http://www.locnguyen.net/st/products/hudup
+ * Email: ng_phloc@yahoo.com
+ * Phone: +84-975250362
+ */
 package net.hudup.data.bit;
 
 import java.io.BufferedReader;
@@ -19,7 +26,6 @@ import net.hudup.core.logistic.DSUtil;
 import net.hudup.core.logistic.LineProcessor;
 import net.hudup.core.parser.TextParserUtil;
 import net.hudup.data.SnapshotImpl;
-
 
 /**
  * This is utility class that provides utility methods for processing bit data.

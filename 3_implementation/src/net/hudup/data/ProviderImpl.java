@@ -1,3 +1,10 @@
+/**
+ * HUDUP: A FRAMEWORK OF E-COMMERCIAL RECOMMENDATION ALGORITHMS
+ * (C) Copyright by Loc Nguyen's Academic Network
+ * Project homepage: http://www.locnguyen.net/st/products/hudup
+ * Email: ng_phloc@yahoo.com
+ * Phone: +84-975250362
+ */
 package net.hudup.data;
 
 import java.io.Serializable;
@@ -42,7 +49,6 @@ import net.hudup.core.parser.DatasetParser;
 import net.hudup.core.parser.Indicator;
 import net.hudup.core.parser.ScannerParser;
 import net.hudup.data.ctx.DefaultCTSManager;
-
 
 /**
  * This class is the default implementation of {@link Provider} to process dataset.

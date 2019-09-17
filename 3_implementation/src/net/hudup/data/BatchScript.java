@@ -1,3 +1,10 @@
+/**
+ * HUDUP: A FRAMEWORK OF E-COMMERCIAL RECOMMENDATION ALGORITHMS
+ * (C) Copyright by Loc Nguyen's Academic Network
+ * Project homepage: http://www.locnguyen.net/st/products/hudup
+ * Email: ng_phloc@yahoo.com
+ * Phone: +84-975250362
+ */
 package net.hudup.data;
 
 import java.io.Reader;
@@ -16,7 +23,6 @@ import net.hudup.core.data.PropList;
 import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.xURI;
 import net.hudup.core.parser.TextParserUtil;
-
 
 /**
  * This utility class helps users to retrieve a dataset pool and a list of algorithm names from text batch script for evaluating many datasets and many algorithms later.

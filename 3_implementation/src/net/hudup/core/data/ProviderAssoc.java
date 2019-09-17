@@ -1,7 +1,13 @@
+/**
+ * HUDUP: A FRAMEWORK OF E-COMMERCIAL RECOMMENDATION ALGORITHMS
+ * (C) Copyright by Loc Nguyen's Academic Network
+ * Project homepage: http://www.locnguyen.net/st/products/hudup
+ * Email: ng_phloc@yahoo.com
+ * Phone: +84-975250362
+ */
 package net.hudup.core.data;
 
 import java.io.IOException;
-
 
 /**
  * Any class that implements this interface is called {@code provider associator} which assists the provider specified by interface {@code Provider} to performs read-write operations.

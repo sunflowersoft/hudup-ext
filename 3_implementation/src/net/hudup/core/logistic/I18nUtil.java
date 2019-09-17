@@ -1,3 +1,10 @@
+/**
+ * HUDUP: A FRAMEWORK OF E-COMMERCIAL RECOMMENDATION ALGORITHMS
+ * (C) Copyright by Loc Nguyen's Academic Network
+ * Project homepage: http://www.locnguyen.net/st/products/hudup
+ * Email: ng_phloc@yahoo.com
+ * Phone: +84-975250362
+ */
 package net.hudup.core.logistic;
 
 import java.io.IOException;
@@ -16,7 +23,6 @@ import java.util.ResourceBundle.Control;
 import net.hudup.core.Constants;
 import net.hudup.core.Util;
 import net.hudup.core.data.PropList;
-
 
 /**
  * This final utility class provides utilit methods for internationalization (I18n) for different languages.

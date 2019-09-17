@@ -1,3 +1,10 @@
+/**
+ * HUDUP: A FRAMEWORK OF E-COMMERCIAL RECOMMENDATION ALGORITHMS
+ * (C) Copyright by Loc Nguyen's Academic Network
+ * Project homepage: http://www.locnguyen.net/st/products/hudup
+ * Email: ng_phloc@yahoo.com
+ * Phone: +84-975250362
+ */
 package net.hudup.core.alg.ui;
 
 import java.awt.BorderLayout;
@@ -36,7 +43,6 @@ import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.DuplicatableAlg;
 import net.hudup.core.logistic.DSUtil;
 import net.hudup.core.logistic.ui.UIUtil;
-
 
 /**
  * This graphic user interface (GUI) component as a {@link JList} shows a list of algorithms.

@@ -1,5 +1,9 @@
 /**
- * 
+ * HUDUP: A FRAMEWORK OF E-COMMERCIAL RECOMMENDATION ALGORITHMS
+ * (C) Copyright by Loc Nguyen's Academic Network
+ * Project homepage: http://www.locnguyen.net/st/products/hudup
+ * Email: ng_phloc@yahoo.com
+ * Phone: +84-975250362
  */
 package net.hudup.core.client;
 
@@ -26,7 +30,6 @@ import net.hudup.core.data.Snapshot;
 import net.hudup.core.data.UserRating;
 import net.hudup.core.evaluate.Evaluator;
 import net.hudup.core.logistic.LogUtil;
-
 
 /**
  * This class implements the {@link Service} interface according to socket connection in order to send request to server and then receive response (result) from server.

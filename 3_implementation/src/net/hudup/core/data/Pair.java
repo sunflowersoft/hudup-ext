@@ -1,5 +1,9 @@
 /**
- * 
+ * HUDUP: A FRAMEWORK OF E-COMMERCIAL RECOMMENDATION ALGORITHMS
+ * (C) Copyright by Loc Nguyen's Academic Network
+ * Project homepage: http://www.locnguyen.net/st/products/hudup
+ * Email: ng_phloc@yahoo.com
+ * Phone: +84-975250362
  */
 package net.hudup.core.data;
 
@@ -13,7 +17,6 @@ import java.util.Set;
 import net.hudup.core.Cloneable;
 import net.hudup.core.Constants;
 import net.hudup.core.Util;
-
 
 /**
  * This class represents a pair of key and value. Key is integer and value is double number.

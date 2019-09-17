@@ -1,3 +1,10 @@
+/**
+ * HUDUP: A FRAMEWORK OF E-COMMERCIAL RECOMMENDATION ALGORITHMS
+ * (C) Copyright by Loc Nguyen's Academic Network
+ * Project homepage: http://www.locnguyen.net/st/products/hudup
+ * Email: ng_phloc@yahoo.com
+ * Phone: +84-975250362
+ */
 package net.hudup.evaluate.ui;
 
 import java.awt.BorderLayout;
@@ -25,7 +32,6 @@ import net.hudup.core.data.ui.DataConfigTextField;
 import net.hudup.core.logistic.I18nUtil;
 import net.hudup.core.logistic.ui.UIUtil;
 import net.hudup.data.DatasetUtil2;
-
 
 /**
  * Graphic user interface (GUI) allows users to adding a pair of training dataset and testing dataset.

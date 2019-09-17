@@ -1,3 +1,10 @@
+/**
+ * HUDUP: A FRAMEWORK OF E-COMMERCIAL RECOMMENDATION ALGORITHMS
+ * (C) Copyright by Loc Nguyen's Academic Network
+ * Project homepage: http://www.locnguyen.net/st/products/hudup
+ * Email: ng_phloc@yahoo.com
+ * Phone: +84-975250362
+ */
 package net.hudup.core.logistic;
 
 import java.awt.Component;
@@ -12,7 +19,6 @@ import java.util.List;
 
 import net.hudup.core.data.AutoCloseable;
 import net.hudup.core.data.DataConfig;
-
 
 /**
  * This interface proposes rules (methods) processing on objects identified by Uniform Resource Identifier (URI) as normal file when URI refers to any resource on net system.

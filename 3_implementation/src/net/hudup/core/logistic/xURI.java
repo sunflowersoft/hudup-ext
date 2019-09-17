@@ -1,3 +1,10 @@
+/**
+ * HUDUP: A FRAMEWORK OF E-COMMERCIAL RECOMMENDATION ALGORITHMS
+ * (C) Copyright by Loc Nguyen's Academic Network
+ * Project homepage: http://www.locnguyen.net/st/products/hudup
+ * Email: ng_phloc@yahoo.com
+ * Phone: +84-975250362
+ */
 package net.hudup.core.logistic;
 
 import java.io.File;
@@ -15,7 +22,6 @@ import java.util.Set;
 import net.hudup.core.Util;
 import net.hudup.core.data.DataDriver;
 import net.hudup.core.parser.TextParserUtil;
-
 
 /**
  * This class is a wrapper of URI. Note that URI, abbreviation of Uniform Resource Identifier, is the string of characters used to identify a resource on Internet.

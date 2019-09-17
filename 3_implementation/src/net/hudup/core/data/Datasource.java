@@ -1,10 +1,16 @@
+/**
+ * HUDUP: A FRAMEWORK OF E-COMMERCIAL RECOMMENDATION ALGORITHMS
+ * (C) Copyright by Loc Nguyen's Academic Network
+ * Project homepage: http://www.locnguyen.net/st/products/hudup
+ * Email: ng_phloc@yahoo.com
+ * Phone: +84-975250362
+ */
 package net.hudup.core.data;
 
 import java.io.Serializable;
 
 import net.hudup.core.logistic.NextUpdate;
 import net.hudup.core.logistic.xURI;
-
 
 /**
  * Data source represented by {@link Datasource} class is a special class used to point to a dataset. Of course it contains a URI of such dataset. Note that URI, abbreviation of Uniform Resource Identifier, is the string of characters used to identify a resource on Internet.
