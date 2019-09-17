@@ -317,21 +317,21 @@ public final class PluginStorage implements Serializable {
 	}
 
 	
-//	/**
-//	 * Adding shutdown hook to release all registered algorithms.
-//	 */
-//	static {
-//		Runtime.getRuntime().addShutdownHook(new Thread() {
-//
-//			@Override
-//			public void run() {
-//				//This code line is not redundant. Please concern the keyword synchronized in releaseAllRegisteredAlgs().
-//				releaseAllRegisteredAlgs();
-//			}
-//			
-//		});
-//		
-//	}
+	/**
+	 * Adding shutdown hook to release all registered algorithms.
+	 */
+	static {
+		Runtime.getRuntime().addShutdownHook(new Thread() {
+
+			@Override
+			public void run() {
+				//This code line is not redundant. Please concern the keyword synchronized in releaseAllRegisteredAlgs().
+				releaseAllRegisteredAlgs();
+			}
+			
+		});
+		
+	}
 	
 	
 }

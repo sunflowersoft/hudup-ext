@@ -849,16 +849,6 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 	@Override
 	public synchronized void close() throws Exception {
 		// TODO Auto-generated method stub
-		close0();
-		
-		PluginStorage.releaseAllRegisteredAlgs();
-	}
-
-
-	/**
-	 * Closing basically evaluator.
-	 */
-	private synchronized void close0() {
 		try {
 			clearDelayUnsetupAlgs();
 		}
@@ -873,15 +863,15 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 			e.printStackTrace();
 		}
 	}
-	
-	
+
+
 	@Override
 	protected void finalize() throws Throwable {
 		// TODO Auto-generated method stub
 		super.finalize();
 		
 		try {
-			close0();
+			close();
 		}
 		catch (Throwable e) {
 			e.printStackTrace();
