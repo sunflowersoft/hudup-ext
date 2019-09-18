@@ -1018,12 +1018,14 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 		String algName = alg.getName();
 
 		if (evt.getType() == SetupAlgEvent.Type.doing) {
-			this.paneWait.setWaitText(I18nUtil.message("setting_up_algorithm") + " '" + DSUtil.shortenVerbalName(algName) + "'. " + I18nUtil.message("please_wait") + "...");
-			this.paneWait.setVisible(true);
+			this.statusBar.setTextPane1(I18nUtil.message("setting_up_algorithm") + " '" + DSUtil.shortenVerbalName(algName) + "'. " + I18nUtil.message("please_wait") + "...");
+//			this.paneWait.setWaitText(I18nUtil.message("setting_up_algorithm") + " '" + DSUtil.shortenVerbalName(algName) + "'. " + I18nUtil.message("please_wait") + "...");
+//			this.paneWait.setVisible(true);
 		}
 		else if (evt.getType() == SetupAlgEvent.Type.done) {
-			this.paneWait.setWaitText(WaitPanel.WAIT_TEXT);
-			this.paneWait.setVisible(false);
+			this.statusBar.setTextPane1("");
+//			this.paneWait.setWaitText(WaitPanel.WAIT_TEXT);
+//			this.paneWait.setVisible(false);
 		}
 		
 		

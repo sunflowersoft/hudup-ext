@@ -302,6 +302,20 @@ public class Profile implements Cloneable, TextParsable, Serializable {
 	
 	
 	/**
+	 * Testing whether all values in this profile are missing.
+	 * As a convention, an empty profile (profile has no attribute) always return true for this method. 
+	 * @return whether all values in this profile are missing.
+	 */
+	public boolean isAllMissing() {
+		for (int i = 0; i < attRef.size(); i++) {
+			if (attValues.get(i) != null) return false;
+		}
+		
+		return true;
+	}
+	
+	
+	/**
 	 * Getting the number of attributes.
 	 * @return count for {@link AttributeList}.
 	 */

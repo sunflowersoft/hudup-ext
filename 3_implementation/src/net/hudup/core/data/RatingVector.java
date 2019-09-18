@@ -229,6 +229,23 @@ public class RatingVector implements Cloneable, TextParsable, Serializable {
 	
 	
 	/**
+	 * Testing whether this rating vector has at least one rated value.
+	 * As a convention, an empty rating vector (has no rating) always return false for this method.
+	 * @return whether this rating vector has at least one rated value.
+	 */
+	public boolean isRated() {
+		if (ratedMap.size() == 0) return false;
+		
+		Collection<Rating> ratings = ratedMap.values();
+		for (Rating rating : ratings) {
+			if (Util.isUsed(rating.value)) return true;
+		}
+		
+		return false;
+	}
+	
+	
+	/**
 	 * Testing whether all ratings associated with field ID (s) in specified collection are rated.
 	 * As a definition, a rating is called {@code rated} (user rated an item) if its rating value is not {@link Constants#UNUSED}; otherwise such rating is called {@code unrated}.
 	 * @param fieldIds specified collection of field IDs. If this rating vector is user rating vector, the field ID is item ID. Otherwise, it is user ID.
