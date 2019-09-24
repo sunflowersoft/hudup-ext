@@ -30,7 +30,7 @@ import net.hudup.core.logistic.xURI;
  *
  */
 @NextUpdate
-public abstract class AugAbstract extends ExecutableAlgAbstract implements Aug {
+public abstract class AugAbstract extends ExecutableAlgAbstract implements Aug, AugRemote {
 
 	
 	/**

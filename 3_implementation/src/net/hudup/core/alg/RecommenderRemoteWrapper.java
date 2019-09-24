@@ -29,7 +29,7 @@ import net.hudup.core.logistic.ui.UIUtil;
  *
  */
 @BaseClass //The annotation is very important which prevent Firer to instantiate the wrapper without referred remote object. This wrapper is not normal algorithm.
-public class RecommenderRemoteWrapper extends AlgRemoteWrapper implements Recommender {
+public class RecommenderRemoteWrapper extends AlgRemoteWrapper implements Recommender, RecommenderRemote {
 
 	
 	/**
@@ -121,8 +121,8 @@ public class RecommenderRemoteWrapper extends AlgRemoteWrapper implements Recomm
 	@Override
 	public Alg newInstance() {
 		// TODO Auto-generated method stub
-		if (remoteAlg instanceof Recommender) {
-			Recommender newRecommender = (Recommender) ((Recommender)remoteAlg).newInstance();
+		if (remoteAlg instanceof RecommenderAbstract) {
+			RecommenderAbstract newRecommender = (RecommenderAbstract) ((RecommenderAbstract)remoteAlg).newInstance();
 			return new RecommenderRemoteWrapper(newRecommender, exclusive);
 		}
 		else {

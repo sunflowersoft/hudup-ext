@@ -14,6 +14,7 @@ import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 
 import net.hudup.core.Util;
+import net.hudup.core.alg.Alg;
 import net.hudup.core.data.AttributeList;
 import net.hudup.core.data.BooleanWrapper;
 import net.hudup.core.data.DataConfig;
@@ -163,9 +164,14 @@ public class Response extends ProtocolParam {
 	public ExternalRecord            externalRecord      = null;
 	
 	/**
-	 * Remote evaluator. Note, evaluator is remote object and it is not serializable object.
+	 * Remote evaluator. Note, evaluator is remote object.
 	 */
 	public Evaluator                 evaluator           = null;
+	
+	/**
+	 * Algorithm.
+	 */
+	public Alg                       alg                 = null;
 	
 	
 	/**
@@ -225,6 +231,9 @@ public class Response extends ProtocolParam {
 
 		else if (evaluator != null)
 			return evaluator;
+
+		else if (alg != null)
+			return alg;
 
 		else
 			return null;
@@ -440,6 +449,19 @@ public class Response extends ProtocolParam {
 	public static Response create(Evaluator evaluator) {
 		Response response = new Response();
 		response.evaluator = evaluator;
+		
+		return response;
+	}
+
+	
+	/**
+	 * Creating result (response) as algorithm.
+	 * @param alg specified algorithm.
+	 * @return result (response) as algorithm.
+	 */
+	public static Response create(Alg alg) {
+		Response response = new Response();
+		response.alg = alg;
 		
 		return response;
 	}

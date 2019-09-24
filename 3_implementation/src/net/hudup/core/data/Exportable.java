@@ -19,7 +19,7 @@ import java.rmi.RemoteException;
  * @version 12.0
  *
  */
-public interface Exportable extends Remote, Serializable {
+public interface Exportable extends Serializable {
 
 	
 	/**

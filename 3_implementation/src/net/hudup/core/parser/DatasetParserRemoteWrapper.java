@@ -25,7 +25,7 @@ import net.hudup.core.logistic.LogUtil;
  *
  */
 @BaseClass //This is not really base class but the base class annotation prevents the wrapper to be registered in plug-in storage.
-public class DatasetParserRemoteWrapper extends AlgRemoteWrapper implements DatasetParser {
+public class DatasetParserRemoteWrapper extends AlgRemoteWrapper implements DatasetParser, DatasetParserRemote {
 
 	
 	/**
@@ -72,8 +72,8 @@ public class DatasetParserRemoteWrapper extends AlgRemoteWrapper implements Data
 	@Override
 	public Alg newInstance() {
 		// TODO Auto-generated method stub
-		if (remoteAlg instanceof DatasetParser) {
-			DatasetParser newDatasetParser = (DatasetParser) ((DatasetParser)remoteAlg).newInstance();
+		if (remoteAlg instanceof DatasetParserAbstract) {
+			DatasetParserAbstract newDatasetParser = (DatasetParserAbstract) ((DatasetParserAbstract)remoteAlg).newInstance();
 			return new DatasetParserRemoteWrapper(newDatasetParser, exclusive);
 		}
 		else {

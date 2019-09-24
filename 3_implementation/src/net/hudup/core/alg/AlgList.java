@@ -139,6 +139,22 @@ public class AlgList implements Serializable, net.hudup.core.Cloneable {
 	
 	
 	/**
+	 * Retrieving index of the algorithm that has specified name.
+	 * @param algName specified algorithm name.
+	 * @return index of the algorithm that has specified name. Return -1 if there is no such algorithm.
+	 */
+	public int indexOf(String algName) {
+		for (int i = 0; i < list.size(); i++) {
+			Alg alg = list.get(i);
+			if (alg.getName().equals(algName))
+				return i;
+		}
+		
+		return -1;
+	}
+	
+	
+	/**
 	 * Getting the size of this list.
 	 * @return size of algorithm list
 	 */

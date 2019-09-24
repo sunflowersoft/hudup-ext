@@ -14,7 +14,11 @@ import java.util.List;
 import java.util.Set;
 
 import net.hudup.core.Firer;
+import net.hudup.core.PluginStorage;
 import net.hudup.core.Util;
+import net.hudup.core.alg.Alg;
+import net.hudup.core.alg.AlgRemote;
+import net.hudup.core.alg.AlgRemoteWrapper;
 import net.hudup.core.alg.RecommendParam;
 import net.hudup.core.alg.Recommender;
 import net.hudup.core.client.ServerInfo;
@@ -39,6 +43,7 @@ import net.hudup.core.data.Scanner;
 import net.hudup.core.data.Snapshot;
 import net.hudup.core.evaluate.Evaluator;
 import net.hudup.core.evaluate.EvaluatorConfig;
+import net.hudup.core.logistic.AlwaysSerialize;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.NextUpdate;
 import net.hudup.data.ProviderImpl;
@@ -1501,6 +1506,70 @@ public class DefaultService implements Service, AutoCloseable {
 	}
 
 
+	@Override
+	public Alg getAlg(String algName) throws RemoteException {
+		// TODO Auto-generated method stub
+		Alg alg = null;
+		
+		trans.lockWrite();
+		try {
+			alg = PluginStorage.query(algName);
+			if ((alg != null) && !(alg instanceof AlwaysSerialize)) {
+				if (alg instanceof AlgRemote) {
+					AlgRemote remoteAlg = (AlgRemote) ((AlgRemote)alg).export(serverConfig.getServerPort());
+					alg = wrap(remoteAlg, false);
+				}
+				else
+					alg = null;
+			}
+		}
+		catch (Throwable e) {
+			e.printStackTrace();
+			alg = null;
+			
+			LogUtil.error("Service fail to get algorithm, caused by " + e.getMessage());
+		}
+		finally {
+			trans.unlockWrite();
+		}
+		
+		return alg;
+	}
+
+
+	@Override
+	public String[] getAlgNames() throws RemoteException {
+		// TODO Auto-generated method stub
+		List<String> algNames = Util.newList();
+		
+		trans.lockRead();
+		try {
+			algNames = PluginStorage.getAlgNames();
+		}
+		catch (Throwable e) {
+			e.printStackTrace();
+			LogUtil.error("Service fail to get evaluator, caused by " + e.getMessage());
+		}
+		finally {
+			trans.unlockRead();
+		}
+		
+		Collections.sort(algNames);
+		return algNames.toArray(new String[0]);
+	}
+
+	
+	/**
+	 * Wrapping a remote algorithm. This method is only called by {@link #getAlg(String)} method.
+	 * @param remoteAlg remote algorithm.
+	 * @param exclusive exclusive mode.
+	 * @return wrapper of a remote algorithm.
+	 */
+	protected AlgRemoteWrapper wrap(AlgRemote remoteAlg, boolean exclusive) {
+		return Firer.wrap(remoteAlg, exclusive);
+	}
+	
+	
 	@Override
 	protected void finalize() throws Throwable {
 		// TODO Auto-generated method stub

@@ -25,7 +25,7 @@ import net.hudup.core.logistic.Inspectable;
  * @author Loc Nguyen
  * @version 10.0
  */
-public abstract interface Recommender extends Alg, RecommenderRemote, Inspectable {
+public abstract interface Recommender extends RecommenderRemoteTask, Alg, Inspectable {
 
 	
 	/**

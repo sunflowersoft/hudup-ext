@@ -56,7 +56,7 @@ import net.hudup.core.alg.Alg;
  * @version 10.0
  *
  */
-public interface Metric extends MetricRemote, Alg, Serializable {
+public interface Metric extends MetricRemoteTask, Alg, Serializable {
 
 	
 }

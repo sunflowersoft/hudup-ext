@@ -21,7 +21,7 @@ import net.hudup.core.data.Dataset;
  * @version 10.0
  *
  */
-public interface DatasetParser extends DatasetParserRemote, Alg {
+public interface DatasetParser extends DatasetParserRemoteTask, Alg {
 
 
 }

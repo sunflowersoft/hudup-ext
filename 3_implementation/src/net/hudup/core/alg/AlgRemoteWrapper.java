@@ -15,6 +15,7 @@ import javax.swing.event.EventListenerList;
 
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.logistic.BaseClass;
+import net.hudup.core.logistic.DSUtil;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.NetUtil;
 
@@ -84,6 +85,24 @@ public class AlgRemoteWrapper implements Alg, AlgRemote, Serializable {
 		this.exclusive = exclusive;
 	}
 
+	
+	/**
+	 * Getting exclusive mode.
+	 * @return exclusive mode.
+	 */
+	public boolean isExclusive() {
+		return exclusive;
+	}
+	
+	
+	/**
+	 * Setting exclusive mode.
+	 * @param exclusive exclusive mode.
+	 */
+	public void setExclusive(boolean exclusive) {
+		this.exclusive = exclusive;
+	}
+	
 	
 	@Override
 	public String queryName() throws RemoteException {
@@ -237,6 +256,13 @@ public class AlgRemoteWrapper implements Alg, AlgRemote, Serializable {
 	}
 
 	
+	@Override
+	public String toString() {
+		// TODO Auto-generated method stub
+		return DSUtil.shortenVerbalName(getName());
+	}
+
+
 	@Override
 	protected void finalize() throws Throwable {
 		// TODO Auto-generated method stub

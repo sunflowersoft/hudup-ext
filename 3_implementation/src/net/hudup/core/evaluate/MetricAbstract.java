@@ -19,7 +19,7 @@ import net.hudup.core.alg.AlgAbstract;
  * @version 10.0
  *
  */
-public abstract class MetricAbstract extends AlgAbstract implements Metric {
+public abstract class MetricAbstract extends AlgAbstract implements Metric, MetricRemote {
 
 	
 	/**

@@ -179,7 +179,7 @@ class HudupProviderAssoc extends ProviderAssocAbstract {
 	@Override
 	public boolean createUnit(String unitName, AttributeList attList) {
 		// TODO Auto-generated method stub
-		System.out.println("Hudup server does not provides any Provider or ProviderAssoc and so this HudupProviderAssoc is only pointer to Hudup server.");
+		System.out.println("Hudup server does not provide any Provider or ProviderAssoc and so this HudupProviderAssoc is only pointer to Hudup server.");
 		return false; //Fixing bug date: 2019.08.07 by Loc Nguyen
 	}
 
@@ -187,7 +187,7 @@ class HudupProviderAssoc extends ProviderAssocAbstract {
 	@Override
 	public boolean deleteUnitData(String unitName) {
 		// TODO Auto-generated method stub
-		System.out.println("Hudup server does not provides any Provider or ProviderAssoc and so this HudupProviderAssoc is only pointer to Hudup server.");
+		System.out.println("Hudup server does not provide any Provider or ProviderAssoc and so this HudupProviderAssoc is only pointer to Hudup server.");
 		return false; //Fixing bug date: 2019.08.07 by Loc Nguyen
 	}
 
@@ -195,7 +195,7 @@ class HudupProviderAssoc extends ProviderAssocAbstract {
 	@Override
 	public boolean dropUnit(String unitName) {
 		// TODO Auto-generated method stub
-		System.out.println("Hudup server does not provides any Provider or ProviderAssoc and so this HudupProviderAssoc is only pointer to Hudup server.");
+		System.out.println("Hudup server does not provide any Provider or ProviderAssoc and so this HudupProviderAssoc is only pointer to Hudup server.");
 		return false; //Fixing bug date: 2019.08.07 by Loc Nguyen
 	}
 
@@ -203,7 +203,7 @@ class HudupProviderAssoc extends ProviderAssocAbstract {
 	@Override
 	public UnitList getUnitList() {
 		// TODO Auto-generated method stub
-		System.out.println("Hudup server does not provides any Provider or ProviderAssoc and so this HudupProviderAssoc is only pointer to Hudup server.");
+		System.out.println("Hudup server does not provide any Provider or ProviderAssoc and so this HudupProviderAssoc is only pointer to Hudup server.");
 		return new UnitList(); //Fixing bug date: 2019.08.07 by Loc Nguyen
 	}
 
@@ -211,7 +211,7 @@ class HudupProviderAssoc extends ProviderAssocAbstract {
 	@Override
 	public NominalList getNominalList(String filterUnit, String attName) {
 		// TODO Auto-generated method stub
-		System.out.println("Hudup server does not provides any Provider or ProviderAssoc and so this HudupProviderAssoc is only pointer to Hudup server.");
+		System.out.println("Hudup server does not provide any Provider or ProviderAssoc and so this HudupProviderAssoc is only pointer to Hudup server.");
 		return new NominalList(); //Fixing bug date: 2019.08.07 by Loc Nguyen
 	}
 
@@ -219,7 +219,7 @@ class HudupProviderAssoc extends ProviderAssocAbstract {
 	@Override
 	public AttributeList getAttributes(String profileUnit) {
 		// TODO Auto-generated method stub
-		System.out.println("Hudup server does not provides any Provider or ProviderAssoc and so this HudupProviderAssoc is only pointer to Hudup server.");
+		System.out.println("Hudup server does not provide any Provider or ProviderAssoc and so this HudupProviderAssoc is only pointer to Hudup server.");
 		return new AttributeList(); //Fixing bug date: 2019.08.07 by Loc Nguyen
 	}
 
@@ -227,7 +227,7 @@ class HudupProviderAssoc extends ProviderAssocAbstract {
 	@Override
 	public AttributeList getAttributes(ParamSql selectSql, Profile condition) {
 		// TODO Auto-generated method stub
-		System.out.println("Hudup server does not provides any Provider or ProviderAssoc and so this HudupProviderAssoc is only pointer to Hudup server.");
+		System.out.println("Hudup server does not provide any Provider or ProviderAssoc and so this HudupProviderAssoc is only pointer to Hudup server.");
 		return new AttributeList(); //Fixing bug date: 2019.08.07 by Loc Nguyen
 	}
 
@@ -235,7 +235,7 @@ class HudupProviderAssoc extends ProviderAssocAbstract {
 	@Override
 	public boolean containsProfile(String profileUnit, Profile profile) {
 		// TODO Auto-generated method stub
-		System.out.println("Hudup server does not provides any Provider or ProviderAssoc and so this HudupProviderAssoc is only pointer to Hudup server.");
+		System.out.println("Hudup server does not provide any Provider or ProviderAssoc and so this HudupProviderAssoc is only pointer to Hudup server.");
 		return false; //Fixing bug date: 2019.08.07 by Loc Nguyen
 	}
 
@@ -243,7 +243,7 @@ class HudupProviderAssoc extends ProviderAssocAbstract {
 	@Override
 	public Profile getProfile(String profileUnit, Profile condition) {
 		// TODO Auto-generated method stub
-		System.out.println("Hudup server does not provides any Provider or ProviderAssoc and so this HudupProviderAssoc is only pointer to Hudup server.");
+		System.out.println("Hudup server does not provide any Provider or ProviderAssoc and so this HudupProviderAssoc is only pointer to Hudup server.");
 		return null; //Fixing bug date: 2019.08.07 by Loc Nguyen
 	}
 
@@ -251,7 +251,7 @@ class HudupProviderAssoc extends ProviderAssocAbstract {
 	@Override
 	public Fetcher<Profile> getProfiles(String profileUnit, Profile condition) {
 		// TODO Auto-generated method stub
-		System.out.println("Hudup server does not provides any Provider or ProviderAssoc and so this HudupProviderAssoc is only pointer to Hudup server.");
+		System.out.println("Hudup server does not provide any Provider or ProviderAssoc and so this HudupProviderAssoc is only pointer to Hudup server.");
 		return new MemFetcher<Profile>(); //Fixing bug date: 2019.08.07 by Loc Nguyen
 	}
 
@@ -259,7 +259,7 @@ class HudupProviderAssoc extends ProviderAssocAbstract {
 	@Override
 	public Fetcher<Profile> getProfiles(ParamSql selectSql, Profile condition) {
 		// TODO Auto-generated method stub
-		System.out.println("Hudup server does not provides any Provider or ProviderAssoc and so this HudupProviderAssoc is only pointer to Hudup server.");
+		System.out.println("Hudup server does not provide any Provider or ProviderAssoc and so this HudupProviderAssoc is only pointer to Hudup server.");
 		return new MemFetcher<Profile>(); //Fixing bug date: 2019.08.07 by Loc Nguyen
 	}
 
@@ -267,7 +267,7 @@ class HudupProviderAssoc extends ProviderAssocAbstract {
 	@Override
 	public Fetcher<Integer> getProfileIds(String profileUnit) {
 		// TODO Auto-generated method stub
-		System.out.println("Hudup server does not provides any Provider or ProviderAssoc and so this HudupProviderAssoc is only pointer to Hudup server.");
+		System.out.println("Hudup server does not provide any Provider or ProviderAssoc and so this HudupProviderAssoc is only pointer to Hudup server.");
 		return new MemFetcher<Integer>(); //Fixing bug date: 2019.08.07 by Loc Nguyen
 	}
 
@@ -275,7 +275,7 @@ class HudupProviderAssoc extends ProviderAssocAbstract {
 	@Override
 	public int getProfileMaxId(String profileUnit) {
 		// TODO Auto-generated method stub
-		System.out.println("Hudup server does not provides any Provider or ProviderAssoc and so this HudupProviderAssoc is only pointer to Hudup server.");
+		System.out.println("Hudup server does not provide any Provider or ProviderAssoc and so this HudupProviderAssoc is only pointer to Hudup server.");
 		return -1; //Fixing bug date: 2019.08.07 by Loc Nguyen
 	}
 
@@ -283,7 +283,7 @@ class HudupProviderAssoc extends ProviderAssocAbstract {
 	@Override
 	public boolean insertProfile(String profileUnit, Profile profile) {
 		// TODO Auto-generated method stub
-		System.out.println("Hudup server does not provides any Provider or ProviderAssoc and so this HudupProviderAssoc is only pointer to Hudup server.");
+		System.out.println("Hudup server does not provide any Provider or ProviderAssoc and so this HudupProviderAssoc is only pointer to Hudup server.");
 		return false; //Fixing bug date: 2019.08.07 by Loc Nguyen
 	}
 
@@ -291,7 +291,7 @@ class HudupProviderAssoc extends ProviderAssocAbstract {
 	@Override
 	public boolean updateProfile(String profileUnit, Profile profile) {
 		// TODO Auto-generated method stub
-		System.out.println("Hudup server does not provides any Provider or ProviderAssoc and so this HudupProviderAssoc is only pointer to Hudup server.");
+		System.out.println("Hudup server does not provide any Provider or ProviderAssoc and so this HudupProviderAssoc is only pointer to Hudup server.");
 		return false; //Fixing bug date: 2019.08.07 by Loc Nguyen
 	}
 
@@ -299,7 +299,7 @@ class HudupProviderAssoc extends ProviderAssocAbstract {
 	@Override
 	public boolean deleteProfile(String profileUnit, Profile condition) {
 		// TODO Auto-generated method stub
-		System.out.println("Hudup server does not provides any Provider or ProviderAssoc and so this HudupProviderAssoc is only pointer to Hudup server.");
+		System.out.println("Hudup server does not provide any Provider or ProviderAssoc and so this HudupProviderAssoc is only pointer to Hudup server.");
 		return false; //Fixing bug date: 2019.08.07 by Loc Nguyen
 	}
 
@@ -307,7 +307,7 @@ class HudupProviderAssoc extends ProviderAssocAbstract {
 	@Override
 	public CsvReader getReader(String unit) {
 		// TODO Auto-generated method stub
-		System.out.println("Hudup server does not provides any Provider or ProviderAssoc and so this HudupProviderAssoc is only pointer to Hudup server.");
+		System.out.println("Hudup server does not provide any Provider or ProviderAssoc and so this HudupProviderAssoc is only pointer to Hudup server.");
 		return null; //Fixing bug date: 2019.08.07 by Loc Nguyen
 	}
 
@@ -315,7 +315,7 @@ class HudupProviderAssoc extends ProviderAssocAbstract {
 	@Override
 	public CsvWriter getWriter(String unit, boolean append) {
 		// TODO Auto-generated method stub
-		System.out.println("Hudup server does not provides any Provider or ProviderAssoc and so this HudupProviderAssoc is only pointer to Hudup server.");
+		System.out.println("Hudup server does not provide any Provider or ProviderAssoc and so this HudupProviderAssoc is only pointer to Hudup server.");
 		return null; //Fixing bug date: 2019.08.07 by Loc Nguyen
 	}
 

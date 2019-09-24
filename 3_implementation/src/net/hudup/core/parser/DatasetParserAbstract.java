@@ -19,7 +19,7 @@ import net.hudup.core.alg.AlgAbstract;
  * @version 10.0
  *
  */
-public abstract class DatasetParserAbstract extends AlgAbstract implements DatasetParser {
+public abstract class DatasetParserAbstract extends AlgAbstract implements DatasetParser, DatasetParserRemote {
 
 	
 	/**

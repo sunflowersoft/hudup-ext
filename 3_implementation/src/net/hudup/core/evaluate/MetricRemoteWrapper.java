@@ -22,7 +22,7 @@ import net.hudup.core.logistic.LogUtil;
  *
  */
 @BaseClass
-public class MetricRemoteWrapper extends AlgRemoteWrapper implements Metric {
+public class MetricRemoteWrapper extends AlgRemoteWrapper implements Metric, MetricRemote {
 
 	
 	/**
@@ -104,8 +104,8 @@ public class MetricRemoteWrapper extends AlgRemoteWrapper implements Metric {
 	@Override
 	public Alg newInstance() {
 		// TODO Auto-generated method stub
-		if (remoteAlg instanceof Metric) {
-			Metric newMetric = (Metric) ((Metric)remoteAlg).newInstance();
+		if (remoteAlg instanceof MetricAbstract) {
+			MetricAbstract newMetric = (MetricAbstract) ((MetricAbstract)remoteAlg).newInstance();
 			return new MetricRemoteWrapper(newMetric, exclusive);
 		}
 		else {

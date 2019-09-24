@@ -26,7 +26,7 @@ import net.hudup.core.logistic.ui.UIUtil;
  * @version 10.0
  * 
  */
-public abstract class RecommenderAbstract extends AlgAbstract implements Recommender {
+public abstract class RecommenderAbstract extends AlgAbstract implements Recommender, RecommenderRemote {
 
 	
 	/**

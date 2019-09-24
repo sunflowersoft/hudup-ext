@@ -574,6 +574,11 @@ public class RecommendEvaluator extends EvaluatorAbstract {
 	@Override
 	public boolean acceptAlg(Alg alg) throws RemoteException {
 		// TODO Auto-generated method stub
+		if (alg == null) return false;
+//		AlgRemote remoteAlg = (alg instanceof AlgRemoteWrapper) ? ((AlgRemoteWrapper)alg).getRemoteAlg() : null;
+//		if ((remoteAlg != null) && (remoteAlg instanceof Alg))
+//			alg = (Alg)remoteAlg;
+		
 		return (alg instanceof Recommender) && (!(alg instanceof TestAlg));
 	}
 

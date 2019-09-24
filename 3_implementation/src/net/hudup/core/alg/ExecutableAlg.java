@@ -16,7 +16,7 @@ import net.hudup.core.logistic.Inspectable;
  * @version 1.0
  *
  */
-public interface ExecutableAlg extends Alg, ExecutableAlgRemote, Inspectable {
+public interface ExecutableAlg extends ExecutableAlgRemoteTask, Alg, Inspectable {
 	
 	
 }

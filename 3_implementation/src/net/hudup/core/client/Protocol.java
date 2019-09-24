@@ -411,6 +411,16 @@ public interface Protocol {
 	 */
 	static final String GET_EVALUATOR_NAMES =               "get_evaluator_names";
 
+	/**
+	 * Action of request of getting algorithm. Such request is created by method {@link #createGetAlgRequest(String)}.
+	 */
+	static final String GET_ALG =                           "get_alg";
+
+	/**
+	 * Action of request of getting algorithm names. Such request is created by method {@link #createGetAlgNamesRequest()}.
+	 */
+	static final String GET_ALG_NAMES =                     "get_alg_names";
+
 	
 	/**
 	 * Create control request.
@@ -1030,6 +1040,21 @@ public interface Protocol {
 	 * @return a request for retrieving evaluator names.
 	 */
 	Request createGetEvaluatorNamesRequest();
+
+
+	/**
+	 * Creating a request for retrieving algorithm.
+	 * @param algName algorithm name.
+	 * @return a request for retrieving algorithm.
+	 */
+	Request createGetAlgRequest(String algName);
+
+
+	/**
+	 * Creating a request for retrieving algorithm names.
+	 * @return a request for retrieving algorithm names.
+	 */
+	Request createGetAlgNamesRequest();
 
 
 }

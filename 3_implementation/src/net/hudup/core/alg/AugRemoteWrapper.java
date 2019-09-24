@@ -7,6 +7,8 @@
  */
 package net.hudup.core.alg;
 
+import java.util.Map;
+
 import net.hudup.core.logistic.BaseClass;
 import net.hudup.core.logistic.NextUpdate;
 
@@ -19,7 +21,7 @@ import net.hudup.core.logistic.NextUpdate;
  */
 @NextUpdate
 @BaseClass //This class is not base class but the base class annotation prevents this class to be registered in plug-in storage.
-public class AugRemoteWrapper extends ExecutableAlgRemoteWrapper {
+public abstract class AugRemoteWrapper extends ExecutableAlgRemoteWrapper implements Aug, AugRemote {
 
 	
 	/**
@@ -46,6 +48,34 @@ public class AugRemoteWrapper extends ExecutableAlgRemoteWrapper {
 	public AugRemoteWrapper(AugRemote remoteAug, boolean exclusive) {
 		super(remoteAug, exclusive);
 		// TODO Auto-generated constructor stub
+	}
+
+	
+	@Override
+	public Object cacheTask(int id1, int id2, Map<Integer, Map<Integer, Object>> cache, Task task, Object... params) {
+		// TODO Auto-generated method stub
+		return SupportCacheAlg.cacheTask(this, id1, id2, cache, task, params);
+	}
+
+	
+	@Override
+	public Object cacheTask(int id, Map<Integer, Object> cache, Task task, Object... params) {
+		// TODO Auto-generated method stub
+		return SupportCacheAlg.cacheTask(this, id, cache, task, params);
+	}
+
+
+	@Override
+	public boolean isCached() {
+		// TODO Auto-generated method stub
+		return getConfig().getAsBoolean(SupportCacheAlg.SUPPORT_CACHE_FIELD);
+	}
+
+	
+	@Override
+	public void setCached(boolean cached) {
+		// TODO Auto-generated method stub
+		getConfig().put(SupportCacheAlg.SUPPORT_CACHE_FIELD, cached);
 	}
 
 	

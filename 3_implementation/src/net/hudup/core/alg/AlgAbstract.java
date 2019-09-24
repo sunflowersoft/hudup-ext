@@ -113,7 +113,11 @@ public abstract class AlgAbstract implements Alg, AlgRemote {
 	@Override
 	public DataConfig queryConfig() throws RemoteException {
 		// TODO Auto-generated method stub
-		return getConfig();
+		DataConfig config = new DataConfig();
+		config.putAll(getConfig());
+		return config;
+		
+//		return getConfig();
 	}
 
 

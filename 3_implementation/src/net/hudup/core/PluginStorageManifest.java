@@ -9,19 +9,20 @@ package net.hudup.core;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.rmi.RemoteException;
 import java.util.List;
 import java.util.Vector;
 
 import javax.swing.JButton;
-import javax.swing.JComboBox;
 import javax.swing.JDialog;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.JTextArea;
 import javax.swing.WindowConstants;
 import javax.swing.event.EventListenerList;
 import javax.swing.table.DefaultTableModel;
@@ -29,11 +30,25 @@ import javax.swing.table.DefaultTableModel;
 import net.hudup.core.RegisterTableList.RegisterTableItem;
 import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.AlgList;
-import net.hudup.core.logistic.NextUpdate;
+import net.hudup.core.alg.AlgRemoteWrapper;
+import net.hudup.core.alg.ui.AlgListBox;
+import net.hudup.core.client.ClientUtil;
+import net.hudup.core.client.Service;
+import net.hudup.core.data.DataConfig;
+import net.hudup.core.data.DataDriver;
+import net.hudup.core.data.DataDriver.DataType;
+import net.hudup.core.data.DataDriverList;
+import net.hudup.core.logistic.xURI;
 import net.hudup.core.logistic.ui.SortableTable;
 import net.hudup.core.logistic.ui.SortableTableModel;
-import net.hudup.core.logistic.ui.StartDlg;
+import net.hudup.core.logistic.ui.TagTextField;
 import net.hudup.core.logistic.ui.UIUtil;
+import net.hudup.core.parser.DatasetParser;
+import net.hudup.core.parser.Indicator;
+import net.hudup.core.parser.RmiServerIndicator;
+import net.hudup.core.parser.SocketServerIndicator;
+import net.hudup.data.ui.DatasetConfigurator;
+import net.hudup.parser.SnapshotParserImpl;
 
 /**
  * {@link PluginStorage} manages many {@link RegisterTable} (s) and each {@link RegisterTable} stores algorithms having the same type.
@@ -314,203 +329,14 @@ public class PluginStorageManifest extends SortableTable {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
-				final String jar = "jar";
-				final String server = "server";
-				
-				StartDlg dlgStart = new StartDlg(tblRegister, "Select jar file or remote service") {
-					
-					/**
-					 * Default serial version UID.
-					 */
-					private static final long serialVersionUID = 1L;
-					
-					@Override
-					protected void start() {
-						// TODO Auto-generated method stub
-						String selectedItem = getItemControl().getSelectedItem().toString();
-						if (selectedItem.equals(jar))
-							new JarImportAlgDlag(tblRegister);
-						else
-							new ServerImportAlgDlag(tblRegister);
-						
-						dispose();
-					}
-					
-					@Override
-					protected JComboBox<?> createItemControl() {
-						// TODO Auto-generated method stub
-						return new JComboBox<>(new String[] {jar, server});
-					}
-					
-					@Override
-					protected JTextArea createHelp() {
-						// TODO Auto-generated method stub
-						JTextArea tooltip = new JTextArea("You select import from jar file or from Hudup server/service");
-						tooltip.setWrapStyleWord(true);
-						tooltip.setLineWrap(true);
-						tooltip.setEditable(false);
-						return tooltip;
-					}
-					
-				};
-				
-				dlgStart.setSize(300, 200);
-				dlgStart.setVisible(true);
+				new ImportAlgDlag(tblRegister).setVisible(true);
 				
 				tblRegister.update();
 			}
 		});
-		importAlg.setVisible(false);
 		
 		
 		return result;
-	}
-	
-	
-	/**
-	 * This is GUI allowing users to import/register dynamically algorithms from jar files.
-	 * @author Loc Nguyen
-	 * @version 12.0
-	 */
-	@NextUpdate
-	protected static class JarImportAlgDlag extends JDialog {
-		
-		/**
-		 * Default serial version UID.
-		 */
-		private static final long serialVersionUID = 1L;
-
-		/**
-		 * Constructor with parent component.
-		 * @param comp parent component.
-		 */
-		public JarImportAlgDlag(Component comp) {
-			super(UIUtil.getFrameForComponent(comp), "Import algorithms from jar file", true);
-			
-			setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-			setSize(600, 400);
-			setLocationRelativeTo(UIUtil.getFrameForComponent(comp));
-			
-			setLayout(new BorderLayout());
-			
-			JPanel header = new JPanel(new BorderLayout());
-			add(header, BorderLayout.NORTH);
-			
-			
-			JPanel body = new JPanel(new BorderLayout());
-			add(body, BorderLayout.CENTER);
-
-			
-			JPanel footer = new JPanel();
-			add(footer, BorderLayout.SOUTH);
-
-			JButton ok = new JButton("OK");
-			footer.add(ok);
-			ok.addActionListener(new ActionListener() {
-				
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					// TODO Auto-generated method stub
-					onOk();
-				}
-			});
-			
-			JButton cancel = new JButton("Cancel");
-			footer.add(cancel);
-			cancel.addActionListener(new ActionListener() {
-				
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					// TODO Auto-generated method stub
-					dispose();
-				}
-			});
-
-			
-			setVisible(true);
-		}
-		
-		/**
-		 * Event-driven method response to OK button command.
-		 */
-		protected void onOk() {
-			dispose();
-		}
-		
-	}
-	
-	
-	/**
-	 * This is GUI allowing users to import/register dynamically and remotely algorithms from Hudup server/service.
-	 * @author Loc Nguyen
-	 * @version 12.0
-	 */
-	@NextUpdate
-	protected static class ServerImportAlgDlag extends JDialog {
-		
-		/**
-		 * Default serial version UID.
-		 */
-		private static final long serialVersionUID = 1L;
-
-		/**
-		 * Constructor with parent component.
-		 * @param comp parent component.
-		 */
-		public ServerImportAlgDlag(Component comp) {
-			super(UIUtil.getFrameForComponent(comp), "Import remotely algorithms from Hudup server/service", true);
-			
-			setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-			setSize(600, 400);
-			setLocationRelativeTo(UIUtil.getFrameForComponent(comp));
-			
-			setLayout(new BorderLayout());
-			
-			JPanel header = new JPanel(new BorderLayout());
-			add(header, BorderLayout.NORTH);
-			
-			
-			JPanel body = new JPanel(new BorderLayout());
-			add(body, BorderLayout.CENTER);
-
-			
-			JPanel footer = new JPanel();
-			add(footer, BorderLayout.SOUTH);
-
-			JButton ok = new JButton("OK");
-			footer.add(ok);
-			ok.addActionListener(new ActionListener() {
-				
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					// TODO Auto-generated method stub
-					onOk();
-				}
-			});
-			
-			JButton cancel = new JButton("Cancel");
-			footer.add(cancel);
-			cancel.addActionListener(new ActionListener() {
-				
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					// TODO Auto-generated method stub
-					dispose();
-				}
-			});
-
-			
-			setVisible(true);
-		}
-		
-		/**
-		 * Event-driven method response to OK button command.
-		 */
-		protected void onOk() {
-			dispose();
-		}
-		
 	}
 	
 	
@@ -534,6 +360,7 @@ public class PluginStorageManifest extends SortableTable {
 	
 	
 }
+
 
 
 /**
@@ -968,6 +795,7 @@ class PluginStorageManifest2 extends JTable {
 }
 
 
+
 /**
  * This is table model of {@link PluginStorageManifest2} because {@link PluginStorageManifest2} is itself a table. 
  * 
@@ -1107,3 +935,526 @@ class RegisterTM2 extends DefaultTableModel {
 
 
 
+/**
+ * This is GUI allowing users to import/register dynamically algorithms from jar files.
+ * @author Loc Nguyen
+ * @version 12.0
+ */
+@Deprecated
+class JarImportAlgDlag extends JDialog {
+	
+	
+	/**
+	 * Default serial version UID.
+	 */
+	private static final long serialVersionUID = 1L;
+
+	
+	/**
+	 * Constructor with parent component.
+	 * @param comp parent component.
+	 */
+	public JarImportAlgDlag(Component comp) {
+		super(UIUtil.getFrameForComponent(comp), "Import algorithms from jar file", true);
+		
+		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+		setSize(600, 400);
+		setLocationRelativeTo(UIUtil.getFrameForComponent(comp));
+		
+		setLayout(new BorderLayout());
+		
+		JPanel header = new JPanel(new BorderLayout());
+		add(header, BorderLayout.NORTH);
+		
+		
+		JPanel body = new JPanel(new BorderLayout());
+		add(body, BorderLayout.CENTER);
+
+		
+		JPanel footer = new JPanel();
+		add(footer, BorderLayout.SOUTH);
+
+		JButton ok = new JButton("OK");
+		footer.add(ok);
+		ok.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				onOk();
+			}
+		});
+		
+		JButton cancel = new JButton("Cancel");
+		footer.add(cancel);
+		cancel.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				dispose();
+			}
+		});
+
+		
+		setVisible(true);
+	}
+	
+	
+	/**
+	 * Event-driven method response to OK button command.
+	 */
+	protected void onOk() {
+		dispose();
+	}
+	
+	
+}
+
+
+
+/**
+ * This is GUI allowing users to import/register dynamically and remotely algorithms from Hudup server/service.
+ * @author Loc Nguyen
+ * @version 12.0
+ */
+class ImportAlgDlag extends JDialog {
+	
+	
+	/**
+	 * Default serial version UID.
+	 */
+	private static final long serialVersionUID = 1L;
+
+	
+	/**
+	 * Browsing button.
+	 */
+	protected JButton btnBrowse = null;
+	
+	
+	/**
+	 * Browsing text field.
+	 */
+	protected TagTextField txtBrowse = null;
+	
+	
+	/**
+	 * Connection button.
+	 */
+	protected JButton btnConnect = null;
+
+	
+	/**
+	 * The left algorithm list box assists users to select algorithms.
+	 */
+	protected AlgListBox leftList = null;
+
+	
+	/**
+	 * The right algorithm list box contains chosen algorithms.
+	 */
+	protected AlgListBox rightList = null;
+
+	
+	/**
+	 * Result as list of chosen algorithms.
+	 */
+	protected AlgList result = new AlgList();
+
+	
+	/**
+	 * If {@code true}, users press OK button to close this dialog.
+	 */
+	private boolean ok = false;
+
+	
+	/**
+	 * Constructor with parent component.
+	 * @param comp parent component.
+	 */
+	public ImportAlgDlag(Component comp) {
+		super(UIUtil.getFrameForComponent(comp), "Import remotely algorithms from Hudup server/service", true);
+		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+		setSize(600, 400);
+		setLocationRelativeTo(UIUtil.getFrameForComponent(comp));
+		JPanel pane = null;
+		
+		setLayout(new BorderLayout());
+		
+		JPanel header = new JPanel(new BorderLayout());
+		add(header, BorderLayout.NORTH);
+		
+		pane = new JPanel(new BorderLayout());
+		header.add(pane, BorderLayout.NORTH);
+		btnBrowse = new JButton("Browse");
+		btnBrowse.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				browse();
+			}
+		});
+		pane.add(btnBrowse, BorderLayout.WEST);
+		txtBrowse = new TagTextField();
+		txtBrowse.setEditable(false);
+		pane.add(txtBrowse, BorderLayout.CENTER);
+		
+		pane = new JPanel();
+		header.add(pane, BorderLayout.SOUTH);
+		btnConnect = new JButton("Load");
+		btnConnect.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				try {
+					connect();
+				} catch (Throwable ex) {ex.printStackTrace();}
+			}
+		});
+		pane.add(btnConnect);
+
+		
+		JPanel body = new JPanel(new GridLayout(1, 0));
+		add(body, BorderLayout.CENTER);
+		
+		JPanel left = new JPanel(new BorderLayout());
+		body.add(left);
+		
+		left.add(new JLabel("Available algorithm list"), BorderLayout.NORTH);
+		leftList = new AlgListBox(true);
+		//leftList.update(remainList);
+		leftList.setEnableDoubleClick(false);
+		left.add(new JScrollPane(leftList), BorderLayout.CENTER);
+
+		JPanel buttons = new JPanel();
+		buttons.setLayout(new GridLayout(0, 1));
+		left.add(buttons, BorderLayout.EAST);
+		
+		JButton leftToRight = new JButton("> ");
+		leftToRight.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				leftToRight();
+			}
+		});
+		pane = new JPanel();
+		pane.add(leftToRight);
+		buttons.add(pane);
+		
+		JButton leftToRightAll = new JButton(">>");
+		leftToRightAll.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				leftToRightAll();
+			}
+		});
+		pane = new JPanel();
+		pane.add(leftToRightAll);
+		buttons.add(pane);
+		
+		JButton rightToLeft = new JButton("< ");
+		rightToLeft.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				rightToLeft();
+			}
+		});
+		pane = new JPanel();
+		pane.add(rightToLeft);
+		buttons.add(pane);
+		
+		JButton rightToLeftAll = new JButton("<<");
+		rightToLeftAll.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				rightToLeftAll();
+			}
+		});
+		pane = new JPanel();
+		pane.add(rightToLeftAll);
+		buttons.add(pane);
+
+		JPanel right = new JPanel(new BorderLayout());
+		body.add(right);
+		
+		right.add(new JLabel("Selected algorithm list"), BorderLayout.NORTH);
+		
+		rightList = new AlgListBox(true);
+		rightList.setEnableDoubleClick(false);
+		//rightList.update(selectedList);
+		right.add(new JScrollPane(rightList), BorderLayout.CENTER);
+		
+		
+		JPanel footer = new JPanel();
+		add(footer, BorderLayout.SOUTH);
+
+		JButton ok = new JButton("OK");
+		footer.add(ok);
+		ok.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				ok();
+			}
+		});
+		
+		JButton cancel = new JButton("Cancel");
+		footer.add(cancel);
+		cancel.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				dispose();
+			}
+		});
+
+	}
+
+	
+	/**
+	 * Event-driven method for browsing button to browse place to store algorithms.
+	 */
+	protected void browse() {
+		List<Alg> parserList = Util.newList();
+		RmiServerIndicator rmiIndicator = new RmiServerIndicator();
+		parserList.add(rmiIndicator);
+		SocketServerIndicator socketIndicator = new SocketServerIndicator();
+		parserList.add(socketIndicator);
+		SnapshotParserImpl snapshotParser = new SnapshotParserImpl(); 
+		parserList.add(snapshotParser);
+		
+		DataDriverList dataDriverList = new DataDriverList();
+		dataDriverList.add(new DataDriver(DataType.file));
+		dataDriverList.add(new DataDriver(DataType.hudup_rmi));
+		dataDriverList.add(new DataDriver(DataType.hudup_socket));
+		
+		DataConfig defaultConfig = new DataConfig();
+		defaultConfig.setParser(rmiIndicator);
+		DatasetConfigurator configurator = new DatasetConfigurator(this, parserList, dataDriverList, defaultConfig);
+		DataConfig config = configurator.getResultedConfig();
+		if (config == null) {
+			JOptionPane.showMessageDialog(
+				this, 
+				"Configuration was not established", 
+				"Configuration was not established", 
+				JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+		
+		txtBrowse.setText(config.getStoreUri().toString(), config);
+	}
+	
+	
+	/**
+	 * Event-driven method for connecting button to connect place to store algorithms.
+	 * @throws RemoteException if any error raises.
+	 */
+	protected void connect() throws RemoteException {
+		DataConfig config = (DataConfig)txtBrowse.getTag();
+		if (config == null) {
+			JOptionPane.showMessageDialog(
+				this, 
+				"Configuration was not established", 
+				"Configuration was not established", 
+				JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+		
+		DatasetParser parser = config.getParser();
+		List<Alg> availableAlgList = Util.newList();
+		xURI storeUri = config.getStoreUri();
+		if (parser instanceof Indicator) {
+			Service service = null;
+			if (parser instanceof RmiServerIndicator) {
+				service = ClientUtil.getRemoteService(
+						storeUri.getHost(),
+						storeUri.getPort(),
+						config.getStoreAccount(), 
+						config.getStorePassword().getText());
+			}
+			else if (parser instanceof SocketServerIndicator) {
+				service = ClientUtil.getSocketConnection(
+						storeUri.getHost(),
+						storeUri.getPort(),
+						config.getStoreAccount(), 
+						config.getStorePassword().getText());
+			}
+			
+			if (service != null) {
+				String[] algNames = service.getAlgNames();
+				for (String algName : algNames) {
+					if (PluginStorage.containsIncludeNextUpdate(algName))
+						continue;
+					
+					Alg alg = null;
+					try {
+						alg = service.getAlg(algName);
+					} catch (Throwable e) {e.printStackTrace(); alg = null;}
+					
+					if (alg != null) availableAlgList.add(alg);
+				}
+			}
+		}
+		else {
+			//Loading algorithms from directory or jar file here.
+		}
+		
+		if (availableAlgList.size() == 0) {
+			JOptionPane.showMessageDialog(
+					this, 
+					"Empty algorithm list", 
+					"Empty algorithm list", 
+					JOptionPane.WARNING_MESSAGE);
+			return;
+		}
+
+		leftList.update(availableAlgList);
+		rightList.clear();
+	}
+	
+	
+	/**
+	 * Transferring selected algorithms from the left {@link AlgListBox} to the right {@link AlgListBox}.
+	 */
+	protected void leftToRight() {
+		List<Alg> list = leftList.removeSelectedList();
+		if (list.isEmpty()) {
+			JOptionPane.showMessageDialog(
+					this, 
+					"Algorithm not selected or empty list", 
+					"Algorithm not selected or empty list", 
+					JOptionPane.WARNING_MESSAGE);
+			return;
+		}
+		rightList.addAll(list);
+		
+	}
+	
+
+	/**
+	 * Transferring all algorithms from the left {@link AlgListBox} to the right {@link AlgListBox}.
+	 */
+	protected void leftToRightAll() {
+		List<Alg> list = leftList.getAlgList();
+		if (list.isEmpty()) {
+			JOptionPane.showMessageDialog(
+					this, 
+					"List empty", 
+					"List empty", 
+					JOptionPane.WARNING_MESSAGE);
+			return;
+		}
+		
+		rightList.addAll(list);
+		leftList.clear();
+	}
+
+	
+	/**
+	 * Transferring selected algorithms from the right {@link AlgListBox} to the left {@link AlgListBox}.
+	 */
+	protected void rightToLeft() {
+		List<Alg> list = rightList.removeSelectedList();
+		if (list.isEmpty()) {
+			JOptionPane.showMessageDialog(
+					this, 
+					"Algorithm not selected or empty list", 
+					"Algorithm not selected or empty list", 
+					JOptionPane.WARNING_MESSAGE);
+			return;
+		}
+		leftList.addAll(list);
+	}
+	
+
+	/**
+	 * Transferring all algorithms from the right {@link AlgListBox} to the left {@link AlgListBox}.
+	 */
+	protected void rightToLeftAll() {
+		List<Alg> list = rightList.getAlgList();
+		if (list.isEmpty()) {
+			JOptionPane.showMessageDialog(
+					this, 
+					"List empty", 
+					"List empty", 
+					JOptionPane.WARNING_MESSAGE);
+			return;
+		}
+
+		leftList.addAll(list);
+		rightList.clear();
+	}
+
+	
+	/**
+	 * Event-driven method response to OK button command.
+	 */
+	protected void ok() {
+		List<Alg> selectedAlgList = rightList.getAlgList();
+		if (selectedAlgList.size() == 0) {
+			if (leftList.getAlgList().size() > 0) {
+				JOptionPane.showMessageDialog(
+					this, 
+					"List empty", 
+					"List empty", 
+					JOptionPane.ERROR_MESSAGE);
+			}
+			
+			dispose();
+			return;
+		}
+		
+		for (Alg selectedAlg : selectedAlgList) {
+			if (selectedAlg instanceof AlgRemoteWrapper)
+				((AlgRemoteWrapper)selectedAlg).setExclusive(true);
+			
+			if (selectedAlg != null)
+				PluginStorage.getNextUpdateList().add(selectedAlg);
+		}
+		this.result = PluginStorage.getNextUpdateList();
+		
+		List<Alg> remainAlgs = leftList.getAlgList();
+		for (Alg remainAlg : remainAlgs) {
+			if (remainAlg instanceof AlgRemoteWrapper) {
+				((AlgRemoteWrapper)remainAlg).setExclusive(true);
+				try {
+					((AlgRemoteWrapper)remainAlg).unexport();
+				} catch (Throwable e) {e.printStackTrace();}
+			}
+		}
+		
+		ok = true;
+		dispose();
+	}
+	
+	
+	/**
+	 * Getting the result as list of chosen algorithms.
+	 * @return result as list of chosen algorithms.
+	 */
+	public AlgList getResult() {
+		return result;
+	}
+	
+	
+	/**
+	 * Checking whether or not the OK button is pressed.
+	 * @return whether or not the OK button is pressed.
+	 */
+	public boolean isOK() {
+		return ok;
+	}
+
+	
+}

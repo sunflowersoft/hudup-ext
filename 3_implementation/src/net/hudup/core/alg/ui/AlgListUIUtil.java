@@ -151,9 +151,9 @@ public final class AlgListUIUtil {
 	 */
 	public static void config(AlgListUI ui) {
 		Alg alg = ui.getSelectedAlg();
-		if (alg == null)
+		if (alg == null || alg.getConfig() == null)
 			return;
-		
+
 		new AlgConfigDlg(getFrame(ui), alg).setVisible(true);
 	}
 

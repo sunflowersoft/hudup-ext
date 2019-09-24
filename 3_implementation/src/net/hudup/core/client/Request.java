@@ -262,6 +262,11 @@ public class Request extends ProtocolParam {
 	 */
 	public String                           evaluatorName                 = null;
 
+	/**
+	 * Algorithm name.
+	 */
+	public String                           algName                       = null;
+
 	
 	/**
 	 * Default constructor.

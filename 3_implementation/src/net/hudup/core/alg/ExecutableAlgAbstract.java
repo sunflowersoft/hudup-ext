@@ -27,7 +27,7 @@ import net.hudup.core.logistic.ui.UIUtil;
  * @author Loc Nguyen
  * @version 1.0
  */
-public abstract class ExecutableAlgAbstract extends AlgAbstract implements ExecutableAlg {
+public abstract class ExecutableAlgAbstract extends AlgAbstract implements ExecutableAlg, ExecutableAlgRemote {
 
 
 	/**

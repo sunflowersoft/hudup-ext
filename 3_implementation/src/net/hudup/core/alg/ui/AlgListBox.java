@@ -11,6 +11,8 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Arrays;
@@ -110,6 +112,17 @@ public class AlgListBox extends JList<Alg> implements AlgListUI {
 			
 		});
 		
+		addKeyListener(new KeyAdapter() {
+			
+			@Override
+			public void keyPressed(KeyEvent e) {
+				if (!getThis().isEnabled()) return;
+				
+				if(e.getKeyCode() == KeyEvent.VK_ENTER) {
+//					AlgListUIUtil.config(getThis());
+				}
+			}
+		});
 	}
 	
 	

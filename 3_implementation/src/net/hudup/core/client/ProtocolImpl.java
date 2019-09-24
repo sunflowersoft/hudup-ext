@@ -718,5 +718,27 @@ public class ProtocolImpl implements Protocol {
 		return request;
 	}
 
+
+	@Override
+	public Request createGetAlgRequest(String algName) {
+		// TODO Auto-generated method stub
+		Request request = new Request();
+		request.notJsonParsing = true;
+		request.action = GET_ALG;
+		request.algName = algName;
+		
+		return request;
+	}
+
+
+	@Override
+	public Request createGetAlgNamesRequest() {
+		// TODO Auto-generated method stub
+		Request request = new Request();
+		request.action = GET_ALG_NAMES;
+		
+		return request;
+	}
+
 	
 }
