@@ -294,11 +294,12 @@ public abstract class ConnectDlg extends JDialog {
 		txtInfo.setLineWrap(true);
 		txtInfo.setText(
 			  "Server serves at default port (RMI) " + Constants.DEFAULT_SERVER_PORT + ".\n\n"
-			+ "Listener serves at default port (RMI) " + Constants.DEFAULT_LISTENER_PORT + ".\n"
+			+ "Listener serves at default port (Socket) " + Constants.DEFAULT_LISTENER_PORT + ".\n"
 			+ "Listener exports at default port (RMI) " + Constants.DEFAULT_LISTENER_EXPORT_PORT + " for control connection.\n\n"
-			+ "Balancer serves at default port (RMI) " + Constants.DEFAULT_BALANCER_PORT + ".\n"
+			+ "Balancer serves at default port (Socket) " + Constants.DEFAULT_BALANCER_PORT + ".\n"
 			+ "Balancer exports at default port (RMI) " + Constants.DEFAULT_BALANCER_EXPORT_PORT + " for control connection.\n\n"
 			+ "Default socket control port is (Socket) " + Constants.DEFAULT_SOCKET_CONTROL_PORT + ".\n\n"
+			+ "Evaluator serves at default port (RMI) " + Constants.DEFAULT_EVALUATOR_PORT + ".\n\n"
 			+ "Default control panel port is (RMI) " + Constants.DEFAULT_CONTROL_PANEL_PORT + ".\n\n");
 
 		

@@ -7,6 +7,8 @@
  */
 package net.hudup.core.logistic.ui;
 
+import java.io.Serializable;
+
 import javax.swing.JLabel;
 
 import net.hudup.core.logistic.AbstractRunner;
@@ -20,9 +22,15 @@ import net.hudup.core.logistic.I18nUtil;
  * @version 11.0
  *
  */
-public class CounterClock extends AbstractRunner {
+public class CounterClock extends AbstractRunner implements Serializable {
 
 	
+	/**
+	 * Default serial version UID.
+	 */
+	private static final long serialVersionUID = 1L;
+
+
 	/**
 	 * The text form of this counter clock &quot;hours: minutes: seconds&quot;.
 	 */

@@ -18,7 +18,6 @@ import net.hudup.core.PluginStorage;
 import net.hudup.core.Util;
 import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.AlgRemote;
-import net.hudup.core.alg.AlgRemoteWrapper;
 import net.hudup.core.alg.RecommendParam;
 import net.hudup.core.alg.Recommender;
 import net.hudup.core.client.ServerInfo;
@@ -1513,11 +1512,11 @@ public class DefaultService implements Service, AutoCloseable {
 		
 		trans.lockWrite();
 		try {
-			alg = PluginStorage.query(algName);
+			alg = PluginStorage.getNormalAlgReg().query(algName);
 			if ((alg != null) && !(alg instanceof AlwaysSerialize)) {
 				if (alg instanceof AlgRemote) {
 					AlgRemote remoteAlg = (AlgRemote) ((AlgRemote)alg).export(serverConfig.getServerPort());
-					alg = wrap(remoteAlg, false);
+					alg = Util.getAlgUtil().wrap(remoteAlg, false);
 				}
 				else
 					alg = null;
@@ -1527,7 +1526,7 @@ public class DefaultService implements Service, AutoCloseable {
 			e.printStackTrace();
 			alg = null;
 			
-			LogUtil.error("Service fail to get algorithm, caused by " + e.getMessage());
+			LogUtil.error("Service fails to get algorithm, caused by " + e.getMessage());
 		}
 		finally {
 			trans.unlockWrite();
@@ -1539,12 +1538,11 @@ public class DefaultService implements Service, AutoCloseable {
 
 	@Override
 	public String[] getAlgNames() throws RemoteException {
-		// TODO Auto-generated method stub
 		List<String> algNames = Util.newList();
 		
 		trans.lockRead();
 		try {
-			algNames = PluginStorage.getAlgNames();
+			algNames = PluginStorage.getNormalAlgReg().getAlgNames();
 		}
 		catch (Throwable e) {
 			e.printStackTrace();
@@ -1558,17 +1556,6 @@ public class DefaultService implements Service, AutoCloseable {
 		return algNames.toArray(new String[0]);
 	}
 
-	
-	/**
-	 * Wrapping a remote algorithm. This method is only called by {@link #getAlg(String)} method.
-	 * @param remoteAlg remote algorithm.
-	 * @param exclusive exclusive mode.
-	 * @return wrapper of a remote algorithm.
-	 */
-	protected AlgRemoteWrapper wrap(AlgRemote remoteAlg, boolean exclusive) {
-		return Firer.wrap(remoteAlg, exclusive);
-	}
-	
 	
 	@Override
 	protected void finalize() throws Throwable {

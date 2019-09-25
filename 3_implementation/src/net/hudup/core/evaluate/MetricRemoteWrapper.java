@@ -11,6 +11,7 @@ import java.rmi.RemoteException;
 
 import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.AlgRemoteWrapper;
+import net.hudup.core.data.DataConfig;
 import net.hudup.core.logistic.BaseClass;
 import net.hudup.core.logistic.LogUtil;
 
@@ -111,6 +112,18 @@ public class MetricRemoteWrapper extends AlgRemoteWrapper implements Metric, Met
 		else {
 			LogUtil.warn("newInstance() returns itselfs and so does not return new object");
 			return this;
+		}
+	}
+
+
+	@Override
+	public DataConfig createDefaultConfig() {
+		// TODO Auto-generated method stub
+		if (remoteAlg instanceof MetricAbstract)
+			return ((MetricAbstract)remoteAlg).createDefaultConfig();
+		else {
+			LogUtil.warn("Wrapper of remote metric does not support createDefaultConfig()");
+			return null;
 		}
 	}
 

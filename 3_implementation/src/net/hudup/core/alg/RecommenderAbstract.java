@@ -18,7 +18,6 @@ import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.ui.DescriptionDlg;
 import net.hudup.core.logistic.ui.UIUtil;
 
-
 /**
  * This abstract class implements basically recommendation algorithms.
  * 

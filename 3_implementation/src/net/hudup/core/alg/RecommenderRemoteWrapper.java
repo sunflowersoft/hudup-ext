@@ -10,6 +10,7 @@ package net.hudup.core.alg;
 import java.rmi.RemoteException;
 import java.util.Set;
 
+import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.RatingVector;
 import net.hudup.core.logistic.BaseClass;
@@ -143,4 +144,16 @@ public class RecommenderRemoteWrapper extends AlgRemoteWrapper implements Recomm
 	}
 
 	
+	@Override
+	public DataConfig createDefaultConfig() {
+		// TODO Auto-generated method stub
+		if (remoteAlg instanceof RecommenderAbstract)
+			return ((RecommenderAbstract)remoteAlg).createDefaultConfig();
+		else {
+			LogUtil.warn("Wrapper of remote recommendation algorithm does not support createDefaultConfig()");
+			return null;
+		}
+	}
+
+
 }

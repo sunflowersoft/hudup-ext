@@ -147,6 +147,11 @@ public class NetUtil {
 		protected Remote stub = null;
 		
 		/**
+		 * Creation flag to indicate whether the registry {@link #registry} is created or retrieve (get).
+		 */
+		protected boolean registryCreated = true;
+		
+		/**
 		 * Constructor with specified registry and remote object.
 		 * @param registry specified registry.
 		 * @param stub specified remote object.
@@ -170,6 +175,14 @@ public class NetUtil {
 		 */
 		public Remote getStub() {
 			return stub;
+		}
+		
+		/**
+		 * Checking whether the registry {@link #registry} is created or retrieve (get).
+		 * @return the registry {@link #registry} is created or retrieve (get).
+		 */
+		public boolean isRegistryCreated() {
+			return registryCreated;
 		}
 		
 		/**
@@ -246,28 +259,84 @@ public class NetUtil {
 		 * @param port registered port.
 		 * @return registry and stub.
 		 */
+		public static RegistryRemote registerExportWithoutCreateRegistry(Remote remote, int port) {
+			if (remote == null) return null;
+
+			Registry registry = null;
+			Remote stub = null;
+			boolean registryCreated = true;
+			try {
+				registry = LocateRegistry.getRegistry(port);
+				if (registry != null)
+					registryCreated = false;
+				else {
+					registry = LocateRegistry.createRegistry(port);
+					registryCreated = true;
+				}
+				if (registry == null) return null;
+				
+				stub = UnicastRemoteObject.exportObject(remote, port);
+				if (stub == null) {
+					if (registryCreated)
+						UnicastRemoteObject.unexportObject(registry, true);
+					return null;
+				}
+				else {
+					RegistryRemote registryRemote = new RegistryRemote(registry, stub);
+					registryRemote.registryCreated = registryCreated;
+					return registryRemote;
+				}
+			}
+			catch (Throwable e) {
+				e.printStackTrace();
+				
+				try {
+		        	if (stub != null)
+		        		UnicastRemoteObject.unexportObject(remote, true);
+				}
+				catch (Throwable e1) {
+					e1.printStackTrace();
+				}
+				
+				try {
+		        	if (registry != null)
+		        		UnicastRemoteObject.unexportObject(registry, true);
+				}
+				catch (Throwable e1) {
+					e1.printStackTrace();
+				}
+			}
+			
+			return null;
+		}
+
+		/**
+		 * Register and export remote object.
+		 * @param remote remote object.
+		 * @param port registered port.
+		 * @return registry and stub.
+		 */
 		public static RegistryRemote registerExport(Remote remote, int port) {
 			if (remote == null) return null;
 
 			Registry registry = null;
 			Remote stub = null;
+			boolean registryCreated = true;
 			try {
-//				try {
-//					registry = LocateRegistry.getRegistry(port);
-//				}
-//				catch (Throwable e) {
-//					registry = null;
-//				}
-				//Fixing bug: always to create new registry. Date: 2019.08.06 by Loc Nguyen.
-				if (registry == null)
-					registry = LocateRegistry.createRegistry(port);
+				registry = LocateRegistry.createRegistry(port);
+				if (registry == null) return null;
 				
 				stub = UnicastRemoteObject.exportObject(remote, port);
-				
-				if (registry == null || stub == null)
+				if (stub == null) {
+					if (registryCreated)
+						UnicastRemoteObject.unexportObject(registry, true);
 					return null;
-				else
-					return new RegistryRemote(registry, stub);
+				}
+				else {
+					RegistryRemote registryRemote = new RegistryRemote(registry, stub);
+					registryRemote.registryCreated = registryCreated;
+					return registryRemote;
+				}
 			}
 			catch (Throwable e) {
 				e.printStackTrace();
@@ -436,6 +505,38 @@ public class NetUtil {
 			}
 			
 			return result && unregisterUnexport(registry, remote);
+		}
+		
+		/**
+		 * Getting registry at specified port.
+		 * @param port specified port.
+		 * @param createIfNotExist when this flag is true, registry will be created if it does not exist.
+		 * @return registry at specified port.
+		 */
+		public static Registry getRegistry(int port, boolean createIfNotExist) {
+			Registry registry = null;
+			try {
+				registry = LocateRegistry.getRegistry(port);
+			}
+			catch (Throwable e) {
+				e.printStackTrace();
+				registry = null;
+			}
+			
+			if (registry != null)
+				return registry;
+			else if (createIfNotExist) {
+				try {
+					registry = LocateRegistry.createRegistry(port);
+				}
+				catch (Throwable e) {
+					e.printStackTrace();
+					registry = null;
+				}
+				return registry;
+			}
+			else
+				return null;
 		}
 		
 	}

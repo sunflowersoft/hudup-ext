@@ -37,6 +37,12 @@ public class EvaluatorConfig extends SysConfig {
 
 	
 	/**
+	 * This constant specifies key name of evaluator port.
+	 */
+	public final static String EVALUATOR_PORT_FIELD = changeCase("evaluator_port");
+
+	
+	/**
 	 * By default, do not recommend all items.
 	 */
 	public final static boolean RECOMMEND_ALL_DEFAULT = false;
@@ -65,7 +71,8 @@ public class EvaluatorConfig extends SysConfig {
 	public void reset() {
 		super.reset();
 		
-		put(DataConfig.RECOMMEND_ALL_FIELD, RECOMMEND_ALL_DEFAULT);
+		setRecommendAll(RECOMMEND_ALL_DEFAULT);
+		setEvaluatorPort(Constants.DEFAULT_EVALUATOR_PORT);
 	}
 
 	
@@ -86,6 +93,24 @@ public class EvaluatorConfig extends SysConfig {
 		put(DataConfig.RECOMMEND_ALL_FIELD, all);
 	}
 	
+	
+	/**
+	 * Setting evaluator port by specified port.
+	 * @param port specified port.
+	 */
+	public void setEvaluatorPort(int port) {
+		put(EVALUATOR_PORT_FIELD, port);
+	}
+	
+	
+	/**
+	 * Getting evaluator port.
+	 * @return evaluator port
+	 */
+	public int getEvaluatorPort() {
+		return getAsInt(EVALUATOR_PORT_FIELD);
+	}
+
 	
 	@Override
 	public Object clone() {

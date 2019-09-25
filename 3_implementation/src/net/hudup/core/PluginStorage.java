@@ -9,7 +9,6 @@ package net.hudup.core;
 
 import java.io.Serializable;
 import java.util.List;
-import java.util.Set;
 
 import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.AlgList;
@@ -282,61 +281,61 @@ public final class PluginStorage implements Serializable {
 	}
 	
 	
-	/**
-	 * Testing whether the specified name contains in registered tables.
-	 * Using this method is careful because different registered tables can have same algorithm names.
-	 * @param algName specified name.
-	 * @return whether the specified name contains in registered tables.
-	 */
-	public final static boolean containsIncludeNextUpdate(String algName) {
-		return parserReg.contains(algName)
-				|| metricReg.contains(algName)
-				|| externalQueryReg.contains(algName)
-				|| ctsmReg.contains(algName)
-				|| normalAlgReg.contains(algName)
-				|| nextUpdateList.indexOf(algName) >= 0;
-	}
-	
-	
-	/**
-	 * Querying registered algorithm via name over all registered tables.
-	 * Using this method is careful because different registered tables can have same algorithm names.
-	 * @param algName specified name.
-	 * @return registered algorithm having specified name over all registered tables.
-	 */
-	public static Alg query(String algName) {
-		if (parserReg.contains(algName))
-			return parserReg.query(algName);
-		else if (metricReg.contains(algName))
-			return metricReg.query(algName);
-		else if (externalQueryReg.contains(algName))
-			return externalQueryReg.query(algName);
-		else if (ctsmReg.contains(algName))
-			return ctsmReg.query(algName);
-		else if (normalAlgReg.contains(algName))
-			return normalAlgReg.query(algName);
-		else
-			return null;
-	}
-
-	
-	/**
-	 * Return an array of names of registered algorithms.
-	 * Using this method is careful because different registered tables can have same algorithm names.
-	 * @return array of names of registered algorithms.
-	 */
-	public static List<String> getAlgNames() {
-		Set<String> namesSet = Util.newSet();
-		namesSet.addAll(parserReg.getAlgNames());
-		namesSet.addAll(metricReg.getAlgNames());
-		namesSet.addAll(externalQueryReg.getAlgNames());
-		namesSet.addAll(ctsmReg.getAlgNames());
-		namesSet.addAll(normalAlgReg.getAlgNames());
-		
-		List<String> namesList = Util.newList(namesSet.size());
-		namesList.addAll(namesSet);
-		return namesList;
-	}
+//	/**
+//	 * Testing whether the specified name contains in registered tables.
+//	 * Using this method is careful because different registered tables can have same algorithm names.
+//	 * @param algName specified name.
+//	 * @return whether the specified name contains in registered tables.
+//	 */
+//	public final static boolean containsIncludeNextUpdate(String algName) {
+//		return parserReg.contains(algName)
+//				|| metricReg.contains(algName)
+//				|| externalQueryReg.contains(algName)
+//				|| ctsmReg.contains(algName)
+//				|| normalAlgReg.contains(algName)
+//				|| nextUpdateList.indexOf(algName) >= 0;
+//	}
+//	
+//	
+//	/**
+//	 * Querying registered algorithm via name over all registered tables.
+//	 * Using this method is careful because different registered tables can have same algorithm names.
+//	 * @param algName specified name.
+//	 * @return registered algorithm having specified name over all registered tables.
+//	 */
+//	public static Alg query(String algName) {
+//		if (parserReg.contains(algName))
+//			return parserReg.query(algName);
+//		else if (metricReg.contains(algName))
+//			return metricReg.query(algName);
+//		else if (externalQueryReg.contains(algName))
+//			return externalQueryReg.query(algName);
+//		else if (ctsmReg.contains(algName))
+//			return ctsmReg.query(algName);
+//		else if (normalAlgReg.contains(algName))
+//			return normalAlgReg.query(algName);
+//		else
+//			return null;
+//	}
+//
+//	
+//	/**
+//	 * Return an array of names of registered algorithms.
+//	 * Using this method is careful because different registered tables can have same algorithm names.
+//	 * @return array of names of registered algorithms.
+//	 */
+//	public static List<String> getAlgNames() {
+//		Set<String> namesSet = Util.newSet();
+//		namesSet.addAll(parserReg.getAlgNames());
+//		namesSet.addAll(metricReg.getAlgNames());
+//		namesSet.addAll(externalQueryReg.getAlgNames());
+//		namesSet.addAll(ctsmReg.getAlgNames());
+//		namesSet.addAll(normalAlgReg.getAlgNames());
+//		
+//		List<String> namesList = Util.newList(namesSet.size());
+//		namesList.addAll(namesSet);
+//		return namesList;
+//	}
 
 	
 	/**

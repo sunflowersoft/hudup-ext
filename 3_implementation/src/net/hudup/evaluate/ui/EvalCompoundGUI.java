@@ -307,6 +307,13 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 	}
 	
 	
+	@Override
+	public boolean isSupportImport() {
+		// TODO Auto-generated method stub
+		return batchEvaluateGUI.bindUri == null /*&& evaluateGUI.bindUri == null*/;
+	}
+
+
 	/**
 	 * Switching evaluator.
 	 * @param selectedEvName selected evaluator name.

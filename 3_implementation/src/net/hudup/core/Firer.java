@@ -16,19 +16,11 @@ import org.reflections.Reflections;
 
 import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.AlgList;
-import net.hudup.core.alg.AlgRemote;
-import net.hudup.core.alg.AlgRemoteWrapper;
-import net.hudup.core.alg.ExecutableAlgRemote;
-import net.hudup.core.alg.ExecutableAlgRemoteWrapper;
-import net.hudup.core.alg.RecommenderRemote;
-import net.hudup.core.alg.RecommenderRemoteWrapper;
 import net.hudup.core.data.DataDriver;
 import net.hudup.core.data.DataDriverList;
 import net.hudup.core.data.ExternalQuery;
 import net.hudup.core.data.ctx.CTSManager;
 import net.hudup.core.evaluate.Metric;
-import net.hudup.core.evaluate.MetricRemote;
-import net.hudup.core.evaluate.MetricRemoteWrapper;
 import net.hudup.core.logistic.BaseClass;
 import net.hudup.core.logistic.Composite;
 import net.hudup.core.logistic.LogUtil;
@@ -37,8 +29,6 @@ import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.UriAdapter.AdapterWriter;
 import net.hudup.core.logistic.xURI;
 import net.hudup.core.parser.DatasetParser;
-import net.hudup.core.parser.DatasetParserRemote;
-import net.hudup.core.parser.DatasetParserRemoteWrapper;
 
 /**
  * This class is the full implementation of {@link PluginManager}.
@@ -284,30 +274,6 @@ public class Firer implements PluginManager {
 
 		if (registered)
 			LogUtil.info("Registered algorithm: " + alg.getName());
-	}
-	
-	
-	/**
-	 * Wrapping a remote algorithm.
-	 * @param remoteAlg remote algorithm.
-	 * @param exclusive exclusive mode.
-	 * @return wrapper of a remote algorithm.
-	 */
-	public static AlgRemoteWrapper wrap(AlgRemote remoteAlg, boolean exclusive) {
-		if (remoteAlg instanceof DatasetParserRemote)
-			return new DatasetParserRemoteWrapper((DatasetParserRemote)remoteAlg, exclusive);
-		else if (remoteAlg instanceof MetricRemote)
-			return new MetricRemoteWrapper((MetricRemote)remoteAlg, exclusive);
-//		else if (remoteAlg instanceof ExternalQueryRemote)
-//			return new ExternalQueryRemoteWrapper((ExternalQueryRemote)remoteAlg, exclusive);
-//		else if (remoteAlg instanceof CTSManagerRemote)
-//			return new CTSManagerRemoteWrapper((CTSManagerRemote)remoteAlg, exclusive);
-		else if (remoteAlg instanceof RecommenderRemote)
-			return new RecommenderRemoteWrapper((RecommenderRemote)remoteAlg, exclusive);
-		else if (remoteAlg instanceof ExecutableAlgRemote)
-			return new ExecutableAlgRemoteWrapper((ExecutableAlgRemote)remoteAlg, exclusive);
-		else
-			return new AlgRemoteWrapper(remoteAlg, exclusive);
 	}
 	
 	

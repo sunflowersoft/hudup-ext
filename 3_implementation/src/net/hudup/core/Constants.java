@@ -162,20 +162,25 @@ public final class Constants {
 	public final static int     DEFAULT_SOCKET_CONTROL_PORT   = DEFAULT_SERVER_PORT + 5;
 
 	/**
+	 * Default evaluator port.
+	 */
+	public final static int     DEFAULT_EVALUATOR_PORT        = DEFAULT_SERVER_PORT + 6;
+
+	/**
 	 * The graphic user interface (GUI) allowing users to control Hudup server is called control panel. Control panel uses this port to connect with Hudup server instead of using {@link #DEFAULT_SERVER_PORT}.
 	 */
-	public final static int     DEFAULT_CONTROL_PANEL_PORT    = DEFAULT_SERVER_PORT + 6;
+	public final static int     DEFAULT_CONTROL_PANEL_PORT    = DEFAULT_SERVER_PORT + 7;
 	
 	/**
 	 * When Hudup server, listener, or balancer starts, it uses firstly the port {@link #DEFAULT_SERVER_PORT}. If this constant is {@code true}, many random ports are tried until success.
 	 * By default, this constant is {@code false}, which means that there is no such randomization. 
 	 */
-	public static boolean TRY_RANDOM_PORT                      = true;
+	public static boolean TRY_RANDOM_PORT                     = true;
 	
 	/**
 	 * This is the period in miliseconds that the Hudup server does periodically internal tasks such as data mining and learning knowledge base.
 	 */
-	public final static int     DEFAULT_SERVER_TASKS_PERIOD    = (int) (1000 * 60 * 5); // 5 minute
+	public final static int     DEFAULT_SERVER_TASKS_PERIOD   = (int) (1000 * 60 * 5); // 5 minute
 	
 	/**
 	 * The Hudup server is available to serve incoming request in a interval called a timeout in miliseconds. This constant specifies such timeout.

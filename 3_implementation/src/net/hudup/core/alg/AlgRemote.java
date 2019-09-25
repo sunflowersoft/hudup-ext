@@ -14,10 +14,10 @@ import java.rmi.Remote;
  * This interface represents a remote algorithm.
  * 
  * @author Loc Nguyen
- * @version 1.0
+ * @version 12.0
  *
  */
-public interface AlgRemote extends AlgRemoteTask, Remote, Serializable {
+public interface AlgRemote extends AlgRemoteTask, SetupAlgListener, Remote, Serializable {
 
 
 }

@@ -7,6 +7,7 @@
  */
 package net.hudup.core.alg;
 
+import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.EventListener;
 
@@ -16,7 +17,7 @@ import java.util.EventListener;
  * @version 1.0
  *
  */
-public interface SetupAlgListener extends EventListener {
+public interface SetupAlgListener extends EventListener, Remote {
 
 	
 	/**

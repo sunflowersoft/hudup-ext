@@ -25,6 +25,8 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.Vector;
 
+import net.hudup.core.alg.AlgUtil;
+import net.hudup.core.alg.AlgUtilImpl;
 import net.hudup.core.factory.Factory;
 import net.hudup.core.factory.FactoryImpl;
 import net.hudup.core.logistic.UriAdapter;
@@ -375,6 +377,26 @@ public final class Util {
 		}
 		
 		return new JsonParserImpl();
+	}
+
+	
+	/**
+	 * Getting algorithm utility.
+	 * @return algorithm utility.
+	 */
+	public static AlgUtil getAlgUtil() {
+		try {
+			String algUtilClassName = getHudupProperty("alg_util");
+			if (algUtilClassName == null)
+				return new AlgUtilImpl();
+			else
+				return (AlgUtil)Class.forName(algUtilClassName).newInstance();
+		}
+		catch (Throwable e) {
+			e.printStackTrace();
+		}
+		
+		return new AlgUtilImpl();
 	}
 
 	

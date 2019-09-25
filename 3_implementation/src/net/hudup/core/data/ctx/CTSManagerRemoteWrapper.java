@@ -5,28 +5,21 @@
  * Email: ng_phloc@yahoo.com
  * Phone: +84-975250362
  */
-package net.hudup.data.ctx;
+package net.hudup.core.data.ctx;
 
 import java.io.Serializable;
 import java.rmi.RemoteException;
 
+import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.AlgRemoteWrapper;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.MemProfiles;
 import net.hudup.core.data.Profile;
 import net.hudup.core.data.Profiles;
-import net.hudup.core.data.ctx.CTSManager;
-import net.hudup.core.data.ctx.CTSManagerRemote;
-import net.hudup.core.data.ctx.CTSMemMultiProfiles;
-import net.hudup.core.data.ctx.CTSMultiProfiles;
-import net.hudup.core.data.ctx.Context;
-import net.hudup.core.data.ctx.ContextList;
-import net.hudup.core.data.ctx.ContextTemplateSchema;
-import net.hudup.core.data.ctx.ContextValue;
 import net.hudup.core.logistic.BaseClass;
 import net.hudup.core.logistic.Inspector;
-import net.hudup.data.ctx.ui.CTScreator;
+import net.hudup.core.logistic.LogUtil;
 
 /**
  * This class is wrapper of remote context template manager.
@@ -217,7 +210,33 @@ public class CTSManagerRemoteWrapper extends AlgRemoteWrapper implements CTSMana
 	@Override
 	public Inspector getInspector() {
 		// TODO Auto-generated method stub
-		return new CTScreator(null, this);
+		return new Inspector.NullInspector();
+	}
+
+	
+	@Override
+	public Alg newInstance() {
+		// TODO Auto-generated method stub
+		if (remoteAlg instanceof CTSManagerAbstract) {
+			CTSManagerAbstract newCTSManager = (CTSManagerAbstract) ((CTSManagerAbstract)remoteAlg).newInstance();
+			return new CTSManagerRemoteWrapper(newCTSManager, exclusive);
+		}
+		else {
+			LogUtil.warn("newInstance() returns itselfs and so does not return new object");
+			return this;
+		}
+	}
+
+	
+	@Override
+	public DataConfig createDefaultConfig() {
+		// TODO Auto-generated method stub
+		if (remoteAlg instanceof CTSManagerAbstract)
+			return ((CTSManagerAbstract)remoteAlg).createDefaultConfig();
+		else {
+			LogUtil.warn("Wrapper of remote CTS manager does not support createDefaultConfig()");
+			return null;
+		}
 	}
 
 	

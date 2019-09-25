@@ -32,7 +32,7 @@ import net.hudup.core.logistic.ui.ProgressListener;
  * @version 10.0
  *
  */
-public interface ExternalQuery extends AutoCloseable, Alg {
+public interface ExternalQuery extends ExternalQueryRemoteTask, Alg, AutoCloseable {
 
 	
 	/**

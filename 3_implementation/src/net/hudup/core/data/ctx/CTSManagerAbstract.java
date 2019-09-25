@@ -147,14 +147,20 @@ public abstract class CTSManagerAbstract extends AlgAbstract implements CTSManag
 
 	
 	@Override
+	public void close() throws Exception {
+		// TODO Auto-generated method stub
+		try {
+			unexport();
+		} catch (Throwable e) {e.printStackTrace();}
+	}
+
+
+	@Override
 	protected void finalize() throws Throwable {
 		// TODO Auto-generated method stub
 		try {
 			close();
-		}
-		catch (Throwable e) {
-			e.printStackTrace();
-		}
+		} catch (Throwable e) {e.printStackTrace();}
 	}
 
 	

@@ -40,4 +40,11 @@ public interface PluginChangedListener extends EventListener {
 	boolean isIdle();
 	
 	
+	/**
+	 * Checking whether to support importing plug-ins.
+	 * @return whether to support importing plug-ins.
+	 */
+	boolean isSupportImport();
+	
+	
 }

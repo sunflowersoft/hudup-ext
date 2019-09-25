@@ -38,6 +38,7 @@ import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.DataDriver;
 import net.hudup.core.data.DataDriver.DataType;
 import net.hudup.core.data.DataDriverList;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.xURI;
 import net.hudup.core.logistic.ui.SortableTable;
 import net.hudup.core.logistic.ui.SortableTableModel;
@@ -334,6 +335,7 @@ public class PluginStorageManifest extends SortableTable {
 				tblRegister.update();
 			}
 		});
+		if (!listener.isSupportImport()) importAlg.setVisible(false);
 		
 		
 		return result;
@@ -718,8 +720,11 @@ class PluginStorageManifest2 extends JTable {
 		JPanel footer = new JPanel();
 		result.add(footer, BorderLayout.SOUTH);
 
+		JPanel buttonGrp1 = new JPanel();
+		footer.add(buttonGrp1, BorderLayout.CENTER);
+
 		JButton apply = new JButton("Apply");
-		footer.add(apply);
+		buttonGrp1.add(apply);
 		apply.addActionListener(new ActionListener() {
 			
 			@Override
@@ -744,9 +749,8 @@ class PluginStorageManifest2 extends JTable {
 			}
 		});
 		
-		
 		JButton selectAll = new JButton("Select all");
-		footer.add(selectAll);
+		buttonGrp1.add(selectAll);
 		selectAll.addActionListener(new ActionListener() {
 			
 			@Override
@@ -756,9 +760,8 @@ class PluginStorageManifest2 extends JTable {
 			}
 		});
 
-		
 		JButton unselectAll = new JButton("Unselect all");
-		footer.add(unselectAll);
+		buttonGrp1.add(unselectAll);
 		unselectAll.addActionListener(new ActionListener() {
 			
 			@Override
@@ -767,6 +770,23 @@ class PluginStorageManifest2 extends JTable {
 				tblRegister.selectAll(false);
 			}
 		});
+
+		
+		JPanel buttonGrp2 = new JPanel();
+		footer.add(buttonGrp2, BorderLayout.EAST);
+		
+		JButton importAlg = new JButton("Import");
+		buttonGrp2.add(importAlg);
+		importAlg.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				new ImportAlgDlag(tblRegister).setVisible(true);
+				
+				tblRegister.update();
+			}
+		});
+		if (!listener.isSupportImport()) importAlg.setVisible(false);
 
 		
 		return result;
@@ -1260,7 +1280,7 @@ class ImportAlgDlag extends JDialog {
 	 * Event-driven method for connecting button to connect place to store algorithms.
 	 * @throws RemoteException if any error raises.
 	 */
-	protected void connect() throws RemoteException {
+	protected void connect() {
 		DataConfig config = (DataConfig)txtBrowse.getTag();
 		if (config == null) {
 			JOptionPane.showMessageDialog(
@@ -1292,15 +1312,27 @@ class ImportAlgDlag extends JDialog {
 			}
 			
 			if (service != null) {
-				String[] algNames = service.getAlgNames();
+				String[] algNames = new String[0];
+				try {
+					algNames = service.getAlgNames();
+				}
+				catch (Throwable e) {
+					LogUtil.error("Retrieving remote algorithm names error by: " + e.getMessage());
+				}
+				if (algNames == null) algNames = new String[0];
+				
+				RegisterTable normalReg = PluginStorage.getNormalAlgReg();
 				for (String algName : algNames) {
-					if (PluginStorage.containsIncludeNextUpdate(algName))
-						continue;
+					if (normalReg.contains(algName)) continue;
 					
 					Alg alg = null;
 					try {
 						alg = service.getAlg(algName);
-					} catch (Throwable e) {e.printStackTrace(); alg = null;}
+					}
+					catch (Throwable e) {
+						LogUtil.error("Retrieving remote algorithm error by: " + e.getMessage());
+						alg = null;
+					}
 					
 					if (alg != null) availableAlgList.add(alg);
 				}

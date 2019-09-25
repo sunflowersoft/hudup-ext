@@ -9,6 +9,7 @@ package net.hudup.core.alg;
 
 import java.rmi.RemoteException;
 
+import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.Fetcher;
 import net.hudup.core.data.Profile;
@@ -120,7 +121,7 @@ public class ExecutableAlgRemoteWrapper extends AlgRemoteWrapper implements Exec
 			return new ExecutableAlgRemoteWrapper(newAlg, exclusive);
 		}
 		else {
-			LogUtil.warn("newInstance() returns itselfs and so does not return new object");
+			LogUtil.warn("Wrapper of remote executable algorithm: newInstance() returns itselfs and so does not return new object");
 			return this;
 		}
 	}
@@ -134,6 +135,18 @@ public class ExecutableAlgRemoteWrapper extends AlgRemoteWrapper implements Exec
 		}
 
 		super.unexport();
+	}
+
+
+	@Override
+	public DataConfig createDefaultConfig() {
+		// TODO Auto-generated method stub
+		if (remoteAlg instanceof ExecutableAlgAbstract)
+			return ((ExecutableAlgAbstract)remoteAlg).createDefaultConfig();
+		else {
+			LogUtil.warn("Wrapper of remote executable algorithm does not support createDefaultConfig()");
+			return null;
+		}
 	}
 
 	

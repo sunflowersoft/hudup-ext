@@ -7,6 +7,7 @@ import java.awt.Insets;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.io.Serializable;
 
 import javax.swing.Icon;
 import javax.swing.JButton;
@@ -138,9 +139,14 @@ public class SortableTable extends JTable {
  * @version 2.1
  *
  */
-class SortableTableHeaderListener implements MouseListener, MouseMotionListener {
+class SortableTableHeaderListener implements MouseListener, MouseMotionListener, Serializable {
 
-    /** A reference to the table model. */
+    /**
+	 * Default serial version UID.
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/** A reference to the table model. */
     private SortableTableModel model;
 
     /** The header renderer. */
@@ -285,9 +291,14 @@ class SortableTableHeaderListener implements MouseListener, MouseMotionListener 
  * @version 2.1
  *
  */
-class SortButtonRenderer implements TableCellRenderer {
+class SortButtonRenderer implements TableCellRenderer, Serializable {
 
     /**
+	 * Default serial version UID.
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
      * Useful constant indicating NO sorting.
      */
     public static final int NONE = 0;
@@ -511,9 +522,14 @@ class SortButtonRenderer implements TableCellRenderer {
  * @version 2.1
  *
  */
-class BevelArrowIcon implements Icon {
+class BevelArrowIcon implements Icon, Serializable {
 
-    /** Constant indicating that the arrow is pointing up. */
+    /**
+	 * Default serial version UID.
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/** Constant indicating that the arrow is pointing up. */
     public static final int UP = 0;
 
     /** Constant indicating that the arrow is pointing down. */

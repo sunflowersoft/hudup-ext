@@ -7,6 +7,8 @@
  */
 package net.hudup.data;
 
+import java.rmi.RemoteException;
+
 import net.hudup.core.Util;
 import net.hudup.core.alg.Alg;
 import net.hudup.core.data.AttributeList;
@@ -16,6 +18,7 @@ import net.hudup.core.data.DataDriver.DataType;
 import net.hudup.core.data.ExternalConfig;
 import net.hudup.core.data.ExternalItemInfo;
 import net.hudup.core.data.ExternalQuery;
+import net.hudup.core.data.ExternalQueryAbstract;
 import net.hudup.core.data.ExternalRecord;
 import net.hudup.core.data.ExternalUserInfo;
 import net.hudup.core.data.Fetcher;
@@ -39,7 +42,7 @@ import net.hudup.core.logistic.ui.ProgressListener;
  * @version 10.0
  *
  */
-public class DefaultExternalQuery implements ExternalQuery {
+public class DefaultExternalQuery extends ExternalQueryAbstract {
 
 	
 	/**
@@ -84,6 +87,8 @@ public class DefaultExternalQuery implements ExternalQuery {
 		try {
 			internalProvider = new ProviderImpl(internalConfig);
 			externalProvider = new ProviderImpl(externalConfig);
+			
+//			config = internalProvider.getConfig(); //Added date: 2019.09.25 by Loc Nguyen
 			
 			return true;
 		}
@@ -586,6 +591,13 @@ public class DefaultExternalQuery implements ExternalQuery {
 
 	
 	@Override
+	public String getDescription() throws RemoteException {
+		// TODO Auto-generated method stub
+		return "Default external_query";
+	}
+
+
+	@Override
 	public Alg newInstance() {
 		// TODO Auto-generated method stub
 		return new DefaultExternalQuery();
@@ -658,57 +670,24 @@ public class DefaultExternalQuery implements ExternalQuery {
 
 	
 	@Override
-	public void resetConfig() {
-		// TODO Auto-generated method stub
-		throw new RuntimeException("DefaultExternalQuery.resetConfig() not implemented");
-	}
-
-	
-	@Override
-	public DataConfig createDefaultConfig() {
-		// TODO Auto-generated method stub
-		throw new RuntimeException("DefaultExternalQuery.createDefaultConfig() not implemented");
-	}
-
-	
-	@Override
 	public void close() throws Exception {
 		// TODO Auto-generated method stub
+		super.close();
 		
 		try {
 			if (internalProvider != null)
 				internalProvider.close();
-			
 			internalProvider = null;
 		}
-		catch (Throwable e) {
-			e.printStackTrace();
-		}
+		catch (Throwable e) {e.printStackTrace();}
 		
 		try {
 			if (externalProvider != null)
 				externalProvider.close();
-			
 			externalProvider = null;
 		}
-		catch (Throwable e) {
-			e.printStackTrace();
-		}
+		catch (Throwable e) {e.printStackTrace();}
 		
-	}
-
-	
-	@Override
-	protected void finalize() throws Throwable {
-		// TODO Auto-generated method stub
-		super.finalize();
-		
-		try {
-			close();
-		}
-		catch (Throwable e) {
-			e.printStackTrace();
-		}
 	}
 
 	

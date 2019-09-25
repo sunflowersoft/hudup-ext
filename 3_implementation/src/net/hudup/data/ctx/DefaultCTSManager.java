@@ -614,28 +614,20 @@ public class DefaultCTSManager extends CTSManagerAbstract {
 	
 	@Override
 	public void close() throws Exception {
-		// TODO Auto-generated method stub
+		try {
+			super.close();
+		} catch (Throwable e) {e.printStackTrace();}
+		
 		if (assoc != null) {
 			try {
 				assoc.close();
-			}
-			catch (Throwable e) {
-				e.printStackTrace();
-			}
+			} catch (Throwable e) {e.printStackTrace();}
 		}
 		assoc = null;
 		
 		if (ctSchema != null)
 			ctSchema.clear();
 		ctSchema = null;
-		
-		try {
-			unexport();
-		}
-		catch (Throwable e) {
-			e.printStackTrace();
-		}
-		
 	}
 
 	

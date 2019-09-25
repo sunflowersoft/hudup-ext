@@ -128,13 +128,19 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	 */
 	public AbstractEvaluateGUI(Evaluator evaluator, xURI bindUri) {
 		this.bindUri = bindUri;
-		if (bindUri != null) {
-//			try {
-//				logger.info(evaluator.ping("Ping"));
-//			} catch (RemoteException e) {e.printStackTrace();}
-			
-			this.registry = NetUtil.RegistryRemote.registerExport(this, bindUri);
+		if (bindUri != null) { //Evaluator is remote
+			this.registry = NetUtil.RegistryRemote.registerExportWithoutCreateRegistry(this, bindUri.getPort());
 			LogUtil.info("Evaluator GUI exported at port " + bindUri.getPort());
+		}
+		else { //Evaluator is local
+			try {
+				int evaluatorPort = evaluator.getConfig().getEvaluatorPort();
+				evaluatorPort = NetUtil.getPort(evaluatorPort, true);
+				
+				evaluator.export(evaluatorPort);
+				
+				evaluator.getConfig().setEvaluatorPort(evaluatorPort);
+			} catch (Throwable e) {e.printStackTrace();}
 		}
 
 		setupListeners(evaluator);
@@ -332,7 +338,14 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 			this.evaluator.close(); //The close() method also unexports evaluator.
 			
 			if (this.registry != null) {
-				NetUtil.RegistryRemote.unregisterUnexport(this.registry.getRegistry(), this);
+				if (this.registry.isRegistryCreated()) {
+					NetUtil.RegistryRemote.unregisterUnexport(this.registry.getRegistry(), this);
+					LogUtil.info("Evaluator GUI unregistered and unexported successfully");
+				}
+				else {
+					NetUtil.RegistryRemote.unexport(this);
+					LogUtil.info("Evaluator GUI unexported successfully");
+				}
 				this.registry = null;
 			}
 		}
