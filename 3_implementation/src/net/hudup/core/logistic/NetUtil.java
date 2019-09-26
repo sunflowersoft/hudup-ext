@@ -259,7 +259,7 @@ public class NetUtil {
 		 * @param port registered port.
 		 * @return registry and stub.
 		 */
-		public static RegistryRemote registerExportWithoutCreateRegistry(Remote remote, int port) {
+		public static RegistryRemote registerExport0(Remote remote, int port) {
 			if (remote == null) return null;
 
 			Registry registry = null;

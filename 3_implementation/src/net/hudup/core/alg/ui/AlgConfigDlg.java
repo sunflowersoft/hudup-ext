@@ -21,6 +21,9 @@ import javax.swing.JTextArea;
 import javax.swing.WindowConstants;
 
 import net.hudup.core.alg.Alg;
+import net.hudup.core.alg.AlgAbstract;
+import net.hudup.core.alg.AlgRemote;
+import net.hudup.core.alg.AlgRemoteWrapper;
 import net.hudup.core.alg.NoteAlg;
 import net.hudup.core.data.ui.PropPane;
 import net.hudup.core.logistic.ui.UIUtil;
@@ -189,6 +192,22 @@ public class AlgConfigDlg extends JDialog {
 			txtNote.setText("");
 			txtNote.setToolTipText(null);
 		}
+		
+		
+		//Added date: 2019.09.26 by Loc Nguyen
+		try {
+			if (alg instanceof AlgRemoteWrapper) {
+				AlgRemote remoteAlg = ((AlgRemoteWrapper)alg).getRemoteAlg();
+				if (!(remoteAlg instanceof AlgAbstract)) {
+					this.paneCfg.setToolbarVisible(false);
+					this.paneCfg.setControlVisible(false);
+					this.paneCfg.setEnabled(false);
+				}
+			}
+		}
+		catch (Throwable e) {
+			e.printStackTrace();
+		}
 	}
 
 	
@@ -204,6 +223,15 @@ public class AlgConfigDlg extends JDialog {
 		}
 		
 		super.setVisible(flag);
+	}
+
+
+	/**
+	 * Getting properties panel.
+	 * @return properties panel.
+	 */
+	public PropPane getPropPane() {
+		return this.paneCfg;
 	}
 	
 	

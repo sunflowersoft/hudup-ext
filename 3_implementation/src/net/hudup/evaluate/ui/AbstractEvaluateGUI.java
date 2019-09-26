@@ -129,7 +129,7 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	public AbstractEvaluateGUI(Evaluator evaluator, xURI bindUri) {
 		this.bindUri = bindUri;
 		if (bindUri != null) { //Evaluator is remote
-			this.registry = NetUtil.RegistryRemote.registerExportWithoutCreateRegistry(this, bindUri.getPort());
+			this.registry = NetUtil.RegistryRemote.registerExport0(this, bindUri.getPort());
 			LogUtil.info("Evaluator GUI exported at port " + bindUri.getPort());
 		}
 		else { //Evaluator is local

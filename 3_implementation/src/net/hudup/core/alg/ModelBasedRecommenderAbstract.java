@@ -117,6 +117,8 @@ public abstract class ModelBasedRecommenderAbstract extends RecommenderAbstract 
 	@Override
 	public Dataset getDataset() throws RemoteException {
 		// TODO Auto-generated method stub
+		if (kb == null) return null;
+		
 		Datasource datasource = kb.getDatasource();
 		if (datasource != null)
 			return datasource.getDataset();

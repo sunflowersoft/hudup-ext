@@ -832,7 +832,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 		// TODO Auto-generated method stub
 		if (this.registry != null) return this.registry.getStub();
 		
-		this.registry = NetUtil.RegistryRemote.registerExportWithoutCreateRegistry(this, serverPort);
+		this.registry = NetUtil.RegistryRemote.registerExport0(this, serverPort);
 		if (this.registry == null)
 			return null;
 		else {

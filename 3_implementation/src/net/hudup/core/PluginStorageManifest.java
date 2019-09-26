@@ -12,6 +12,8 @@ import java.awt.Component;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.rmi.RemoteException;
 import java.util.List;
 import java.util.Vector;
@@ -19,10 +21,13 @@ import java.util.Vector;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 import javax.swing.event.EventListenerList;
 import javax.swing.table.DefaultTableModel;
@@ -31,9 +36,11 @@ import net.hudup.core.RegisterTableList.RegisterTableItem;
 import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.AlgList;
 import net.hudup.core.alg.AlgRemoteWrapper;
+import net.hudup.core.alg.ui.AlgConfigDlg;
 import net.hudup.core.alg.ui.AlgListBox;
 import net.hudup.core.client.ClientUtil;
 import net.hudup.core.client.Service;
+import net.hudup.core.client.SocketConnection;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.DataDriver;
 import net.hudup.core.data.DataDriver.DataType;
@@ -45,7 +52,6 @@ import net.hudup.core.logistic.ui.SortableTableModel;
 import net.hudup.core.logistic.ui.TagTextField;
 import net.hudup.core.logistic.ui.UIUtil;
 import net.hudup.core.parser.DatasetParser;
-import net.hudup.core.parser.Indicator;
 import net.hudup.core.parser.RmiServerIndicator;
 import net.hudup.core.parser.SocketServerIndicator;
 import net.hudup.data.ui.DatasetConfigurator;
@@ -87,6 +93,51 @@ public class PluginStorageManifest extends SortableTable {
 	public PluginStorageManifest() {
 		super(new RegisterTM());
 		update();
+		
+		addMouseListener(new MouseAdapter() {
+
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				// TODO Auto-generated method stub
+				int row = getSelectedRow();
+				if (row < 0) return;
+				Alg alg = (Alg) getModel().getValueAt(row, 3);
+				if (alg.getConfig() == null) return;
+				
+				if(SwingUtilities.isRightMouseButton(e) ) {
+					JPopupMenu contextMenu = new JPopupMenu();
+					
+					JMenuItem miConfig = UIUtil.makeMenuItem( (String)null, "Configuration", 
+						new ActionListener() {
+							
+							@Override
+							public void actionPerformed(ActionEvent e) {
+								AlgConfigDlg dlgConfig = new AlgConfigDlg(UIUtil.getFrameForComponent(getThisManifest()), alg);
+								dlgConfig.getPropPane().setToolbarVisible(false);
+								dlgConfig.getPropPane().setControlVisible(false);
+								dlgConfig.getPropPane().setEnabled(false);
+								dlgConfig.setVisible(true);
+							}
+						});
+					contextMenu.add(miConfig);
+
+					contextMenu.show((Component)e.getSource(), e.getX(), e.getY());
+				}
+				else if (e.getClickCount() >= 2) {
+					
+				}
+			}
+			
+		});
+	}
+	
+	
+	/**
+	 * Getting this manifest.
+	 * @return this manifest.
+	 */
+	private PluginStorageManifest getThisManifest() {
+		return this;
 	}
 	
 	
@@ -335,7 +386,7 @@ public class PluginStorageManifest extends SortableTable {
 				tblRegister.update();
 			}
 		});
-		if (!listener.isSupportImport()) importAlg.setVisible(false);
+		if (listener != null && !listener.isSupportImport()) importAlg.setVisible(false);
 		
 		
 		return result;
@@ -539,6 +590,51 @@ class PluginStorageManifest2 extends JTable {
 	public PluginStorageManifest2() {
 		super(new RegisterTM2());
 		update();
+		
+		addMouseListener(new MouseAdapter() {
+
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				// TODO Auto-generated method stub
+				int row = getSelectedRow();
+				if (row < 0) return;
+				Alg alg = (Alg) getModel().getValueAt(row, 3);
+				if (alg.getConfig() == null) return;
+				
+				if(SwingUtilities.isRightMouseButton(e) ) {
+					JPopupMenu contextMenu = new JPopupMenu();
+					
+					JMenuItem miConfig = UIUtil.makeMenuItem( (String)null, "Configuration", 
+						new ActionListener() {
+							
+							@Override
+							public void actionPerformed(ActionEvent e) {
+								AlgConfigDlg dlgConfig = new AlgConfigDlg(UIUtil.getFrameForComponent(getThisManifest()), alg);
+								dlgConfig.getPropPane().setToolbarVisible(false);
+								dlgConfig.getPropPane().setControlVisible(false);
+								dlgConfig.getPropPane().setEnabled(false);
+								dlgConfig.setVisible(true);
+							}
+						});
+					contextMenu.add(miConfig);
+
+					contextMenu.show((Component)e.getSource(), e.getX(), e.getY());
+				}
+				else if (e.getClickCount() >= 2) {
+					
+				}
+			}
+			
+		});
+	}
+	
+	
+	/**
+	 * Getting this manifest.
+	 * @return this manifest.
+	 */
+	private PluginStorageManifest2 getThisManifest() {
+		return this;
 	}
 	
 	
@@ -1259,8 +1355,11 @@ class ImportAlgDlag extends JDialog {
 		dataDriverList.add(new DataDriver(DataType.hudup_rmi));
 		dataDriverList.add(new DataDriver(DataType.hudup_socket));
 		
-		DataConfig defaultConfig = new DataConfig();
-		defaultConfig.setParser(rmiIndicator);
+		DataConfig defaultConfig = (DataConfig)txtBrowse.getTag();
+		if (defaultConfig == null) {
+			defaultConfig = new DataConfig();
+			defaultConfig.setParser(rmiIndicator);
+		}
 		DatasetConfigurator configurator = new DatasetConfigurator(this, parserList, dataDriverList, defaultConfig);
 		DataConfig config = configurator.getResultedConfig();
 		if (config == null) {
@@ -1293,54 +1392,12 @@ class ImportAlgDlag extends JDialog {
 		
 		DatasetParser parser = config.getParser();
 		List<Alg> availableAlgList = Util.newList();
-		xURI storeUri = config.getStoreUri();
-		if (parser instanceof Indicator) {
-			Service service = null;
-			if (parser instanceof RmiServerIndicator) {
-				service = ClientUtil.getRemoteService(
-						storeUri.getHost(),
-						storeUri.getPort(),
-						config.getStoreAccount(), 
-						config.getStorePassword().getText());
-			}
-			else if (parser instanceof SocketServerIndicator) {
-				service = ClientUtil.getSocketConnection(
-						storeUri.getHost(),
-						storeUri.getPort(),
-						config.getStoreAccount(), 
-						config.getStorePassword().getText());
-			}
-			
-			if (service != null) {
-				String[] algNames = new String[0];
-				try {
-					algNames = service.getAlgNames();
-				}
-				catch (Throwable e) {
-					LogUtil.error("Retrieving remote algorithm names error by: " + e.getMessage());
-				}
-				if (algNames == null) algNames = new String[0];
-				
-				RegisterTable normalReg = PluginStorage.getNormalAlgReg();
-				for (String algName : algNames) {
-					if (normalReg.contains(algName)) continue;
-					
-					Alg alg = null;
-					try {
-						alg = service.getAlg(algName);
-					}
-					catch (Throwable e) {
-						LogUtil.error("Retrieving remote algorithm error by: " + e.getMessage());
-						alg = null;
-					}
-					
-					if (alg != null) availableAlgList.add(alg);
-				}
-			}
-		}
-		else {
-			//Loading algorithms from directory or jar file here.
-		}
+		if (parser instanceof RmiServerIndicator)
+			loadClassesFromRmiServer(config, availableAlgList);
+		else if (parser instanceof SocketServerIndicator)
+			loadClassesFromSocketServer(config, availableAlgList);
+		else
+			loadClassesFromStore(config.getStoreUri(), availableAlgList);
 		
 		if (availableAlgList.size() == 0) {
 			JOptionPane.showMessageDialog(
@@ -1353,6 +1410,132 @@ class ImportAlgDlag extends JDialog {
 
 		leftList.update(availableAlgList);
 		rightList.clear();
+	}
+	
+	
+	/**
+	 * Loading classes from RMI server specified by configuration.
+	 * @param config server configuration.
+	 * @param outAlgList list of algorithms as output.
+	 */
+	private void loadClassesFromRmiServer(DataConfig config, List<Alg> outAlgList) {
+		xURI storeUri = config.getStoreUri();
+		if (storeUri == null) return;
+		Service service = ClientUtil.getRemoteService(storeUri.getHost(), storeUri.getPort(), config.getStoreAccount(), config.getStorePassword().getText());
+		if (service == null) return;
+		
+		String[] algNames = new String[0];
+		try {
+			algNames = service.getAlgNames();
+		}
+		catch (Throwable e) {
+			LogUtil.error("Retrieving remote algorithm names error by: " + e.getMessage());
+		}
+		if (algNames == null) algNames = new String[0];
+		
+		RegisterTable normalReg = PluginStorage.getNormalAlgReg();
+		AlgList nextUpdateList = PluginStorage.getNextUpdateList();
+		for (String algName : algNames) {
+			if (normalReg.contains(algName)) continue;
+			
+			Alg alg = null;
+			try {
+				alg = service.getAlg(algName);
+			}
+			catch (Throwable e) {
+				LogUtil.error("Retrieving remote algorithm error by: " + e.getMessage());
+				alg = null;
+			}
+			if (alg == null) continue;
+			
+			int idx = nextUpdateList.indexOf(algName);
+			if (idx < 0)
+				outAlgList.add(alg);
+			else {
+				Alg nextUpdateAlg = nextUpdateList.get(idx);
+				if (PluginStorage.lookupAlgTypeName(nextUpdateAlg.getClass()) != PluginStorage.lookupAlgTypeName(alg.getClass()))
+					outAlgList.add(alg);
+			}
+		}
+	}
+	
+	
+	/**
+	 * Loading classes from socket server specified by configuration.
+	 * @param config server configuration.
+	 * @param outAlgList list of algorithms as output.
+	 */
+	private void loadClassesFromSocketServer(DataConfig config, List<Alg> outAlgList) {
+		xURI storeUri = config.getStoreUri();
+		if (storeUri == null) return;
+		
+		SocketConnection service = null;
+		String[] algNames = new String[0];
+		try {
+			service = ClientUtil.getSocketConnection(storeUri.getHost(), storeUri.getPort(),config.getStoreAccount(), config.getStorePassword().getText());
+			algNames = service.getAlgNames();
+			service.close(); service = null;
+		}
+		catch (Throwable e) {
+			LogUtil.error("Retrieving remote algorithm names error by: " + e.getMessage());
+		}
+		if (algNames == null) algNames = new String[0];
+		
+		RegisterTable normalReg = PluginStorage.getNormalAlgReg();
+		AlgList nextUpdateList = PluginStorage.getNextUpdateList();
+		for (String algName : algNames) {
+			if (normalReg.contains(algName)) continue;
+			
+			Alg alg = null;
+			try {
+				service = ClientUtil.getSocketConnection(storeUri.getHost(), storeUri.getPort(),config.getStoreAccount(), config.getStorePassword().getText());
+				alg = service.getAlg(algName);
+				service.close(); service = null;
+			}
+			catch (Throwable e) {
+				LogUtil.error("Retrieving remote algorithm error by: " + e.getMessage());
+				alg = null;
+			}
+			if (alg == null) continue;
+			
+			int idx = nextUpdateList.indexOf(algName);
+			if (idx < 0)
+				outAlgList.add(alg);
+			else {
+				Alg nextUpdateAlg = nextUpdateList.get(idx);
+				if (PluginStorage.lookupAlgTypeName(nextUpdateAlg.getClass()) != PluginStorage.lookupAlgTypeName(alg.getClass()))
+					outAlgList.add(alg);
+			}
+		}
+		
+		if (service != null) service.close();
+	}
+
+	
+	/**
+	 * Loading classes from store.
+	 * @param storeUri store URI.
+	 * @param outAlgList list of algorithms as output.
+	 */
+	private void loadClassesFromStore(xURI storeUri, List<Alg> outAlgList) {
+		if (storeUri == null) return;
+
+		List<Alg> algList = Firer.getInstances(storeUri, Alg.class);
+		RegisterTable normalReg = PluginStorage.getNormalAlgReg();
+		AlgList nextUpdateList = PluginStorage.getNextUpdateList();
+		for (Alg alg : algList) {
+			if (normalReg.contains(alg.getName())) continue;
+			
+			int idx = nextUpdateList.indexOf(alg.getName());
+			if (idx < 0)
+				outAlgList.add(alg);
+			else {
+				Alg nextUpdateAlg = nextUpdateList.get(idx);
+				if (PluginStorage.lookupAlgTypeName(nextUpdateAlg.getClass()) != PluginStorage.lookupAlgTypeName(alg.getClass()))
+					outAlgList.add(alg);
+			}
+		}
+		
 	}
 	
 	
@@ -1433,7 +1616,7 @@ class ImportAlgDlag extends JDialog {
 	 * Event-driven method response to OK button command.
 	 */
 	protected void ok() {
-		List<Alg> selectedAlgList = rightList.getAlgList();
+		List<Alg> selectedAlgList = this.rightList.getAlgList();
 		if (selectedAlgList.size() == 0) {
 			if (leftList.getAlgList().size() > 0) {
 				JOptionPane.showMessageDialog(
@@ -1455,8 +1638,9 @@ class ImportAlgDlag extends JDialog {
 				PluginStorage.getNextUpdateList().add(selectedAlg);
 		}
 		this.result = PluginStorage.getNextUpdateList();
+		this.rightList.clear();
 		
-		List<Alg> remainAlgs = leftList.getAlgList();
+		List<Alg> remainAlgs = this.leftList.getAlgList();
 		for (Alg remainAlg : remainAlgs) {
 			if (remainAlg instanceof AlgRemoteWrapper) {
 				((AlgRemoteWrapper)remainAlg).setExclusive(true);
@@ -1465,6 +1649,7 @@ class ImportAlgDlag extends JDialog {
 				} catch (Throwable e) {e.printStackTrace();}
 			}
 		}
+		this.leftList.clear();
 		
 		ok = true;
 		dispose();
@@ -1486,6 +1671,27 @@ class ImportAlgDlag extends JDialog {
 	 */
 	public boolean isOK() {
 		return ok;
+	}
+
+
+	@Override
+	public void dispose() {
+		// TODO Auto-generated method stub
+		List<Alg> algList = this.leftList.getAlgList();
+		algList.addAll(this.rightList.getAlgList());
+		for (Alg alg : algList) {
+			if (alg instanceof AlgRemoteWrapper) {
+				((AlgRemoteWrapper)alg).setExclusive(true);
+				try {
+					((AlgRemoteWrapper)alg).unexport();
+				} catch (Throwable e) {e.printStackTrace();}
+			}
+		}
+		
+		this.leftList.clear();
+		this.rightList.clear();
+		
+		super.dispose();
 	}
 
 	

@@ -347,6 +347,17 @@ public class Delegator extends AbstractDelegator {
 			
 			else if (action.equals(GET_EVALUATOR_NAMES))
 				return Response.create(remoteService.getEvaluatorNames());
+			
+			else if (action.equals(GET_ALG)) {
+				Alg remoteAlg = remoteService.getAlg(request.algName);
+				if (remoteAlg == null)
+					return null;
+				//This is work-around solution because it is necessary to wrap remote algorithm one more time at listener like delegator-evaluator but this is so complicated.
+				return Response.create(remoteAlg);
+			}
+			
+			else if (action.equals(GET_ALG_NAMES))
+				return Response.create(remoteService.getAlgNames());
 		}
 		catch (Throwable e) {
 			e.printStackTrace();

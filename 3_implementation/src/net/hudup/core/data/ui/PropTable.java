@@ -86,6 +86,7 @@ public class PropTable extends JTable {
 					JMenuItem miConfig = UIUtil.makeMenuItem( (String)null, "User edit", 
 						new ActionListener() {
 							
+							@Override
 							public void actionPerformed(ActionEvent e) {
 								userEdit();
 							}

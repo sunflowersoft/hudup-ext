@@ -514,7 +514,6 @@ public class Response extends ProtocolParam {
 			return (Response)objectIn.readObject();
 		}
 		catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		

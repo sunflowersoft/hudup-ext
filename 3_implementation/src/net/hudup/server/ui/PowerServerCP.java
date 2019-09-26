@@ -12,6 +12,7 @@ import java.awt.Container;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.Image;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
@@ -34,6 +35,8 @@ import javax.swing.JTextField;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import net.hudup.core.PluginChangedEvent;
+import net.hudup.core.PluginChangedListener;
 import net.hudup.core.Util;
 import net.hudup.core.client.ConnectDlg;
 import net.hudup.core.client.PowerServer;
@@ -51,11 +54,12 @@ import net.hudup.core.data.ui.UnitListBox;
 import net.hudup.core.data.ui.UnitTable;
 import net.hudup.core.data.ui.UnitTable.SelectionChangedEvent;
 import net.hudup.core.data.ui.UnitTable.SelectionChangedListener;
+import net.hudup.core.logistic.I18nUtil;
 import net.hudup.core.logistic.xURI;
 import net.hudup.core.logistic.ui.UIUtil;
 import net.hudup.data.DatasetUtil2;
 import net.hudup.data.ProviderImpl;
-import net.hudup.logistic.SystemPropertiesPane;
+import net.hudup.data.ui.SysConfigDlgExt;
 import net.hudup.server.PowerServerConfig;
 
 /**
@@ -66,7 +70,7 @@ import net.hudup.server.PowerServerConfig;
  * @version 10.0
  *
  */
-public class PowerServerCP extends JFrame implements ServerStatusListener {
+public class PowerServerCP extends JFrame implements ServerStatusListener, PluginChangedListener {
 
 
 	/**
@@ -110,6 +114,11 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 	 */
 	protected JButton btnStop = null;
 	
+	/**
+	 * System button.
+	 */
+	protected JButton btnSystem = null;
+
 	/**
 	 * Applying configuration server.
 	 */
@@ -234,7 +243,7 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 			main.add(createGeneralPane(), "General");
 			main.add(createStorePane(), "Store");
 			main.add(createAccountPane(), "Account");
-			main.add(new SystemPropertiesPane(), "System");
+			//main.add(new SystemPropertiesPane(), "System properties");
 
 			bindServer();
 			
@@ -322,14 +331,38 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 	protected JPanel createGeneralPane() throws Exception {
 		JPanel general = new JPanel(new BorderLayout());
 		
+
 		JPanel body = new JPanel(new BorderLayout());
 		general.add(body, BorderLayout.CENTER);
 		
-		body.add(new JLabel("Server configuration"), BorderLayout.NORTH);
+		JPanel configGrp1 = new JPanel(new BorderLayout());
+		body.add(configGrp1, BorderLayout.NORTH);
+		configGrp1.add(new JLabel("Server configuration"), BorderLayout.WEST);
+		this.btnSystem = UIUtil.makeIconButton(
+			"system-16x16.png", 
+			"system", 
+			I18nUtil.message("system_configure"), 
+			I18nUtil.message("system_configure"), 
+			
+			new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					SysConfigDlgExt cfg = new SysConfigDlgExt(general, I18nUtil.message("system_configure"), getThisPowerServerCP());
+					cfg.getBodyTabbedPane().remove(cfg.getSysConfigPane());
+					cfg.setVisible(true);
+				}
+			});
+		this.btnSystem.setMargin(new Insets(0, 0 , 0, 0));
+		if (bRemote) this.btnSystem.setVisible(false);
+		configGrp1.add(this.btnSystem, BorderLayout.EAST);
+		
+		JPanel configGrp2 = new JPanel(new BorderLayout());
+		body.add(configGrp2, BorderLayout.CENTER);
 		paneConfig = new SysConfigPane();
 		paneConfig.setControlVisible(false);
 		paneConfig.update(server.getConfig());
-		body.add(paneConfig, BorderLayout.CENTER);
+		configGrp2.add(paneConfig, BorderLayout.CENTER);
 		
 		
 		JPanel footer = new JPanel();
@@ -455,6 +488,7 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 			}
 		});
 		centerToolbar.add(btnStop);
+		
 		
 		return general;
 	}
@@ -871,6 +905,7 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 		btnStart.setEnabled(enabled);
 		btnPauseResume.setEnabled(enabled);
 		btnStop.setEnabled(enabled);
+		btnSystem.setEnabled(enabled);
 		btnApplyConfig.setEnabled(enabled);
 		btnResetConfig.setEnabled(enabled);
 		btnRefresh.setEnabled(enabled);
@@ -907,6 +942,7 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 			btnPauseResume.setEnabled(true && !bRemote);
 			btnPauseResume.setText("Pause");
 			btnStop.setEnabled(true);
+			btnSystem.setEnabled(false);
 			
 			btnApplyConfig.setEnabled(false);
 			btnResetConfig.setEnabled(false);
@@ -943,6 +979,7 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 			btnPauseResume.setEnabled(true && !bRemote);
 			btnPauseResume.setText("Resume");
 			btnStop.setEnabled(true);
+			btnSystem.setEnabled(false);
 			
 			btnApplyConfig.setEnabled(false);
 			btnResetConfig.setEnabled(false);
@@ -964,6 +1001,7 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 			btnPauseResume.setEnabled(false);
 			btnPauseResume.setText("Pause");
 			btnStop.setEnabled(false);
+			btnSystem.setEnabled(true && !bRemote);
 			
 			btnApplyConfig.setEnabled(true);
 			btnResetConfig.setEnabled(true);
@@ -1081,6 +1119,40 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 		bindUri = null;
 		registry = null;
 		provider = null;
+	}
+	
+	
+	@Override
+	public void pluginChanged(PluginChangedEvent evt) {
+		// TODO Auto-generated method stub
+		//Doing something...
+	}
+
+
+	@Override
+	public boolean isIdle() {
+		// TODO Auto-generated method stub
+		try {
+			return !server.isStarted();
+		} catch (Throwable e) {e.printStackTrace();}
+		
+		return false;
+	}
+
+
+	@Override
+	public boolean isSupportImport() {
+		// TODO Auto-generated method stub
+		return true;
+	}
+
+
+	/**
+	 * Getting this power server control panel.
+	 * @return this power server control panel.
+	 */
+	private PowerServerCP getThisPowerServerCP() {
+		return this;
 	}
 	
 	

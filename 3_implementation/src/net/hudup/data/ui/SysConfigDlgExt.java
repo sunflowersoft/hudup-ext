@@ -40,6 +40,12 @@ public class SysConfigDlgExt extends SysConfigDlg {
 
 	
 	/**
+	 * Body tab panel.
+	 */
+	protected JTabbedPane body; //Do not setting null to this variable.
+
+	
+	/**
 	 * Registering panel.
 	 */
 	protected JPanel paneRegister = null;
@@ -73,7 +79,7 @@ public class SysConfigDlgExt extends SysConfigDlg {
 	protected void init(Object...vars) {
 		setLayout(new BorderLayout());
 		
-		JTabbedPane body = new JTabbedPane();
+		body = new JTabbedPane();
 		add(body, BorderLayout.CENTER);
 		
 		paneSysConfig = new SysConfigPane(); 
@@ -108,5 +114,14 @@ public class SysConfigDlgExt extends SysConfigDlg {
 		
 	}
 
+	
+	/**
+	 * Getting body tab panel.
+	 * @return body tab panel.
+	 */
+	public JTabbedPane getBodyTabbedPane() {
+		return body;
+	}
+	
 	
 }

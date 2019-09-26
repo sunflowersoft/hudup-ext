@@ -494,7 +494,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			"refresh", 
 			I18nUtil.message("refresh"), 
 			I18nUtil.message("refresh"), 
-				
+			
 			new ActionListener() {
 				
 				@Override

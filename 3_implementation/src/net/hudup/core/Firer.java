@@ -8,6 +8,8 @@
 package net.hudup.core;
 
 import java.lang.reflect.Modifier;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
@@ -27,6 +29,8 @@ import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.NextUpdate;
 import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.UriAdapter.AdapterWriter;
+import net.hudup.core.logistic.UriFilter;
+import net.hudup.core.logistic.UriProcessor;
 import net.hudup.core.logistic.xURI;
 import net.hudup.core.parser.DatasetParser;
 
@@ -173,17 +177,11 @@ public class Firer implements PluginManager {
 		List<Class<? extends Alg>> compositeAlgClassList = Util.newList();
 		Set<Class<? extends Alg>> algClasses = reflections.getSubTypesOf(Alg.class);
 		for (Class<? extends Alg> algClass : algClasses) {
+			if (algClass == null) continue;
+			
 			try {
-				if (algClass.isInterface() || algClass.isMemberClass() || algClass.isAnonymousClass())
-					continue;
+				if (!isClassValid(algClass)) continue;
 				
-				int modifiers = algClass.getModifiers();
-				if ( (modifiers & Modifier.ABSTRACT) != 0 || (modifiers & Modifier.PUBLIC) == 0)
-					continue;
-				if (algClass.getAnnotation(BaseClass.class) != null || 
-						algClass.getAnnotation(Deprecated.class) != null) {
-					continue;
-				}
 				if (algClass.getAnnotation(Composite.class) != null) {
 					compositeAlgClassList.add(algClass);
 					continue;
@@ -313,20 +311,9 @@ public class Firer implements PluginManager {
 		Set<Class<? extends T>> apClasses = reflections.getSubTypesOf(referredClass);
 		List<T> instances = Util.newList();
 		for (Class<? extends T> apClass : apClasses) {
-			if (!referredClass.isAssignableFrom(apClass))
-				continue;
-			
-			if (apClass.isInterface() || apClass.isMemberClass() || apClass.isAnonymousClass())
-				continue;
-			
-			int modifiers = apClass.getModifiers();
-			if ( (modifiers & Modifier.ABSTRACT) != 0 || (modifiers & Modifier.PUBLIC) == 0)
-				continue;
-			
-			if (apClass.getAnnotation(BaseClass.class) != null || 
-					apClass.getAnnotation(Deprecated.class) != null) {
-				continue;
-			}
+			if (apClass == null) continue;
+			if (!referredClass.isAssignableFrom(apClass)) continue;
+			if (!isClassValid(apClass)) continue;
 
 			try {
 				T instance = Util.newInstance(apClass);
@@ -339,6 +326,147 @@ public class Firer implements PluginManager {
 		}
 		
 		return instances;
+	}
+	
+	
+	/**
+	 * Loading classes from store.
+	 * @param storeUri store URI.
+	 * @param referredClass referred class.
+	 * @return list of algorithms as output.
+	 */
+	public static <T> List<T> getInstances(xURI storeUri, Class<T> referredClass) {
+		URL storeUrl = null;
+		try {
+			storeUrl = storeUri.getURI().toURL();
+		}
+		catch (Throwable e) {
+			e.printStackTrace();
+			storeUrl = null;
+		}
+		if (storeUrl == null) return Util.newList();
+		
+		URLClassLoader classLoader = new URLClassLoader(
+				new URL[] {storeUrl},
+				Firer.class.getClassLoader());
+		UriAdapter adapter = new UriAdapter(storeUri);
+		
+		String rootPath = storeUri.getPath();
+		List<T> outObjList = Util.newList();
+		getInstances(storeUri, rootPath, adapter, classLoader, referredClass, outObjList);
+		try {
+			classLoader.close();
+		} catch (Throwable e) {e.printStackTrace();}
+		
+		return outObjList;
+	}
+
+	
+	/**
+	 * Loading classes from specified store and class loader.
+	 * @param storeUri specified store.
+	 * @param rootPath root path.
+	 * @param adapter URI adapter.
+	 * @param classLoader specified class loader.
+	 * @param referredClass referred class.
+	 * @param outObjList list of objects as output.
+	 */
+	private static <T> void getInstances(xURI storeUri, String rootPath, UriAdapter adapter, ClassLoader classLoader, Class<T> referredClass, List<T> outObjList) {
+		adapter.uriListProcess(storeUri,
+			new UriFilter() {
+			
+				@Override
+				public String getDescription() {
+					// TODO Auto-generated method stub
+					return "*.class";
+				}
+				
+				@Override
+				public boolean accept(xURI uri) {
+					// TODO Auto-generated method stub
+					UriAdapter adapter = new UriAdapter(uri);
+					if (adapter.isStore(uri))
+						return true;
+					
+					String ext = uri.getLastNameExtension();
+					if (ext == null || !ext.toLowerCase().equals("class"))
+						return false;
+					
+					String lastName = uri.getLastName();
+					if (lastName == null || lastName.isEmpty())
+						return false;
+					else if (lastName.contains("$"))
+						return false;
+					else
+						return true;
+				}
+			},
+			new UriProcessor() {
+			
+				@SuppressWarnings("unchecked")
+				@Override
+				public void uriProcess(xURI uri) throws Exception {
+					// TODO Auto-generated method stub
+					if (adapter.isStore(uri)) {
+						getInstances(uri, rootPath, adapter, classLoader, referredClass, outObjList);
+						return;
+					}
+					
+					String path = uri.getPath();
+					if (path == null || path.isEmpty()) return;
+					if (path.startsWith(rootPath))
+						path = path.substring(rootPath.length());
+					if (path == null || path.isEmpty()) return;
+					
+					String classPath = UriAdapter.packageSlashToDot(path);
+					int idx = classPath.lastIndexOf(".class");
+					if (idx >= 0) classPath = classPath.substring(0, idx);
+					
+					Class<?> cls = null;
+					try {
+						cls = Class.forName(classPath, true, classLoader);
+					}
+					catch (Throwable e) {
+						System.out.println("Loading class \"" + classPath + "\" error");
+						cls = null;
+					}
+					if (cls == null || !referredClass.isAssignableFrom(cls))
+						return;
+					if (!isClassValid(cls)) return;
+					
+					T obj = null;
+					try {
+						obj = (T) cls.newInstance();
+					}
+					catch (Throwable e) {
+						System.out.println("Instantiate class \"" + classPath + "\" error");
+						obj = null;
+					}
+					
+					if (obj != null) outObjList.add(obj);
+				}
+			});
+	}
+
+	
+	/**
+	 * Checking whether specified class is valid.
+	 * @param cls specified class.
+	 * @return whether specified class is valid.
+	 */
+	public static boolean isClassValid(Class<?> cls) {
+		if (cls == null || cls.isInterface() || cls.isMemberClass() || cls.isAnonymousClass())
+			return false;
+		
+		int modifiers = cls.getModifiers();
+		if ( (modifiers & Modifier.ABSTRACT) != 0 || (modifiers & Modifier.PUBLIC) == 0)
+			return false;
+		else if (cls.getAnnotation(BaseClass.class) != null || 
+				cls.getAnnotation(Deprecated.class) != null) {
+			return false;
+		}
+		else
+			return true;
 	}
 	
 	

@@ -86,4 +86,13 @@ public class SysConfigDlg extends JDialog {
 	}
 	
 	
+	/**
+	 * Getting system configuration panel.
+	 * @return system configuration panel.
+	 */
+	public SysConfigPane getSysConfigPane() {
+		return paneSysConfig;
+	}
+	
+	
 }
