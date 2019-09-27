@@ -58,7 +58,12 @@ public final class Constants {
 	/**
 	 * Maximum verbal name length.
 	 */
-	public static final int MAX_VERBAL_NAME_LENGTH     = 32;
+	public static int MAX_VERBAL_NAME_LENGTH           = 32;
+	
+	/**
+	 * Logging utility.
+	 */
+	public static boolean LOG4J                        = true;
 	
 	
 	/**
@@ -221,6 +226,15 @@ public final class Constants {
 		}
 		catch (Throwable e) {
 			System.out.println("Error when parsing try random port");
+		}
+		
+		try {
+			String log4j = Util.getHudupProperty("log4j");
+			if (log4j != null)
+				LOG4J = Boolean.parseBoolean(log4j);
+		}
+		catch (Throwable e) {
+			System.out.println("Error when parsing log4j property");
 		}
 	}
 	

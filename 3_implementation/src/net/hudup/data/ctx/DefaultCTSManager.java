@@ -631,4 +631,33 @@ public class DefaultCTSManager extends CTSManagerAbstract {
 	}
 
 	
+	/**
+	 * Create a context template schema manager by associating with context template schema and provider associator.
+	 * @param ctSchema context template schema.
+	 * @param assoc provider associator.
+	 * @return a context template schema manager by associating with context template schema and provider associator.
+	 */
+	public static CTSManager associate(ContextTemplateSchema ctSchema, ProviderAssoc assoc) {
+		if (ctSchema == null || assoc == null)
+			return null;
+		
+		DefaultCTSManager ctsm = new DefaultCTSManager();
+		ctsm.assoc = assoc;
+		ctsm.ctSchema = ctSchema;
+		
+		return ctsm;
+	}
+	
+	/**
+	 * Create a context template schema manager by associating with context template schema and store configuration.
+	 * @param ctSchema context template schema.
+	 * @param config store configuration.
+	 * @return a context template schema manager by associating with context template schema and store configuration.
+	 */
+	public static CTSManager associate(ContextTemplateSchema ctSchema, DataConfig config) {
+		ProviderAssoc assoc = Util.getFactory().createProviderAssoc(config);
+		return associate(ctSchema, assoc);
+	}
+	
+	
 }

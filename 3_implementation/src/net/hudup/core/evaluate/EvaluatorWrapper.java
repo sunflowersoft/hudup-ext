@@ -226,6 +226,13 @@ public class EvaluatorWrapper implements Evaluator, Serializable {
 
 	
 	@Override
+	public void clearDelayUnsetupAlgs() throws RemoteException {
+		// TODO Auto-generated method stub
+		remoteEvaluator.clearDelayUnsetupAlgs();
+	}
+
+
+	@Override
 	public PluginStorageWrapper getPluginStorage() throws RemoteException {
 		// TODO Auto-generated method stub
 		return remoteEvaluator.getPluginStorage();

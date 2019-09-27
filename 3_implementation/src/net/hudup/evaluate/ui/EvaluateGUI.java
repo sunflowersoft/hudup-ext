@@ -42,6 +42,8 @@ import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
+import net.hudup.core.PluginChangedEvent;
+import net.hudup.core.PluginChangedEvent2;
 import net.hudup.core.RegisterTable;
 import net.hudup.core.Util;
 import net.hudup.core.alg.Alg;
@@ -56,6 +58,7 @@ import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.DatasetPool;
 import net.hudup.core.data.DatasetUtil;
+import net.hudup.core.data.Exportable;
 import net.hudup.core.data.Pointer;
 import net.hudup.core.evaluate.EvaluatorAbstract;
 import net.hudup.core.evaluate.Evaluator;
@@ -252,7 +255,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 		super(evaluator, bindUri);
 		try {
 			RegisterTable algRegTable = evaluator.extractAlgFromPluginStorage();
-			init(algRegTable, true);
+			init(algRegTable);
 		}
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
@@ -271,7 +274,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 		try {
 			if (evaluator.acceptAlg(recommeder)) {
 				RegisterTable algRegTable = new RegisterTable(Arrays.asList(recommeder));
-				init(algRegTable, false);
+				init(algRegTable);
 			}
 		}
 		catch (Throwable e) {
@@ -284,15 +287,11 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 	/**
 	 * Initializing the evaluator.
 	 * @param algRegTable registered table of algorithm.
-	 * @param cloneAlgs true if creating (cloning) instances of algorithms in the specified table.
 	 */
-	private void init(RegisterTable algRegTable, boolean cloneAlgs) {
+	private void init(RegisterTable algRegTable) {
 		if (algRegTable == null) return;
 		
-		if (cloneAlgs)
-			this.algRegTable.copy(algRegTable);
-		else
-			this.algRegTable.register(algRegTable.getAlgList());
+		this.algRegTable.register(algRegTable); //Algorithms are not cloned because of saving memory when evaluator GUI keep algorithms for a long time.
 		
 		setLayout(new BorderLayout(2, 2));
 		
@@ -320,10 +319,24 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 	
 	
 	@Override
-	public void pluginChanged() {
+	public void pluginChanged(PluginChangedEvent evt) {
 		try {
+			evaluator.clearDelayUnsetupAlgs();
+
+			if (evt instanceof PluginChangedEvent2) {
+				List<Alg> removedAlgList = ((PluginChangedEvent2)evt).getRemovedAlgList();
+				for (Alg alg : removedAlgList) {
+					if (alg instanceof Exportable) {
+						try {
+							((Exportable)alg).unexport();
+						} catch (Throwable e) {e.printStackTrace();}
+					}
+				}
+				removedAlgList.clear();
+			}
+			
 			algRegTable.clear();
-			algRegTable.copy(evaluator.extractAlgFromPluginStorage());
+			algRegTable.register(evaluator.extractAlgFromPluginStorage()); //Algorithms are not cloned because of saving memory when evaluator GUI keep algorithms for a long time.
 			cmbAlgs.update(algRegTable.getAlgList());
 			updateMode();
 		}

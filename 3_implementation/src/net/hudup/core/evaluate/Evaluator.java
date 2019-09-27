@@ -204,6 +204,13 @@ public interface Evaluator extends Remote, RemoteRunner, SetupAlgListener, Expor
 
 	
 	/**
+	 * Clearing delay unsetting up algorithms.
+	 * @throws RemoteException if any error raises.
+	 */
+	void clearDelayUnsetupAlgs() throws RemoteException;
+
+	
+	/**
 	 * Getting system plug-in storage.
 	 * @return wrapper of system plug-in storage.
 	 * @throws RemoteException if any error raises.

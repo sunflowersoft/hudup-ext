@@ -349,7 +349,7 @@ public class PowerServerCP extends JFrame implements ServerStatusListener, Plugi
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					SysConfigDlgExt cfg = new SysConfigDlgExt(general, I18nUtil.message("system_configure"), getThisPowerServerCP());
-					cfg.getBodyTabbedPane().remove(cfg.getSysConfigPane());
+					cfg.removedSysConfigPane();
 					cfg.setVisible(true);
 				}
 			});

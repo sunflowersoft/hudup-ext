@@ -7,13 +7,17 @@
  */
 package net.hudup;
 
+import java.net.URL;
 import java.rmi.RemoteException;
 
 import net.hudup.core.AccessPoint;
 import net.hudup.core.Firer;
 import net.hudup.core.client.PowerServer;
+import net.hudup.core.logistic.UriAdapter;
+import net.hudup.core.logistic.xURI;
 import net.hudup.data.ui.toolkit.DatasetToolkit;
 import net.hudup.server.DefaultServer;
+import net.hudup.server.PowerServerConfig;
 import net.hudup.server.external.ExternalServer;
 
 /**
@@ -53,6 +57,20 @@ public final class Server implements AccessPoint {
 		
 		new Firer();
 		
+		//Not important.
+		try {
+			URL sampleDataUrl = getClass().getResource(PowerServerConfig.TEMPLATES_SAMPLE_DATA_PATH);
+			xURI sampleDataUri = xURI.create(sampleDataUrl.toURI());
+			xURI storeUri = xURI.create(PowerServerConfig.STORE_PATH_DEFAULT);
+			UriAdapter adapter = new UriAdapter(sampleDataUri);
+			if (!adapter.exists(storeUri))
+				adapter.copy(sampleDataUri, storeUri, false, null);
+			adapter.close();
+		}
+		catch (Throwable e) {
+			e.printStackTrace();
+		}
+
 		PowerServer server = null;
 		if (args.length == 0) {
 			server = DefaultServer.create();

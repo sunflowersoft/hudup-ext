@@ -285,32 +285,22 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 	@Override
 	public void pluginChanged(PluginChangedEvent evt) {
 		// TODO Auto-generated method stub
-//		evaluateGUI.pluginChanged(); //Single mode is removed. Fix bug date: August 6, 2019.
-		batchEvaluateGUI.pluginChanged();
+//		evaluateGUI.pluginChanged(evt); //Single mode is removed. Fix bug date: August 6, 2019.
+		batchEvaluateGUI.pluginChanged(evt);
 	}
 
 
 	@Override
 	public boolean isIdle() {
 		// TODO Auto-generated method stub
-		try {
-//			//Single mode is removed. Fix bug date: August 6, 2019.
-//			return !evaluateGUI.getEvaluator().remoteIsStarted() 
-//					&& !batchEvaluateGUI.getEvaluator().remoteIsStarted();
-			return !batchEvaluateGUI.getEvaluator().remoteIsStarted();
-		}
-		catch (Throwable e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return false;
-		}
+		return batchEvaluateGUI.isIdle() /*&& evaluateGUI.isIdle()*/;
 	}
 	
 	
 	@Override
 	public boolean isSupportImport() {
 		// TODO Auto-generated method stub
-		return batchEvaluateGUI.bindUri == null /*&& evaluateGUI.bindUri == null*/;
+		return batchEvaluateGUI.isSupportImport() /*&& evaluateGUI.isSupportImport()*/;
 	}
 
 

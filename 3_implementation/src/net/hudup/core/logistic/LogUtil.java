@@ -7,7 +7,12 @@
  */
 package net.hudup.core.logistic;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import org.apache.log4j.Logger;
+
+import net.hudup.core.Constants;
 
 /**
  * This is utility class to provide logging methods.
@@ -22,7 +27,13 @@ public class LogUtil {
 	/**
 	 * Logger of this class.
 	 */
-	protected final static Logger logger = Logger.getLogger(LogUtil.class);
+	protected final static Logger logger = Constants.LOG4J ? Logger.getLogger("Hudup") : null;
+
+	
+	/**
+	 * Simple date format.
+	 */
+	protected final static SimpleDateFormat df = new SimpleDateFormat(Constants.DATE_FORMAT);
 
 	
 	/**
@@ -30,7 +41,10 @@ public class LogUtil {
 	 * @param message logging information.
 	 */
 	public static void info(Object message) {
-		logger.info(message);
+		if (Constants.LOG4J && logger != null)
+			logger.info(message);
+		else
+			System.out.println(df.format(new Date()) + " INFO " + "Hudup " + message);
 	}
 
 	
@@ -39,7 +53,10 @@ public class LogUtil {
 	 * @param message logging error.
 	 */
 	public static void error(Object message) {
-		logger.error(message);
+		if (Constants.LOG4J && logger != null)
+			logger.error(message);
+		else
+			System.out.println(df.format(new Date()) + " ERROR " + "Hudup " + message);
 	}
 
 
@@ -48,7 +65,10 @@ public class LogUtil {
 	 * @param message warning information.
 	 */
 	public static void warn(Object message) {
-		logger.warn(message);
+		if (Constants.LOG4J && logger != null)
+			logger.warn(message);
+		else
+			System.out.println(df.format(new Date()) + " WARN " + "Hudup " + message);
 	}
 
 

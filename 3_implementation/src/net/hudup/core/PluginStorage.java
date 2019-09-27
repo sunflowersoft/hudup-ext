@@ -60,31 +60,31 @@ public final class PluginStorage implements Serializable {
 	 * As aforementioned, {@link PluginStorage} manages many {@link RegisterTable} (s) and each {@link RegisterTable} stores only the same type algorithms.
 	 * This constant is the name of {@link RegisterTable} of normal algorithm (s).
 	 */
-	private static final String NORMAL_ALG     = "Alg";
+	public static final String NORMAL_ALG     = "Alg";
 	
 	/**
 	 * As aforementioned, {@link PluginStorage} manages many {@link RegisterTable} (s) and each {@link RegisterTable} stores only the same type algorithms.
 	 * This constant is the name of {@link RegisterTable} of {@code DatasetParser} (s).
 	 */
-	private static final String PARSER         = "Parser";
+	public static final String PARSER         = "Parser";
 	
 	/**
 	 * As aforementioned, {@link PluginStorage} manages many {@link RegisterTable} (s) and each {@link RegisterTable} stores only the same type algorithms.
 	 * This constant is the name of {@link RegisterTable} of {@code Metric} (s).
 	 */
-	private static final String METRIC         = "Metric";
+	public static final String METRIC         = "Metric";
 	
 	/**
 	 * As aforementioned, {@link PluginStorage} manages many {@link RegisterTable} (s) and each {@link RegisterTable} stores only the same type algorithms.
 	 * This constant is the name of {@link RegisterTable} of {@code ExternalQuery} (s).
 	 */
-	private static final String EXTERNAL_QUERY = "External query";
+	public static final String EXTERNAL_QUERY = "External query";
 	
 	/**
 	 * As aforementioned, {@link PluginStorage} manages many {@link RegisterTable} (s) and each {@link RegisterTable} stores only the same type algorithms.
 	 * This constant is the name of {@link RegisterTable} of {@code CTSManager} (s).
 	 */
-	private static final String CTS_MANAGER    = "CTS manager";
+	public static final String CTS_MANAGER    = "CTS manager";
 	
 
 	/**

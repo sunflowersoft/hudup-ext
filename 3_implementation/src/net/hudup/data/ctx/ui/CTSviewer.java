@@ -61,21 +61,31 @@ public class CTSviewer extends JXTreeTable {
 			public void mouseClicked(MouseEvent e) {
 				if(SwingUtilities.isRightMouseButton(e) ) {
 					JPopupMenu contextMenu = createContextMenu();
-					if(contextMenu != null) 
-						contextMenu.show((Component)e.getSource(), e.getX(), e.getY());
+					if(contextMenu == null) return;
+					
+					addToContextMenu(contextMenu);
+					contextMenu.show((Component)e.getSource(), e.getX(), e.getY());
 				}
 			}
 		});
-		
 	}
 	
 	
 	/**
-	 * Getting this context template viewer.
-	 * @return this viewer
+	 * Getting this context template schema viewer.
+	 * @return this viewer.
 	 */
 	private CTSviewer getThis() {
 		return this;
+	}
+	
+	
+	/**
+	 * Getting the model of this viewer.
+	 * @return the model of this viewer.
+	 */
+	protected CTSViewerModel getCTSViewerModel() {
+		return (CTSViewerModel) getModel();
 	}
 	
 	
@@ -108,9 +118,10 @@ public class CTSviewer extends JXTreeTable {
 		
 		JPopupMenu contextMenu = new JPopupMenu();
 		
-		JMenuItem miProfile = UIUtil.makeMenuItem((String)null, "Profile", 
+		JMenuItem miProfileAtt = UIUtil.makeMenuItem((String)null, "Profile attribute", 
 			new ActionListener() {
 				
+				@Override
 				public void actionPerformed(ActionEvent e) {
 					final JDialog dlg = new JDialog(UIUtil.getFrameForComponent(getThis()), "Profile", true);
 					dlg.setSize(400, 300);
@@ -126,13 +137,21 @@ public class CTSviewer extends JXTreeTable {
 					dlg.setVisible(true);
 				}
 			});
-		contextMenu.add(miProfile);
-		
+		contextMenu.add(miProfileAtt);
 		
 		return contextMenu;
 	}
 	
 	
+    /**
+     * Adding the context menu to this list.
+     * @param contextMenu specified context menu.
+     */
+    protected void addToContextMenu(JPopupMenu contextMenu) {
+
+    }
+    
+    
 }
 
 

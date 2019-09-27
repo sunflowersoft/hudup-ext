@@ -524,6 +524,13 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluatorProgr
 	
 	
 	@Override
+	public void clearDelayUnsetupAlgs() throws RemoteException {
+		// TODO Auto-generated method stub
+		remoteEvaluator.clearDelayUnsetupAlgs();
+	}
+
+
+	@Override
 	public PluginStorageWrapper getPluginStorage() throws RemoteException {
 		// TODO Auto-generated method stub
 		return remoteEvaluator.getPluginStorage();

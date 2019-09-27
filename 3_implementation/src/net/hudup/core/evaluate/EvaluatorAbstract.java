@@ -205,7 +205,9 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 			return;
 		}
 		
-		clearDelayUnsetupAlgs(); //This code line is important.
+		try {
+			clearDelayUnsetupAlgs(); //This code line is important.
+		} catch (Throwable e) {e.printStackTrace();} 
 		
 		this.algList = algList;
 		this.pool = pool;
@@ -450,12 +452,14 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 	
 	/**
 	 * Unsetting up specified algorithm with support delaying.
-	 * This method is always called by another method and so it is not synchronized.
 	 * @param alg specified algorithm.
 	 */
 	protected void unsetupAlgSupportDelay(Alg alg) {
-		if (!alg.getConfig().getAsBoolean(DataConfig.DELAY_UNSETUP))
-			unsetupAlg(alg);
+		if (!alg.getConfig().getAsBoolean(DataConfig.DELAY_UNSETUP)) {
+			try {
+				unsetupAlg(alg);
+			} catch (Throwable e) {e.printStackTrace();}
+		}
 		else {
 			synchronized (delayUnsetupAlgs) {
 				delayUnsetupAlgs.add(alg);
@@ -464,14 +468,13 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 	}
 	
 	
-	/**
-	 * Clearing delay unsetting up algorithms.
-	 * This method is not synchronized because it is also called by another method as {@link #close()} method.
-	 */
-	protected void clearDelayUnsetupAlgs() {
+	@Override
+	public synchronized void clearDelayUnsetupAlgs() throws RemoteException {
 		synchronized (delayUnsetupAlgs) {
 			for (Alg alg : delayUnsetupAlgs) {
-				unsetupAlg(alg);
+				try {
+					unsetupAlg(alg);
+				} catch (Throwable e) {e.printStackTrace();}
 			}
 			
 			delayUnsetupAlgs.clear();

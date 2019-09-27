@@ -34,7 +34,7 @@ public class SysConfigDlg extends JDialog {
 	/**
 	 * Panel of system configuration.
 	 */
-	protected SysConfigPane paneSysConfig = null;
+	protected SysConfigPane paneSysConfig; //Do not setting null to this variable.
 
 	
 	/**
@@ -86,13 +86,13 @@ public class SysConfigDlg extends JDialog {
 	}
 	
 	
-	/**
-	 * Getting system configuration panel.
-	 * @return system configuration panel.
-	 */
-	public SysConfigPane getSysConfigPane() {
-		return paneSysConfig;
-	}
+//	/**
+//	 * Getting system configuration panel.
+//	 * @return system configuration panel.
+//	 */
+//	public SysConfigPane getSysConfigPane() {
+//		return paneSysConfig;
+//	}
 	
 	
 }

@@ -128,7 +128,6 @@ public class AlgListBox extends JList<Alg> implements AlgListUI {
 	
     /**
      * Adding the context menu to this list.
-     * 
      * @param contextMenu specified context menu.
      */
     protected void addToContextMenu(JPopupMenu contextMenu) {

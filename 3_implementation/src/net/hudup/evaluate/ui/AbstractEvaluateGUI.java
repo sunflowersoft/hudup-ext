@@ -16,6 +16,7 @@ import java.util.Set;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
+import net.hudup.core.PluginChangedListener;
 import net.hudup.core.Util;
 import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.Recommender;
@@ -40,7 +41,7 @@ import net.hudup.core.logistic.ui.CounterClock;
  * @author Loc Nguyen
  * @version 10.0
  */
-public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorListener, EvaluatorProgressListener, SetupAlgListener {
+public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorListener, EvaluatorProgressListener, SetupAlgListener, PluginChangedListener {
 
 	
 	/**
@@ -155,12 +156,6 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	 * @return list of algorithms.
 	 */
 	protected abstract List<Alg> getCurrentAlgList();
-	
-	
-	/**
-	 * Responding to plug-ins changed. 
-	 */
-	public abstract void pluginChanged();
 	
 	
 	/**
@@ -400,6 +395,27 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	}
 	
 	
+	@Override
+	public boolean isIdle() {
+		// TODO Auto-generated method stub
+		try {
+			return !evaluator.remoteIsStarted();
+		}
+		catch (Throwable e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return false;
+		}
+	}
+
+
+	@Override
+	public boolean isSupportImport() {
+		// TODO Auto-generated method stub
+		return this.bindUri == null;
+	}
+
+
 	/**
 	 * Add this GUI as listeners to specified evaluator.
 	 * @param evaluator specified evaluator.

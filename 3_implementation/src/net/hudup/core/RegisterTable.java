@@ -124,6 +124,22 @@ public final class RegisterTable implements Cloneable, Serializable {
 
 	
 	/**
+	 * Registering all algorithms of the specified register table.
+	 * All algorithms are not cloned.
+	 * @param from specified register table.
+	 */
+	public void register(RegisterTable from) {
+		this.algMap.clear();
+		
+		Set<String> keys = from.algMap.keySet();
+		for (String key : keys) {
+			Alg alg = from.algMap.get(key);
+			this.register(alg);
+		}
+	}
+
+	
+	/**
 	 * Checking if it is able to register the specified algorithm.
 	 * Algorithms registered in this table are distinguished by their names.
 	 * Algorithms in this table cannot duplicated, which means that two algorithms having the same name cannot exist in this table.

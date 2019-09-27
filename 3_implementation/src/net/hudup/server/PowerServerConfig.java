@@ -7,9 +7,6 @@
  */
 package net.hudup.server;
 
-import java.net.URI;
-import java.net.URL;
-
 import net.hudup.alg.cf.gfall.GreenFallCF;
 import net.hudup.core.Constants;
 import net.hudup.core.Util;
@@ -42,11 +39,23 @@ public class PowerServerConfig extends ServerConfig {
 	
 	
 	/**
+	 * Sample data name.
+	 */
+	public final static String  TEMPLATES_SAMPLE_DATA_NAME = "hudup_sample_data.zip";
+
+	
+	/**
 	 * Sample data path.
 	 */
-	public final static String  TEMPLATES_SAMPLE_DATA = Constants.TEMPLATES_PACKAGE + "hudup_sample_data.zip";
+	public final static String  TEMPLATES_SAMPLE_DATA_PATH = Constants.TEMPLATES_PACKAGE + TEMPLATES_SAMPLE_DATA_NAME;
 	
 
+	/**
+	 * Default store path.
+	 */
+	public final static String  STORE_PATH_DEFAULT = Constants.DATABASE_DIRECTORY + "/file/" + TEMPLATES_SAMPLE_DATA_NAME;
+
+	
 	/**
 	 * Server recommender field.
 	 */
@@ -97,12 +106,10 @@ public class PowerServerConfig extends ServerConfig {
 		// TODO Auto-generated method stub
 		super.reset();
 		try {
-			URL storeUrl = getClass().getResource(TEMPLATES_SAMPLE_DATA);
-			URI storeUri = storeUrl.toURI();
-			putDefaultUnitList(xURI.create(storeUri));
+			xURI storeUri = xURI.create(STORE_PATH_DEFAULT);
+			putDefaultUnitList(storeUri);
 			setRecommender(new GreenFallCF());
 			setParser(new SnapshotParserImpl());
-			setRecommenderPeriodLearn(RECOMMENDER_PERIOD_LEARN_DEFAULT);
 		} 
 		catch (Throwable e) {
 			e.printStackTrace();
@@ -110,6 +117,7 @@ public class PowerServerConfig extends ServerConfig {
 			setRecommender(new GreenFallCF());
 			setParser(new SemiScannerParser());
 		}
+		setRecommenderPeriodLearn(RECOMMENDER_PERIOD_LEARN_DEFAULT);
 	}
 
 	

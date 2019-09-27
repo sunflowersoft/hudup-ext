@@ -182,9 +182,19 @@ public class ProfileTable extends JTable {
 	
 	
 	/**
+	 * Applying internal data.
+	 * @return true if applying successful.
+	 */
+	public boolean apply() {
+		return getProfileTableModel().apply();
+	}
+	
+	
+	/**
 	 * Creating context menu.
 	 * @return context menu.
 	 */
+	@NextUpdate
 	protected JPopupMenu createContextMenu() {
 		return null;
 	}
@@ -193,6 +203,7 @@ public class ProfileTable extends JTable {
 	/**
 	 * Viewing selected row.
 	 */
+	@NextUpdate
 	protected void viewRow() {
 		
 	}
@@ -210,8 +221,10 @@ public class ProfileTable extends JTable {
 		}
 		else if(cmd.equals("Remove")) {
 			int selectedRow = getSelectedRow();
-			if(selectedRow != -1)
+			if(selectedRow != -1) {
 				getProfileTableModel().removeRow(selectedRow);
+				getProfileTableModel().modified = true;
+			}
 		}
 		else if(cmd.equals("Refresh")) {
 			System.out.println("Refresh command is not implemented yet");
@@ -236,6 +249,15 @@ public class ProfileTable extends JTable {
 		getProfileTableModel().setEditable(editable);
 	}
 
+	
+	/**
+	 * Testing whether table is modified.
+	 * @return whether table is modified.
+	 */
+	public boolean isModified() {
+		return getProfileTableModel().isModified();
+	}
+	
 	
 	@Override
 	public TableCellRenderer getCellRenderer(int row, int column) {
@@ -278,7 +300,6 @@ public class ProfileTable extends JTable {
  * @version 10.0
  *
  */
-@NextUpdate
 class ProfileTableModel extends DefaultTableModel implements TableModelListener {
 
 	
@@ -305,6 +326,12 @@ class ProfileTableModel extends DefaultTableModel implements TableModelListener 
 	 */
 	protected boolean editable = true;
 	
+	
+	/**
+	 * Modified flag.
+	 */
+	protected boolean modified = false;
+
 	
 	/**
 	 * Constructor with collection of profiles.
@@ -336,6 +363,8 @@ class ProfileTableModel extends DefaultTableModel implements TableModelListener 
 		setDataVector(
 				Util.newVector(), 
 				toColumns(attRef));
+		
+		modified = false;
 	}
 	
 	
@@ -370,6 +399,8 @@ class ProfileTableModel extends DefaultTableModel implements TableModelListener 
 		setDataVector(
 				dataVector, 
 				toColumns(attributes));
+		
+		modified = false;
 	}
 
 	
@@ -394,6 +425,33 @@ class ProfileTableModel extends DefaultTableModel implements TableModelListener 
 	
 	
 	/**
+	 * Applying internal data. This method update the internal data {@link #data} by rows shown in table.
+	 * @return true if applying is successful.
+	 */
+	public boolean apply() {
+		this.data.clear();
+		if (this.attRef == null) {
+			return false;
+		}
+		
+		Vector<?> vectors = getDataVector();
+		for (int i = 0; i < vectors.size(); i++) {
+			Vector<?> vector = (Vector<?>)vectors.get(i);
+			Profile profile = new Profile(this.attRef);
+			for (int j = 0; j < vector.size(); j++) {
+				Object value = vector.get(j);
+				profile.setValue(j, value);
+			}
+			
+			this.data.add(profile);
+		}
+		
+		modified = false;
+		return true;
+	}
+
+	
+	/**
 	 * Getting internal data.
 	 * @return internal data.
 	 */
@@ -408,30 +466,6 @@ class ProfileTableModel extends DefaultTableModel implements TableModelListener 
 	 */
 	public AttributeList getAttributeList() {
 		return this.attRef;
-	}
-	
-	
-	/**
-	 * Extracting data.
-	 * @return data as list of profiles.
-	 */
-	@NextUpdate
-	private void updateInternalData() {
-		this.data.clear();
-		if (this.attRef == null)
-			return;
-		
-		Vector<?> vectors = getDataVector();
-		for (int i = 0; i < vectors.size(); i++) {
-			Vector<?> vector = (Vector<?>)vectors.get(i);
-			Profile profile = new Profile(this.attRef);
-			for (int j = 0; j < vector.size(); j++) {
-				Object value = vector.get(j);
-				profile.setValue(j, value);
-			}
-			
-			this.data.add(profile);
-		}
 	}
 	
 	
@@ -463,8 +497,18 @@ class ProfileTableModel extends DefaultTableModel implements TableModelListener 
 	@Override
 	public void setValueAt(Object value, int row, int column) {
 		super.setValueAt(value, row, column);
+		modified = true;
 	}
 
+	
+	/**
+	 * Testing whether model is modified.
+	 * @return whether model is modified.
+	 */
+	public boolean isModified() {
+		return modified;
+	}
+	
 	
 	@Override
 	public Class<?> getColumnClass(int columnIndex) {
@@ -482,7 +526,7 @@ class ProfileTableModel extends DefaultTableModel implements TableModelListener 
 	public void tableChanged(TableModelEvent e) {
 		// TODO Auto-generated method stub
 //		System.out.println("ProfileTableModel.tableChanged(TableModelEvent) not implemented yet");
-//		updateInternalData(); //This code line is not optimized, which is a work-around solution.
+//		apply(); //This code line is not optimized, which is a work-around solution.
 	}
 
 

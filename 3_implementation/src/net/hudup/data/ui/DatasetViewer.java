@@ -19,8 +19,10 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.WindowConstants;
@@ -30,10 +32,17 @@ import javax.swing.event.ListSelectionListener;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.DatasetMetadata2;
+import net.hudup.core.data.Fetcher;
+import net.hudup.core.data.Profile;
+import net.hudup.core.data.Profiles;
 import net.hudup.core.data.Provider;
+import net.hudup.core.data.ctx.CTSManager;
+import net.hudup.core.data.ctx.ContextTemplate;
+import net.hudup.core.data.ctx.ContextTemplateSchema;
 import net.hudup.core.data.ui.ProfileTable;
 import net.hudup.core.logistic.ui.UIUtil;
 import net.hudup.data.ProviderImpl;
+import net.hudup.data.ctx.DefaultCTSManager;
 import net.hudup.data.ctx.ui.CTSviewer;
 
 /**
@@ -387,7 +396,62 @@ public class DatasetViewer extends JDialog {
 	private JPanel createCTSPane() {
 		JPanel main = new JPanel(new BorderLayout());
 		
-		CTSviewer ctsViewer = new CTSviewer(dataset.getCTSchema());
+		ContextTemplateSchema cts = dataset.getCTSchema();
+		if (cts == null) return main;
+		
+		CTSviewer ctsViewer = new CTSviewer(cts) {
+
+			/**
+			 * Default serial version UID.
+			 */
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			protected void addToContextMenu(JPopupMenu contextMenu) {
+				// TODO Auto-generated method stub
+				super.addToContextMenu(contextMenu);
+				
+				try {
+					final ContextTemplate template = getSelectedTemplate();
+					if (template == null || template.getProfileAttributes().size() == 0)
+						return;
+	
+					CTSManager ctsm = DefaultCTSManager.associate(cts, dataset.getConfig());
+					if (ctsm == null) return;
+					
+					final Profiles profiles = ctsm.profilesOf(template.getId());
+					if (profiles == null || profiles.size() == 0)
+						return;
+
+					JMenuItem miProfile = UIUtil.makeMenuItem((String)null, "Profile", 
+						new ActionListener() {
+							
+							@Override
+							public void actionPerformed(ActionEvent e) {
+								final JDialog dlg = new JDialog(UIUtil.getFrameForComponent(main), "Profile", true);
+								dlg.setSize(400, 300);
+								dlg.setLocationRelativeTo(UIUtil.getFrameForComponent(main));
+								
+								dlg.setLayout(new BorderLayout());
+								
+								Fetcher<Profile> fetcher = profiles.fetch();
+								ProfileTable profileTable = new ProfileTable(fetcher);
+								try {
+									fetcher.close();
+								} catch (Throwable ex) {ex.printStackTrace();}
+								
+								dlg.add(new JScrollPane(profileTable), BorderLayout.CENTER);
+								
+								dlg.setVisible(true);
+							}
+						});
+					contextMenu.add(miProfile);
+				}
+				catch (Throwable e) {e.printStackTrace();}
+			}
+			
+		};
+		
 		main.add(new JScrollPane(ctsViewer), BorderLayout.CENTER);
 		
 		return main;

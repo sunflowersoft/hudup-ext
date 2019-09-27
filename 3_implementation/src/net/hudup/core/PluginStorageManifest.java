@@ -45,6 +45,7 @@ import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.DataDriver;
 import net.hudup.core.data.DataDriver.DataType;
 import net.hudup.core.data.DataDriverList;
+import net.hudup.core.data.Exportable;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.xURI;
 import net.hudup.core.logistic.ui.SortableTable;
@@ -163,24 +164,29 @@ public class PluginStorageManifest extends SortableTable {
 	 */
 	public boolean apply() {
 		boolean idle = isListenersIdle();
-		
-		if (!idle)
-			return false;
+		if (!idle) return false;
 
 		
 		AlgList nextUpdateList = PluginStorage.getNextUpdateList();
-		
 		int n = getRowCount();
+		List<Alg> removedAlgList = Util.newList();
 		for (int i = 0; i < n; i++) {
-			
 			Alg alg = (Alg) getValueAt(i, 3);
-			
-			boolean registered = (Boolean)getValueAt(i, 4);
 			RegisterTable table = PluginStorage.lookupTable(alg.getClass());
-			if (table == null)
-				continue;
+			if (table == null) continue;
+
+			boolean registered = (Boolean)getValueAt(i, 4);
+			boolean removed = (Boolean)getValueAt(i, 5);
 			
-			if (registered) {
+			if (removed) {
+				if (!table.contains(alg.getName()))
+					nextUpdateList.remove(alg);
+				else
+					table.unregister(alg.getName());
+				
+				removedAlgList.add(alg);
+			}
+			else if (registered) {
 				if (!table.contains(alg.getName())) {
 					table.register(alg);
 					nextUpdateList.remove(alg);
@@ -193,21 +199,42 @@ public class PluginStorageManifest extends SortableTable {
 		}
 		
 		update();
-		firePluginChangedEvent(new PluginChangedEvent(this));
+		
+		firePluginChangedEvent(new PluginChangedEvent2(this, removedAlgList));
+		for (Alg alg : removedAlgList) {
+			if (alg instanceof Exportable) {
+				try {
+					((Exportable)alg).unexport(); //Finalize method will call unsetup method if unsetup method exists in this algorithm.
+				} catch (Throwable e) {e.printStackTrace();}
+			}
+		}
 		
 		return true;
 	}
 	
 
 	/**
-	 * Selecting or unselecting all rows according the specified input parameter {@code selected}.
+	 * Registering or unregistering all rows according the specified input parameter {@code selected}.
 	 * @param selected if {@code true} then all rows are selected. Otherwise, all rows are unselected. 
 	 */
-	public void selectAll(boolean selected) {
+	public void registerAll(boolean selected) {
 		int n = getRowCount();
 		for (int i = 0; i < n; i++) {
 			
 			setValueAt(selected, i, 4);
+		}
+	}
+
+	
+	/**
+	 * Removing or unremoving all rows according the specified input parameter {@code selected}.
+	 * @param selected if {@code true} then all rows are selected. Otherwise, all rows are unselected. 
+	 */
+	public void removeAll(boolean selected) {
+		int n = getRowCount();
+		for (int i = 0; i < n; i++) {
+			
+			setValueAt(selected, i, 5);
 		}
 	}
 
@@ -300,96 +327,170 @@ public class PluginStorageManifest extends SortableTable {
     }
 
     
-    /**
-	 * Creating {@link JPanel} that contains {@link PluginStorageManifest}.
-	 * @param listener {@link PluginChangedListener} to receive {@link PluginChangedEvent} if {@link PluginStorageManifest} is changed.
-	 * @return {@link JPanel} that contains {@link PluginStorageManifest}.
+	/**
+	 * Testing whether manifest table is modified.
+	 * @return whether manifest table is modified.
 	 */
-	public static JPanel createPane(PluginChangedListener listener) {
-		
-		JPanel result = new JPanel(new BorderLayout());
-		
-		JPanel body = new JPanel(new BorderLayout());
-		result.add(body, BorderLayout.CENTER);
-		
-		final PluginStorageManifest tblRegister = new PluginStorageManifest();
-		if (listener != null)
-			tblRegister.addPluginChangedListener(listener);
-		body.add(new JScrollPane(tblRegister), BorderLayout.CENTER);
-		
-		JPanel footer = new JPanel(new BorderLayout());
-		result.add(footer, BorderLayout.SOUTH);
+	public boolean isModified() {
+		return getRegisterTM().isModified();
+	}
 
-		JPanel buttonGrp1 = new JPanel();
-		footer.add(buttonGrp1, BorderLayout.CENTER);
+	
+	/**
+	 * Panel for plug-in storage manifest.
+	 * @author Loc Nguyen
+	 * @version 12.0
+	 */
+	public static class PluginStorageManifestPanel extends JPanel {
+
+		/**
+		 * Default serial version UID.
+		 */
+		private static final long serialVersionUID = 1L;
 		
-		JButton apply = new JButton("Apply");
-		buttonGrp1.add(apply);
-		apply.addActionListener(new ActionListener() {
+		/**
+		 * Plug-in storage manifest.
+		 */
+		protected PluginStorageManifest tblRegister = null;
+		
+		/**
+		 * Constructor with plug-in changed listener.
+		 * @param listener plug-in changed listener.
+		 */
+		public PluginStorageManifestPanel(PluginChangedListener listener) {
+			setLayout(new BorderLayout());
+			JPanel body = new JPanel(new BorderLayout());
+			add(body, BorderLayout.CENTER);
 			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
-				if (tblRegister.apply()) {
+			tblRegister = new PluginStorageManifest();
+			if (listener != null)
+				tblRegister.addPluginChangedListener(listener);
+			body.add(new JScrollPane(tblRegister), BorderLayout.CENTER);
+			
+			JPanel footer = new JPanel(new GridLayout(0, 1));
+			add(footer, BorderLayout.SOUTH);
+
+			JPanel buttonGrp1 = new JPanel();
+			footer.add(buttonGrp1);
+			
+			JButton registerAll = new JButton("Register all");
+			buttonGrp1.add(registerAll);
+			registerAll.addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					// TODO Auto-generated method stub
+					tblRegister.registerAll(true);
+				}
+			});
+
+			JButton unregisterAll = new JButton("Unregister all");
+			buttonGrp1.add(unregisterAll);
+			unregisterAll.addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					// TODO Auto-generated method stub
+					tblRegister.registerAll(false);
+				}
+			});
+
+			JButton removeAll = new JButton("Remove all");
+			buttonGrp1.add(removeAll);
+			removeAll.addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					// TODO Auto-generated method stub
+					tblRegister.removeAll(true);
+				}
+			});
+
+			JButton unremoveAll = new JButton("Unremove all");
+			buttonGrp1.add(unremoveAll);
+			unremoveAll.addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					// TODO Auto-generated method stub
+					tblRegister.removeAll(false);
+				}
+			});
+
+			JButton importAlg = new JButton("Import");
+			buttonGrp1.add(importAlg);
+			importAlg.addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					if (tblRegister.isModified()) {
+						int confirm = JOptionPane.showConfirmDialog(
+								tblRegister, 
+								"System properties are modified. Do you want to apply them?", 
+								"System properties are modified", 
+								JOptionPane.YES_NO_OPTION,
+								JOptionPane.QUESTION_MESSAGE);
+						
+						if (confirm == JOptionPane.YES_OPTION)
+							apply();
+					}
 					
-					JOptionPane.showMessageDialog(
-							UIUtil.getFrameForComponent(tblRegister), 
-							"Apply successfully. Algorithms are registered / unregistered", 
-							"Apply successfully", 
-							JOptionPane.INFORMATION_MESSAGE);
+					new ImportAlgDlag(tblRegister).setVisible(true);
+					tblRegister.update();
 				}
-				else {
-					JOptionPane.showMessageDialog(
-							UIUtil.getFrameForComponent(tblRegister), 
-							"Listeners not idle", 
-							"Listeners not idle", 
-							JOptionPane.INFORMATION_MESSAGE);
+			});
+			if (listener != null && !listener.isSupportImport())
+				importAlg.setVisible(false);
+			
+			
+			JPanel buttonGrp2 = new JPanel();
+			footer.add(buttonGrp2);
+			
+			JButton apply = new JButton("Apply");
+			buttonGrp2.add(apply);
+			apply.addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					// TODO Auto-generated method stub
+					apply();
 				}
-				
-			}
-		});
-		
-		JButton selectAll = new JButton("Select all");
-		buttonGrp1.add(selectAll);
-		selectAll.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
-				tblRegister.selectAll(true);
-			}
-		});
+			});
 
-		JButton unselectAll = new JButton("Unselect all");
-		buttonGrp1.add(unselectAll);
-		unselectAll.addActionListener(new ActionListener() {
 			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
-				tblRegister.selectAll(false);
+		}
+		
+		/**
+		 * Testing whether the plug-in storage manifest is modified.
+		 * @return whether the plug-in storage manifest is modified.
+		 */
+		public boolean isModified() {
+			return tblRegister.isModified();
+		}
+		
+		/**
+		 * Applying changes to the plug-in storage manifest.
+		 * @return true if applying is successful.
+		 */
+		public boolean apply() {
+			boolean ret = tblRegister.apply();
+			if (ret) {
+				JOptionPane.showMessageDialog(
+						UIUtil.getFrameForComponent(tblRegister), 
+						"Apply plug-in storage successfully. Algorithms are registered/unregistered/removed/unremoved", 
+						"Apply successfully", 
+						JOptionPane.INFORMATION_MESSAGE);
 			}
-		});
-
-		
-		JPanel buttonGrp2 = new JPanel();
-		footer.add(buttonGrp2, BorderLayout.EAST);
-		
-		JButton importAlg = new JButton("Import");
-		buttonGrp2.add(importAlg);
-		importAlg.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				new ImportAlgDlag(tblRegister).setVisible(true);
-				
-				tblRegister.update();
+			else {
+				JOptionPane.showMessageDialog(
+						UIUtil.getFrameForComponent(tblRegister), 
+						"Apply plug-in storage failed", 
+						"Apply failed", 
+						JOptionPane.INFORMATION_MESSAGE);
 			}
-		});
-		if (listener != null && !listener.isSupportImport()) importAlg.setVisible(false);
+			return ret;
+		}
 		
-		
-		return result;
 	}
 	
 	
@@ -406,7 +507,7 @@ public class PluginStorageManifest extends SortableTable {
 		dlg.setLocationRelativeTo(UIUtil.getFrameForComponent(comp));
 		
 		dlg.setLayout(new BorderLayout());
-		dlg.add(createPane(listener), BorderLayout.CENTER);
+		dlg.add(new PluginStorageManifestPanel(listener), BorderLayout.CENTER);
 		
 		dlg.setVisible(true);
 	}
@@ -433,6 +534,12 @@ class RegisterTM extends SortableTableModel {
 	
 	
 	/**
+	 * Whether or not this model was modified.
+	 */
+	protected boolean modified = false;
+
+	
+	/**
 	 * Default constructor.
 	 */
 	public RegisterTM() {
@@ -452,6 +559,8 @@ class RegisterTM extends SortableTableModel {
 		updateNextUpdateList(data);
 		
 		setDataVector(data, toColumns());
+		
+		modified = false;
 	}
 	
 	
@@ -486,6 +595,7 @@ class RegisterTM extends SortableTableModel {
 			row.add(alg.getClass().toString());
 			row.add(alg);
 			row.add(true);
+			row.add(false);
 			
 			data.add(row);
 		}
@@ -511,6 +621,7 @@ class RegisterTM extends SortableTableModel {
 			row.add(alg.getClass().toString());
 			row.add(alg);
 			row.add(false);
+			row.add(false);
 			
 			data.add(row);
 			
@@ -529,15 +640,25 @@ class RegisterTM extends SortableTableModel {
 		columns.add("Java class");
 		columns.add("Object");
 		columns.add("Registered");
+		columns.add("Removed");
 		
 		return columns;
 	}
 
 
+	/**
+	 * Testing whether this model is modified.
+	 * @return whether model is modified.
+	 */
+	public boolean isModified() {
+		return modified;
+	}
+
+	
 	@Override
 	public Class<?> getColumnClass(int columnIndex) {
 		// TODO Auto-generated method stub
-		if (columnIndex == 4)
+		if (columnIndex == 4 || columnIndex == 5)
 			return Boolean.class;
 		else
 			return super.getColumnClass(columnIndex);
@@ -547,7 +668,16 @@ class RegisterTM extends SortableTableModel {
 	@Override
 	public boolean isCellEditable(int row, int column) {
 		// TODO Auto-generated method stub
-		return column == 4;
+		return column == 4 || column == 5;
+	}
+
+
+	@Override
+	public void setValueAt(Object aValue, int row, int column) {
+		// TODO Auto-generated method stub
+		super.setValueAt(aValue, row, column);
+		
+		modified = true;
 	}
 	
 	
@@ -659,24 +789,29 @@ class PluginStorageManifest2 extends JTable {
 	 */
 	public boolean apply() {
 		boolean idle = isListenersIdle();
-		
-		if (!idle)
-			return false;
+		if (!idle) return false;
 
 		
 		AlgList nextUpdateList = PluginStorage.getNextUpdateList();
-		
 		int n = getRowCount();
+		List<Alg> removedAlgList = Util.newList();
 		for (int i = 0; i < n; i++) {
-			
 			Alg alg = (Alg) getValueAt(i, 3);
-			
-			boolean registered = (Boolean)getValueAt(i, 4);
 			RegisterTable table = PluginStorage.lookupTable(alg.getClass());
-			if (table == null)
-				continue;
+			if (table == null) continue;
+
+			boolean registered = (Boolean)getValueAt(i, 4);
+			boolean removed = (Boolean)getValueAt(i, 5);
 			
-			if (registered) {
+			if (removed) {
+				if (!table.contains(alg.getName()))
+					nextUpdateList.remove(alg);
+				else
+					table.unregister(alg.getName());
+				
+				removedAlgList.add(alg);
+			}
+			else if (registered) {
 				if (!table.contains(alg.getName())) {
 					table.register(alg);
 					nextUpdateList.remove(alg);
@@ -689,7 +824,15 @@ class PluginStorageManifest2 extends JTable {
 		}
 		
 		update();
-		firePluginChangedEvent(new PluginChangedEvent(this));
+		
+		firePluginChangedEvent(new PluginChangedEvent2(this, removedAlgList));
+		for (Alg alg : removedAlgList) {
+			if (alg instanceof Exportable) {
+				try {
+					((Exportable)alg).unexport();
+				} catch (Throwable e) {e.printStackTrace();}
+			}
+		}
 		
 		return true;
 	}
@@ -699,11 +842,24 @@ class PluginStorageManifest2 extends JTable {
 	 * Selecting or unselecting all rows according the specified input parameter {@code selected}.
 	 * @param selected if {@code true} then all rows are selected. Otherwise, all rows are unselected. 
 	 */
-	public void selectAll(boolean selected) {
+	public void registerAll(boolean selected) {
 		int n = getRowCount();
 		for (int i = 0; i < n; i++) {
 			
 			setValueAt(selected, i, 4);
+		}
+	}
+
+	
+	/**
+	 * Removing or unremoving all rows according the specified input parameter {@code selected}.
+	 * @param selected if {@code true} then all rows are selected. Otherwise, all rows are unselected. 
+	 */
+	public void removeAll(boolean selected) {
+		int n = getRowCount();
+		for (int i = 0; i < n; i++) {
+			
+			setValueAt(selected, i, 5);
 		}
 	}
 
@@ -796,96 +952,170 @@ class PluginStorageManifest2 extends JTable {
     }
 
     
-    /**
-	 * Creating {@link JPanel} that contains {@link PluginStorageManifest2}.
-	 * @param listener {@link PluginChangedListener} to receive {@link PluginChangedEvent} if {@link PluginStorageManifest2} is changed.
-	 * @return {@link JPanel} that contains {@link PluginStorageManifest2}.
+	/**
+	 * Testing whether manifest table is modified.
+	 * @return whether manifest table is modified.
 	 */
-	public static JPanel createPane(PluginChangedListener listener) {
-		
-		JPanel result = new JPanel(new BorderLayout());
-		
-		JPanel body = new JPanel(new BorderLayout());
-		result.add(body, BorderLayout.CENTER);
-		
-		final PluginStorageManifest2 tblRegister = new PluginStorageManifest2();
-		if (listener != null)
-			tblRegister.addPluginChangedListener(listener);
-		body.add(new JScrollPane(tblRegister), BorderLayout.CENTER);
-		
-		JPanel footer = new JPanel();
-		result.add(footer, BorderLayout.SOUTH);
+	public boolean isModified() {
+		return getRegisterTM().isModified();
+	}
 
-		JPanel buttonGrp1 = new JPanel();
-		footer.add(buttonGrp1, BorderLayout.CENTER);
+	
+	/**
+	 * Panel for plug-in storage manifest.
+	 * @author Loc Nguyen
+	 * @version 12.0
+	 */
+	public static class PluginStorageManifestPanel extends JPanel {
 
-		JButton apply = new JButton("Apply");
-		buttonGrp1.add(apply);
-		apply.addActionListener(new ActionListener() {
+		/**
+		 * Default serial version UID.
+		 */
+		private static final long serialVersionUID = 1L;
+		
+		/**
+		 * Plug-in storage manifest.
+		 */
+		protected PluginStorageManifest2 tblRegister = null;
+		
+		/**
+		 * Constructor with plug-in changed listener.
+		 * @param listener plug-in changed listener.
+		 */
+		public PluginStorageManifestPanel(PluginChangedListener listener) {
+			setLayout(new BorderLayout());
+			JPanel body = new JPanel(new BorderLayout());
+			add(body, BorderLayout.CENTER);
 			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
-				if (tblRegister.apply()) {
+			tblRegister = new PluginStorageManifest2();
+			if (listener != null)
+				tblRegister.addPluginChangedListener(listener);
+			body.add(new JScrollPane(tblRegister), BorderLayout.CENTER);
+			
+			JPanel footer = new JPanel(new GridLayout(0, 1));
+			add(footer, BorderLayout.SOUTH);
+
+			JPanel buttonGrp1 = new JPanel();
+			footer.add(buttonGrp1);
+			
+			JButton registerAll = new JButton("Register all");
+			buttonGrp1.add(registerAll);
+			registerAll.addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					// TODO Auto-generated method stub
+					tblRegister.registerAll(true);
+				}
+			});
+
+			JButton unregisterAll = new JButton("Unregister all");
+			buttonGrp1.add(unregisterAll);
+			unregisterAll.addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					// TODO Auto-generated method stub
+					tblRegister.registerAll(false);
+				}
+			});
+
+			JButton removeAll = new JButton("Remove all");
+			buttonGrp1.add(removeAll);
+			removeAll.addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					// TODO Auto-generated method stub
+					tblRegister.removeAll(true);
+				}
+			});
+
+			JButton unremoveAll = new JButton("Unremove all");
+			buttonGrp1.add(unremoveAll);
+			unremoveAll.addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					// TODO Auto-generated method stub
+					tblRegister.removeAll(false);
+				}
+			});
+
+			JButton importAlg = new JButton("Import");
+			buttonGrp1.add(importAlg);
+			importAlg.addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					if (tblRegister.isModified()) {
+						int confirm = JOptionPane.showConfirmDialog(
+								tblRegister, 
+								"System properties are modified. Do you want to apply them?", 
+								"System properties are modified", 
+								JOptionPane.YES_NO_OPTION,
+								JOptionPane.QUESTION_MESSAGE);
+						
+						if (confirm == JOptionPane.YES_OPTION)
+							apply();
+					}
 					
-					JOptionPane.showMessageDialog(
-							UIUtil.getFrameForComponent(tblRegister), 
-							"Apply successfully. Algorithms are registered", 
-							"Apply successfully", 
-							JOptionPane.INFORMATION_MESSAGE);
+					new ImportAlgDlag(tblRegister).setVisible(true);
+					tblRegister.update();
 				}
-				else {
-					JOptionPane.showMessageDialog(
-							UIUtil.getFrameForComponent(tblRegister), 
-							"Listeners not idle", 
-							"Listeners not idle", 
-							JOptionPane.INFORMATION_MESSAGE);
+			});
+			if (listener != null && !listener.isSupportImport())
+				importAlg.setVisible(false);
+			
+			
+			JPanel buttonGrp2 = new JPanel();
+			footer.add(buttonGrp2);
+			
+			JButton apply = new JButton("Apply");
+			buttonGrp2.add(apply);
+			apply.addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					// TODO Auto-generated method stub
+					apply();
 				}
-				
-			}
-		});
-		
-		JButton selectAll = new JButton("Select all");
-		buttonGrp1.add(selectAll);
-		selectAll.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
-				tblRegister.selectAll(true);
-			}
-		});
+			});
 
-		JButton unselectAll = new JButton("Unselect all");
-		buttonGrp1.add(unselectAll);
-		unselectAll.addActionListener(new ActionListener() {
 			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
-				tblRegister.selectAll(false);
+		}
+		
+		/**
+		 * Testing whether the plug-in storage manifest is modified.
+		 * @return whether the plug-in storage manifest is modified.
+		 */
+		public boolean isModified() {
+			return tblRegister.isModified();
+		}
+		
+		/**
+		 * Applying changes to the plug-in storage manifest.
+		 * @return true if applying is successful.
+		 */
+		public boolean apply() {
+			boolean ret = tblRegister.apply();
+			if (ret) {
+				JOptionPane.showMessageDialog(
+						UIUtil.getFrameForComponent(tblRegister), 
+						"Apply plug-in storage successfully. Algorithms are registered/unregistered/removed/unremoved", 
+						"Apply successfully", 
+						JOptionPane.INFORMATION_MESSAGE);
 			}
-		});
-
-		
-		JPanel buttonGrp2 = new JPanel();
-		footer.add(buttonGrp2, BorderLayout.EAST);
-		
-		JButton importAlg = new JButton("Import");
-		buttonGrp2.add(importAlg);
-		importAlg.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				new ImportAlgDlag(tblRegister).setVisible(true);
-				
-				tblRegister.update();
+			else {
+				JOptionPane.showMessageDialog(
+						UIUtil.getFrameForComponent(tblRegister), 
+						"Apply plug-in storage failed", 
+						"Apply failed", 
+						JOptionPane.INFORMATION_MESSAGE);
 			}
-		});
-		if (!listener.isSupportImport()) importAlg.setVisible(false);
-
+			return ret;
+		}
 		
-		return result;
 	}
 	
 	
@@ -902,7 +1132,7 @@ class PluginStorageManifest2 extends JTable {
 		dlg.setLocationRelativeTo(UIUtil.getFrameForComponent(comp));
 		
 		dlg.setLayout(new BorderLayout());
-		dlg.add(createPane(listener), BorderLayout.CENTER);
+		dlg.add(new PluginStorageManifestPanel(listener), BorderLayout.CENTER);
 		
 		dlg.setVisible(true);
 	}
@@ -929,6 +1159,12 @@ class RegisterTM2 extends DefaultTableModel {
 	
 	
 	/**
+	 * Whether or not this model was modified.
+	 */
+	protected boolean modified = false;
+
+	
+	/**
 	 * Default constructor.
 	 */
 	public RegisterTM2() {
@@ -948,6 +1184,8 @@ class RegisterTM2 extends DefaultTableModel {
 		updateNextUpdateList(data);
 		
 		setDataVector(data, toColumns());
+		
+		modified = false;
 	}
 	
 	
@@ -982,6 +1220,7 @@ class RegisterTM2 extends DefaultTableModel {
 			row.add(alg.getClass().toString());
 			row.add(alg);
 			row.add(true);
+			row.add(false);
 			
 			data.add(row);
 		}
@@ -1007,6 +1246,7 @@ class RegisterTM2 extends DefaultTableModel {
 			row.add(alg.getClass().toString());
 			row.add(alg);
 			row.add(false);
+			row.add(false);
 			
 			data.add(row);
 			
@@ -1025,15 +1265,25 @@ class RegisterTM2 extends DefaultTableModel {
 		columns.add("Java class");
 		columns.add("Object");
 		columns.add("Registered");
+		columns.add("Removed");
 		
 		return columns;
 	}
 
 
+	/**
+	 * Testing whether this model is modified.
+	 * @return whether model is modified.
+	 */
+	public boolean isModified() {
+		return modified;
+	}
+
+	
 	@Override
 	public Class<?> getColumnClass(int columnIndex) {
 		// TODO Auto-generated method stub
-		if (columnIndex == 4)
+		if (columnIndex == 4 || columnIndex == 5)
 			return Boolean.class;
 		else
 			return super.getColumnClass(columnIndex);
@@ -1043,7 +1293,16 @@ class RegisterTM2 extends DefaultTableModel {
 	@Override
 	public boolean isCellEditable(int row, int column) {
 		// TODO Auto-generated method stub
-		return column == 4;
+		return column == 4 || column == 5;
+	}
+	
+	
+	@Override
+	public void setValueAt(Object aValue, int row, int column) {
+		// TODO Auto-generated method stub
+		super.setValueAt(aValue, row, column);
+		
+		modified = true;
 	}
 	
 	

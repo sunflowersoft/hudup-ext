@@ -665,7 +665,10 @@ public class DefaultExternalQuery extends ExternalQueryAbstract {
 	@Override
 	public DataConfig getConfig() {
 		// TODO Auto-generated method stub
-		return externalProvider.getConfig();
+		if (externalProvider == null)
+			return null;
+		else
+			return externalProvider.getConfig();
 	}
 
 	

@@ -318,14 +318,14 @@ public class PropPane extends JPanel {
 		if (!apply) {
 			JOptionPane.showMessageDialog(
 					this, 
-					"Cannot apply", 
+					"Cannot apply properties", 
 					"Cannot apply", 
 					JOptionPane.ERROR_MESSAGE);
 		}
 		else {
 			JOptionPane.showMessageDialog(
 					this, 
-					"Apply successfully", 
+					"Apply properties successfully", 
 					"Apply successfully", 
 					JOptionPane.INFORMATION_MESSAGE);
 		}
@@ -420,4 +420,13 @@ public class PropPane extends JPanel {
 	}
 	
 	
+	/**
+	 * Testing whether property list is modified.
+	 * @return whether property list is modified.
+	 */
+	public boolean isModified() {
+		return tblProp.isModified();
+	}
+
+
 }

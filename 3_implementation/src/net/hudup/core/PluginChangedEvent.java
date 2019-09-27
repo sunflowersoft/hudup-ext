@@ -29,7 +29,7 @@ public class PluginChangedEvent extends EventObject {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	
+
 	/**
 	 * Constructor with specified source.
 	 * @param source the source to issue this event. As usual, it is {@link PluginStorageManifest} which is the graphic user interface (GUI) allows users to manage {@link PluginStorage}.

@@ -331,6 +331,7 @@ public class Firer implements PluginManager {
 	
 	/**
 	 * Loading classes from store.
+	 * @param <T> object type.
 	 * @param storeUri store URI.
 	 * @param referredClass referred class.
 	 * @return list of algorithms as output.

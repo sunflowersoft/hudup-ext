@@ -11,13 +11,16 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 import javax.swing.JButton;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
 import net.hudup.core.PluginChangedListener;
-import net.hudup.core.PluginStorageManifest;
+import net.hudup.core.PluginStorageManifest.PluginStorageManifestPanel;
 import net.hudup.core.data.DataDriverList;
 import net.hudup.core.data.ui.DataDriverListTable;
 import net.hudup.core.data.ui.SysConfigPane;
@@ -48,19 +51,19 @@ public class SysConfigDlgExt extends SysConfigDlg {
 	/**
 	 * Registering panel.
 	 */
-	protected JPanel paneRegister = null;
+	protected PluginStorageManifestPanel paneRegister; //Do not setting null to this variable.
 
 	
 	/**
 	 * Data driver list panel.
 	 */
-	protected JPanel paneDataDriverList = null;
+	protected JPanel paneDataDriverList; //Do not setting null to this variable.
 
 	
 	/**
 	 * System properties panel.
 	 */
-	protected JPanel paneSystemProperties = null;
+	protected JPanel paneSystemProperties; //Do not setting null to this variable.
 
 	
 	/**
@@ -72,6 +75,28 @@ public class SysConfigDlgExt extends SysConfigDlg {
 	public SysConfigDlgExt(Component comp, String title, Object...vars) {
 		super(comp, title, vars);
 		
+		addWindowListener(new WindowAdapter() {
+
+			@Override
+			public void windowClosed(WindowEvent e) {
+				// TODO Auto-generated method stub
+				super.windowClosed(e);
+				
+				if (!isModified())
+					return;
+				
+				int confirm = JOptionPane.showConfirmDialog(
+						comp, 
+						"System properties are modified. Do you want to apply them?", 
+						"System properties are modified", 
+						JOptionPane.YES_NO_OPTION,
+						JOptionPane.QUESTION_MESSAGE);
+				
+				if (confirm == JOptionPane.YES_OPTION)
+					onApply();
+			}
+
+		});
 	}
 
 	
@@ -87,9 +112,9 @@ public class SysConfigDlgExt extends SysConfigDlg {
 		body.add("Configuration", paneSysConfig);
 		
 		if (vars.length == 0)
-			paneRegister = PluginStorageManifest.createPane(null);
+			paneRegister = new PluginStorageManifestPanel(null);
 		else if (vars[0] instanceof PluginChangedListener)
-			paneRegister = PluginStorageManifest.createPane((PluginChangedListener)vars[0]);
+			paneRegister = new PluginStorageManifestPanel((PluginChangedListener)vars[0]);
 		body.add("Plugins", paneRegister);
 		
 		paneDataDriverList = DataDriverListTable.createPane(DataDriverList.list());
@@ -116,11 +141,38 @@ public class SysConfigDlgExt extends SysConfigDlg {
 
 	
 	/**
-	 * Getting body tab panel.
-	 * @return body tab panel.
+	 * Removing system configuration panel.
 	 */
-	public JTabbedPane getBodyTabbedPane() {
-		return body;
+	public void removedSysConfigPane() {
+		if (body != null && paneSysConfig != null) {
+			body.remove(paneSysConfig);
+			paneSysConfig = null;
+		}
+	}
+	
+	
+	/**
+	 * This event-driven method applies changes on system properties.
+	 */
+	protected void onApply() {
+		if (!isModified())
+			return;
+		
+		if (paneSysConfig != null && paneSysConfig.isModified())
+			paneSysConfig.apply();
+		
+		if (paneRegister != null && paneRegister.isModified())
+			paneRegister.apply();
+	}
+	
+	
+	/**
+	 * Testing whether system properties are modified.
+	 * @return whether system properties are modified.
+	 */
+	protected boolean isModified() {
+		return (paneSysConfig != null && paneSysConfig.isModified())
+				|| (paneRegister != null && paneRegister.isModified());
 	}
 	
 	
