@@ -22,7 +22,7 @@ import net.hudup.core.data.ctx.ContextTemplateSchema;
  * @version 12.0
  *
  */
-public interface DatasetRemoteTask {
+public interface DatasetRemoteTask extends Exportable {
 
 
 	
@@ -293,20 +293,4 @@ public interface DatasetRemoteTask {
 	ContextTemplateSchema remoteGetCTSchema() throws RemoteException;
 	
 	
-	/**
-     * Remote exporting this remote dataset.
-     * @param serverPort server port.
-     * @return stub as remote dataset. Return null if exporting fails.
-     * @throws RemoteException if any error raises.
-     */
-    DatasetRemote remoteExport(int serverPort) throws RemoteException;
-    
-    
-    /**
-     * Remote unexporting remote dataset.
-     * @throws RemoteException if any error raises.
-     */
-    void remoteUnexport() throws RemoteException;
-
-
 }

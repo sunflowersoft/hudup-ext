@@ -7,6 +7,9 @@
  */
 package net.hudup.core.data;
 
+import java.rmi.RemoteException;
+
+import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.AlgAbstract;
 import net.hudup.core.logistic.LogUtil;
 
@@ -54,6 +57,27 @@ public abstract class ExternalQueryAbstract extends AlgAbstract implements Exter
 	}
 
 	
+	@Override
+	public String getName() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	@Override
+	public Alg newInstance() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	@Override
+	public String getDescription() throws RemoteException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
 	@Override
 	public void close() throws Exception {
 		// TODO Auto-generated method stub

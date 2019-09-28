@@ -8,6 +8,7 @@
 package net.hudup.core.data;
 
 import java.io.Serializable;
+import java.rmi.Remote;
 import java.rmi.RemoteException;
 
 import net.hudup.core.data.ctx.Context;
@@ -465,6 +466,33 @@ public class DatasetRemoteWrapper implements Dataset, DatasetRemote {
 
 	
 	@Override
+	public synchronized Remote export(int serverPort) throws RemoteException {
+		//Remote wrapper can export itself because this function is useful when the wrapper as remote algorithm can be called remotely by remote evaluator via Evaluator.remoteStart method.
+		if (exportedStub == null)
+			exportedStub = (DatasetRemote) NetUtil.RegistryRemote.export(this, serverPort);
+	
+		return exportedStub;
+	}
+
+
+	@Override
+	public synchronized void unexport() throws RemoteException {
+		// TODO Auto-generated method stub
+		if (exclusive && remoteDataset != null) {
+			try {
+				remoteDataset.unexport();
+			} catch (Exception e) {e.printStackTrace();}
+		}
+		remoteDataset = null;
+		
+		if (exportedStub != null) {
+			NetUtil.RegistryRemote.unexport(this);
+			exportedStub = null;
+		}
+	}
+
+	
+	@Override
 	public void clear() {
 		// TODO Auto-generated method stub
 		if (remoteDataset instanceof DatasetAbstract) {
@@ -472,7 +500,7 @@ public class DatasetRemoteWrapper implements Dataset, DatasetRemote {
 		}
 		
 		try {
-			remoteUnexport();
+			unexport();
 		}
 		catch (Throwable e) {e.printStackTrace();}
 	}
@@ -678,33 +706,6 @@ public class DatasetRemoteWrapper implements Dataset, DatasetRemote {
 	public ContextTemplateSchema remoteGetCTSchema() throws RemoteException {
 		// TODO Auto-generated method stub
 		return getCTSchema();
-	}
-
-	
-	@Override
-	public synchronized DatasetRemote remoteExport(int serverPort) throws RemoteException {
-		//Remote wrapper can export itself because this function is useful when the wrapper as remote algorithm can be called remotely by remote evaluator via Evaluator.remoteStart method.
-		if (exportedStub == null)
-			exportedStub = (DatasetRemote) NetUtil.RegistryRemote.export(this, serverPort);
-	
-		return exportedStub;
-	}
-
-
-	@Override
-	public synchronized void remoteUnexport() throws RemoteException {
-		// TODO Auto-generated method stub
-		if (exclusive && remoteDataset != null) {
-			try {
-				remoteDataset.remoteUnexport();
-			} catch (Exception e) {e.printStackTrace();}
-		}
-		remoteDataset = null;
-		
-		if (exportedStub != null) {
-			NetUtil.RegistryRemote.unexport(this);
-			exportedStub = null;
-		}
 	}
 
 	

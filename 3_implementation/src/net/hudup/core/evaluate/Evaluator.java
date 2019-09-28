@@ -211,10 +211,11 @@ public interface Evaluator extends Remote, RemoteRunner, SetupAlgListener, Expor
 
 	
 	/**
-	 * Getting system plug-in storage.
+	 * Getting system plug-in storage. This method is currently not used.
 	 * @return wrapper of system plug-in storage.
 	 * @throws RemoteException if any error raises.
 	 */
+	@Deprecated
 	PluginStorageWrapper getPluginStorage() throws RemoteException;
 	
 	

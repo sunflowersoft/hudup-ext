@@ -15,6 +15,7 @@ import java.io.BufferedReader;
 import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.Writer;
+import java.rmi.RemoteException;
 import java.util.List;
 
 import javax.swing.JButton;
@@ -512,8 +513,13 @@ public abstract class SvdGradientKB extends KBaseRecommendIntegrated {
 	
 	@Override
 	public void export0(DataConfig storeConfig) {
-		if (isEmpty())
+		try {
+			if (isEmpty()) return;
+		}
+		catch (Throwable e) {
+			e.printStackTrace();
 			return;
+		}
 		
 		UriAdapter adapter = null;
 		PrintWriter printer = null;
@@ -559,7 +565,7 @@ public abstract class SvdGradientKB extends KBaseRecommendIntegrated {
 	
 	
 	@Override
-	public boolean isEmpty() {
+	public boolean isEmpty() throws RemoteException {
 		// TODO Auto-generated method stub
 		
 		return !Util.isUsed(avgRating);
@@ -650,8 +656,13 @@ public abstract class SvdGradientKB extends KBaseRecommendIntegrated {
 	 * @return user {@link RatingMatrix}.
 	 */
 	public RatingMatrix createUserRatingMatrix() {
-		if (isEmpty())
+		try {
+			if (isEmpty()) return null;
+		}
+		catch (Throwable e) {
+			e.printStackTrace();
 			return null;
+		}
 		
 		int nUsers = userIds.size();
 		int nItems = itemIds.size();

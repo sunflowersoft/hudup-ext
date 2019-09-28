@@ -124,8 +124,9 @@ public final class RegisterTable implements Cloneable, Serializable {
 
 	
 	/**
-	 * Registering all algorithms of the specified register table.
-	 * All algorithms are not cloned.
+	 * Registering all algorithms of the specified register table. This method is only called by evaluator GUI.
+	 * By default all algorithms are not cloned due to saving memory and supporting well remote (imported) algorithms but you can clone algorithms (by overriding) for safety.
+	 * Alternatively, method {@link #copy(RegisterTable)} clones algorithms.
 	 * @param from specified register table.
 	 */
 	public void register(RegisterTable from) {
@@ -134,6 +135,7 @@ public final class RegisterTable implements Cloneable, Serializable {
 		Set<String> keys = from.algMap.keySet();
 		for (String key : keys) {
 			Alg alg = from.algMap.get(key);
+			//alg = alg.newInstance(); //You can clone algorithms for safety.
 			this.register(alg);
 		}
 	}

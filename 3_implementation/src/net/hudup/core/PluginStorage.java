@@ -125,6 +125,12 @@ public final class PluginStorage implements Serializable {
 	
 	
 	/**
+	 * Flag to indicate whether plug-in storage is initialized.
+	 */
+	protected static boolean initialized = false;
+	
+	
+	/**
 	 * This static method gets normal algorithm register.
 	 * @return register table of {@link Alg}.
 	 */
@@ -373,6 +379,15 @@ public final class PluginStorage implements Serializable {
 		catch (Throwable e) {e.printStackTrace();}
 	}
 
+	
+	/**
+	 * Checking whether plug-in storage is initialized.
+	 * @return whether plug-in storage is initialized.
+	 */
+	public static boolean isInitialized() {
+		return initialized;
+	}
+	
 	
 	/**
 	 * Adding shutdown hook to release all registered algorithms.

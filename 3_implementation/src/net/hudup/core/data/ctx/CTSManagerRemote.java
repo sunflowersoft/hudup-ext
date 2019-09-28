@@ -8,7 +8,6 @@
 package net.hudup.core.data.ctx;
 
 import net.hudup.core.alg.AlgRemote;
-import net.hudup.core.data.AutoCloseable;
 
 /**
  * This interface represents a remote context template schema (CTS) manager.
@@ -17,7 +16,7 @@ import net.hudup.core.data.AutoCloseable;
  * @version 12.0
  *
  */
-public interface CTSManagerRemote extends CTSManagerRemoteTask, AlgRemote, AutoCloseable {
+public interface CTSManagerRemote extends CTSManagerRemoteTask, AlgRemote {
 
 
 }

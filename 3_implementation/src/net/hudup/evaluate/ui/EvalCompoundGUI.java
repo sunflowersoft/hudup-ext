@@ -12,8 +12,6 @@ import java.awt.Container;
 import java.awt.Image;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -77,13 +75,6 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 	private JTabbedPane body = null;
 	
 	
-//	/**
-//	 * Single mode evaluator GUI.
-//	 */
-//	@Deprecated
-//	private EvaluateGUI evaluateGUI = null;
-	
-	
 	/**
 	 * Batch mode evaluator GUI.
 	 */
@@ -115,20 +106,16 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 		this.bindUri = bindUri;
 		
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		addWindowListener(new WindowAdapter() {
-
-			@Override
-			public void windowClosed(WindowEvent e) {
-				// TODO Auto-generated method stub
-				super.windowClosed(e);
-				
-				//evaluateGUI.dispose(); //Single mode is removed. Fix bug date: August 6, 2019.
-				batchEvaluateGUI.dispose();
-				
-				thisConfig.save();
-			}
-
-		});
+//		addWindowListener(new WindowAdapter() {
+//
+//			@Override
+//			public void windowClosed(WindowEvent e) {
+//				super.windowClosed(e);
+//				batchEvaluateGUI.dispose();
+//				thisConfig.save();
+//			}
+//
+//		});
 		
         Image image = UIUtil.getImage("evaluator-32x32.png");
         if (image != null)
@@ -143,10 +130,6 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 		
 		body = new JTabbedPane();
 		content.add(body, BorderLayout.CENTER);
-		
-//		 //Single mode is removed. Fix bug date: August 6, 2019.
-//		evaluateGUI = new EvaluateGUI(evaluator, bindUri);
-//		body.add(getMessage("evaluate"), evaluateGUI);
 		
 		batchEvaluateGUI = new BatchEvaluateGUI(evaluator, bindUri);
 		body.add(I18nUtil.message("evaluate_batch"), batchEvaluateGUI);
@@ -283,9 +266,18 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 
 
 	@Override
+	public void dispose() {
+		batchEvaluateGUI.dispose();
+		
+		thisConfig.save();
+
+		super.dispose();
+	}
+
+
+	@Override
 	public void pluginChanged(PluginChangedEvent evt) {
 		// TODO Auto-generated method stub
-//		evaluateGUI.pluginChanged(evt); //Single mode is removed. Fix bug date: August 6, 2019.
 		batchEvaluateGUI.pluginChanged(evt);
 	}
 
@@ -293,14 +285,14 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 	@Override
 	public boolean isIdle() {
 		// TODO Auto-generated method stub
-		return batchEvaluateGUI.isIdle() /*&& evaluateGUI.isIdle()*/;
+		return batchEvaluateGUI.isIdle();
 	}
 	
 	
 	@Override
 	public boolean isSupportImport() {
 		// TODO Auto-generated method stub
-		return batchEvaluateGUI.isSupportImport() /*&& evaluateGUI.isSupportImport()*/;
+		return batchEvaluateGUI.isSupportImport();
 	}
 
 
@@ -364,7 +356,8 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 				// TODO Auto-generated method stub
 				final Evaluator ev = (Evaluator) getItemControl().getSelectedItem();
 				dispose();
-				if (oldGUI != null) oldGUI.dispose();
+				if (oldGUI != null)
+					oldGUI.dispose();
 
 				run(ev, null, null);
 			}
@@ -449,9 +442,7 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 						
 						xURI bindUri = ConnectDlg.getBindUri();
 						
-						ev.getPluginStorage().assignToSystem(); //This code line is very important for initializing plug-in storage.
-//						PluginStorageWrapper wrapper = ev.getPluginStorage();
-//						wrapper.assignToSystem(); //This code line is very important for initializing plug-in storage.
+						//ev.getPluginStorage().assignToSystem();
 						run(ev, bindUri, null);
 					}
 					catch (Exception e) {
@@ -506,6 +497,8 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 	 * @param oldGUI old GUI.
 	 */
 	public static void run(Evaluator evaluator, xURI bindUri, Window oldGUI) {
+		new Firer();
+		
 		try {
 //			RegisterTable algReg = evaluator.extractAlgFromPluginStorage();
 //			if (algReg == null || algReg.size() == 0) {

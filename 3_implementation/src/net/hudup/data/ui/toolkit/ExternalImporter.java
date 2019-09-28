@@ -11,6 +11,7 @@ import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.rmi.RemoteException;
 
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
@@ -241,25 +242,16 @@ public class ExternalImporter extends JPanel implements ProgressListener, Dispos
 			public void run() {
 				// TODO Auto-generated method stub
 				ExternalQuery externalQuery = new DefaultExternalQuery();
-				boolean setup = externalQuery.setup(internalConfig, externalConfig);
-				
-				if (!setup) {
-					try {
+				try {
+					boolean setup = externalQuery.setup(internalConfig, externalConfig);
+					if (!setup)
+						externalQuery.close();
+					else {
+						externalQuery.importData(getThis());
 						externalQuery.close();
 					}
-					catch (Throwable e) {
-						e.printStackTrace();
-					}
 				}
-				else {
-					externalQuery.importData(getThis());
-					try {
-						externalQuery.close();
-					}
-					catch (Throwable e) {
-						e.printStackTrace();
-					}
-				}
+				catch (Throwable e) {e.printStackTrace();}
 				
 				JOptionPane.showMessageDialog(
 						getThis(), 
@@ -299,7 +291,7 @@ public class ExternalImporter extends JPanel implements ProgressListener, Dispos
 
 
 	@Override
-	public void receiveProgress(ProgressEvent evt) {
+	public void receiveProgress(ProgressEvent evt) throws RemoteException {
 		// TODO Auto-generated method stub
 		int progressTotal = evt.getProgressTotal();
 		int progressStep = evt.getProgressStep();

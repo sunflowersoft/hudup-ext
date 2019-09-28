@@ -14,7 +14,7 @@ package net.hudup.core.alg;
  * @version 10.0
  *
  */
-public abstract class ServiceRecommenderAbstract extends RecommenderAbstract implements ServiceRecommender {
+public abstract class ServiceRecommenderAbstract extends RecommenderAbstract implements ServiceRecommender, ServiceAlgRemote {
 
 	
 	/**

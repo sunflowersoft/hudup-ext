@@ -26,7 +26,7 @@ import net.hudup.core.evaluate.recommend.Accuracy;
  * @version 10.0
  *
  */
-public abstract class MemoryBasedRecommenderAbstract extends RecommenderAbstract implements MemoryBasedRecommender {
+public abstract class MemoryBasedRecommenderAbstract extends RecommenderAbstract implements MemoryBasedRecommender, MemoryBasedAlgRemote {
 
 	
 	/**

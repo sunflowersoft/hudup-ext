@@ -8,6 +8,7 @@
 package net.hudup.core.data;
 
 import java.io.Serializable;
+import java.rmi.Remote;
 import java.rmi.RemoteException;
 
 import net.hudup.core.data.ctx.Context;
@@ -68,7 +69,7 @@ public abstract class DatasetAbstract implements Dataset, DatasetRemote {
 		exclusive = false;
 		
 		try {
-			remoteUnexport();
+			unexport();
 		}
 		catch (Throwable e) {e.printStackTrace();}
 	}
@@ -98,6 +99,26 @@ public abstract class DatasetAbstract implements Dataset, DatasetRemote {
 	 */
 	public DatasetRemote getExportedDataset() {
 		return (DatasetRemote)exportedStub;
+	}
+
+	
+	@Override
+	public synchronized Remote export(int serverPort) throws RemoteException {
+		//Remote wrapper can export itself because this function is useful when the wrapper as remote algorithm can be called remotely by remote evaluator via Evaluator.remoteStart method.
+		if (exportedStub == null)
+			exportedStub = (DatasetRemote) NetUtil.RegistryRemote.export(this, serverPort);
+	
+		return exportedStub;
+	}
+
+
+	@Override
+	public synchronized void unexport() throws RemoteException {
+		// TODO Auto-generated method stub
+		if (exportedStub != null) {
+			NetUtil.RegistryRemote.unexport(this);
+			exportedStub = null;
+		}
 	}
 
 	
@@ -301,26 +322,6 @@ public abstract class DatasetAbstract implements Dataset, DatasetRemote {
 	public ContextTemplateSchema remoteGetCTSchema() throws RemoteException {
 		// TODO Auto-generated method stub
 		return getCTSchema();
-	}
-
-
-	@Override
-	public synchronized DatasetRemote remoteExport(int serverPort) throws RemoteException {
-		//Remote wrapper can export itself because this function is useful when the wrapper as remote algorithm can be called remotely by remote evaluator via Evaluator.remoteStart method.
-		if (exportedStub == null)
-			exportedStub = (DatasetRemote) NetUtil.RegistryRemote.export(this, serverPort);
-	
-		return exportedStub;
-	}
-
-
-	@Override
-	public synchronized void remoteUnexport() throws RemoteException {
-		// TODO Auto-generated method stub
-		if (exportedStub != null) {
-			NetUtil.RegistryRemote.unexport(this);
-			exportedStub = null;
-		}
 	}
 
 

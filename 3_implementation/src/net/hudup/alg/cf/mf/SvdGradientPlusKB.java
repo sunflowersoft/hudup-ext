@@ -325,8 +325,13 @@ public abstract class SvdGradientPlusKB extends SvdGradientKB {
 		// TODO Auto-generated method stub
 		super.export0(storeConfig);
 		
-		if (isEmpty())
+		try {
+			if (isEmpty()) return;
+		}
+		catch (Throwable e) {
+			e.printStackTrace();
 			return;
+		}
 
 		UriAdapter adapter = null;
 		PrintWriter printer = null;

@@ -21,7 +21,7 @@ import javax.swing.JPanel;
 
 import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.AlgDesc;
-import net.hudup.core.alg.AlgDesc.MethodologyType;
+import net.hudup.core.alg.AlgDesc.MethodType;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.DatasetPair;
@@ -203,14 +203,14 @@ public class AddingDatasetDlg extends JDialog {
 		if (this.algList == null || this.algList.size() == 0)
 			return;
 		
-		MethodologyType type = AlgDesc.getTypeOf(this.algList);
-		if (type == MethodologyType.memorybased)
+		MethodType type = AlgDesc.methodTypeOf(this.algList);
+		if (type == MethodType.memorybased)
 			btnTrainingBrowse.setText(I18nUtil.message("training_set"));
-		else if (type == MethodologyType.modelbased)
+		else if (type == MethodType.modelbased)
 			btnTrainingBrowse.setText(I18nUtil.message("training_set_kbase"));
-		else if (type == MethodologyType.composite)
+		else if (type == MethodType.composite)
 			btnTrainingBrowse.setText(I18nUtil.message("any_source"));
-		else if (type == MethodologyType.service)
+		else if (type == MethodType.service)
 			btnTrainingBrowse.setText(I18nUtil.message("service_pointer"));
 		else
 			btnTrainingBrowse.setText(I18nUtil.message("training_set"));
@@ -224,11 +224,11 @@ public class AddingDatasetDlg extends JDialog {
 	protected void openTrainingSet(String mainUnit) {
 		
 		DataConfig defaultCfg = txtTrainingBrowse.getConfig();
-		MethodologyType type = AlgDesc.getTypeOf(this.algList);
+		MethodType type = AlgDesc.methodTypeOf(this.algList);
 		
 		//Getting default configuration according to algorithm if possible.
 		if (defaultCfg == null) {
-			defaultCfg = type != MethodologyType.unknown ?
+			defaultCfg = type != MethodType.unknown ?
 						DatasetUtil2.createDefaultConfig(this.algList.get(0))
 						: new DataConfig();
 		}
@@ -240,7 +240,7 @@ public class AddingDatasetDlg extends JDialog {
 		
 		//Getting default configuration according to algorithm if possible.
 		DataConfig config = DatasetUtil2.chooseTrainingConfig(this, defaultCfg,
-				type != MethodologyType.unknown ? this.algList.get(0) : null);
+				type != MethodType.unknown ? this.algList.get(0) : null);
 		
 		if (config == null) {
 			JOptionPane.showMessageDialog(

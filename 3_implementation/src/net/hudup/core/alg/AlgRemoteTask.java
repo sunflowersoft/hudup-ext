@@ -23,24 +23,24 @@ public interface AlgRemoteTask extends Exportable {
 
 	
 	/**
-	 * Getting name of this inspectable object.
-	 * @return name of this inspectable object.
+	 * Getting name of this remote algorithm.
+	 * @return name of this remote algorithm.
 	 * @throws RemoteException if any error raises
 	 */
 	String queryName() throws RemoteException;
 	
 	
 	/**
-	 * Getting configuration of this inspectable object.
-	 * @return configuration of this inspectable object.
+	 * Getting configuration of this remote algorithm.
+	 * @return configuration of this remote algorithm.
 	 * @throws RemoteException if any error raises
 	 */
 	DataConfig queryConfig() throws RemoteException;
 	
 	
 	/**
-	 * Getting description of this inspectable object.
-	 * @return text form of this inspectable object.
+	 * Getting description of this remote object.
+	 * @return text form of this remote object.
 	 * @throws RemoteException if any error raises.
 	 */
 	String getDescription() throws RemoteException;

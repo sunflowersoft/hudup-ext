@@ -12,7 +12,6 @@ package net.hudup.core.alg;
 
 import java.io.Serializable;
 
-import net.hudup.core.data.AutoCloseable;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.Datasource;
@@ -66,14 +65,12 @@ import net.hudup.core.parser.TextParserUtil;
  * Methods of model-based recommender always using {@code KBase} are {@code ModelBasedRecommender.setup()}, {@code ModelBasedRecommender.createKB()}, {@code ModelBasedRecommender.estimate(...)} and {@code ModelBasedRecommender.recommend(...)}.
  * Especially, it is mandatory that {@code setup()} method of model-based recommender calls method {@code KBase.learn(...)} or {@code KBase.load()}.
  * Conversely, the association between memory-based recommender represented by {@code MemoryBasedRecommender} class and dataset indicates that all memory-based algorithms use dataset for recommendation task.<br>
- * <br>
- * {@code KBase} does not support remote call because of three reasons: 1. Security. 2. {@code KBase} is always owned by model-based algorithm and so making a remote model-based algorithm is to create indirectly a remote {@code KBase}.
- * 3. {@code KBase} is too flexible to establish a remote interface (it does not have specific methods). 
+ * 
  * @author Loc Nguyen
  * @version 10.0
  *
  */
-public interface KBase extends Inspectable, Serializable, AutoCloseable {
+public interface KBase extends KBaseRemoteTask, Inspectable, Serializable {
 	
 	
 	/**
@@ -97,59 +94,6 @@ public interface KBase extends Inspectable, Serializable, AutoCloseable {
 	 * This constant defines the key of such entry.
 	 */
 	public final static String KBASE_NAME = "kbase_name";
-	
-	
-	/**
-	 * This method is used to read {@code KBase} from storage system. Storage system can be files, database, etc.
-	 */
-	void load();
-	
-
-	/**
-	 * This method is responsible for creating {@code KBase} or learning from specified dataset.
-	 * Because every model-based recommender owns distinguished {@code KBase}, the second parameter is such algorithm.
-	 * The association between model-based recommender and {@code KBase} is tight.
-	 * This method tells us that {@code KBase} can be learned by any approaches: machine learning, data mining, artificial intelligence, statistics, etc.
-	 * @param dataset specified dataset.
-	 * @param alg the algorithm that owns this KBase. 
-	 */
-	void learn(Dataset dataset, Alg alg);
-	
-	
-	/**
-	 * This method is used to write {@code KBase} to storage system according to internal configuration. Storage system can be files, database, etc.
-	 * This method in turn calls {@link #export(DataConfig)} method.
-	 */
-	void save();
-	
-	
-	/**
-	 * This method is used to write {@code KBase} to storage system according to the specified configuration.
-	 * It is possible to store knowledge base anywhere according to the specified configuration.
-	 * This method is called by {@link #save()} method.
-	 * @param storeConfig specified configuration where to store knowledge base.
-	 */
-	void export(DataConfig storeConfig);
-	
-	
-	/**
-	 * Checking whether {@code KBase} is empty or not. If a KBase which is empty, it needs to re-learned by calling the method {@link #learn(Dataset, Alg)} again.
-	 * @return whether knowledge base is empty or not.
-	 */
-	boolean isEmpty();
-	
-	
-	/**
-	 * Cleaning out {@code KBase}. This method is stronger than method {@link #close()} because it firstly deletes all storage and then calls {@link #close()}.
-	 * Using this method should be careful.
-	 */
-	void clear();
-	
-	
-	/**
-	 * Close this KBase. After this method is called, KBase becomes empty, which means that method {@link #isEmpty()} returns {@code true} but KBase can be re-learned by calling the method {@link #learn(Dataset, Alg)} again.
-	 */
-	void close();
 	
 	
 	/**

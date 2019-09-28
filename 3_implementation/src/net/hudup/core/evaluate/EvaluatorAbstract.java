@@ -288,7 +288,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 					int         datasetId = j + 1;
 					xURI        datasetUri = testing.getConfig() != null ? testing.getConfig().getUriId() : null;
 					
-					// Adding default metrics to metric result
+					// Adding default metrics to metric result. Pay attention to cloning metrics list.
 					result.add( alg.getName(), datasetId, datasetUri, ((NoneWrapperMetricList)metricList.clone()).sort().list() );
 					
 					if (alg instanceof AlgRemote) {
@@ -590,6 +590,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 	}
 	
 	
+	@Deprecated
 	@Override
 	public PluginStorageWrapper getPluginStorage() throws RemoteException {
 		// TODO Auto-generated method stub
@@ -876,6 +877,13 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 	@Override
 	public synchronized void close() throws Exception {
 		// TODO Auto-generated method stub
+		try {
+			stop();
+		}
+		catch (Throwable e) {
+			e.printStackTrace();
+		}
+
 		try {
 			clearDelayUnsetupAlgs();
 		}

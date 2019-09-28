@@ -18,6 +18,7 @@ import net.hudup.core.alg.Alg;
  * @version 12.0
  *
  */
+@Deprecated
 public class PluginChangedEvent2 extends PluginChangedEvent {
 
 	

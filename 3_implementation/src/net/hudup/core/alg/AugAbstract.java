@@ -110,8 +110,11 @@ public abstract class AugAbstract extends ExecutableAlgAbstract implements Aug, 
 		// TODO Auto-generated method stub
 		super.unsetup();
 		
-		if (kb != null)
-			kb.close();
+		if (kb != null) {
+			try {
+				kb.close();
+			} catch (Throwable e) {e.printStackTrace();}
+		}
 	}
 
 

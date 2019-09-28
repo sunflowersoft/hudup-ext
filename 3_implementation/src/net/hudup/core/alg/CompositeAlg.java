@@ -14,7 +14,7 @@ package net.hudup.core.alg;
  * @version 1.0
  *
  */
-public interface CompositeAlg extends Alg {
+public interface CompositeAlg extends CompositeAlgRemoteTask, Alg {
 
 	
 }

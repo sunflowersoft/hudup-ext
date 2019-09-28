@@ -114,7 +114,7 @@ public class Listener extends SocketServer implements ServerStatusListener, Gate
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			LogUtil.error("Listener/Balancer fail to be constructed in constructor method, caused by " + e.getMessage());
+			LogUtil.error("Listener/Balancer (socket server) failed to be constructed in constructor method, caused by " + e.getMessage());
 			System.exit(0);
 		}
 
@@ -132,15 +132,18 @@ public class Listener extends SocketServer implements ServerStatusListener, Gate
 			
 			try {
 				bindServerList.prune();
-				bindServerList.bind(
+				boolean bound = bindServerList.bind(
 						((ListenerConfig)config).getRemoteInfo(), this);
 				
-				LogUtil.info("Listener bind remote server successfully");
+				if (bound)
+					LogUtil.info("Listener/Balancer (socket server) bound remote server successfully");
+				else
+					LogUtil.error("Listener/Balancer (socket server) failed to bind remote server");
 			} 
 			catch (Throwable e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-				LogUtil.error("Listener fail to bind remote server, caused by " + e.getMessage());
+				LogUtil.error("Listener/Balancer (socket server) failed to bind remote server, caused by " + e.getMessage());
 			}
 			
 		}
@@ -157,7 +160,7 @@ public class Listener extends SocketServer implements ServerStatusListener, Gate
 		super.start();
 		
 		rebind();
-		LogUtil.info("Listener/Balancer export at port " + ((ListenerConfig)config).getExportPort());
+		LogUtil.info("Listener/Balancer (socket server) exported at port " + ((ListenerConfig)config).getExportPort());
 	}
 	
 	
@@ -192,11 +195,11 @@ public class Listener extends SocketServer implements ServerStatusListener, Gate
     	}
     	catch (Throwable e) {
     		e.printStackTrace();
-    		LogUtil.error("Listener/Balancer fail to shutdown, caused by" + e.getMessage());
+    		LogUtil.error("Listener/Balancer (socket server) failed to shutdown, caused by" + e.getMessage());
     	}
 
 		config.save();
-		LogUtil.info("Listener/Balancer shutdown");
+		LogUtil.info("Listener/Balancer (socket server) shutdown");
 		config = null;
 		
 		fireStatusEvent(new ServerStatusEvent(this, Status.exit));
@@ -465,7 +468,7 @@ public class Listener extends SocketServer implements ServerStatusListener, Gate
 			return true;
 		}
 		catch (Exception e) {
-			LogUtil.error("Listener/Balancer fail to create system tray, caused by" + e.getMessage());
+			LogUtil.error("Listener/Balancer (socket server) failed to create system tray, caused by" + e.getMessage());
 		}
 		
 		return false;

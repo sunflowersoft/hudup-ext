@@ -1505,10 +1505,13 @@ public class ProviderImpl implements Provider {
 				result &= false;
 			}
 		}
-		if (registeredListener != null)
-			registeredListener.receiveProgress(
-				new ProgressEvent(this, progressTotal, ++progressStep, "Template schema created"));
-	
+		if (registeredListener != null) {
+			try {
+				registeredListener.receiveProgress(
+					new ProgressEvent(this, progressTotal, ++progressStep, "Template schema created"));
+			} catch (Throwable ex) {ex.printStackTrace();}
+		}
+		
 		
 		// 2. Configuring
 		Fetcher<Profile> configs = src.getProfiles(srcConfig.getConfigUnit(), null);
@@ -1535,9 +1538,12 @@ public class ProviderImpl implements Provider {
 				e.printStackTrace();
 			}
 		}
-		if (registeredListener != null)
-			registeredListener.receiveProgress(
-				new ProgressEvent(this, progressTotal, ++progressStep, "Dataset configured"));
+		if (registeredListener != null) {
+			try {
+				registeredListener.receiveProgress(
+					new ProgressEvent(this, progressTotal, ++progressStep, "Dataset configured"));
+			} catch (Throwable ex) {ex.printStackTrace();}
+		}
 		
 		
 		// 3. Inserting users
@@ -1600,9 +1606,12 @@ public class ProviderImpl implements Provider {
 			result &= false;
 		}
 
-		if (registeredListener != null)
-			registeredListener.receiveProgress(
-				new ProgressEvent(this, progressTotal, ++progressStep, "User profiles inserted"));
+		if (registeredListener != null) {
+			try {
+				registeredListener.receiveProgress(
+					new ProgressEvent(this, progressTotal, ++progressStep, "User profiles inserted"));
+			} catch (Throwable ex) {ex.printStackTrace();}
+		}
 
 		
 		// 4. Inserting items
@@ -1668,9 +1677,12 @@ public class ProviderImpl implements Provider {
 			result &= false;
 		}
 		
-		if (registeredListener != null)
-			registeredListener.receiveProgress(
-				new ProgressEvent(this, progressTotal, ++progressStep, "Item profiles inserted"));
+		if (registeredListener != null) {
+			try {
+				registeredListener.receiveProgress(
+					new ProgressEvent(this, progressTotal, ++progressStep, "Item profiles inserted"));
+			} catch (Throwable ex) {ex.printStackTrace();}
+		}
 
 		
 		// 5. Inserting items
@@ -1703,9 +1715,12 @@ public class ProviderImpl implements Provider {
 				e.printStackTrace();
 			}
 		}
-		if (registeredListener != null)
-			registeredListener.receiveProgress(
-				new ProgressEvent(this, progressTotal, ++progressStep, "Ratings inserted"));
+		if (registeredListener != null) {
+			try {
+				registeredListener.receiveProgress(
+					new ProgressEvent(this, progressTotal, ++progressStep, "Ratings inserted"));
+			} catch (Throwable ex) {ex.printStackTrace();}
+		}
 
 		
 		// 6. Importing context template schema
@@ -1715,9 +1730,12 @@ public class ProviderImpl implements Provider {
 		catch (Throwable e) {
 			e.printStackTrace();
 		}
-		if (registeredListener != null)
-			registeredListener.receiveProgress(
-				new ProgressEvent(this, progressTotal, ++progressStep, "Context template schema imported"));
+		if (registeredListener != null) {
+			try {
+				registeredListener.receiveProgress(
+						new ProgressEvent(this, progressTotal, ++progressStep, "Context template schema imported"));
+			} catch (Throwable ex) {ex.printStackTrace();}
+		}
 
 		
 		// 7. Inserting samples
@@ -1749,9 +1767,12 @@ public class ProviderImpl implements Provider {
 				e.printStackTrace();
 			}
 		}
-		if (registeredListener != null)
-			registeredListener.receiveProgress(
-				new ProgressEvent(this, progressTotal, ++progressStep, "Sample inserted"));
+		if (registeredListener != null) {
+			try {
+				registeredListener.receiveProgress(
+					new ProgressEvent(this, progressTotal, ++progressStep, "Sample inserted"));
+			} catch (Throwable ex) {ex.printStackTrace();}
+		}
 		
 		
 		return result;
@@ -1818,9 +1839,12 @@ public class ProviderImpl implements Provider {
 			}
 			
 		} // end if
-		if (registeredListener != null)
-			registeredListener.receiveProgress(
-				new ProgressEvent(this, progressTotal, ++progressStep, "Template schema created"));
+		if (registeredListener != null) {
+			try {
+				registeredListener.receiveProgress(
+					new ProgressEvent(this, progressTotal, ++progressStep, "Template schema created"));
+			} catch (Throwable ex) {ex.printStackTrace();}
+		}
 	
 		
 		// 2. Configuring
@@ -1841,9 +1865,12 @@ public class ProviderImpl implements Provider {
 			e.printStackTrace();
 			result &= false;
 		}
-		if (registeredListener != null)
-			registeredListener.receiveProgress(
-				new ProgressEvent(this, progressTotal, ++progressStep, "Dataset configured"));
+		if (registeredListener != null) {
+			try {
+				registeredListener.receiveProgress(
+					new ProgressEvent(this, progressTotal, ++progressStep, "Dataset configured"));
+			} catch (Throwable ex) {ex.printStackTrace();}
+		}
 		
 		
 		// 3. Inserting users
@@ -1913,9 +1940,12 @@ public class ProviderImpl implements Provider {
 			result &= false;
 		}
 
-		if (registeredListener != null)
-			registeredListener.receiveProgress(
-				new ProgressEvent(this, progressTotal, ++progressStep, "User profiles inserted"));
+		if (registeredListener != null) {
+			try {
+				registeredListener.receiveProgress(
+					new ProgressEvent(this, progressTotal, ++progressStep, "User profiles inserted"));
+			} catch (Throwable ex) {ex.printStackTrace();}
+		}
 
 		
 		// 4. Inserting items
@@ -1987,9 +2017,12 @@ public class ProviderImpl implements Provider {
 			result &= false;
 		}
 		
-		if (registeredListener != null)
-			registeredListener.receiveProgress(
-				new ProgressEvent(this, progressTotal, ++progressStep, "Item profiles inserted"));
+		if (registeredListener != null) {
+			try {
+				registeredListener.receiveProgress(
+					new ProgressEvent(this, progressTotal, ++progressStep, "Item profiles inserted"));
+			} catch (Throwable ex) {ex.printStackTrace();}
+		}
 
 		
 		// 5. Inserting items
@@ -2026,9 +2059,12 @@ public class ProviderImpl implements Provider {
 				e.printStackTrace();
 			}
 		}
-		if (registeredListener != null)
-			registeredListener.receiveProgress(
-				new ProgressEvent(this, progressTotal, ++progressStep, "Ratings inserted"));
+		if (registeredListener != null) {
+			try {
+				registeredListener.receiveProgress(
+					new ProgressEvent(this, progressTotal, ++progressStep, "Ratings inserted"));
+			} catch (Throwable ex) {ex.printStackTrace();}
+		}
 
 		
 		// 6. Importing context template schema
@@ -2038,9 +2074,12 @@ public class ProviderImpl implements Provider {
 		catch (Throwable e) {
 			e.printStackTrace();
 		}
-		if (registeredListener != null)
-			registeredListener.receiveProgress(
-				new ProgressEvent(this, progressTotal, ++progressStep, "Context template schema imported"));
+		if (registeredListener != null) {
+			try {
+				registeredListener.receiveProgress(
+					new ProgressEvent(this, progressTotal, ++progressStep, "Context template schema imported"));
+			} catch (Throwable ex) {ex.printStackTrace();}
+		}
 
 		
 		// 7. Inserting samples
@@ -2072,9 +2111,12 @@ public class ProviderImpl implements Provider {
 				e.printStackTrace();
 			}
 		}
-		if (registeredListener != null)
-			registeredListener.receiveProgress(
-				new ProgressEvent(this, progressTotal, ++progressStep, "Sample inserted"));
+		if (registeredListener != null) {
+			try {
+				registeredListener.receiveProgress(
+					new ProgressEvent(this, progressTotal, ++progressStep, "Sample inserted"));
+			} catch (Throwable ex) {ex.printStackTrace();}
+		}
 
 		
 		return result;

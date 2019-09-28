@@ -530,6 +530,7 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluatorProgr
 	}
 
 
+	@Deprecated
 	@Override
 	public PluginStorageWrapper getPluginStorage() throws RemoteException {
 		// TODO Auto-generated method stub

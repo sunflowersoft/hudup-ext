@@ -14,6 +14,6 @@ package net.hudup.core.alg;
  * @version 1.0
  *
  */
-public interface ServiceAlg extends Alg {
+public interface ServiceAlg extends ServiceAlgRemoteTask, Alg {
 
 }

@@ -83,6 +83,8 @@ public class Firer implements PluginManager {
 	 * </ol>
 	 */
 	protected void fire() {
+		if (PluginStorage.isInitialized())
+			return;
 		
 		try {
 			UriAdapter adapter = new UriAdapter(Constants.WORKING_DIRECTORY);
@@ -114,6 +116,8 @@ public class Firer implements PluginManager {
 			xURI backup = xURI.create(Constants.BACKUP_DIRECTORY);
 			if (!adapter.exists(backup))
 				adapter.create(backup, true);
+			
+			adapter.close();
 		}
 		catch (Throwable e) {
 			e.printStackTrace();
@@ -137,7 +141,9 @@ public class Firer implements PluginManager {
 		}
 
 		
+		PluginStorage.releaseAllRegisteredAlgs();
 		discover(Util.getLoadablePackages());
+		PluginStorage.initialized = true;
 	}
 	
 	

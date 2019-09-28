@@ -9,7 +9,9 @@ package net.hudup.core;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.FlowLayout;
 import java.awt.GridLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -18,6 +20,7 @@ import java.rmi.RemoteException;
 import java.util.List;
 import java.util.Vector;
 
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
@@ -200,7 +203,7 @@ public class PluginStorageManifest extends SortableTable {
 		
 		update();
 		
-		firePluginChangedEvent(new PluginChangedEvent2(this, removedAlgList));
+		firePluginChangedEvent(new PluginChangedEvent(this));
 		for (Alg alg : removedAlgList) {
 			if (alg instanceof Exportable) {
 				try {
@@ -367,58 +370,117 @@ public class PluginStorageManifest extends SortableTable {
 				tblRegister.addPluginChangedListener(listener);
 			body.add(new JScrollPane(tblRegister), BorderLayout.CENTER);
 			
-			JPanel footer = new JPanel(new GridLayout(0, 1));
+			JPanel footer = new JPanel(new BorderLayout());
 			add(footer, BorderLayout.SOUTH);
 
-			JPanel buttonGrp1 = new JPanel();
-			footer.add(buttonGrp1);
+			JPanel toolbar1 = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+			footer.add(toolbar1, BorderLayout.NORTH);
 			
-			JButton registerAll = new JButton("Register all");
-			buttonGrp1.add(registerAll);
-			registerAll.addActionListener(new ActionListener() {
-				
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					// TODO Auto-generated method stub
-					tblRegister.registerAll(true);
-				}
-			});
+			JPanel toolbar1Grp1 = new JPanel(new BorderLayout());
+			toolbar1Grp1.setBorder(BorderFactory.createEtchedBorder());
+			toolbar1.add(toolbar1Grp1);
 
-			JButton unregisterAll = new JButton("Unregister all");
-			buttonGrp1.add(unregisterAll);
-			unregisterAll.addActionListener(new ActionListener() {
-				
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					// TODO Auto-generated method stub
-					tblRegister.registerAll(false);
-				}
-			});
+			toolbar1Grp1.add(new JLabel("Register/Unregister"), BorderLayout.NORTH);
+			JPanel toolbar1Grp1Buttons = new JPanel();
+			toolbar1Grp1.add(toolbar1Grp1Buttons, BorderLayout.SOUTH);
+			
+			JButton registerAll = UIUtil.makeIconButton(
+				"selectall-16x16.png", 
+				"register_all", "Register all", "Register all", 
+				new ActionListener() {
+					
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						// TODO Auto-generated method stub
+						tblRegister.registerAll(true);
+					}
+				});
+			registerAll.setMargin(new Insets(0, 0 , 0, 0));
+			toolbar1Grp1Buttons.add(registerAll);
 
-			JButton removeAll = new JButton("Remove all");
-			buttonGrp1.add(removeAll);
-			removeAll.addActionListener(new ActionListener() {
-				
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					// TODO Auto-generated method stub
-					tblRegister.removeAll(true);
-				}
-			});
+			JButton unregisterAll = UIUtil.makeIconButton(
+				"unselectall-16x16.png", 
+				"unregister_all", "Unregister all", "Unregister all", 
+				new ActionListener() {
+					
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						// TODO Auto-generated method stub
+						tblRegister.registerAll(false);
+					}
+				});
+			unregisterAll.setMargin(new Insets(0, 0 , 0, 0));
+			toolbar1Grp1Buttons.add(unregisterAll);
 
-			JButton unremoveAll = new JButton("Unremove all");
-			buttonGrp1.add(unremoveAll);
-			unremoveAll.addActionListener(new ActionListener() {
+			JPanel toolbar1Grp2 = new JPanel(new BorderLayout());
+			toolbar1Grp2.setBorder(BorderFactory.createEtchedBorder());
+			toolbar1.add(toolbar1Grp2);
+
+			toolbar1Grp2.add(new JLabel("Remove/Unremove"), BorderLayout.NORTH);
+			JPanel toolbar1Grp2Buttons = new JPanel();
+			toolbar1Grp2.add(toolbar1Grp2Buttons, BorderLayout.SOUTH);
+
+			JButton removeAll = UIUtil.makeIconButton(
+				"selectall-16x16.png", 
+				"remove_all", "Remove all", "Remove all", 
+				new ActionListener() {
+					
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						// TODO Auto-generated method stub
+						tblRegister.removeAll(true);
+					}
+				});
+			removeAll.setMargin(new Insets(0, 0 , 0, 0));
+			toolbar1Grp2Buttons.add(removeAll);
+
+			JButton unremoveAll = UIUtil.makeIconButton(
+				"unselectall-16x16.png", 
+				"unremove_all", "Unremove all", "Unremove all", 
+				new ActionListener() {
+					
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						// TODO Auto-generated method stub
+						tblRegister.removeAll(false);
+					}
+				});
+			unremoveAll.setMargin(new Insets(0, 0 , 0, 0));
+			toolbar1Grp2Buttons.add(unremoveAll);
+
+			
+			JPanel toolbar2 = new JPanel(new BorderLayout());
+			footer.add(toolbar2, BorderLayout.SOUTH);
+			
+			JPanel toolbar2Grp1 = new JPanel();
+			toolbar2.add(toolbar2Grp1, BorderLayout.CENTER);
+			
+			JButton apply = new JButton("Apply");
+			apply.addActionListener(new ActionListener() {
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					// TODO Auto-generated method stub
-					tblRegister.removeAll(false);
+					apply();
 				}
 			});
+			toolbar2Grp1.add(apply);
+
+			JButton reset = new JButton("Reset");
+			reset.addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					// TODO Auto-generated method stub
+					tblRegister.update();
+				}
+			});
+			toolbar2Grp1.add(reset);
+
+			JPanel toolbar2Grp2 = new JPanel();
+			toolbar2.add(toolbar2Grp2, BorderLayout.EAST);
 
 			JButton importAlg = new JButton("Import");
-			buttonGrp1.add(importAlg);
 			importAlg.addActionListener(new ActionListener() {
 				
 				@Override
@@ -441,22 +503,7 @@ public class PluginStorageManifest extends SortableTable {
 			});
 			if (listener != null && !listener.isSupportImport())
 				importAlg.setVisible(false);
-			
-			
-			JPanel buttonGrp2 = new JPanel();
-			footer.add(buttonGrp2);
-			
-			JButton apply = new JButton("Apply");
-			buttonGrp2.add(apply);
-			apply.addActionListener(new ActionListener() {
-				
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					// TODO Auto-generated method stub
-					apply();
-				}
-			});
-
+			toolbar2Grp2.add(importAlg);
 			
 		}
 		
@@ -825,7 +872,7 @@ class PluginStorageManifest2 extends JTable {
 		
 		update();
 		
-		firePluginChangedEvent(new PluginChangedEvent2(this, removedAlgList));
+		firePluginChangedEvent(new PluginChangedEvent(this));
 		for (Alg alg : removedAlgList) {
 			if (alg instanceof Exportable) {
 				try {
@@ -992,58 +1039,117 @@ class PluginStorageManifest2 extends JTable {
 				tblRegister.addPluginChangedListener(listener);
 			body.add(new JScrollPane(tblRegister), BorderLayout.CENTER);
 			
-			JPanel footer = new JPanel(new GridLayout(0, 1));
+			JPanel footer = new JPanel(new BorderLayout());
 			add(footer, BorderLayout.SOUTH);
 
-			JPanel buttonGrp1 = new JPanel();
-			footer.add(buttonGrp1);
+			JPanel toolbar1 = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+			footer.add(toolbar1, BorderLayout.NORTH);
 			
-			JButton registerAll = new JButton("Register all");
-			buttonGrp1.add(registerAll);
-			registerAll.addActionListener(new ActionListener() {
-				
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					// TODO Auto-generated method stub
-					tblRegister.registerAll(true);
-				}
-			});
+			JPanel toolbar1Grp1 = new JPanel(new BorderLayout());
+			toolbar1Grp1.setBorder(BorderFactory.createEtchedBorder());
+			toolbar1.add(toolbar1Grp1);
 
-			JButton unregisterAll = new JButton("Unregister all");
-			buttonGrp1.add(unregisterAll);
-			unregisterAll.addActionListener(new ActionListener() {
-				
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					// TODO Auto-generated method stub
-					tblRegister.registerAll(false);
-				}
-			});
+			toolbar1Grp1.add(new JLabel("Register/Unregister"), BorderLayout.NORTH);
+			JPanel toolbar1Grp1Buttons = new JPanel();
+			toolbar1Grp1.add(toolbar1Grp1Buttons, BorderLayout.SOUTH);
+			
+			JButton registerAll = UIUtil.makeIconButton(
+				"selectall-16x16.png", 
+				"register_all", "Register all", "Register all", 
+				new ActionListener() {
+					
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						// TODO Auto-generated method stub
+						tblRegister.registerAll(true);
+					}
+				});
+			registerAll.setMargin(new Insets(0, 0 , 0, 0));
+			toolbar1Grp1Buttons.add(registerAll);
 
-			JButton removeAll = new JButton("Remove all");
-			buttonGrp1.add(removeAll);
-			removeAll.addActionListener(new ActionListener() {
-				
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					// TODO Auto-generated method stub
-					tblRegister.removeAll(true);
-				}
-			});
+			JButton unregisterAll = UIUtil.makeIconButton(
+				"unselectall-16x16.png", 
+				"unregister_all", "Unregister all", "Unregister all", 
+				new ActionListener() {
+					
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						// TODO Auto-generated method stub
+						tblRegister.registerAll(false);
+					}
+				});
+			unregisterAll.setMargin(new Insets(0, 0 , 0, 0));
+			toolbar1Grp1Buttons.add(unregisterAll);
 
-			JButton unremoveAll = new JButton("Unremove all");
-			buttonGrp1.add(unremoveAll);
-			unremoveAll.addActionListener(new ActionListener() {
+			JPanel toolbar1Grp2 = new JPanel(new BorderLayout());
+			toolbar1Grp2.setBorder(BorderFactory.createEtchedBorder());
+			toolbar1.add(toolbar1Grp2);
+
+			toolbar1Grp2.add(new JLabel("Remove/Unremove"), BorderLayout.NORTH);
+			JPanel toolbar1Grp2Buttons = new JPanel();
+			toolbar1Grp2.add(toolbar1Grp2Buttons, BorderLayout.SOUTH);
+
+			JButton removeAll = UIUtil.makeIconButton(
+				"selectall-16x16.png", 
+				"remove_all", "Remove all", "Remove all", 
+				new ActionListener() {
+					
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						// TODO Auto-generated method stub
+						tblRegister.removeAll(true);
+					}
+				});
+			removeAll.setMargin(new Insets(0, 0 , 0, 0));
+			toolbar1Grp2Buttons.add(removeAll);
+
+			JButton unremoveAll = UIUtil.makeIconButton(
+				"unselectall-16x16.png", 
+				"unremove_all", "Unremove all", "Unremove all", 
+				new ActionListener() {
+					
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						// TODO Auto-generated method stub
+						tblRegister.removeAll(false);
+					}
+				});
+			unremoveAll.setMargin(new Insets(0, 0 , 0, 0));
+			toolbar1Grp2Buttons.add(unremoveAll);
+
+			
+			JPanel toolbar2 = new JPanel(new BorderLayout());
+			footer.add(toolbar2, BorderLayout.SOUTH);
+			
+			JPanel toolbar2Grp1 = new JPanel();
+			toolbar2.add(toolbar2Grp1, BorderLayout.CENTER);
+			
+			JButton apply = new JButton("Apply");
+			apply.addActionListener(new ActionListener() {
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					// TODO Auto-generated method stub
-					tblRegister.removeAll(false);
+					apply();
 				}
 			});
+			toolbar2Grp1.add(apply);
+
+			JButton reset = new JButton("Reset");
+			reset.addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					// TODO Auto-generated method stub
+					tblRegister.update();
+				}
+			});
+			toolbar2Grp1.add(reset);
+
+			JPanel toolbar2Grp2 = new JPanel();
+			toolbar2.add(toolbar2Grp2, BorderLayout.EAST);
 
 			JButton importAlg = new JButton("Import");
-			buttonGrp1.add(importAlg);
 			importAlg.addActionListener(new ActionListener() {
 				
 				@Override
@@ -1066,22 +1172,7 @@ class PluginStorageManifest2 extends JTable {
 			});
 			if (listener != null && !listener.isSupportImport())
 				importAlg.setVisible(false);
-			
-			
-			JPanel buttonGrp2 = new JPanel();
-			footer.add(buttonGrp2);
-			
-			JButton apply = new JButton("Apply");
-			buttonGrp2.add(apply);
-			apply.addActionListener(new ActionListener() {
-				
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					// TODO Auto-generated method stub
-					apply();
-				}
-			});
-
+			toolbar2Grp2.add(importAlg);
 			
 		}
 		

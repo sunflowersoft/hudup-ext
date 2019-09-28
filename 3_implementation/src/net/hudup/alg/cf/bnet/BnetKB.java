@@ -7,20 +7,27 @@
  */
 package net.hudup.alg.cf.bnet;
 
+import java.awt.BorderLayout;
 import java.awt.Frame;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.rmi.RemoteException;
 import java.util.List;
 import java.util.Set;
 import java.util.Vector;
 
+import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.WindowConstants;
 
 import elvira.Bnet;
 import elvira.CaseListMem;
 import elvira.NodeList;
 import elvira.database.DataBaseCases;
-import elvira.gui.ElviraDesktopPane;
-import elvira.gui.NetworkFrame;
 import elvira.learning.BICLearning;
 import elvira.learning.K2Learning;
 import elvira.learning.LPLearning;
@@ -36,6 +43,7 @@ import net.hudup.core.logistic.Inspector;
 import net.hudup.core.logistic.NextUpdate;
 import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.xURI;
+import net.hudup.core.logistic.ui.TextArea;
 import net.hudup.core.parser.TextParserUtil;
 import net.hudup.data.DatasetUtil2;
 
@@ -138,7 +146,7 @@ public abstract class BnetKB extends KBaseAbstract {
 	
 	
 	@Override
-	public void load() {
+	public void load() throws RemoteException {
 		// TODO Auto-generated method stub
 		super.load();
 		
@@ -155,7 +163,7 @@ public abstract class BnetKB extends KBaseAbstract {
 
 	
 	@Override
-	public void learn(Dataset dataset, Alg alg) {
+	public void learn(Dataset dataset, Alg alg) throws RemoteException {
 		// TODO Auto-generated method stub
 		super.learn(dataset, alg);
 		
@@ -202,10 +210,10 @@ public abstract class BnetKB extends KBaseAbstract {
 	
 	
 	@Override
-	public void export(DataConfig storeConfig) {
+	public void save(DataConfig storeConfig) throws RemoteException {
 		// TODO Auto-generated method stub
 		
-		super.export(storeConfig);
+		super.save(storeConfig);
 		
 		UriAdapter adapter = new UriAdapter(storeConfig);
 		saveBnet(adapter, bnetList, storeConfig.getStoreUri(), getName());
@@ -214,14 +222,14 @@ public abstract class BnetKB extends KBaseAbstract {
 
 	
 	@Override
-	public boolean isEmpty() {
+	public boolean isEmpty() throws RemoteException {
 		// TODO Auto-generated method stub
 		return bnetList.size() == 0;
 	}
 
 	
 	@Override
-	public void close() {
+	public void close() throws Exception {
 		// TODO Auto-generated method stub
 		super.close();
 		
@@ -244,9 +252,9 @@ public abstract class BnetKB extends KBaseAbstract {
 	public Inspector getInspector() {
 		// TODO Auto-generated method stub
 		if (bnetList.size() == 0)
-			return super.getInspector();
+			return new Inspector.NullInspector();
 		else
-			return super.getInspector();
+			return new BnetInspector(bnetList.get(0));
 	}
 
 
@@ -256,7 +264,7 @@ public abstract class BnetKB extends KBaseAbstract {
 	 * @version 12
 	 */
 	@NextUpdate
-	public class BnetInspector extends JDialog implements Inspector {
+	public static class BnetInspector extends JDialog implements Inspector {
 
 		/**
 		 * Default serial version UID.
@@ -270,18 +278,55 @@ public abstract class BnetKB extends KBaseAbstract {
 		public BnetInspector(Bnet bnet) {
 			// TODO Auto-generated constructor stub
 			super((Frame)null, "Inspector for Bayesian network knowledge base", true);
-			
 			setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 			setSize(600, 400);
 			setLocationRelativeTo(null);
 			
-			ElviraDesktopPane desktopPane = new ElviraDesktopPane();
-			setContentPane(desktopPane);
+//			ElviraDesktopPane desktopPane = new ElviraDesktopPane();
+//			setContentPane(desktopPane);
+//			
+//			NetworkFrame networkFrame = new NetworkFrame();
+//			networkFrame.setVisible(true);
+//			desktopPane.add(networkFrame);
+//			networkFrame.getEditorPanel().setBayesNet(bnet);
 			
-			NetworkFrame networkFrame = new NetworkFrame();
-			networkFrame.setVisible(true);
-			desktopPane.add(networkFrame);
-			networkFrame.getEditorPanel().setBayesNet(bnet);
+			setLayout(new BorderLayout());
+
+			JPanel body = new JPanel(new BorderLayout());
+			add(body, BorderLayout.CENTER);
+			
+			TextArea bnetContent = new TextArea();
+			try {
+				StringWriter stringWriter = new StringWriter();
+				PrintWriter writer = new PrintWriter(stringWriter);
+				bnet.save(writer);
+				writer.flush();
+				writer.close();
+				
+				StringBuffer buffer = stringWriter.getBuffer();
+				if (buffer != null)
+					bnetContent.setText(buffer.toString());
+			}
+			catch (Throwable e) {
+				e.printStackTrace();
+				bnetContent.setText("Error Bayesian network");
+			}
+				
+			body.add(new JScrollPane(bnetContent), BorderLayout.CENTER);
+
+			JPanel footer = new JPanel();
+			add(footer, BorderLayout.SOUTH);
+			
+			JButton btnClose = new JButton("Close");
+			btnClose.addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					// TODO Auto-generated method stub
+					dispose();
+				}
+			});
+			footer.add(btnClose);
 		}
 
 		@Override

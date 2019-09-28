@@ -23,4 +23,6 @@ public interface Cloneable extends java.lang.Cloneable {
 	 * @return Cloned object
 	 */
 	public Object clone();
+	
+	
 }

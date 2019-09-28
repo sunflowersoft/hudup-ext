@@ -10,6 +10,7 @@ package net.hudup.core.data.ctx;
 import java.io.Serializable;
 import java.rmi.RemoteException;
 
+import net.hudup.core.data.AutoCloseable;
 import net.hudup.core.alg.AlgRemoteTask;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Dataset;
@@ -23,7 +24,7 @@ import net.hudup.core.data.Profiles;
  * @version 12.0
  *
  */
-public interface CTSManagerRemoteTask extends AlgRemoteTask {
+public interface CTSManagerRemoteTask extends AlgRemoteTask, AutoCloseable {
 
 
 	/**

@@ -7,11 +7,17 @@
  */
 package net.hudup.core.alg;
 
+import java.rmi.Remote;
+import java.rmi.RemoteException;
+
+import javax.swing.event.EventListenerList;
+
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.Datasource;
 import net.hudup.core.data.Pointer;
 import net.hudup.core.logistic.Inspector;
+import net.hudup.core.logistic.NetUtil;
 import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.UriFilter;
 import net.hudup.core.logistic.xURI;
@@ -25,7 +31,7 @@ import net.hudup.core.logistic.xURI;
  * @version 10.0
  *
  */
-public abstract class KBaseAbstract implements KBase {
+public abstract class KBaseAbstract implements KBase, KBaseRemote {
 
 	
 	/**
@@ -47,7 +53,20 @@ public abstract class KBaseAbstract implements KBase {
 	protected Datasource datasource = new Datasource();
 	
 	
+    /**
+     * Exported knowledge base must be serializable.
+     */
+    protected KBaseRemote exportedStub = null;
+
+    
 	/**
+	 * Holding a list of listeners.
+	 * 
+	 */
+    protected EventListenerList listenerList = new EventListenerList();
+
+    
+    /**
 	 * Default constructor.
 	 */
 	protected KBaseAbstract() {
@@ -56,7 +75,7 @@ public abstract class KBaseAbstract implements KBase {
 	
 	
 	@Override
-	public void load() {
+	public void load() throws RemoteException {
 		// TODO Auto-generated method stub
 		
 		xURI store = config.getStoreUri();
@@ -75,7 +94,7 @@ public abstract class KBaseAbstract implements KBase {
 
 
 	@Override
-	public void learn(Dataset dataset, Alg alg) {
+	public void learn(Dataset dataset, Alg alg) throws RemoteException {
 		// TODO Auto-generated method stub
 		config.setMetadata(dataset.getConfig().getMetadata());
 		config.put(KBASE_NAME, getName());
@@ -98,13 +117,13 @@ public abstract class KBaseAbstract implements KBase {
 
 
 	@Override
-	public void save() {
-		export(config);
+	public void save() throws RemoteException {
+		save(config);
 	}
 	
 	
 	@Override
-	public void export(DataConfig storeConfig) {
+	public void save(DataConfig storeConfig) throws RemoteException {
 		// TODO Auto-generated method stub
 
 		UriAdapter adapter = new UriAdapter(storeConfig);
@@ -136,7 +155,7 @@ public abstract class KBaseAbstract implements KBase {
 
 
 	@Override
-	public void clear() {
+	public void clear() throws RemoteException {
 		// TODO Auto-generated method stub
 		
 		xURI store = config.getStoreUri();
@@ -160,12 +179,18 @@ public abstract class KBaseAbstract implements KBase {
 			adapter.close();
 		}
 		
-		close();
+		try {
+			close();
+		} catch (Throwable e) {e.printStackTrace();}
 	}
 
 
+	/*
+	 * This close method does not call unexport method as usual. This is a special case.
+	 * @see net.hudup.core.alg.KBaseRemoteTask#close()
+	 */
 	@Override
-	public void close() {
+	public void close() throws Exception {
 		// TODO Auto-generated method stub
 		datasource.close();
 		
@@ -180,12 +205,33 @@ public abstract class KBaseAbstract implements KBase {
 
 
 	@Override
+	public String queryName() throws RemoteException {
+		// TODO Auto-generated method stub
+		return getName();
+	}
+
+
+	@Override
+	public String getDescription() throws RemoteException {
+		// TODO Auto-generated method stub
+		return getName();
+	}
+
+
+	@Override
 	public DataConfig getConfig() {
 		
 		return config;
 	}
 	
 	
+	@Override
+	public DataConfig queryConfig() throws RemoteException {
+		// TODO Auto-generated method stub
+		return getConfig();
+	}
+
+
 	@Override
 	public void setConfig(DataConfig config) {
 		this.config = config;
@@ -207,12 +253,101 @@ public abstract class KBaseAbstract implements KBase {
 
 	
 	@Override
+	public void addSetupListener(SetupAlgListener listener) throws RemoteException {
+		// TODO Auto-generated method stub
+		synchronized (listenerList) {
+			listenerList.add(SetupAlgListener.class, listener);
+		}
+	}
+
+
+	@Override
+	public void removeSetupListener(SetupAlgListener listener) throws RemoteException {
+		// TODO Auto-generated method stub
+		synchronized (listenerList) {
+			listenerList.remove(SetupAlgListener.class, listener);
+		}
+	}
+
+
+	/**
+	 * Getting an array of listeners for this EM.
+	 * @return array of listeners for this EM.
+	 */
+	protected SetupAlgListener[] getSetupListeners() {
+		// TODO Auto-generated method stub
+		synchronized (listenerList) {
+			return listenerList.getListeners(SetupAlgListener.class);
+		}
+	}
+
+
+	@Override
+	public void fireSetupEvent(SetupAlgEvent evt) throws RemoteException {
+		// TODO Auto-generated method stub
+		SetupAlgListener[] listeners = getSetupListeners();
+		for (SetupAlgListener listener : listeners) {
+			try {
+				listener.receivedSetup(evt);
+			}
+			catch (Throwable e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+
+	@Override
+	public void receivedSetup(SetupAlgEvent evt) throws RemoteException {
+		// TODO Auto-generated method stub
+		fireSetupEvent(evt);
+	}
+
+	
+	@Override
+	public synchronized Remote export(int serverPort) throws RemoteException {
+		// TODO Auto-generated method stub
+		if (exportedStub == null)
+			exportedStub = (KBaseRemote) NetUtil.RegistryRemote.export(this, serverPort);
+	
+		return exportedStub;
+	}
+
+
+	/*
+	 * This unexport method is not called by close method as usual. This is a special case.
+	 * @see net.hudup.core.data.Exportable#unexport()
+	 */
+	@Override
+	public synchronized void unexport() throws RemoteException {
+		// TODO Auto-generated method stub
+		if (exportedStub != null) {
+			NetUtil.RegistryRemote.unexport(this);
+			exportedStub = null;
+		}
+	}
+
+	
+	/**
+	 * Getting exported knowledge base.
+	 * @return exported knowledge base.
+	 */
+	public KBaseRemote getExportedKBase() {
+		return (KBaseRemote)exportedStub;
+	}
+
+	
+	@Override
 	protected void finalize() throws Throwable {
 		// TODO Auto-generated method stub
 		super.finalize();
 		
 		try {
 			if (!isEmpty()) close();
+		} catch (Throwable e) {e.printStackTrace();}
+		
+		try {
+			unexport();;
 		} catch (Throwable e) {e.printStackTrace();}
 	}
 
@@ -231,7 +366,7 @@ public abstract class KBaseAbstract implements KBase {
 			private static final long serialVersionUID = 1L;
 
 			@Override
-			public boolean isEmpty() {
+			public boolean isEmpty() throws RemoteException {
 				// TODO Auto-generated method stub
 				return true;
 			}

@@ -26,7 +26,7 @@ import net.hudup.core.logistic.xURI;
  * @version 10.0
  *
  */
-public abstract class ModelBasedRecommenderAbstract extends RecommenderAbstract implements ModelBasedRecommender {
+public abstract class ModelBasedRecommenderAbstract extends RecommenderAbstract implements ModelBasedRecommender, ModelBasedAlgRemote {
 
 	
 	/**
@@ -37,7 +37,7 @@ public abstract class ModelBasedRecommenderAbstract extends RecommenderAbstract 
 	
 	/**
 	 * The internal {@code KBase} of this model-based recommender.
-	 * For example, if model-based recommender uses frequent purchase pattern to make recommendation, the internal {@code KBase} contains such pattern.
+	 * For example, if model-based recommender uses frequent pattern to make recommendation, the internal {@code KBase} contains such pattern.
 	 */
 	protected KBase kb = null;
 	
@@ -83,8 +83,11 @@ public abstract class ModelBasedRecommenderAbstract extends RecommenderAbstract 
 	public synchronized void unsetup() throws RemoteException {
 		// TODO Auto-generated method stub
 		super.unsetup();
-		if (kb != null)
-			kb.close();
+		if (kb != null) {
+			try {
+				kb.close();
+			} catch (Throwable e) {e.printStackTrace();}
+		}
 	}
 
 	
@@ -133,9 +136,9 @@ public abstract class ModelBasedRecommenderAbstract extends RecommenderAbstract 
 		
 		boolean fixedStore = false;
 		try {
-			String fixedText = Util.getHudupProperty("kb_fixedstore");
-			if (fixedText != null && !fixedText.isEmpty())
-				fixedStore = Boolean.parseBoolean(fixedText);
+			String fixedStoreText = Util.getHudupProperty("kb_fixedstore");
+			if (fixedStoreText != null && !fixedStoreText.isEmpty())
+				fixedStore = Boolean.parseBoolean(fixedStoreText);
 		}
 		catch (Exception e) {
 			fixedStore= false;

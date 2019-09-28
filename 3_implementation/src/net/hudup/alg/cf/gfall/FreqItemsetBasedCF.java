@@ -361,7 +361,7 @@ abstract class FreqItemsetKB extends KBaseAbstract {
 	
 	
 	@Override
-	public void load() {
+	public void load() throws RemoteException {
 		// TODO Auto-generated method stub
 		super.load();
 		
@@ -433,7 +433,7 @@ abstract class FreqItemsetKB extends KBaseAbstract {
 
 	
 	@Override
-	public void learn(Dataset dataset, Alg alg) {
+	public void learn(Dataset dataset, Alg alg) throws RemoteException {
 		// TODO Auto-generated method stub
 		super.learn(dataset, alg);
 		
@@ -474,10 +474,10 @@ abstract class FreqItemsetKB extends KBaseAbstract {
 
 	
 	@Override
-	public void export(DataConfig storeConfig) {
+	public void save(DataConfig storeConfig) throws RemoteException {
 		// TODO Auto-generated method stub
 		
-		super.export(storeConfig);
+		super.save(storeConfig);
 		
 		UriAdapter adapter = null;
 		Writer resultWriter = null;
@@ -529,14 +529,14 @@ abstract class FreqItemsetKB extends KBaseAbstract {
 
 	
 	@Override
-	public boolean isEmpty() {
+	public boolean isEmpty() throws RemoteException {
 		// TODO Auto-generated method stub
 		return freqResults.size() == 0;
 	}
 
 	
 	@Override
-	public void close() {
+	public void close() throws Exception {
 		// TODO Auto-generated method stub
 		super.close();
 		

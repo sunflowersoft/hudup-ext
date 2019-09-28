@@ -75,10 +75,13 @@ public class KBasePointer extends Pointer {
 			}
 		}
 		
-		if (kbase != null && kbase.isEmpty()) {
-			kbase.close();
-			kbase = null;
+		try {
+			if (kbase != null && kbase.isEmpty()) {
+				kbase.close();
+				kbase = null;
+			}
 		}
+		catch (Throwable e) {e.printStackTrace(); kbase = null;}
 		
 		return kbase;
 	}

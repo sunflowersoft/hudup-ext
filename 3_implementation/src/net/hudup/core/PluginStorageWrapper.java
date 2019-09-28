@@ -72,6 +72,7 @@ public final class PluginStorageWrapper implements Serializable {
 	/**
 	 * Default constructor.
 	 */
+	@Deprecated
 	public PluginStorageWrapper() {
 		// TODO Auto-generated constructor stub
 		assignFromSystem();
@@ -81,6 +82,7 @@ public final class PluginStorageWrapper implements Serializable {
 	/**
 	 * Assigning from system plug-in storage: this = PluginStorage.
 	 */
+	@Deprecated
 	private void assignFromSystem() {
 		this.normalAlgReg = PluginStorage.getNormalAlgReg();
 		this.parserReg = PluginStorage.getParserReg();
@@ -94,6 +96,7 @@ public final class PluginStorageWrapper implements Serializable {
 	/**
 	 * Assigning to system plug-in storage: this = PluginStorage. Using this method carefully.
 	 */
+	@Deprecated
 	public void assignToSystem() {
 		PluginStorage.releaseAllRegisteredAlgs();
 		

@@ -87,16 +87,35 @@ public final class AlgListUIUtil {
 			KBase kb = null;
 			try {
 				kb = ((ModelBasedAlg)alg).getKBase();
-			} catch (Throwable e) {e.printStackTrace();}
+			} catch (Throwable e) {e.printStackTrace(); kb = null;}
+			
+			boolean empty = false;
+			if (kb == null)
+				empty = true;
+			else {
+				try {
+					empty = kb.isEmpty();
+				}
+				catch (Throwable e) {e.printStackTrace(); empty = true;}
+			}
 			
 			final KBase kbase = kb;
-			if (kbase != null && !kbase.isEmpty()) {
+			if (!empty) {
 				JMenuItem miViewKB = new JMenuItem("View knowledge base");
 				miViewKB.addActionListener( 
 					new ActionListener() {
 						
 						@Override
 						public void actionPerformed(ActionEvent e) {
+							int confirm = JOptionPane.showConfirmDialog(
+									UIUtil.getFrameForComponent((Component)ui), 
+									"Be careful, out of memory in case of huge knowledge base", 
+									"Out of memory in case of huge knowledge base", 
+									JOptionPane.OK_CANCEL_OPTION, 
+									JOptionPane.WARNING_MESSAGE);
+							if (confirm != JOptionPane.OK_OPTION)
+								return;
+
 							Inspector inspector = null;
 							try {
 								inspector = kbase.getInspector();

@@ -9,6 +9,7 @@ package net.hudup.core.alg;
 
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.rmi.RemoteException;
 
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.logistic.UriAdapter;
@@ -54,7 +55,7 @@ public abstract class KBaseAbstractSerializable extends KBaseAbstract {
 
 	
 	@Override
-	public void load() {
+	public void load() throws RemoteException {
 		// TODO Auto-generated method stub
 		super.load();
 		deserializeNut();
@@ -62,15 +63,15 @@ public abstract class KBaseAbstractSerializable extends KBaseAbstract {
 
 
 	@Override
-	public void export(DataConfig storeConfig) {
+	public void save(DataConfig storeConfig) throws RemoteException {
 		// TODO Auto-generated method stub
-		super.export(storeConfig);
+		super.save(storeConfig);
 		serializeNut();
 	}
 
 
 	@Override
-	public void close() {
+	public void close() throws Exception {
 		// TODO Auto-generated method stub
 		super.close();
 		
@@ -84,7 +85,7 @@ public abstract class KBaseAbstractSerializable extends KBaseAbstract {
 
 
 	@Override
-	public boolean isEmpty() {
+	public boolean isEmpty() throws RemoteException {
 		// TODO Auto-generated method stub
 		return nut != null;
 	}

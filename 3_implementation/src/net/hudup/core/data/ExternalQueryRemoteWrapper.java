@@ -54,48 +54,30 @@ public class ExternalQueryRemoteWrapper extends AlgRemoteWrapper implements Exte
 
 	
 	@Override
-	public boolean setup(DataConfig internalConfig, ExternalConfig externalConfig) {
+	public boolean setup(DataConfig internalConfig, ExternalConfig externalConfig) throws RemoteException {
 		// TODO Auto-generated method stub
-		if (remoteAlg instanceof ExternalQueryAbstract)
-			return ((ExternalQueryAbstract)remoteAlg).setup(internalConfig, externalConfig);
-		else {
-			LogUtil.info("External query remote wrapper does not support method setup(DataConfig, ExternalConfig)");
-			return false;
-		}
+		return ((ExternalQueryRemote)remoteAlg).setup(internalConfig, externalConfig);
 	}
 
 	
 	@Override
-	public ExternalItemInfo getItemInfo(int itemId) {
+	public ExternalItemInfo getItemInfo(int itemId) throws RemoteException {
 		// TODO Auto-generated method stub
-		if (remoteAlg instanceof ExternalQueryAbstract)
-			return ((ExternalQueryAbstract)remoteAlg).getItemInfo(itemId);
-		else {
-			LogUtil.info("External query remote wrapper does not support method getItemInfo(int)");
-			return null;
-		}
+		return ((ExternalQueryRemote)remoteAlg).getItemInfo(itemId);
 	}
 
 	
 	@Override
-	public ExternalUserInfo getUserInfo(int userId) {
+	public ExternalUserInfo getUserInfo(int userId) throws RemoteException {
 		// TODO Auto-generated method stub
-		if (remoteAlg instanceof ExternalQueryAbstract)
-			return ((ExternalQueryAbstract)remoteAlg).getUserInfo(userId);
-		else {
-			LogUtil.info("External query remote wrapper does not support method getUserInfo(int)");
-			return null;
-		}
+		return ((ExternalQueryRemote)remoteAlg).getUserInfo(userId);
 	}
 
 	
 	@Override
-	public void importData(ProgressListener registeredListener) {
+	public void importData(ProgressListener registeredListener) throws RemoteException {
 		// TODO Auto-generated method stub
-		if (remoteAlg instanceof ExternalQueryAbstract)
-			((ExternalQueryAbstract)remoteAlg).importData(registeredListener);
-		else
-			LogUtil.info("External query remote wrapper does not support method importData(ProgressListener)");
+		((ExternalQueryRemote)remoteAlg).importData(registeredListener);
 	}
 
 	
@@ -124,9 +106,11 @@ public class ExternalQueryRemoteWrapper extends AlgRemoteWrapper implements Exte
 	@Override
 	public synchronized void unexport() throws RemoteException {
 		// TODO Auto-generated method stub
-//		if (exclusive && remoteAlg != null) {
-//			((ExternalQueryRemote)remoteAlg).close();
-//		}
+		if (exclusive && remoteAlg != null) {
+			try {
+				((ExternalQueryRemote)remoteAlg).close();
+			} catch (Throwable e) {e.printStackTrace();}
+		}
 
 		super.unexport();
 	}
@@ -165,5 +149,5 @@ public class ExternalQueryRemoteWrapper extends AlgRemoteWrapper implements Exte
 		} catch (Throwable e) {e.printStackTrace();}
 	}
 
-	
+
 }

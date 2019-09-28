@@ -27,7 +27,7 @@ import net.hudup.core.logistic.xURI;
  */
 @Composite
 @NextUpdate
-public abstract class CompositeRecommenderAbstract extends RecommenderAbstract implements CompositeRecommender {
+public abstract class CompositeRecommenderAbstract extends RecommenderAbstract implements CompositeRecommender, CompositeAlgRemote {
 
 	
 	/**

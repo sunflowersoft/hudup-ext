@@ -25,10 +25,8 @@ import net.hudup.core.PluginStorage;
 import net.hudup.core.RegisterTable;
 import net.hudup.core.Util;
 import net.hudup.core.alg.Alg;
-import net.hudup.core.alg.CompositeAlg;
-import net.hudup.core.alg.ModelBasedAlg;
-import net.hudup.core.alg.RmiAlg;
-import net.hudup.core.alg.ServiceAlg;
+import net.hudup.core.alg.AlgDesc;
+import net.hudup.core.alg.AlgDesc.MethodType;
 import net.hudup.core.alg.SocketAlg;
 import net.hudup.core.data.Attribute;
 import net.hudup.core.data.Attribute.Type;
@@ -76,12 +74,15 @@ public final class DatasetUtil2 {
 			return null;
 		
 		DatasetParser parser = null;
-		if (defaultAlg instanceof ModelBasedAlg)
+		MethodType defaultAlgType = AlgDesc.methodTypeOf(defaultAlg);
+		if (defaultAlgType == MethodType.modelbased)
 			parser = (DatasetParser) PluginStorage.getParserReg().query(new KBaseIndicator().getName());
-		else if (defaultAlg instanceof SocketAlg)
-			parser = (DatasetParser) PluginStorage.getParserReg().query(new SocketServerIndicator().getName());
-		else if (defaultAlg instanceof RmiAlg)
-			parser = (DatasetParser) PluginStorage.getParserReg().query(new RmiServerIndicator().getName());
+		else if (defaultAlgType == MethodType.service) {
+			if (defaultAlg instanceof SocketAlg)
+				parser = (DatasetParser) PluginStorage.getParserReg().query(new SocketServerIndicator().getName());
+			else
+				parser = (DatasetParser) PluginStorage.getParserReg().query(new RmiServerIndicator().getName());
+		}
 		else
 			parser = (DatasetParser) PluginStorage.getParserReg().query(new SnapshotParserImpl().getName());
 		
@@ -188,19 +189,20 @@ public final class DatasetUtil2 {
 		if (alg == null)
 			return DatasetUtil2.chooseConfig(comp, defaultConfig);
 		
+		MethodType algType = AlgDesc.methodTypeOf(alg);
 		List<Alg> parserList = ((RegisterTable) PluginStorage.getParserReg().clone()).getAlgList();
 		List<Alg> newParserList = Util.newList();
 		for (Alg parser : parserList) {
-			if (alg instanceof ModelBasedAlg) {
+			if (algType == MethodType.modelbased) {
 				if (parser instanceof KBaseIndicator || 
 						parser instanceof SnapshotParser ||
 						parser instanceof ScannerParser)
 					newParserList.add(parser);
 			}
-			else if (alg instanceof CompositeAlg) {
+			else if (algType == MethodType.composite) {
 				newParserList.add(parser);
 			}
-			else if (alg instanceof ServiceAlg) {
+			else if (algType == MethodType.service) {
 				if (parser instanceof Indicator && !(parser instanceof KBaseIndicator))
 					newParserList.add(parser);
 			}
@@ -348,7 +350,8 @@ public final class DatasetUtil2 {
 				boolean flag = false;
 				
 				for (Alg alg : algList) {
-					if (alg instanceof ModelBasedAlg || alg instanceof CompositeAlg) {
+					MethodType algType = AlgDesc.methodTypeOf(alg);
+					if (algType == MethodType.modelbased || algType == MethodType.composite) {
 						flag = true;
 						break;
 					}
@@ -368,7 +371,8 @@ public final class DatasetUtil2 {
 				boolean flag = false;
 				
 				for (Alg alg : algList) {
-					if (alg instanceof ServiceAlg || alg instanceof CompositeAlg) {
+					MethodType algType = AlgDesc.methodTypeOf(alg);
+					if (algType == MethodType.service || algType == MethodType.composite) {
 						flag = true;
 						break;
 					}
@@ -393,7 +397,8 @@ public final class DatasetUtil2 {
 			boolean flag = false;
 			
 			for (Alg alg : algList) {
-				if (!(alg instanceof ServiceAlg)) {
+				MethodType algType = AlgDesc.methodTypeOf(alg);
+				if (algType != MethodType.service) {
 					flag = true;
 					break;
 				}

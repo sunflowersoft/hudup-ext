@@ -248,7 +248,7 @@ public class DatasetPoolTable extends JTable {
 							int confirm = JOptionPane.showConfirmDialog(
 									getThis(), 
 									"Be careful, out of memory in case of huge knowledge base", 
-									"Out of memory in case of huge dataset", 
+									"Out of memory in case of huge knowledge base", 
 									JOptionPane.OK_CANCEL_OPTION, 
 									JOptionPane.WARNING_MESSAGE);
 							if (confirm != JOptionPane.OK_OPTION)
@@ -265,7 +265,9 @@ public class DatasetPoolTable extends JTable {
 							}
 							
 							kbase.getInspector().inspect();
-							kbase.close();
+							try {
+								kbase.close();
+							} catch (Throwable ex) {ex.printStackTrace();}
 							
 						} //end actionPerformed
 						

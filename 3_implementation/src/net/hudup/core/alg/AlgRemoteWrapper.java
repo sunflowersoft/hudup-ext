@@ -34,7 +34,7 @@ public class AlgRemoteWrapper implements Alg, AlgRemote, Serializable {
 
 	
 	/**
-	 * Defautl serial version UID.
+	 * Default serial version UID.
 	 */
 	private static final long serialVersionUID = 1L;
 

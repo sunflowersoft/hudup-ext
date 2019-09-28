@@ -232,6 +232,7 @@ public class EvaluatorWrapper implements Evaluator, Serializable {
 	}
 
 
+	@Deprecated
 	@Override
 	public PluginStorageWrapper getPluginStorage() throws RemoteException {
 		// TODO Auto-generated method stub

@@ -30,11 +30,11 @@ public class AlgDesc implements Serializable, net.hudup.core.Cloneable {
 
 
 	/**
-	 * Type of algorithm.
+	 * Methodological type of algorithm.
 	 * @author Loc Nguyen
 	 * @version 1.0
 	 */
-	public enum MethodologyType {
+	public enum MethodType {
 		
 		/**
 		 * Memory-based algorithm.
@@ -62,6 +62,30 @@ public class AlgDesc implements Serializable, net.hudup.core.Cloneable {
 		unknown
 	}
 	
+	
+	/**
+	 * Functional type of algorithm.
+	 * @author Loc Nguyen
+	 * @version 1.0
+	 */
+	public enum FunctionType {
+		
+		/**
+		 * Recommendation algorithm.
+		 */
+		recommend,
+		
+		/**
+		 * Executable algorithm.
+		 */
+		execute,
+		
+		/**
+		 * Unknown algorithm.
+		 */
+		unknown
+	}
+
 	
 	/**
 	 * Algorithm name.
@@ -162,61 +186,70 @@ public class AlgDesc implements Serializable, net.hudup.core.Cloneable {
 	
 	
 	/**
-	 * Getting type of given algorithm.
+	 * Getting methodological type of given algorithm.
 	 * @param alg given algorithm.
-	 * @return type of given algorithm.
+	 * @return methodological type of given algorithm.
 	 */
-	public static MethodologyType getTypeOf(Alg alg) {
+	public static MethodType methodTypeOf(Alg alg) {
 		if (alg instanceof MemoryBasedAlg)
-			return MethodologyType.memorybased;
+			return MethodType.memorybased;
 		else if (alg instanceof ModelBasedAlg)
-			return MethodologyType.modelbased;
+			return MethodType.modelbased;
 		else if (alg instanceof CompositeAlg)
-			return MethodologyType.composite;
+			return MethodType.composite;
 		else if (alg instanceof ServiceAlg)
-			return MethodologyType.service;
+			return MethodType.service;
 		else if (alg instanceof AlgRemoteWrapper) {
 			AlgRemote remoteAlg = ((AlgRemoteWrapper)alg).getRemoteAlg();
 			if (remoteAlg instanceof Alg)
-				return getTypeOf((Alg)remoteAlg);
+				return methodTypeOf((Alg)remoteAlg);
+			else if (remoteAlg instanceof MemoryBasedAlgRemote)
+				return MethodType.memorybased;
+			else if (remoteAlg instanceof ModelBasedAlgRemote)
+				return MethodType.modelbased;
+			else if (remoteAlg instanceof CompositeAlgRemote)
+				return MethodType.composite;
+			else if (remoteAlg instanceof ServiceAlg)
+				return MethodType.service;
 			else
-				return MethodologyType.unknown;
+				return MethodType.unknown;
 		}
 		else
-			return MethodologyType.unknown;
+			return MethodType.unknown;
 	}
 
 	
 	/**
-	 * Getting type of given algorithms.
+	 * Getting methodological type of given algorithms.
 	 * @param algs given algorithms.
-	 * @return type of given algorithms.
+	 * @return methodological type of given algorithms.
 	 */
-	public static MethodologyType getTypeOf(Collection<Alg> algs) {
+	public static MethodType methodTypeOf(Collection<Alg> algs) {
 		if (algs == null || algs.size() == 0)
-			return MethodologyType.unknown;
+			return MethodType.unknown;
 		
 		boolean memorybased = true, modelbased = true, composite = true, service = true;
 		for (Alg alg : algs) {
-			if (alg instanceof MemoryBasedAlg) {
+			MethodType type = methodTypeOf(alg);
+			if (type == MethodType.memorybased) {
 				memorybased = memorybased && true;
 				modelbased = modelbased && false;
 				composite = composite && false;
 				service = service && false;
 			}
-			else if (alg instanceof ModelBasedAlg) {
+			else if (type == MethodType.modelbased) {
 				memorybased = memorybased && false;
 				modelbased = modelbased && true;
 				composite = composite && false;
 				service = service && false;
 			}
-			else if (alg instanceof CompositeAlg) {
+			else if (type == MethodType.composite) {
 				memorybased = memorybased && false;
 				modelbased = modelbased && false;
 				composite = composite && true;
 				service = service && false;
 			}
-			else if (alg instanceof ServiceAlg) {
+			else if (type == MethodType.service) {
 				memorybased = memorybased && false;
 				modelbased = modelbased && false;
 				composite = composite && false;
@@ -231,15 +264,76 @@ public class AlgDesc implements Serializable, net.hudup.core.Cloneable {
 		}
 		
 		if (memorybased)
-			return MethodologyType.memorybased;
+			return MethodType.memorybased;
 		else if (modelbased)
-			return MethodologyType.modelbased;
+			return MethodType.modelbased;
 		else if (composite)
-			return MethodologyType.composite;
+			return MethodType.composite;
 		else if (service)
-			return MethodologyType.service;
+			return MethodType.service;
 		else
-			return MethodologyType.unknown;
+			return MethodType.unknown;
+	}
+	
+
+	/**
+	 * Getting functional type of given algorithm.
+	 * @param alg given algorithm.
+	 * @return functional type of given algorithm.
+	 */
+	public static FunctionType functionTypeOf(Alg alg) {
+		if (alg instanceof Recommender)
+			return FunctionType.recommend;
+		else if (alg instanceof ExecutableAlg)
+			return FunctionType.execute;
+		else if (alg instanceof AlgRemoteWrapper) {
+			AlgRemote remoteAlg = ((AlgRemoteWrapper)alg).getRemoteAlg();
+			if (remoteAlg instanceof Alg)
+				return functionTypeOf((Alg)remoteAlg);
+			else if (remoteAlg instanceof RecommenderRemote)
+				return FunctionType.recommend;
+			else if (remoteAlg instanceof ExecutableAlgRemote)
+				return FunctionType.execute;
+			else
+				return FunctionType.unknown;
+		}
+		else
+			return FunctionType.unknown;
+	}
+
+	
+	/**
+	 * Getting functional type of given algorithms.
+	 * @param algs given algorithms.
+	 * @return functional type of given algorithms.
+	 */
+	public static FunctionType functionTypeOf(Collection<Alg> algs) {
+		if (algs == null || algs.size() == 0)
+			return FunctionType.unknown;
+		
+		boolean recommend = true, execute = true;
+		for (Alg alg : algs) {
+			FunctionType type = functionTypeOf(alg);
+			if (type == FunctionType.recommend) {
+				recommend = recommend && true;
+				execute = execute && false;
+			}
+			else if (type == FunctionType.execute) {
+				recommend = recommend && false;
+				execute = execute && true;
+			}
+			else {
+				recommend = recommend && false;
+				execute = execute && false;
+			}
+		}
+		
+		if (recommend)
+			return FunctionType.recommend;
+		else if (execute)
+			return FunctionType.execute;
+		else
+			return FunctionType.unknown;
 	}
 	
 

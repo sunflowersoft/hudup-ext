@@ -352,42 +352,31 @@ public class SetupExternalServerWizard extends SetupServerWizard {
 					return;
 				}
 
-				ExternalQuery externalQuery = new DefaultExternalQuery();
-				boolean setup = externalQuery.setup(config, externalConfig);
-				
-				if (!setup) {
-					try {
+				try {
+					ExternalQuery externalQuery = new DefaultExternalQuery();
+					boolean setup = externalQuery.setup(config, externalConfig);
+					if (!setup)
 						externalQuery.close();
-					}
-					catch (Throwable ex) {
-						ex.printStackTrace();
-					}
-				}
-				else {
-					JDialog wait = new JDialog(getWizard(), "Please waiting", false);
-					wait.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-					wait.setLocationRelativeTo(getWizard());
-					wait.setSize(200, 100);
-					wait.setVisible(true);
-
-					try {
+					else {
+						JDialog wait = new JDialog(getWizard(), "Please wait...", false);
+						wait.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+						wait.setLocationRelativeTo(getWizard());
+						wait.setSize(200, 100);
+						wait.setVisible(true);
+	
 						externalQuery.importData(null);
 						externalQuery.close();
+						
+						wait.dispose();
 					}
-					catch (Throwable ex) {
-						ex.printStackTrace();
-					}
-					
-					wait.dispose();
 				}
+				catch (Throwable ex) {ex.printStackTrace();}
 				
 				JOptionPane.showMessageDialog(
-						getWizard(), 
-						"Import external succuessfully", 
-						"Import external succuessfully", 
-						JOptionPane.INFORMATION_MESSAGE);
-
-				
+					getWizard(), 
+					"Import external succuessfully", 
+					"Import external succuessfully", 
+					JOptionPane.INFORMATION_MESSAGE);
 			}
 		});
 

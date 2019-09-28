@@ -43,7 +43,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
 import net.hudup.core.PluginChangedEvent;
-import net.hudup.core.PluginChangedEvent2;
 import net.hudup.core.RegisterTable;
 import net.hudup.core.Util;
 import net.hudup.core.alg.Alg;
@@ -58,10 +57,9 @@ import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.DatasetPool;
 import net.hudup.core.data.DatasetUtil;
-import net.hudup.core.data.Exportable;
 import net.hudup.core.data.Pointer;
-import net.hudup.core.evaluate.EvaluatorAbstract;
 import net.hudup.core.evaluate.Evaluator;
+import net.hudup.core.evaluate.EvaluatorAbstract;
 import net.hudup.core.evaluate.EvaluatorEvent;
 import net.hudup.core.evaluate.EvaluatorEvent.Type;
 import net.hudup.core.evaluate.EvaluatorProgressEvent;
@@ -323,18 +321,6 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 		try {
 			evaluator.clearDelayUnsetupAlgs();
 
-			if (evt instanceof PluginChangedEvent2) {
-				List<Alg> removedAlgList = ((PluginChangedEvent2)evt).getRemovedAlgList();
-				for (Alg alg : removedAlgList) {
-					if (alg instanceof Exportable) {
-						try {
-							((Exportable)alg).unexport();
-						} catch (Throwable e) {e.printStackTrace();}
-					}
-				}
-				removedAlgList.clear();
-			}
-			
 			algRegTable.clear();
 			algRegTable.register(evaluator.extractAlgFromPluginStorage()); //Algorithms are not cloned because of saving memory when evaluator GUI keep algorithms for a long time.
 			cmbAlgs.update(algRegTable.getAlgList());

@@ -8,7 +8,6 @@
 package net.hudup.core.data;
 
 import net.hudup.core.alg.Alg;
-import net.hudup.core.logistic.ui.ProgressListener;
 
 /**
  * {@link Alg} is the most abstract interface for all algorithms.
@@ -34,42 +33,5 @@ import net.hudup.core.logistic.ui.ProgressListener;
  */
 public interface ExternalQuery extends ExternalQueryRemoteTask, Alg, AutoCloseable {
 
-	
-	/**
-	 * Setting up (initializing) this external query by both internal configuration and external configuration.
-	 * @param internalConfig internal configuration to describe Hudup database.
-	 * @param externalConfig external configuration to describe outside database.
-	 * @return whether setting up successfully.
-	 */
-	boolean setup(
-			DataConfig internalConfig, 
-			ExternalConfig externalConfig);
-	
-	
-	/**
-	 * Getting external item information from internal item identifier.
-	 * 
-	 * @param itemId internal item id.
-	 * @return {@link ExternalItemInfo} stored in outside database.
-	 */
-	ExternalItemInfo getItemInfo(int itemId);
-	
-	
-	/**
-	 * Getting external user information from internal user identifier.
-	 * 
-	 * @param userId internal user id.
-	 * @return {@link ExternalUserInfo} stored in outside database.
-	 */
-	ExternalUserInfo getUserInfo(int userId);
-	
-	
-	/**
-	 * Fill in Hudup database by importing data from outside (external database) database.
-	 * The Hudup database (internal database) is described by internal configuration mentioned in {@link #setup(DataConfig, ExternalConfig)}.
-	 * The outside database (external database) is described by external configuration mentioned in {@link #setup(DataConfig, ExternalConfig)}.
-	 * @param registeredListener the registered {@link ProgressListener} to observe the importing process. This listener can do some particular tasks such as showing the progress bar so that users know the progress of importing process.
-	 */
-	void importData(ProgressListener registeredListener);
 	
 }

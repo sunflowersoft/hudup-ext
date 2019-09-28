@@ -74,7 +74,7 @@ public class DefaultExternalQuery extends ExternalQueryAbstract {
 	@Override
 	public boolean setup(
 			DataConfig internalConfig, 
-			ExternalConfig externalConfig) {
+			ExternalConfig externalConfig) throws RemoteException {
 		
 		try {
 			close();
@@ -163,7 +163,7 @@ public class DefaultExternalQuery extends ExternalQueryAbstract {
 	
 	
 	@Override
-	public void importData(ProgressListener registeredListener) {
+	public void importData(ProgressListener registeredListener) throws RemoteException {
 		// TODO Auto-generated method stub
 		DataConfig internalConfig = internalProvider.getConfig();
 		ExternalConfig externalConfig = (ExternalConfig) externalProvider.getConfig();
@@ -369,8 +369,9 @@ public class DefaultExternalQuery extends ExternalQueryAbstract {
 	 * Fill in Hudup database by importing data from outside (external) database with note that Hudup database is a set of files.
 	 * @param registeredListener the registered listener to observe the importing process.
 	 * This listener can do some particular tasks such as showing the progress bar so that users know the progress of importing process.
+	 * @throws RemoteException if any error raises.
 	 */
-	private void fileImportData(ProgressListener registeredListener) {
+	private void fileImportData(ProgressListener registeredListener) throws RemoteException {
 		// TODO Auto-generated method stub
 		preImportData();
 		
@@ -593,7 +594,7 @@ public class DefaultExternalQuery extends ExternalQueryAbstract {
 	@Override
 	public String getDescription() throws RemoteException {
 		// TODO Auto-generated method stub
-		return "Default external_query";
+		return "Default external query";
 	}
 
 
@@ -605,7 +606,7 @@ public class DefaultExternalQuery extends ExternalQueryAbstract {
 
 
 	@Override
-	public ExternalUserInfo getUserInfo(int userId) {
+	public ExternalUserInfo getUserInfo(int userId) throws RemoteException {
 		// TODO Auto-generated method stub
 		DataConfig internalConfig = internalProvider.getConfig();
 		
@@ -634,7 +635,7 @@ public class DefaultExternalQuery extends ExternalQueryAbstract {
 
 	
 	@Override
-	public ExternalItemInfo getItemInfo(int itemId) {
+	public ExternalItemInfo getItemInfo(int itemId) throws RemoteException {
 		// TODO Auto-generated method stub
 		DataConfig internalConfig = internalProvider.getConfig();
 		

@@ -165,7 +165,7 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			LogUtil.error("Server constructor causes error " + e.getMessage());
+			LogUtil.error("Server constructor caused error " + e.getMessage());
 			System.exit(0);
 		}
 		
@@ -218,7 +218,7 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 			
 			started = true;
 			fireStatusEvent(new ServerStatusEvent(this, Status.started));
-			LogUtil.info("Server started at port " + config.getServerPort());
+			LogUtil.info("POWER SERVER IS SERVING AT PORT " + config.getServerPort());
 		} 
     	catch (Throwable e) {
 			// TODO Auto-generated catch block
@@ -231,7 +231,7 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 				e2.printStackTrace();
 			}
 			
-			LogUtil.error("Server fail to start, caused by " + e.getMessage());
+			LogUtil.error("Power server failed to start, caused by " + e.getMessage());
 		}
     	finally {
         	trans.unlockWrite();
@@ -258,7 +258,7 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 			
     		paused = true;
     		fireStatusEvent(new ServerStatusEvent(this, Status.paused));
-    		LogUtil.info("Server paused");
+    		LogUtil.info("Power server paused");
 		}
     	
 	}
@@ -278,7 +278,7 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
         	
 			paused = false;
     		fireStatusEvent(new ServerStatusEvent(this, Status.resumed));
-    		LogUtil.info("Server resumed");
+    		LogUtil.info("Power server resumed");
     		
         	trans.unlockWrite();
 		}
@@ -303,7 +303,7 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 		
     	trans.lockWrite();
     	try {
-    		LogUtil.info("Server is initializing to stop, please waiting...");
+    		LogUtil.info("Power server is initializing to stop, please waiting...");
 			destroyTimer();
 			
 			UnicastRemoteObject.unexportObject(getService(), true);
@@ -312,13 +312,13 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 			activeMeasure.reset();
 			started = false;
     		fireStatusEvent(new ServerStatusEvent(this, Status.stopped));
-    		LogUtil.info("Server stopped");
+    		LogUtil.info("Power server stopped");
 		} 
     	catch (Throwable e) {
 			// TODO Auto-generated catch block
 
 			e.printStackTrace();
-			LogUtil.error("Server fail to stop, caused by " + e.getMessage());
+			LogUtil.error("Power server failed to stop, caused by " + e.getMessage());
 		}
     	finally {
         	trans.unlockWrite();
@@ -374,13 +374,13 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
     	catch (Throwable e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			LogUtil.error("Server get error when shutdowning, error is " + e.getMessage());
+			LogUtil.error("Power server got error when shutdowning, error is " + e.getMessage());
 		} 
     	finally {
         	trans.unlockWrite();
     	}
 		config = null;
-		LogUtil.info("Server shutdown");
+		LogUtil.info("Power server shutdown");
     	
 		fireStatusEvent(new ServerStatusEvent(this, Status.exit));
 		
@@ -412,14 +412,14 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 					catch (Throwable e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
-						LogUtil.error("Calling server tasks causes error " + e.getMessage());
+						LogUtil.error("Calling power server tasks causes error " + e.getMessage());
 					}
 				}
 			}, 
 			milisec, 
 			milisec);
 		
-		LogUtil.info("Server created internal timer, executing periodly " + milisec + " miliseconds");
+		LogUtil.info("Power server created internal timer, executing periodly " + milisec + " miliseconds");
 	}
 	
 	
@@ -431,7 +431,7 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 			timer.cancel();
 			timer = null;
 			
-			LogUtil.info("Server destroyed internal timer");
+			LogUtil.info("Power server destroyed internal timer");
 		}
 	}
 
@@ -444,11 +444,11 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 
 		try {
 			serverTasks();
-			LogUtil.info("Server has done timer internal tasks");
+			LogUtil.info("Power server has done timer internal tasks");
 		}
 		catch (Throwable e) {
 			e.printStackTrace();
-			LogUtil.error("Server got error to do timer internal tasks, error is " + e.getMessage());
+			LogUtil.error("Power server got error to do timer internal tasks, error is " + e.getMessage());
 		}
 		
 		SystemUtil.enhanceAuto();
@@ -512,14 +512,14 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
     		try {
 		        listenerList.add(ServerStatusListener.class, listener);
 		        
-		        LogUtil.info("Server added successfully status listener " + 
+		        LogUtil.info("Power server added successfully status listener " + 
 		        		(listenerList.getListenerCount() - 1) + ": " + listener.getClass());
 		        
 		        return true;
     		}
     		catch (Throwable e) {
     			e.printStackTrace();
-    			LogUtil.error("Server fail to add status listener " + listener.getClass() + 
+    			LogUtil.error("Power server failed to add status listener " + listener.getClass() + 
 		        		", error is " + e.getMessage());
     		}
     		
@@ -544,12 +544,12 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
     	synchronized (listenerList) {
     		try {
     			listenerList.remove(ServerStatusListener.class, listener);
-    			LogUtil.info("Server remove successfully status listener " + listener.getClass());
+    			LogUtil.info("Power server removed successfully status listener " + listener.getClass());
     	        return true;
     		}
     		catch (Throwable e) {
     			e.printStackTrace();
-    			LogUtil.error("Server fail to remove status listener " + listener.getClass() + 
+    			LogUtil.error("Power server failed to remove status listener " + listener.getClass() + 
 		        		", error is " + e.getMessage());
     		}
     		
@@ -587,12 +587,12 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 				this.config.putAll(config);
     		fireStatusEvent(new ServerStatusEvent(this, Status.setconfig));
     		
-    		LogUtil.info("Server set configuration successfully");
+    		LogUtil.info("Power server set configuration successfully");
 		}
 		catch (Throwable e) {
 			e.printStackTrace();
 			
-			LogUtil.error("Server fail to set configuration, caused by " + e.getMessage());
+			LogUtil.error("Power server failed to set configuration, caused by " + e.getMessage());
 		}
 		finally {
 			trans.unlockWrite();
@@ -611,11 +611,11 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 			try {
 				evt.setShutdownHookStatus(shutdownHookStatus);
 				listener.statusChanged(evt);
-				LogUtil.info("Server fire successfully status event " + evt + " to listener " + listener.getClass());
+				LogUtil.info("Power server fired successfully status event " + evt + " to listener " + listener.getClass());
 			}
 			catch (Throwable e) {
 				e.printStackTrace();
-				LogUtil.error("Server fail to fire status event " + evt + " to listener " + listener.getClass() + 
+				LogUtil.error("Power server failed to fire status event " + evt + " to listener " + listener.getClass() + 
 		        		", caused by " + e.getMessage());
 		        
 				try {
@@ -653,7 +653,7 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 		catch (Throwable e) {
 			e.printStackTrace();
 			server = null;
-			LogUtil.error("Server: remote client fail to connect to server as control panel, caused by " + e.getMessage());
+			LogUtil.error("Remote client failed to connect to this power server as control panel, caused by " + e.getMessage());
 		}
 		
 		return server;
@@ -679,7 +679,7 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 		catch (Throwable e) {
 			e.printStackTrace();
 			service = null;
-			LogUtil.error("Server: remote client fail to connect to server as service, caused by " + e.getMessage());
+			LogUtil.error("Remote client failed to connect to this power server as service, caused by " + e.getMessage());
 		}
 		
 		return service;

@@ -9,6 +9,7 @@ package net.hudup.core.logistic.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.rmi.RemoteException;
 
 import javax.swing.JDialog;
 import javax.swing.JProgressBar;
@@ -74,7 +75,7 @@ public class ProgressDlg extends JDialog implements ProgressListener {
 
 
 	@Override
-	public void receiveProgress(ProgressEvent evt) {
+	public void receiveProgress(ProgressEvent evt) throws RemoteException {
 		// TODO Auto-generated method stub
 		if (disposed)
 			return;

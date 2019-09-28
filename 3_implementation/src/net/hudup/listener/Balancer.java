@@ -74,12 +74,15 @@ public class Balancer extends Listener {
 				bindServerList.bind(
 						((BalancerConfig)config).getRemoteInfoList(), this);
 				
-				LogUtil.info("Balancer bind list of remote servers successfully");
+				if (bindServerList.size() > 0)
+					LogUtil.info("Listener/Balancer (socket server) bound list of remote servers successfully");
+				else
+					LogUtil.error("Listener/Balancer (socket server) failed to bind list of remote servers");
 			} 
 			catch (Throwable e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-				LogUtil.error("Balancer fail to bind list of remote servers, caused by " + e.getMessage());
+				LogUtil.error("Listener/Balancer (socket server) failed to bind list of remote servers, caused by " + e.getMessage());
 			}
 			
 		}
@@ -195,7 +198,7 @@ public class Balancer extends Listener {
 			return true;
 		}
 		catch (Exception e) {
-			LogUtil.error("Balancer fail to create system tray fail, caused by" + e.getMessage());
+			LogUtil.error("Listener/Balancer (socket server) failed to create system tray fail, caused by" + e.getMessage());
 		}
 		
 		return false;

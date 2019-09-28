@@ -11,6 +11,7 @@ import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.rmi.RemoteException;
 
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
@@ -285,7 +286,7 @@ public class DatasetExporter extends JPanel implements ProgressListener, Dispose
 	
 	
 	@Override
-	public void receiveProgress(ProgressEvent evt) {
+	public void receiveProgress(ProgressEvent evt) throws RemoteException {
 		// TODO Auto-generated method stub
 		
 		int progressTotal = evt.getProgressTotal();
