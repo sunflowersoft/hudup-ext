@@ -276,7 +276,7 @@ public class ExternalServerCP extends PowerServerCP {
 		
 		ExternalConfig defaultExternalConfig = extSrvConfig.getExternalConfig(); 
 		ExternalConfigurator configurator = new ExternalConfigurator(
-				this, DataDriverList.list(), defaultExternalConfig);
+				this, DataDriverList.get(), defaultExternalConfig);
 		
 		ExternalConfig externalConfig = configurator.getResult();
 		if (externalConfig == null || externalConfig.size() == 0) {

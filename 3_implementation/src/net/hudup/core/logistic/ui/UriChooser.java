@@ -779,7 +779,7 @@ public class UriChooser extends JDialog {
 		UriChooser configurator = new UriChooser(
 				parent, 
 				indicators, 
-				DataDriverList.list(),
+				DataDriverList.get(),
 				defaultConfig != null ? defaultConfig : new DataConfig());
 		
 		return configurator.getResult();

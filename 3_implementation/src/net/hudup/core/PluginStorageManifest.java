@@ -91,6 +91,12 @@ public class PluginStorageManifest extends SortableTable {
     protected EventListenerList listenerList = new EventListenerList();
 
     
+    /**
+     * Exported port.
+     */
+    protected int port = 0;
+    
+    
 	/**
 	 * Default constructor.
 	 */
@@ -103,36 +109,148 @@ public class PluginStorageManifest extends SortableTable {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				// TODO Auto-generated method stub
-				int row = getSelectedRow();
-				if (row < 0) return;
-				Alg alg = (Alg) getModel().getValueAt(row, 3);
-				if (alg.getConfig() == null) return;
-				
 				if(SwingUtilities.isRightMouseButton(e) ) {
-					JPopupMenu contextMenu = new JPopupMenu();
-					
-					JMenuItem miConfig = UIUtil.makeMenuItem( (String)null, "Configuration", 
-						new ActionListener() {
-							
-							@Override
-							public void actionPerformed(ActionEvent e) {
-								AlgConfigDlg dlgConfig = new AlgConfigDlg(UIUtil.getFrameForComponent(getThisManifest()), alg);
-								dlgConfig.getPropPane().setToolbarVisible(false);
-								dlgConfig.getPropPane().setControlVisible(false);
-								dlgConfig.getPropPane().setEnabled(false);
-								dlgConfig.setVisible(true);
-							}
-						});
-					contextMenu.add(miConfig);
-
-					contextMenu.show((Component)e.getSource(), e.getX(), e.getY());
+					JPopupMenu contextMenu = createContextMenu();
+					if (contextMenu != null)
+						contextMenu.show((Component)e.getSource(), e.getX(), e.getY());
 				}
 				else if (e.getClickCount() >= 2) {
-					
+					int selectedColumn = getSelectedColumn();
+					if (selectedColumn != 4 && selectedColumn != 5 && selectedColumn != 6)
+						showConfig();
 				}
 			}
 			
 		});
+		
+	}
+	
+	
+	/**
+	 * Default constructor with specified exported port.
+	 * @param port specified exported port.
+	 */
+	public PluginStorageManifest(int port) {
+		this();
+		this.port = port;
+	}
+	
+	
+	/**
+	 * Create context menu.
+	 * @return context menu.
+	 */
+	private JPopupMenu createContextMenu() {
+		JPopupMenu contextMenu = new JPopupMenu();
+		
+		int selectedRow = getSelectedRow();
+		Alg alg = selectedRow < 0 ? null : (Alg) getModel().getValueAt(selectedRow, 3);
+		DataConfig config = alg == null ? null : alg.getConfig(); 
+		if (config != null) {
+			JMenuItem miConfig = UIUtil.makeMenuItem( (String)null, "Configuration", 
+				new ActionListener() {
+					
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						showConfig();
+					}
+				});
+			contextMenu.add(miConfig);
+			
+			contextMenu.addSeparator();
+		}
+		
+		JMenuItem miRegisterAllAlgs = UIUtil.makeMenuItem( (String)null, "Register all algorithms", 
+			new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					selectAllNormalAlgs(true, 4);
+				}
+			});
+		contextMenu.add(miRegisterAllAlgs);
+		
+		JMenuItem miUnregisterAllAlgs = UIUtil.makeMenuItem( (String)null, "Unregister all algorithms", 
+			new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					selectAllNormalAlgs(false, 4);
+				}
+			});
+		contextMenu.add(miUnregisterAllAlgs);
+
+		contextMenu.addSeparator();
+		
+		JMenuItem miExportAllAlgs = UIUtil.makeMenuItem( (String)null, "Export all algorithms", 
+			new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					selectAllNormalAlgs(true, 5);
+				}
+			});
+		contextMenu.add(miExportAllAlgs);
+		
+		JMenuItem miUnexportAllAlgs = UIUtil.makeMenuItem( (String)null, "Unexport all algorithms", 
+			new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					selectAllNormalAlgs(false, 5);
+				}
+			});
+		contextMenu.add(miUnexportAllAlgs);
+
+		contextMenu.addSeparator();
+		
+		JMenuItem miRemoveAllAlgs = UIUtil.makeMenuItem( (String)null, "Remove all algorithms", 
+			new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					selectAllNormalAlgs(true, 6);
+				}
+			});
+		contextMenu.add(miRemoveAllAlgs);
+		
+		JMenuItem miUnremoveAllAlgs = UIUtil.makeMenuItem( (String)null, "Unremove all algorithms", 
+			new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					selectAllNormalAlgs(false, 6);
+				}
+			});
+		contextMenu.add(miUnremoveAllAlgs);
+		
+		
+		return contextMenu;
+	}
+
+	
+	/**
+	 * Showing configuration dialog of selected algorithm. 
+	 */
+	private void showConfig() {
+		int selectedRow = getSelectedRow();
+		Alg alg = selectedRow < 0 ? null : (Alg) getModel().getValueAt(selectedRow, 3);
+		DataConfig config = alg == null ? null : alg.getConfig(); 
+		
+		if (config == null) {
+			JOptionPane.showMessageDialog(
+					UIUtil.getFrameForComponent(this), 
+					"No configuration", 
+					"No configuration", 
+					JOptionPane.INFORMATION_MESSAGE);
+		}
+		else {
+			AlgConfigDlg dlgConfig = new AlgConfigDlg(UIUtil.getFrameForComponent(getThisManifest()), alg);
+			dlgConfig.getPropPane().setToolbarVisible(false);
+			dlgConfig.getPropPane().setControlVisible(false);
+			dlgConfig.getPropPane().setEnabled(false);
+			dlgConfig.setVisible(true);
+		}
 	}
 	
 	
@@ -172,14 +290,16 @@ public class PluginStorageManifest extends SortableTable {
 		
 		AlgList nextUpdateList = PluginStorage.getNextUpdateList();
 		int n = getRowCount();
-		List<Alg> removedAlgList = Util.newList();
+		List<Alg> unexportedAlgList = Util.newList();
+		boolean changed = false;
 		for (int i = 0; i < n; i++) {
 			Alg alg = (Alg) getValueAt(i, 3);
 			RegisterTable table = PluginStorage.lookupTable(alg.getClass());
 			if (table == null) continue;
 
 			boolean registered = (Boolean)getValueAt(i, 4);
-			boolean removed = (Boolean)getValueAt(i, 5);
+			boolean exported = (Boolean)getValueAt(i, 5);
+			boolean removed = (Boolean)getValueAt(i, 6);
 			
 			if (removed) {
 				if (!table.contains(alg.getName()))
@@ -187,24 +307,54 @@ public class PluginStorageManifest extends SortableTable {
 				else
 					table.unregister(alg.getName());
 				
-				removedAlgList.add(alg);
+				unexportedAlgList.add(alg);
+				changed = true;
 			}
-			else if (registered) {
-				if (!table.contains(alg.getName())) {
-					table.register(alg);
-					nextUpdateList.remove(alg);
+			else {
+				if (registered) {
+					if (!table.contains(alg.getName())) {
+						table.register(alg);
+						nextUpdateList.remove(alg);
+						changed = true;
+					}
 				}
-			}
-			else if(table.contains(alg.getName())) {
-				table.unregister(alg.getName());
-				nextUpdateList.add(alg);
+				else if(table.contains(alg.getName())) {
+					table.unregister(alg.getName());
+					nextUpdateList.add(alg);
+					changed = true;
+				}
+				
+				if (alg instanceof Exportable) {
+					try {
+						boolean algExported = ((Exportable)alg).getExportedStub() != null;
+						if (exported) {
+							if (!algExported) {
+								String algTypeName = getValueAt(i, 0).toString();
+								if (algTypeName.equals(PluginStorage.NORMAL_ALG)) { //Only export normal algorithms.
+									((Exportable)alg).export(this.port);
+									changed = true;
+								}
+							}
+						}
+						else {
+							if (algExported) {
+								unexportedAlgList.add(alg);
+								changed = true;
+							}
+						}
+					} 
+					catch (Throwable e) {
+						e.printStackTrace();
+						changed = true;
+					}
+				}
 			}
 		}
 		
-		update();
+		if (changed)
+			firePluginChangedEvent(new PluginChangedEvent(this));
 		
-		firePluginChangedEvent(new PluginChangedEvent(this));
-		for (Alg alg : removedAlgList) {
+		for (Alg alg : unexportedAlgList) {
 			if (alg instanceof Exportable) {
 				try {
 					((Exportable)alg).unexport(); //Finalize method will call unsetup method if unsetup method exists in this algorithm.
@@ -212,32 +362,42 @@ public class PluginStorageManifest extends SortableTable {
 			}
 		}
 		
+		update();
+
 		return true;
 	}
 	
 
 	/**
-	 * Registering or unregistering all rows according the specified input parameter {@code selected}.
-	 * @param selected if {@code true} then all rows are selected. Otherwise, all rows are unselected. 
+	 * Selecting or unselecting all rows according the specified input parameter {@code selected}.
+	 * @param selected if {@code true} then all rows are selected. Otherwise, all rows are unselected.
+	 * @param column column to be selected or not selected.
 	 */
-	public void registerAll(boolean selected) {
+	protected void selectAll(boolean selected, int column) {
+		if (column != 4 && column != 5 && column != 6)
+			return;
+		
 		int n = getRowCount();
 		for (int i = 0; i < n; i++) {
-			
-			setValueAt(selected, i, 4);
+			setValueAt(selected, i, column);
 		}
 	}
 
 	
 	/**
-	 * Removing or unremoving all rows according the specified input parameter {@code selected}.
-	 * @param selected if {@code true} then all rows are selected. Otherwise, all rows are unselected. 
+	 * Registering or unregistering all normal algorithms.
+	 * @param selected if {@code true} then all normal algorithms are selected. Otherwise, all normal algorithms are unselected. 
+	 * @param column column to be selected or not selected.
 	 */
-	public void removeAll(boolean selected) {
+	protected void selectAllNormalAlgs(boolean selected, int column) {
+		if (column != 4 && column != 5 && column != 6)
+			return;
+
 		int n = getRowCount();
 		for (int i = 0; i < n; i++) {
-			
-			setValueAt(selected, i, 5);
+			String algTypeName = getValueAt(i, 0).toString();
+			if (algTypeName.equals(PluginStorage.NORMAL_ALG))
+				setValueAt(selected, i, column);
 		}
 	}
 
@@ -365,7 +525,7 @@ public class PluginStorageManifest extends SortableTable {
 			JPanel body = new JPanel(new BorderLayout());
 			add(body, BorderLayout.CENTER);
 			
-			tblRegister = new PluginStorageManifest();
+			tblRegister = new PluginStorageManifest(listener.getPort() < 0 ? 0 : listener.getPort());
 			if (listener != null)
 				tblRegister.addPluginChangedListener(listener);
 			body.add(new JScrollPane(tblRegister), BorderLayout.CENTER);
@@ -392,7 +552,7 @@ public class PluginStorageManifest extends SortableTable {
 					@Override
 					public void actionPerformed(ActionEvent e) {
 						// TODO Auto-generated method stub
-						tblRegister.registerAll(true);
+						tblRegister.selectAll(true, 4);
 					}
 				});
 			registerAll.setMargin(new Insets(0, 0 , 0, 0));
@@ -406,7 +566,7 @@ public class PluginStorageManifest extends SortableTable {
 					@Override
 					public void actionPerformed(ActionEvent e) {
 						// TODO Auto-generated method stub
-						tblRegister.registerAll(false);
+						tblRegister.selectAll(false, 4);
 					}
 				});
 			unregisterAll.setMargin(new Insets(0, 0 , 0, 0));
@@ -416,9 +576,46 @@ public class PluginStorageManifest extends SortableTable {
 			toolbar1Grp2.setBorder(BorderFactory.createEtchedBorder());
 			toolbar1.add(toolbar1Grp2);
 
-			toolbar1Grp2.add(new JLabel("Remove/Unremove"), BorderLayout.NORTH);
+			toolbar1Grp2.add(new JLabel("Export/Unexport"), BorderLayout.NORTH);
 			JPanel toolbar1Grp2Buttons = new JPanel();
 			toolbar1Grp2.add(toolbar1Grp2Buttons, BorderLayout.SOUTH);
+
+			JButton exportAll = UIUtil.makeIconButton(
+				"selectall-16x16.png", 
+				"export_all", "Export all", "Export all", 
+				new ActionListener() {
+					
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						// TODO Auto-generated method stub
+						tblRegister.selectAll(true, 5);
+					}
+				});
+			exportAll.setMargin(new Insets(0, 0 , 0, 0));
+			exportAll.setToolTipText("Only export normal algorithms");
+			toolbar1Grp2Buttons.add(exportAll);
+
+			JButton unexportAll = UIUtil.makeIconButton(
+				"unselectall-16x16.png", 
+				"unexport_all", "Unexport all", "Unexport all", 
+				new ActionListener() {
+					
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						// TODO Auto-generated method stub
+						tblRegister.selectAll(false, 5);
+					}
+				});
+			unexportAll.setMargin(new Insets(0, 0 , 0, 0));
+			toolbar1Grp2Buttons.add(unexportAll);
+
+			JPanel toolbar1Grp3 = new JPanel(new BorderLayout());
+			toolbar1Grp3.setBorder(BorderFactory.createEtchedBorder());
+			toolbar1.add(toolbar1Grp3);
+
+			toolbar1Grp3.add(new JLabel("Remove/Unremove"), BorderLayout.NORTH);
+			JPanel toolbar1Grp3Buttons = new JPanel();
+			toolbar1Grp3.add(toolbar1Grp3Buttons, BorderLayout.SOUTH);
 
 			JButton removeAll = UIUtil.makeIconButton(
 				"selectall-16x16.png", 
@@ -428,11 +625,11 @@ public class PluginStorageManifest extends SortableTable {
 					@Override
 					public void actionPerformed(ActionEvent e) {
 						// TODO Auto-generated method stub
-						tblRegister.removeAll(true);
+						tblRegister.selectAll(true, 6);
 					}
 				});
 			removeAll.setMargin(new Insets(0, 0 , 0, 0));
-			toolbar1Grp2Buttons.add(removeAll);
+			toolbar1Grp3Buttons.add(removeAll);
 
 			JButton unremoveAll = UIUtil.makeIconButton(
 				"unselectall-16x16.png", 
@@ -442,44 +639,35 @@ public class PluginStorageManifest extends SortableTable {
 					@Override
 					public void actionPerformed(ActionEvent e) {
 						// TODO Auto-generated method stub
-						tblRegister.removeAll(false);
+						tblRegister.selectAll(false, 6);
 					}
 				});
 			unremoveAll.setMargin(new Insets(0, 0 , 0, 0));
-			toolbar1Grp2Buttons.add(unremoveAll);
+			toolbar1Grp3Buttons.add(unremoveAll);
 
 			
 			JPanel toolbar2 = new JPanel(new BorderLayout());
 			footer.add(toolbar2, BorderLayout.SOUTH);
 			
 			JPanel toolbar2Grp1 = new JPanel();
-			toolbar2.add(toolbar2Grp1, BorderLayout.CENTER);
-			
-			JButton apply = new JButton("Apply");
-			apply.addActionListener(new ActionListener() {
-				
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					// TODO Auto-generated method stub
-					apply();
-				}
-			});
-			toolbar2Grp1.add(apply);
+			toolbar2.add(toolbar2Grp1, BorderLayout.WEST);
 
-			JButton reset = new JButton("Reset");
-			reset.addActionListener(new ActionListener() {
+			//Reload plugin storage from built packages.
+			JButton reloadAlg = new JButton("Reload");
+			reloadAlg.addActionListener(new ActionListener() {
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					// TODO Auto-generated method stub
+					tblRegister.firePluginChangedEvent(new PluginChangedEvent(tblRegister)); //Force to unsetting up algorithms.
+					Util.getPluginManager().discover();
 					tblRegister.update();
+					tblRegister.firePluginChangedEvent(new PluginChangedEvent(tblRegister));
 				}
 			});
-			toolbar2Grp1.add(reset);
+			reloadAlg.setToolTipText("Reload plugin storage from built packages");
+			toolbar2Grp1.add(reloadAlg);
 
-			JPanel toolbar2Grp2 = new JPanel();
-			toolbar2.add(toolbar2Grp2, BorderLayout.EAST);
-
+			//Only import normal algorithms
 			JButton importAlg = new JButton("Import");
 			importAlg.addActionListener(new ActionListener() {
 				
@@ -501,10 +689,34 @@ public class PluginStorageManifest extends SortableTable {
 					tblRegister.update();
 				}
 			});
-			if (listener != null && !listener.isSupportImport())
-				importAlg.setVisible(false);
-			toolbar2Grp2.add(importAlg);
+			importAlg.setToolTipText("Only import normal algorithms");
+			toolbar2Grp1.add(importAlg);
 			
+			JPanel toolbar2Grp2 = new JPanel();
+			toolbar2.add(toolbar2Grp2, BorderLayout.CENTER);
+			
+			JButton apply = new JButton("Apply");
+			apply.addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					// TODO Auto-generated method stub
+					apply();
+				}
+			});
+			toolbar2Grp2.add(apply);
+
+			JButton reset = new JButton("Reset");
+			reset.addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					// TODO Auto-generated method stub
+					tblRegister.update();
+				}
+			});
+			toolbar2Grp2.add(reset);
+
 		}
 		
 		/**
@@ -524,7 +736,7 @@ public class PluginStorageManifest extends SortableTable {
 			if (ret) {
 				JOptionPane.showMessageDialog(
 						UIUtil.getFrameForComponent(tblRegister), 
-						"Apply plug-in storage successfully. Algorithms are registered/unregistered/removed/unremoved", 
+						"Apply plug-in storage successfully.\nAlgorithms were registered/unregistered exported/unexported removed/unremoved.", 
 						"Apply successfully", 
 						JOptionPane.INFORMATION_MESSAGE);
 			}
@@ -642,8 +854,20 @@ class RegisterTM extends SortableTableModel {
 			row.add(alg.getClass().toString());
 			row.add(alg);
 			row.add(true);
-			row.add(false);
+
+			boolean exported = false;
+			if (alg instanceof Exportable) {
+				try {
+					exported = ((Exportable)alg).getExportedStub() != null;
+				} catch (Throwable e) {
+					e.printStackTrace();
+					exported = false;
+				}
+			}
+			row.add(exported);
 			
+			row.add(false);
+
 			data.add(row);
 		}
 		
@@ -668,8 +892,20 @@ class RegisterTM extends SortableTableModel {
 			row.add(alg.getClass().toString());
 			row.add(alg);
 			row.add(false);
-			row.add(false);
 			
+			boolean exported = false;
+			if (alg instanceof Exportable) {
+				try {
+					exported = ((Exportable)alg).getExportedStub() != null;
+				} catch (Throwable e) {
+					e.printStackTrace();
+					exported = false;
+				}
+			}
+			row.add(exported);
+
+			row.add(false);
+
 			data.add(row);
 			
 		}
@@ -687,6 +923,7 @@ class RegisterTM extends SortableTableModel {
 		columns.add("Java class");
 		columns.add("Object");
 		columns.add("Registered");
+		columns.add("Exported");
 		columns.add("Removed");
 		
 		return columns;
@@ -705,7 +942,7 @@ class RegisterTM extends SortableTableModel {
 	@Override
 	public Class<?> getColumnClass(int columnIndex) {
 		// TODO Auto-generated method stub
-		if (columnIndex == 4 || columnIndex == 5)
+		if (columnIndex == 4 || columnIndex == 5 || columnIndex == 6)
 			return Boolean.class;
 		else
 			return super.getColumnClass(columnIndex);
@@ -715,7 +952,10 @@ class RegisterTM extends SortableTableModel {
 	@Override
 	public boolean isCellEditable(int row, int column) {
 		// TODO Auto-generated method stub
-		return column == 4 || column == 5;
+		if (column == 4 || column == 5 || column == 6)
+			return true;
+		else
+			return false;
 	}
 
 
@@ -761,7 +1001,13 @@ class PluginStorageManifest2 extends JTable {
     protected EventListenerList listenerList = new EventListenerList();
 
     
-	/**
+    /**
+     * Exported port.
+     */
+    protected int port = 0;
+
+    
+    /**
 	 * Default constructor.
 	 */
 	public PluginStorageManifest2() {
@@ -773,36 +1019,147 @@ class PluginStorageManifest2 extends JTable {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				// TODO Auto-generated method stub
-				int row = getSelectedRow();
-				if (row < 0) return;
-				Alg alg = (Alg) getModel().getValueAt(row, 3);
-				if (alg.getConfig() == null) return;
-				
 				if(SwingUtilities.isRightMouseButton(e) ) {
-					JPopupMenu contextMenu = new JPopupMenu();
-					
-					JMenuItem miConfig = UIUtil.makeMenuItem( (String)null, "Configuration", 
-						new ActionListener() {
-							
-							@Override
-							public void actionPerformed(ActionEvent e) {
-								AlgConfigDlg dlgConfig = new AlgConfigDlg(UIUtil.getFrameForComponent(getThisManifest()), alg);
-								dlgConfig.getPropPane().setToolbarVisible(false);
-								dlgConfig.getPropPane().setControlVisible(false);
-								dlgConfig.getPropPane().setEnabled(false);
-								dlgConfig.setVisible(true);
-							}
-						});
-					contextMenu.add(miConfig);
-
-					contextMenu.show((Component)e.getSource(), e.getX(), e.getY());
+					JPopupMenu contextMenu = createContextMenu();
+					if (contextMenu != null)
+						contextMenu.show((Component)e.getSource(), e.getX(), e.getY());
 				}
 				else if (e.getClickCount() >= 2) {
-					
+					int selectedColumn = getSelectedColumn();
+					if (selectedColumn != 4 && selectedColumn != 5 && selectedColumn != 6)
+						showConfig();
 				}
 			}
 			
 		});
+	}
+	
+	
+	/**
+	 * Default constructor with specified exported port.
+	 * @param port specified exported port.
+	 */
+	public PluginStorageManifest2(int port) {
+		this();
+		this.port = port;
+	}
+	
+	
+	/**
+	 * Create context menu.
+	 * @return context menu.
+	 */
+	private JPopupMenu createContextMenu() {
+		JPopupMenu contextMenu = new JPopupMenu();
+		
+		int selectedRow = getSelectedRow();
+		Alg alg = selectedRow < 0 ? null : (Alg) getModel().getValueAt(selectedRow, 3);
+		DataConfig config = alg == null ? null : alg.getConfig(); 
+		if (config != null) {
+			JMenuItem miConfig = UIUtil.makeMenuItem( (String)null, "Configuration", 
+				new ActionListener() {
+					
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						showConfig();
+					}
+				});
+			contextMenu.add(miConfig);
+			
+			contextMenu.addSeparator();
+		}
+		
+		JMenuItem miRegisterAllAlgs = UIUtil.makeMenuItem( (String)null, "Register all algorithms", 
+			new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					selectAllNormalAlgs(true, 4);
+				}
+			});
+		contextMenu.add(miRegisterAllAlgs);
+		
+		JMenuItem miUnregisterAllAlgs = UIUtil.makeMenuItem( (String)null, "Unregister all algorithms", 
+			new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					selectAllNormalAlgs(false, 4);
+				}
+			});
+		contextMenu.add(miUnregisterAllAlgs);
+
+		contextMenu.addSeparator();
+		
+		JMenuItem miExportAllAlgs = UIUtil.makeMenuItem( (String)null, "Export all algorithms", 
+			new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					selectAllNormalAlgs(true, 5);
+				}
+			});
+		contextMenu.add(miExportAllAlgs);
+		
+		JMenuItem miUnexportAllAlgs = UIUtil.makeMenuItem( (String)null, "Unexport all algorithms", 
+			new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					selectAllNormalAlgs(false, 5);
+				}
+			});
+		contextMenu.add(miUnexportAllAlgs);
+
+		contextMenu.addSeparator();
+		
+		JMenuItem miRemoveAllAlgs = UIUtil.makeMenuItem( (String)null, "Remove all algorithms", 
+			new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					selectAllNormalAlgs(true, 6);
+				}
+			});
+		contextMenu.add(miRemoveAllAlgs);
+		
+		JMenuItem miUnremoveAllAlgs = UIUtil.makeMenuItem( (String)null, "Unremove all algorithms", 
+			new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					selectAllNormalAlgs(false, 6);
+				}
+			});
+		contextMenu.add(miUnremoveAllAlgs);
+		
+		
+		return contextMenu;
+	}
+	
+	
+	/**
+	 * Showing configuration dialog of selected algorithm. 
+	 */
+	private void showConfig() {
+		int selectedRow = getSelectedRow();
+		Alg alg = selectedRow < 0 ? null : (Alg) getModel().getValueAt(selectedRow, 3);
+		DataConfig config = alg == null ? null : alg.getConfig(); 
+		
+		if (config == null) {
+			JOptionPane.showMessageDialog(
+					UIUtil.getFrameForComponent(this), 
+					"Apply plug-in storage successfully. Algorithms are registered/unregistered/removed/unremoved", 
+					"Apply successfully", 
+					JOptionPane.INFORMATION_MESSAGE);
+		}
+		else {
+			AlgConfigDlg dlgConfig = new AlgConfigDlg(UIUtil.getFrameForComponent(getThisManifest()), alg);
+			dlgConfig.getPropPane().setToolbarVisible(false);
+			dlgConfig.getPropPane().setControlVisible(false);
+			dlgConfig.getPropPane().setEnabled(false);
+			dlgConfig.setVisible(true);
+		}
 	}
 	
 	
@@ -841,14 +1198,16 @@ class PluginStorageManifest2 extends JTable {
 		
 		AlgList nextUpdateList = PluginStorage.getNextUpdateList();
 		int n = getRowCount();
-		List<Alg> removedAlgList = Util.newList();
+		List<Alg> unexportedAlgList = Util.newList();
+		boolean changed = false;
 		for (int i = 0; i < n; i++) {
 			Alg alg = (Alg) getValueAt(i, 3);
 			RegisterTable table = PluginStorage.lookupTable(alg.getClass());
 			if (table == null) continue;
 
 			boolean registered = (Boolean)getValueAt(i, 4);
-			boolean removed = (Boolean)getValueAt(i, 5);
+			boolean exported = (Boolean)getValueAt(i, 5);
+			boolean removed = (Boolean)getValueAt(i, 6);
 			
 			if (removed) {
 				if (!table.contains(alg.getName()))
@@ -856,57 +1215,97 @@ class PluginStorageManifest2 extends JTable {
 				else
 					table.unregister(alg.getName());
 				
-				removedAlgList.add(alg);
+				unexportedAlgList.add(alg);
+				changed = true;
 			}
-			else if (registered) {
-				if (!table.contains(alg.getName())) {
-					table.register(alg);
-					nextUpdateList.remove(alg);
+			else {
+				if (registered) {
+					if (!table.contains(alg.getName())) {
+						table.register(alg);
+						nextUpdateList.remove(alg);
+						changed = true;
+					}
 				}
-			}
-			else if(table.contains(alg.getName())) {
-				table.unregister(alg.getName());
-				nextUpdateList.add(alg);
+				else if(table.contains(alg.getName())) {
+					table.unregister(alg.getName());
+					nextUpdateList.add(alg);
+					changed = true;
+				}
+				
+				if (alg instanceof Exportable) {
+					try {
+						boolean algExported = ((Exportable)alg).getExportedStub() != null;
+						if (exported) {
+							if (!algExported) {
+								String algTypeName = getValueAt(i, 0).toString();
+								if (algTypeName.equals(PluginStorage.NORMAL_ALG)) { //Only export normal algorithms.
+									((Exportable)alg).export(port);
+									changed = true;
+								}
+							}
+						}
+						else {
+							if (algExported) {
+								unexportedAlgList.add(alg);
+								changed = true;
+							}
+						}
+					} 
+					catch (Throwable e) {
+						e.printStackTrace();
+						changed = true;
+					}
+				}
 			}
 		}
 		
-		update();
+		if (changed)
+			firePluginChangedEvent(new PluginChangedEvent(this));
 		
-		firePluginChangedEvent(new PluginChangedEvent(this));
-		for (Alg alg : removedAlgList) {
+		for (Alg alg : unexportedAlgList) {
 			if (alg instanceof Exportable) {
 				try {
-					((Exportable)alg).unexport();
+					((Exportable)alg).unexport(); //Finalize method will call unsetup method if unsetup method exists in this algorithm.
 				} catch (Throwable e) {e.printStackTrace();}
 			}
 		}
 		
+		update();
+
 		return true;
 	}
 	
 
 	/**
 	 * Selecting or unselecting all rows according the specified input parameter {@code selected}.
-	 * @param selected if {@code true} then all rows are selected. Otherwise, all rows are unselected. 
+	 * @param selected if {@code true} then all rows are selected. Otherwise, all rows are unselected.
+	 * @param column column to be selected or not selected.
 	 */
-	public void registerAll(boolean selected) {
+	protected void selectAll(boolean selected, int column) {
+		if (column != 4 && column != 5 && column != 6)
+			return;
+		
 		int n = getRowCount();
 		for (int i = 0; i < n; i++) {
-			
-			setValueAt(selected, i, 4);
+			setValueAt(selected, i, column);
 		}
 	}
 
 	
 	/**
-	 * Removing or unremoving all rows according the specified input parameter {@code selected}.
-	 * @param selected if {@code true} then all rows are selected. Otherwise, all rows are unselected. 
+	 * Registering or unregistering all normal algorithms.
+	 * @param selected if {@code true} then all normal algorithms are selected. Otherwise, all normal algorithms are unselected. 
+	 * @param column column to be selected or not selected.
 	 */
-	public void removeAll(boolean selected) {
+	protected void selectAllNormalAlgs(boolean selected, int column) {
+		if (column != 4 && column != 5 && column != 6)
+			return;
+
 		int n = getRowCount();
 		for (int i = 0; i < n; i++) {
-			
-			setValueAt(selected, i, 5);
+			String algTypeName = getValueAt(i, 0).toString();
+			if (algTypeName.equals(PluginStorage.NORMAL_ALG))
+				setValueAt(selected, i, column);
 		}
 	}
 
@@ -1034,7 +1433,7 @@ class PluginStorageManifest2 extends JTable {
 			JPanel body = new JPanel(new BorderLayout());
 			add(body, BorderLayout.CENTER);
 			
-			tblRegister = new PluginStorageManifest2();
+			tblRegister = new PluginStorageManifest2(listener.getPort() < 0 ? 0 : listener.getPort());
 			if (listener != null)
 				tblRegister.addPluginChangedListener(listener);
 			body.add(new JScrollPane(tblRegister), BorderLayout.CENTER);
@@ -1061,7 +1460,7 @@ class PluginStorageManifest2 extends JTable {
 					@Override
 					public void actionPerformed(ActionEvent e) {
 						// TODO Auto-generated method stub
-						tblRegister.registerAll(true);
+						tblRegister.selectAll(true, 4);
 					}
 				});
 			registerAll.setMargin(new Insets(0, 0 , 0, 0));
@@ -1075,7 +1474,7 @@ class PluginStorageManifest2 extends JTable {
 					@Override
 					public void actionPerformed(ActionEvent e) {
 						// TODO Auto-generated method stub
-						tblRegister.registerAll(false);
+						tblRegister.selectAll(false, 4);
 					}
 				});
 			unregisterAll.setMargin(new Insets(0, 0 , 0, 0));
@@ -1085,9 +1484,46 @@ class PluginStorageManifest2 extends JTable {
 			toolbar1Grp2.setBorder(BorderFactory.createEtchedBorder());
 			toolbar1.add(toolbar1Grp2);
 
-			toolbar1Grp2.add(new JLabel("Remove/Unremove"), BorderLayout.NORTH);
+			toolbar1Grp2.add(new JLabel("Export/Unexport"), BorderLayout.NORTH);
 			JPanel toolbar1Grp2Buttons = new JPanel();
 			toolbar1Grp2.add(toolbar1Grp2Buttons, BorderLayout.SOUTH);
+
+			JButton exportAll = UIUtil.makeIconButton(
+				"selectall-16x16.png", 
+				"export_all", "Export all", "Export all", 
+				new ActionListener() {
+					
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						// TODO Auto-generated method stub
+						tblRegister.selectAll(true, 5);
+					}
+				});
+			exportAll.setMargin(new Insets(0, 0 , 0, 0));
+			exportAll.setToolTipText("Only export normal algorithms");
+			toolbar1Grp2Buttons.add(exportAll);
+
+			JButton unexportAll = UIUtil.makeIconButton(
+				"unselectall-16x16.png", 
+				"unexport_all", "Unexport all", "Unexport all", 
+				new ActionListener() {
+					
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						// TODO Auto-generated method stub
+						tblRegister.selectAll(false, 5);
+					}
+				});
+			unexportAll.setMargin(new Insets(0, 0 , 0, 0));
+			toolbar1Grp2Buttons.add(unexportAll);
+
+			JPanel toolbar1Grp3 = new JPanel(new BorderLayout());
+			toolbar1Grp3.setBorder(BorderFactory.createEtchedBorder());
+			toolbar1.add(toolbar1Grp3);
+
+			toolbar1Grp3.add(new JLabel("Remove/Unremove"), BorderLayout.NORTH);
+			JPanel toolbar1Grp3Buttons = new JPanel();
+			toolbar1Grp3.add(toolbar1Grp3Buttons, BorderLayout.SOUTH);
 
 			JButton removeAll = UIUtil.makeIconButton(
 				"selectall-16x16.png", 
@@ -1097,11 +1533,11 @@ class PluginStorageManifest2 extends JTable {
 					@Override
 					public void actionPerformed(ActionEvent e) {
 						// TODO Auto-generated method stub
-						tblRegister.removeAll(true);
+						tblRegister.selectAll(true, 6);
 					}
 				});
 			removeAll.setMargin(new Insets(0, 0 , 0, 0));
-			toolbar1Grp2Buttons.add(removeAll);
+			toolbar1Grp3Buttons.add(removeAll);
 
 			JButton unremoveAll = UIUtil.makeIconButton(
 				"unselectall-16x16.png", 
@@ -1111,44 +1547,35 @@ class PluginStorageManifest2 extends JTable {
 					@Override
 					public void actionPerformed(ActionEvent e) {
 						// TODO Auto-generated method stub
-						tblRegister.removeAll(false);
+						tblRegister.selectAll(false, 6);
 					}
 				});
 			unremoveAll.setMargin(new Insets(0, 0 , 0, 0));
-			toolbar1Grp2Buttons.add(unremoveAll);
+			toolbar1Grp3Buttons.add(unremoveAll);
 
 			
 			JPanel toolbar2 = new JPanel(new BorderLayout());
 			footer.add(toolbar2, BorderLayout.SOUTH);
 			
 			JPanel toolbar2Grp1 = new JPanel();
-			toolbar2.add(toolbar2Grp1, BorderLayout.CENTER);
-			
-			JButton apply = new JButton("Apply");
-			apply.addActionListener(new ActionListener() {
-				
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					// TODO Auto-generated method stub
-					apply();
-				}
-			});
-			toolbar2Grp1.add(apply);
+			toolbar2.add(toolbar2Grp1, BorderLayout.WEST);
 
-			JButton reset = new JButton("Reset");
-			reset.addActionListener(new ActionListener() {
+			//Reload plugin storage from built packages.
+			JButton reloadAlg = new JButton("Reload");
+			reloadAlg.addActionListener(new ActionListener() {
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					// TODO Auto-generated method stub
+					tblRegister.firePluginChangedEvent(new PluginChangedEvent(tblRegister)); //Force to unsetting up algorithms.
+					Util.getPluginManager().discover();
 					tblRegister.update();
+					tblRegister.firePluginChangedEvent(new PluginChangedEvent(tblRegister));
 				}
 			});
-			toolbar2Grp1.add(reset);
+			reloadAlg.setToolTipText("Reload plugin storage from built packages");
+			toolbar2Grp1.add(reloadAlg);
 
-			JPanel toolbar2Grp2 = new JPanel();
-			toolbar2.add(toolbar2Grp2, BorderLayout.EAST);
-
+			//Only import normal algorithms
 			JButton importAlg = new JButton("Import");
 			importAlg.addActionListener(new ActionListener() {
 				
@@ -1170,10 +1597,34 @@ class PluginStorageManifest2 extends JTable {
 					tblRegister.update();
 				}
 			});
-			if (listener != null && !listener.isSupportImport())
-				importAlg.setVisible(false);
-			toolbar2Grp2.add(importAlg);
+			importAlg.setToolTipText("Only import normal algorithms");
+			toolbar2Grp1.add(importAlg);
 			
+			JPanel toolbar2Grp2 = new JPanel();
+			toolbar2.add(toolbar2Grp2, BorderLayout.CENTER);
+			
+			JButton apply = new JButton("Apply");
+			apply.addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					// TODO Auto-generated method stub
+					apply();
+				}
+			});
+			toolbar2Grp2.add(apply);
+
+			JButton reset = new JButton("Reset");
+			reset.addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					// TODO Auto-generated method stub
+					tblRegister.update();
+				}
+			});
+			toolbar2Grp2.add(reset);
+
 		}
 		
 		/**
@@ -1193,7 +1644,7 @@ class PluginStorageManifest2 extends JTable {
 			if (ret) {
 				JOptionPane.showMessageDialog(
 						UIUtil.getFrameForComponent(tblRegister), 
-						"Apply plug-in storage successfully. Algorithms are registered/unregistered/removed/unremoved", 
+						"Apply plug-in storage successfully.\nAlgorithms were registered/unregistered exported/unexported removed/unremoved.", 
 						"Apply successfully", 
 						JOptionPane.INFORMATION_MESSAGE);
 			}
@@ -1311,8 +1762,20 @@ class RegisterTM2 extends DefaultTableModel {
 			row.add(alg.getClass().toString());
 			row.add(alg);
 			row.add(true);
-			row.add(false);
 			
+			boolean exported = false;
+			if (alg instanceof Exportable) {
+				try {
+					exported = ((Exportable)alg).getExportedStub() != null;
+				} catch (Throwable e) {
+					e.printStackTrace();
+					exported = false;
+				}
+			}
+			row.add(exported);
+
+			row.add(false);
+
 			data.add(row);
 		}
 		
@@ -1337,8 +1800,20 @@ class RegisterTM2 extends DefaultTableModel {
 			row.add(alg.getClass().toString());
 			row.add(alg);
 			row.add(false);
-			row.add(false);
 			
+			boolean exported = false;
+			if (alg instanceof Exportable) {
+				try {
+					exported = ((Exportable)alg).getExportedStub() != null;
+				} catch (Throwable e) {
+					e.printStackTrace();
+					exported = false;
+				}
+			}
+			row.add(exported);
+
+			row.add(false);
+
 			data.add(row);
 			
 		}
@@ -1356,6 +1831,7 @@ class RegisterTM2 extends DefaultTableModel {
 		columns.add("Java class");
 		columns.add("Object");
 		columns.add("Registered");
+		columns.add("Exported");
 		columns.add("Removed");
 		
 		return columns;
@@ -1374,7 +1850,7 @@ class RegisterTM2 extends DefaultTableModel {
 	@Override
 	public Class<?> getColumnClass(int columnIndex) {
 		// TODO Auto-generated method stub
-		if (columnIndex == 4 || columnIndex == 5)
+		if (columnIndex == 4 || columnIndex == 5 || columnIndex == 6)
 			return Boolean.class;
 		else
 			return super.getColumnClass(columnIndex);
@@ -1384,7 +1860,10 @@ class RegisterTM2 extends DefaultTableModel {
 	@Override
 	public boolean isCellEditable(int row, int column) {
 		// TODO Auto-generated method stub
-		return column == 4 || column == 5;
+		if (column == 4 || column == 5 || column == 6)
+			return true;
+		else
+			return false;
 	}
 	
 	
@@ -1805,6 +2284,12 @@ class ImportAlgDlag extends JDialog {
 				Alg nextUpdateAlg = nextUpdateList.get(idx);
 				if (PluginStorage.lookupAlgTypeName(nextUpdateAlg.getClass()) != PluginStorage.lookupAlgTypeName(alg.getClass()))
 					outAlgList.add(alg);
+				else if (alg instanceof AlgRemoteWrapper) {
+					((AlgRemoteWrapper)alg).setExclusive(true);
+					try {
+						((AlgRemoteWrapper)alg).unexport();
+					} catch (Throwable e) {e.printStackTrace();}
+				}
 			}
 		}
 	}
@@ -1855,6 +2340,12 @@ class ImportAlgDlag extends JDialog {
 				Alg nextUpdateAlg = nextUpdateList.get(idx);
 				if (PluginStorage.lookupAlgTypeName(nextUpdateAlg.getClass()) != PluginStorage.lookupAlgTypeName(alg.getClass()))
 					outAlgList.add(alg);
+				else if (alg instanceof AlgRemoteWrapper) {
+					((AlgRemoteWrapper)alg).setExclusive(true);
+					try {
+						((AlgRemoteWrapper)alg).unexport();
+					} catch (Throwable e) {e.printStackTrace();}
+				}
 			}
 		}
 		
@@ -1870,7 +2361,7 @@ class ImportAlgDlag extends JDialog {
 	private void loadClassesFromStore(xURI storeUri, List<Alg> outAlgList) {
 		if (storeUri == null) return;
 
-		List<Alg> algList = Firer.getInstances(storeUri, Alg.class);
+		List<Alg> algList = Util.getPluginManager().discover(storeUri, Alg.class);
 		RegisterTable normalReg = PluginStorage.getNormalAlgReg();
 		AlgList nextUpdateList = PluginStorage.getNextUpdateList();
 		for (Alg alg : algList) {

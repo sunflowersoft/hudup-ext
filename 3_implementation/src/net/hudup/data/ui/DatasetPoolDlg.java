@@ -45,6 +45,7 @@ import net.hudup.evaluate.ui.AddingDatasetDlg;
  * @version 1.0
  *
  */
+@Deprecated
 public class DatasetPoolDlg extends JDialog {
 
 	
@@ -121,9 +122,9 @@ public class DatasetPoolDlg extends JDialog {
 		addWindowListener(new WindowAdapter() {
 
 			@Override
-			public void windowClosing(WindowEvent e) {
+			public void windowClosed(WindowEvent e) {
 				// TODO Auto-generated method stub
-				super.windowClosing(e);
+				super.windowClosed(e);
 			}
 			
 		});

@@ -283,8 +283,10 @@ public class DatasetViewer extends JDialog {
 				exportDlg.addWindowListener(new WindowAdapter() {
 
 					@Override
-					public void windowClosing(WindowEvent e) {
+					public void windowClosed(WindowEvent e) {
 						// TODO Auto-generated method stub
+						super.windowClosed(e);
+						
 						try {
 							exporter.dispose();
 						}

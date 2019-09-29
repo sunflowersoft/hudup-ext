@@ -24,7 +24,7 @@ public interface Exportable extends Serializable {
 	
 	/**
      * Remote exporting this object.
-     * @param serverPort server port.
+     * @param serverPort server port. Using port 0 if not concerning registry or naming.
      * @return stub as remote object. Return null if exporting fails.
      * @throws RemoteException if any error raises.
      */
@@ -38,4 +38,12 @@ public interface Exportable extends Serializable {
     void unexport() throws RemoteException;
 
 
+	/**
+	 * Getting exported stub.
+	 * @return exported stub.
+     * @throws RemoteException if any error raises.
+	 */
+	Remote getExportedStub() throws RemoteException;
+	
+	
 }

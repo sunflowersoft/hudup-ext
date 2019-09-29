@@ -117,7 +117,7 @@ public class SysConfigDlgExt extends SysConfigDlg {
 			paneRegister = new PluginStorageManifestPanel((PluginChangedListener)vars[0]);
 		body.add("Plugins", paneRegister);
 		
-		paneDataDriverList = DataDriverListTable.createPane(DataDriverList.list());
+		paneDataDriverList = DataDriverListTable.createPane(DataDriverList.get());
 		body.add("Data drivers", paneDataDriverList);
 		
 		paneSystemProperties = new SystemPropertiesPane();

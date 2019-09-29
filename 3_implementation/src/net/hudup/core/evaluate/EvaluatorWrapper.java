@@ -19,6 +19,7 @@ import net.hudup.core.alg.SetupAlgEvent;
 import net.hudup.core.alg.SetupAlgListener;
 import net.hudup.core.data.DatasetPool;
 import net.hudup.core.logistic.BaseClass;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.NetUtil;
 
 /**
@@ -39,9 +40,9 @@ public class EvaluatorWrapper implements Evaluator, Serializable {
 
 	
     /**
-     * Stub as remote evaluator. It must be serializable.
+     * Exported stub as remote evaluator. It must be serializable.
      */
-    protected Evaluator stub = null;
+    protected Evaluator exportedStub = null;
 
 	
 	/**
@@ -285,10 +286,15 @@ public class EvaluatorWrapper implements Evaluator, Serializable {
 	@Override
 	public Remote export(int serverPort) throws RemoteException {
 		// TODO Auto-generated method stub
-		if (stub == null)
-			stub = (Evaluator) NetUtil.RegistryRemote.export(this, serverPort);
-	
-		return stub;
+		if (exportedStub != null) return exportedStub;
+
+		exportedStub = (Evaluator) NetUtil.RegistryRemote.export(this, serverPort);
+		if (exportedStub != null)
+			LogUtil.info("Evaluator served at port " + serverPort);
+		else
+			LogUtil.info("Evaluator failed to export");
+			
+		return exportedStub;
 	}
 
 	
@@ -302,13 +308,22 @@ public class EvaluatorWrapper implements Evaluator, Serializable {
 		}
 		remoteEvaluator = null;
 		
-		if (stub != null) {
-			NetUtil.RegistryRemote.unexport(this);
-			stub = null;
-		}
+		if (exportedStub == null) return;
+		boolean ret = NetUtil.RegistryRemote.unexport(this);
+		exportedStub = null;
+		if (ret)
+			LogUtil.info("Evaluator unexported successfully");
+		else
+			LogUtil.info("Evaluator unexported failedly");
 	}
 
 
+	@Override
+	public Remote getExportedStub() throws RemoteException {
+		return exportedStub;
+	}
+
+	
 	@Override
 	protected void finalize() throws Throwable {
 		// TODO Auto-generated method stub

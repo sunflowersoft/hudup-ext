@@ -106,7 +106,7 @@ public class DatasetExporter extends JPanel implements ProgressListener, Dispose
 				DatasetConfigurator chooser = new DatasetConfigurator(
 						btnSource, 
 						PluginStorage.getParserReg().getAlgList(),
-						DataDriverList.list(),
+						DataDriverList.get(),
 						null);
 				
 				DataConfig config = chooser.getResultedConfig();
@@ -136,7 +136,7 @@ public class DatasetExporter extends JPanel implements ProgressListener, Dispose
 				DatasetConfigurator chooser = new DatasetConfigurator(
 						getThisExporter(),
 						PluginStorage.getParserReg().getAlgList(),
-						DataDriverList.list(),
+						DataDriverList.get(),
 						null);
 				
 				DataConfig config = chooser.getResultedConfig();

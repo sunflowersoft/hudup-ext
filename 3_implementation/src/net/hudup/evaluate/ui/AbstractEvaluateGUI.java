@@ -9,6 +9,7 @@ package net.hudup.evaluate.ui;
 
 import java.io.IOException;
 import java.nio.channels.ByteChannel;
+import java.rmi.Remote;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -30,7 +31,6 @@ import net.hudup.core.evaluate.Metrics;
 import net.hudup.core.logistic.I18nUtil;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.NetUtil;
-import net.hudup.core.logistic.NetUtil.RegistryRemote;
 import net.hudup.core.logistic.UriAdapter.AdapterWriteChannel;
 import net.hudup.core.logistic.xURI;
 import net.hudup.core.logistic.ui.CounterClock;
@@ -111,9 +111,9 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	
 	
 	/**
-	 * Remote registry.
+	 * Exported stub (EvaluatorListener, EvaluatorProgressListener, SetupAlgListener).
 	 */
-	protected RegistryRemote registry = null;
+	protected Remote exportedStub = null;
 	
 	
 	/**
@@ -130,8 +130,11 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	public AbstractEvaluateGUI(Evaluator evaluator, xURI bindUri) {
 		this.bindUri = bindUri;
 		if (bindUri != null) { //Evaluator is remote
-			this.registry = NetUtil.RegistryRemote.registerExport0(this, bindUri.getPort());
-			LogUtil.info("Evaluator GUI exported at port " + bindUri.getPort());
+			this.exportedStub = NetUtil.RegistryRemote.export(this, bindUri.getPort());
+			if (this.exportedStub != null)
+				LogUtil.info("Evaluator GUI exported at port " + bindUri.getPort());
+			else
+				LogUtil.info("Evaluator GUI failed to exported");
 		}
 		else { //Evaluator is local
 			try {
@@ -332,16 +335,13 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 			
 			this.evaluator.close(); //The close() method also unexports evaluator.
 			
-			if (this.registry != null) {
-				if (this.registry.isRegistryCreated()) {
-					NetUtil.RegistryRemote.unregisterUnexport(this.registry.getRegistry(), this);
-					LogUtil.info("Evaluator GUI unregistered and unexported successfully");
-				}
-				else {
-					NetUtil.RegistryRemote.unexport(this);
+			if (this.exportedStub != null) {
+				boolean ret = NetUtil.RegistryRemote.unexport(this);
+				if (ret)
 					LogUtil.info("Evaluator GUI unexported successfully");
-				}
-				this.registry = null;
+				else
+					LogUtil.info("Evaluator GUI unexported failedly");
+				this.exportedStub = null;
 			}
 		}
 		catch (Exception e) {
@@ -409,10 +409,24 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	}
 
 
+//	@Override
+//	public boolean isSupportImport() {
+//		// TODO Auto-generated method stub
+//		return this.bindUri == null;
+//	}
+
+
 	@Override
-	public boolean isSupportImport() {
-		// TODO Auto-generated method stub
-		return this.bindUri == null;
+	public int getPort() {
+		if (bindUri != null) //Evaluator is remote
+			return bindUri.getPort();
+		else { //Evaluator is local
+			try {
+				return evaluator.getConfig().getEvaluatorPort();
+			} catch (Throwable e) {e.printStackTrace();}
+			
+			return -1;
+		}
 	}
 
 

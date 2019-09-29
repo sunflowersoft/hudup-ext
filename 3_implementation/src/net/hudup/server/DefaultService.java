@@ -13,7 +13,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import net.hudup.core.Firer;
 import net.hudup.core.PluginStorage;
 import net.hudup.core.Util;
 import net.hudup.core.alg.Alg;
@@ -1450,7 +1449,7 @@ public class DefaultService implements Service, AutoCloseable {
 		
 		trans.lockWrite();
 		try {
-			List<Evaluator> evList = Firer.getInstances(Evaluator.class);
+			List<Evaluator> evList = Util.getPluginManager().discover(Evaluator.class);
 			for (Evaluator ev : evList) {
 				if (ev.getName().equals(evaluatorName)) {
 					evaluator = ev;
@@ -1487,7 +1486,7 @@ public class DefaultService implements Service, AutoCloseable {
 		
 		trans.lockRead();
 		try {
-			List<Evaluator> evList = Firer.getInstances(Evaluator.class);
+			List<Evaluator> evList = Util.getPluginManager().discover(Evaluator.class);
 			for (Evaluator ev : evList) {
 				evaluatorNames.add(ev.getName());
 			}
@@ -1515,8 +1514,10 @@ public class DefaultService implements Service, AutoCloseable {
 			alg = PluginStorage.getNormalAlgReg().query(algName);
 			if ((alg != null) && !(alg instanceof AlwaysSerialize)) {
 				if (alg instanceof AlgRemote) {
-					AlgRemote remoteAlg = (AlgRemote) ((AlgRemote)alg).export(serverConfig.getServerPort());
-					alg = Util.getAlgUtil().wrap(remoteAlg, false);
+//					AlgRemote remoteAlg = (AlgRemote) ((AlgRemote)alg).export(serverConfig.getServerPort());
+//					alg = Util.getPluginManager().wrap(remoteAlg, false);
+					((AlgRemote)alg).export(serverConfig.getServerPort());
+					alg = Util.getPluginManager().wrap((AlgRemote)alg, false);
 				}
 				else
 					alg = null;

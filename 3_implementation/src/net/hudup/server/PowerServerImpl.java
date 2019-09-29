@@ -165,7 +165,7 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			LogUtil.error("Server constructor caused error " + e.getMessage());
+			LogUtil.error("Power server constructor caused error " + e.getMessage());
 			System.exit(0);
 		}
 		
@@ -208,7 +208,7 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
     	
     	trans.lockWrite();
     	try {
-    		LogUtil.info("Server is initializing to start, please wait...");
+    		LogUtil.info("Power server is initializing to start, please wait...");
 			doWhenStart();
 			activeMeasure.reset();
 
@@ -384,8 +384,8 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
     	
 		fireStatusEvent(new ServerStatusEvent(this, Status.exit));
 		
-		//Added date: 2019.09.15 by Loc Nguyen
-		PluginStorage.releaseAllRegisteredAlgs();
+		//Added date: 2019.09.15 by Loc Nguyen.
+		PluginStorage.clear();
 	}
 
 	

@@ -183,7 +183,7 @@ public class SetupExternalServerWizard extends SetupServerWizard {
 				ExternalConfig defaultExternalConfig = ((ExternalServerConfig)config).getExternalConfig();
 				
 				ExternalConfigurator configurator = new ExternalConfigurator(
-						getWizard(), DataDriverList.list(), defaultExternalConfig);
+						getWizard(), DataDriverList.get(), defaultExternalConfig);
 				
 				ExternalConfig externalConfig = configurator.getResult();
 				if (externalConfig == null || externalConfig.size() == 0) {

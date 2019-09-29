@@ -25,7 +25,6 @@ import net.hudup.core.PluginStorage;
 import net.hudup.core.RegisterTable;
 import net.hudup.core.Util;
 import net.hudup.core.alg.Alg;
-import net.hudup.core.alg.AlgDesc;
 import net.hudup.core.alg.AlgDesc.MethodType;
 import net.hudup.core.alg.SocketAlg;
 import net.hudup.core.data.Attribute;
@@ -74,7 +73,7 @@ public final class DatasetUtil2 {
 			return null;
 		
 		DatasetParser parser = null;
-		MethodType defaultAlgType = AlgDesc.methodTypeOf(defaultAlg);
+		MethodType defaultAlgType = Util.getPluginManager().methodTypeOf(defaultAlg);
 		if (defaultAlgType == MethodType.modelbased)
 			parser = (DatasetParser) PluginStorage.getParserReg().query(new KBaseIndicator().getName());
 		else if (defaultAlgType == MethodType.service) {
@@ -174,7 +173,7 @@ public final class DatasetUtil2 {
 		}
 		
 		return chooseConfig(
-				comp, parserList, DataDriverList.list(), defaultConfig);
+				comp, parserList, DataDriverList.get(), defaultConfig);
 	}
 
 	
@@ -189,7 +188,7 @@ public final class DatasetUtil2 {
 		if (alg == null)
 			return DatasetUtil2.chooseConfig(comp, defaultConfig);
 		
-		MethodType algType = AlgDesc.methodTypeOf(alg);
+		MethodType algType = Util.getPluginManager().methodTypeOf(alg);
 		List<Alg> parserList = ((RegisterTable) PluginStorage.getParserReg().clone()).getAlgList();
 		List<Alg> newParserList = Util.newList();
 		for (Alg parser : parserList) {
@@ -210,7 +209,7 @@ public final class DatasetUtil2 {
 				newParserList.add(parser);
 		}
 		
-		return chooseConfig(comp, newParserList, DataDriverList.list(), defaultConfig);
+		return chooseConfig(comp, newParserList, DataDriverList.get(), defaultConfig);
 	}
 
 	
@@ -229,7 +228,7 @@ public final class DatasetUtil2 {
 				newParserList.add(parser);
 		}
 		
-		return chooseConfig(comp, newParserList, DataDriverList.list(), defaultConfig);
+		return chooseConfig(comp, newParserList, DataDriverList.get(), defaultConfig);
 	}
 
 	
@@ -248,7 +247,7 @@ public final class DatasetUtil2 {
 				newParserList.add(parser);
 		}
 		
-		return chooseConfig(comp, newParserList, DataDriverList.list(), defaultConfig);
+		return chooseConfig(comp, newParserList, DataDriverList.get(), defaultConfig);
 	}
 
 	
@@ -279,7 +278,7 @@ public final class DatasetUtil2 {
 			
 			if (dataDriverName == null)
 				return chooseConfig(
-						comp, newParserList, DataDriverList.list(), defaultConfig);
+						comp, newParserList, DataDriverList.get(), defaultConfig);
 				
 			defaultConfig.setDataDriverName(dataDriverName);
 			DataDriver dataDriver = DataDriver.createByName(dataDriverName);
@@ -296,7 +295,7 @@ public final class DatasetUtil2 {
 		}
 		
 		return chooseConfig(
-				comp, newParserList, DataDriverList.list(), defaultConfig);
+				comp, newParserList, DataDriverList.get(), defaultConfig);
 	}
 
 	
@@ -350,7 +349,7 @@ public final class DatasetUtil2 {
 				boolean flag = false;
 				
 				for (Alg alg : algList) {
-					MethodType algType = AlgDesc.methodTypeOf(alg);
+					MethodType algType = Util.getPluginManager().methodTypeOf(alg);
 					if (algType == MethodType.modelbased || algType == MethodType.composite) {
 						flag = true;
 						break;
@@ -371,7 +370,7 @@ public final class DatasetUtil2 {
 				boolean flag = false;
 				
 				for (Alg alg : algList) {
-					MethodType algType = AlgDesc.methodTypeOf(alg);
+					MethodType algType = Util.getPluginManager().methodTypeOf(alg);
 					if (algType == MethodType.service || algType == MethodType.composite) {
 						flag = true;
 						break;
@@ -397,7 +396,7 @@ public final class DatasetUtil2 {
 			boolean flag = false;
 			
 			for (Alg alg : algList) {
-				MethodType algType = AlgDesc.methodTypeOf(alg);
+				MethodType algType = Util.getPluginManager().methodTypeOf(alg);
 				if (algType != MethodType.service) {
 					flag = true;
 					break;

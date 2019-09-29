@@ -93,18 +93,8 @@ public abstract class DatasetAbstract implements Dataset, DatasetRemote {
 	}
 
 
-	/**
-	 * Getting exported dataset.
-	 * @return exported dataset.
-	 */
-	public DatasetRemote getExportedDataset() {
-		return (DatasetRemote)exportedStub;
-	}
-
-	
 	@Override
 	public synchronized Remote export(int serverPort) throws RemoteException {
-		//Remote wrapper can export itself because this function is useful when the wrapper as remote algorithm can be called remotely by remote evaluator via Evaluator.remoteStart method.
 		if (exportedStub == null)
 			exportedStub = (DatasetRemote) NetUtil.RegistryRemote.export(this, serverPort);
 	
@@ -119,6 +109,12 @@ public abstract class DatasetAbstract implements Dataset, DatasetRemote {
 			NetUtil.RegistryRemote.unexport(this);
 			exportedStub = null;
 		}
+	}
+
+	
+	@Override
+	public Remote getExportedStub() throws RemoteException {
+		return exportedStub;
 	}
 
 	

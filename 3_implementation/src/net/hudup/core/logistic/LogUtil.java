@@ -7,9 +7,6 @@
  */
 package net.hudup.core.logistic;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 import org.apache.log4j.Logger;
 
 import net.hudup.core.Constants;
@@ -30,10 +27,10 @@ public class LogUtil {
 	protected final static Logger logger = Constants.LOG4J ? Logger.getLogger("Hudup") : null;
 
 	
-	/**
-	 * Simple date format.
-	 */
-	protected final static SimpleDateFormat df = new SimpleDateFormat(Constants.DATE_FORMAT);
+//	/**
+//	 * Simple date format.
+//	 */
+//	protected final static SimpleDateFormat df = new SimpleDateFormat(Constants.DATE_FORMAT);
 
 	
 	/**
@@ -44,7 +41,7 @@ public class LogUtil {
 		if (Constants.LOG4J && logger != null)
 			logger.info(message);
 		else
-			System.out.println(df.format(new Date()) + " INFO " + "Hudup " + message);
+			System.out.println("INFO " + "Hudup " + message);
 	}
 
 	
@@ -56,7 +53,7 @@ public class LogUtil {
 		if (Constants.LOG4J && logger != null)
 			logger.error(message);
 		else
-			System.out.println(df.format(new Date()) + " ERROR " + "Hudup " + message);
+			System.out.println("ERROR " + "Hudup " + message);
 	}
 
 
@@ -68,7 +65,7 @@ public class LogUtil {
 		if (Constants.LOG4J && logger != null)
 			logger.warn(message);
 		else
-			System.out.println(df.format(new Date()) + " WARN " + "Hudup " + message);
+			System.out.println("WARN " + "Hudup " + message);
 	}
 
 

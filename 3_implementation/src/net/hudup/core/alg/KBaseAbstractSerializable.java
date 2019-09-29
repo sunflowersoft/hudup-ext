@@ -58,7 +58,7 @@ public abstract class KBaseAbstractSerializable extends KBaseAbstract {
 	public void load() throws RemoteException {
 		// TODO Auto-generated method stub
 		super.load();
-		deserializeNut();
+		deserializeNut(config.getStoreUri());
 	}
 
 
@@ -66,7 +66,7 @@ public abstract class KBaseAbstractSerializable extends KBaseAbstract {
 	public void save(DataConfig storeConfig) throws RemoteException {
 		// TODO Auto-generated method stub
 		super.save(storeConfig);
-		serializeNut();
+		serializeNut(storeConfig.getStoreUri());
 	}
 
 
@@ -91,25 +91,19 @@ public abstract class KBaseAbstractSerializable extends KBaseAbstract {
 	}
 
 
-//	/**
-//	 * Instantiate knowledge base nut.
-//	 * @return instance of knowledge base nut.
-//	 */
-//	protected abstract KBaseSerializedNut newNut();
-	
-	
 	/**
 	 * Reading (deserializing) nut from knowledge base store.
+	 * @param storeUri store URI.
 	 * @return true if reading (deserializing) is successful. 
 	 */
-	protected boolean deserializeNut() {
+	protected boolean deserializeNut(xURI storeUri) {
 		try {
 			if (nut != null) {
 				nut.close();
 				nut = null;
 			}
 			
-			xURI nutUri = config.getStoreUri().concat(getName() + KBASE_NUT_EXT);
+			xURI nutUri = storeUri.concat(getName() + KBASE_NUT_EXT);
 			UriAdapter adapter = new UriAdapter(nutUri);
 			if (!adapter.exists(nutUri)) return false;
 			
@@ -133,13 +127,14 @@ public abstract class KBaseAbstractSerializable extends KBaseAbstract {
 	
 	/**
 	 * Writing (serializing) nut to knowledge base store.
+	 * @param storeUri store URI.
 	 * @return true if writing (serializing) is successful. 
 	 */
-	protected boolean serializeNut() {
+	protected boolean serializeNut(xURI storeUri) {
 		try {
 			if (nut == null) return false;
 			
-			xURI nutUri = config.getStoreUri().concat(getName() + KBASE_NUT_EXT);
+			xURI nutUri = storeUri.concat(getName() + KBASE_NUT_EXT);
 			UriAdapter adapter = new UriAdapter(nutUri);
 			
 			ObjectOutputStream output = new ObjectOutputStream(adapter.getOutputStream(nutUri, true));

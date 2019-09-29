@@ -414,8 +414,8 @@ public abstract class SocketServer extends AbstractRunner implements Server, Acc
 		LogUtil.info("Socket server shutdown");
 		fireStatusEvent(new ServerStatusEvent(this, Status.exit));
 		
-		//Added date: 2019.09.15 by Loc Nguyen
-		PluginStorage.releaseAllRegisteredAlgs();
+		//Added date: 2019.09.15 by Loc Nguyen.
+		PluginStorage.clear();
 	}
 
 	

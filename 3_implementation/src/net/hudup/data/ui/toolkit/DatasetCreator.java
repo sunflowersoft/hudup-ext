@@ -925,7 +925,7 @@ public class DatasetCreator extends JPanel implements Dispose {
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
 				ExternalConfigurator configurator = new ExternalConfigurator(
-						getCreator(), DataDriverList.list(), null);
+						getCreator(), DataDriverList.get(), null);
 				
 				ExternalConfig externalConfig = configurator.getResult();
 				if (externalConfig == null || externalConfig.size() == 0) {

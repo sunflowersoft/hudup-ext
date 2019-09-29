@@ -12,6 +12,8 @@ import java.awt.Container;
 import java.awt.Image;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -27,11 +29,11 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 
 import net.hudup.core.Constants;
-import net.hudup.core.Firer;
 import net.hudup.core.PluginChangedEvent;
 import net.hudup.core.PluginChangedListener;
 import net.hudup.core.PluginStorage;
 import net.hudup.core.RegisterTable;
+import net.hudup.core.Util;
 import net.hudup.core.client.ConnectDlg;
 import net.hudup.core.client.Service;
 import net.hudup.core.evaluate.Evaluator;
@@ -106,16 +108,16 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 		this.bindUri = bindUri;
 		
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-//		addWindowListener(new WindowAdapter() {
-//
-//			@Override
-//			public void windowClosed(WindowEvent e) {
-//				super.windowClosed(e);
-//				batchEvaluateGUI.dispose();
-//				thisConfig.save();
-//			}
-//
-//		});
+		addWindowListener(new WindowAdapter() {
+
+			@Override
+			public void windowClosed(WindowEvent e) {
+				super.windowClosed(e);
+//				batchEvaluateGUI.dispose(); //Calling in dispose() method instead.
+//				thisConfig.save(); //Calling in dispose() method instead.
+			}
+
+		});
 		
         Image image = UIUtil.getImage("evaluator-32x32.png");
         if (image != null)
@@ -268,9 +270,8 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 	@Override
 	public void dispose() {
 		batchEvaluateGUI.dispose();
-		
 		thisConfig.save();
-
+		PluginStorage.clear();
 		super.dispose();
 	}
 
@@ -289,10 +290,17 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 	}
 	
 	
+//	@Override
+//	public boolean isSupportImport() {
+//		// TODO Auto-generated method stub
+//		return batchEvaluateGUI.isSupportImport();
+//	}
+
+
 	@Override
-	public boolean isSupportImport() {
+	public int getPort() {
 		// TODO Auto-generated method stub
-		return batchEvaluateGUI.isSupportImport();
+		return batchEvaluateGUI.getPort();
 	}
 
 
@@ -302,7 +310,7 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 	 * @param oldGUI old GUI.
 	 */
 	public static void switchEvaluator(String selectedEvName, Window oldGUI) {
-		List<Evaluator> evList = Firer.getInstances(Evaluator.class);
+		List<Evaluator> evList = Util.getPluginManager().discover(Evaluator.class);
 		if (evList.size() == 0) {
 			JOptionPane.showMessageDialog(
 					null, 
@@ -497,8 +505,11 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 	 * @param oldGUI old GUI.
 	 */
 	public static void run(Evaluator evaluator, xURI bindUri, Window oldGUI) {
-		new Firer();
-		
+		if (!Util.getPluginManager().isFired())
+			Util.getPluginManager().fire();
+		else
+			Util.getPluginManager().discover();
+			
 		try {
 //			RegisterTable algReg = evaluator.extractAlgFromPluginStorage();
 //			if (algReg == null || algReg.size() == 0) {

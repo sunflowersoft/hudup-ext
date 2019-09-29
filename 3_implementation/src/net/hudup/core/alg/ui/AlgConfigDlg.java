@@ -51,6 +51,12 @@ public class AlgConfigDlg extends JDialog {
 
 	
 	/**
+	 * Information label.
+	 */
+	protected JLabel lblInfo = null;
+
+	
+	/**
 	 * The graphic user interface (GUI) component as panel shows a properties list.
 	 */
 	protected PropPane paneCfg = null;
@@ -85,9 +91,9 @@ public class AlgConfigDlg extends JDialog {
 		addWindowListener(new WindowAdapter() {
 
 			@Override
-			public void windowClosing(WindowEvent e) {
+			public void windowClosed(WindowEvent e) {
 				// TODO Auto-generated method stub
-				super.windowClosing(e);
+				super.windowClosed(e);
 				if (paneCfg.getPropTable().isModified()) {
 					int confirm = JOptionPane.showConfirmDialog(
 							comp, 
@@ -102,6 +108,13 @@ public class AlgConfigDlg extends JDialog {
 			}
 			
 		});
+		
+		
+		JPanel paneInfo = new JPanel(new BorderLayout());
+		add(paneInfo, BorderLayout.NORTH);
+		lblInfo = new JLabel("Configuration of algorithm '" + alg.getName() + "'");
+		paneInfo.add(lblInfo, BorderLayout.NORTH);
+		
 		
 		paneCfg = new PropPane() {
 			

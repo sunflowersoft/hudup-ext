@@ -39,7 +39,6 @@ import net.hudup.core.logistic.AbstractRunner;
 import net.hudup.core.logistic.DSUtil;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.NetUtil;
-import net.hudup.core.logistic.NetUtil.RegistryRemote;
 import net.hudup.core.logistic.SystemUtil;
 import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.xURI;
@@ -169,10 +168,10 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 	protected NoneWrapperMetricList metricList = null;
 
 	
-	/**
-	 * Remote registry.
-	 */
-	protected RegistryRemote registry = null;
+    /**
+     * Exported stub as remote evaluator. It must be serializable.
+     */
+    protected Evaluator exportedStub = null;
 
 	
 	/**
@@ -403,13 +402,11 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 						if (testingFetcher != null)
 							testingFetcher.close();
 						testingFetcher = null;
-					} 
-					catch (Throwable e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
+					} catch (Throwable e) {e.printStackTrace();}
 					
-					unsetupAlgSupportDelay(alg);
+					try {
+						unsetupAlgSupportDelay(alg);
+					} catch (Throwable e) {e.printStackTrace();}
 				}
 				
 				SystemUtil.enhanceAuto();
@@ -455,7 +452,10 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 	 * @param alg specified algorithm.
 	 */
 	protected void unsetupAlgSupportDelay(Alg alg) {
-		if (!alg.getConfig().getAsBoolean(DataConfig.DELAY_UNSETUP)) {
+		DataConfig config = alg.getConfig();
+		if (config == null) return;
+		
+		if (!config.getAsBoolean(DataConfig.DELAY_UNSETUP)) {
 			try {
 				unsetupAlg(alg);
 			} catch (Throwable e) {e.printStackTrace();}
@@ -834,43 +834,34 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 	@Override
 	public synchronized Remote export(int serverPort) throws RemoteException {
 		// TODO Auto-generated method stub
-		if (this.registry != null) return this.registry.getStub();
-		
-		this.registry = NetUtil.RegistryRemote.registerExport0(this, serverPort);
-		if (this.registry == null)
-			return null;
-		else {
+		if (exportedStub != null) return exportedStub;
+
+		exportedStub = (Evaluator) NetUtil.RegistryRemote.export(this, serverPort);
+		if (exportedStub != null)
 			LogUtil.info("Evaluator served at port " + serverPort);
-			return this.registry.getStub();
-		}
+		else
+			LogUtil.info("Evaluator failed to export");
+		
+		return exportedStub;
 	}
 
 
 	@Override
 	public synchronized void unexport() throws RemoteException {
-		if (this.registry == null) return;
-
-		if (this.registry.isRegistryCreated()) {
-			NetUtil.RegistryRemote.unregisterUnexport(this.registry.getRegistry(), this);
-			LogUtil.info("Evaluator unregistered and unexported successfully");
-		}
-		else {
-			NetUtil.RegistryRemote.unexport(this);
+		if (exportedStub == null) return;
+		
+		boolean ret = NetUtil.RegistryRemote.unexport(this);
+		exportedStub = null;
+		if (ret)
 			LogUtil.info("Evaluator unexported successfully");
-		}
-		this.registry = null;
+		else
+			LogUtil.info("Evaluator unexported failedly");
 	}
 
 
-	/**
-	 * Getting exported stub as remote evaluator.
-	 * @return exported stub as remote evaluator.
-	 */
-	protected Evaluator getStub() {
-		if (this.registry == null)
-			return null;
-		else
-			return (Evaluator) this.registry.getStub();
+	@Override
+	public Remote getExportedStub() throws RemoteException {
+		return exportedStub;
 	}
 	
 	

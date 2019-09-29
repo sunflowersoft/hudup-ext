@@ -139,7 +139,7 @@ public class ExternalServerConfig extends PowerServerConfig {
 			
 			ExternalConfig defaultExternalConfig = getExternalConfig(); 
 			ExternalConfigurator configurator = new ExternalConfigurator(
-					comp, DataDriverList.list(), defaultExternalConfig);
+					comp, DataDriverList.get(), defaultExternalConfig);
 			
 			ExternalConfig externalConfig = configurator.getResult();
 			if (externalConfig == null || externalConfig.size() == 0) {

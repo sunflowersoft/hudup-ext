@@ -817,6 +817,10 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluatorProgr
 		// TODO Auto-generated method stub
 		if (exportedStub == null) {
 			exportedStub = (Evaluator)NetUtil.RegistryRemote.export(this, serverPort);
+			if (exportedStub != null)
+				LogUtil.info("Delegator evaluator served at port " + serverPort);
+			else
+				LogUtil.info("Delegator evaluator failed to export");
 
 			try {
 				remoteEvaluator.addEvaluatorListener(this);
@@ -846,13 +850,23 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluatorProgr
 			} catch (Exception e) {e.printStackTrace();}
 			
 			socketServer.removeRunner(this);
-			NetUtil.RegistryRemote.unexport(this);
+			boolean ret = NetUtil.RegistryRemote.unexport(this);
 			exportedStub = null;
 			remoteServer.decRequest();
+			if (ret)
+				LogUtil.info("Delegator evaluator unexported successfully");
+			else
+				LogUtil.info("Delegator evaluator unexported failedly");
 		}
 	}
 
 
+	@Override
+	public Remote getExportedStub() throws RemoteException {
+		return exportedStub;
+	}
+
+	
 	@Override
 	public void close() throws Exception {
 		// TODO Auto-generated method stub

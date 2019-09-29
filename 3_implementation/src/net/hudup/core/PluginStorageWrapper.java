@@ -98,7 +98,7 @@ public final class PluginStorageWrapper implements Serializable {
 	 */
 	@Deprecated
 	public void assignToSystem() {
-		PluginStorage.releaseAllRegisteredAlgs();
+		PluginStorage.clear();
 		
 		PluginStorage.normalAlgReg = this.normalAlgReg;
 		PluginStorage.parserReg = this.parserReg;

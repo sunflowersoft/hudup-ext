@@ -247,12 +247,9 @@ public class AlgRemoteWrapper implements Alg, AlgRemote, Serializable {
 	}
 
 	
-	/**
-	 * Getting exported algorithm.
-	 * @return exported algorithm.
-	 */
-	public AlgRemote getExportedAlg() {
-		return (AlgRemote)exportedStub;
+	@Override
+	public Remote getExportedStub() throws RemoteException {
+		return exportedStub;
 	}
 
 	

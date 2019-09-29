@@ -307,13 +307,11 @@ public class RecommendEvaluator extends EvaluatorAbstract {
 						if (testingUsers != null)
 							testingUsers.close();
 						testingUsers = null;
-					} 
-					catch (Throwable e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
+					} catch (Throwable e) {e.printStackTrace();}
 					
-					unsetupAlgSupportDelay(recommender);
+					try {
+						unsetupAlgSupportDelay(recommender);
+					} catch (Throwable e) {e.printStackTrace();}
 				}
 				
 				SystemUtil.enhanceAuto();

@@ -328,12 +328,9 @@ public abstract class KBaseAbstract implements KBase, KBaseRemote {
 	}
 
 	
-	/**
-	 * Getting exported knowledge base.
-	 * @return exported knowledge base.
-	 */
-	public KBaseRemote getExportedKBase() {
-		return (KBaseRemote)exportedStub;
+	@Override
+	public Remote getExportedStub() throws RemoteException {
+		return exportedStub;
 	}
 
 	

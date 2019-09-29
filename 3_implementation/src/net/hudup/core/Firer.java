@@ -7,7 +7,6 @@
  */
 package net.hudup.core;
 
-import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.List;
@@ -18,21 +17,43 @@ import org.reflections.Reflections;
 
 import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.AlgList;
+import net.hudup.core.alg.AlgRemote;
+import net.hudup.core.alg.AlgRemoteWrapper;
+import net.hudup.core.alg.AugRemote;
+import net.hudup.core.alg.AugRemoteWrapper;
+import net.hudup.core.alg.CompositeAlg;
+import net.hudup.core.alg.CompositeAlgRemote;
+import net.hudup.core.alg.ExecutableAlg;
+import net.hudup.core.alg.ExecutableAlgRemote;
+import net.hudup.core.alg.ExecutableAlgRemoteWrapper;
+import net.hudup.core.alg.MemoryBasedAlg;
+import net.hudup.core.alg.MemoryBasedAlgRemote;
+import net.hudup.core.alg.ModelBasedAlg;
+import net.hudup.core.alg.ModelBasedAlgRemote;
+import net.hudup.core.alg.Recommender;
+import net.hudup.core.alg.RecommenderRemote;
+import net.hudup.core.alg.RecommenderRemoteWrapper;
+import net.hudup.core.alg.ServiceAlg;
+import net.hudup.core.alg.AlgDesc.FunctionType;
+import net.hudup.core.alg.AlgDesc.MethodType;
 import net.hudup.core.data.DataDriver;
 import net.hudup.core.data.DataDriverList;
-import net.hudup.core.data.ExternalQuery;
-import net.hudup.core.data.ctx.CTSManager;
-import net.hudup.core.evaluate.Metric;
-import net.hudup.core.logistic.BaseClass;
+import net.hudup.core.data.ExternalQueryRemote;
+import net.hudup.core.data.ExternalQueryRemoteWrapper;
+import net.hudup.core.data.ctx.CTSManagerRemote;
+import net.hudup.core.data.ctx.CTSManagerRemoteWrapper;
+import net.hudup.core.evaluate.MetricRemote;
+import net.hudup.core.evaluate.MetricRemoteWrapper;
 import net.hudup.core.logistic.Composite;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.NextUpdate;
 import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.UriAdapter.AdapterWriter;
+import net.hudup.core.parser.DatasetParserRemote;
+import net.hudup.core.parser.DatasetParserRemoteWrapper;
 import net.hudup.core.logistic.UriFilter;
 import net.hudup.core.logistic.UriProcessor;
 import net.hudup.core.logistic.xURI;
-import net.hudup.core.parser.DatasetParser;
 
 /**
  * This class is the full implementation of {@link PluginManager}.
@@ -62,29 +83,22 @@ public class Firer implements PluginManager {
 	
 	
 	/**
+	 * Flag to indicate whether {@link #fire()} method was fired.
+	 */
+	protected boolean fired = false;
+	
+	
+	/**
 	 * This default constructor calls the method {@link #fire()} to initialize important system information.
 	 */
 	public Firer() {
 
-		fire();
-		
 	}
 	
 	
-	/**
-	 * In current implementation, there are two important tasks of method {@link #fire()} as follows:
-	 * <ol>
-	 * <li>
-	 * Method {@link #fire()} creates default directories such as working directory and directory of knowledge base.
-	 * </li>
-	 * <li>
-	 * Method {@link #fire()} continues to call method {@link #discover(String...)} to discover and register all algorithms (from class path and libaray of Hudup framework) into {@link PluginStorage}.
-	 * </li>
-	 * </ol>
-	 */
-	protected void fire() {
-		if (PluginStorage.isInitialized())
-			return;
+	@Override
+	public void fire() {
+		if (isFired()) return;
 		
 		try {
 			UriAdapter adapter = new UriAdapter(Constants.WORKING_DIRECTORY);
@@ -123,34 +137,47 @@ public class Firer implements PluginManager {
 			e.printStackTrace();
 		}
 		
-		
-		Properties p = System.getProperties();
-		p.setProperty("derby.system.home", Constants.DATABASE_DIRECTORY + "/derby");
-		
-		DataDriverList dataDriverList = DataDriverList.list();
-		for (int i = 0; i < dataDriverList.size(); i++) {
-			DataDriver dataDriver = dataDriverList.get(i);
-			try {
-				dataDriver.loadDriver();
-				LogUtil.info("Loaded data driver class: " + dataDriver.getInnerClassName());
-			}
-			catch (Throwable e) {
-				LogUtil.error("Can not load data driver \"" + dataDriver.getInnerClassName() + "\"" + " error is " + e.getMessage());
-			}
-			
+		try {
+			Properties p = System.getProperties();
+			p.setProperty("derby.system.home", Constants.DATABASE_DIRECTORY + "/derby");
 		}
+		catch (Throwable e) {
+			e.printStackTrace();
+		}
+		
+		
+		loadDrivers();
 
 		
-		PluginStorage.releaseAllRegisteredAlgs();
-		discover(Util.getLoadablePackages());
-		PluginStorage.initialized = true;
+		discover();
+		fired = true;
 	}
 	
 	
 	@Override
-	public void discover(String...prefixList) {
+	public boolean isFired() {
+		// TODO Auto-generated method stub
+		return fired;
+	}
+
+
+	@Override
+	public void discover() {
+		// TODO Auto-generated method stub
+		PluginStorage.clear();
+		discover(Util.getLoadablePackages());
+	}
+
+
+	/**
+	 * The main method discovers automatically all algorithms via their names, given list of prefixes.
+	 * This method affects plug-in storage.
+	 * @param prefixList list of text strings of root paths to discover algorithms, for example, &quot;/net/hudup/&quot;.
+	 * If this list is null or empty, all packages are browsed.
+	 */
+	private void discover(String...prefixList) {
 		if (prefixList == null || prefixList.length == 0) {
-			LogUtil.error("Cannot discover classes because of empty packages list.");
+			discover("");
 			return;
 		}
 		
@@ -186,7 +213,7 @@ public class Firer implements PluginManager {
 			if (algClass == null) continue;
 			
 			try {
-				if (!isClassValid(algClass)) continue;
+				if (!PluginManager.isClassValid(algClass)) continue;
 				
 				if (algClass.getAnnotation(Composite.class) != null) {
 					compositeAlgClassList.add(algClass);
@@ -212,7 +239,7 @@ public class Firer implements PluginManager {
 					continue;
 				}
 			
-				registerAlg(alg);
+				PluginManager.registerAlg(alg);
 			}
 			catch (Exception e) {e.printStackTrace();}
 		}
@@ -233,7 +260,7 @@ public class Firer implements PluginManager {
 					continue;
 				}
 
-				registerAlg(compositeAlg);
+				PluginManager.registerAlg(compositeAlg);
 			}
 			catch (Exception e) {e.printStackTrace();}
 		}
@@ -249,46 +276,12 @@ public class Firer implements PluginManager {
 	}
 	
 	
-	/**
-	 * Registering the specified algorithm into respective register table of {@link PluginStorage}.
-	 * For example, a recommendation algorithm will be added into recommender register table returned by {@link PluginStorage#getRecommenderReg()}. 
-	 * @param alg specified algorithm.
-	 */
-	private void registerAlg(Alg alg) {
-
-		RegisterTable normalAlgReg = PluginStorage.getNormalAlgReg();
-		RegisterTable metricReg = PluginStorage.getMetricReg();
-		RegisterTable parserReg = PluginStorage.getParserReg();
-		RegisterTable externalQueryReg = PluginStorage.getExternalQueryReg();
-		RegisterTable ctsmReg = PluginStorage.getCTSManagerReg();
-
-		boolean registered = false;
-		if (alg instanceof DatasetParser)
-			registered = parserReg.register( (DatasetParser)alg );
-		else if (alg instanceof Metric) {
-			// MetaMetric and MetricWrapper are annotated as BaseClass and so they are not registered
-			registered = metricReg.register( (Metric)alg );
-		}
-		else if (alg instanceof ExternalQuery)
-			registered = externalQueryReg.register( (ExternalQuery)alg );
-		else if (alg instanceof CTSManager)
-			registered = ctsmReg.register( (CTSManager)alg );
-		else
-			registered = normalAlgReg.register(alg);
-
-		if (registered)
-			LogUtil.info("Registered algorithm: " + alg.getName());
-	}
-	
-	
-	/**
-	 * Getting a list of instances from referred class.
-	 * @param <T> type of returned instances.
-	 * @param referredClass referred class.
-	 * @return list of instances from specified package and referred class.
-	 */
-	public static <T> List<T> getInstances(Class<T> referredClass) {
+	@Override
+	public <T> List<T> discover(Class<T> referredClass) {
 		String[] prefixList = Util.getLoadablePackages();
+		if (prefixList == null || prefixList.length == 0)
+			prefixList = new String[] {""};
+
 		Reflections reflections = null;
 		for (String prefix : prefixList) {
 			try {
@@ -302,24 +295,26 @@ public class Firer implements PluginManager {
 		}
 		if (reflections == null) return Util.newList();
 		
-		return getInstances(referredClass, reflections);
+		return discover(referredClass, reflections);
 	}
 
-
+	
 	/**
 	 * Getting a list of instances from reflections and referred class.
+	 * This method does not affect plug-in storage.
 	 * @param <T> type of returned instances.
-	 * @param referredClass referred class.
+	 * @param referredClass referred class. If this referred class is null, all classes are retrieved.
 	 * @param reflections specified reflections. 
-	 * @return list of instances from specified package and referred class.
+	 * @return list of instances from reflections and referred class.
 	 */
-	private static <T> List<T> getInstances(Class<T> referredClass, Reflections reflections) {
+	private static <T> List<T> discover(Class<T> referredClass, Reflections reflections) {
 		Set<Class<? extends T>> apClasses = reflections.getSubTypesOf(referredClass);
 		List<T> instances = Util.newList();
 		for (Class<? extends T> apClass : apClasses) {
 			if (apClass == null) continue;
-			if (!referredClass.isAssignableFrom(apClass)) continue;
-			if (!isClassValid(apClass)) continue;
+			if (referredClass != null && !referredClass.isAssignableFrom(apClass))
+				continue;
+			if (!PluginManager.isClassValid(apClass)) continue;
 
 			try {
 				T instance = Util.newInstance(apClass);
@@ -335,14 +330,10 @@ public class Firer implements PluginManager {
 	}
 	
 	
-	/**
-	 * Loading classes from store.
-	 * @param <T> object type.
-	 * @param storeUri store URI.
-	 * @param referredClass referred class.
-	 * @return list of algorithms as output.
-	 */
-	public static <T> List<T> getInstances(xURI storeUri, Class<T> referredClass) {
+	@Override
+	public <T> List<T> discover(xURI storeUri, Class<T> referredClass) {
+		if (storeUri == null) storeUri = xURI.create(".");
+		
 		URL storeUrl = null;
 		try {
 			storeUrl = storeUri.getURI().toURL();
@@ -360,7 +351,7 @@ public class Firer implements PluginManager {
 		
 		String rootPath = storeUri.getPath();
 		List<T> outObjList = Util.newList();
-		getInstances(storeUri, rootPath, adapter, classLoader, referredClass, outObjList);
+		discover(storeUri, rootPath, adapter, classLoader, referredClass, outObjList);
 		try {
 			classLoader.close();
 		} catch (Throwable e) {e.printStackTrace();}
@@ -370,15 +361,16 @@ public class Firer implements PluginManager {
 
 	
 	/**
-	 * Loading classes from specified store and class loader.
+	 * Loading a list of instances from specified store and class loader.
+	 * This method does not affect plug-in storage.
 	 * @param storeUri specified store.
 	 * @param rootPath root path.
 	 * @param adapter URI adapter.
 	 * @param classLoader specified class loader.
-	 * @param referredClass referred class.
-	 * @param outObjList list of objects as output.
+	 * @param referredClass referred class. If this referred class is null, all classes are retrieved.
+	 * @param outObjList list of objects (instances) as output.
 	 */
-	private static <T> void getInstances(xURI storeUri, String rootPath, UriAdapter adapter, ClassLoader classLoader, Class<T> referredClass, List<T> outObjList) {
+	private static <T> void discover(xURI storeUri, String rootPath, UriAdapter adapter, ClassLoader classLoader, Class<T> referredClass, List<T> outObjList) {
 		adapter.uriListProcess(storeUri,
 			new UriFilter() {
 			
@@ -415,7 +407,7 @@ public class Firer implements PluginManager {
 				public void uriProcess(xURI uri) throws Exception {
 					// TODO Auto-generated method stub
 					if (adapter.isStore(uri)) {
-						getInstances(uri, rootPath, adapter, classLoader, referredClass, outObjList);
+						discover(uri, rootPath, adapter, classLoader, referredClass, outObjList);
 						return;
 					}
 					
@@ -437,9 +429,10 @@ public class Firer implements PluginManager {
 						System.out.println("Loading class \"" + classPath + "\" error");
 						cls = null;
 					}
-					if (cls == null || !referredClass.isAssignableFrom(cls))
+					if (cls == null) return;
+					if (referredClass != null && !referredClass.isAssignableFrom(cls))
 						return;
-					if (!isClassValid(cls)) return;
+					if (!PluginManager.isClassValid(cls)) return;
 					
 					T obj = null;
 					try {
@@ -456,25 +449,95 @@ public class Firer implements PluginManager {
 	}
 
 	
-	/**
-	 * Checking whether specified class is valid.
-	 * @param cls specified class.
-	 * @return whether specified class is valid.
-	 */
-	public static boolean isClassValid(Class<?> cls) {
-		if (cls == null || cls.isInterface() || cls.isMemberClass() || cls.isAnonymousClass())
-			return false;
-		
-		int modifiers = cls.getModifiers();
-		if ( (modifiers & Modifier.ABSTRACT) != 0 || (modifiers & Modifier.PUBLIC) == 0)
-			return false;
-		else if (cls.getAnnotation(BaseClass.class) != null || 
-				cls.getAnnotation(Deprecated.class) != null) {
-			return false;
+	@Override
+	public void loadDrivers() {
+		// TODO Auto-generated method stub
+		DataDriverList dataDriverList = DataDriverList.get();
+		for (int i = 0; i < dataDriverList.size(); i++) {
+			DataDriver dataDriver = dataDriverList.get(i);
+			try {
+				dataDriver.loadDriver();
+				LogUtil.info("Loaded data driver class: " + dataDriver.getInnerClassName());
+			}
+			catch (Throwable e) {
+				LogUtil.error("Can not load data driver \"" + dataDriver.getInnerClassName() + "\"" + " error is " + e.getMessage());
+			}
 		}
+	}
+
+
+	@Override
+	public AlgRemoteWrapper wrap(AlgRemote remoteAlg, boolean exclusive) {
+		// TODO Auto-generated method stub
+		if (remoteAlg instanceof DatasetParserRemote)
+			return new DatasetParserRemoteWrapper((DatasetParserRemote)remoteAlg, exclusive);
+		else if (remoteAlg instanceof MetricRemote)
+			return new MetricRemoteWrapper((MetricRemote)remoteAlg, exclusive);
+		else if (remoteAlg instanceof ExternalQueryRemote)
+			return new ExternalQueryRemoteWrapper((ExternalQueryRemote)remoteAlg, exclusive);
+		else if (remoteAlg instanceof CTSManagerRemote)
+			return new CTSManagerRemoteWrapper((CTSManagerRemote)remoteAlg, exclusive);
+		else if (remoteAlg instanceof RecommenderRemote)
+			return new RecommenderRemoteWrapper((RecommenderRemote)remoteAlg, exclusive);
+		else if (remoteAlg instanceof ExecutableAlgRemote)
+			return new ExecutableAlgRemoteWrapper((ExecutableAlgRemote)remoteAlg, exclusive);
+		else if (remoteAlg instanceof AugRemote)
+			return new AugRemoteWrapper((AugRemote)remoteAlg, exclusive);
 		else
-			return true;
+			return new AlgRemoteWrapper(remoteAlg, exclusive);
 	}
 	
 	
+	@Override
+	public MethodType methodTypeOf(Alg alg) {
+		if (alg instanceof MemoryBasedAlg)
+			return MethodType.memorybased;
+		else if (alg instanceof ModelBasedAlg)
+			return MethodType.modelbased;
+		else if (alg instanceof CompositeAlg)
+			return MethodType.composite;
+		else if (alg instanceof ServiceAlg)
+			return MethodType.service;
+		else if (alg instanceof AlgRemoteWrapper) {
+			AlgRemote remoteAlg = ((AlgRemoteWrapper)alg).getRemoteAlg();
+			if (remoteAlg instanceof Alg)
+				return methodTypeOf((Alg)remoteAlg);
+			else if (remoteAlg instanceof MemoryBasedAlgRemote)
+				return MethodType.memorybased;
+			else if (remoteAlg instanceof ModelBasedAlgRemote)
+				return MethodType.modelbased;
+			else if (remoteAlg instanceof CompositeAlgRemote)
+				return MethodType.composite;
+			else if (remoteAlg instanceof ServiceAlg)
+				return MethodType.service;
+			else
+				return MethodType.unknown;
+		}
+		else
+			return MethodType.unknown;
+	}
+
+
+	@Override
+	public FunctionType functionTypeOf(Alg alg) {
+		if (alg instanceof Recommender)
+			return FunctionType.recommend;
+		else if (alg instanceof ExecutableAlg)
+			return FunctionType.execute;
+		else if (alg instanceof AlgRemoteWrapper) {
+			AlgRemote remoteAlg = ((AlgRemoteWrapper)alg).getRemoteAlg();
+			if (remoteAlg instanceof Alg)
+				return functionTypeOf((Alg)remoteAlg);
+			else if (remoteAlg instanceof RecommenderRemote)
+				return FunctionType.recommend;
+			else if (remoteAlg instanceof ExecutableAlgRemote)
+				return FunctionType.execute;
+			else
+				return FunctionType.unknown;
+		}
+		else
+			return FunctionType.unknown;
+	}
+
+
 }

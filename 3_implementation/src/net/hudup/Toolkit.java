@@ -10,9 +10,9 @@ package net.hudup;
 import javax.swing.JOptionPane;
 
 import net.hudup.core.AccessPoint;
-import net.hudup.core.Firer;
 import net.hudup.core.PluginStorage;
 import net.hudup.core.RegisterTable;
+import net.hudup.core.Util;
 import net.hudup.data.ui.toolkit.DatasetToolkit;
 
 
@@ -48,7 +48,7 @@ public class Toolkit implements AccessPoint {
 	@Override
 	public void run(String[] args) {
 		// TODO Auto-generated method stub
-		new Firer();
+		Util.getPluginManager().fire();
 		
 		RegisterTable parserReg = PluginStorage.getParserReg();
 		if (parserReg.size() == 0) {

@@ -106,7 +106,7 @@ public final class Constants {
 	/**
 	 * The root package (root directory) of all classes.
 	 */
-	public final static String  ROOT_PACKAGE             = "/net/hudup/";
+	public final static String  ROOT_PACKAGE             = "/net/hudup/"; //Setting ROOT_PACKAGE="" will retrieve all classes from plug-in manager. 
 	
 	/**
 	 * The resources directory that contains any resources except classes such as images, template files.

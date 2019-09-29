@@ -15,9 +15,9 @@ import java.util.List;
 
 import net.hudup.core.AccessPoint;
 import net.hudup.core.Constants;
-import net.hudup.core.Firer;
 import net.hudup.core.PluginStorage;
 import net.hudup.core.RegisterTable;
+import net.hudup.core.Util;
 import net.hudup.core.alg.Alg;
 import net.hudup.core.data.DatasetPool;
 import net.hudup.core.evaluate.EvaluatorEvent;
@@ -57,7 +57,7 @@ public class Evaluator implements AccessPoint {
 	public void run(String[] args) {
 		// TODO Auto-generated method stub
 		LogUtil.info("Sytax: java net.hudup.Evaluator \"EvaluatorName\" \"batch.script\"");
-		new Firer();
+		Util.getPluginManager().fire();
 		
 		if (args == null || args.length == 0) {
 			EvalCompoundGUI.switchEvaluator(Constants.DEFAULT_EVALUATOR_NAME, null);
@@ -74,7 +74,7 @@ public class Evaluator implements AccessPoint {
 			ev = null;
 		}
 		if (ev == null) {
-			List<net.hudup.core.evaluate.Evaluator> tempEvList = Firer.getInstances(net.hudup.core.evaluate.Evaluator.class);
+			List<net.hudup.core.evaluate.Evaluator> tempEvList = Util.getPluginManager().discover(net.hudup.core.evaluate.Evaluator.class);
 			for (net.hudup.core.evaluate.Evaluator tempEv : tempEvList) {
 				try {
 					if (tempEv.getName().equals(args[0])) {

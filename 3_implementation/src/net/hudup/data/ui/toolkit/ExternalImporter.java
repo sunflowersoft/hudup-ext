@@ -198,7 +198,7 @@ public class ExternalImporter extends JPanel implements ProgressListener, Dispos
 		
 		ExternalConfig defaultConfig = (ExternalConfig) txtExternalConfig.getConfig(); 
 		ExternalConfigurator configurator = new ExternalConfigurator(
-				this, DataDriverList.list(), defaultConfig);
+				this, DataDriverList.get(), defaultConfig);
 		
 		ExternalConfig config = configurator.getResult();
 		if (config == null || config.size() == 0) {

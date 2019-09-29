@@ -70,9 +70,9 @@ public class PropDlg extends JDialog {
 		addWindowListener(new WindowAdapter() {
 
 			@Override
-			public void windowClosing(WindowEvent e) {
+			public void windowClosed(WindowEvent e) {
 				// TODO Auto-generated method stub
-				super.windowClosing(e);
+				super.windowClosed(e);
 				if (!tblProp.isModified())
 					return;
 				
@@ -251,9 +251,9 @@ class PropDlg2 extends JDialog {
 		addWindowListener(new WindowAdapter() {
 
 			@Override
-			public void windowClosing(WindowEvent e) {
+			public void windowClosed(WindowEvent e) {
 				// TODO Auto-generated method stub
-				super.windowClosing(e);
+				super.windowClosed(e);
 				if (paneCfg.getPropTable().isModified()) {
 					int confirm = JOptionPane.showConfirmDialog(
 							comp, 

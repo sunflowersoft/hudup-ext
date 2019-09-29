@@ -37,6 +37,7 @@ import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
+import net.hudup.core.Constants;
 import net.hudup.core.PluginChangedEvent;
 import net.hudup.core.RegisterTable;
 import net.hudup.core.alg.Alg;
@@ -1234,8 +1235,8 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			xURI uri = adapter.chooseUri(
 					this, 
 					true, 
-					new String[] {"properties", "script", "hudup"}, 
-					new String[] {"Properties files", "Script files", "Hudup files"},
+					new String[] {"properties", "script", Constants.DEFAULT_EXT}, 
+					new String[] {"Properties files (*.properties)", "Script files (*.script)", "Hudup files (*." + Constants.DEFAULT_EXT + ")"},
 					null,
 					null);
 			adapter.close();
@@ -1319,8 +1320,8 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
         xURI uri = adapter.chooseUri(
 				this, 
 				false, 
-				new String[] {"properties", "script", "hudup"}, 
-				new String[] {"Properties URI (s)", "Script files", "Hudup URI (s)"},
+				new String[] {"properties", "script", Constants.DEFAULT_EXT}, 
+				new String[] {"Properties files (*.properties)", "Script files (*.script)", "Hudup files (*." + Constants.DEFAULT_EXT + ")"},
 				null,
 				null);
         adapter.close();

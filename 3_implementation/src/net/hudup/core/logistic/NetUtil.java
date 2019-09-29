@@ -137,12 +137,12 @@ public class NetUtil {
 	public static class RegistryRemote {
 		
 		/**
-		 * Registry.
+		 * Registry. It should be serialized.
 		 */
 		protected Registry registry = null;
 		
 		/**
-		 * Stub object.
+		 * Stub object. It must be serialized.
 		 */
 		protected Remote stub = null;
 		
@@ -259,7 +259,9 @@ public class NetUtil {
 		 * @param port registered port.
 		 * @return registry and stub.
 		 */
-		public static RegistryRemote registerExport0(Remote remote, int port) {
+		@Deprecated
+		@SuppressWarnings("unused")
+		private static RegistryRemote registerExport0(Remote remote, int port) {
 			if (remote == null) return null;
 
 			Registry registry = null;

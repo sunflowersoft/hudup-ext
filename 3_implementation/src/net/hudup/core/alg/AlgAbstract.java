@@ -43,7 +43,7 @@ public abstract class AlgAbstract implements Alg, AlgRemote {
 
 	
     /**
-     * Exported algorithm must be serializable.
+     * Exported algorithm stub must be serializable.
      */
     protected AlgRemote exportedStub = null;
     
@@ -193,12 +193,9 @@ public abstract class AlgAbstract implements Alg, AlgRemote {
 	}
 
 	
-	/**
-	 * Getting exported algorithm.
-	 * @return exported algorithm.
-	 */
-	public AlgRemote getExportedAlg() {
-		return (AlgRemote)exportedStub;
+	@Override
+	public Remote getExportedStub() throws RemoteException {
+		return exportedStub;
 	}
 
 

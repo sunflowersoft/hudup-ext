@@ -25,8 +25,6 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.Vector;
 
-import net.hudup.core.alg.AlgUtil;
-import net.hudup.core.alg.AlgUtilImpl;
 import net.hudup.core.factory.Factory;
 import net.hudup.core.factory.FactoryImpl;
 import net.hudup.core.logistic.UriAdapter;
@@ -58,6 +56,13 @@ public final class Util {
 	 * Hudup properties name.
 	 */
 	private final static String hudupPropName = "hudup.properties";
+	
+	
+	/**
+	 * Plug-in manager.
+	 */
+	private static PluginManager pluginManager = null;
+	
 	
 	/**
 	 * Loading system properties.
@@ -100,7 +105,15 @@ public final class Util {
 		catch (Throwable e) {
 			e.printStackTrace();
 		}
-
+		
+		try {
+			String pluginManagerText = getHudupProperty("plugin_manager");
+			pluginManager = (PluginManager) Class.forName(pluginManagerText).newInstance();
+		}
+		catch (Throwable e) {
+			e.printStackTrace();
+			pluginManager = new Firer();
+		}
 	}
 	
 	
@@ -381,22 +394,11 @@ public final class Util {
 
 	
 	/**
-	 * Getting algorithm utility.
-	 * @return algorithm utility.
+	 * Getting plug-in manager.
+	 * @return plug-in manager.
 	 */
-	public static AlgUtil getAlgUtil() {
-		try {
-			String algUtilClassName = getHudupProperty("alg_util");
-			if (algUtilClassName == null)
-				return new AlgUtilImpl();
-			else
-				return (AlgUtil)Class.forName(algUtilClassName).newInstance();
-		}
-		catch (Throwable e) {
-			e.printStackTrace();
-		}
-		
-		return new AlgUtilImpl();
+	public static PluginManager getPluginManager() {
+		return pluginManager;
 	}
 
 	

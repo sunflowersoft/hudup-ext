@@ -1140,11 +1140,11 @@ public class PowerServerCP extends JFrame implements ServerStatusListener, Plugi
 	}
 
 
-	@Override
-	public boolean isSupportImport() {
-		// TODO Auto-generated method stub
-		return true;
-	}
+//	@Override
+//	public boolean isSupportImport() {
+//		// TODO Auto-generated method stub
+//		return true;
+//	}
 
 
 	/**
@@ -1156,6 +1156,25 @@ public class PowerServerCP extends JFrame implements ServerStatusListener, Plugi
 	}
 	
 	
+	@Override
+	public int getPort() {
+		// TODO Auto-generated method stub
+		if (bRemote) {
+			if (bindUri != null)
+				return bindUri.getPort();
+			else
+				return -1;
+		}
+		else {
+			try {
+				return ((PowerServerConfig)server.getConfig()).getServerPort();
+			} catch (Throwable e) {e.printStackTrace();}
+			
+			return -1;
+		}
+	}
+
+
 	/**
 	 * Main method.
 	 * @param args specified arguments.

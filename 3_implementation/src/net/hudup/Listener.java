@@ -8,7 +8,7 @@
 package net.hudup;
 
 import net.hudup.core.AccessPoint;
-import net.hudup.core.Firer;
+import net.hudup.core.Util;
 
 /**
  * There are 5 applications of Hudup framework such as {@code Evaluator}, {@code Server}, {@code Listener}, {@code Balancer}, {@code Toolkit}.
@@ -43,7 +43,7 @@ public final class Listener implements AccessPoint {
 	@Override
 	public void run(String[] args) {
 		// TODO Auto-generated method stub
-		new Firer();
+		Util.getPluginManager().fire();
 		
 		net.hudup.listener.Listener listener = net.hudup.listener.Listener.create();
 		listener.start();

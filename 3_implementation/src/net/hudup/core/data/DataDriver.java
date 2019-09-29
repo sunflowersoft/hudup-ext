@@ -313,7 +313,7 @@ public final class DataDriver implements Cloneable, Serializable {
 	
 	
 	/**
-	 * Loading driver which is its inner class name. In current implementation, it call {@link #getInnerClass()} method.
+	 * Loading (reloading) driver which is its inner class name. In current implementation, it call {@link #getInnerClass()} method.
 	 */
 	public void loadDriver() {
 		getInnerClass();

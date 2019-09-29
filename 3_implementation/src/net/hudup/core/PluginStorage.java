@@ -125,12 +125,6 @@ public final class PluginStorage implements Serializable {
 	
 	
 	/**
-	 * Flag to indicate whether plug-in storage is initialized.
-	 */
-	protected static boolean initialized = false;
-	
-	
-	/**
 	 * This static method gets normal algorithm register.
 	 * @return register table of {@link Alg}.
 	 */
@@ -190,12 +184,35 @@ public final class PluginStorage implements Serializable {
 	 * This static method clears this storage, which means that all register tables become empty.
 	 */
 	public final static void clear() {
-		normalAlgReg.clear();
-		parserReg.clear();
-		metricReg.clear();
-		externalQueryReg.clear();
-		ctsmReg.clear();
-		nextUpdateList.clear();
+		try {
+			synchronized (NORMAL_ALG) {
+				RegisterTableList tableList = getRegisterTableList();
+				for (int i = 0; i < tableList.size(); i++) {
+					RegisterTable registeredTable = tableList.get(i).getRegisterTable();
+					List<Alg> algList = registeredTable.getAlgList();
+					for (Alg alg : algList) {
+						try {
+							if (alg instanceof Exportable)
+								((Exportable)alg).unexport();
+						}
+						catch (Throwable e) {e.printStackTrace();}
+					}
+					
+					registeredTable.clear();
+				}
+				
+				for (int i = 0; i < nextUpdateList.size(); i++) {
+					Alg alg = nextUpdateList.get(i);
+					try {
+						if (alg instanceof Exportable)
+							((Exportable)alg).unexport();
+					}
+					catch (Throwable e) {e.printStackTrace();}
+				}
+				nextUpdateList.clear();
+			}
+		}
+		catch (Throwable e) {e.printStackTrace();}
 	}
 	
 	
@@ -345,51 +362,6 @@ public final class PluginStorage implements Serializable {
 
 	
 	/**
-	 * Releasing all registered algorithms.
-	 */
-	public final static void releaseAllRegisteredAlgs() {
-		try {
-			synchronized (NORMAL_ALG) {
-				RegisterTableList tableList = getRegisterTableList();
-				for (int i = 0; i < tableList.size(); i++) {
-					RegisterTable registeredTable = tableList.get(i).getRegisterTable();
-					List<Alg> algList = registeredTable.getAlgList();
-					for (Alg alg : algList) {
-						try {
-							if (alg instanceof Exportable)
-								((Exportable)alg).unexport();
-						}
-						catch (Throwable e) {e.printStackTrace();}
-					}
-					
-					registeredTable.clear();
-				}
-				
-				for (int i = 0; i < nextUpdateList.size(); i++) {
-					Alg alg = nextUpdateList.get(i);
-					try {
-						if (alg instanceof Exportable)
-							((Exportable)alg).unexport();
-					}
-					catch (Throwable e) {e.printStackTrace();}
-				}
-				nextUpdateList.clear();
-			}
-		}
-		catch (Throwable e) {e.printStackTrace();}
-	}
-
-	
-	/**
-	 * Checking whether plug-in storage is initialized.
-	 * @return whether plug-in storage is initialized.
-	 */
-	public static boolean isInitialized() {
-		return initialized;
-	}
-	
-	
-	/**
 	 * Adding shutdown hook to release all registered algorithms.
 	 */
 	static {
@@ -398,7 +370,7 @@ public final class PluginStorage implements Serializable {
 			@Override
 			public void run() {
 				//This code line is not redundant. Please concern the keyword synchronized in releaseAllRegisteredAlgs().
-				releaseAllRegisteredAlgs();
+				clear();
 			}
 			
 		});

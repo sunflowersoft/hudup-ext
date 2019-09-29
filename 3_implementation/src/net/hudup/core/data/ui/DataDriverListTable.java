@@ -9,8 +9,11 @@ package net.hudup.core.data.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.Vector;
 
+import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -97,6 +100,20 @@ public class DataDriverListTable extends SortableTable {
 		final DataDriverListTable tblDataDriverList = new DataDriverListTable();
 		tblDataDriverList.update(dataDriverList);
 		body.add(new JScrollPane(tblDataDriverList), BorderLayout.CENTER);
+		
+		JPanel footer = new JPanel();
+		result.add(footer, BorderLayout.SOUTH);
+		
+		JButton btnReload = new JButton("Reload");
+		btnReload.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				//Doing something.
+			}
+		});
+		btnReload.setVisible(false);
+		footer.add(btnReload);
 		
 		return result;
 	}

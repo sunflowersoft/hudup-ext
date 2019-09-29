@@ -128,12 +128,12 @@ public final class DataDriverList {
 
 	
 	/**
-	 * Loading default data driver list including data drivers such as
+	 * Retrieving default data driver list including data drivers such as
 	 * Derby, Derby engine, file system, FTP file system, HTTP file system,
 	 * Hudup RMI, Hudup socket, Microsoft SQL Sever database, MySQL database,
 	 * Oracle database, PostgreSQL database.
 	 */
-	public void loadDefault() {
+	private void defaultList() {
 		clear();
 		
 		try {
@@ -159,10 +159,10 @@ public final class DataDriverList {
 	 * Retrieving global data driver list.
 	 * @return global data driver list {@link #dataDriverList}.
 	 */
-	public static DataDriverList list() {
+	public static DataDriverList get() {
 		if (dataDriverList == null) {
 			dataDriverList = new DataDriverList();
-			dataDriverList.loadDefault();
+			dataDriverList.defaultList();
 		}
 		
 		return dataDriverList;
