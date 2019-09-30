@@ -10,7 +10,6 @@ package net.hudup.core;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.FlowLayout;
-import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -29,18 +28,17 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
-import javax.swing.JTable;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 import javax.swing.event.EventListenerList;
-import javax.swing.table.DefaultTableModel;
 
 import net.hudup.core.RegisterTableList.RegisterTableItem;
 import net.hudup.core.alg.Alg;
+import net.hudup.core.alg.AlgDesc2;
+import net.hudup.core.alg.AlgDesc2List;
 import net.hudup.core.alg.AlgList;
 import net.hudup.core.alg.AlgRemoteWrapper;
 import net.hudup.core.alg.ui.AlgConfigDlg;
-import net.hudup.core.alg.ui.AlgListBox;
 import net.hudup.core.client.ClientUtil;
 import net.hudup.core.client.Service;
 import net.hudup.core.client.SocketConnection;
@@ -51,8 +49,9 @@ import net.hudup.core.data.DataDriverList;
 import net.hudup.core.data.Exportable;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.xURI;
+import net.hudup.core.logistic.ui.SortableSelectableTable;
+import net.hudup.core.logistic.ui.SortableSelectableTableModel;
 import net.hudup.core.logistic.ui.SortableTable;
-import net.hudup.core.logistic.ui.SortableTableModel;
 import net.hudup.core.logistic.ui.TagTextField;
 import net.hudup.core.logistic.ui.UIUtil;
 import net.hudup.core.parser.DatasetParser;
@@ -76,7 +75,7 @@ import net.hudup.parser.SnapshotParserImpl;
  * @version 10.0
  *
  */
-public class PluginStorageManifest extends SortableTable {
+public class PluginStorageManifest extends SortableSelectableTable {
 
 	
 	/**
@@ -539,6 +538,7 @@ public class PluginStorageManifest extends SortableTable {
 			JPanel toolbar1Grp1 = new JPanel(new BorderLayout());
 			toolbar1Grp1.setBorder(BorderFactory.createEtchedBorder());
 			toolbar1.add(toolbar1Grp1);
+			toolbar1.setVisible(false);
 
 			toolbar1Grp1.add(new JLabel("Register/Unregister"), BorderLayout.NORTH);
 			JPanel toolbar1Grp1Buttons = new JPanel();
@@ -687,6 +687,7 @@ public class PluginStorageManifest extends SortableTable {
 					
 					new ImportAlgDlag(tblRegister).setVisible(true);
 					tblRegister.update();
+					tblRegister.firePluginChangedEvent(new PluginChangedEvent(tblRegister));
 				}
 			});
 			importAlg.setToolTipText("Only import normal algorithms");
@@ -783,7 +784,7 @@ public class PluginStorageManifest extends SortableTable {
  * @version 10.0
  *
  */
-class RegisterTM extends SortableTableModel {
+class RegisterTM extends SortableSelectableTableModel {
 
 	
 	/**
@@ -849,7 +850,7 @@ class RegisterTM extends SortableTableModel {
 		for (Alg alg : algList) {
 			Vector<Object> row = Util.newVector();
 			
-			row.add(PluginStorage.lookupAlgTypeName(alg.getClass()));
+			row.add(PluginStorage.lookupTableName(alg.getClass()));
 			row.add(alg.getName());
 			row.add(alg.getClass().toString());
 			row.add(alg);
@@ -887,7 +888,7 @@ class RegisterTM extends SortableTableModel {
 			Alg alg = nextUpdateList.get(i);
 			Vector<Object> row = Util.newVector();
 			
-			row.add(PluginStorage.lookupAlgTypeName(alg.getClass()));
+			row.add(PluginStorage.lookupTableName(alg.getClass()));
 			row.add(alg.getName());
 			row.add(alg.getClass().toString());
 			row.add(alg);
@@ -965,992 +966,6 @@ class RegisterTM extends SortableTableModel {
 		super.setValueAt(aValue, row, column);
 		
 		modified = true;
-	}
-	
-	
-}
-
-
-
-/**
- * {@link PluginStorage} manages many {@link RegisterTable} (s) and each {@link RegisterTable} stores algorithms having the same type.
- * For example, a register table manages recommendation algorithms (recommenders) whereas another manages metrics for evaluating recommenders.
- * This {@link PluginStorageManifest2} which is the graphic user interface (GUI) allows users to manage {@link PluginStorage}.
- * Every time {@link PluginStorage} was changed, an event {@link PluginChangedEvent} is issued and dispatched to a listener {@link PluginChangedListener}.
- * Later on, {@link PluginChangedListener} can do some tasks in its method {@link PluginChangedListener#pluginChanged(PluginChangedEvent)}.
- * Please pay attention that such {@link PluginChangedListener} must be registered with {@link PluginStorageManifest2} before to receive {@link PluginChangedEvent}.
- * <br> 
- * As a convention, this class is called {@code plug-in storage manifest}.
- * 
- * @author Loc Nguyen
- * @version 10.0
- *
- */
-class PluginStorageManifest2 extends JTable {
-
-	
-	/**
-	 * Serial version UID for serializable class. 
-	 */
-	private static final long serialVersionUID = 1L;
-
-	
-	/**
-	 * Internal list of registered {@link PluginChangedListener} (s).
-	 */
-    protected EventListenerList listenerList = new EventListenerList();
-
-    
-    /**
-     * Exported port.
-     */
-    protected int port = 0;
-
-    
-    /**
-	 * Default constructor.
-	 */
-	public PluginStorageManifest2() {
-		super(new RegisterTM2());
-		update();
-		
-		addMouseListener(new MouseAdapter() {
-
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				// TODO Auto-generated method stub
-				if(SwingUtilities.isRightMouseButton(e) ) {
-					JPopupMenu contextMenu = createContextMenu();
-					if (contextMenu != null)
-						contextMenu.show((Component)e.getSource(), e.getX(), e.getY());
-				}
-				else if (e.getClickCount() >= 2) {
-					int selectedColumn = getSelectedColumn();
-					if (selectedColumn != 4 && selectedColumn != 5 && selectedColumn != 6)
-						showConfig();
-				}
-			}
-			
-		});
-	}
-	
-	
-	/**
-	 * Default constructor with specified exported port.
-	 * @param port specified exported port.
-	 */
-	public PluginStorageManifest2(int port) {
-		this();
-		this.port = port;
-	}
-	
-	
-	/**
-	 * Create context menu.
-	 * @return context menu.
-	 */
-	private JPopupMenu createContextMenu() {
-		JPopupMenu contextMenu = new JPopupMenu();
-		
-		int selectedRow = getSelectedRow();
-		Alg alg = selectedRow < 0 ? null : (Alg) getModel().getValueAt(selectedRow, 3);
-		DataConfig config = alg == null ? null : alg.getConfig(); 
-		if (config != null) {
-			JMenuItem miConfig = UIUtil.makeMenuItem( (String)null, "Configuration", 
-				new ActionListener() {
-					
-					@Override
-					public void actionPerformed(ActionEvent e) {
-						showConfig();
-					}
-				});
-			contextMenu.add(miConfig);
-			
-			contextMenu.addSeparator();
-		}
-		
-		JMenuItem miRegisterAllAlgs = UIUtil.makeMenuItem( (String)null, "Register all algorithms", 
-			new ActionListener() {
-				
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					selectAllNormalAlgs(true, 4);
-				}
-			});
-		contextMenu.add(miRegisterAllAlgs);
-		
-		JMenuItem miUnregisterAllAlgs = UIUtil.makeMenuItem( (String)null, "Unregister all algorithms", 
-			new ActionListener() {
-				
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					selectAllNormalAlgs(false, 4);
-				}
-			});
-		contextMenu.add(miUnregisterAllAlgs);
-
-		contextMenu.addSeparator();
-		
-		JMenuItem miExportAllAlgs = UIUtil.makeMenuItem( (String)null, "Export all algorithms", 
-			new ActionListener() {
-				
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					selectAllNormalAlgs(true, 5);
-				}
-			});
-		contextMenu.add(miExportAllAlgs);
-		
-		JMenuItem miUnexportAllAlgs = UIUtil.makeMenuItem( (String)null, "Unexport all algorithms", 
-			new ActionListener() {
-				
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					selectAllNormalAlgs(false, 5);
-				}
-			});
-		contextMenu.add(miUnexportAllAlgs);
-
-		contextMenu.addSeparator();
-		
-		JMenuItem miRemoveAllAlgs = UIUtil.makeMenuItem( (String)null, "Remove all algorithms", 
-			new ActionListener() {
-				
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					selectAllNormalAlgs(true, 6);
-				}
-			});
-		contextMenu.add(miRemoveAllAlgs);
-		
-		JMenuItem miUnremoveAllAlgs = UIUtil.makeMenuItem( (String)null, "Unremove all algorithms", 
-			new ActionListener() {
-				
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					selectAllNormalAlgs(false, 6);
-				}
-			});
-		contextMenu.add(miUnremoveAllAlgs);
-		
-		
-		return contextMenu;
-	}
-	
-	
-	/**
-	 * Showing configuration dialog of selected algorithm. 
-	 */
-	private void showConfig() {
-		int selectedRow = getSelectedRow();
-		Alg alg = selectedRow < 0 ? null : (Alg) getModel().getValueAt(selectedRow, 3);
-		DataConfig config = alg == null ? null : alg.getConfig(); 
-		
-		if (config == null) {
-			JOptionPane.showMessageDialog(
-					UIUtil.getFrameForComponent(this), 
-					"Apply plug-in storage successfully. Algorithms are registered/unregistered/removed/unremoved", 
-					"Apply successfully", 
-					JOptionPane.INFORMATION_MESSAGE);
-		}
-		else {
-			AlgConfigDlg dlgConfig = new AlgConfigDlg(UIUtil.getFrameForComponent(getThisManifest()), alg);
-			dlgConfig.getPropPane().setToolbarVisible(false);
-			dlgConfig.getPropPane().setControlVisible(false);
-			dlgConfig.getPropPane().setEnabled(false);
-			dlgConfig.setVisible(true);
-		}
-	}
-	
-	
-	/**
-	 * Getting this manifest.
-	 * @return this manifest.
-	 */
-	private PluginStorageManifest2 getThisManifest() {
-		return this;
-	}
-	
-	
-	/**
-	 * Updating {@link PluginStorageManifest2} according to {@link RegisterTM2}.
-	 */
-	private void update() {
-		getRegisterTM().update();
-		
-		if (getColumnModel().getColumnCount() > 3) {
-			getColumnModel().getColumn(3).setMaxWidth(0);
-			getColumnModel().getColumn(3).setMinWidth(0);
-			getColumnModel().getColumn(3).setPreferredWidth(0);
-		}
-	}
-
-	
-	/**
-	 * This public method is called from outside in order to update {@link PluginStorageManifest2} according to {@link RegisterTM2}.
-	 * It really calls method {@link #update()}.
-	 * @return true if {@link PluginStorageManifest2} is updated successfully from outside.
-	 */
-	public boolean apply() {
-		boolean idle = isListenersIdle();
-		if (!idle) return false;
-
-		
-		AlgList nextUpdateList = PluginStorage.getNextUpdateList();
-		int n = getRowCount();
-		List<Alg> unexportedAlgList = Util.newList();
-		boolean changed = false;
-		for (int i = 0; i < n; i++) {
-			Alg alg = (Alg) getValueAt(i, 3);
-			RegisterTable table = PluginStorage.lookupTable(alg.getClass());
-			if (table == null) continue;
-
-			boolean registered = (Boolean)getValueAt(i, 4);
-			boolean exported = (Boolean)getValueAt(i, 5);
-			boolean removed = (Boolean)getValueAt(i, 6);
-			
-			if (removed) {
-				if (!table.contains(alg.getName()))
-					nextUpdateList.remove(alg);
-				else
-					table.unregister(alg.getName());
-				
-				unexportedAlgList.add(alg);
-				changed = true;
-			}
-			else {
-				if (registered) {
-					if (!table.contains(alg.getName())) {
-						table.register(alg);
-						nextUpdateList.remove(alg);
-						changed = true;
-					}
-				}
-				else if(table.contains(alg.getName())) {
-					table.unregister(alg.getName());
-					nextUpdateList.add(alg);
-					changed = true;
-				}
-				
-				if (alg instanceof Exportable) {
-					try {
-						boolean algExported = ((Exportable)alg).getExportedStub() != null;
-						if (exported) {
-							if (!algExported) {
-								String algTypeName = getValueAt(i, 0).toString();
-								if (algTypeName.equals(PluginStorage.NORMAL_ALG)) { //Only export normal algorithms.
-									((Exportable)alg).export(port);
-									changed = true;
-								}
-							}
-						}
-						else {
-							if (algExported) {
-								unexportedAlgList.add(alg);
-								changed = true;
-							}
-						}
-					} 
-					catch (Throwable e) {
-						e.printStackTrace();
-						changed = true;
-					}
-				}
-			}
-		}
-		
-		if (changed)
-			firePluginChangedEvent(new PluginChangedEvent(this));
-		
-		for (Alg alg : unexportedAlgList) {
-			if (alg instanceof Exportable) {
-				try {
-					((Exportable)alg).unexport(); //Finalize method will call unsetup method if unsetup method exists in this algorithm.
-				} catch (Throwable e) {e.printStackTrace();}
-			}
-		}
-		
-		update();
-
-		return true;
-	}
-	
-
-	/**
-	 * Selecting or unselecting all rows according the specified input parameter {@code selected}.
-	 * @param selected if {@code true} then all rows are selected. Otherwise, all rows are unselected.
-	 * @param column column to be selected or not selected.
-	 */
-	protected void selectAll(boolean selected, int column) {
-		if (column != 4 && column != 5 && column != 6)
-			return;
-		
-		int n = getRowCount();
-		for (int i = 0; i < n; i++) {
-			setValueAt(selected, i, column);
-		}
-	}
-
-	
-	/**
-	 * Registering or unregistering all normal algorithms.
-	 * @param selected if {@code true} then all normal algorithms are selected. Otherwise, all normal algorithms are unselected. 
-	 * @param column column to be selected or not selected.
-	 */
-	protected void selectAllNormalAlgs(boolean selected, int column) {
-		if (column != 4 && column != 5 && column != 6)
-			return;
-
-		int n = getRowCount();
-		for (int i = 0; i < n; i++) {
-			String algTypeName = getValueAt(i, 0).toString();
-			if (algTypeName.equals(PluginStorage.NORMAL_ALG))
-				setValueAt(selected, i, column);
-		}
-	}
-
-	
-	/**
-	 * Getting the model of this {@link PluginStorageManifest2}.
-	 * @return register table model {@link RegisterTM2}
-	 */
-	public RegisterTM2 getRegisterTM() {
-		return (RegisterTM2)getModel();
-	}
-	
-	
-	/**
-	 * Adding the specified listener to the end of list of listeners, which means that such listener is registered.
-	 * 
-	 * @param listener specified {@link PluginChangedListener} that is registered.
-	 * 
-	 */
-	public void addPluginChangedListener(PluginChangedListener listener) {
-		synchronized (listenerList) {
-			listenerList.add(PluginChangedListener.class, listener);
-		}
-    }
-
-    
-	/**
-	 * Remove the specified listener from the list of listener
-	 * 
-	 * @param listener {@link PluginChangedListener} that is unregistered.
-	 */
-    public void removePluginChangedListener(PluginChangedListener listener) {
-		synchronized (listenerList) {
-			listenerList.remove(PluginChangedListener.class, listener);
-		}
-    }
-	
-    
-    /**
-     * Return an array of registered {@link PluginChangedListener} (s).
-     * 
-     * @return array of registered {@link PluginChangedListener} (s).
-     * 
-     */
-    protected PluginChangedListener[] getPluginChangedListeners() {
-		synchronized (listenerList) {
-			return listenerList.getListeners(PluginChangedListener.class);
-		}
-    }
-
-    
-    /**
-     * Dispatching {@link PluginChangedEvent} event to registered {@link PluginChangedListener} (s) after {@link PluginStorageManifest2} was changed.
-     * @param evt {@link PluginChangedEvent} event is issued to registered {@link PluginChangedListener} (s) after {@link PluginStorageManifest2} was changed.
-     */
-    protected void firePluginChangedEvent(PluginChangedEvent evt) {
-		PluginChangedListener[] listeners = getPluginChangedListeners();
-		
-		for (PluginChangedListener listener : listeners) {
-			try {
-				listener.pluginChanged(evt);
-			}
-			catch (Throwable e) {
-				e.printStackTrace();
-			}
-		}
-	
-    }
-
-    
-    /**
-     * Testing whether a registered {@link PluginChangedListener} is idle.
-     * @return whether a registered {@link PluginChangedListener} is idle. Note, there can be many registered {@link PluginChangedListener} (s). 
-     */
-    protected boolean isListenersIdle() {
-		PluginChangedListener[] listeners = getPluginChangedListeners();
-		
-		for (PluginChangedListener listener : listeners) {
-			try {
-				if (!listener.isIdle())
-					return false;
-			}
-			catch (Throwable e) {
-				e.printStackTrace();
-			}
-		}
-		
-		return true;
-	
-    }
-
-    
-	/**
-	 * Testing whether manifest table is modified.
-	 * @return whether manifest table is modified.
-	 */
-	public boolean isModified() {
-		return getRegisterTM().isModified();
-	}
-
-	
-	/**
-	 * Panel for plug-in storage manifest.
-	 * @author Loc Nguyen
-	 * @version 12.0
-	 */
-	public static class PluginStorageManifestPanel extends JPanel {
-
-		/**
-		 * Default serial version UID.
-		 */
-		private static final long serialVersionUID = 1L;
-		
-		/**
-		 * Plug-in storage manifest.
-		 */
-		protected PluginStorageManifest2 tblRegister = null;
-		
-		/**
-		 * Constructor with plug-in changed listener.
-		 * @param listener plug-in changed listener.
-		 */
-		public PluginStorageManifestPanel(PluginChangedListener listener) {
-			setLayout(new BorderLayout());
-			JPanel body = new JPanel(new BorderLayout());
-			add(body, BorderLayout.CENTER);
-			
-			tblRegister = new PluginStorageManifest2(listener.getPort() < 0 ? 0 : listener.getPort());
-			if (listener != null)
-				tblRegister.addPluginChangedListener(listener);
-			body.add(new JScrollPane(tblRegister), BorderLayout.CENTER);
-			
-			JPanel footer = new JPanel(new BorderLayout());
-			add(footer, BorderLayout.SOUTH);
-
-			JPanel toolbar1 = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-			footer.add(toolbar1, BorderLayout.NORTH);
-			
-			JPanel toolbar1Grp1 = new JPanel(new BorderLayout());
-			toolbar1Grp1.setBorder(BorderFactory.createEtchedBorder());
-			toolbar1.add(toolbar1Grp1);
-
-			toolbar1Grp1.add(new JLabel("Register/Unregister"), BorderLayout.NORTH);
-			JPanel toolbar1Grp1Buttons = new JPanel();
-			toolbar1Grp1.add(toolbar1Grp1Buttons, BorderLayout.SOUTH);
-			
-			JButton registerAll = UIUtil.makeIconButton(
-				"selectall-16x16.png", 
-				"register_all", "Register all", "Register all", 
-				new ActionListener() {
-					
-					@Override
-					public void actionPerformed(ActionEvent e) {
-						// TODO Auto-generated method stub
-						tblRegister.selectAll(true, 4);
-					}
-				});
-			registerAll.setMargin(new Insets(0, 0 , 0, 0));
-			toolbar1Grp1Buttons.add(registerAll);
-
-			JButton unregisterAll = UIUtil.makeIconButton(
-				"unselectall-16x16.png", 
-				"unregister_all", "Unregister all", "Unregister all", 
-				new ActionListener() {
-					
-					@Override
-					public void actionPerformed(ActionEvent e) {
-						// TODO Auto-generated method stub
-						tblRegister.selectAll(false, 4);
-					}
-				});
-			unregisterAll.setMargin(new Insets(0, 0 , 0, 0));
-			toolbar1Grp1Buttons.add(unregisterAll);
-
-			JPanel toolbar1Grp2 = new JPanel(new BorderLayout());
-			toolbar1Grp2.setBorder(BorderFactory.createEtchedBorder());
-			toolbar1.add(toolbar1Grp2);
-
-			toolbar1Grp2.add(new JLabel("Export/Unexport"), BorderLayout.NORTH);
-			JPanel toolbar1Grp2Buttons = new JPanel();
-			toolbar1Grp2.add(toolbar1Grp2Buttons, BorderLayout.SOUTH);
-
-			JButton exportAll = UIUtil.makeIconButton(
-				"selectall-16x16.png", 
-				"export_all", "Export all", "Export all", 
-				new ActionListener() {
-					
-					@Override
-					public void actionPerformed(ActionEvent e) {
-						// TODO Auto-generated method stub
-						tblRegister.selectAll(true, 5);
-					}
-				});
-			exportAll.setMargin(new Insets(0, 0 , 0, 0));
-			exportAll.setToolTipText("Only export normal algorithms");
-			toolbar1Grp2Buttons.add(exportAll);
-
-			JButton unexportAll = UIUtil.makeIconButton(
-				"unselectall-16x16.png", 
-				"unexport_all", "Unexport all", "Unexport all", 
-				new ActionListener() {
-					
-					@Override
-					public void actionPerformed(ActionEvent e) {
-						// TODO Auto-generated method stub
-						tblRegister.selectAll(false, 5);
-					}
-				});
-			unexportAll.setMargin(new Insets(0, 0 , 0, 0));
-			toolbar1Grp2Buttons.add(unexportAll);
-
-			JPanel toolbar1Grp3 = new JPanel(new BorderLayout());
-			toolbar1Grp3.setBorder(BorderFactory.createEtchedBorder());
-			toolbar1.add(toolbar1Grp3);
-
-			toolbar1Grp3.add(new JLabel("Remove/Unremove"), BorderLayout.NORTH);
-			JPanel toolbar1Grp3Buttons = new JPanel();
-			toolbar1Grp3.add(toolbar1Grp3Buttons, BorderLayout.SOUTH);
-
-			JButton removeAll = UIUtil.makeIconButton(
-				"selectall-16x16.png", 
-				"remove_all", "Remove all", "Remove all", 
-				new ActionListener() {
-					
-					@Override
-					public void actionPerformed(ActionEvent e) {
-						// TODO Auto-generated method stub
-						tblRegister.selectAll(true, 6);
-					}
-				});
-			removeAll.setMargin(new Insets(0, 0 , 0, 0));
-			toolbar1Grp3Buttons.add(removeAll);
-
-			JButton unremoveAll = UIUtil.makeIconButton(
-				"unselectall-16x16.png", 
-				"unremove_all", "Unremove all", "Unremove all", 
-				new ActionListener() {
-					
-					@Override
-					public void actionPerformed(ActionEvent e) {
-						// TODO Auto-generated method stub
-						tblRegister.selectAll(false, 6);
-					}
-				});
-			unremoveAll.setMargin(new Insets(0, 0 , 0, 0));
-			toolbar1Grp3Buttons.add(unremoveAll);
-
-			
-			JPanel toolbar2 = new JPanel(new BorderLayout());
-			footer.add(toolbar2, BorderLayout.SOUTH);
-			
-			JPanel toolbar2Grp1 = new JPanel();
-			toolbar2.add(toolbar2Grp1, BorderLayout.WEST);
-
-			//Reload plugin storage from built packages.
-			JButton reloadAlg = new JButton("Reload");
-			reloadAlg.addActionListener(new ActionListener() {
-				
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					tblRegister.firePluginChangedEvent(new PluginChangedEvent(tblRegister)); //Force to unsetting up algorithms.
-					Util.getPluginManager().discover();
-					tblRegister.update();
-					tblRegister.firePluginChangedEvent(new PluginChangedEvent(tblRegister));
-				}
-			});
-			reloadAlg.setToolTipText("Reload plugin storage from built packages");
-			toolbar2Grp1.add(reloadAlg);
-
-			//Only import normal algorithms
-			JButton importAlg = new JButton("Import");
-			importAlg.addActionListener(new ActionListener() {
-				
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					if (tblRegister.isModified()) {
-						int confirm = JOptionPane.showConfirmDialog(
-								tblRegister, 
-								"System properties are modified. Do you want to apply them?", 
-								"System properties are modified", 
-								JOptionPane.YES_NO_OPTION,
-								JOptionPane.QUESTION_MESSAGE);
-						
-						if (confirm == JOptionPane.YES_OPTION)
-							apply();
-					}
-					
-					new ImportAlgDlag(tblRegister).setVisible(true);
-					tblRegister.update();
-				}
-			});
-			importAlg.setToolTipText("Only import normal algorithms");
-			toolbar2Grp1.add(importAlg);
-			
-			JPanel toolbar2Grp2 = new JPanel();
-			toolbar2.add(toolbar2Grp2, BorderLayout.CENTER);
-			
-			JButton apply = new JButton("Apply");
-			apply.addActionListener(new ActionListener() {
-				
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					// TODO Auto-generated method stub
-					apply();
-				}
-			});
-			toolbar2Grp2.add(apply);
-
-			JButton reset = new JButton("Reset");
-			reset.addActionListener(new ActionListener() {
-				
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					// TODO Auto-generated method stub
-					tblRegister.update();
-				}
-			});
-			toolbar2Grp2.add(reset);
-
-		}
-		
-		/**
-		 * Testing whether the plug-in storage manifest is modified.
-		 * @return whether the plug-in storage manifest is modified.
-		 */
-		public boolean isModified() {
-			return tblRegister.isModified();
-		}
-		
-		/**
-		 * Applying changes to the plug-in storage manifest.
-		 * @return true if applying is successful.
-		 */
-		public boolean apply() {
-			boolean ret = tblRegister.apply();
-			if (ret) {
-				JOptionPane.showMessageDialog(
-						UIUtil.getFrameForComponent(tblRegister), 
-						"Apply plug-in storage successfully.\nAlgorithms were registered/unregistered exported/unexported removed/unremoved.", 
-						"Apply successfully", 
-						JOptionPane.INFORMATION_MESSAGE);
-			}
-			else {
-				JOptionPane.showMessageDialog(
-						UIUtil.getFrameForComponent(tblRegister), 
-						"Apply plug-in storage failed", 
-						"Apply failed", 
-						JOptionPane.INFORMATION_MESSAGE);
-			}
-			return ret;
-		}
-		
-	}
-	
-	
-	/**
-	 * Showing a dialog containing {@link PluginStorageManifest2}.
-	 * @param comp parent component.
-	 * @param listener {@link PluginChangedListener} to receive {@link PluginChangedEvent} if {@link PluginStorageManifest2} is changed. 
-	 * @param modal whether or not the dialog is modal. The modal dialog will block user inputs. Please see {@link JDialog} for more details. 
-	 */
-	public static void showDlg(Component comp, PluginChangedListener listener, boolean modal) {
-		JDialog dlg = new JDialog(UIUtil.getFrameForComponent(comp), "Plugin storage", modal);
-		dlg.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-		dlg.setSize(600, 400);
-		dlg.setLocationRelativeTo(UIUtil.getFrameForComponent(comp));
-		
-		dlg.setLayout(new BorderLayout());
-		dlg.add(new PluginStorageManifestPanel(listener), BorderLayout.CENTER);
-		
-		dlg.setVisible(true);
-	}
-	
-	
-}
-
-
-
-/**
- * This is table model of {@link PluginStorageManifest2} because {@link PluginStorageManifest2} is itself a table. 
- * 
- * @author Loc Nguyen
- * @version 10.0
- *
- */
-class RegisterTM2 extends DefaultTableModel {
-
-	
-	/**
-	 * Serial version UID for serializable class. 
-	 */
-	private static final long serialVersionUID = 1L;
-	
-	
-	/**
-	 * Whether or not this model was modified.
-	 */
-	protected boolean modified = false;
-
-	
-	/**
-	 * Default constructor.
-	 */
-	public RegisterTM2() {
-		super();
-		update();
-	}
-	
-	
-	/**
-	 * Updating this model.
-	 */
-	public void update() {
-		Vector<Vector<Object>> data = Util.newVector();
-		
-		updateReg(data);
-		
-		updateNextUpdateList(data);
-		
-		setDataVector(data, toColumns());
-		
-		modified = false;
-	}
-	
-	
-	/**
-	 * Updating this model with a matrix of objects.
-	 * @param data specified data as a matrix of objects.
-	 */
-	private void updateReg(Vector<Vector<Object>> data) {
-		RegisterTableList list = PluginStorage.getRegisterTableList();
-		for (int i = 0; i < list.size(); i++) {
-			RegisterTableItem item = list.get(i);
-			updateEachReg(data, item.getRegisterTable());
-			
-		}
-		
-	}
-	
-	
-	/**
-	 * Creating data from the specified register table for this model.
-	 * @param data output parameter that is filled from the specified register table.
-	 * @param regTable specified register table.
-	 */
-	private void updateEachReg(Vector<Vector<Object>> data, RegisterTable regTable) {
-		
-		List<Alg> algList = regTable.getAlgList();
-		for (Alg alg : algList) {
-			Vector<Object> row = Util.newVector();
-			
-			row.add(PluginStorage.lookupAlgTypeName(alg.getClass()));
-			row.add(alg.getName());
-			row.add(alg.getClass().toString());
-			row.add(alg);
-			row.add(true);
-			
-			boolean exported = false;
-			if (alg instanceof Exportable) {
-				try {
-					exported = ((Exportable)alg).getExportedStub() != null;
-				} catch (Throwable e) {
-					e.printStackTrace();
-					exported = false;
-				}
-			}
-			row.add(exported);
-
-			row.add(false);
-
-			data.add(row);
-		}
-		
-	}
-	
-	
-	/**
-	 * Creating data from next-update algorithms for this model.
-	 * Note, next-update algorithm is the one which needs to be updated in next version of Hudup framework because it is not perfect, for example.
-	 * List of next-update algorithms is managed by {@link PluginStorage}.
-	 * 
-	 * @param data output parameter that is filled from next-update algorithms.
-	 */
-	private void updateNextUpdateList(Vector<Vector<Object>> data) {
-		AlgList nextUpdateList = PluginStorage.getNextUpdateList();
-		for (int i = 0; i < nextUpdateList.size(); i++) {
-			Alg alg = nextUpdateList.get(i);
-			Vector<Object> row = Util.newVector();
-			
-			row.add(PluginStorage.lookupAlgTypeName(alg.getClass()));
-			row.add(alg.getName());
-			row.add(alg.getClass().toString());
-			row.add(alg);
-			row.add(false);
-			
-			boolean exported = false;
-			if (alg instanceof Exportable) {
-				try {
-					exported = ((Exportable)alg).getExportedStub() != null;
-				} catch (Throwable e) {
-					e.printStackTrace();
-					exported = false;
-				}
-			}
-			row.add(exported);
-
-			row.add(false);
-
-			data.add(row);
-			
-		}
-	}
-	
-	
-	/**
-	 * Creating a string vector for columns of this model.
-	 * @return a string vector for columns of this model, specified by {@link Vector} of string.
-	 */
-	protected Vector<String> toColumns() {
-		Vector<String> columns = Util.newVector();
-		columns.add("Type");
-		columns.add("Name");
-		columns.add("Java class");
-		columns.add("Object");
-		columns.add("Registered");
-		columns.add("Exported");
-		columns.add("Removed");
-		
-		return columns;
-	}
-
-
-	/**
-	 * Testing whether this model is modified.
-	 * @return whether model is modified.
-	 */
-	public boolean isModified() {
-		return modified;
-	}
-
-	
-	@Override
-	public Class<?> getColumnClass(int columnIndex) {
-		// TODO Auto-generated method stub
-		if (columnIndex == 4 || columnIndex == 5 || columnIndex == 6)
-			return Boolean.class;
-		else
-			return super.getColumnClass(columnIndex);
-	}
-
-	
-	@Override
-	public boolean isCellEditable(int row, int column) {
-		// TODO Auto-generated method stub
-		if (column == 4 || column == 5 || column == 6)
-			return true;
-		else
-			return false;
-	}
-	
-	
-	@Override
-	public void setValueAt(Object aValue, int row, int column) {
-		// TODO Auto-generated method stub
-		super.setValueAt(aValue, row, column);
-		
-		modified = true;
-	}
-	
-	
-}
-
-
-
-/**
- * This is GUI allowing users to import/register dynamically algorithms from jar files.
- * @author Loc Nguyen
- * @version 12.0
- */
-@Deprecated
-class JarImportAlgDlag extends JDialog {
-	
-	
-	/**
-	 * Default serial version UID.
-	 */
-	private static final long serialVersionUID = 1L;
-
-	
-	/**
-	 * Constructor with parent component.
-	 * @param comp parent component.
-	 */
-	public JarImportAlgDlag(Component comp) {
-		super(UIUtil.getFrameForComponent(comp), "Import algorithms from jar file", true);
-		
-		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-		setSize(600, 400);
-		setLocationRelativeTo(UIUtil.getFrameForComponent(comp));
-		
-		setLayout(new BorderLayout());
-		
-		JPanel header = new JPanel(new BorderLayout());
-		add(header, BorderLayout.NORTH);
-		
-		
-		JPanel body = new JPanel(new BorderLayout());
-		add(body, BorderLayout.CENTER);
-
-		
-		JPanel footer = new JPanel();
-		add(footer, BorderLayout.SOUTH);
-
-		JButton ok = new JButton("OK");
-		footer.add(ok);
-		ok.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
-				onOk();
-			}
-		});
-		
-		JButton cancel = new JButton("Cancel");
-		footer.add(cancel);
-		cancel.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
-				dispose();
-			}
-		});
-
-		
-		setVisible(true);
-	}
-	
-	
-	/**
-	 * Event-driven method response to OK button command.
-	 */
-	protected void onOk() {
-		dispose();
 	}
 	
 	
@@ -1991,16 +1006,11 @@ class ImportAlgDlag extends JDialog {
 
 	
 	/**
-	 * The left algorithm list box assists users to select algorithms.
+	 * Table of extended algorithm descriptions.
 	 */
-	protected AlgListBox leftList = null;
-
+	protected AlgDescImportTable tblAlgDescImport = null;
 	
-	/**
-	 * The right algorithm list box contains chosen algorithms.
-	 */
-	protected AlgListBox rightList = null;
-
+	
 	
 	/**
 	 * Result as list of chosen algorithms.
@@ -2053,90 +1063,18 @@ class ImportAlgDlag extends JDialog {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				try {
-					connect();
+					load();
 				} catch (Throwable ex) {ex.printStackTrace();}
 			}
 		});
 		pane.add(btnConnect);
 
 		
-		JPanel body = new JPanel(new GridLayout(1, 0));
+		JPanel body = new JPanel(new BorderLayout());
 		add(body, BorderLayout.CENTER);
 		
-		JPanel left = new JPanel(new BorderLayout());
-		body.add(left);
-		
-		left.add(new JLabel("Available algorithm list"), BorderLayout.NORTH);
-		leftList = new AlgListBox(true);
-		//leftList.update(remainList);
-		leftList.setEnableDoubleClick(false);
-		left.add(new JScrollPane(leftList), BorderLayout.CENTER);
-
-		JPanel buttons = new JPanel();
-		buttons.setLayout(new GridLayout(0, 1));
-		left.add(buttons, BorderLayout.EAST);
-		
-		JButton leftToRight = new JButton("> ");
-		leftToRight.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
-				leftToRight();
-			}
-		});
-		pane = new JPanel();
-		pane.add(leftToRight);
-		buttons.add(pane);
-		
-		JButton leftToRightAll = new JButton(">>");
-		leftToRightAll.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
-				leftToRightAll();
-			}
-		});
-		pane = new JPanel();
-		pane.add(leftToRightAll);
-		buttons.add(pane);
-		
-		JButton rightToLeft = new JButton("< ");
-		rightToLeft.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
-				rightToLeft();
-			}
-		});
-		pane = new JPanel();
-		pane.add(rightToLeft);
-		buttons.add(pane);
-		
-		JButton rightToLeftAll = new JButton("<<");
-		rightToLeftAll.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
-				rightToLeftAll();
-			}
-		});
-		pane = new JPanel();
-		pane.add(rightToLeftAll);
-		buttons.add(pane);
-
-		JPanel right = new JPanel(new BorderLayout());
-		body.add(right);
-		
-		right.add(new JLabel("Selected algorithm list"), BorderLayout.NORTH);
-		
-		rightList = new AlgListBox(true);
-		rightList.setEnableDoubleClick(false);
-		//rightList.update(selectedList);
-		right.add(new JScrollPane(rightList), BorderLayout.CENTER);
+		tblAlgDescImport = new AlgDescImportTable();
+		body.add(new JScrollPane(tblAlgDescImport), BorderLayout.CENTER);
 		
 		
 		JPanel footer = new JPanel();
@@ -2208,9 +1146,9 @@ class ImportAlgDlag extends JDialog {
 	 * Event-driven method for connecting button to connect place to store algorithms.
 	 * @throws RemoteException if any error raises.
 	 */
-	protected void connect() {
+	protected void load() {
 		DataConfig config = (DataConfig)txtBrowse.getTag();
-		if (config == null) {
+		if (config == null || config.getParser() == null || config.getStoreUri() == null) {
 			JOptionPane.showMessageDialog(
 				this, 
 				"Configuration was not established", 
@@ -2220,138 +1158,38 @@ class ImportAlgDlag extends JDialog {
 		}
 		
 		DatasetParser parser = config.getParser();
-		List<Alg> availableAlgList = Util.newList();
-		if (parser instanceof RmiServerIndicator)
-			loadClassesFromRmiServer(config, availableAlgList);
-		else if (parser instanceof SocketServerIndicator)
-			loadClassesFromSocketServer(config, availableAlgList);
-		else
-			loadClassesFromStore(config.getStoreUri(), availableAlgList);
-		
-		if (availableAlgList.size() == 0) {
-			JOptionPane.showMessageDialog(
-					this, 
-					"Empty algorithm list", 
-					"Empty algorithm list", 
-					JOptionPane.WARNING_MESSAGE);
-			return;
-		}
-
-		leftList.update(availableAlgList);
-		rightList.clear();
-	}
-	
-	
-	/**
-	 * Loading classes from RMI server specified by configuration.
-	 * @param config server configuration.
-	 * @param outAlgList list of algorithms as output.
-	 */
-	private void loadClassesFromRmiServer(DataConfig config, List<Alg> outAlgList) {
 		xURI storeUri = config.getStoreUri();
-		if (storeUri == null) return;
-		Service service = ClientUtil.getRemoteService(storeUri.getHost(), storeUri.getPort(), config.getStoreAccount(), config.getStorePassword().getText());
-		if (service == null) return;
-		
-		String[] algNames = new String[0];
-		try {
-			algNames = service.getAlgNames();
-		}
-		catch (Throwable e) {
-			LogUtil.error("Retrieving remote algorithm names error by: " + e.getMessage());
-		}
-		if (algNames == null) algNames = new String[0];
-		
-		RegisterTable normalReg = PluginStorage.getNormalAlgReg();
-		AlgList nextUpdateList = PluginStorage.getNextUpdateList();
-		for (String algName : algNames) {
-			if (normalReg.contains(algName)) continue;
-			
-			Alg alg = null;
-			try {
-				alg = service.getAlg(algName);
-			}
-			catch (Throwable e) {
-				LogUtil.error("Retrieving remote algorithm error by: " + e.getMessage());
-				alg = null;
-			}
-			if (alg == null) continue;
-			
-			int idx = nextUpdateList.indexOf(algName);
-			if (idx < 0)
-				outAlgList.add(alg);
-			else {
-				Alg nextUpdateAlg = nextUpdateList.get(idx);
-				if (PluginStorage.lookupAlgTypeName(nextUpdateAlg.getClass()) != PluginStorage.lookupAlgTypeName(alg.getClass()))
-					outAlgList.add(alg);
-				else if (alg instanceof AlgRemoteWrapper) {
-					((AlgRemoteWrapper)alg).setExclusive(true);
-					try {
-						((AlgRemoteWrapper)alg).unexport();
-					} catch (Throwable e) {e.printStackTrace();}
-				}
-			}
-		}
-	}
-	
-	
-	/**
-	 * Loading classes from socket server specified by configuration.
-	 * @param config server configuration.
-	 * @param outAlgList list of algorithms as output.
-	 */
-	private void loadClassesFromSocketServer(DataConfig config, List<Alg> outAlgList) {
-		xURI storeUri = config.getStoreUri();
-		if (storeUri == null) return;
-		
-		SocketConnection service = null;
-		String[] algNames = new String[0];
-		try {
-			service = ClientUtil.getSocketConnection(storeUri.getHost(), storeUri.getPort(),config.getStoreAccount(), config.getStorePassword().getText());
-			algNames = service.getAlgNames();
-			service.close(); service = null;
-		}
-		catch (Throwable e) {
-			LogUtil.error("Retrieving remote algorithm names error by: " + e.getMessage());
-		}
-		if (algNames == null) algNames = new String[0];
-		
-		RegisterTable normalReg = PluginStorage.getNormalAlgReg();
-		AlgList nextUpdateList = PluginStorage.getNextUpdateList();
-		for (String algName : algNames) {
-			if (normalReg.contains(algName)) continue;
-			
-			Alg alg = null;
-			try {
+		if ((parser instanceof RmiServerIndicator) || (parser instanceof SocketServerIndicator)) {
+			AlgDesc2List algDescList = new AlgDesc2List();
+			Service service = null;
+			if (parser instanceof RmiServerIndicator)
+				service = ClientUtil.getRemoteService(storeUri.getHost(), storeUri.getPort(), config.getStoreAccount(), config.getStorePassword().getText());
+			else if (parser instanceof SocketServerIndicator)
 				service = ClientUtil.getSocketConnection(storeUri.getHost(), storeUri.getPort(),config.getStoreAccount(), config.getStorePassword().getText());
-				alg = service.getAlg(algName);
-				service.close(); service = null;
-			}
-			catch (Throwable e) {
-				LogUtil.error("Retrieving remote algorithm error by: " + e.getMessage());
-				alg = null;
-			}
-			if (alg == null) continue;
 			
-			int idx = nextUpdateList.indexOf(algName);
-			if (idx < 0)
-				outAlgList.add(alg);
-			else {
-				Alg nextUpdateAlg = nextUpdateList.get(idx);
-				if (PluginStorage.lookupAlgTypeName(nextUpdateAlg.getClass()) != PluginStorage.lookupAlgTypeName(alg.getClass()))
-					outAlgList.add(alg);
-				else if (alg instanceof AlgRemoteWrapper) {
-					((AlgRemoteWrapper)alg).setExclusive(true);
-					try {
-						((AlgRemoteWrapper)alg).unexport();
-					} catch (Throwable e) {e.printStackTrace();}
-				}
+			try {
+				algDescList = service.getAlgDescs();
+			} catch (Throwable e) {
+				e.printStackTrace();
+				algDescList = new AlgDesc2List();
 			}
+
+			tblAlgDescImport.update(algDescList);
+			
+			if ((service != null) && (service instanceof SocketConnection))
+				((SocketConnection)service).close();
+		}
+		else {
+			List<Alg> availableAlgList = Util.newList();
+			loadClassesFromStore(storeUri, availableAlgList);
+			tblAlgDescImport.update(availableAlgList);
 		}
 		
-		if (service != null) service.close();
+		
+		if (tblAlgDescImport.getRowCount() == 0)
+			JOptionPane.showMessageDialog(this, "Algorithm list empty", "Algorithm list empty", JOptionPane.WARNING_MESSAGE);
 	}
-
+	
 	
 	/**
 	 * Loading classes from store.
@@ -2372,7 +1210,7 @@ class ImportAlgDlag extends JDialog {
 				outAlgList.add(alg);
 			else {
 				Alg nextUpdateAlg = nextUpdateList.get(idx);
-				if (PluginStorage.lookupAlgTypeName(nextUpdateAlg.getClass()) != PluginStorage.lookupAlgTypeName(alg.getClass()))
+				if (PluginStorage.lookupTableName(nextUpdateAlg.getClass()) != PluginStorage.lookupTableName(alg.getClass()))
 					outAlgList.add(alg);
 			}
 		}
@@ -2381,128 +1219,114 @@ class ImportAlgDlag extends JDialog {
 	
 	
 	/**
-	 * Transferring selected algorithms from the left {@link AlgListBox} to the right {@link AlgListBox}.
-	 */
-	protected void leftToRight() {
-		List<Alg> list = leftList.removeSelectedList();
-		if (list.isEmpty()) {
-			JOptionPane.showMessageDialog(
-					this, 
-					"Algorithm not selected or empty list", 
-					"Algorithm not selected or empty list", 
-					JOptionPane.WARNING_MESSAGE);
-			return;
-		}
-		rightList.addAll(list);
-		
-	}
-	
-
-	/**
-	 * Transferring all algorithms from the left {@link AlgListBox} to the right {@link AlgListBox}.
-	 */
-	protected void leftToRightAll() {
-		List<Alg> list = leftList.getAlgList();
-		if (list.isEmpty()) {
-			JOptionPane.showMessageDialog(
-					this, 
-					"List empty", 
-					"List empty", 
-					JOptionPane.WARNING_MESSAGE);
-			return;
-		}
-		
-		rightList.addAll(list);
-		leftList.clear();
-	}
-
-	
-	/**
-	 * Transferring selected algorithms from the right {@link AlgListBox} to the left {@link AlgListBox}.
-	 */
-	protected void rightToLeft() {
-		List<Alg> list = rightList.removeSelectedList();
-		if (list.isEmpty()) {
-			JOptionPane.showMessageDialog(
-					this, 
-					"Algorithm not selected or empty list", 
-					"Algorithm not selected or empty list", 
-					JOptionPane.WARNING_MESSAGE);
-			return;
-		}
-		leftList.addAll(list);
-	}
-	
-
-	/**
-	 * Transferring all algorithms from the right {@link AlgListBox} to the left {@link AlgListBox}.
-	 */
-	protected void rightToLeftAll() {
-		List<Alg> list = rightList.getAlgList();
-		if (list.isEmpty()) {
-			JOptionPane.showMessageDialog(
-					this, 
-					"List empty", 
-					"List empty", 
-					JOptionPane.WARNING_MESSAGE);
-			return;
-		}
-
-		leftList.addAll(list);
-		rightList.clear();
-	}
-
-	
-	/**
 	 * Event-driven method response to OK button command.
 	 */
 	protected void ok() {
-		List<Alg> selectedAlgList = this.rightList.getAlgList();
-		if (selectedAlgList.size() == 0) {
-			if (leftList.getAlgList().size() > 0) {
-				JOptionPane.showMessageDialog(
-					this, 
-					"List empty", 
-					"List empty", 
-					JOptionPane.ERROR_MESSAGE);
-			}
-			
-			dispose();
+		DataConfig config = (DataConfig)txtBrowse.getTag();
+		if (config == null || config.getParser() == null || config.getStoreUri() == null) {
+			JOptionPane.showMessageDialog(this, "Configuration was not established", "Configuration was not established", JOptionPane.ERROR_MESSAGE);
 			return;
 		}
-		
-		for (Alg selectedAlg : selectedAlgList) {
-			if (selectedAlg instanceof AlgRemoteWrapper)
-				((AlgRemoteWrapper)selectedAlg).setExclusive(true);
+
+		DatasetParser parser = config.getParser();
+		xURI storeUri = config.getStoreUri();
+		int importedCount = 0;
+		if ((parser instanceof RmiServerIndicator) || (parser instanceof SocketServerIndicator)) {
+			List<AlgDesc2> selectedList = tblAlgDescImport.getSelectedAlgDescList();
+			if (selectedList.size() == 0) {
+				JOptionPane.showMessageDialog(this, "No algorithm selected", "No algorithm selected", JOptionPane.WARNING_MESSAGE);
+				return;
+			}
 			
-			if (selectedAlg != null)
-				PluginStorage.getNextUpdateList().add(selectedAlg);
-		}
-		this.result = PluginStorage.getNextUpdateList();
-		this.rightList.clear();
-		
-		List<Alg> remainAlgs = this.leftList.getAlgList();
-		for (Alg remainAlg : remainAlgs) {
-			if (remainAlg instanceof AlgRemoteWrapper) {
-				((AlgRemoteWrapper)remainAlg).setExclusive(true);
+			AlgList nextUpdateList = PluginStorage.getNextUpdateList();
+			Service service = null;
+			for (AlgDesc2 algDesc : selectedList) {
+				if (parser instanceof RmiServerIndicator) {
+					if (service == null)
+						service = ClientUtil.getRemoteService(storeUri.getHost(), storeUri.getPort(), config.getStoreAccount(), config.getStorePassword().getText());
+				}
+				else if (parser instanceof SocketServerIndicator) {
+					if (service != null)
+						((SocketConnection)service).close();
+					service = ClientUtil.getSocketConnection(storeUri.getHost(), storeUri.getPort(),config.getStoreAccount(), config.getStorePassword().getText());
+				}
+				
+				Alg alg = null;
 				try {
-					((AlgRemoteWrapper)remainAlg).unexport();
-				} catch (Throwable e) {e.printStackTrace();}
+					alg = service.getAlg(algDesc.algName);
+				}
+				catch (Throwable e) {
+					LogUtil.error("Retrieving remote algorithm error by: " + e.getMessage());
+					alg = null;
+				}
+				if (alg == null) continue;
+				
+				RegisterTable table = PluginStorage.lookupTable(alg.getClass());
+				if (table == null || table.contains(algDesc.algName)) continue;
+				
+				int idx = nextUpdateList.indexOf(algDesc.algName);
+				if (idx < 0) {
+					if (table.register(alg))
+						importedCount++;
+				}
+				else {
+					Alg nextUpdateAlg = nextUpdateList.get(idx);
+					if (PluginStorage.lookupTableName(nextUpdateAlg.getClass()) != PluginStorage.lookupTableName(alg.getClass())) {
+						if (table.register(alg))
+							importedCount++;
+					}
+					else if (alg instanceof AlgRemoteWrapper) {
+						((AlgRemoteWrapper)alg).setExclusive(true);
+						try {
+							((AlgRemoteWrapper)alg).unexport();
+						} catch (Throwable e) {e.printStackTrace();}
+					}
+				}
+			}
+
+			if ((service != null) && (service instanceof SocketConnection))
+				((SocketConnection)service).close();
+		}
+		else {
+			List<Alg> selectedList = tblAlgDescImport.getSelectedAlgList();
+			if (selectedList.size() == 0) {
+				JOptionPane.showMessageDialog(this, "No algorithm selected", "No algorithm selected", JOptionPane.WARNING_MESSAGE);
+				return;
+			}
+			
+			AlgList nextUpdateList = PluginStorage.getNextUpdateList();
+			for (Alg alg : selectedList) {
+				RegisterTable table = PluginStorage.lookupTable(alg.getClass());
+				if (table == null || table.contains(alg.getName())) continue;
+				
+				int idx = nextUpdateList.indexOf(alg.getName());
+				if (idx < 0) {
+					if (table.register(alg))
+						importedCount++;
+				}
+				else {
+					Alg nextUpdateAlg = nextUpdateList.get(idx);
+					if (PluginStorage.lookupTableName(nextUpdateAlg.getClass()) != PluginStorage.lookupTableName(alg.getClass())) {
+						if (table.register(alg))
+							importedCount++;
+					}
+				}
 			}
 		}
-		this.leftList.clear();
+		
+		if (importedCount == 0)
+			JOptionPane.showMessageDialog(this, 
+				"No algorithm imported", 
+				"No algorithm imported", 
+				JOptionPane.INFORMATION_MESSAGE);
+		else
+			JOptionPane.showMessageDialog(this, 
+				"Importing " + importedCount + " algorithm successfully", 
+				"Successful importing", 
+				JOptionPane.INFORMATION_MESSAGE);
 		
 		ok = true;
 		dispose();
-	}
-	
-	
-	/**
-	 * Getting the result as list of chosen algorithms.
-	 * @return result as list of chosen algorithms.
-	 */
-	public AlgList getResult() {
-		return result;
 	}
 	
 	
@@ -2515,25 +1339,265 @@ class ImportAlgDlag extends JDialog {
 	}
 
 
-	@Override
-	public void dispose() {
-		// TODO Auto-generated method stub
-		List<Alg> algList = this.leftList.getAlgList();
-		algList.addAll(this.rightList.getAlgList());
-		for (Alg alg : algList) {
-			if (alg instanceof AlgRemoteWrapper) {
-				((AlgRemoteWrapper)alg).setExclusive(true);
-				try {
-					((AlgRemoteWrapper)alg).unexport();
-				} catch (Throwable e) {e.printStackTrace();}
-			}
-		}
-		
-		this.leftList.clear();
-		this.rightList.clear();
-		
-		super.dispose();
+}
+
+
+/**
+ * This is table of extended algorithm descriptions. 
+ * 
+ * @author Loc Nguyen
+ * @version 12.0
+ *
+ */
+class AlgDescImportTable extends SortableSelectableTable {
+
+	
+	/**
+	 * Default serial version UID.
+	 */
+	private static final long serialVersionUID = 1L;
+
+	
+	/**
+	 * Default constructor.
+	 */
+	public AlgDescImportTable() {
+		super(new AlgDescImportTM());
 	}
 
 	
+	/**
+	 * Updating this table by specified list of algorithms.
+	 * @param algDescList list of algorithms.
+	 */
+	public void update(List<Alg> algList) {
+		((AlgDescImportTM)getModel()).update(algList);
+		init();
+	}
+	
+	
+	/**
+	 * Updating this table by specified list of extended algorithm descriptions.
+	 * @param algDescList list of extended algorithm descriptions.
+	 */
+	public void update(AlgDesc2List algDescList) {
+		((AlgDescImportTM)getModel()).update(algDescList);
+		init();
+	}
+	
+	
+	/**
+	 * Getting list of selected extended algorithm descriptions.
+	 * @return list of selected extended algorithm descriptions.
+	 */
+	public List<AlgDesc2> getSelectedAlgDescList() {
+		List<AlgDesc2> selectedList = Util.newList();
+		int n = getRowCount();
+		for (int i = 0; i < n; i++) {
+			boolean imported = (Boolean)getValueAt(i, 5);
+			if (!imported) continue;
+			
+			AlgDesc2 algDesc = (AlgDesc2)getValueAt(i, 3);
+			if (algDesc != null)
+				selectedList.add(algDesc);
+		}
+		
+		return selectedList;
+	}
+	
+	
+	/**
+	 * Getting list of selected algorithm.
+	 * @return list of selected algorithm.
+	 */
+	public List<Alg> getSelectedAlgList() {
+		List<Alg> selectedList = Util.newList();
+		int n = getRowCount();
+		for (int i = 0; i < n; i++) {
+			boolean imported = (Boolean)getValueAt(i, 5);
+			if (!imported) continue;
+			
+			Alg alg = (Alg)getValueAt(i, 4);
+			if (alg != null)
+				selectedList.add(alg);
+		}
+		
+		return selectedList;
+	}
+	
+	
+	@Override
+	protected void init() {
+		// TODO Auto-generated method stub
+		super.init();
+		if (getColumnModel().getColumnCount() > 3) {
+			getColumnModel().getColumn(3).setMaxWidth(0);
+			getColumnModel().getColumn(3).setMinWidth(0);
+			getColumnModel().getColumn(3).setPreferredWidth(0);
+		}
+		if (getColumnModel().getColumnCount() > 4) {
+			getColumnModel().getColumn(4).setMaxWidth(0);
+			getColumnModel().getColumn(4).setMinWidth(0);
+			getColumnModel().getColumn(4).setPreferredWidth(0);
+		}
+	}
+
+
+	/**
+	 * Showing a dialog containing table of extended algorithm descriptions.
+	 * @param comp parent component.
+	 * @param algDescList list of extended algorithm descriptions.
+	 */
+	public static void showDlg(Component comp, AlgDesc2List algDescList) {
+		JDialog dlg = new JDialog(UIUtil.getFrameForComponent(comp), "Extended algorithm descriptions", true);
+		dlg.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+		dlg.setSize(600, 400);
+		dlg.setLocationRelativeTo(UIUtil.getFrameForComponent(comp));
+		
+		dlg.setLayout(new BorderLayout());
+		
+		AlgDescImportTable table = new AlgDescImportTable();
+		table.update(algDescList);
+		dlg.add(new JScrollPane(table), BorderLayout.CENTER);
+		
+		dlg.setVisible(true);
+	}
 }
+
+
+
+/**
+ * This is table model of algorithm descriptions. 
+ * 
+ * @author Loc Nguyen
+ * @version 10.0
+ *
+ */
+class AlgDescImportTM extends SortableSelectableTableModel {
+
+	
+	/**
+	 * Serial version UID for serializable class. 
+	 */
+	private static final long serialVersionUID = 1L;
+	
+	
+	/**
+	 * Whether or not this model was modified.
+	 */
+	protected boolean modified = false;
+
+	
+	/**
+	 * Default constructor.
+	 */
+	public AlgDescImportTM() {
+		super();
+	}
+	
+	
+	/**
+	 * Updating this model by specified list of algorithms.
+	 * @param algDescList list of algorithms.
+	 */
+	public void update(List<Alg> algList) {
+		AlgDesc2List list = new AlgDesc2List();
+		list.addAll2(algList);
+		update(list);
+	}
+
+	
+	/**
+	 * Updating this model by specified list of extended algorithm descriptions.
+	 * @param algDescList list of extended algorithm descriptions.
+	 */
+	public void update2(List<AlgDesc2> algDescList) {
+		AlgDesc2List list = new AlgDesc2List(algDescList);
+		update(list);
+	}
+
+	
+	/**
+	 * Updating this model by specified list of extended algorithm descriptions.
+	 * @param algDescList list of extended algorithm descriptions.
+	 */
+	public void update(AlgDesc2List algDescList) {
+		Vector<Vector<Object>> data = Util.newVector();
+		
+		for (int i = 0; i < algDescList.size(); i++) {
+			AlgDesc2 algDesc = algDescList.get(i);
+			Vector<Object> row = Util.newVector();
+			
+			row.add(algDesc.tableName);
+			row.add(algDesc.algName);
+			row.add(algDesc.getAlgClassName());
+			row.add(algDesc);
+			row.add(null);
+			row.add(false);
+
+			data.add(row);
+		}
+		
+		setDataVector(data, toColumns());
+		
+		modified = false;
+	}
+	
+	
+	/**
+	 * Creating a string vector for columns of this model.
+	 * @return a string vector for columns of this model.
+	 */
+	protected Vector<String> toColumns() {
+		Vector<String> columns = Util.newVector();
+		columns.add("Type");
+		columns.add("Name");
+		columns.add("Java class");
+		columns.add("Description object");
+		columns.add("Alg object");
+		columns.add("Imported");
+		
+		return columns;
+	}
+
+
+	/**
+	 * Testing whether this model is modified.
+	 * @return whether model is modified.
+	 */
+	public boolean isModified() {
+		return modified;
+	}
+
+	
+	@Override
+	public Class<?> getColumnClass(int columnIndex) {
+		// TODO Auto-generated method stub
+		if (columnIndex == 5)
+			return Boolean.class;
+		else
+			return super.getColumnClass(columnIndex);
+	}
+
+	
+	@Override
+	public boolean isCellEditable(int row, int column) {
+		// TODO Auto-generated method stub
+		if (column == 5)
+			return true;
+		else
+			return false;
+	}
+
+
+	@Override
+	public void setValueAt(Object aValue, int row, int column) {
+		// TODO Auto-generated method stub
+		super.setValueAt(aValue, row, column);
+		
+		modified = true;
+	}
+	
+	
+}
+

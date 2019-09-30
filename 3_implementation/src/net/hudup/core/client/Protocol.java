@@ -420,6 +420,11 @@ public interface Protocol {
 	 * Action of request of getting algorithm names. Such request is created by method {@link #createGetAlgNamesRequest()}.
 	 */
 	static final String GET_ALG_NAMES =                     "get_alg_names";
+	
+	/**
+	 * Action of request of getting algorithm descriptions. Such request is created by method {@link #createGetAlgDescsRequest()}.
+	 */
+	static final String GET_ALG_DESCS =                     "get_alg_descs";
 
 	
 	/**
@@ -1055,6 +1060,13 @@ public interface Protocol {
 	 * @return a request for retrieving algorithm names.
 	 */
 	Request createGetAlgNamesRequest();
+
+
+	/**
+	 * Creating a request for retrieving algorithm descriptions.
+	 * @return a request for retrieving algorithm descriptions.
+	 */
+	Request createGetAlgDescsRequest();
 
 
 }

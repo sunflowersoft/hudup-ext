@@ -741,4 +741,15 @@ public class ProtocolImpl implements Protocol {
 	}
 
 	
+	@Override
+	public Request createGetAlgDescsRequest() {
+		// TODO Auto-generated method stub
+		Request request = new Request();
+		request.notJsonParsing = true;
+		request.action = GET_ALG_DESCS;
+		
+		return request;
+	}
+
+
 }

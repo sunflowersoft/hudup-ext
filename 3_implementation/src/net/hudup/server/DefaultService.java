@@ -10,12 +10,15 @@ package net.hudup.server;
 import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
 import net.hudup.core.PluginStorage;
 import net.hudup.core.Util;
 import net.hudup.core.alg.Alg;
+import net.hudup.core.alg.AlgDesc2;
+import net.hudup.core.alg.AlgDesc2List;
 import net.hudup.core.alg.AlgRemote;
 import net.hudup.core.alg.RecommendParam;
 import net.hudup.core.alg.Recommender;
@@ -1547,7 +1550,7 @@ public class DefaultService implements Service, AutoCloseable {
 		}
 		catch (Throwable e) {
 			e.printStackTrace();
-			LogUtil.error("Service fail to get evaluator, caused by " + e.getMessage());
+			LogUtil.error("Service fail to get algorithm names, caused by " + e.getMessage());
 		}
 		finally {
 			trans.unlockRead();
@@ -1558,6 +1561,36 @@ public class DefaultService implements Service, AutoCloseable {
 	}
 
 	
+	@Override
+	public AlgDesc2List getAlgDescs() throws RemoteException {
+		// TODO Auto-generated method stub
+		AlgDesc2List algDescs = new AlgDesc2List();
+		
+		trans.lockRead();
+		try {
+			algDescs.addAll2(PluginStorage.getNormalAlgReg().getAlgList());
+		}
+		catch (Throwable e) {
+			e.printStackTrace();
+			LogUtil.error("Service fail to get list of extended algorithm descriptions, caused by " + e.getMessage());
+		}
+		finally {
+			trans.unlockRead();
+		}
+		
+		algDescs.sort(new Comparator<AlgDesc2>() {
+
+			@Override
+			public int compare(AlgDesc2 o1, AlgDesc2 o2) {
+				// TODO Auto-generated method stub
+				return o1.algName.compareTo(o2.algName);
+			}
+			
+		});
+		return algDescs;
+	}
+
+
 	@Override
 	protected void finalize() throws Throwable {
 		// TODO Auto-generated method stub

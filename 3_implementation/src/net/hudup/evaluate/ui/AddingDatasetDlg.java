@@ -19,9 +19,9 @@ import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-import net.hudup.core.PluginManager;
 import net.hudup.core.alg.Alg;
-import net.hudup.core.alg.AlgDesc.MethodType;
+import net.hudup.core.alg.AlgDesc2;
+import net.hudup.core.alg.AlgDesc2.MethodType;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.DatasetPair;
@@ -203,7 +203,7 @@ public class AddingDatasetDlg extends JDialog {
 		if (this.algList == null || this.algList.size() == 0)
 			return;
 		
-		MethodType type = PluginManager.methodTypeOf(this.algList);
+		MethodType type = AlgDesc2.methodTypeOf(this.algList);
 		if (type == MethodType.memorybased)
 			btnTrainingBrowse.setText(I18nUtil.message("training_set"));
 		else if (type == MethodType.modelbased)
@@ -224,7 +224,7 @@ public class AddingDatasetDlg extends JDialog {
 	protected void openTrainingSet(String mainUnit) {
 		
 		DataConfig defaultCfg = txtTrainingBrowse.getConfig();
-		MethodType type = PluginManager.methodTypeOf(this.algList);
+		MethodType type = AlgDesc2.methodTypeOf(this.algList);
 		
 		//Getting default configuration according to algorithm if possible.
 		if (defaultCfg == null) {

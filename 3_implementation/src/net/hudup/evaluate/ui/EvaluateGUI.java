@@ -212,7 +212,6 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 	 * Table of listing metrics.
 	 */
 	protected MetricsTable tblMetrics = null;
-//	protected MetricsTable2 tblMetrics = null; //MetricsTable2 (normal JTable, not sortable) avoids out of array index error.
 	
 	/**
 	 * Button to analyze testing results.
@@ -707,7 +706,6 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 		footer.add(this.paneResult, BorderLayout.CENTER);
 		
 		this.tblMetrics = new MetricsTable(new RegisterTable(Arrays.asList(getAlg())));
-		//this.tblMetrics = new MetricsTable2(new RegisterTable(Arrays.asList(getAlg()))); //MetricsTable2 (normal JTable, not sortable) avoids out of array index error.
 		this.tblMetrics.setPreferredScrollableViewportSize(new Dimension(600, 100));
 		this.paneResult.add(new JScrollPane(this.tblMetrics), BorderLayout.CENTER);
 

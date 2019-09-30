@@ -475,8 +475,10 @@ class PropTableModel extends DefaultTableModel {
 	 */
 	public Class<?> getColumnClass(int row, int column) {
 		Object value = getValueAt(row, column);
-		
-		return value.getClass();
+		if (value == null)
+			return getColumnClass(column);
+		else
+			return value.getClass();
 	}
 	
 	

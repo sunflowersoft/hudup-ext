@@ -22,10 +22,12 @@ import javax.swing.WindowConstants;
 
 import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.AlgAbstract;
+import net.hudup.core.alg.AlgDesc2;
 import net.hudup.core.alg.AlgRemote;
 import net.hudup.core.alg.AlgRemoteWrapper;
 import net.hudup.core.alg.NoteAlg;
 import net.hudup.core.data.ui.PropPane;
+import net.hudup.core.logistic.ui.TextArea;
 import net.hudup.core.logistic.ui.UIUtil;
 
 /**
@@ -53,7 +55,7 @@ public class AlgConfigDlg extends JDialog {
 	/**
 	 * Information label.
 	 */
-	protected JLabel lblInfo = null;
+	protected TextArea txtInfo = null;
 
 	
 	/**
@@ -112,8 +114,15 @@ public class AlgConfigDlg extends JDialog {
 		
 		JPanel paneInfo = new JPanel(new BorderLayout());
 		add(paneInfo, BorderLayout.NORTH);
-		lblInfo = new JLabel("Configuration of algorithm '" + alg.getName() + "'");
-		paneInfo.add(lblInfo, BorderLayout.NORTH);
+		txtInfo = new TextArea();
+		String info = "";
+		try {
+			AlgDesc2 algDesc = new AlgDesc2(alg);
+			info += algDesc.toString();
+		} catch (Throwable e) {e.printStackTrace();}
+		txtInfo.setText(info);
+		txtInfo.setRows(3);
+		paneInfo.add(new JScrollPane(txtInfo), BorderLayout.NORTH);
 		
 		
 		paneCfg = new PropPane() {

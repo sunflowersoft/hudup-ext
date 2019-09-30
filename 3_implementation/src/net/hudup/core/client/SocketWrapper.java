@@ -16,6 +16,7 @@ import java.rmi.RemoteException;
 import java.util.Set;
 
 import net.hudup.core.alg.Alg;
+import net.hudup.core.alg.AlgDesc2List;
 import net.hudup.core.alg.RecommendParam;
 import net.hudup.core.data.AttributeList;
 import net.hudup.core.data.DataConfig;
@@ -743,6 +744,18 @@ public class SocketWrapper extends ProtocolImpl implements Service {
 	}
 
 	
+	@Override
+	public AlgDesc2List getAlgDescs() throws RemoteException {
+		// TODO Auto-generated method stub
+		Request request = createGetAlgDescsRequest();
+		Response response = sendRequest(request);
+		if (response == null)
+			return null;
+		
+		return response.algDescList;
+	}
+
+
 	/**
 	 * Sending the quit request to server.
 	 * Quit request is the one that requires server to quit, which means that server will be stopped and removed from memory.

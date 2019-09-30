@@ -250,8 +250,8 @@ public final class PluginStorage implements Serializable {
 	
 	
 	/**
-	 * Looking up the register table whose name is equal to specified name
-	 * @param algTypeName specified name. This is the name implying the type of algorithm.
+	 * Looking up the register table whose table name is equal to specified name
+	 * @param tableName specified table name. This is the name implying the type of algorithm.
 	 * <ul>
 	 * <li>Register table of {@link Alg} (s) has name specified by the constant {@link #NORMAL_ALG}.</li>
 	 * <li>Register table of {@link DatasetParser} (s) has name specified by the constant {@link #PARSER}.</li>
@@ -259,18 +259,18 @@ public final class PluginStorage implements Serializable {
 	 * <li>Register table of {@link ExternalQuery} (s) has name specified by the constant {@link #EXTERNAL_QUERY}.</li>
 	 * <li>Register table of {@link CTSManager} (s) has name specified by the constant {@link #CTS_MANAGER}.</li>
 	 * </ul>
-	 * @return {@link RegisterTable} whose name is equal to specified name.
+	 * @return {@link RegisterTable} whose name is equal to specified table name.
 	 */
-	public final static RegisterTable lookupTable(String algTypeName) {
-		if (algTypeName.equals(NORMAL_ALG))
+	public final static RegisterTable lookupTable(String tableName) {
+		if (tableName.equals(NORMAL_ALG))
 			return normalAlgReg;
-		else if (algTypeName.equals(PARSER))
+		else if (tableName.equals(PARSER))
 			return parserReg;
-		else if (algTypeName.equals(METRIC))
+		else if (tableName.equals(METRIC))
 			return metricReg;
-		else if (algTypeName.equals(EXTERNAL_QUERY))
+		else if (tableName.equals(EXTERNAL_QUERY))
 			return externalQueryReg;
-		else if (algTypeName.equals(CTS_MANAGER))
+		else if (tableName.equals(CTS_MANAGER))
 			return ctsmReg;
 		else
 			return null;
@@ -278,7 +278,7 @@ public final class PluginStorage implements Serializable {
 	
 	
 	/**
-	 * Looking up the type name of specified class of algorithm.
+	 * Looking up the table name of specified class of algorithm.
 	 * @param algClass specified class of algorithm.
 	 * @return type name of specified class of algorithm.
 	 * <ul>
@@ -289,7 +289,7 @@ public final class PluginStorage implements Serializable {
 	 * <li>Class of {@link CTSManager} (s) has type name specified by the constant {@link #CTS_MANAGER}.</li>
 	 * </ul>
 	 */
-	public final static String lookupAlgTypeName(Class<? extends Alg> algClass) {
+	public final static String lookupTableName(Class<? extends Alg> algClass) {
 		if (DatasetParser.class.isAssignableFrom(algClass))
 			return PARSER;
 		else if (Metric.class.isAssignableFrom(algClass))
@@ -301,6 +301,27 @@ public final class PluginStorage implements Serializable {
 		else
 			return NORMAL_ALG;
 	
+	}
+	
+	
+	/**
+	 * Looking whether the specified algorithm class and algorithm name stored in next update list.
+	 * @param algClass specified algorithm class.
+	 * @param algName specified algorithm name.
+	 * @return the index of the specified algorithm class and algorithm name stored in next update list.
+	 * Return -1 if not found.
+	 */
+	public final static int lookupNextUpdateList(Class<? extends Alg> algClass, String algName) {
+		if (algClass == null || algName == null) return -1;
+		
+		int idx = nextUpdateList.indexOf(algName);
+		if (idx == -1) return -1;
+		
+		Class<? extends Alg> cls = nextUpdateList.get(idx).getClass();
+		if (algClass.equals(cls))
+			return idx;
+		else
+			return -1;
 	}
 	
 	

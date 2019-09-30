@@ -29,64 +29,6 @@ public class AlgDesc implements Serializable, net.hudup.core.Cloneable {
 
 
 	/**
-	 * Methodological type of algorithm.
-	 * @author Loc Nguyen
-	 * @version 1.0
-	 */
-	public enum MethodType {
-		
-		/**
-		 * Memory-based algorithm.
-		 */
-		memorybased,
-		
-		/**
-		 * Model-based algorithm.
-		 */
-		modelbased,
-		
-		/**
-		 * Composite algorithm.
-		 */
-		composite,
-		
-		/**
-		 * Service algorithm is a service that points to another algorithm.
-		 */
-		service,
-		
-		/**
-		 * Unknown algorithm.
-		 */
-		unknown
-	}
-	
-	
-	/**
-	 * Functional type of algorithm.
-	 * @author Loc Nguyen
-	 * @version 1.0
-	 */
-	public enum FunctionType {
-		
-		/**
-		 * Recommendation algorithm.
-		 */
-		recommend,
-		
-		/**
-		 * Executable algorithm.
-		 */
-		execute,
-		
-		/**
-		 * Unknown algorithm.
-		 */
-		unknown
-	}
-
-	
-	/**
 	 * Algorithm name.
 	 */
 	protected String algClassName = null;

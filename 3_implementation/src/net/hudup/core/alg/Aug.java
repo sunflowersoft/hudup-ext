@@ -10,7 +10,7 @@ package net.hudup.core.alg;
 import java.io.Serializable;
 import java.rmi.RemoteException;
 
-import net.hudup.core.alg.AlgDesc.MethodType;
+import net.hudup.core.alg.AlgDesc2.MethodType;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.logistic.Inspectable;
 

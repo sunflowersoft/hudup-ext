@@ -358,6 +358,9 @@ public class Delegator extends AbstractDelegator {
 			
 			else if (action.equals(GET_ALG_NAMES))
 				return Response.create(remoteService.getAlgNames());
+			
+			else if (action.equals(GET_ALG_DESCS))
+				return Response.create(remoteService.getAlgDescs());
 		}
 		catch (Throwable e) {
 			e.printStackTrace();

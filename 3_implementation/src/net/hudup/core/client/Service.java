@@ -13,6 +13,7 @@ import java.rmi.RemoteException;
 import java.util.Set;
 
 import net.hudup.core.alg.Alg;
+import net.hudup.core.alg.AlgDesc2List;
 import net.hudup.core.alg.RecommendParam;
 import net.hudup.core.data.AttributeList;
 import net.hudup.core.data.DataConfig;
@@ -628,6 +629,14 @@ public interface Service extends Remote {
 	 * @throws RemoteException if any error raises.
 	 */
 	String[] getAlgNames() throws RemoteException;
+
+
+	/**
+	 * Getting list of extended algorithm descriptions.
+	 * @return list of extended algorithm descriptions.
+	 * @throws RemoteException if any error raises.
+	 */
+	AlgDesc2List getAlgDescs() throws RemoteException;
 
 
 }

@@ -34,26 +34,30 @@ import net.hudup.core.alg.Recommender;
 import net.hudup.core.alg.RecommenderRemote;
 import net.hudup.core.alg.RecommenderRemoteWrapper;
 import net.hudup.core.alg.ServiceAlg;
-import net.hudup.core.alg.AlgDesc.FunctionType;
-import net.hudup.core.alg.AlgDesc.MethodType;
 import net.hudup.core.data.DataDriver;
 import net.hudup.core.data.DataDriverList;
+import net.hudup.core.data.ExternalQuery;
 import net.hudup.core.data.ExternalQueryRemote;
 import net.hudup.core.data.ExternalQueryRemoteWrapper;
+import net.hudup.core.data.ctx.CTSManager;
 import net.hudup.core.data.ctx.CTSManagerRemote;
 import net.hudup.core.data.ctx.CTSManagerRemoteWrapper;
+import net.hudup.core.evaluate.MetaMetric;
+import net.hudup.core.evaluate.Metric;
 import net.hudup.core.evaluate.MetricRemote;
 import net.hudup.core.evaluate.MetricRemoteWrapper;
+import net.hudup.core.evaluate.MetricWrapper;
 import net.hudup.core.logistic.Composite;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.NextUpdate;
 import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.UriAdapter.AdapterWriter;
-import net.hudup.core.parser.DatasetParserRemote;
-import net.hudup.core.parser.DatasetParserRemoteWrapper;
 import net.hudup.core.logistic.UriFilter;
 import net.hudup.core.logistic.UriProcessor;
 import net.hudup.core.logistic.xURI;
+import net.hudup.core.parser.DatasetParser;
+import net.hudup.core.parser.DatasetParserRemote;
+import net.hudup.core.parser.DatasetParserRemoteWrapper;
 
 /**
  * This class is the full implementation of {@link PluginManager}.
@@ -239,7 +243,7 @@ public class Firer implements PluginManager {
 					continue;
 				}
 			
-				PluginManager.registerAlg(alg);
+				registerAlg(alg);
 			}
 			catch (Exception e) {e.printStackTrace();}
 		}
@@ -260,7 +264,7 @@ public class Firer implements PluginManager {
 					continue;
 				}
 
-				PluginManager.registerAlg(compositeAlg);
+				registerAlg(compositeAlg);
 			}
 			catch (Exception e) {e.printStackTrace();}
 		}
@@ -467,6 +471,37 @@ public class Firer implements PluginManager {
 
 
 	@Override
+	public void registerAlg(Alg alg) {
+		RegisterTable normalAlgReg = PluginStorage.getNormalAlgReg();
+		RegisterTable metricReg = PluginStorage.getMetricReg();
+		RegisterTable parserReg = PluginStorage.getParserReg();
+		RegisterTable externalQueryReg = PluginStorage.getExternalQueryReg();
+		RegisterTable ctsmReg = PluginStorage.getCTSManagerReg();
+
+		boolean registered = false;
+		if (alg instanceof DatasetParser)
+			registered = parserReg.register( (DatasetParser)alg );
+		else if (alg instanceof Metric) {
+			if (alg instanceof MetricWrapper)
+				LogUtil.info("Metric wrapper is used for calculating other metrics and so it is not registered");
+			else if (alg instanceof MetaMetric)
+				LogUtil.info("Meta Metric can be registered if its internal metrics are referred correctly. In this current implementation, meta metric is not registered");
+			else
+				registered = metricReg.register( (Metric)alg );
+		}
+		else if (alg instanceof ExternalQuery)
+			registered = externalQueryReg.register( (ExternalQuery)alg );
+		else if (alg instanceof CTSManager)
+			registered = ctsmReg.register( (CTSManager)alg );
+		else
+			registered = normalAlgReg.register(alg);
+
+		if (registered)
+			LogUtil.info("Registered algorithm: " + alg.getName());
+	}
+
+	
+	@Override
 	public AlgRemoteWrapper wrap(AlgRemote remoteAlg, boolean exclusive) {
 		// TODO Auto-generated method stub
 		if (remoteAlg instanceof DatasetParserRemote)
@@ -489,54 +524,54 @@ public class Firer implements PluginManager {
 	
 	
 	@Override
-	public MethodType methodTypeOf(Alg alg) {
+	public int methodTypeOf(Alg alg) {
 		if (alg instanceof MemoryBasedAlg)
-			return MethodType.memorybased;
+			return 0;
 		else if (alg instanceof ModelBasedAlg)
-			return MethodType.modelbased;
+			return 1;
 		else if (alg instanceof CompositeAlg)
-			return MethodType.composite;
+			return 2;
 		else if (alg instanceof ServiceAlg)
-			return MethodType.service;
+			return 3;
 		else if (alg instanceof AlgRemoteWrapper) {
 			AlgRemote remoteAlg = ((AlgRemoteWrapper)alg).getRemoteAlg();
 			if (remoteAlg instanceof Alg)
 				return methodTypeOf((Alg)remoteAlg);
 			else if (remoteAlg instanceof MemoryBasedAlgRemote)
-				return MethodType.memorybased;
+				return 0;
 			else if (remoteAlg instanceof ModelBasedAlgRemote)
-				return MethodType.modelbased;
+				return 1;
 			else if (remoteAlg instanceof CompositeAlgRemote)
-				return MethodType.composite;
+				return 2;
 			else if (remoteAlg instanceof ServiceAlg)
-				return MethodType.service;
+				return 3;
 			else
-				return MethodType.unknown;
+				return -1;
 		}
 		else
-			return MethodType.unknown;
+			return -1;
 	}
 
 
 	@Override
-	public FunctionType functionTypeOf(Alg alg) {
+	public int functionTypeOf(Alg alg) {
 		if (alg instanceof Recommender)
-			return FunctionType.recommend;
+			return 0;
 		else if (alg instanceof ExecutableAlg)
-			return FunctionType.execute;
+			return 1;
 		else if (alg instanceof AlgRemoteWrapper) {
 			AlgRemote remoteAlg = ((AlgRemoteWrapper)alg).getRemoteAlg();
 			if (remoteAlg instanceof Alg)
 				return functionTypeOf((Alg)remoteAlg);
 			else if (remoteAlg instanceof RecommenderRemote)
-				return FunctionType.recommend;
+				return 0;
 			else if (remoteAlg instanceof ExecutableAlgRemote)
-				return FunctionType.execute;
+				return 1;
 			else
-				return FunctionType.unknown;
+				return -1;
 		}
 		else
-			return FunctionType.unknown;
+			return -1;
 	}
 
 

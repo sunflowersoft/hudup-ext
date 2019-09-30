@@ -15,6 +15,7 @@ import java.io.OutputStream;
 
 import net.hudup.core.Util;
 import net.hudup.core.alg.Alg;
+import net.hudup.core.alg.AlgDesc2List;
 import net.hudup.core.data.AttributeList;
 import net.hudup.core.data.BooleanWrapper;
 import net.hudup.core.data.DataConfig;
@@ -173,6 +174,11 @@ public class Response extends ProtocolParam {
 	 */
 	public Alg                       alg                 = null;
 	
+	/**
+	 * List of extended algorithm descriptions.
+	 */
+	public AlgDesc2List              algDescList         = null;
+	
 	
 	/**
 	 * Default constructor.
@@ -234,6 +240,9 @@ public class Response extends ProtocolParam {
 
 		else if (alg != null)
 			return alg;
+
+		else if (algDescList != null)
+			return algDescList;
 
 		else
 			return null;
@@ -462,6 +471,19 @@ public class Response extends ProtocolParam {
 	public static Response create(Alg alg) {
 		Response response = new Response();
 		response.alg = alg;
+		
+		return response;
+	}
+
+	
+	/**
+	 * Creating result (response) as list of extended algorithm descriptions.
+	 * @param algDescList list of extended algorithm descriptions.
+	 * @return result (response) as list of extended algorithm descriptions.
+	 */
+	public static Response create(AlgDesc2List algDescList) {
+		Response response = new Response();
+		response.algDescList = algDescList;
 		
 		return response;
 	}

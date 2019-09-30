@@ -11,6 +11,7 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 
+import net.hudup.core.Cloneable;
 import net.hudup.core.Util;
 import net.hudup.core.parser.TextParserUtil;
 
@@ -21,7 +22,7 @@ import net.hudup.core.parser.TextParserUtil;
  * @version 10.0
  *
  */
-public class AlgDescList implements Serializable, net.hudup.core.Cloneable {
+public class AlgDescList implements Serializable, Cloneable {
 
 	
 	/**
@@ -112,7 +113,7 @@ public class AlgDescList implements Serializable, net.hudup.core.Cloneable {
 	
 	/**
 	 * Adding other list of algorithm descriptions at the end of this list.
-	 * @param algDescList Specified list algorithm descriptions
+	 * @param algDescList Specified list of algorithm descriptions
 	 * @return whether adding algorithm descriptions successfully
 	 */
 	public boolean addAll(AlgDescList algDescList) {
@@ -121,7 +122,7 @@ public class AlgDescList implements Serializable, net.hudup.core.Cloneable {
 	
 	
 	/**
-	 * Extracting descriptions of specified list of algorithms and adding such description at the end of this list.
+	 * Adding descriptions of specified list of algorithms and adding such description at the end of this list.
 	 * @param algList Specified list of algorithms, please see {@link AlgList}.
 	 * @return whether adding algorithm descriptions successfully
 	 */
@@ -186,7 +187,7 @@ public class AlgDescList implements Serializable, net.hudup.core.Cloneable {
 	
 	
 	/**
-	 * Clearing this list, which means that removing all algorithm description from this list.
+	 * Clearing this list, which means that removing all algorithm descriptions from this list.
 	 */
 	public void clear() {
 		list.clear();
