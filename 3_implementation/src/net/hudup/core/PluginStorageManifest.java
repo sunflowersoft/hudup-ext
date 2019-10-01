@@ -320,11 +320,8 @@ public class PluginStorageManifest extends SortableSelectableTable {
 						boolean algExported = ((Exportable)alg).getExportedStub() != null;
 						if (exported) {
 							if (!algExported) {
-								String algTypeName = getValueAt(i, 0).toString();
-								if (algTypeName.equals(PluginStorage.NORMAL_ALG)) { //Only export normal algorithms.
-									((Exportable)alg).export(this.port);
-									changed = true;
-								}
+								((Exportable)alg).export(this.port);
+								changed = true;
 							}
 						}
 						else {

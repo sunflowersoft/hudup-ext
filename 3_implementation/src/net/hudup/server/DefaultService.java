@@ -41,10 +41,10 @@ import net.hudup.core.data.Provider;
 import net.hudup.core.data.Rating;
 import net.hudup.core.data.RatingVector;
 import net.hudup.core.data.Scanner;
+import net.hudup.core.data.SingletonExport;
 import net.hudup.core.data.Snapshot;
 import net.hudup.core.evaluate.Evaluator;
 import net.hudup.core.evaluate.EvaluatorConfig;
-import net.hudup.core.logistic.AlwaysSerialize;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.NextUpdate;
 import net.hudup.data.ProviderImpl;
@@ -1507,6 +1507,10 @@ public class DefaultService implements Service, AutoCloseable {
 	}
 
 
+	/*
+	 * In current implementation, only normal algorithms are concerned.
+	 * @see net.hudup.core.client.Service#getAlg(java.lang.String)
+	 */
 	@Override
 	public Alg getAlg(String algName) throws RemoteException {
 		// TODO Auto-generated method stub
@@ -1515,15 +1519,12 @@ public class DefaultService implements Service, AutoCloseable {
 		trans.lockWrite();
 		try {
 			alg = PluginStorage.getNormalAlgReg().query(algName);
-			if ((alg != null) && !(alg instanceof AlwaysSerialize)) {
-				if (alg instanceof AlgRemote) {
-//					AlgRemote remoteAlg = (AlgRemote) ((AlgRemote)alg).export(serverConfig.getServerPort());
-//					alg = Util.getPluginManager().wrap(remoteAlg, false);
-					((AlgRemote)alg).export(serverConfig.getServerPort());
-					alg = Util.getPluginManager().wrap((AlgRemote)alg, false);
-				}
-				else
-					alg = null;
+			if (alg instanceof AlgRemote) {
+				AlgRemote remoteAlg = (AlgRemote)alg;
+				if (!(remoteAlg instanceof SingletonExport))
+					remoteAlg = (AlgRemote) alg.newInstance();
+				remoteAlg.export(serverConfig.getServerPort());
+				alg = Util.getPluginManager().wrap(remoteAlg, false);
 			}
 		}
 		catch (Throwable e) {
@@ -1540,6 +1541,10 @@ public class DefaultService implements Service, AutoCloseable {
 	}
 
 
+	/*
+	 * In current implementation, only normal algorithms are concerned.
+	 * @see net.hudup.core.client.Service#getAlgNames()
+	 */
 	@Override
 	public String[] getAlgNames() throws RemoteException {
 		List<String> algNames = Util.newList();
@@ -1561,6 +1566,10 @@ public class DefaultService implements Service, AutoCloseable {
 	}
 
 	
+	/*
+	 * In current implementation, only normal algorithms are concerned.
+	 * @see net.hudup.core.client.Service#getAlgDescs()
+	 */
 	@Override
 	public AlgDesc2List getAlgDescs() throws RemoteException {
 		// TODO Auto-generated method stub

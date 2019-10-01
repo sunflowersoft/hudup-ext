@@ -14,6 +14,8 @@ package net.hudup.core.logistic;
  * @version 12.0
  *
  */
+@Deprecated
 public interface AlwaysSerialize {
 
+	
 }
