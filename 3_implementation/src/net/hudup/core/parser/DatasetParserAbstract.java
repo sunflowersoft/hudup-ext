@@ -7,6 +7,8 @@
  */
 package net.hudup.core.parser;
 
+import java.rmi.RemoteException;
+
 import net.hudup.core.alg.AlgAbstract;
 
 /**
@@ -36,4 +38,11 @@ public abstract class DatasetParserAbstract extends AlgAbstract implements Datas
 	}
 
 
+	@Override
+	public String[] getBaseRemoteInterfaceNames() throws RemoteException {
+		// TODO Auto-generated method stub
+		return new String[] {DatasetParserRemote.class.getName()};
+	}
+
+	
 }

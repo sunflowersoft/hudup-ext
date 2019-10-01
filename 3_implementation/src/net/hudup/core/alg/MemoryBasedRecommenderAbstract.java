@@ -316,4 +316,11 @@ public abstract class MemoryBasedRecommenderAbstract extends RecommenderAbstract
 //	}
 
 	
+	@Override
+	public String[] getBaseRemoteInterfaceNames() throws RemoteException {
+		// TODO Auto-generated method stub
+		return new String[] {RecommenderRemote.class.getName(), MemoryBasedAlgRemote.class.getName()};
+	}
+
+
 }

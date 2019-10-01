@@ -150,4 +150,11 @@ public abstract class CompositeRecommenderAbstract extends RecommenderAbstract i
 	}
 	
 	
+	@Override
+	public String[] getBaseRemoteInterfaceNames() throws RemoteException {
+		// TODO Auto-generated method stub
+		return new String[] {RecommenderRemote.class.getName(), CompositeAlgRemote.class.getName()};
+	}
+	
+	
 }

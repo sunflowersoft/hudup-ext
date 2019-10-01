@@ -9,6 +9,7 @@ package net.hudup.core.alg;
 
 import java.io.Serializable;
 import java.rmi.Remote;
+import java.rmi.RemoteException;
 
 /**
  * This interface represents a remote knowledge base.
@@ -20,4 +21,12 @@ import java.rmi.Remote;
 public interface KBaseRemote extends KBaseRemoteTask, AlgRemoteTask, SetupAlgListener, Remote, Serializable {
 
 	
+	/**
+	 * Getting remote base class names.
+	 * @return remote base class names.
+	 * @throws RemoteException if any error raises.
+	 */
+	String[] getBaseRemoteInterfaceNames() throws RemoteException;
+
+
 }

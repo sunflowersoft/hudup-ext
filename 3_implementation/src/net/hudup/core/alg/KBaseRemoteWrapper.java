@@ -46,7 +46,7 @@ public class KBaseRemoteWrapper implements KBase, KBaseRemote {
     
 	/**
 	 * Constructor with specified remote knowledge base.
-	 * @param remoteAlg remote knowledge base.
+	 * @param remoteKBase remote knowledge base.
 	 */
 	public KBaseRemoteWrapper(KBaseRemote remoteKBase) {
 		// TODO Auto-generated constructor stub
@@ -56,7 +56,7 @@ public class KBaseRemoteWrapper implements KBase, KBaseRemote {
 	
 	/**
 	 * Constructor with specified remote knowledge base and exclusive mode.
-	 * @param remoteAlg remote knowledge base.
+	 * @param remoteKBase remote knowledge base.
 	 * @param exclusive exclusive mode.
 	 */
 	public KBaseRemoteWrapper(KBaseRemote remoteKBase, boolean exclusive) {
@@ -189,6 +189,13 @@ public class KBaseRemoteWrapper implements KBase, KBaseRemote {
 	}
 
 
+	@Override
+	public String[] getBaseRemoteInterfaceNames() throws RemoteException {
+		// TODO Auto-generated method stub
+		return new String[] {KBase.class.getName()};
+	}
+
+	
 	@Override
 	public String getDescription() throws RemoteException {
 		// TODO Auto-generated method stub

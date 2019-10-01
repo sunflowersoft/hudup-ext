@@ -86,9 +86,9 @@ public class CTScreator extends JDialog implements Inspector {
 		addWindowListener(new WindowAdapter() {
 
 			@Override
-			public void windowClosed(WindowEvent e) {
+			public void windowClosing(WindowEvent e) {
 				// TODO Auto-generated method stub
-				super.windowClosed(e);
+				super.windowClosing(e);
 				commit();
 				dispose();
 			}

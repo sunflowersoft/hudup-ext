@@ -33,7 +33,7 @@ import net.hudup.core.alg.Alg;
  * {@link RegisterTable} provides two important methods as follows:
  * <ul>
  * <li>
- * Method {@link #register(Alg)} registers a given algorithm. This method is called by {@link PluginManager#discover(String...)} at starting time of Hudup.
+ * Method {@link #register(Alg)} registers a given algorithm. This method is called by {@link PluginManager#discover()} at starting time of Hudup.
  * A algorithm which is registered in {@link RegisterTable} will be added in the internal map {@link #algMap}.
  * </li>
  * <li>

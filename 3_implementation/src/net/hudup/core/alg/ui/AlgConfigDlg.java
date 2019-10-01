@@ -17,14 +17,10 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
 import javax.swing.WindowConstants;
 
 import net.hudup.core.alg.Alg;
-import net.hudup.core.alg.AlgAbstract;
 import net.hudup.core.alg.AlgDesc2;
-import net.hudup.core.alg.AlgRemote;
-import net.hudup.core.alg.AlgRemoteWrapper;
 import net.hudup.core.alg.NoteAlg;
 import net.hudup.core.data.ui.PropPane;
 import net.hudup.core.logistic.ui.TextArea;
@@ -73,7 +69,7 @@ public class AlgConfigDlg extends JDialog {
 	/**
 	 * Note text area.
 	 */
-	JTextArea txtNote = null;
+	protected TextArea txtNote = null;
 
 	
 	/**
@@ -82,8 +78,8 @@ public class AlgConfigDlg extends JDialog {
 	 * @param alg specified algorithm whose configuration is edited.
 	 */
 	public AlgConfigDlg(final Component comp, final Alg alg) {
-		super(UIUtil.getFrameForComponent(comp), "Configure algorithm " + alg.getName(), true);
-		// TODO Auto-generated constructor stub
+		super(UIUtil.getFrameForComponent(comp), "Algorithm configuration", true);
+		this.thisAlg = alg;
 		
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		setSize(600, 400);
@@ -93,9 +89,9 @@ public class AlgConfigDlg extends JDialog {
 		addWindowListener(new WindowAdapter() {
 
 			@Override
-			public void windowClosed(WindowEvent e) {
+			public void windowClosing(WindowEvent e) {
 				// TODO Auto-generated method stub
-				super.windowClosed(e);
+				super.windowClosing(e);
 				if (paneCfg.getPropTable().isModified()) {
 					int confirm = JOptionPane.showConfirmDialog(
 							comp, 
@@ -115,12 +111,6 @@ public class AlgConfigDlg extends JDialog {
 		JPanel paneInfo = new JPanel(new BorderLayout());
 		add(paneInfo, BorderLayout.NORTH);
 		txtInfo = new TextArea();
-		String info = "";
-		try {
-			AlgDesc2 algDesc = new AlgDesc2(alg);
-			info += algDesc.toString();
-		} catch (Throwable e) {e.printStackTrace();}
-		txtInfo.setText(info);
 		txtInfo.setRows(3);
 		paneInfo.add(new JScrollPane(txtInfo), BorderLayout.NORTH);
 		
@@ -167,28 +157,16 @@ public class AlgConfigDlg extends JDialog {
 				return super.apply();
 			}
 
-		}; 
-		paneCfg.setToolbarVisible(true);
+		};
 		add(paneCfg, BorderLayout.CENTER);
 
 		
 		paneNote = new JPanel(new BorderLayout());
-		paneNote.setVisible(false);
 		add(paneNote, BorderLayout.SOUTH);
 		paneNote.add(new JLabel("Note: "), BorderLayout.WEST);
-		txtNote = new JTextArea();
-		txtNote.setEditable(false);
-		txtNote.setLineWrap(true);
-		txtNote.setWrapStyleWord(true);
+		txtNote = new TextArea();
 		txtNote.setRows(3);
 		paneNote.add(new JScrollPane(txtNote), BorderLayout.CENTER);
-		if (alg instanceof NoteAlg) {
-			String note = ((NoteAlg)alg).note();
-			txtNote.setText(note);
-			txtNote.setToolTipText("Please pay attention to this algorithm note.");
-			txtNote.setCaretPosition(0);
-			paneNote.setVisible(true);
-		}
 		
 		update(alg);
 	}
@@ -202,12 +180,26 @@ public class AlgConfigDlg extends JDialog {
 		this.thisAlg = alg;
 		this.paneCfg.update(alg.getConfig());
 		
+		//Added date: 2019.09.26 by Loc Nguyen
+		try {
+			AlgDesc2 algDesc = new AlgDesc2(alg);
+			this.setTitle("Configure algorithm '" + algDesc.algName + "'");
+			txtInfo.setText(algDesc.toString());
+			if (algDesc.isRemote) {
+				paneCfg.setToolbarVisible(false);
+				paneCfg.setControlVisible(false);
+				paneCfg.setEnabled(false);
+			}
+		}
+		catch (Throwable e) {
+			e.printStackTrace();
+		}
+
 		paneNote.setVisible(false);
 		if (alg instanceof NoteAlg) {
 			String note = ((NoteAlg)alg).note();
 			txtNote.setText(note);
 			txtNote.setToolTipText("Please pay attention to this algorithm note.");
-			txtNote.setCaretPosition(0);
 			paneNote.setVisible(true);
 		}
 		else {
@@ -215,21 +207,6 @@ public class AlgConfigDlg extends JDialog {
 			txtNote.setToolTipText(null);
 		}
 		
-		
-		//Added date: 2019.09.26 by Loc Nguyen
-		try {
-			if (alg instanceof AlgRemoteWrapper) {
-				AlgRemote remoteAlg = ((AlgRemoteWrapper)alg).getRemoteAlg();
-				if (!(remoteAlg instanceof AlgAbstract)) {
-					this.paneCfg.setToolbarVisible(false);
-					this.paneCfg.setControlVisible(false);
-					this.paneCfg.setEnabled(false);
-				}
-			}
-		}
-		catch (Throwable e) {
-			e.printStackTrace();
-		}
 	}
 
 	

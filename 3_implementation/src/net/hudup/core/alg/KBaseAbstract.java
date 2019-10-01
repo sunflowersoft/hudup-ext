@@ -219,6 +219,13 @@ public abstract class KBaseAbstract implements KBase, KBaseRemote {
 
 
 	@Override
+	public String[] getBaseRemoteInterfaceNames() throws RemoteException {
+		// TODO Auto-generated method stub
+		return new String[] {KBase.class.getName()};
+	}
+
+	
+	@Override
 	public DataConfig getConfig() {
 		
 		return config;

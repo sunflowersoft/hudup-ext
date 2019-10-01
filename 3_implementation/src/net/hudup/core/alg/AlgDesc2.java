@@ -16,6 +16,7 @@ import net.hudup.core.RegisterTable;
 import net.hudup.core.Util;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Exportable;
+import net.hudup.core.parser.TextParserUtil;
 
 /**
  * This class represents extended description of an algorithm.
@@ -98,6 +99,12 @@ public class AlgDesc2 extends AlgDesc {
 	
 	
 	/**
+	 * Base remote interface names.
+	 */
+	public String[] baseRemoteInterfaceNames = new String[0];
+	
+	
+	/**
 	 * Methodological type.
 	 */
 	public MethodType methodType = MethodType.memorybased;
@@ -169,6 +176,14 @@ public class AlgDesc2 extends AlgDesc {
 		
 		config = (DataConfig)config.clone();
 		algName = alg.getName();
+		
+		if (alg instanceof AlgRemote) {
+			try {
+				baseRemoteInterfaceNames = ((AlgRemote)alg).getBaseRemoteInterfaceNames();
+			} catch (Throwable e) {e.printStackTrace();}
+		}
+		baseRemoteInterfaceNames = baseRemoteInterfaceNames != null ? baseRemoteInterfaceNames : new String[0];
+		
 		methodType = methodTypeOf(alg);
 		functionType = functionTypeOf(alg);
 		registered = isRegistered(alg);
@@ -193,6 +208,7 @@ public class AlgDesc2 extends AlgDesc {
 		StringBuffer buffer = new StringBuffer();
 		buffer.append("Algorithm name: " + algName + "\n");
 		buffer.append("Class name: " + algClassName + "\n");
+		buffer.append("Remote interfaces: " + TextParserUtil.toText(baseRemoteInterfaceNames, ",") + "\n");
 		buffer.append("Methodological type: " + toString(methodType) + "\n");
 		buffer.append("Functional type: " + toString(functionType) + "\n");
 		buffer.append("Registered: " + registered + "\n");

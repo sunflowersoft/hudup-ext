@@ -8,6 +8,7 @@
 package net.hudup.core.data;
 
 import java.rmi.Remote;
+import java.rmi.RemoteException;
 
 /**
  * This interface represents remote dataset.
@@ -17,6 +18,14 @@ import java.rmi.Remote;
  *
  */
 public interface DatasetRemote extends DatasetRemoteTask, Remote {
+
+
+	/**
+	 * Getting base remote interface names.
+	 * @return base remote interface names.
+	 * @throws RemoteException if any error raises.
+	 */
+	String[] getBaseRemoteInterfaceNames() throws RemoteException;
 
 
 }

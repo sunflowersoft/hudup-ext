@@ -22,6 +22,7 @@ import javax.swing.RowSorter;
 import javax.swing.UIManager;
 import javax.swing.event.EventListenerList;
 import javax.swing.table.JTableHeader;
+import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
@@ -279,6 +280,56 @@ public class SortableSelectableTable extends JTable {
 			listener.select(evt);
 		}
 	}
+
+	
+	/*
+	 * The call of DefaultTableModel#getValueAt(int, int) can cause out of bound error from DefaultTableColumnModel#getColumn(int).
+	 * @see javax.swing.JTable#getCellRenderer(int, int)
+	 */
+	@Override
+	public TableCellRenderer getCellRenderer(int row, int column) {
+		try {
+			Object value = getValueAt(row, column);
+			if (value == null)
+				return super.getCellRenderer(row, column);
+			else {
+				TableCellRenderer renderer = getDefaultRenderer(value.getClass());
+				if(renderer == null)
+					return super.getCellRenderer(row, column);
+				else
+					return renderer;
+			}
+		}
+		catch (Throwable e) {
+			e.printStackTrace();
+			return getDefaultRenderer(Object.class);
+		}
+	}
+	
+	
+	/*
+	 * The call of DefaultTableModel#getValueAt(int, int) can cause out of bound error from DefaultTableColumnModel#getColumn(int).
+	 * @see javax.swing.JTable#getCellEditor(int, int)
+	 */
+	@Override
+    public TableCellEditor getCellEditor(int row, int column) {
+		try {
+			Object value = getValueAt(row, column);
+			if (value == null)
+				return super.getCellEditor(row, column);
+			else {
+				TableCellEditor editor = getDefaultEditor(value.getClass());
+				if(editor == null)
+					return super.getCellEditor(row, column);
+				else
+					return editor;
+			}
+		}
+		catch (Throwable e) {
+			e.printStackTrace();
+			return getDefaultEditor(Object.class);
+		}
+    }
 
 	
 	/**

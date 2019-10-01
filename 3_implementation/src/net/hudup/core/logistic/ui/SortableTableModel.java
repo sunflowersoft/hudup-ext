@@ -85,17 +85,27 @@ public class SortableTableModel extends DefaultTableModel {
 	}
 
 
+	/*
+	 * The call of DefaultTableModel#getValueAt(int, int) can cause out of bound error from DefaultTableColumnModel#getColumn(int).
+	 * @see javax.swing.table.AbstractTableModel#getColumnClass(int)
+	 */
 	@Override
 	public Class<?> getColumnClass(int columnIndex) {
 		// TODO Auto-generated method stub
-		if (getRowCount() == 0)
-			return super.getColumnClass(columnIndex);
-		else {
-			Object value = getValueAt(0, columnIndex);
-			if (value == null)
+		try {
+			if (getRowCount() == 0)
 				return super.getColumnClass(columnIndex);
-			else
-				return value.getClass();
+			else {
+				Object value = getValueAt(0, columnIndex);
+				if (value == null)
+					return super.getColumnClass(columnIndex);
+				else
+					return value.getClass();
+			}
+		}
+		catch (Throwable e) {
+			e.printStackTrace();
+			return Object.class;
 		}
 	}
 

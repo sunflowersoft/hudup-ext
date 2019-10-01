@@ -162,6 +162,13 @@ public abstract class ExecutableAlgAbstract extends AlgAbstract implements Execu
 	
 	
 	@Override
+	public String[] getBaseRemoteInterfaceNames() throws RemoteException {
+		// TODO Auto-generated method stub
+		return new String[] {ExecutableAlgRemote.class.getName()};
+	}
+
+	
+	@Override
 	protected void finalize() throws Throwable {
 		// TODO Auto-generated method stub
 		super.finalize();

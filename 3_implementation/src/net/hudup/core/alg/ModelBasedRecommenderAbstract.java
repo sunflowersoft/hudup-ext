@@ -131,6 +131,13 @@ public abstract class ModelBasedRecommenderAbstract extends RecommenderAbstract 
 
 
 	@Override
+	public String[] getBaseRemoteInterfaceNames() throws RemoteException {
+		// TODO Auto-generated method stub
+		return new String[] {RecommenderRemote.class.getName(), ModelBasedAlgRemote.class.getName()};
+	}
+
+
+	@Override
 	public DataConfig createDefaultConfig() {
 		DataConfig config = super.createDefaultConfig();
 		

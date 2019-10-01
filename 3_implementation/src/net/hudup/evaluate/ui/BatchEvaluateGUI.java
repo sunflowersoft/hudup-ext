@@ -36,6 +36,8 @@ import javax.swing.JPopupMenu;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+import javax.swing.table.DefaultTableColumnModel;
+import javax.swing.table.DefaultTableModel;
 
 import net.hudup.core.Constants;
 import net.hudup.core.PluginChangedEvent;
@@ -62,6 +64,10 @@ import net.hudup.core.logistic.I18nUtil;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.xURI;
+import net.hudup.core.logistic.ui.SortableSelectableTable;
+import net.hudup.core.logistic.ui.SortableSelectableTableModel;
+import net.hudup.core.logistic.ui.SortableTable;
+import net.hudup.core.logistic.ui.SortableTableModel;
 import net.hudup.core.logistic.ui.UIUtil;
 import net.hudup.core.logistic.ui.WaitPanel;
 import net.hudup.data.BatchScript;
@@ -1425,10 +1431,23 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 	
 	/**
 	 * Update (repaint) all controls.
+	 * This method can cause error ({@link MetricsTable}): The call of {@link DefaultTableModel#getValueAt(int, int)} can cause out of bound error from {@link DefaultTableColumnModel#getColumn(int)}
+	 * Please see:
+	 * {@link SortableTable#getCellRenderer(int, int)},
+	 * {@link SortableTable#getCellEditor(int, int)},
+	 * {@link SortableTableModel#getColumnClass(int)},
+	 * {@link SortableSelectableTable#getCellRenderer(int, int)},
+	 * {@link SortableSelectableTable#getCellEditor(int, int)},
+	 * {@link SortableSelectableTableModel#getColumnClass(int)}
 	 */
 	private void updateGUI() {
-		validate(); //This code line can be removed.
-		updateUI();
+		try {
+			validate(); //This code line can be removed.
+			updateUI();
+		}
+		catch (Throwable e) {
+			e.printStackTrace();
+		}
 	}
 	
 	

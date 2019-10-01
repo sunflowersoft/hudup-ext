@@ -45,7 +45,6 @@ import net.hudup.core.logistic.xURI;
 import net.hudup.core.parser.TextParsable;
 import net.hudup.core.parser.TextParserUtil;
 
-
 /**
  * This utility class stores dictionary of entries. It is called properties list.
  * Each entry represents a property, which is a pair of key and value.

@@ -145,6 +145,13 @@ public class RecommenderRemoteWrapper extends AlgRemoteWrapper implements Recomm
 
 	
 	@Override
+	public String[] getBaseRemoteInterfaceNames() throws RemoteException {
+		// TODO Auto-generated method stub
+		return new String[] {RecommenderRemote.class.getName()};
+	}
+
+	
+	@Override
 	public DataConfig createDefaultConfig() {
 		// TODO Auto-generated method stub
 		if (remoteAlg instanceof RecommenderAbstract)

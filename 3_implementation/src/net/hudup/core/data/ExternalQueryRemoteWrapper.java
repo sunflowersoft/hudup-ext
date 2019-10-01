@@ -140,6 +140,13 @@ public class ExternalQueryRemoteWrapper extends AlgRemoteWrapper implements Exte
 
 
 	@Override
+	public String[] getBaseRemoteInterfaceNames() throws RemoteException {
+		// TODO Auto-generated method stub
+		return new String[] {ExternalQueryRemote.class.getName()};
+	}
+
+	
+	@Override
 	protected void finalize() throws Throwable {
 		// TODO Auto-generated method stub
 		super.finalize();

@@ -17,13 +17,13 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
 import javax.swing.WindowConstants;
 
 import net.hudup.core.alg.KBase;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.ui.PropPane;
 import net.hudup.core.logistic.xURI;
+import net.hudup.core.logistic.ui.TextArea;
 import net.hudup.core.logistic.ui.UIUtil;
 
 /**
@@ -63,7 +63,7 @@ public class KBaseConfigDlg extends JDialog {
 	/**
 	 * Note text area.
 	 */
-	JTextArea txtNote = null;
+	TextArea txtNote = null;
 
 	
 	/**
@@ -82,7 +82,7 @@ public class KBaseConfigDlg extends JDialog {
 	 * @param kbaseConfig specified configuration of knowledge base.
 	 */
 	public KBaseConfigDlg(final Component comp, DataConfig kbaseConfig) {
-		super(UIUtil.getFrameForComponent(comp), "Configure knowledge base " + kbaseConfig.getAsString(KBase.KBASE_NAME), true);
+		super(UIUtil.getFrameForComponent(comp), "Knowledge base configuration", true);
 		
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		setSize(600, 400);
@@ -92,9 +92,9 @@ public class KBaseConfigDlg extends JDialog {
 		addWindowListener(new WindowAdapter() {
 
 			@Override
-			public void windowClosed(WindowEvent e) {
+			public void windowClosing(WindowEvent e) {
 				// TODO Auto-generated method stub
-				super.windowClosed(e);
+				super.windowClosing(e);
 				if (paneCfg.getPropTable().isModified()) {
 					int confirm = JOptionPane.showConfirmDialog(
 							comp, 
@@ -113,7 +113,7 @@ public class KBaseConfigDlg extends JDialog {
 		
 		JPanel paneInfo = new JPanel(new BorderLayout());
 		add(paneInfo, BorderLayout.NORTH);
-		lblInfo = new JLabel("Configuration of knowledge base '" + kbaseConfig.getAsString(KBase.KBASE_NAME) + "'");
+		lblInfo = new JLabel();
 		paneInfo.add(lblInfo, BorderLayout.NORTH);
 
 		
@@ -166,18 +166,13 @@ public class KBaseConfigDlg extends JDialog {
 			}
 
 		};
-		paneCfg.setToolbarVisible(false);
 		add(paneCfg, BorderLayout.CENTER);
 
 		
 		paneNote = new JPanel(new BorderLayout());
-		paneNote.setVisible(false);
 		add(paneNote, BorderLayout.SOUTH);
 		paneNote.add(new JLabel("Note: "), BorderLayout.WEST);
-		txtNote = new JTextArea();
-		txtNote.setEditable(false);
-		txtNote.setLineWrap(true);
-		txtNote.setWrapStyleWord(true);
+		txtNote = new TextArea();
 		txtNote.setRows(3);
 		paneNote.add(new JScrollPane(txtNote), BorderLayout.CENTER);
 		
@@ -190,8 +185,12 @@ public class KBaseConfigDlg extends JDialog {
 	 * @param kbaseConfig specified configuration of knowledge base.
 	 */
 	public void update(DataConfig kbaseConfig) {
-		paneCfg.update(kbaseConfig);
+		this.setTitle("Configure knowledge base '" + kbaseConfig.getAsString(KBase.KBASE_NAME) + "'");
 		
+		paneCfg.update(kbaseConfig);
+		paneCfg.setToolbarVisible(false);
+		
+		lblInfo.setText("Configuration of knowledge base '" + kbaseConfig.getAsString(KBase.KBASE_NAME) + "'");
 		paneNote.setVisible(false);
 	}
 

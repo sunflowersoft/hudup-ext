@@ -21,7 +21,7 @@ import net.hudup.core.logistic.MathUtil;
  * @version 10.0
  *
  */
-public class FractionMetricValue implements MetricValue {
+public class FractionMetricValue implements MetricValue /*, Comparable<FractionMetricValue>*/ {
 
 	
 	/**
@@ -123,6 +123,13 @@ public class FractionMetricValue implements MetricValue {
 		double value = (b == 0 ? Constants.UNUSED : ((Number)value()).doubleValue());
 		return MathUtil.format(value);
 	}
+
+
+//	@Override
+//	public int compareTo(FractionMetricValue o) {
+//		// TODO Auto-generated method stub
+//		return new Double((Double)this.value()).compareTo((Double)o.value());
+//	}
 	
 	
 }

@@ -141,7 +141,7 @@ public class DataDriverListTable extends SortableTable {
 
 
 /**
- * This class is the data model of {@link DataDriverListTable2}.
+ * This class is the data model of data driver list table.
  * 
  * @author Loc Nguyen
  * @version 10.0

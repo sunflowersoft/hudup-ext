@@ -504,6 +504,13 @@ public class DatasetRemoteWrapper implements Dataset, DatasetRemote {
 
 	
 	@Override
+	public String[] getBaseRemoteInterfaceNames() throws RemoteException {
+		// TODO Auto-generated method stub
+		return new String[] {DatasetRemote.class.getName()};
+	}
+
+	
+	@Override
 	protected void finalize() throws Throwable {
 		// TODO Auto-generated method stub
 		super.finalize();

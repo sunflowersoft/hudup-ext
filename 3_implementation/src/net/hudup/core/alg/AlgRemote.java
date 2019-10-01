@@ -9,6 +9,7 @@ package net.hudup.core.alg;
 
 import java.io.Serializable;
 import java.rmi.Remote;
+import java.rmi.RemoteException;
 
 /**
  * This interface represents a remote algorithm.
@@ -19,5 +20,13 @@ import java.rmi.Remote;
  */
 public interface AlgRemote extends AlgRemoteTask, SetupAlgListener, Remote, Serializable {
 
+
+	/**
+	 * Getting base remote interface names.
+	 * @return base remote interface names.
+	 * @throws RemoteException if any error raises.
+	 */
+	String[] getBaseRemoteInterfaceNames() throws RemoteException;
+	
 
 }

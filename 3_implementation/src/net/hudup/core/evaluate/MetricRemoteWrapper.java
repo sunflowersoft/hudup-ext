@@ -117,6 +117,13 @@ public class MetricRemoteWrapper extends AlgRemoteWrapper implements Metric, Met
 
 
 	@Override
+	public String[] getBaseRemoteInterfaceNames() throws RemoteException {
+		// TODO Auto-generated method stub
+		return new String[] {MetricRemote.class.getName()};
+	}
+
+	
+	@Override
 	public DataConfig createDefaultConfig() {
 		// TODO Auto-generated method stub
 		if (remoteAlg instanceof MetricAbstract)

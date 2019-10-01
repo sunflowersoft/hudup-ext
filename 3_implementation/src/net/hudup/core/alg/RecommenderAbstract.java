@@ -155,6 +155,13 @@ public abstract class RecommenderAbstract extends AlgAbstract implements Recomme
 
 	
 	@Override
+	public String[] getBaseRemoteInterfaceNames() throws RemoteException {
+		// TODO Auto-generated method stub
+		return new String[] {RecommenderRemote.class.getName()};
+	}
+
+	
+	@Override
 	protected void finalize() throws Throwable {
 		// TODO Auto-generated method stub
 		super.finalize();

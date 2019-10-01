@@ -139,6 +139,13 @@ public class ExecutableAlgRemoteWrapper extends AlgRemoteWrapper implements Exec
 
 
 	@Override
+	public String[] getBaseRemoteInterfaceNames() throws RemoteException {
+		// TODO Auto-generated method stub
+		return new String[] {ExecutableAlgRemote.class.getName()};
+	}
+
+	
+	@Override
 	public DataConfig createDefaultConfig() {
 		// TODO Auto-generated method stub
 		if (remoteAlg instanceof ExecutableAlgAbstract)

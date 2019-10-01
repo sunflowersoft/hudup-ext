@@ -43,4 +43,11 @@ public abstract class MetricAbstract extends AlgAbstract implements Metric, Metr
 	}
 
 	
+	@Override
+	public String[] getBaseRemoteInterfaceNames() throws RemoteException {
+		// TODO Auto-generated method stub
+		return new String[] {MetricRemote.class.getName()};
+	}
+
+	
 }

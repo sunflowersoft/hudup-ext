@@ -39,6 +39,7 @@ import net.hudup.core.alg.AlgDesc2List;
 import net.hudup.core.alg.AlgList;
 import net.hudup.core.alg.AlgRemoteWrapper;
 import net.hudup.core.alg.ui.AlgConfigDlg;
+import net.hudup.core.alg.ui.AlgDesc2ConfigDlg;
 import net.hudup.core.client.ClientUtil;
 import net.hudup.core.client.Service;
 import net.hudup.core.client.SocketConnection;
@@ -159,7 +160,7 @@ public class PluginStorageManifest extends SortableSelectableTable {
 			contextMenu.addSeparator();
 		}
 		
-		JMenuItem miRegisterAllAlgs = UIUtil.makeMenuItem( (String)null, "Register all algorithms", 
+		JMenuItem miRegisterAllAlgs = UIUtil.makeMenuItem( (String)null, "Register all normal algorithms", 
 			new ActionListener() {
 				
 				@Override
@@ -169,7 +170,7 @@ public class PluginStorageManifest extends SortableSelectableTable {
 			});
 		contextMenu.add(miRegisterAllAlgs);
 		
-		JMenuItem miUnregisterAllAlgs = UIUtil.makeMenuItem( (String)null, "Unregister all algorithms", 
+		JMenuItem miUnregisterAllAlgs = UIUtil.makeMenuItem( (String)null, "Unregister all normal algorithms", 
 			new ActionListener() {
 				
 				@Override
@@ -181,7 +182,7 @@ public class PluginStorageManifest extends SortableSelectableTable {
 
 		contextMenu.addSeparator();
 		
-		JMenuItem miExportAllAlgs = UIUtil.makeMenuItem( (String)null, "Export all algorithms", 
+		JMenuItem miExportAllAlgs = UIUtil.makeMenuItem( (String)null, "Export all normal algorithms", 
 			new ActionListener() {
 				
 				@Override
@@ -191,7 +192,7 @@ public class PluginStorageManifest extends SortableSelectableTable {
 			});
 		contextMenu.add(miExportAllAlgs);
 		
-		JMenuItem miUnexportAllAlgs = UIUtil.makeMenuItem( (String)null, "Unexport all algorithms", 
+		JMenuItem miUnexportAllAlgs = UIUtil.makeMenuItem( (String)null, "Unexport all normal algorithms", 
 			new ActionListener() {
 				
 				@Override
@@ -203,7 +204,7 @@ public class PluginStorageManifest extends SortableSelectableTable {
 
 		contextMenu.addSeparator();
 		
-		JMenuItem miRemoveAllAlgs = UIUtil.makeMenuItem( (String)null, "Remove all algorithms", 
+		JMenuItem miRemoveAllAlgs = UIUtil.makeMenuItem( (String)null, "Remove all normal algorithms", 
 			new ActionListener() {
 				
 				@Override
@@ -213,7 +214,7 @@ public class PluginStorageManifest extends SortableSelectableTable {
 			});
 		contextMenu.add(miRemoveAllAlgs);
 		
-		JMenuItem miUnremoveAllAlgs = UIUtil.makeMenuItem( (String)null, "Unremove all algorithms", 
+		JMenuItem miUnremoveAllAlgs = UIUtil.makeMenuItem( (String)null, "Unremove all normal algorithms", 
 			new ActionListener() {
 				
 				@Override
@@ -244,21 +245,12 @@ public class PluginStorageManifest extends SortableSelectableTable {
 					JOptionPane.INFORMATION_MESSAGE);
 		}
 		else {
-			AlgConfigDlg dlgConfig = new AlgConfigDlg(UIUtil.getFrameForComponent(getThisManifest()), alg);
+			AlgConfigDlg dlgConfig = new AlgConfigDlg(UIUtil.getFrameForComponent(this), alg);
 			dlgConfig.getPropPane().setToolbarVisible(false);
 			dlgConfig.getPropPane().setControlVisible(false);
 			dlgConfig.getPropPane().setEnabled(false);
 			dlgConfig.setVisible(true);
 		}
-	}
-	
-	
-	/**
-	 * Getting this manifest.
-	 * @return this manifest.
-	 */
-	private PluginStorageManifest getThisManifest() {
-		return this;
 	}
 	
 	
@@ -384,7 +376,7 @@ public class PluginStorageManifest extends SortableSelectableTable {
 
 	
 	/**
-	 * Registering or unregistering all normal algorithms.
+	 * Selecting or unselecting all normal algorithms.
 	 * @param selected if {@code true} then all normal algorithms are selected. Otherwise, all normal algorithms are unselected. 
 	 * @param column column to be selected or not selected.
 	 */
@@ -685,9 +677,12 @@ public class PluginStorageManifest extends SortableSelectableTable {
 							apply();
 					}
 					
-					new ImportAlgDlag(tblRegister).setVisible(true);
-					tblRegister.update();
-					tblRegister.firePluginChangedEvent(new PluginChangedEvent(tblRegister));
+					ImportAlgDlag importAlgDlg = new ImportAlgDlag(tblRegister);
+					importAlgDlg.setVisible(true);
+					if (importAlgDlg.getImportedCount() > 0) {
+						tblRegister.update();
+						tblRegister.firePluginChangedEvent(new PluginChangedEvent(tblRegister));
+					}
 				}
 			});
 			importAlg.setToolTipText("Only import normal algorithms");
@@ -1021,8 +1016,14 @@ class ImportAlgDlag extends JDialog {
 	/**
 	 * If {@code true}, users press OK button to close this dialog.
 	 */
-	private boolean ok = false;
+	protected boolean ok = false;
 
+	
+	/**
+	 * Importing count.
+	 */
+	protected int importedCount = 0;
+	
 	
 	/**
 	 * Constructor with parent component.
@@ -1222,6 +1223,8 @@ class ImportAlgDlag extends JDialog {
 	 * Event-driven method response to OK button command.
 	 */
 	protected void ok() {
+		importedCount = 0;
+
 		DataConfig config = (DataConfig)txtBrowse.getTag();
 		if (config == null || config.getParser() == null || config.getStoreUri() == null) {
 			JOptionPane.showMessageDialog(this, "Configuration was not established", "Configuration was not established", JOptionPane.ERROR_MESSAGE);
@@ -1230,7 +1233,6 @@ class ImportAlgDlag extends JDialog {
 
 		DatasetParser parser = config.getParser();
 		xURI storeUri = config.getStoreUri();
-		int importedCount = 0;
 		if ((parser instanceof RmiServerIndicator) || (parser instanceof SocketServerIndicator)) {
 			List<AlgDesc2> selectedList = tblAlgDescImport.getSelectedAlgDescList();
 			if (selectedList.size() == 0) {
@@ -1251,6 +1253,22 @@ class ImportAlgDlag extends JDialog {
 					service = ClientUtil.getSocketConnection(storeUri.getHost(), storeUri.getPort(),config.getStoreAccount(), config.getStorePassword().getText());
 				}
 				
+				boolean localExist = true;
+				if (algDesc.baseRemoteInterfaceNames != null) {
+					for (String iName : algDesc.baseRemoteInterfaceNames) {
+						try {
+							Class.forName(iName);
+						}
+						catch (Throwable e) {
+							LogUtil.error("Interface '" + iName + "' not exists, error by " + e.getMessage());
+							localExist = localExist && false;
+						}
+						
+						if (!localExist) break;
+					}
+				}
+				if (!localExist) continue;
+				
 				Alg alg = null;
 				try {
 					alg = service.getAlg(algDesc.algName);
@@ -1262,25 +1280,28 @@ class ImportAlgDlag extends JDialog {
 				if (alg == null) continue;
 				
 				RegisterTable table = PluginStorage.lookupTable(alg.getClass());
-				if (table == null || table.contains(algDesc.algName)) continue;
+				if (table == null || table.contains(algDesc.algName)) {
+					unexportRemoteWrapperAlg(alg);
+					continue;
+				}
 				
 				int idx = nextUpdateList.indexOf(algDesc.algName);
 				if (idx < 0) {
 					if (table.register(alg))
 						importedCount++;
+					else
+						unexportRemoteWrapperAlg(alg);
 				}
 				else {
 					Alg nextUpdateAlg = nextUpdateList.get(idx);
 					if (PluginStorage.lookupTableName(nextUpdateAlg.getClass()) != PluginStorage.lookupTableName(alg.getClass())) {
 						if (table.register(alg))
 							importedCount++;
+						else
+							unexportRemoteWrapperAlg(alg);
 					}
-					else if (alg instanceof AlgRemoteWrapper) {
-						((AlgRemoteWrapper)alg).setExclusive(true);
-						try {
-							((AlgRemoteWrapper)alg).unexport();
-						} catch (Throwable e) {e.printStackTrace();}
-					}
+					else
+						unexportRemoteWrapperAlg(alg);
 				}
 			}
 
@@ -1331,6 +1352,21 @@ class ImportAlgDlag extends JDialog {
 	
 	
 	/**
+	 * Unexporting wrapper of a remote algorithm.
+	 * @param alg wrapper of a remote algorithm.
+	 */
+	private void unexportRemoteWrapperAlg(Alg alg) {
+		if ((alg != null) && (alg instanceof AlgRemoteWrapper)) {
+			((AlgRemoteWrapper)alg).setExclusive(true);
+			try {
+				((AlgRemoteWrapper)alg).unexport();
+			} catch (Throwable e) {e.printStackTrace();}
+		}
+		
+	}
+	
+	
+	/**
 	 * Checking whether or not the OK button is pressed.
 	 * @return whether or not the OK button is pressed.
 	 */
@@ -1338,7 +1374,16 @@ class ImportAlgDlag extends JDialog {
 		return ok;
 	}
 
+	
+	/**
+	 * Getting imported count.
+	 * @return imported count.
+	 */
+	public int getImportedCount() {
+		return importedCount;
+	}
 
+	
 }
 
 
@@ -1363,6 +1408,106 @@ class AlgDescImportTable extends SortableSelectableTable {
 	 */
 	public AlgDescImportTable() {
 		super(new AlgDescImportTM());
+		
+		addMouseListener(new MouseAdapter() {
+
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				// TODO Auto-generated method stub
+				if(SwingUtilities.isRightMouseButton(e) ) {
+					JPopupMenu contextMenu = createContextMenu();
+					if (contextMenu != null)
+						contextMenu.show((Component)e.getSource(), e.getX(), e.getY());
+				}
+				else if (e.getClickCount() >= 2) {
+					int selectedColumn = getSelectedColumn();
+					if (selectedColumn != 5)
+						showConfig();
+				}
+			}
+			
+		});
+	}
+
+	
+	/**
+	 * Creating context menu.
+	 * @return context menu.
+	 */
+	private JPopupMenu createContextMenu() {
+		JPopupMenu contextMenu = new JPopupMenu();
+		int selectedRow = getSelectedRow();
+		AlgDesc2 algDesc = selectedRow < 0 ? null : (AlgDesc2) getModel().getValueAt(selectedRow, 3);
+
+		if (algDesc != null) {
+			JMenuItem miConfig = UIUtil.makeMenuItem( (String)null, "Configuration", 
+				new ActionListener() {
+					
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						showConfig();
+					}
+				});
+			contextMenu.add(miConfig);
+			
+			contextMenu.addSeparator();
+		}
+		
+		JMenuItem miRegisterAllAlgs = UIUtil.makeMenuItem( (String)null, "Select all normal algorithms", 
+			new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					selectAllNormalAlgs(true);
+				}
+			});
+		contextMenu.add(miRegisterAllAlgs);
+		
+		JMenuItem miUnregisterAllAlgs = UIUtil.makeMenuItem( (String)null, "Unselect all normal algorithms", 
+			new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					selectAllNormalAlgs(false);
+				}
+			});
+		contextMenu.add(miUnregisterAllAlgs);
+
+		return contextMenu;
+	}
+	
+	
+	/**
+	 * Showing configuration.
+	 */
+	private void showConfig() {
+		int selectedRow = getSelectedRow();
+		AlgDesc2 algDesc = selectedRow < 0 ? null : (AlgDesc2) getModel().getValueAt(selectedRow, 3);
+		if (algDesc == null) {
+			JOptionPane.showMessageDialog(
+					UIUtil.getFrameForComponent(this), 
+					"No algorithm description", 
+					"No algorithm description", 
+					JOptionPane.INFORMATION_MESSAGE);
+		}
+		else {
+			AlgDesc2ConfigDlg dlgConfig = new AlgDesc2ConfigDlg(UIUtil.getFrameForComponent(this), algDesc);
+			dlgConfig.setVisible(true);
+		}
+	}
+	
+	
+	/**
+	 * Selecting or unselecting all normal algorithms.
+	 * @param selected if {@code true} then all normal algorithms are selected. Otherwise, all normal algorithms are unselected. 
+	 */
+	protected void selectAllNormalAlgs(boolean selected) {
+		int n = getRowCount();
+		for (int i = 0; i < n; i++) {
+			String algTypeName = getValueAt(i, 0).toString();
+			if (algTypeName.equals(PluginStorage.NORMAL_ALG))
+				setValueAt(selected, i, 5);
+		}
 	}
 
 	
@@ -1555,7 +1700,7 @@ class AlgDescImportTM extends SortableSelectableTableModel {
 		columns.add("Java class");
 		columns.add("Description object");
 		columns.add("Alg object");
-		columns.add("Imported");
+		columns.add("Registered");
 		
 		return columns;
 	}

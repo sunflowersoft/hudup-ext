@@ -112,6 +112,13 @@ public class AlgRemoteWrapper implements Alg, AlgRemote, Serializable {
 
 	
 	@Override
+	public String[] getBaseRemoteInterfaceNames() throws RemoteException {
+		// TODO Auto-generated method stub
+		return new String[] {AlgRemote.class.getName()};
+	}
+	
+	
+	@Override
 	public DataConfig queryConfig() throws RemoteException {
 		// TODO Auto-generated method stub
 		return remoteAlg.queryConfig();

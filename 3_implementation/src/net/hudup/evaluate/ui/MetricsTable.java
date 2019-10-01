@@ -17,6 +17,8 @@ import java.util.Vector;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
+import javax.swing.table.TableCellEditor;
+import javax.swing.table.TableCellRenderer;
 
 import net.hudup.core.RegisterTable;
 import net.hudup.core.Util;
@@ -189,6 +191,36 @@ public class MetricsTable extends SortableTable {
 	}
 	
 	
+	@Override
+	public TableCellRenderer getCellRenderer(int row, int column) {
+		Object value = getValueAt(row, column);
+		if (value == null)
+			return super.getCellRenderer(row, column);
+		else {
+			TableCellRenderer renderer = getDefaultRenderer(value.getClass());
+			if(renderer == null)
+				return super.getCellRenderer(row, column);
+			else
+				return renderer;
+		}
+	}
+	
+	
+	@Override
+    public TableCellEditor getCellEditor(int row, int column) {
+		Object value = getValueAt(row, column);
+		if (value == null)
+			return super.getCellEditor(row, column);
+		else {
+			TableCellEditor editor = getDefaultEditor(value.getClass());
+			if(editor == null)
+				return super.getCellEditor(row, column);
+			else
+				return editor;
+		}
+    }
+
+
 }
 
 

@@ -258,6 +258,13 @@ public class CTSManagerRemoteWrapper extends AlgRemoteWrapper implements CTSMana
 
 	
 	@Override
+	public String[] getBaseRemoteInterfaceNames() throws RemoteException {
+		// TODO Auto-generated method stub
+		return new String[] {CTSManagerRemote.class.getName()};
+	}
+
+	
+	@Override
 	protected void finalize() throws Throwable {
 		// TODO Auto-generated method stub
 		try {

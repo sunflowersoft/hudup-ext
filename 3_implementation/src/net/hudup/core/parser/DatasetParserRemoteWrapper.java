@@ -84,6 +84,13 @@ public class DatasetParserRemoteWrapper extends AlgRemoteWrapper implements Data
 
 
 	@Override
+	public String[] getBaseRemoteInterfaceNames() throws RemoteException {
+		// TODO Auto-generated method stub
+		return new String[] {DatasetParserRemote.class.getName()};
+	}
+
+	
+	@Override
 	public DataConfig createDefaultConfig() {
 		// TODO Auto-generated method stub
 		if (remoteAlg instanceof DatasetParserAbstract)

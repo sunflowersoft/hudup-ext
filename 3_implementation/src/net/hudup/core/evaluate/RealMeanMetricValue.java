@@ -18,7 +18,7 @@ import net.hudup.core.Util;
  * @version 10.0
  *
  */
-public class RealMeanMetricValue extends MeanMetricValue {
+public class RealMeanMetricValue extends MeanMetricValue /*implements Comparable<RealMeanMetricValue>*/ {
 
 	
 	/**
@@ -100,6 +100,15 @@ public class RealMeanMetricValue extends MeanMetricValue {
 		mean.count = this.count;
 		return mean;
 	}
+
+
+//	@Override
+//	public int compareTo(RealMeanMetricValue o) {
+//		// TODO Auto-generated method stub
+//		Double v1 = ((Number)this.value).doubleValue();
+//		Double v2 = ((Number)o.value).doubleValue();
+//		return v1.compareTo(v2);
+//	}
 
 	
 }

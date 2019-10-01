@@ -22,7 +22,7 @@ import net.hudup.core.logistic.MathUtil;
  * @version 10.0
  *
  */
-public class RealMetricValue implements MetricValue {
+public class RealMetricValue implements MetricValue /*, Comparable<RealMetricValue>*/ {
 
 	
 	/**
@@ -96,6 +96,13 @@ public class RealMetricValue implements MetricValue {
 		// TODO Auto-generated method stub
 		return MathUtil.format(value);
 	}
+
+
+//	@Override
+//	public int compareTo(RealMetricValue o) {
+//		// TODO Auto-generated method stub
+//		return new Double(this.value).compareTo(o.value);
+//	}
 
 	
 }

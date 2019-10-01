@@ -146,6 +146,20 @@ public class AlgDescList implements Serializable, Cloneable {
 
 	
 	/**
+	 * Adding descriptions of specified list of algorithms and adding such description at the end of this list.
+	 * @param algList Specified list of algorithms.
+	 * @return whether adding algorithm descriptions successfully
+	 */
+	public boolean addAll2(Collection<Alg> algList) {
+		for (Alg alg : algList) {
+			add(alg);
+		}
+		
+		return true;
+	}
+
+	
+	/**
 	 * Removing a algorithm description at specified index.
 	 * @param index Specified index
 	 * @return removed algorithm description

@@ -174,6 +174,13 @@ public abstract class AugAbstract extends ExecutableAlgAbstract implements Aug, 
 
 	
 	@Override
+	public String[] getBaseRemoteInterfaceNames() throws RemoteException {
+		// TODO Auto-generated method stub
+		return new String[] {AugRemote.class.getName()};
+	}
+
+	
+	@Override
 	public DataConfig createDefaultConfig() {
 		DataConfig config = super.createDefaultConfig();
 		

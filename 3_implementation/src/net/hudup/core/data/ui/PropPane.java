@@ -45,55 +45,55 @@ public class PropPane extends JPanel {
 	/**
 	 * The graphic user interface (GUI) component as table shows a properties list represented by {@link PropList}.
 	 */
-	protected PropTable tblProp = null;
+	public PropTable tblProp = null;
 	
 	
 	/**
 	 * The tool-bar with interactive buttons such as load button, save button.
 	 */
-	protected JPanel toolbar = null;
+	public JPanel toolbar = null;
 	
 	
 	/**
 	 * The control-bar with interactive buttons such as reset button, apply button.
 	 */
-	protected JPanel control = null;
+	public JPanel control = null;
 	
 	
 	/**
 	 * Load button.
 	 */
-	protected JButton btnLoad = null;
+	public JButton btnLoad = null;
 
 	
 	/**
 	 * Save button.
 	 */
-	protected JButton btnSave = null;
+	public JButton btnSave = null;
 
 	
 	/**
 	 * Reset button.
 	 */
-	protected JButton btnReset = null;
+	public JButton btnReset = null;
 	
 	
 	/**
 	 * Apply button.
 	 */
-	protected JButton btnApply = null;
+	public JButton btnApply = null;
 	
 	
 	/**
 	 * OK button.
 	 */
-	protected JButton btnOk = null;
+	public JButton btnOk = null;
 	
 	
 	/**
 	 * Cancel button.
 	 */
-	protected JButton btnCancel = null;
+	public JButton btnCancel = null;
 	
 	
 	/**

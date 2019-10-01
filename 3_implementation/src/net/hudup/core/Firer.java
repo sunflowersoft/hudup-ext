@@ -11,7 +11,10 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.List;
 import java.util.Properties;
+import java.util.Random;
 import java.util.Set;
+
+import javax.swing.UIManager;
 
 import org.reflections.Reflections;
 
@@ -150,11 +153,55 @@ public class Firer implements PluginManager {
 		}
 		
 		
-		loadDrivers();
-
+		try {
+			loadDrivers();
+		}
+		catch (Throwable e) {e.printStackTrace();}
 		
-		discover();
+		
+		try {
+			discover();
+		}
+		catch (Throwable e) {e.printStackTrace();}
+		
+		
+		try {
+			randomLookAndFeel();
+			LogUtil.info("Look and feel used: " + UIManager.getLookAndFeel().getName());
+		}
+		catch (Throwable e) {e.printStackTrace();}
+		
+		
 		fired = true;
+	}
+	
+	
+	/**
+	 * Setting UI look and feel randomly. 
+	 */
+	private void randomLookAndFeel() {
+		boolean lfRnd = false;
+		try {
+			String lfText = Util.getHudupProperty("look_and_feel_random");
+			if (lfText != null && !lfText.isEmpty())
+				lfRnd = Boolean.parseBoolean(lfText);
+		}
+		catch (Throwable e) {
+			e.printStackTrace();
+			lfRnd = false;
+		}
+		if (!lfRnd) return;
+		
+		Random rnd = new Random();
+		int index = rnd.nextInt(lookAndFeels.length);
+		if (index == 0) return;
+		
+		try {
+			UIManager.setLookAndFeel(lookAndFeels[index][1]);
+		}
+		catch (Throwable e) {
+			LogUtil.info("Look and feel '" + lookAndFeels[index][1] + "' not supported");
+		}
 	}
 	
 	

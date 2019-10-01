@@ -9,11 +9,15 @@ package net.hudup.core;
 
 import java.lang.reflect.Modifier;
 import java.util.List;
+import java.util.Set;
+
+import javax.swing.UIManager;
 
 import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.AlgRemote;
 import net.hudup.core.alg.AlgRemoteWrapper;
 import net.hudup.core.logistic.BaseClass;
+import net.hudup.core.logistic.NextUpdate;
 import net.hudup.core.logistic.xURI;
 
 /**
@@ -31,6 +35,19 @@ import net.hudup.core.logistic.xURI;
  *
  */
 public interface PluginManager {
+	
+	
+	/**
+	 * Look and feel.
+	 */
+	String[][] lookAndFeels = {
+			{"default", null},
+			{"metal", "javax.swing.plaf.metal.MetalLookAndFeel", "javax.swing.plaf.metal.DefaultMetalTheme, javax.swing.plaf.metal.OceanTheme"},
+			{"system", UIManager.getSystemLookAndFeelClassName()},
+			{"motif", "com.sun.java.swing.plaf.motif.MotifLookAndFeel"},
+			{"gtk", "com.sun.java.swing.plaf.gtk.GTKLookAndFeel"},
+//			{"aqua", "com.apple.laf.AquaLookAndFeel"},
+	};
 	
 	
 	/**
@@ -117,7 +134,7 @@ public interface PluginManager {
 	
 	/**
 	 * Registering the specified algorithm into respective register table of {@link PluginStorage}.
-	 * For example, a recommendation algorithm will be added into recommender register table returned by {@link PluginStorage#getRecommenderReg()}. 
+	 * For example, a recommendation algorithm will be added into recommender register table returned by {@link PluginStorage#getNormalAlgReg()}. 
 	 * @param alg specified algorithm.
 	 */
 	void registerAlg(Alg alg);
@@ -144,6 +161,33 @@ public interface PluginManager {
 	}
 
 
-
+	/**
+	 * Getting all interfaces of given object and referred class.
+	 * This method will be revised because its deep level is only 1.
+	 * Please see: <a href="http://commons.apache.org/proper/commons-lang/javadocs/api-release/org/apache/commons/lang3/ClassUtils.html">http://commons.apache.org/proper/commons-lang/javadocs/api-release/org/apache/commons/lang3/ClassUtils.html</a>
+	 * @param obj given object.
+	 * @param <T> type of given object.
+	 * @param referredClass referred class.
+	 * @param includeReferredClass if true, including referred class.
+	 * @return all interfaces of given object and referred class.
+	 */
+	@NextUpdate
+	@SuppressWarnings("unchecked")
+	static <T> Set<Class<? extends T>> getAllInterfaces(Object obj, Class<T>  referredClass, boolean includeReferredClass) {
+		Set<Class<? extends T>> iSet = Util.newSet();
+		
+		Class<?>[] iClasses = obj.getClass().getInterfaces();
+		for (Class<?> iClass : iClasses) {
+			if (!referredClass.isAssignableFrom(iClass)) continue;
+			
+			if (includeReferredClass)
+				iSet.add((Class<? extends T>) iClass);
+			else if (!referredClass.equals(iClass))
+				iSet.add((Class<? extends T>) iClass);
+		}
+		
+		return iSet;
+	}
+	
 
 }

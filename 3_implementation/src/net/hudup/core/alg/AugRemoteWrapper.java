@@ -174,6 +174,13 @@ public class AugRemoteWrapper extends ExecutableAlgRemoteWrapper implements Aug,
 
 
 	@Override
+	public String[] getBaseRemoteInterfaceNames() throws RemoteException {
+		// TODO Auto-generated method stub
+		return new String[] {AugRemote.class.getName()};
+	}
+
+	
+	@Override
 	public DataConfig createDefaultConfig() {
 		// TODO Auto-generated method stub
 		if (remoteAlg instanceof AugAbstract)
