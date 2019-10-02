@@ -7,7 +7,6 @@
  */
 package net.hudup.core.alg;
 
-import java.rmi.server.RemoteObject;
 import java.util.Collection;
 
 import net.hudup.core.PluginManager;
@@ -159,6 +158,12 @@ public class AlgDesc2 extends AlgDesc {
 	
 	
 	/**
+	 * Flag to indicate exclusive mode if algorithm is wrapper.
+	 */
+	public boolean isExclusive = false;
+	
+	
+	/**
 	 * Default constructor.
 	 */
 	public AlgDesc2() {
@@ -200,6 +205,8 @@ public class AlgDesc2 extends AlgDesc {
 		
 		isRemote = isRemote(alg);
 		isWrapper = alg instanceof AlgRemoteWrapper;
+		if (isWrapper)
+			isExclusive = ((AlgRemoteWrapper)alg).isExclusive();
 	}
 
 	
@@ -218,6 +225,7 @@ public class AlgDesc2 extends AlgDesc {
 		buffer.append("Exported: " + isExported + "\n");
 		buffer.append("Remote: " + isRemote + "\n");
 		buffer.append("Wrapper: " + isWrapper);
+		buffer.append("Exclusive mode (for wrapper): " + isExclusive);
 		
 		return buffer.toString();
 	}
@@ -419,17 +427,34 @@ public class AlgDesc2 extends AlgDesc {
 	 * @return whether the specified algorithm is remote object.
 	 */
 	public static boolean isRemote(Alg alg) {
-		if (alg instanceof RemoteObject)
-			return true;
+		if (alg == null)
+			return false;
 		else if (alg instanceof AlgRemoteWrapper) {
 			AlgRemote remoteAlg = ((AlgRemoteWrapper)alg).getRemoteAlg();
-			if (remoteAlg == null)
-				return false;
-			else
-				return remoteAlg instanceof RemoteObject;
+			return ((remoteAlg != null) && !(remoteAlg instanceof Alg));
 		}
 		else
 			return false;
+	}
+	
+	
+	/**
+	 * Getting remote algorithm of a given algorithm.
+	 * @param alg given algorithm.
+	 * @return remote algorithm of a given algorithm.
+	 */
+	public static AlgRemote getAlgRemote(Alg alg) {
+		if (alg == null)
+			return null;
+		else if (alg instanceof AlgRemoteWrapper) {
+			AlgRemote remoteAlg = ((AlgRemoteWrapper)alg).getRemoteAlg();
+			if ((remoteAlg == null) || (remoteAlg instanceof Alg))
+				return null;
+			else
+				return remoteAlg;
+		}
+		else
+			return null;
 	}
 	
 	
@@ -454,6 +479,29 @@ public class AlgDesc2 extends AlgDesc {
 	 */
 	public static boolean isInUpdateList(Alg alg) {
 		return PluginStorage.lookupNextUpdateList(alg.getClass(), alg.getName()) >= 0;
+	}
+
+
+	/**
+	 * Wrapping (and instantiating if necessary) the specified algorithm.
+	 * @param alg specified algorithm.
+	 * @param exclusive exclusive mode.
+	 * @return wrapper of specified algorithm.
+	 */
+	public static Alg wrapNewInstance(Alg alg, boolean exclusive) {
+		if (alg == null)
+			return null;
+		else if (alg instanceof AlgRemoteWrapper) {
+			AlgRemote remoteAlg = ((AlgRemoteWrapper)alg).getRemoteAlg();
+			if (remoteAlg == null)
+				return null;
+			else if (remoteAlg instanceof Alg)
+				return wrapNewInstance((Alg)remoteAlg, exclusive);
+			else
+				return Util.getPluginManager().wrap(remoteAlg, exclusive);
+		}
+		else
+			return alg.newInstance();
 	}
 
 

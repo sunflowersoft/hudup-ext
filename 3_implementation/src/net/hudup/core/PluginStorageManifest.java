@@ -1257,6 +1257,7 @@ class ImportAlgDlag extends JDialog {
 							Class.forName(iName);
 						}
 						catch (Throwable e) {
+							e.printStackTrace();
 							LogUtil.error("Interface '" + iName + "' not exists, error by " + e.getMessage());
 							localExist = localExist && false;
 						}
@@ -1271,6 +1272,7 @@ class ImportAlgDlag extends JDialog {
 					alg = service.getAlg(algDesc.algName);
 				}
 				catch (Throwable e) {
+					e.printStackTrace();
 					LogUtil.error("Retrieving remote algorithm error by: " + e.getMessage());
 					alg = null;
 				}

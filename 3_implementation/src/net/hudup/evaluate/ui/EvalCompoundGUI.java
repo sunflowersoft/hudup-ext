@@ -507,11 +507,9 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 	public static void run(Evaluator evaluator, xURI bindUri, Window oldGUI) {
 		if (!Util.getPluginManager().isFired())
 			Util.getPluginManager().fire();
-		else
-			Util.getPluginManager().discover();
 			
 		try {
-//			RegisterTable algReg = evaluator.extractAlgFromPluginStorage();
+//			RegisterTable algReg = EvaluatorAbstract.extractAlgFromPluginStorage(evaluator);
 //			if (algReg == null || algReg.size() == 0) {
 //				JOptionPane.showMessageDialog(null, 
 //						"WARNING: There is no registered algorithm.\n Program cannot run.", 

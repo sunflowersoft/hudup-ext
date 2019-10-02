@@ -24,8 +24,8 @@ import net.hudup.core.RegisterTable;
 import net.hudup.core.RegisterTable.AlgFilter;
 import net.hudup.core.Util;
 import net.hudup.core.alg.Alg;
+import net.hudup.core.alg.AlgDesc2;
 import net.hudup.core.alg.AlgRemote;
-import net.hudup.core.alg.AlgRemoteWrapper;
 import net.hudup.core.alg.SetupAlgEvent;
 import net.hudup.core.alg.SetupAlgListener;
 import net.hudup.core.alg.SupportCacheAlg;
@@ -608,22 +608,20 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 
 			@Override
 			public boolean accept(Alg alg) {
+				alg = AlgDesc2.wrapNewInstance(alg, false);
 				if (alg == null) return false;
-				
-				if (alg instanceof AlgRemoteWrapper) {
-					AlgRemote remoteAlg = ((AlgRemoteWrapper)alg).getRemoteAlg();
-					if (remoteAlg == null) return false;
-					alg = Util.getPluginManager().wrap(remoteAlg, false);  //Prevent automatic unexporting
-				}
 				
 				try {
 					return evaluator.acceptAlg(alg);
 				} 
 				catch (Throwable e) {
+					e.printStackTrace();
 					LogUtil.error("Evaluator does not accept algorithm '" + alg.getName() + "' due to " + e.getMessage());
 					return false;
 				}
 			}
+			
+			
 		});
 		
 		return new RegisterTable(algList);
