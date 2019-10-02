@@ -520,9 +520,10 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluatorProgr
 	}
 	
 	
+	@Deprecated
 	@Override
-	public RegisterTable extractAlgFromPluginStorage() throws RemoteException {
-		return remoteEvaluator.extractAlgFromPluginStorage();
+	public RegisterTable extractAlgFromPluginStorage0() throws RemoteException {
+		return remoteEvaluator.extractAlgFromPluginStorage0();
 	}
 	
 	

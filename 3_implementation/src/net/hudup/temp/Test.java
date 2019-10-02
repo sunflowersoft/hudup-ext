@@ -36,6 +36,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 import javax.swing.event.EventListenerList;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -116,6 +117,10 @@ public class Test {
 //		AlgDesc2List list = new AlgDesc2List();
 //		list.addAll2(PluginStorage.getNormalAlgReg().getAlgList());
 		//AlgDesc2Table.showDlg(null, list);
+		UIManager.LookAndFeelInfo[] looks = UIManager.getInstalledLookAndFeels();
+		for (UIManager.LookAndFeelInfo look : looks) {
+			System.out.println(look.getClassName());
+		}
 	}
 
 	

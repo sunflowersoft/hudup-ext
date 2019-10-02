@@ -25,6 +25,7 @@ import net.hudup.core.RegisterTable.AlgFilter;
 import net.hudup.core.Util;
 import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.AlgRemote;
+import net.hudup.core.alg.AlgRemoteWrapper;
 import net.hudup.core.alg.SetupAlgEvent;
 import net.hudup.core.alg.SetupAlgListener;
 import net.hudup.core.alg.SupportCacheAlg;
@@ -563,8 +564,9 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 	}
 	
 	
+	@Deprecated
 	@Override
-	public RegisterTable extractAlgFromPluginStorage() throws RemoteException {
+	public RegisterTable extractAlgFromPluginStorage0() throws RemoteException {
 		List<Alg> algList = PluginStorage.getNormalAlgReg().getAlgList(new AlgFilter() {
 			
 			/**
@@ -574,13 +576,51 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 
 			@Override
 			public boolean accept(Alg alg) {
-				// TODO Auto-generated method stub
+				if (alg == null) return false;
+
 				try {
 					return acceptAlg(alg);
 				} 
 				catch (Throwable e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
+					return false;
+				}
+			}
+		});
+		
+		return new RegisterTable(algList);
+	}
+	
+	
+	/**
+	 * Extracting algorithms from plug-in storage so that such algorithms are accepted by the specified evaluator.
+	 * @param evaluator specified evaluator.
+	 * @return register table to store algorithms extracted from plug-in storage.
+	 */
+	public static RegisterTable extractAlgFromPluginStorage(Evaluator evaluator) {
+		List<Alg> algList = PluginStorage.getNormalAlgReg().getAlgList(new AlgFilter() {
+			
+			/**
+			 * Default serial version UID.
+			 */
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public boolean accept(Alg alg) {
+				if (alg == null) return false;
+				
+				if (alg instanceof AlgRemoteWrapper) {
+					AlgRemote remoteAlg = ((AlgRemoteWrapper)alg).getRemoteAlg();
+					if (remoteAlg == null) return false;
+					alg = Util.getPluginManager().wrap(remoteAlg, false);  //Prevent automatic unexporting
+				}
+				
+				try {
+					return evaluator.acceptAlg(alg);
+				} 
+				catch (Throwable e) {
+					LogUtil.error("Evaluator does not accept algorithm '" + alg.getName() + "' due to " + e.getMessage());
 					return false;
 				}
 			}

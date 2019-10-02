@@ -196,11 +196,13 @@ public interface Evaluator extends Remote, RemoteRunner, SetupAlgListener, Expor
 	
 	
 	/**
-	 * Extracting algorithms from plug-in storage.
+	 * Extracting algorithms from plug-in storage so that such algorithms are accepted by this evaluator.
+	 * This method is deprecated because of RMI class loading.
 	 * @return register table to store algorithms extracted from plug-in storage.
 	 * @throws RemoteException if any error raises.
 	 */
-	RegisterTable extractAlgFromPluginStorage() throws RemoteException;
+	@Deprecated
+	RegisterTable extractAlgFromPluginStorage0() throws RemoteException;
 
 	
 	/**

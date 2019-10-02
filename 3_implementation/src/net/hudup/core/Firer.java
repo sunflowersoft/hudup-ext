@@ -15,6 +15,7 @@ import java.util.Random;
 import java.util.Set;
 
 import javax.swing.UIManager;
+import javax.swing.UIManager.LookAndFeelInfo;
 
 import org.reflections.Reflections;
 
@@ -192,15 +193,17 @@ public class Firer implements PluginManager {
 		}
 		if (!lfRnd) return;
 		
+		LookAndFeelInfo[] looks = UIManager.getInstalledLookAndFeels();
+
 		Random rnd = new Random();
-		int index = rnd.nextInt(lookAndFeels.length);
+		int index = rnd.nextInt(looks.length);
 		if (index == 0) return;
 		
 		try {
-			UIManager.setLookAndFeel(lookAndFeels[index][1]);
+			UIManager.setLookAndFeel(looks[index].getClassName());
 		}
 		catch (Throwable e) {
-			LogUtil.info("Look and feel '" + lookAndFeels[index][1] + "' not supported");
+			LogUtil.info("Look and feel '" + looks[index].getClassName() + "' not supported");
 		}
 	}
 	

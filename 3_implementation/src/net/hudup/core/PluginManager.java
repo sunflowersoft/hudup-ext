@@ -11,8 +11,6 @@ import java.lang.reflect.Modifier;
 import java.util.List;
 import java.util.Set;
 
-import javax.swing.UIManager;
-
 import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.AlgRemote;
 import net.hudup.core.alg.AlgRemoteWrapper;
@@ -37,17 +35,19 @@ import net.hudup.core.logistic.xURI;
 public interface PluginManager {
 	
 	
-	/**
-	 * Look and feel.
-	 */
-	String[][] lookAndFeels = {
-			{"default", null},
-			{"metal", "javax.swing.plaf.metal.MetalLookAndFeel", "javax.swing.plaf.metal.DefaultMetalTheme, javax.swing.plaf.metal.OceanTheme"},
-			{"system", UIManager.getSystemLookAndFeelClassName()},
-			{"motif", "com.sun.java.swing.plaf.motif.MotifLookAndFeel"},
-			{"gtk", "com.sun.java.swing.plaf.gtk.GTKLookAndFeel"},
+//	/**
+//	 * Look and feel.
+//	 */
+//	String[][] lookAndFeels = {
+//			{"default", null},
+//			{"metal", "javax.swing.plaf.metal.MetalLookAndFeel", "javax.swing.plaf.metal.DefaultMetalTheme, javax.swing.plaf.metal.OceanTheme"},
+//			{"motif", "com.sun.java.swing.plaf.motif.MotifLookAndFeel"},
+//			{"nimbus", "com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel"},
+//			{"system", UIManager.getSystemLookAndFeelClassName()},
+//			{"windows", "com.sun.java.swing.plaf.windows.WindowsLookAndFeel"},
 //			{"aqua", "com.apple.laf.AquaLookAndFeel"},
-	};
+//			{"gtk", "com.sun.java.swing.plaf.gtk.GTKLookAndFeel"},
+//	};
 	
 	
 	/**

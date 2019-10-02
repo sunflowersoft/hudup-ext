@@ -252,7 +252,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 		
 		RegisterTable algRegTable = null;
 		try {
-			algRegTable = evaluator.extractAlgFromPluginStorage();
+			algRegTable = EvaluatorAbstract.extractAlgFromPluginStorage(evaluator);
 		}
 		catch (Throwable e) {
 			e.printStackTrace();
@@ -295,7 +295,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			evaluator.clearDelayUnsetupAlgs();
 			
 			algRegTable.clear();
-			algRegTable.register(evaluator.extractAlgFromPluginStorage()); //Algorithms are not cloned because of saving memory when evaluator GUI keep algorithms for a long time.
+			algRegTable.register(EvaluatorAbstract.extractAlgFromPluginStorage(evaluator)); //Algorithms are not cloned because of saving memory when evaluator GUI keep algorithms for a long time.
 			lbAlgs.update(algRegTable.getAlgList());
 			
 			updateMode();

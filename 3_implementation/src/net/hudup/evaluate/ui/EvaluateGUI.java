@@ -251,7 +251,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 	public EvaluateGUI(Evaluator evaluator, xURI bindUri) {
 		super(evaluator, bindUri);
 		try {
-			RegisterTable algRegTable = evaluator.extractAlgFromPluginStorage();
+			RegisterTable algRegTable = EvaluatorAbstract.extractAlgFromPluginStorage(evaluator);
 			init(algRegTable);
 		}
 		catch (Throwable e) {
@@ -321,7 +321,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			evaluator.clearDelayUnsetupAlgs();
 
 			algRegTable.clear();
-			algRegTable.register(evaluator.extractAlgFromPluginStorage()); //Algorithms are not cloned because of saving memory when evaluator GUI keep algorithms for a long time.
+			algRegTable.register(EvaluatorAbstract.extractAlgFromPluginStorage(evaluator)); //Algorithms are not cloned because of saving memory when evaluator GUI keep algorithms for a long time.
 			cmbAlgs.update(algRegTable.getAlgList());
 			updateMode();
 		}
