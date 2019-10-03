@@ -154,57 +154,16 @@ public class Firer implements PluginManager {
 		}
 		
 		
-		try {
-			loadDrivers();
-		}
-		catch (Throwable e) {e.printStackTrace();}
+		loadDrivers();
 		
 		
-		try {
-			discover();
-		}
-		catch (Throwable e) {e.printStackTrace();}
+		discover();
 		
 		
-		try {
-			randomLookAndFeel();
-			LogUtil.info("Look and feel used: " + UIManager.getLookAndFeel().getName());
-		}
-		catch (Throwable e) {e.printStackTrace();}
+		extraTasks();
 		
 		
 		fired = true;
-	}
-	
-	
-	/**
-	 * Setting UI look and feel randomly. 
-	 */
-	private void randomLookAndFeel() {
-		boolean lfRnd = false;
-		try {
-			String lfText = Util.getHudupProperty("look_and_feel_random");
-			if (lfText != null && !lfText.isEmpty())
-				lfRnd = Boolean.parseBoolean(lfText);
-		}
-		catch (Throwable e) {
-			e.printStackTrace();
-			lfRnd = false;
-		}
-		if (!lfRnd) return;
-		
-		LookAndFeelInfo[] looks = UIManager.getInstalledLookAndFeels();
-
-		Random rnd = new Random();
-		int index = rnd.nextInt(looks.length);
-		if (index == 0) return;
-		
-		try {
-			UIManager.setLookAndFeel(looks[index].getClassName());
-		}
-		catch (Throwable e) {
-			LogUtil.info("Look and feel '" + looks[index].getClassName() + "' not supported");
-		}
 	}
 	
 	
@@ -218,8 +177,11 @@ public class Firer implements PluginManager {
 	@Override
 	public void discover() {
 		// TODO Auto-generated method stub
-		PluginStorage.clear();
-		discover(Util.getLoadablePackages());
+		try { //Redundant try-catch because it is impossible to solve the problem of error by PluginStorage.clear(). Solving later. 
+			PluginStorage.clear();
+			discover(Util.getLoadablePackages());
+		}
+		catch (Throwable e) {e.printStackTrace();}
 	}
 
 
@@ -506,20 +468,66 @@ public class Firer implements PluginManager {
 	@Override
 	public void loadDrivers() {
 		// TODO Auto-generated method stub
-		DataDriverList dataDriverList = DataDriverList.get();
-		for (int i = 0; i < dataDriverList.size(); i++) {
-			DataDriver dataDriver = dataDriverList.get(i);
-			try {
-				dataDriver.loadDriver();
-				LogUtil.info("Loaded data driver class: " + dataDriver.getInnerClassName());
-			}
-			catch (Throwable e) {
-				LogUtil.error("Can not load data driver \"" + dataDriver.getInnerClassName() + "\"" + " error is " + e.getMessage());
+		try { //DataDriverList.get() can cause error.
+			DataDriverList dataDriverList = DataDriverList.get();
+			for (int i = 0; i < dataDriverList.size(); i++) {
+				DataDriver dataDriver = dataDriverList.get(i);
+				try {
+					dataDriver.loadDriver();
+					LogUtil.info("Loaded data driver class: " + dataDriver.getInnerClassName());
+				}
+				catch (Throwable e) {
+					LogUtil.error("Can not load data driver \"" + dataDriver.getInnerClassName() + "\"" + " error is " + e.getMessage());
+				}
 			}
 		}
+		catch (Throwable e) {e.printStackTrace();}
 	}
 
 
+	/**
+	 * Defining extra tasks for {@link #fire()} method.
+	 */
+	protected void extraTasks() {
+		try {
+			randomLookAndFeel();
+			LogUtil.info("Look and feel used: " + UIManager.getLookAndFeel().getName());
+		}
+		catch (Throwable e) {e.printStackTrace();}
+	}
+	
+	
+	/**
+	 * Setting UI look and feel randomly. 
+	 */
+	private void randomLookAndFeel() {
+		boolean lfRnd = false;
+		try {
+			String lfText = Util.getHudupProperty("look_and_feel_random");
+			if (lfText != null && !lfText.isEmpty())
+				lfRnd = Boolean.parseBoolean(lfText);
+		}
+		catch (Throwable e) {
+			e.printStackTrace();
+			lfRnd = false;
+		}
+		if (!lfRnd) return;
+		
+		LookAndFeelInfo[] looks = UIManager.getInstalledLookAndFeels();
+
+		Random rnd = new Random();
+		int index = rnd.nextInt(looks.length);
+		if (index == 0) return;
+		
+		try {
+			UIManager.setLookAndFeel(looks[index].getClassName());
+		}
+		catch (Throwable e) {
+			LogUtil.info("Look and feel '" + looks[index].getClassName() + "' not supported");
+		}
+	}
+	
+	
 	@Override
 	public void registerAlg(Alg alg) {
 		RegisterTable normalAlgReg = PluginStorage.getNormalAlgReg();

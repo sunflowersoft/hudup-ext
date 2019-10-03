@@ -48,11 +48,8 @@ public class TooltipTextArea extends JTextArea {
 	 */
 	public TooltipTextArea() {
 		super();
-
 		setEditable(false);
-		setWrapStyleWord(true);
-		setLineWrap(true);
-		
+
 		try {
 			InputStream is = getClass().getResourceAsStream(RESOURCES_PACKAGE + README);
 			StringBuffer textBuffer = new StringBuffer();

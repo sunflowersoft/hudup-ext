@@ -35,7 +35,6 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
-import javax.swing.JTextField;
 import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.table.DefaultTableModel;
 
@@ -68,6 +67,7 @@ import net.hudup.core.logistic.ui.SortableSelectableTable;
 import net.hudup.core.logistic.ui.SortableSelectableTableModel;
 import net.hudup.core.logistic.ui.SortableTable;
 import net.hudup.core.logistic.ui.SortableTableModel;
+import net.hudup.core.logistic.ui.TextField;
 import net.hudup.core.logistic.ui.UIUtil;
 import net.hudup.core.logistic.ui.WaitPanel;
 import net.hudup.data.BatchScript;
@@ -184,7 +184,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 	/**
 	 * Text field to show place of saving running information.
 	 */
-	protected JTextField txtRunSaveBrowse = null;
+	protected TextField txtRunSaveBrowse = null;
 	
 	/**
 	 * Check box for whether or not to save running information.
@@ -624,7 +624,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 		main.add(this.paneRunSave);
 		JPanel pane = new JPanel(new BorderLayout(2, 2));
 		this.paneRunSave.add(pane, BorderLayout.NORTH);
-		this.txtRunSaveBrowse = new JTextField();
+		this.txtRunSaveBrowse = new TextField();
 		this.txtRunSaveBrowse.setEditable(false);
 		this.txtRunSaveBrowse.setToolTipText(I18nUtil.message("save_evaluate_place"));;
 		pane.add(this.txtRunSaveBrowse, BorderLayout.CENTER);

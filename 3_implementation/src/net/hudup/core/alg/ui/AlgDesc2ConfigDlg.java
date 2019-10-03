@@ -83,6 +83,7 @@ public class AlgDesc2ConfigDlg extends JDialog {
 		JPanel paneInfo = new JPanel(new BorderLayout());
 		add(paneInfo, BorderLayout.NORTH);
 		txtInfo = new TextArea();
+		txtInfo.setEditable(false);
 		txtInfo.setText(algDesc.toString());
 		txtInfo.setRows(3);
 		paneInfo.add(new JScrollPane(txtInfo), BorderLayout.NORTH);
@@ -97,6 +98,7 @@ public class AlgDesc2ConfigDlg extends JDialog {
 		add(paneNote, BorderLayout.SOUTH);
 		paneNote.add(new JLabel("Note: "), BorderLayout.WEST);
 		txtNote = new TextArea();
+		txtNote.setEditable(false);
 		txtNote.setRows(3);
 		paneNote.add(new JScrollPane(txtNote), BorderLayout.CENTER);
 		

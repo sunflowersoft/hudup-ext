@@ -7,8 +7,6 @@
  */
 package net.hudup.core.logistic.ui;
 
-import javax.swing.JTextField;
-
 /**
  * Text field whose tag is a particular object.
  * 
@@ -16,7 +14,7 @@ import javax.swing.JTextField;
  * @version 10.0
  *
  */
-public class TagTextField extends JTextField {
+public class TagTextField extends TextField {
 
 	
 	/**

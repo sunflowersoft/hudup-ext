@@ -40,7 +40,6 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
-import javax.swing.JTextField;
 
 import net.hudup.core.PluginChangedEvent;
 import net.hudup.core.RegisterTable;
@@ -72,6 +71,7 @@ import net.hudup.core.logistic.Inspector;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.xURI;
+import net.hudup.core.logistic.ui.TextField;
 import net.hudup.core.logistic.ui.UIUtil;
 import net.hudup.core.logistic.ui.WaitPanel;
 import net.hudup.data.DatasetUtil2;
@@ -184,7 +184,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 	/**
 	 * Text field to show place of saving running information.
 	 */
-	protected JTextField txtRunSaveBrowse = null;
+	protected TextField txtRunSaveBrowse = null;
 	
 	/**
 	 * Check box for whether or not to save running information.
@@ -605,7 +605,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 		main.add(this.paneRunSave);
 		JPanel pane = new JPanel(new BorderLayout(2, 2));
 		this.paneRunSave.add(pane, BorderLayout.NORTH);
-		this.txtRunSaveBrowse = new JTextField();
+		this.txtRunSaveBrowse = new TextField();
 		this.txtRunSaveBrowse.setEditable(false);
 		this.txtRunSaveBrowse.setToolTipText(I18nUtil.message("save_evaluate_place"));;
 		pane.add(this.txtRunSaveBrowse, BorderLayout.CENTER);

@@ -8,10 +8,14 @@
 package net.hudup.evaluate.ui;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Container;
 import java.awt.Image;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.Collections;
@@ -25,8 +29,10 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JPopupMenu;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
+import javax.swing.SwingUtilities;
 
 import net.hudup.core.Constants;
 import net.hudup.core.PluginChangedEvent;
@@ -134,6 +140,30 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 		content.add(body, BorderLayout.CENTER);
 		
 		batchEvaluateGUI = new BatchEvaluateGUI(evaluator, bindUri);
+		batchEvaluateGUI.addMouseListener(new MouseAdapter() {
+
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				// TODO Auto-generated method stub
+				if(SwingUtilities.isRightMouseButton(e) ) {
+					if (!isIdle()) return;
+					JPopupMenu contextMenu = new JPopupMenu();
+					
+					JMenuItem mniSysConfig = UIUtil.makeMenuItem(null, I18nUtil.message("system_configure"), 
+						new ActionListener() {
+							
+							@Override
+							public void actionPerformed(ActionEvent e) {
+								sysConfig();
+							}
+						});
+					contextMenu.add(mniSysConfig);
+
+					contextMenu.show((Component)e.getSource(), e.getX(), e.getY());
+				}
+			}
+			
+		});
 		body.add(I18nUtil.message("evaluate_batch"), batchEvaluateGUI);
 		
 		setTitle(I18nUtil.message("evaluator"));

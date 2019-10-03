@@ -224,7 +224,7 @@ public class AlgDesc2 extends AlgDesc {
 		buffer.append("Exportable: " + isExportable + "\n");
 		buffer.append("Exported: " + isExported + "\n");
 		buffer.append("Remote: " + isRemote + "\n");
-		buffer.append("Wrapper: " + isWrapper);
+		buffer.append("Wrapper: " + isWrapper + "\n");
 		buffer.append("Exclusive mode (for wrapper): " + isExclusive);
 		
 		return buffer.toString();

@@ -96,8 +96,9 @@ public class ProfileTable extends JTable {
 			public void mouseClicked(MouseEvent e) {
 				if(SwingUtilities.isRightMouseButton(e) ) {
 					JPopupMenu contextMenu = createContextMenu();
-					if(contextMenu != null) 
-						contextMenu.show((Component)e.getSource(), e.getX(), e.getY());
+					if(contextMenu == null) return;
+					
+					contextMenu.show((Component)e.getSource(), e.getX(), e.getY());
 				}
 				else if (e.getClickCount() >= 2) {
 					viewRow();

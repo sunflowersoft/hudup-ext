@@ -7,12 +7,22 @@
  */
 package net.hudup.core.logistic.ui;
 
+import java.awt.Component;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
 import javax.swing.JTextArea;
+import javax.swing.SwingUtilities;
+import javax.swing.text.Document;
 
+import net.hudup.core.logistic.ClipboardUtil;
 import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.xURI;
 
@@ -38,10 +48,129 @@ public class TextArea extends JTextArea {
 	public TextArea() {
 		// TODO Auto-generated constructor stub
 		super();
+		init();
+	}
 
-		setEditable(false);
+	
+	/**
+	 * Constructor with specified document, text, rows, and columns.
+	 * @param doc specified document.
+	 * @param text specified text.
+	 * @param rows specified row.
+	 * @param columns specified columns.
+	 */
+	public TextArea(Document doc, String text, int rows, int columns) {
+		super(doc, text, rows, columns);
+		// TODO Auto-generated constructor stub
+		init();
+	}
+
+
+	/**
+	 * Constructor with specified document.
+	 * @param doc specified document.
+	 */
+	public TextArea(Document doc) {
+		super(doc);
+		// TODO Auto-generated constructor stub
+		init();
+	}
+
+
+	/**
+	 * Constructor with specified rows and columns.
+	 * @param rows specified row.
+	 * @param columns specified columns.
+	 */
+	public TextArea(int rows, int columns) {
+		super(rows, columns);
+		// TODO Auto-generated constructor stub
+		init();
+	}
+
+
+	/**
+	 * Constructor with specified text, rows, and columns.
+	 * @param text specified text.
+	 * @param rows specified row.
+	 * @param columns specified columns.
+	 */
+	public TextArea(String text, int rows, int columns) {
+		super(text, rows, columns);
+		// TODO Auto-generated constructor stub
+		init();
+	}
+
+
+	/**
+	 * Constructor with specified text.
+	 * @param text specified text.
+	 */
+	public TextArea(String text) {
+		super(text);
+		// TODO Auto-generated constructor stub
+		init();
+	}
+
+
+	/**
+	 * Initializing method.
+	 */
+	protected void init() {
 		setWrapStyleWord(true);
 		setLineWrap(true);
+		
+		addMouseListener(new MouseAdapter() {
+
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				// TODO Auto-generated method stub
+				if(SwingUtilities.isRightMouseButton(e) ) {
+					JPopupMenu contextMenu = createContextMenu();
+					if(contextMenu == null) return;
+					
+					addToContextMenu(contextMenu);
+					
+					contextMenu.show((Component)e.getSource(), e.getX(), e.getY());
+				}
+				else {
+				}
+			}
+			
+		});
+	}
+	
+	
+	/**
+	 * Creating context menu.
+	 * @return context menu.
+	 */
+	protected JPopupMenu createContextMenu() {
+		String text = getText();
+		if (text == null || text.isEmpty()) return null;
+		
+		JPopupMenu contextMenu = new JPopupMenu();
+		
+		JMenuItem miCopyDesc = UIUtil.makeMenuItem(null, "Copy", 
+			new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					ClipboardUtil.util.setText(text);
+				}
+			});
+		contextMenu.add(miCopyDesc);
+
+		return contextMenu;
+	}
+	
+	
+	/**
+	 * Adding menu item to specified context menu.
+	 * @param contextMenu specified context menu.
+	 */
+	protected void addToContextMenu(JPopupMenu contextMenu) {
+		
 	}
 
 	

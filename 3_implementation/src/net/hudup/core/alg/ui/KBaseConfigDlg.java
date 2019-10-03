@@ -173,6 +173,7 @@ public class KBaseConfigDlg extends JDialog {
 		add(paneNote, BorderLayout.SOUTH);
 		paneNote.add(new JLabel("Note: "), BorderLayout.WEST);
 		txtNote = new TextArea();
+		txtNote.setEditable(false);
 		txtNote.setRows(3);
 		paneNote.add(new JScrollPane(txtNote), BorderLayout.CENTER);
 		

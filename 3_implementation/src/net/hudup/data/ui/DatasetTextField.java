@@ -7,16 +7,12 @@
  */
 package net.hudup.data.ui;
 
-import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
-import javax.swing.SwingUtilities;
 
 import net.hudup.core.alg.KBase;
 import net.hudup.core.alg.ui.KBaseConfigDlg;
@@ -52,20 +48,6 @@ public class DatasetTextField extends TagTextField {
 	public DatasetTextField() {
 		super();
 		// TODO Auto-generated constructor stub
-		
-		addMouseListener(new MouseAdapter() {
-
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				// TODO Auto-generated method stub
-				if (SwingUtilities.isRightMouseButton(e) && getDataset() != null) {
-					JPopupMenu contextMenu = createContextMenu();
-					if(contextMenu != null) 
-						contextMenu.show((Component)e.getSource(), e.getX(), e.getY());
-				}
-			}
-			
-		});
 	}
 
 	
@@ -79,11 +61,10 @@ public class DatasetTextField extends TagTextField {
 	}
 
 	
-	/**
-	 * Creating context menu.
-	 * @return {@link JPopupMenu} as context menu.
-	 */
-	private JPopupMenu createContextMenu() {
+	@Override
+	protected JPopupMenu createContextMenu() {
+		if (getDataset() == null) return null;
+		
 		JPopupMenu contextMenu = new JPopupMenu();
 		
 		String uriText = getText();

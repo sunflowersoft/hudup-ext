@@ -342,7 +342,6 @@ public class RecommendEvaluator extends EvaluatorAbstract {
 	 * @return relevant ratio in specified dataset.
 	 */
 	private double calcRelevantSparseRatio(Dataset dataset) {
-		int rateCount = 0;
 		int relevantRateCount = 0;
 		int nUsers = 0;
 		Fetcher<RatingVector> users = null;
@@ -357,7 +356,6 @@ public class RecommendEvaluator extends EvaluatorAbstract {
 				if (count == 0) continue;
 				
 				nUsers++;
-				rateCount += count;
 
 				int relevantCount = Accuracy.countForRelevant(user, true, minRating, maxRating);
 				relevantRateCount += relevantCount;
@@ -384,7 +382,7 @@ public class RecommendEvaluator extends EvaluatorAbstract {
 		if (nUsers == 0 || nItems == 0)
 			return 0;
 		else
-			return ((double)relevantRateCount/rateCount) * ((double)rateCount/(nUsers*nItems));
+			return ((double)relevantRateCount/(nUsers*nItems));
 	}
 	
 	

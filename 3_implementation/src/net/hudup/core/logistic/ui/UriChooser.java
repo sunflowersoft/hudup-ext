@@ -82,7 +82,7 @@ public class UriChooser extends JDialog {
 	/**
 	 * {@link JTextField} to fill in path of remote storage.
 	 */
-	private JTextField txtPath = null;
+	private TextField txtPath = null;
 	
 	/**
 	 * Button for users to choose the path of remote storage.
@@ -292,7 +292,7 @@ public class UriChooser extends JDialog {
 		//
 		pane = new JPanel(new BorderLayout());
 		attValues.add(pane);
-		txtPath = new JTextField();
+		txtPath = new TextField();
 		pane.add(txtPath, BorderLayout.CENTER);
 		btnPath = new JButton("Browse");
 		pane.add(btnPath, BorderLayout.EAST);

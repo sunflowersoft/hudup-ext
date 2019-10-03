@@ -42,6 +42,7 @@ import net.hudup.core.data.ui.PropTable;
 import net.hudup.core.data.ui.UnitListBox;
 import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.xURI;
+import net.hudup.core.logistic.ui.TextField;
 import net.hudup.core.logistic.ui.UIUtil;
 import net.hudup.core.parser.DatasetParser;
 
@@ -92,7 +93,7 @@ public class DatasetConfigurator extends JDialog {
 	/**
 	 * Path text field.
 	 */
-	private JTextField txtPath = null;
+	private TextField txtPath = null;
 
 	/**
 	 * Path button.
@@ -301,7 +302,7 @@ public class DatasetConfigurator extends JDialog {
 		//
 		pane = new JPanel(new BorderLayout());
 		attValues.add(pane);
-		txtPath = new JTextField();
+		txtPath = new TextField();
 		pane.add(txtPath, BorderLayout.CENTER);
 		btnPath = new JButton("Browse");
 		pane.add(btnPath, BorderLayout.EAST);

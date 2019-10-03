@@ -296,6 +296,7 @@ public abstract class BnetKB extends KBaseAbstract {
 			add(body, BorderLayout.CENTER);
 			
 			TextArea bnetContent = new TextArea();
+			bnetContent.setEditable(false);
 			try {
 				StringWriter stringWriter = new StringWriter();
 				PrintWriter writer = new PrintWriter(stringWriter);
