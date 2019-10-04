@@ -25,12 +25,12 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.JTextArea;
 
 import net.hudup.core.RegisterTable;
 import net.hudup.core.evaluate.Metrics;
 import net.hudup.core.evaluate.MetricsUtil;
 import net.hudup.core.logistic.xURI;
+import net.hudup.core.logistic.ui.TextArea;
 import net.hudup.core.logistic.ui.UIUtil;
 import net.hudup.logistic.SystemPropertiesTextArea;
 
@@ -87,7 +87,7 @@ public class MetricsAnalyzeDlg extends JDialog {
 		
 		header.add(new JLabel("Note"), BorderLayout.NORTH);
 
-		JTextArea info = new SystemPropertiesTextArea(5, 10);
+		TextArea info = new SystemPropertiesTextArea(5, 10);
 		header.add(new JScrollPane(info), BorderLayout.CENTER);
 		
 		StringBuffer buffer = new StringBuffer();
@@ -206,7 +206,7 @@ public class MetricsAnalyzeDlg extends JDialog {
 
 		algDescs.add(new JLabel("Algorithm descriptions"), BorderLayout.NORTH);
 		
-		JTextArea tblAlgDescs = util.createAlgDescsTextArea();
+		TextArea tblAlgDescs = util.createAlgDescsTextArea();
 		algDescs.add(new JScrollPane(tblAlgDescs), BorderLayout.CENTER);
 		
 		JPanel algDescsTool = new JPanel();
@@ -357,7 +357,7 @@ public class MetricsAnalyzeDlg extends JDialog {
 		zoomDlg.add(new JLabel("Algorithm descriptions"), BorderLayout.NORTH);
 		
 		MetricsUtil util = new MetricsUtil(metrics, algTable);
-		JTextArea tblAlgDescs = util.createAlgDescsTextArea();
+		TextArea tblAlgDescs = util.createAlgDescsTextArea();
 		zoomDlg.add(new JScrollPane(tblAlgDescs), BorderLayout.CENTER);
 		
 		

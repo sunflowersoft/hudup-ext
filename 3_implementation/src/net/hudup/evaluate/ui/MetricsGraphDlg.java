@@ -22,13 +22,13 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
 
 import flanagan.plot.PlotGraph;
 import net.hudup.core.RegisterTable;
 import net.hudup.core.evaluate.Metrics;
 import net.hudup.core.evaluate.MetricsUtil;
 import net.hudup.core.logistic.xURI;
+import net.hudup.core.logistic.ui.TextArea;
 import net.hudup.core.logistic.ui.UIUtil;
 
 /**
@@ -81,7 +81,7 @@ public class MetricsGraphDlg extends JDialog {
 		add(header, BorderLayout.NORTH);
 		
 		header.add(new JLabel("Note"), BorderLayout.NORTH);
-		JTextArea info = new JTextArea(5, 10);
+		TextArea info = new TextArea(5, 10);
 		info.setEditable(false);
 		header.add(new JScrollPane(info), BorderLayout.CENTER);
 		

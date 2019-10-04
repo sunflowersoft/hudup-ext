@@ -27,7 +27,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.text.NumberFormatter;
 
@@ -35,6 +34,7 @@ import net.hudup.core.Constants;
 import net.hudup.core.Util;
 import net.hudup.core.logistic.NetUtil;
 import net.hudup.core.logistic.xURI;
+import net.hudup.core.logistic.ui.TextArea;
 import net.hudup.core.logistic.ui.UIUtil;
 
 /**
@@ -287,11 +287,9 @@ public abstract class ConnectDlg extends JDialog {
 		JPanel body = new JPanel(new BorderLayout());
 		add(body, BorderLayout.CENTER);
 		
-		JTextArea txtInfo = new JTextArea();
+		TextArea txtInfo = new TextArea();
 		body.add(new JScrollPane(txtInfo), BorderLayout.CENTER);
 		txtInfo.setEditable(false);
-		txtInfo.setWrapStyleWord(true);
-		txtInfo.setLineWrap(true);
 		txtInfo.setText(
 			  "Server serves at default port (RMI) " + Constants.DEFAULT_SERVER_PORT + ".\n\n"
 			+ "Listener serves at default port (Socket) " + Constants.DEFAULT_LISTENER_PORT + ".\n"

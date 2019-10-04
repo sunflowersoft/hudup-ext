@@ -15,6 +15,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.rmi.RemoteException;
 import java.util.List;
 import java.util.Vector;
@@ -48,6 +50,7 @@ import net.hudup.core.data.DataDriver;
 import net.hudup.core.data.DataDriver.DataType;
 import net.hudup.core.data.DataDriverList;
 import net.hudup.core.data.Exportable;
+import net.hudup.core.logistic.I18nUtil;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.xURI;
 import net.hudup.core.logistic.ui.SortableSelectableTable;
@@ -674,7 +677,7 @@ public class PluginStorageManifest extends SortableSelectableTable {
 							apply();
 					}
 					
-					ImportAlgDlag importAlgDlg = new ImportAlgDlag(tblRegister);
+					ImportAlgDlg importAlgDlg = new ImportAlgDlg(tblRegister);
 					importAlgDlg.setVisible(true);
 					if (importAlgDlg.getImportedCount() > 0) {
 						tblRegister.update();
@@ -750,16 +753,72 @@ public class PluginStorageManifest extends SortableSelectableTable {
 	 * Showing a dialog containing {@link PluginStorageManifest}.
 	 * @param comp parent component.
 	 * @param listener {@link PluginChangedListener} to receive {@link PluginChangedEvent} if {@link PluginStorageManifest} is changed. 
-	 * @param modal whether or not the dialog is modal. The modal dialog will block user inputs. Please see {@link JDialog} for more details. 
 	 */
-	public static void showDlg(Component comp, PluginChangedListener listener, boolean modal) {
-		JDialog dlg = new JDialog(UIUtil.getFrameForComponent(comp), "Plugin storage", modal);
+	public static void showDlg(Component comp, PluginChangedListener listener) {
+		JDialog dlg = new JDialog(UIUtil.getFrameForComponent(comp), I18nUtil.message("plugin_manager"), true);
 		dlg.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		dlg.setSize(600, 400);
 		dlg.setLocationRelativeTo(UIUtil.getFrameForComponent(comp));
-		
 		dlg.setLayout(new BorderLayout());
-		dlg.add(new PluginStorageManifestPanel(listener), BorderLayout.CENTER);
+		
+		
+		JPanel body = new JPanel(new BorderLayout());
+		dlg.add(body, BorderLayout.CENTER);
+		
+		final PluginStorageManifestPanel paneManifest= new PluginStorageManifestPanel(listener);
+		body.add(paneManifest, BorderLayout.CENTER);
+		
+		
+		JPanel footer = new JPanel();
+		dlg.add(footer, BorderLayout.SOUTH);
+
+		JButton ok = new JButton("OK");
+		ok.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				if (paneManifest.isModified())
+					paneManifest.apply();
+				dlg.dispose();
+			}
+		});
+		footer.add(ok);
+
+		JButton cancel = new JButton("Cancel");
+		cancel.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				dlg.dispose();
+			}
+		});
+		footer.add(cancel);
+
+		
+		dlg.addWindowListener(new WindowAdapter() {
+
+			@Override
+			public void windowClosed(WindowEvent e) {
+				// TODO Auto-generated method stub
+				super.windowClosed(e);
+				
+				if (!paneManifest.isModified())
+					return;
+				
+				int confirm = JOptionPane.showConfirmDialog(
+						comp, 
+						"Plug-ins are changed. Do you want to apply them?", 
+						"Plug-ins are changed", 
+						JOptionPane.YES_NO_OPTION,
+						JOptionPane.QUESTION_MESSAGE);
+				
+				if (confirm == JOptionPane.YES_OPTION)
+					paneManifest.apply();
+			}
+
+		});
 		
 		dlg.setVisible(true);
 	}
@@ -970,7 +1029,7 @@ class RegisterTM extends SortableSelectableTableModel {
  * @author Loc Nguyen
  * @version 12.0
  */
-class ImportAlgDlag extends JDialog {
+class ImportAlgDlg extends JDialog {
 	
 	
 	/**
@@ -1026,7 +1085,7 @@ class ImportAlgDlag extends JDialog {
 	 * Constructor with parent component.
 	 * @param comp parent component.
 	 */
-	public ImportAlgDlag(Component comp) {
+	public ImportAlgDlg(Component comp) {
 		super(UIUtil.getFrameForComponent(comp), "Import remotely algorithms from Hudup server/service", true);
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		setSize(600, 400);
@@ -1538,8 +1597,8 @@ class AlgDescImportTable extends SortableSelectableTable {
 		List<AlgDesc2> selectedList = Util.newList();
 		int n = getRowCount();
 		for (int i = 0; i < n; i++) {
-			boolean imported = (Boolean)getValueAt(i, 5);
-			if (!imported) continue;
+			boolean selected = (Boolean)getValueAt(i, 5);
+			if (!selected) continue;
 			
 			AlgDesc2 algDesc = (AlgDesc2)getValueAt(i, 3);
 			if (algDesc != null)
@@ -1558,8 +1617,8 @@ class AlgDescImportTable extends SortableSelectableTable {
 		List<Alg> selectedList = Util.newList();
 		int n = getRowCount();
 		for (int i = 0; i < n; i++) {
-			boolean imported = (Boolean)getValueAt(i, 5);
-			if (!imported) continue;
+			boolean selected = (Boolean)getValueAt(i, 5);
+			if (!selected) continue;
 			
 			Alg alg = (Alg)getValueAt(i, 4);
 			if (alg != null)
@@ -1645,9 +1704,25 @@ class AlgDescImportTM extends SortableSelectableTableModel {
 	 * @param algDescList list of algorithms.
 	 */
 	public void update(List<Alg> algList) {
-		AlgDesc2List list = new AlgDesc2List();
-		list.addAll2(algList);
-		update(list);
+		Vector<Vector<Object>> data = Util.newVector();
+		
+		for (Alg alg : algList) {
+			AlgDesc2 algDesc = new AlgDesc2(alg);
+			Vector<Object> row = Util.newVector();
+			
+			row.add(algDesc.tableName);
+			row.add(algDesc.algName);
+			row.add(algDesc.getAlgClassName());
+			row.add(algDesc);
+			row.add(alg);
+			row.add(false);
+
+			data.add(row);
+		}
+		
+		setDataVector(data, toColumns());
+		
+		modified = false;
 	}
 
 	

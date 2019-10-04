@@ -22,7 +22,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
 import net.hudup.core.Util;
@@ -38,6 +37,7 @@ import net.hudup.core.logistic.ui.JCheckList;
 import net.hudup.core.logistic.ui.ProgressEvent;
 import net.hudup.core.logistic.ui.ProgressListener;
 import net.hudup.core.logistic.ui.StartDlg;
+import net.hudup.core.logistic.ui.TextArea;
 import net.hudup.core.parser.TextParserUtil;
 import net.hudup.data.DatasetSampler;
 import net.hudup.data.DatasetUtil2;
@@ -267,9 +267,9 @@ public class DatasetSampling extends JPanel implements ProgressListener, Dispose
 			}
 			
 			@Override
-			protected JTextArea createHelp() {
+			protected TextArea createHelp() {
 				// TODO Auto-generated method stub
-				return new JTextArea("Choosing an unit is optional.");
+				return new TextArea("Choosing an unit is optional.");
 			}
 			
 			@Override

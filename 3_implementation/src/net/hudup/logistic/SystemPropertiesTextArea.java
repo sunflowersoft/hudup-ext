@@ -9,11 +9,10 @@ package net.hudup.logistic;
 
 import java.util.List;
 
-import javax.swing.JTextArea;
-
 import net.hudup.core.Util;
 import net.hudup.core.data.PropList;
 import net.hudup.core.logistic.SystemUtil;
+import net.hudup.core.logistic.ui.TextArea;
 
 /**
  * Text area to show system properties.
@@ -22,7 +21,7 @@ import net.hudup.core.logistic.SystemUtil;
  * @version 11.0
  *
  */
-public class SystemPropertiesTextArea extends JTextArea {
+public class SystemPropertiesTextArea extends TextArea {
 
 	
 	/**
@@ -50,17 +49,13 @@ public class SystemPropertiesTextArea extends JTextArea {
 	 */
 	public SystemPropertiesTextArea() {
 		super();
-		init();
 	}
 	
 	
-	/**
-	 * Initialization method.
-	 */
-	private void init() {
+	@Override
+	protected void init() {
+		super.init();
 		setEditable(false);
-		setWrapStyleWord(true);
-		setLineWrap(true);
 		
 		refresh();
 	}

@@ -31,13 +31,13 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JTabbedPane;
-import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 
 import net.hudup.core.Constants;
 import net.hudup.core.PluginChangedEvent;
 import net.hudup.core.PluginChangedListener;
 import net.hudup.core.PluginStorage;
+import net.hudup.core.PluginStorageManifest;
 import net.hudup.core.RegisterTable;
 import net.hudup.core.Util;
 import net.hudup.core.client.ConnectDlg;
@@ -53,6 +53,7 @@ import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.xURI;
 import net.hudup.core.logistic.ui.HelpContent;
 import net.hudup.core.logistic.ui.StartDlg;
+import net.hudup.core.logistic.ui.TextArea;
 import net.hudup.core.logistic.ui.UIUtil;
 import net.hudup.data.ui.SysConfigDlgExt;
 
@@ -140,33 +141,27 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 		content.add(body, BorderLayout.CENTER);
 		
 		batchEvaluateGUI = new BatchEvaluateGUI(evaluator, bindUri);
-		batchEvaluateGUI.addMouseListener(new MouseAdapter() {
-
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				// TODO Auto-generated method stub
-				if(SwingUtilities.isRightMouseButton(e) ) {
-					if (!isIdle()) return;
-					JPopupMenu contextMenu = new JPopupMenu();
-					
-					JMenuItem mniSysConfig = UIUtil.makeMenuItem(null, I18nUtil.message("system_configure"), 
-						new ActionListener() {
-							
-							@Override
-							public void actionPerformed(ActionEvent e) {
-								sysConfig();
-							}
-						});
-					contextMenu.add(mniSysConfig);
-
-					contextMenu.show((Component)e.getSource(), e.getX(), e.getY());
-				}
-			}
-			
-		});
 		body.add(I18nUtil.message("evaluate_batch"), batchEvaluateGUI);
 		
 		setTitle(I18nUtil.message("evaluator"));
+		
+		body.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if(!SwingUtilities.isRightMouseButton(e)) return;
+				JPopupMenu contextMenu = createContextMenu();
+				if (contextMenu != null) contextMenu.show((Component)e.getSource(), e.getX(), e.getY());
+			}
+		});
+		batchEvaluateGUI.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if(!SwingUtilities.isRightMouseButton(e)) return;
+				JPopupMenu contextMenu = createContextMenu();
+				if (contextMenu != null) contextMenu.show((Component)e.getSource(), e.getX(), e.getY());
+			}
+		});
+		
 		setVisible(true);
 	}
 	
@@ -248,6 +243,28 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 		return mnBar;
 	}
 
+	
+	/**
+	 * Create context menu.
+	 * @return context menu.
+	 */
+	private JPopupMenu createContextMenu() {
+		if (!isIdle()) return null;
+		JPopupMenu contextMenu = new JPopupMenu();
+		
+		JMenuItem mniPluginConfig = UIUtil.makeMenuItem(null, I18nUtil.message("plugin_manager"), 
+			new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					PluginStorageManifest.showDlg(getThisEvalGUI(), getThisEvalGUI());
+				}
+			});
+		contextMenu.add(mniPluginConfig);
+
+		return contextMenu;
+	}
+	
 	
 	/**
 	 * Switch evaluator.
@@ -407,9 +424,9 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 			}
 			
 			@Override
-			protected JTextArea createHelp() {
+			protected TextArea createHelp() {
 				// TODO Auto-generated method stub
-				JTextArea toolkit = new JTextArea("Thank you for choosing evaluators");
+				TextArea toolkit = new TextArea("Thank you for choosing evaluators");
 				toolkit.setEditable(false);
 				return toolkit;
 			}
@@ -497,9 +514,9 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 				}
 				
 				@Override
-				protected JTextArea createHelp() {
+				protected TextArea createHelp() {
 					// TODO Auto-generated method stub
-					JTextArea helper = new JTextArea("Thank you for choosing evaluators");
+					TextArea helper = new TextArea("Thank you for choosing evaluators");
 					helper.setEditable(false);
 					return helper;
 				}

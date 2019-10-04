@@ -688,7 +688,6 @@ public class ExternalConfigurator extends JDialog {
  * @version 10.0
  *
  */
-@Deprecated
 class MappingColumnDlg extends JDialog {
 
 	

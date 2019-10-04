@@ -454,7 +454,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			}
 
 		};
-		this.tblDatasetPool.setPreferredScrollableViewportSize(new Dimension(200, 80));
+		this.tblDatasetPool.setPreferredScrollableViewportSize(new Dimension(600, 80));
 		down.add(new JScrollPane(this.tblDatasetPool), BorderLayout.CENTER);
 
 		JPanel tool = new JPanel(new BorderLayout());
@@ -723,7 +723,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 		footer.add(this.paneResult, BorderLayout.CENTER);
 		
 		this.tblMetrics = new MetricsTable(new RegisterTable(lbAlgs.getAlgList()));
-		this.tblMetrics.setPreferredScrollableViewportSize(new Dimension(600, 100));
+		this.tblMetrics.setPreferredScrollableViewportSize(new Dimension(600, 80));
 		this.paneResult.add(new JScrollPane(this.tblMetrics), BorderLayout.CENTER);
 
 		JPanel toolbar = new JPanel(new FlowLayout(FlowLayout.RIGHT));

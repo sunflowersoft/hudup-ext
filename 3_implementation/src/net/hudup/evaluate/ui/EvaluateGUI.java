@@ -706,7 +706,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 		footer.add(this.paneResult, BorderLayout.CENTER);
 		
 		this.tblMetrics = new MetricsTable(new RegisterTable(Arrays.asList(getAlg())));
-		this.tblMetrics.setPreferredScrollableViewportSize(new Dimension(600, 100));
+		this.tblMetrics.setPreferredScrollableViewportSize(new Dimension(600, 80));
 		this.paneResult.add(new JScrollPane(this.tblMetrics), BorderLayout.CENTER);
 
 		JPanel toolbar = new JPanel(new FlowLayout(FlowLayout.RIGHT));

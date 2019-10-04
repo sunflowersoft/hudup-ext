@@ -21,7 +21,6 @@ import java.util.Vector;
 
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
-import javax.swing.JTextArea;
 import javax.swing.table.DefaultTableModel;
 
 import flanagan.plot.PlotGraph;
@@ -42,6 +41,7 @@ import net.hudup.core.logistic.MathUtil;
 import net.hudup.core.logistic.SystemUtil;
 import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.xURI;
+import net.hudup.core.logistic.ui.TextArea;
 
 /**
  * Utility class for processing metrics, for example, exporting metrics into text file, excel file.
@@ -369,9 +369,9 @@ public class MetricsUtil {
 	
 	/**
 	 * Create text area for showing algorithms descriptions.
-	 * @return {@link JTable} for showing algorithms descriptions.
+	 * @return text area for showing algorithms descriptions.
 	 */
-	public JTextArea createAlgDescsTextArea() {
+	public TextArea createAlgDescsTextArea() {
 		List<String> algNameList = this.metrics.getAlgNameList();
 		Collections.sort(algNameList);
 		List<Integer> datasetIdList = this.metrics.getDatasetIdList();
@@ -392,7 +392,7 @@ public class MetricsUtil {
 			}
 		}
 		
-		JTextArea txtAlgDescs = new JTextArea(buffer.toString());
+		TextArea txtAlgDescs = new TextArea(buffer.toString());
 		txtAlgDescs.setEditable(false);
 		
 		return txtAlgDescs;

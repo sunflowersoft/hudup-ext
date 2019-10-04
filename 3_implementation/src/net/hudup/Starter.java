@@ -14,11 +14,11 @@ import java.util.List;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-import javax.swing.JTextArea;
 
 import net.hudup.core.AccessPoint;
 import net.hudup.core.Util;
 import net.hudup.core.logistic.ui.StartDlg;
+import net.hudup.core.logistic.ui.TextArea;
 import net.hudup.core.logistic.ui.TooltipTextArea;
 
 
@@ -93,7 +93,7 @@ public class Starter {
 			}
 			
 			@Override
-			protected JTextArea createHelp() {
+			protected TextArea createHelp() {
 				// TODO Auto-generated method stub
 				TooltipTextArea tooltip = new TooltipTextArea();
 				tooltip.setEditable(false);

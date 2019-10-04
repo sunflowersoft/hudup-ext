@@ -17,7 +17,6 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
 
 import net.hudup.core.logistic.Inspector;
 
@@ -53,10 +52,8 @@ public class DescriptionDlg extends JDialog implements Inspector {
 		JPanel body = new JPanel(new BorderLayout());
 		add(body, BorderLayout.CENTER);
 		
-		JTextArea txtDesc = new JTextArea(description);
+		TextArea txtDesc = new TextArea(description);
 		txtDesc.setEditable(false);
-		txtDesc.setLineWrap(true);
-		txtDesc.setWrapStyleWord(true);
 		body.add(new JScrollPane(txtDesc), BorderLayout.CENTER);
 		
 		JPanel footer = new JPanel();

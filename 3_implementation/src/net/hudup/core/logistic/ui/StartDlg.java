@@ -20,7 +20,6 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
 
 /**
  * This dialog allows users to choose and start some class or application.
@@ -82,7 +81,7 @@ public abstract class StartDlg extends JDialog {
         JPanel body = new JPanel(new BorderLayout());
         add(body, BorderLayout.CENTER);
         
-        JTextArea txtHelp = createHelp();
+        TextArea txtHelp = createHelp();
         if (txtHelp != null)
         	body.add(new JScrollPane(txtHelp), BorderLayout.CENTER);
 	}
@@ -99,7 +98,7 @@ public abstract class StartDlg extends JDialog {
 	 * Creating text area for showing some helpful information.
 	 * @return text area for showing some helpful information.
 	 */
-	protected abstract JTextArea createHelp();
+	protected abstract TextArea createHelp();
 	
 	
 	/**

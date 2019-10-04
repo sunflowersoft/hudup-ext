@@ -14,8 +14,6 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-import javax.swing.JTextArea;
-
 import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.xURI;
 
@@ -28,7 +26,7 @@ import net.hudup.core.logistic.xURI;
  * @version 11.0
  *
  */
-public class TooltipTextArea extends JTextArea {
+public class TooltipTextArea extends TextArea {
 
 	
 	/**

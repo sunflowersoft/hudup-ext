@@ -52,8 +52,7 @@ public class TxtOutput extends JTextArea {
 				if(SwingUtilities.isRightMouseButton(e) ) {
 					JPopupMenu contextMenu = createOutputContextMenu();
 					if(contextMenu != null) 
-						contextMenu.show((Component)e.getSource(), 
-								e.getX(), e.getY());
+						contextMenu.show((Component)e.getSource(), e.getX(), e.getY());
 				}
 			}
 			
