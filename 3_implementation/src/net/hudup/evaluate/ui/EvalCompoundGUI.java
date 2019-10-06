@@ -566,10 +566,11 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 			
 			RegisterTable parserReg = PluginStorage.getParserReg();
 			if (parserReg.size() == 0) {
-				JOptionPane.showMessageDialog(null, 
-						"There is no registered dataset parser.\n Program cannot run.", 
-						"No dataset parser", JOptionPane.ERROR_MESSAGE);
-				return;
+				Util.getPluginManager().discover();
+//				JOptionPane.showMessageDialog(null,
+//						"There is no registered dataset parser.\n Program cannot run.", 
+//						"No dataset parser", JOptionPane.ERROR_MESSAGE);
+//				return;
 			}
 			
 			RegisterTable metricReg = PluginStorage.getMetricReg();
