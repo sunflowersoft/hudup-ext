@@ -14,6 +14,9 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
+import jxl.Cell;
+import jxl.Sheet;
+import jxl.Workbook;
 import net.hudup.core.Constants;
 import net.hudup.core.Util;
 import net.hudup.core.data.Attribute;
@@ -27,6 +30,7 @@ import net.hudup.core.data.Nominal;
 import net.hudup.core.data.NominalList;
 import net.hudup.core.data.ParamSql;
 import net.hudup.core.data.Profile;
+import net.hudup.core.data.ProviderAssoc.CsvReader;
 import net.hudup.core.data.ProviderAssocAbstract;
 import net.hudup.core.data.Unit;
 import net.hudup.core.data.UnitList;
@@ -913,11 +917,11 @@ class FlatProviderAssoc extends ProviderAssocAbstract {
 		final com.csvreader.CsvWriter csvWriter = new com.csvreader.CsvWriter(writer, DELIMITER);
 		return new CsvWriter() {
 			
-			@Override
-			public void write(String column) throws IOException {
-				// TODO Auto-generated method stub
-				csvWriter.write(column);
-			}
+//			@Override
+//			public void write(String column) throws IOException {
+//				// TODO Auto-generated method stub
+//				csvWriter.write(column);
+//			}
 			
 			@Override
 			public void writeRecord(String[] record) throws IOException {
@@ -931,6 +935,138 @@ class FlatProviderAssoc extends ProviderAssocAbstract {
 				csvWriter.close();
 			}
 		};
+	}
+	
+	
+}
+
+
+
+/**
+ * This is reader for reading excel file.
+ * 
+ * @author Loc Nguyen
+ * @version 12.0
+ *
+ */
+class ExcelReader implements CsvReader {
+
+	
+	/**
+	 * Workbook.
+	 */
+	protected Workbook workbook = null;
+	
+	
+	/**
+	 * Only use the first sheet.
+	 */
+	protected Sheet sheet = null;
+	
+	
+	/**
+	 * Attribute list.
+	 */
+	protected AttributeList attList = null;
+	
+	
+	/**
+	 * Current row.
+	 */
+	protected int currentRow = -1;
+
+	
+	/**
+	 * Current profile.
+	 */
+	protected String[] currentProfile = null;
+	
+	
+	@Override
+	public boolean readHeader() throws IOException {
+		// TODO Auto-generated method stub
+		reset();
+		
+		if (workbook == null) return false;
+		try {
+			sheet = workbook.getSheet(0);
+		}
+		catch (Throwable e) {
+			e.printStackTrace();
+			sheet = null;
+		}
+		if (sheet == null) return false;
+		int n = sheet.getColumns();
+		if (n == 0) return false;
+		
+		currentRow = 0;
+		attList = new AttributeList();
+		for (int j = 0; j < n; j++) {
+			Cell cell = sheet.getCell(j, currentRow);
+			Attribute att = new Attribute();
+			att.parseText(cell.getContents());
+			attList.add(att);
+		}
+		return true;
+	}
+
+	
+	@Override
+	public String[] getHeader() throws IOException {
+		// TODO Auto-generated method stub
+		if (attList == null) return null;
+		
+		String[] headers = new String[attList.size()];
+		for (int j = 0; j < headers.length; j++) {
+			headers[j] = attList.get(j).getName();
+		}
+		
+		return headers;
+	}
+
+	
+	@Override
+	public boolean readRecord() throws IOException {
+		// TODO Auto-generated method stub
+		currentProfile = null;
+		if (attList == null) return false;
+
+		currentRow ++;
+		currentProfile = new String[attList.size()];
+		for (int j = 0; j < currentProfile.length; j++) {
+			Cell cell = sheet.getCell(j, currentRow);
+			currentProfile[j] = cell.getContents();
+		}
+		
+		return true;
+	}
+
+	
+	@Override
+	public String[] getRecord() throws IOException {
+		// TODO Auto-generated method stub
+		return currentProfile;
+	}
+
+	
+	@Override
+	public void close() {
+		// TODO Auto-generated method stub
+		reset();
+
+		if (workbook != null) workbook.close();
+		workbook = null;
+	}
+	
+	
+	/**
+	 * Reset internal data.
+	 */
+	private void reset() {
+		sheet = null;
+		attList = null;
+		currentRow = -1;
+		currentProfile = null;
 	}
 	
 	

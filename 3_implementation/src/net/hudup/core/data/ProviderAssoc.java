@@ -286,12 +286,12 @@ public interface ProviderAssoc extends AutoCloseable {
 	 */
 	public static interface CsvWriter {
 		
-		/**
-		 * Writing the specified column to current record.
-		 * @param column column (field) to be written.
-		 * @throws IOException if any error raises.
-		 */
-		void write(String column) throws IOException;
+//		/**
+//		 * Writing the specified column to current record.
+//		 * @param column column (field) to be written.
+//		 * @throws IOException if any error raises.
+//		 */
+//		void write(String column) throws IOException;
 		
 		/**
 		 * Writing the specified record into CSV file.
