@@ -31,6 +31,7 @@ import net.hudup.core.data.NominalList;
 import net.hudup.core.data.ParamSql;
 import net.hudup.core.data.Profile;
 import net.hudup.core.data.ProviderAssoc.CsvReader;
+import net.hudup.core.data.ProviderAssoc.CsvWriter;
 import net.hudup.core.data.ProviderAssocAbstract;
 import net.hudup.core.data.Unit;
 import net.hudup.core.data.UnitList;
@@ -866,39 +867,7 @@ class FlatProviderAssoc extends ProviderAssocAbstract {
 			return null;
 
 		Reader reader = adapter.getReader(unitURI);
-		final com.csvreader.CsvReader csvReader = new com.csvreader.CsvReader(reader);
-		return new CsvReader() {
-			
-			@Override
-			public boolean readHeader() throws IOException {
-				// TODO Auto-generated method stub
-				return csvReader.readHeaders();
-			}
-			
-			@Override
-			public String[] getHeader() throws IOException {
-				// TODO Auto-generated method stub
-				return csvReader.getHeaders();
-			}
-
-			@Override
-			public boolean readRecord() throws IOException {
-				// TODO Auto-generated method stub
-				return csvReader.readRecord();
-			}
-			
-			@Override
-			public String[] getRecord() throws IOException {
-				// TODO Auto-generated method stub
-				return csvReader.getValues();
-			}
-			
-			@Override
-			public void close() {
-				// TODO Auto-generated method stub
-				csvReader.close();
-			}
-		};
+		return new DefaultCsvReader(reader);
 	}
 	
 	
@@ -914,32 +883,157 @@ class FlatProviderAssoc extends ProviderAssocAbstract {
 			return null;
 		
 		Writer writer = adapter.getWriter(unitURI, append);
-		final com.csvreader.CsvWriter csvWriter = new com.csvreader.CsvWriter(writer, DELIMITER);
-		return new CsvWriter() {
-			
-//			@Override
-//			public void write(String column) throws IOException {
-//				// TODO Auto-generated method stub
-//				csvWriter.write(column);
-//			}
-			
-			@Override
-			public void writeRecord(String[] record) throws IOException {
-				// TODO Auto-generated method stub
-				csvWriter.writeRecord(record);
-			}
-
-			@Override
-			public void close() {
-				// TODO Auto-generated method stub
-				csvWriter.close();
-			}
-		};
+		return new DefaultCsvWriter(writer);
 	}
 	
 	
 }
 
+
+
+/**
+ * This is default reader for reading CSV file.
+ * 
+ * @author Loc Nguyen
+ * @version 12.0
+ *
+ */
+class DefaultCsvReader implements CsvReader {
+
+	
+	/**
+	 * Internal reader
+	 */
+	protected com.csvreader.CsvReader csvReader = null;
+	
+	
+	/**
+	 * Constructor with reader.
+	 * @param reader specified reader.
+	 */
+	public DefaultCsvReader(Reader reader) {
+		csvReader = new com.csvreader.CsvReader(reader);
+	}
+	
+	
+	@Override
+	public boolean readHeader() throws IOException {
+		// TODO Auto-generated method stub
+		return csvReader.readHeaders();
+	}
+	
+	
+	@Override
+	public String[] getHeader() throws IOException {
+		// TODO Auto-generated method stub
+		return csvReader.getHeaders();
+	}
+
+	
+	@Override
+	public boolean readRecord() throws IOException {
+		// TODO Auto-generated method stub
+		return csvReader.readRecord();
+	}
+	
+	
+	@Override
+	public String[] getRecord() throws IOException {
+		// TODO Auto-generated method stub
+		return csvReader.getValues();
+	}
+	
+	
+	@Override
+	public void close() {
+		// TODO Auto-generated method stub
+		if (csvReader == null) return;
+		
+		try {
+			csvReader.close();
+		} catch (Throwable e) {e.printStackTrace();}
+		csvReader = null;
+	}
+
+
+	@Override
+	protected void finalize() throws Throwable {
+		// TODO Auto-generated method stub
+		super.finalize();
+		
+		try {
+			close();
+		} catch (Throwable e) {e.printStackTrace();}
+	}
+
+
+}
+
+
+
+/**
+ * This is default writer for writing CSV file.
+ * 
+ * @author Loc Nguyen
+ * @version 12.0
+ *
+ */
+class DefaultCsvWriter implements CsvWriter {
+	
+	
+	/**
+	 * Internal CSV writer.
+	 */
+	protected com.csvreader.CsvWriter csvWriter = null;
+
+	
+	/**
+	 * Constructor with writer.
+	 * @param writer specified writer.
+	 */
+	public DefaultCsvWriter(Writer writer) {
+		csvWriter = new com.csvreader.CsvWriter(writer, FlatProviderAssoc.DELIMITER);
+	}
+	
+	
+//	@Override
+//	public void write(String column) throws IOException {
+//		// TODO Auto-generated method stub
+//		csvWriter.write(column);
+//	}
+	
+	
+	@Override
+	public void writeRecord(String[] record) throws IOException {
+		// TODO Auto-generated method stub
+		csvWriter.writeRecord(record);
+	}
+
+	
+	@Override
+	public void close() {
+		// TODO Auto-generated method stub
+		if (csvWriter == null) return;
+		
+		try {
+			csvWriter.close();
+		} catch (Throwable e) {e.printStackTrace();}
+		csvWriter = null;
+	}
+
+	
+	@Override
+	protected void finalize() throws Throwable {
+		// TODO Auto-generated method stub
+		super.finalize();
+		
+		try {
+			close();
+		} catch (Throwable e) {e.printStackTrace();}
+	}
+
+
+}
 
 
 /**
@@ -1052,6 +1146,8 @@ class ExcelReader implements CsvReader {
 	@Override
 	public void close() {
 		// TODO Auto-generated method stub
+		if (workbook == null) return;
+		
 		reset();
 
 		if (workbook != null) workbook.close();
@@ -1070,4 +1166,15 @@ class ExcelReader implements CsvReader {
 	}
 	
 	
+	@Override
+	protected void finalize() throws Throwable {
+		// TODO Auto-generated method stub
+		super.finalize();
+		
+		try {
+			close();
+		} catch (Throwable e) {e.printStackTrace();}
+	}
+
+
 }
