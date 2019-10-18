@@ -295,10 +295,11 @@ public interface ProviderAssoc extends AutoCloseable {
 		
 		/**
 		 * Writing the specified record into CSV file.
-		 * @param record record (row) to be written. 
+		 * @param record record (row) to be written.
+		 * @return whether writing is successful. 
 		 * @throws IOException if any error raises.
 		 */
-		void writeRecord(String[] record) throws IOException;
+		boolean writeRecord(String[] record) throws IOException;
 		
 		/**
 		 * Close this writer.

@@ -8,6 +8,8 @@
 package net.hudup.core.factory;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.Reader;
 import java.io.Writer;
 import java.text.SimpleDateFormat;
@@ -17,6 +19,11 @@ import java.util.List;
 import jxl.Cell;
 import jxl.Sheet;
 import jxl.Workbook;
+import jxl.write.DateTime;
+import jxl.write.Label;
+import jxl.write.WritableCell;
+import jxl.write.WritableSheet;
+import jxl.write.WritableWorkbook;
 import net.hudup.core.Constants;
 import net.hudup.core.Util;
 import net.hudup.core.data.Attribute;
@@ -865,9 +872,24 @@ class FlatProviderAssoc extends ProviderAssocAbstract {
 		xURI unitURI = getUnitUri(unit);
 		if (unitURI == null || !adapter.exists(unitURI))
 			return null;
-
-		Reader reader = adapter.getReader(unitURI);
-		return new DefaultCsvReader(reader);
+		
+		String ext = unitURI.getLastNameExtension();
+		if (ext == null || ext.isEmpty())
+			return new DefaultCsvReader(adapter.getReader(unitURI));
+		else if (ext.toLowerCase().equals("xls")) {
+			InputStream is = adapter.getInputStream(unitURI);
+			if (is == null) return null;
+			
+			try {
+				Workbook workbook = Workbook.getWorkbook(is);
+				is.close();
+				return new ExcelReader(workbook);
+			} catch (Throwable e) {e.printStackTrace();}
+			return null;
+		}
+		else
+			return new DefaultCsvReader(adapter.getReader(unitURI));
+			
 	}
 	
 	
@@ -882,8 +904,17 @@ class FlatProviderAssoc extends ProviderAssocAbstract {
 		if (unitURI == null || !adapter.exists(unitURI))
 			return null;
 		
-		Writer writer = adapter.getWriter(unitURI, append);
-		return new DefaultCsvWriter(writer);
+		String ext = unitURI.getLastNameExtension();
+		if (ext == null || ext.isEmpty())
+			return new DefaultCsvWriter(adapter.getWriter(unitURI, append));
+		else if (ext.toLowerCase().equals("xls")) {
+			String scheme = unitURI.getScheme();
+			if (scheme == null || scheme.isEmpty() || !scheme.equals("file"))
+				return new DefaultCsvWriter(adapter.getWriter(unitURI, append));
+			return new DefaultCsvWriter(adapter.getWriter(unitURI, append));
+		}
+		else
+			return new DefaultCsvWriter(adapter.getWriter(unitURI, append));
 	}
 	
 	
@@ -1004,9 +1035,10 @@ class DefaultCsvWriter implements CsvWriter {
 	
 	
 	@Override
-	public void writeRecord(String[] record) throws IOException {
+	public boolean writeRecord(String[] record) throws IOException {
 		// TODO Auto-generated method stub
 		csvWriter.writeRecord(record);
+		return true;
 	}
 
 	
@@ -1076,6 +1108,15 @@ class ExcelReader implements CsvReader {
 	protected String[] currentProfile = null;
 	
 	
+	/**
+	 * Constructor with specified workbook.
+	 * @param workbook specified workbook.
+	 */
+	public ExcelReader(Workbook workbook) {
+		this.workbook = workbook;
+	}
+	
+	
 	@Override
 	public boolean readHeader() throws IOException {
 		// TODO Auto-generated method stub
@@ -1090,17 +1131,10 @@ class ExcelReader implements CsvReader {
 			sheet = null;
 		}
 		if (sheet == null) return false;
-		int n = sheet.getColumns();
-		if (n == 0) return false;
+		if (sheet.getColumns() == 0) return false;
 		
 		currentRow = 0;
-		attList = new AttributeList();
-		for (int j = 0; j < n; j++) {
-			Cell cell = sheet.getCell(j, currentRow);
-			Attribute att = new Attribute();
-			att.parseText(cell.getContents());
-			attList.add(att);
-		}
+		attList = extractAttributeList(sheet);
 		return true;
 	}
 
@@ -1163,6 +1197,196 @@ class ExcelReader implements CsvReader {
 		attList = null;
 		currentRow = -1;
 		currentProfile = null;
+	}
+	
+	
+	@Override
+	protected void finalize() throws Throwable {
+		// TODO Auto-generated method stub
+		super.finalize();
+		
+		try {
+			close();
+		} catch (Throwable e) {e.printStackTrace();}
+	}
+
+
+	/**
+	 * Extracting attribute list from specified sheet.
+	 * @param sheet specified sheet.
+	 * @return attribute list extracted from specified sheet.
+	 */
+	static AttributeList extractAttributeList(Sheet sheet) {
+		int n = sheet.getColumns();
+		AttributeList attList = new AttributeList();
+		for (int j = 0; j < n; j++) {
+			Cell cell = sheet.getCell(j, 0);
+			Attribute att = new Attribute();
+			att.parseText(cell.getContents());
+			attList.add(att);
+		}
+		
+		return attList;
+	}
+	
+	
+}
+
+
+
+/**
+ * This is writer for writing Excel file.
+ * 
+ * @author Loc Nguyen
+ * @version 12.0
+ *
+ */
+class ExcelWriter implements CsvWriter {
+
+	
+	/**
+	 * Writable workbook.
+	 */
+	protected WritableWorkbook workbook = null;
+	
+	
+	/**
+	 * Writable sheet.
+	 */
+	protected WritableSheet sheet = null;
+	
+	
+	/**
+	 * Attribute list.
+	 */
+	protected AttributeList attList = null;
+
+	
+	/**
+	 * Current row.
+	 */
+	protected int currentRow = -1;
+
+	
+	/**
+	 * Output stream.
+	 */
+	protected OutputStream os = null;
+	
+	
+	/**
+	 * Constructor with specified workbook.
+	 * @param workbook specified workbook.
+	 * @param append append mode.
+	 */
+	public ExcelWriter(WritableWorkbook workbook, boolean append) {
+		this(workbook, append, null);
+	}
+	
+	
+	/**
+	 * Constructor with specified workbook and attribute list.
+	 * @param workbook specified workbook.
+	 * @param append append mode.
+	 * @param attList specified attribute list.
+	 */
+	public ExcelWriter(WritableWorkbook workbook, boolean append, AttributeList attList) {
+		this.workbook = workbook;
+		if (workbook.getNumberOfSheets() > 0)
+			this.sheet = workbook.getSheet(0);
+		else
+			this.sheet = workbook.createSheet("First", 0);
+		
+		if (attList == null)
+			this.attList = ExcelReader.extractAttributeList(this.sheet);
+		else
+			this.attList = attList;
+		
+		if (append)
+			this.currentRow = this.sheet.getRows() - 1;
+		else
+			this.currentRow = -1;
+		this.currentRow = this.currentRow < 0 ? -1 : this.currentRow; 
+	}
+	
+	
+	@Override
+	public boolean writeRecord(String[] record) throws IOException {
+		// TODO Auto-generated method stub
+		if (this.sheet == null || record == null || record.length == 0)
+			return false;
+		
+		this.currentRow ++;
+		for (int j = 0; j < record.length; j++) {
+			WritableCell cell = createCell(record[j], this.currentRow, j);
+			try {
+				sheet.addCell(cell);
+			} catch (Throwable e) {e.printStackTrace();}
+		}
+		
+		try {
+			this.workbook.write();
+			if (this.currentRow == 0)
+				this.attList = ExcelReader.extractAttributeList(this.sheet);
+			return true;
+		}
+		catch (Throwable e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
+
+	
+	/**
+	 * Creating cell with specified string value.
+	 * @param svalue specified string value.
+	 * @param row specified row.
+	 * @param column specified column.
+	 * @return cell with specified string value.
+	 */
+	private WritableCell createCell(String svalue, int row, int column) {
+		if (svalue == null) return null;
+		if (attList == null || attList.size() == 0 || attList.size() <= column)
+			return new Label(column, row, svalue);
+		
+		Attribute att = attList.get(column);
+		if (att.isNumber()) {
+			try {
+				return new jxl.write.Number(column, row, Double.parseDouble(svalue));
+			} catch (Throwable e) {e.printStackTrace();}
+			return new Label(column, row, svalue);
+		}
+		else if (att.getType() == Type.date) {
+			try {
+				SimpleDateFormat df = new SimpleDateFormat(Constants.DATE_FORMAT);
+				return new DateTime(column, row, df.parse(svalue));
+			} catch (Throwable e) {e.printStackTrace();}
+			return new Label(column, row, svalue);
+		}
+		else
+			return new Label(column, row, svalue);
+	}
+	
+	
+	@Override
+	public void close() {
+		// TODO Auto-generated method stub
+		if (workbook != null) {
+			try {
+				workbook.close();
+			} catch (Throwable e) {e.printStackTrace();}
+		}
+		workbook = null;
+		
+		if (os != null) {
+			try {
+				os.close();
+			} catch (Throwable e) {e.printStackTrace();}
+		}
+		os = null;
+
+		attList = null;
+		currentRow = -1;
 	}
 	
 	
