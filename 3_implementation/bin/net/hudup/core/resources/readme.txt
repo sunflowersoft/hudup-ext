@@ -2,15 +2,10 @@
 
                                      --------------------
 
-Owners:
-       Prof. Dr. Bich-Ngoc Tran, Loc Nguyen's Academic Network, Vietnam
-       Prof. Dr. Thu-Hang Thi Ho, Vinh Long General Hospital, Vietnam
+Author and owner:
+       Prof. Dr. Loc Nguyen, Loc Nguyen's Academic Network, Vietnam
 
-Authors:
-       Prof. Dr. Loc Nguyen
-       Prof. Dr. Minh-Phung Thi Do
-
-	   
+   
 --------------------
 Hudup product is the recommender framework dedicated to scientists and software developers who create or deploy recommendation solutions and algorithms in e-commerce and e-learning.
 
