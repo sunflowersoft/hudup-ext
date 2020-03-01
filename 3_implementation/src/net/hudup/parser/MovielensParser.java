@@ -7,13 +7,17 @@
  */
 package net.hudup.parser;
 
+import java.awt.Component;
 import java.io.BufferedReader;
+import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+
+import javax.swing.JOptionPane;
 
 import net.hudup.core.Constants;
 import net.hudup.core.Util;
@@ -61,6 +65,33 @@ public class MovielensParser extends SnapshotParser {
 
 	
 	/**
+	 * Movielens type field name.
+	 */
+	protected static final String MOVIELENS_TYPE_FIELD = "type";
+	
+	
+	/**
+	 * Movielens 100K type.
+	 */
+	public static final String MOVIELENS_TYPE_100K = "100k";
+
+	
+	/**
+	 * Movielens 1M type.
+	 */
+	public static final String MOVIELENS_TYPE_1M = "1m";
+
+
+	/**
+	 * Array of supported Movielens types.
+	 */
+	public static final String[] MOVIELENS_TYPES_SUPPORTED = {
+		MOVIELENS_TYPE_100K,
+		MOVIELENS_TYPE_1M,
+	};
+	
+	
+	/**
 	 * Default constructor.
 	 */
 	public MovielensParser() {
@@ -79,12 +110,14 @@ public class MovielensParser extends SnapshotParser {
 		MemProfiles items = MemProfiles.createEmpty();
 
 		Properties props = DatasetUtil2.loadFlatConfig(config);
-		String type = props.getProperty("type").toLowerCase();
-		if (type.equalsIgnoreCase("100k")) {
+		String type = props.getProperty(MOVIELENS_TYPE_FIELD);
+		type = type != null ? type : getConfig().getAsString(MOVIELENS_TYPE_FIELD);
+		type = type != null ? type : MOVIELENS_TYPE_100K;
+		if (type.equalsIgnoreCase(MOVIELENS_TYPE_100K)) {
 			users = load100KUserProfiles(config);
 			items = load100KItemProfiles(config);
 		}
-		else if (type.equalsIgnoreCase("1m")) {
+		else if (type.equalsIgnoreCase(MOVIELENS_TYPE_1M)) {
 			users = load1MUserProfiles(config);
 			items = load1MItemProfiles(config);
 		}
@@ -97,11 +130,19 @@ public class MovielensParser extends SnapshotParser {
 			items = MemProfiles.createEmpty(DataConfig.ITEMID_FIELD, Type.integer);
 		items.fillAs(itemRatingMap.keySet());
 		
-		double minRating = Double.parseDouble(props.getProperty(DataConfig.MIN_RATING_FIELD));
-		double maxRating = Double.parseDouble(props.getProperty(DataConfig.MAX_RATING_FIELD));
+		double minRating = DataConfig.MIN_RATING_DEFAULT;
+		double maxRating = DataConfig.MAX_RATING_DEFAULT;
+		try {
+			minRating = Double.parseDouble(props.getProperty(DataConfig.MIN_RATING_FIELD));
+			maxRating = Double.parseDouble(props.getProperty(DataConfig.MAX_RATING_FIELD));
+		}
+		catch (Throwable e) {
+			minRating = Constants.UNUSED;
+			maxRating = Constants.UNUSED;
+		}
 		DatasetMetadata metadata = this.config.getMetadata();
-		metadata.minRating = minRating;
-		metadata.maxRating = maxRating;
+		metadata.minRating = Util.isUsed(minRating) ? minRating : DataConfig.MIN_RATING_DEFAULT;
+		metadata.maxRating = Util.isUsed(maxRating) ? maxRating : DataConfig.MAX_RATING_DEFAULT;
 		config.setMetadata(metadata);
 		
 		SnapshotImpl dataset = new SnapshotImpl();
@@ -244,14 +285,17 @@ public class MovielensParser extends SnapshotParser {
 		UriAdapter adapter = null;
 		BufferedReader reader = null;
 		MemProfiles memProfiles = MemProfiles.createEmpty();
+		if (config.getUserUnit() == null) return memProfiles;
 		
 		try {
 			adapter = new UriAdapter(config);
 			xURI store = config.getStoreUri();
 			
-			xURI nominalUri = store.concat(config.getNominalUnit());
-			Map<String, Attribute> attributeMap = 
-					DatasetUtil2.loadNominalAttributes(adapter, nominalUri, config.getUserUnit());
+			Map<String, Attribute> attributeMap = Util.newMap();
+			if (config.getNominalUnit() != null) {
+				xURI nominalUri = store.concat(config.getNominalUnit());
+				attributeMap = DatasetUtil2.loadNominalAttributes(adapter, nominalUri, config.getUserUnit());
+			}
 			
 			Attribute userid = new Attribute(DataConfig.USERID_FIELD, Type.integer);
 
@@ -274,8 +318,7 @@ public class MovielensParser extends SnapshotParser {
 			
 			final Map<Integer, Profile> profileMap = Util.newMap();
 			
-			String usersUnit = config.getUserUnit();
-			xURI usersUri = store.concat(usersUnit);
+			xURI usersUri = store.concat(config.getUserUnit());
 			reader = new BufferedReader(adapter.getReader(usersUri));
 			
 			DSUtil.lineProcess(reader, new LineProcessor() {
@@ -331,14 +374,17 @@ public class MovielensParser extends SnapshotParser {
 		UriAdapter adapter = null;
 		BufferedReader reader = null;
 		MemProfiles memProfiles = MemProfiles.createEmpty();
+		if (config.getUserUnit() == null) return memProfiles;
 
 		try {
 			adapter = new UriAdapter(config);
 			xURI store = config.getStoreUri();
 			
-			xURI nominalUri = store.concat(config.getNominalUnit());
-			Map<String, Attribute> attributeMap = 
-					DatasetUtil2.loadNominalAttributes(adapter, nominalUri, config.getUserUnit());
+			Map<String, Attribute> attributeMap = Util.newMap();
+			if (config.getNominalUnit() != null) {
+				xURI nominalUri = store.concat(config.getNominalUnit());
+				attributeMap = DatasetUtil2.loadNominalAttributes(adapter, nominalUri, config.getUserUnit());
+			}
 			
 			Attribute userid = new Attribute(DataConfig.USERID_FIELD, Type.integer);
 
@@ -360,8 +406,7 @@ public class MovielensParser extends SnapshotParser {
 					new Attribute[] {userid, age, gender, occupation, zipcode});
 			final Map<Integer, Profile> profileMap = Util.newMap();
 
-			String usersUnit = config.getUserUnit();
-			xURI usersUri = store.concat(usersUnit);
+			xURI usersUri = store.concat(config.getUserUnit());
 			reader = new BufferedReader(adapter.getReader(usersUri));
 			
 			DSUtil.lineProcess(reader, new LineProcessor() {
@@ -419,6 +464,7 @@ public class MovielensParser extends SnapshotParser {
 		UriAdapter adapter = null;
 		BufferedReader reader = null;
 		MemProfiles memProfiles = MemProfiles.createEmpty();
+		if (config.getItemUnit() == null) return memProfiles;
 		
 		try {
 			
@@ -482,8 +528,7 @@ public class MovielensParser extends SnapshotParser {
 			adapter = new UriAdapter(config);
 			
 			xURI store = config.getStoreUri();
-			String itemsUnit = config.getItemUnit();
-			xURI itemsUri = store.concat(itemsUnit);
+			xURI itemsUri = store.concat(config.getItemUnit());
 			reader = new BufferedReader(adapter.getReader(itemsUri));
 
 			DSUtil.lineProcess(reader, new LineProcessor() {
@@ -562,6 +607,7 @@ public class MovielensParser extends SnapshotParser {
 		UriAdapter adapter = null;
 		BufferedReader reader = null;
 		MemProfiles memProfiles = MemProfiles.createEmpty();
+		if (config.getItemUnit() == null) return memProfiles;
 
 		try {
 			
@@ -633,8 +679,7 @@ public class MovielensParser extends SnapshotParser {
 			adapter = new UriAdapter(config);
 			
 			xURI store = config.getStoreUri();
-			String itemsUnit = config.getItemUnit();
-			xURI itemsUri = store.concat(itemsUnit);
+			xURI itemsUri = store.concat(config.getItemUnit());
 			reader = new BufferedReader(adapter.getReader(itemsUri));
 
 			DSUtil.lineProcess(reader, new LineProcessor() {
@@ -717,6 +762,45 @@ public class MovielensParser extends SnapshotParser {
 	public Alg newInstance() {
 		// TODO Auto-generated method stub
 		return new MovielensParser();
+	}
+
+
+	@Override
+	public DataConfig createDefaultConfig() {
+		// TODO Auto-generated method stub
+		DataConfig tempConfig = super.createDefaultConfig();
+		tempConfig.put(MOVIELENS_TYPE_FIELD, MOVIELENS_TYPE_100K);
+
+		DataConfig config = new DataConfig() {
+
+			/**
+			 * Serial version UID for serializable class. 
+			 */
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public Serializable userEdit(Component comp, String key, Serializable defaultValue) {
+				// TODO Auto-generated method stub
+				if (key.equals(MOVIELENS_TYPE_FIELD)) {
+					String type = getAsString(MOVIELENS_TYPE_FIELD);
+					type = type == null ? MOVIELENS_TYPE_100K : type;
+					return (Serializable) JOptionPane.showInputDialog(
+							comp, 
+							"Please choose one Movielens type", 
+							"Choosing Movielens type", 
+							JOptionPane.INFORMATION_MESSAGE, 
+							null, 
+							MOVIELENS_TYPES_SUPPORTED, 
+							type);
+				}
+				else 
+					return tempConfig.userEdit(comp, key, defaultValue);
+			}
+			
+		};
+		
+		config.putAll(tempConfig);
+		return config;
 	}
 
 	
