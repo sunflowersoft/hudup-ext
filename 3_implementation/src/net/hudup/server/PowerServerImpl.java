@@ -7,7 +7,6 @@
  */
 package net.hudup.server;
 
-import java.net.URL;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -125,7 +124,6 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 	 * Constructor with specified configuration.
 	 * @param config specified configuration.
 	 */
-	@SuppressWarnings("deprecation")
 	public PowerServerImpl(PowerServerConfig config) {
 		super();
 		
@@ -136,17 +134,7 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 			this.trans = createTransaction();
 			this.gateway = new GatewayImpl(this);		
 			
-			URL policyUrl = getClass().getResource(SERVER_POLICY);
-			if (policyUrl != null) {
-				System.setProperty("java.security.policy", policyUrl.toString());
-				if (System.getSecurityManager() == null) {
-					int version = SystemUtil.getJavaVersion();
-					if (version <= 8)
-						System.setSecurityManager(new java.rmi.RMISecurityManager());
-					else
-						System.setSecurityManager(new SecurityManager());
-				}
-			}
+			SystemUtil.setSecurityPolicy(getClass().getResource(SERVER_POLICY));
 			
 			int port = NetUtil.getPort(this.config.getServerPort(), Constants.TRY_RANDOM_PORT);
 			if (port < 0)

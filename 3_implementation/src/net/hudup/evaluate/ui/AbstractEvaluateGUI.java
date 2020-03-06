@@ -24,6 +24,7 @@ import net.hudup.core.alg.Recommender;
 import net.hudup.core.alg.SetupAlgListener;
 import net.hudup.core.evaluate.Evaluator;
 import net.hudup.core.evaluate.EvaluatorAbstract;
+import net.hudup.core.evaluate.EvaluatorConfig;
 import net.hudup.core.evaluate.EvaluatorListener;
 import net.hudup.core.evaluate.EvaluatorProgressListener;
 import net.hudup.core.evaluate.Metric;
@@ -125,7 +126,7 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	/**
 	 * Constructor with specified evaluator.
 	 * @param evaluator specified evaluator.
-	 * @param bindUri bound URI.
+	 * @param bindUri bound URI. If this parameter is null, evaluator is local.
 	 */
 	public AbstractEvaluateGUI(Evaluator evaluator, xURI bindUri) {
 		this.bindUri = bindUri;
@@ -138,12 +139,15 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 		}
 		else { //Evaluator is local
 			try {
-				int evaluatorPort = evaluator.getConfig().getEvaluatorPort();
-				evaluatorPort = NetUtil.getPort(evaluatorPort, true);
-				
-				evaluator.export(evaluatorPort);
-				
-				evaluator.getConfig().setEvaluatorPort(evaluatorPort);
+				EvaluatorConfig config = evaluator.getConfig();
+				if (!config.isStandalone()) { //Evaluator is non-standalone.
+					int evaluatorPort = config.getEvaluatorPort();
+					evaluatorPort = NetUtil.getPort(evaluatorPort, true);
+					
+					evaluator.export(evaluatorPort);
+					
+					config.setEvaluatorPort(evaluatorPort);
+				}
 			} catch (Throwable e) {e.printStackTrace();}
 		}
 
@@ -326,26 +330,29 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	 * Dispose this GUI.
 	 */
 	public void dispose() {
+		stop();
+		clear();
+		closeIOChannels();
+
+		unsetupListeners(this.evaluator);
+		
 		try {
-			stop();
-			clear();
-			closeIOChannels();
-	
-			unsetupListeners(this.evaluator);
-			
-			this.evaluator.close(); //The close() method also unexports evaluator.
-			
-			if (this.exportedStub != null) {
-				boolean ret = NetUtil.RegistryRemote.unexport(this);
-				if (ret)
-					LogUtil.info("Evaluator GUI unexported successfully");
-				else
-					LogUtil.info("Evaluator GUI unexported failedly");
-				this.exportedStub = null;
-			}
+			if (bindUri != null) //Evaluator is remote.
+				this.evaluator.close(); //The close() method also unexports evaluator.
+			else if (!this.evaluator.getConfig().isStandalone()) //Evaluator is local and non-standalone.
+				this.evaluator.close(); //The close() method also unexports evaluator.
 		}
 		catch (Exception e) {
 			e.printStackTrace();
+		}
+			
+		if (this.exportedStub != null) {
+			boolean ret = NetUtil.RegistryRemote.unexport(this);
+			if (ret)
+				LogUtil.info("Evaluator GUI unexported successfully");
+			else
+				LogUtil.info("Evaluator GUI unexported failedly");
+			this.exportedStub = null;
 		}
 	}
 	

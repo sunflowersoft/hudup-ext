@@ -28,7 +28,6 @@ import net.hudup.core.alg.AlgDesc2;
 import net.hudup.core.alg.AlgRemote;
 import net.hudup.core.alg.SetupAlgEvent;
 import net.hudup.core.alg.SetupAlgListener;
-import net.hudup.core.alg.SupportCacheAlg;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.DatasetPair;
@@ -180,7 +179,17 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 	 */
 	public EvaluatorAbstract() {
 		try {
-			this.config = new EvaluatorConfig(xURI.create(EvaluatorConfig.evalConfig));
+			String evalconfigPath = Constants.WORKING_DIRECTORY + "/" +
+					(EvaluatorConfig.EVALCONFIG_FILENAME_PREFIX + getName()).replaceAll("\\s", "") + "." +
+					EvaluatorConfig.EVALCONFIG_FILEEXT;
+			this.config = new EvaluatorConfig(xURI.create(evalconfigPath));
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			this.config = new EvaluatorConfig(xURI.create(EvaluatorConfig.EVALCONFIG_FILEPATH_DEFAULT));
+		}
+		
+		try {
 			this.metricList = defaultMetrics();
 			this.metricList.sort();
 		}
@@ -214,29 +223,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 		this.parameter = parameter;
 		this.result = null;
 		
-		initializeBeforeRun();
-		
 		start();
-	}
-	
-	
-	/**
-	 * Initialize before running this evaluator.
-	 */
-	protected void initializeBeforeRun() {
-		//Setting cache mode in algorithm list. Improving date: 2019.07.11 by Loc Nguyen
-		try { //Use try-catch block because this code block is not important.
-			if (this.config.containsKey(SupportCacheAlg.SUPPORT_CACHE_FIELD)) {
-				boolean cache = this.config.getAsBoolean(SupportCacheAlg.SUPPORT_CACHE_FIELD);
-				for (Alg alg : this.algList) {
-					if (alg instanceof SupportCacheAlg)
-						((SupportCacheAlg)alg).setCached(cache);
-				}
-			}
-		}
-		catch (Throwable e) {
-			LogUtil.error("Error in setting support cache mode");
-		}
 	}
 	
 	

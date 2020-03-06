@@ -95,7 +95,7 @@ public class PluginStorageManifest extends SortableSelectableTable {
 
     
     /**
-     * Exported port.
+     * Exported port. This port is used to export algorithms.
      */
     protected int port = 0;
     
@@ -516,7 +516,7 @@ public class PluginStorageManifest extends SortableSelectableTable {
 			JPanel body = new JPanel(new BorderLayout());
 			add(body, BorderLayout.CENTER);
 			
-			tblRegister = new PluginStorageManifest(listener.getPort() < 0 ? 0 : listener.getPort());
+			tblRegister = new PluginStorageManifest(listener == null || listener.getPort() < 0 ? 0 : listener.getPort());
 			if (listener != null)
 				tblRegister.addPluginChangedListener(listener);
 			body.add(new JScrollPane(tblRegister), BorderLayout.CENTER);

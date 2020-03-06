@@ -30,10 +30,22 @@ public class EvaluatorConfig extends SysConfig {
 
 	
 	/**
+	 * Default file name of evaluator configuration.
+	 */
+	public final static String EVALCONFIG_FILENAME_PREFIX = "evalconfig";
+
+	
+	/**
+	 * Default file name extension of evaluator configuration.
+	 */
+	public final static String EVALCONFIG_FILEEXT = "xml";
+
+	
+	/**
 	 * Default path including directory and file name to store evaluator configuration.
 	 * By default, it is &quot;&lt;directory to deploy Hudup framework&gt;/working/evalconfig.xml&quot;.
 	 */
-	public final static String evalConfig = Constants.WORKING_DIRECTORY + "/evalconfig.xml";
+	public final static String EVALCONFIG_FILEPATH_DEFAULT = Constants.WORKING_DIRECTORY + "/" + EVALCONFIG_FILENAME_PREFIX + "." + EVALCONFIG_FILEEXT;
 
 	
 	/**
@@ -46,6 +58,18 @@ public class EvaluatorConfig extends SysConfig {
 	 * By default, do not recommend all items.
 	 */
 	public final static boolean RECOMMEND_ALL_DEFAULT = false;
+
+	
+	/**
+	 * This constant specifies standalone field. If standalone mode is true, no GUI can close evaluator.
+	 */
+	public final static String EVALUATOR_STANDALONE_FIELD = changeCase("evaluator_standalone");
+
+	
+	/**
+	 * By default, standalone field is false. If standalone mode is true, no GUI can close evaluator.
+	 */
+	public final static boolean EVALUATOR_STANDALONE_DEFAULT = false;
 
 	
 	/**
@@ -73,6 +97,7 @@ public class EvaluatorConfig extends SysConfig {
 		
 		setRecommendAll(RECOMMEND_ALL_DEFAULT);
 		setEvaluatorPort(Constants.DEFAULT_EVALUATOR_PORT);
+		setStandalone(EVALUATOR_STANDALONE_DEFAULT);
 	}
 
 	
@@ -119,6 +144,24 @@ public class EvaluatorConfig extends SysConfig {
 		cfg.putAll(this);
 		
 		return cfg;
+	}
+
+
+	/**
+	 * Checking whether standalone mode is true. If standalone mode is true, no GUI can close evaluator. 
+	 * @return whether standalone mode is true.
+	 */
+	public boolean isStandalone() {
+		return getAsBoolean(EVALUATOR_STANDALONE_FIELD);
+	}
+	
+	
+	/**
+	 * Setting whether standalone mode is true. If standalone mode is true, no GUI can close evaluator.
+	 * @param standalone standalone mode.
+	 */
+	public void setStandalone(boolean standalone) {
+		put(EVALUATOR_STANDALONE_FIELD, standalone);
 	}
 
 

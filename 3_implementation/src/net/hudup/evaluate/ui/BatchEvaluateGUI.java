@@ -243,40 +243,96 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 
 	
 	/**
-	 * Constructor with specified evaluator.
+	 * Constructor with specified evaluator and bound URI.
 	 * @param evaluator specified evaluator.
 	 * @param bindUri bound URI.
 	 */
 	public BatchEvaluateGUI(Evaluator evaluator, xURI bindUri) {
 		super(evaluator, bindUri);
-		
-		RegisterTable algRegTable = null;
-		try {
-			algRegTable = EvaluatorAbstract.extractAlgFromPluginStorage(evaluator);
+		init(evaluator, bindUri, null);
+	}
+
+	
+	/**
+	 * Constructor with specified evaluator, bound URI, and GUI data.
+	 * @param evaluator specified evaluator.
+	 * @param bindUri bound URI.
+	 * @param data GUI parameter.
+	 */
+	public BatchEvaluateGUI(Evaluator evaluator, xURI bindUri, EvaluateGUIData data) {
+		super(evaluator, bindUri);
+		// TODO Auto-generated constructor stub
+		init(evaluator, bindUri, data);
+	}
+
+	
+	/**
+	 * Initializing the evaluator batch GUI with specified evaluator, bound URI, and GUI data.
+	 * @param evaluator specified evaluator.
+	 * @param bindUri bound URI.
+	 * @param data GUI parameter.
+	 */
+	private void init(Evaluator evaluator, xURI bindUri, EvaluateGUIData data) {
+		if (data == null) {
+			RegisterTable algRegTable = null;
+			try {
+				algRegTable = EvaluatorAbstract.extractAlgFromPluginStorage(evaluator);
+			}
+			catch (Throwable e) {
+				e.printStackTrace();
+				algRegTable = null;
+			}
+			
+			if (algRegTable == null) return;
+			
+			this.algRegTable.register(algRegTable.getAlgList()); //Algorithms are not cloned because of saving memory when evaluator GUI keep algorithms for a long time. 
+			
+			this.pool = new DatasetPool();
+			
+			setLayout(new BorderLayout(2, 2));
+			
+			JPanel header = createHeader();
+			add(header, BorderLayout.NORTH);
+			
+			JPanel body = createBody();
+			add(body, BorderLayout.CENTER);
+			
+			JPanel footer = createFooter();
+			add(footer, BorderLayout.SOUTH);
+			
+			setVerbal(false);
 		}
-		catch (Throwable e) {
-			e.printStackTrace();
-			algRegTable = null;
+		else {
+			this.result = data.result;
+			
+			this.algRegTable = data.algRegTable;
+			
+			this.pool = data.pool;
+			
+			setLayout(new BorderLayout(2, 2));
+			
+			JPanel header = createHeader();
+			add(header, BorderLayout.NORTH);
+			this.tblDatasetPool.update(data.pool);
+					
+			JPanel body = createBody();
+			add(body, BorderLayout.CENTER);
+			this.txtRunSaveBrowse.setText(data.txtRunSaveBrowse);
+			this.chkRunSave.setSelected(data.chkRunSave);
+			this.prgRunning.setValue(data.prgRunning[0]);
+			this.prgRunning.setMaximum(data.prgRunning[1]);
+			
+			JPanel footer = createFooter();
+			add(footer, BorderLayout.SOUTH);
+			this.tblMetrics.update(data.result);
+			this.statusBar.setTexts(data.statusBar);
+			this.paneWait.setWaitText(data.paneWait);
+			
+			setVerbal(data.chkVerbal);
+
+			updateMode();
+			updateGUI();
 		}
-		
-		if (algRegTable == null) return;
-		
-		this.algRegTable.register(algRegTable.getAlgList()); //Algorithms are not cloned because of saving memory when evaluator GUI keep algorithms for a long time. 
-		
-		this.pool = new DatasetPool();
-		
-		setLayout(new BorderLayout(2, 2));
-		
-		JPanel header = createHeader();
-		add(header, BorderLayout.NORTH);
-		
-		JPanel body = createBody();
-		add(body, BorderLayout.CENTER);
-		
-		JPanel footer = createFooter();
-		add(footer, BorderLayout.SOUTH);
-		
-		setVerbal(false);
 	}
 
 	

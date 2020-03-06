@@ -12,6 +12,7 @@ import java.rmi.RemoteException;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import net.hudup.core.PluginStorage;
@@ -68,9 +69,9 @@ public class DefaultService implements Service, AutoCloseable {
 	
 	
 	/**
-	 * Evaluator configuration.
+	 * Evaluator configuration map.
 	 */
-	protected EvaluatorConfig evaluatorConfig = null;
+	protected Map<String, EvaluatorConfig> evaluatorConfigMap = Util.newMap();
 
 	
 	/**
@@ -260,24 +261,6 @@ public class DefaultService implements Service, AutoCloseable {
 		}
 	}
 
-	
-	/**
-	 * Getting evaluator configuration.
-	 * @return evaluator configuration.
-	 */
-	protected EvaluatorConfig getEvaluatorConfig() {
-		return evaluatorConfig;
-	}
-	
-	
-	/**
-	 * Setting evaluator configuration.
-	 * @param evaluatorConfig specified evaluator configuration. 
-	 */
-	protected void setEvaluatorConfig(EvaluatorConfig evaluatorConfig) {
-		this.evaluatorConfig = evaluatorConfig;
-	}
-	
 	
 	@Override
 	public RatingVector estimate(RecommendParam param, Set<Integer> queryIds) throws RemoteException {
@@ -1463,9 +1446,7 @@ public class DefaultService implements Service, AutoCloseable {
 			if (evaluator != null) {
 				evaluator.export(serverConfig.getServerPort());
 				
-				//Getting evaluator configuration here is not best solution. Update later.
-				if (this.evaluatorConfig == null)
-					this.evaluatorConfig = evaluator.getConfig();
+				this.evaluatorConfigMap.put(evaluator.getName(), evaluator.getConfig());
 			}
 		}
 		catch (Throwable e) {

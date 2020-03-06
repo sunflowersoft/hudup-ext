@@ -126,4 +126,22 @@ public abstract class SysConfig extends DataConfig {
 	}
 	
 	
+	/**
+	 * Getting store/load URI.
+	 * @return store/load URI.
+	 */
+	public String getUri() {
+		return this.uri;
+	}
+	
+	
+	/**
+	 * Setting store/load URI
+	 * @param uri store/load URI.
+	 */
+	public void setUri(String uri) {
+		this.uri = uri;
+	}
+	
+	
 }

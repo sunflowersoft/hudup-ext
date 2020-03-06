@@ -99,13 +99,24 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 	/**
 	 * Constructor with specified evaluator.
 	 * @param evaluator specified {@link EvaluatorAbstract}.
-	 * @param bindUri bound URI.
+	 * @param bindUri bound URI. If this parameter is null, evaluator is local.
 	 */
 	public EvalCompoundGUI(Evaluator evaluator, xURI bindUri) {
+		this(evaluator, bindUri, null);
+	}
+	
+	
+	/**
+	 * Constructor with specified evaluator.
+	 * @param evaluator specified {@link EvaluatorAbstract}.
+	 * @param bindUri bound URI. If this parameter is null, evaluator is local.
+	 * @param data evaluator GUI data.
+	 */
+	public EvalCompoundGUI(Evaluator evaluator, xURI bindUri, final EvaluateGUIData data) {
 		super("Evaluator GUI");
 		try {
 			this.thisConfig = evaluator.getConfig();
-			this.thisConfig.setSaveAbility(bindUri == null); //Do not save remote configuration.
+			this.thisConfig.setSaveAbility(bindUri == null && !this.thisConfig.isStandalone()); //Only save local and non-standalone evaluator.
 		}
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
@@ -122,6 +133,7 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 				super.windowClosed(e);
 //				batchEvaluateGUI.dispose(); //Calling in dispose() method instead.
 //				thisConfig.save(); //Calling in dispose() method instead.
+				if (data != null) data.active = false;
 			}
 
 		});
@@ -140,7 +152,7 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 		body = new JTabbedPane();
 		content.add(body, BorderLayout.CENTER);
 		
-		batchEvaluateGUI = new BatchEvaluateGUI(evaluator, bindUri);
+		batchEvaluateGUI = new BatchEvaluateGUI(evaluator, bindUri, data);
 		body.add(I18nUtil.message("evaluate_batch"), batchEvaluateGUI);
 		
 		setTitle(I18nUtil.message("evaluator"));
@@ -162,6 +174,7 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 			}
 		});
 		
+		if (data != null) data.active = true;
 		setVisible(true);
 	}
 	
@@ -317,8 +330,10 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 	@Override
 	public void dispose() {
 		batchEvaluateGUI.dispose();
-		thisConfig.save();
-		PluginStorage.clear();
+		if (!thisConfig.isStandalone()) {
+			thisConfig.save();
+			PluginStorage.clear();
+		}
 		super.dispose();
 	}
 
@@ -373,7 +388,7 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 			public int compare(Evaluator o1, Evaluator o2) {
 				// TODO Auto-generated method stub
 				try {
-					return o1.getName().compareTo(o2.getName());
+					return o1.getName().compareToIgnoreCase(o2.getName());
 				}
 				catch (Throwable e) {
 					// TODO Auto-generated catch block
@@ -414,7 +429,7 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 				if (oldGUI != null)
 					oldGUI.dispose();
 
-				run(ev, null, null);
+				run(ev, null, null, null);
 			}
 			
 			@Override
@@ -498,7 +513,7 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 						xURI bindUri = ConnectDlg.getBindUri();
 						
 						//ev.getPluginStorage().assignToSystem();
-						run(ev, bindUri, null);
+						run(ev, bindUri, null, null);
 					}
 					catch (Exception e) {
 						e.printStackTrace();
@@ -549,9 +564,10 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 	 * Staring the particular evaluator selected by user.
 	 * @param evaluator particular evaluator selected by user.
 	 * @param bindUri bound URI. If this parameter is null, evaluator is inside evaluator, otherwise it is remote evaluator.
+	 * @param data evaluator GUI data.
 	 * @param oldGUI old GUI.
 	 */
-	public static void run(Evaluator evaluator, xURI bindUri, Window oldGUI) {
+	public static void run(Evaluator evaluator, xURI bindUri, EvaluateGUIData data, Window oldGUI) {
 		if (!Util.getPluginManager().isFired())
 			Util.getPluginManager().fire();
 			
@@ -587,7 +603,7 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 			}
 
 			if (oldGUI != null) oldGUI.dispose();
-			new EvalCompoundGUI(evaluator, bindUri);
+			new EvalCompoundGUI(evaluator, bindUri, data);
 		}
 		catch (Exception e) {
 			// TODO Auto-generated catch block

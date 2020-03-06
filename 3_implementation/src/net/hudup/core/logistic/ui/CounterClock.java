@@ -159,10 +159,11 @@ public class CounterClock extends AbstractRunner implements Serializable {
 
 	
 	/**
-	 * clearing the text of elapsed time as empty text.
+	 * Clearing the text of elapsed time as empty text.
 	 */
 	public synchronized void clearText() {
-		txtTime.setText("");
+		if (txtTime != null)
+			txtTime.setText("");
 	}
 	
 	
@@ -180,7 +181,8 @@ public class CounterClock extends AbstractRunner implements Serializable {
 		long seconds = (timeSum % 3600) % 60;
 		String text = String.format(TIME_FORMAT, hours, minutes, seconds);
 		
-		txtTime.setText(text);
+		if (txtTime != null)
+			txtTime.setText(text);
 	}
 	
 	

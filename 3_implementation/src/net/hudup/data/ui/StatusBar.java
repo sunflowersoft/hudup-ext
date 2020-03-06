@@ -170,6 +170,35 @@ public class StatusBar extends JPanel {
 	}
 
 	
+	/**
+	 * Getting texts from all text panes.
+	 * @return texts from all text panes.
+	 */
+	public String[] getTexts() {
+		String[] texts = new String[paneList.length];
+		for (int i = 0; i < paneList.length; i++) {
+			texts[i] = paneList[i].getText();
+			texts[i] = texts[i] != null ? texts[i] : "";
+		}
+		
+		return texts;
+	}
+	
+	
+	/**
+	 * Setting texts to all text panes.
+	 * @param texts texts set to all text panes.
+	 */
+	public void setTexts(String[] texts) {
+		int n = Math.min(texts.length, paneList.length);
+		for (int i = 0; i < n; i++) {
+			String text = texts[i];
+			text = text != null ? text : "";
+			paneList[i].setText(text);
+		}
+	}
+	
+	
 }
 
 

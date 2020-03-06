@@ -17,6 +17,7 @@ import java.awt.event.ActionListener;
 import java.rmi.RemoteException;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.Collection;
 
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
@@ -109,13 +110,13 @@ public class DefaultServer extends PowerServerImpl {
 	@Override
 	@NextUpdate
 	protected void doWhenStop() {
-		//Saving evaluator configuration here is not best solution. Update later.
 		try {
-			EvaluatorConfig evaluatorConfig = service.getEvaluatorConfig();
-			if (evaluatorConfig != null) {
-				evaluatorConfig.save();
-				service.setEvaluatorConfig(null);
+			Collection<EvaluatorConfig> configs = service.evaluatorConfigMap.values();
+			for (EvaluatorConfig config : configs) {
+				if (config != null)	config.save();
 			}
+			
+			service.evaluatorConfigMap.clear();
 		}
 		catch (Throwable e) {
 			e.printStackTrace();
@@ -244,6 +245,16 @@ public class DefaultServer extends PowerServerImpl {
 			});
             popup.add(cp);
             
+            //Creating extended menu items.
+            PopupMenu extMenu = createSysTrayMenuExt();
+            if (extMenu != null && extMenu.getItemCount() > 0) {
+                popup.addSeparator();
+            	for (int i = 0; i < extMenu.getItemCount(); i++) {
+            		MenuItem menuItem = extMenu.getItem(i);
+                    popup.add(menuItem);
+            	}
+            }
+            
             popup.addSeparator();
 
             MenuItem helpContent = new MenuItem(I18nUtil.message("help_content"));
@@ -313,6 +324,15 @@ public class DefaultServer extends PowerServerImpl {
 	
 	
 	/**
+	 * Creating extended pop-up menu of system tray.
+	 * @return extended pop-up menu of system tray or null if there is no extended pop-up menu.
+	 */
+	protected PopupMenu createSysTrayMenuExt() {
+		return null;
+	}
+	
+	
+	/**
 	 * Show control panel.
 	 */
 	protected void showCP() {
@@ -356,7 +376,7 @@ public class DefaultServer extends PowerServerImpl {
 	        Image image = UIUtil.getImage("server-32x32.png");
 			int confirm = JOptionPane.showConfirmDialog(
 					null, 
-					"Server not set up yet\n Do you want to setup server?", 
+					"Server not set up yet.\n Do you want to setup server?", 
 					"Setup server", 
 					JOptionPane.OK_CANCEL_OPTION, 
 					JOptionPane.INFORMATION_MESSAGE, 

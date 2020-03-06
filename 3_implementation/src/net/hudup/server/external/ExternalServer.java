@@ -123,7 +123,7 @@ public class ExternalServer extends DefaultServer {
 	        Image image = UIUtil.getImage("server-32x32.png");
 			int confirm = JOptionPane.showConfirmDialog(
 					null, 
-					"External server not set up yet\n Do you want to setup server?", 
+					"External server not set up yet.\n Do you want to setup server?", 
 					"Setup external server", 
 					JOptionPane.OK_CANCEL_OPTION, 
 					JOptionPane.INFORMATION_MESSAGE, 

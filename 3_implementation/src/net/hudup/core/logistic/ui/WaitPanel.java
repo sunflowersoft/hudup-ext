@@ -64,4 +64,14 @@ public class WaitPanel extends JPanel implements Serializable {
 	}
 	
 	
+	/**
+	 * Getting waiting text.
+	 * @return waiting text.
+	 */
+	public String getWaitText() {
+		String text = lblWait.getText();
+		return text != null ? text : "";
+	}
+	
+	
 }
