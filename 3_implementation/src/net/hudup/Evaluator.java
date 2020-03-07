@@ -93,7 +93,7 @@ public class Evaluator implements AccessPoint {
 		}
 		
 		if (args.length < 2) {
-			EvalCompoundGUI.run(ev, null, null);
+			EvalCompoundGUI.run(ev, null, null, null);
 			return;
 		}
 		

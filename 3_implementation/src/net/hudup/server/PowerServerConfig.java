@@ -83,6 +83,18 @@ public class PowerServerConfig extends ServerConfig {
 
 	
 	/**
+	 * Flag field to indicate empty dataset.
+	 */
+	public final static String DATASET_EMPTY_FIELD = changeCase("dataset_empty");
+
+	
+	/**
+	 * By default, dataset is not empty.
+	 */
+	public final static boolean DATASET_EMPTY_DEFAULT = false;
+
+	
+	/**
 	 * Default constructor.
 	 */
 	public PowerServerConfig() {
@@ -118,6 +130,7 @@ public class PowerServerConfig extends ServerConfig {
 			setParser(new SemiScannerParser());
 		}
 		setRecommenderPeriodLearn(RECOMMENDER_PERIOD_LEARN_DEFAULT);
+		setDatasetEmpty(DATASET_EMPTY_DEFAULT);
 	}
 
 	
@@ -155,6 +168,24 @@ public class PowerServerConfig extends ServerConfig {
 	 */
 	public boolean isRecommenderPeriodLearn() {
 		return getAsBoolean(RECOMMENDER_PERIOD_LEARN_FIELD);
+	}
+
+	
+	/**
+	 * Setting flag to indicate empty dataset.
+	 * @param flag flag to indicate empty dataset.
+	 */
+	public void setDatasetEmpty(boolean flag) {
+		put(DATASET_EMPTY_FIELD, flag);
+	}
+	
+	
+	/**
+	 * Getting flag to indicate empty dataset.
+	 * @return flag to indicate empty dataset.
+	 */
+	public boolean isDatasetEmpty() {
+		return getAsBoolean(DATASET_EMPTY_FIELD);
 	}
 
 	

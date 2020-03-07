@@ -99,7 +99,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 	/**
 	 * Dataset pool.
 	 */
-	protected DatasetPool pool = null;
+	protected DatasetPool pool = new DatasetPool();
 	
 	/**
 	 * Table to show dataset pool.
@@ -257,12 +257,12 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 	 * Constructor with specified evaluator, bound URI, and GUI data.
 	 * @param evaluator specified evaluator.
 	 * @param bindUri bound URI.
-	 * @param data GUI parameter.
+	 * @param referredData GUI parameter.
 	 */
-	public BatchEvaluateGUI(Evaluator evaluator, xURI bindUri, EvaluateGUIData data) {
+	public BatchEvaluateGUI(Evaluator evaluator, xURI bindUri, EvaluateGUIData referredData) {
 		super(evaluator, bindUri);
 		// TODO Auto-generated constructor stub
-		init(evaluator, bindUri, data);
+		init(evaluator, bindUri, referredData);
 	}
 
 	
@@ -270,24 +270,18 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 	 * Initializing the evaluator batch GUI with specified evaluator, bound URI, and GUI data.
 	 * @param evaluator specified evaluator.
 	 * @param bindUri bound URI.
-	 * @param data GUI parameter.
+	 * @param referredData GUI data.
 	 */
-	private void init(Evaluator evaluator, xURI bindUri, EvaluateGUIData data) {
-		if (data == null) {
+	private void init(Evaluator evaluator, xURI bindUri, EvaluateGUIData referredData) {
+		if (referredData == null || !referredData.wasGUIRun) {
 			RegisterTable algRegTable = null;
 			try {
 				algRegTable = EvaluatorAbstract.extractAlgFromPluginStorage(evaluator);
 			}
-			catch (Throwable e) {
-				e.printStackTrace();
-				algRegTable = null;
-			}
-			
-			if (algRegTable == null) return;
+			catch (Throwable e) {e.printStackTrace();}
+			if (algRegTable == null) algRegTable = new RegisterTable();
 			
 			this.algRegTable.register(algRegTable.getAlgList()); //Algorithms are not cloned because of saving memory when evaluator GUI keep algorithms for a long time. 
-			
-			this.pool = new DatasetPool();
 			
 			setLayout(new BorderLayout(2, 2));
 			
@@ -303,35 +297,42 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			setVerbal(false);
 		}
 		else {
-			this.result = data.result;
+			this.result = referredData.result;
 			
-			this.algRegTable = data.algRegTable;
+			this.algRegTable = referredData.algRegTable;
 			
-			this.pool = data.pool;
+			this.pool = referredData.pool;
 			
 			setLayout(new BorderLayout(2, 2));
 			
 			JPanel header = createHeader();
 			add(header, BorderLayout.NORTH);
-			this.tblDatasetPool.update(data.pool);
+			this.tblDatasetPool.update(referredData.pool);
+			this.lbAlgs.update(referredData.lbAlgs);
 					
 			JPanel body = createBody();
 			add(body, BorderLayout.CENTER);
-			this.txtRunSaveBrowse.setText(data.txtRunSaveBrowse);
-			this.chkRunSave.setSelected(data.chkRunSave);
-			this.prgRunning.setValue(data.prgRunning[0]);
-			this.prgRunning.setMaximum(data.prgRunning[1]);
+			this.txtRunSaveBrowse.setText(referredData.txtRunSaveBrowse);
+			this.chkRunSave.setSelected(referredData.chkRunSave);
+			this.prgRunning.setValue(referredData.prgRunning[0]);
+			this.prgRunning.setMaximum(referredData.prgRunning[1]);
 			
 			JPanel footer = createFooter();
 			add(footer, BorderLayout.SOUTH);
-			this.tblMetrics.update(data.result);
-			this.statusBar.setTexts(data.statusBar);
-			this.paneWait.setWaitText(data.paneWait);
+			this.tblMetrics.update(referredData.result);
+			this.statusBar.setTexts(referredData.statusBar);
+			this.paneWait.setWaitText(referredData.paneWait);
 			
-			setVerbal(data.chkVerbal);
+			setVerbal(referredData.chkVerbal);
 
 			updateMode();
 			updateGUI();
+		}
+		
+		if (referredData != null) {
+			referredData.wasGUIRun = true;
+			referredData.active = true;
+			this.referredData = referredData;
 		}
 	}
 
@@ -930,6 +931,19 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 	}
 	
 	
+	@Override
+	public void dispose() {
+		// TODO Auto-generated method stub
+		super.dispose();
+		
+		if (this.referredData != null) {
+			this.referredData.extractFrom(this);
+			this.referredData.active = false;
+			this.referredData = null;
+		}
+	}
+
+
 	@Override
 	protected void run() {
 		try {

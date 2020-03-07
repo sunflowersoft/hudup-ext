@@ -8,8 +8,11 @@
 package net.hudup.evaluate.ui;
 
 import java.io.Serializable;
+import java.util.List;
 
 import net.hudup.core.RegisterTable;
+import net.hudup.core.Util;
+import net.hudup.core.alg.Alg;
 import net.hudup.core.data.DatasetPool;
 import net.hudup.core.evaluate.Metrics;
 
@@ -36,6 +39,12 @@ public class EvaluateGUIData implements Serializable {
 	
 	
 	/**
+	 * Flag to indicate whether the GUI was run.
+	 */
+	public boolean wasGUIRun = false;
+	
+
+	/**
 	 * Metrics as result of evaluation.
 	 */
 	public Metrics result = null;
@@ -50,7 +59,13 @@ public class EvaluateGUIData implements Serializable {
 	/**
 	 * Dataset pool.
 	 */
-	public DatasetPool pool = null;
+	public DatasetPool pool = new DatasetPool();
+
+	
+	/**
+	 * Algorithm list box.
+	 */
+	public List<Alg> lbAlgs = Util.newList();
 
 	
 	/**
@@ -90,17 +105,24 @@ public class EvaluateGUIData implements Serializable {
 
 
 	/**
+	 * Default constructor.
+	 */
+	public EvaluateGUIData() {
+		
+	}
+	
+	
+	/**
 	 * Extracting GUI data.
 	 * @param gui batch evaluator GUI.
 	 */
 	public void extractFrom(BatchEvaluateGUI gui) {
-		EvaluateGUIData data = new EvaluateGUIData();
-		
 		this.result = gui.result;
 		this.algRegTable = gui.algRegTable;
 		this.pool = gui.pool;
+		this.lbAlgs = gui.lbAlgs.getAlgList();
 		this.txtRunSaveBrowse = gui.txtRunSaveBrowse.getText();
-		this.txtRunSaveBrowse = data.txtRunSaveBrowse != null ? data.txtRunSaveBrowse : "";
+		this.txtRunSaveBrowse = this.txtRunSaveBrowse != null ? this.txtRunSaveBrowse : "";
 		this.chkRunSave = gui.chkRunSave.isSelected();
 		this.chkVerbal = gui.chkVerbal.isSelected();
 		this.prgRunning[0] = gui.prgRunning.getValue();

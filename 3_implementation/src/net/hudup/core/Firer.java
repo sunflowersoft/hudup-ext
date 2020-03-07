@@ -11,11 +11,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.List;
 import java.util.Properties;
-import java.util.Random;
 import java.util.Set;
-
-import javax.swing.UIManager;
-import javax.swing.UIManager.LookAndFeelInfo;
 
 import org.reflections.Reflections;
 
@@ -59,6 +55,7 @@ import net.hudup.core.logistic.UriAdapter.AdapterWriter;
 import net.hudup.core.logistic.UriFilter;
 import net.hudup.core.logistic.UriProcessor;
 import net.hudup.core.logistic.xURI;
+import net.hudup.core.logistic.ui.UIUtil;
 import net.hudup.core.parser.DatasetParser;
 import net.hudup.core.parser.DatasetParserRemote;
 import net.hudup.core.parser.DatasetParserRemoteWrapper;
@@ -490,41 +487,9 @@ public class Firer implements PluginManager {
 	 */
 	protected void extraTasks() {
 		try {
-			randomLookAndFeel();
-			LogUtil.info("Look and feel used: " + UIManager.getLookAndFeel().getName());
+			UIUtil.randomLookAndFeel();
 		}
 		catch (Throwable e) {e.printStackTrace();}
-	}
-	
-	
-	/**
-	 * Setting UI look and feel randomly. 
-	 */
-	private void randomLookAndFeel() {
-		boolean lfRnd = false;
-		try {
-			String lfText = Util.getHudupProperty("look_and_feel_random");
-			if (lfText != null && !lfText.isEmpty())
-				lfRnd = Boolean.parseBoolean(lfText);
-		}
-		catch (Throwable e) {
-			e.printStackTrace();
-			lfRnd = false;
-		}
-		if (!lfRnd) return;
-		
-		LookAndFeelInfo[] looks = UIManager.getInstalledLookAndFeels();
-
-		Random rnd = new Random();
-		int index = rnd.nextInt(looks.length);
-		if (index == 0) return;
-		
-		try {
-			UIManager.setLookAndFeel(looks[index].getClassName());
-		}
-		catch (Throwable e) {
-			LogUtil.info("Look and feel '" + looks[index].getClassName() + "' not supported");
-		}
 	}
 	
 	

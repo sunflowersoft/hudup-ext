@@ -124,6 +124,12 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	
 
 	/**
+	 * Evaluator GUI data.
+	 */
+	protected EvaluateGUIData referredData = null;
+	
+	
+	/**
 	 * Constructor with specified evaluator.
 	 * @param evaluator specified evaluator.
 	 * @param bindUri bound URI. If this parameter is null, evaluator is local.
@@ -330,20 +336,32 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	 * Dispose this GUI.
 	 */
 	public void dispose() {
-		stop();
-		clear();
-		closeIOChannels();
-
-		unsetupListeners(this.evaluator);
-		
+		boolean standalone = false;
 		try {
-			if (bindUri != null) //Evaluator is remote.
-				this.evaluator.close(); //The close() method also unexports evaluator.
-			else if (!this.evaluator.getConfig().isStandalone()) //Evaluator is local and non-standalone.
-				this.evaluator.close(); //The close() method also unexports evaluator.
-		}
-		catch (Exception e) {
+			standalone = this.evaluator.getConfig().isStandalone();
+		} 
+		catch (Throwable e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
+			standalone = false;
+		}
+		
+		if (standalone) {
+			unsetupListeners(this.evaluator);
+		}
+		else {
+			stop();
+			clear();
+			closeIOChannels();
+
+			unsetupListeners(this.evaluator);
+			
+			try {
+				this.evaluator.close(); //The close() method also unexports evaluator.
+			}
+			catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
 			
 		if (this.exportedStub != null) {
@@ -354,6 +372,7 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 				LogUtil.info("Evaluator GUI unexported failedly");
 			this.exportedStub = null;
 		}
+		
 	}
 	
 	

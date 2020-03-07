@@ -12,9 +12,6 @@ import java.awt.MenuItem;
 import java.awt.PopupMenu;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.rmi.RemoteException;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import javax.swing.ImageIcon;
@@ -22,8 +19,6 @@ import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
-import net.hudup.core.Constants;
-import net.hudup.core.Util;
 import net.hudup.core.evaluate.Evaluator;
 import net.hudup.core.logistic.I18nUtil;
 import net.hudup.core.logistic.LogUtil;
@@ -35,6 +30,7 @@ import net.hudup.evaluate.ui.EvalCompoundGUI;
 import net.hudup.server.DefaultServer;
 import net.hudup.server.DefaultService;
 import net.hudup.server.PowerServerConfig;
+import net.hudup.server.ext.DefaultServiceExt.EvaluatorPair;
 import net.hudup.server.ui.SetupServerWizard;
 
 /**
@@ -94,9 +90,21 @@ public class DefaultServerExt extends DefaultServer {
 	 * Showing evaluator.
 	 */
 	protected void showEvaluator() {
+		final DefaultServiceExt finalService = ((DefaultServiceExt)service);
+		final List<Evaluator> evList;
 		try {
-			if (service == null || !isRunning()) {
-				LogUtil.warn("Service is not initialized yet or server is not running");
+			if (finalService == null || !isRunning()) {
+				LogUtil.error("Service is not initialized yet or server is not running");
+				return;
+			}
+			
+			evList = finalService.getEvaluatorList();
+			if (evList == null || evList.size() == 0) {
+				JOptionPane.showMessageDialog(
+						null, 
+						"There is no evaluator", 
+						"There is no evaluator", 
+						JOptionPane.INFORMATION_MESSAGE);
 				return;
 			}
 		}
@@ -106,17 +114,6 @@ public class DefaultServerExt extends DefaultServer {
 			return;
 		}
 
-		final DefaultServiceExt finalService = ((DefaultServiceExt)service);
-		List<Evaluator> evList = finalService.getLocalEvaluatorList();
-		if (evList.size() == 0) {
-			JOptionPane.showMessageDialog(
-					null, 
-					"There is no evaluator", 
-					"There is no evaluator", 
-					JOptionPane.INFORMATION_MESSAGE);
-			return;
-		}
-		
 		final StartDlg dlgEvStarter = new StartDlg((JFrame)null, "List of evaluators") {
 			
 			/**
@@ -129,27 +126,34 @@ public class DefaultServerExt extends DefaultServer {
 				// TODO Auto-generated method stub
 				final Evaluator ev = (Evaluator) getItemControl().getSelectedItem();
 				dispose();
-
+				
 				try {
-					if (finalService.evGUIDataMap.containsKey(ev.getName())) {
-						
+					if (!finalService.pairMap.containsKey(ev.getName())) {
+						JOptionPane.showMessageDialog(
+								null, 
+								"There is no evaluator named '" + ev.getName() + "'.", 
+								"No evaluator", 
+								JOptionPane.INFORMATION_MESSAGE);
+						return;
 					}
-						
-					new EvalCompoundGUI(ev, null) {
-
-						/**
-						 * Serial version UID for serializable class.
-						 */
-						private static final long serialVersionUID = 1L;
-
-						@Override
-						public void dispose() {
-							// TODO Auto-generated method stub
-							super.dispose();
-						}
-						
-					};
-				} catch (RemoteException e) { e.printStackTrace();}
+					
+					EvaluatorPair pair = finalService.pairMap.get(ev.getName());
+					if (pair.data.active) {
+						JOptionPane.showMessageDialog(
+								null, 
+								"GUI of evaluator named '" + ev.getName() + "' is running.", 
+								"Evaluator GUI running", 
+								JOptionPane.INFORMATION_MESSAGE);
+						return;
+					}
+					
+					new EvalCompoundGUI(pair.evaluator, null, pair.data);
+				} 
+				catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					LogUtil.error("Error in showing evaluator GUI.");
+				}
 			}
 			
 			@Override

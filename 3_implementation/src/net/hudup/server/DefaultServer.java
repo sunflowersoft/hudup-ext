@@ -133,7 +133,8 @@ public class DefaultServer extends PowerServerImpl {
 		// Task 1
 		if (config.isRecommenderPeriodLearn()) { //This method is used to prevent time consuming to learn internal recommender.
 			DefaultService newService = createService();
-			newService.transfer(service);
+			newService.open(config); //This statement is important, which takes much time.
+			newService.transferTo(service);
 		}
 	}
 	

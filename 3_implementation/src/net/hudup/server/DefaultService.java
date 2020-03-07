@@ -122,6 +122,13 @@ public class DefaultService implements Service, AutoCloseable {
 		this.serverConfig = serverConfig;
 		try {
 			Dataset dataset = serverConfig.getParser().parse((DataConfig)serverConfig.clone());
+			if (!serverConfig.isDatasetEmpty()) {
+				dataset = serverConfig.getParser().parse((DataConfig)serverConfig.clone());
+			}
+			else {
+				dataset = new SnapshotImpl();
+				dataset.setConfig((DataConfig)serverConfig.clone());
+			}
 			dataset.setExclusive(true);
 			
 			recommender = (Recommender) serverConfig.getRecommender().newInstance();
@@ -180,15 +187,17 @@ public class DefaultService implements Service, AutoCloseable {
 	 * @param target target service.
 	 * @return whether transfer successfully.
 	 */
-	public boolean transfer(DefaultService target) {
+	public boolean transferTo(DefaultService target) {
 		if (!isOpened())
 			return false;
 		
 		boolean result = true;
 		trans.lockWrite();
 		try {
-			target.close();
-			target.recommender = recommender;
+			target.recommender = this.recommender;
+			
+			this.recommender = null;
+			this.close();
 		}
 		catch (Throwable e) {
 			e.printStackTrace();
@@ -243,7 +252,7 @@ public class DefaultService implements Service, AutoCloseable {
 		}
 		else if (dataset instanceof Scanner) {
 			try {
-				provider.close();
+				if (provider != null) provider.close();
 			}
 			catch (Exception e) {
 				e.printStackTrace();

@@ -110,9 +110,9 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 	 * Constructor with specified evaluator.
 	 * @param evaluator specified {@link EvaluatorAbstract}.
 	 * @param bindUri bound URI. If this parameter is null, evaluator is local.
-	 * @param data evaluator GUI data.
+	 * @param referredData evaluator GUI data.
 	 */
-	public EvalCompoundGUI(Evaluator evaluator, xURI bindUri, final EvaluateGUIData data) {
+	public EvalCompoundGUI(Evaluator evaluator, xURI bindUri, final EvaluateGUIData referredData) {
 		super("Evaluator GUI");
 		try {
 			this.thisConfig = evaluator.getConfig();
@@ -124,6 +124,7 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 			LogUtil.error("Error in getting evaluator configuration");
 		}
 		this.bindUri = bindUri;
+		this.batchEvaluateGUI = new BatchEvaluateGUI(evaluator, bindUri, referredData);
 		
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		addWindowListener(new WindowAdapter() {
@@ -133,7 +134,6 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 				super.windowClosed(e);
 //				batchEvaluateGUI.dispose(); //Calling in dispose() method instead.
 //				thisConfig.save(); //Calling in dispose() method instead.
-				if (data != null) data.active = false;
 			}
 
 		});
@@ -149,15 +149,14 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 		Container content = getContentPane();
 		content.setLayout(new BorderLayout(2, 2));
 		
-		body = new JTabbedPane();
-		content.add(body, BorderLayout.CENTER);
+		this.body = new JTabbedPane();
+		content.add(this.body, BorderLayout.CENTER);
 		
-		batchEvaluateGUI = new BatchEvaluateGUI(evaluator, bindUri, data);
-		body.add(I18nUtil.message("evaluate_batch"), batchEvaluateGUI);
+		this.body.add(I18nUtil.message("evaluate_batch"), this.batchEvaluateGUI);
 		
 		setTitle(I18nUtil.message("evaluator"));
 		
-		body.addMouseListener(new MouseAdapter() {
+		this.body.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				if(!SwingUtilities.isRightMouseButton(e)) return;
@@ -165,7 +164,7 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 				if (contextMenu != null) contextMenu.show((Component)e.getSource(), e.getX(), e.getY());
 			}
 		});
-		batchEvaluateGUI.addMouseListener(new MouseAdapter() {
+		this.batchEvaluateGUI.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				if(!SwingUtilities.isRightMouseButton(e)) return;
@@ -174,7 +173,6 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 			}
 		});
 		
-		if (data != null) data.active = true;
 		setVisible(true);
 	}
 	
@@ -215,21 +213,23 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 		
 		mnTools.add(mniSysConfig);
 
-		JMenuItem mniSwitchEvaluator = new JMenuItem(
-			new AbstractAction(I18nUtil.message("switch_evaluator")) {
-
-				/**
-				 * Serial version UID for serializable class. 
-				 */
-				private static final long serialVersionUID = 1L;
-
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					switchEvaluator();
-				}
-			
-			});
-		mnTools.add(mniSwitchEvaluator);
+		if (batchEvaluateGUI.referredData == null) {
+			JMenuItem mniSwitchEvaluator = new JMenuItem(
+				new AbstractAction(I18nUtil.message("switch_evaluator")) {
+	
+					/**
+					 * Serial version UID for serializable class. 
+					 */
+					private static final long serialVersionUID = 1L;
+	
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						switchEvaluator();
+					}
+				
+				});
+			mnTools.add(mniSwitchEvaluator);
+		}
 			
 
 		JMenu mnHelp = new JMenu(I18nUtil.message("help"));
@@ -564,10 +564,10 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 	 * Staring the particular evaluator selected by user.
 	 * @param evaluator particular evaluator selected by user.
 	 * @param bindUri bound URI. If this parameter is null, evaluator is inside evaluator, otherwise it is remote evaluator.
-	 * @param data evaluator GUI data.
+	 * @param referredData evaluator GUI data.
 	 * @param oldGUI old GUI.
 	 */
-	public static void run(Evaluator evaluator, xURI bindUri, EvaluateGUIData data, Window oldGUI) {
+	public static void run(Evaluator evaluator, xURI bindUri, EvaluateGUIData referredData, Window oldGUI) {
 		if (!Util.getPluginManager().isFired())
 			Util.getPluginManager().fire();
 			
@@ -603,7 +603,7 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 			}
 
 			if (oldGUI != null) oldGUI.dispose();
-			new EvalCompoundGUI(evaluator, bindUri, data);
+			new EvalCompoundGUI(evaluator, bindUri, referredData);
 		}
 		catch (Exception e) {
 			// TODO Auto-generated catch block

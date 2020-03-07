@@ -190,6 +190,8 @@ public class StatusBar extends JPanel {
 	 * @param texts texts set to all text panes.
 	 */
 	public void setTexts(String[] texts) {
+		if (texts == null) return;
+		
 		int n = Math.min(texts.length, paneList.length);
 		for (int i = 0; i < n; i++) {
 			String text = texts[i];

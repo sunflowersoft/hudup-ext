@@ -579,7 +579,8 @@ class DatasetPoolTableModel extends DefaultTableModel {
 		columns.add(I18nUtil.message("whole_set"));
 		
 		Vector<Vector<Object>> data = new Vector<Vector<Object>>();
-		for (int i = 0; i < pool.size(); i++) {
+		int n = pool != null ? pool.size() : 0;
+		for (int i = 0; i < n; i++) {
 			DatasetPair pair = pool.get(i);
 			
 			Vector<Object> row = new Vector<Object>();

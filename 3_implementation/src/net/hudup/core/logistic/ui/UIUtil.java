@@ -10,18 +10,24 @@ package net.hudup.core.logistic.ui;
 import java.awt.Component;
 import java.awt.Dialog;
 import java.awt.Frame;
+import java.awt.GraphicsEnvironment;
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.Window;
 import java.awt.event.ActionListener;
 import java.net.URL;
+import java.util.Random;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenuItem;
+import javax.swing.UIManager;
+import javax.swing.UIManager.LookAndFeelInfo;
 
 import net.hudup.core.Constants;
+import net.hudup.core.Util;
+import net.hudup.core.logistic.LogUtil;
 
 /**
  * This utility class provides utility methods relevant to user interface (UI) such as getting image from URI, creating button, and creating menu item.
@@ -232,4 +238,38 @@ public final class UIUtil {
 	}
 
 
+	/**
+	 * Setting UI look and feel randomly. 
+	 */
+	public static void randomLookAndFeel() {
+		if (GraphicsEnvironment.isHeadless()) return;
+		
+		boolean lfRnd = false;
+		try {
+			String lfText = Util.getHudupProperty("look_and_feel_random");
+			if (lfText != null && !lfText.isEmpty())
+				lfRnd = Boolean.parseBoolean(lfText);
+		}
+		catch (Throwable e) {
+			e.printStackTrace();
+			lfRnd = false;
+		}
+		if (!lfRnd) return;
+		
+		LookAndFeelInfo[] looks = UIManager.getInstalledLookAndFeels();
+
+		Random rnd = new Random();
+		int index = rnd.nextInt(looks.length);
+		if (index == 0) return;
+		
+		try {
+			UIManager.setLookAndFeel(looks[index].getClassName());
+			LogUtil.info("Look and feel used: " + UIManager.getLookAndFeel().getName());
+		}
+		catch (Throwable e) {
+			LogUtil.info("Look and feel '" + looks[index].getClassName() + "' not supported");
+		}
+	}
+	
+	
 }

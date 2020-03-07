@@ -7,6 +7,7 @@
  */
 package net.hudup.server.ext;
 
+import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -31,16 +32,47 @@ public class DefaultServiceExt extends DefaultService {
 
 	
 	/**
-	 * Internal map of evaluators, each evaluator has a unique name.
+	 * This class is the pair of evaluator and evaluator GUI data.
+	 * @author Loc Nguyen
+	 * @version 1.0
 	 */
-	protected Map<String, Evaluator> evMap = Util.newMap();
+	class EvaluatorPair {
+		
+		/**
+		 * Evaluator.
+		 */
+		public Evaluator evaluator = null;
+		
+		/**
+		 * Evaluator GUI data.
+		 */
+		public EvaluateGUIData data = null;
+		
+		/**
+		 * Default constructor.
+		 */
+		public EvaluatorPair() {
+			
+		}
+		
+		/**
+		 * Constructor with specified evaluator and GUI data.
+		 * @param evaluator specified evaluator.
+		 * @param data specified data.
+		 */
+		public EvaluatorPair(Evaluator evaluator, EvaluateGUIData data) {
+			this.evaluator = evaluator;
+			this.data = data;
+		}
+		
+	}
 	
 	
 	/**
-	 * Internal map of evaluators GUI data, each evaluator has a unique name.
+	 * Internal map of evaluator pair, each evaluator pair has a unique name which is evaluator name.
 	 */
-	protected Map<String, EvaluateGUIData> evGUIDataMap = Util.newMap();
-
+	protected Map<String, EvaluatorPair> pairMap = Util.newMap();
+	
 	
 	/**
 	 * Constructor with specified transaction.
@@ -62,12 +94,13 @@ public class DefaultServiceExt extends DefaultService {
 		for (int i = 0; i < evList.size(); i++) {
 			Evaluator ev = evList.get(i);
 			try {
-				if (evMap.containsKey(ev.getName())) continue;
+				if (pairMap.containsKey(ev.getName())) continue;
 				
 				ev.getConfig().setEvaluatorPort(serverConfig.getServerPort());
 				ev.getConfig().setStandalone(true);
 				ev.export(serverConfig.getServerPort());
-				evMap.put(ev.getName(), ev);
+				
+				pairMap.put(ev.getName(), new EvaluatorPair(ev, new EvaluateGUIData()));
 			}
 			catch (Throwable e) {e.printStackTrace();}
 		}
@@ -80,15 +113,16 @@ public class DefaultServiceExt extends DefaultService {
 	public void close() {
 		// TODO Auto-generated method stub
 		super.close();
+		if (pairMap == null) return;
 		
-		Collection<Evaluator> evs = evMap.values();
-		for (Evaluator ev : evs) {
+		Collection<EvaluatorPair> pairs = pairMap.values();
+		for (EvaluatorPair pair : pairs) {
 			try {
-				ev.getConfig().save();
-				ev.close();
+				pair.evaluator.getConfig().save();
+				pair.evaluator.close();
 			} catch (Throwable e) {e.printStackTrace();}
 		}
-		evMap.clear();
+		pairMap.clear();
 	}
 
 	
@@ -96,9 +130,14 @@ public class DefaultServiceExt extends DefaultService {
 	 * Getting list of local evaluators.
 	 * @return list of local evaluators.
 	 */
-	public List<Evaluator> getLocalEvaluatorList() {
+	public List<Evaluator> getEvaluatorList() throws RemoteException {
 		List<Evaluator> evList = Util.newList();
-		evList.addAll(evMap.values());
+		if (pairMap == null) return evList;
+		
+		Collection<EvaluatorPair> pairs = pairMap.values();
+		for (EvaluatorPair pair : pairs) {
+			evList.add(pair.evaluator);
+		}
 		
 		Collections.sort(evList, new Comparator<Evaluator>() {
 
