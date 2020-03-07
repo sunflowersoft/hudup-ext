@@ -7,21 +7,17 @@
  */
 package net.hudup.evaluate.ui;
 
-import java.io.IOException;
-import java.nio.channels.ByteChannel;
 import java.rmi.Remote;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import net.hudup.core.PluginChangedListener;
-import net.hudup.core.Util;
 import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.Recommender;
 import net.hudup.core.alg.SetupAlgListener;
+import net.hudup.core.evaluate.EvaluateProcessor;
 import net.hudup.core.evaluate.Evaluator;
 import net.hudup.core.evaluate.EvaluatorAbstract;
 import net.hudup.core.evaluate.EvaluatorConfig;
@@ -32,7 +28,6 @@ import net.hudup.core.evaluate.Metrics;
 import net.hudup.core.logistic.I18nUtil;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.NetUtil;
-import net.hudup.core.logistic.UriAdapter.AdapterWriteChannel;
 import net.hudup.core.logistic.xURI;
 import net.hudup.core.logistic.ui.CounterClock;
 
@@ -52,36 +47,6 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 
 	
 	/**
-	 * Evaluation file extension.
-	 */
-	protected final static String EVALUATION_FILE_EXTENSION = ".eval";
-	
-	
-	/**
-	 * Setting up doing mode file extension.
-	 */
-	protected final static String SETUP_DOING_FILE_EXTENSION = ".setup.doing";
-	
-	
-	/**
-	 * Setting up doing mode file extension.
-	 */
-	protected final static String SETUP_DONE_FILE_EXTENSION = ".setup.done";
-
-	
-	/**
-	 * Metrics analyzing Excel file name.
-	 */
-	public final static String METRICS_ANALYZE_EXCEL_FILE_NAME = "analyze.xls";
-	
-	
-	/**
-	 * Metrics analyzing Excel file name.
-	 */
-	public final static String METRICS_ANALYZE_EXCEL_FILE_NAME2 = "analyze.hdp";
-
-	
-	/**
 	 * Main evaluator.
 	 */
 	protected Evaluator evaluator = null;
@@ -94,9 +59,9 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	
 	
 	/**
-	 * IO channels for IO writing evaluation results.
+	 * Processor to process evaluation results.
 	 */
-	protected Map<String, ByteChannel> ioChannels = Util.newMap();
+	protected EvaluateProcessor evProcessor = new EvaluateProcessor();
 	
 	
 	/**
@@ -269,70 +234,6 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	
 	
 	/**
-	 * Close IO channels.
-	 */
-	protected void closeIOChannels() {
-			
-		Set<String> keys = ioChannels.keySet();
-		for (String key : keys) {
-			try {
-				ioChannels.get(key).close();
-			} 
-			catch (Throwable e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-		
-		ioChannels.clear();
-		
-	}
-	
-	
-	/**
-	 * Close IO channels by specified key.
-	 * @param key specified key.
-	 * @return whether close channel successfully.
-	 */
-	protected boolean closeIOChannel(String key) {
-		if (!ioChannels.containsKey(key))
-			return false;
-		
-		try {
-			ByteChannel channel = ioChannels.get(key);
-			channel.close();
-			ioChannels.remove(key);
-			
-			return true;
-		}
-		catch (IOException e) {
-			e.printStackTrace();
-		}
-		
-		return false;
-		
-	}
-	
-	
-	/**
-	 * Getting channel from specified storage and key.
-	 * @param store URI of specified storage.
-	 * @param key specified key.
-	 * @param append if true then the write channel allows appending writing.
-	 * @return byte channel from specified storage and key.
-	 */
-	protected ByteChannel getIOChannel(xURI store, String key, boolean append) {
-		if (ioChannels.containsKey(key))
-			return ioChannels.get(key);
-		
-		xURI uri = store.concat(key);
-		AdapterWriteChannel channel = new AdapterWriteChannel(uri, append);
-		ioChannels.put(key, channel);
-		return channel;
-	}
-	
-	
-	/**
 	 * Dispose this GUI.
 	 */
 	public void dispose() {
@@ -352,7 +253,7 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 		else {
 			stop();
 			clear();
-			closeIOChannels();
+			this.evProcessor.clear();
 
 			unsetupListeners(this.evaluator);
 			

@@ -20,13 +20,9 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.nio.ByteBuffer;
-import java.nio.channels.ByteChannel;
 import java.rmi.RemoteException;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
@@ -62,8 +58,6 @@ import net.hudup.core.evaluate.EvaluatorAbstract;
 import net.hudup.core.evaluate.EvaluatorEvent;
 import net.hudup.core.evaluate.EvaluatorEvent.Type;
 import net.hudup.core.evaluate.EvaluatorProgressEvent;
-import net.hudup.core.evaluate.Metrics;
-import net.hudup.core.evaluate.MetricsUtil;
 import net.hudup.core.logistic.ClipboardUtil;
 import net.hudup.core.logistic.DSUtil;
 import net.hudup.core.logistic.I18nUtil;
@@ -244,65 +238,112 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 
 	
 	/**
-	 * Constructor with specified evaluator.
+	 * Constructor with specified evaluator and bound URI.
 	 * @param evaluator specified evaluator.
 	 * @param bindUri bound URI.
 	 */
 	public EvaluateGUI(Evaluator evaluator, xURI bindUri) {
 		super(evaluator, bindUri);
-		try {
-			RegisterTable algRegTable = EvaluatorAbstract.extractAlgFromPluginStorage(evaluator);
-			init(algRegTable);
-		}
-		catch (Throwable e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-	
-	
-	/**
-	 * Constructor with specified evaluator.
-	 * @param evaluator specified evaluator.
-	 * @param bindUri bound URI.
-	 */
-	private EvaluateGUI(Evaluator evaluator, Recommender recommeder) {
-		super(evaluator, null);
-		try {
-			if (evaluator.acceptAlg(recommeder)) {
-				RegisterTable algRegTable = new RegisterTable(Arrays.asList(recommeder));
-				init(algRegTable);
-			}
-		}
-		catch (Throwable e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		init(evaluator, null, null);
 	}
 
 	
 	/**
-	 * Initializing the evaluator.
-	 * @param algRegTable registered table of algorithm.
+	 * Constructor with specified evaluator, bound URI, and GUI data.
+	 * @param evaluator specified evaluator.
+	 * @param bindUri bound URI.
+	 * @param referredData GUI parameter.
 	 */
-	private void init(RegisterTable algRegTable) {
-		if (algRegTable == null) return;
+	public EvaluateGUI(Evaluator evaluator, xURI bindUri, EvaluateGUIData referredData) {
+		super(evaluator, bindUri);
+		init(evaluator, null, referredData);
+	}
+
+	
+	/**
+	 * Constructor with specified evaluator and algorithm.
+	 * @param evaluator specified evaluator.
+	 * @param alg referred algorithm.
+	 */
+	private EvaluateGUI(Evaluator evaluator, Alg alg) {
+		super(evaluator, null);
+		init(evaluator, alg, null);
+	}
+
+	
+	/**
+	 * Initializing the evaluator batch GUI with specified evaluator, bound URI, referred algorithm, and GUI data.
+	 * @param evaluator specified evaluator.
+	 * @param referredAlg referred algorithm.
+	 * @param referredData GUI data.
+	 */
+	private void init(Evaluator evaluator, Alg referredAlg, EvaluateGUIData referredData) {
+		if (referredData == null || !referredData.wasGUIRun) {
+			RegisterTable algRegTable = null;
+			if (referredAlg == null) {
+				try {
+					algRegTable = EvaluatorAbstract.extractAlgFromPluginStorage(evaluator);
+				}
+				catch (Throwable e) {e.printStackTrace();}
+			}
+			else {
+				try {
+					if (evaluator.acceptAlg(referredAlg))
+						algRegTable = new RegisterTable(Arrays.asList(referredAlg));
+				}
+				catch (Throwable e) {e.printStackTrace();}
+			}
+			if (algRegTable == null) algRegTable = new RegisterTable();
+			
+			this.algRegTable.register(algRegTable.getAlgList()); //Algorithms are not cloned because of saving memory when evaluator GUI keep algorithms for a long time. 
+			
+			setLayout(new BorderLayout(2, 2));
+			
+			JPanel header = createHeader();
+			add(header, BorderLayout.NORTH);
+			
+			JPanel body = createBody();
+			add(body, BorderLayout.CENTER);
+			
+			JPanel footer = createFooter();
+			add(footer, BorderLayout.SOUTH);
+			
+			algChanged();
+			setVerbal(false);
+		}
+		else {
+			this.result = referredData.result;
+			
+			this.algRegTable = referredData.algRegTable;
+			
+			setLayout(new BorderLayout(2, 2));
+			
+			JPanel header = createHeader();
+			add(header, BorderLayout.NORTH);
+			this.cmbAlgs.update(referredData.lbAlgs);
+					
+			JPanel body = createBody();
+			add(body, BorderLayout.CENTER);
+			this.txtRunSaveBrowse.setText(referredData.txtRunSaveBrowse);
+			this.chkRunSave.setSelected(referredData.chkRunSave);
+			this.prgRunning.setValue(referredData.prgRunning[0]);
+			this.prgRunning.setMaximum(referredData.prgRunning[1]);
+			
+			JPanel footer = createFooter();
+			add(footer, BorderLayout.SOUTH);
+			this.tblMetrics.update(referredData.result);
+			this.statusBar.setTexts(referredData.statusBar);
+			this.paneWait.setWaitText(referredData.paneWait);
+			
+			algChanged();
+			setVerbal(referredData.chkVerbal);
+		}
 		
-		this.algRegTable.register(algRegTable); //Algorithms are not cloned because of saving memory when evaluator GUI keep algorithms for a long time.
-		
-		setLayout(new BorderLayout(2, 2));
-		
-		JPanel header = createHeader();
-		add(header, BorderLayout.NORTH);
-		
-		JPanel body = createBody();
-		add(body, BorderLayout.CENTER);
-		
-		JPanel footer = createFooter();
-		add(footer, BorderLayout.SOUTH);
-		
-		algChanged();
-		setVerbal(false);
+		if (referredData != null) {
+			referredData.wasGUIRun = true;
+			referredData.active = true;
+			this.referredData = referredData;
+		}
 	}
 
 	
@@ -615,10 +656,10 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
+				xURI store = null;
 				if(chkRunSave.isSelected()) {
-					
 					UriAdapter adapter = new UriAdapter();
-					xURI store = adapter.chooseStore(getThisGUI());
+					store = adapter.chooseStore(getThisGUI());
 					adapter.close();
 					
 					if (store == null) {
@@ -635,6 +676,11 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 					txtRunSaveBrowse.setText("");
 				}
 				updateMode();
+				
+				//Setting evaluation store path to evaluator.
+				try {
+					evaluator.setEvaluateStorePath(store != null ? store.toString() : null);
+				} catch (Throwable ex) {ex.printStackTrace();}
 			}
 		});
 		this.chkRunSave.setToolTipText(I18nUtil.message("save_evaluate_tooltip"));
@@ -1109,57 +1155,12 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			this.txtRunInfo.setCaretPosition(0);
 		}
 		else if (chkRunSave.isSelected()) {
-			String storePath = this.txtRunSaveBrowse.getText().trim();
-			if (storePath.length() == 0)
-				return;
-
+			boolean fastsave = false;
 			try {
-				xURI store = xURI.create(storePath);
-				UriAdapter adapter = new UriAdapter(store);
-				boolean existed = adapter.exists(store);
-				if (!existed)
-					adapter.create(store, true);
-				adapter.close();
-				
-				if (evt.getType() == Type.done) {
-					String key = getAlg().getName() + EVALUATION_FILE_EXTENSION;
-					ByteChannel channel = getIOChannel(store, key, true);
+				fastsave = evaluator.getConfig().isFastSave();
+			} catch (Throwable e) {e.printStackTrace();}
 
-					String info = evt.translate(getAlg().getName(), -1) + "\n\n\n\n";
-					ByteBuffer buffer = ByteBuffer.wrap(info.getBytes());
-					channel.write(buffer);
-
-				    // Exporting excel file
-					MetricsUtil util = new MetricsUtil(this.result, new RegisterTable(Arrays.asList(getAlg())));
-					util.createExcel(store.concat(METRICS_ANALYZE_EXCEL_FILE_NAME));
-					// Begin exporting plain text. It is possible to remove this snippet.
-					channel = getIOChannel(store, METRICS_ANALYZE_EXCEL_FILE_NAME2, false);
-					buffer = ByteBuffer.wrap(util.createPlainText().getBytes());
-					channel.write(buffer);
-					// End exporting plain text. It is possible to remove this snippet.
-					
-					closeIOChannels();
-				}
-				else {
-					Map<Integer, Metrics> map = evt.getMetrics().gets(getAlg().getName());
-					Set<Integer> datasetIdList = map.keySet();
-					for (int datasetId : datasetIdList) {
-						String key = getAlg().getName() + "@" + datasetId + EVALUATION_FILE_EXTENSION;
-						ByteChannel channel = getIOChannel(store, key, true);
-
-						String info = evt.translate(getAlg().getName(), datasetId) + "\n\n\n\n";
-						ByteBuffer buffer = ByteBuffer.wrap(info.getBytes());
-						channel.write(buffer);
-						
-						if (evt.getType() == Type.done_one)
-							closeIOChannel(key);
-					}
-				}
-			} 
-			catch (Exception e) {
-				e.printStackTrace();
-			}
-			
+			evProcessor.saveEvaluateResult(txtRunSaveBrowse.getText(), evt, Arrays.asList(getAlg()), fastsave);
 		}
 		
 		
@@ -1217,41 +1218,20 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 		}
 
 		
-		String info = "========== Algorithm \"" + algName + "\" ==========\n";
-		info = info + evt.translate() + "\n\n\n\n";
-		
 		if (chkVerbal.isSelected()) {
+			String info = "========== Algorithm \"" + algName + "\" ==========\n";
+			info = info + evt.translate() + "\n\n\n\n";
+			
 			this.txtRunInfo.insert(info, 0);
 			this.txtRunInfo.setCaretPosition(0);
 		}
 		else if (chkRunSave.isSelected()) {
-			String storePath = this.txtRunSaveBrowse.getText().trim();
-			if (storePath.length() == 0)
-				return;
-
+			boolean fastsave = false;
 			try {
-				xURI store = xURI.create(storePath);
-				UriAdapter adapter = new UriAdapter(store);
-				boolean existed = adapter.exists(store);
-				if (!existed)
-					adapter.create(store, true);
-				adapter.close();
-				
-				String key = algName;
-				if (evt.getType() == SetupAlgEvent.Type.doing)
-					key += SETUP_DOING_FILE_EXTENSION;
-				else
-					key += SETUP_DONE_FILE_EXTENSION;
-				
-				ByteChannel channel = getIOChannel(store, key, true);
-				ByteBuffer buffer = ByteBuffer.wrap(info.getBytes());
-				channel.write(buffer);
-				closeIOChannel(key);
-			} 
-			catch (Exception e) {
-				e.printStackTrace();
-			}
-			
+				fastsave = evaluator.getConfig().isFastSave();
+			} catch (Throwable e) {e.printStackTrace();}
+
+			evProcessor.saveSetupResult(this.txtRunSaveBrowse.getText(), evt, algName, fastsave);
 		}
 		
 	}
@@ -1260,7 +1240,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 	@Override
 	protected void updateMode() {
 		try {
-			closeIOChannels();
+			evProcessor.closeIOChannels();
 			
 			Dataset training = txtTrainingBrowse.getDataset();
 			Dataset testing = txtTestingBrowse.getDataset();

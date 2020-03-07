@@ -22,6 +22,7 @@ import javax.swing.SwingUtilities;
 
 import net.hudup.core.PluginStorage;
 import net.hudup.core.RegisterTable;
+import net.hudup.core.Util;
 import net.hudup.core.alg.Alg;
 
 
@@ -259,6 +260,20 @@ public class AlgComboBox extends JComboBox<Alg> implements AlgListUI {
 	@Override
 	public Alg getSelectedAlg() {
 		return (Alg)getSelectedItem();
+	}
+	
+	
+	/**
+	 * Getting list of algorithms.
+	 * @return list of algorithms.
+	 */
+	public List<Alg> getAlgList() {
+		List<Alg> algs = Util.newList();
+		for (int i = 0; i < this.getItemCount(); i++) {
+			algs.add(this.getItemAt(i));
+		}
+		
+		return algs;
 	}
 	
 	

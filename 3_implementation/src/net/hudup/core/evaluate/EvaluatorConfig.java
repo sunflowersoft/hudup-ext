@@ -73,6 +73,18 @@ public class EvaluatorConfig extends SysConfig {
 
 	
 	/**
+	 * This constant specifies fast result saving field. If true, only done evaluated results are saved.
+	 */
+	public final static String EVALUATOR_FASTSAVE_FIELD = changeCase("evaluator_fastsave");
+
+	
+	/**
+	 * By default, fast result saving is false. If true, only done evaluated results are saved.
+	 */
+	public final static boolean EVALUATOR_FASTSAVE_DEFAULT = false;
+
+	
+	/**
 	 * Default constructor.
 	 */
 	public EvaluatorConfig() {
@@ -98,6 +110,7 @@ public class EvaluatorConfig extends SysConfig {
 		setRecommendAll(RECOMMEND_ALL_DEFAULT);
 		setEvaluatorPort(Constants.DEFAULT_EVALUATOR_PORT);
 		setStandalone(EVALUATOR_STANDALONE_DEFAULT);
+		setFastSave(EVALUATOR_FASTSAVE_DEFAULT);
 	}
 
 	
@@ -164,5 +177,22 @@ public class EvaluatorConfig extends SysConfig {
 		put(EVALUATOR_STANDALONE_FIELD, standalone);
 	}
 
+
+	/**
+	 * Checking whether fast result saving mode is true. If true, only done evaluated results are saved. 
+	 * @return whether fast result saving mode is true.
+	 */
+	public boolean isFastSave() {
+		return getAsBoolean(EVALUATOR_FASTSAVE_FIELD);
+	}
+	
+	
+	/**
+	 * Setting whether fast result saving mode is true. If true, only done evaluated results are saved.
+	 * @param fastsave fast result saving mode is true.
+	 */
+	public void setFastSave(boolean fastsave) {
+		put(EVALUATOR_FASTSAVE_FIELD, fastsave);
+	}
 
 }

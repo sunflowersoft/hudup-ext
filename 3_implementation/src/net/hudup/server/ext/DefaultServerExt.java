@@ -98,7 +98,7 @@ public class DefaultServerExt extends DefaultServer {
 				return;
 			}
 			
-			evList = finalService.getEvaluatorList();
+			evList = finalService.getLocalEvaluators();
 			if (evList == null || evList.size() == 0) {
 				JOptionPane.showMessageDialog(
 						null, 

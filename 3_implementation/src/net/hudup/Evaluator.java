@@ -20,6 +20,7 @@ import net.hudup.core.RegisterTable;
 import net.hudup.core.Util;
 import net.hudup.core.alg.Alg;
 import net.hudup.core.data.DatasetPool;
+import net.hudup.core.evaluate.EvaluateProcessor;
 import net.hudup.core.evaluate.EvaluatorEvent;
 import net.hudup.core.evaluate.EvaluatorEvent.Type;
 import net.hudup.core.evaluate.EvaluatorListener;
@@ -29,7 +30,6 @@ import net.hudup.core.logistic.MathUtil;
 import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.xURI;
 import net.hudup.data.BatchScript;
-import net.hudup.evaluate.ui.AbstractEvaluateGUI;
 import net.hudup.evaluate.ui.EvalCompoundGUI;
 
 /**
@@ -134,9 +134,9 @@ public class Evaluator implements AccessPoint {
 					
 					try {
 						MetricsUtil util = new MetricsUtil(finalEv.getResult(), new RegisterTable(algList));
-						util.createExcel(analyzeDir.concat(AbstractEvaluateGUI.METRICS_ANALYZE_EXCEL_FILE_NAME));
+						util.createExcel(analyzeDir.concat(EvaluateProcessor.METRICS_ANALYZE_EXCEL_FILE_NAME));
 						
-						Writer writer = workingAdapter.getWriter(analyzeDir.concat(AbstractEvaluateGUI.METRICS_ANALYZE_EXCEL_FILE_NAME2), false);
+						Writer writer = workingAdapter.getWriter(analyzeDir.concat(EvaluateProcessor.METRICS_ANALYZE_EXCEL_FILE_NAME2), false);
 						writer.write(util.createPlainText());
 						writer.close();
 						

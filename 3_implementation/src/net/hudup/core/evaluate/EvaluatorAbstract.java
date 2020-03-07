@@ -174,6 +174,18 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
     protected Evaluator exportedStub = null;
 
 	
+    /**
+     * Directory to store evaluation results. If null, evaluation results are not stored. 
+     */
+    protected String evStorePath = null;
+    
+    
+    /**
+     * Evaluation processor.
+     */
+    protected EvaluateProcessor evProcessor = new EvaluateProcessor();
+    
+    
 	/**
 	 * Default constructor.
 	 */
@@ -698,6 +710,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
      */
     protected void fireEvaluatorEvent(EvaluatorEvent evt) {
 		EvaluatorListener[] listeners = getEvaluatorListeners();
+		if (listeners.length > 0) evProcessor.closeIOChannels();
 		for (EvaluatorListener listener : listeners) {
 			try {
 				listener.receivedEvaluation(evt);
@@ -707,6 +720,16 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 			}
 		}
 		
+		if (listeners.length == 0 && evStorePath != null && algList != null) {
+			boolean fastsave = false;
+			try {
+				fastsave = config.isFastSave();
+			} catch (Throwable e) {e.printStackTrace();}
+			
+			evProcessor.saveEvaluateResult(evStorePath, evt, algList, fastsave);
+		}
+		
+		//Backing up evaluation results.
 		boolean backup = false;
 		try {
 			String bkText = Util.getHudupProperty("evaluator_analyze_backup");
@@ -775,11 +798,9 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
      * @param evt the specified for evaluation progress.
      */
     protected void fireProgressEvent(EvaluatorProgressEvent evt) {
-    	if (!isStarted())
-    		return;
+    	if (!isStarted()) return;
 
     	EvaluatorProgressListener[] listeners = getProgressListeners();
-		
 		for (EvaluatorProgressListener listener : listeners) {
 			try {
 				listener.receivedProgress(evt);
@@ -824,11 +845,10 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
      * @param evt the specified for setup algorithm event.
      */
     protected void fireSetupAlgEvent(SetupAlgEvent evt) {
-    	if (!isStarted())
-    		return;
+    	if (!isStarted()) return;
 
     	SetupAlgListener[] listeners = getSetupAlgListeners();
-		
+		if (listeners.length > 0) evProcessor.closeIOChannels();
 		for (SetupAlgListener listener : listeners) {
 			try {
 				listener.receivedSetup(evt);
@@ -838,10 +858,25 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 			}
 		}
 	
+		if (listeners.length == 0 && evStorePath != null) {
+			boolean fastsave = false;
+			try {
+				fastsave = config.isFastSave();
+			} catch (Throwable e) {e.printStackTrace();}
+
+			evProcessor.saveSetupResult(evStorePath, evt, evt.getAlg().getName(), fastsave);
+		}
     }
 
     
     @Override
+	public void setEvaluateStorePath(String evStorePath) throws RemoteException {
+		// TODO Auto-generated method stub
+		this.evStorePath = evStorePath;
+	}
+
+
+	@Override
 	public String toString() {
 		// TODO Auto-generated method stub
     	String evaluatorName = "No name";
@@ -907,6 +942,14 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 			e.printStackTrace();
 		}
 		
+		try {
+			evStorePath = null;
+			evProcessor.clear();
+		}
+		catch (Throwable e) {
+			e.printStackTrace();
+		}
+
 		try {
 			unexport();
 		}

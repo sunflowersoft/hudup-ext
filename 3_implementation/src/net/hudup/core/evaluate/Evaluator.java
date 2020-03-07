@@ -269,6 +269,14 @@ public interface Evaluator extends Remote, RemoteRunner, SetupAlgListener, Expor
     void removeSetupAlgListener(SetupAlgListener listener) throws RemoteException;
 
     
+    /**
+     * Setting evaluation store path.
+     * @param evStorePath evaluation store path.
+     * @throws RemoteException if any error raises.
+     */
+    void setEvaluateStorePath(String evStorePath) throws RemoteException;
+    
+    
 //    /**
 //     * Testing RMI call.
 //     * @param o parameter.

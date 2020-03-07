@@ -127,10 +127,10 @@ public class DefaultServiceExt extends DefaultService {
 
 	
 	/**
-	 * Getting list of local evaluators.
-	 * @return list of local evaluators.
+	 * Getting local evaluators.
+	 * @return local evaluators.
 	 */
-	public List<Evaluator> getEvaluatorList() throws RemoteException {
+	public List<Evaluator> getLocalEvaluators() throws RemoteException {
 		List<Evaluator> evList = Util.newList();
 		if (pairMap == null) return evList;
 		

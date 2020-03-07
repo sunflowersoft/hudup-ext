@@ -8,6 +8,7 @@
 package net.hudup.evaluate.ui;
 
 import java.io.Serializable;
+import java.rmi.RemoteException;
 import java.util.List;
 
 import net.hudup.core.RegisterTable;
@@ -117,10 +118,37 @@ public class EvaluateGUIData implements Serializable {
 	 * @param gui batch evaluator GUI.
 	 */
 	public void extractFrom(BatchEvaluateGUI gui) {
-		this.result = gui.result;
+		try {
+			this.result = gui.evaluator.getResult(); //Only applying for local evaluator.
+		} catch (RemoteException e) {e.printStackTrace();}
+		this.result = this.result != null ? this.result : gui.result;
+		
 		this.algRegTable = gui.algRegTable;
 		this.pool = gui.pool;
 		this.lbAlgs = gui.lbAlgs.getAlgList();
+		this.txtRunSaveBrowse = gui.txtRunSaveBrowse.getText();
+		this.txtRunSaveBrowse = this.txtRunSaveBrowse != null ? this.txtRunSaveBrowse : "";
+		this.chkRunSave = gui.chkRunSave.isSelected();
+		this.chkVerbal = gui.chkVerbal.isSelected();
+		this.prgRunning[0] = gui.prgRunning.getValue();
+		this.prgRunning[1] = gui.prgRunning.getMaximum();
+		this.statusBar = gui.statusBar.getTexts();
+		this.paneWait = gui.paneWait.getWaitText();
+	}
+
+
+	/**
+	 * Extracting GUI data.
+	 * @param gui evaluator GUI.
+	 */
+	public void extractFrom(EvaluateGUI gui) {
+		try {
+			this.result = gui.evaluator.getResult(); //Only applying for local evaluator.
+		} catch (RemoteException e) {e.printStackTrace();}
+		this.result = this.result != null ? this.result : gui.result;
+		
+		this.algRegTable = gui.algRegTable;
+		this.lbAlgs = gui.cmbAlgs.getAlgList();
 		this.txtRunSaveBrowse = gui.txtRunSaveBrowse.getText();
 		this.txtRunSaveBrowse = this.txtRunSaveBrowse != null ? this.txtRunSaveBrowse : "";
 		this.chkRunSave = gui.chkRunSave.isSelected();

@@ -19,6 +19,7 @@ import net.hudup.core.alg.SetupAlgEvent;
 import net.hudup.core.alg.SetupAlgListener;
 import net.hudup.core.data.DatasetPool;
 import net.hudup.core.logistic.BaseClass;
+import net.hudup.core.logistic.DSUtil;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.NetUtil;
 
@@ -281,6 +282,28 @@ public class EvaluatorWrapper implements Evaluator, Serializable {
 	public void removeSetupAlgListener(SetupAlgListener listener) throws RemoteException {
 		// TODO Auto-generated method stub
 		remoteEvaluator.removeSetupAlgListener(listener);
+	}
+
+	
+	@Override
+	public void setEvaluateStorePath(String evStorePath) throws RemoteException {
+		// TODO Auto-generated method stub
+		remoteEvaluator.setEvaluateStorePath(evStorePath);
+	}
+
+
+	@Override
+	public String toString() {
+		// TODO Auto-generated method stub
+    	String evaluatorName = "No name";
+		try {
+			evaluatorName = getName();
+		}
+		catch (Throwable e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return DSUtil.shortenVerbalName(evaluatorName);
 	}
 
 	

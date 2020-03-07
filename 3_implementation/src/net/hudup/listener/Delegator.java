@@ -41,6 +41,7 @@ import net.hudup.core.evaluate.EvaluatorProgressListener;
 import net.hudup.core.evaluate.Metric;
 import net.hudup.core.evaluate.Metrics;
 import net.hudup.core.evaluate.NoneWrapperMetricList;
+import net.hudup.core.logistic.DSUtil;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.NetUtil;
 import net.hudup.core.logistic.UriAdapter;
@@ -866,6 +867,13 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluatorProgr
 
 
 	@Override
+	public void setEvaluateStorePath(String evStorePath) throws RemoteException {
+		// TODO Auto-generated method stub
+		remoteEvaluator.setEvaluateStorePath(evStorePath);
+	}
+
+
+	@Override
 	public Remote getExportedStub() throws RemoteException {
 		return exportedStub;
 	}
@@ -883,6 +891,21 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluatorProgr
 	}
 
 
+	@Override
+	public String toString() {
+		// TODO Auto-generated method stub
+    	String evaluatorName = "No name";
+		try {
+			evaluatorName = getName();
+		}
+		catch (Throwable e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return DSUtil.shortenVerbalName(evaluatorName);
+	}
+
+	
 	@Override
 	protected void finalize() throws Throwable {
 		// TODO Auto-generated method stub

@@ -720,8 +720,12 @@ public class UriAdapter implements UriAssoc, AutoCloseable {
 		@Override
 		public void close() throws IOException {
 			// TODO Auto-generated method stub
-			if (channel != null && channel.isOpen())
-				channel.close();
+			if (channel != null && channel.isOpen()) {
+				try {
+					channel.close();
+				}
+				catch (Throwable e) {e.printStackTrace();}
+			}
 			channel = null;
 			
 			if (adapter != null)

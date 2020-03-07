@@ -17,12 +17,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.Reader;
 import java.io.Writer;
-import java.nio.ByteBuffer;
-import java.nio.channels.ByteChannel;
 import java.rmi.RemoteException;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import javax.swing.AbstractAction;
 import javax.swing.BoxLayout;
@@ -55,8 +51,6 @@ import net.hudup.core.evaluate.EvaluatorAbstract;
 import net.hudup.core.evaluate.EvaluatorEvent;
 import net.hudup.core.evaluate.EvaluatorEvent.Type;
 import net.hudup.core.evaluate.EvaluatorProgressEvent;
-import net.hudup.core.evaluate.Metrics;
-import net.hudup.core.evaluate.MetricsUtil;
 import net.hudup.core.logistic.ClipboardUtil;
 import net.hudup.core.logistic.DSUtil;
 import net.hudup.core.logistic.I18nUtil;
@@ -249,7 +243,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 	 */
 	public BatchEvaluateGUI(Evaluator evaluator, xURI bindUri) {
 		super(evaluator, bindUri);
-		init(evaluator, bindUri, null);
+		init(evaluator, null);
 	}
 
 	
@@ -261,18 +255,16 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 	 */
 	public BatchEvaluateGUI(Evaluator evaluator, xURI bindUri, EvaluateGUIData referredData) {
 		super(evaluator, bindUri);
-		// TODO Auto-generated constructor stub
-		init(evaluator, bindUri, referredData);
+		init(evaluator,referredData);
 	}
 
 	
 	/**
 	 * Initializing the evaluator batch GUI with specified evaluator, bound URI, and GUI data.
 	 * @param evaluator specified evaluator.
-	 * @param bindUri bound URI.
 	 * @param referredData GUI data.
 	 */
-	private void init(Evaluator evaluator, xURI bindUri, EvaluateGUIData referredData) {
+	private void init(Evaluator evaluator, EvaluateGUIData referredData) {
 		if (referredData == null || !referredData.wasGUIRun) {
 			RegisterTable algRegTable = null;
 			try {
@@ -324,9 +316,6 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			this.paneWait.setWaitText(referredData.paneWait);
 			
 			setVerbal(referredData.chkVerbal);
-
-			updateMode();
-			updateGUI();
 		}
 		
 		if (referredData != null) {
@@ -691,9 +680,11 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
+				
+				xURI store = null;
 				if(chkRunSave.isSelected()) {
 					UriAdapter adapter = new UriAdapter();
-					xURI store = adapter.chooseStore(getThisGUI());
+					store = adapter.chooseStore(getThisGUI());
 					adapter.close();
 					if (store == null) {
 						JOptionPane.showMessageDialog(
@@ -702,13 +693,19 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 							"Not open store", 
 							JOptionPane.WARNING_MESSAGE);
 					}
-					else
+					else {
 						txtRunSaveBrowse.setText(store.toString());
+					}
 				}
 				else {
 					txtRunSaveBrowse.setText("");
 				}
 				updateMode();
+				
+				//Setting evaluation store path to evaluator.
+				try {
+					evaluator.setEvaluateStorePath(store != null ? store.toString() : null);
+				} catch (Throwable ex) {ex.printStackTrace();}
 			}
 			
 		});
@@ -982,66 +979,13 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			this.txtRunInfo.insert(info, 0);
 			this.txtRunInfo.setCaretPosition(0);
 		}
-		else if (chkRunSave.isSelected()){
-			String storePath = this.txtRunSaveBrowse.getText().trim();
-			if (storePath.length() == 0)
-				return;
-			
+		else if (chkRunSave.isSelected()) {
+			boolean fastsave = false;
 			try {
-				xURI store = xURI.create(storePath);
-				UriAdapter adapter = new UriAdapter(store);
-				boolean existed = adapter.exists(store);
-				if (!existed)
-					adapter.create(store, true);
-				adapter.close();
-				
-				List<Alg> algs = lbAlgs.getAlgList();
-				for (Alg alg : algs) {
-					if (evt.getType() == Type.done) {
-						String key = alg.getName() + EVALUATION_FILE_EXTENSION;
-						ByteChannel channel = getIOChannel(store, key, true);
-						
-						String info = evt.translate(alg.getName(), -1) + "\n\n\n\n";
-						ByteBuffer buffer = ByteBuffer.wrap(info.getBytes());
-						channel.write(buffer);
-					}
-					else {
-						Map<Integer, Metrics> map = evt.getMetrics().gets(alg.getName());
-						Set<Integer> datasetIdList = map.keySet();
-						for (int datasetId : datasetIdList) {
-							String key = alg.getName() + "@" + datasetId + EVALUATION_FILE_EXTENSION;
-							ByteChannel channel = getIOChannel(store, key, true);
-
-							String info = evt.translate(alg.getName(), datasetId) + "\n\n\n\n";
-							ByteBuffer buffer = ByteBuffer.wrap(info.getBytes());
-							channel.write(buffer);
-							
-							if (evt.getType() == Type.done_one)
-								closeIOChannel(key);
-						}
-					}
-				}
-				
-			    // Exporting excel file
-				if (evt.getType() == Type.done || evt.getType() == Type.done_one) {
-				    // Exporting excel file
-					MetricsUtil util = new MetricsUtil(this.result, new RegisterTable(lbAlgs.getAlgList()));
-					util.createExcel(store.concat(METRICS_ANALYZE_EXCEL_FILE_NAME));
-					// Begin exporting plain text. It is possible to remove this snippet.
-					ByteChannel channel = getIOChannel(store, METRICS_ANALYZE_EXCEL_FILE_NAME2, false);
-					ByteBuffer buffer = ByteBuffer.wrap(util.createPlainText().getBytes());
-					channel.write(buffer);
-					closeIOChannel(METRICS_ANALYZE_EXCEL_FILE_NAME2);
-					// End exporting plain text. It is possible to remove this snippet.
-					
-					if (evt.getType() == Type.done)
-						closeIOChannels();
-				}
-			} 
-			catch (Exception e) {
-				e.printStackTrace();
-			}
+				fastsave = evaluator.getConfig().isFastSave();
+			} catch (Throwable e) {e.printStackTrace();}
 			
+			evProcessor.saveEvaluateResult(txtRunSaveBrowse.getText(), evt, lbAlgs.getAlgList(), fastsave);
 		}
 		
 		
@@ -1098,41 +1042,20 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 		}
 		
 		
-		String info = "========== Algorithm \"" + algName + "\" ==========\n";
-		info = info + evt.translate() + "\n\n\n\n";
-		
 		if (chkVerbal.isSelected()) {
+			String info = "========== Algorithm \"" + algName + "\" ==========\n";
+			info = info + evt.translate() + "\n\n\n\n";
+
 			this.txtRunInfo.insert(info, 0);
 			this.txtRunInfo.setCaretPosition(0);
 		}
 		else if (chkRunSave.isSelected()) {
-			String storePath = this.txtRunSaveBrowse.getText().trim();
-			if (storePath.length() == 0)
-				return;
-			
+			boolean fastsave = false;
 			try {
-				xURI store = xURI.create(storePath);
-				UriAdapter adapter = new UriAdapter(store);
-				boolean existed = adapter.exists(store);
-				if (!existed)
-					adapter.create(store, true);
-				adapter.close();
-				
-				String key = algName;
-				if (evt.getType() == SetupAlgEvent.Type.doing)
-					key += SETUP_DOING_FILE_EXTENSION;
-				else
-					key += SETUP_DONE_FILE_EXTENSION;
-					
-				ByteChannel channel = getIOChannel(store, key, true);
-				ByteBuffer buffer = ByteBuffer.wrap(info.getBytes());
-				channel.write(buffer);
-				closeIOChannel(key);
-			} 
-			catch (Exception e) {
-				e.printStackTrace();
-			}
-			
+				fastsave = evaluator.getConfig().isFastSave();
+			} catch (Throwable e) {e.printStackTrace();}
+
+			evProcessor.saveSetupResult(txtRunSaveBrowse.getText(), evt, algName, fastsave);
 		}
 	}
 	
@@ -1140,7 +1063,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 	@Override
 	protected void updateMode() {
 		try {
-			closeIOChannels();
+			evProcessor.closeIOChannels();
 			
 			if (lbAlgs.getAlgList().size() == 0) {
 				setInternalEnable(false);
