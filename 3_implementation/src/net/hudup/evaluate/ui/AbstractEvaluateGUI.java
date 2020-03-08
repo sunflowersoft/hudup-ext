@@ -185,6 +185,7 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 		this.pool = referredData != null && referredData.pool != null ? referredData.pool : new DatasetPool ();
 
 		this.counterClock = new CounterClock();
+		this.counterClock.setTimeElapse(this.otherResult.timeElapse);
 
 		this.referredData = referredData;
 		if (referredData != null) {
