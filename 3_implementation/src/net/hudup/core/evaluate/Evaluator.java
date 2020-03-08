@@ -180,6 +180,14 @@ public interface Evaluator extends Remote, RemoteRunner, SetupAlgListener, Expor
 	
 	
 	/**
+	 * Getting other result of evaluation process as the evaluation information.
+	 * @return other result of evaluation process as the evaluation information.
+	 * @throws RemoteException if any error raises.
+	 */
+	EvaluateInfo getOtherResult() throws RemoteException;
+
+	
+	/**
 	 * Getting the list of metrics resulted from the evaluation process.
 	 * @return list of metrics resulted from the evaluation process.
 	 * @throws RemoteException if any error raises.

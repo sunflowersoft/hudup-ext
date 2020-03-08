@@ -8,15 +8,19 @@
 package net.hudup.evaluate.ui;
 
 import java.rmi.Remote;
+import java.rmi.RemoteException;
 import java.util.List;
 
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import net.hudup.core.PluginChangedListener;
+import net.hudup.core.RegisterTable;
 import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.Recommender;
 import net.hudup.core.alg.SetupAlgListener;
+import net.hudup.core.data.DatasetPool;
+import net.hudup.core.evaluate.EvaluateInfo;
 import net.hudup.core.evaluate.EvaluateProcessor;
 import net.hudup.core.evaluate.Evaluator;
 import net.hudup.core.evaluate.EvaluatorAbstract;
@@ -59,15 +63,15 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	
 	
 	/**
+	 * Evaluation information as other result of evaluation.
+	 */
+	protected EvaluateInfo otherResult = null;
+
+	
+	/**
 	 * Processor to process evaluation results.
 	 */
 	protected EvaluateProcessor evProcessor = new EvaluateProcessor();
-	
-	
-	/**
-	 * Internal counter clock.
-	 */
-	protected CounterClock counterClock = null;
 	
 	
 	/**
@@ -89,17 +93,55 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	
 
 	/**
+	 * Table of algorithms.
+	 */
+	protected RegisterTable algRegTable = null;
+
+	
+	/**
+	 * Dataset pool.
+	 */
+	protected DatasetPool pool = null;
+	
+
+	/**
+	 * Internal counter clock.
+	 */
+	protected CounterClock counterClock = null;
+	
+	
+	/**
 	 * Evaluator GUI data.
 	 */
 	protected EvaluateGUIData referredData = null;
 	
 	
 	/**
-	 * Constructor with specified evaluator.
+	 * Constructor with local evaluator.
+	 * @param evaluator local evaluator.
+	 */
+	public AbstractEvaluateGUI(Evaluator evaluator) {
+		this(evaluator, null, null);
+	}
+
+	
+	/**
+	 * Constructor with specified evaluator and bound URI.
 	 * @param evaluator specified evaluator.
 	 * @param bindUri bound URI. If this parameter is null, evaluator is local.
 	 */
 	public AbstractEvaluateGUI(Evaluator evaluator, xURI bindUri) {
+		this(evaluator, bindUri, null);
+	}
+	
+	
+	/**
+	 * Constructor with specified evaluator, bound URI, and referred GUI data.
+	 * @param evaluator specified evaluator.
+	 * @param bindUri bound URI. If this parameter is null, evaluator is local.
+	 * @param referredData addition referred GUI data.
+	 */
+	public AbstractEvaluateGUI(Evaluator evaluator, xURI bindUri, EvaluateGUIData referredData) {
 		this.bindUri = bindUri;
 		if (bindUri != null) { //Evaluator is remote
 			this.exportedStub = NetUtil.RegistryRemote.export(this, bindUri.getPort());
@@ -125,7 +167,31 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 		setupListeners(evaluator);
 		
 		this.evaluator = evaluator;
+		
+		try {
+			this.result = evaluator.getResult();
+		} catch (RemoteException e) {e.printStackTrace();}
+
+		try {
+			this.otherResult = evaluator.getOtherResult();
+		} catch (RemoteException e) {e.printStackTrace();}
+		if (this.otherResult == null) this.otherResult = new EvaluateInfo();
+
+		try {
+			this.algRegTable = EvaluatorAbstract.extractAlgFromPluginStorage(evaluator);
+		} catch (Throwable e) {e.printStackTrace();}
+		if (this.algRegTable == null) this.algRegTable = new RegisterTable();
+		
+		this.pool = referredData != null && referredData.pool != null ? referredData.pool : new DatasetPool ();
+
 		this.counterClock = new CounterClock();
+
+		this.referredData = referredData;
+		if (referredData != null) {
+			referredData.wasGUIRun = true;
+			referredData.active = true;
+		}
+
 	}
 	
 	

@@ -207,6 +207,13 @@ public class EvaluatorWrapper implements Evaluator, Serializable {
 
 	
 	@Override
+	public EvaluateInfo getOtherResult() throws RemoteException {
+		// TODO Auto-generated method stub
+		return remoteEvaluator.getOtherResult();
+	}
+
+
+	@Override
 	public List<Metric> getMetricList() throws RemoteException {
 		// TODO Auto-generated method stub
 		return remoteEvaluator.getMetricList();

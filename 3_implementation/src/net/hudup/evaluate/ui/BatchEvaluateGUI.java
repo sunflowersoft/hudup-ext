@@ -63,7 +63,6 @@ import net.hudup.core.logistic.ui.SortableTable;
 import net.hudup.core.logistic.ui.SortableTableModel;
 import net.hudup.core.logistic.ui.TextField;
 import net.hudup.core.logistic.ui.UIUtil;
-import net.hudup.core.logistic.ui.WaitPanel;
 import net.hudup.data.BatchScript;
 import net.hudup.data.DatasetUtil2;
 import net.hudup.data.ui.DatasetPoolTable;
@@ -85,15 +84,6 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	/**
-	 * Table of algorithms.
-	 */
-	protected RegisterTable algRegTable = new RegisterTable();
-	
-	/**
-	 * Dataset pool.
-	 */
-	protected DatasetPool pool = new DatasetPool();
 	
 	/**
 	 * Table to show dataset pool.
@@ -230,99 +220,54 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 	protected StatusBar statusBar = null;
 //	protected StatusBar2 statusBar = null;
 	
+	
 	/**
-	 * Waiting panel which is the alternative of testing result panel.
+	 * Constructor with local evaluator.
+	 * @param evaluator local evaluator.
 	 */
-	protected WaitPanel paneWait = null; //Added date: 2019.09.03 by Loc Nguyen.
+	public BatchEvaluateGUI(Evaluator evaluator) {
+		this(evaluator, null, null);
+	}
 
 	
 	/**
 	 * Constructor with specified evaluator and bound URI.
 	 * @param evaluator specified evaluator.
-	 * @param bindUri bound URI.
+	 * @param bindUri bound URI. If this parameter is null, evaluator is local.
 	 */
 	public BatchEvaluateGUI(Evaluator evaluator, xURI bindUri) {
-		super(evaluator, bindUri);
-		init(evaluator, null);
+		this(evaluator, bindUri, null);
 	}
 
 	
 	/**
 	 * Constructor with specified evaluator, bound URI, and GUI data.
 	 * @param evaluator specified evaluator.
-	 * @param bindUri bound URI.
+	 * @param bindUri bound URI. If this parameter is null, evaluator is local.
 	 * @param referredData GUI parameter.
 	 */
 	public BatchEvaluateGUI(Evaluator evaluator, xURI bindUri, EvaluateGUIData referredData) {
-		super(evaluator, bindUri);
-		init(evaluator,referredData);
+		super(evaluator, bindUri, referredData);
+		init();
 	}
 
 	
 	/**
-	 * Initializing the evaluator batch GUI with specified evaluator, bound URI, and GUI data.
-	 * @param evaluator specified evaluator.
-	 * @param referredData GUI data.
+	 * Initializing the evaluator batch GUI.
 	 */
-	private void init(Evaluator evaluator, EvaluateGUIData referredData) {
-		if (referredData == null || !referredData.wasGUIRun) {
-			RegisterTable algRegTable = null;
-			try {
-				algRegTable = EvaluatorAbstract.extractAlgFromPluginStorage(evaluator);
-			}
-			catch (Throwable e) {e.printStackTrace();}
-			if (algRegTable == null) algRegTable = new RegisterTable();
-			
-			this.algRegTable.register(algRegTable.getAlgList()); //Algorithms are not cloned because of saving memory when evaluator GUI keep algorithms for a long time. 
-			
-			setLayout(new BorderLayout(2, 2));
-			
-			JPanel header = createHeader();
-			add(header, BorderLayout.NORTH);
-			
-			JPanel body = createBody();
-			add(body, BorderLayout.CENTER);
-			
-			JPanel footer = createFooter();
-			add(footer, BorderLayout.SOUTH);
-			
-			setVerbal(false);
-		}
-		else {
-			this.result = referredData.result;
-			
-			this.algRegTable = referredData.algRegTable;
-			
-			this.pool = referredData.pool;
-			
-			setLayout(new BorderLayout(2, 2));
-			
-			JPanel header = createHeader();
-			add(header, BorderLayout.NORTH);
-			this.tblDatasetPool.update(referredData.pool);
-			this.lbAlgs.update(referredData.lbAlgs);
-					
-			JPanel body = createBody();
-			add(body, BorderLayout.CENTER);
-			this.txtRunSaveBrowse.setText(referredData.txtRunSaveBrowse);
-			this.chkRunSave.setSelected(referredData.chkRunSave);
-			this.prgRunning.setValue(referredData.prgRunning[0]);
-			this.prgRunning.setMaximum(referredData.prgRunning[1]);
-			
-			JPanel footer = createFooter();
-			add(footer, BorderLayout.SOUTH);
-			this.tblMetrics.update(referredData.result);
-			this.statusBar.setTexts(referredData.statusBar);
-			this.paneWait.setWaitText(referredData.paneWait);
-			
-			setVerbal(referredData.chkVerbal);
-		}
+	private void init() {
+		setLayout(new BorderLayout(2, 2));
 		
-		if (referredData != null) {
-			referredData.wasGUIRun = true;
-			referredData.active = true;
-			this.referredData = referredData;
-		}
+		JPanel header = createHeader();
+		add(header, BorderLayout.NORTH);
+		
+		JPanel body = createBody();
+		add(body, BorderLayout.CENTER);
+		
+		JPanel footer = createFooter();
+		add(footer, BorderLayout.SOUTH);
+		
+		setVerbal(referredData != null ? referredData.chkVerbal : false);
 	}
 
 	
@@ -500,6 +445,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			}
 
 		};
+		this.tblDatasetPool.update(this.pool);
 		this.tblDatasetPool.setPreferredScrollableViewportSize(new Dimension(600, 80));
 		down.add(new JScrollPane(this.tblDatasetPool), BorderLayout.CENTER);
 
@@ -672,7 +618,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 		this.paneRunSave.add(pane, BorderLayout.NORTH);
 		this.txtRunSaveBrowse = new TextField();
 		this.txtRunSaveBrowse.setEditable(false);
-		this.txtRunSaveBrowse.setToolTipText(I18nUtil.message("save_evaluate_place"));;
+		this.txtRunSaveBrowse.setToolTipText(I18nUtil.message("save_evaluate_place"));
 		pane.add(this.txtRunSaveBrowse, BorderLayout.CENTER);
 		this.chkRunSave = new JCheckBox(I18nUtil.message("save_evaluate"));
 		this.chkRunSave.addActionListener(new ActionListener() {
@@ -704,12 +650,17 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 				
 				//Setting evaluation store path to evaluator.
 				try {
-					evaluator.setEvaluateStorePath(store != null ? store.toString() : null);
+					if (bindUri == null) //Local evaluator.
+						evaluator.setEvaluateStorePath(store != null ? store.toString() : null);
 				} catch (Throwable ex) {ex.printStackTrace();}
 			}
 			
 		});
 		this.chkRunSave.setToolTipText(I18nUtil.message("save_evaluate_tooltip"));
+		if (referredData != null && referredData.txtRunSaveBrowse != null) {
+			this.txtRunSaveBrowse.setText(referredData.txtRunSaveBrowse);
+			this.chkRunSave.setSelected(true);
+		}
 		pane.add(this.chkRunSave, BorderLayout.WEST);
 
 		JPanel toolbar = new JPanel(new BorderLayout());
@@ -757,8 +708,8 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 		this.prgRunning = new JProgressBar();
 		this.prgRunning.setStringPainted(true);
 		this.prgRunning.setToolTipText(I18nUtil.message("evaluation_progress"));
-		this.prgRunning.setMaximum(0);
-		this.prgRunning.setValue(0);
+		this.prgRunning.setMaximum(otherResult.progressTotal);
+		this.prgRunning.setValue(otherResult.progressStep);
 		this.prgRunning.setVisible(false);
 		toolbar.add(this.prgRunning, BorderLayout.CENTER);
 
@@ -777,6 +728,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 		footer.add(this.paneResult, BorderLayout.CENTER);
 		
 		this.tblMetrics = new MetricsTable(new RegisterTable(lbAlgs.getAlgList()));
+		this.tblMetrics.update(result);
 		this.tblMetrics.setPreferredScrollableViewportSize(new Dimension(600, 80));
 		this.paneResult.add(new JScrollPane(this.tblMetrics), BorderLayout.CENTER);
 
@@ -839,13 +791,20 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 		footer.add(statusPane, BorderLayout.SOUTH);
 		
 		this.statusBar = new StatusBar();
-		this.counterClock.setTimeTextPane(this.statusBar.getLastPane());
+		if (otherResult.inSetup) {
+			this.statusBar.setTextPane1(I18nUtil.message("setting_up_algorithm") + " '" + DSUtil.shortenVerbalName(otherResult.algName) + "'. " + I18nUtil.message("please_wait") + "...");
+		}
+		else if (otherResult.progressTotal > 0) {
+			this.statusBar.setTextPane1(
+					I18nUtil.message("algorithm") + " '" + DSUtil.shortenVerbalName(otherResult.algName) + "' " +
+					I18nUtil.message("dataset") + " '" + otherResult.datasetId + "': " + 
+					otherResult.vCurrentCount + "/" + otherResult.vCurrentTotal);
+			
+			this.statusBar.setTextPane2(I18nUtil.message("total") + ": " + otherResult.progressStep + "/" + otherResult.progressTotal);
+		}
+		this.counterClock.setTimeElapse(otherResult.timeElapse);
+		this.counterClock.setAssocTimeTextPane(this.statusBar.getLastPane());
 		statusPane.add(this.statusBar, BorderLayout.CENTER);
-
-		//Added date: 2019.09.03 by Loc Nguyen.
-		this.paneWait = new WaitPanel();
-		statusPane.add(this.paneWait, BorderLayout.SOUTH);
-		this.paneWait.setVisible(false);
 
 
 		return footer;
@@ -1032,13 +991,9 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 
 		if (evt.getType() == SetupAlgEvent.Type.doing) {
 			this.statusBar.setTextPane1(I18nUtil.message("setting_up_algorithm") + " '" + DSUtil.shortenVerbalName(algName) + "'. " + I18nUtil.message("please_wait") + "...");
-//			this.paneWait.setWaitText(I18nUtil.message("setting_up_algorithm") + " '" + DSUtil.shortenVerbalName(algName) + "'. " + I18nUtil.message("please_wait") + "...");
-//			this.paneWait.setVisible(true);
 		}
 		else if (evt.getType() == SetupAlgEvent.Type.done) {
 			this.statusBar.setTextPane1("");
-//			this.paneWait.setWaitText(WaitPanel.WAIT_TEXT);
-//			this.paneWait.setVisible(false);
 		}
 		
 		
@@ -1146,9 +1101,6 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 		catch (Throwable e) {
 			e.printStackTrace();
 		}
-		
-		//Added date: 2019.09.03 by Loc Nguyen.
-		this.paneWait.setVisible(false);
 	}
 	
 	
@@ -1209,14 +1161,6 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 		paneResult.setVisible(visible);
 		btnAnalyzeResult.setEnabled(visible);
 		btnCopyResult.setEnabled(visible);
-		
-		//Added date: 2019.09.03 by Loc Nguyen.
-		try {
-			//paneWait.setVisible(!visible && evaluator.remoteIsStarted());
-		} catch (Exception e) {
-			e.printStackTrace();
-			paneWait.setVisible(false);
-		}
 	}
 
 	
@@ -1414,7 +1358,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			this.txtRunInfo.setText("");
 			this.result = null;
 			this.tblMetrics.clear();
-			this.counterClock.stopAndClearText();
+			this.counterClock.stopAndClearAssoc();
 		}
 		catch (Throwable e) {
 			e.printStackTrace();

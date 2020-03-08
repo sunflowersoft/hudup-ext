@@ -42,6 +42,7 @@ import net.hudup.core.logistic.NetUtil;
 import net.hudup.core.logistic.SystemUtil;
 import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.xURI;
+import net.hudup.core.logistic.ui.CounterClock;
 import net.hudup.core.logistic.ui.ProgressEvent;
 import net.hudup.core.logistic.ui.ProgressListener;
 
@@ -162,6 +163,12 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 	protected volatile Metrics result = null;
 	
 	
+	/**
+	 * Information of resulted metrics.
+	 */
+	protected EvaluateInfo otherResult = new EvaluateInfo();
+	
+	
     /**
      * The list of original metrics used to evaluate algorithms in {@link #algList}.
      */
@@ -187,6 +194,12 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
     
     
 	/**
+	 * Internal counter clock.
+	 */
+	protected CounterClock counterClock = null;
+
+	
+	/**
 	 * Default constructor.
 	 */
 	public EvaluatorAbstract() {
@@ -209,6 +222,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 			e.printStackTrace();
 		}
 		
+		this.counterClock = new CounterClock(otherResult);
 	}
 	
 	
@@ -235,6 +249,12 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 		this.parameter = parameter;
 		this.result = null;
 		
+		this.otherResult.reset();
+		try {
+			this.counterClock.stop();
+			this.counterClock.start();
+		} catch (Throwable e) {e.printStackTrace();}
+		
 		start();
 	}
 	
@@ -255,13 +275,13 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 	 * Actually, make evaluation process on algorithms with a dataset pool according to original (built-in) metrics.
 	 */
 	protected void run0() {
-		int progressStep = 0;
-		int progressTotal = 0;
+		otherResult.progressStep = 0;
+		otherResult.progressTotal = 0;
 		for (int i = 0; i < pool.size(); i++) {
 			Dataset testing = pool.get(i).getTesting();
 			Fetcher<Profile> fetcher = fetchTesting(testing);
 			try {
-				progressTotal += fetcher.getMetadata().getSize();
+				otherResult.progressTotal += fetcher.getMetadata().getSize();
 				fetcher.close();
 			}
 			catch (Exception e) {
@@ -269,13 +289,14 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 				e.printStackTrace();
 			}
 		}
-		progressTotal *= algList.size();
+		otherResult.progressTotal *= algList.size();
 		
 		result = new Metrics();
 		
 		Thread current = Thread.currentThread();
 		for (int i = 0; current == thread && algList != null && i < algList.size(); i++) {
 			Alg alg = algList.get(i);
+			otherResult.algName = alg.getName();
 			
 			for (int j = 0; current == thread && pool != null && j < pool.size(); j++) {
 				
@@ -286,10 +307,12 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 					Dataset     testing = dsPair.getTesting();
 					int         datasetId = j + 1;
 					xURI        datasetUri = testing.getConfig() != null ? testing.getConfig().getUriId() : null;
+					otherResult.datasetId = datasetId;
 					
 					// Adding default metrics to metric result. Pay attention to cloning metrics list.
 					result.add( alg.getName(), datasetId, datasetUri, ((NoneWrapperMetricList)metricList.clone()).sort().list() );
 					
+					otherResult.inSetup = true;
 					if (alg instanceof AlgRemote) {
 						((AlgRemote)alg).addSetupListener(this);
 						SetupAlgEvent setupEvt = new SetupAlgEvent(new Integer(-1), SetupAlgEvent.Type.doing, alg, null, "not supported yet");
@@ -297,7 +320,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 					}
 					
 					long beginSetupTime = System.currentTimeMillis();
-					//
+					// 
 					setupAlg(alg, training);
 					//
 					long endSetupTime = System.currentTimeMillis();
@@ -315,22 +338,23 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 						fireSetupAlgEvent(setupEvt);
 						((AlgRemote)alg).removeSetupListener(this);
 					}
+					otherResult.inSetup = false;
 					
 					//Auto enhancement after setting up algorithm.
 					SystemUtil.enhanceAuto();
 
 					testingFetcher = fetchTesting(testing);
-					int vCurrentTotal = testingFetcher.getMetadata().getSize();
-					int vCurrentCount = 0;
+					otherResult.vCurrentTotal = testingFetcher.getMetadata().getSize();
+					otherResult.vCurrentCount = 0;
 					int vExecutedCount = 0;
 					while (current == thread && testingFetcher.next()) {
-						progressStep++;
-						vCurrentCount++;
-						EvaluatorProgressEvent progressEvt = new EvaluatorProgressEvent(this, progressTotal, progressStep);
+						otherResult.progressStep++;
+						otherResult.vCurrentCount++;
+						EvaluatorProgressEvent progressEvt = new EvaluatorProgressEvent(this, otherResult.progressTotal, otherResult.progressStep);
 						progressEvt.setAlgName(alg.getName());
 						progressEvt.setDatasetId(datasetId);
-						progressEvt.setCurrentCount(vCurrentCount);
-						progressEvt.setCurrentTotal(vCurrentTotal);
+						progressEvt.setCurrentCount(otherResult.vCurrentCount);
+						progressEvt.setCurrentTotal(otherResult.vCurrentTotal);
 						fireProgressEvent(progressEvt);
 						
 						Profile testingProfile = testingFetcher.pick();
@@ -373,12 +397,14 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 						}
 						
 						
+						counterClock.pause();
 						synchronized (this) {
 							while (paused) {
 								notifyAll();
 								wait();
 							}
 						}
+						counterClock.resume();
 						
 					} // User id iterate
 					
@@ -386,7 +412,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 							alg, 
 							datasetId, 
 							HudupRecallMetric.class, 
-							new Object[] { new FractionMetricValue(vExecutedCount, vCurrentTotal) }
+							new Object[] { new FractionMetricValue(vExecutedCount, otherResult.vCurrentTotal) }
 						);
 					fireEvaluatorEvent(new EvaluatorEvent(this, Type.doing, hudupRecallMetrics));
 					
@@ -541,6 +567,13 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 
 	
 	@Override
+	public EvaluateInfo getOtherResult() throws RemoteException {
+		// TODO Auto-generated method stub
+		return otherResult;
+	}
+
+
+	@Override
 	public List<Metric> getMetricList() throws RemoteException {
 		synchronized(metricList) {
 			return this.metricList.list();
@@ -641,6 +674,10 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 		this.algList = null;
 		this.pool = null;
 		this.parameter = null;
+		
+		try {
+			this.counterClock.stop();
+		} catch (Throwable e) {e.printStackTrace();}
 	}
 
 	

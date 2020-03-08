@@ -418,4 +418,12 @@ public class DatasetPool implements Serializable {
     }
 
     
+    /**
+     * Removing all pairs but not clearing datasets.
+     */
+    public void removeAllNoClearDatasets() {
+    	dspList.clear();
+    }
+    
+    
 }

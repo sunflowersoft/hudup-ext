@@ -11,6 +11,7 @@ import java.io.Serializable;
 
 import javax.swing.JLabel;
 
+import net.hudup.core.evaluate.EvaluateInfo;
 import net.hudup.core.logistic.AbstractRunner;
 import net.hudup.core.logistic.I18nUtil;
 
@@ -44,9 +45,15 @@ public class CounterClock extends AbstractRunner implements Serializable {
 	
 	
 	/**
-	 * The text pane to show the counter in text form &quot;hours: minutes: seconds&quot;.
+	 * Associated text pane to show the counter in text form &quot;hours: minutes: seconds&quot;.
 	 */
-	protected JLabel txtTime = null;
+	protected JLabel assocTxtTime = null;
+	
+	
+	/**
+	 * Associated evaluation information.
+	 */
+	protected EvaluateInfo assocEvaluateInfo = null;
 	
 	
 	/**
@@ -70,22 +77,42 @@ public class CounterClock extends AbstractRunner implements Serializable {
 	
 	
 	/**
-	 * Constructor with the specified text pane for showing the counter in text form &quot;hours: minutes: seconds&quot;.
-	 * @param txtTime specified text pane.
+	 * Constructor with the associated text pane for showing the counter in text form &quot;hours: minutes: seconds&quot;.
+	 * @param assocTxtTime associated text pane.
 	 */
-	public CounterClock(JLabel txtTime) {
+	public CounterClock(JLabel assocTxtTime) {
 		this();
-		
-		setTimeTextPane(txtTime);
+		setAssocTimeTextPane(assocTxtTime);
 	}
 	
 	
 	/**
-	 * Setting the text pane for showing the counter in text form &quot;hours: minutes: seconds&quot;.
-	 * @param txtTime text pane for showing the counter in text form &quot;hours: minutes: seconds&quot;.
+	 * Constructor with associated evaluation information.
+	 * @param assocEvaluateInfo associated evaluation information.
 	 */
-	public void setTimeTextPane(JLabel txtTime) {
-		this.txtTime = txtTime;
+	public CounterClock(EvaluateInfo assocEvaluateInfo) {
+		this();
+		setAssocEvaluateInfo(assocEvaluateInfo);
+	}
+
+	
+	/**
+	 * Setting associated text pane for showing the counter in text form &quot;hours: minutes: seconds&quot;.
+	 * @param assocTxtTime associated text pane for showing the counter in text form &quot;hours: minutes: seconds&quot;.
+	 */
+	public synchronized void setAssocTimeTextPane(JLabel assocTxtTime) {
+		if (assocTxtTime != null)
+			this.assocTxtTime = assocTxtTime;
+	}
+	
+	
+	/**
+	 * Setting associated evaluation information.
+	 * @param assocEvaluateInfo evaluation information.
+	 */
+	public synchronized void setAssocEvaluateInfo(EvaluateInfo assocEvaluateInfo) {
+		if (assocEvaluateInfo != null)
+			this.assocEvaluateInfo = assocEvaluateInfo;
 	}
 	
 	
@@ -150,20 +177,20 @@ public class CounterClock extends AbstractRunner implements Serializable {
 	
 	
 	/**
-	 * Stopping this counter and clearing the text of elapsed time as empty text.
+	 * Stopping this counter and clearing associated information.
 	 */
-	public synchronized void stopAndClearText() {
+	public synchronized void stopAndClearAssoc() {
 		stop();
-		clearText();
+		clearAssoc();
 	}
 
 	
 	/**
-	 * Clearing the text of elapsed time as empty text.
+	 * Clearing associated information.
 	 */
-	public synchronized void clearText() {
-		if (txtTime != null)
-			txtTime.setText("");
+	public synchronized void clearAssoc() {
+		if (assocTxtTime != null) assocTxtTime.setText("");
+		if (assocEvaluateInfo != null) assocEvaluateInfo.timeElapse = 0;
 	}
 	
 	
@@ -171,18 +198,48 @@ public class CounterClock extends AbstractRunner implements Serializable {
 	 * Updating the time counter in text form &quot;hours: minutes: seconds&quot; by current system time.
 	 */
 	private void updateTime() {
-		if (startedTime == 0)
-			return;
+		if (startedTime == 0) return;
+		
+		long milis = getTimeElapse();
+		String text = formatTime(milis);
+		
+		if (assocEvaluateInfo != null) assocEvaluateInfo.timeElapse = milis;
+		if (assocTxtTime != null) assocTxtTime.setText(text);
+	}
+	
+	
+	/**
+	 * Getting time elapse in miliseconds.
+	 * @return time elapse in miliseconds.
+	 */
+	public synchronized long getTimeElapse() {
+		if (startedTime == 0) return timeElapse;
 		
 		long currentTime = System.currentTimeMillis();
-		long timeSum = (timeElapse + currentTime - startedTime) / 1000;
+		return (timeElapse + currentTime - startedTime);
+	}
+	
+	
+	/**
+	 * Setting time elapse in miliseconds.
+	 * @param timeElapse time elapse in miliseconds.
+	 */
+	public synchronized void setTimeElapse(long timeElapse) {
+		if (timeElapse >= 0) this.timeElapse = timeElapse;
+	}
+	
+	
+	/**
+	 * Formatting miliseconds in date-time format.
+	 * @param milis specified miliseconds. 
+	 * @return date-time format text of specified miliseconds.
+	 */
+	public static String formatTime(long milis) {
+		long timeSum = milis / 1000;
 		long hours = timeSum / 3600;
 		long minutes = (timeSum % 3600) / 60;
 		long seconds = (timeSum % 3600) % 60;
-		String text = String.format(TIME_FORMAT, hours, minutes, seconds);
-		
-		if (txtTime != null)
-			txtTime.setText(text);
+		return String.format(TIME_FORMAT, hours, minutes, seconds);
 	}
 	
 	

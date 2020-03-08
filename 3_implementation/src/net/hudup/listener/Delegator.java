@@ -32,6 +32,7 @@ import net.hudup.core.client.Service;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.DatasetPool;
 import net.hudup.core.data.MemFetcher;
+import net.hudup.core.evaluate.EvaluateInfo;
 import net.hudup.core.evaluate.Evaluator;
 import net.hudup.core.evaluate.EvaluatorConfig;
 import net.hudup.core.evaluate.EvaluatorEvent;
@@ -509,6 +510,13 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluatorProgr
 	}
 
 	
+	@Override
+	public EvaluateInfo getOtherResult() throws RemoteException {
+		// TODO Auto-generated method stub
+		return remoteEvaluator.getOtherResult();
+	}
+
+
 	@Override
 	public List<Metric> getMetricList() throws RemoteException {
 		return remoteEvaluator.getMetricList();

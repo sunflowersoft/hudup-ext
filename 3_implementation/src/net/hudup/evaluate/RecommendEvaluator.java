@@ -121,8 +121,8 @@ public class RecommendEvaluator extends EvaluatorAbstract {
 	
 	@Override
 	protected void run0() {
-		int progressStep = 0;
-		int progressTotal = pool.getTotalTestingUserNumber() * algList.size();
+		otherResult.progressStep = 0;
+		otherResult.progressTotal = pool.getTotalTestingUserNumber() * algList.size();
 		result = new Metrics();
 		
 		Thread current = Thread.currentThread();
@@ -135,6 +135,7 @@ public class RecommendEvaluator extends EvaluatorAbstract {
 				continue;
 			}
 			Recommender recommender = (Recommender)algList.get(i);
+			otherResult.algName = recommender.getName();
 			
 			for (int j = 0; current == thread && pool != null && j < pool.size(); j++) {
 				
@@ -145,10 +146,12 @@ public class RecommendEvaluator extends EvaluatorAbstract {
 					Dataset     testing = dsPair.getTesting();
 					int         datasetId = j + 1;
 					xURI        datasetUri = testing.getConfig() != null ? testing.getConfig().getUriId() : null;
+					otherResult.datasetId = datasetId;
 					
 					// Adding default metrics to metric result
 					result.add( recommender.getName(), datasetId, datasetUri, ((NoneWrapperMetricList)metricList.clone()).sort().list() );
 					
+					otherResult.inSetup = true;
 					recommender.addSetupListener(this);
 					SetupAlgEvent setupEvt = new SetupAlgEvent(new Integer(-1), SetupAlgEvent.Type.doing, recommender, null, "not supported yet");
 					fireSetupAlgEvent(setupEvt);
@@ -171,6 +174,7 @@ public class RecommendEvaluator extends EvaluatorAbstract {
 					setupEvt = new SetupAlgEvent(new Integer(1), SetupAlgEvent.Type.done, recommender, null, "not supported yet");
 					fireSetupAlgEvent(setupEvt);
 					recommender.removeSetupListener(this);
+					otherResult.inSetup = false;
 					
 					//Auto enhancement after setting up algorithm.
 					SystemUtil.enhanceAuto();
@@ -187,21 +191,21 @@ public class RecommendEvaluator extends EvaluatorAbstract {
 					
 					
 					testingUsers = testing.fetchUserRatings();
-					int vCurrentTotal = testingUsers.getMetadata().getSize();
-					int vCurrentCount = 0; //Vector count for Hudup recall metric.
+					otherResult.vCurrentTotal = testingUsers.getMetadata().getSize();
+					otherResult.vCurrentCount = 0; //Vector count for Hudup recall metric.
 					int vRecommendedCount = 0; //Recommended vector count for Hudup recall metric.
 					//
 					int vExactCurrentTotal = 0; //Exact total vector count for exact recall metric.
 					int vExactRecommendedCount = 0; //Exact recommended vector count for exact recall metric.
 					while (current == thread && testingUsers.next()) {
 						
-						progressStep++;
-						vCurrentCount++;
-						EvaluatorProgressEvent progressEvt = new EvaluatorProgressEvent(this, progressTotal, progressStep);
+						otherResult.progressStep++;
+						otherResult.vCurrentCount++;
+						EvaluatorProgressEvent progressEvt = new EvaluatorProgressEvent(this, otherResult.progressTotal, otherResult.progressStep);
 						progressEvt.setAlgName(recommender.getName());
 						progressEvt.setDatasetId(datasetId);
-						progressEvt.setCurrentCount(vCurrentCount);
-						progressEvt.setCurrentTotal(vCurrentTotal);
+						progressEvt.setCurrentCount(otherResult.vCurrentCount);
+						progressEvt.setCurrentTotal(otherResult.vCurrentTotal);
 						//Fire progress event.
 						fireProgressEvent(progressEvt);
 						
@@ -267,12 +271,14 @@ public class RecommendEvaluator extends EvaluatorAbstract {
 						}
 						
 						
+						counterClock.pause();
 						synchronized (this) {
 							while (paused) {
 								notifyAll();
 								wait();
 							}
 						}
+						counterClock.resume();
 						
 					} // User id iterate
 					
@@ -281,7 +287,7 @@ public class RecommendEvaluator extends EvaluatorAbstract {
 							recommender.getName(), 
 							datasetId, 
 							HudupRecallMetric.class, 
-							new Object[] { new FractionMetricValue(vRecommendedCount, vCurrentTotal) }
+							new Object[] { new FractionMetricValue(vRecommendedCount, otherResult.vCurrentTotal) }
 						);
 					fireEvaluatorEvent(new EvaluatorEvent(this, Type.doing, hudupRecallMetrics));
 					

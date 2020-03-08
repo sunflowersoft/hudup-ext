@@ -80,7 +80,7 @@ public final class RegisterTable implements Cloneable, Serializable {
 
 	
 	/**
-	 * COnstructor with specified collection of algorithms.
+	 * Constructor with specified collection of algorithms.
 	 * @param algs specified collection of algorithms. These algorithms are registered.
 	 */
 	public RegisterTable(Collection<Alg> algs) {

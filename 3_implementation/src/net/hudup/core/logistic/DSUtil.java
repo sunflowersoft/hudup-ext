@@ -553,6 +553,8 @@ public final class DSUtil {
 	 * @return verbal name shortened.
 	 */
 	public static String shortenVerbalName(String name) {
+		if (name == null) return "";
+		
 		if (name.length() > Constants.MAX_VERBAL_NAME_LENGTH)
 			name = name.substring(0, Constants.MAX_VERBAL_NAME_LENGTH) + "...";
 		return name;
