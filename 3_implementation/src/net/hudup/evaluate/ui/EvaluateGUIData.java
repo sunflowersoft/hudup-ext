@@ -36,7 +36,7 @@ public class EvaluateGUIData implements Serializable {
 	/**
 	 * Flag to indicate whether the GUI was run.
 	 */
-	public boolean wasGUIRun = false;
+	public boolean wasRun = false;
 	
 
 	/**
@@ -66,26 +66,19 @@ public class EvaluateGUIData implements Serializable {
 	
 	
 	/**
-	 * Extracting GUI data.
-	 * @param gui batch evaluator GUI.
+	 * Filling data to the target.
+	 * @param target target data.
 	 */
-	public void extractFrom(BatchEvaluateGUI gui) {
-		this.pool = gui.pool;
-		this.txtRunSaveBrowse = gui.chkRunSave.isSelected() ? gui.txtRunSaveBrowse.getText() : null;
-		this.chkVerbal = gui.chkVerbal.isSelected();
+	public void fillTo(EvaluateGUIData target) {
+		if (target == null) return;
+		
+		target.active = this.active;
+		target.wasRun = this.wasRun;
+		target.pool = this.pool;
+		target.txtRunSaveBrowse = this.txtRunSaveBrowse;
+		target.chkVerbal = this.chkVerbal;
 	}
-
-
-	/**
-	 * Extracting GUI data.
-	 * @param gui evaluator GUI.
-	 */
-	public void extractFrom(EvaluateGUI gui) {
-		this.pool = gui.pool;
-		this.txtRunSaveBrowse = gui.chkRunSave.isSelected() ? gui.txtRunSaveBrowse.getText() : null;
-		this.chkVerbal = gui.chkVerbal.isSelected();
-	}
-
+	
 
 }
 

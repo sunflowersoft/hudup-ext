@@ -37,6 +37,7 @@ import javax.swing.table.DefaultTableModel;
 import net.hudup.core.Constants;
 import net.hudup.core.PluginChangedEvent;
 import net.hudup.core.RegisterTable;
+import net.hudup.core.Util;
 import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.SetupAlgEvent;
 import net.hudup.core.alg.ui.AlgListBox;
@@ -344,7 +345,12 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			}
 			
 		};
-		this.lbAlgs.update(algRegTable.getAlgList());
+		List<Alg> algList = Util.newList();
+		if (otherResult.algNames == null || otherResult.algNames.size() == 0)
+			algList = algRegTable.getAlgList();
+		else
+			algList = algRegTable.getAlgList(otherResult.algNames);
+		this.lbAlgs.update(algList);
 		this.lbAlgs.setVisibleRowCount(3);
 		this.lbAlgs.addAlgListChangedListener(new AlgListBox.AlgListChangedListener() {
 			
@@ -888,19 +894,6 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 	
 	
 	@Override
-	public void dispose() {
-		// TODO Auto-generated method stub
-		super.dispose();
-		
-		if (this.referredData != null) {
-			this.referredData.extractFrom(this);
-			this.referredData.active = false;
-			this.referredData = null;
-		}
-	}
-
-
-	@Override
 	protected void run() {
 		try {
 			if (evaluator.remoteIsStarted())
@@ -944,7 +937,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 				fastsave = evaluator.getConfig().isFastSave();
 			} catch (Throwable e) {e.printStackTrace();}
 			
-			evProcessor.saveEvaluateResult(txtRunSaveBrowse.getText(), evt, lbAlgs.getAlgList(), fastsave);
+			evProcessor.saveEvaluateResult(txtRunSaveBrowse.getText(), evt, lbAlgs.getAlgList(), fastsave, "tempui");
 		}
 		
 		
@@ -1010,7 +1003,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 				fastsave = evaluator.getConfig().isFastSave();
 			} catch (Throwable e) {e.printStackTrace();}
 
-			evProcessor.saveSetupResult(txtRunSaveBrowse.getText(), evt, algName, fastsave);
+			evProcessor.saveSetupResult(txtRunSaveBrowse.getText(), evt, algName, fastsave, "tempui");
 		}
 	}
 	
@@ -1366,6 +1359,19 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 	}
 
 	
+	@Override
+	public EvaluateGUIData extractGUIData() {
+		// TODO Auto-generated method stub
+		EvaluateGUIData data = new EvaluateGUIData();
+		
+		data.pool = this.pool;
+		data.txtRunSaveBrowse = this.chkRunSave.isSelected() ? this.txtRunSaveBrowse.getText() : null;
+		data.chkVerbal = this.chkVerbal.isSelected();
+		
+		return data;
+	}
+
+
 	/**
 	 * Update (repaint) all controls.
 	 * This method can cause error ({@link MetricsTable}): The call of {@link DefaultTableModel#getValueAt(int, int)} can cause out of bound error from {@link DefaultTableColumnModel#getColumn(int)}

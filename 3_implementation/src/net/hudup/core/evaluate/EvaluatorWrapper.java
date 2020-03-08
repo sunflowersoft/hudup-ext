@@ -242,6 +242,22 @@ public class EvaluatorWrapper implements Evaluator, Serializable {
 	}
 
 
+//	@Override
+//	public List<String> getAlgNames() throws RemoteException {
+//		// TODO Auto-generated method stub
+//		return remoteEvaluator.getAlgNames();
+//	}
+//
+//
+//	@NextUpdate
+//	@Deprecated
+//	@Override
+//	public DatasetPool getDatasetPool() throws RemoteException {
+//		// TODO Auto-generated method stub
+//		return remoteEvaluator.getDatasetPool();
+//	}
+
+
 	@Deprecated
 	@Override
 	public PluginStorageWrapper getPluginStorage() throws RemoteException {

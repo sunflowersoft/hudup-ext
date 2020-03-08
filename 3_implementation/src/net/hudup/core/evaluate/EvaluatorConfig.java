@@ -61,15 +61,15 @@ public class EvaluatorConfig extends SysConfig {
 
 	
 	/**
-	 * This constant specifies standalone field. If standalone mode is true, no GUI can close evaluator.
+	 * This constant specifies auto-self field. If auto-self mode is true, no GUI can close evaluator.
 	 */
-	public final static String EVALUATOR_STANDALONE_FIELD = changeCase("evaluator_standalone");
+	public final static String EVALUATOR_AUTOSELF_FIELD = changeCase("evaluator_autoself");
 
 	
 	/**
-	 * By default, standalone field is false. If standalone mode is true, no GUI can close evaluator.
+	 * By default, auto-self field is false. If auto-self mode is true, no GUI can close evaluator.
 	 */
-	public final static boolean EVALUATOR_STANDALONE_DEFAULT = false;
+	public final static boolean EVALUATOR_AUTOSELF_DEFAULT = false;
 
 	
 	/**
@@ -109,7 +109,7 @@ public class EvaluatorConfig extends SysConfig {
 		
 		setRecommendAll(RECOMMEND_ALL_DEFAULT);
 		setEvaluatorPort(Constants.DEFAULT_EVALUATOR_PORT);
-		setStandalone(EVALUATOR_STANDALONE_DEFAULT);
+		setAutoself(EVALUATOR_AUTOSELF_DEFAULT);
 		setFastSave(EVALUATOR_FASTSAVE_DEFAULT);
 	}
 
@@ -161,20 +161,20 @@ public class EvaluatorConfig extends SysConfig {
 
 
 	/**
-	 * Checking whether standalone mode is true. If standalone mode is true, no GUI can close evaluator. 
-	 * @return whether standalone mode is true.
+	 * Checking whether auto-self mode is true. If auto-self mode is true, no GUI can close evaluator. 
+	 * @return whether auto-self mode is true.
 	 */
-	public boolean isStandalone() {
-		return getAsBoolean(EVALUATOR_STANDALONE_FIELD);
+	public boolean isAutoself() {
+		return getAsBoolean(EVALUATOR_AUTOSELF_FIELD);
 	}
 	
 	
 	/**
-	 * Setting whether standalone mode is true. If standalone mode is true, no GUI can close evaluator.
-	 * @param standalone standalone mode.
+	 * Setting whether auto-self mode is true. If auto-self mode is true, no GUI can close evaluator.
+	 * @param autoself auto-self mode.
 	 */
-	public void setStandalone(boolean standalone) {
-		put(EVALUATOR_STANDALONE_FIELD, standalone);
+	public void setAutoself(boolean autoself) {
+		put(EVALUATOR_AUTOSELF_FIELD, autoself);
 	}
 
 

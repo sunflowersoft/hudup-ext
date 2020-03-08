@@ -229,6 +229,25 @@ public interface Evaluator extends Remote, RemoteRunner, SetupAlgListener, Expor
 	PluginStorageWrapper getPluginStorage() throws RemoteException;
 	
 	
+//	/**
+//	 * Getting list of algorithm names.
+//	 * @return list of algorithm names.
+//	 * @throws RemoteException if any error raises.
+//	 */
+//	@NextUpdate
+//	List<String> getAlgNames() throws RemoteException;
+//	
+//	
+//	/**
+//	 * Getting dataset pool. It is recommended not to use this method when it is necessary to improved with remote datasets.
+//	 * @return dataset pool.
+//	 * @throws RemoteException if any error raises.
+//	 */
+//	@NextUpdate
+//	@Deprecated
+//	DatasetPool getDatasetPool() throws RemoteException;
+
+	
 	/**
 	 * Add the specified listener to the end of listener list.
 	 * @param listener specified {@link EvaluatorListener}

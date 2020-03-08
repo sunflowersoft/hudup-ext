@@ -543,6 +543,22 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluatorProgr
 	}
 
 
+//	@Override
+//	public List<String> getAlgNames() throws RemoteException {
+//		// TODO Auto-generated method stub
+//		return remoteEvaluator.getAlgNames();
+//	}
+//
+//
+//	@NextUpdate
+//	@Deprecated
+//	@Override
+//	public DatasetPool getDatasetPool() throws RemoteException {
+//		// TODO Auto-generated method stub
+//		return remoteEvaluator.getDatasetPool();
+//	}
+
+	
 	@Deprecated
 	@Override
 	public PluginStorageWrapper getPluginStorage() throws RemoteException {

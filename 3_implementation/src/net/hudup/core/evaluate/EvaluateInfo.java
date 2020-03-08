@@ -8,9 +8,10 @@
 package net.hudup.core.evaluate;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
- * This class represents information of evaluation.
+ * This class represents information of evaluator.
  * 
  * @author Loc Nguyen
  * @version 1.0
@@ -28,6 +29,12 @@ public class EvaluateInfo implements Serializable {
 	 * Algorithm name.
 	 */
 	public String algName = null;
+	
+	
+	/**
+	 * List of algorithm names.
+	 */
+	public List<String> algNames = null;
 	
 	
 	/**
@@ -85,6 +92,7 @@ public class EvaluateInfo implements Serializable {
 	 */
 	public void reset() {
 		algName = null;
+		algNames = null;
 		datasetId = 0;
 		progressStep = 0;
 		progressTotal = 0;

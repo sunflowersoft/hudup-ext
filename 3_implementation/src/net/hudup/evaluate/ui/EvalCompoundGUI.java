@@ -116,7 +116,7 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 		super("Evaluator GUI");
 		try {
 			this.thisConfig = evaluator.getConfig();
-			this.thisConfig.setSaveAbility(bindUri == null && !this.thisConfig.isStandalone()); //Only save local and non-standalone evaluator.
+			this.thisConfig.setSaveAbility(bindUri == null && !this.thisConfig.isAutoself()); //Only save local and auto-self evaluator.
 		}
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
@@ -330,7 +330,7 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 	@Override
 	public void dispose() {
 		batchEvaluateGUI.dispose();
-		if (!thisConfig.isStandalone()) {
+		if (!thisConfig.isAutoself()) {
 			thisConfig.save();
 			PluginStorage.clear();
 		}

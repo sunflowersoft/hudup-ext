@@ -20,13 +20,13 @@ import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.Recommender;
 import net.hudup.core.alg.SetupAlgListener;
 import net.hudup.core.data.DatasetPool;
-import net.hudup.core.evaluate.EvaluateInfo;
 import net.hudup.core.evaluate.EvaluateProcessor;
 import net.hudup.core.evaluate.Evaluator;
 import net.hudup.core.evaluate.EvaluatorAbstract;
 import net.hudup.core.evaluate.EvaluatorConfig;
 import net.hudup.core.evaluate.EvaluatorListener;
 import net.hudup.core.evaluate.EvaluatorProgressListener;
+import net.hudup.core.evaluate.EvaluateInfo;
 import net.hudup.core.evaluate.Metric;
 import net.hudup.core.evaluate.Metrics;
 import net.hudup.core.logistic.I18nUtil;
@@ -153,7 +153,7 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 		else { //Evaluator is local
 			try {
 				EvaluatorConfig config = evaluator.getConfig();
-				if (!config.isStandalone()) { //Evaluator is non-standalone.
+				if (!config.isAutoself()) { //Evaluator is auto-self.
 					int evaluatorPort = config.getEvaluatorPort();
 					evaluatorPort = NetUtil.getPort(evaluatorPort, true);
 					
@@ -188,7 +188,7 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 
 		this.referredData = referredData;
 		if (referredData != null) {
-			referredData.wasGUIRun = true;
+			referredData.wasRun = true;
 			referredData.active = true;
 		}
 
@@ -303,34 +303,38 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	 * Dispose this GUI.
 	 */
 	public void dispose() {
-		boolean standalone = false;
+		boolean agent = false;
 		try {
-			standalone = this.evaluator.getConfig().isStandalone();
+			agent = this.evaluator.getConfig().isAutoself();
 		} 
 		catch (Throwable e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
-			standalone = false;
+			agent = false;
 		}
 		
-		if (standalone) {
+		if (agent) {
 			unsetupListeners(this.evaluator);
 		}
 		else {
 			stop();
 			clear();
-			this.evProcessor.clear();
 
 			unsetupListeners(this.evaluator);
 			
 			try {
 				this.evaluator.close(); //The close() method also unexports evaluator.
 			}
-			catch (Exception e) {
-				e.printStackTrace();
-			}
+			catch (Exception e) {e.printStackTrace();}
 		}
-			
+		
+		this.counterClock.stop();
+		this.evProcessor.clear();
+		if (this.referredData != null) {
+			extractGUIData().fillTo(this.referredData);
+			this.referredData.active = false;
+			this.referredData = null;
+		}
+		
 		if (this.exportedStub != null) {
 			boolean ret = NetUtil.RegistryRemote.unexport(this);
 			if (ret)
@@ -454,7 +458,14 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 		}
 	}
 
+	
+	/**
+	 * Extracting GUI data.
+	 * @return extracted GUI data.
+	 */
+	public abstract EvaluateGUIData extractGUIData();
 
+	
 }
 
 

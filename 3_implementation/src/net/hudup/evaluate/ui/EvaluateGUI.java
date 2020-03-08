@@ -1149,7 +1149,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 				fastsave = evaluator.getConfig().isFastSave();
 			} catch (Throwable e) {e.printStackTrace();}
 
-			evProcessor.saveEvaluateResult(txtRunSaveBrowse.getText(), evt, Arrays.asList(getAlg()), fastsave);
+			evProcessor.saveEvaluateResult(txtRunSaveBrowse.getText(), evt, Arrays.asList(getAlg()), fastsave, "tempui");
 		}
 		
 		
@@ -1216,7 +1216,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 				fastsave = evaluator.getConfig().isFastSave();
 			} catch (Throwable e) {e.printStackTrace();}
 
-			evProcessor.saveSetupResult(this.txtRunSaveBrowse.getText(), evt, algName, fastsave);
+			evProcessor.saveSetupResult(this.txtRunSaveBrowse.getText(), evt, algName, fastsave, "tempui");
 		}
 		
 	}
@@ -1419,6 +1419,19 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 		}
 	}
 	
+	
+	@Override
+	public EvaluateGUIData extractGUIData() {
+		// TODO Auto-generated method stub
+		EvaluateGUIData data = new EvaluateGUIData();
+		
+		data.pool = this.pool;
+		data.txtRunSaveBrowse = this.chkRunSave.isSelected() ? this.txtRunSaveBrowse.getText() : null;
+		data.chkVerbal = this.chkVerbal.isSelected();
+		
+		return data;
+	}
+
 	
 	/**
 	 * Creating inspector for recommendation algorithm.

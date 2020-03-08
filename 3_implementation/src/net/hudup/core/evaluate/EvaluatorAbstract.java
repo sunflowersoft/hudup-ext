@@ -250,6 +250,13 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 		this.result = null;
 		
 		this.otherResult.reset();
+		if (algList != null) {
+			this.otherResult.algNames = Util.newList(algList.size());
+			for (Alg alg : algList) {
+				this.otherResult.algNames.add(alg.getName());
+			}
+		}
+		
 		try {
 			this.counterClock.stop();
 			this.counterClock.start();
@@ -747,7 +754,6 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
      */
     protected void fireEvaluatorEvent(EvaluatorEvent evt) {
 		EvaluatorListener[] listeners = getEvaluatorListeners();
-		if (listeners.length > 0) evProcessor.closeIOChannels();
 		for (EvaluatorListener listener : listeners) {
 			try {
 				listener.receivedEvaluation(evt);
@@ -757,7 +763,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 			}
 		}
 		
-		if (listeners.length == 0 && evStorePath != null && algList != null) {
+		if (evStorePath != null && algList != null) {
 			boolean fastsave = false;
 			try {
 				fastsave = config.isFastSave();
@@ -766,17 +772,9 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 			evProcessor.saveEvaluateResult(evStorePath, evt, algList, fastsave);
 		}
 		
+		
 		//Backing up evaluation results.
-		boolean backup = false;
-		try {
-			String bkText = Util.getHudupProperty("evaluator_analyze_backup");
-			if (bkText != null && !bkText.isEmpty())
-				backup = Boolean.parseBoolean(bkText);
-		}
-		catch (Throwable e) {
-			e.printStackTrace();
-			backup = false;
-		}
+		boolean backup = isBackup() || (evStorePath == null && listeners.length == 0);
 		if (!backup) return;
 		
 		if (evt.getType() != Type.done && evt.getType() != Type.done_one)
@@ -787,8 +785,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 		try {
 			xURI backupDir = xURI.create(Constants.BACKUP_DIRECTORY);
 			UriAdapter backupAdapter = new UriAdapter(backupDir);
-			if (backupAdapter.exists(backupDir))
-				backupAdapter.create(backupDir, true);
+			if (!backupAdapter.exists(backupDir)) backupAdapter.create(backupDir, true);
 			xURI analyzeBackupFile = backupDir.concat("evaluator-analyze-backup-" + new Date().getTime() + "." + Constants.DEFAULT_EXT);
 			
 			MetricsUtil util = new MetricsUtil(this.result, new RegisterTable(this.algList));
@@ -885,7 +882,6 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
     	if (!isStarted()) return;
 
     	SetupAlgListener[] listeners = getSetupAlgListeners();
-		if (listeners.length > 0) evProcessor.closeIOChannels();
 		for (SetupAlgListener listener : listeners) {
 			try {
 				listener.receivedSetup(evt);
@@ -895,13 +891,38 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 			}
 		}
 	
-		if (listeners.length == 0 && evStorePath != null) {
+		if (evStorePath != null) {
 			boolean fastsave = false;
 			try {
 				fastsave = config.isFastSave();
 			} catch (Throwable e) {e.printStackTrace();}
 
 			evProcessor.saveSetupResult(evStorePath, evt, evt.getAlg().getName(), fastsave);
+		}
+		
+		
+		//Backing up evaluation results.
+		boolean backup = isBackup() || (evStorePath == null && listeners.length == 0);
+		if (!backup || evt.getType() != SetupAlgEvent.Type.done)
+			return;
+		try {
+			String info = "========== Algorithm \"" + evt.getAlg().getName() + "\" ==========\n";
+			info = info + evt.translate() + "\n\n\n\n";
+
+			xURI backupDir = xURI.create(Constants.BACKUP_DIRECTORY);
+			UriAdapter backupAdapter = new UriAdapter(backupDir);
+			if (!backupAdapter.exists(backupDir)) backupAdapter.create(backupDir, true);
+			xURI analyzeBackupFile = backupDir.concat(
+					"evaluator-" + evt.getAlg().getName() + "-backup-" + new Date().getTime() +
+					EvaluateProcessor.SETUP_DONE_FILE_EXTENSION);
+			
+			Writer writer = backupAdapter.getWriter(analyzeBackupFile, false);
+			writer.write(info.toCharArray());
+			writer.close();
+			backupAdapter.close();
+		}
+		catch (Throwable e) {
+			e.printStackTrace();
 		}
     }
 
@@ -913,6 +934,25 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 	}
 
 
+    /**
+     * Testing whether backing up evaluation results is necessary.
+     * @return whether backing up evaluation results is necessary.
+     */
+    private boolean isBackup() {
+		boolean backup = false;
+		try {
+			String bkText = Util.getHudupProperty("evaluator_backup");
+			if (bkText != null && !bkText.isEmpty())
+				backup = Boolean.parseBoolean(bkText);
+		}
+		catch (Throwable e) {
+			e.printStackTrace();
+			backup = false;
+		}
+		return backup;
+    }
+    
+    
 	@Override
 	public String toString() {
 		// TODO Auto-generated method stub

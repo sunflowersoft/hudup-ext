@@ -82,12 +82,37 @@ public class EvaluateProcessor {
 	 * @param storePath directory path to store evaluation results.
 	 * @param evt evaluation event.
 	 * @param algs list of algorithms.
+	 */
+	public void saveEvaluateResult(String storePath, EvaluatorEvent evt, List<Alg> algs) {
+		saveEvaluateResult(storePath, evt, algs, false, null);
+	}
+
+	
+	/**
+	 * Saving bath evaluation results.
+	 * @param storePath directory path to store evaluation results.
+	 * @param evt evaluation event.
+	 * @param algs list of algorithms.
 	 * @param fastsave fast saving mode.
 	 */
 	public void saveEvaluateResult(String storePath, EvaluatorEvent evt, List<Alg> algs, boolean fastsave) {
+		saveEvaluateResult(storePath, evt, algs, fastsave, null);
+	}
+	
+	
+	/**
+	 * Saving bath evaluation results.
+	 * @param storePath directory path to store evaluation results.
+	 * @param evt evaluation event.
+	 * @param algs list of algorithms.
+	 * @param fastsave fast saving mode.
+	 * @param prefix prefix of file name.
+	 */
+	public void saveEvaluateResult(String storePath, EvaluatorEvent evt, List<Alg> algs, boolean fastsave, String prefix) {
 		if (storePath == null) return;
 		storePath = storePath.trim();
 		
+		prefix = (prefix != null && !prefix.isEmpty() ? prefix + "-" : "");
 		try {
 			xURI store = xURI.create(storePath);
 			UriAdapter adapter = new UriAdapter(store);
@@ -99,7 +124,7 @@ public class EvaluateProcessor {
 			if (!fastsave) {
 				for (Alg alg : algs) {
 					if (evt.getType() == Type.done) {
-						String key = alg.getName() + EVALUATION_FILE_EXTENSION;
+						String key = prefix + alg.getName() + EVALUATION_FILE_EXTENSION;
 						ByteChannel channel = getIOChannel(store, key, true);
 						
 						String info = evt.translate(alg.getName(), -1) + "\n\n\n\n";
@@ -110,7 +135,7 @@ public class EvaluateProcessor {
 						Map<Integer, Metrics> map = evt.getMetrics().gets(alg.getName());
 						Set<Integer> datasetIdList = map.keySet();
 						for (int datasetId : datasetIdList) {
-							String key = alg.getName() + "@" + datasetId + EVALUATION_FILE_EXTENSION;
+							String key = prefix + alg.getName() + "@" + datasetId + EVALUATION_FILE_EXTENSION;
 							ByteChannel channel = getIOChannel(store, key, true);
 	
 							String info = evt.translate(alg.getName(), datasetId) + "\n\n\n\n";
@@ -128,9 +153,9 @@ public class EvaluateProcessor {
 			if (evt.getType() == Type.done || evt.getType() == Type.done_one) {
 			    // Exporting excel file
 				MetricsUtil util = new MetricsUtil(evt.getMetrics(), new RegisterTable(algs));
-				util.createExcel(store.concat(METRICS_ANALYZE_EXCEL_FILE_NAME));
+				util.createExcel(store.concat(prefix + METRICS_ANALYZE_EXCEL_FILE_NAME));
 				// Begin exporting plain text. It is possible to remove this snippet.
-				ByteChannel channel = getIOChannel(store, METRICS_ANALYZE_EXCEL_FILE_NAME2, false);
+				ByteChannel channel = getIOChannel(store, prefix + METRICS_ANALYZE_EXCEL_FILE_NAME2, false);
 				ByteBuffer buffer = ByteBuffer.wrap(util.createPlainText().getBytes());
 				channel.write(buffer);
 				closeIOChannel(METRICS_ANALYZE_EXCEL_FILE_NAME2);
@@ -147,13 +172,37 @@ public class EvaluateProcessor {
 	
 	
 	/**
-	 * Saving bath evaluation results.
-	 * @param storePath directory path to store evaluation results.
+	 * Saving setting up results.
+	 * @param storePath directory path to store setting up results.
+	 * @param evt setting up event.
+	 * @param algName list of algorithm name.
+	 */
+	public void saveSetupResult(String storePath, SetupAlgEvent evt, String algName) {
+		saveSetupResult(storePath, evt, algName, false, null);
+	}
+
+	
+	/**
+	 * Saving setting up results.
+	 * @param storePath directory path to store setting up results.
 	 * @param evt setting up event.
 	 * @param algName list of algorithm name.
 	 * @param fastsave fast saving mode.
 	 */
 	public void saveSetupResult(String storePath, SetupAlgEvent evt, String algName, boolean fastsave) {
+		saveSetupResult(storePath, evt, algName, fastsave, null);
+	}
+	
+	
+	/**
+	 * Saving setting up results.
+	 * @param storePath directory path to store setting up results.
+	 * @param evt setting up event.
+	 * @param algName list of algorithm name.
+	 * @param fastsave fast saving mode.
+	 * @param prefix prefix of file name.
+	 */
+	public void saveSetupResult(String storePath, SetupAlgEvent evt, String algName, boolean fastsave, String prefix) {
 		if (storePath == null) return;
 		if (fastsave && (evt.getType() != SetupAlgEvent.Type.done))
 			return;
@@ -163,15 +212,15 @@ public class EvaluateProcessor {
 		String info = "========== Algorithm \"" + algName + "\" ==========\n";
 		info = info + evt.translate() + "\n\n\n\n";
 		
+		prefix = (prefix != null && !prefix.isEmpty() ? prefix + "-" : "");
 		try {
 			xURI store = xURI.create(storePath);
 			UriAdapter adapter = new UriAdapter(store);
 			boolean existed = adapter.exists(store);
-			if (!existed)
-				adapter.create(store, true);
+			if (!existed) adapter.create(store, true);
 			adapter.close();
 			
-			String key = algName;
+			String key = prefix + algName;
 			if (evt.getType() == SetupAlgEvent.Type.doing)
 				key += EvaluateProcessor.SETUP_DOING_FILE_EXTENSION;
 			else
