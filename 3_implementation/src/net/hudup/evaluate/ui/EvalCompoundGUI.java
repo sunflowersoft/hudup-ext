@@ -18,6 +18,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.rmi.RemoteException;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -204,23 +205,26 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 		
 		mnTools.add(mniSysConfig);
 
-		if (batchEvaluateGUI.referredData == null) {
-			JMenuItem mniSwitchEvaluator = new JMenuItem(
-				new AbstractAction(I18nUtil.message("switch_evaluator")) {
-	
-					/**
-					 * Serial version UID for serializable class. 
-					 */
-					private static final long serialVersionUID = 1L;
-	
-					@Override
-					public void actionPerformed(ActionEvent e) {
-						switchEvaluator();
-					}
-				
-				});
-			mnTools.add(mniSwitchEvaluator);
+		try {
+			if (!batchEvaluateGUI.evaluator.isAgent() || batchEvaluateGUI.bindUri != null) {
+				JMenuItem mniSwitchEvaluator = new JMenuItem(
+					new AbstractAction(I18nUtil.message("switch_evaluator")) {
+
+						/**
+						 * Serial version UID for serializable class. 
+						 */
+						private static final long serialVersionUID = 1L;
+
+						@Override
+						public void actionPerformed(ActionEvent e) {
+							switchEvaluator();
+						}
+					
+					});
+				mnTools.add(mniSwitchEvaluator);
+			}
 		}
+		catch (RemoteException e) {e.printStackTrace();}
 			
 
 		JMenu mnHelp = new JMenu(I18nUtil.message("help"));
@@ -320,9 +324,15 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 
 	@Override
 	public void dispose() {
+		boolean agent = false;
+		try {
+			agent = batchEvaluateGUI.evaluator.isAgent();
+		} 
+		catch (Exception e) {e.printStackTrace();}
+
 		batchEvaluateGUI.dispose();
 		try {
-			if (!batchEvaluateGUI.evaluator.isAgent())
+			if (!agent || batchEvaluateGUI.bindUri != null)
 				PluginStorage.clear();
 		} catch (Exception e) {e.printStackTrace();}
 		

@@ -37,7 +37,6 @@ import javax.swing.table.DefaultTableModel;
 import net.hudup.core.Constants;
 import net.hudup.core.PluginChangedEvent;
 import net.hudup.core.RegisterTable;
-import net.hudup.core.Util;
 import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.SetupAlgEvent;
 import net.hudup.core.alg.ui.AlgListBox;
@@ -53,12 +52,13 @@ import net.hudup.core.evaluate.EvaluatorEvent;
 import net.hudup.core.evaluate.EvaluatorEvent.Type;
 import net.hudup.core.evaluate.EvaluatorProgressEvent;
 import net.hudup.core.logistic.ClipboardUtil;
+import net.hudup.core.logistic.Counter;
+import net.hudup.core.logistic.CounterElapsedTimeEvent;
 import net.hudup.core.logistic.DSUtil;
 import net.hudup.core.logistic.I18nUtil;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.xURI;
-import net.hudup.core.logistic.ui.CounterClock;
 import net.hudup.core.logistic.ui.SortableSelectableTable;
 import net.hudup.core.logistic.ui.SortableSelectableTableModel;
 import net.hudup.core.logistic.ui.SortableTable;
@@ -246,10 +246,10 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 	 * Constructor with specified evaluator, bound URI, and GUI data.
 	 * @param evaluator specified evaluator.
 	 * @param bindUri bound URI. If this parameter is null, evaluator is local.
-	 * @param referredData GUI parameter.
+	 * @param referredGUIData referred GUI data.
 	 */
-	public BatchEvaluateGUI(Evaluator evaluator, xURI bindUri, EvaluateGUIData referredData) {
-		super(evaluator, bindUri, referredData);
+	public BatchEvaluateGUI(Evaluator evaluator, xURI bindUri, EvaluateGUIData referredGUIData) {
+		super(evaluator, bindUri, referredGUIData);
 		init();
 	}
 
@@ -269,7 +269,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 		JPanel footer = createFooter();
 		add(footer, BorderLayout.SOUTH);
 		
-		setVerbal(referredData != null ? referredData.chkVerbal : false);
+		setVerbal(guiData != null ? guiData.chkVerbal : false);
 	}
 
 	
@@ -346,12 +346,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			}
 			
 		};
-		List<Alg> algList = Util.newList();
-		if (otherResult.algNames == null || otherResult.algNames.size() == 0)
-			algList = algRegTable.getAlgList();
-		else
-			algList = algRegTable.getAlgList(otherResult.algNames);
-		this.lbAlgs.update(algList);
+		this.lbAlgs.update(algRegTable.getAlgList(guiData.algNames));
 		this.lbAlgs.setVisibleRowCount(3);
 		this.lbAlgs.addAlgListChangedListener(new AlgListBox.AlgListChangedListener() {
 			
@@ -452,7 +447,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			}
 
 		};
-		this.tblDatasetPool.update(this.pool);
+		this.tblDatasetPool.update(guiData.pool);
 		this.tblDatasetPool.setPreferredScrollableViewportSize(new Dimension(600, 80));
 		down.add(new JScrollPane(this.tblDatasetPool), BorderLayout.CENTER);
 
@@ -664,8 +659,8 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			
 		});
 		this.chkRunSave.setToolTipText(I18nUtil.message("save_evaluate_tooltip"));
-		if (referredData != null && referredData.txtRunSaveBrowse != null) {
-			this.txtRunSaveBrowse.setText(referredData.txtRunSaveBrowse);
+		if (guiData.txtRunSaveBrowse != null) {
+			this.txtRunSaveBrowse.setText(guiData.txtRunSaveBrowse);
 			this.chkRunSave.setSelected(true);
 		}
 		pane.add(this.chkRunSave, BorderLayout.WEST);
@@ -809,19 +804,11 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			
 			this.statusBar.setTextPane2(I18nUtil.message("total") + ": " + otherResult.progressStep + "/" + otherResult.progressTotal);
 		}
-		this.counterClock.setAssocTimeTextPane(this.statusBar.getLastPane());
-		try {
-			if (otherResult.timeElapse > 0) {
-				this.statusBar.getLastPane().setText(CounterClock.formatTime(otherResult.timeElapse));
-				if (evaluator.remoteIsRunning())
-					this.counterClock.start(otherResult.timeElapse);
-			}
-		}
-		catch (Exception e) {
-			e.printStackTrace();
+		if (otherResult.elapsedTime > 0) {
+			String elapsedTimeText = Counter.formatTime(otherResult.elapsedTime);
+			statusBar.getLastPane().setText(elapsedTimeText);
 		}
 		statusPane.add(this.statusBar, BorderLayout.CENTER);
-
 
 		return footer;
 		
@@ -866,9 +853,9 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			if (evaluator.remoteIsStarted())
 				return;
 			
-			this.pool.reload();
+			guiData.pool.reload();
 	
-			tblDatasetPool.update(pool);
+			tblDatasetPool.update(guiData.pool);
 			clearResult();
 			updateMode();
 			
@@ -887,8 +874,8 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			if (evaluator.remoteIsStarted())
 				return;
 			
-			this.pool.clear();
-			this.tblDatasetPool.update(this.pool);
+			guiData.pool.clear();
+			this.tblDatasetPool.update(guiData.pool);
 			this.lbAlgs.update(algRegTable.getAlgList());
 			
 			clearResult();
@@ -909,7 +896,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			if (evaluator.remoteIsStarted())
 				return;
 			
-			if (pool.size() == 0 || lbAlgs.getAlgList().size() == 0) {
+			if (guiData.pool.size() == 0 || lbAlgs.getAlgList().size() == 0) {
 				JOptionPane.showMessageDialog(
 					getThisGUI(), 
 					"Not load data set pool", 
@@ -920,9 +907,8 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			}
 			
 			clearResult();
-			evaluator.remoteStart(lbAlgs.getAlgList(), pool, null);
+			evaluator.remoteStart(lbAlgs.getAlgList(), guiData.pool, null);
 			
-			counterClock.start();
 			updateMode();
 		}
 		catch (Throwable e) {
@@ -954,7 +940,6 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 		//this.result = evaluator.getResult();
 		this.result = evt.getMetrics(); //Fix bug date: 2019.09.04 by Loc Nguyen.
 		if (evt.getType() == Type.done) {
-			counterClock.stop();
 			updateMode();
 		}
 		
@@ -1019,6 +1004,16 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 	
 	
 	@Override
+	public void receivedElapsedTime(CounterElapsedTimeEvent evt) throws RemoteException {
+		// TODO Auto-generated method stub
+		if (statusBar != null && statusBar.getLastPane() != null) {
+			String elapsedTimeText = Counter.formatTime(evt.getElapsedTime());
+			statusBar.getLastPane().setText(elapsedTimeText);
+		}
+	}
+
+
+	@Override
 	protected void updateMode() {
 		try {
 			evProcessor.closeIOChannels();
@@ -1033,7 +1028,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 				prgRunning.setValue(0);
 				prgRunning.setVisible(false);
 			}
-			else if (pool.size() == 0) {
+			else if (guiData.pool.size() == 0) {
 				setInternalEnable(false);
 				setResultVisible(false);
 				
@@ -1116,40 +1111,40 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 		
 		this.btnConfigAlgs.setEnabled(flag);
 		this.lbAlgs.setEnabled(flag);
-		this.tblDatasetPool.setEnabled2(flag && pool.size() > 0);
+		this.tblDatasetPool.setEnabled2(flag && guiData.pool.size() > 0);
 		this.btnAddDataset.setEnabled(flag);
 		this.btnLoadBatchScript.setEnabled(flag);
-		this.btnSaveBatchScript.setEnabled(flag && pool.size() > 0);
+		this.btnSaveBatchScript.setEnabled(flag && guiData.pool.size() > 0);
 		
-		this.btnRefresh.setEnabled(flag && pool.size() > 0);
+		this.btnRefresh.setEnabled(flag && guiData.pool.size() > 0);
 		
-		this.btnClear.setEnabled(flag && pool.size() > 0);
+		this.btnClear.setEnabled(flag && guiData.pool.size() > 0);
 
-		this.btnRun.setEnabled(flag && pool.size() > 0);
+		this.btnRun.setEnabled(flag && guiData.pool.size() > 0);
 
-		this.btnPauseResume.setEnabled(flag && pool.size() > 0);
+		this.btnPauseResume.setEnabled(flag && guiData.pool.size() > 0);
 
-		this.btnStop.setEnabled(flag && pool.size() > 0);
+		this.btnStop.setEnabled(flag && guiData.pool.size() > 0);
 
-		this.btnForceStop.setEnabled(flag && pool.size() > 0);
+		this.btnForceStop.setEnabled(flag && guiData.pool.size() > 0);
 
-		this.txtRunInfo.setEnabled(flag && pool.size() > 0);
+		this.txtRunInfo.setEnabled(flag && guiData.pool.size() > 0);
 		
-		this.chkRunSave.setEnabled(flag && pool.size() > 0);
+		this.chkRunSave.setEnabled(flag && guiData.pool.size() > 0);
 
-		this.chkRunSave.setEnabled(flag && pool.size() > 0);
+		this.chkRunSave.setEnabled(flag && guiData.pool.size() > 0);
 
-		this.txtRunSaveBrowse.setEnabled(flag && pool.size() > 0);
+		this.txtRunSaveBrowse.setEnabled(flag && guiData.pool.size() > 0);
 
 		this.chkVerbal.setEnabled(flag);
 		
 		this.btnMetricsOption.setEnabled(flag);
 		
 		this.btnAnalyzeResult.setEnabled(
-			flag && pool.size() > 0 && result != null && result.size() > 0);
+			flag && guiData.pool.size() > 0 && result != null && result.size() > 0);
 		
 		this.btnCopyResult.setEnabled(
-				flag && pool.size() > 0 && result != null && result.size() > 0);
+				flag && guiData.pool.size() > 0 && result != null && result.size() > 0);
 	}
 
 	
@@ -1159,7 +1154,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 	 */
 	private void setResultVisible(boolean flag) {
 		
-		boolean visible = flag && pool.size() > 0 && result != null && result.size() > 0;
+		boolean visible = flag && guiData.pool.size() > 0 && result != null && result.size() > 0;
  
 		paneResult.setVisible(visible);
 		btnAnalyzeResult.setEnabled(visible);
@@ -1220,7 +1215,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			else
 				this.lbAlgs.update(batchAlgList);
 			
-			this.pool.clear();
+			guiData.pool.clear();
 			DatasetPool scriptPool = script.getPool();
 			Alg[] algList = this.lbAlgs.getAlgList().toArray(new Alg[] {} );
 			for (int i = 0; i < scriptPool.size(); i++) {
@@ -1230,9 +1225,9 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 				
 				Dataset trainingSet = pair.getTraining();
 				if (DatasetUtil2.validateTrainingset(this, trainingSet, algList))
-					this.pool.add(pair);
+					guiData.pool.add(pair);
 			}
-			this.tblDatasetPool.update(this.pool);
+			this.tblDatasetPool.update(guiData.pool);
 			clearResult();
 			updateMode();
 			
@@ -1251,7 +1246,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 	 * Saving batch script.
 	 */
 	protected void saveBatchScript() {
-		if (pool.size() == 0) {
+		if (guiData.pool.size() == 0) {
 			JOptionPane.showMessageDialog(
 					this, 
 					"Pool empty",
@@ -1300,7 +1295,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
     		writer = adapter.getWriter(uri, false);
     		
 			BatchScript script = BatchScript.assign(
-					pool, lbAlgs.getAlgNameList(), evaluator.getMainUnit());
+					guiData.pool, lbAlgs.getAlgNameList(), evaluator.getMainUnit());
 			
 			script.save(writer);
     		writer.flush();
@@ -1338,10 +1333,10 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 				return;
 			
 			if (nullTesting)
-				new AddingTrainingDatasetNullTestingDatasetDlg(this, pool, this.lbAlgs.getAlgList(), evaluator.getMainUnit()).setVisible(true);
+				new AddingTrainingDatasetNullTestingDatasetDlg(this, guiData.pool, this.lbAlgs.getAlgList(), evaluator.getMainUnit()).setVisible(true);
 			else
-				new AddingDatasetDlg(this, pool, this.lbAlgs.getAlgList(), evaluator.getMainUnit()).setVisible(true);
-			this.tblDatasetPool.update(this.pool);
+				new AddingDatasetDlg(this, guiData.pool, this.lbAlgs.getAlgList(), evaluator.getMainUnit()).setVisible(true);
+			this.tblDatasetPool.update(guiData.pool);
 			
 			clearResult();
 			updateMode();
@@ -1361,7 +1356,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			this.txtRunInfo.setText("");
 			this.result = null;
 			this.tblMetrics.clear();
-			this.counterClock.stopAndClearAssoc();
+			this.statusBar.getLastPane().setText(""); //Clearing elapsed time information.
 		}
 		catch (Throwable e) {
 			e.printStackTrace();
@@ -1370,15 +1365,11 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 
 	
 	@Override
-	public EvaluateGUIData extractGUIData() {
+	protected void updateGUIData() {
 		// TODO Auto-generated method stub
-		EvaluateGUIData data = new EvaluateGUIData();
-		
-		data.pool = this.pool;
-		data.txtRunSaveBrowse = this.chkRunSave.isSelected() ? this.txtRunSaveBrowse.getText() : null;
-		data.chkVerbal = this.chkVerbal.isSelected();
-		
-		return data;
+		guiData.algNames = lbAlgs.getAlgNameList();
+		guiData.txtRunSaveBrowse = this.chkRunSave.isSelected() ? this.txtRunSaveBrowse.getText() : null;
+		guiData.chkVerbal = this.chkVerbal.isSelected();
 	}
 
 

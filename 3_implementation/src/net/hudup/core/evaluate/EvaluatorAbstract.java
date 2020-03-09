@@ -36,13 +36,15 @@ import net.hudup.core.data.Fetcher;
 import net.hudup.core.data.Profile;
 import net.hudup.core.evaluate.EvaluatorEvent.Type;
 import net.hudup.core.logistic.AbstractRunner;
+import net.hudup.core.logistic.Counter;
+import net.hudup.core.logistic.CounterElapsedTimeListener;
 import net.hudup.core.logistic.DSUtil;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.NetUtil;
+import net.hudup.core.logistic.NextUpdate;
 import net.hudup.core.logistic.SystemUtil;
 import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.xURI;
-import net.hudup.core.logistic.ui.CounterClock;
 import net.hudup.core.logistic.ui.ProgressEvent;
 import net.hudup.core.logistic.ui.ProgressListener;
 
@@ -169,7 +171,13 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 	protected EvaluateInfo otherResult = new EvaluateInfo();
 	
 	
-    /**
+	/**
+	 * Resulted dataset pool.
+	 */
+	protected DatasetPool poolResult = null;
+
+	
+	/**
      * The list of original metrics used to evaluate algorithms in {@link #algList}.
      */
 	protected NoneWrapperMetricList metricList = null;
@@ -182,21 +190,15 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 
 	
     /**
-     * Directory to store evaluation results. If null, evaluation results are not stored. 
-     */
-    protected String evStorePath = null;
-    
-    
-    /**
      * Evaluation processor.
      */
     protected EvaluateProcessor evProcessor = new EvaluateProcessor();
     
     
 	/**
-	 * Internal counter clock.
+	 * Internal counter.
 	 */
-	protected CounterClock counterClock = null;
+	protected Counter counter = null;
 
 	
 	/**
@@ -222,7 +224,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 			e.printStackTrace();
 		}
 		
-		this.counterClock = new CounterClock(otherResult);
+		this.counter = new Counter(otherResult);
 	}
 	
 	
@@ -257,9 +259,11 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 			}
 		}
 		
+		this.poolResult = pool;
+		
 		try {
-			this.counterClock.stop();
-			this.counterClock.start();
+			this.counter.stop();
+			this.counter.start();
 		} catch (Throwable e) {e.printStackTrace();}
 		
 		start();
@@ -404,14 +408,14 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 						}
 						
 						
-						counterClock.pause();
+						counter.pause();
 						synchronized (this) {
 							while (paused) {
 								notifyAll();
 								wait();
 							}
 						}
-						counterClock.resume();
+						counter.resume();
 						
 					} // User id iterate
 					
@@ -523,6 +527,14 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 	protected abstract Fetcher<Profile> fetchTesting(Dataset testing);
 	
 	
+	@NextUpdate
+	@Override
+	public DatasetPool getDatasetPool() throws RemoteException {
+		// TODO Auto-generated method stub
+		return poolResult;
+	}
+
+
 	/**
 	 * Prepare to execute the specified algorithm.
 	 * @param alg specified algorithm.
@@ -683,7 +695,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 		this.parameter = null;
 		
 		try {
-			this.counterClock.stop();
+			this.counter.stop();
 		} catch (Throwable e) {e.printStackTrace();}
 	}
 
@@ -718,6 +730,13 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 	}
 	
 	
+	@Override
+	public boolean isWrapper() throws RemoteException {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+
 	@Override
 	public void addEvaluatorListener(EvaluatorListener listener) throws RemoteException {
 		synchronized (listenerList) {
@@ -763,18 +782,18 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 			}
 		}
 		
-		if (evStorePath != null && algList != null) {
+		if (otherResult.evStorePath != null && algList != null) {
 			boolean fastsave = false;
 			try {
 				fastsave = config.isFastSave();
 			} catch (Throwable e) {e.printStackTrace();}
 			
-			evProcessor.saveEvaluateResult(evStorePath, evt, algList, fastsave);
+			evProcessor.saveEvaluateResult(otherResult.evStorePath, evt, algList, fastsave);
 		}
 		
 		
 		//Backing up evaluation results.
-		boolean backup = isBackup() || (evStorePath == null && listeners.length == 0);
+		boolean backup = isBackup() || (otherResult.evStorePath == null && listeners.length == 0);
 		if (!backup) return;
 		
 		if (evt.getType() != Type.done && evt.getType() != Type.done_one)
@@ -817,7 +836,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 	
     
     /**
-     * Getting an array of evaluation progress listener.
+     * Getting an array of evaluation progress listeners.
      * @return array of {@link ProgressListener} (s).
      */
     protected EvaluatorProgressListener[] getProgressListeners() {
@@ -891,18 +910,18 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 			}
 		}
 	
-		if (evStorePath != null) {
+		if (otherResult.evStorePath != null) {
 			boolean fastsave = false;
 			try {
 				fastsave = config.isFastSave();
 			} catch (Throwable e) {e.printStackTrace();}
 
-			evProcessor.saveSetupResult(evStorePath, evt, evt.getAlg().getName(), fastsave);
+			evProcessor.saveSetupResult(otherResult.evStorePath, evt, evt.getAlg().getName(), fastsave);
 		}
 		
 		
 		//Backing up evaluation results.
-		boolean backup = isBackup() || (evStorePath == null && listeners.length == 0);
+		boolean backup = isBackup() || (otherResult.evStorePath == null && listeners.length == 0);
 		if (!backup || evt.getType() != SetupAlgEvent.Type.done)
 			return;
 		try {
@@ -928,9 +947,21 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 
     
     @Override
+	public void addElapsedTimeListener(CounterElapsedTimeListener listener) throws RemoteException {
+		counter.addElapsedTimeListener(listener);
+    }
+
+    
+    @Override
+    public void removeElapsedTimeListener(CounterElapsedTimeListener listener) throws RemoteException {
+		counter.removeElapsedTimeListener(listener);
+    }
+
+    
+    @Override
 	public void setEvaluateStorePath(String evStorePath) throws RemoteException {
 		// TODO Auto-generated method stub
-		this.evStorePath = evStorePath;
+		this.otherResult.evStorePath = evStorePath;
 	}
 
 
@@ -1034,7 +1065,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 		}
 		
 		try {
-			evStorePath = null;
+			otherResult.evStorePath = null;
 			evProcessor.clear();
 		}
 		catch (Throwable e) {

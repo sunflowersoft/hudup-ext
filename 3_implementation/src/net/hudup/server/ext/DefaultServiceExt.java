@@ -16,6 +16,7 @@ import java.util.Map;
 
 import net.hudup.core.Util;
 import net.hudup.core.evaluate.Evaluator;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.evaluate.ui.EvaluateGUIData;
 import net.hudup.server.DefaultService;
 import net.hudup.server.PowerServerConfig;
@@ -36,7 +37,7 @@ public class DefaultServiceExt extends DefaultService {
 	 * @author Loc Nguyen
 	 * @version 1.0
 	 */
-	class EvaluatorPair {
+	public class EvaluatorPair {
 		
 		/**
 		 * Evaluator.
@@ -129,6 +130,7 @@ public class DefaultServiceExt extends DefaultService {
 	/**
 	 * Getting local evaluators.
 	 * @return local evaluators.
+	 * @throws RemoteException if any error raises.
 	 */
 	public List<Evaluator> getLocalEvaluators() throws RemoteException {
 		List<Evaluator> evList = Util.newList();
@@ -156,6 +158,63 @@ public class DefaultServiceExt extends DefaultService {
 		});
 		
 		return evList;
+	}
+
+
+	@Override
+	public Evaluator getEvaluator(String evaluatorName) throws RemoteException {
+		// TODO Auto-generated method stub
+		Evaluator evaluator = null;
+		
+		trans.lockWrite();
+		try {
+			if (pairMap.containsKey(evaluatorName))
+				evaluator = pairMap.get(evaluatorName).evaluator;
+		}
+		catch (Throwable e) {
+			e.printStackTrace();
+			evaluator = null;
+			
+			LogUtil.error("Service fail to get evaluator, caused by " + e.getMessage());
+		}
+		finally {
+			trans.unlockWrite();
+		}
+		
+		return evaluator;
+	}
+
+
+	@Override
+	public String[] getEvaluatorNames() throws RemoteException {
+		// TODO Auto-generated method stub
+		List<String> evaluatorNames = Util.newList();
+		
+		trans.lockRead();
+		try {
+			Collection<EvaluatorPair> pairs = pairMap.values();
+			for (EvaluatorPair pair : pairs) {
+				evaluatorNames.add(pair.evaluator.getName());
+			}
+		}
+		catch (Throwable e) {
+			e.printStackTrace();
+			LogUtil.error("Service fail to get evaluator, caused by " + e.getMessage());
+		}
+		finally {
+			trans.unlockRead();
+		}
+		
+		Collections.sort(evaluatorNames, new Comparator<String>() {
+
+			@Override
+			public int compare(String o1, String o2) {
+				// TODO Auto-generated method stub
+				return o1.compareToIgnoreCase(o2);
+			}
+			
+		});
+		return evaluatorNames.toArray(new String[0]);
 	}
 
 

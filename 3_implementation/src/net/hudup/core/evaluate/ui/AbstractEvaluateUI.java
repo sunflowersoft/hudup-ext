@@ -17,13 +17,13 @@ import net.hudup.core.evaluate.Evaluator;
 import net.hudup.core.evaluate.EvaluatorListener;
 import net.hudup.core.evaluate.EvaluatorProgressListener;
 import net.hudup.core.evaluate.Metrics;
+import net.hudup.core.logistic.Counter;
 import net.hudup.core.logistic.I18nUtil;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.NetUtil;
 import net.hudup.core.logistic.NextUpdate;
 import net.hudup.core.logistic.UriAdapter.AdapterWriteChannel;
 import net.hudup.core.logistic.xURI;
-import net.hudup.core.logistic.ui.CounterClock;
 
 /**
  * This abstract class represents an abstract UI to allow users to interact with evaluator.
@@ -91,9 +91,9 @@ public abstract class AbstractEvaluateUI implements EvaluatorListener, Evaluator
 	
 	
 	/**
-	 * Internal counter clock.
+	 * Internal counter.
 	 */
-	protected CounterClock counterClock = null;
+	protected Counter counterClock = null;
 	
 	
 	/**
@@ -132,7 +132,7 @@ public abstract class AbstractEvaluateUI implements EvaluatorListener, Evaluator
 		setupListeners(evaluator);
 		
 		this.evaluator = evaluator;
-		this.counterClock = new CounterClock();
+		this.counterClock = new Counter();
 	}
 	
 	

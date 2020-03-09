@@ -42,9 +42,12 @@ import net.hudup.core.evaluate.EvaluatorProgressListener;
 import net.hudup.core.evaluate.Metric;
 import net.hudup.core.evaluate.Metrics;
 import net.hudup.core.evaluate.NoneWrapperMetricList;
+import net.hudup.core.logistic.CounterElapsedTimeEvent;
+import net.hudup.core.logistic.CounterElapsedTimeListener;
 import net.hudup.core.logistic.DSUtil;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.NetUtil;
+import net.hudup.core.logistic.NextUpdate;
 import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.xURI;
 import net.hudup.core.logistic.ui.ProgressEvent;
@@ -548,15 +551,14 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluatorProgr
 //		// TODO Auto-generated method stub
 //		return remoteEvaluator.getAlgNames();
 //	}
-//
-//
-//	@NextUpdate
-//	@Deprecated
-//	@Override
-//	public DatasetPool getDatasetPool() throws RemoteException {
-//		// TODO Auto-generated method stub
-//		return remoteEvaluator.getDatasetPool();
-//	}
+
+
+	@NextUpdate
+	@Override
+	public DatasetPool getDatasetPool() throws RemoteException {
+		// TODO Auto-generated method stub
+		return remoteEvaluator.getDatasetPool();
+	}
 
 	
 	@Deprecated
@@ -573,6 +575,13 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluatorProgr
 	}
 	
 	
+	@Override
+	public boolean isWrapper() throws RemoteException {
+		// TODO Auto-generated method stub
+		return true;
+	}
+
+
 	@Override
 	public void addEvaluatorListener(EvaluatorListener listener) throws RemoteException {
 		synchronized (listenerList) {
@@ -608,9 +617,7 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluatorProgr
      * @param evt event from this evaluator.
      */
     protected void fireEvaluatorEvent(EvaluatorEvent evt) {
-    	
 		EvaluatorListener[] listeners = getEvaluatorListeners();
-		
 		for (EvaluatorListener listener : listeners) {
 			try {
 				listener.receivedEvaluation(evt);
@@ -736,7 +743,59 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluatorProgr
 	}
 
 
-	@Override
+	/**
+	 * Adding elapsed time listener.
+	 * @param listener elapsed time listener.
+	 * @throws RemoteException if any error raises.
+	 */
+	public void addElapsedTimeListener(CounterElapsedTimeListener listener) throws RemoteException {
+		synchronized (listenerList) {
+			listenerList.add(CounterElapsedTimeListener.class, listener);
+		}
+    }
+
+    
+	/**
+	 * Removing elapsed time listener.
+	 * @param listener elapsed time listener.
+	 * @throws RemoteException if any error raises.
+	 */
+    public void removeElapsedTimeListener(CounterElapsedTimeListener listener) throws RemoteException {
+		synchronized (listenerList) {
+			listenerList.remove(CounterElapsedTimeListener.class, listener);
+		}
+    }
+	
+    
+    /**
+     * Getting an array of elapsed time listeners.
+     * @return array of elapsed time listeners.
+     */
+    protected CounterElapsedTimeListener[] getElapsedTimeListeners() {
+		synchronized (listenerList) {
+			return listenerList.getListeners(CounterElapsedTimeListener.class);
+		}
+    }
+    
+    
+    /**
+     * Firing elapsed time event.
+     * @param evt elapsed time event.
+     */
+    protected void fireElapsedTimeEvent(CounterElapsedTimeEvent evt) {
+    	CounterElapsedTimeListener[] listeners = getElapsedTimeListeners();
+		for (CounterElapsedTimeListener listener : listeners) {
+			try {
+				listener.receivedElapsedTime(evt);
+			}
+			catch (Throwable e) {
+				e.printStackTrace();
+			}
+		}
+    }
+
+    
+    @Override
 	public synchronized void remoteStart(Serializable... parameters) throws RemoteException {
 		// TODO Auto-generated method stub
 		boolean flag = socketServer.getFlag();
@@ -869,7 +928,8 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluatorProgr
 	public synchronized void unexport() throws RemoteException {
 		// TODO Auto-generated method stub
 		if (exportedStub != null) {
-			this.remoteStop(); //It is possible to stop this evaluator because its is delegated evaluator.
+			if (!remoteEvaluator.isAgent())
+				this.remoteStop(); //It is possible to stop this evaluator because its is delegated evaluator.
 			
 			try {
 				remoteEvaluator.removeEvaluatorListener(this);
@@ -907,14 +967,14 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluatorProgr
 	@Override
 	public boolean isAgent() throws RemoteException {
 		// TODO Auto-generated method stub
-		return false;
+		return remoteEvaluator.isAgent();
 	}
 
 
 	@Override
 	public void setAgent(boolean agent) throws RemoteException {
 		// TODO Auto-generated method stub
-		LogUtil.info("Evaluator-Delegator wrapper not support setting agent");
+		remoteEvaluator.setAgent(agent);
 	}
 
 

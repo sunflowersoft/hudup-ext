@@ -19,9 +19,11 @@ import net.hudup.core.alg.SetupAlgEvent;
 import net.hudup.core.alg.SetupAlgListener;
 import net.hudup.core.data.DatasetPool;
 import net.hudup.core.logistic.BaseClass;
+import net.hudup.core.logistic.CounterElapsedTimeListener;
 import net.hudup.core.logistic.DSUtil;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.NetUtil;
+import net.hudup.core.logistic.NextUpdate;
 
 /**
  * This class is wrapper of remote evaluator.
@@ -127,7 +129,8 @@ public class EvaluatorWrapper implements Evaluator, Serializable {
 		// TODO Auto-generated method stub
 		if (exclusive && remoteEvaluator != null) {
 			try {
-				remoteEvaluator.close();
+				if (!remoteEvaluator.isAgent())
+					remoteEvaluator.close();
 			} catch (Exception e) {e.printStackTrace();}
 		}
 		remoteEvaluator = null;
@@ -178,6 +181,13 @@ public class EvaluatorWrapper implements Evaluator, Serializable {
 	}
 
 	
+	@Override
+	public boolean isWrapper() throws RemoteException {
+		// TODO Auto-generated method stub
+		return true;
+	}
+
+
 	@Override
 	public boolean acceptAlg(Alg alg) throws RemoteException {
 		// TODO Auto-generated method stub
@@ -247,15 +257,14 @@ public class EvaluatorWrapper implements Evaluator, Serializable {
 //		// TODO Auto-generated method stub
 //		return remoteEvaluator.getAlgNames();
 //	}
-//
-//
-//	@NextUpdate
-//	@Deprecated
-//	@Override
-//	public DatasetPool getDatasetPool() throws RemoteException {
-//		// TODO Auto-generated method stub
-//		return remoteEvaluator.getDatasetPool();
-//	}
+
+	
+	@NextUpdate
+	@Override
+	public DatasetPool getDatasetPool() throws RemoteException {
+		// TODO Auto-generated method stub
+		return remoteEvaluator.getDatasetPool();
+	}
 
 
 	@Deprecated
@@ -312,6 +321,20 @@ public class EvaluatorWrapper implements Evaluator, Serializable {
 	public void setEvaluateStorePath(String evStorePath) throws RemoteException {
 		// TODO Auto-generated method stub
 		remoteEvaluator.setEvaluateStorePath(evStorePath);
+	}
+
+
+	@Override
+	public void addElapsedTimeListener(CounterElapsedTimeListener listener) throws RemoteException {
+		// TODO Auto-generated method stub
+		remoteEvaluator.addElapsedTimeListener(listener);
+	}
+
+
+	@Override
+	public void removeElapsedTimeListener(CounterElapsedTimeListener listener) throws RemoteException {
+		// TODO Auto-generated method stub
+		remoteEvaluator.removeElapsedTimeListener(listener);
 	}
 
 
@@ -375,14 +398,14 @@ public class EvaluatorWrapper implements Evaluator, Serializable {
 	@Override
 	public boolean isAgent() throws RemoteException {
 		// TODO Auto-generated method stub
-		return false;
+		return remoteEvaluator.isAgent();
 	}
 
 
 	@Override
 	public void setAgent(boolean agent) throws RemoteException {
 		// TODO Auto-generated method stub
-		LogUtil.info("Evaluator wrapper not support setting agent");
+		remoteEvaluator.setAgent(agent);
 	}
 
 

@@ -283,14 +283,14 @@ public class KBaseRemoteWrapper implements KBase, KBaseRemote {
 //	@Override
 //	public boolean isAgent() throws RemoteException {
 //		// TODO Auto-generated method stub
-//		return false;
+//		return remoteKBase.isAgent();
 //	}
 //
 //
 //	@Override
 //	public void setAgent(boolean agent) throws RemoteException {
 //		// TODO Auto-generated method stub
-//		LogUtil.info("KBase wrapper not support setting agent");
+//		remoteKBase.setAgent(agent);
 //	}
 
 

@@ -8,6 +8,7 @@
 package net.hudup.evaluate.ui;
 
 import java.io.Serializable;
+import java.util.List;
 
 import net.hudup.core.data.DatasetPool;
 
@@ -40,6 +41,18 @@ public class EvaluateGUIData implements Serializable {
 	
 
 	/**
+	 * Algorithm name.
+	 */
+	public String algName = null;
+	
+	
+	/**
+	 * List of algorithm names.
+	 */
+	public List<String> algNames = null;
+
+	
+	/**
 	 * Dataset pool.
 	 */
 	public DatasetPool pool = null;
@@ -57,14 +70,6 @@ public class EvaluateGUIData implements Serializable {
 	public boolean chkVerbal = false;
 
 
-	/**
-	 * Default constructor.
-	 */
-	public EvaluateGUIData() {
-		
-	}
-	
-	
 	/**
 	 * Filling data to the target.
 	 * @param target target data.

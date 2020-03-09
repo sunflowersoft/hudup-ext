@@ -47,7 +47,6 @@ import net.hudup.core.data.Snapshot;
 import net.hudup.core.evaluate.Evaluator;
 import net.hudup.core.evaluate.EvaluatorConfig;
 import net.hudup.core.logistic.LogUtil;
-import net.hudup.core.logistic.NextUpdate;
 import net.hudup.data.ProviderImpl;
 import net.hudup.data.SnapshotImpl;
 
@@ -1437,7 +1436,6 @@ public class DefaultService implements Service, AutoCloseable {
 
 
 	@Override
-	@NextUpdate
 	public Evaluator getEvaluator(String evaluatorName) throws RemoteException {
 		// TODO Auto-generated method stub
 		Evaluator evaluator = null;
@@ -1492,7 +1490,15 @@ public class DefaultService implements Service, AutoCloseable {
 			trans.unlockRead();
 		}
 		
-		Collections.sort(evaluatorNames);
+		Collections.sort(evaluatorNames, new Comparator<String>() {
+
+			@Override
+			public int compare(String o1, String o2) {
+				// TODO Auto-generated method stub
+				return o1.compareToIgnoreCase(o2);
+			}
+			
+		});
 		return evaluatorNames.toArray(new String[0]);
 	}
 

@@ -20,6 +20,8 @@ import net.hudup.core.data.AutoCloseable;
 import net.hudup.core.data.DatasetPool;
 import net.hudup.core.data.Exportable;
 import net.hudup.core.logistic.AgentSupport;
+import net.hudup.core.logistic.CounterElapsedTimeListener;
+import net.hudup.core.logistic.NextUpdate;
 import net.hudup.core.logistic.RemoteRunner;
 
 /**
@@ -148,6 +150,14 @@ public interface Evaluator extends Remote, RemoteRunner, SetupAlgListener, Expor
 
 	
 	/**
+	 * Checking whether this object is a wrapper of an evaluator.
+	 * @return whether this object is a wrapper of an evaluator.
+	 * @throws RemoteException if any error raises.
+	 */
+	boolean isWrapper() throws RemoteException;
+	
+	
+	/**
 	 * Checking whether the specified algorithm is accepted by this evaluator.
 	 * @param alg specified algorithm.
 	 * @return whether the specified algorithm is accepted by this evaluator.
@@ -219,6 +229,15 @@ public interface Evaluator extends Remote, RemoteRunner, SetupAlgListener, Expor
 	 * @throws RemoteException if any error raises.
 	 */
 	void clearDelayUnsetupAlgs() throws RemoteException;
+
+	
+	/**
+	 * Getting dataset pool. This method needs to be improved when dataset pool is large. Moreover, pool can be scanner.
+	 * @return dataset pool.
+	 * @throws RemoteException if any error raises.
+	 */
+	@NextUpdate
+	DatasetPool getDatasetPool() throws RemoteException;
 
 	
 	/**
@@ -297,8 +316,24 @@ public interface Evaluator extends Remote, RemoteRunner, SetupAlgListener, Expor
     void removeSetupAlgListener(SetupAlgListener listener) throws RemoteException;
 
     
+	/**
+	 * Adding elapsed time listener.
+	 * @param listener elapsed time listener.
+	 * @throws RemoteException if any error raises.
+	 */
+	void addElapsedTimeListener(CounterElapsedTimeListener listener) throws RemoteException;
+
+    
+	/**
+	 * Removing elapsed time listener.
+	 * @param listener elapsed time listener.
+	 * @throws RemoteException if any error raises.
+	 */
+    void removeElapsedTimeListener(CounterElapsedTimeListener listener) throws RemoteException;
+
+    
     /**
-     * Setting evaluation store path.
+     * Setting evaluation store path. This method is only called locally because of different file systems in network.
      * @param evStorePath evaluation store path.
      * @throws RemoteException if any error raises.
      */

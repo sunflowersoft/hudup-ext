@@ -194,14 +194,14 @@ public class EstimateEvaluator extends RecommendEvaluator {
 						}
 						
 						
-						counterClock.pause();
+						counter.pause();
 						synchronized (this) {
 							while (paused) {
 								notifyAll();
 								wait();
 							}
 						}
-						counterClock.resume();
+						counter.resume();
 						
 					} // User id iterate
 					

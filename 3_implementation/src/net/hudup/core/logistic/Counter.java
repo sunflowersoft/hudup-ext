@@ -5,25 +5,25 @@
  * Email: ng_phloc@yahoo.com
  * Phone: +84-975250362
  */
-package net.hudup.core.logistic.ui;
+package net.hudup.core.logistic;
 
 import java.io.Serializable;
+import java.rmi.RemoteException;
 
 import javax.swing.JLabel;
+import javax.swing.event.EventListenerList;
 
 import net.hudup.core.evaluate.EvaluateInfo;
-import net.hudup.core.logistic.AbstractRunner;
-import net.hudup.core.logistic.I18nUtil;
 
 /**
- * This class shows a time counter (counter clock) in text form &quot;hours: minutes: seconds&quot;.
+ * This class shows a time counter in text form &quot;hours: minutes: seconds&quot;.
  * Because it class is a runner by extending {@link AbstractRunner}, it updates automatically the time counter in text form &quot;hours: minutes: seconds&quot;.
  * 
  * @author Loc Nguyen
  * @version 11.0
  *
  */
-public class CounterClock extends AbstractRunner implements Serializable {
+public class Counter extends AbstractRunner implements Serializable {
 
 	
 	/**
@@ -33,7 +33,7 @@ public class CounterClock extends AbstractRunner implements Serializable {
 
 
 	/**
-	 * The text form of this counter clock &quot;hours: minutes: seconds&quot;.
+	 * The text form of this counter &quot;hours: minutes: seconds&quot;.
 	 */
 	public static final String TIME_FORMAT = I18nUtil.message("time") + " %d:%d:%d";
 	
@@ -47,6 +47,7 @@ public class CounterClock extends AbstractRunner implements Serializable {
 	/**
 	 * Associated text pane to show the counter in text form &quot;hours: minutes: seconds&quot;.
 	 */
+	@Deprecated
 	protected JLabel assocTxtTime = null;
 	
 	
@@ -57,9 +58,16 @@ public class CounterClock extends AbstractRunner implements Serializable {
 	
 	
 	/**
+	 * Holding a list of event listener.
+	 * 
+	 */
+    protected EventListenerList listenerList = new EventListenerList();
+
+    
+    /**
 	 * Elapsed time in miliseconds.
 	 */
-	protected long timeElapse = 0;
+	protected long elapsedTime = 0;
 	
 	
 	/**
@@ -71,7 +79,7 @@ public class CounterClock extends AbstractRunner implements Serializable {
 	/**
 	 * Default constructor.
 	 */
-	public CounterClock() {
+	public Counter() {
 		
 	}
 	
@@ -80,7 +88,8 @@ public class CounterClock extends AbstractRunner implements Serializable {
 	 * Constructor with the associated text pane for showing the counter in text form &quot;hours: minutes: seconds&quot;.
 	 * @param assocTxtTime associated text pane.
 	 */
-	public CounterClock(JLabel assocTxtTime) {
+	@Deprecated
+	public Counter(JLabel assocTxtTime) {
 		this();
 		setAssocTimeTextPane(assocTxtTime);
 	}
@@ -90,7 +99,7 @@ public class CounterClock extends AbstractRunner implements Serializable {
 	 * Constructor with associated evaluation information.
 	 * @param assocEvaluateInfo associated evaluation information.
 	 */
-	public CounterClock(EvaluateInfo assocEvaluateInfo) {
+	public Counter(EvaluateInfo assocEvaluateInfo) {
 		this();
 		setAssocEvaluateInfo(assocEvaluateInfo);
 	}
@@ -100,6 +109,7 @@ public class CounterClock extends AbstractRunner implements Serializable {
 	 * Setting associated text pane for showing the counter in text form &quot;hours: minutes: seconds&quot;.
 	 * @param assocTxtTime associated text pane for showing the counter in text form &quot;hours: minutes: seconds&quot;.
 	 */
+	@Deprecated
 	public synchronized void setAssocTimeTextPane(JLabel assocTxtTime) {
 		if (assocTxtTime != null)
 			this.assocTxtTime = assocTxtTime;
@@ -144,13 +154,13 @@ public class CounterClock extends AbstractRunner implements Serializable {
 
 	
 	/**
-	 * Starting counter clock with started time elapse.
-	 * @param timeElapse started time elapse.
+	 * Starting counter with started time elapse.
+	 * @param elapsedTime started time elapse.
 	 */
-	public synchronized void start(long timeElapse) {
+	public synchronized void start(long elapsedTime) {
 		// TODO Auto-generated method stub
 		super.start();
-		this.timeElapse = 0;
+		this.elapsedTime = 0;
 		this.startedTime = System.currentTimeMillis();
 	}
 
@@ -160,7 +170,7 @@ public class CounterClock extends AbstractRunner implements Serializable {
 		// TODO Auto-generated method stub
 		super.stop();
 		updateTime();
-		timeElapse = 0;
+		elapsedTime = 0;
 		startedTime = 0;
 	}
 
@@ -172,7 +182,7 @@ public class CounterClock extends AbstractRunner implements Serializable {
 		updateTime();
 		
 		long currentTime = System.currentTimeMillis();
-		timeElapse = timeElapse + currentTime - startedTime;
+		elapsedTime = elapsedTime + currentTime - startedTime;
 		startedTime = 0;
 	}
 
@@ -200,46 +210,101 @@ public class CounterClock extends AbstractRunner implements Serializable {
 	 */
 	public synchronized void clearAssoc() {
 		if (assocTxtTime != null) assocTxtTime.setText("");
-		if (assocEvaluateInfo != null) assocEvaluateInfo.timeElapse = 0;
+		if (assocEvaluateInfo != null) assocEvaluateInfo.elapsedTime = 0;
 	}
 	
 	
 	/**
 	 * Updating the time counter in text form &quot;hours: minutes: seconds&quot; by current system time.
+	 * This method also fires elapsed time event.
 	 */
-	private void updateTime() {
+	protected void updateTime() {
 		if (startedTime == 0) return;
 		
-		long milis = getTimeElapse();
-		String text = formatTime(milis);
+		long elapsedTime = getElapsedTime();
+		String text = formatTime(elapsedTime);
 		
-		if (assocEvaluateInfo != null) assocEvaluateInfo.timeElapse = milis;
+		if (assocEvaluateInfo != null) assocEvaluateInfo.elapsedTime = elapsedTime;
 		if (assocTxtTime != null) assocTxtTime.setText(text);
+		
+		fireElapsedTimeEvent(new CounterElapsedTimeEvent(this, elapsedTime));
 	}
 	
 	
 	/**
-	 * Getting time elapse in miliseconds.
-	 * @return time elapse in miliseconds.
+	 * Getting elapsed time in miliseconds.
+	 * @return elapsed time in miliseconds.
 	 */
-	public synchronized long getTimeElapse() {
-		if (startedTime == 0) return timeElapse;
+	public synchronized long getElapsedTime() {
+		if (startedTime == 0) return elapsedTime;
 		
 		long currentTime = System.currentTimeMillis();
-		return (timeElapse + currentTime - startedTime);
+		return (elapsedTime + currentTime - startedTime);
 	}
 	
 	
 	/**
-	 * Setting time elapse in miliseconds.
-	 * @param timeElapse time elapse in miliseconds.
+	 * Setting elapsed time in miliseconds.
+	 * @param elapsedTime elapsed time in miliseconds.
 	 */
-	public synchronized void setTimeElapse(long timeElapse) {
-		if (timeElapse >= 0) this.timeElapse = timeElapse;
+	public synchronized void setTimeElapse(long elapsedTime) {
+		if (elapsedTime >= 0) this.elapsedTime = elapsedTime;
 	}
 	
 	
 	/**
+	 * Adding elapsed time listener.
+	 * @param listener elapsed time listener.
+	 * @throws RemoteException if any error raises.
+	 */
+	public void addElapsedTimeListener(CounterElapsedTimeListener listener) throws RemoteException {
+		synchronized (listenerList) {
+			listenerList.add(CounterElapsedTimeListener.class, listener);
+		}
+    }
+
+    
+	/**
+	 * Removing elapsed time listener.
+	 * @param listener elapsed time listener.
+	 * @throws RemoteException if any error raises.
+	 */
+    public void removeElapsedTimeListener(CounterElapsedTimeListener listener) throws RemoteException {
+		synchronized (listenerList) {
+			listenerList.remove(CounterElapsedTimeListener.class, listener);
+		}
+    }
+	
+    
+    /**
+     * Getting an array of elapsed time listeners.
+     * @return array of elapsed time listeners.
+     */
+    protected CounterElapsedTimeListener[] getElapsedTimeListeners() {
+		synchronized (listenerList) {
+			return listenerList.getListeners(CounterElapsedTimeListener.class);
+		}
+    }
+    
+    
+    /**
+     * Firing elapsed time event.
+     * @param evt elapsed time event.
+     */
+    protected void fireElapsedTimeEvent(CounterElapsedTimeEvent evt) {
+    	CounterElapsedTimeListener[] listeners = getElapsedTimeListeners();
+		for (CounterElapsedTimeListener listener : listeners) {
+			try {
+				listener.receivedElapsedTime(evt);
+			}
+			catch (Throwable e) {
+				e.printStackTrace();
+			}
+		}
+    }
+
+    
+    /**
 	 * Formatting miliseconds in date-time format.
 	 * @param milis specified miliseconds. 
 	 * @return date-time format text of specified miliseconds.

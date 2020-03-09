@@ -60,13 +60,14 @@ import net.hudup.core.evaluate.EvaluatorEvent;
 import net.hudup.core.evaluate.EvaluatorEvent.Type;
 import net.hudup.core.evaluate.EvaluatorProgressEvent;
 import net.hudup.core.logistic.ClipboardUtil;
+import net.hudup.core.logistic.Counter;
+import net.hudup.core.logistic.CounterElapsedTimeEvent;
 import net.hudup.core.logistic.DSUtil;
 import net.hudup.core.logistic.I18nUtil;
 import net.hudup.core.logistic.Inspector;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.xURI;
-import net.hudup.core.logistic.ui.CounterClock;
 import net.hudup.core.logistic.ui.TextField;
 import net.hudup.core.logistic.ui.UIUtil;
 import net.hudup.data.DatasetUtil2;
@@ -265,10 +266,10 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 	 * Constructor with specified evaluator, bound URI, and GUI data.
 	 * @param evaluator specified evaluator.
 	 * @param bindUri bound URI. If this parameter is null, evaluator is local.
-	 * @param referredData GUI parameter.
+	 * @param referredGUIData referred GUI data.
 	 */
-	public EvaluateGUI(Evaluator evaluator, xURI bindUri, EvaluateGUIData referredData) {
-		super(evaluator, bindUri, referredData);
+	public EvaluateGUI(Evaluator evaluator, xURI bindUri, EvaluateGUIData referredGUIData) {
+		super(evaluator, bindUri, referredGUIData);
 		init(null);
 	}
 
@@ -298,11 +299,11 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 		add(footer, BorderLayout.SOUTH);
 		
 		algChanged();
-		setVerbal(referredData != null ? referredData.chkVerbal : false);
+		setVerbal(guiData != null ? guiData.chkVerbal : false);
 		
-		if (this.pool.size() > 0) {
-			this.txtTrainingBrowse.setDataset(this.pool.get(0).getTraining());
-			this.txtTestingBrowse.setDataset(this.pool.get(0).getTesting());
+		if (guiData.pool.size() > 0) {
+			this.txtTrainingBrowse.setDataset(guiData.pool.get(0).getTraining());
+			this.txtTestingBrowse.setDataset(guiData.pool.get(0).getTesting());
 		}
 	}
 
@@ -390,8 +391,8 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 		Dimension preferredSize = this.cmbAlgs.getPreferredSize();
 		preferredSize.width = Math.max(preferredSize.width, 200);
 		this.cmbAlgs.setPreferredSize(preferredSize);
-		if (otherResult.algName != null)
-			this.cmbAlgs.setDefaultSelected(otherResult.algName);
+		if (guiData.algName != null)
+			this.cmbAlgs.setDefaultSelected(guiData.algName);
 
 		this.btnConfig = UIUtil.makeIconButton(
 			"config-16x16.png", 
@@ -647,8 +648,8 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			}
 		});
 		this.chkRunSave.setToolTipText(I18nUtil.message("save_evaluate_tooltip"));
-		if (referredData != null && referredData.txtRunSaveBrowse != null) {
-			this.txtRunSaveBrowse.setText(referredData.txtRunSaveBrowse);
+		if (guiData.txtRunSaveBrowse != null) {
+			this.txtRunSaveBrowse.setText(guiData.txtRunSaveBrowse);
 			this.chkRunSave.setSelected(true);
 		}
 		pane.add(this.chkRunSave, BorderLayout.WEST);
@@ -790,17 +791,9 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			
 			this.statusBar.setTextPane2(I18nUtil.message("total") + ": " + otherResult.progressStep + "/" + otherResult.progressTotal);
 		}
-		this.counterClock.setAssocTimeTextPane(this.statusBar.getLastPane());
-		this.counterClock.setAssocTimeTextPane(this.statusBar.getLastPane());
-		try {
-			if (evaluator.remoteIsStarted()) {
-				this.statusBar.getLastPane().setText(CounterClock.formatTime(otherResult.timeElapse));
-				if (evaluator.remoteIsRunning())
-					this.counterClock.start();
-			}
-		}
-		catch (Exception e) {
-			e.printStackTrace();
+		if (otherResult.elapsedTime > 0) {
+			String elapsedTimeText = Counter.formatTime(otherResult.elapsedTime);
+			statusBar.getLastPane().setText(elapsedTimeText);
 		}
 		statusPane.add(this.statusBar, BorderLayout.CENTER);
 
@@ -908,8 +901,8 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 		}
 		
 		//Additional code.
-		this.pool.removeAllNoClearDatasets();
-		this.pool.add(new DatasetPair(txtTrainingBrowse.getDataset(), txtTestingBrowse.getDataset()));
+		guiData.pool.removeAllNoClearDatasets();
+		guiData.pool.add(new DatasetPair(txtTrainingBrowse.getDataset(), txtTestingBrowse.getDataset()));
 	}
 	
 	
@@ -944,8 +937,8 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 		}
 		
 		//Additional code.
-		this.pool.removeAllNoClearDatasets();
-		this.pool.add(new DatasetPair(txtTrainingBrowse.getDataset(), txtTestingBrowse.getDataset()));
+		guiData.pool.removeAllNoClearDatasets();
+		guiData.pool.add(new DatasetPair(txtTrainingBrowse.getDataset(), txtTestingBrowse.getDataset()));
 	}
 
 	
@@ -1029,8 +1022,8 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 		}
 		
 		//Additional code.
-		this.pool.removeAllNoClearDatasets();
-		this.pool.add(new DatasetPair(txtTrainingBrowse.getDataset(), txtTestingBrowse.getDataset()));
+		guiData.pool.removeAllNoClearDatasets();
+		guiData.pool.add(new DatasetPair(txtTrainingBrowse.getDataset(), txtTestingBrowse.getDataset()));
 	}
 
 	
@@ -1079,7 +1072,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 		}
 		
 		//Additional code.
-		this.pool.removeAllNoClearDatasets();
+		guiData.pool.removeAllNoClearDatasets();
 	}
 	
 	
@@ -1132,7 +1125,6 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			algList.add(alg);
 			evaluator.remoteStart(algList, pool, null);
 		
-			counterClock.start();
 			updateMode();
 		}
 		catch (Throwable e) {
@@ -1167,9 +1159,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 		//this.result = evaluator.getResult();
 		this.result = evt.getMetrics(); //Fix bug date: 2019.09.04 by Loc Nguyen.
 		if (evt.getType() == Type.done) {
-			counterClock.stop();
 			updateMode();
-			
 		}
 	}
 	
@@ -1230,6 +1220,16 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			evProcessor.saveSetupResult(this.txtRunSaveBrowse.getText(), evt, algName, fastsave, "tempui");
 		}
 		
+	}
+
+
+	@Override
+	public void receivedElapsedTime(CounterElapsedTimeEvent evt) throws RemoteException {
+		// TODO Auto-generated method stub
+		if (statusBar != null && statusBar.getLastPane() != null) {
+			String elapsedTimeText = Counter.formatTime(evt.getElapsedTime());
+			statusBar.getLastPane().setText(elapsedTimeText);
+		}
 	}
 
 
@@ -1423,7 +1423,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			this.txtRunInfo.setText("");
 			this.result = null;
 			this.tblMetrics.clear();
-			this.counterClock.stopAndClearAssoc();
+			this.statusBar.getLastPane().setText(""); //Clearing elapsed time information.
 		}
 		catch (Throwable e) {
 			e.printStackTrace();
@@ -1432,15 +1432,14 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 	
 	
 	@Override
-	public EvaluateGUIData extractGUIData() {
+	protected void updateGUIData() {
 		// TODO Auto-generated method stub
-		EvaluateGUIData data = new EvaluateGUIData();
-		
-		data.pool = this.pool;
-		data.txtRunSaveBrowse = this.chkRunSave.isSelected() ? this.txtRunSaveBrowse.getText() : null;
-		data.chkVerbal = this.chkVerbal.isSelected();
-		
-		return data;
+		if (cmbAlgs.getSelectedAlg() != null)
+			guiData.algName = cmbAlgs.getSelectedAlg().getName();
+		else
+			guiData.algName = null;
+		guiData.txtRunSaveBrowse = this.chkRunSave.isSelected() ? this.txtRunSaveBrowse.getText() : null;
+		guiData.chkVerbal = this.chkVerbal.isSelected();
 	}
 
 	

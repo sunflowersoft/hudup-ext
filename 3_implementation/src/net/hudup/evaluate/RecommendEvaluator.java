@@ -271,14 +271,14 @@ public class RecommendEvaluator extends EvaluatorAbstract {
 						}
 						
 						
-						counterClock.pause();
+						counter.pause();
 						synchronized (this) {
 							while (paused) {
 								notifyAll();
 								wait();
 							}
 						}
-						counterClock.resume();
+						counter.resume();
 						
 					} // User id iterate
 					

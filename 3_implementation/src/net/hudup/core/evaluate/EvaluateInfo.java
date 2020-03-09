@@ -74,17 +74,15 @@ public class EvaluateInfo implements Serializable {
 	
 	
 	/**
-	 * Time elapsed in miliseconds.
+	 * Elapsed time in miliseconds.
 	 */
-	public long timeElapse = 0;
+	public long elapsedTime = 0;
 	
 	
 	/**
-	 * Default constructor.
+	 * Directory to store evaluation results. If null, evaluation results are not stored.
 	 */
-	public EvaluateInfo() {
-		reset();
-	}
+	public String evStorePath = null;
 	
 	
 	/**
@@ -99,7 +97,8 @@ public class EvaluateInfo implements Serializable {
 		vCurrentTotal = 0;
 		vCurrentCount = 0;
 		inSetup = false;
-		timeElapse = 0;
+		elapsedTime = 0;
+		evStorePath = null;
 	}
 	
 	
