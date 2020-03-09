@@ -58,6 +58,7 @@ import net.hudup.core.logistic.I18nUtil;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.xURI;
+import net.hudup.core.logistic.ui.CounterClock;
 import net.hudup.core.logistic.ui.SortableSelectableTable;
 import net.hudup.core.logistic.ui.SortableSelectableTableModel;
 import net.hudup.core.logistic.ui.SortableTable;
@@ -808,8 +809,17 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			
 			this.statusBar.setTextPane2(I18nUtil.message("total") + ": " + otherResult.progressStep + "/" + otherResult.progressTotal);
 		}
-		this.counterClock.setTimeElapse(otherResult.timeElapse);
 		this.counterClock.setAssocTimeTextPane(this.statusBar.getLastPane());
+		try {
+			if (otherResult.timeElapse > 0) {
+				this.statusBar.getLastPane().setText(CounterClock.formatTime(otherResult.timeElapse));
+				if (evaluator.remoteIsRunning())
+					this.counterClock.start(otherResult.timeElapse);
+			}
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
 		statusPane.add(this.statusBar, BorderLayout.CENTER);
 
 

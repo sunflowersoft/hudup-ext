@@ -97,7 +97,7 @@ public class DefaultServiceExt extends DefaultService {
 				if (pairMap.containsKey(ev.getName())) continue;
 				
 				ev.getConfig().setEvaluatorPort(serverConfig.getServerPort());
-				ev.getConfig().setAutoself(true);
+				ev.setAgent(true);
 				ev.export(serverConfig.getServerPort());
 				
 				pairMap.put(ev.getName(), new EvaluatorPair(ev, new EvaluateGUIData()));

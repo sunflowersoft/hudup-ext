@@ -61,15 +61,9 @@ public class EvaluatorConfig extends SysConfig {
 
 	
 	/**
-	 * This constant specifies auto-self field. If auto-self mode is true, no GUI can close evaluator.
+	 * By default, agent field is false. If agent mode is true, no GUI can close evaluator.
 	 */
-	public final static String EVALUATOR_AUTOSELF_FIELD = changeCase("evaluator_autoself");
-
-	
-	/**
-	 * By default, auto-self field is false. If auto-self mode is true, no GUI can close evaluator.
-	 */
-	public final static boolean EVALUATOR_AUTOSELF_DEFAULT = false;
+	public final static boolean EVALUATOR_AGENT_DEFAULT = false;
 
 	
 	/**
@@ -109,7 +103,7 @@ public class EvaluatorConfig extends SysConfig {
 		
 		setRecommendAll(RECOMMEND_ALL_DEFAULT);
 		setEvaluatorPort(Constants.DEFAULT_EVALUATOR_PORT);
-		setAutoself(EVALUATOR_AUTOSELF_DEFAULT);
+		setAgent(EVALUATOR_AGENT_DEFAULT);
 		setFastSave(EVALUATOR_FASTSAVE_DEFAULT);
 	}
 
@@ -161,20 +155,20 @@ public class EvaluatorConfig extends SysConfig {
 
 
 	/**
-	 * Checking whether auto-self mode is true. If auto-self mode is true, no GUI can close evaluator. 
-	 * @return whether auto-self mode is true.
+	 * Checking whether the evaluator is agent. If the evaluator is agent, no GUI can close evaluator. 
+	 * @return whether the evaluator is agent.
 	 */
-	public boolean isAutoself() {
-		return getAsBoolean(EVALUATOR_AUTOSELF_FIELD);
+	public boolean isAgent() {
+		return getAsBoolean(DataConfig.AGENT_FIELD);
 	}
 	
 	
 	/**
-	 * Setting whether auto-self mode is true. If auto-self mode is true, no GUI can close evaluator.
-	 * @param autoself auto-self mode.
+	 * Setting whether the evaluator is agent. If the evaluator is agent, no GUI can close evaluator. 
+	 * @param agent agent mode.
 	 */
-	public void setAutoself(boolean autoself) {
-		put(EVALUATOR_AUTOSELF_FIELD, autoself);
+	public void setAgent(boolean agent) {
+		put(DataConfig.AGENT_FIELD, agent);
 	}
 
 

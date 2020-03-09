@@ -19,7 +19,7 @@ import net.hudup.core.data.Exportable;
  * @version 12.0
  *
  */
-public interface AlgRemoteTask extends Exportable {
+public interface AlgRemoteTask extends Exportable /*, AgentSupport*/ {
 
 	
 	/**

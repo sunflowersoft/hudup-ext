@@ -102,7 +102,8 @@ public class KBaseRemoteWrapper implements KBase, KBaseRemote {
 
 	
 	/*
-	 * This close method does not call unexport method as usual. This is a special case.
+	 * This close method does not call unexport method as usual. This is a special case because
+	 * after close method is called, KBase becomes empty, which means that method {@link #isEmpty()} returns {@code true} but KBase can be re-learned by calling the method {@link #learn(Dataset, Alg)} again.
 	 * @see net.hudup.core.alg.KBaseRemoteTask#close()
 	 */
 	@Override
@@ -242,12 +243,21 @@ public class KBaseRemoteWrapper implements KBase, KBaseRemote {
 
 
 	/*
-	 * This unexport method is not called by close method as usual. This is a special case.
+	 * This unexport method is not called by close method as usual. This is a special case because
+	 * after close method is called, KBase becomes empty, which means that method {@link #isEmpty()} returns {@code true} but KBase can be re-learned by calling the method {@link #learn(Dataset, Alg)} again.
 	 * @see net.hudup.core.data.Exportable#unexport()
 	 */
 	@Override
 	public synchronized void unexport() throws RemoteException {
 		// TODO Auto-generated method stub
+		if (exclusive && remoteKBase != null) {
+			try {
+				//if (!remoteKBase.isAgent())
+					remoteKBase.unexport();
+			} catch (Exception e) {e.printStackTrace();}
+		}
+		remoteKBase = null;
+
 		if (exportedStub != null) {
 			NetUtil.RegistryRemote.unexport(this);
 			exportedStub = null;
@@ -270,6 +280,20 @@ public class KBaseRemoteWrapper implements KBase, KBaseRemote {
 	}
 
 	
+//	@Override
+//	public boolean isAgent() throws RemoteException {
+//		// TODO Auto-generated method stub
+//		return false;
+//	}
+//
+//
+//	@Override
+//	public void setAgent(boolean agent) throws RemoteException {
+//		// TODO Auto-generated method stub
+//		LogUtil.info("KBase wrapper not support setting agent");
+//	}
+
+
 	@Override
 	protected void finalize() throws Throwable {
 		// TODO Auto-generated method stub

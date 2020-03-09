@@ -875,7 +875,8 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluatorProgr
 				remoteEvaluator.removeEvaluatorListener(this);
 				remoteEvaluator.removeProgressListener(this);
 				remoteEvaluator.removeSetupAlgListener(this);
-				remoteEvaluator.unexport();
+				if (!remoteEvaluator.isAgent())
+					remoteEvaluator.unexport();
 			} catch (Exception e) {e.printStackTrace();}
 			
 			socketServer.removeRunner(this);
@@ -903,6 +904,20 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluatorProgr
 	}
 
 	
+	@Override
+	public boolean isAgent() throws RemoteException {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+
+	@Override
+	public void setAgent(boolean agent) throws RemoteException {
+		// TODO Auto-generated method stub
+		LogUtil.info("Evaluator-Delegator wrapper not support setting agent");
+	}
+
+
 	@Override
 	public void close() throws Exception {
 		// TODO Auto-generated method stub

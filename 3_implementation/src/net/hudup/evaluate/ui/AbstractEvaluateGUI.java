@@ -153,7 +153,7 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 		else { //Evaluator is local
 			try {
 				EvaluatorConfig config = evaluator.getConfig();
-				if (!config.isAutoself()) { //Evaluator is auto-self.
+				if (!evaluator.isAgent()) { //Evaluator is agent.
 					int evaluatorPort = config.getEvaluatorPort();
 					evaluatorPort = NetUtil.getPort(evaluatorPort, true);
 					
@@ -185,7 +185,6 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 		this.pool = referredData != null && referredData.pool != null ? referredData.pool : new DatasetPool ();
 
 		this.counterClock = new CounterClock();
-		this.counterClock.setTimeElapse(this.otherResult.timeElapse);
 
 		this.referredData = referredData;
 		if (referredData != null) {
@@ -306,7 +305,7 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	public void dispose() {
 		boolean agent = false;
 		try {
-			agent = this.evaluator.getConfig().isAutoself();
+			agent = this.evaluator.isAgent();
 		} 
 		catch (Throwable e) {
 			e.printStackTrace();
@@ -314,6 +313,8 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 		}
 		
 		if (agent) {
+			this.counterClock.stop();
+			
 			unsetupListeners(this.evaluator);
 		}
 		else {
@@ -322,13 +323,19 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 
 			unsetupListeners(this.evaluator);
 			
+			if (bindUri == null) { //Local evaluator.
+				try {
+					this.evaluator.getConfig().save();
+				}
+				catch (Exception e) {e.printStackTrace();}
+			}
+			
 			try {
 				this.evaluator.close(); //The close() method also unexports evaluator.
 			}
 			catch (Exception e) {e.printStackTrace();}
 		}
 		
-		this.counterClock.stop();
 		this.evProcessor.clear();
 		if (this.referredData != null) {
 			extractGUIData().fillTo(this.referredData);

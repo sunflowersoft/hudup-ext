@@ -19,6 +19,7 @@ import net.hudup.core.alg.SetupAlgListener;
 import net.hudup.core.data.AutoCloseable;
 import net.hudup.core.data.DatasetPool;
 import net.hudup.core.data.Exportable;
+import net.hudup.core.logistic.AgentSupport;
 import net.hudup.core.logistic.RemoteRunner;
 
 /**
@@ -86,7 +87,7 @@ import net.hudup.core.logistic.RemoteRunner;
  * @version 10.0
  *
  */
-public interface Evaluator extends Remote, RemoteRunner, SetupAlgListener, Exportable, AutoCloseable {
+public interface Evaluator extends Remote, RemoteRunner, SetupAlgListener, Exportable, AgentSupport, AutoCloseable {
 
 	
 	/**

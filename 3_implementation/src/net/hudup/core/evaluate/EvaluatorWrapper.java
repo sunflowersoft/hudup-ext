@@ -350,7 +350,8 @@ public class EvaluatorWrapper implements Evaluator, Serializable {
 		// TODO Auto-generated method stub
 		if (exclusive && remoteEvaluator != null) {
 			try {
-				remoteEvaluator.unexport();
+				if (!remoteEvaluator.isAgent())
+					remoteEvaluator.unexport();
 			} catch (Exception e) {e.printStackTrace();}
 		}
 		remoteEvaluator = null;
@@ -371,6 +372,20 @@ public class EvaluatorWrapper implements Evaluator, Serializable {
 	}
 
 	
+	@Override
+	public boolean isAgent() throws RemoteException {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+
+	@Override
+	public void setAgent(boolean agent) throws RemoteException {
+		// TODO Auto-generated method stub
+		LogUtil.info("Evaluator wrapper not support setting agent");
+	}
+
+
 	@Override
 	protected void finalize() throws Throwable {
 		// TODO Auto-generated method stub

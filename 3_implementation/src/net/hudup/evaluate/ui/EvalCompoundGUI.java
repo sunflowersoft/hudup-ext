@@ -91,12 +91,6 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 	
 	
 	/**
-	 * Bound URI.
-	 */
-	protected xURI bindUri = null;
-	
-	
-	/**
 	 * Constructor with specified evaluator.
 	 * @param evaluator specified {@link EvaluatorAbstract}.
 	 * @param bindUri bound URI. If this parameter is null, evaluator is local.
@@ -116,14 +110,12 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 		super("Evaluator GUI");
 		try {
 			this.thisConfig = evaluator.getConfig();
-			this.thisConfig.setSaveAbility(bindUri == null && !this.thisConfig.isAutoself()); //Only save local and auto-self evaluator.
 		}
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			LogUtil.error("Error in getting evaluator configuration");
 		}
-		this.bindUri = bindUri;
 		this.batchEvaluateGUI = new BatchEvaluateGUI(evaluator, bindUri, referredData);
 		
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -133,7 +125,6 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 			public void windowClosed(WindowEvent e) {
 				super.windowClosed(e);
 //				batchEvaluateGUI.dispose(); //Calling in dispose() method instead.
-//				thisConfig.save(); //Calling in dispose() method instead.
 			}
 
 		});
@@ -297,7 +288,7 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 		}
 	
 		try {
-			if (bindUri == null)
+			if (batchEvaluateGUI.bindUri == null)
 				switchEvaluator(batchEvaluateGUI.getEvaluator().getName(), this);
 			else
 				switchRemoteEvaluator(batchEvaluateGUI.getEvaluator().getName(), this);
@@ -330,10 +321,11 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 	@Override
 	public void dispose() {
 		batchEvaluateGUI.dispose();
-		if (!thisConfig.isAutoself()) {
-			thisConfig.save();
-			PluginStorage.clear();
-		}
+		try {
+			if (!batchEvaluateGUI.evaluator.isAgent())
+				PluginStorage.clear();
+		} catch (Exception e) {e.printStackTrace();}
+		
 		super.dispose();
 	}
 

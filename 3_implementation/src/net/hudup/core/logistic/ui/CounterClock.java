@@ -139,9 +139,19 @@ public class CounterClock extends AbstractRunner implements Serializable {
 	@Override
 	public synchronized void start() {
 		// TODO Auto-generated method stub
+		start(0);
+	}
+
+	
+	/**
+	 * Starting counter clock with started time elapse.
+	 * @param timeElapse started time elapse.
+	 */
+	public synchronized void start(long timeElapse) {
+		// TODO Auto-generated method stub
 		super.start();
-		timeElapse = 0;
-		startedTime = System.currentTimeMillis();
+		this.timeElapse = 0;
+		this.startedTime = System.currentTimeMillis();
 	}
 
 	

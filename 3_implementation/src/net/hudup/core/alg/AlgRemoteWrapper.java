@@ -233,7 +233,8 @@ public class AlgRemoteWrapper implements Alg, AlgRemote, Serializable {
 		// TODO Auto-generated method stub
 		if (exclusive && remoteAlg != null) {
 			try {
-				remoteAlg.unexport();
+				//if (!remoteAlg.isAgent())
+					remoteAlg.unexport();
 			} catch (Exception e) {e.printStackTrace();}
 		}
 		remoteAlg = null;
@@ -260,6 +261,20 @@ public class AlgRemoteWrapper implements Alg, AlgRemote, Serializable {
 	}
 
 	
+//	@Override
+//	public boolean isAgent() throws RemoteException {
+//		// TODO Auto-generated method stub
+//		return false;
+//	}
+//
+//
+//	@Override
+//	public void setAgent(boolean agent) throws RemoteException {
+//		// TODO Auto-generated method stub
+//		LogUtil.info("Algorithm wrapper not support setting agent");
+//	}
+
+
 	@Override
 	public String toString() {
 		// TODO Auto-generated method stub

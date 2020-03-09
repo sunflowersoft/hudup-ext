@@ -66,6 +66,7 @@ import net.hudup.core.logistic.Inspector;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.xURI;
+import net.hudup.core.logistic.ui.CounterClock;
 import net.hudup.core.logistic.ui.TextField;
 import net.hudup.core.logistic.ui.UIUtil;
 import net.hudup.data.DatasetUtil2;
@@ -789,8 +790,18 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			
 			this.statusBar.setTextPane2(I18nUtil.message("total") + ": " + otherResult.progressStep + "/" + otherResult.progressTotal);
 		}
-		this.counterClock.setTimeElapse(otherResult.timeElapse);
 		this.counterClock.setAssocTimeTextPane(this.statusBar.getLastPane());
+		this.counterClock.setAssocTimeTextPane(this.statusBar.getLastPane());
+		try {
+			if (evaluator.remoteIsStarted()) {
+				this.statusBar.getLastPane().setText(CounterClock.formatTime(otherResult.timeElapse));
+				if (evaluator.remoteIsRunning())
+					this.counterClock.start();
+			}
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
 		statusPane.add(this.statusBar, BorderLayout.CENTER);
 
 		return footer;

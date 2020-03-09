@@ -342,6 +342,12 @@ public class DataConfig extends PropList {
 
 	
 	/**
+	 * This constant specifies agent field. If this field is true, the object is agent.
+	 */
+	public final static String AGENT_FIELD                   = changeCase("agent");
+
+	
+	/**
 	 * Normal user privilege for access account
 	 */
 	public final static int ACCOUNT_ACCESS_PRIVILEGE = 1;

@@ -1003,6 +1003,20 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 	
 	
 	@Override
+	public boolean isAgent() throws RemoteException {
+		// TODO Auto-generated method stub
+		return config.isAgent();
+	}
+
+
+	@Override
+	public void setAgent(boolean agent) throws RemoteException {
+		// TODO Auto-generated method stub
+		config.setAgent(agent);
+	}
+
+
+	@Override
 	public synchronized void close() throws Exception {
 		// TODO Auto-generated method stub
 		try {
