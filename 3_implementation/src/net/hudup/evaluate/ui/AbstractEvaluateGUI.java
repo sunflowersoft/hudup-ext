@@ -223,14 +223,26 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 		} catch (RemoteException e) {e.printStackTrace();}
 		if (otherResult == null) otherResult = new EvaluateInfo();
 
-		if (guiData.algNames == null || guiData.algNames.size() == 0)
+		boolean started = false;
+		try {
+			started = evaluator.remoteIsStarted();
+		}
+		catch (RemoteException e) {
+			e.printStackTrace();
+		}
+		
+		if (started) {
+			guiData.algName = otherResult.algName;
 			guiData.algNames = otherResult.algNames;
+			
+			try {
+				guiData.pool = evaluator.getDatasetPool();
+			} catch (Throwable e) {e.printStackTrace();}
+		}
+		
 		if (guiData.algNames == null || guiData.algNames.size() == 0)
 			guiData.algNames = algRegTable.getAlgNames();
 		
-		try {
-			guiData.pool = guiData.pool != null ? guiData.pool : evaluator.getDatasetPool();
-		} catch (Throwable e) {e.printStackTrace();}
 		guiData.pool = guiData.pool != null ? guiData.pool : new DatasetPool();
 	}
 	

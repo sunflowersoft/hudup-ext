@@ -74,6 +74,8 @@ public class EvaluateGUIData implements Serializable {
 	 * Resetting GUI data.
 	 */
 	public void reset() {
+		algName = null;
+		algNames = null;
 		pool = null;
 		txtRunSaveBrowse = null;
 		chkVerbal = false;
