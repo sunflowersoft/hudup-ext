@@ -21,10 +21,10 @@ import net.hudup.core.data.DatasetPair;
 import net.hudup.core.data.Fetcher;
 import net.hudup.core.data.Profile;
 import net.hudup.core.data.RatingVector;
+import net.hudup.core.evaluate.EvaluateEvent;
+import net.hudup.core.evaluate.EvaluateEvent.Type;
+import net.hudup.core.evaluate.EvaluateProgressEvent;
 import net.hudup.core.evaluate.EvaluatorAbstract;
-import net.hudup.core.evaluate.EvaluatorEvent;
-import net.hudup.core.evaluate.EvaluatorEvent.Type;
-import net.hudup.core.evaluate.EvaluatorProgressEvent;
 import net.hudup.core.evaluate.ExactRecallMetric;
 import net.hudup.core.evaluate.FractionMetricValue;
 import net.hudup.core.evaluate.HudupRecallMetric;
@@ -126,6 +126,7 @@ public class RecommendEvaluator extends EvaluatorAbstract {
 		result = new Metrics();
 		
 		Thread current = Thread.currentThread();
+		
 		for (int i = 0; current == thread && algList != null && i < algList.size(); i++) {
 			try {
 				if (!acceptAlg(algList.get(i))) continue;
@@ -151,7 +152,7 @@ public class RecommendEvaluator extends EvaluatorAbstract {
 					// Adding default metrics to metric result
 					result.add( recommender.getName(), datasetId, datasetUri, ((NoneWrapperMetricList)metricList.clone()).sort().list() );
 					
-					otherResult.inSetup = true;
+					otherResult.inAlgSetup = true;
 					recommender.addSetupListener(this);
 					SetupAlgEvent setupEvt = new SetupAlgEvent(new Integer(-1), SetupAlgEvent.Type.doing, recommender, null, "not supported yet");
 					fireSetupAlgEvent(setupEvt);
@@ -169,12 +170,12 @@ public class RecommendEvaluator extends EvaluatorAbstract {
 							new Object[] { setupElapsed / 1000.0f }
 						); // calculating setup time metric
 					//Fire doing event with setup time metric.
-					fireEvaluatorEvent(new EvaluatorEvent(this, Type.doing, setupMetrics)); // firing setup time metric
+					fireEvaluateEvent(new EvaluateEvent(this, Type.doing, setupMetrics)); // firing setup time metric
 					
 					setupEvt = new SetupAlgEvent(new Integer(1), SetupAlgEvent.Type.done, recommender, null, "not supported yet");
 					fireSetupAlgEvent(setupEvt);
 					recommender.removeSetupListener(this);
-					otherResult.inSetup = false;
+					otherResult.inAlgSetup = false;
 					
 					//Auto enhancement after setting up algorithm.
 					SystemUtil.enhanceAuto();
@@ -201,13 +202,13 @@ public class RecommendEvaluator extends EvaluatorAbstract {
 						
 						otherResult.progressStep++;
 						otherResult.vCurrentCount++;
-						EvaluatorProgressEvent progressEvt = new EvaluatorProgressEvent(this, otherResult.progressTotal, otherResult.progressStep);
+						EvaluateProgressEvent progressEvt = new EvaluateProgressEvent(this, otherResult.progressTotal, otherResult.progressStep);
 						progressEvt.setAlgName(recommender.getName());
 						progressEvt.setDatasetId(datasetId);
 						progressEvt.setCurrentCount(otherResult.vCurrentCount);
 						progressEvt.setCurrentTotal(otherResult.vCurrentTotal);
 						//Fire progress event.
-						fireProgressEvent(progressEvt);
+						fireEvaluateProgressEvent(progressEvt);
 						
 						RatingVector testingUser = testingUsers.pick();
 						if (testingUser == null) continue;
@@ -242,7 +243,7 @@ public class RecommendEvaluator extends EvaluatorAbstract {
 							); // calculating time speed metric
 						
 						//Fire doing event with speed metric.
-						fireEvaluatorEvent(new EvaluatorEvent(
+						fireEvaluateEvent(new EvaluateEvent(
 								this, 
 								Type.doing, 
 								speedMetrics,
@@ -262,7 +263,7 @@ public class RecommendEvaluator extends EvaluatorAbstract {
 							vExactRecommendedCount++; //Increase exact recommended count.
 							
 							//Fire doing event with most of accuracy metrics.
-							fireEvaluatorEvent(new EvaluatorEvent(
+							fireEvaluateEvent(new EvaluateEvent(
 									this, 
 									Type.doing, 
 									recommendedMetrics, 
@@ -271,14 +272,12 @@ public class RecommendEvaluator extends EvaluatorAbstract {
 						}
 						
 						
-						counter.pause();
 						synchronized (this) {
 							while (paused) {
 								notifyAll();
 								wait();
 							}
 						}
-						counter.resume();
 						
 					} // User id iterate
 					
@@ -289,7 +288,7 @@ public class RecommendEvaluator extends EvaluatorAbstract {
 							HudupRecallMetric.class, 
 							new Object[] { new FractionMetricValue(vRecommendedCount, otherResult.vCurrentTotal) }
 						);
-					fireEvaluatorEvent(new EvaluatorEvent(this, Type.doing, hudupRecallMetrics));
+					fireEvaluateEvent(new EvaluateEvent(this, Type.doing, hudupRecallMetrics));
 					
 					//Fire exact recall.
 					Metrics exactRecallMetrics = result.recalc(
@@ -298,11 +297,11 @@ public class RecommendEvaluator extends EvaluatorAbstract {
 							ExactRecallMetric.class, 
 							new Object[] { new FractionMetricValue(vExactRecommendedCount, vExactCurrentTotal) }
 						);
-					fireEvaluatorEvent(new EvaluatorEvent(this, Type.doing, exactRecallMetrics));
+					fireEvaluateEvent(new EvaluateEvent(this, Type.doing, exactRecallMetrics));
 
 					//Fire done-one event (1 algorithm is finished with 1 dataset).
 					Metrics doneOneMetrics = result.gets(recommender.getName(), datasetId);
-					fireEvaluatorEvent(new EvaluatorEvent(this, Type.done_one, doneOneMetrics));
+					fireEvaluateEvent(new EvaluateEvent(this, Type.done_one, doneOneMetrics));
 					
 				} // end try
 				catch (Throwable e) {
@@ -332,7 +331,7 @@ public class RecommendEvaluator extends EvaluatorAbstract {
 			paused = false;
 			
 			//Fire evaluation finished event (done event).
-			fireEvaluatorEvent(new EvaluatorEvent(this, Type.done, result));
+			fireEvaluateEvent(new EvaluateEvent(this, Type.done, result));
 			
 			clear();
 

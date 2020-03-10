@@ -21,9 +21,9 @@ import net.hudup.core.Util;
 import net.hudup.core.alg.Alg;
 import net.hudup.core.data.DatasetPool;
 import net.hudup.core.evaluate.EvaluateProcessor;
-import net.hudup.core.evaluate.EvaluatorEvent;
-import net.hudup.core.evaluate.EvaluatorEvent.Type;
-import net.hudup.core.evaluate.EvaluatorListener;
+import net.hudup.core.evaluate.EvaluateEvent;
+import net.hudup.core.evaluate.EvaluateEvent.Type;
+import net.hudup.core.evaluate.EvaluateListener;
 import net.hudup.core.evaluate.MetricsUtil;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.MathUtil;
@@ -124,10 +124,10 @@ public class Evaluator implements AccessPoint {
 				workingAdapter.create(analyzeDir, true);
 			
 			final net.hudup.core.evaluate.Evaluator finalEv = ev;
-			ev.addEvaluatorListener(new EvaluatorListener() {
+			ev.addEvaluateListener(new EvaluateListener() {
 				
 				@Override
-				public void receivedEvaluation(EvaluatorEvent evt) throws RemoteException {
+				public void receivedEvaluation(EvaluateEvent evt) throws RemoteException {
 					// TODO Auto-generated method stub
 					if (evt.getType() != Type.done && evt.getType() != Type.done_one)
 						return;

@@ -18,7 +18,7 @@ import java.util.EventListener;
  * @version 10.0
  *
  */
-public interface EvaluatorProgressListener extends EventListener, Remote {
+public interface EvaluateProgressListener extends EventListener, Remote {
 	
 	
 	/**
@@ -26,7 +26,7 @@ public interface EvaluatorProgressListener extends EventListener, Remote {
 	 * @param evt event of evaluation progress.
 	 * @throws RemoteException if any error raises.
 	 */
-	void receivedProgress(EvaluatorProgressEvent evt) throws RemoteException;
+	void receivedProgress(EvaluateProgressEvent evt) throws RemoteException;
 	
 	
 }

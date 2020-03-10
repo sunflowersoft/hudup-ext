@@ -134,8 +134,13 @@ public class Counter extends AbstractRunner implements Serializable {
 		
 		long currentTime = System.currentTimeMillis();
 		long interval = currentTime - startedTime;
-		if (interval >= PERIOD)
-			updateTime();
+		if (interval < PERIOD) return;
+		
+		long newElapsedTime = elapsedTime + interval;
+		if (assocEvaluateInfo != null) assocEvaluateInfo.elapsedTime = newElapsedTime;
+		if (assocTxtTime != null) assocTxtTime.setText(formatTime(newElapsedTime));
+		
+		fireElapsedTimeEvent(new CounterElapsedTimeEvent(this, newElapsedTime));
 	}
 
 	
@@ -157,19 +162,26 @@ public class Counter extends AbstractRunner implements Serializable {
 	 * Starting counter with started time elapse.
 	 * @param elapsedTime started time elapse.
 	 */
-	public synchronized void start(long elapsedTime) {
+	private synchronized void start(long elapsedTime) {
 		// TODO Auto-generated method stub
-		super.start();
+		if (isStarted())
+			return;
+
 		this.elapsedTime = 0;
 		this.startedTime = System.currentTimeMillis();
+
+		super.start();
 	}
 
 	
 	@Override
 	public synchronized void stop() {
 		// TODO Auto-generated method stub
+		if (!isStarted())
+			return;
+
 		super.stop();
-		updateTime();
+		
 		elapsedTime = 0;
 		startedTime = 0;
 	}
@@ -178,8 +190,9 @@ public class Counter extends AbstractRunner implements Serializable {
 	@Override
 	public synchronized void pause() {
 		// TODO Auto-generated method stub
+		if (!isRunning()) return;
+
 		super.pause();
-		updateTime();
 		
 		long currentTime = System.currentTimeMillis();
 		elapsedTime = elapsedTime + currentTime - startedTime;
@@ -190,16 +203,20 @@ public class Counter extends AbstractRunner implements Serializable {
 	@Override
 	public synchronized void resume() {
 		// TODO Auto-generated method stub
-		super.resume();
+		if (!isPaused()) return;
+
 		startedTime = System.currentTimeMillis();
-		updateTime();
+
+		super.resume();
 	}
 	
 	
 	/**
 	 * Stopping this counter and clearing associated information.
 	 */
-	public synchronized void stopAndClearAssoc() {
+	@SuppressWarnings("unused")
+	@Deprecated
+	private synchronized void stopAndClearAssoc() {
 		stop();
 		clearAssoc();
 	}
@@ -208,26 +225,9 @@ public class Counter extends AbstractRunner implements Serializable {
 	/**
 	 * Clearing associated information.
 	 */
-	public synchronized void clearAssoc() {
+	private synchronized void clearAssoc() {
 		if (assocTxtTime != null) assocTxtTime.setText("");
 		if (assocEvaluateInfo != null) assocEvaluateInfo.elapsedTime = 0;
-	}
-	
-	
-	/**
-	 * Updating the time counter in text form &quot;hours: minutes: seconds&quot; by current system time.
-	 * This method also fires elapsed time event.
-	 */
-	protected void updateTime() {
-		if (startedTime == 0) return;
-		
-		long elapsedTime = getElapsedTime();
-		String text = formatTime(elapsedTime);
-		
-		if (assocEvaluateInfo != null) assocEvaluateInfo.elapsedTime = elapsedTime;
-		if (assocTxtTime != null) assocTxtTime.setText(text);
-		
-		fireElapsedTimeEvent(new CounterElapsedTimeEvent(this, elapsedTime));
 	}
 	
 	
@@ -247,7 +247,9 @@ public class Counter extends AbstractRunner implements Serializable {
 	 * Setting elapsed time in miliseconds.
 	 * @param elapsedTime elapsed time in miliseconds.
 	 */
-	public synchronized void setTimeElapse(long elapsedTime) {
+	@SuppressWarnings("unused")
+	@Deprecated
+	private synchronized void setTimeElapse(long elapsedTime) {
 		if (elapsedTime >= 0) this.elapsedTime = elapsedTime;
 	}
 	

@@ -58,8 +58,10 @@ import net.hudup.core.data.Pointer;
 import net.hudup.core.evaluate.Evaluator;
 import net.hudup.core.evaluate.EvaluatorAbstract;
 import net.hudup.core.evaluate.EvaluatorEvent;
-import net.hudup.core.evaluate.EvaluatorEvent.Type;
-import net.hudup.core.evaluate.EvaluatorProgressEvent;
+import net.hudup.core.evaluate.Metrics;
+import net.hudup.core.evaluate.EvaluateEvent;
+import net.hudup.core.evaluate.EvaluateEvent.Type;
+import net.hudup.core.evaluate.EvaluateProgressEvent;
 import net.hudup.core.logistic.ClipboardUtil;
 import net.hudup.core.logistic.Counter;
 import net.hudup.core.logistic.CounterElapsedTimeEvent;
@@ -283,7 +285,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 	/**
 	 * Initializing GUI.
 	 */
-	protected void initGUI() {
+	private synchronized void initGUI() {
 		removeAll();
 		setLayout(new BorderLayout(2, 2));
 		
@@ -717,7 +719,53 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 		this.paneResult = new JPanel(new BorderLayout());
 		footer.add(this.paneResult, BorderLayout.CENTER);
 		
-		this.tblMetrics = new MetricsTable(new RegisterTable(Arrays.asList(getAlg())));
+		this.tblMetrics = new MetricsTable(new RegisterTable(Arrays.asList(getAlg()))) {
+
+			/**
+			 * Serial version UID for serializable class.
+			 */
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			protected void addToContextMenu(JPopupMenu contextMenu) {
+				// TODO Auto-generated method stub
+				super.addToContextMenu(contextMenu);
+				if (contextMenu == null) return;
+				
+				JMenuItem miRefresh = UIUtil.makeMenuItem((String)null, "Refresh", 
+					new ActionListener() {
+						
+						@Override
+						public void actionPerformed(ActionEvent e) {
+							Metrics result = null;
+							try {
+								result = getThisGUI().evaluator.getResult();
+							}
+							catch (Exception ex) {ex.printStackTrace();}
+							if (result != null) {
+								getThisGUI().result = result;
+								update(result);
+							}
+							else {
+								JOptionPane.showMessageDialog(
+									getThisGUI(), 
+									"Empty resulted metrics", 
+									"Empty resulted metrics", 
+									JOptionPane.WARNING_MESSAGE);
+							}
+						}
+					});
+				
+				try {
+					if (!getThisGUI().evaluator.remoteIsRunning()) {
+						contextMenu.addSeparator();
+						contextMenu.add(miRefresh);
+					}
+				}
+				catch (Exception ex) {ex.printStackTrace();}
+			}
+			
+		};
 		this.tblMetrics.update(result);
 		this.tblMetrics.setPreferredScrollableViewportSize(new Dimension(600, 80));
 		this.paneResult.add(new JScrollPane(this.tblMetrics), BorderLayout.CENTER);
@@ -778,7 +826,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 		footer.add(statusPane, BorderLayout.SOUTH);
 
 		this.statusBar = new StatusBar();
-		if (otherResult.inSetup) {
+		if (otherResult.inAlgSetup) {
 			this.statusBar.setTextPane1(I18nUtil.message("setting_up_algorithm") + " '" + DSUtil.shortenVerbalName(otherResult.algName) + "'. " + I18nUtil.message("please_wait") + "...");
 		}
 		else if (otherResult.progressTotal > 0) {
@@ -1139,21 +1187,27 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 
 	
 	@Override
-	public void receivedEvaluation(EvaluatorEvent evt) throws RemoteException {
-		if (evt.getType() == Type.setup || evt.getTimestamp() != null) {
+	public synchronized void receivedEvaluator(EvaluatorEvent evt) throws RemoteException {
+		// TODO Auto-generated method stub
+		if (evt.getType() == EvaluatorEvent.Type.start) {
 			Timestamp timestamp = evt.getTimestamp();
 			if (timestamp.isValid() && timestamp.getTimestamp() != this.timestamp) {
-				synchronized (this) {
-					clear();
-					guiData.reset();
-					initGUIData(guiData);
-					initGUI();
-				}
+				clear();
+				guiData.reset();
+				initGUIData(guiData);
+				initGUI();
 			}
-			
-			return;
 		}
+		else if (evt.getType() == EvaluatorEvent.Type.pause ||
+				evt.getType() == EvaluatorEvent.Type.resume || 
+				evt.getType() == EvaluatorEvent.Type.stop) {
+			updateMode();
+		}
+	}
 
+
+	@Override
+	public synchronized void receivedEvaluation(EvaluateEvent evt) throws RemoteException {
 		if (chkVerbal.isSelected()) {
 			String info = evt.translate() + "\n\n\n\n";
 			this.txtRunInfo.insert(info, 0);
@@ -1165,7 +1219,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 				saveResultSummary = evaluator.getConfig().isSaveResultSummary();
 			} catch (Throwable e) {e.printStackTrace();}
 
-			evProcessor.saveEvaluateResult(txtRunSaveBrowse.getText(), evt, Arrays.asList(getAlg()), saveResultSummary, "gui");
+			evProcessor.saveEvaluateResult(txtRunSaveBrowse.getText(), evt, Arrays.asList(getAlg()), saveResultSummary, EV_RESULT_FILENAME_PREFIX);
 		}
 		
 		
@@ -1178,7 +1232,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 	
 	
 	@Override
-	public void receivedProgress(EvaluatorProgressEvent evt) throws RemoteException {
+	public synchronized void receivedProgress(EvaluateProgressEvent evt) throws RemoteException {
 		// TODO Auto-generated method stub
 
 		int progressTotal = evt.getProgressTotal();
@@ -1203,7 +1257,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 
 
 	@Override
-	public void receivedSetup(SetupAlgEvent evt) throws RemoteException {
+	public synchronized void receivedSetup(SetupAlgEvent evt) throws RemoteException {
 		// TODO Auto-generated method stub
 		Alg alg = evt.getAlg();
 		if (alg == null) return;
@@ -1230,7 +1284,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 				saveResultSummary = evaluator.getConfig().isSaveResultSummary();
 			} catch (Throwable e) {e.printStackTrace();}
 
-			evProcessor.saveSetupResult(this.txtRunSaveBrowse.getText(), evt, algName, saveResultSummary, "gui");
+			evProcessor.saveSetupResult(this.txtRunSaveBrowse.getText(), evt, algName, saveResultSummary, EV_RESULT_FILENAME_PREFIX);
 		}
 		
 	}
@@ -1290,7 +1344,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 					prgRunning.setVisible(true);
 					
 				}
-				else {
+				else { //Paused
 					setInternalEnable(false);
 					setResultVisible(true);
 					
@@ -1303,6 +1357,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 					chkVerbal.setEnabled(true);
 					
 					tblMetrics.update(result);
+					prgRunning.setVisible(true); //Added by Loc Nguyen: 2020.03.10
 				}
 			}
 			else {
@@ -1331,6 +1386,15 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 		}
 		catch (Throwable e) {
 			e.printStackTrace();
+			
+			boolean flag = cmbAlgs.getItemCount() > 0 &&
+				txtTrainingBrowse.getDataset() != null && txtTestingBrowse.getDataset() != null;
+			setInternalEnable(flag);
+			setResultVisible(flag);
+			
+			cmbAlgs.setEnabled(algRegTable.size() > 0);
+			btnTrainingBrowse.setEnabled(true);
+			btnTestingBrowse.setEnabled(true);
 		}
 	}
 	

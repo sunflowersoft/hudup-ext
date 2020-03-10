@@ -18,7 +18,7 @@ import net.hudup.core.logistic.NextUpdate;
  * @version 10.0
  *
  */
-public class EvaluatorProgressEvent extends EventObject {
+public class EvaluateProgressEvent extends EventObject {
 
 	
 	/**
@@ -76,7 +76,7 @@ public class EvaluatorProgressEvent extends EventObject {
 	 * @param progressStep current step.
 	 */
 	@NextUpdate
-	public EvaluatorProgressEvent(Evaluator evaluator, int progressTotal, int progressStep) {
+	public EvaluateProgressEvent(Evaluator evaluator, int progressTotal, int progressStep) {
 //		super(evaluator); //Test different hosts for RMI, evaluator wrapper can solve.
 		super(new Integer(1)); //Not use evaluator because of improving network speed.
 		

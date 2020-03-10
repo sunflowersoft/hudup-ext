@@ -70,7 +70,7 @@ public class EvaluateInfo implements Serializable {
 	/**
 	 * Flag to indicate whether in setting up progress.
 	 */
-	public boolean inSetup = false;
+	public boolean inAlgSetup = false;
 	
 	
 	/**
@@ -96,7 +96,7 @@ public class EvaluateInfo implements Serializable {
 		progressTotal = 0;
 		vCurrentTotal = 0;
 		vCurrentCount = 0;
-		inSetup = false;
+		inAlgSetup = false;
 		elapsedTime = 0;
 		evStorePath = null;
 	}

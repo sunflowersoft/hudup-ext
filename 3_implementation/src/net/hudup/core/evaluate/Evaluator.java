@@ -256,32 +256,38 @@ public interface Evaluator extends Remote, RemoteRunner, SetupAlgListener, Expor
 //	 */
 //	@NextUpdate
 //	List<String> getAlgNames() throws RemoteException;
-//	
-//	
-//	/**
-//	 * Getting dataset pool. It is recommended not to use this method when it is necessary to improved with remote datasets.
-//	 * @return dataset pool.
-//	 * @throws RemoteException if any error raises.
-//	 */
-//	@NextUpdate
-//	@Deprecated
-//	DatasetPool getDatasetPool() throws RemoteException;
 
 	
 	/**
-	 * Add the specified listener to the end of listener list.
-	 * @param listener specified {@link EvaluatorListener}
+	 * Add the specified evaluator listener to the end of listener list.
+	 * @param listener specified evaluator listener.
 	 * @throws RemoteException if any error raises.
 	 */
 	void addEvaluatorListener(EvaluatorListener listener) throws RemoteException;
 	
 	
 	/**
-	 * Remove the specified listener from the listener list.
-	 * @param listener specified {@link EvaluatorListener}.
+	 * Remove the specified evaluator listener from the listener list.
+	 * @param listener specified evaluator listener.
 	 * @throws RemoteException if any error raises.
 	 */
     void removeEvaluatorListener(EvaluatorListener listener) throws RemoteException;
+
+    
+    /**
+	 * Add the specified evaluation listener to the end of listener list.
+	 * @param listener specified {@link EvaluateListener}
+	 * @throws RemoteException if any error raises.
+	 */
+	void addEvaluateListener(EvaluateListener listener) throws RemoteException;
+	
+	
+	/**
+	 * Remove the specified evaluation listener from the listener list.
+	 * @param listener specified {@link EvaluateListener}.
+	 * @throws RemoteException if any error raises.
+	 */
+    void removeEvaluateListener(EvaluateListener listener) throws RemoteException;
 	
 
     /**
@@ -289,7 +295,7 @@ public interface Evaluator extends Remote, RemoteRunner, SetupAlgListener, Expor
      * @param listener specified progress listener.
 	 * @throws RemoteException if any error raises.
      */
-	void addProgressListener(EvaluatorProgressListener listener) throws RemoteException;
+	void addEvaluateProgressListener(EvaluateProgressListener listener) throws RemoteException;
 
     
 	/**
@@ -297,7 +303,7 @@ public interface Evaluator extends Remote, RemoteRunner, SetupAlgListener, Expor
 	 * @param listener specified progress listener.
 	 * @throws RemoteException if any error raises.
 	 */
-    void removeProgressListener(EvaluatorProgressListener listener) throws RemoteException;
+    void removeEvaluateProgressListener(EvaluateProgressListener listener) throws RemoteException;
 
 
     /**

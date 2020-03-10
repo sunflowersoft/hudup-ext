@@ -99,6 +99,8 @@ public class MetricsTable extends SortableTable {
 						contextMenu.add(miAlgDesc);
 					}
 
+					addToContextMenu(contextMenu);
+					
 					if(contextMenu != null) 
 						contextMenu.show((Component)e.getSource(), e.getX(), e.getY());
 					
@@ -151,6 +153,15 @@ public class MetricsTable extends SortableTable {
 	}
 	
 	
+    /**
+     * Adding the context menu to this list.
+     * @param contextMenu specified context menu.
+     */
+    protected void addToContextMenu(JPopupMenu contextMenu) {
+    	
+    }
+    
+    
 	/**
 	 * Update table by specified metrics.
 	 * @param metrics specified metrics.

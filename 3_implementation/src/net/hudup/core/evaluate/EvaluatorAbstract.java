@@ -34,7 +34,7 @@ import net.hudup.core.data.DatasetPair;
 import net.hudup.core.data.DatasetPool;
 import net.hudup.core.data.Fetcher;
 import net.hudup.core.data.Profile;
-import net.hudup.core.evaluate.EvaluatorEvent.Type;
+import net.hudup.core.evaluate.EvaluateEvent.Type;
 import net.hudup.core.logistic.AbstractRunner;
 import net.hudup.core.logistic.Counter;
 import net.hudup.core.logistic.CounterElapsedTimeListener;
@@ -253,27 +253,16 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 		this.result = null;
 		
 		this.otherResult.reset();
-		if (algList != null) {
+		if (algList != null && algList.size() > 0) {
 			this.otherResult.algNames = Util.newList(algList.size());
 			for (Alg alg : algList) {
 				this.otherResult.algNames.add(alg.getName());
 			}
+			this.otherResult.algName = this.otherResult.algNames.get(0);
 		}
 		
 		this.poolResult = pool;
 		
-		try {
-			this.counter.stop();
-			this.counter.start();
-		} catch (Throwable e) {e.printStackTrace();}
-		
-		if ((parameter != null) && (parameter instanceof Timestamp) && ((Timestamp)parameter).isValid()) {
-			fireEvaluatorEvent(new EvaluatorEvent(
-				this, 
-				Type.setup, 
-				(Timestamp)parameter)); // firing setting up event with time stamp.
-		}
-
 		start();
 	}
 	
@@ -331,7 +320,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 					// Adding default metrics to metric result. Pay attention to cloning metrics list.
 					result.add( alg.getName(), datasetId, datasetUri, ((NoneWrapperMetricList)metricList.clone()).sort().list() );
 					
-					otherResult.inSetup = true;
+					otherResult.inAlgSetup = true;
 					if (alg instanceof AlgRemote) {
 						((AlgRemote)alg).addSetupListener(this);
 						SetupAlgEvent setupEvt = new SetupAlgEvent(new Integer(-1), SetupAlgEvent.Type.doing, alg, null, "not supported yet");
@@ -350,14 +339,14 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 							SetupTimeMetric.class, 
 							new Object[] { setupElapsed / 1000.0f }
 						); // calculating setup time metric
-					fireEvaluatorEvent(new EvaluatorEvent(this, Type.doing, setupMetrics)); // firing setup time metric
+					fireEvaluateEvent(new EvaluateEvent(this, Type.doing, setupMetrics)); // firing setup time metric
 					
 					if (alg instanceof AlgRemote) {
 						SetupAlgEvent setupEvt = new SetupAlgEvent(new Integer(1), SetupAlgEvent.Type.done, alg, null, "not supported yet");
 						fireSetupAlgEvent(setupEvt);
 						((AlgRemote)alg).removeSetupListener(this);
 					}
-					otherResult.inSetup = false;
+					otherResult.inAlgSetup = false;
 					
 					//Auto enhancement after setting up algorithm.
 					SystemUtil.enhanceAuto();
@@ -369,12 +358,12 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 					while (current == thread && testingFetcher.next()) {
 						otherResult.progressStep++;
 						otherResult.vCurrentCount++;
-						EvaluatorProgressEvent progressEvt = new EvaluatorProgressEvent(this, otherResult.progressTotal, otherResult.progressStep);
+						EvaluateProgressEvent progressEvt = new EvaluateProgressEvent(this, otherResult.progressTotal, otherResult.progressStep);
 						progressEvt.setAlgName(alg.getName());
 						progressEvt.setDatasetId(datasetId);
 						progressEvt.setCurrentCount(otherResult.vCurrentCount);
 						progressEvt.setCurrentTotal(otherResult.vCurrentTotal);
-						fireProgressEvent(progressEvt);
+						fireEvaluateProgressEvent(progressEvt);
 						
 						Profile testingProfile = testingFetcher.pick();
 						if (testingProfile == null)
@@ -393,7 +382,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 								SpeedMetric.class, 
 								new Object[] { recommendElapsed / 1000.0f }
 							); // calculating time speed metric
-						fireEvaluatorEvent(new EvaluatorEvent(
+						fireEvaluateEvent(new EvaluateEvent(
 								this, 
 								Type.doing, 
 								speedMetrics)); // firing time speed metric
@@ -407,7 +396,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 							
 							vExecutedCount++;
 							
-							fireEvaluatorEvent(new EvaluatorEvent(
+							fireEvaluateEvent(new EvaluateEvent(
 									this, 
 									Type.doing, 
 									executedMetrics, 
@@ -416,14 +405,12 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 						}
 						
 						
-						counter.pause();
 						synchronized (this) {
 							while (paused) {
 								notifyAll();
 								wait();
 							}
 						}
-						counter.resume();
 						
 					} // User id iterate
 					
@@ -433,10 +420,10 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 							HudupRecallMetric.class, 
 							new Object[] { new FractionMetricValue(vExecutedCount, otherResult.vCurrentTotal) }
 						);
-					fireEvaluatorEvent(new EvaluatorEvent(this, Type.doing, hudupRecallMetrics));
+					fireEvaluateEvent(new EvaluateEvent(this, Type.doing, hudupRecallMetrics));
 					
 					Metrics doneOneMetrics = result.gets(alg.getName(), datasetId);
-					fireEvaluatorEvent(new EvaluatorEvent(this, Type.done_one, doneOneMetrics));
+					fireEvaluateEvent(new EvaluateEvent(this, Type.done_one, doneOneMetrics));
 					
 				} // end try
 				catch (Throwable e) {
@@ -465,7 +452,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 			thread = null;
 			paused = false;
 			
-			fireEvaluatorEvent(new EvaluatorEvent(this, Type.done, result));
+			fireEvaluateEvent(new EvaluateEvent(this, Type.done, result));
 			
 			clear();
 
@@ -702,9 +689,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 		this.pool = null;
 		this.parameter = null;
 		
-		try {
-			this.counter.stop();
-		} catch (Throwable e) {e.printStackTrace();}
+		this.counter.stop();
 	}
 
 	
@@ -718,6 +703,9 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 	@SuppressWarnings("static-access")
 	@Override
 	public synchronized void forceStop() {
+		if (!isStarted())
+			return;
+
 		super.forceStop();
 		
 		try {
@@ -728,7 +716,22 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 			e.printStackTrace();
 		}
 		
-		fireEvaluatorEvent(new EvaluatorEvent(this, Type.done, result));
+		this.counter.stop();
+		if (algList != null) {
+			synchronized (delayUnsetupAlgs) {
+				for (Alg alg : algList) {
+					for (Alg delayUnsetupAlg : delayUnsetupAlgs) {
+						if (!alg.getName().equals(delayUnsetupAlg.getName())) {
+							try {
+								unsetupAlg(alg);
+							} catch (Throwable e) {e.printStackTrace();}
+						}
+					}
+				}
+			}
+		}
+		
+		fireEvaluateEvent(new EvaluateEvent(this, Type.done, result));
 	}
 	
 	
@@ -762,10 +765,8 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 	
     
     /**
-     * Return a {@link EvaluatorListener} list for this evaluator.
-     * 
-     * @return array of {@link EvaluatorListener} for this evaluator.
-     * 
+     * Return array of evaluator listeners for this evaluator.
+     * @return array of evaluator listeners for this evaluator.
      */
     protected EvaluatorListener[] getEvaluatorListeners() {
 		synchronized (listenerList) {
@@ -775,13 +776,56 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 
     
     /**
-     * Firing (issuing) an event from this evaluator to all listeners. 
-     * 
+     * Firing (issuing) an event from this evaluator to all evaluator listeners. 
      * @param evt event from this evaluator.
      */
     protected void fireEvaluatorEvent(EvaluatorEvent evt) {
 		EvaluatorListener[] listeners = getEvaluatorListeners();
 		for (EvaluatorListener listener : listeners) {
+			try {
+				listener.receivedEvaluator(evt);
+			}
+			catch (Throwable e) {
+				e.printStackTrace();
+			}
+		}
+    }
+
+    
+    @Override
+	public void addEvaluateListener(EvaluateListener listener) throws RemoteException {
+		synchronized (listenerList) {
+			listenerList.add(EvaluateListener.class, listener);
+		}
+    }
+
+    
+	@Override
+    public void removeEvaluateListener(EvaluateListener listener) throws RemoteException {
+		synchronized (listenerList) {
+			listenerList.remove(EvaluateListener.class, listener);
+		}
+    }
+	
+    
+    /**
+     * Return array of evaluation listeners for this evaluator.
+     * @return array of evaluation listeners.
+     */
+    protected EvaluateListener[] getEvaluateListeners() {
+		synchronized (listenerList) {
+			return listenerList.getListeners(EvaluateListener.class);
+		}
+    }
+
+    
+    /**
+     * Firing an evaluation event from this evaluator to all evaluation listeners. 
+     * @param evt event from this evaluator.
+     */
+    protected void fireEvaluateEvent(EvaluateEvent evt) {
+		EvaluateListener[] listeners = getEvaluateListeners();
+		for (EvaluateListener listener : listeners) {
 			try {
 				listener.receivedEvaluation(evt);
 			}
@@ -791,12 +835,12 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 		}
 		
 		if (otherResult.evStorePath != null && algList != null) {
-			boolean fastsave = false;
+			boolean saveResultSummary = false;
 			try {
-				fastsave = config.isSaveResultSummary();
+				saveResultSummary = config.isSaveResultSummary();
 			} catch (Throwable e) {e.printStackTrace();}
 			
-			evProcessor.saveEvaluateResult(otherResult.evStorePath, evt, algList, fastsave);
+			evProcessor.saveEvaluateResult(otherResult.evStorePath, evt, algList, saveResultSummary);
 		}
 		
 		
@@ -828,17 +872,17 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 
     
     @Override
-	public void addProgressListener(EvaluatorProgressListener listener) throws RemoteException {
+	public void addEvaluateProgressListener(EvaluateProgressListener listener) throws RemoteException {
 		synchronized (listenerList) {
-			listenerList.add(EvaluatorProgressListener.class, listener);
+			listenerList.add(EvaluateProgressListener.class, listener);
 		}
     }
 
     
     @Override
-    public void removeProgressListener(EvaluatorProgressListener listener) throws RemoteException {
+    public void removeEvaluateProgressListener(EvaluateProgressListener listener) throws RemoteException {
 		synchronized (listenerList) {
-			listenerList.remove(EvaluatorProgressListener.class, listener);
+			listenerList.remove(EvaluateProgressListener.class, listener);
 		}
     }
 	
@@ -847,9 +891,9 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
      * Getting an array of evaluation progress listeners.
      * @return array of {@link ProgressListener} (s).
      */
-    protected EvaluatorProgressListener[] getProgressListeners() {
+    protected EvaluateProgressListener[] getEvaluateProgressListeners() {
 		synchronized (listenerList) {
-			return listenerList.getListeners(EvaluatorProgressListener.class);
+			return listenerList.getListeners(EvaluateProgressListener.class);
 		}
     }
     
@@ -858,11 +902,11 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
      * Firing {@link ProgressEvent}.
      * @param evt the specified for evaluation progress.
      */
-    protected void fireProgressEvent(EvaluatorProgressEvent evt) {
+    protected void fireEvaluateProgressEvent(EvaluateProgressEvent evt) {
     	if (!isStarted()) return;
 
-    	EvaluatorProgressListener[] listeners = getProgressListeners();
-		for (EvaluatorProgressListener listener : listeners) {
+    	EvaluateProgressListener[] listeners = getEvaluateProgressListeners();
+		for (EvaluateProgressListener listener : listeners) {
 			try {
 				listener.receivedProgress(evt);
 			}
@@ -919,12 +963,12 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 		}
 	
 		if (otherResult.evStorePath != null) {
-			boolean fastsave = false;
+			boolean saveResultSummary = false;
 			try {
-				fastsave = config.isSaveResultSummary();
+				saveResultSummary = config.isSaveResultSummary();
 			} catch (Throwable e) {e.printStackTrace();}
 
-			evProcessor.saveSetupResult(otherResult.evStorePath, evt, evt.getAlg().getName(), fastsave);
+			evProcessor.saveSetupResult(otherResult.evStorePath, evt, evt.getAlg().getName(), saveResultSummary);
 		}
 		
 		
@@ -1049,7 +1093,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 
 
 	@Override
-	public void setAgent(boolean agent) throws RemoteException {
+	public synchronized void setAgent(boolean agent) throws RemoteException {
 		// TODO Auto-generated method stub
 		config.setAgent(agent);
 	}
@@ -1104,7 +1148,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 
 	
 	@Override
-	public void remoteStart(Serializable... parameters) throws RemoteException {
+	public synchronized void remoteStart(Serializable... parameters) throws RemoteException {
 		// TODO Auto-generated method stub
 		if (parameters == null || parameters.length < 2
 				|| !(parameters[0] instanceof List<?>)
@@ -1116,35 +1160,85 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 		DatasetPool pool = (DatasetPool)(parameters[1]);
 		Serializable parameter = parameters.length > 2? parameters[2] : null;
 		
+		if (isStarted()) return;
+
 		evaluate(algList, pool, parameter);
+		
+		this.counter.stop();
+		this.counter.start();
+
+		Timestamp timestamp = null;
+		if ((parameter != null) && (parameter instanceof Timestamp) && ((Timestamp)parameter).isValid())
+			timestamp = (Timestamp)parameter;
+		else
+			timestamp = new Timestamp();
+		fireEvaluatorEvent(new EvaluatorEvent(
+			this, 
+			EvaluatorEvent.Type.start, 
+			timestamp)); // firing setting up done event with time stamp.
+		
 	}
 
 
 	@Override
-	public void remoteStart(List<Alg> algList, DatasetPool pool, Serializable parameter) throws RemoteException {
+	public synchronized void remoteStart(List<Alg> algList, DatasetPool pool, Serializable parameter) throws RemoteException {
 		// TODO Auto-generated method stub
+		if (isStarted()) return;
+
 		evaluate(algList, pool, parameter);
+		
+		this.counter.stop();
+		this.counter.start();
+
+		Timestamp timestamp = null;
+		if ((parameter != null) && (parameter instanceof Timestamp) && ((Timestamp)parameter).isValid())
+			timestamp = (Timestamp)parameter;
+		else
+			timestamp = new Timestamp();
+		fireEvaluatorEvent(new EvaluatorEvent(
+			this, 
+			EvaluatorEvent.Type.start, 
+			timestamp)); // firing setting up done event with time stamp.
 	}
 
 	
 	@Override
-	public void remotePause() throws RemoteException {
+	public synchronized void remotePause() throws RemoteException {
 		// TODO Auto-generated method stub
+		if (!isRunning()) return;
+
 		pause();
+		counter.pause();
+		fireEvaluatorEvent(new EvaluatorEvent(
+				this, 
+				EvaluatorEvent.Type.pause)); // firing paused event.
 	}
 
 	
 	@Override
-	public void remoteResume() throws RemoteException {
+	public synchronized void remoteResume() throws RemoteException {
 		// TODO Auto-generated method stub
+		if (!isPaused()) return;
+
 		resume();
+		counter.resume();
+		fireEvaluatorEvent(new EvaluatorEvent(
+				this, 
+				EvaluatorEvent.Type.resume)); // firing resume event.
 	}
 
 	
 	@Override
-	public void remoteStop() throws RemoteException {
+	public synchronized void remoteStop() throws RemoteException {
 		// TODO Auto-generated method stub
+		if (!isStarted()) return;
+
 		stop();
+		fireEvaluatorEvent(new EvaluatorEvent(
+				this, 
+				EvaluatorEvent.Type.stop)); // firing stop event.
+		
+		this.counter.stop();
 	}
 
 	

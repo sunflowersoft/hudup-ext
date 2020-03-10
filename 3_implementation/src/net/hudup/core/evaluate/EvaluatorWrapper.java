@@ -290,16 +290,30 @@ public class EvaluatorWrapper implements Evaluator, Serializable {
 
 	
 	@Override
-	public void addProgressListener(EvaluatorProgressListener listener) throws RemoteException {
+	public void addEvaluateListener(EvaluateListener listener) throws RemoteException {
 		// TODO Auto-generated method stub
-		remoteEvaluator.addProgressListener(listener);
+		remoteEvaluator.addEvaluateListener(listener);
 	}
 
 	
 	@Override
-	public void removeProgressListener(EvaluatorProgressListener listener) throws RemoteException {
+	public void removeEvaluateListener(EvaluateListener listener) throws RemoteException {
 		// TODO Auto-generated method stub
-		remoteEvaluator.removeProgressListener(listener);
+		remoteEvaluator.removeEvaluateListener(listener);
+	}
+
+	
+	@Override
+	public void addEvaluateProgressListener(EvaluateProgressListener listener) throws RemoteException {
+		// TODO Auto-generated method stub
+		remoteEvaluator.addEvaluateProgressListener(listener);
+	}
+
+	
+	@Override
+	public void removeEvaluateProgressListener(EvaluateProgressListener listener) throws RemoteException {
+		// TODO Auto-generated method stub
+		remoteEvaluator.removeEvaluateProgressListener(listener);
 	}
 
 	

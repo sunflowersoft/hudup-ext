@@ -14,8 +14,8 @@ import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.Recommender;
 import net.hudup.core.alg.SetupAlgListener;
 import net.hudup.core.evaluate.Evaluator;
-import net.hudup.core.evaluate.EvaluatorListener;
-import net.hudup.core.evaluate.EvaluatorProgressListener;
+import net.hudup.core.evaluate.EvaluateListener;
+import net.hudup.core.evaluate.EvaluateProgressListener;
 import net.hudup.core.evaluate.Metrics;
 import net.hudup.core.logistic.Counter;
 import net.hudup.core.logistic.I18nUtil;
@@ -33,7 +33,7 @@ import net.hudup.core.logistic.xURI;
  */
 @NextUpdate
 @Deprecated
-public abstract class AbstractEvaluateUI implements EvaluatorListener, EvaluatorProgressListener, SetupAlgListener, PluginChangedListener, Serializable {
+public abstract class AbstractEvaluateUI implements EvaluateListener, EvaluateProgressListener, SetupAlgListener, PluginChangedListener, Serializable {
 
 	
 	/**
@@ -370,8 +370,8 @@ public abstract class AbstractEvaluateUI implements EvaluatorListener, Evaluator
 	 */
 	private void setupListeners(Evaluator evaluator) {
 		try {
-			evaluator.addEvaluatorListener(this);
-			evaluator.addProgressListener(this);
+			evaluator.addEvaluateListener(this);
+			evaluator.addEvaluateProgressListener(this);
 			evaluator.addSetupAlgListener(this);
 		}
 		catch (Throwable e) {
@@ -386,8 +386,8 @@ public abstract class AbstractEvaluateUI implements EvaluatorListener, Evaluator
 	 */
 	private void unsetupListeners(Evaluator evaluator) {
 		try {
-			evaluator.removeEvaluatorListener(this);
-			evaluator.removeProgressListener(this);
+			evaluator.removeEvaluateListener(this);
+			evaluator.removeEvaluateProgressListener(this);
 			evaluator.removeSetupAlgListener(this);
 		}
 		catch (Throwable e) {

@@ -18,7 +18,7 @@ import net.hudup.core.RegisterTable;
 import net.hudup.core.Util;
 import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.SetupAlgEvent;
-import net.hudup.core.evaluate.EvaluatorEvent.Type;
+import net.hudup.core.evaluate.EvaluateEvent.Type;
 import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.UriAdapter.AdapterWriteChannel;
 import net.hudup.core.logistic.xURI;
@@ -83,7 +83,7 @@ public class EvaluateProcessor {
 	 * @param evt evaluation event.
 	 * @param algs list of algorithms.
 	 */
-	public void saveEvaluateResult(String storePath, EvaluatorEvent evt, List<Alg> algs) {
+	public void saveEvaluateResult(String storePath, EvaluateEvent evt, List<Alg> algs) {
 		saveEvaluateResult(storePath, evt, algs, false, null);
 	}
 
@@ -95,7 +95,7 @@ public class EvaluateProcessor {
 	 * @param algs list of algorithms.
 	 * @param fastsave fast saving mode.
 	 */
-	public void saveEvaluateResult(String storePath, EvaluatorEvent evt, List<Alg> algs, boolean fastsave) {
+	public void saveEvaluateResult(String storePath, EvaluateEvent evt, List<Alg> algs, boolean fastsave) {
 		saveEvaluateResult(storePath, evt, algs, fastsave, null);
 	}
 	
@@ -105,10 +105,10 @@ public class EvaluateProcessor {
 	 * @param storePath directory path to store evaluation results.
 	 * @param evt evaluation event.
 	 * @param algs list of algorithms.
-	 * @param fastsave fast saving mode.
+	 * @param saveResultSummary fast saving mode.
 	 * @param prefix prefix of file name.
 	 */
-	public void saveEvaluateResult(String storePath, EvaluatorEvent evt, List<Alg> algs, boolean fastsave, String prefix) {
+	public void saveEvaluateResult(String storePath, EvaluateEvent evt, List<Alg> algs, boolean saveResultSummary, String prefix) {
 		if (storePath == null) return;
 		storePath = storePath.trim();
 		
@@ -121,7 +121,7 @@ public class EvaluateProcessor {
 				adapter.create(store, true);
 			adapter.close();
 			
-			if (!fastsave) {
+			if (!saveResultSummary) {
 				for (Alg alg : algs) {
 					if (evt.getType() == Type.done) {
 						String key = prefix + alg.getName() + EVALUATION_FILE_EXTENSION;
@@ -187,10 +187,10 @@ public class EvaluateProcessor {
 	 * @param storePath directory path to store setting up results.
 	 * @param evt setting up event.
 	 * @param algName list of algorithm name.
-	 * @param fastsave fast saving mode.
+	 * @param saveResultSummary fast saving mode.
 	 */
-	public void saveSetupResult(String storePath, SetupAlgEvent evt, String algName, boolean fastsave) {
-		saveSetupResult(storePath, evt, algName, fastsave, null);
+	public void saveSetupResult(String storePath, SetupAlgEvent evt, String algName, boolean saveResultSummary) {
+		saveSetupResult(storePath, evt, algName, saveResultSummary, null);
 	}
 	
 	
@@ -199,12 +199,12 @@ public class EvaluateProcessor {
 	 * @param storePath directory path to store setting up results.
 	 * @param evt setting up event.
 	 * @param algName list of algorithm name.
-	 * @param fastsave fast saving mode.
+	 * @param saveResultSummary fast saving mode.
 	 * @param prefix prefix of file name.
 	 */
-	public void saveSetupResult(String storePath, SetupAlgEvent evt, String algName, boolean fastsave, String prefix) {
+	public void saveSetupResult(String storePath, SetupAlgEvent evt, String algName, boolean saveResultSummary, String prefix) {
 		if (storePath == null) return;
-		if (fastsave && (evt.getType() != SetupAlgEvent.Type.done))
+		if (saveResultSummary && (evt.getType() != SetupAlgEvent.Type.done))
 			return;
 
 		storePath = storePath.trim();

@@ -37,8 +37,10 @@ import net.hudup.core.evaluate.Evaluator;
 import net.hudup.core.evaluate.EvaluatorConfig;
 import net.hudup.core.evaluate.EvaluatorEvent;
 import net.hudup.core.evaluate.EvaluatorListener;
-import net.hudup.core.evaluate.EvaluatorProgressEvent;
-import net.hudup.core.evaluate.EvaluatorProgressListener;
+import net.hudup.core.evaluate.EvaluateEvent;
+import net.hudup.core.evaluate.EvaluateListener;
+import net.hudup.core.evaluate.EvaluateProgressEvent;
+import net.hudup.core.evaluate.EvaluateProgressListener;
 import net.hudup.core.evaluate.Metric;
 import net.hudup.core.evaluate.Metrics;
 import net.hudup.core.evaluate.NoneWrapperMetricList;
@@ -420,7 +422,7 @@ public class Delegator extends AbstractDelegator {
  * @version 1.0
  *
  */
-class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluatorProgressListener {
+class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluateListener, EvaluateProgressListener, CounterElapsedTimeListener {
 
 	
 	/**
@@ -596,13 +598,11 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluatorProgr
 			listenerList.remove(EvaluatorListener.class, listener);
 		}
     }
+
 	
-    
-    /**
-     * Return a {@link EvaluatorListener} list for this evaluator.
-     * 
-     * @return array of {@link EvaluatorListener} for this evaluator.
-     * 
+	/**
+     * Return array of evaluator listeners for this evaluator.
+     * @return array of evaluator listeners for this evaluator.
      */
     protected EvaluatorListener[] getEvaluatorListeners() {
 		synchronized (listenerList) {
@@ -612,13 +612,63 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluatorProgr
 
     
     /**
-     * Firing (issuing) an event from this evaluator to all listeners. 
-     * 
+     * Firing (issuing) an event from this evaluator to all evaluator listeners. 
      * @param evt event from this evaluator.
      */
     protected void fireEvaluatorEvent(EvaluatorEvent evt) {
 		EvaluatorListener[] listeners = getEvaluatorListeners();
 		for (EvaluatorListener listener : listeners) {
+			try {
+				listener.receivedEvaluator(evt);
+			}
+			catch (Throwable e) {
+				e.printStackTrace();
+			}
+		}
+    }
+
+    
+    @Override
+	public void receivedEvaluator(EvaluatorEvent evt) throws RemoteException {
+		// TODO Auto-generated method stub
+    	fireEvaluatorEvent(evt);
+	}
+
+    
+    @Override
+	public void addEvaluateListener(EvaluateListener listener) throws RemoteException {
+		synchronized (listenerList) {
+			listenerList.add(EvaluateListener.class, listener);
+		}
+    }
+
+    
+	@Override
+    public void removeEvaluateListener(EvaluateListener listener) throws RemoteException {
+		synchronized (listenerList) {
+			listenerList.remove(EvaluateListener.class, listener);
+		}
+    }
+	
+    
+    /**
+     * Return array of evaluation listeners for this evaluator.
+     * @return array of evaluation listeners.
+     */
+    protected EvaluateListener[] getEvaluateListeners() {
+		synchronized (listenerList) {
+			return listenerList.getListeners(EvaluateListener.class);
+		}
+    }
+
+    
+    /**
+     * Firing an evaluation event from this evaluator to all evaluation listeners. 
+     * @param evt event from this evaluator.
+     */
+    protected void fireEvaluateEvent(EvaluateEvent evt) {
+		EvaluateListener[] listeners = getEvaluateListeners();
+		for (EvaluateListener listener : listeners) {
 			try {
 				listener.receivedEvaluation(evt);
 			}
@@ -631,24 +681,24 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluatorProgr
 
     
     @Override
-	public void receivedEvaluation(EvaluatorEvent evt) throws RemoteException {
+	public void receivedEvaluation(EvaluateEvent evt) throws RemoteException {
 		// TODO Auto-generated method stub
-    	fireEvaluatorEvent(evt);
+    	fireEvaluateEvent(evt);
 	}
 
 
 	@Override
-	public void addProgressListener(EvaluatorProgressListener listener) throws RemoteException {
+	public void addEvaluateProgressListener(EvaluateProgressListener listener) throws RemoteException {
 		synchronized (listenerList) {
-			listenerList.add(EvaluatorProgressListener.class, listener);
+			listenerList.add(EvaluateProgressListener.class, listener);
 		}
     }
 
     
     @Override
-    public void removeProgressListener(EvaluatorProgressListener listener) throws RemoteException {
+    public void removeEvaluateProgressListener(EvaluateProgressListener listener) throws RemoteException {
 		synchronized (listenerList) {
-			listenerList.remove(EvaluatorProgressListener.class, listener);
+			listenerList.remove(EvaluateProgressListener.class, listener);
 		}
     }
 	
@@ -657,9 +707,9 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluatorProgr
      * Getting an array of evaluation progress listener.
      * @return array of {@link ProgressListener} (s).
      */
-    protected EvaluatorProgressListener[] getProgressListeners() {
+    protected EvaluateProgressListener[] getProgressListeners() {
 		synchronized (listenerList) {
-			return listenerList.getListeners(EvaluatorProgressListener.class);
+			return listenerList.getListeners(EvaluateProgressListener.class);
 		}
     }
     
@@ -668,10 +718,10 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluatorProgr
      * Firing {@link ProgressEvent}.
      * @param evt the specified for evaluation progress.
      */
-    protected void fireProgressEvent(EvaluatorProgressEvent evt) {
-    	EvaluatorProgressListener[] listeners = getProgressListeners();
+    protected void fireProgressEvent(EvaluateProgressEvent evt) {
+    	EvaluateProgressListener[] listeners = getProgressListeners();
 		
-		for (EvaluatorProgressListener listener : listeners) {
+		for (EvaluateProgressListener listener : listeners) {
 			try {
 				listener.receivedProgress(evt);
 			}
@@ -684,7 +734,7 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluatorProgr
 
 
     @Override
-	public void receivedProgress(EvaluatorProgressEvent evt) throws RemoteException {
+	public void receivedProgress(EvaluateProgressEvent evt) throws RemoteException {
 		// TODO Auto-generated method stub
 		fireProgressEvent(evt);
 	}
@@ -796,6 +846,13 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluatorProgr
 
     
     @Override
+	public void receivedElapsedTime(CounterElapsedTimeEvent evt) throws RemoteException {
+		// TODO Auto-generated method stub
+    	fireElapsedTimeEvent(evt);
+	}
+
+
+	@Override
 	public synchronized void remoteStart(Serializable... parameters) throws RemoteException {
 		// TODO Auto-generated method stub
 		boolean flag = socketServer.getFlag();
@@ -912,8 +969,10 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluatorProgr
 
 			try {
 				remoteEvaluator.addEvaluatorListener(this);
-				remoteEvaluator.addProgressListener(this);
+				remoteEvaluator.addEvaluateListener(this);
+				remoteEvaluator.addEvaluateProgressListener(this);
 				remoteEvaluator.addSetupAlgListener(this);
+				remoteEvaluator.addElapsedTimeListener(this);
 			} catch (Exception e) {e.printStackTrace();}
 			
 			socketServer.addRunner(this);
@@ -933,8 +992,10 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluatorProgr
 			
 			try {
 				remoteEvaluator.removeEvaluatorListener(this);
-				remoteEvaluator.removeProgressListener(this);
+				remoteEvaluator.removeEvaluateListener(this);
+				remoteEvaluator.removeEvaluateProgressListener(this);
 				remoteEvaluator.removeSetupAlgListener(this);
+				remoteEvaluator.removeElapsedTimeListener(this);
 				if (!remoteEvaluator.isAgent())
 					remoteEvaluator.unexport();
 			} catch (Exception e) {e.printStackTrace();}

@@ -13,13 +13,14 @@ import java.util.EventListener;
 
 /**
  * This interface represents a listener for evaluator.
+ * Please distinguish evaluation listener {@link EvaluateListener} and evaluator listener {@link EvaluatorListener}.
  * 
  * @author Loc Nguyen
  * @version 10.0
  *
  */
 public interface EvaluatorListener extends EventListener, Remote {
-	
+
 	
 	/**
 	 * The main method is to respond a event from evaluator.
@@ -28,7 +29,7 @@ public interface EvaluatorListener extends EventListener, Remote {
 	 * @param evt event from an evaluator.
 	 * @throws RemoteException if any error raises
 	 */
-	void receivedEvaluation(EvaluatorEvent evt) throws RemoteException;
-	
-	
+	void receivedEvaluator(EvaluatorEvent evt) throws RemoteException;
+
+
 }

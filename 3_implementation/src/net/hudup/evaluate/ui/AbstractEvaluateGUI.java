@@ -18,16 +18,16 @@ import javax.swing.JPanel;
 import net.hudup.core.PluginChangedListener;
 import net.hudup.core.RegisterTable;
 import net.hudup.core.alg.Alg;
-import net.hudup.core.alg.Recommender;
 import net.hudup.core.alg.SetupAlgListener;
 import net.hudup.core.data.DatasetPool;
 import net.hudup.core.evaluate.EvaluateInfo;
+import net.hudup.core.evaluate.EvaluateListener;
 import net.hudup.core.evaluate.EvaluateProcessor;
+import net.hudup.core.evaluate.EvaluateProgressListener;
 import net.hudup.core.evaluate.Evaluator;
 import net.hudup.core.evaluate.EvaluatorAbstract;
 import net.hudup.core.evaluate.EvaluatorConfig;
 import net.hudup.core.evaluate.EvaluatorListener;
-import net.hudup.core.evaluate.EvaluatorProgressListener;
 import net.hudup.core.evaluate.Metric;
 import net.hudup.core.evaluate.Metrics;
 import net.hudup.core.logistic.CounterElapsedTimeListener;
@@ -41,7 +41,7 @@ import net.hudup.core.logistic.xURI;
  * @author Loc Nguyen
  * @version 10.0
  */
-public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorListener, EvaluatorProgressListener, SetupAlgListener, PluginChangedListener, CounterElapsedTimeListener {
+public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorListener, EvaluateListener, EvaluateProgressListener, SetupAlgListener, PluginChangedListener, CounterElapsedTimeListener {
 
 	
 	/**
@@ -49,6 +49,12 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	 */
 	private static final long serialVersionUID = 1L;
 
+	
+	/**
+	 * Prefix of evaluated file name.
+	 */
+	public static final String EV_RESULT_FILENAME_PREFIX = "gui";
+	
 	
 	/**
 	 * Main evaluator.
@@ -209,29 +215,31 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	 * Initializing the evaluator batch GUI.
 	 * @param referredGUIData referred GUI data.
 	 */
-	protected void initGUIData(EvaluateGUIData referredGUIData) {
+	protected synchronized void initGUIData(EvaluateGUIData referredGUIData) {
 		guiData = referredGUIData != null ? referredGUIData : new EvaluateGUIData(); 
 		guiData.wasRun = true;
 		guiData.active = true;
 		
 		try {
-			result = evaluator.getResult();
+			result = evaluator.getResult(); //From server
 		} catch (RemoteException e) {e.printStackTrace();}
 
 		try {
-			otherResult = evaluator.getOtherResult();
+			otherResult = evaluator.getOtherResult(); //From server
 		} catch (RemoteException e) {e.printStackTrace();}
 		if (otherResult == null) otherResult = new EvaluateInfo();
 
-		boolean started = false;
+		boolean loadFromServer = false;
 		try {
-			started = evaluator.remoteIsStarted();
+			loadFromServer = evaluator.remoteIsStarted(); //From server
 		}
 		catch (RemoteException e) {
 			e.printStackTrace();
+			loadFromServer = false;
 		}
+		loadFromServer = loadFromServer || result != null;
 		
-		if (started) {
+		if (loadFromServer) {
 			guiData.algName = otherResult.algName;
 			guiData.algNames = otherResult.algNames;
 			
@@ -288,11 +296,11 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 		try {
 			if (evaluator.remoteIsPaused()) {
 				evaluator.remoteResume();
-				updateMode();
+				//updateMode(); //Evaluator calls instead
 			}
 			else if (evaluator.remoteIsRunning()) {
 				evaluator.remotePause();
-				updateMode();
+				//updateMode(); //Evaluator calls instead
 			}
 		}
 		catch (Throwable e) {
@@ -308,7 +316,7 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	protected void stop() {
 		try {
 			evaluator.remoteStop();
-			updateMode();
+			//updateMode(); //Evaluator calls instead
 		}
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
@@ -324,14 +332,7 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	protected void forceStop() {
 		try {
 			evaluator.remoteForceStop();
-		
-			List<Alg> list = getCurrentAlgList();
-			for (Alg alg : list) {
-				if (alg instanceof Recommender)
-					((Recommender)alg).unsetup();
-			}
-			
-			updateMode();
+			//updateMode(); //Evaluator calls instead
 		}
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
@@ -492,7 +493,8 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	private void setupListeners(Evaluator evaluator) {
 		try {
 			evaluator.addEvaluatorListener(this);
-			evaluator.addProgressListener(this);
+			evaluator.addEvaluateListener(this);
+			evaluator.addEvaluateProgressListener(this);
 			evaluator.addSetupAlgListener(this);
 			evaluator.addElapsedTimeListener(this);
 		}
@@ -509,7 +511,8 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	private void unsetupListeners(Evaluator evaluator) {
 		try {
 			evaluator.removeEvaluatorListener(this);
-			evaluator.removeProgressListener(this);
+			evaluator.removeEvaluateListener(this);
+			evaluator.removeEvaluateProgressListener(this);
 			evaluator.removeSetupAlgListener(this);
 			evaluator.removeElapsedTimeListener(this);
 		}

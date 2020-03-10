@@ -8,18 +8,13 @@
 package net.hudup.core.evaluate;
 
 import java.io.Serializable;
-import java.rmi.RemoteException;
-import java.util.Collections;
 import java.util.EventObject;
-import java.util.List;
 
-import net.hudup.core.data.RatingVector;
 import net.hudup.core.logistic.NextUpdate;
 import net.hudup.core.logistic.Timestamp;
-import net.hudup.core.parser.TextParsable;
 
 /**
- * This class represents an event fired by evaluator in evaluation process.
+ * This class represents an event of evaluator.
  * 
  * @author Loc Nguyen
  * @version 10.0
@@ -27,7 +22,7 @@ import net.hudup.core.parser.TextParsable;
  */
 public class EvaluatorEvent extends EventObject {
 
-	
+
 	/**
 	 * Serial version UID for serializable class. 
 	 */
@@ -35,55 +30,60 @@ public class EvaluatorEvent extends EventObject {
 
 	
 	/**
-	 * Type of evaluator event.
+	 * Type of evaluation event.
 	 * @author Loc Nguyen
 	 * @version 10.0
 	 */
 	public static enum Type {
 		
 		/**
-		 * Evaluator is set up. No evaluation yet. 
+		 * Evaluator is setting up. 
 		 */
-		setup,
+		start,
 		
 		/**
-		 * Evaluation task in progress.
+		 * Evaluator was paused. 
 		 */
-		doing,
+		pause,
 		
 		/**
-		 * One evaluation task is done.
+		 * Evaluator was resumed. 
 		 */
-		done_one,
+		resume,
 		
 		/**
-		 * All evaluation tasks are done, which means that evaluation process is finished.
+		 * Evaluator was stopped. 
 		 */
-		done
+		stop,
+		
+		/**
+		 * Evaluator was stopped. 
+		 */
+		force_stop,
 	}
 	
 	
 	/**
 	 * Type of event.
 	 */
-	protected Type type = Type.doing;
+	protected Type type = Type.start;
 
 	
 	/**
-	 * List of metrics.
+	 * Time stamp.
 	 */
-	protected Metrics metrics = null;
+	protected Timestamp timestamp = null;
 	
 	
 	/**
-	 * Additional information for calculating metrics.
+	 * Additional information.
 	 */
 	protected Serializable[] params = null;
-	
+
 	
 	/**
 	 * Constructor with specified evaluator and event type.
-	 * @param evaluator reference to an {@link Evaluator}. This evaluator is invalid in remote call.
+	 * @param evaluator reference to evaluator. This evaluator is invalid in remote call.
 	 * @param type type of this event.
 	 */
 	@NextUpdate
@@ -96,34 +96,7 @@ public class EvaluatorEvent extends EventObject {
 
 	
 	/**
-	 * Constructor with specified evaluator, type of evaluation event, and list of metrics. 
-	 * @param evaluator specified evaluator. This evaluator is invalid in remote call.
-	 * @param type specified type of evaluation event.
-	 * @param metrics specified list of metrics.
-	 */
-	public EvaluatorEvent(Evaluator evaluator, Type type, Metrics metrics) {
-		this(evaluator, type);
-		
-		setMetrics(metrics);
-	}
-
-	
-	/**
-	 * Constructor with specified evaluator, type of evaluation event, list of metrics, and additional parameters. 
-	 * @param evaluator specified evaluator. This evaluator is invalid in remote call.
-	 * @param type specified type of evaluation event.
-	 * @param metrics specified list of metrics.
-	 * @param params additional parameters.
-	 */
-	public EvaluatorEvent(Evaluator evaluator, Type type, Metrics metrics, Serializable... params) {
-		this(evaluator, type, metrics);
-		
-		setParams(params);
-	}
-
-	
-	/**
-	 * Constructor with specified time stamp. 
+	 * Constructor with specified evaluator and time stamp. 
 	 * @param evaluator specified evaluator. This evaluator is invalid in remote call.
 	 * @param type specified type of evaluation event.
 	 * @param timestamp specified time stamp.
@@ -132,7 +105,7 @@ public class EvaluatorEvent extends EventObject {
 		this(evaluator, type);
 		setTimestamp(timestamp);
 	}
-
+	
 	
 	/**
 	 * Getting evaluator. This method is invalid in remote call.
@@ -159,23 +132,22 @@ public class EvaluatorEvent extends EventObject {
 	
 	
 	/**
-	 * Getting list of metrics.
-	 * @return {@link Metrics} as list of metrics.
+	 * Getting time stamp.
+	 * @return time stamp.
 	 */
-	public Metrics getMetrics() {
-		return metrics;
+	public Timestamp getTimestamp() {
+		return timestamp;
 	}
 	
 	
 	/**
-	 * Getting list of metrics.
-	 * @param metrics specified list of metrics.
+	 * Setting time stamp.
+	 * @param timestamp specified time stamp.
 	 */
-	public void setMetrics(Metrics metrics) {
-		this.metrics = metrics;
+	public void setTimestamp(Timestamp timestamp) {
+		this.timestamp = timestamp;
 	}
-	
-	
+
 	
 	/**
 	 * Getting additional parameter list.
@@ -193,124 +165,6 @@ public class EvaluatorEvent extends EventObject {
 	public void setParams(Serializable... params) {
 		this.params = params;
 	}
-	
-	
-	/**
-	 * Getting time stamp.
-	 * @return time stamp.
-	 */
-	public Timestamp getTimestamp() {
-		if ((params == null) || (params.length == 0) || !(params[0] instanceof Timestamp))
-			return null;
-		else
-			return (Timestamp)params[0];
-	}
-	
-	
-	/**
-	 * Setting time stamp.
-	 * @param timestamp specified time stamp.
-	 */
-	public void setTimestamp(Timestamp timestamp) {
-		if (timestamp != null)
-			this.params = new Serializable[] {timestamp};
-		else
-			this.params = null;
-	}
 
-	
-	/**
-	 * Translating this event into text for all algorithm and all datasets.
-	 * @return translated text of this event for all datasets.
-	 * @throws RemoteException if any error raises.
-	 */
-	public String translate() throws RemoteException {
-		return translate(null, -1);
-	}
-	
-	
-	/**
-	 * Translating this event into text for specified algorithm and specified dataset.
-	 * @param fAlgName specified algorithm name.
-	 * @param fDatasetId specified dataset identifier.
-	 * @return translated text of this event.
-	 * @throws RemoteException if any error raises.
-	 */
-	public String translate(String fAlgName, int fDatasetId) throws RemoteException {
-		// TODO Auto-generated method stub
-		StringBuffer buffer = new StringBuffer();
-		if (this.metrics == null)
-			return buffer.toString();
-		
-		String testingResult = "";
-		String testingRecord = "";
-		if (params != null) {
-			if (params.length >= 1 && params[0] != null) {
-				testingResult += "\nResult = [";
-				if (params[0] instanceof RatingVector)
-					testingResult += ((RatingVector)params[0]).toTextNice();
-				else if (params[0] instanceof TextParsable)
-					testingResult += ((TextParsable)params[0]).toText();
-				else
-					testingResult += params[0].toString();
-				testingResult += "]";
-			}
-			if (params.length >= 2 && params[1] != null) {
-				testingRecord += "\nTesting = [";
-				if (params[1] instanceof RatingVector)
-					testingRecord += ((RatingVector)params[1]).toText(); //Can be toTextNice()
-				else if (params[1] instanceof TextParsable)
-					testingRecord += ((TextParsable)params[1]).toText();
-				else
-					testingRecord += params[1].toString();
-				testingRecord += "]";
-			}
-		}
-		
-		List<String> algNameList = this.metrics.getAlgNameList();
-		Collections.sort(algNameList);
-		
-		int i = 0;
-		for (String algName : algNameList) {
-			if (fAlgName != null && !fAlgName.isEmpty() && !algName.equals(fAlgName))
-				continue;
-			
-			if (i > 0)
-				buffer.append("\n\n\n");
-			
-			i++;
-			buffer.append("========== Algorithm \"" + algName + "\"" + (type == Type.doing ? "" : " - Final result ") + "==========");
-			List<Integer> datasetIdList = this.metrics.getDatasetIdList(algName);
-			Collections.sort(datasetIdList);
-			
-			for (int datasetId : datasetIdList) {
-				if (fDatasetId >= 0 && datasetId != fDatasetId)
-					continue;
-				
-				buffer.append("\n\n----- Testing dataset \"" + datasetId + "\" -----");
-				buffer.append(testingRecord);
-				buffer.append(testingResult);
-				
-				Metrics metrics = this.metrics.gets(algName, datasetId);
-				for (int k = 0; k < metrics.size(); k++) {
-					
-					MetricWrapper wrapper = metrics.get(k);
-					if (!wrapper.isValid())
-						continue;
-					
-					MetricValue metricValue = (type == Type.doing ? wrapper.getCurrentValue() : wrapper.getAccumValue());
-					buffer.append("\n" + wrapper.getName() + " = " + MetricValue.valueToText(metricValue));
-				}
-				buffer.append("\n----- Testing dataset \"" + datasetId + "\" -----");
-			}
-			
-			buffer.append("\n\n========== Algorithm \"" + algName + "\"" + (type == Type.doing ? "" : " - Final result ") + "==========");
-			
-			
-		}
-		
-		return buffer.toString();
-	}
 
-	
 }
