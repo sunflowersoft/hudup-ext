@@ -111,6 +111,7 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 		super("Evaluator GUI");
 		try {
 			this.thisConfig = evaluator.getConfig();
+			this.thisConfig.setSaveAbility(bindUri == null); //Save only local configuration.
 		}
 		catch (Throwable e) {
 			// TODO Auto-generated catch block

@@ -22,6 +22,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.rmi.RemoteException;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import javax.swing.AbstractAction;
@@ -66,6 +67,7 @@ import net.hudup.core.logistic.DSUtil;
 import net.hudup.core.logistic.I18nUtil;
 import net.hudup.core.logistic.Inspector;
 import net.hudup.core.logistic.LogUtil;
+import net.hudup.core.logistic.Timestamp;
 import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.xURI;
 import net.hudup.core.logistic.ui.TextField;
@@ -91,12 +93,6 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 	 */
 	private static final long serialVersionUID = 1L;
 	
-	
-	/**
-	 * List of used algorithms stored in register table.
-	 */
-	protected RegisterTable algRegTable = null;
-
 	
 	/**
 	 * Algorithm combo-box.
@@ -252,13 +248,23 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 
 	
 	/**
-	 * Constructor with specified evaluator and algorithm.
-	 * @param evaluator specified evaluator.
-	 * @param alg referred algorithm.
+	 * Constructor with local evaluator and referred GUI data.
+	 * @param evaluator local evaluator.
+	 * @param referredGUIData referred GUI data.
 	 */
-	private EvaluateGUI(Evaluator evaluator, Alg alg) {
-		super(evaluator, null, null);
-		init(alg);
+	public EvaluateGUI(Evaluator evaluator, EvaluateGUIData referredGUIData) {
+		this(evaluator, null, referredGUIData);
+	}
+
+	
+	/**
+	 * Constructor with local evaluator and algorithm.
+	 * @param evaluator local evaluator.
+	 * @param referredAlg referred algorithm.
+	 */
+	private EvaluateGUI(Evaluator evaluator, Alg referredAlg) {
+		super(evaluator, null, null, referredAlg);
+		initGUI();
 	}
 
 	
@@ -269,24 +275,16 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 	 * @param referredGUIData referred GUI data.
 	 */
 	public EvaluateGUI(Evaluator evaluator, xURI bindUri, EvaluateGUIData referredGUIData) {
-		super(evaluator, bindUri, referredGUIData);
-		init(null);
+		super(evaluator, bindUri, referredGUIData, null);
+		initGUI();
 	}
 
-	
+
 	/**
-	 * Initializing the evaluator batch GUI with specified referred algorithm.
-	 * @param referredAlg referred algorithm.
+	 * Initializing GUI.
 	 */
-	private void init(Alg referredAlg) {
-		if (referredAlg != null) {
-			try {
-				if (evaluator.acceptAlg(referredAlg))
-					this.algRegTable = new RegisterTable(Arrays.asList(referredAlg));
-			} catch (Throwable e) {e.printStackTrace();}
-			if (this.algRegTable == null) this.algRegTable = new RegisterTable();
-		}
-		
+	protected void initGUI() {
+		removeAll();
 		setLayout(new BorderLayout(2, 2));
 		
 		JPanel header = createHeader();
@@ -1069,6 +1067,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			updateMode();
 		}
 		
 		//Additional code.
@@ -1123,9 +1122,12 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 				
 			List<Alg> algList = Util.newList();
 			algList.add(alg);
-			evaluator.remoteStart(algList, pool, null);
+			timestamp = new Date().getTime();
+			evaluator.remoteStart(algList, pool, new Timestamp(timestamp));
 		
-			updateMode();
+			synchronized (this) {
+				updateMode();
+			}
 		}
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
@@ -1138,21 +1140,32 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 	
 	@Override
 	public void receivedEvaluation(EvaluatorEvent evt) throws RemoteException {
-		if (evt.getMetrics() == null)
+		if (evt.getType() == Type.setup || evt.getTimestamp() != null) {
+			Timestamp timestamp = evt.getTimestamp();
+			if (timestamp.isValid() && timestamp.getTimestamp() != this.timestamp) {
+				synchronized (this) {
+					clear();
+					guiData.reset();
+					initGUIData(guiData);
+					initGUI();
+				}
+			}
+			
 			return;
-		
+		}
+
 		if (chkVerbal.isSelected()) {
 			String info = evt.translate() + "\n\n\n\n";
 			this.txtRunInfo.insert(info, 0);
 			this.txtRunInfo.setCaretPosition(0);
 		}
 		else if (chkRunSave.isSelected()) {
-			boolean fastsave = false;
+			boolean saveResultSummary = false;
 			try {
-				fastsave = evaluator.getConfig().isFastSave();
+				saveResultSummary = evaluator.getConfig().isSaveResultSummary();
 			} catch (Throwable e) {e.printStackTrace();}
 
-			evProcessor.saveEvaluateResult(txtRunSaveBrowse.getText(), evt, Arrays.asList(getAlg()), fastsave, "tempui");
+			evProcessor.saveEvaluateResult(txtRunSaveBrowse.getText(), evt, Arrays.asList(getAlg()), saveResultSummary, "gui");
 		}
 		
 		
@@ -1212,12 +1225,12 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			this.txtRunInfo.setCaretPosition(0);
 		}
 		else if (chkRunSave.isSelected()) {
-			boolean fastsave = false;
+			boolean saveResultSummary = false;
 			try {
-				fastsave = evaluator.getConfig().isFastSave();
+				saveResultSummary = evaluator.getConfig().isSaveResultSummary();
 			} catch (Throwable e) {e.printStackTrace();}
 
-			evProcessor.saveSetupResult(this.txtRunSaveBrowse.getText(), evt, algName, fastsave, "tempui");
+			evProcessor.saveSetupResult(this.txtRunSaveBrowse.getText(), evt, algName, saveResultSummary, "gui");
 		}
 		
 	}
@@ -1424,6 +1437,8 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			this.result = null;
 			this.tblMetrics.clear();
 			this.statusBar.getLastPane().setText(""); //Clearing elapsed time information.
+			
+			this.timestamp = 0;
 		}
 		catch (Throwable e) {
 			e.printStackTrace();

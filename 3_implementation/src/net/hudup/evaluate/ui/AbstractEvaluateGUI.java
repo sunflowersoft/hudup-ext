@@ -9,6 +9,7 @@ package net.hudup.evaluate.ui;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.JOptionPane;
@@ -98,11 +99,17 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	
 	
 	/**
+	 * Time stamp.
+	 */
+	protected volatile long timestamp = 0;
+	
+	
+	/**
 	 * Constructor with local evaluator.
 	 * @param evaluator local evaluator.
 	 */
 	public AbstractEvaluateGUI(Evaluator evaluator) {
-		this(evaluator, null, null);
+		this(evaluator, null, null, null);
 	}
 
 	
@@ -112,17 +119,49 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	 * @param bindUri bound URI. If this parameter is null, evaluator is local.
 	 */
 	public AbstractEvaluateGUI(Evaluator evaluator, xURI bindUri) {
-		this(evaluator, bindUri, null);
+		this(evaluator, bindUri, null, null);
 	}
 	
+	
+	/**
+	 * Constructor with local evaluator and referred algorithm.
+	 * @param evaluator local evaluator.
+	 * @param referredAlg referred algorithm.
+	 */
+	protected AbstractEvaluateGUI(Evaluator evaluator, Alg referredAlg) {
+		this(evaluator, null, null, referredAlg);
+	}
+
+	
+	/**
+	 * Constructor with local evaluator and referred GUI data.
+	 * @param evaluator local evaluator.
+	 * @param referredGUIData referred GUI data.
+	 */
+	public AbstractEvaluateGUI(Evaluator evaluator, EvaluateGUIData referredGUIData) {
+		this(evaluator, null, referredGUIData, null);
+	}
+
 	
 	/**
 	 * Constructor with specified evaluator, bound URI, and referred GUI data.
 	 * @param evaluator specified evaluator.
 	 * @param bindUri bound URI. If this parameter is null, evaluator is local.
-	 * @param referredGUIData addition referred GUI data.
+	 * @param referredGUIData referred GUI data.
 	 */
 	public AbstractEvaluateGUI(Evaluator evaluator, xURI bindUri, EvaluateGUIData referredGUIData) {
+		this(evaluator, bindUri, referredGUIData, null);
+	}
+	
+	
+	/**
+	 * Constructor with specified evaluator, bound URI, referred GUI data, and referred algorithm.
+	 * @param evaluator specified evaluator.
+	 * @param bindUri bound URI. If this parameter is null, evaluator is local.
+	 * @param referredGUIData referred GUI data.
+	 * @param referredAlg referred algorithm.
+	 */
+	public AbstractEvaluateGUI(Evaluator evaluator, xURI bindUri, EvaluateGUIData referredGUIData, Alg referredAlg) {
 		this.bindUri = bindUri;
 		if (bindUri != null) { //Evaluator is remote
 			this.exportedStub = NetUtil.RegistryRemote.export(this, bindUri.getPort());
@@ -148,6 +187,29 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 		setupListeners(evaluator);
 		
 		this.evaluator = evaluator;
+		
+		if (referredAlg != null) {
+			try {
+				if (evaluator.acceptAlg(referredAlg))
+					this.algRegTable = new RegisterTable(Arrays.asList(referredAlg));
+			} catch (Throwable e) {e.printStackTrace();}
+		}
+		else {
+			try {
+				algRegTable = EvaluatorAbstract.extractAlgFromPluginStorage(evaluator);
+			} catch (Throwable e) {e.printStackTrace();}
+		}
+		if (algRegTable == null) algRegTable = new RegisterTable();
+
+		initGUIData(referredGUIData);
+	}
+	
+	
+	/**
+	 * Initializing the evaluator batch GUI.
+	 * @param referredGUIData referred GUI data.
+	 */
+	protected void initGUIData(EvaluateGUIData referredGUIData) {
 		guiData = referredGUIData != null ? referredGUIData : new EvaluateGUIData(); 
 		guiData.wasRun = true;
 		guiData.active = true;
@@ -161,11 +223,6 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 		} catch (RemoteException e) {e.printStackTrace();}
 		if (otherResult == null) otherResult = new EvaluateInfo();
 
-		try {
-			algRegTable = EvaluatorAbstract.extractAlgFromPluginStorage(evaluator);
-		} catch (Throwable e) {e.printStackTrace();}
-		if (algRegTable == null) algRegTable = new RegisterTable();
-		
 		if (guiData.algNames == null || guiData.algNames.size() == 0)
 			guiData.algNames = otherResult.algNames;
 		if (guiData.algNames == null || guiData.algNames.size() == 0)
@@ -175,7 +232,6 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 			guiData.pool = guiData.pool != null ? guiData.pool : evaluator.getDatasetPool();
 		} catch (Throwable e) {e.printStackTrace();}
 		guiData.pool = guiData.pool != null ? guiData.pool : new DatasetPool();
-
 	}
 	
 	
@@ -285,10 +341,13 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	public void dispose() {
 		boolean agent = false;
 		boolean wrapper = false;
+		EvaluatorConfig config = null;
 		try {
 			agent = evaluator.isAgent();
 			wrapper = evaluator.isWrapper();
-		} 
+			config = evaluator.getConfig();
+			config.setSaveAbility(bindUri == null); //Save only local configuration.
+		}
 		catch (Throwable e) {
 			e.printStackTrace();
 		}
@@ -311,19 +370,13 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 
 			unsetupListeners(evaluator);
 			
-			if (bindUri == null) { //Local evaluator.
-				try {
-					evaluator.getConfig().save();
-				}
-				catch (Exception e) {e.printStackTrace();}
-			}
-			
 			try {
 				evaluator.close(); //The close() method also unexports evaluator.
 			}
 			catch (Exception e) {e.printStackTrace();}
 		}
 		
+		config.save();
 		this.evProcessor.clear();
 		updateGUIData();
 		guiData.active = false;

@@ -43,6 +43,7 @@ import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.NetUtil;
 import net.hudup.core.logistic.NextUpdate;
 import net.hudup.core.logistic.SystemUtil;
+import net.hudup.core.logistic.Timestamp;
 import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.xURI;
 import net.hudup.core.logistic.ui.ProgressEvent;
@@ -266,6 +267,13 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 			this.counter.start();
 		} catch (Throwable e) {e.printStackTrace();}
 		
+		if ((parameter != null) && (parameter instanceof Timestamp) && ((Timestamp)parameter).isValid()) {
+			fireEvaluatorEvent(new EvaluatorEvent(
+				this, 
+				Type.setup, 
+				(Timestamp)parameter)); // firing setting up event with time stamp.
+		}
+
 		start();
 	}
 	
@@ -785,7 +793,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 		if (otherResult.evStorePath != null && algList != null) {
 			boolean fastsave = false;
 			try {
-				fastsave = config.isFastSave();
+				fastsave = config.isSaveResultSummary();
 			} catch (Throwable e) {e.printStackTrace();}
 			
 			evProcessor.saveEvaluateResult(otherResult.evStorePath, evt, algList, fastsave);
@@ -913,7 +921,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 		if (otherResult.evStorePath != null) {
 			boolean fastsave = false;
 			try {
-				fastsave = config.isFastSave();
+				fastsave = config.isSaveResultSummary();
 			} catch (Throwable e) {e.printStackTrace();}
 
 			evProcessor.saveSetupResult(otherResult.evStorePath, evt, evt.getAlg().getName(), fastsave);

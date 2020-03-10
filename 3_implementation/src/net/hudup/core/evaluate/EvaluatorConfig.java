@@ -67,15 +67,15 @@ public class EvaluatorConfig extends SysConfig {
 
 	
 	/**
-	 * This constant specifies fast result saving field. If true, only done evaluated results are saved.
+	 * This constant specifies result summary saving field. If true, only done evaluated results are saved.
 	 */
-	public final static String EVALUATOR_FASTSAVE_FIELD = changeCase("evaluator_fastsave");
+	public final static String EVALUATOR_SAVE_RESULT_SUMMARY_FIELD = changeCase("save_result_summary");
 
 	
 	/**
-	 * By default, fast result saving is false. If true, only done evaluated results are saved.
+	 * By default, result summary saving is false. If true, only done evaluated results are saved.
 	 */
-	public final static boolean EVALUATOR_FASTSAVE_DEFAULT = false;
+	public final static boolean EVALUATOR_SAVE_RESULT_SUMMARY_DEFAULT = false;
 
 	
 	/**
@@ -104,7 +104,7 @@ public class EvaluatorConfig extends SysConfig {
 		setRecommendAll(RECOMMEND_ALL_DEFAULT);
 		setEvaluatorPort(Constants.DEFAULT_EVALUATOR_PORT);
 		setAgent(EVALUATOR_AGENT_DEFAULT);
-		setFastSave(EVALUATOR_FASTSAVE_DEFAULT);
+		setSaveResultSummary(EVALUATOR_SAVE_RESULT_SUMMARY_DEFAULT);
 	}
 
 	
@@ -173,20 +173,20 @@ public class EvaluatorConfig extends SysConfig {
 
 
 	/**
-	 * Checking whether fast result saving mode is true. If true, only done evaluated results are saved. 
-	 * @return whether fast result saving mode is true.
+	 * Checking whether result summary saving mode is true. If true, only done evaluated results are saved. 
+	 * @return whether result summary saving mode is true.
 	 */
-	public boolean isFastSave() {
-		return getAsBoolean(EVALUATOR_FASTSAVE_FIELD);
+	public boolean isSaveResultSummary() {
+		return getAsBoolean(EVALUATOR_SAVE_RESULT_SUMMARY_FIELD);
 	}
 	
 	
 	/**
-	 * Setting whether fast result saving mode is true. If true, only done evaluated results are saved.
-	 * @param fastsave fast result saving mode is true.
+	 * Setting whether result summary saving mode is true. If true, only done evaluated results are saved.
+	 * @param saveResultSummary result summary saving mode is true.
 	 */
-	public void setFastSave(boolean fastsave) {
-		put(EVALUATOR_FASTSAVE_FIELD, fastsave);
+	public void setSaveResultSummary(boolean saveResultSummary) {
+		put(EVALUATOR_SAVE_RESULT_SUMMARY_FIELD, saveResultSummary);
 	}
 
 }

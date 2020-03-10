@@ -15,6 +15,7 @@ import java.util.List;
 
 import net.hudup.core.data.RatingVector;
 import net.hudup.core.logistic.NextUpdate;
+import net.hudup.core.logistic.Timestamp;
 import net.hudup.core.parser.TextParsable;
 
 /**
@@ -39,6 +40,11 @@ public class EvaluatorEvent extends EventObject {
 	 * @version 10.0
 	 */
 	public static enum Type {
+		
+		/**
+		 * Evaluator is set up. No evaluation yet. 
+		 */
+		setup,
 		
 		/**
 		 * Evaluation task in progress.
@@ -117,6 +123,18 @@ public class EvaluatorEvent extends EventObject {
 
 	
 	/**
+	 * Constructor with specified time stamp. 
+	 * @param evaluator specified evaluator. This evaluator is invalid in remote call.
+	 * @param type specified type of evaluation event.
+	 * @param timestamp specified time stamp.
+	 */
+	public EvaluatorEvent(Evaluator evaluator, Type type, Timestamp timestamp) {
+		this(evaluator, type);
+		setTimestamp(timestamp);
+	}
+
+	
+	/**
 	 * Getting evaluator. This method is invalid in remote call.
 	 * @return {@link Evaluator} that fires this event.
 	 */
@@ -176,6 +194,30 @@ public class EvaluatorEvent extends EventObject {
 		this.params = params;
 	}
 	
+	
+	/**
+	 * Getting time stamp.
+	 * @return time stamp.
+	 */
+	public Timestamp getTimestamp() {
+		if ((params == null) || (params.length == 0) || !(params[0] instanceof Timestamp))
+			return null;
+		else
+			return (Timestamp)params[0];
+	}
+	
+	
+	/**
+	 * Setting time stamp.
+	 * @param timestamp specified time stamp.
+	 */
+	public void setTimestamp(Timestamp timestamp) {
+		if (timestamp != null)
+			this.params = new Serializable[] {timestamp};
+		else
+			this.params = null;
+	}
+
 	
 	/**
 	 * Translating this event into text for all algorithm and all datasets.

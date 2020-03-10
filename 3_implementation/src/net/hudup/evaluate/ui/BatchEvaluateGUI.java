@@ -57,6 +57,7 @@ import net.hudup.core.logistic.CounterElapsedTimeEvent;
 import net.hudup.core.logistic.DSUtil;
 import net.hudup.core.logistic.I18nUtil;
 import net.hudup.core.logistic.LogUtil;
+import net.hudup.core.logistic.Timestamp;
 import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.xURI;
 import net.hudup.core.logistic.ui.SortableSelectableTable;
@@ -243,21 +244,32 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 
 	
 	/**
+	 * Constructor with local evaluator and referred GUI data.
+	 * @param evaluator local evaluator.
+	 * @param referredGUIData referred GUI data.
+	 */
+	public BatchEvaluateGUI(Evaluator evaluator, EvaluateGUIData referredGUIData) {
+		this(evaluator, null, referredGUIData);
+	}
+
+	
+	/**
 	 * Constructor with specified evaluator, bound URI, and GUI data.
 	 * @param evaluator specified evaluator.
 	 * @param bindUri bound URI. If this parameter is null, evaluator is local.
 	 * @param referredGUIData referred GUI data.
 	 */
 	public BatchEvaluateGUI(Evaluator evaluator, xURI bindUri, EvaluateGUIData referredGUIData) {
-		super(evaluator, bindUri, referredGUIData);
-		init();
+		super(evaluator, bindUri, referredGUIData, null);
+		initGUI();
 	}
 
 	
 	/**
-	 * Initializing the evaluator batch GUI.
+	 * Initializing GUI.
 	 */
-	private void init() {
+	private void initGUI() {
+		removeAll();
 		setLayout(new BorderLayout(2, 2));
 		
 		JPanel header = createHeader();
@@ -907,9 +919,13 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			}
 			
 			clearResult();
-			evaluator.remoteStart(lbAlgs.getAlgList(), guiData.pool, null);
+			Timestamp timestamp = new Timestamp();
+			this.timestamp = timestamp.getTimestamp();
+			evaluator.remoteStart(lbAlgs.getAlgList(), guiData.pool, timestamp);
 			
-			updateMode();
+			synchronized (this) {
+				updateMode();
+			}
 		}
 		catch (Throwable e) {
 			e.printStackTrace();
@@ -921,6 +937,19 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 	
 	@Override
 	public void receivedEvaluation(EvaluatorEvent evt) throws RemoteException {
+		if (evt.getType() == Type.setup || evt.getTimestamp() != null) {
+			Timestamp timestamp = evt.getTimestamp();
+			if (timestamp.isValid() && timestamp.getTimestamp() != this.timestamp) {
+				synchronized (this) {
+					clear();
+					guiData.reset();
+					initGUIData(guiData);
+					initGUI();
+				}
+			}
+			
+			return;
+		}
 		
 		if (chkVerbal.isSelected()) {
 			String info = evt.translate() + "\n\n\n\n";
@@ -928,12 +957,12 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			this.txtRunInfo.setCaretPosition(0);
 		}
 		else if (chkRunSave.isSelected()) {
-			boolean fastsave = false;
+			boolean saveResultSummary = false;
 			try {
-				fastsave = evaluator.getConfig().isFastSave();
+				saveResultSummary = evaluator.getConfig().isSaveResultSummary();
 			} catch (Throwable e) {e.printStackTrace();}
 			
-			evProcessor.saveEvaluateResult(txtRunSaveBrowse.getText(), evt, lbAlgs.getAlgList(), fastsave, "tempui");
+			evProcessor.saveEvaluateResult(txtRunSaveBrowse.getText(), evt, lbAlgs.getAlgList(), saveResultSummary, "gui");
 		}
 		
 		
@@ -993,12 +1022,12 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			this.txtRunInfo.setCaretPosition(0);
 		}
 		else if (chkRunSave.isSelected()) {
-			boolean fastsave = false;
+			boolean saveResultSummary = false;
 			try {
-				fastsave = evaluator.getConfig().isFastSave();
+				saveResultSummary = evaluator.getConfig().isSaveResultSummary();
 			} catch (Throwable e) {e.printStackTrace();}
 
-			evProcessor.saveSetupResult(txtRunSaveBrowse.getText(), evt, algName, fastsave, "tempui");
+			evProcessor.saveSetupResult(txtRunSaveBrowse.getText(), evt, algName, saveResultSummary, "gui");
 		}
 	}
 	
@@ -1357,6 +1386,8 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			this.result = null;
 			this.tblMetrics.clear();
 			this.statusBar.getLastPane().setText(""); //Clearing elapsed time information.
+			
+			this.timestamp = 0;
 		}
 		catch (Throwable e) {
 			e.printStackTrace();

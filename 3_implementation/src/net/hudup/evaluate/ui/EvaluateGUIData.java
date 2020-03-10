@@ -71,17 +71,12 @@ public class EvaluateGUIData implements Serializable {
 
 
 	/**
-	 * Filling data to the target.
-	 * @param target target data.
+	 * Resetting GUI data.
 	 */
-	public void fillTo(EvaluateGUIData target) {
-		if (target == null) return;
-		
-		target.active = this.active;
-		target.wasRun = this.wasRun;
-		target.pool = this.pool;
-		target.txtRunSaveBrowse = this.txtRunSaveBrowse;
-		target.chkVerbal = this.chkVerbal;
+	public void reset() {
+		pool = null;
+		txtRunSaveBrowse = null;
+		chkVerbal = false;
 	}
 	
 
