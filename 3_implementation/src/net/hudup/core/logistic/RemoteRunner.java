@@ -24,30 +24,34 @@ public interface RemoteRunner extends Remote {
 	/**
 	 * Runner starts.
 	 * @param parameters additional parameters.
+	 * @return true if successful.
 	 * @throws RemoteException if any error raises.
 	 */
-	void remoteStart(Serializable...parameters) throws RemoteException;
+	boolean remoteStart(Serializable...parameters) throws RemoteException;
 
 	
 	/**
 	 * Runner pauses.
+	 * @return true if successful.
 	 * @throws RemoteException if any error raises.
 	 */
-	void remotePause() throws RemoteException;
+	boolean remotePause() throws RemoteException;
 
 	
 	/**
 	 * Runner resumes
+	 * @return true if successful.
 	 * @throws RemoteException if any error raises.
 	 */
-	void remoteResume() throws RemoteException;
+	boolean remoteResume() throws RemoteException;
 
 	
 	/**
 	 * Runner stops.
+	 * @return true if successful.
 	 * @throws RemoteException if any error raises.
 	 */
-	void remoteStop() throws RemoteException;
+	boolean remoteStop() throws RemoteException;
 	
 	
 }

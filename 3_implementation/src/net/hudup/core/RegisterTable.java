@@ -237,6 +237,7 @@ public final class RegisterTable implements Cloneable, Serializable {
 	 */
 	public List<Alg> getAlgList(List<String> nameList) {
 		List<Alg> algs = Util.newList();
+		if (nameList == null) return algs;
 		
 		for (String name : nameList) {
 			Alg alg = query(name);

@@ -189,10 +189,9 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 
 	
 	@Override
-	public synchronized void start()  throws RemoteException {
+	public synchronized boolean start() throws RemoteException {
 		// TODO Auto-generated method stub
-		if (isStarted())
-			return;
+		if (isStarted()) return false;
     	
     	trans.lockWrite();
     	try {
@@ -226,6 +225,8 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
     	}
     	
 		SystemUtil.enhanceAuto();
+		
+		return true;
 	}
 
     
@@ -236,54 +237,54 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
     
     
 	@Override
-	public synchronized void pause()  throws RemoteException {
+	public synchronized boolean pause() throws RemoteException {
 		// TODO Auto-generated method stub
-		if (isRunning()) {
-			
-        	trans.lockWrite();
-        	
-			destroyTimer();
-			
-    		paused = true;
-    		fireStatusEvent(new ServerStatusEvent(this, Status.paused));
-    		LogUtil.info("Power server paused");
-		}
+		if (!isRunning()) return false;
+
+    	trans.lockWrite();
     	
+		destroyTimer();
+		
+		paused = true;
+		fireStatusEvent(new ServerStatusEvent(this, Status.paused));
+		LogUtil.info("Power server paused");
+		
+		return true;
 	}
 
 	
 	@Override
-	public synchronized void resume()  throws RemoteException {
+	public synchronized boolean resume() throws RemoteException {
 		// TODO Auto-generated method stub
 		//Which thread locked server can unlock server. This feature is used for security of service.
 		//However, this feature causes trouble in remote control.
 		if (!trans.isWriteLockedByCurrentThread())
-			return;
+			return false;
 			
-		if (isPaused()) {
+		if (!isPaused()) return false;
         	
-			createTimer();
-        	
-			paused = false;
-    		fireStatusEvent(new ServerStatusEvent(this, Status.resumed));
-    		LogUtil.info("Power server resumed");
-    		
-        	trans.unlockWrite();
-		}
+		createTimer();
+    	
+		paused = false;
+		fireStatusEvent(new ServerStatusEvent(this, Status.resumed));
+		LogUtil.info("Power server resumed");
+		
+    	trans.unlockWrite();
+    	
+    	return true;
 	}
 
 	
 	@Override
-	public synchronized void stop()  throws RemoteException {
+	public synchronized boolean stop()  throws RemoteException {
 		// TODO Auto-generated method stub
-		if (!isStarted())
-			return;
+		if (!isStarted()) return false;
 		
 		if (isPaused()) {
 			//Which thread locked server can unlock server. This feature is used for security of service.
 			//However, this feature causes trouble in remote control.
 			if (!trans.isWriteLockedByCurrentThread())
-				return;
+				return false;
 			
 			paused = false;
         	trans.unlockWrite();
@@ -312,6 +313,7 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
         	trans.unlockWrite();
     	}
     	
+    	return true;
 	}
 
 	
@@ -325,19 +327,17 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 	public void exit() throws RemoteException {
 		// TODO Auto-generated method stub
 		shutdown();
-		
 		System.exit(0);
 	}
 
 	
 	/**
-	 * Shutdown server, after server shutdown, program exits. Called by {@link #exit()} 
+	 * Shutdown server, after server shutdown, program exits. Called by {@link #exit()}.
 	 * @throws RemoteException if any error raises.
 	 */
 	protected synchronized void shutdown() throws RemoteException {
 		// TODO Auto-generated method stub
-		if (config == null)
-			return;
+		if (config == null) return;
 		
 		stop();
 		

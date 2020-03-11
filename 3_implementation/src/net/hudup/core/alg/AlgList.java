@@ -221,14 +221,28 @@ public class AlgList implements Serializable, net.hudup.core.Cloneable {
 	@Override
 	public Object clone() {
 		// TODO Auto-generated method stub
-		AlgList algList = new AlgList();
-		for (Alg alg : list) {
+		AlgList newAlgList = new AlgList();
+		newAlgList.list = clone(this.list);
+		return newAlgList;
+	}
+	
+	
+	/**
+	 * Cloning list of algorithms.
+	 * @param algList specified list of algorithms.
+	 * @return list of cloned algorithms.
+	 */
+	public static List<Alg> clone(List<Alg> algList) {
+		if (algList == null) return Util.newList();
+		List<Alg> newAlgList = Util.newList(algList.size());
+		
+		for (Alg alg : algList) {
 			Alg newAlg = alg.newInstance();
 			newAlg.getConfig().putAll(alg.getConfig());
-			algList.add(newAlg);
+			newAlgList.add(newAlg);
 		}
 		
-		return algList;
+		return newAlgList;
 	}
 	
 	

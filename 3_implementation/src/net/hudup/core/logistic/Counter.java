@@ -152,62 +152,61 @@ public class Counter extends AbstractRunner implements Serializable {
 
 
 	@Override
-	public synchronized void start() {
+	public synchronized boolean start() {
 		// TODO Auto-generated method stub
-		start(0);
+		return start(0);
 	}
 
 	
 	/**
 	 * Starting counter with started time elapse.
 	 * @param elapsedTime started time elapse.
+	 * @return true if successful.
 	 */
-	private synchronized void start(long elapsedTime) {
+	public synchronized boolean start(long elapsedTime) {
 		// TODO Auto-generated method stub
-		if (isStarted())
-			return;
+		if (!super.start()) return false;
 
 		this.elapsedTime = 0;
 		this.startedTime = System.currentTimeMillis();
 
-		super.start();
+		return true;
 	}
 
 	
 	@Override
-	public synchronized void stop() {
+	public synchronized boolean stop() {
 		// TODO Auto-generated method stub
-		if (!isStarted())
-			return;
+		if (!super.stop()) return false;
 
-		super.stop();
-		
 		elapsedTime = 0;
 		startedTime = 0;
+		
+		return true;
 	}
 
 	
 	@Override
-	public synchronized void pause() {
+	public synchronized boolean pause() {
 		// TODO Auto-generated method stub
-		if (!isRunning()) return;
+		if (!super.pause()) return false;
 
-		super.pause();
-		
 		long currentTime = System.currentTimeMillis();
 		elapsedTime = elapsedTime + currentTime - startedTime;
 		startedTime = 0;
+		
+		return true;
 	}
 
 	
 	@Override
-	public synchronized void resume() {
+	public synchronized boolean resume() {
 		// TODO Auto-generated method stub
-		if (!isPaused()) return;
+		if (!super.resume()) return false;
 
 		startedTime = System.currentTimeMillis();
 
-		super.resume();
+		return true;
 	}
 	
 	

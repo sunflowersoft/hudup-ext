@@ -243,9 +243,9 @@ public abstract class AbstractDelegator extends ProtocolImpl implements Runner, 
 
 	
 	@Override
-	public synchronized void start() {
+	public synchronized boolean start() {
 		if (isStarted())
-			return;
+			return false;
 		
 		new RunnerThread(this).start();
 		
@@ -257,14 +257,15 @@ public abstract class AbstractDelegator extends ProtocolImpl implements Runner, 
 			e.printStackTrace();
 			LogUtil.error("Delegator fail to start, causes error " + e.getMessage());
 		}
+		
+		return true;
 	}
 
 	
 	@Override
-	public synchronized void pause() {
-		if (!isStarted() || isPaused())
-			return;
-		
+	public synchronized boolean pause() {
+		if (!isRunning()) return false;
+
 		paused  = true;
 		
 		try {
@@ -275,24 +276,25 @@ public abstract class AbstractDelegator extends ProtocolImpl implements Runner, 
 			e.printStackTrace();
 			LogUtil.error("Delegator fail to pause, causes error " + e.getMessage());
 		}
-			
+		
+		return true;
 	}
 	
 	
 	@Override
-	public synchronized void resume() {
-		if (!isStarted() || !isPaused())
-			return;
+	public synchronized boolean resume() {
+		if (!isPaused()) return false;
 		
 		paused = false;
 		notifyAll();
+		
+		return true;
 	}
 	
 	
 	@Override
-	public synchronized void stop() {
-		if (!isStarted())
-			return;
+	public synchronized boolean stop() {
+		if (!isStarted()) return false;
 		
 		try {
 			socket.close();
@@ -317,6 +319,7 @@ public abstract class AbstractDelegator extends ProtocolImpl implements Runner, 
 			LogUtil.error("Delegator fail to stop, causes error " + e.getMessage());
 		}
 		
+		return true;
 	}
 	
 	
@@ -334,7 +337,7 @@ public abstract class AbstractDelegator extends ProtocolImpl implements Runner, 
 	
 	@Override
 	public boolean isRunning() {
-		return isStarted() && !isPaused();
+		return started && !paused;
 	}
 
 

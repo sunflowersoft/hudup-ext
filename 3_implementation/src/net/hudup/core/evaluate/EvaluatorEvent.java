@@ -70,6 +70,12 @@ public class EvaluatorEvent extends EventObject {
 
 	
 	/**
+	 * evaluation information as other result.
+	 */
+	protected EvaluateInfo otherResult = null;
+	
+	
+	/**
 	 * Time stamp.
 	 */
 	protected Timestamp timestamp = null;
@@ -96,14 +102,27 @@ public class EvaluatorEvent extends EventObject {
 
 	
 	/**
-	 * Constructor with specified evaluator and time stamp. 
+	 * Constructor with specified evaluator and evaluation information. 
 	 * @param evaluator specified evaluator. This evaluator is invalid in remote call.
 	 * @param type specified type of evaluation event.
+	 * @param otherResult evaluation information as other result.
+	 */
+	public EvaluatorEvent(Evaluator evaluator, Type type, EvaluateInfo otherResult) {
+		this(evaluator, type);
+		this.otherResult = otherResult;
+	}
+
+	
+	/**
+	 * Constructor with specified evaluator, evaluation information, and time stamp. 
+	 * @param evaluator specified evaluator. This evaluator is invalid in remote call.
+	 * @param type specified type of evaluation event.
+	 * @param otherResult evaluation information as other result.
 	 * @param timestamp specified time stamp.
 	 */
-	public EvaluatorEvent(Evaluator evaluator, Type type, Timestamp timestamp) {
-		this(evaluator, type);
-		setTimestamp(timestamp);
+	public EvaluatorEvent(Evaluator evaluator, Type type, EvaluateInfo otherResult, Timestamp timestamp) {
+		this(evaluator, type, otherResult);
+		this.timestamp = timestamp;
 	}
 	
 	
@@ -132,6 +151,24 @@ public class EvaluatorEvent extends EventObject {
 	
 	
 	/**
+	 * Setting evaluation information as other result.
+	 * @param otherResult evaluation information as other result.
+	 */
+	public void setOtherResult(EvaluateInfo otherResult) {
+		this.otherResult = otherResult;
+	}
+
+	
+	/**
+	 * Getting evaluation information as other result.
+	 * @return evaluation information as other result.
+	 */
+	public EvaluateInfo getOtherResult() {
+		return otherResult;
+	}
+
+	
+	/**
 	 * Getting time stamp.
 	 * @return time stamp.
 	 */
@@ -151,7 +188,7 @@ public class EvaluatorEvent extends EventObject {
 	
 	/**
 	 * Getting additional parameter list.
-	 * @return additional  parameter list
+	 * @return additional  parameter list.
 	 */
 	public Serializable[] getParams() {
 		return params;

@@ -15,6 +15,7 @@ import java.util.List;
 import net.hudup.core.PluginStorageWrapper;
 import net.hudup.core.RegisterTable;
 import net.hudup.core.alg.Alg;
+import net.hudup.core.alg.AlgDesc2List;
 import net.hudup.core.alg.SetupAlgEvent;
 import net.hudup.core.alg.SetupAlgListener;
 import net.hudup.core.data.DatasetPool;
@@ -83,37 +84,37 @@ public class EvaluatorWrapper implements Evaluator, Serializable {
 
 	
 	@Override
-	public void remoteStart(Serializable... parameters) throws RemoteException {
+	public boolean remoteStart(Serializable... parameters) throws RemoteException {
 		// TODO Auto-generated method stub
-		remoteEvaluator.remoteStart(parameters);
+		return remoteEvaluator.remoteStart(parameters);
 	}
 
 	
 	@Override
-	public void remoteStart(List<Alg> algList, DatasetPool pool, Serializable parameter) throws RemoteException {
+	public boolean remoteStart(List<Alg> algList, DatasetPool pool, Serializable parameter) throws RemoteException {
 		// TODO Auto-generated method stub
-		remoteEvaluator.remoteStart(algList, pool, parameter);
+		return remoteEvaluator.remoteStart(algList, pool, parameter);
 	}
 
 
 	@Override
-	public void remotePause() throws RemoteException {
+	public boolean remotePause() throws RemoteException {
 		// TODO Auto-generated method stub
-		remoteEvaluator.remotePause();
-	}
-
-	
-	@Override
-	public void remoteResume() throws RemoteException {
-		// TODO Auto-generated method stub
-		remoteEvaluator.remoteResume();
+		return remoteEvaluator.remotePause();
 	}
 
 	
 	@Override
-	public void remoteStop() throws RemoteException {
+	public boolean remoteResume() throws RemoteException {
 		// TODO Auto-generated method stub
-		remoteEvaluator.remoteStop();
+		return remoteEvaluator.remoteResume();
+	}
+
+	
+	@Override
+	public boolean remoteStop() throws RemoteException {
+		// TODO Auto-generated method stub
+		return remoteEvaluator.remoteStop();
 	}
 
 	
@@ -140,9 +141,9 @@ public class EvaluatorWrapper implements Evaluator, Serializable {
 
 	
 	@Override
-	public void remoteForceStop() throws RemoteException {
+	public boolean remoteForceStop() throws RemoteException {
 		// TODO Auto-generated method stub
-		remoteEvaluator.remoteForceStop();
+		return remoteEvaluator.remoteForceStop();
 	}
 
 	
@@ -275,6 +276,27 @@ public class EvaluatorWrapper implements Evaluator, Serializable {
 	}
 
 	
+	@Override
+	public List<String> getPluginAlgNames(Class<? extends Alg> algClass) throws RemoteException {
+		// TODO Auto-generated method stub
+		return remoteEvaluator.getPluginAlgNames(algClass);
+	}
+
+
+	@Override
+	public AlgDesc2List getPluginAlgDescs(Class<? extends Alg> algClass) throws RemoteException {
+		// TODO Auto-generated method stub
+		return remoteEvaluator.getPluginAlgDescs(algClass);
+	}
+
+
+	@Override
+	public Alg getPluginAlgCloned(Class<? extends Alg> algClass, String algName) throws RemoteException {
+		// TODO Auto-generated method stub
+		return remoteEvaluator.getPluginAlgCloned(algClass, algName);
+	}
+
+
 	@Override
 	public void addEvaluatorListener(EvaluatorListener listener) throws RemoteException {
 		// TODO Auto-generated method stub

@@ -310,17 +310,16 @@ public abstract class SocketServer extends AbstractRunner implements Server, Acc
 	
 	
 	@Override
-	public synchronized void start() {
+	public synchronized boolean start() {
 		// TODO Auto-generated method stub
-		if (isStarted())
-			return;
+		if (isStarted()) return false;
 		
 		LogUtil.info("Socket server is initializing to start, please wait...");
 		setupServerSocket();
 		if (!testServerSocket()) {
 			fireStatusEvent(new ServerStatusEvent(this, Status.stopped));
 			LogUtil.error("Socket server failed to start");
-			return;
+			return false;
 		}
 		
 		super.start();
@@ -329,50 +328,53 @@ public abstract class SocketServer extends AbstractRunner implements Server, Acc
 		fireStatusEvent(new ServerStatusEvent(this, Status.started));
 		LogUtil.info("SOCKET SERVER IS SERVING AT PORT " + config.getServerPort());
 		LogUtil.info("Socket server has socket control port " + config.getSocketControlPort());
+		
+		return true;
 	}
 	
 	
 	@Override
-	public synchronized void pause() {
+	public synchronized boolean pause() {
 		// TODO Auto-generated method stub
-		if (isRunning()) {
+		if (!isRunning()) return false;
 		
-			pauseInternalRunners(); //Added date: 2019.08.11 by Loc Nguyen.
-			pauseDelegators();
+		pauseInternalRunners(); //Added date: 2019.08.11 by Loc Nguyen.
+		pauseDelegators();
 
-			destroyTimer();
-			new SocketWrapper("localhost", 
-					config.getServerPort()).sendQuitRequest();
-			super.pause();
-			
-			fireStatusEvent(new ServerStatusEvent(this, Status.paused));
-			LogUtil.info("Socket server paused");
-		}
+		destroyTimer();
+		new SocketWrapper("localhost", 
+				config.getServerPort()).sendQuitRequest();
+		super.pause();
+		
+		fireStatusEvent(new ServerStatusEvent(this, Status.paused));
+		LogUtil.info("Socket server paused");
+		
+		return true;
 	}
 
 
 	@Override
-	public synchronized void resume() {
+	public synchronized boolean resume() {
 		// TODO Auto-generated method stub
-		if (isPaused()) {
+		if (!isPaused()) return false;
 		
-			resumeInternalRunners(); //Added date: 2019.08.11 by Loc Nguyen.
-			resumeDelegators(); //Added date: 2019.08.11 by Loc Nguyen. Resume all delegators first.
-			
-			super.resume();
-			createTimer();
-			
-			fireStatusEvent(new ServerStatusEvent(this, Status.resumed));
-			LogUtil.info("Socket server resumed");
-		}
+		resumeInternalRunners(); //Added date: 2019.08.11 by Loc Nguyen.
+		resumeDelegators(); //Added date: 2019.08.11 by Loc Nguyen. Resume all delegators first.
+		
+		super.resume();
+		createTimer();
+		
+		fireStatusEvent(new ServerStatusEvent(this, Status.resumed));
+		LogUtil.info("Socket server resumed");
+		
+		return true;
 	}
 
 
 	@Override
-	public synchronized void stop() {
+	public synchronized boolean stop() {
 		// TODO Auto-generated method stub
-		if (!isStarted())
-			return;
+		if (!isStarted()) return false;
 		
 		LogUtil.info("Socket server prepares to stop, please waiting...");
 		
@@ -386,6 +388,8 @@ public abstract class SocketServer extends AbstractRunner implements Server, Acc
 		
 		fireStatusEvent(new ServerStatusEvent(this, Status.stopped));
 		LogUtil.info("Socket server stopped");
+		
+		return true;
 	}
 
 

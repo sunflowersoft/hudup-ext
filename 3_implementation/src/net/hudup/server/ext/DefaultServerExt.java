@@ -77,7 +77,19 @@ public class DefaultServerExt extends DefaultServer {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
-				showEvaluator();
+				try {
+					showEvaluator();
+				}
+				catch (Throwable ex) {
+					ex.printStackTrace();
+					LogUtil.error("Server fail to show evaluator, caused by " + ex.getMessage());
+					
+					/*
+					 * It is possible that current Java environment does not support GUI.
+					 * Use of GraphicsEnvironment.isHeadless() tests Java GUI.
+					 * Hence, create control panel with console here.
+					 */
+				}
 			}
 		});
         popup.add(evItem);
@@ -95,6 +107,11 @@ public class DefaultServerExt extends DefaultServer {
 		try {
 			if (finalService == null || !isRunning()) {
 				LogUtil.error("Service is not initialized yet or server is not running");
+				JOptionPane.showMessageDialog(
+						null, 
+						"Service is not initialized yet or server is not running", 
+						"Evaluator now shown", 
+						JOptionPane.INFORMATION_MESSAGE);
 				return;
 			}
 			

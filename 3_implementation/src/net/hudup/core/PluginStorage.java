@@ -15,6 +15,7 @@ import net.hudup.core.alg.AlgList;
 import net.hudup.core.data.Exportable;
 import net.hudup.core.data.ExternalQuery;
 import net.hudup.core.data.ctx.CTSManager;
+import net.hudup.core.evaluate.Evaluator;
 import net.hudup.core.evaluate.Metric;
 import net.hudup.core.parser.DatasetParser;
 
@@ -231,6 +232,27 @@ public final class PluginStorage implements Serializable {
 	
 	
 	/**
+	 * Looking up class.
+	 * @param tableName specified table name.
+	 * @return the class corresponding with table name.
+	 */
+	public final static Class<? extends Alg> lookupClass(String tableName) {
+		if (tableName.equals(NORMAL_ALG))
+			return Alg.class;
+		else if (tableName.equals(PARSER))
+			return DatasetParser.class;
+		else if (tableName.equals(METRIC))
+			return Metric.class;
+		else if (tableName.equals(EXTERNAL_QUERY))
+			return ExternalQuery.class;
+		else if (tableName.equals(CTS_MANAGER))
+			return CTSManager.class;
+		else
+			return null;
+	}
+	
+	
+	/**
 	 * Looking up the register table whose algorithms have the class which is equal to specified algorithm class.
 	 * @param algClass specified algorithm class.
 	 * @return {@link RegisterTable} whose algorithms have the class which is equal to specified algorithm class.
@@ -322,6 +344,69 @@ public final class PluginStorage implements Serializable {
 			return idx;
 		else
 			return -1;
+	}
+	
+	
+	/**
+	 * Looking whether the specified algorithm class and algorithm name stored in next update list by possible assignment.
+	 * @param algClass specified algorithm class.
+	 * @param algName specified algorithm name.
+	 * @return the index of the specified algorithm class and algorithm name stored in next update list by possible assignment.
+	 * Return -1 if not found.
+	 */
+	public final static int lookupNextUpdateListAssignable(Class<? extends Alg> algClass, String algName) {
+		if (algClass == null || algName == null) return -1;
+		
+		int idx = nextUpdateList.indexOf(algName);
+		if (idx == -1) return -1;
+		
+		Class<? extends Alg> cls = nextUpdateList.get(idx).getClass();
+		if (algClass.equals(Alg.class)) {
+			if (!DatasetParser.class.isAssignableFrom(cls) &&
+					!Metric.class.isAssignableFrom(cls) &&
+					!ExternalQuery.class.isAssignableFrom(cls) &&
+					!CTSManager.class.isAssignableFrom(cls))
+				return idx;
+			else
+				return -1;
+		}
+		else if (algClass.isAssignableFrom(cls))
+			return idx;
+		else
+			return -1;
+	}
+	
+	
+	/**
+	 * Updating plug-in storage from evaluator.
+	 * @param evaluator specified evaluator.
+	 * @param algClass specified algorithm class.
+	 */
+	public static void updateFromEvaluator(Evaluator evaluator, Class<? extends Alg> algClass) {
+		List<String> algNames = Util.newList();
+		try {
+			algNames = evaluator.getPluginAlgNames(algClass);
+		} catch (Exception e) {e.printStackTrace();}
+		
+		RegisterTable algReg = PluginStorage.lookupTable(algClass);
+		for (String algName : algNames) {
+			if (algReg.contains(algName)) continue;
+			
+			int idx = lookupNextUpdateListAssignable(algClass, algName);
+			if (idx != -1) {
+				Alg alg = nextUpdateList.get(idx);
+				nextUpdateList.remove(idx);
+				algReg.register(alg);
+			}
+			else {
+				Alg alg = null;
+				try {
+					alg = evaluator.getPluginAlgCloned(algClass, algName);
+				} catch (Exception e) {e.printStackTrace();}
+				
+				if (alg != null) algReg.register(alg);
+			}
+		}
 	}
 	
 	

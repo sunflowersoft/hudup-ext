@@ -85,30 +85,31 @@ public abstract class AbstractRunner implements Runner {
 	
 	
 	@Override
-	public synchronized void start() {
-		if (isStarted())
-			return;
+	public synchronized boolean start() {
+		if (isStarted()) return false;
 		
 		thread = new RunnerThread(this);
 		thread.start();
+		
+		return true;
 	}
 
 	
 	@Override
-	public synchronized void pause() {
-		if (isRunning()) {
+	public synchronized boolean pause() {
+		if (!isRunning()) return false;
 		
-			paused  = true;
-			
-			try {
-				wait();
-			} 
-			catch (Throwable e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			
+		paused  = true;
+		
+		try {
+			wait();
+		} 
+		catch (Throwable e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
+		
+		return true;
 	}
 	
 	
@@ -118,20 +119,20 @@ public abstract class AbstractRunner implements Runner {
 	 */
 	@Override
 	@NextUpdate
-	public synchronized void resume() {
-		if (isPaused()) {
+	public synchronized boolean resume() {
+		if (!isPaused()) return false;
 		
-			paused = false;
-			//Risked can be issued when start/stop/pause can intervene right here if the method is not synchronized.
-			notifyAll();
-		}
+		paused = false;
+		//Risked can be issued when start/stop/pause can intervene right here if the method is not synchronized.
+		notifyAll();
+		
+		return true;
 	}
 	
 	
 	@Override
-	public synchronized void stop() {
-		if (!isStarted())
-			return;
+	public synchronized boolean stop() {
+		if (!isStarted()) return false;
 		
 		thread = null;
 		
@@ -148,6 +149,7 @@ public abstract class AbstractRunner implements Runner {
 			e.printStackTrace();
 		}
 		
+		return true;
 	}
 	
 	
@@ -157,9 +159,8 @@ public abstract class AbstractRunner implements Runner {
 	 */
 	@SuppressWarnings("deprecation")
 	@NextUpdate
-	public synchronized void forceStop() {
-		if (!isStarted())
-			return;
+	public synchronized boolean forceStop() {
+		if (!isStarted()) return false;
 
 		try {
 			if (thread != null)
@@ -179,6 +180,8 @@ public abstract class AbstractRunner implements Runner {
 		catch (Throwable e) {
 			LogUtil.error("Calling notifyAll() in Evaluator#forceStop causes error " + e.getMessage());
 		}
+		
+		return true;
 	}
 
 	

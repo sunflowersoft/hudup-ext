@@ -1517,10 +1517,12 @@ public class DefaultService implements Service, AutoCloseable {
 			alg = PluginStorage.getNormalAlgReg().query(algName);
 			if (alg instanceof AlgRemote) {
 				AlgRemote remoteAlg = (AlgRemote)alg;
-				if (!(remoteAlg instanceof SingletonExport))
+				boolean singleton = remoteAlg instanceof SingletonExport;
+				if (!singleton)
 					remoteAlg = (AlgRemote) alg.newInstance();
+				
 				remoteAlg.export(serverConfig.getServerPort());
-				alg = Util.getPluginManager().wrap(remoteAlg, false);
+				alg = Util.getPluginManager().wrap(remoteAlg, !singleton);
 			}
 		}
 		catch (Throwable e) {

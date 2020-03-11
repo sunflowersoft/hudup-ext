@@ -86,30 +86,34 @@ public interface Server extends Remote {
 	
 	/**
 	 * Server starts.
+	 * @return true if successful.
 	 * @throws RemoteException if any error raises.
 	 */
-	void start() throws RemoteException;
+	boolean start() throws RemoteException;
 
 	
 	/**
 	 * Server pauses.
+	 * @return true if successful.
 	 * @throws RemoteException if any error raises.
 	 */
-	void pause() throws RemoteException;
+	boolean pause() throws RemoteException;
 
 	
 	/**
 	 * Server resumes
+	 * @return true if successful.
 	 * @throws RemoteException if any error raises.
 	 */
-	void resume() throws RemoteException;
+	boolean resume() throws RemoteException;
 
 	
 	/**
 	 * Server stops. After server stopped, it can re-start by calling {@link #start()}.
+	 * @return true if successful.
 	 * @throws RemoteException if any error raises.
 	 */
-	void stop() throws RemoteException;
+	boolean stop() throws RemoteException;
 	
 	
 	/**

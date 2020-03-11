@@ -505,4 +505,26 @@ public class AlgDesc2 extends AlgDesc {
 	}
 
 
+	/**
+	 * Getting the most inner algorithm of the specified algorithm.
+	 * @param alg specified algorithm.
+	 * @return the most inner algorithm of the specified algorithm.
+	 */
+	public static Alg getMostInnerAlg(Alg alg) {
+		if (alg == null)
+			return null;
+		else if (alg instanceof AlgRemoteWrapper) {
+			AlgRemote remoteAlg = ((AlgRemoteWrapper)alg).getRemoteAlg();
+			if (remoteAlg == null)
+				return null;
+			else if (remoteAlg instanceof Alg)
+				return getMostInnerAlg((Alg)remoteAlg);
+			else
+				return null;
+		}
+		else
+			return alg;
+	}
+
+
 }

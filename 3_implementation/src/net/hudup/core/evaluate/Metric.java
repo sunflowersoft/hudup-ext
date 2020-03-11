@@ -50,8 +50,9 @@ import net.hudup.core.alg.Alg;
  * </ul>
  * Note, metric is also algorithm because it extends {@link Alg} interface.
  * Therefore it is registered in system register table and identified by its name.
- * Plug-in manager presented by {@code PluginManager} interface discovers automatically all metrics via their names at the booting time.
- * 
+ * Plug-in manager presented by {@code PluginManager} interface discovers automatically all metrics via their names at the booting time.<br>
+ * <br>
+ * Note that current version does not support remote metric.
  * @author Loc Nguyen
  * @version 10.0
  *

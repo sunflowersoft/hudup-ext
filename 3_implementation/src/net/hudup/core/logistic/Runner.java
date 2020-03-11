@@ -28,29 +28,33 @@ public interface Runner extends Runnable {
 	/**
 	 * Runner starts running.
 	 * This method will be synchronized.
+	 * @return true if successful.
 	 */
-	public void start();
+	boolean start();
 
 	
 	/**
 	 * Runner pauses.
 	 * This method will be synchronized.
+	 * @return true if successful.
 	 */
-	void pause();
+	boolean pause();
 	
 	
 	/**
 	 * Runner resumes after runner pauses.
 	 * This method will be synchronized.
+	 * @return true if successful.
 	 */
-	public void resume();
+	boolean resume();
 	
 	
 	/**
 	 * Runner stops. If runner wants to run again, runner must start again.
 	 * This method will be synchronized.
+	 * @return true if successful.
 	 */
-	void stop();
+	boolean stop();
 	
 	
 	/**

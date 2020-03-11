@@ -15,6 +15,7 @@ import java.util.List;
 import net.hudup.core.PluginStorageWrapper;
 import net.hudup.core.RegisterTable;
 import net.hudup.core.alg.Alg;
+import net.hudup.core.alg.AlgDesc2List;
 import net.hudup.core.alg.SetupAlgListener;
 import net.hudup.core.data.AutoCloseable;
 import net.hudup.core.data.DatasetPool;
@@ -97,16 +98,18 @@ public interface Evaluator extends Remote, RemoteRunner, SetupAlgListener, Expor
 	 * @param algList specified list of algorithms. It must be serializable in remote call.
 	 * @param pool specified dataset pool containing many training datasets and testing datasets. It must be serializable in remote call.
 	 * @param parameter additional parameter.
+	 * @return true if successful.
 	 * @throws RemoteException if any error raises.
 	 */
-	void remoteStart(List<Alg> algList, DatasetPool pool, Serializable parameter) throws RemoteException;
+	boolean remoteStart(List<Alg> algList, DatasetPool pool, Serializable parameter) throws RemoteException;
 
 	
 	/**
 	 * Evaluator forces to stop.
+	 * @return true if successful.
 	 * @throws RemoteException if any error raises.
 	 */
-	void remoteForceStop() throws RemoteException;
+	boolean remoteForceStop() throws RemoteException;
 
 	
 	/**
@@ -249,15 +252,34 @@ public interface Evaluator extends Remote, RemoteRunner, SetupAlgListener, Expor
 	PluginStorageWrapper getPluginStorage() throws RemoteException;
 	
 	
-//	/**
-//	 * Getting list of algorithm names.
-//	 * @return list of algorithm names.
-//	 * @throws RemoteException if any error raises.
-//	 */
-//	@NextUpdate
-//	List<String> getAlgNames() throws RemoteException;
+    /**
+     * Getting name list of registered plug-in algorithms.
+     * @param algClass specified algorithm class.
+     * @return name list of registered plug-in algorithms.
+     * @throws RemoteException if any error raises.
+     */
+    List<String> getPluginAlgNames(Class<? extends Alg> algClass) throws RemoteException;
 
-	
+    
+    /**
+     * Getting description list of registered plug-in algorithms.
+     * @param algClass specified algorithm class.
+     * @return description list of registered plug-in algorithms.
+     * @throws RemoteException if any error raises.
+     */
+    AlgDesc2List getPluginAlgDescs(Class<? extends Alg> algClass) throws RemoteException;
+    
+    
+    /**
+     * Getting registered cloned plug-in algorithm.
+     * @param algClass specified algorithm class.
+     * @param algName algorithm name.
+     * @return registered cloned plug-in algorithm.
+     * @throws RemoteException if any error raises.
+     */
+    Alg getPluginAlgCloned(Class<? extends Alg> algClass, String algName) throws RemoteException;
+
+    
 	/**
 	 * Add the specified evaluator listener to the end of listener list.
 	 * @param listener specified evaluator listener.

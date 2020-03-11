@@ -38,6 +38,7 @@ import net.hudup.core.Constants;
 import net.hudup.core.PluginChangedEvent;
 import net.hudup.core.RegisterTable;
 import net.hudup.core.alg.Alg;
+import net.hudup.core.alg.AlgList;
 import net.hudup.core.alg.SetupAlgEvent;
 import net.hudup.core.alg.ui.AlgListBox;
 import net.hudup.core.alg.ui.AlgListBox.AlgListChangedEvent;
@@ -271,7 +272,6 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 	 * Initializing GUI.
 	 */
 	private synchronized void initGUI() {
-		removeAll();
 		setLayout(new BorderLayout(2, 2));
 		
 		JPanel header = createHeader();
@@ -546,7 +546,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 				
 			});
 		this.btnSaveBatchScript.setMargin(new Insets(0, 0 , 0, 0));
-		//this.btnSaveBatchScript.setVisible(false);
+		this.btnSaveBatchScript.setVisible(false);
 		toolGrp2.add(this.btnSaveBatchScript);
 
 		this.btnForceStop = UIUtil.makeIconButton(
@@ -969,11 +969,10 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			clearResult();
 			Timestamp timestamp = new Timestamp();
 			this.timestamp = timestamp.getTimestamp();
-			evaluator.remoteStart(lbAlgs.getAlgList(), guiData.pool, timestamp);
-			
-			synchronized (this) {
-				updateMode();
-			}
+			if (bindUri == null)
+				evaluator.remoteStart(lbAlgs.getAlgList(), guiData.pool, timestamp);
+			else
+				evaluator.remoteStart(AlgList.clone(lbAlgs.getAlgList()), guiData.pool, timestamp); //Cloning algorithms is important to remote RMI.
 		}
 		catch (Throwable e) {
 			e.printStackTrace();
@@ -987,13 +986,19 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 	public synchronized void receivedEvaluator(EvaluatorEvent evt) throws RemoteException {
 		// TODO Auto-generated method stub
 		if (evt.getType() == EvaluatorEvent.Type.start) {
+			lbAlgs.update(algRegTable.getAlgList(evt.getOtherResult().algNames));
+
 			Timestamp timestamp = evt.getTimestamp();
 			if (!timestamp.isValid() || timestamp.getTimestamp() != this.timestamp) {
-				clear();
-				guiData.reset();
-				initGUIData(guiData);
-				initGUI();
+				try {
+					guiData.pool = evaluator.getDatasetPool();
+				} catch (Throwable e) {e.printStackTrace();}
+				guiData.pool = guiData.pool != null ? guiData.pool : new DatasetPool();
+				
+				tblDatasetPool.update(guiData.pool);
 			}
+			
+			updateMode();
 		}
 		else if (evt.getType() == EvaluatorEvent.Type.pause ||
 				evt.getType() == EvaluatorEvent.Type.resume || 

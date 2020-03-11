@@ -22,6 +22,7 @@ import net.hudup.core.PluginStorageWrapper;
 import net.hudup.core.RegisterTable;
 import net.hudup.core.Util;
 import net.hudup.core.alg.Alg;
+import net.hudup.core.alg.AlgDesc2List;
 import net.hudup.core.alg.SetupAlgEvent;
 import net.hudup.core.alg.SetupAlgListener;
 import net.hudup.core.client.PowerServer;
@@ -572,6 +573,27 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluateListen
 
 
 	@Override
+	public List<String> getPluginAlgNames(Class<? extends Alg> algClass) throws RemoteException {
+		// TODO Auto-generated method stub
+		return remoteEvaluator.getPluginAlgNames(algClass);
+	}
+
+
+	@Override
+	public AlgDesc2List getPluginAlgDescs(Class<? extends Alg> algClass) throws RemoteException {
+		// TODO Auto-generated method stub
+		return remoteEvaluator.getPluginAlgDescs(algClass);
+	}
+
+
+	@Override
+	public Alg getPluginAlgCloned(Class<? extends Alg> algClass, String algName) throws RemoteException {
+		// TODO Auto-generated method stub
+		return remoteEvaluator.getPluginAlgCloned(algClass, algName);
+	}
+
+
+	@Override
 	public EvaluatorConfig getConfig() throws RemoteException {
 		return remoteEvaluator.getConfig();
 	}
@@ -853,84 +875,84 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluateListen
 
 
 	@Override
-	public synchronized void remoteStart(Serializable... parameters) throws RemoteException {
+	public synchronized boolean remoteStart(Serializable... parameters) throws RemoteException {
 		// TODO Auto-generated method stub
 		boolean flag = socketServer.getFlag();
 		
 		if (flag)
-			remoteEvaluator.remoteStart(parameters);
+			return remoteEvaluator.remoteStart(parameters);
 		else if (socketServer.isRunning())
-			remoteEvaluator.remoteStart(parameters);
+			return remoteEvaluator.remoteStart(parameters);
 		else
 			throw new RemoteException("Socket server is not running");
 	}
 
 
 	@Override
-	public synchronized void remoteStart(List<Alg> algList, DatasetPool pool, Serializable parameter) throws RemoteException {
+	public synchronized boolean remoteStart(List<Alg> algList, DatasetPool pool, Serializable parameter) throws RemoteException {
 		// TODO Auto-generated method stub
 		boolean flag = socketServer.getFlag();
 		
 		if (flag)
-			remoteEvaluator.remoteStart(algList, pool, parameter);
+			return remoteEvaluator.remoteStart(algList, pool, parameter);
 		else if (socketServer.isRunning())
-			remoteEvaluator.remoteStart(algList, pool, parameter);
+			return remoteEvaluator.remoteStart(algList, pool, parameter);
 		else
 			throw new RemoteException("Socket server is not running");
 	}
 
 	
 	@Override
-	public synchronized void remotePause() throws RemoteException {
+	public synchronized boolean remotePause() throws RemoteException {
 		// TODO Auto-generated method stub
 		boolean flag = socketServer.getFlag();
 
 		if (flag)
-			remoteEvaluator.remotePause();
+			return remoteEvaluator.remotePause();
 		else if (socketServer.isRunning())
-			remoteEvaluator.remotePause();
+			return remoteEvaluator.remotePause();
 		else
 			throw new RemoteException("Socket server is not running");
 	}
 
 	
 	@Override
-	public synchronized void remoteResume() throws RemoteException {
+	public synchronized boolean remoteResume() throws RemoteException {
 		// TODO Auto-generated method stub
 		boolean flag = socketServer.getFlag();
 
 		if (flag)
-			remoteEvaluator.remoteResume();
+			return remoteEvaluator.remoteResume();
 		else if (socketServer.isRunning())
-			remoteEvaluator.remoteResume();
+			return remoteEvaluator.remoteResume();
 		else
 			throw new RemoteException("Socket server is not running");
 	}
 
 	
 	@Override
-	public synchronized void remoteStop() throws RemoteException {
+	public synchronized boolean remoteStop() throws RemoteException {
 		// TODO Auto-generated method stub
 		boolean flag = socketServer.getFlag();
 
 		if (flag)
-			remoteEvaluator.remoteStop();
+			return remoteEvaluator.remoteStop();
 		else if (socketServer.isRunning())
-			remoteEvaluator.remoteStop();
+			return remoteEvaluator.remoteStop();
 		else
 			throw new RemoteException("Socket server is not running");
 	}
 
 	
 	@Override
-	public void remoteForceStop() throws RemoteException {
+	public boolean remoteForceStop() throws RemoteException {
 		// TODO Auto-generated method stub
 		boolean flag = socketServer.getFlag();
 		
 		if (flag)
-			remoteEvaluator.remoteForceStop();
+			return remoteEvaluator.remoteForceStop();
 		else if (socketServer.isRunning())
-			remoteEvaluator.remoteForceStop();
+			return remoteEvaluator.remoteForceStop();
 		else
 			throw new RemoteException("Socket server is not running");
 	}

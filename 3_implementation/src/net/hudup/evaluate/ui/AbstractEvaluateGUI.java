@@ -16,6 +16,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import net.hudup.core.PluginChangedListener;
+import net.hudup.core.PluginStorage;
 import net.hudup.core.RegisterTable;
 import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.SetupAlgListener;
@@ -194,10 +195,14 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 		
 		this.evaluator = evaluator;
 		
+		//Current version only update normal algorithm and metric plug-in
+		PluginStorage.updateFromEvaluator(evaluator, Alg.class);
+		PluginStorage.updateFromEvaluator(evaluator, Metric.class);
+
 		if (referredAlg != null) {
 			try {
 				if (evaluator.acceptAlg(referredAlg))
-					this.algRegTable = new RegisterTable(Arrays.asList(referredAlg));
+					algRegTable = new RegisterTable(Arrays.asList(referredAlg));
 			} catch (Throwable e) {e.printStackTrace();}
 		}
 		else {
@@ -207,15 +212,6 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 		}
 		if (algRegTable == null) algRegTable = new RegisterTable();
 
-		initGUIData(referredGUIData);
-	}
-	
-	
-	/**
-	 * Initializing the evaluator batch GUI.
-	 * @param referredGUIData referred GUI data.
-	 */
-	protected synchronized void initGUIData(EvaluateGUIData referredGUIData) {
 		guiData = referredGUIData != null ? referredGUIData : new EvaluateGUIData(); 
 		guiData.wasRun = true;
 		guiData.active = true;

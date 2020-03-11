@@ -152,29 +152,31 @@ public class Listener extends SocketServer implements ServerStatusListener, Gate
 	
 	
 	@Override
-	public synchronized void start() {
+	public synchronized boolean start() {
 		// TODO Auto-generated method stub
-		if (isStarted())
-			return;
+		if (isStarted()) return false;
 		
 		super.start();
 		
 		rebind();
 		LogUtil.info("Listener/Balancer (socket server) exported at port " + ((ListenerConfig)config).getExportPort());
+		
+		return true;
 	}
 	
 	
 	@Override
-	public synchronized void stop() {
+	public synchronized boolean stop() {
 		// TODO Auto-generated method stub
-		if (!isStarted())
-			return;
+		if (!isStarted()) return false;
 		
 		super.stop();
 		
 		synchronized (bindServerList) {
 			bindServerList.unbindAll();
 		}
+		
+		return true;
 	}
 	
 	

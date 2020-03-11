@@ -22,7 +22,6 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.rmi.RemoteException;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 
 import javax.swing.AbstractAction;
@@ -42,6 +41,7 @@ import net.hudup.core.PluginChangedEvent;
 import net.hudup.core.RegisterTable;
 import net.hudup.core.Util;
 import net.hudup.core.alg.Alg;
+import net.hudup.core.alg.AlgList;
 import net.hudup.core.alg.CompositeAlg;
 import net.hudup.core.alg.ModelBasedAlg;
 import net.hudup.core.alg.Recommender;
@@ -55,13 +55,13 @@ import net.hudup.core.data.DatasetPair;
 import net.hudup.core.data.DatasetPool;
 import net.hudup.core.data.DatasetUtil;
 import net.hudup.core.data.Pointer;
+import net.hudup.core.evaluate.EvaluateEvent;
+import net.hudup.core.evaluate.EvaluateEvent.Type;
+import net.hudup.core.evaluate.EvaluateProgressEvent;
 import net.hudup.core.evaluate.Evaluator;
 import net.hudup.core.evaluate.EvaluatorAbstract;
 import net.hudup.core.evaluate.EvaluatorEvent;
 import net.hudup.core.evaluate.Metrics;
-import net.hudup.core.evaluate.EvaluateEvent;
-import net.hudup.core.evaluate.EvaluateEvent.Type;
-import net.hudup.core.evaluate.EvaluateProgressEvent;
 import net.hudup.core.logistic.ClipboardUtil;
 import net.hudup.core.logistic.Counter;
 import net.hudup.core.logistic.CounterElapsedTimeEvent;
@@ -286,7 +286,6 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 	 * Initializing GUI.
 	 */
 	private synchronized void initGUI() {
-		removeAll();
 		setLayout(new BorderLayout(2, 2));
 		
 		JPanel header = createHeader();
@@ -1170,12 +1169,12 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 				
 			List<Alg> algList = Util.newList();
 			algList.add(alg);
-			timestamp = new Date().getTime();
-			evaluator.remoteStart(algList, pool, new Timestamp(timestamp));
-		
-			synchronized (this) {
-				updateMode();
-			}
+			Timestamp timestamp = new Timestamp();
+			this.timestamp = timestamp.getTimestamp();
+			if (bindUri == null)
+				evaluator.remoteStart(algList, pool, timestamp);
+			else
+				evaluator.remoteStart(AlgList.clone(algList), pool, timestamp); //Cloning algorithms is important to remote RMI.
 		}
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
@@ -1190,12 +1189,24 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 	public synchronized void receivedEvaluator(EvaluatorEvent evt) throws RemoteException {
 		// TODO Auto-generated method stub
 		if (evt.getType() == EvaluatorEvent.Type.start) {
+			cmbAlgs.update(algRegTable.getAlgList(evt.getOtherResult().algNames));
+			algChanged();
+			
 			Timestamp timestamp = evt.getTimestamp();
 			if (timestamp.isValid() && timestamp.getTimestamp() != this.timestamp) {
-				clear();
-				guiData.reset();
-				initGUIData(guiData);
-				initGUI();
+				try {
+					guiData.pool = evaluator.getDatasetPool();
+				} catch (Throwable e) {e.printStackTrace();}
+				guiData.pool = guiData.pool != null ? guiData.pool : new DatasetPool();
+				
+				if (guiData.pool.size() > 0) {
+					txtTrainingBrowse.setDataset(guiData.pool.get(0).getTraining());
+					txtTestingBrowse.setDataset(guiData.pool.get(0).getTesting());
+				}
+				else {
+					txtTrainingBrowse.setDataset(null);
+					txtTestingBrowse.setDataset(null);
+				}
 			}
 		}
 		else if (evt.getType() == EvaluatorEvent.Type.pause ||
