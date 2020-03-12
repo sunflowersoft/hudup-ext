@@ -269,9 +269,9 @@ public class AlgRemoteWrapper implements Alg, AlgRemote, Serializable {
 //
 //
 //	@Override
-//	public void setAgent(boolean agent) throws RemoteException {
+//	public void setAgent(boolean isAgent) throws RemoteException {
 //		// TODO Auto-generated method stub
-//		remoteAlg.setAgent(agent);
+//		remoteAlg.setAgent(isAgent);
 //	}
 
 

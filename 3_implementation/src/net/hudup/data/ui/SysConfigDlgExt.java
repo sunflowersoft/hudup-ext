@@ -143,10 +143,21 @@ public class SysConfigDlgExt extends SysConfigDlg {
 	/**
 	 * Removing system configuration panel.
 	 */
-	public void removedSysConfigPane() {
+	public void removeSysConfigPane() {
 		if (body != null && paneSysConfig != null) {
 			body.remove(paneSysConfig);
 			paneSysConfig = null;
+		}
+	}
+	
+	
+	/**
+	 * Removing plug-in storage manifest.
+	 */
+	public void removePluginStorageManifest() {
+		if (body != null && paneRegister != null) {
+			body.remove(paneRegister);
+			paneRegister = null;
 		}
 	}
 	

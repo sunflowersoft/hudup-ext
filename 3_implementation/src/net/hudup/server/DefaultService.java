@@ -193,10 +193,17 @@ public class DefaultService implements Service, AutoCloseable {
 		boolean result = true;
 		trans.lockWrite();
 		try {
-			target.recommender = this.recommender;
-			
-			this.recommender = null;
-			this.close();
+			if (this.recommender != null) {
+				try {
+					if (target.recommender != null) target.recommender.unsetup();
+				} catch (Throwable e) {e.printStackTrace();}
+				target.recommender = this.recommender;
+				
+				this.recommender = null;
+				this.close();
+			}
+			else
+				result = false;
 		}
 		catch (Throwable e) {
 			e.printStackTrace();

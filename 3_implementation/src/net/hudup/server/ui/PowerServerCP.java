@@ -195,7 +195,7 @@ public class PowerServerCP extends JFrame implements ServerStatusListener, Plugi
 	protected Registry registry = null;
 
 	/**
-	 * Binded URI of power server.
+	 * Binded URI of this control panel.
 	 */
 	protected xURI bindUri = null;
 	
@@ -349,7 +349,7 @@ public class PowerServerCP extends JFrame implements ServerStatusListener, Plugi
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					SysConfigDlgExt cfg = new SysConfigDlgExt(general, I18nUtil.message("system_configure"), getThisPowerServerCP());
-					cfg.removedSysConfigPane();
+					cfg.removeSysConfigPane();
 					cfg.setVisible(true);
 				}
 			});

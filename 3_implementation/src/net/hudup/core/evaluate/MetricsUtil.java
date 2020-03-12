@@ -37,6 +37,7 @@ import net.hudup.core.RegisterTable;
 import net.hudup.core.Util;
 import net.hudup.core.alg.Alg;
 import net.hudup.core.data.PropList;
+import net.hudup.core.logistic.Counter;
 import net.hudup.core.logistic.MathUtil;
 import net.hudup.core.logistic.SystemUtil;
 import net.hudup.core.logistic.UriAdapter;
@@ -60,20 +61,46 @@ public class MetricsUtil {
 	
 	
 	/**
-	 * Algorithm table.
+	 * Algorithm table. It can be empty.
 	 */
 	protected RegisterTable algTable = new RegisterTable();
 	
 	
 	/**
-	 * Constructor with metrics and algorithm table.
-	 * 
+	 * Referred evaluator. It can be null.
+	 */
+	protected Evaluator referredEvaluator = null;
+	
+	
+	/**
+	 * Constructor with metrics.
 	 * @param metrics specified metrics.
-	 * @param algTable specified algorithm table.
+	 */
+	public MetricsUtil(Metrics metrics) {
+		this(metrics, null, null);
+	}
+
+	
+	/**
+	 * Constructor with metrics and algorithm table.
+	 * @param metrics specified metrics.
+	 * @param algTable specified algorithm table. It can be null or empty.
 	 */
 	public MetricsUtil(Metrics metrics, RegisterTable algTable) {
+		this(metrics, algTable, null);
+	}
+	
+	
+	/**
+	 * Constructor with metrics, algorithm table, and evaluator.
+	 * @param metrics specified metrics.
+	 * @param algTable specified algorithm table. It can be null or empty.
+	 * @param evaluator specified evaluator. It can be null.
+	 */
+	public MetricsUtil(Metrics metrics, RegisterTable algTable, Evaluator evaluator) {
 		this.metrics = metrics;
 		this.algTable = algTable == null ? new RegisterTable() : algTable;
+		this.referredEvaluator = evaluator;
 	}
 	
 	
@@ -318,8 +345,69 @@ public class MetricsUtil {
 
 	
 	/**
+	 * Create table for showing evaluation information.
+	 * @return table for showing evaluation information.
+	 */
+	public JTable createEvaluateInfoTable() {
+		if (referredEvaluator == null) return new JTable();
+		
+		EvaluateInfo otherResult = null;
+		try {
+			otherResult = referredEvaluator.getOtherResult();
+		} catch (Throwable e) {e.printStackTrace();}
+		if (otherResult == null) return new JTable();
+		
+		Vector<Vector<Object>> data = Util.newVector();
+		Vector<Object> row = null;
+		
+		row = Util.newVector();
+		row.add("Total records");
+		row.add(otherResult.progressTotal);
+		data.add(row);
+
+		row = Util.newVector();
+		row.add("Evaluated records");
+		row.add(otherResult.progressStep);
+		data.add(row);
+
+		row = Util.newVector();
+		row.add("Evaluation percentage");
+		row.add(MathUtil.round((double)otherResult.progressStep / otherResult.progressTotal * 100.0) + "%");
+		data.add(row);
+
+		row = Util.newVector();
+		row.add("Elapsed time");
+		row.add(Counter.formatTimeInterval(otherResult.elapsedTime));
+		data.add(row);
+
+		Vector<String> columns = Util.newVector();
+		columns.add("Variable");
+		columns.add("Value");
+		
+		DefaultTableModel generalModel = new DefaultTableModel(data, columns) {
+
+			/**
+			 * Serial version UID for serializable class. 
+			 */
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public boolean isCellEditable(int row, int column) {
+				// TODO Auto-generated method stub
+				return false;
+			}
+			
+		};
+		
+		
+		JTable table = new JTable(generalModel);
+		return table;
+	}
+
+	
+	/**
 	 * Create table for showing algorithms descriptions.
-	 * @return {@link JTable} for showing algorithms descriptions.
+	 * @return table for showing algorithms descriptions.
 	 */
 	public JTable createAlgDescsTable() {
 		List<String> algNameList = this.metrics.getAlgNameList();
@@ -401,7 +489,7 @@ public class MetricsUtil {
 	
 	/**
 	 * Create metrics evaluation by parameters.
-	 * @return parameters {@link JTable} metrics evaluation by parameters.
+	 * @return table to show parameters of algorithms.
 	 */
 	public JTable createAlgParamsTable() {
 		List<String> algNameList = this.metrics.getAlgNameList();
@@ -511,6 +599,34 @@ public class MetricsUtil {
 	
 	
 	/**
+	 * Create Excel cell formats.
+	 * @return Excel cell formats.
+	 */
+	private WritableCellFormat[] createCellFormats() {
+		WritableCellFormat[] formats = new WritableCellFormat[4];
+		
+		WritableFont font12 = new WritableFont(WritableFont.TIMES, 12,
+				WritableFont.NO_BOLD, false);
+		formats[0] = new WritableCellFormat(font12);
+
+		WritableFont boldFont12 = new WritableFont(WritableFont.TIMES, 12,
+				WritableFont.BOLD, false);
+		formats[1] = new WritableCellFormat(boldFont12);
+
+		WritableFont font14 = new WritableFont(WritableFont.TIMES, 14,
+				WritableFont.NO_BOLD, false);
+		formats[2] = new WritableCellFormat(font14);
+
+		WritableFont boldFont14 = new WritableFont(WritableFont.TIMES, 14,
+				WritableFont.BOLD, false);
+		formats[3] = new WritableCellFormat(boldFont14);
+
+
+		return formats;
+	}
+	
+	
+	/**
 	 * Create excel rows of metrics evaluation by dataset.
 	 * @param sheet excel sheet writer.
 	 * @param datasetId dataset identifier.
@@ -526,19 +642,13 @@ public class MetricsUtil {
 			int col) throws Exception {
 		int rows = 0;
 		
-		WritableFont boldFont12 = new WritableFont(WritableFont.TIMES, 12,
-				WritableFont.BOLD, false);
-		WritableCellFormat boldCellFormat12 = new WritableCellFormat(boldFont12);
-
-		WritableFont font12 = new WritableFont(WritableFont.TIMES, 12,
-				WritableFont.NO_BOLD, false);
-		WritableCellFormat cellFormat12 = new WritableCellFormat(font12);
+		WritableCellFormat[] formats = createCellFormats();
 
 		List<String> algNameList = this.metrics.getAlgNameList();
 		Collections.sort(algNameList);
 		int newcol = col + 1;
 		for (String algName : algNameList) {
-			Label lblAlg = new Label(newcol, row, algName, boldCellFormat12);
+			Label lblAlg = new Label(newcol, row, algName, formats[1]);
 			sheet.addCell(lblAlg);
 			
 			newcol++;
@@ -552,7 +662,7 @@ public class MetricsUtil {
 		
 		//Create metric cells for given dataset.
 		for (String metricName : metricNameList) {
-			Label lblMetricName = new Label(col, row, metricName, cellFormat12);
+			Label lblMetricName = new Label(col, row, metricName, formats[0]);
 			sheet.addCell(lblMetricName);
 			
 			newcol = col + 1;
@@ -562,7 +672,7 @@ public class MetricsUtil {
 				if (algValues.containsKey(metricName))
 					metricValue = algValues.get(metricName);
 				
-				WritableCell cell = createMetricValueCell(metricValue, row, newcol, cellFormat12);
+				WritableCell cell = createMetricValueCell(metricValue, row, newcol, formats[0]);
 				if (cell != null)
 					sheet.addCell(cell);
 				
@@ -610,19 +720,13 @@ public class MetricsUtil {
 			int col) throws Exception {
 		int rows = 0;
 		
-		WritableFont boldFont12 = new WritableFont(WritableFont.TIMES, 12,
-				WritableFont.BOLD, false);
-		WritableCellFormat boldCellFormat12 = new WritableCellFormat(boldFont12);
-
-		WritableFont font12 = new WritableFont(WritableFont.TIMES, 12,
-				WritableFont.NO_BOLD, false);
-		WritableCellFormat cellFormat12 = new WritableCellFormat(font12);
+		WritableCellFormat[] formats = createCellFormats();
 
 		List<String> algNameList = this.metrics.getAlgNameList();
 		Collections.sort(algNameList);
 		int newcol = col + 1;
 		for (String algName : algNameList) {
-			Label lblAlg = new Label(newcol, row, algName, boldCellFormat12);
+			Label lblAlg = new Label(newcol, row, algName, formats[1]);
 			sheet.addCell(lblAlg);
 			
 			newcol++;
@@ -637,7 +741,7 @@ public class MetricsUtil {
 					col, 
 					row, 
 					"Dataset \"" + datasetId + "\"", 
-					cellFormat12);
+					formats[0]);
 			
 			sheet.addCell(lblDataset);
 			
@@ -649,7 +753,7 @@ public class MetricsUtil {
 				if (metric != null && metric.isValid())
 					metricValue = metric.getAccumValue();
 				
-				WritableCell cell = createMetricValueCell(metricValue, row, newcol, cellFormat12);
+				WritableCell cell = createMetricValueCell(metricValue, row, newcol, formats[0]);
 				if (cell != null)
 					sheet.addCell(cell);
 
@@ -664,9 +768,58 @@ public class MetricsUtil {
 
 	
 	/**
+	 * Create excel rows of evaluation information.
+	 * @param sheet excel sheet writer.
+	 * @param row starting row index.
+	 * @param col starting column index.
+	 * @return rows to be saved
+	 * @throws Exception if any error raises.
+	 */
+	private int createEvaluateInfoExcel(
+			WritableSheet sheet, 
+			int row, 
+			int col) throws Exception {
+		if (referredEvaluator == null) return 1;
+		
+		EvaluateInfo otherResult = referredEvaluator.getOtherResult();
+		WritableCellFormat[] formats = createCellFormats();
+		int rows = 0;
+		
+		Label totalRecords = new Label(0, row, "Total records", formats[0]);
+		sheet.addCell(totalRecords);
+		Number totalRecordsValue = new Number(1, row, otherResult.progressTotal, formats[0]);
+		sheet.addCell(totalRecordsValue);
+
+		rows++;
+		row++;
+		Label evRecords = new Label(0, row, "Evaluated records", formats[0]);
+		sheet.addCell(evRecords);
+		Number evRecordsValue = new Number(1, row, otherResult.progressStep, formats[0]);
+		sheet.addCell(evRecordsValue);
+		
+		rows++;
+		row++;
+		Label evPercentage = new Label(0, row, "Evaluation percentage", formats[0]);
+		sheet.addCell(evPercentage);
+		Label evPercentageValue = new Label(1, row,
+				MathUtil.round((double)otherResult.progressStep / otherResult.progressTotal * 100.0) + "%",
+				formats[0]);
+		sheet.addCell(evPercentageValue);
+
+		rows++;
+		row++;
+		Label elapsedTime = new Label(0, row, "Elapsed time", formats[0]);
+		sheet.addCell(elapsedTime);
+		Label elapsedTimeValue = new Label(1, row, Counter.formatTimeInterval(otherResult.elapsedTime), formats[0]);
+		sheet.addCell(elapsedTimeValue);
+		
+		return rows + 1;
+	}
+	
+	
+	/**
 	 * Create excel rows of algorithm parameters.
 	 * @param sheet excel sheet writer.
-	 * @param metricName metric name.
 	 * @param row starting row index.
 	 * @param col starting column index.
 	 * @return rows to be saved
@@ -677,13 +830,7 @@ public class MetricsUtil {
 			int row, 
 			int col) throws Exception {
 		
-		WritableFont boldFont12 = new WritableFont(WritableFont.TIMES, 12,
-				WritableFont.BOLD, false);
-		WritableCellFormat boldCellFormat12 = new WritableCellFormat(boldFont12);
-
-		WritableFont font12 = new WritableFont(WritableFont.TIMES, 12,
-				WritableFont.NO_BOLD, false);
-		WritableCellFormat cellFormat12 = new WritableCellFormat(font12);
+		WritableCellFormat[] formats = createCellFormats();
 
 		List<String> algNameList = this.metrics.getAlgNameList();
 		Collections.sort(algNameList);
@@ -695,7 +842,7 @@ public class MetricsUtil {
 			if (alg == null) continue;
 			
 			int r = 0;
-			Label lblAlg = new Label(c + 1, row + r, algName, boldCellFormat12);
+			Label lblAlg = new Label(c + 1, row + r, algName, formats[1]);
 			sheet.addCell(lblAlg);
 			
 			List<String> paramNames = Util.newList();
@@ -720,7 +867,7 @@ public class MetricsUtil {
 				
 				r ++;
 				countRow ++;
-				Label paramCell = new Label(c + 1, row + r, paramText, cellFormat12);
+				Label paramCell = new Label(c + 1, row + r, paramText, formats[0]);
 				sheet.addCell(paramCell);
 			}
 			maxRow = Math.max(maxRow, countRow);
@@ -733,7 +880,6 @@ public class MetricsUtil {
 	/**
 	 * Create excel rows of algorithm descriptions.
 	 * @param sheet excel sheet writer.
-	 * @param metricName metric name.
 	 * @param row starting row index.
 	 * @param col starting column index.
 	 * @return rows to be saved
@@ -745,19 +891,13 @@ public class MetricsUtil {
 			int col) throws Exception {
 		int rows = 0;
 		
-		WritableFont boldFont12 = new WritableFont(WritableFont.TIMES, 12,
-				WritableFont.BOLD, false);
-		WritableCellFormat boldCellFormat12 = new WritableCellFormat(boldFont12);
-
-		WritableFont font12 = new WritableFont(WritableFont.TIMES, 12,
-				WritableFont.NO_BOLD, false);
-		WritableCellFormat cellFormat12 = new WritableCellFormat(font12);
+		WritableCellFormat[] formats = createCellFormats();
 
 		List<String> algNameList = this.metrics.getAlgNameList();
 		Collections.sort(algNameList);
 		int newcol = col + 1;
 		for (String algName : algNameList) {
-			Label lblAlg = new Label(newcol, row, algName, boldCellFormat12);
+			Label lblAlg = new Label(newcol, row, algName, formats[1]);
 			sheet.addCell(lblAlg);
 			
 			newcol++;
@@ -772,7 +912,7 @@ public class MetricsUtil {
 					col, 
 					row, 
 					"Dataset \"" + datasetId + "\"", 
-					cellFormat12);
+					formats[0]);
 			
 			sheet.addCell(lblDataset);
 			
@@ -782,7 +922,7 @@ public class MetricsUtil {
 				String algDesc = metrics.getAlgDesc(algName, datasetId);
 				algDesc = algDesc == null ? "" : algDesc; 
 				
-				Label cell = new Label(newcol, row, algDesc, cellFormat12);
+				Label cell = new Label(newcol, row, algDesc, formats[0]);
 				sheet.addCell(cell);
 
 				newcol++;
@@ -798,7 +938,6 @@ public class MetricsUtil {
 	/**
 	 * Create excel rows of notes.
 	 * @param sheet excel sheet writer.
-	 * @param metricName metric name.
 	 * @param row starting row index.
 	 * @param col starting column index.
 	 * @return rows to be saved
@@ -809,9 +948,7 @@ public class MetricsUtil {
 			int row, 
 			int col) throws Exception {
 		
-		WritableFont font12 = new WritableFont(WritableFont.TIMES, 12,
-				WritableFont.NO_BOLD, false);
-		WritableCellFormat cellFormat12 = new WritableCellFormat(font12);
+		WritableCellFormat[] formats = createCellFormats();
 
 		List<Integer> datasetIdList = this.metrics.getDatasetIdList();
 		Collections.sort(datasetIdList);
@@ -822,7 +959,7 @@ public class MetricsUtil {
 			if (datasetUri != null) {
 				Label lbl = new Label(0, row, 
 						"Dataset \"" + datasetId + "\" has path \"" + datasetUri + "\"", 
-						cellFormat12);
+						formats[0]);
 				sheet.addCell(lbl);
 				
 				row ++;
@@ -840,7 +977,7 @@ public class MetricsUtil {
 			String key = keys.get(i).toString();
 			Label lbl = new Label(0, row, 
 					key + ": " + sysProps.getAsString(key), 
-					cellFormat12);
+					formats[0]);
 			sheet.addCell(lbl);
 		}
 		
@@ -859,20 +996,12 @@ public class MetricsUtil {
 		WritableWorkbook workbook = Workbook.createWorkbook(os);
 		
 		WritableSheet sheet = workbook.createSheet("Results", 0);
-	
-		WritableFont boldFont14 = new WritableFont(WritableFont.TIMES, 14,
-				WritableFont.BOLD, false);
-		WritableCellFormat boldCellFormat14 = new WritableCellFormat(boldFont14);
-
-		WritableFont boldFont12 = new WritableFont(WritableFont.TIMES, 12,
-				WritableFont.BOLD, false);
-		WritableCellFormat boldCellFormat12 = new WritableCellFormat(boldFont12);
-
 		int row = 0;
+		WritableCellFormat[] formats = createCellFormats();
 		
 		
 		//General evaluation
-		Label lblGeneral = new Label(0, row, "General evaluation", boldCellFormat14);
+		Label lblGeneral = new Label(0, row, "General evaluation", formats[3]);
 		sheet.addCell(lblGeneral);
 		row ++;
 		int count = createDatasetExcel(sheet, row, 0);
@@ -880,56 +1009,60 @@ public class MetricsUtil {
 		
 		
 		//Dataset evaluation
-		Label lblDsDetails = new Label(0, row, "Datasets evaluation", boldCellFormat14);
+		Label lblDsDetails = new Label(0, row, "Datasets evaluation", formats[3]);
 		sheet.addCell(lblDsDetails);
-		row ++;
 		List<String> algNameList = this.metrics.getAlgNameList();
 		Collections.sort(algNameList);
 		List<Integer> datasetIdList = this.metrics.getDatasetIdList();
 		Collections.sort(datasetIdList);
-		int maxCount = 0;
+		row++;
 		int col = 0;
 		for (int datasetId : datasetIdList) {
-			Label lblDataset = new Label(col, row, "Dataset \"" + datasetId + "\"", boldCellFormat12);
+			row ++;
+			Label lblDataset = new Label(col, row, "Dataset \"" + datasetId + "\"", formats[1]);
 			sheet.addCell(lblDataset);
 			
-			count = createDatasetExcel(sheet, datasetId, row + 1, col);
-			col += algNameList.size() + 3;
-			
-			if (maxCount < count)
-				maxCount = count;
+			row++;
+			count = createDatasetExcel(sheet, datasetId, row, col);
+			row += count;
 		}
-		maxCount++;
-		row += maxCount + 2;
+		row += 2;
 		
 		
 		// Evaluation on each metric
 		List<String> metricNameList = this.metrics.getMetricNameList();
 		Collections.sort(metricNameList);
 		for (String metricName : metricNameList) {
-			Label lblMetricName = new Label(0, row, metricName + " evaluation", boldCellFormat14);
+			Label lblMetricName = new Label(0, row, metricName + " evaluation", formats[3]);
 			sheet.addCell(lblMetricName);
 			row ++;
 			row += createMetricExcel(sheet, metricName, row, 0) + 2;
 		}
 
 		
+		// Evaluation information
+		Label lblEvInfo = new Label(0, row, "Evaluation information", formats[3]);
+		sheet.addCell(lblEvInfo);
+		row ++;
+		row += createEvaluateInfoExcel(sheet, row, col) + 2;
+
+		
 		// Algorithm parameters
-		Label lblParameters = new Label(0, row, "Algorithm parameters", boldCellFormat14);
+		Label lblParameters = new Label(0, row, "Algorithm parameters", formats[3]);
 		sheet.addCell(lblParameters);
 		row ++;
 		row += createAlgParamsExcel(sheet, row, col) + 2;
 		
 		
 		// Algorithm descriptions
-		Label lblDescs = new Label(0, row, "Algorithm descriptions", boldCellFormat14);
+		Label lblDescs = new Label(0, row, "Algorithm descriptions", formats[3]);
 		sheet.addCell(lblDescs);
 		row ++;
 		row += createAlgDescsExcel(sheet, row, 0) + 2;
 		
 		
 		// Note
-		Label lblNote = new Label(0, row, "Note", boldCellFormat12);
+		Label lblNote = new Label(0, row, "Note", formats[1]);
 		sheet.addCell(lblNote);
 		row ++;
 		row += createNoteExcel(sheet, row, 0) + 2;
@@ -1034,6 +1167,17 @@ public class MetricsUtil {
 		} // metric name iteration
 		
 		
+		if (referredEvaluator != null) {
+			EvaluateInfo otherResult = referredEvaluator.getOtherResult();
+
+			buffer.append("\n\n\nEvaluation information");
+			buffer.append("\n  Total records: " + otherResult.progressTotal);
+			buffer.append("\n  Evaluated records: " + otherResult.progressStep);
+			buffer.append("\n  Evaluation percentage: " + MathUtil.round((double)otherResult.progressStep / otherResult.progressTotal * 100.0) + "%");
+			buffer.append("\n  Elapsed time: " + Counter.formatTimeInterval(otherResult.elapsedTime));
+		}
+
+		
 		// Algorithm parameters
 		buffer.append("\n\n\nAlgorithm parameters");
 		for (String algName : algNameList) {
@@ -1079,10 +1223,24 @@ public class MetricsUtil {
 
 		
 		buffer.append("\n\n\nNote");
+		buffer.append(createNote());
+		
+		return buffer.toString();
+	}
+
+	
+	/**
+	 * Creating evaluation note.
+	 * @return evaluation note as text buffer.
+	 */
+	public StringBuffer createNote() {
+		StringBuffer buffer = new StringBuffer();
+		List<Integer> datasetIdList = this.metrics.getDatasetIdList();
+		
 		for (int datasetId : datasetIdList) {
 			xURI datasetUri = this.metrics.getDatasetUri(datasetId);
 			if (datasetUri != null) {
-				buffer.append("\n  Dataset \"" + datasetId + "\" has path \"" + datasetUri + "\"");
+				buffer.append("\n  Testing dataset \"" + datasetId + "\" has path \"" + datasetUri + "\"");
 			}
 		}
 		buffer.append("\n\n");
@@ -1096,9 +1254,9 @@ public class MetricsUtil {
 			buffer.append("  " + key + ": " + sysProps.getAsString(key));
 		}
 		
-		return buffer.toString();
+		return buffer;
 	}
-
+	
 	
 	/**
 	 * Exporting (saving) metrics evaluation to excel file or plain text.

@@ -319,4 +319,18 @@ public class Counter extends AbstractRunner implements Serializable {
 	}
 	
 	
+    /**
+	 * Formatting miliseconds in time interval.
+	 * @param milis specified miliseconds. 
+	 * @return interval format text of specified miliseconds.
+	 */
+	public static String formatTimeInterval(long milis) {
+		long timeSum = milis / 1000;
+		long hours = timeSum / 3600;
+		long minutes = (timeSum % 3600) / 60;
+		long seconds = (timeSum % 3600) % 60;
+		return hours + " hours " + minutes + " minutes " + seconds + " seconds";
+	}
+
+
 }

@@ -718,7 +718,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 		this.paneResult = new JPanel(new BorderLayout());
 		footer.add(this.paneResult, BorderLayout.CENTER);
 		
-		this.tblMetrics = new MetricsTable(new RegisterTable(Arrays.asList(getAlg()))) {
+		this.tblMetrics = new MetricsTable(new RegisterTable(Arrays.asList(getAlg())), evaluator) {
 
 			/**
 			 * Serial version UID for serializable class.
@@ -780,7 +780,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 				// TODO Auto-generated method stub
 				if (result != null) {
 					try {
-						new MetricsAnalyzeDlg(getThisGUI(), result, new RegisterTable(Arrays.asList(getAlg())));
+						new MetricsAnalyzeDlg(getThisGUI(), result, new RegisterTable(Arrays.asList(getAlg())), evaluator);
 					} catch (Exception ex) {
 						ex.printStackTrace();
 						result = null;
@@ -1270,9 +1270,8 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 	@Override
 	public synchronized void receivedSetup(SetupAlgEvent evt) throws RemoteException {
 		// TODO Auto-generated method stub
-		Alg alg = evt.getAlg();
-		if (alg == null) return;
-		String algName = alg.getName();
+		String algName = evt.getAlgName();
+		if (algName == null) return;
 
 		if (evt.getType() == SetupAlgEvent.Type.doing) {
 			this.statusBar.setTextPane1(I18nUtil.message("setting_up_algorithm") + " '" + DSUtil.shortenVerbalName(algName) + "'. " + I18nUtil.message("please_wait") + "...");
@@ -1295,7 +1294,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 				saveResultSummary = evaluator.getConfig().isSaveResultSummary();
 			} catch (Throwable e) {e.printStackTrace();}
 
-			evProcessor.saveSetupResult(this.txtRunSaveBrowse.getText(), evt, algName, saveResultSummary, EV_RESULT_FILENAME_PREFIX);
+			evProcessor.saveSetupResult(this.txtRunSaveBrowse.getText(), evt, saveResultSummary, EV_RESULT_FILENAME_PREFIX);
 		}
 		
 	}

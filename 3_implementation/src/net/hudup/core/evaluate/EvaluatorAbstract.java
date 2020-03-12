@@ -126,6 +126,12 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 
 
 	/**
+	 * Flag to indicate whether the evaluator is agent. The agent evaluator runs on server.
+	 */
+	protected boolean isAgent = false;
+	
+	
+	/**
 	 * Configuration of this evaluator.
 	 */
 	protected EvaluatorConfig config = null;
@@ -195,7 +201,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
     /**
      * Evaluation processor.
      */
-    protected EvaluateProcessor evProcessor = new EvaluateProcessor();
+    protected EvaluateProcessor evProcessor = null;
     
     
 	/**
@@ -227,6 +233,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 			e.printStackTrace();
 		}
 		
+		this.evProcessor = new EvaluateProcessor(this);
 		this.counter = new Counter(otherResult);
 	}
 	
@@ -268,7 +275,9 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 		this.parameter = parameter;
 		this.result = null;
 		
+		String evStorePath = this.otherResult.evStorePath;
 		this.otherResult.reset();
+		this.otherResult.evStorePath = evStorePath;
 		this.otherResult.algNames = Util.newList(this.algList.size());
 		for (Alg alg : this.algList) {
 			this.otherResult.algNames.add(alg.getName());
@@ -898,6 +907,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 				saveResultSummary = config.isSaveResultSummary();
 			} catch (Throwable e) {e.printStackTrace();}
 			
+			evt.setMetrics(result); //Important code line, saving all metrics.
 			evProcessor.saveEvaluateResult(otherResult.evStorePath, evt, algList, saveResultSummary);
 		}
 		
@@ -917,7 +927,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 			if (!backupAdapter.exists(backupDir)) backupAdapter.create(backupDir, true);
 			xURI analyzeBackupFile = backupDir.concat("evaluator-analyze-backup-" + new Date().getTime() + "." + Constants.DEFAULT_EXT);
 			
-			MetricsUtil util = new MetricsUtil(this.result, new RegisterTable(this.algList));
+			MetricsUtil util = new MetricsUtil(this.result, new RegisterTable(this.algList), this);
 			Writer writer = backupAdapter.getWriter(analyzeBackupFile, false);
 			writer.write(util.createPlainText());
 			writer.close();
@@ -1026,7 +1036,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 				saveResultSummary = config.isSaveResultSummary();
 			} catch (Throwable e) {e.printStackTrace();}
 
-			evProcessor.saveSetupResult(otherResult.evStorePath, evt, evt.getAlg().getName(), saveResultSummary);
+			evProcessor.saveSetupResult(otherResult.evStorePath, evt, saveResultSummary);
 		}
 		
 		
@@ -1146,14 +1156,14 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 	@Override
 	public boolean isAgent() throws RemoteException {
 		// TODO Auto-generated method stub
-		return config.isAgent();
+		return isAgent;
 	}
 
 
 	@Override
-	public synchronized void setAgent(boolean agent) throws RemoteException {
+	public synchronized void setAgent(boolean isAgent) throws RemoteException {
 		// TODO Auto-generated method stub
-		config.setAgent(agent);
+		this.isAgent = isAgent;
 	}
 
 

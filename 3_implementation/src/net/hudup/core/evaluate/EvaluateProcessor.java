@@ -7,7 +7,6 @@
  */
 package net.hudup.core.evaluate;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.ByteChannel;
 import java.util.List;
@@ -70,10 +69,27 @@ public class EvaluateProcessor {
 
 	
 	/**
+	 * Referred evaluator.
+	 */
+	protected Evaluator referredEvaluator = null;
+	
+	
+	/**
 	 * Default constructor.
 	 */
 	public EvaluateProcessor() {
 		// TODO Auto-generated constructor stub
+		this(null);
+	}
+
+	
+	/**
+	 * Default constructor with referred evaluator.
+	 * @param referredEvaluator referred evaluator.
+	 */
+	public EvaluateProcessor(Evaluator referredEvaluator) {
+		// TODO Auto-generated constructor stub
+		this.referredEvaluator = referredEvaluator;
 	}
 
 	
@@ -93,10 +109,10 @@ public class EvaluateProcessor {
 	 * @param storePath directory path to store evaluation results.
 	 * @param evt evaluation event.
 	 * @param algs list of algorithms.
-	 * @param fastsave fast saving mode.
+	 * @param saveResultSummary fast saving mode.
 	 */
-	public void saveEvaluateResult(String storePath, EvaluateEvent evt, List<Alg> algs, boolean fastsave) {
-		saveEvaluateResult(storePath, evt, algs, fastsave, null);
+	public void saveEvaluateResult(String storePath, EvaluateEvent evt, List<Alg> algs, boolean saveResultSummary) {
+		saveEvaluateResult(storePath, evt, algs, saveResultSummary, null);
 	}
 	
 	
@@ -113,60 +129,65 @@ public class EvaluateProcessor {
 		storePath = storePath.trim();
 		
 		prefix = (prefix != null && !prefix.isEmpty() ? prefix + "-" : "");
-		try {
-			xURI store = xURI.create(storePath);
-			UriAdapter adapter = new UriAdapter(store);
-			boolean existed = adapter.exists(store);
-			if (!existed)
-				adapter.create(store, true);
-			adapter.close();
-			
-			if (!saveResultSummary) {
-				for (Alg alg : algs) {
-					if (evt.getType() == Type.done) {
-						String key = prefix + alg.getName() + EVALUATION_FILE_EXTENSION;
+		xURI store = xURI.create(storePath);
+		UriAdapter adapter = new UriAdapter(store);
+		boolean existed = adapter.exists(store);
+		if (!existed)
+			adapter.create(store, true);
+		adapter.close();
+		
+		List<String> algNames = evt.getMetrics().getAlgNameList();
+		if (!saveResultSummary) {
+			for (String algName : algNames) {
+				if (evt.getType() == Type.done) {
+					String key = prefix + algName + EVALUATION_FILE_EXTENSION;
+					try {
 						ByteChannel channel = getIOChannel(store, key, true);
-						
-						String info = evt.translate(alg.getName(), -1) + "\n\n\n\n";
+						String info = evt.translate(algName, -1) + "\n\n\n\n";
 						ByteBuffer buffer = ByteBuffer.wrap(info.getBytes());
 						channel.write(buffer);
-					}
-					else {
-						Map<Integer, Metrics> map = evt.getMetrics().gets(alg.getName());
-						Set<Integer> datasetIdList = map.keySet();
-						for (int datasetId : datasetIdList) {
-							String key = prefix + alg.getName() + "@" + datasetId + EVALUATION_FILE_EXTENSION;
+					} catch (Throwable e) {e.printStackTrace();}
+				}
+				else {
+					Map<Integer, Metrics> map = evt.getMetrics().gets(algName);
+					Set<Integer> datasetIdList = map.keySet();
+					for (int datasetId : datasetIdList) {
+						String key = prefix + algName + "@" + datasetId + EVALUATION_FILE_EXTENSION;
+						try {
 							ByteChannel channel = getIOChannel(store, key, true);
-	
-							String info = evt.translate(alg.getName(), datasetId) + "\n\n\n\n";
+							String info = evt.translate(algName, datasetId) + "\n\n\n\n";
 							ByteBuffer buffer = ByteBuffer.wrap(info.getBytes());
 							channel.write(buffer);
-							
-							if (evt.getType() == Type.done_one)
-								closeIOChannel(key);
-						}
+						} catch (Throwable e) {e.printStackTrace();}
+						
+						if (evt.getType() == Type.done_one)
+							closeIOChannel(key);
 					}
 				}
 			}
-			
+		}
+		
+	    // Exporting excel file
+		if (evt.getType() == Type.done || evt.getType() == Type.done_one) {
 		    // Exporting excel file
-			if (evt.getType() == Type.done || evt.getType() == Type.done_one) {
-			    // Exporting excel file
-				MetricsUtil util = new MetricsUtil(evt.getMetrics(), new RegisterTable(algs));
+			MetricsUtil util = new MetricsUtil(evt.getMetrics(), new RegisterTable(algs), referredEvaluator);
+			
+			try {
 				util.createExcel(store.concat(prefix + METRICS_ANALYZE_EXCEL_FILE_NAME));
-				// Begin exporting plain text. It is possible to remove this snippet.
-				ByteChannel channel = getIOChannel(store, prefix + METRICS_ANALYZE_EXCEL_FILE_NAME2, false);
+			} catch (Throwable e) {e.printStackTrace();}
+			
+			// Begin exporting plain text. It is possible to remove this snippet.
+			String key = prefix + METRICS_ANALYZE_EXCEL_FILE_NAME2;
+			try {
+				ByteChannel channel = getIOChannel(store, key, false);
 				ByteBuffer buffer = ByteBuffer.wrap(util.createPlainText().getBytes());
 				channel.write(buffer);
-				closeIOChannel(METRICS_ANALYZE_EXCEL_FILE_NAME2);
-				// End exporting plain text. It is possible to remove this snippet.
-				
-				if (evt.getType() == Type.done)
-					closeIOChannels();
-			}
-		} 
-		catch (Exception e) {
-			e.printStackTrace();
+			} catch (Throwable e) {e.printStackTrace();}
+			closeIOChannel(key);
+			// End exporting plain text. It is possible to remove this snippet.
+			
+			if (evt.getType() == Type.done)
+				closeIOChannels();
 		}
 	}
 	
@@ -175,10 +196,9 @@ public class EvaluateProcessor {
 	 * Saving setting up results.
 	 * @param storePath directory path to store setting up results.
 	 * @param evt setting up event.
-	 * @param algName list of algorithm name.
 	 */
-	public void saveSetupResult(String storePath, SetupAlgEvent evt, String algName) {
-		saveSetupResult(storePath, evt, algName, false, null);
+	public void saveSetupResult(String storePath, SetupAlgEvent evt) {
+		saveSetupResult(storePath, evt, false, null);
 	}
 
 	
@@ -186,11 +206,10 @@ public class EvaluateProcessor {
 	 * Saving setting up results.
 	 * @param storePath directory path to store setting up results.
 	 * @param evt setting up event.
-	 * @param algName list of algorithm name.
 	 * @param saveResultSummary fast saving mode.
 	 */
-	public void saveSetupResult(String storePath, SetupAlgEvent evt, String algName, boolean saveResultSummary) {
-		saveSetupResult(storePath, evt, algName, saveResultSummary, null);
+	public void saveSetupResult(String storePath, SetupAlgEvent evt, boolean saveResultSummary) {
+		saveSetupResult(storePath, evt, saveResultSummary, null);
 	}
 	
 	
@@ -198,42 +217,40 @@ public class EvaluateProcessor {
 	 * Saving setting up results.
 	 * @param storePath directory path to store setting up results.
 	 * @param evt setting up event.
-	 * @param algName list of algorithm name.
 	 * @param saveResultSummary fast saving mode.
 	 * @param prefix prefix of file name.
 	 */
-	public void saveSetupResult(String storePath, SetupAlgEvent evt, String algName, boolean saveResultSummary, String prefix) {
+	public void saveSetupResult(String storePath, SetupAlgEvent evt, boolean saveResultSummary, String prefix) {
 		if (storePath == null) return;
 		if (saveResultSummary && (evt.getType() != SetupAlgEvent.Type.done))
 			return;
 
 		storePath = storePath.trim();
 		
+		String algName = evt.getAlgName();
 		String info = "========== Algorithm \"" + algName + "\" ==========\n";
 		info = info + evt.translate() + "\n\n\n\n";
 		
 		prefix = (prefix != null && !prefix.isEmpty() ? prefix + "-" : "");
-		try {
-			xURI store = xURI.create(storePath);
-			UriAdapter adapter = new UriAdapter(store);
-			boolean existed = adapter.exists(store);
-			if (!existed) adapter.create(store, true);
-			adapter.close();
+		xURI store = xURI.create(storePath);
+		UriAdapter adapter = new UriAdapter(store);
+		boolean existed = adapter.exists(store);
+		if (!existed) adapter.create(store, true);
+		adapter.close();
+		
+		String key = prefix + algName;
+		if (evt.getType() == SetupAlgEvent.Type.doing)
+			key += EvaluateProcessor.SETUP_DOING_FILE_EXTENSION;
+		else
+			key += EvaluateProcessor.SETUP_DONE_FILE_EXTENSION;
 			
-			String key = prefix + algName;
-			if (evt.getType() == SetupAlgEvent.Type.doing)
-				key += EvaluateProcessor.SETUP_DOING_FILE_EXTENSION;
-			else
-				key += EvaluateProcessor.SETUP_DONE_FILE_EXTENSION;
-				
+		try {
 			ByteChannel channel = getIOChannel(store, key, true);
 			ByteBuffer buffer = ByteBuffer.wrap(info.getBytes());
 			channel.write(buffer);
-			closeIOChannel(key);
-		} 
-		catch (Exception e) {
-			e.printStackTrace();
-		}
+		} catch (Throwable e) {e.printStackTrace();}
+		
+		closeIOChannel(key);
 	}
 
 		
@@ -286,19 +303,19 @@ public class EvaluateProcessor {
 		if (!ioChannels.containsKey(key))
 			return false;
 		
+		ByteChannel channel = ioChannels.get(key);
+		boolean closed = true;
 		try {
-			ByteChannel channel = ioChannels.get(key);
 			channel.close();
-			ioChannels.remove(key);
-			
-			return true;
 		}
-		catch (IOException e) {
+		catch (Throwable e) {
 			e.printStackTrace();
+			closed = false;
 		}
+		ioChannels.remove(key);
 		
-		return false;
-		
+		return closed;
+
 	}
 	
 	
@@ -308,6 +325,7 @@ public class EvaluateProcessor {
 	public void clear() {
 		// TODO Auto-generated method stub
 		closeIOChannels();
+		referredEvaluator = null;
 	}
 
 

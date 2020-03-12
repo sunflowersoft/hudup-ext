@@ -341,10 +341,10 @@ public class DataConfig extends PropList {
 	public final static String DELAY_UNSETUP                 = changeCase("delay_unsetup");
 
 	
-	/**
-	 * This constant specifies agent field. If this field is true, the object is agent.
-	 */
-	public final static String AGENT_FIELD                   = changeCase("agent");
+//	/**
+//	 * This constant specifies agent field. If this field is true, the object is agent.
+//	 */
+//	public final static String AGENT_FIELD                   = changeCase("agent");
 
 	
 	/**

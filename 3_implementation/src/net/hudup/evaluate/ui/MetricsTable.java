@@ -22,6 +22,7 @@ import javax.swing.table.TableCellRenderer;
 
 import net.hudup.core.RegisterTable;
 import net.hudup.core.Util;
+import net.hudup.core.evaluate.Evaluator;
 import net.hudup.core.evaluate.Metric;
 import net.hudup.core.evaluate.MetricValue;
 import net.hudup.core.evaluate.MetricWrapper;
@@ -50,11 +51,28 @@ public class MetricsTable extends SortableTable {
 	
 	
 	/**
+	 * Default constructor.
+	 */
+	public MetricsTable() {
+		this(null, null);
+	}
+
+	
+	/**
 	 * Constructor with algorithm table.
-	 * 
 	 * @param algTable specified algorithm table.
 	 */
-	public MetricsTable(final RegisterTable algTable) {
+	public MetricsTable(RegisterTable algTable) {
+		this(algTable, null);
+	}
+	
+	
+	/**
+	 * Constructor with algorithm table and referred evaluator.
+	 * @param algTable specified algorithm table.
+	 * @param referredEvaluator referred evaluator.
+	 */
+	public MetricsTable(final RegisterTable algTable, final Evaluator referredEvaluator) {
 		// TODO Auto-generated constructor stub
 		super (new MetricsTM());
 		
@@ -87,7 +105,7 @@ public class MetricsTable extends SortableTable {
 							
 							@Override
 							public void actionPerformed(ActionEvent e) {
-								MetricsUtil util = new MetricsUtil(metrics, algTable);
+								MetricsUtil util = new MetricsUtil(metrics, algTable, referredEvaluator);
 								util.export(getThis());
 							}
 						});

@@ -124,7 +124,7 @@ public class Evaluator implements AccessPoint {
 				workingAdapter.create(analyzeDir, true);
 			
 			final net.hudup.core.evaluate.Evaluator finalEv = ev;
-			ev.addEvaluateListener(new EvaluateListener() {
+			finalEv.addEvaluateListener(new EvaluateListener() {
 				
 				@Override
 				public void receivedEvaluation(EvaluateEvent evt) throws RemoteException {
@@ -133,7 +133,7 @@ public class Evaluator implements AccessPoint {
 						return;
 					
 					try {
-						MetricsUtil util = new MetricsUtil(finalEv.getResult(), new RegisterTable(algList));
+						MetricsUtil util = new MetricsUtil(finalEv.getResult(), new RegisterTable(algList), finalEv);
 						util.createExcel(analyzeDir.concat(EvaluateProcessor.METRICS_ANALYZE_EXCEL_FILE_NAME));
 						
 						Writer writer = workingAdapter.getWriter(analyzeDir.concat(EvaluateProcessor.METRICS_ANALYZE_EXCEL_FILE_NAME2), false);

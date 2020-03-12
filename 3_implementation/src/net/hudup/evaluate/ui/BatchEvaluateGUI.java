@@ -743,7 +743,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 		this.paneResult = new JPanel(new BorderLayout());
 		footer.add(this.paneResult, BorderLayout.CENTER);
 		
-		this.tblMetrics = new MetricsTable(new RegisterTable(lbAlgs.getAlgList())) {
+		this.tblMetrics = new MetricsTable(new RegisterTable(lbAlgs.getAlgList()), evaluator) {
 
 			/**
 			 * Serial version UID for serializable class.
@@ -805,7 +805,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 				// TODO Auto-generated method stub
 				if (result != null) {
 					try {
-						new MetricsAnalyzeDlg(getThisGUI(), result, new RegisterTable(lbAlgs.getAlgList()));
+						new MetricsAnalyzeDlg(getThisGUI(), result, new RegisterTable(lbAlgs.getAlgList()), evaluator);
 					}
 					catch (Exception ex) {
 						ex.printStackTrace();
@@ -1061,9 +1061,8 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 	@Override
 	public synchronized void receivedSetup(SetupAlgEvent evt) throws RemoteException {
 		// TODO Auto-generated method stub
-		Alg alg = evt.getAlg();
-		if (alg == null) return;
-		String algName = alg.getName();
+		String algName = evt.getAlgName();
+		if (algName == null) return;
 
 		if (evt.getType() == SetupAlgEvent.Type.doing) {
 			this.statusBar.setTextPane1(I18nUtil.message("setting_up_algorithm") + " '" + DSUtil.shortenVerbalName(algName) + "'. " + I18nUtil.message("please_wait") + "...");
@@ -1086,7 +1085,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 				saveResultSummary = evaluator.getConfig().isSaveResultSummary();
 			} catch (Throwable e) {e.printStackTrace();}
 
-			evProcessor.saveSetupResult(txtRunSaveBrowse.getText(), evt, algName, saveResultSummary, EV_RESULT_FILENAME_PREFIX);
+			evProcessor.saveSetupResult(txtRunSaveBrowse.getText(), evt, saveResultSummary, EV_RESULT_FILENAME_PREFIX);
 		}
 	}
 	

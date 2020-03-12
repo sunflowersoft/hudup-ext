@@ -25,6 +25,7 @@ import javax.swing.JScrollPane;
 
 import flanagan.plot.PlotGraph;
 import net.hudup.core.RegisterTable;
+import net.hudup.core.evaluate.Evaluator;
 import net.hudup.core.evaluate.Metrics;
 import net.hudup.core.evaluate.MetricsUtil;
 import net.hudup.core.logistic.xURI;
@@ -59,17 +60,48 @@ public class MetricsGraphDlg extends JDialog {
 
 	
 	/**
+	 * Referred evaluator.
+	 */
+	private Evaluator referredEvaluator = null;
+
+	
+	/**
+	 * Constructor with metrics.
+	 * @param comp parent component.
+	 * @param metrics metrics.
+	 * @throws RemoteException if any error raises.
+	 */
+	public MetricsGraphDlg(Component comp, Metrics metrics) throws RemoteException {
+		this(comp, metrics, null, null);
+	}
+
+	
+	/**
 	 * Constructor with metrics and algorithm table.
 	 * @param comp parent component.
 	 * @param metrics metrics.
 	 * @param algTable algorithm table.
 	 * @throws RemoteException if any error raises.
 	 */
-	public MetricsGraphDlg(final Component comp, final Metrics metrics, final RegisterTable algTable) throws RemoteException {
+	public MetricsGraphDlg(Component comp, Metrics metrics, RegisterTable algTable) throws RemoteException {
+		this(comp, metrics, algTable, null);
+	}
+	
+	
+	/**
+	 * Constructor with metrics, algorithm table, and referred evaluator.
+	 * @param comp parent component.
+	 * @param metrics metrics.
+	 * @param algTable algorithm table.
+	 * @param referredEvaluator referred evaluator.
+	 * @throws RemoteException if any error raises.
+	 */
+	public MetricsGraphDlg(Component comp, final Metrics metrics, final RegisterTable algTable, Evaluator referredEvaluator) throws RemoteException {
 		super(UIUtil.getFrameForComponent(comp), "Metrics graph viewer", true);
 		this.metrics = metrics;
 		this.algTable = algTable;
-		final MetricsUtil util = new MetricsUtil(metrics, algTable);
+		this.referredEvaluator = referredEvaluator;
+		final MetricsUtil util = new MetricsUtil(metrics, algTable, referredEvaluator);
 		
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		setSize(600, 500);
@@ -203,7 +235,7 @@ public class MetricsGraphDlg extends JDialog {
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
 				try {
-					new MetricsAnalyzeDlg(comp, metrics, algTable);
+					new MetricsAnalyzeDlg(comp, metrics, algTable, referredEvaluator);
 				} catch (Exception ex) {ex.printStackTrace();}
 			}
 		});
@@ -225,10 +257,10 @@ public class MetricsGraphDlg extends JDialog {
 	
 	
 	/**
-	 * 
+	 * Exporting / aving metrics.
 	 */
 	private void export() {
-		MetricsUtil util = new MetricsUtil(metrics, algTable);
+		MetricsUtil util = new MetricsUtil(metrics, algTable, referredEvaluator);
 		util.export(this);
 	}
 	

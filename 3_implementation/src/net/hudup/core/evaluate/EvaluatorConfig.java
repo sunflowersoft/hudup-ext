@@ -60,10 +60,10 @@ public class EvaluatorConfig extends SysConfig {
 	public final static boolean RECOMMEND_ALL_DEFAULT = false;
 
 	
-	/**
-	 * By default, agent field is false. If agent mode is true, no GUI can close evaluator.
-	 */
-	public final static boolean EVALUATOR_AGENT_DEFAULT = false;
+//	/**
+//	 * By default, agent field is false. If agent mode is true, no GUI can close evaluator.
+//	 */
+//	public final static boolean EVALUATOR_AGENT_DEFAULT = false;
 
 	
 	/**
@@ -103,7 +103,7 @@ public class EvaluatorConfig extends SysConfig {
 		
 		setRecommendAll(RECOMMEND_ALL_DEFAULT);
 		setEvaluatorPort(Constants.DEFAULT_EVALUATOR_PORT);
-		setAgent(EVALUATOR_AGENT_DEFAULT);
+		//setAgent(EVALUATOR_AGENT_DEFAULT);
 		setSaveResultSummary(EVALUATOR_SAVE_RESULT_SUMMARY_DEFAULT);
 	}
 
@@ -154,22 +154,22 @@ public class EvaluatorConfig extends SysConfig {
 	}
 
 
-	/**
-	 * Checking whether the evaluator is agent. If the evaluator is agent, no GUI can close evaluator. 
-	 * @return whether the evaluator is agent.
-	 */
-	public boolean isAgent() {
-		return getAsBoolean(DataConfig.AGENT_FIELD);
-	}
-	
-	
-	/**
-	 * Setting whether the evaluator is agent. If the evaluator is agent, no GUI can close evaluator. 
-	 * @param agent agent mode.
-	 */
-	public void setAgent(boolean agent) {
-		put(DataConfig.AGENT_FIELD, agent);
-	}
+//	/**
+//	 * Checking whether the evaluator is agent. If the evaluator is agent, no GUI can close evaluator. 
+//	 * @return whether the evaluator is agent.
+//	 */
+//	public boolean isAgent() {
+//		return getAsBoolean(DataConfig.AGENT_FIELD);
+//	}
+//	
+//	
+//	/**
+//	 * Setting whether the evaluator is agent. If the evaluator is agent, no GUI can close evaluator. 
+//	 * @param isAgent agent mode.
+//	 */
+//	public void setAgent(boolean isAgent) {
+//		put(DataConfig.AGENT_FIELD, isAgent);
+//	}
 
 
 	/**

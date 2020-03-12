@@ -288,9 +288,9 @@ public class KBaseRemoteWrapper implements KBase, KBaseRemote {
 //
 //
 //	@Override
-//	public void setAgent(boolean agent) throws RemoteException {
+//	public void setAgent(boolean isAgent) throws RemoteException {
 //		// TODO Auto-generated method stub
-//		remoteKBase.setAgent(agent);
+//		remoteKBase.setAgent(isAgent);
 //	}
 
 

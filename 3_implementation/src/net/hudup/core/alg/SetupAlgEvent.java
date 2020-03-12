@@ -59,6 +59,12 @@ public class SetupAlgEvent extends EventObject {
 	
 	
 	/**
+	 * Name of algorithm issuing the setup result.
+	 */
+	protected String algName = null;
+
+	
+	/**
 	 * Training dataset. It must be serializable in remote call.
 	 */
 	protected Dataset trainingDataset = null;
@@ -82,6 +88,8 @@ public class SetupAlgEvent extends EventObject {
 		super(source);
 		// TODO Auto-generated constructor stub
 		this.alg = alg;
+		if (alg != null)
+			this.algName = alg.getName();
 		this.type = type;
 		this.trainingDataset = trainingDataset;
 		this.setupResult = setupResult;
@@ -103,6 +111,15 @@ public class SetupAlgEvent extends EventObject {
 	 */
 	public Alg getAlg() {
 		return alg;
+	}
+
+	
+	/**
+	 * Getting name of algorithm that issues the setup result.
+	 * @return name of algorithm that issues the setup result.
+	 */
+	public String getAlgName() {
+		return algName;
 	}
 
 	

@@ -214,9 +214,9 @@ public abstract class AlgAbstract implements Alg, AlgRemote {
 //
 //
 //	@Override
-//	public void setAgent(boolean agent) throws RemoteException {
+//	public void setAgent(boolean isAgent) throws RemoteException {
 //		// TODO Auto-generated method stub
-//		config.put(DataConfig.AGENT_FIELD, agent);
+//		config.put(DataConfig.AGENT_FIELD, isAgent); //Should use variable instead.
 //	}
 
 

@@ -8,17 +8,13 @@
 package net.hudup.evaluate.ui;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.Container;
 import java.awt.Image;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.rmi.RemoteException;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -32,7 +28,6 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JTabbedPane;
-import javax.swing.SwingUtilities;
 
 import net.hudup.core.Constants;
 import net.hudup.core.PluginChangedEvent;
@@ -149,22 +144,22 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 		
 		setTitle(I18nUtil.message("evaluator"));
 		
-		this.body.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				if(!SwingUtilities.isRightMouseButton(e)) return;
-				JPopupMenu contextMenu = createContextMenu();
-				if (contextMenu != null) contextMenu.show((Component)e.getSource(), e.getX(), e.getY());
-			}
-		});
-		this.batchEvaluateGUI.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				if(!SwingUtilities.isRightMouseButton(e)) return;
-				JPopupMenu contextMenu = createContextMenu();
-				if (contextMenu != null) contextMenu.show((Component)e.getSource(), e.getX(), e.getY());
-			}
-		});
+//		this.body.addMouseListener(new MouseAdapter() {
+//			@Override
+//			public void mouseClicked(MouseEvent e) {
+//				if(!SwingUtilities.isRightMouseButton(e)) return;
+//				JPopupMenu contextMenu = createContextMenu();
+//				if (contextMenu != null) contextMenu.show((Component)e.getSource(), e.getX(), e.getY());
+//			}
+//		});
+//		this.batchEvaluateGUI.addMouseListener(new MouseAdapter() {
+//			@Override
+//			public void mouseClicked(MouseEvent e) {
+//				if(!SwingUtilities.isRightMouseButton(e)) return;
+//				JPopupMenu contextMenu = createContextMenu();
+//				if (contextMenu != null) contextMenu.show((Component)e.getSource(), e.getX(), e.getY());
+//			}
+//		});
 		
 		setVisible(true);
 	}
@@ -203,29 +198,25 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 				}
 			
 			});
-		
 		mnTools.add(mniSysConfig);
 
-		try {
-			if (!batchEvaluateGUI.evaluator.isAgent() || batchEvaluateGUI.bindUri != null) {
-				JMenuItem mniSwitchEvaluator = new JMenuItem(
-					new AbstractAction(I18nUtil.message("switch_evaluator")) {
+		if (batchEvaluateGUI.guiData.switchable) {
+			JMenuItem mniSwitchEvaluator = new JMenuItem(
+				new AbstractAction(I18nUtil.message("switch_evaluator")) {
 
-						/**
-						 * Serial version UID for serializable class. 
-						 */
-						private static final long serialVersionUID = 1L;
+					/**
+					 * Serial version UID for serializable class. 
+					 */
+					private static final long serialVersionUID = 1L;
 
-						@Override
-						public void actionPerformed(ActionEvent e) {
-							switchEvaluator();
-						}
-					
-					});
-				mnTools.add(mniSwitchEvaluator);
-			}
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						switchEvaluator();
+					}
+				
+				});
+			mnTools.add(mniSwitchEvaluator);
 		}
-		catch (RemoteException e) {e.printStackTrace();}
 			
 
 		JMenu mnHelp = new JMenu(I18nUtil.message("help"));
@@ -245,7 +236,6 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 				}
 			
 			});
-		
 		mnHelp.add(mniHelpContent);
 
 		
@@ -257,8 +247,20 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 	 * Create context menu.
 	 * @return context menu.
 	 */
+	@SuppressWarnings("unused")
 	private JPopupMenu createContextMenu() {
 		if (!isIdle()) return null;
+		
+		boolean agent = false;
+		try {
+			agent = batchEvaluateGUI.evaluator.isAgent();
+		}
+		catch (Throwable e) {
+			e.printStackTrace();
+		}
+		if (agent && batchEvaluateGUI.bindUri == null)
+			return null;
+
 		JPopupMenu contextMenu = new JPopupMenu();
 		
 		JMenuItem mniPluginConfig = UIUtil.makeMenuItem(null, I18nUtil.message("plugin_manager"), 
@@ -317,27 +319,42 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 			return;
 		}
 		
+		boolean agent = false;
+		try {
+			agent = batchEvaluateGUI.evaluator.isAgent();
+		}
+		catch (Throwable e) {
+			e.printStackTrace();
+		}
+		
 		SysConfigDlgExt cfg = new SysConfigDlgExt(this, I18nUtil.message("system_configure"), this);
 		cfg.update(thisConfig);
+		if (agent && batchEvaluateGUI.bindUri == null)
+			cfg.removePluginStorageManifest();
+		
 		cfg.setVisible(true);
 	}
 
 
 	@Override
 	public void dispose() {
-		boolean agent = false;
 		try {
-			agent = batchEvaluateGUI.evaluator.isAgent();
-		} 
-		catch (Exception e) {e.printStackTrace();}
-
-		batchEvaluateGUI.dispose();
-		try {
+			boolean agent = false;
+			try {
+				agent = batchEvaluateGUI.evaluator.isAgent();
+			} 
+			catch (Exception e) {e.printStackTrace();}
+	
+			batchEvaluateGUI.dispose();
 			if (!agent || batchEvaluateGUI.bindUri != null)
 				PluginStorage.clear();
-		} catch (Exception e) {e.printStackTrace();}
-		
-		super.dispose();
+			
+			super.dispose();
+		}
+		catch (Throwable e) {
+			if (batchEvaluateGUI.bindUri != null)
+				System.exit(0);
+		}
 	}
 
 

@@ -78,11 +78,11 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	/**
 	 * Processor to process evaluation results.
 	 */
-	protected EvaluateProcessor evProcessor = new EvaluateProcessor();
+	protected EvaluateProcessor evProcessor = null;
 	
 	
 	/**
-	 * Remote bind URI.
+	 * Remote bind URI. This is exactly bound URI of this GUI. If this bound URI is not null, the remote evaluator connects to this GUI vis this bound URI.
 	 */
 	protected xURI bindUri = null;
 	
@@ -194,10 +194,13 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 		setupListeners(evaluator);
 		
 		this.evaluator = evaluator;
+		this.evProcessor = new EvaluateProcessor(evaluator);
 		
 		//Current version only update normal algorithm and metric plug-in
-		PluginStorage.updateFromEvaluator(evaluator, Alg.class);
-		PluginStorage.updateFromEvaluator(evaluator, Metric.class);
+		if (bindUri != null) { //Only remote
+			PluginStorage.updateFromEvaluator(evaluator, Alg.class);
+			PluginStorage.updateFromEvaluator(evaluator, Metric.class);
+		}
 
 		if (referredAlg != null) {
 			try {

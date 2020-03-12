@@ -74,6 +74,7 @@ import net.hudup.core.data.DataDriver.DataType;
 import net.hudup.core.data.DataDriverList;
 import net.hudup.core.data.Exportable;
 import net.hudup.core.data.HiddenText;
+import net.hudup.core.evaluate.Evaluator;
 import net.hudup.core.evaluate.MetaMetric;
 import net.hudup.core.evaluate.Metric;
 import net.hudup.core.evaluate.MetricValue;
@@ -1608,11 +1609,28 @@ class MetricsTable2 extends JTable {
 	
 	
 	/**
+	 * Default constructor.
+	 */
+	public MetricsTable2() {
+		this(null, null);
+	}
+
+	
+	/**
 	 * Constructor with algorithm table.
-	 * 
 	 * @param algTable specified algorithm table.
 	 */
-	public MetricsTable2(final RegisterTable algTable) {
+	public MetricsTable2(RegisterTable algTable) {
+		this(algTable, null);
+	}
+
+	
+	/**
+	 * Constructor with algorithm table and referred evaluator.
+	 * @param algTable specified algorithm table.
+	 * @param referredEvaluator referred evaluator.
+	 */
+	public MetricsTable2(final RegisterTable algTable, final Evaluator referredEvaluator) {
 		// TODO Auto-generated constructor stub
 		super (new MetricsTM2());
 		
@@ -1645,7 +1663,7 @@ class MetricsTable2 extends JTable {
 							
 							@Override
 							public void actionPerformed(ActionEvent e) {
-								MetricsUtil util = new MetricsUtil(metrics, algTable);
+								MetricsUtil util = new MetricsUtil(metrics, algTable, referredEvaluator);
 								util.export(getThis());
 							}
 						});
