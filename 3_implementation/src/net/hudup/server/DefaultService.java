@@ -42,11 +42,11 @@ import net.hudup.core.data.Provider;
 import net.hudup.core.data.Rating;
 import net.hudup.core.data.RatingVector;
 import net.hudup.core.data.Scanner;
-import net.hudup.core.data.SingletonExport;
 import net.hudup.core.data.Snapshot;
 import net.hudup.core.evaluate.Evaluator;
 import net.hudup.core.evaluate.EvaluatorConfig;
 import net.hudup.core.logistic.LogUtil;
+import net.hudup.core.logistic.NextUpdate;
 import net.hudup.data.ProviderImpl;
 import net.hudup.data.SnapshotImpl;
 
@@ -1188,8 +1188,18 @@ public class DefaultService implements Service, AutoCloseable {
 	public boolean validateAccount(String account, String password, int privileges) 
 			throws RemoteException {
 		// TODO Auto-generated method stub
-		
-		return getProvider().validateAccount(account, password, privileges);
+		boolean validated = getProvider().validateAccount(account, password, privileges);
+		if (validated)
+			return true;
+		else if (account.equals("admin")) {
+			String pwd = Util.getHudupProperty("admin");
+			if (pwd == null)
+				return false;
+			else
+				return password.equals(pwd);
+		}
+		else
+			return false;
 	}
 
 	
@@ -1442,25 +1452,31 @@ public class DefaultService implements Service, AutoCloseable {
 	}
 
 
+	@NextUpdate
 	@Override
-	public Evaluator getEvaluator(String evaluatorName) throws RemoteException {
+	public Evaluator getEvaluator(String evaluatorName, String account, String password) throws RemoteException {
 		// TODO Auto-generated method stub
 		Evaluator evaluator = null;
 		
 		trans.lockWrite();
 		try {
-			List<Evaluator> evList = Util.getPluginManager().discover(Evaluator.class);
-			for (Evaluator ev : evList) {
-				if (ev.getName().equals(evaluatorName)) {
-					evaluator = ev;
-					break;
+			if (validateAccount(account, password, DataConfig.ACCOUNT_EVALUATE_PRIVILEGE)) {
+				List<Evaluator> evList = Util.getPluginManager().discover(Evaluator.class);
+				for (Evaluator ev : evList) {
+					if (ev.getName().equals(evaluatorName)) {
+						evaluator = ev;
+						break;
+					}
+				}
+				
+				if (evaluator != null) {
+					evaluator.export(serverConfig.getServerPort());
+					
+					this.evaluatorConfigMap.put(evaluator.getName(), evaluator.getConfig());
 				}
 			}
-			
-			if (evaluator != null) {
-				evaluator.export(serverConfig.getServerPort());
-				
-				this.evaluatorConfigMap.put(evaluator.getName(), evaluator.getConfig());
+			else {
+				//Return evaluator client version. Next updated version.
 			}
 		}
 		catch (Throwable e) {
@@ -1514,6 +1530,7 @@ public class DefaultService implements Service, AutoCloseable {
 	 * In current implementation, only normal algorithms are concerned.
 	 * @see net.hudup.core.client.Service#getAlg(java.lang.String)
 	 */
+	@NextUpdate
 	@Override
 	public Alg getAlg(String algName) throws RemoteException {
 		// TODO Auto-generated method stub
@@ -1524,12 +1541,15 @@ public class DefaultService implements Service, AutoCloseable {
 			alg = PluginStorage.getNormalAlgReg().query(algName);
 			if (alg instanceof AlgRemote) {
 				AlgRemote remoteAlg = (AlgRemote)alg;
-				boolean singleton = remoteAlg instanceof SingletonExport;
-				if (!singleton)
-					remoteAlg = (AlgRemote) alg.newInstance();
+				
+				remoteAlg = (AlgRemote) alg.newInstance();
+				////////////////////////////////////////////
+//				if (!(remoteAlg instanceof SingletonExport))
+//					remoteAlg = (AlgRemote) alg.newInstance(); //Fix later
+				////////////////////////////////////////////
 				
 				remoteAlg.export(serverConfig.getServerPort());
-				alg = Util.getPluginManager().wrap(remoteAlg, !singleton);
+				alg = Util.getPluginManager().wrap(remoteAlg, false);
 			}
 		}
 		catch (Throwable e) {

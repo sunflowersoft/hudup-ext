@@ -478,7 +478,7 @@ public class AlgDesc2 extends AlgDesc {
 	 * @return whether specified algorithm is stored in next update list.
 	 */
 	public static boolean isInUpdateList(Alg alg) {
-		return PluginStorage.lookupNextUpdateList(alg.getClass(), alg.getName()) >= 0;
+		return PluginStorage.lookupNextUpdateListExact(alg.getClass(), alg.getName()) >= 0;
 	}
 
 

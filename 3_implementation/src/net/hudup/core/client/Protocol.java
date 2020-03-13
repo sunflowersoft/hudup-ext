@@ -402,7 +402,7 @@ public interface Protocol {
 	static final String GET_SESSION_ATTRIBUTE =             "get_session_attribute";
 	
 	/**
-	 * Action of request of getting evaluator. Such request is created by method {@link #createGetEvaluatorRequest(String)}.
+	 * Action of request of getting evaluator. Such request is created by method {@link #createGetEvaluatorRequest(String, String, String)}.
 	 */
 	static final String GET_EVALUATOR =                     "get_evaluator";
 
@@ -1035,9 +1035,11 @@ public interface Protocol {
 	/**
 	 * Creating a request for retrieving evaluator.
 	 * @param evaluatorName evaluator name.
+	 * @param account account with evaluation privilege.
+	 * @param password password.
 	 * @return a request for retrieving evaluator.
 	 */
-	Request createGetEvaluatorRequest(String evaluatorName);
+	Request createGetEvaluatorRequest(String evaluatorName, String account, String password);
 
 
 	/**

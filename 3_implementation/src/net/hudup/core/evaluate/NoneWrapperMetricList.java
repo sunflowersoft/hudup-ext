@@ -14,6 +14,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import net.hudup.core.Cloneable;
+import net.hudup.core.PluginStorage;
 import net.hudup.core.RegisterTable;
 import net.hudup.core.Util;
 import net.hudup.core.alg.Alg;
@@ -74,6 +75,31 @@ public class NoneWrapperMetricList implements Cloneable, Serializable {
 	 */
 	public List<Metric> list() {
 		return mlist;
+	}
+	
+	
+	/**
+	 * Getting the name list of internal metrics.
+	 * @return name list of internal metrics.
+	 */
+	public List<String> nameList() {
+		return MetricsUtil.extractMetricNameList(mlist);
+	}
+
+	
+	/**
+	 * Synchronize with plug-in storage.
+	 */
+	public void syncWithPlugin() {
+		List<Metric> tempList = Util.newList(mlist.size());
+		tempList.addAll(mlist);
+		
+		mlist.clear();
+		RegisterTable metricReg = PluginStorage.getMetricReg();
+		for (Metric metric : tempList) {
+			if (metricReg.contains(metric.getName()))
+				mlist.add((Metric)metricReg.query(metric.getName()));
+		}
 	}
 	
 	

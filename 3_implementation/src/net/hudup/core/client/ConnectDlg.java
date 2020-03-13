@@ -221,6 +221,18 @@ public abstract class ConnectDlg extends JDialog {
 	
 	
 	/**
+	 * Remote user name.
+	 */
+	protected String remoteUsername = null;
+	
+	
+	/**
+	 * Remote password.
+	 */
+	protected String remotePassword = null;
+	
+	
+	/**
 	 * Default constructor.
 	 */
 	protected ConnectDlg() {
@@ -400,6 +412,24 @@ public abstract class ConnectDlg extends JDialog {
 	
 	
 	/**
+	 * Getting remote user name.
+	 * @return remote user name.
+	 */
+	public String getRemoteUsername() {
+		return remoteUsername;
+	}
+	
+	
+	/**
+	 * Getting remote password.
+	 * @return remote password.
+	 */
+	public String getRemotePassword() {
+		return remotePassword;
+	}
+
+	
+	/**
 	 * Disconnecting specified connector.
 	 * @param connector the remote connector returned by connecting method.
 	 */
@@ -457,8 +487,11 @@ public abstract class ConnectDlg extends JDialog {
 					JOptionPane.showMessageDialog(
 						this, "Can't connect to server", "Can't connect to server", JOptionPane.ERROR_MESSAGE);
 				}
-				else
+				else {
+					remoteUsername = txtRemoteUsername.getText();
+					remotePassword = txtRemotePassword.getText();
 					dispose();
+				}
 			}
 		};
 		

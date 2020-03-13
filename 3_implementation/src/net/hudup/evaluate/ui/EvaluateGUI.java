@@ -41,7 +41,6 @@ import net.hudup.core.PluginChangedEvent;
 import net.hudup.core.RegisterTable;
 import net.hudup.core.Util;
 import net.hudup.core.alg.Alg;
-import net.hudup.core.alg.AlgList;
 import net.hudup.core.alg.CompositeAlg;
 import net.hudup.core.alg.ModelBasedAlg;
 import net.hudup.core.alg.Recommender;
@@ -1167,14 +1166,11 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			
 			DatasetPool pool = new DatasetPool(training, testing);
 				
-			List<Alg> algList = Util.newList();
-			algList.add(alg);
+			List<String> algNameList = Util.newList();
+			algNameList.add(alg.getName());
 			Timestamp timestamp = new Timestamp();
 			this.timestamp = timestamp.getTimestamp();
-			if (bindUri == null)
-				evaluator.remoteStart(algList, pool, timestamp);
-			else
-				evaluator.remoteStart(AlgList.clone(algList), pool, timestamp); //Cloning algorithms is important to remote RMI.
+			evaluator.remoteStart(algNameList, pool, timestamp);
 		}
 		catch (Throwable e) {
 			// TODO Auto-generated catch block

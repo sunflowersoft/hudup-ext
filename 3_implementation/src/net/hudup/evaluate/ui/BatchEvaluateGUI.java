@@ -38,7 +38,6 @@ import net.hudup.core.Constants;
 import net.hudup.core.PluginChangedEvent;
 import net.hudup.core.RegisterTable;
 import net.hudup.core.alg.Alg;
-import net.hudup.core.alg.AlgList;
 import net.hudup.core.alg.SetupAlgEvent;
 import net.hudup.core.alg.ui.AlgListBox;
 import net.hudup.core.alg.ui.AlgListBox.AlgListChangedEvent;
@@ -969,10 +968,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			clearResult();
 			Timestamp timestamp = new Timestamp();
 			this.timestamp = timestamp.getTimestamp();
-			if (bindUri == null)
-				evaluator.remoteStart(lbAlgs.getAlgList(), guiData.pool, timestamp);
-			else
-				evaluator.remoteStart(AlgList.clone(lbAlgs.getAlgList()), guiData.pool, timestamp); //Cloning algorithms is important to remote RMI.
+			evaluator.remoteStart(lbAlgs.getAlgNameList(), guiData.pool, timestamp);
 		}
 		catch (Throwable e) {
 			e.printStackTrace();

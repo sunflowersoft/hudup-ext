@@ -33,16 +33,15 @@ import net.hudup.core.client.Service;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.DatasetPool;
 import net.hudup.core.data.MemFetcher;
+import net.hudup.core.evaluate.EvaluateEvent;
 import net.hudup.core.evaluate.EvaluateInfo;
+import net.hudup.core.evaluate.EvaluateListener;
+import net.hudup.core.evaluate.EvaluateProgressEvent;
+import net.hudup.core.evaluate.EvaluateProgressListener;
 import net.hudup.core.evaluate.Evaluator;
 import net.hudup.core.evaluate.EvaluatorConfig;
 import net.hudup.core.evaluate.EvaluatorEvent;
 import net.hudup.core.evaluate.EvaluatorListener;
-import net.hudup.core.evaluate.EvaluateEvent;
-import net.hudup.core.evaluate.EvaluateListener;
-import net.hudup.core.evaluate.EvaluateProgressEvent;
-import net.hudup.core.evaluate.EvaluateProgressListener;
-import net.hudup.core.evaluate.Metric;
 import net.hudup.core.evaluate.Metrics;
 import net.hudup.core.evaluate.NoneWrapperMetricList;
 import net.hudup.core.logistic.CounterElapsedTimeEvent;
@@ -346,7 +345,7 @@ public class Delegator extends AbstractDelegator {
 				return Response.create(remoteService.getSnapshot());
 			
 			else if (action.equals(GET_EVALUATOR)) {
-				Evaluator remoteEvaluator = remoteService.getEvaluator(request.evaluatorName);
+				Evaluator remoteEvaluator = remoteService.getEvaluator(request.evaluatorName, request.account_name, request.account_password);
 				if (remoteEvaluator == null)
 					return null;
 				DelegatorEvaluator evaluator = new DelegatorEvaluator(this, remoteEvaluator);
@@ -524,14 +523,14 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluateListen
 
 
 	@Override
-	public List<Metric> getMetricList() throws RemoteException {
-		return remoteEvaluator.getMetricList();
+	public List<String> getMetricNameList() throws RemoteException {
+		return remoteEvaluator.getMetricNameList();
 	}
 
 	
 	@Override
-	public void setMetricList(List<Metric> metricList) throws RemoteException {
-		remoteEvaluator.setMetricList(metricList);
+	public void setMetricNameList(List<String> metricNameList) throws RemoteException {
+		remoteEvaluator.setMetricNameList(metricNameList);
 	}
 	
 	
@@ -587,9 +586,9 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluateListen
 
 
 	@Override
-	public Alg getPluginAlgCloned(Class<? extends Alg> algClass, String algName) throws RemoteException {
+	public Alg getPluginAlg(Class<? extends Alg> algClass, String algName, boolean remote) throws RemoteException {
 		// TODO Auto-generated method stub
-		return remoteEvaluator.getPluginAlgCloned(algClass, algName);
+		return remoteEvaluator.getPluginAlg(algClass, algName, remote);
 	}
 
 
@@ -599,6 +598,13 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluateListen
 	}
 	
 	
+	@Override
+	public void setConfig(EvaluatorConfig config) throws RemoteException {
+		// TODO Auto-generated method stub
+		remoteEvaluator.setConfig(config);
+	}
+
+
 	@Override
 	public boolean isWrapper() throws RemoteException {
 		// TODO Auto-generated method stub
@@ -889,14 +895,14 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluateListen
 
 
 	@Override
-	public synchronized boolean remoteStart(List<Alg> algList, DatasetPool pool, Serializable parameter) throws RemoteException {
+	public synchronized boolean remoteStart(List<String> algNameList, DatasetPool pool, Serializable parameter) throws RemoteException {
 		// TODO Auto-generated method stub
 		boolean flag = socketServer.getFlag();
 		
 		if (flag)
-			return remoteEvaluator.remoteStart(algList, pool, parameter);
+			return remoteEvaluator.remoteStart(algNameList, pool, parameter);
 		else if (socketServer.isRunning())
-			return remoteEvaluator.remoteStart(algList, pool, parameter);
+			return remoteEvaluator.remoteStart(algNameList, pool, parameter);
 		else
 			throw new RemoteException("Socket server is not running");
 	}

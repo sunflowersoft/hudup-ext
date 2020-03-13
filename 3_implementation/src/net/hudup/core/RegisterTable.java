@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.Set;
 
 import net.hudup.core.alg.Alg;
+import net.hudup.core.alg.AlgList;
 
 /**
  * Plug-in manager is responsible for discovering and managing registered recommendation algorithms.
@@ -89,6 +90,18 @@ public final class RegisterTable implements Cloneable, Serializable {
 		}
 	}
 	
+	
+	/**
+	 * Constructor with specified list of algorithms.
+	 * @param algs specified list of algorithms. These algorithms are registered.
+	 */
+	public RegisterTable(AlgList algList) {
+		for (int i = 0; i < algList.size(); i++) {
+			Alg alg = algList.get(i);
+			register(alg);
+		}
+	}
+
 	
 	/**
 	 * Registering an specified algorithm.

@@ -91,9 +91,9 @@ public class EvaluatorWrapper implements Evaluator, Serializable {
 
 	
 	@Override
-	public boolean remoteStart(List<Alg> algList, DatasetPool pool, Serializable parameter) throws RemoteException {
+	public boolean remoteStart(List<String> algNameList, DatasetPool pool, Serializable parameter) throws RemoteException {
 		// TODO Auto-generated method stub
-		return remoteEvaluator.remoteStart(algList, pool, parameter);
+		return remoteEvaluator.remoteStart(algNameList, pool, parameter);
 	}
 
 
@@ -183,6 +183,13 @@ public class EvaluatorWrapper implements Evaluator, Serializable {
 
 	
 	@Override
+	public void setConfig(EvaluatorConfig config) throws RemoteException {
+		// TODO Auto-generated method stub
+		remoteEvaluator.setConfig(config);
+	}
+
+
+	@Override
 	public boolean isWrapper() throws RemoteException {
 		// TODO Auto-generated method stub
 		return true;
@@ -225,16 +232,16 @@ public class EvaluatorWrapper implements Evaluator, Serializable {
 
 
 	@Override
-	public List<Metric> getMetricList() throws RemoteException {
+	public List<String> getMetricNameList() throws RemoteException {
 		// TODO Auto-generated method stub
-		return remoteEvaluator.getMetricList();
+		return remoteEvaluator.getMetricNameList();
 	}
 
 	
 	@Override
-	public void setMetricList(List<Metric> metricList) throws RemoteException {
+	public void setMetricNameList(List<String> metricNameList) throws RemoteException {
 		// TODO Auto-generated method stub
-		remoteEvaluator.setMetricList(metricList);
+		remoteEvaluator.setMetricNameList(metricNameList);
 	}
 
 	
@@ -291,9 +298,9 @@ public class EvaluatorWrapper implements Evaluator, Serializable {
 
 
 	@Override
-	public Alg getPluginAlgCloned(Class<? extends Alg> algClass, String algName) throws RemoteException {
+	public Alg getPluginAlg(Class<? extends Alg> algClass, String algName, boolean remote) throws RemoteException {
 		// TODO Auto-generated method stub
-		return remoteEvaluator.getPluginAlgCloned(algClass, algName);
+		return remoteEvaluator.getPluginAlg(algClass, algName, remote);
 	}
 
 

@@ -603,7 +603,7 @@ public interface Service extends Remote {
 	 * @return evaluator.
 	 * @throws RemoteException if any error raises.
 	 */
-	Evaluator getEvaluator(String evaluatorName) throws RemoteException;
+	Evaluator getEvaluator(String evaluatorName, String account, String password) throws RemoteException;
 	
 
 	/**

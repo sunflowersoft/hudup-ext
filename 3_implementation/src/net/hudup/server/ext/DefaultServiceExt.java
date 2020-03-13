@@ -15,8 +15,10 @@ import java.util.List;
 import java.util.Map;
 
 import net.hudup.core.Util;
+import net.hudup.core.data.DataConfig;
 import net.hudup.core.evaluate.Evaluator;
 import net.hudup.core.logistic.LogUtil;
+import net.hudup.core.logistic.NextUpdate;
 import net.hudup.evaluate.ui.EvaluateGUIData;
 import net.hudup.server.DefaultService;
 import net.hudup.server.PowerServerConfig;
@@ -119,7 +121,6 @@ public class DefaultServiceExt extends DefaultService {
 		Collection<EvaluatorPair> pairs = pairMap.values();
 		for (EvaluatorPair pair : pairs) {
 			try {
-				pair.evaluator.getConfig().save();
 				pair.evaluator.close();
 			} catch (Throwable e) {e.printStackTrace();}
 		}
@@ -161,15 +162,21 @@ public class DefaultServiceExt extends DefaultService {
 	}
 
 
+	@NextUpdate
 	@Override
-	public Evaluator getEvaluator(String evaluatorName) throws RemoteException {
+	public Evaluator getEvaluator(String evaluatorName, String account, String password) throws RemoteException {
 		// TODO Auto-generated method stub
 		Evaluator evaluator = null;
 		
 		trans.lockWrite();
 		try {
-			if (pairMap.containsKey(evaluatorName))
-				evaluator = pairMap.get(evaluatorName).evaluator;
+			if (validateAccount(account, password, DataConfig.ACCOUNT_EVALUATE_PRIVILEGE)) {
+				if (pairMap.containsKey(evaluatorName))
+					evaluator = pairMap.get(evaluatorName).evaluator;
+			}
+			else {
+				//Return evaluator client version. Next updated version.
+			}
 		}
 		catch (Throwable e) {
 			e.printStackTrace();

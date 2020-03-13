@@ -18,6 +18,7 @@ import javax.swing.JPanel;
 import net.hudup.core.PluginChangedListener;
 import net.hudup.core.PluginStorage;
 import net.hudup.core.RegisterTable;
+import net.hudup.core.Util;
 import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.SetupAlgListener;
 import net.hudup.core.data.DatasetPool;
@@ -31,6 +32,7 @@ import net.hudup.core.evaluate.EvaluatorConfig;
 import net.hudup.core.evaluate.EvaluatorListener;
 import net.hudup.core.evaluate.Metric;
 import net.hudup.core.evaluate.Metrics;
+import net.hudup.core.evaluate.MetricsUtil;
 import net.hudup.core.logistic.CounterElapsedTimeListener;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.NetUtil;
@@ -198,8 +200,8 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 		
 		//Current version only update normal algorithm and metric plug-in
 		if (bindUri != null) { //Only remote
-			PluginStorage.updateFromEvaluator(evaluator, Alg.class);
-			PluginStorage.updateFromEvaluator(evaluator, Metric.class);
+			PluginStorage.updateFromEvaluator(evaluator, Alg.class, true);
+			PluginStorage.updateFromEvaluator(evaluator, Metric.class, true);
 		}
 
 		if (referredAlg != null) {
@@ -353,12 +355,9 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	public void dispose() {
 		boolean agent = false;
 		boolean wrapper = false;
-		EvaluatorConfig config = null;
 		try {
 			agent = evaluator.isAgent();
 			wrapper = evaluator.isWrapper();
-			config = evaluator.getConfig();
-			config.setSaveAbility(bindUri == null); //Save only local configuration.
 		}
 		catch (Throwable e) {
 			e.printStackTrace();
@@ -388,7 +387,6 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 			catch (Exception e) {e.printStackTrace();}
 		}
 		
-		config.save();
 		this.evProcessor.clear();
 		updateGUIData();
 		guiData.active = false;
@@ -420,7 +418,7 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	
 	
 	/**
-	 * Change list of metrics in evaluator.
+	 * Change list of metrics in evaluator. Current implementation does not export metrics. Exporting normal algorithms only.
 	 */
 	protected void metricsOption() {
 		try {
@@ -429,7 +427,14 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 				return;
 			}
 
-			MetricsOptionDlg dlg = new MetricsOptionDlg(this, evaluator.getMetricList());
+			List<String> metricNameList = evaluator.getMetricNameList();
+			List<Metric> metricList = Util.newList();
+			for (String metricName : metricNameList) {
+				if (PluginStorage.getMetricReg().contains(metricName))
+					metricList.add((Metric)PluginStorage.getMetricReg().query(metricName));
+			}
+			
+			MetricsOptionDlg dlg = new MetricsOptionDlg(this, metricList);
 			List<Metric> selectedMetricList = dlg.getSelectedMetricList();
 			
 			if (selectedMetricList.size() == 0) {
@@ -440,7 +445,7 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 						JOptionPane.WARNING_MESSAGE);
 			}
 			
-			evaluator.setMetricList(selectedMetricList);
+			evaluator.setMetricNameList(MetricsUtil.extractMetricNameList(selectedMetricList));
 		}
 		catch (Throwable e) {
 			// TODO Auto-generated catch block

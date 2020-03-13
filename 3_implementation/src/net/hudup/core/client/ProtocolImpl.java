@@ -698,12 +698,14 @@ public class ProtocolImpl implements Protocol {
 
 
 	@Override
-	public Request createGetEvaluatorRequest(String evaluatorName) {
+	public Request createGetEvaluatorRequest(String evaluatorName, String account, String password) {
 		// TODO Auto-generated method stub
 		Request request = new Request();
 		request.notJsonParsing = true;
 		request.action = GET_EVALUATOR;
 		request.evaluatorName = evaluatorName;
+		request.account_name = account;
+		request.account_password = password;
 		
 		return request;
 	}

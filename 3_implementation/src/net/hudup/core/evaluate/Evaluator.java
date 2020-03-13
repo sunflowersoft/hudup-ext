@@ -95,13 +95,13 @@ public interface Evaluator extends Remote, RemoteRunner, SetupAlgListener, Expor
 	
 	/**
 	 * Evaluator starts.
-	 * @param algList specified list of algorithms. It must be serializable in remote call.
+	 * @param algNameList specified list of algorithm name.
 	 * @param pool specified dataset pool containing many training datasets and testing datasets. It must be serializable in remote call.
 	 * @param parameter additional parameter.
 	 * @return true if successful.
 	 * @throws RemoteException if any error raises.
 	 */
-	boolean remoteStart(List<Alg> algList, DatasetPool pool, Serializable parameter) throws RemoteException;
+	boolean remoteStart(List<String> algNameList, DatasetPool pool, Serializable parameter) throws RemoteException;
 
 	
 	/**
@@ -153,6 +153,14 @@ public interface Evaluator extends Remote, RemoteRunner, SetupAlgListener, Expor
 
 	
 	/**
+	 * Setting configuration of this evaluator.
+	 * @param config specified configuration. 
+	 * @throws RemoteException if any error raises.
+	 */
+	void setConfig(EvaluatorConfig config) throws RemoteException;
+
+	
+	/**
 	 * Checking whether this object is a wrapper of an evaluator.
 	 * @return whether this object is a wrapper of an evaluator.
 	 * @throws RemoteException if any error raises.
@@ -170,7 +178,7 @@ public interface Evaluator extends Remote, RemoteRunner, SetupAlgListener, Expor
 
 	
 	/**
-	 * Defining the list of default metrics.
+	 * Defining the list of default metrics. This method is used only locally.
 	 * @return the list of default metrics as {@link NoneWrapperMetricList}.
 	 * @throws RemoteException if any error raises.
 	 */
@@ -202,19 +210,19 @@ public interface Evaluator extends Remote, RemoteRunner, SetupAlgListener, Expor
 
 	
 	/**
-	 * Getting the list of metrics resulted from the evaluation process.
-	 * @return list of metrics resulted from the evaluation process.
+	 * Getting the metric name list resulted from the evaluation process.
+	 * @return metric name list resulted from the evaluation process.
 	 * @throws RemoteException if any error raises.
 	 */
-	List<Metric> getMetricList() throws RemoteException;
+	List<String> getMetricNameList() throws RemoteException;
 
 	
 	/**
-	 * Setting metric list.
-	 * @param metricList specified metric list.
+	 * Setting metric name list. Current implementation does not export metrics. Exporting normal algorithms only.
+	 * @param metricNameList specified metric name list.
 	 * @throws RemoteException if any error raises.
 	 */
-	void setMetricList(List<Metric> metricList) throws RemoteException;
+	void setMetricNameList(List<String> metricNameList) throws RemoteException;
 	
 	
 	/**
@@ -274,10 +282,11 @@ public interface Evaluator extends Remote, RemoteRunner, SetupAlgListener, Expor
      * Getting registered cloned plug-in algorithm.
      * @param algClass specified algorithm class.
      * @param algName algorithm name.
+     * @param remote true if getting remotely.
      * @return registered cloned plug-in algorithm.
      * @throws RemoteException if any error raises.
      */
-    Alg getPluginAlgCloned(Class<? extends Alg> algClass, String algName) throws RemoteException;
+    Alg getPluginAlg(Class<? extends Alg> algClass, String algName, boolean remote) throws RemoteException;
 
     
 	/**

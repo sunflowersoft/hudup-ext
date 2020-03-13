@@ -188,14 +188,23 @@ public class AlgList implements Serializable, net.hudup.core.Cloneable {
 	 * @return {@link List} of names of all algorithms in this list.
 	 */
 	public List<String> getAlgNameList() {
-		List<String> algNameList = Util.newList();
-		for (Alg alg : list) {
+		return getAlgNameList(list);
+	}
+	
+	
+	/**
+	 * Getting list of algorithm names.
+	 * @return list of algorithm names.
+	 */
+	public static List<String> getAlgNameList(List<Alg> algList) {
+		List<String> algNameList = Util.newList(algList.size());
+		for (Alg alg : algList) {
 			algNameList.add(alg.getName());
 		}
 		
 		return algNameList;
 	}
-	
+
 	
 	/**
 	 * Extracting class names of all algorithms in this list.
@@ -232,12 +241,13 @@ public class AlgList implements Serializable, net.hudup.core.Cloneable {
 	 * @param algList specified list of algorithms.
 	 * @return list of cloned algorithms.
 	 */
-	public static List<Alg> clone(List<Alg> algList) {
+	@SuppressWarnings("unchecked")
+	public static <T extends Alg> List<T> clone(Collection<T> algList) {
 		if (algList == null) return Util.newList();
-		List<Alg> newAlgList = Util.newList(algList.size());
+		List<T> newAlgList = Util.newList(algList.size());
 		
-		for (Alg alg : algList) {
-			Alg newAlg = alg.newInstance();
+		for (T alg : algList) {
+			T newAlg = (T) alg.newInstance();
 			newAlg.getConfig().putAll(alg.getConfig());
 			newAlgList.add(newAlg);
 		}

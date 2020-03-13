@@ -27,7 +27,6 @@ import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.AlgDesc2;
 import net.hudup.core.alg.AlgDesc2List;
 import net.hudup.core.alg.AlgRemote;
-import net.hudup.core.alg.AlgRemoteWrapper;
 import net.hudup.core.alg.SetupAlgEvent;
 import net.hudup.core.alg.SetupAlgListener;
 import net.hudup.core.data.DataConfig;
@@ -227,6 +226,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 		
 		try {
 			this.metricList = defaultMetrics();
+			this.metricList.syncWithPlugin();
 			this.metricList.sort();
 		}
 		catch (Exception e) {
@@ -242,12 +242,12 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 	 * Starting the evaluation process on specified algorithms with specified dataset pool.
 	 * The original (built-in) metrics were discovered by Plug-in manager.
 	 * 
-	 * @param algList specified list of algorithms. It must be serializable in remote call.
+	 * @param algNameList specified list of algorithm name.
 	 * @param pool specified dataset pool containing many training datasets and testing datasets. It must be serializable in remote call.
 	 * @param parameter additional parameter.
 	 * @return true if successful.
 	 */
-	public synchronized boolean evaluate(List<Alg> algList, DatasetPool pool, Serializable parameter) {
+	public synchronized boolean evaluate(List<String> algNameList, DatasetPool pool, Serializable parameter) {
 		if (isStarted() || this.algList != null || this.pool != null) {
 			LogUtil.error("Evaluator is running and so evaluation is not run");
 			return false;
@@ -259,8 +259,8 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 		
 		RegisterTable pluginAlgReg = PluginStorage.getNormalAlgReg();
 		List<Alg> newAlgList = Util.newList();
-		for (Alg alg : algList) {
-			Alg pluginAlg = pluginAlgReg.query(alg.getName());
+		for (String algName : algNameList) {
+			Alg pluginAlg = pluginAlgReg.query(algName);
 			if (pluginAlg != null)
 				newAlgList.add(pluginAlg); //This code line is important to remote setting.
 		}
@@ -611,26 +611,29 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 
 
 	@Override
-	public List<Metric> getMetricList() throws RemoteException {
+	public List<String> getMetricNameList() throws RemoteException {
 		synchronized(metricList) {
-			return this.metricList.list();
+			return this.metricList.nameList();
 		}
 	}
 
 	
+	/*
+	 * Current implementation does not export metrics. Exporting normal algorithms only.
+	 */
 	@Override
-	public synchronized void setMetricList(List<Metric> metricList) throws RemoteException {
+	public synchronized void setMetricNameList(List<String> metricNameList) throws RemoteException {
 		if (isStarted()) {
 			LogUtil.error("Evaluator is started and so it is impossible to set up metric list");
 			return;
 		}
 		
-		RegisterTable pluginMetricReg = PluginStorage.getMetricReg();
+		RegisterTable metricReg = PluginStorage.getMetricReg();
 		List<Metric> newMetricList = Util.newList();
-		for (Metric metric : metricList) {
-			Metric pluginMetric = (Metric) pluginMetricReg.query(metric.getName());
-			if (pluginMetric != null)
-				newMetricList.add(pluginMetric); //This code line is important to remote setting.
+		for (String metricName : metricNameList) {
+			Metric registeredMetric = (Metric) metricReg.query(metricName);
+			if (registeredMetric != null)
+				newMetricList.add(registeredMetric); //This code line is important to remote setting.
 		}
 		
 		synchronized(this.metricList) {
@@ -716,36 +719,60 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
     @Override
 	public List<String> getPluginAlgNames(Class<? extends Alg> algClass) throws RemoteException {
 		// TODO Auto-generated method stub
-		return PluginStorage.lookupTable(algClass).getAlgNames();
+    	RegisterTable algReg = PluginStorage.lookupTable(algClass);
+    	List<String> algNames = Util.newList();
+    	if (algReg == null) return algNames;
+    	
+    	List<Alg> algList = algReg.getAlgList();
+    	for (Alg alg : algList) {
+    		try {
+    			if (acceptAlg(alg)) algNames.add(alg.getName());
+    		} catch (Throwable e) {e.printStackTrace();}
+    	}
+    	
+		return algNames;
 	}
 
 
 	@Override
 	public AlgDesc2List getPluginAlgDescs(Class<? extends Alg> algClass) throws RemoteException {
 		// TODO Auto-generated method stub
+    	RegisterTable algReg = PluginStorage.lookupTable(algClass);
 		AlgDesc2List algDescs = new AlgDesc2List();
-		algDescs.addAll2(PluginStorage.lookupTable(algClass).getAlgList());
+    	if (algReg == null) return algDescs;
 		
+    	List<Alg> algList = algReg.getAlgList();
+    	for (Alg alg : algList) {
+    		try {
+    			if (acceptAlg(alg))
+    				algDescs.add(alg);
+    		} catch (Throwable e) {e.printStackTrace();}
+    	}
+    	
 		return algDescs;
 	}
 
 
-	/*
-	 * Current implementation does not instantiate (clone) wrapper. It will be improved.
-	 * @see net.hudup.core.evaluate.Evaluator#getClonedPluginAlg(java.lang.Class, java.lang.String)
-	 */
-	@NextUpdate
 	@Override
-	public Alg getPluginAlgCloned(Class<? extends Alg> algClass, String algName) throws RemoteException {
+	public Alg getPluginAlg(Class<? extends Alg> algClass, String algName, boolean remote) throws RemoteException {
 		// TODO Auto-generated method stub
 		Alg alg = PluginStorage.lookupTable(algClass).query(algName);
 		if (alg == null) return null;
+		if (!acceptAlg(alg)) return null;
 		
-		if (alg instanceof AlgRemoteWrapper)
-			return null; //Not instantiating wrapper.
-		else {
-			return (Alg)alg.newInstance();
+		if (!remote)
+			return alg;
+		else if (alg instanceof AlgRemote) {
+			AlgRemote remoteAlg = (AlgRemote)alg;
+			synchronized (remoteAlg) {
+				remoteAlg.export(config.getEvaluatorPort());
+			}
+			
+			return Util.getPluginManager().wrap(remoteAlg, false);
 		}
+		else
+			return alg;
+		
 	}
 
 
@@ -808,6 +835,14 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 	}
 	
 	
+	@Override
+	public void setConfig(EvaluatorConfig config) throws RemoteException {
+		// TODO Auto-generated method stub
+		if (config == null) return;
+		this.config.putAll(config);
+	}
+
+
 	@Override
 	public boolean isWrapper() throws RemoteException {
 		// TODO Auto-generated method stub
@@ -1173,31 +1208,27 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 		try {
 			stop();
 		}
-		catch (Throwable e) {
-			e.printStackTrace();
-		}
+		catch (Throwable e) {e.printStackTrace();}
 
 		try {
 			clearDelayUnsetupAlgs();
 		}
-		catch (Throwable e) {
-			e.printStackTrace();
-		}
+		catch (Throwable e) {e.printStackTrace();}
 		
 		try {
 			otherResult.evStorePath = null;
 			evProcessor.clear();
 		}
-		catch (Throwable e) {
-			e.printStackTrace();
-		}
+		catch (Throwable e) {e.printStackTrace();}
+
+		try {
+			config.save();
+		} catch (Throwable e) {e.printStackTrace();}
 
 		try {
 			unexport();
 		}
-		catch (Throwable e) {
-			e.printStackTrace();
-		}
+		catch (Throwable e) {e.printStackTrace();}
 	}
 
 
@@ -1224,11 +1255,11 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 			return false;
 		
 		@SuppressWarnings("unchecked")
-		List<Alg> algList = (List<Alg>)(parameters[0]);
+		List<String> algNameList = (List<String>)(parameters[0]);
 		DatasetPool pool = (DatasetPool)(parameters[1]);
 		Serializable parameter = parameters.length > 2? parameters[2] : null;
 		
-		if (!evaluate(algList, pool, parameter)) return false;
+		if (!evaluate(algNameList, pool, parameter)) return false;
 
 		this.counter.stop();
 		this.counter.start();
@@ -1249,9 +1280,9 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 
 
 	@Override
-	public synchronized boolean remoteStart(List<Alg> algList, DatasetPool pool, Serializable parameter) throws RemoteException {
+	public synchronized boolean remoteStart(List<String> algNameList, DatasetPool pool, Serializable parameter) throws RemoteException {
 		// TODO Auto-generated method stub
-		if (!evaluate(algList, pool, parameter)) return false;
+		if (!evaluate(algNameList, pool, parameter)) return false;
 
 		this.counter.stop();
 		this.counter.start();

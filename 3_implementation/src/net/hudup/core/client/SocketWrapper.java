@@ -697,9 +697,9 @@ public class SocketWrapper extends ProtocolImpl implements Service {
 
 
 	@Override
-	public Evaluator getEvaluator(String evaluatorName) throws RemoteException {
+	public Evaluator getEvaluator(String evaluatorName, String account, String password) throws RemoteException {
 		// TODO Auto-generated method stub
-		Request request = createGetEvaluatorRequest(evaluatorName);
+		Request request = createGetEvaluatorRequest(evaluatorName, account, password);
 		Response response = sendRequest(request);
 		if (response == null)
 			return null;

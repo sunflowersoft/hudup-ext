@@ -164,7 +164,6 @@ public class DefaultServerExt extends DefaultServer {
 						return;
 					}
 					
-					pair.data.switchable = false;
 					new EvalCompoundGUI(pair.evaluator, null, pair.data);
 				} 
 				catch (Exception e) {

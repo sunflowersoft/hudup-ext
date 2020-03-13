@@ -12,7 +12,6 @@ import java.awt.Container;
 import java.awt.Image;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.Collections;
@@ -26,14 +25,12 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
-import javax.swing.JPopupMenu;
 import javax.swing.JTabbedPane;
 
 import net.hudup.core.Constants;
 import net.hudup.core.PluginChangedEvent;
 import net.hudup.core.PluginChangedListener;
 import net.hudup.core.PluginStorage;
-import net.hudup.core.PluginStorageManifest;
 import net.hudup.core.RegisterTable;
 import net.hudup.core.Util;
 import net.hudup.core.client.ConnectDlg;
@@ -109,7 +106,6 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 			this.thisConfig.setSaveAbility(bindUri == null); //Save only local configuration.
 		}
 		catch (Throwable e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			LogUtil.error("Error in getting evaluator configuration");
 		}
@@ -160,7 +156,7 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 //				if (contextMenu != null) contextMenu.show((Component)e.getSource(), e.getX(), e.getY());
 //			}
 //		});
-		
+
 		setVisible(true);
 	}
 	
@@ -200,7 +196,12 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 			});
 		mnTools.add(mniSysConfig);
 
-		if (batchEvaluateGUI.guiData.switchable) {
+		boolean agent = false;
+		try {
+			agent = batchEvaluateGUI.evaluator.isAgent();
+		}
+		catch (Throwable e) {e.printStackTrace();}
+		if (batchEvaluateGUI.bindUri != null || !agent) {
 			JMenuItem mniSwitchEvaluator = new JMenuItem(
 				new AbstractAction(I18nUtil.message("switch_evaluator")) {
 
@@ -243,38 +244,37 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 	}
 
 	
-	/**
-	 * Create context menu.
-	 * @return context menu.
-	 */
-	@SuppressWarnings("unused")
-	private JPopupMenu createContextMenu() {
-		if (!isIdle()) return null;
-		
-		boolean agent = false;
-		try {
-			agent = batchEvaluateGUI.evaluator.isAgent();
-		}
-		catch (Throwable e) {
-			e.printStackTrace();
-		}
-		if (agent && batchEvaluateGUI.bindUri == null)
-			return null;
-
-		JPopupMenu contextMenu = new JPopupMenu();
-		
-		JMenuItem mniPluginConfig = UIUtil.makeMenuItem(null, I18nUtil.message("plugin_manager"), 
-			new ActionListener() {
-				
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					PluginStorageManifest.showDlg(getThisEvalGUI(), getThisEvalGUI());
-				}
-			});
-		contextMenu.add(mniPluginConfig);
-
-		return contextMenu;
-	}
+//	/**
+//	 * Create context menu.
+//	 * @return context menu.
+//	 */
+//	private JPopupMenu createContextMenu() {
+//		if (!isIdle()) return null;
+//		
+//		boolean agent = false;
+//		try {
+//			agent = batchEvaluateGUI.evaluator.isAgent();
+//		}
+//		catch (Throwable e) {
+//			e.printStackTrace();
+//		}
+//		if (agent && batchEvaluateGUI.bindUri == null)
+//			return null;
+//
+//		JPopupMenu contextMenu = new JPopupMenu();
+//		
+//		JMenuItem mniPluginConfig = UIUtil.makeMenuItem(null, I18nUtil.message("plugin_manager"), 
+//			new ActionListener() {
+//				
+//				@Override
+//				public void actionPerformed(ActionEvent e) {
+//					PluginStorageManifest.showDlg(getThisEvalGUI(), getThisEvalGUI());
+//				}
+//			});
+//		contextMenu.add(mniPluginConfig);
+//
+//		return contextMenu;
+//	}
 	
 	
 	/**
@@ -327,9 +327,36 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 			e.printStackTrace();
 		}
 		
-		SysConfigDlgExt cfg = new SysConfigDlgExt(this, I18nUtil.message("system_configure"), this);
+		SysConfigDlgExt cfg = new SysConfigDlgExt(this, I18nUtil.message("system_configure"), this) {
+
+			/**
+			 * Serial version UID for serializable class.
+			 */
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			protected void onApply() {
+				// TODO Auto-generated method stub
+				if (!isModified())
+					return;
+				
+				if (paneSysConfig != null && paneSysConfig.isModified()) {
+					paneSysConfig.apply();
+					
+					try {
+						if (batchEvaluateGUI.bindUri != null)
+							batchEvaluateGUI.evaluator.setConfig(thisConfig);
+					} catch (Throwable e) {e.printStackTrace();}
+				}
+				
+				if (paneRegister != null && paneRegister.isModified())
+					paneRegister.apply();
+			}
+			
+		};
+		
 		cfg.update(thisConfig);
-		if (agent && batchEvaluateGUI.bindUri == null)
+		if ((batchEvaluateGUI.bindUri != null) || (batchEvaluateGUI.bindUri == null && agent))
 			cfg.removePluginStorageManifest();
 		
 		cfg.setVisible(true);
@@ -372,13 +399,6 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 	}
 	
 	
-//	@Override
-//	public boolean isSupportImport() {
-//		// TODO Auto-generated method stub
-//		return batchEvaluateGUI.isSupportImport();
-//	}
-
-
 	@Override
 	public int getPort() {
 		// TODO Auto-generated method stub
@@ -526,7 +546,12 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 					// TODO Auto-generated method stub
 					String evName = (String) getItemControl().getSelectedItem();
 					try {
-						final Evaluator ev = service.getEvaluator(evName);
+						final Evaluator ev = service.getEvaluator(evName, connectDlg.getRemoteUsername(), connectDlg.getRemotePassword());
+						if (ev == null) {
+							JOptionPane.showMessageDialog(
+									this, "Can't get remote evaluator", "Connection to evaluator fail", JOptionPane.ERROR_MESSAGE);
+							return;
+						}
 						dispose();
 						if (oldGUI != null) oldGUI.dispose();
 						
@@ -538,7 +563,7 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 					catch (Exception e) {
 						e.printStackTrace();
 						JOptionPane.showMessageDialog(
-								null, "Can't get remote evaluator", "Connection to evaluator fail", JOptionPane.ERROR_MESSAGE);
+								this, "Can't get remote evaluator", "Connection to evaluator fail", JOptionPane.ERROR_MESSAGE);
 					}
 				}
 				

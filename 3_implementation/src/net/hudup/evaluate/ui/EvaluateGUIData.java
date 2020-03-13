@@ -41,12 +41,6 @@ public class EvaluateGUIData implements Serializable {
 	
 
 	/**
-	 * Flag to indicate whether the GUI can be switched.
-	 */
-	public boolean switchable = true;
-
-	
-	/**
 	 * Algorithm name.
 	 */
 	public String algName = null;
@@ -82,7 +76,6 @@ public class EvaluateGUIData implements Serializable {
 	public void reset() {
 		active = false;
 		wasRun = false;
-		switchable = true;
 		
 		algName = null;
 		algNames = null;

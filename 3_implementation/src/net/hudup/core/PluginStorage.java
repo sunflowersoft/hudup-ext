@@ -333,17 +333,18 @@ public final class PluginStorage implements Serializable {
 	 * @return the index of the specified algorithm class and algorithm name stored in next update list.
 	 * Return -1 if not found.
 	 */
-	public final static int lookupNextUpdateList(Class<? extends Alg> algClass, String algName) {
+	public final static int lookupNextUpdateListExact(Class<? extends Alg> algClass, String algName) {
 		if (algClass == null || algName == null) return -1;
 		
-		int idx = nextUpdateList.indexOf(algName);
-		if (idx == -1) return -1;
+		for (int i = 0; i < nextUpdateList.size(); i++) {
+			int idx = nextUpdateList.indexOf(algName);
+			if (idx == -1) continue;
+			
+			Class<? extends Alg> cls = nextUpdateList.get(idx).getClass();
+			if (algClass.equals(cls)) return idx;
+		}
 		
-		Class<? extends Alg> cls = nextUpdateList.get(idx).getClass();
-		if (algClass.equals(cls))
-			return idx;
-		else
-			return -1;
+		return -1;
 	}
 	
 	
@@ -354,45 +355,75 @@ public final class PluginStorage implements Serializable {
 	 * @return the index of the specified algorithm class and algorithm name stored in next update list by possible assignment.
 	 * Return -1 if not found.
 	 */
-	public final static int lookupNextUpdateListAssignable(Class<? extends Alg> algClass, String algName) {
+	public final static int lookupNextUpdateList(Class<? extends Alg> algClass, String algName) {
 		if (algClass == null || algName == null) return -1;
 		
-		int idx = nextUpdateList.indexOf(algName);
-		if (idx == -1) return -1;
-		
-		Class<? extends Alg> cls = nextUpdateList.get(idx).getClass();
-		if (algClass.equals(Alg.class)) {
-			if (!DatasetParser.class.isAssignableFrom(cls) &&
-					!Metric.class.isAssignableFrom(cls) &&
-					!ExternalQuery.class.isAssignableFrom(cls) &&
-					!CTSManager.class.isAssignableFrom(cls))
-				return idx;
-			else
-				return -1;
+		for (int i = 0; i < nextUpdateList.size(); i++) {
+			Alg alg = nextUpdateList.get(i); 
+			if (!alg.getName().equals(algName))
+				continue;
+			
+			Class<? extends Alg> cls = alg.getClass();
+			if (algClass.equals(Alg.class)) {
+				if (!DatasetParser.class.isAssignableFrom(cls) &&
+						!Metric.class.isAssignableFrom(cls) &&
+						!ExternalQuery.class.isAssignableFrom(cls) &&
+						!CTSManager.class.isAssignableFrom(cls))
+					return i;
+			}
+			else if (algClass.isAssignableFrom(cls))
+				return i;
 		}
-		else if (algClass.isAssignableFrom(cls))
-			return idx;
-		else
-			return -1;
+
+		return -1;
 	}
 	
+	
+	/**
+	 * Looking whether the specified algorithm class stored in next update list by possible assignment.
+	 * @param algClass specified algorithm class.
+	 * @return array of algorithms whose classed are specified.
+	 * Return empty if not found.
+	 */
+	public final static List<Alg> lookupNextUpdateList(Class<? extends Alg> algClass) {
+		List<Alg> algs = Util.newList();
+		
+		for (int i = 0; i < nextUpdateList.size(); i++) {
+			Alg alg = nextUpdateList.get(i); 
+			
+			Class<? extends Alg> cls = alg.getClass();
+			if (algClass.equals(Alg.class)) {
+				if (!DatasetParser.class.isAssignableFrom(cls) &&
+						!Metric.class.isAssignableFrom(cls) &&
+						!ExternalQuery.class.isAssignableFrom(cls) &&
+						!CTSManager.class.isAssignableFrom(cls))
+					algs.add(alg);
+			}
+			else if (algClass.isAssignableFrom(cls))
+				algs.add(alg);
+		}
+		
+		return algs;
+	}
+
 	
 	/**
 	 * Updating plug-in storage from evaluator.
 	 * @param evaluator specified evaluator.
 	 * @param algClass specified algorithm class.
+	 * @param remote true if evaluator is remote.
 	 */
-	public static void updateFromEvaluator(Evaluator evaluator, Class<? extends Alg> algClass) {
-		List<String> algNames = Util.newList();
+	public static void updateFromEvaluator(Evaluator evaluator, Class<? extends Alg> algClass, boolean remote) {
+		List<String> algEvNames = Util.newList();
 		try {
-			algNames = evaluator.getPluginAlgNames(algClass);
+			algEvNames = evaluator.getPluginAlgNames(algClass);
 		} catch (Exception e) {e.printStackTrace();}
 		
 		RegisterTable algReg = PluginStorage.lookupTable(algClass);
-		for (String algName : algNames) {
-			if (algReg.contains(algName)) continue;
+		for (String algEvName : algEvNames) {
+			if (algReg.contains(algEvName)) continue;
 			
-			int idx = lookupNextUpdateListAssignable(algClass, algName);
+			int idx = lookupNextUpdateList(algClass, algEvName);
 			if (idx != -1) {
 				Alg alg = nextUpdateList.get(idx);
 				nextUpdateList.remove(idx);
@@ -401,10 +432,40 @@ public final class PluginStorage implements Serializable {
 			else {
 				Alg alg = null;
 				try {
-					alg = evaluator.getPluginAlgCloned(algClass, algName);
-				} catch (Exception e) {e.printStackTrace();}
+					alg = evaluator.getPluginAlg(algClass, algEvName, remote);
+				}
+				catch (Exception e) {
+					System.out.println("Retrieving remote algorithm causes error by " + e.getMessage());
+					alg = null;
+				}
 				
 				if (alg != null) algReg.register(alg);
+			}
+		}
+		
+		List<String> algNames = algReg.getAlgNames();
+		algNames.removeAll(algEvNames);
+		for (String algName : algNames) {
+			Alg alg = algReg.query(algName);
+			if (alg instanceof Exportable) {
+				try {
+					((Exportable)alg).unexport(); //Finalize method will call unsetup method if unsetup method exists in this algorithm.
+				} catch (Throwable e) {e.printStackTrace();}
+			}
+			
+			algReg.unregister(algName);
+		}
+		
+		List<Alg> nextUpdateAlgs = lookupNextUpdateList(algClass);
+		for (Alg nextUpdateAlg : nextUpdateAlgs) {
+			if (!algEvNames.contains(nextUpdateAlg.getName())) {
+				if (nextUpdateAlg instanceof Exportable) {
+					try {
+						((Exportable)nextUpdateAlg).unexport(); //Finalize method will call unsetup method if unsetup method exists in this algorithm.
+					} catch (Throwable e) {e.printStackTrace();}
+				}
+				
+				nextUpdateList.remove(nextUpdateAlg);
 			}
 		}
 	}

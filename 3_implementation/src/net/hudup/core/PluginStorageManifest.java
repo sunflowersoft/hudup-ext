@@ -52,6 +52,7 @@ import net.hudup.core.data.DataDriverList;
 import net.hudup.core.data.Exportable;
 import net.hudup.core.logistic.I18nUtil;
 import net.hudup.core.logistic.LogUtil;
+import net.hudup.core.logistic.NextUpdate;
 import net.hudup.core.logistic.xURI;
 import net.hudup.core.logistic.ui.SortableSelectableTable;
 import net.hudup.core.logistic.ui.SortableSelectableTableModel;
@@ -1278,6 +1279,7 @@ class ImportAlgDlg extends JDialog {
 	/**
 	 * Event-driven method response to OK button command.
 	 */
+	@NextUpdate
 	protected void ok() {
 		importedCount = 0;
 
@@ -1336,6 +1338,11 @@ class ImportAlgDlg extends JDialog {
 					alg = null;
 				}
 				if (alg == null) continue;
+				
+				/////////////////////////////////////////////////
+				if (alg instanceof AlgRemoteWrapper) //Fix later
+					((AlgRemoteWrapper)alg).setExclusive(true);
+				/////////////////////////////////////////////////
 				
 				RegisterTable table = PluginStorage.lookupTable(alg.getClass());
 				if (table == null || table.contains(algDesc.algName)) {

@@ -1315,7 +1315,21 @@ public class MetricsUtil {
 			e.printStackTrace();
 		}
         
-        
+	}
+	
+
+	/**
+	 * Extracting names of metric list.
+	 * @param metricList metric list.
+	 * @return names of metric list.
+	 */
+	public static List<String> extractMetricNameList(List<Metric> metricList) {
+		List<String> metricNameList = Util.newList();
+		for (Metric metric : metricList) {
+			metricNameList.add(metric.getName());
+		}
+		
+		return metricNameList;
 	}
 	
 	
