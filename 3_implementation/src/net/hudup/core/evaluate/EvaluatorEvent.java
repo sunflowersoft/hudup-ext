@@ -94,8 +94,7 @@ public class EvaluatorEvent extends EventObject {
 	 */
 	@NextUpdate
 	public EvaluatorEvent(Evaluator evaluator, Type type) {
-//		super(evaluator); //Test different hosts for RMI, evaluator wrapper can solve.
-		super(new Integer(1)); //Not use evaluator because of improving network speed.
+		super(evaluator); //Test different hosts for RMI, evaluator wrapper can solve.
 		
 		this.type = type;
 	}

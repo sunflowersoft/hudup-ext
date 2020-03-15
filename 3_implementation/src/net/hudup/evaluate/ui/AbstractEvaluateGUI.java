@@ -36,6 +36,7 @@ import net.hudup.core.evaluate.MetricsUtil;
 import net.hudup.core.logistic.CounterElapsedTimeListener;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.NetUtil;
+import net.hudup.core.logistic.Timestamp;
 import net.hudup.core.logistic.xURI;
 
 /**
@@ -110,7 +111,7 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	/**
 	 * Time stamp.
 	 */
-	protected volatile long timestamp = 0;
+	protected Timestamp timestamp = null;
 	
 	
 	/**
@@ -211,9 +212,15 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 			} catch (Throwable e) {e.printStackTrace();}
 		}
 		else {
-			try {
-				algRegTable = EvaluatorAbstract.extractAlgFromPluginStorage(evaluator);
-			} catch (Throwable e) {e.printStackTrace();}
+			if (bindUri != null) {
+				algRegTable = new RegisterTable();
+				algRegTable.register(PluginStorage.getNormalAlgReg());
+			}
+			else {
+				try {
+					algRegTable = EvaluatorAbstract.extractAlgFromPluginStorage(evaluator);
+				} catch (Throwable e) {e.printStackTrace();}
+			}
 		}
 		if (algRegTable == null) algRegTable = new RegisterTable();
 
@@ -245,7 +252,7 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 			guiData.algNames = otherResult.algNames;
 			
 			try {
-				guiData.pool = evaluator.getDatasetPool();
+				guiData.pool = evaluator.getDatasetPool().toDatasetPoolClient();
 			} catch (Throwable e) {e.printStackTrace();}
 		}
 		
@@ -296,12 +303,12 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	protected void pauseResume() {
 		try {
 			if (evaluator.remoteIsPaused()) {
-				evaluator.remoteResume();
-				//updateMode(); //Evaluator calls instead
+				if (!evaluator.remoteResume())
+					updateMode();
 			}
 			else if (evaluator.remoteIsRunning()) {
-				evaluator.remotePause();
-				//updateMode(); //Evaluator calls instead
+				if (!evaluator.remotePause())
+					updateMode();
 			}
 		}
 		catch (Throwable e) {
@@ -316,8 +323,8 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	 */
 	protected void stop() {
 		try {
-			evaluator.remoteStop();
-			//updateMode(); //Evaluator calls instead
+			if (!evaluator.remoteStop())
+				updateMode();
 		}
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
@@ -332,8 +339,8 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	 */
 	protected void forceStop() {
 		try {
-			evaluator.remoteForceStop();
-			//updateMode(); //Evaluator calls instead
+			if (!evaluator.remoteForceStop())
+				updateMode();
 		}
 		catch (Throwable e) {
 			// TODO Auto-generated catch block

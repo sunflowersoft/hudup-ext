@@ -38,14 +38,14 @@ public class MemFetcher<E /*extends Serializable*/> implements Fetcher<E> {
 	/**
 	 * The internal collection stores elements over which this memory fetcher iterates.
 	 */
-	private Collection<E> data = null;
+	protected Collection<E> data = null;
 	
 	
 	/**
 	 * The iterator browses elements stored in the internal collection {@link #data}. This is the iterator of such collection.
 	 * In fact, the memory fetcher uses this iterator to browse data elements.
 	 */
-	private Iterator<E> iterator = null;
+	protected transient Iterator<E> iterator = null;
 	
 	
 	/**
@@ -106,7 +106,13 @@ public class MemFetcher<E /*extends Serializable*/> implements Fetcher<E> {
 	 * Constructors calls this method to construct this memory fetcher.
 	 * @param data specified data collection.
 	 */
-	private void update(Collection<E> data) {
+	public void update(Collection<E> data) {
+		if (!(data instanceof Serializable)) {
+			List<E> newData = Util.newList(data.size());
+			newData.addAll(data);
+			data = newData;
+		}
+		
 		this.data = data;
 		this.iterator = data.iterator();
 		this.current = null;

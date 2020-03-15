@@ -266,6 +266,21 @@ public class KBaseRemoteWrapper implements KBase, KBaseRemote {
 
 	
 	@Override
+	public synchronized void forceUnexport() throws RemoteException {
+		// TODO Auto-generated method stub
+		if (remoteKBase != null) {
+			try {
+				//if (!remoteKBase.isAgent())
+					remoteKBase.unexport();
+			} catch (Exception e) {e.printStackTrace();}
+		}
+		remoteKBase = null;
+
+		unexport();
+	}
+
+
+	@Override
 	public Remote getExportedStub() throws RemoteException {
 		return exportedStub;
 	}

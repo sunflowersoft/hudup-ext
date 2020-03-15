@@ -18,11 +18,10 @@ import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.AlgDesc2List;
 import net.hudup.core.alg.SetupAlgListener;
 import net.hudup.core.data.AutoCloseable;
-import net.hudup.core.data.DatasetPool;
+import net.hudup.core.data.DatasetPoolExchanged;
 import net.hudup.core.data.Exportable;
 import net.hudup.core.logistic.AgentSupport;
 import net.hudup.core.logistic.CounterElapsedTimeListener;
-import net.hudup.core.logistic.NextUpdate;
 import net.hudup.core.logistic.RemoteRunner;
 
 /**
@@ -94,14 +93,25 @@ public interface Evaluator extends Remote, RemoteRunner, SetupAlgListener, Expor
 
 	
 	/**
-	 * Evaluator starts.
-	 * @param algNameList specified list of algorithm name.
+	 * Starting the evaluation process on specified algorithms with specified dataset pool.
+	 * @param algList specified list of algorithms.
 	 * @param pool specified dataset pool containing many training datasets and testing datasets. It must be serializable in remote call.
 	 * @param parameter additional parameter.
 	 * @return true if successful.
 	 * @throws RemoteException if any error raises.
 	 */
-	boolean remoteStart(List<String> algNameList, DatasetPool pool, Serializable parameter) throws RemoteException;
+	boolean remoteStart0(List<Alg> algList, DatasetPoolExchanged pool, Serializable parameter) throws RemoteException;
+
+	
+	/**
+	 * Starting the evaluation process on specified algorithms with specified dataset pool.
+	 * @param algNameList specified list of algorithm names.
+	 * @param pool specified dataset pool containing many training datasets and testing datasets. It must be serializable in remote call.
+	 * @param parameter additional parameter.
+	 * @return true if successful.
+	 * @throws RemoteException if any error raises.
+	 */
+	boolean remoteStart(List<String> algNameList, DatasetPoolExchanged pool, Serializable parameter) throws RemoteException;
 
 	
 	/**
@@ -243,12 +253,11 @@ public interface Evaluator extends Remote, RemoteRunner, SetupAlgListener, Expor
 
 	
 	/**
-	 * Getting dataset pool. This method needs to be improved when dataset pool is large. Moreover, pool can be scanner.
+	 * Getting dataset pool. This method needs to be improved with large dataset pool and scanner.
 	 * @return dataset pool.
 	 * @throws RemoteException if any error raises.
 	 */
-	@NextUpdate
-	DatasetPool getDatasetPool() throws RemoteException;
+	DatasetPoolExchanged getDatasetPool() throws RemoteException;
 
 	
 	/**

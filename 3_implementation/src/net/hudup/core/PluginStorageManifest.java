@@ -1422,9 +1422,8 @@ class ImportAlgDlg extends JDialog {
 	 */
 	private void unexportRemoteWrapperAlg(Alg alg) {
 		if ((alg != null) && (alg instanceof AlgRemoteWrapper)) {
-			((AlgRemoteWrapper)alg).setExclusive(true);
 			try {
-				((AlgRemoteWrapper)alg).unexport();
+				((AlgRemoteWrapper)alg).forceUnexport();
 			} catch (Throwable e) {e.printStackTrace();}
 		}
 		

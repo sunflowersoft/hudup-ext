@@ -2849,6 +2849,7 @@ class ImportAlgDlag extends JDialog {
 		this.rightList.clear();
 		
 		super.dispose();
+		
 	}
 
 	

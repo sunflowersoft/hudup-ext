@@ -18,6 +18,7 @@ import java.util.TimerTask;
 import javax.swing.event.EventListenerList;
 
 import net.hudup.core.Constants;
+import net.hudup.core.ExtraStorage;
 import net.hudup.core.PluginStorage;
 import net.hudup.core.client.ActiveMeasure;
 import net.hudup.core.client.Gateway;
@@ -299,6 +300,7 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 				
         	doWhenStop();
 			activeMeasure.reset();
+			ExtraStorage.clearUnmanagedExportedObjects(); //Added by Loc Nguyen: 2020.03.15
 			started = false;
     		fireStatusEvent(new ServerStatusEvent(this, Status.stopped));
     		LogUtil.info("Power server stopped");

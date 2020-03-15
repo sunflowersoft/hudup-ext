@@ -59,11 +59,29 @@ public class DatasetPoolTable extends JTable {
 	
 	
 	/**
+	 * Bound URIs.
+	 */
+	protected xURI bindUri = null;
+
+	
+	/**
 	 * Default constructor.
+	 * @param bindUri bound URI.
 	 */
 	public DatasetPoolTable() {
+		this(null);
+	}
+	
+	
+	/**
+	 * Constructor with bound URI.
+	 * @param bindUri bound URI.
+	 */
+	public DatasetPoolTable(xURI bindUri) {
 		// TODO Auto-generated constructor stub
 		super(new DatasetPoolTableModel());
+		this.bindUri = bindUri;
+		
 		addMouseListener(new MouseAdapter() {
 
 			@Override
@@ -431,7 +449,10 @@ public class DatasetPoolTable extends JTable {
 		
 		DatasetPoolTableModel model = getPoolTableModel();
 		DatasetPool pool = model.getPool();
-		pool.remove(idxes);
+		if (bindUri == null)
+			pool.remove(idxes);
+		else
+			pool.removeWithoutClear(idxes);
 		model.update(pool);
 		setupUI();
 		

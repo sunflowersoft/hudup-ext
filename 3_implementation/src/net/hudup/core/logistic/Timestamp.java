@@ -8,7 +8,7 @@
 package net.hudup.core.logistic;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.util.UUID;
 
 /**
  * This class is the wrapper of a time stamp.
@@ -26,9 +26,9 @@ public class Timestamp implements Serializable {
 
 	
 	/**
-	 * Internal time stamp.
+	 * Internal UUID.
 	 */
-	protected long timestamp = 0;
+	protected UUID uuid = null;
 	
 	
 	/**
@@ -36,25 +36,16 @@ public class Timestamp implements Serializable {
 	 */
 	public Timestamp() {
 		// TODO Auto-generated constructor stub
-		timestamp = new Date().getTime();
+		uuid = UUID.randomUUID();
 	}
 
 	
 	/**
-	 * Constructor with specified time stamp.
-	 * @param timestamp specified time stamp.
+	 * Getting UUID of this time stamp.
+	 * @return UUID of this time stamp.
 	 */
-	public Timestamp(long timestamp) {
-		this.timestamp = timestamp >= 0 ? timestamp : 0;
-	}
-	
-	
-	/**
-	 * Getting time stamp as long number.
-	 * @return time stamp as long number.
-	 */
-	public long getTimestamp() {
-		return timestamp;
+	public UUID getUUID() {
+		return uuid;
 	}
 	
 	
@@ -63,7 +54,21 @@ public class Timestamp implements Serializable {
 	 * @return whether this time stamp is valid.
 	 */
 	public boolean isValid() {
-		return timestamp > 0;
+		return uuid != null;
+	}
+
+
+	@Override
+	public boolean equals(Object obj) {
+		// TODO Auto-generated method stub
+		if (obj == null)
+			return uuid == null;
+		else if (!(obj instanceof Timestamp))
+			return false;
+		else if (!((Timestamp)obj).isValid())
+			return !isValid();
+		else
+			return this.uuid.equals(((Timestamp)obj).uuid);
 	}
 	
 	

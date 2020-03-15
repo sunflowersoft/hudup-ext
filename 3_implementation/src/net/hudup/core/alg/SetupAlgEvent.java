@@ -10,7 +10,10 @@ package net.hudup.core.alg;
 import java.io.Serializable;
 import java.util.EventObject;
 
+import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Dataset;
+import net.hudup.core.data.DatasetRemote;
+import net.hudup.core.data.DatasetRemoteWrapper;
 
 /**
  * This class represents an event fired by a source (often evaluator) for successful setting up an algorithm.
@@ -67,7 +70,7 @@ public class SetupAlgEvent extends EventObject {
 	/**
 	 * Training dataset. It must be serializable in remote call.
 	 */
-	protected Dataset trainingDataset = null;
+	private DatasetRemote trainingDataset = null;
 	
 	
 	/**
@@ -87,11 +90,20 @@ public class SetupAlgEvent extends EventObject {
 	public SetupAlgEvent(Serializable source, Type type, Alg alg, Dataset trainingDataset, Serializable setupResult) {
 		super(source);
 		// TODO Auto-generated constructor stub
-		this.alg = alg;
-		if (alg != null)
+		if (alg != null) {
 			this.algName = alg.getName();
+			if (AlgDesc2.isRemote(alg))
+				this.alg = alg;
+			else
+				this.alg = alg.newInstance();
+		}
+		if (source == alg) this.source = this.alg;
+		
 		this.type = type;
-		this.trainingDataset = trainingDataset;
+		if (trainingDataset instanceof DatasetRemoteWrapper)
+			this.trainingDataset = (DatasetRemoteWrapper)trainingDataset;
+		else if (trainingDataset instanceof DatasetRemote)
+			this.trainingDataset = new DatasetRemoteWrapper((DatasetRemote)trainingDataset, false);
 		this.setupResult = setupResult;
 	}
 
@@ -128,7 +140,7 @@ public class SetupAlgEvent extends EventObject {
 	 * @return training dataset.
 	 */
 	public Dataset getTrainingDataset() {
-		return trainingDataset;
+		return trainingDataset instanceof Dataset ? (Dataset)trainingDataset : null;
 	}
 	
 	
@@ -150,9 +162,12 @@ public class SetupAlgEvent extends EventObject {
 		buffer.append("Setup result of algorithm");
 		if (alg != null)
 			buffer.append(" \"" + alg.getName() + "\"");
-		if (trainingDataset != null && trainingDataset.getConfig().getMainUnit() != null) {
-			String mainUnit = trainingDataset.getConfig().getMainUnit();
-			String datasetName = trainingDataset.getConfig().getAsString(mainUnit);
+		
+		Dataset trainingDataset = getTrainingDataset();
+		DataConfig config = trainingDataset != null ? trainingDataset.getConfig() : null;
+		if (config != null && config.getMainUnit() != null) {
+			String mainUnit = config.getMainUnit();
+			String datasetName = config.getAsString(mainUnit);
 			if (datasetName != null)
 				buffer.append(" on training dataset \"" + datasetName + "\"");
 		}

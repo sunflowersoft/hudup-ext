@@ -101,7 +101,7 @@ public class DatasetRemoteWrapper implements Dataset, DatasetRemote {
 	public Fetcher<Integer> fetchUserIds() {
 		// TODO Auto-generated method stub
 		try {
-			return remoteDataset.remoteFetchUserIds();
+			return FetcherUtil.fixFetcherSerialized(remoteDataset.remoteFetchUserIds());
 		}
 		catch (Exception e) {e.printStackTrace();}
 		
@@ -137,7 +137,7 @@ public class DatasetRemoteWrapper implements Dataset, DatasetRemote {
 	public Fetcher<Integer> fetchItemIds() {
 		// TODO Auto-generated method stub
 		try {
-			return remoteDataset.remoteFetchItemIds();
+			return FetcherUtil.fixFetcherSerialized(remoteDataset.remoteFetchItemIds());
 		}
 		catch (Exception e) {e.printStackTrace();}
 		
@@ -197,7 +197,7 @@ public class DatasetRemoteWrapper implements Dataset, DatasetRemote {
 	public Fetcher<RatingVector> fetchUserRatings() {
 		// TODO Auto-generated method stub
 		try {
-			return remoteDataset.remoteFetchUserRatings();
+			return FetcherUtil.fixFetcherSerialized(remoteDataset.remoteFetchUserRatings());
 		}
 		catch (Exception e) {e.printStackTrace();}
 		
@@ -221,7 +221,7 @@ public class DatasetRemoteWrapper implements Dataset, DatasetRemote {
 	public Fetcher<RatingVector> fetchItemRatings() {
 		// TODO Auto-generated method stub
 		try {
-			return remoteDataset.remoteFetchItemRatings();
+			return FetcherUtil.fixFetcherSerialized(remoteDataset.remoteFetchItemRatings());
 		}
 		catch (Exception e) {e.printStackTrace();}
 		
@@ -269,7 +269,7 @@ public class DatasetRemoteWrapper implements Dataset, DatasetRemote {
 	public Fetcher<Profile> fetchUserProfiles() {
 		// TODO Auto-generated method stub
 		try {
-			return remoteDataset.remoteFetchUserProfiles();
+			return FetcherUtil.fixFetcherSerialized(remoteDataset.remoteFetchUserProfiles());
 		}
 		catch (Exception e) {e.printStackTrace();}
 		
@@ -305,7 +305,7 @@ public class DatasetRemoteWrapper implements Dataset, DatasetRemote {
 	public Fetcher<Profile> fetchItemProfiles() {
 		// TODO Auto-generated method stub
 		try {
-			return remoteDataset.remoteFetchItemProfiles();
+			return FetcherUtil.fixFetcherSerialized(remoteDataset.remoteFetchItemProfiles());
 		}
 		catch (Exception e) {e.printStackTrace();}
 		
@@ -353,7 +353,7 @@ public class DatasetRemoteWrapper implements Dataset, DatasetRemote {
 	public Fetcher<Profile> fetchSample() {
 		// TODO Auto-generated method stub
 		try {
-			return remoteDataset.remoteFetchSample();
+			return FetcherUtil.fixFetcherSerialized(remoteDataset.remoteFetchSample());
 		}
 		catch (Exception e) {e.printStackTrace();}
 		
@@ -466,6 +466,27 @@ public class DatasetRemoteWrapper implements Dataset, DatasetRemote {
 	}
 
 
+	/**
+	 * Exporting internal dataset.
+	 * @param serverPort server port. Using port 0 if not concerning registry or naming..
+	 * @return successfully stub object. Return null if failed.
+	 * @throws RemoteException if any error raises.
+	 */
+	public synchronized Remote exportInside(int serverPort) throws RemoteException {
+		if (remoteDataset == null)
+			return null;
+		else if (remoteDataset instanceof Exportable) {
+			try {
+				return ((Exportable)remoteDataset).export(serverPort);
+			} catch (Exception e) {e.printStackTrace();}
+			
+			return null;
+		}
+		else
+			return NetUtil.RegistryRemote.export(remoteDataset, serverPort);
+	}
+
+	
 	@Override
 	public synchronized void unexport() throws RemoteException {
 		// TODO Auto-generated method stub
@@ -484,6 +505,20 @@ public class DatasetRemoteWrapper implements Dataset, DatasetRemote {
 
 	
 	@Override
+	public synchronized void forceUnexport() throws RemoteException {
+		// TODO Auto-generated method stub
+		if (remoteDataset != null) {
+			try {
+				remoteDataset.unexport();
+			} catch (Exception e) {e.printStackTrace();}
+		}
+		remoteDataset = null;
+
+		unexport();
+	}
+
+
+	@Override
 	public Remote getExportedStub() throws RemoteException {
 		return exportedStub;
 	}
@@ -492,7 +527,7 @@ public class DatasetRemoteWrapper implements Dataset, DatasetRemote {
 	@Override
 	public void clear() {
 		// TODO Auto-generated method stub
-		if (remoteDataset instanceof DatasetAbstract) {
+		if (remoteDataset != null && (remoteDataset instanceof DatasetAbstract)) {
 			((DatasetAbstract)remoteDataset).clear();
 		}
 		

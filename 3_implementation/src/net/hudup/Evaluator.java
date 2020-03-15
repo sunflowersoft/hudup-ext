@@ -19,7 +19,6 @@ import net.hudup.core.PluginStorage;
 import net.hudup.core.RegisterTable;
 import net.hudup.core.Util;
 import net.hudup.core.alg.Alg;
-import net.hudup.core.alg.AlgList;
 import net.hudup.core.data.DatasetPool;
 import net.hudup.core.evaluate.EvaluateEvent;
 import net.hudup.core.evaluate.EvaluateEvent.Type;
@@ -158,7 +157,7 @@ public class Evaluator implements AccessPoint {
 			
 			DatasetPool pool = script.getPool();
 			LogUtil.info("Evaluation is running...");
-			ev.remoteStart(AlgList.getAlgNameList(algList), pool, beginTime);
+			ev.remoteStart0(algList, pool.toDatasetExchangedPoolClient(), beginTime);
 		}
 		catch (Exception e) {
 			e.printStackTrace();

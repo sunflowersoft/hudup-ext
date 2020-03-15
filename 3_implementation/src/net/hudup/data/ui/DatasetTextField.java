@@ -184,7 +184,17 @@ public class DatasetTextField extends TagTextField {
 	 * @param dataset specified dataset.
 	 */
 	public void setDataset(Dataset dataset) {
-		if (tag != null && tag instanceof Dataset)
+		setDataset(dataset, true);
+	}
+	
+	
+	/**
+	 * Setting dataset.
+	 * @param dataset specified dataset.
+	 * @param clearPreviousDataset true if clearing previous dataset. 
+	 */
+	public void setDataset(Dataset dataset, boolean clearPreviousDataset) {
+		if (tag != null && clearPreviousDataset && tag instanceof Dataset)
 			((Dataset)tag).clear();
 		
 		tag = dataset;

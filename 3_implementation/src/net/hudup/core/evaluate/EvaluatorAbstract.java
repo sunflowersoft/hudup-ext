@@ -33,6 +33,7 @@ import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.DatasetPair;
 import net.hudup.core.data.DatasetPool;
+import net.hudup.core.data.DatasetPoolExchanged;
 import net.hudup.core.data.Fetcher;
 import net.hudup.core.data.Profile;
 import net.hudup.core.evaluate.EvaluateEvent.Type;
@@ -42,7 +43,6 @@ import net.hudup.core.logistic.CounterElapsedTimeListener;
 import net.hudup.core.logistic.DSUtil;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.NetUtil;
-import net.hudup.core.logistic.NextUpdate;
 import net.hudup.core.logistic.SystemUtil;
 import net.hudup.core.logistic.Timestamp;
 import net.hudup.core.logistic.UriAdapter;
@@ -182,7 +182,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 	/**
 	 * Resulted dataset pool.
 	 */
-	protected DatasetPool poolResult = null;
+	protected DatasetPoolExchanged poolResult = null;
 
 	
 	/**
@@ -238,40 +238,27 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 	}
 	
 	
-	/**
-	 * Starting the evaluation process on specified algorithms with specified dataset pool.
-	 * The original (built-in) metrics were discovered by Plug-in manager.
-	 * 
-	 * @param algNameList specified list of algorithm name.
-	 * @param pool specified dataset pool containing many training datasets and testing datasets. It must be serializable in remote call.
-	 * @param parameter additional parameter.
-	 * @return true if successful.
-	 */
-	public synchronized boolean evaluate(List<String> algNameList, DatasetPool pool, Serializable parameter) {
+	@Override
+	public synchronized boolean remoteStart0(List<Alg> algList, DatasetPoolExchanged pool, Serializable parameter) throws RemoteException {
+		// TODO Auto-generated method stub
 		if (isStarted() || this.algList != null || this.pool != null) {
 			LogUtil.error("Evaluator is running and so evaluation is not run");
 			return false;
 		}
 		
-		try {
-			clearDelayUnsetupAlgs(); //This code line is important.
-		} catch (Throwable e) {e.printStackTrace();} 
-		
-		RegisterTable pluginAlgReg = PluginStorage.getNormalAlgReg();
-		List<Alg> newAlgList = Util.newList();
-		for (String algName : algNameList) {
-			Alg pluginAlg = pluginAlgReg.query(algName);
-			if (pluginAlg != null)
-				newAlgList.add(pluginAlg); //This code line is important to remote setting.
-		}
-
-		if (newAlgList == null || newAlgList.size() == 0 || pool == null || pool.size() == 0) {
+		if (algList == null || algList.size() == 0 || pool == null || pool.dspList.size() == 0) {
 			LogUtil.error("Empty algorithm list of empty dataset pool");
 			return false;
 		}
 
-		this.algList = newAlgList;
-		this.pool = pool;
+		try {
+			clearDelayUnsetupAlgs(); //This code line is important.
+		} catch (Throwable e) {e.printStackTrace();} 
+		
+		this.algList = algList;
+		
+		this.pool = pool.toDatasetPool(poolResult);
+		this.pool.fillMissingUUID();
 		this.parameter = parameter;
 		this.result = null;
 		
@@ -284,11 +271,33 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 		}
 		this.otherResult.algName = this.otherResult.algNames.get(0);
 		
-		this.poolResult = pool;
+		if (this.poolResult != null)
+			this.poolResult.unexport(true);
+		this.poolResult = this.pool.toDatasetExchangedPool();
+		this.poolResult.export(config.getEvaluatorPort(), false);
+			
+		if (!start()) {
+			clear();
+			return false;
+		}
 		
-		return start();
+		this.counter.stop();
+		this.counter.start();
+
+		Timestamp timestamp = null;
+		if ((parameter != null) && (parameter instanceof Timestamp) && ((Timestamp)parameter).isValid())
+			timestamp = (Timestamp)parameter;
+		else
+			timestamp = new Timestamp();
+		fireEvaluatorEvent(new EvaluatorEvent(
+				this, 
+				EvaluatorEvent.Type.start,
+				this.otherResult,
+				timestamp));
+		
+		return true;
 	}
-	
+
 	
 	@Override
 	public void run() {
@@ -346,7 +355,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 					otherResult.inAlgSetup = true;
 					if (alg instanceof AlgRemote) {
 						((AlgRemote)alg).addSetupListener(this);
-						SetupAlgEvent setupEvt = new SetupAlgEvent(new Integer(-1), SetupAlgEvent.Type.doing, alg, null, "not supported yet");
+						SetupAlgEvent setupEvt = new SetupAlgEvent(alg, SetupAlgEvent.Type.doing, alg, null, "not supported yet");
 						fireSetupAlgEvent(setupEvt);
 					}
 					
@@ -365,7 +374,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 					fireEvaluateEvent(new EvaluateEvent(this, Type.doing, setupMetrics)); // firing setup time metric
 					
 					if (alg instanceof AlgRemote) {
-						SetupAlgEvent setupEvt = new SetupAlgEvent(new Integer(1), SetupAlgEvent.Type.done, alg, null, "not supported yet");
+						SetupAlgEvent setupEvt = new SetupAlgEvent(alg, SetupAlgEvent.Type.done, alg, null, "not supported yet");
 						fireSetupAlgEvent(setupEvt);
 						((AlgRemote)alg).removeSetupListener(this);
 					}
@@ -545,9 +554,8 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 	protected abstract Fetcher<Profile> fetchTesting(Dataset testing);
 	
 	
-	@NextUpdate
 	@Override
-	public DatasetPool getDatasetPool() throws RemoteException {
+	public DatasetPoolExchanged getDatasetPool() throws RemoteException {
 		// TODO Auto-generated method stub
 		return poolResult;
 	}
@@ -776,6 +784,9 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 	}
 
 
+	/*
+	 * This method only clears parameters.
+	 */
 	@Override
 	protected void clear() {
 		// TODO Auto-generated method stub
@@ -1183,6 +1194,13 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 
 
 	@Override
+	public synchronized void forceUnexport() throws RemoteException {
+		// TODO Auto-generated method stub
+		unexport();
+	}
+
+
+	@Override
 	public Remote getExportedStub() throws RemoteException {
 		return exportedStub;
 	}
@@ -1216,6 +1234,17 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 		catch (Throwable e) {e.printStackTrace();}
 		
 		try {
+			if (pool != null)
+				pool.clear();
+			if (poolResult != null)
+				poolResult.unexport(true);
+
+			pool = null;
+			poolResult = null;
+		}
+		catch (Throwable e) {e.printStackTrace();}
+
+		try {
 			otherResult.evStorePath = null;
 			evProcessor.clear();
 		}
@@ -1247,61 +1276,36 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 
 	
 	@Override
+	public synchronized boolean remoteStart(List<String> algNameList, DatasetPoolExchanged pool, Serializable parameter) throws RemoteException {
+		RegisterTable algReg = PluginStorage.getNormalAlgReg();
+		List<Alg> algList = Util.newList();
+		for (String algName : algNameList) {
+			Alg alg = algReg.query(algName);
+			if (alg != null)
+				algList.add(alg); //This code line is important to remote setting.
+		}
+		
+		return remoteStart0(algList, pool, parameter);
+	}
+	
+	
+	@Override
 	public synchronized boolean remoteStart(Serializable... parameters) throws RemoteException {
 		// TODO Auto-generated method stub
 		if (parameters == null || parameters.length < 2
 				|| !(parameters[0] instanceof List<?>)
-				|| !(parameters[1] instanceof DatasetPool))
+				|| !(parameters[1] instanceof DatasetPoolExchanged))
 			return false;
 		
 		@SuppressWarnings("unchecked")
 		List<String> algNameList = (List<String>)(parameters[0]);
-		DatasetPool pool = (DatasetPool)(parameters[1]);
+		DatasetPoolExchanged pool = (DatasetPoolExchanged)(parameters[1]);
 		Serializable parameter = parameters.length > 2? parameters[2] : null;
 		
-		if (!evaluate(algNameList, pool, parameter)) return false;
-
-		this.counter.stop();
-		this.counter.start();
-
-		Timestamp timestamp = null;
-		if ((parameter != null) && (parameter instanceof Timestamp) && ((Timestamp)parameter).isValid())
-			timestamp = (Timestamp)parameter;
-		else
-			timestamp = new Timestamp();
-		fireEvaluatorEvent(new EvaluatorEvent(
-			this, 
-			EvaluatorEvent.Type.start,
-			this.otherResult,
-			timestamp));
-		
-		return true;
+		return remoteStart(algNameList, pool, parameter);
 	}
 
 
-	@Override
-	public synchronized boolean remoteStart(List<String> algNameList, DatasetPool pool, Serializable parameter) throws RemoteException {
-		// TODO Auto-generated method stub
-		if (!evaluate(algNameList, pool, parameter)) return false;
-
-		this.counter.stop();
-		this.counter.start();
-
-		Timestamp timestamp = null;
-		if ((parameter != null) && (parameter instanceof Timestamp) && ((Timestamp)parameter).isValid())
-			timestamp = (Timestamp)parameter;
-		else
-			timestamp = new Timestamp();
-		fireEvaluatorEvent(new EvaluatorEvent(
-				this, 
-				EvaluatorEvent.Type.start,
-				this.otherResult,
-				timestamp));
-		
-		return true;
-	}
-
-	
 	@Override
 	public synchronized boolean remotePause() throws RemoteException {
 		// TODO Auto-generated method stub

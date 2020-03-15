@@ -12,6 +12,7 @@ import java.rmi.RemoteException;
 
 import javax.swing.event.EventListenerList;
 
+import net.hudup.core.ExtraStorage;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.logistic.DSUtil;
 import net.hudup.core.logistic.NetUtil;
@@ -196,10 +197,19 @@ public abstract class AlgAbstract implements Alg, AlgRemote {
 		if (exportedStub != null) {
 			NetUtil.RegistryRemote.unexport(this);
 			exportedStub = null;
+	
+			ExtraStorage.removeUnmanagedExportedObject(this);
 		}
 	}
 
 	
+	@Override
+	public synchronized void forceUnexport() throws RemoteException {
+		// TODO Auto-generated method stub
+		unexport();
+	}
+
+
 	@Override
 	public Remote getExportedStub() throws RemoteException {
 		return exportedStub;

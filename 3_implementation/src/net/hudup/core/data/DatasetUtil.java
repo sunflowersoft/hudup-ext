@@ -103,4 +103,38 @@ public final class DatasetUtil {
 	}
 	
 	
+	/**
+	 * Checking whether the specified dataset is remote object.
+	 * @param dataset specified dataset.
+	 * @return whether the specified dataset is remote object.
+	 */
+	public static boolean isRemote(Dataset dataset) {
+		if (dataset == null)
+			return false;
+		else if (dataset instanceof DatasetRemoteWrapper) {
+			DatasetRemote remoteDataset = ((DatasetRemoteWrapper)dataset).getRemoteDataset();
+			return ((remoteDataset != null) && !(remoteDataset instanceof Dataset));
+		}
+		else
+			return false;
+	}
+
+	
+	/**
+	 * Getting most inner dataset of remote dataset.
+	 * @param remoteDataset remote dataset.
+	 * @return most inner dataset of remote dataset.
+	 */
+	public static Dataset getMostInnerDataset(DatasetRemote remoteDataset) {
+		if (remoteDataset == null)
+			return null;
+		else if (remoteDataset instanceof DatasetRemoteWrapper)
+			return getMostInnerDataset(((DatasetRemoteWrapper)remoteDataset).getRemoteDataset());
+		else if (remoteDataset instanceof Dataset)
+			return (Dataset)remoteDataset;
+		else
+			return null;
+	}
+
+
 }

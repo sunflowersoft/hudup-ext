@@ -8,6 +8,7 @@
 package net.hudup.core.data;
 
 import java.io.Serializable;
+import java.util.UUID;
 
 /**
  * This contains a pair of dataset such as training dataset and testing dataset.
@@ -44,6 +45,24 @@ public class DatasetPair implements Serializable {
 	 * Whole dataset (entire dataset) from which training dataset and testing dataset are extracted.
 	 */
 	protected Dataset whole = null;
+
+	
+	/**
+	 * Training time stamp;
+	 */
+	protected UUID trainingUUID = null;
+
+	
+	/**
+	 * Testing time stamp;
+	 */
+	protected UUID testingUUID = null;
+	
+	
+	/**
+	 * Whole time stamp;
+	 */
+	protected UUID wholeUUID = null;
 
 	
 	/**

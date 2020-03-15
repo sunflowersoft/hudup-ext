@@ -48,7 +48,7 @@ import net.hudup.core.parser.DatasetParser;
  * @version 10.0
  *
  */
-public final class PluginStorage implements Serializable {
+public class PluginStorage implements Serializable {
 
 	
 	/**

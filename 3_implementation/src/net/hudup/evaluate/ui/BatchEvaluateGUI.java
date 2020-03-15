@@ -434,7 +434,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 		JPanel down = new JPanel(new BorderLayout(2, 2));
 		header.add(down, BorderLayout.CENTER);
 		
-		this.tblDatasetPool = new DatasetPoolTable() {
+		this.tblDatasetPool = new DatasetPoolTable(this.bindUri) {
 
 			/**
 			 * Serial version UID for serializable class. 
@@ -912,8 +912,11 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			if (evaluator.remoteIsStarted())
 				return;
 			
-			guiData.pool.reload();
-	
+			if (bindUri == null)
+				guiData.pool.reload();
+			else
+				guiData.pool = evaluator.getDatasetPool().toDatasetPoolClient();
+
 			tblDatasetPool.update(guiData.pool);
 			clearResult();
 			updateMode();
@@ -933,7 +936,10 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			if (evaluator.remoteIsStarted())
 				return;
 			
-			guiData.pool.clear();
+			if (bindUri == null)
+				guiData.pool.clear();
+			else
+				guiData.pool = new DatasetPool();
 			this.tblDatasetPool.update(guiData.pool);
 			this.lbAlgs.update(algRegTable.getAlgList());
 			
@@ -967,8 +973,12 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			
 			clearResult();
 			Timestamp timestamp = new Timestamp();
-			this.timestamp = timestamp.getTimestamp();
-			evaluator.remoteStart(lbAlgs.getAlgNameList(), guiData.pool, timestamp);
+			boolean started = false;
+			if (bindUri == null)
+				started = evaluator.remoteStart0(lbAlgs.getAlgList(), guiData.pool.toDatasetExchangedPoolClient(), timestamp);
+			else
+				started = evaluator.remoteStart(lbAlgs.getAlgNameList(), guiData.pool.toDatasetExchangedPoolClient(), timestamp);
+			if (!started) updateMode();
 		}
 		catch (Throwable e) {
 			e.printStackTrace();
@@ -985,9 +995,10 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			lbAlgs.update(algRegTable.getAlgList(evt.getOtherResult().algNames));
 
 			Timestamp timestamp = evt.getTimestamp();
-			if (!timestamp.isValid() || timestamp.getTimestamp() != this.timestamp) {
+			if (timestamp == null || this.timestamp == null || !timestamp.isValid() || !this.timestamp.isValid() ||
+					!timestamp.equals(this.timestamp)) {
 				try {
-					guiData.pool = evaluator.getDatasetPool();
+					guiData.pool = evaluator.getDatasetPool().toDatasetPoolClient();
 				} catch (Throwable e) {e.printStackTrace();}
 				guiData.pool = guiData.pool != null ? guiData.pool : new DatasetPool();
 				
@@ -1026,7 +1037,6 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 		if (evt.getType() == Type.done) {
 			updateMode();
 		}
-		
 	}
 
 	
@@ -1097,7 +1107,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 
 
 	@Override
-	protected void updateMode() {
+	protected synchronized void updateMode() {
 		try {
 			evProcessor.closeIOChannels();
 			
@@ -1306,7 +1316,10 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			else
 				this.lbAlgs.update(batchAlgList);
 			
-			guiData.pool.clear();
+			if (bindUri == null)
+				guiData.pool.clear();
+			else
+				guiData.pool = new DatasetPool();
 			DatasetPool scriptPool = script.getPool();
 			Alg[] algList = this.lbAlgs.getAlgList().toArray(new Alg[] {} );
 			for (int i = 0; i < scriptPool.size(); i++) {
@@ -1449,7 +1462,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			this.tblMetrics.clear();
 			this.statusBar.getLastPane().setText(""); //Clearing elapsed time information.
 			
-			this.timestamp = 0;
+			this.timestamp = null;
 		}
 		catch (Throwable e) {
 			e.printStackTrace();

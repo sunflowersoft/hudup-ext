@@ -113,6 +113,13 @@ public abstract class DatasetAbstract implements Dataset, DatasetRemote {
 
 	
 	@Override
+	public synchronized void forceUnexport() throws RemoteException {
+		// TODO Auto-generated method stub
+		unexport();
+	}
+
+
+	@Override
 	public Remote getExportedStub() throws RemoteException {
 		return exportedStub;
 	}

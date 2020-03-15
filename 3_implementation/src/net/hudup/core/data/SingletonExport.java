@@ -16,7 +16,6 @@ package net.hudup.core.data;
  * @version 12.0
  *
  */
-@Deprecated
 public interface SingletonExport {
 
 	

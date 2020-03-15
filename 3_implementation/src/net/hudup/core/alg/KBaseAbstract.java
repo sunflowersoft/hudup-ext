@@ -336,6 +336,13 @@ public abstract class KBaseAbstract implements KBase, KBaseRemote {
 
 	
 	@Override
+	public synchronized void forceUnexport() throws RemoteException {
+		// TODO Auto-generated method stub
+		unexport();
+	}
+
+
+	@Override
 	public Remote getExportedStub() throws RemoteException {
 		return exportedStub;
 	}
@@ -365,7 +372,7 @@ public abstract class KBaseAbstract implements KBase, KBaseRemote {
 		} catch (Throwable e) {e.printStackTrace();}
 		
 		try {
-			unexport();;
+			unexport();
 		} catch (Throwable e) {e.printStackTrace();}
 	}
 

@@ -31,7 +31,7 @@ import net.hudup.core.client.Request;
 import net.hudup.core.client.Response;
 import net.hudup.core.client.Service;
 import net.hudup.core.data.DataConfig;
-import net.hudup.core.data.DatasetPool;
+import net.hudup.core.data.DatasetPoolExchanged;
 import net.hudup.core.data.MemFetcher;
 import net.hudup.core.evaluate.EvaluateEvent;
 import net.hudup.core.evaluate.EvaluateInfo;
@@ -557,7 +557,7 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluateListen
 
 	@NextUpdate
 	@Override
-	public DatasetPool getDatasetPool() throws RemoteException {
+	public DatasetPoolExchanged getDatasetPool() throws RemoteException {
 		// TODO Auto-generated method stub
 		return remoteEvaluator.getDatasetPool();
 	}
@@ -881,6 +881,35 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluateListen
 
 
 	@Override
+	public synchronized boolean remoteStart0(List<Alg> algList, DatasetPoolExchanged pool, Serializable parameter) throws RemoteException {
+		// TODO Auto-generated method stub
+		boolean flag = socketServer.getFlag();
+		
+		if (flag)
+			return remoteEvaluator.remoteStart0(algList, pool, parameter);
+		else if (socketServer.isRunning())
+			return remoteEvaluator.remoteStart0(algList, pool, parameter);
+		else
+			throw new RemoteException("Socket server is not running");
+	}
+
+	
+	@Override
+	public boolean remoteStart(List<String> algNameList, DatasetPoolExchanged pool, Serializable parameter)
+			throws RemoteException {
+		// TODO Auto-generated method stub
+		boolean flag = socketServer.getFlag();
+		
+		if (flag)
+			return remoteEvaluator.remoteStart(algNameList, pool, parameter);
+		else if (socketServer.isRunning())
+			return remoteEvaluator.remoteStart(algNameList, pool, parameter);
+		else
+			throw new RemoteException("Socket server is not running");
+	}
+
+
+	@Override
 	public synchronized boolean remoteStart(Serializable... parameters) throws RemoteException {
 		// TODO Auto-generated method stub
 		boolean flag = socketServer.getFlag();
@@ -894,20 +923,6 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluateListen
 	}
 
 
-	@Override
-	public synchronized boolean remoteStart(List<String> algNameList, DatasetPool pool, Serializable parameter) throws RemoteException {
-		// TODO Auto-generated method stub
-		boolean flag = socketServer.getFlag();
-		
-		if (flag)
-			return remoteEvaluator.remoteStart(algNameList, pool, parameter);
-		else if (socketServer.isRunning())
-			return remoteEvaluator.remoteStart(algNameList, pool, parameter);
-		else
-			throw new RemoteException("Socket server is not running");
-	}
-
-	
 	@Override
 	public synchronized boolean remotePause() throws RemoteException {
 		// TODO Auto-generated method stub
@@ -1037,6 +1052,13 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluateListen
 			else
 				LogUtil.info("Delegator evaluator unexported failedly");
 		}
+	}
+
+
+	@Override
+	public synchronized void forceUnexport() throws RemoteException {
+		// TODO Auto-generated method stub
+		unexport();
 	}
 
 

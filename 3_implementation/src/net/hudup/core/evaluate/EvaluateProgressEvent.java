@@ -77,8 +77,7 @@ public class EvaluateProgressEvent extends EventObject {
 	 */
 	@NextUpdate
 	public EvaluateProgressEvent(Evaluator evaluator, int progressTotal, int progressStep) {
-//		super(evaluator); //Test different hosts for RMI, evaluator wrapper can solve.
-		super(new Integer(1)); //Not use evaluator because of improving network speed.
+		super(evaluator); //Test different hosts for RMI, evaluator wrapper can solve.
 		
 		this.progressTotal = progressTotal;
 		this.progressStep = progressStep;

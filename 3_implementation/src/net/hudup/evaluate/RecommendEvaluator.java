@@ -154,7 +154,7 @@ public class RecommendEvaluator extends EvaluatorAbstract {
 					
 					otherResult.inAlgSetup = true;
 					recommender.addSetupListener(this);
-					SetupAlgEvent setupEvt = new SetupAlgEvent(new Integer(-1), SetupAlgEvent.Type.doing, recommender, null, "not supported yet");
+					SetupAlgEvent setupEvt = new SetupAlgEvent(recommender, SetupAlgEvent.Type.doing, recommender, null, "not supported yet");
 					fireSetupAlgEvent(setupEvt);
 					
 					long beginSetupTime = System.currentTimeMillis();
@@ -172,7 +172,7 @@ public class RecommendEvaluator extends EvaluatorAbstract {
 					//Fire doing event with setup time metric.
 					fireEvaluateEvent(new EvaluateEvent(this, Type.doing, setupMetrics)); // firing setup time metric
 					
-					setupEvt = new SetupAlgEvent(new Integer(1), SetupAlgEvent.Type.done, recommender, null, "not supported yet");
+					setupEvt = new SetupAlgEvent(recommender, SetupAlgEvent.Type.done, recommender, null, "not supported yet");
 					fireSetupAlgEvent(setupEvt);
 					recommender.removeSetupListener(this);
 					otherResult.inAlgSetup = false;

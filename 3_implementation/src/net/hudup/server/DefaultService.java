@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import net.hudup.core.ExtraStorage;
 import net.hudup.core.PluginStorage;
 import net.hudup.core.Util;
 import net.hudup.core.alg.Alg;
@@ -42,6 +43,7 @@ import net.hudup.core.data.Provider;
 import net.hudup.core.data.Rating;
 import net.hudup.core.data.RatingVector;
 import net.hudup.core.data.Scanner;
+import net.hudup.core.data.SingletonExport;
 import net.hudup.core.data.Snapshot;
 import net.hudup.core.evaluate.Evaluator;
 import net.hudup.core.evaluate.EvaluatorConfig;
@@ -1543,13 +1545,14 @@ public class DefaultService implements Service, AutoCloseable {
 				AlgRemote remoteAlg = (AlgRemote)alg;
 				
 				remoteAlg = (AlgRemote) alg.newInstance();
-				////////////////////////////////////////////
-//				if (!(remoteAlg instanceof SingletonExport))
-//					remoteAlg = (AlgRemote) alg.newInstance(); //Fix later
-				////////////////////////////////////////////
+				boolean singleton = remoteAlg instanceof SingletonExport;
+				if (!singleton)
+					remoteAlg = (AlgRemote) alg.newInstance(); //Fix later
 				
 				remoteAlg.export(serverConfig.getServerPort());
 				alg = Util.getPluginManager().wrap(remoteAlg, false);
+				if (!singleton)
+					ExtraStorage.addUnmanagedExportedObject(remoteAlg);
 			}
 		}
 		catch (Throwable e) {

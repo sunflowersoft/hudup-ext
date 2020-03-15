@@ -148,7 +148,6 @@ public final class RegisterTable implements Cloneable, Serializable {
 		Set<String> keys = from.algMap.keySet();
 		for (String key : keys) {
 			Alg alg = from.algMap.get(key);
-			//alg = alg.newInstance(); //You can clone algorithms for safety.
 			this.register(alg);
 		}
 	}

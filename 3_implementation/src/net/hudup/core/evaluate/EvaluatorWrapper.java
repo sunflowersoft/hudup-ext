@@ -18,13 +18,12 @@ import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.AlgDesc2List;
 import net.hudup.core.alg.SetupAlgEvent;
 import net.hudup.core.alg.SetupAlgListener;
-import net.hudup.core.data.DatasetPool;
+import net.hudup.core.data.DatasetPoolExchanged;
 import net.hudup.core.logistic.BaseClass;
 import net.hudup.core.logistic.CounterElapsedTimeListener;
 import net.hudup.core.logistic.DSUtil;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.NetUtil;
-import net.hudup.core.logistic.NextUpdate;
 
 /**
  * This class is wrapper of remote evaluator.
@@ -84,19 +83,26 @@ public class EvaluatorWrapper implements Evaluator, Serializable {
 
 	
 	@Override
+	public boolean remoteStart0(List<Alg> algList, DatasetPoolExchanged pool, Serializable parameter) throws RemoteException {
+		// TODO Auto-generated method stub
+		return remoteEvaluator.remoteStart0(algList, pool, parameter);
+	}
+
+
+	@Override
+	public boolean remoteStart(List<String> algNameList, DatasetPoolExchanged pool, Serializable parameter) throws RemoteException {
+		// TODO Auto-generated method stub
+		return remoteEvaluator.remoteStart(algNameList, pool, parameter);
+	}
+
+
+	@Override
 	public boolean remoteStart(Serializable... parameters) throws RemoteException {
 		// TODO Auto-generated method stub
 		return remoteEvaluator.remoteStart(parameters);
 	}
 
 	
-	@Override
-	public boolean remoteStart(List<String> algNameList, DatasetPool pool, Serializable parameter) throws RemoteException {
-		// TODO Auto-generated method stub
-		return remoteEvaluator.remoteStart(algNameList, pool, parameter);
-	}
-
-
 	@Override
 	public boolean remotePause() throws RemoteException {
 		// TODO Auto-generated method stub
@@ -267,9 +273,8 @@ public class EvaluatorWrapper implements Evaluator, Serializable {
 //	}
 
 	
-	@NextUpdate
 	@Override
-	public DatasetPool getDatasetPool() throws RemoteException {
+	public DatasetPoolExchanged getDatasetPool() throws RemoteException {
 		// TODO Auto-generated method stub
 		return remoteEvaluator.getDatasetPool();
 	}
@@ -397,7 +402,7 @@ public class EvaluatorWrapper implements Evaluator, Serializable {
 
 	
 	@Override
-	public Remote export(int serverPort) throws RemoteException {
+	public synchronized Remote export(int serverPort) throws RemoteException {
 		// TODO Auto-generated method stub
 		if (exportedStub != null) return exportedStub;
 
@@ -412,7 +417,7 @@ public class EvaluatorWrapper implements Evaluator, Serializable {
 
 	
 	@Override
-	public void unexport() throws RemoteException {
+	public synchronized void unexport() throws RemoteException {
 		// TODO Auto-generated method stub
 		if (exclusive && remoteEvaluator != null) {
 			try {
@@ -429,6 +434,21 @@ public class EvaluatorWrapper implements Evaluator, Serializable {
 			LogUtil.info("Evaluator unexported successfully");
 		else
 			LogUtil.info("Evaluator unexported failedly");
+	}
+
+
+	@Override
+	public synchronized void forceUnexport() throws RemoteException {
+		// TODO Auto-generated method stub
+		if (remoteEvaluator != null) {
+			try {
+				if (!remoteEvaluator.isAgent())
+					remoteEvaluator.unexport();
+			} catch (Exception e) {e.printStackTrace();}
+		}
+		remoteEvaluator = null;
+		
+		unexport();
 	}
 
 

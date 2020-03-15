@@ -246,6 +246,21 @@ public class AlgRemoteWrapper implements Alg, AlgRemote, Serializable {
 	}
 
 	
+	@Override
+	public synchronized void forceUnexport() throws RemoteException {
+		// TODO Auto-generated method stub
+		if (remoteAlg != null) {
+			try {
+				//if (!remoteAlg.isAgent())
+					remoteAlg.unexport();
+			} catch (Exception e) {e.printStackTrace();}
+		}
+		remoteAlg = null;
+		
+		unexport();
+	}
+
+
 	/**
 	 * Getting remote algorithm.
 	 * @return remote algorithm.

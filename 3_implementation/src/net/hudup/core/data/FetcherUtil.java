@@ -54,4 +54,22 @@ public class FetcherUtil {
 	}
 	
 	
+	/**
+	 * Fixing the problem of serializing memory fetcher.
+	 * @param fetcher specified fetcher.
+	 * @return the specified fetcher itself.
+	 */
+	public static <T> Fetcher<T> fixFetcherSerialized(Fetcher<T> fetcher) {
+		if ((fetcher == null) || !(fetcher instanceof MemFetcher<?>))
+			return fetcher;
+		
+		MemFetcher<T> memFetcher = (MemFetcher<T>)fetcher;
+		if (memFetcher.iterator == null && memFetcher.data != null) {
+			memFetcher.update(memFetcher.data);
+		}
+		
+		return memFetcher;
+	}
+	
+	
 }

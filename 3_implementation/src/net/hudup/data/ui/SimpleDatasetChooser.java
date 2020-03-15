@@ -118,7 +118,7 @@ public class SimpleDatasetChooser extends JDialog {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
-				txtBrowse.setDataset(null);
+				txtBrowse.setDataset(null, true);
 				dispose();
 			}
 		});
@@ -144,7 +144,7 @@ public class SimpleDatasetChooser extends JDialog {
 		}
 		
 		Dataset dataset = DatasetUtil.loadDataset(config);
-		this.txtBrowse.setDataset(dataset);
+		this.txtBrowse.setDataset(dataset, true);
 	}
 	
 	
@@ -161,7 +161,7 @@ public class SimpleDatasetChooser extends JDialog {
 					"Dataset not open", 
 					JOptionPane.ERROR_MESSAGE);
 			
-			txtBrowse.setDataset(null);
+			txtBrowse.setDataset(null, true);
 			return;
 		}
 		

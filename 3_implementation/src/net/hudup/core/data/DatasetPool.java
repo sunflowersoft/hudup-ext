@@ -10,6 +10,7 @@ package net.hudup.core.data;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 
 import net.hudup.core.Util;
 import net.hudup.core.logistic.DSUtil;
@@ -38,7 +39,7 @@ public class DatasetPool implements Serializable {
 	 * Note, training dataset is the dataset used to build up some model like knowledge database ({@code KBase}) whereas testing dataset is the dataset used to test or evaluate such model.
 	 * Both training dataset and testing dataset are extracted from a so-called whole dataset or entire dataset.
 	 */
-	List<DatasetPair> dspList = Util.newList();
+	protected List<DatasetPair> dspList = Util.newList();
 	
 	
 	/**
@@ -178,6 +179,15 @@ public class DatasetPool implements Serializable {
     
     
     /**
+     * Removing the specified dataset pair from this dataset pool without clearing dataset.
+     * @param dsPair the dataset pair that will be removed.
+     */
+    public void removeWithoutClear(DatasetPair dsPair) {
+    	this.dspList.remove(dsPair);
+    }
+
+    
+    /**
      * Removing the dataset pair at specified index.
      * @param idx index of {@link DatasetPair} which will be removed.
      */
@@ -200,6 +210,23 @@ public class DatasetPool implements Serializable {
     	
     	for (DatasetPair pair : list) {
     		remove(pair);
+    	}
+    	
+    }
+    
+    
+    /**
+     * Removing dataset pairs at indices without clearing datasets.
+     * @param idxes array of indices of dataset pairs which will be removed.
+     */
+    public void removeWithoutClear(int[] idxes) {
+    	List<DatasetPair> list = Util.newList();
+    	for (int idx : idxes) {
+    		list.add(dspList.get(idx));
+    	}
+    	
+    	for (DatasetPair pair : list) {
+    		removeWithoutClear(pair);
     	}
     	
     }
@@ -424,6 +451,130 @@ public class DatasetPool implements Serializable {
     public void removeAllNoClearDatasets() {
     	dspList.clear();
     }
+
     
-    
+	/**
+	 * Filling missing UUIDs.
+	 */
+	public void fillMissingUUID() {
+		for (DatasetPair pair : dspList) {
+			if (pair.training != null && pair.trainingUUID == null)
+				pair.trainingUUID = UUID.randomUUID();
+			
+			if (pair.testing != null && pair.testingUUID == null)
+				pair.testingUUID = UUID.randomUUID();
+			
+			if (pair.whole != null && pair.wholeUUID == null)
+				pair.wholeUUID = UUID.randomUUID();
+		}
+	}
+
+	
+	/**
+	 * Converting normal dataset pool to exchanged dataset.
+	 * @return exchanged dataset pool.
+	 */
+	public DatasetPoolExchanged toDatasetExchangedPool() {
+		List<DatasetPairExchanged> exchangeDspList = Util.newList();
+		for (DatasetPair pair : dspList) {
+			if (pair == null) continue;
+			
+			DatasetRemoteWrapper training = null;
+			UUID trainingUUID = null;
+			if (pair.training != null) {
+				if (pair.training instanceof DatasetRemoteWrapper)
+					training = (DatasetRemoteWrapper)pair.training;
+				else if (pair.training instanceof DatasetRemote)
+					training = new DatasetRemoteWrapper((DatasetRemote)pair.training, false);
+				trainingUUID = training != null ? pair.trainingUUID : null;
+			}
+			
+			DatasetRemoteWrapper testing = null;
+			UUID testingUUID = null;
+			if (pair.testing != null) {
+				if (pair.testing instanceof DatasetRemoteWrapper)
+					testing = (DatasetRemoteWrapper)pair.testing;
+				else if (pair.testing instanceof DatasetRemote)
+					testing = new DatasetRemoteWrapper((DatasetRemote)pair.testing, false);
+				testingUUID = testing != null ? pair.testingUUID : null;
+			}
+			
+			DatasetRemoteWrapper whole = null;
+			UUID wholeUUID = null;
+			if (pair.whole != null) {
+				if (pair.whole instanceof DatasetRemoteWrapper)
+					whole = (DatasetRemoteWrapper)pair.whole;
+				else if (pair.whole instanceof DatasetRemote)
+					whole = new DatasetRemoteWrapper((DatasetRemote)pair.whole, false);
+				wholeUUID = whole != null ? pair.wholeUUID : null;
+			}
+			
+			
+			DatasetPairExchanged newPair = new DatasetPairExchanged(training, testing, whole);
+			newPair.trainingUUID = trainingUUID;
+			newPair.testingUUID = testingUUID;
+			newPair.wholeUUID = wholeUUID;
+			exchangeDspList.add(newPair);
+		}
+		
+		DatasetPoolExchanged exchangedPool = new DatasetPoolExchanged();
+		exchangedPool.dspList = exchangeDspList;
+		return exchangedPool;
+	}
+
+	
+	/**
+	 * Converting normal dataset pool to exchanged dataset in client. This method is called by evaluator GUI.
+	 * @return exchanged dataset pool in client.
+	 */
+	public DatasetPoolExchanged toDatasetExchangedPoolClient() {
+		List<DatasetPairExchanged> exchangeDspList = Util.newList();
+		for (DatasetPair pair : dspList) {
+			DatasetPairExchanged newPair = new DatasetPairExchanged();
+			
+			if (pair.training != null) {
+				if (DatasetUtil.isRemote(pair.training)) {
+					newPair.training = null;
+					newPair.trainingUUID = pair.trainingUUID;
+				}
+				else if (pair.training instanceof DatasetRemote) { //AbstractDataset as usual.
+					newPair.training = (DatasetRemote)pair.training;
+					newPair.trainingUUID = pair.trainingUUID;
+					newPair.trainingUUID = newPair.trainingUUID != null ? newPair.trainingUUID : UUID.randomUUID();
+				}
+			}
+			
+			if (pair.testing != null) {
+				if (DatasetUtil.isRemote(pair.testing)) {
+					newPair.testing = null;
+					newPair.testingUUID = pair.testingUUID;
+				}
+				else if (pair.testing instanceof DatasetRemote) { //AbstractDataset as usual.
+					newPair.testing = (DatasetRemote)pair.testing;
+					newPair.testingUUID = pair.testingUUID;
+					newPair.testingUUID = newPair.testingUUID != null ? newPair.testingUUID : UUID.randomUUID();
+				}
+			}
+			
+			if (pair.whole != null) {
+				if (DatasetUtil.isRemote(pair.whole)) {
+					newPair.whole = null;
+					newPair.wholeUUID = pair.wholeUUID;
+				}
+				else if (pair.whole instanceof DatasetRemote) { //AbstractDataset as usual.
+					newPair.whole = (DatasetRemote)pair.whole;
+					newPair.wholeUUID = pair.wholeUUID;
+					newPair.wholeUUID = newPair.wholeUUID != null ? newPair.wholeUUID : UUID.randomUUID();
+				}
+			}
+			
+			exchangeDspList.add(newPair);
+		}
+		
+		DatasetPoolExchanged exchangedPool = new DatasetPoolExchanged();
+		exchangedPool.dspList = exchangeDspList;
+		return exchangedPool;
+	}
+	
+	
 }

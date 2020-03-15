@@ -170,7 +170,7 @@ public class DatasetPoolDlg extends JDialog {
 		JPanel body = new JPanel(new BorderLayout());
 		add(body, BorderLayout.CENTER);
 		
-		this.tblDatasetPool = new DatasetPoolTable() {
+		this.tblDatasetPool = new DatasetPoolTable(null) {
 
 			/**
 			 * Serial version UID for serializable class. 
