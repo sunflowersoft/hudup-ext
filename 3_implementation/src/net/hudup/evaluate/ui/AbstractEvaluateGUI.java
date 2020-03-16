@@ -22,6 +22,7 @@ import net.hudup.core.Util;
 import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.SetupAlgListener;
 import net.hudup.core.data.DatasetPool;
+import net.hudup.core.data.DatasetPoolExchanged;
 import net.hudup.core.evaluate.EvaluateInfo;
 import net.hudup.core.evaluate.EvaluateListener;
 import net.hudup.core.evaluate.EvaluateProcessor;
@@ -237,29 +238,27 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 		} catch (RemoteException e) {e.printStackTrace();}
 		if (otherResult == null) otherResult = new EvaluateInfo();
 
-		boolean loadFromServer = false;
 		try {
-			loadFromServer = evaluator.remoteIsStarted(); //From server
+			if (evaluator.remoteIsStarted()) {
+				guiData.algName = otherResult.algName;
+				guiData.algNames = otherResult.algNames;
+			}
 		}
-		catch (RemoteException e) {
-			e.printStackTrace();
-			loadFromServer = false;
-		}
-		loadFromServer = loadFromServer || result != null;
-		
-		if (loadFromServer) {
-			guiData.algName = otherResult.algName;
-			guiData.algNames = otherResult.algNames;
-			
-			try {
-				guiData.pool = evaluator.getDatasetPool().toDatasetPoolClient();
-			} catch (Throwable e) {e.printStackTrace();}
-		}
-		
+		catch (RemoteException e) {e.printStackTrace();}
 		if (guiData.algNames == null || guiData.algNames.size() == 0)
 			guiData.algNames = algRegTable.getAlgNames();
 		
-		guiData.pool = guiData.pool != null ? guiData.pool : new DatasetPool();
+		DatasetPool oldPool = guiData.pool; 
+		try {
+			DatasetPoolExchanged pool = evaluator.getDatasetPool();
+			guiData.pool = pool != null ? pool.toDatasetPoolClient() : null;
+		} catch (Throwable e) {e.printStackTrace();}
+		if (guiData.pool == null) {
+			if (oldPool != null)
+				guiData.pool = oldPool;
+			else
+				guiData.pool = new DatasetPool();
+		}
 	}
 	
 	

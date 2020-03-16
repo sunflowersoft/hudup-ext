@@ -370,12 +370,13 @@ public class DatasetPool implements Serializable {
 		for (DatasetPair pair : dspList) {
 			Dataset training = pair.getTraining();
 			Dataset testing = pair.getTesting();
+			if (training == null || testing == null) continue;
 			
 			DataConfig trainingCfg = training.getConfig();
 			DataConfig testingCfg = testing.getConfig();
 			
-			if (trainingCfg.getUriId().equals(trainingId) &&
-				testingCfg.getUriId().equals(testingId)) {
+			if (trainingCfg != null && trainingCfg.getUriId().equals(trainingId) &&
+				testingCfg != null && testingCfg.getUriId().equals(testingId)) {
 				found = pair;
 				break;
 			}
@@ -401,10 +402,11 @@ public class DatasetPool implements Serializable {
     	DatasetPair found = null;
 		for (DatasetPair pair : dspList) {
 			Dataset training = pair.getTraining();
+			if (training == null) continue;
 			
 			DataConfig trainingCfg = training.getConfig();
 			
-			if (trainingCfg.getUriId().equals(trainingId)) {
+			if (trainingCfg != null && trainingCfg.getUriId().equals(trainingId)) {
 				found = pair;
 				break;
 			}
@@ -435,7 +437,7 @@ public class DatasetPool implements Serializable {
 			
 			DataConfig config = whole.getConfig();
 			
-			if (config.getUriId().equals(wholeId)) {
+			if (config != null && config.getUriId().equals(wholeId)) {
 				found = pair;
 				break;
 			}
@@ -510,11 +512,13 @@ public class DatasetPool implements Serializable {
 			}
 			
 			
-			DatasetPairExchanged newPair = new DatasetPairExchanged(training, testing, whole);
-			newPair.trainingUUID = trainingUUID;
-			newPair.testingUUID = testingUUID;
-			newPair.wholeUUID = wholeUUID;
-			exchangeDspList.add(newPair);
+			if (training != null || testing != null || whole != null) {
+				DatasetPairExchanged newPair = new DatasetPairExchanged(training, testing, whole);
+				newPair.trainingUUID = trainingUUID;
+				newPair.testingUUID = testingUUID;
+				newPair.wholeUUID = wholeUUID;
+				exchangeDspList.add(newPair);
+			}
 		}
 		
 		DatasetPoolExchanged exchangedPool = new DatasetPoolExchanged();
@@ -530,45 +534,57 @@ public class DatasetPool implements Serializable {
 	public DatasetPoolExchanged toDatasetExchangedPoolClient() {
 		List<DatasetPairExchanged> exchangeDspList = Util.newList();
 		for (DatasetPair pair : dspList) {
-			DatasetPairExchanged newPair = new DatasetPairExchanged();
-			
+			if (pair == null) continue;
+
+			DatasetRemote training = null;
+			UUID trainingUUID = null;
 			if (pair.training != null) {
 				if (DatasetUtil.isRemote(pair.training)) {
-					newPair.training = null;
-					newPair.trainingUUID = pair.trainingUUID;
+					training = null;
+					trainingUUID = pair.trainingUUID;
 				}
 				else if (pair.training instanceof DatasetRemote) { //AbstractDataset as usual.
-					newPair.training = (DatasetRemote)pair.training;
-					newPair.trainingUUID = pair.trainingUUID;
-					newPair.trainingUUID = newPair.trainingUUID != null ? newPair.trainingUUID : UUID.randomUUID();
+					training = (DatasetRemote)pair.training;
+					trainingUUID = pair.trainingUUID;
+					trainingUUID = trainingUUID != null ? trainingUUID : UUID.randomUUID();
 				}
 			}
 			
+			DatasetRemote testing = null;
+			UUID testingUUID = null;
 			if (pair.testing != null) {
 				if (DatasetUtil.isRemote(pair.testing)) {
-					newPair.testing = null;
-					newPair.testingUUID = pair.testingUUID;
+					testing = null;
+					testingUUID = pair.testingUUID;
 				}
 				else if (pair.testing instanceof DatasetRemote) { //AbstractDataset as usual.
-					newPair.testing = (DatasetRemote)pair.testing;
-					newPair.testingUUID = pair.testingUUID;
-					newPair.testingUUID = newPair.testingUUID != null ? newPair.testingUUID : UUID.randomUUID();
+					testing = (DatasetRemote)pair.testing;
+					testingUUID = pair.testingUUID;
+					testingUUID = testingUUID != null ? testingUUID : UUID.randomUUID();
 				}
 			}
 			
+			DatasetRemote whole = null;
+			UUID wholeUUID = null;
 			if (pair.whole != null) {
 				if (DatasetUtil.isRemote(pair.whole)) {
-					newPair.whole = null;
-					newPair.wholeUUID = pair.wholeUUID;
+					whole = null;
+					wholeUUID = pair.wholeUUID;
 				}
 				else if (pair.whole instanceof DatasetRemote) { //AbstractDataset as usual.
-					newPair.whole = (DatasetRemote)pair.whole;
-					newPair.wholeUUID = pair.wholeUUID;
-					newPair.wholeUUID = newPair.wholeUUID != null ? newPair.wholeUUID : UUID.randomUUID();
+					whole = (DatasetRemote)pair.whole;
+					wholeUUID = pair.wholeUUID;
+					wholeUUID = wholeUUID != null ? wholeUUID : UUID.randomUUID();
 				}
 			}
 			
-			exchangeDspList.add(newPair);
+//			if (training != null || testing != null || whole != null) {
+				DatasetPairExchanged newPair = new DatasetPairExchanged(training, testing, whole);
+				newPair.trainingUUID = trainingUUID;
+				newPair.testingUUID = testingUUID;
+				newPair.wholeUUID = wholeUUID;
+				exchangeDspList.add(newPair);
+//			}
 		}
 		
 		DatasetPoolExchanged exchangedPool = new DatasetPoolExchanged();

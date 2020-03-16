@@ -10,7 +10,7 @@ package net.hudup.core.evaluate;
 import java.io.Serializable;
 import java.util.EventObject;
 
-import net.hudup.core.logistic.NextUpdate;
+import net.hudup.core.data.DatasetPoolExchanged;
 import net.hudup.core.logistic.Timestamp;
 
 /**
@@ -60,6 +60,11 @@ public class EvaluatorEvent extends EventObject {
 		 * Evaluator was stopped. 
 		 */
 		force_stop,
+		
+		/**
+		 * Updating pool. 
+		 */
+		update_pool,
 	}
 	
 	
@@ -70,10 +75,16 @@ public class EvaluatorEvent extends EventObject {
 
 	
 	/**
-	 * evaluation information as other result.
+	 * Evaluation information as other result.
 	 */
 	protected EvaluateInfo otherResult = null;
 	
+	
+	/**
+	 * Pool result.
+	 */
+	protected DatasetPoolExchanged poolResult = null;
+
 	
 	/**
 	 * Time stamp.
@@ -92,11 +103,8 @@ public class EvaluatorEvent extends EventObject {
 	 * @param evaluator reference to evaluator. This evaluator is invalid in remote call.
 	 * @param type type of this event.
 	 */
-	@NextUpdate
 	public EvaluatorEvent(Evaluator evaluator, Type type) {
-		super(evaluator); //Test different hosts for RMI, evaluator wrapper can solve.
-		
-		this.type = type;
+		this(evaluator, type, null, null);
 	}
 
 	
@@ -107,8 +115,7 @@ public class EvaluatorEvent extends EventObject {
 	 * @param otherResult evaluation information as other result.
 	 */
 	public EvaluatorEvent(Evaluator evaluator, Type type, EvaluateInfo otherResult) {
-		this(evaluator, type);
-		this.otherResult = otherResult;
+		this(evaluator, type, otherResult, null);
 	}
 
 	
@@ -117,11 +124,13 @@ public class EvaluatorEvent extends EventObject {
 	 * @param evaluator specified evaluator. This evaluator is invalid in remote call.
 	 * @param type specified type of evaluation event.
 	 * @param otherResult evaluation information as other result.
-	 * @param timestamp specified time stamp.
+	 * @param poolResult specified pool result.
 	 */
-	public EvaluatorEvent(Evaluator evaluator, Type type, EvaluateInfo otherResult, Timestamp timestamp) {
-		this(evaluator, type, otherResult);
-		this.timestamp = timestamp;
+	public EvaluatorEvent(Evaluator evaluator, Type type, EvaluateInfo otherResult, DatasetPoolExchanged poolResult) {
+		super(evaluator); //Test different hosts for RMI, evaluator wrapper can solve.
+		this.type = type;
+		this.otherResult = otherResult;
+		this.poolResult = poolResult;
 	}
 	
 	
@@ -164,6 +173,24 @@ public class EvaluatorEvent extends EventObject {
 	 */
 	public EvaluateInfo getOtherResult() {
 		return otherResult;
+	}
+
+	
+	/**
+	 * Setting pool result.
+	 * @param poolResult pool result.
+	 */
+	public void setPoolResult(DatasetPoolExchanged poolResult) {
+		this.poolResult = poolResult;
+	}
+
+	
+	/**
+	 * Getting pool result.
+	 * @return pool result.
+	 */
+	public DatasetPoolExchanged getPoolResult() {
+		return poolResult;
 	}
 
 	

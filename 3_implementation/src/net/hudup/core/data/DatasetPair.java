@@ -253,14 +253,17 @@ public class DatasetPair implements Serializable {
 		if (training != null)
 			training.clear();
 		training = null;
+		trainingUUID = null;
 		
 		if (testing != null)
 			testing.clear();
 		testing = null;
+		testingUUID = null;
 		
 		if (whole != null)
 			whole.clear();
 		whole = null;
+		wholeUUID = null;
 	}
 	
 

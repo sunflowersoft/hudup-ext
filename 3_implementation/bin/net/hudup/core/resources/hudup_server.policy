@@ -27,4 +27,5 @@ grant {
     permission java.awt.AWTPermission "accessEventQueue";
     permission java.awt.AWTPermission "accessSystemTray";
     permission java.awt.AWTPermission "setWindowAlwaysOnTop";
+    permission java.awt.AWTPermission "accessClipboard";
 };

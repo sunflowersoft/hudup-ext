@@ -32,8 +32,10 @@ import net.hudup.core.alg.SetupAlgListener;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.DatasetPair;
+import net.hudup.core.data.DatasetPairExchanged;
 import net.hudup.core.data.DatasetPool;
 import net.hudup.core.data.DatasetPoolExchanged;
+import net.hudup.core.data.DatasetRemoteWrapper;
 import net.hudup.core.data.Fetcher;
 import net.hudup.core.data.Profile;
 import net.hudup.core.evaluate.EvaluateEvent.Type;
@@ -44,7 +46,6 @@ import net.hudup.core.logistic.DSUtil;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.NetUtil;
 import net.hudup.core.logistic.SystemUtil;
-import net.hudup.core.logistic.Timestamp;
 import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.xURI;
 import net.hudup.core.logistic.ui.ProgressEvent;
@@ -251,16 +252,20 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 			return false;
 		}
 
+		this.pool = updatePoolResult(pool);
+		if (this.pool == null) {
+			LogUtil.error("Cannot create pool");
+			return false;
+		}
+		
 		try {
 			clearDelayUnsetupAlgs(); //This code line is important.
 		} catch (Throwable e) {e.printStackTrace();} 
 		
 		this.algList = algList;
 		
-		this.pool = pool.toDatasetPool(poolResult);
-		this.pool.fillMissingUUID();
-		this.parameter = parameter;
 		this.result = null;
+		this.parameter = parameter;
 		
 		String evStorePath = this.otherResult.evStorePath;
 		this.otherResult.reset();
@@ -271,11 +276,6 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 		}
 		this.otherResult.algName = this.otherResult.algNames.get(0);
 		
-		if (this.poolResult != null)
-			this.poolResult.unexport(true);
-		this.poolResult = this.pool.toDatasetExchangedPool();
-		this.poolResult.export(config.getEvaluatorPort(), false);
-			
 		if (!start()) {
 			clear();
 			return false;
@@ -284,16 +284,11 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 		this.counter.stop();
 		this.counter.start();
 
-		Timestamp timestamp = null;
-		if ((parameter != null) && (parameter instanceof Timestamp) && ((Timestamp)parameter).isValid())
-			timestamp = (Timestamp)parameter;
-		else
-			timestamp = new Timestamp();
 		fireEvaluatorEvent(new EvaluatorEvent(
 				this, 
 				EvaluatorEvent.Type.start,
 				this.otherResult,
-				timestamp));
+				this.poolResult));
 		
 		return true;
 	}
@@ -781,6 +776,117 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 		else
 			return alg;
 		
+	}
+
+
+	/**
+	 * Updating exchanged pool result.
+	 * @param pool specified exchanged pool.
+	 * @return normal pool for evaluation.
+	 * @throws RemoteException if any error raises.
+	 */
+	private synchronized DatasetPool updatePoolResult(DatasetPoolExchanged pool) throws RemoteException {
+		if (pool == null) pool = new DatasetPoolExchanged();
+
+		if (poolResult != null) {
+			List<DatasetPairExchanged> tempDspList = Util.newList(poolResult.dspList.size());
+			tempDspList.addAll(poolResult.dspList);
+			
+			for (DatasetPairExchanged pair1 : tempDspList) {
+				boolean foundTraining = false;
+				boolean foundTesting = false;
+				boolean foundWhole = false;
+				for (DatasetPairExchanged pair2 : pool.dspList) {
+					if (pair1.trainingUUID != null && pair2.trainingUUID != null && pair1.trainingUUID.equals(pair2.trainingUUID))
+						foundTraining = true;
+					if (pair1.testingUUID != null && pair2.testingUUID != null && pair1.testingUUID.equals(pair2.testingUUID))
+						foundTesting = true;
+					if (pair1.wholeUUID != null && pair2.wholeUUID != null && pair1.wholeUUID.equals(pair2.wholeUUID))
+						foundWhole = true;
+					
+					if (foundTraining && foundTesting && foundWhole)
+						break;
+				}
+				
+				boolean clearTraining = pair1.training == null;
+				if ((!foundTraining) && (pair1.training != null)) {
+					if (pair1.training instanceof DatasetRemoteWrapper) {
+						((DatasetRemoteWrapper)pair1.training).forceClear();
+						clearTraining = true;
+					}
+				}
+				
+				boolean clearTesting = pair1.testing == null;
+				if ((!foundTesting) && (pair1.testing != null)) {
+					if (pair1.testing instanceof DatasetRemoteWrapper) {
+						((DatasetRemoteWrapper)pair1.testing).forceClear();
+						clearTesting = true;
+					}
+				}
+				
+				boolean clearWhole = pair1.whole == null;
+				if ((!foundWhole) && (pair1.whole != null)) {
+					if (pair1.whole instanceof DatasetRemoteWrapper) {
+						((DatasetRemoteWrapper)pair1.whole).forceClear();
+						clearWhole = true;
+					}
+				}
+				
+				if (clearTraining && clearTesting && clearWhole)
+					poolResult.dspList.remove(pair1);
+			}
+		}
+		
+		DatasetPool returnedPool = pool.toDatasetPool(this.poolResult);
+		returnedPool.fillMissingUUID();
+		if (this.poolResult != null)
+			this.poolResult.unexport(true);
+		this.poolResult = returnedPool.toDatasetExchangedPool();
+		this.poolResult.export(config.getEvaluatorPort(), false);
+		
+		//System.runFinalization();
+		return returnedPool;
+	}
+	
+	
+	@Override
+	public synchronized boolean updatePool(DatasetPoolExchanged pool) throws RemoteException {
+		// TODO Auto-generated method stub
+		if (isStarted() || this.pool != null) {
+			LogUtil.error("Evaluator is running and so it cannot update pool");
+			return false;
+		}
+		
+		DatasetPool returnedPool = updatePoolResult(pool);
+		
+		if (returnedPool != null) {
+			fireEvaluatorEvent(new EvaluatorEvent(
+					this, 
+					EvaluatorEvent.Type.update_pool,
+					this.otherResult,
+					this.poolResult));
+			return true;
+		}
+		else
+			return false;
+	}
+
+
+	@Override
+	public boolean reloadPool() throws RemoteException {
+		// TODO Auto-generated method stub
+		if (poolResult == null) return false;
+		
+		this.poolResult.reload();
+		this.poolResult.fillMissingUUID();
+		this.poolResult.export(config.getEvaluatorPort(), false);
+		
+		fireEvaluatorEvent(new EvaluatorEvent(
+				this, 
+				EvaluatorEvent.Type.update_pool,
+				this.otherResult,
+				this.poolResult));
+		return true;
 	}
 
 

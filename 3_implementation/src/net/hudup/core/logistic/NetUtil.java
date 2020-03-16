@@ -242,7 +242,7 @@ public class NetUtil {
 	        	return true;
 			}
 			catch (NoSuchObjectException e) {
-				e.printStackTrace();
+				//e.printStackTrace();
 				return true;
 			}
 			catch (Throwable e) {

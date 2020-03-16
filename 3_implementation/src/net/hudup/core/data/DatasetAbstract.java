@@ -335,4 +335,11 @@ public abstract class DatasetAbstract implements Dataset, DatasetRemote {
 	}
 
 
+	@Override
+	public void remoteClear() throws RemoteException {
+		// TODO Auto-generated method stub
+		clear();
+	}
+
+
 }

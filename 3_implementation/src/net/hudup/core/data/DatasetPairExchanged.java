@@ -83,5 +83,99 @@ public class DatasetPairExchanged implements Serializable {
 		this.whole = whole;
 	}
 
+	
+	/**
+	 * Clearing this dataset pair, which means that training dataset, testing dataset, and the whole (entire) dataset are cleared. 
+	 * @param forced forced mode.
+	 */
+	public void clear(boolean forced) {
+		if (training != null) {
+			try {
+				if (training instanceof DatasetRemoteWrapper) {
+					if (forced)
+						((DatasetRemoteWrapper)training).forceClear();
+					else
+						((DatasetRemoteWrapper)training).clear();
+				}
+				else
+					training.remoteClear();
+			} catch (Throwable e) {e.printStackTrace();}
+		}
+		training = null;
+		trainingUUID = null;
+		
+		if (testing != null) {
+			try {
+				if (testing instanceof DatasetRemoteWrapper) {
+					if (forced)
+						((DatasetRemoteWrapper)testing).forceClear();
+					else
+						((DatasetRemoteWrapper)testing).clear();
+				}
+				else
+					testing.remoteClear();
+			} catch (Throwable e) {e.printStackTrace();}
+		}
+		testing = null;
+		testingUUID = null;
+		
+		if (whole != null) {
+			try {
+				if (whole instanceof DatasetRemoteWrapper) {
+					if (forced)
+						((DatasetRemoteWrapper)whole).forceClear();
+					else
+						((DatasetRemoteWrapper)whole).clear();
+				}
+				else
+					whole.remoteClear();
+			} catch (Throwable e) {e.printStackTrace();}
+		}
+		whole = null;
+		wholeUUID = null;
+	}
+	
+	
+	/**
+	 * Reloading remote dataset.
+	 * @param remoteDataset remote dataset.
+	 * @return wrapper of remote dataset.
+	 */
+	private static DatasetRemoteWrapper reload(DatasetRemote remoteDataset) {
+		if (remoteDataset == null) return null;
+		
+		DataConfig config = null;
+		try {
+			config = (DataConfig) remoteDataset.remoteGetConfig().clone();
+		} catch (Throwable e) {e.printStackTrace();}
+		if (config == null) return null;
+		
+		boolean exclusive = remoteDataset instanceof DatasetRemoteWrapper ?
+				((DatasetRemoteWrapper)remoteDataset).isExclusive() : true;
+		
+		try {
+			if (remoteDataset instanceof DatasetRemoteWrapper)
+				((DatasetRemoteWrapper)remoteDataset).forceClear();
+			else
+				remoteDataset.remoteClear();
+		} catch (Throwable e) {e.printStackTrace();}
 
+		Dataset dataset = DatasetUtil.loadDataset(config);
+		if ((dataset == null) || !(dataset instanceof DatasetRemote))
+			return null;
+		else
+			return new DatasetRemoteWrapper((DatasetRemote)dataset, exclusive);
+	}
+	
+	
+	/**
+	 * Reloading training dataset, testing dataset, and the whole (entire) dataset in this dataset pair.
+	 */
+	public void reload() {
+		training  = reload(training);
+		testing  = reload(testing);
+		whole  = reload(whole);
+	}
+	
+	
 }

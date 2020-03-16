@@ -317,6 +317,20 @@ public class EvaluatorWrapper implements Evaluator, Serializable {
 
 	
 	@Override
+	public boolean updatePool(DatasetPoolExchanged pool) throws RemoteException {
+		// TODO Auto-generated method stub
+		return remoteEvaluator.updatePool(pool);
+	}
+
+
+	@Override
+	public boolean reloadPool() throws RemoteException {
+		// TODO Auto-generated method stub
+		return remoteEvaluator.reloadPool();
+	}
+
+
+	@Override
 	public void removeEvaluatorListener(EvaluatorListener listener) throws RemoteException {
 		// TODO Auto-generated method stub
 		remoteEvaluator.removeEvaluatorListener(listener);

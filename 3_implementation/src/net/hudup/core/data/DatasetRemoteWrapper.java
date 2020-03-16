@@ -527,12 +527,32 @@ public class DatasetRemoteWrapper implements Dataset, DatasetRemote {
 	@Override
 	public void clear() {
 		// TODO Auto-generated method stub
-		if (remoteDataset != null && (remoteDataset instanceof DatasetAbstract)) {
-			((DatasetAbstract)remoteDataset).clear();
+		if (exclusive && remoteDataset != null) {
+			try {
+				remoteDataset.remoteClear();
+			} catch (Exception e) {e.printStackTrace();}
 		}
 		
 		try {
 			unexport();
+		}
+		catch (Throwable e) {e.printStackTrace();}
+	}
+
+	
+	/**
+	 * Forcing clear.
+	 */
+	public void forceClear() {
+		// TODO Auto-generated method stub
+		if (remoteDataset != null) {
+			try {
+				remoteDataset.remoteClear();
+			} catch (Exception e) {e.printStackTrace();}
+		}
+		
+		try {
+			forceUnexport();
 		}
 		catch (Throwable e) {e.printStackTrace();}
 	}
@@ -745,6 +765,13 @@ public class DatasetRemoteWrapper implements Dataset, DatasetRemote {
 	public ContextTemplateSchema remoteGetCTSchema() throws RemoteException {
 		// TODO Auto-generated method stub
 		return getCTSchema();
+	}
+
+
+	@Override
+	public void remoteClear() throws RemoteException {
+		// TODO Auto-generated method stub
+		clear();
 	}
 
 	

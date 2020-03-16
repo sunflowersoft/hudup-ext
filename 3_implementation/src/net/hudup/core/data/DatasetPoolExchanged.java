@@ -44,8 +44,47 @@ public class DatasetPoolExchanged  implements Serializable {
 		
 	}
 
+	
+	/**
+     * Clearing this dataset pool, which means that all dataset pairs are removed from this dataset pool.
+	 * @param forced forced mode to unexport datasets.
+	 */
+	public void clear(boolean forced) {
+		for (DatasetPairExchanged pair : dspList) {
+			pair.clear(forced);
+		}
+		dspList.clear();
+	}
 
-    /**
+	
+	/**
+	 * Reloading the pool.
+	 */
+	public void reload() {
+		for (DatasetPairExchanged pair : dspList) {
+			pair.reload();
+		}
+	}
+	
+	
+	/**
+	 * Filling missing UUIDs.
+	 */
+	public void fillMissingUUID() {
+		for (DatasetPairExchanged pair : dspList) {
+			if (pair.training != null && pair.trainingUUID == null)
+				pair.trainingUUID = UUID.randomUUID();
+			
+			if (pair.testing != null && pair.testingUUID == null)
+				pair.testingUUID = UUID.randomUUID();
+			
+			if (pair.whole != null && pair.wholeUUID == null)
+				pair.wholeUUID = UUID.randomUUID();
+		}
+	}
+
+	
+	/**
 	 * Exporting the this pool and returning a new exported pool.
 	 * @param serverPort port to export. Using port 0 if not concerning registry or naming.
      * @param exclusive exclusive mode.
@@ -248,11 +287,13 @@ public class DatasetPoolExchanged  implements Serializable {
 				}
 			}
 			
-			DatasetPair newPair = new DatasetPair(training, testing, whole);
-			newPair.trainingUUID = trainingUUID;
-			newPair.testingUUID = testingUUID;
-			newPair.wholeUUID = wholeUUID;
-			pool.add(newPair);
+			if (training != null || testing != null || whole != null) {
+				DatasetPair newPair = new DatasetPair(training, testing, whole);
+				newPair.trainingUUID = trainingUUID;
+				newPair.testingUUID = testingUUID;
+				newPair.wholeUUID = wholeUUID;
+				pool.add(newPair);
+			}
 		}
 		
 		return pool;
@@ -298,11 +339,13 @@ public class DatasetPoolExchanged  implements Serializable {
 				wholeUUID = whole != null ? pair.wholeUUID : null;
 			}
 			
-			DatasetPair newPair = new DatasetPair(training, testing, whole);
-			newPair.trainingUUID = trainingUUID;
-			newPair.testingUUID = testingUUID;
-			newPair.wholeUUID = wholeUUID;
-			pool.add(newPair);
+			if (training != null || testing != null || whole != null) {
+				DatasetPair newPair = new DatasetPair(training, testing, whole);
+				newPair.trainingUUID = trainingUUID;
+				newPair.testingUUID = testingUUID;
+				newPair.wholeUUID = wholeUUID;
+				pool.add(newPair);
+			}
 		}
 		
 		return pool;

@@ -1090,6 +1090,20 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluateListen
 
 
 	@Override
+	public boolean updatePool(DatasetPoolExchanged pool) throws RemoteException {
+		// TODO Auto-generated method stub
+		return remoteEvaluator.updatePool(pool);
+	}
+
+	
+	@Override
+	public boolean reloadPool() throws RemoteException {
+		// TODO Auto-generated method stub
+		return remoteEvaluator.reloadPool();
+	}
+
+
+	@Override
 	public void close() throws Exception {
 		// TODO Auto-generated method stub
 		try {

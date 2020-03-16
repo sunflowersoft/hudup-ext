@@ -293,4 +293,10 @@ public interface DatasetRemoteTask extends Exportable {
 	ContextTemplateSchema remoteGetCTSchema() throws RemoteException;
 	
 	
+	/**
+	 * Clearing this {@code Dataset}, deallocating memory of {@code Dataset}.
+	 * @throws RemoteException if any error raises.
+	 */
+    void remoteClear() throws RemoteException;
+
 }

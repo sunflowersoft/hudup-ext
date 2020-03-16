@@ -30,6 +30,7 @@ import net.hudup.core.data.DatasetUtil;
 import net.hudup.core.data.Pointer;
 import net.hudup.core.data.ui.DataConfigTextField;
 import net.hudup.core.logistic.I18nUtil;
+import net.hudup.core.logistic.xURI;
 import net.hudup.core.logistic.ui.UIUtil;
 import net.hudup.data.DatasetUtil2;
 
@@ -89,6 +90,12 @@ public class AddingDatasetDlg extends JDialog {
 	
 	
 	/**
+	 * Bound URI.
+	 */
+	protected xURI bindUri = null;
+	
+	
+	/**
 	 * Constructor with specified dataset pool and algorithm list.
 	 * @param comp parent component.
 	 * @param pool specified dataset pool.
@@ -96,10 +103,24 @@ public class AddingDatasetDlg extends JDialog {
 	 * @param mainUnit main unit.
 	 */
 	public AddingDatasetDlg(Component comp, DatasetPool pool, List<Alg> algList, String mainUnit) {
+		this(comp, pool, algList, mainUnit, null);
+	}
+	
+	
+	/**
+	 * Constructor with specified dataset pool, algorithm list, and bind URI.
+	 * @param comp parent component.
+	 * @param pool specified dataset pool.
+	 * @param algList specified algorithm list.
+	 * @param mainUnit main unit.
+	 * @param bound URI.
+	 */
+	public AddingDatasetDlg(Component comp, DatasetPool pool, List<Alg> algList, final String mainUnit, xURI bindUri) {
 		super(UIUtil.getFrameForComponent(comp), "Add datasets", true);
 		this.setTitle(I18nUtil.message("add_datasets"));
 		this.pool = pool;
 		this.algList = algList;
+		this.bindUri = bindUri;
 		
 		this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		this.setSize(600, 200);
@@ -341,18 +362,18 @@ public class AddingDatasetDlg extends JDialog {
 			return;
 		}
 		
-		DatasetPair found = pool.findTrainingTesting(
-				trainingCfg.getUriId(), 
-				testingCfg.getUriId());
-		
-		if (found != null) {
-			JOptionPane.showMessageDialog(
-					this, 
-					"Can't add dataset because of duplication", 
-					"Can't add dataset because of duplication", 
-					JOptionPane.ERROR_MESSAGE);
-			clear();
-			return;
+		if (bindUri == null) {
+			DatasetPair found = pool.findTrainingTesting(
+					trainingCfg.getUriId(), 
+					testingCfg.getUriId());
+			
+			if (found != null) {
+				JOptionPane.showMessageDialog(
+						this, 
+						"Notice: Duplicated training/testing datasets", 
+						"Duplication training/testing datasets", 
+						JOptionPane.INFORMATION_MESSAGE);
+			}
 		}
 		
 		Dataset trainingSet = DatasetUtil.loadDataset(trainingCfg);

@@ -288,6 +288,23 @@ public interface Evaluator extends Remote, RemoteRunner, SetupAlgListener, Expor
     
     
     /**
+     * Updating resulted dataset pool.
+     * @param pool specified dataset pool.
+     * @return true if successful.
+     * @throws RemoteException if any error raises.
+     */
+    boolean updatePool(DatasetPoolExchanged pool) throws RemoteException;
+    
+    
+    /**
+     * Reloading resulted dataset pool.
+     * @return true if successful.
+     * @throws RemoteException if any error raises.
+     */
+    boolean reloadPool() throws RemoteException;
+
+    
+    /**
      * Getting registered cloned plug-in algorithm.
      * @param algClass specified algorithm class.
      * @param algName algorithm name.

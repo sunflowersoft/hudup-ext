@@ -19,6 +19,7 @@ import net.hudup.core.data.DatasetPair;
 import net.hudup.core.data.DatasetPool;
 import net.hudup.core.data.DatasetUtil;
 import net.hudup.core.data.NullPointer;
+import net.hudup.core.logistic.xURI;
 import net.hudup.data.DatasetUtil2;
 
 /**
@@ -46,7 +47,21 @@ public class AddingTrainingDatasetNullTestingDatasetDlg extends AddingDatasetDlg
 	 */
 	public AddingTrainingDatasetNullTestingDatasetDlg(Component comp, DatasetPool pool, List<Alg> algList,
 			String mainUnit) {
-		super(comp, pool, algList, mainUnit);
+		this(comp, pool, algList, mainUnit, null);
+	}
+	
+	
+	/**
+	 * Constructor with specified dataset pool, algorithm list, and bind URI.
+	 * @param comp parent component.
+	 * @param pool specified dataset pool.
+	 * @param algList specified algorithm list.
+	 * @param mainUnit main unit.
+	 * @param bindUri bound URI.
+	 */
+	public AddingTrainingDatasetNullTestingDatasetDlg(Component comp, DatasetPool pool, List<Alg> algList,
+			String mainUnit, xURI bindUri) {
+		super(comp, pool, algList, mainUnit, bindUri);
 		// TODO Auto-generated constructor stub
 		
 		btnTestingBrowse.setVisible(false);
@@ -68,18 +83,17 @@ public class AddingTrainingDatasetNullTestingDatasetDlg extends AddingDatasetDlg
 			return;
 		}
 		
-		DatasetPair found = pool.findTraining(trainingCfg.getUriId());
-		
-		if (found != null) {
-			JOptionPane.showMessageDialog(
+		if (bindUri == null) {
+			DatasetPair found = pool.findTraining(trainingCfg.getUriId());
+			if (found != null) {
+				JOptionPane.showMessageDialog(
 					this, 
-					"Can't add dataset because of duplication", 
-					"Can't add dataset because of duplication", 
-					JOptionPane.ERROR_MESSAGE);
-			clear();
-			return;
+					"Notice: Duplicated training/testing datasets", 
+					"Duplication training/testing datasets", 
+					JOptionPane.INFORMATION_MESSAGE);
+			}
 		}
-		
+
 		Dataset trainingSet = DatasetUtil.loadDataset(trainingCfg);
 		if (trainingSet == null) {
 			

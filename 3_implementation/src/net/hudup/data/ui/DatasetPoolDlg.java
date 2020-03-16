@@ -104,17 +104,38 @@ public class DatasetPoolDlg extends JDialog {
 
 	
 	/**
+	 * Bound URI.
+	 */
+	protected xURI bindUri = null;
+	
+	
+	/**
 	 * Constructor with dataset pool, algorithm list, and main unit.
 	 * @param comp parent component.
 	 * @param pool dataset pool.
 	 * @param algList algorithm list.
 	 * @param mainUnit main unit.
+	 * @param bindUri bound URI.
 	 */
 	public DatasetPoolDlg(Component comp, DatasetPool pool, List<Alg> algList, String mainUnit) {
+		this(comp, pool, algList, mainUnit, null);
+	}
+	
+	
+	/**
+	 * Constructor with dataset pool, algorithm list, main unit, and bound URI.
+	 * @param comp parent component.
+	 * @param pool dataset pool.
+	 * @param algList algorithm list.
+	 * @param mainUnit main unit.
+	 * @param bindUri bound URI.
+	 */
+	public DatasetPoolDlg(Component comp, DatasetPool pool, List<Alg> algList, String mainUnit, xURI bindUri) {
 		super(UIUtil.getFrameForComponent(comp), "Dataset pool dialog", true);
 		this.pool = pool;
 		this.algList = algList;
 		this.mainUnit = mainUnit;
+		this.bindUri = bindUri;
 		
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		setSize(600, 400);
@@ -170,7 +191,7 @@ public class DatasetPoolDlg extends JDialog {
 		JPanel body = new JPanel(new BorderLayout());
 		add(body, BorderLayout.CENTER);
 		
-		this.tblDatasetPool = new DatasetPoolTable(null) {
+		this.tblDatasetPool = new DatasetPoolTable(true) {
 
 			/**
 			 * Serial version UID for serializable class. 
@@ -260,7 +281,7 @@ public class DatasetPoolDlg extends JDialog {
 	 * Adding dataset;
 	 */
 	private void addDataset() {
-		new AddingDatasetDlg(this, this.pool, this.algList, this.mainUnit);
+		new AddingDatasetDlg(this, this.pool, this.algList, this.mainUnit, bindUri);
 		this.tblDatasetPool.update(this.pool);
 		updateGUI();
 	}

@@ -59,28 +59,27 @@ public class DatasetPoolTable extends JTable {
 	
 	
 	/**
-	 * Bound URIs.
+	 * Flag to indicate whether to clear dataset when remove it.
 	 */
-	protected xURI bindUri = null;
+	protected boolean clearDatasetWhenRemove = false;
 
 	
 	/**
 	 * Default constructor.
-	 * @param bindUri bound URI.
 	 */
 	public DatasetPoolTable() {
-		this(null);
+		this(false);
 	}
 	
 	
 	/**
-	 * Constructor with bound URI.
-	 * @param bindUri bound URI.
+	 * Constructor with clearing flag.
+	 * @param clearDatasetWhenRemove flag to indicate whether to clear dataset when remove it..
 	 */
-	public DatasetPoolTable(xURI bindUri) {
+	public DatasetPoolTable(boolean clearDatasetWhenRemove) {
 		// TODO Auto-generated constructor stub
 		super(new DatasetPoolTableModel());
-		this.bindUri = bindUri;
+		this.clearDatasetWhenRemove = clearDatasetWhenRemove;
 		
 		addMouseListener(new MouseAdapter() {
 
@@ -449,7 +448,7 @@ public class DatasetPoolTable extends JTable {
 		
 		DatasetPoolTableModel model = getPoolTableModel();
 		DatasetPool pool = model.getPool();
-		if (bindUri == null)
+		if (clearDatasetWhenRemove)
 			pool.remove(idxes);
 		else
 			pool.removeWithoutClear(idxes);

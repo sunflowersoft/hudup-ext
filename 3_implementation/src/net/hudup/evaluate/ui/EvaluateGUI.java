@@ -69,7 +69,6 @@ import net.hudup.core.logistic.DSUtil;
 import net.hudup.core.logistic.I18nUtil;
 import net.hudup.core.logistic.Inspector;
 import net.hudup.core.logistic.LogUtil;
-import net.hudup.core.logistic.Timestamp;
 import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.xURI;
 import net.hudup.core.logistic.ui.TextField;
@@ -917,9 +916,6 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			if (evaluator.remoteIsStarted())
 				return;
 		
-			clearResult();
-			updateMode();
-			
 			Dataset dataset = DatasetUtil.loadDataset(config);
 			if (dataset == null) {
 				JOptionPane.showMessageDialog(
@@ -936,18 +932,24 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 				return;
 			}
 			
-			this.txtTrainingBrowse.setDataset(dataset, bindUri == null);
-			updateMode();
+			clearResult();
+			guiData.pool = new DatasetPool();
+			guiData.pool.add(new DatasetPair(dataset, txtTestingBrowse.getDataset()));
+			if (bindUri == null) {
+				try {
+					evaluator.updatePool(guiData.pool.toDatasetExchangedPoolClient());
+				} catch (Throwable e) {e.printStackTrace();}
+			}
+			else {
+				txtTrainingBrowse.setDataset(dataset, false);
+				updateMode();
+			}
 		}
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			updateMode();
 		}
-		
-		//Additional code.
-		guiData.pool = new DatasetPool();
-		guiData.pool.add(new DatasetPair(txtTrainingBrowse.getDataset(), txtTestingBrowse.getDataset()));
 	}
 	
 	
@@ -960,7 +962,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 				return;
 			
 			DatasetPool pool = new DatasetPool();
-			new AddingTrainingDatasetNullTestingDatasetDlg(this, pool, Arrays.asList(getAlg()), evaluator.getMainUnit()).setVisible(true);
+			new AddingTrainingDatasetNullTestingDatasetDlg(this, pool, Arrays.asList(getAlg()), evaluator.getMainUnit(), bindUri).setVisible(true);
 			if (pool.size() == 0) {
 				JOptionPane.showMessageDialog(
 						this, 
@@ -970,20 +972,23 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 				return;
 			}
 			
-			this.txtTrainingBrowse.setDataset(pool.get(0).getTraining(), bindUri == null);
-			this.txtTestingBrowse.setDataset(pool.get(0).getTesting(), bindUri == null);
-			
 			clearResult();
-			updateMode();
+			guiData.pool = pool;
+			if (bindUri == null) {
+				try {
+					evaluator.updatePool(guiData.pool.toDatasetExchangedPoolClient());
+				} catch (Throwable e) {e.printStackTrace();}
+			}
+			else {
+				txtTrainingBrowse.setDataset(guiData.pool.get(0).getTraining(), false);
+				txtTestingBrowse.setDataset(guiData.pool.get(0).getTesting(), false);
+				updateMode();
+			}
 		}
 		catch (Throwable e) {
 			e.printStackTrace();
 			updateMode();
 		}
-		
-		//Additional code.
-		guiData.pool = new DatasetPool();
-		guiData.pool.add(new DatasetPair(txtTrainingBrowse.getDataset(), txtTestingBrowse.getDataset()));
 	}
 
 	
@@ -1033,9 +1038,6 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			if (evaluator.remoteIsStarted())
 				return;
 			
-			clearResult();
-			updateMode();
-			
 			Dataset dataset = DatasetUtil.loadDataset(config);
 			if (dataset == null) {
 				JOptionPane.showMessageDialog(
@@ -1057,18 +1059,24 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 					return;
 			}
 	
-			this.txtTestingBrowse.setDataset(dataset, bindUri == null);
-			updateMode();
+			clearResult();
+			guiData.pool = new DatasetPool();
+			guiData.pool.add(new DatasetPair(txtTrainingBrowse.getDataset(), dataset));
+			if (bindUri == null) {
+				try {
+					evaluator.updatePool(guiData.pool.toDatasetExchangedPoolClient());
+				} catch (Throwable e) {e.printStackTrace();}
+			}
+			else {
+				txtTestingBrowse.setDataset(dataset, false);
+				updateMode();
+			}
 		}
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			updateMode();
 		}
-		
-		//Additional code.
-		guiData.pool = new DatasetPool();
-		guiData.pool.add(new DatasetPair(txtTrainingBrowse.getDataset(), txtTestingBrowse.getDataset()));
 	}
 
 	
@@ -1078,19 +1086,9 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			if (evaluator.remoteIsStarted())
 				return;
 			
-			DataConfig trainingCfg = txtTrainingBrowse.getConfig();
-			if (trainingCfg != null)
-				trainingCfg = (DataConfig) trainingCfg.clone();
-			
-			DataConfig testingCfg = txtTestingBrowse.getConfig();
-			if (testingCfg != null)
-				testingCfg = (DataConfig) testingCfg.clone();
-			
-			if (trainingCfg != null)
-				openTrainingSet(trainingCfg);
-			
-			if (testingCfg != null)
-				openTestingSet(testingCfg);
+			clearResult();
+
+			evaluator.reloadPool();
 		}
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
@@ -1105,20 +1103,26 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			if (evaluator.remoteIsStarted())
 				return;
 			
-			this.txtTrainingBrowse.setDataset(null, bindUri == null);
-			this.txtTestingBrowse.setDataset(null, bindUri == null);
-			
 			clearResult();
 			updateMode();
+			
+			if (bindUri == null) {
+				try {
+					evaluator.updatePool(null);
+				} catch (Throwable e) {e.printStackTrace();}
+			}
+			else {
+				this.txtTrainingBrowse.setDataset(null, false);
+				this.txtTestingBrowse.setDataset(null, false);
+				guiData.pool = new DatasetPool();
+				updateMode();
+			}
 		}
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			updateMode();
 		}
-		
-		//Additional code.
-		guiData.pool = new DatasetPool();
 	}
 	
 	
@@ -1163,19 +1167,17 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			if (!DatasetUtil2.validateTrainingset(this, training, new Alg[] { getAlg() }))
 				return;
 			
-			clearResult();
-			
 			DatasetPool pool = new DatasetPool(training, testing);
 				
 			List<Alg> algList = Util.newList();
 			algList.add(alg);
-			Timestamp timestamp = new Timestamp();
 			
+			clearResult();
 			boolean started = false;
 			if (bindUri == null)
-				started = evaluator.remoteStart0(algList, pool.toDatasetExchangedPoolClient(), timestamp);
+				started = evaluator.remoteStart0(algList, pool.toDatasetExchangedPoolClient(), null);
 			else
-				started = evaluator.remoteStart(AlgList.getAlgNameList(algList), pool.toDatasetExchangedPoolClient(), timestamp);
+				started = evaluator.remoteStart(AlgList.getAlgNameList(algList), pool.toDatasetExchangedPoolClient(), null);
 			if (!started) updateMode();
 		}
 		catch (Throwable e) {
@@ -1190,27 +1192,20 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 	@Override
 	public synchronized void receivedEvaluator(EvaluatorEvent evt) throws RemoteException {
 		// TODO Auto-generated method stub
-		if (evt.getType() == EvaluatorEvent.Type.start) {
-			cmbAlgs.update(algRegTable.getAlgList(evt.getOtherResult().algNames));
-			algChanged();
+		if (evt.getType() == EvaluatorEvent.Type.start || evt.getType() == EvaluatorEvent.Type.update_pool) {
+			guiData.pool = evt.getPoolResult().toDatasetPoolClient();
+			guiData.pool = guiData.pool != null ? guiData.pool : new DatasetPool();
 			
-			Timestamp timestamp = evt.getTimestamp();
-			if (timestamp == null || this.timestamp == null || !timestamp.isValid() || !this.timestamp.isValid() ||
-					!timestamp.equals(this.timestamp)) {
-				try {
-					guiData.pool = evaluator.getDatasetPool().toDatasetPoolClient();
-				} catch (Throwable e) {e.printStackTrace();}
-				guiData.pool = guiData.pool != null ? guiData.pool : new DatasetPool();
-				
-				if (guiData.pool.size() > 0) {
-					txtTrainingBrowse.setDataset(guiData.pool.get(0).getTraining(), bindUri == null);
-					txtTestingBrowse.setDataset(guiData.pool.get(0).getTesting(), bindUri == null);
-				}
-				else {
-					txtTrainingBrowse.setDataset(null, bindUri == null);
-					txtTestingBrowse.setDataset(null, bindUri == null);
-				}
+			if (guiData.pool.size() > 0) {
+				txtTrainingBrowse.setDataset(guiData.pool.get(0).getTraining(), bindUri == null);
+				txtTestingBrowse.setDataset(guiData.pool.get(0).getTesting(), bindUri == null);
 			}
+			else {
+				txtTrainingBrowse.setDataset(null, bindUri == null);
+				txtTestingBrowse.setDataset(null, bindUri == null);
+			}
+			
+			updateMode();
 		}
 		else if (evt.getType() == EvaluatorEvent.Type.pause ||
 				evt.getType() == EvaluatorEvent.Type.resume || 
@@ -1323,7 +1318,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			
 			if (cmbAlgs.getItemCount() == 0) {
 				setInternalEnable(false);
-				setResultVisible(false);
+				setResultVisible(result != null && result.size() > 0);
 				
 				prgRunning.setMaximum(0);
 				prgRunning.setValue(0);
@@ -1331,7 +1326,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			}
 			else if (training == null || testing == null) {
 				setInternalEnable(false);
-				setResultVisible(false);
+				setResultVisible(result != null && result.size() > 0);
 				
 				cmbAlgs.setEnabled(true);
 				btnConfig.setEnabled(true);
@@ -1479,10 +1474,10 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 		this.btnMetricsOption.setEnabled(flag);
 		
 		this.btnAnalyzeResult.setEnabled(
-			flag && trainingSet != null && testingSet != null && result != null && result.size() > 0);
+			flag && result != null && result.size() > 0);
 			
 		this.btnCopyResult.setEnabled(
-			flag && trainingSet != null && testingSet != null && result != null && result.size() > 0);
+			flag && result != null && result.size() > 0);
 	}
 
 	
@@ -1491,12 +1486,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 	 * @param flag flag to set whether results are visible.
 	 */
 	private void setResultVisible(boolean flag) {
-		Dataset trainingSet = txtTrainingBrowse.getDataset();
-		Dataset testingSet = txtTestingBrowse.getDataset();
-
 		boolean visible = flag && 
-				trainingSet != null && 
-				testingSet != null &&
 				result != null && result.size() > 0;
  
 		paneResult.setVisible(visible);

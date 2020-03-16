@@ -59,7 +59,6 @@ import net.hudup.core.logistic.CounterElapsedTimeEvent;
 import net.hudup.core.logistic.DSUtil;
 import net.hudup.core.logistic.I18nUtil;
 import net.hudup.core.logistic.LogUtil;
-import net.hudup.core.logistic.Timestamp;
 import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.xURI;
 import net.hudup.core.logistic.ui.SortableSelectableTable;
@@ -360,7 +359,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			
 		};
 		this.lbAlgs.update(algRegTable.getAlgList(guiData.algNames));
-		this.lbAlgs.setVisibleRowCount(3);
+		this.lbAlgs.setVisibleRowCount(4);
 		this.lbAlgs.addAlgListChangedListener(new AlgListBox.AlgListChangedListener() {
 			
 			@Override
@@ -385,7 +384,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 		JScrollPane scrollAlgsPane = new JScrollPane(this.lbAlgs);
 		paneAlg.add(scrollAlgsPane);
 		Dimension preferredSize = scrollAlgsPane.getPreferredSize();
-		preferredSize.width = Math.max(preferredSize.width, 200);
+		preferredSize.width = Math.max(preferredSize.width, 300);
 		preferredSize.height = Math.max(preferredSize.height, 50);
 		scrollAlgsPane.setPreferredSize(preferredSize);
 		
@@ -423,8 +422,6 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 					
 					lbAlgs.update(dlg.getResult());
 					updateMode();
-					
-					updateGUI();
 				}
 			});
 		this.btnConfigAlgs.setMargin(new Insets(0, 0 , 0, 0));
@@ -434,7 +431,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 		JPanel down = new JPanel(new BorderLayout(2, 2));
 		header.add(down, BorderLayout.CENTER);
 		
-		this.tblDatasetPool = new DatasetPoolTable(this.bindUri) {
+		this.tblDatasetPool = new DatasetPoolTable(false) {
 
 			/**
 			 * Serial version UID for serializable class. 
@@ -448,7 +445,15 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 				
 				if (ret) {
 					clearResult();
-					updateMode();
+					
+					if (bindUri == null) {
+						try {
+							evaluator.updatePool(guiData.pool.toDatasetExchangedPoolClient());
+						} catch (Throwable e) {e.printStackTrace();}
+					}
+					else {
+						updateMode();
+					}
 				}
 				
 				return ret;
@@ -912,16 +917,9 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			if (evaluator.remoteIsStarted())
 				return;
 			
-			if (bindUri == null)
-				guiData.pool.reload();
-			else
-				guiData.pool = evaluator.getDatasetPool().toDatasetPoolClient();
-
-			tblDatasetPool.update(guiData.pool);
 			clearResult();
-			updateMode();
-			
-			updateGUI();
+
+			evaluator.reloadPool();
 		}
 		catch (Throwable e) {
 			e.printStackTrace();
@@ -936,17 +934,19 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			if (evaluator.remoteIsStarted())
 				return;
 			
-			if (bindUri == null)
-				guiData.pool.clear();
-			else
-				guiData.pool = new DatasetPool();
-			this.tblDatasetPool.update(guiData.pool);
-			this.lbAlgs.update(algRegTable.getAlgList());
-			
+			lbAlgs.update(algRegTable.getAlgList());
 			clearResult();
-			
-			updateMode();
-			updateGUI();
+
+			if (bindUri == null) {
+				try {
+					evaluator.updatePool(null);
+				} catch (Throwable e) {e.printStackTrace();}
+			}
+			else {
+				guiData.pool = new DatasetPool();
+				tblDatasetPool.update(guiData.pool);
+				updateMode();
+			}
 		}
 		catch (Throwable e) {
 			e.printStackTrace();
@@ -972,12 +972,11 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			}
 			
 			clearResult();
-			Timestamp timestamp = new Timestamp();
 			boolean started = false;
 			if (bindUri == null)
-				started = evaluator.remoteStart0(lbAlgs.getAlgList(), guiData.pool.toDatasetExchangedPoolClient(), timestamp);
+				started = evaluator.remoteStart0(lbAlgs.getAlgList(), guiData.pool.toDatasetExchangedPoolClient(), null);
 			else
-				started = evaluator.remoteStart(lbAlgs.getAlgNameList(), guiData.pool.toDatasetExchangedPoolClient(), timestamp);
+				started = evaluator.remoteStart(lbAlgs.getAlgNameList(), guiData.pool.toDatasetExchangedPoolClient(), null);
 			if (!started) updateMode();
 		}
 		catch (Throwable e) {
@@ -991,19 +990,11 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 	@Override
 	public synchronized void receivedEvaluator(EvaluatorEvent evt) throws RemoteException {
 		// TODO Auto-generated method stub
-		if (evt.getType() == EvaluatorEvent.Type.start) {
-			lbAlgs.update(algRegTable.getAlgList(evt.getOtherResult().algNames));
-
-			Timestamp timestamp = evt.getTimestamp();
-			if (timestamp == null || this.timestamp == null || !timestamp.isValid() || !this.timestamp.isValid() ||
-					!timestamp.equals(this.timestamp)) {
-				try {
-					guiData.pool = evaluator.getDatasetPool().toDatasetPoolClient();
-				} catch (Throwable e) {e.printStackTrace();}
-				guiData.pool = guiData.pool != null ? guiData.pool : new DatasetPool();
-				
-				tblDatasetPool.update(guiData.pool);
-			}
+		if (evt.getType() == EvaluatorEvent.Type.start || evt.getType() == EvaluatorEvent.Type.update_pool) {
+			guiData.pool = evt.getPoolResult().toDatasetPoolClient();
+			guiData.pool = guiData.pool != null ? guiData.pool : new DatasetPool();
+			
+			tblDatasetPool.update(guiData.pool);
 			
 			updateMode();
 		}
@@ -1113,7 +1104,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			
 			if (lbAlgs.getAlgList().size() == 0) {
 				setInternalEnable(false);
-				setResultVisible(false);
+				setResultVisible(result != null && result.size() > 0);
 				
 				btnConfigAlgs.setEnabled(algRegTable.size() > 0);
 				
@@ -1123,7 +1114,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			}
 			else if (guiData.pool.size() == 0) {
 				setInternalEnable(false);
-				setResultVisible(false);
+				setResultVisible(result != null && result.size() > 0);
 				
 				lbAlgs.setEnabled(true);
 				btnConfigAlgs.setEnabled(true);
@@ -1200,6 +1191,8 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			btnConfigAlgs.setEnabled(algRegTable.size() > 0);
 			btnAddDataset.setEnabled(true);
 		}
+		
+		updateGUI();
 	}
 	
 	
@@ -1242,10 +1235,10 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 		this.btnMetricsOption.setEnabled(flag);
 		
 		this.btnAnalyzeResult.setEnabled(
-			flag && guiData.pool.size() > 0 && result != null && result.size() > 0);
+			flag && result != null && result.size() > 0);
 		
 		this.btnCopyResult.setEnabled(
-				flag && guiData.pool.size() > 0 && result != null && result.size() > 0);
+				flag && result != null && result.size() > 0);
 	}
 
 	
@@ -1255,7 +1248,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 	 */
 	private void setResultVisible(boolean flag) {
 		
-		boolean visible = flag && guiData.pool.size() > 0 && result != null && result.size() > 0;
+		boolean visible = flag && result != null && result.size() > 0;
  
 		paneResult.setVisible(visible);
 		btnAnalyzeResult.setEnabled(visible);
@@ -1316,10 +1309,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			else
 				this.lbAlgs.update(batchAlgList);
 			
-			if (bindUri == null)
-				guiData.pool.clear();
-			else
-				guiData.pool = new DatasetPool();
+			guiData.pool.clear();
 			DatasetPool scriptPool = script.getPool();
 			Alg[] algList = this.lbAlgs.getAlgList().toArray(new Alg[] {} );
 			for (int i = 0; i < scriptPool.size(); i++) {
@@ -1331,11 +1321,18 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 				if (DatasetUtil2.validateTrainingset(this, trainingSet, algList))
 					guiData.pool.add(pair);
 			}
-			this.tblDatasetPool.update(guiData.pool);
-			clearResult();
-			updateMode();
 			
-			updateGUI();
+			clearResult();
+			if (bindUri == null) {
+				try {
+					evaluator.updatePool(guiData.pool.toDatasetExchangedPoolClient());
+				} catch (Throwable e) {e.printStackTrace();}
+				
+			}
+			else {
+				tblDatasetPool.update(guiData.pool);
+				updateMode();
+			}
 		}
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
@@ -1436,14 +1433,23 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			if (evaluator.remoteIsStarted() || this.lbAlgs.getAlgList().size() == 0)
 				return;
 			
-			if (nullTesting)
-				new AddingTrainingDatasetNullTestingDatasetDlg(this, guiData.pool, this.lbAlgs.getAlgList(), evaluator.getMainUnit()).setVisible(true);
-			else
-				new AddingDatasetDlg(this, guiData.pool, this.lbAlgs.getAlgList(), evaluator.getMainUnit()).setVisible(true);
-			this.tblDatasetPool.update(guiData.pool);
-			
 			clearResult();
-			updateMode();
+
+			if (nullTesting)
+				new AddingTrainingDatasetNullTestingDatasetDlg(this, guiData.pool, this.lbAlgs.getAlgList(), evaluator.getMainUnit(), bindUri).setVisible(true);
+			else
+				new AddingDatasetDlg(this, guiData.pool, this.lbAlgs.getAlgList(), evaluator.getMainUnit(), bindUri).setVisible(true);
+			
+			if (bindUri == null) {
+				try {
+					evaluator.updatePool(guiData.pool.toDatasetExchangedPoolClient());
+				} catch (Throwable e) {e.printStackTrace();}
+			}
+			else {
+				this.tblDatasetPool.update(guiData.pool);
+				updateMode();
+			}
+			
 		}
 		catch (Throwable e) {
 			e.printStackTrace();
