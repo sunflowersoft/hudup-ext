@@ -53,6 +53,7 @@ import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.DatasetPair;
 import net.hudup.core.data.DatasetPool;
+import net.hudup.core.data.DatasetPoolExchanged;
 import net.hudup.core.data.DatasetUtil;
 import net.hudup.core.data.Pointer;
 import net.hudup.core.evaluate.EvaluateEvent;
@@ -114,6 +115,16 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 	 * Clearing button
 	 */
 	protected JButton btnClear = null;
+	
+	/**
+	 * Upload button.
+	 */
+	protected JButton btnUpload = null;
+	
+	/**
+	 * Download button.
+	 */
+	protected JButton btnDownload = null;
 	
 	
 	/**
@@ -472,6 +483,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 				}
 			});
 		this.btnRefresh.setMargin(new Insets(0, 0 , 0, 0));
+		this.btnRefresh.setVisible(bindUri == null);
 		tool.add(this.btnRefresh);
 
 		this.btnClear = UIUtil.makeIconButton(
@@ -491,6 +503,90 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			});
 		this.btnClear.setMargin(new Insets(0, 0 , 0, 0));
 		tool.add(this.btnClear);
+
+		this.btnUpload = UIUtil.makeIconButton(
+			"upload-16x16.png", 
+			"upload", 
+			I18nUtil.message("upload"), 
+			I18nUtil.message("upload"), 
+				
+			new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					// TODO Auto-generated method stub
+					boolean ret = true;
+					try {
+						ret = evaluator.updatePool(guiData.pool.toDatasetExchangedPoolClient());
+					} catch (Exception ex) {ex.printStackTrace();}
+					
+					if (ret) {
+						JOptionPane.showMessageDialog(
+							getThisGUI(), 
+							"Success to upload to server", 
+							"Success upload", 
+							JOptionPane.INFORMATION_MESSAGE);
+					}
+					else {
+						JOptionPane.showMessageDialog(
+							getThisGUI(), 
+							"Fail to upload to server", 
+							"Fail upload", 
+							JOptionPane.ERROR_MESSAGE);
+					}
+				}
+			});
+		this.btnUpload.setMargin(new Insets(0, 0 , 0, 0));
+		this.btnUpload.setVisible(bindUri != null);
+		tool.add(this.btnUpload);
+
+		this.btnDownload = UIUtil.makeIconButton(
+			"download-16x16.png", 
+			"download", 
+			I18nUtil.message("download"), 
+			I18nUtil.message("download"), 
+				
+			new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					// TODO Auto-generated method stub
+					DatasetPoolExchanged poolResult = null;
+					try {
+						poolResult = evaluator.getDatasetPool();
+					} catch (Exception ex) {ex.printStackTrace();}
+					
+					if (poolResult != null) {
+						clearResult();
+						guiData.pool = poolResult.toDatasetPoolClient();
+						if (guiData.pool.size() > 0) {
+							txtTrainingBrowse.setDataset(guiData.pool.get(0).getTraining(), false);
+							txtTestingBrowse.setDataset(guiData.pool.get(0).getTesting(), false);
+						}
+						else {
+							txtTrainingBrowse.setDataset(null, false);
+							txtTestingBrowse.setDataset(null, false);
+						}
+						updateMode();
+						
+						JOptionPane.showMessageDialog(
+							getThisGUI(), 
+							"Success to download from server", 
+							"Success download", 
+							JOptionPane.INFORMATION_MESSAGE);
+					}
+					else {
+						JOptionPane.showMessageDialog(
+							getThisGUI(), 
+							"Fail to download from server", 
+							"Fail download", 
+							JOptionPane.ERROR_MESSAGE);
+					}
+				}
+			});
+		this.btnDownload.setMargin(new Insets(0, 0 , 0, 0));
+		this.btnDownload.setVisible(bindUri != null);
+		tool.add(this.btnDownload);
 
 		this.btnForceStop = UIUtil.makeIconButton(
 			"forcestop-16x16.png", 
@@ -1419,63 +1515,56 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 		
 		Dataset trainingSet = txtTrainingBrowse.getDataset();
 		Dataset testingSet = txtTestingBrowse.getDataset();
-		
 		this.btnTrainingBrowse.setEnabled(flag);
 		this.txtTrainingBrowse.setEnabled(flag);
-		
 		this.btnTestingBrowse.setEnabled(
 			flag && trainingSet != null);
 		this.txtTestingBrowse.setEnabled(
 			flag && trainingSet != null);
 		
 		this.btnRefresh.setEnabled(
-				flag && (trainingSet != null || testingSet != null) );
-		
+			flag && (trainingSet != null || testingSet != null) );
 		this.btnClear.setEnabled(
-				flag && (trainingSet != null || testingSet != null));
+			flag && (trainingSet != null || testingSet != null));
+		this.btnUpload.setEnabled(
+			flag && (trainingSet != null || testingSet != null));
+		this.btnDownload.setEnabled(flag);
 
 		this.btnRun.setEnabled(
 			flag && 
 			trainingSet != null && 
 			testingSet != null && 
 			DatasetUtil2.validateTrainingset(this, trainingSet, new Alg[] { getAlg() }) );
-
 		this.btnPauseResume.setEnabled(
-				flag && 
-				trainingSet != null && 
-				testingSet != null);
-
+			flag && 
+			trainingSet != null && 
+			testingSet != null);
 		this.btnStop.setEnabled(
-				flag && 
-				trainingSet != null && 
-				testingSet != null);
-
+			flag && 
+			trainingSet != null && 
+			testingSet != null);
 		this.btnForceStop.setEnabled(
-				flag && 
-				trainingSet != null && 
-				testingSet != null);
-
+			flag && 
+			trainingSet != null && 
+			testingSet != null);
 		this.txtRunInfo.setEnabled(
 			flag && 
 			trainingSet != null && 
 			testingSet != null);
 		
 		this.chkRunSave.setEnabled(
-				flag && 
-				trainingSet != null && 
-				testingSet != null);
-		
+			flag && 
+			trainingSet != null && 
+			testingSet != null);
 		this.txtRunSaveBrowse.setEnabled(
-				flag && 
-				trainingSet != null && 
-				testingSet != null);
-
+			flag && 
+			trainingSet != null && 
+			testingSet != null);
 		this.chkVerbal.setEnabled(flag);
-		this.btnMetricsOption.setEnabled(flag);
 		
+		this.btnMetricsOption.setEnabled(flag);
 		this.btnAnalyzeResult.setEnabled(
 			flag && result != null && result.size() > 0);
-			
 		this.btnCopyResult.setEnabled(
 			flag && result != null && result.size() > 0);
 	}

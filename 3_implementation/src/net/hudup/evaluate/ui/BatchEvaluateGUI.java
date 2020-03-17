@@ -45,6 +45,7 @@ import net.hudup.core.alg.ui.AlgListChooser;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.DatasetPair;
 import net.hudup.core.data.DatasetPool;
+import net.hudup.core.data.DatasetPoolExchanged;
 import net.hudup.core.data.NullPointer;
 import net.hudup.core.evaluate.EvaluateEvent;
 import net.hudup.core.evaluate.EvaluateEvent.Type;
@@ -114,6 +115,16 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 	 * Clear button.
 	 */
 	protected JButton btnClear = null;
+	
+	/**
+	 * Upload button.
+	 */
+	protected JButton btnUpload = null;
+	
+	/**
+	 * Download button.
+	 */
+	protected JButton btnDownload = null;
 	
 	
 	/**
@@ -431,7 +442,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 		JPanel down = new JPanel(new BorderLayout(2, 2));
 		header.add(down, BorderLayout.CENTER);
 		
-		this.tblDatasetPool = new DatasetPoolTable(false) {
+		this.tblDatasetPool = new DatasetPoolTable(false, bindUri) {
 
 			/**
 			 * Serial version UID for serializable class. 
@@ -515,6 +526,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 				}
 			});
 		this.btnRefresh.setMargin(new Insets(0, 0 , 0, 0));
+		this.btnRefresh.setVisible(bindUri == null);
 		toolGrp2.add(this.btnRefresh);
 
 		this.btnClear = UIUtil.makeIconButton(
@@ -534,6 +546,84 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			});
 		this.btnClear.setMargin(new Insets(0, 0 , 0, 0));
 		toolGrp2.add(this.btnClear);
+
+		this.btnUpload = UIUtil.makeIconButton(
+			"upload-16x16.png", 
+			"upload", 
+			I18nUtil.message("upload"), 
+			I18nUtil.message("upload"), 
+				
+			new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					// TODO Auto-generated method stub
+					boolean ret = true;
+					try {
+						ret = evaluator.updatePool(guiData.pool.toDatasetExchangedPoolClient());
+					} catch (Exception ex) {ex.printStackTrace();}
+					
+					if (ret) {
+						JOptionPane.showMessageDialog(
+							getThisGUI(), 
+							"Success to upload to server", 
+							"Success upload", 
+							JOptionPane.INFORMATION_MESSAGE);
+					}
+					else {
+						JOptionPane.showMessageDialog(
+							getThisGUI(), 
+							"Fail to upload to server", 
+							"Fail upload", 
+							JOptionPane.ERROR_MESSAGE);
+					}
+				}
+			});
+		this.btnUpload.setMargin(new Insets(0, 0 , 0, 0));
+		this.btnUpload.setVisible(bindUri != null);
+		toolGrp2.add(this.btnUpload);
+
+		this.btnDownload = UIUtil.makeIconButton(
+			"download-16x16.png", 
+			"download", 
+			I18nUtil.message("download"), 
+			I18nUtil.message("download"), 
+				
+			new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					// TODO Auto-generated method stub
+					DatasetPoolExchanged poolResult = null;
+					try {
+						poolResult = evaluator.getDatasetPool();
+					} catch (Exception ex) {ex.printStackTrace();}
+					
+					if (poolResult != null) {
+						clearResult();
+						guiData.pool = poolResult.toDatasetPoolClient();
+						tblDatasetPool.update(guiData.pool);
+						updateMode();
+						
+						JOptionPane.showMessageDialog(
+							getThisGUI(), 
+							"Success to download from server", 
+							"Success download", 
+							JOptionPane.INFORMATION_MESSAGE);
+					}
+					else {
+						JOptionPane.showMessageDialog(
+							getThisGUI(), 
+							"Fail to download from server", 
+							"Fail download", 
+							JOptionPane.ERROR_MESSAGE);
+					}
+				}
+				
+			});
+		this.btnDownload.setMargin(new Insets(0, 0 , 0, 0));
+		this.btnDownload.setVisible(bindUri != null);
+		toolGrp2.add(this.btnDownload);
 
 		this.btnSaveBatchScript = UIUtil.makeIconButton(
 			"save-16x16.png", 
@@ -1120,6 +1210,8 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 				btnConfigAlgs.setEnabled(true);
 				btnAddDataset.setEnabled(true);
 				btnLoadBatchScript.setEnabled(true);
+				btnUpload.setEnabled(guiData.pool.size() > 0);
+				btnDownload.setEnabled(true);
 				
 				prgRunning.setMaximum(0);
 				prgRunning.setValue(0);
@@ -1211,32 +1303,24 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 		this.btnSaveBatchScript.setEnabled(flag && guiData.pool.size() > 0);
 		
 		this.btnRefresh.setEnabled(flag && guiData.pool.size() > 0);
-		
 		this.btnClear.setEnabled(flag && guiData.pool.size() > 0);
+		this.btnUpload.setEnabled(flag && guiData.pool.size() > 0);
+		this.btnDownload.setEnabled(flag);
 
 		this.btnRun.setEnabled(flag && guiData.pool.size() > 0);
-
 		this.btnPauseResume.setEnabled(flag && guiData.pool.size() > 0);
-
 		this.btnStop.setEnabled(flag && guiData.pool.size() > 0);
-
 		this.btnForceStop.setEnabled(flag && guiData.pool.size() > 0);
 
 		this.txtRunInfo.setEnabled(flag && guiData.pool.size() > 0);
-		
 		this.chkRunSave.setEnabled(flag && guiData.pool.size() > 0);
-
 		this.chkRunSave.setEnabled(flag && guiData.pool.size() > 0);
-
 		this.txtRunSaveBrowse.setEnabled(flag && guiData.pool.size() > 0);
-
 		this.chkVerbal.setEnabled(flag);
 		
 		this.btnMetricsOption.setEnabled(flag);
-		
 		this.btnAnalyzeResult.setEnabled(
 			flag && result != null && result.size() > 0);
-		
 		this.btnCopyResult.setEnabled(
 				flag && result != null && result.size() > 0);
 	}

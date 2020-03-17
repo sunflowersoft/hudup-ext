@@ -7,6 +7,7 @@
  */
 package net.hudup.data.ui;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -21,7 +22,9 @@ import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 import javax.swing.SwingUtilities;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellRenderer;
 
 import net.hudup.core.alg.KBase;
 import net.hudup.core.alg.ui.KBaseConfigDlg;
@@ -29,6 +32,8 @@ import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.DatasetPair;
 import net.hudup.core.data.DatasetPool;
+import net.hudup.core.data.DatasetRemoteWrapper;
+import net.hudup.core.data.DatasetUtil;
 import net.hudup.core.data.KBasePointer;
 import net.hudup.core.data.NullPointer;
 import net.hudup.core.data.Pointer;
@@ -65,21 +70,38 @@ public class DatasetPoolTable extends JTable {
 
 	
 	/**
+	 * Bound URI.
+	 */
+	protected xURI bindUri = null;
+	
+	
+	/**
 	 * Default constructor.
 	 */
 	public DatasetPoolTable() {
-		this(false);
+		this(false, null);
 	}
 	
 	
 	/**
 	 * Constructor with clearing flag.
-	 * @param clearDatasetWhenRemove flag to indicate whether to clear dataset when remove it..
+	 * @param clearDatasetWhenRemove flag to indicate whether to clear dataset when remove it.
 	 */
 	public DatasetPoolTable(boolean clearDatasetWhenRemove) {
+		this(clearDatasetWhenRemove, null);
+	}
+	
+	
+	/**
+	 * Constructor with clearing flag and bound URI.
+	 * @param clearDatasetWhenRemove flag to indicate whether to clear dataset when remove it.
+	 * @param bindUri bound URI.
+	 */
+	public DatasetPoolTable(boolean clearDatasetWhenRemove, xURI bindUri) {
 		// TODO Auto-generated constructor stub
 		super(new DatasetPoolTableModel());
 		this.clearDatasetWhenRemove = clearDatasetWhenRemove;
+		this.bindUri = bindUri;
 		
 		addMouseListener(new MouseAdapter() {
 
@@ -108,7 +130,6 @@ public class DatasetPoolTable extends JTable {
 			}
 			
 		});
-		
 	}
 	
 	
@@ -129,6 +150,7 @@ public class DatasetPoolTable extends JTable {
 		getPoolTableModel().update(pool);
 		
 		setupUI();
+		
 	}
 	
 	
@@ -550,7 +572,76 @@ public class DatasetPoolTable extends JTable {
 		// TODO Auto-generated method stub
 		return enabled;
 	}
-	
+
+
+	@Override
+	public TableCellRenderer getCellRenderer(int row, int column) {
+		// TODO Auto-generated method stub
+		if (column >=1 && column <= 3)
+			return new HighlightCellRenderer();
+		else
+			return super.getCellRenderer(row, column);
+	}
+
+
+	/**
+	 * This class represents highlight cell renderer according to pool.
+	 * @author Loc Nguyen
+	 * @version 1.0
+	 */
+	private class HighlightCellRenderer extends DefaultTableCellRenderer {
+
+		/**
+		 * Serial version UID for serializable class.
+		 */
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus,
+				int row, int column) {
+			// TODO Auto-generated method stub
+			Component comp = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+			
+			if (bindUri == null) return comp;
+			
+			DatasetPool pool = getPool();
+			if (pool == null || row >= pool.size()) return comp;
+			
+			Dataset dataset = null;
+			if (column == 1)
+				dataset = pool.get(row).getTraining();
+			else if (column == 2)
+				dataset = pool.get(row).getTesting();
+			else if (column == 3)
+				dataset = pool.get(row).getWhole();
+				
+			dataset = getMostInnerDataset(dataset);
+			if (dataset != null)
+				comp.setBackground(new Color(200, 200, 200));
+			return comp;
+		}
+		
+		/**
+		 * Getting most inner dataset of dataset.
+		 * @param remoteDataset specified dataset.
+		 * @return most inner dataset of specified dataset.
+		 */
+		private Dataset getMostInnerDataset(Dataset dataset) {
+			if (dataset == null)
+				return null;
+			else if (dataset instanceof DatasetRemoteWrapper) {
+				dataset = DatasetUtil.getMostInnerDataset((DatasetRemoteWrapper)dataset);
+				if ((dataset != null) && (dataset instanceof Dataset))
+					return dataset;
+				else
+					return null;
+			}
+			else
+				return dataset;
+		}
+		
+		
+	}
 	
 }
 
