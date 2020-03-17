@@ -7,12 +7,6 @@
  */
 package net.hudup.core.data;
 
-import net.hudup.core.PluginStorage;
-import net.hudup.core.alg.Alg;
-import net.hudup.core.alg.KBase;
-import net.hudup.core.alg.ModelBasedAlg;
-import net.hudup.core.logistic.xURI;
-
 /**
  * There are two typical {@link Dataset} such as {@link Snapshot} and {@link Scanner}.
  * {@link Snapshot} or scanner is defined as an image of piece of {@link Dataset} and knowledge base ({@link KBase}) at certain time point.
@@ -34,74 +28,7 @@ import net.hudup.core.logistic.xURI;
  * @version 10.0
  *
  */
-public class KBasePointer extends Pointer {
+public interface KBasePointer extends Pointer {
 
-	
-	/**
-	 * Serial version UID for serializable class. 
-	 */
-	private static final long serialVersionUID = 1L;
-
-	
-	/**
-	 * Default constructor.
-	 */
-	public KBasePointer() {
-		super();
-		// TODO Auto-generated constructor stub
-	}
-
-
-	/**
-	 * Create knowledge base from specified dataset.
-	 * @param dataset specified dataset. It is often {@link KBasePointer}.
-	 * @return knowledge base from dataset.
-	 */
-	public static KBase createKB(Dataset dataset) {
-		DataConfig config = loadKBaseConfig(dataset);
-		if (config == null) return null;
-		String kbaseName = config.getAsString(KBase.KBASE_NAME);
-		if (kbaseName == null) return null;
-		
-		KBase kbase = null;
-		Alg alg = PluginStorage.getNormalAlgReg().query(kbaseName);
-		if (alg != null && (alg instanceof ModelBasedAlg)) {
-			try {
-				kbase = ((ModelBasedAlg)alg).createKBase(dataset);
-			}
-			catch (Throwable e) {
-				e.printStackTrace();
-				kbase = null;
-			}
-		}
-		
-		try {
-			if (kbase != null && kbase.isEmpty()) {
-				kbase.close();
-				kbase = null;
-			}
-		}
-		catch (Throwable e) {e.printStackTrace(); kbase = null;}
-		
-		return kbase;
-	}
-	
-	
-	/**
-	 * Loading configuration of knowledge base from specified dataset.
-	 * @param dataset specified dataset. It is often {@link KBasePointer}.
-	 * @return configuration of knowledge base from specified dataset.
-	 */
-	public static DataConfig loadKBaseConfig(Dataset dataset) {
-		DataConfig config = (DataConfig) dataset.getConfig().clone();
-		xURI storeUri = config.getStoreUri();
-		if (storeUri == null) return null;
-		xURI configUri = storeUri.concat(KBase.KBASE_CONFIG);
-		config.load(configUri);
-		
-		return config;
-	}
-	
-	
 	
 }

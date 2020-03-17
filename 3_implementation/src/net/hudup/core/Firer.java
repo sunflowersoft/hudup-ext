@@ -36,6 +36,8 @@ import net.hudup.core.alg.RecommenderRemoteWrapper;
 import net.hudup.core.alg.ServiceAlg;
 import net.hudup.core.data.DataDriver;
 import net.hudup.core.data.DataDriverList;
+import net.hudup.core.data.DatasetRemote;
+import net.hudup.core.data.DatasetRemoteWrapper;
 import net.hudup.core.data.ExternalQuery;
 import net.hudup.core.data.ExternalQueryRemote;
 import net.hudup.core.data.ExternalQueryRemoteWrapper;
@@ -546,6 +548,13 @@ public class Firer implements PluginManager {
 	}
 	
 	
+	@Override
+	public DatasetRemoteWrapper wrap(DatasetRemote remoteDataset, boolean exclusive) {
+		// TODO Auto-generated method stub
+		return new DatasetRemoteWrapper(remoteDataset, exclusive);
+	}
+
+
 	@Override
 	public int methodTypeOf(Alg alg) {
 		if (alg instanceof MemoryBasedAlg)

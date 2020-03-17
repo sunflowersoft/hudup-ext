@@ -122,7 +122,7 @@ public class DefaultService implements Service, AutoCloseable {
 		boolean opened = true;
 		this.serverConfig = serverConfig;
 		try {
-			Dataset dataset = serverConfig.getParser().parse((DataConfig)serverConfig.clone());
+			Dataset dataset = null;
 			if (!serverConfig.isDatasetEmpty()) {
 				dataset = serverConfig.getParser().parse((DataConfig)serverConfig.clone());
 			}
@@ -369,7 +369,6 @@ public class DefaultService implements Service, AutoCloseable {
 				trans.unlockRead();
 			}
 		}
-		
 		
 		return result;
 	}

@@ -418,6 +418,21 @@ public class SnapshotImpl extends Snapshot {
 	}
 	
 	
+	@Override
+	public void assignNull() {
+		this.config = null;
+		this.externalUserRecordMap = null; 
+		this.userRatingMap = null; 
+		this.userProfiles = null; 
+		this.externalItemRecordMap = null; 
+		this.itemRatingMap = null; 
+		this.itemProfiles = null;
+		this.ctSchema = null;
+		this.ctsProfiles = null;
+		this.sampleProfiles = null;
+	}
+	
+	
 	/**
 	 * Enhancing internal structures.
 	 */
@@ -500,17 +515,17 @@ public class SnapshotImpl extends Snapshot {
 	public void clear() {
 		super.clear();
 		
-		itemRatingMap.clear();
-		itemProfiles.clear();
-		externalItemRecordMap.clear();
+		if (itemRatingMap != null) itemRatingMap.clear();
+		if (itemProfiles != null) itemProfiles.clear();
+		if (externalItemRecordMap != null) externalItemRecordMap.clear();
 		
-		userRatingMap.clear();
-		userProfiles.clear();
-		externalUserRecordMap.clear();
+		if (userRatingMap != null) userRatingMap.clear();
+		if (userProfiles != null) userProfiles.clear();
+		if (externalUserRecordMap != null) externalUserRecordMap.clear();
 		
-		ctSchema.clear();
-		ctsProfiles.clear();
-		sampleProfiles.clear();
+		if (ctSchema != null) ctSchema.clear();
+		if (ctsProfiles != null) ctsProfiles.clear();
+		if (sampleProfiles != null) sampleProfiles.clear();
 	}
 
 

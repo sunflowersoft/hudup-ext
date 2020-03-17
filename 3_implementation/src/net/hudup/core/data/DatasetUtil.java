@@ -137,4 +137,26 @@ public final class DatasetUtil {
 	}
 
 
+	/**
+	 * Getting the most inner algorithm of the specified algorithm.
+	 * @param alg specified algorithm.
+	 * @return the most inner algorithm of the specified algorithm.
+	 */
+	public static Dataset getMostInnerDataset2(Dataset dataset) {
+		if (dataset == null)
+			return null;
+		else if (dataset instanceof DatasetRemoteWrapper) {
+			DatasetRemote remoteDataset = ((DatasetRemoteWrapper)dataset).getRemoteDataset();
+			if (remoteDataset == null)
+				return null;
+			else if (remoteDataset instanceof Dataset)
+				return getMostInnerDataset2((Dataset)remoteDataset);
+			else
+				return null;
+		}
+		else
+			return dataset;
+	}
+
+
 }

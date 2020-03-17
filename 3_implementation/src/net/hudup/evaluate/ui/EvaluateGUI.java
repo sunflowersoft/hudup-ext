@@ -1289,6 +1289,12 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 	public synchronized void receivedEvaluator(EvaluatorEvent evt) throws RemoteException {
 		// TODO Auto-generated method stub
 		if (evt.getType() == EvaluatorEvent.Type.start || evt.getType() == EvaluatorEvent.Type.update_pool) {
+			if (evt.getType() == EvaluatorEvent.Type.start) {
+				String algName = evt.getOtherResult().algName;
+				if (algName != null)
+					cmbAlgs.setDefaultSelected(algName);
+			}
+
 			guiData.pool = evt.getPoolResult().toDatasetPoolClient();
 			guiData.pool = guiData.pool != null ? guiData.pool : new DatasetPool();
 			

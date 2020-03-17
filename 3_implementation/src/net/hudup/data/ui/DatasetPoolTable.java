@@ -32,9 +32,9 @@ import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.DatasetPair;
 import net.hudup.core.data.DatasetPool;
-import net.hudup.core.data.DatasetRemoteWrapper;
 import net.hudup.core.data.DatasetUtil;
 import net.hudup.core.data.KBasePointer;
+import net.hudup.core.data.KBasePointerImpl;
 import net.hudup.core.data.NullPointer;
 import net.hudup.core.data.Pointer;
 import net.hudup.core.logistic.ClipboardUtil;
@@ -293,7 +293,7 @@ public class DatasetPoolTable extends JTable {
 							if (confirm != JOptionPane.OK_OPTION)
 								return;
 							
-							KBase kbase = KBasePointer.createKB(dataset);
+							KBase kbase = KBasePointerImpl.createKB(dataset);
 							if (kbase == null) {
 								JOptionPane.showMessageDialog(
 										getThis(), 
@@ -318,7 +318,7 @@ public class DatasetPoolTable extends JTable {
 						
 						@Override
 						public void actionPerformed(ActionEvent e) {
-							DataConfig kbaseConfig = KBasePointer.loadKBaseConfig(dataset);
+							DataConfig kbaseConfig = KBasePointerImpl.loadKBaseConfig(dataset);
 							if (kbaseConfig == null) {
 								JOptionPane.showMessageDialog(
 										getThis(), 
@@ -615,29 +615,10 @@ public class DatasetPoolTable extends JTable {
 			else if (column == 3)
 				dataset = pool.get(row).getWhole();
 				
-			dataset = getMostInnerDataset(dataset);
+			dataset = DatasetUtil.getMostInnerDataset2(dataset);
 			if (dataset != null)
 				comp.setBackground(new Color(200, 200, 200));
 			return comp;
-		}
-		
-		/**
-		 * Getting most inner dataset of dataset.
-		 * @param remoteDataset specified dataset.
-		 * @return most inner dataset of specified dataset.
-		 */
-		private Dataset getMostInnerDataset(Dataset dataset) {
-			if (dataset == null)
-				return null;
-			else if (dataset instanceof DatasetRemoteWrapper) {
-				dataset = DatasetUtil.getMostInnerDataset((DatasetRemoteWrapper)dataset);
-				if ((dataset != null) && (dataset instanceof Dataset))
-					return dataset;
-				else
-					return null;
-			}
-			else
-				return dataset;
 		}
 		
 		

@@ -10,6 +10,8 @@ package net.hudup.core.data;
 import java.io.Serializable;
 import java.util.UUID;
 
+import net.hudup.core.Util;
+
 /**
  * This class is the exchanged data for dataset pair.
  * 
@@ -164,7 +166,7 @@ public class DatasetPairExchanged implements Serializable {
 		if ((dataset == null) || !(dataset instanceof DatasetRemote))
 			return null;
 		else
-			return new DatasetRemoteWrapper((DatasetRemote)dataset, exclusive);
+			return Util.getPluginManager().wrap((DatasetRemote)dataset, exclusive);
 	}
 	
 	

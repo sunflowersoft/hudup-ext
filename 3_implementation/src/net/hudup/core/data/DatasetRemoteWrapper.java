@@ -571,7 +571,8 @@ public class DatasetRemoteWrapper implements Dataset, DatasetRemote {
 		super.finalize();
 		
 		try {
-			clear();
+//			clear(); //Clear method can close provider with scanner.
+			unexport();
 		}
 		catch (Throwable e) {
 			e.printStackTrace();

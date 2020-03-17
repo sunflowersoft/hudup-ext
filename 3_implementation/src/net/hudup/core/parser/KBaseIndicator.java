@@ -14,6 +14,7 @@ import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.DataDriver;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.KBasePointer;
+import net.hudup.core.data.KBasePointerImpl;
 
 
 /**
@@ -56,7 +57,7 @@ public class KBaseIndicator extends Indicator {
 	public Dataset parse(DataConfig config) throws RemoteException {
 		// TODO Auto-generated method stub
 		
-		KBasePointer kbasePointer = new KBasePointer();
+		KBasePointer kbasePointer = new KBasePointerImpl();
 		config.setParser(this);
 		kbasePointer.setConfig(config);
 

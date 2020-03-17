@@ -70,6 +70,13 @@ public abstract class Snapshot extends DatasetAbstract {
 	
 	
 	/**
+	 * Assigning null to avoid duplicated clearing.
+	 */
+	@Deprecated
+	public abstract void assignNull();
+	
+	
+	/**
 	 * Every context template represented by {@code ContextTemplate} interface owns a profile table and each value represented by {@code ContextValue} of template corresponds to a row in this table.
 	 * Each row in such template profile table is represented by {@code Profile} class.
 	 * A class that implements this interface {@code CTSMultiProfiles} contains all profiles of all templates.

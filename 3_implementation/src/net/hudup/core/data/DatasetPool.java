@@ -487,7 +487,7 @@ public class DatasetPool implements Serializable {
 				if (pair.training instanceof DatasetRemoteWrapper)
 					training = (DatasetRemoteWrapper)pair.training;
 				else if (pair.training instanceof DatasetRemote)
-					training = new DatasetRemoteWrapper((DatasetRemote)pair.training, false);
+					training = Util.getPluginManager().wrap((DatasetRemote)pair.training, false);
 				trainingUUID = training != null ? pair.trainingUUID : null;
 			}
 			
@@ -497,7 +497,7 @@ public class DatasetPool implements Serializable {
 				if (pair.testing instanceof DatasetRemoteWrapper)
 					testing = (DatasetRemoteWrapper)pair.testing;
 				else if (pair.testing instanceof DatasetRemote)
-					testing = new DatasetRemoteWrapper((DatasetRemote)pair.testing, false);
+					testing = Util.getPluginManager().wrap((DatasetRemote)pair.testing, false);
 				testingUUID = testing != null ? pair.testingUUID : null;
 			}
 			
@@ -507,7 +507,7 @@ public class DatasetPool implements Serializable {
 				if (pair.whole instanceof DatasetRemoteWrapper)
 					whole = (DatasetRemoteWrapper)pair.whole;
 				else if (pair.whole instanceof DatasetRemote)
-					whole = new DatasetRemoteWrapper((DatasetRemote)pair.whole, false);
+					whole = Util.getPluginManager().wrap((DatasetRemote)pair.whole, false);
 				wholeUUID = whole != null ? pair.wholeUUID : null;
 			}
 			

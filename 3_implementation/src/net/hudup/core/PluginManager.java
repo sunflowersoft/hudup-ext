@@ -14,6 +14,8 @@ import java.util.Set;
 import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.AlgRemote;
 import net.hudup.core.alg.AlgRemoteWrapper;
+import net.hudup.core.data.DatasetRemote;
+import net.hudup.core.data.DatasetRemoteWrapper;
 import net.hudup.core.logistic.BaseClass;
 import net.hudup.core.logistic.NextUpdate;
 import net.hudup.core.logistic.xURI;
@@ -114,6 +116,15 @@ public interface PluginManager {
 	 * @return wrapper of a remote algorithm.
 	 */
 	AlgRemoteWrapper wrap(AlgRemote remoteAlg, boolean exclusive);
+
+	
+	/**
+	 * Wrapping a remote dataset.
+	 * @param remoteDataset remote dataset.
+	 * @param exclusive exclusive mode.
+	 * @return wrapper of a remote dataset.
+	 */
+	DatasetRemoteWrapper wrap(DatasetRemote remoteDataset, boolean exclusive);
 
 	
 	/**

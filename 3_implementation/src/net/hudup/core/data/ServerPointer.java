@@ -7,8 +7,6 @@
  */
 package net.hudup.core.data;
 
-import net.hudup.core.alg.KBase;
-
 /**
  * There are two typical {@link Dataset} such as {@link Snapshot} and {@link Scanner}.
  * {@link Snapshot} or scanner is defined as an image of piece of {@link Dataset} and knowledge base ({@link KBase}) at certain time point.
@@ -30,22 +28,7 @@ import net.hudup.core.alg.KBase;
  * @version 10.0
  *
  */
-public class ServerPointer extends Pointer {
+public interface ServerPointer extends Pointer {
 
 	
-	/**
-	 * Serial version UID for serializable class. 
-	 */
-	private static final long serialVersionUID = 1L;
-
-	
-	/**
-	 * Default constructor.
-	 */
-	public ServerPointer() {
-		super();
-		// TODO Auto-generated constructor stub
-	}
-
-
 }

@@ -17,6 +17,7 @@ import net.hudup.core.data.DataDriver.DataType;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.DatasetMetadata;
 import net.hudup.core.data.ServerPointer;
+import net.hudup.core.data.ServerPointerImpl;
 
 /**
  * There are two typical {@code Dataset} such as {@code Snapshot} and {@code Scanner}.
@@ -71,7 +72,7 @@ public class SocketServerIndicator extends Indicator {
 			DatasetMetadata metadata = srvConfig.getMetadata();
 			config.setMetadata(metadata);
 			
-			ServerPointer pointer = new ServerPointer();
+			ServerPointer pointer = new ServerPointerImpl();
 			config.setParser(this);
 			pointer.setConfig(config);
 			return pointer;

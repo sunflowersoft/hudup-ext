@@ -15,6 +15,7 @@ import net.hudup.core.data.DataDriver;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.Pointer;
 import net.hudup.core.data.ServerPointer;
+import net.hudup.core.data.ServerPointerImpl;
 
 /**
  * There are two typical {@code Dataset} such as {@code Snapshot} and {@code Scanner}.
@@ -55,7 +56,7 @@ public class FlatServerIndicator extends Indicator {
 	@Override
 	public Dataset parse(DataConfig config) throws RemoteException {
 		// TODO Auto-generated method stub
-		Pointer pointer = new ServerPointer();
+		Pointer pointer = new ServerPointerImpl();
 		config.setParser(this);
 		pointer.setConfig(config);
 		return pointer;

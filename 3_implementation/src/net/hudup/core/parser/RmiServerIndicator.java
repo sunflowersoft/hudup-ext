@@ -18,6 +18,7 @@ import net.hudup.core.data.DataDriver.DataType;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.DatasetMetadata;
 import net.hudup.core.data.ServerPointer;
+import net.hudup.core.data.ServerPointerImpl;
 import net.hudup.core.logistic.xURI;
 
 
@@ -77,7 +78,7 @@ public class RmiServerIndicator extends Indicator {
 				DatasetMetadata metadata = srvConfig.getMetadata();
 				config.setMetadata(metadata);
 				
-				ServerPointer pointer = new ServerPointer();
+				ServerPointer pointer = new ServerPointerImpl();
 				config.setParser(this);
 				pointer.setConfig(config);
 				return pointer;

@@ -19,6 +19,7 @@ import net.hudup.core.alg.ui.KBaseConfigDlg;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.KBasePointer;
+import net.hudup.core.data.KBasePointerImpl;
 import net.hudup.core.data.NullPointer;
 import net.hudup.core.data.Pointer;
 import net.hudup.core.logistic.ClipboardUtil;
@@ -132,7 +133,7 @@ public class DatasetTextField extends TagTextField {
 						if (confirm != JOptionPane.OK_OPTION)
 							return;
 						
-						KBase kbase = KBasePointer.createKB(dataset);
+						KBase kbase = KBasePointerImpl.createKB(dataset);
 						if (kbase == null) {
 							JOptionPane.showMessageDialog(
 									getThis(), 
@@ -157,7 +158,7 @@ public class DatasetTextField extends TagTextField {
 					
 					@Override
 					public void actionPerformed(ActionEvent e) {
-						DataConfig kbaseConfig = KBasePointer.loadKBaseConfig(dataset);
+						DataConfig kbaseConfig = KBasePointerImpl.loadKBaseConfig(dataset);
 						if (kbaseConfig == null) {
 							JOptionPane.showMessageDialog(
 									getThis(), 

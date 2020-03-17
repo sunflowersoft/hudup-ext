@@ -1081,6 +1081,14 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 	public synchronized void receivedEvaluator(EvaluatorEvent evt) throws RemoteException {
 		// TODO Auto-generated method stub
 		if (evt.getType() == EvaluatorEvent.Type.start || evt.getType() == EvaluatorEvent.Type.update_pool) {
+			if (evt.getType() == EvaluatorEvent.Type.start) {
+				List<String> algNames = evt.getOtherResult().algNames;
+				if (algNames != null && algNames.size() > 0)
+					lbAlgs.update(algRegTable.getAlgList(algNames));
+				else
+					lbAlgs.update(algRegTable.getAlgList());
+			}
+			
 			guiData.pool = evt.getPoolResult().toDatasetPoolClient();
 			guiData.pool = guiData.pool != null ? guiData.pool : new DatasetPool();
 			

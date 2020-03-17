@@ -70,6 +70,8 @@ public abstract class ModelBasedRecommenderAbstract extends RecommenderAbstract 
 			}
 			kb.load();
 			
+			//This line is important because algorithm configuration is KBase configuration which in turn is loaded from dataset (pointed by KBasePointer).
+			//Therefore, configuring dataset (pointed by KBasePointer) here is to configure algorithm.
 			dataset.getConfig().putAll(kb.getConfig());
 		}
 		else if (!(dataset instanceof Pointer)) {

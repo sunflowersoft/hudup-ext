@@ -101,7 +101,7 @@ public class DatasetPoolExchanged  implements Serializable {
 				if (pair.training instanceof DatasetRemoteWrapper)
 					newTraining = pair.training;
 				else
-					newTraining = new DatasetRemoteWrapper(pair.training, exclusive);
+					newTraining = Util.getPluginManager().wrap(pair.training, exclusive);
 				
 				try {
 					((DatasetRemoteWrapper)newTraining).exportInside(serverPort);
@@ -114,7 +114,7 @@ public class DatasetPoolExchanged  implements Serializable {
 				if (pair.testing instanceof DatasetRemoteWrapper)
 					newTesting = pair.testing;
 				else
-					newTesting = new DatasetRemoteWrapper(pair.testing, exclusive);
+					newTesting = Util.getPluginManager().wrap(pair.testing, exclusive);
 				
 				try {
 					((DatasetRemoteWrapper)newTesting).exportInside(serverPort);
@@ -127,7 +127,7 @@ public class DatasetPoolExchanged  implements Serializable {
 				if (pair.whole instanceof DatasetRemoteWrapper)
 					newWhole = pair.whole;
 				else
-					newWhole = new DatasetRemoteWrapper(pair.whole, exclusive);
+					newWhole = Util.getPluginManager().wrap(pair.whole, exclusive);
 				
 				try {
 					((DatasetRemoteWrapper)newWhole).exportInside(serverPort);
@@ -315,7 +315,7 @@ public class DatasetPoolExchanged  implements Serializable {
 				if (pair.training instanceof DatasetRemoteWrapper)
 					training = (DatasetRemoteWrapper)pair.training;
 				else
-					training = new DatasetRemoteWrapper(pair.training, false);
+					training = Util.getPluginManager().wrap(pair.training, false);
 				trainingUUID = training != null ? pair.trainingUUID : null;
 			}
 			
@@ -325,7 +325,7 @@ public class DatasetPoolExchanged  implements Serializable {
 				if (pair.testing instanceof DatasetRemoteWrapper)
 					testing = (DatasetRemoteWrapper)pair.testing;
 				else
-					testing = new DatasetRemoteWrapper(pair.testing, false);
+					testing = Util.getPluginManager().wrap(pair.testing, false);
 				testingUUID = testing != null ? pair.testingUUID : null;
 			}
 			
@@ -335,7 +335,7 @@ public class DatasetPoolExchanged  implements Serializable {
 				if (pair.whole instanceof DatasetRemoteWrapper)
 					whole = (DatasetRemoteWrapper)pair.whole;
 				else
-					whole = new DatasetRemoteWrapper(pair.whole, false);
+					whole = Util.getPluginManager().wrap(pair.whole, false);
 				wholeUUID = whole != null ? pair.wholeUUID : null;
 			}
 			

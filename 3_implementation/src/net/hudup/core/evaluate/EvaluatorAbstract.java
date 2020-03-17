@@ -1340,13 +1340,13 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 		catch (Throwable e) {e.printStackTrace();}
 		
 		try {
+			if (poolResult != null)
+				poolResult.clear(true);
+			poolResult = null;
+
 			if (pool != null)
 				pool.clear();
-			if (poolResult != null)
-				poolResult.unexport(true);
-
 			pool = null;
-			poolResult = null;
 		}
 		catch (Throwable e) {e.printStackTrace();}
 
