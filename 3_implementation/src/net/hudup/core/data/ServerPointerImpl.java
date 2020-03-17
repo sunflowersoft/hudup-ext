@@ -14,7 +14,7 @@ package net.hudup.core.data;
  * @version 1.0
  *
  */
-public class ServerPointerImpl extends PointerAbstract implements ServerPointer {
+public class ServerPointerImpl extends PointerAbstract implements ServerPointer, ServerPointerRemote {
 
 	
 	/**

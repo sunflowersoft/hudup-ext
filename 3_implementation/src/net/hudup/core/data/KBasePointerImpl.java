@@ -20,7 +20,7 @@ import net.hudup.core.logistic.xURI;
  * @version 1.0
  *
  */
-public class KBasePointerImpl extends PointerAbstract implements KBasePointer {
+public class KBasePointerImpl extends PointerAbstract implements KBasePointer, KBasePointerRemote {
 
 	
 	/**

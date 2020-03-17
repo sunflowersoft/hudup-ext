@@ -20,7 +20,7 @@ import net.hudup.core.data.ctx.ContextTemplateSchema;
  * @version 1.0
  *
  */
-public abstract class PointerAbstract extends DatasetAbstract implements Pointer {
+public abstract class PointerAbstract extends DatasetAbstract implements Pointer, PointerRemote {
 
 	
 	/**

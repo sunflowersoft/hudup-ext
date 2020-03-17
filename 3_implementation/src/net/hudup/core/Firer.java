@@ -41,6 +41,12 @@ import net.hudup.core.data.DatasetRemoteWrapper;
 import net.hudup.core.data.ExternalQuery;
 import net.hudup.core.data.ExternalQueryRemote;
 import net.hudup.core.data.ExternalQueryRemoteWrapper;
+import net.hudup.core.data.KBasePointerRemote;
+import net.hudup.core.data.KBasePointerRemoteWrapper;
+import net.hudup.core.data.PointerRemote;
+import net.hudup.core.data.PointerRemoteWrapper;
+import net.hudup.core.data.ServerPointerRemote;
+import net.hudup.core.data.ServerPointerRemoteWrapper;
 import net.hudup.core.data.ctx.CTSManager;
 import net.hudup.core.data.ctx.CTSManagerRemote;
 import net.hudup.core.data.ctx.CTSManagerRemoteWrapper;
@@ -551,7 +557,14 @@ public class Firer implements PluginManager {
 	@Override
 	public DatasetRemoteWrapper wrap(DatasetRemote remoteDataset, boolean exclusive) {
 		// TODO Auto-generated method stub
-		return new DatasetRemoteWrapper(remoteDataset, exclusive);
+		if (remoteDataset instanceof KBasePointerRemote)
+			return new KBasePointerRemoteWrapper((KBasePointerRemote)remoteDataset, exclusive);
+		else if (remoteDataset instanceof ServerPointerRemote)
+			return new ServerPointerRemoteWrapper((ServerPointerRemote)remoteDataset, exclusive);
+		else if (remoteDataset instanceof PointerRemote)
+			return new PointerRemoteWrapper((PointerRemote)remoteDataset, exclusive);
+		else
+			return new DatasetRemoteWrapper(remoteDataset, exclusive);
 	}
 
 
