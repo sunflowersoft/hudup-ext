@@ -56,6 +56,7 @@ public class FetcherUtil {
 	
 	/**
 	 * Fixing the problem of serializing memory fetcher.
+	 * @param <T> type of elements.
 	 * @param fetcher specified fetcher.
 	 * @return the specified fetcher itself.
 	 */

@@ -156,6 +156,7 @@ public abstract class AbstractRunner implements Runner {
 	/**
 	 * Forcing this runner to stop immediately. This method stops the thread of this runner and so it is unsafe.
 	 * Please see {@link Thread#stop()} for more details.
+	 * @return true if forcing to stop successful.
 	 */
 	@SuppressWarnings("deprecation")
 	@NextUpdate

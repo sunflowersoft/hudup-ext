@@ -600,6 +600,8 @@ public interface Service extends Remote {
 	/**
 	 * Getting evaluator with specified evaluator name.
 	 * @param evaluatorName evaluator name.
+	 * @param account account name.
+	 * @param password account password.
 	 * @return evaluator.
 	 * @throws RemoteException if any error raises.
 	 */

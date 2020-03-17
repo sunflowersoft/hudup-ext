@@ -138,9 +138,9 @@ public final class DatasetUtil {
 
 
 	/**
-	 * Getting the most inner algorithm of the specified algorithm.
-	 * @param alg specified algorithm.
-	 * @return the most inner algorithm of the specified algorithm.
+	 * Getting the most inner dataset of the specified dataset.
+	 * @param dataset specified dataset.
+	 * @return the most inner dataset of the specified dataset.
 	 */
 	public static Dataset getMostInnerDataset2(Dataset dataset) {
 		if (dataset == null)

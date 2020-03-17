@@ -14,6 +14,7 @@ net.hudup.core.data.ui
 net.hudup.core.evaluate
 net.hudup.core.evaluate.execute
 net.hudup.core.evaluate.recommend
+net.hudup.core.evaluate.ui
 net.hudup.core.factory
 net.hudup.core.logistic
 net.hudup.core.logistic.ui
@@ -36,6 +37,7 @@ net.hudup.parser
 net.hudup.phoebe.math
 net.hudup.phoebe.math.ui
 net.hudup.server
+net.hudup.server.ext
 net.hudup.server.external
 net.hudup.server.external.ui
 net.hudup.server.ui

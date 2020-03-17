@@ -30,6 +30,7 @@ public interface AgentSupport {
 	/**
 	 * Setting whether the implemented object is agent.
 	 * @param isAgent agent mode.
+	 * @throws RemoteException if any error raises.
 	 */
 	void setAgent(boolean isAgent) throws RemoteException;
 	

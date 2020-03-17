@@ -93,7 +93,7 @@ public final class RegisterTable implements Cloneable, Serializable {
 	
 	/**
 	 * Constructor with specified list of algorithms.
-	 * @param algs specified list of algorithms. These algorithms are registered.
+	 * @param algList specified list of algorithms. These algorithms are registered.
 	 */
 	public RegisterTable(AlgList algList) {
 		for (int i = 0; i < algList.size(); i++) {

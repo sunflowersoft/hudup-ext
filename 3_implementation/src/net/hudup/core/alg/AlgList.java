@@ -194,6 +194,7 @@ public class AlgList implements Serializable, net.hudup.core.Cloneable {
 	
 	/**
 	 * Getting list of algorithm names.
+	 * @param algList list of algorithms.
 	 * @return list of algorithm names.
 	 */
 	public static List<String> getAlgNameList(List<Alg> algList) {
@@ -238,6 +239,7 @@ public class AlgList implements Serializable, net.hudup.core.Cloneable {
 	
 	/**
 	 * Cloning list of algorithms.
+	 * @param <T> type of algorithm.
 	 * @param algList specified list of algorithms.
 	 * @return list of cloned algorithms.
 	 */

@@ -113,7 +113,7 @@ public class AddingDatasetDlg extends JDialog {
 	 * @param pool specified dataset pool.
 	 * @param algList specified algorithm list.
 	 * @param mainUnit main unit.
-	 * @param bound URI.
+	 * @param bindUri bound URI.
 	 */
 	public AddingDatasetDlg(Component comp, DatasetPool pool, List<Alg> algList, final String mainUnit, xURI bindUri) {
 		super(UIUtil.getFrameForComponent(comp), "Add datasets", true);

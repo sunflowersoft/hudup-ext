@@ -115,7 +115,6 @@ public class DatasetPoolDlg extends JDialog {
 	 * @param pool dataset pool.
 	 * @param algList algorithm list.
 	 * @param mainUnit main unit.
-	 * @param bindUri bound URI.
 	 */
 	public DatasetPoolDlg(Component comp, DatasetPool pool, List<Alg> algList, String mainUnit) {
 		this(comp, pool, algList, mainUnit, null);
