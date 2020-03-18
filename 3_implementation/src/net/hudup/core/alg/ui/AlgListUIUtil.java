@@ -21,6 +21,7 @@ import net.hudup.core.alg.KBase;
 import net.hudup.core.alg.ModelBasedAlg;
 import net.hudup.core.logistic.Inspectable;
 import net.hudup.core.logistic.Inspector;
+import net.hudup.core.logistic.NextUpdate;
 import net.hudup.core.logistic.ui.UIUtil;
 
 /**
@@ -38,7 +39,19 @@ public final class AlgListUIUtil {
 	 * @param ui specified {@link AlgListUI}.
 	 * @return context menu {@link JPopupMenu} for {@link AlgListUI}.
 	 */
-	public final static JPopupMenu createContextMenu(final AlgListUI ui) {
+	public final static JPopupMenu createContextMenu(AlgListUI ui) {
+		return createContextMenu0(ui);
+	}
+	
+	
+	/**
+	 * Creating the context menu for {@link AlgListUI}. This method is deprecated with remote imported algorithms. It will be updated.
+	 * @param ui specified {@link AlgListUI}.
+	 * @return context menu {@link JPopupMenu} for {@link AlgListUI}.
+	 */
+	@NextUpdate
+	@Deprecated
+	private final static JPopupMenu createContextMenu0(final AlgListUI ui) {
 		Alg alg = ui.getSelectedAlg();
 		if (alg == null)
 			return null;
