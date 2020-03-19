@@ -98,7 +98,7 @@ public abstract class AugAbstract extends ExecutableAlgAbstract implements Aug, 
 		SetupAlgEvent evt = new SetupAlgEvent(
 				this,
 				Type.done,
-				this,
+				this.getName(),
 				dataset,
 				"Learned models: " + this.getDescription());
 		fireSetupEvent(evt);

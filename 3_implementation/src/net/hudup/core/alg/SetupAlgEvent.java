@@ -56,12 +56,6 @@ public class SetupAlgEvent extends EventObject {
 	
 	
 	/**
-	 * Algorithm issues the setup result.
-	 */
-	protected Alg alg = null;
-	
-	
-	/**
 	 * Name of algorithm issuing the setup result.
 	 */
 	protected String algName = null;
@@ -80,24 +74,17 @@ public class SetupAlgEvent extends EventObject {
 	
 	
 	/**
-	 * Constructor with a source of event, algorithm, training dataset, and setting up result.
+	 * Constructor with a source of event, algorithm name, training dataset, and setting up result.
 	 * @param source source of event. Usually, it is an evaluator.
 	 * @param type type of event.
-	 * @param alg algorithm issues the setup result.
+	 * @param algName name of the algorithm issuing the setup result.
 	 * @param trainingDataset training dataset.
 	 * @param setupResult specified result.
 	 */
-	public SetupAlgEvent(Serializable source, Type type, Alg alg, Dataset trainingDataset, Serializable setupResult) {
+	public SetupAlgEvent(Serializable source, Type type, String algName, Dataset trainingDataset, Serializable setupResult) {
 		super(source);
 		// TODO Auto-generated constructor stub
-		if (alg != null) {
-			this.algName = alg.getName();
-			if (AlgDesc2.isRemote(alg))
-				this.alg = alg;
-			else
-				this.alg = alg.newInstance();
-		}
-		if (source == alg) this.source = this.alg;
+		this.algName = algName;
 		
 		this.type = type;
 		if (trainingDataset instanceof DatasetRemoteWrapper)
@@ -116,15 +103,6 @@ public class SetupAlgEvent extends EventObject {
 		return type;
 	}
 	
-	
-	/**
-	 * Getting algorithm that issues the setup result.
-	 * @return algorithm that issues the setup result.
-	 */
-	public Alg getAlg() {
-		return alg;
-	}
-
 	
 	/**
 	 * Getting name of algorithm that issues the setup result.
@@ -160,8 +138,10 @@ public class SetupAlgEvent extends EventObject {
 	public String translate() {
 		StringBuffer buffer = new StringBuffer();
 		buffer.append("Setup result of algorithm");
-		if (alg != null)
-			buffer.append(" \"" + alg.getName() + "\"");
+		if (algName != null)
+			buffer.append(" \"" + algName + "\"");
+		else
+			buffer.append(" \"noname\"");
 		
 		Dataset trainingDataset = getTrainingDataset();
 		DataConfig config = trainingDataset != null ? trainingDataset.getConfig() : null;

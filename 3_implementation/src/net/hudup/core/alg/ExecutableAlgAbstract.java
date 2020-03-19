@@ -73,7 +73,7 @@ public abstract class ExecutableAlgAbstract extends AlgAbstract implements Execu
 		SetupAlgEvent evt = new SetupAlgEvent(
 				this,
 				Type.done,
-				this,
+				this.getName(),
 				dataset,
 				"Learned models: " + this.getDescription());
 		fireSetupEvent(evt);

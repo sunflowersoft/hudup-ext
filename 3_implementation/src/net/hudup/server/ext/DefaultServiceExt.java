@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.hudup.core.Util;
+import net.hudup.core.client.ServiceExt;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.evaluate.Evaluator;
 import net.hudup.core.logistic.LogUtil;
@@ -31,7 +32,7 @@ import net.hudup.server.Transaction;
  * @version 1.0
  *
  */
-public class DefaultServiceExt extends DefaultService {
+public class DefaultServiceExt extends DefaultService implements ServiceExt {
 
 	
 	/**
@@ -133,7 +134,7 @@ public class DefaultServiceExt extends DefaultService {
 	 * @return local evaluators.
 	 * @throws RemoteException if any error raises.
 	 */
-	public List<Evaluator> getLocalEvaluators() throws RemoteException {
+	public List<Evaluator> getEvaluators() throws RemoteException {
 		List<Evaluator> evList = Util.newList();
 		if (pairMap == null) return evList;
 		

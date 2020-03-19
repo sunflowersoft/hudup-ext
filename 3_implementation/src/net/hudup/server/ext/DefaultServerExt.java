@@ -12,25 +12,18 @@ import java.awt.MenuItem;
 import java.awt.PopupMenu;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.List;
 
 import javax.swing.ImageIcon;
-import javax.swing.JComboBox;
-import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
-import net.hudup.core.evaluate.Evaluator;
 import net.hudup.core.logistic.I18nUtil;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.xURI;
-import net.hudup.core.logistic.ui.StartDlg;
-import net.hudup.core.logistic.ui.TextArea;
 import net.hudup.core.logistic.ui.UIUtil;
-import net.hudup.evaluate.ui.EvalCompoundGUI;
+import net.hudup.evaluate.ui.EvaluatorCP;
 import net.hudup.server.DefaultServer;
 import net.hudup.server.DefaultService;
 import net.hudup.server.PowerServerConfig;
-import net.hudup.server.ext.DefaultServiceExt.EvaluatorPair;
 import net.hudup.server.ui.SetupServerWizard;
 
 /**
@@ -103,7 +96,6 @@ public class DefaultServerExt extends DefaultServer {
 	 */
 	protected void showEvaluator() {
 		final DefaultServiceExt finalService = ((DefaultServiceExt)service);
-		final List<Evaluator> evList;
 		try {
 			if (finalService == null || !isRunning()) {
 				LogUtil.error("Service is not initialized yet or server is not running");
@@ -115,81 +107,13 @@ public class DefaultServerExt extends DefaultServer {
 				return;
 			}
 			
-			evList = finalService.getLocalEvaluators();
-			if (evList == null || evList.size() == 0) {
-				JOptionPane.showMessageDialog(
-						null, 
-						"There is no evaluator", 
-						"There is no evaluator", 
-						JOptionPane.INFORMATION_MESSAGE);
-				return;
-			}
+			EvaluatorCP ecp = new EvaluatorCP(finalService, null);
+			ecp.setVisible(true);
 		}
 		catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			return;
 		}
-
-		final StartDlg dlgEvStarter = new StartDlg((JFrame)null, "List of evaluators") {
-			
-			/**
-			 * Serial version UID for serializable class.
-			 */
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			protected void start() {
-				// TODO Auto-generated method stub
-				final Evaluator ev = (Evaluator) getItemControl().getSelectedItem();
-				dispose();
-				
-				try {
-					if (!finalService.pairMap.containsKey(ev.getName())) {
-						JOptionPane.showMessageDialog(
-								null, 
-								"There is no evaluator named '" + ev.getName() + "'.", 
-								"No evaluator", 
-								JOptionPane.INFORMATION_MESSAGE);
-						return;
-					}
-					
-					EvaluatorPair pair = finalService.pairMap.get(ev.getName());
-					if (pair.data.active) {
-						JOptionPane.showMessageDialog(
-								null, 
-								"GUI of evaluator named '" + ev.getName() + "' is running.", 
-								"Evaluator GUI running", 
-								JOptionPane.INFORMATION_MESSAGE);
-						return;
-					}
-					
-					new EvalCompoundGUI(pair.evaluator, null, pair.data);
-				} 
-				catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-					LogUtil.error("Error in showing evaluator GUI.");
-				}
-			}
-			
-			@Override
-			protected JComboBox<?> createItemControl() {
-				// TODO Auto-generated method stub
-				return new JComboBox<Evaluator>(evList.toArray(new Evaluator[0]));
-			}
-			
-			@Override
-			protected TextArea createHelp() {
-				// TODO Auto-generated method stub
-				TextArea toolkit = new TextArea("Thank you for choosing evaluators");
-				toolkit.setEditable(false);
-				return toolkit;
-			}
-		};
-		
-		dlgEvStarter.setSize(400, 150);
-        dlgEvStarter.setVisible(true);
 	}
 	
 	

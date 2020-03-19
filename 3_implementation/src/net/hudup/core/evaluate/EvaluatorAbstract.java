@@ -350,7 +350,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 					otherResult.inAlgSetup = true;
 					if (alg instanceof AlgRemote) {
 						((AlgRemote)alg).addSetupListener(this);
-						SetupAlgEvent setupEvt = new SetupAlgEvent(alg, SetupAlgEvent.Type.doing, alg, null, "not supported yet");
+						SetupAlgEvent setupEvt = new SetupAlgEvent(alg, SetupAlgEvent.Type.doing, alg.getName(), null, "not supported yet");
 						fireSetupAlgEvent(setupEvt);
 					}
 					
@@ -369,7 +369,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 					fireEvaluateEvent(new EvaluateEvent(this, Type.doing, setupMetrics)); // firing setup time metric
 					
 					if (alg instanceof AlgRemote) {
-						SetupAlgEvent setupEvt = new SetupAlgEvent(alg, SetupAlgEvent.Type.done, alg, null, "not supported yet");
+						SetupAlgEvent setupEvt = new SetupAlgEvent(alg, SetupAlgEvent.Type.done, alg.getName(), null, "not supported yet");
 						fireSetupAlgEvent(setupEvt);
 						((AlgRemote)alg).removeSetupListener(this);
 					}
@@ -1197,14 +1197,14 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 		if (!backup || evt.getType() != SetupAlgEvent.Type.done)
 			return;
 		try {
-			String info = "========== Algorithm \"" + evt.getAlg().getName() + "\" ==========\n";
+			String info = "========== Algorithm \"" + evt.getAlgName() + "\" ==========\n";
 			info = info + evt.translate() + "\n\n\n\n";
 
 			xURI backupDir = xURI.create(Constants.BACKUP_DIRECTORY);
 			UriAdapter backupAdapter = new UriAdapter(backupDir);
 			if (!backupAdapter.exists(backupDir)) backupAdapter.create(backupDir, true);
 			xURI analyzeBackupFile = backupDir.concat(
-					"evaluator-" + evt.getAlg().getName() + "-backup-" + new Date().getTime() +
+					"evaluator-" + evt.getAlgName() + "-backup-" + new Date().getTime() +
 					EvaluateProcessor.SETUP_DONE_FILE_EXTENSION);
 			
 			Writer writer = backupAdapter.getWriter(analyzeBackupFile, false);
