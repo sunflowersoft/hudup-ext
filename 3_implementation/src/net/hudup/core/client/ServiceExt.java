@@ -23,11 +23,37 @@ public interface ServiceExt extends Service {
 
 	
 	/**
-	 * Getting list of evaluators.
-	 * @return list of evaluators.
+	 * Getting list of evaluator pairs.
+	 * @param account account name.
+	 * @param password account password.
+	 * @return list of evaluator pairs.
 	 * @throws RemoteException if any error raises.
 	 */
-	List<Evaluator> getEvaluators() throws RemoteException;
+	List<Evaluator> getEvaluators(String account, String password) throws RemoteException;
 
+	
+	/**
+	 * Getting a evaluator with name and reproduced version.
+	 * @param evaluatorName evaluator name.
+	 * @param account account.
+	 * @param password password.
+	 * @param reproducedVersion reproduced version.
+	 * @return evaluator with reproduced version.
+	 * @throws RemoteException if any error raises.
+	 */
+	Evaluator getEvaluator(String evaluatorName, String account, String password, String reproducedVersion) throws RemoteException;
+	
+	
+	/**
+	 * Removing a evaluator with name reproduced version.
+	 * @param evaluatorName evaluator name.
+	 * @param account account.
+	 * @param password password.
+	 * @param reproducedVersion reproduced version.
+	 * @return evaluator with reproduced version.
+	 * @throws RemoteException if any error raises.
+	 */
+	boolean removeEvaluator(String evaluatorName, String account, String password, String reproducedVersion) throws RemoteException;
+	
 	
 }

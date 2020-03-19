@@ -94,6 +94,18 @@ public class DefaultService implements Service, AutoCloseable {
 	
 	
 	/**
+	 * Account name.
+	 */
+	protected String account = null;
+	
+	
+	/**
+	 * Account password.
+	 */
+	protected String password = null;
+
+	
+	/**
 	 * Constructor with specified transaction.
 	 * @param trans specified transaction.
 	 */
@@ -1453,7 +1465,6 @@ public class DefaultService implements Service, AutoCloseable {
 	}
 
 
-	@NextUpdate
 	@Override
 	public Evaluator getEvaluator(String evaluatorName, String account, String password) throws RemoteException {
 		// TODO Auto-generated method stub

@@ -79,6 +79,12 @@ public class EvaluatorConfig extends SysConfig {
 
 	
 	/**
+	 * This constant specifies reproduction field. If true, evaluator is reproduced.
+	 */
+	public final static String EVALUATOR_REPRODUCED_VERSION_FIELD = changeCase("reproduced_version");
+
+	
+	/**
 	 * Default constructor.
 	 */
 	public EvaluatorConfig() {
@@ -105,6 +111,8 @@ public class EvaluatorConfig extends SysConfig {
 		setEvaluatorPort(Constants.DEFAULT_EVALUATOR_PORT);
 		//setAgent(EVALUATOR_AGENT_DEFAULT);
 		setSaveResultSummary(EVALUATOR_SAVE_RESULT_SUMMARY_DEFAULT);
+		
+		addInvisible(EVALUATOR_REPRODUCED_VERSION_FIELD);
 	}
 
 	
@@ -189,4 +197,35 @@ public class EvaluatorConfig extends SysConfig {
 		put(EVALUATOR_SAVE_RESULT_SUMMARY_FIELD, saveResultSummary);
 	}
 
+	
+	/**
+	 * Setting reproduced version.
+	 * @param reproducedVersion reproduced version. If null, removing reproduced version.
+	 */
+	public void setReproducedVersion(String reproducedVersion) {
+		if (reproducedVersion == null)
+			remove(EVALUATOR_REPRODUCED_VERSION_FIELD);
+		else
+			put(EVALUATOR_REPRODUCED_VERSION_FIELD, reproducedVersion);
+	}
+	
+	
+	/**
+	 * Checking whether the evaluator is reproduced.
+	 * @return whether the evaluator is reproduced.
+	 */
+	public boolean isReproduced() {
+		return containsKey(EVALUATOR_REPRODUCED_VERSION_FIELD);
+	}
+	
+	
+	/**
+	 * Getting reproduced version.
+	 * @return reproduced version.
+	 */
+	public String getReproducedVersion() {
+		return getAsString(EVALUATOR_REPRODUCED_VERSION_FIELD);
+	}
+	
+	
 }

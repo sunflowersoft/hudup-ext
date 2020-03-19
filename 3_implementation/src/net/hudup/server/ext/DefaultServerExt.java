@@ -19,6 +19,7 @@ import javax.swing.JOptionPane;
 import net.hudup.core.logistic.I18nUtil;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.xURI;
+import net.hudup.core.logistic.ui.LoginDlg;
 import net.hudup.core.logistic.ui.UIUtil;
 import net.hudup.evaluate.ui.EvaluatorCP;
 import net.hudup.server.DefaultServer;
@@ -107,7 +108,10 @@ public class DefaultServerExt extends DefaultServer {
 				return;
 			}
 			
-			EvaluatorCP ecp = new EvaluatorCP(finalService, null);
+			LoginDlg dlgLogin = new LoginDlg(null, "Retype admin account and password");
+			if (!dlgLogin.wasLogin()) return;
+			
+			EvaluatorCP ecp = new EvaluatorCP(finalService, dlgLogin.getUsername(), dlgLogin.getPassword(), null);
 			ecp.setVisible(true);
 		}
 		catch (Exception e) {

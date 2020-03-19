@@ -19,7 +19,6 @@ import net.hudup.core.client.ServiceExt;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.evaluate.Evaluator;
 import net.hudup.core.logistic.LogUtil;
-import net.hudup.core.logistic.NextUpdate;
 import net.hudup.evaluate.ui.EvaluateGUIData;
 import net.hudup.server.DefaultService;
 import net.hudup.server.PowerServerConfig;
@@ -36,47 +35,16 @@ public class DefaultServiceExt extends DefaultService implements ServiceExt {
 
 	
 	/**
-	 * This class is the pair of evaluator and evaluator GUI data.
-	 * @author Loc Nguyen
-	 * @version 1.0
+	 * Internal map of evaluator pair, each evaluator pair has a unique name which is evaluator name.
 	 */
-	public class EvaluatorPair {
-		
-		/**
-		 * Evaluator.
-		 */
-		public Evaluator evaluator = null;
-		
-		/**
-		 * Evaluator GUI data.
-		 */
-		public EvaluateGUIData data = null;
-		
-		/**
-		 * Default constructor.
-		 */
-		public EvaluatorPair() {
-			
-		}
-		
-		/**
-		 * Constructor with specified evaluator and GUI data.
-		 * @param evaluator specified evaluator.
-		 * @param data specified data.
-		 */
-		public EvaluatorPair(Evaluator evaluator, EvaluateGUIData data) {
-			this.evaluator = evaluator;
-			this.data = data;
-		}
-		
-	}
+	protected Map<String, Evaluator> pairMap = Util.newMap();
 	
 	
 	/**
-	 * Internal map of evaluator pair, each evaluator pair has a unique name which is evaluator name.
+	 * Internal map of reproduced evaluator pair, each evaluator pair has a unique name which is reproduced evaluator name.
 	 */
-	protected Map<String, EvaluatorPair> pairMap = Util.newMap();
-	
+	protected Map<String, Evaluator> pairReproducedMap = Util.newMap();
+
 	
 	/**
 	 * Constructor with specified transaction.
@@ -102,9 +70,10 @@ public class DefaultServiceExt extends DefaultService implements ServiceExt {
 				
 				ev.getConfig().setEvaluatorPort(serverConfig.getServerPort());
 				ev.setAgent(true);
+				ev.setTag(new EvaluateGUIData());
 				ev.export(serverConfig.getServerPort());
 				
-				pairMap.put(ev.getName(), new EvaluatorPair(ev, new EvaluateGUIData()));
+				pairMap.put(ev.getName(), ev);
 			}
 			catch (Throwable e) {e.printStackTrace();}
 		}
@@ -117,67 +86,92 @@ public class DefaultServiceExt extends DefaultService implements ServiceExt {
 	public void close() {
 		// TODO Auto-generated method stub
 		super.close();
-		if (pairMap == null) return;
 		
-		Collection<EvaluatorPair> pairs = pairMap.values();
-		for (EvaluatorPair pair : pairs) {
-			try {
-				pair.evaluator.close();
-			} catch (Throwable e) {e.printStackTrace();}
+		if (pairMap != null) {
+			Collection<Evaluator> evs = pairMap.values();
+			for (Evaluator ev : evs) {
+				try {
+					ev.close();
+				} catch (Throwable e) {e.printStackTrace();}
+			}
+			pairMap.clear();
 		}
-		pairMap.clear();
+		
+		if (pairReproducedMap != null) {
+			Collection<Evaluator> evs = pairReproducedMap.values();
+			for (Evaluator ev : evs) {
+				try {
+					ev.close();
+				} catch (Throwable e) {e.printStackTrace();}
+			}
+			pairReproducedMap.clear();
+		}
 	}
 
 	
-	/**
-	 * Getting local evaluators.
-	 * @return local evaluators.
-	 * @throws RemoteException if any error raises.
-	 */
-	public List<Evaluator> getEvaluators() throws RemoteException {
+	@Override
+	public List<Evaluator> getEvaluators(String account, String password) throws RemoteException {
+		if (!validateAccount(account, password, DataConfig.ACCOUNT_EVALUATE_PRIVILEGE))
+			return Util.newList();
+		
 		List<Evaluator> evList = Util.newList();
-		if (pairMap == null) return evList;
-		
-		Collection<EvaluatorPair> pairs = pairMap.values();
-		for (EvaluatorPair pair : pairs) {
-			evList.add(pair.evaluator);
-		}
-		
-		Collections.sort(evList, new Comparator<Evaluator>() {
-
-			@Override
-			public int compare(Evaluator o1, Evaluator o2) {
-				// TODO Auto-generated method stub
-				try {
-					return o1.getName().compareToIgnoreCase(o2.getName());
-				}
-				catch (Throwable e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-					return -1;
+		trans.lockWrite();
+		try {
+			if (pairMap != null) {
+				Collection<Evaluator> evs = pairMap.values();
+				for (Evaluator ev : evs) {
+					evList.add(ev);
 				}
 			}
-		});
+			
+			if (pairReproducedMap != null) {
+				Collection<Evaluator> evs = pairReproducedMap.values();
+				for (Evaluator ev : evs) {
+					evList.add(ev);
+				}
+			}
+
+			Collections.sort(evList, new Comparator<Evaluator>() {
+				
+				@Override
+				public int compare(Evaluator o1, Evaluator o2) {
+					// TODO Auto-generated method stub
+					try {
+						return o1.getName().compareToIgnoreCase(o2.getName());
+					}
+					catch (Throwable e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+						return -1;
+					}
+				}
+			});
+		}
+		catch (Throwable e) {
+			e.printStackTrace();
+			evList = Util.newList();
+			
+			LogUtil.error("Service fail to get evaluator list, caused by " + e.getMessage());
+		}
+		finally {
+			trans.unlockWrite();
+		}
 		
 		return evList;
 	}
 
 
-	@NextUpdate
 	@Override
 	public Evaluator getEvaluator(String evaluatorName, String account, String password) throws RemoteException {
 		// TODO Auto-generated method stub
-		Evaluator evaluator = null;
+		if (!validateAccount(account, password, DataConfig.ACCOUNT_EVALUATE_PRIVILEGE))
+			return null;
 		
+		Evaluator evaluator = null;
 		trans.lockWrite();
 		try {
-			if (validateAccount(account, password, DataConfig.ACCOUNT_EVALUATE_PRIVILEGE)) {
-				if (pairMap.containsKey(evaluatorName))
-					evaluator = pairMap.get(evaluatorName).evaluator;
-			}
-			else {
-				//Return evaluator client version. Next updated version.
-			}
+			if (pairMap.containsKey(evaluatorName))
+				evaluator = pairMap.get(evaluatorName);
 		}
 		catch (Throwable e) {
 			e.printStackTrace();
@@ -194,15 +188,100 @@ public class DefaultServiceExt extends DefaultService implements ServiceExt {
 
 
 	@Override
+	public Evaluator getEvaluator(String evaluatorName, String account, String password, String reproducedVersion)
+			throws RemoteException {
+		// TODO Auto-generated method stub
+		if (!validateAccount(account, password, DataConfig.ACCOUNT_EVALUATE_PRIVILEGE))
+			return null;
+
+		Evaluator reproducedEvaluator = null;
+		trans.lockWrite();
+		try {
+			if (reproducedVersion == null || reproducedVersion.isEmpty())
+				reproducedEvaluator = getEvaluator(evaluatorName, account, password);
+			else if (validateAccount(account, password, DataConfig.ACCOUNT_EVALUATE_PRIVILEGE)) {
+				String evaluatorReproducedName = evaluatorName + "-" + reproducedVersion;
+				
+				if (pairReproducedMap.containsKey(evaluatorReproducedName))
+					reproducedEvaluator = pairReproducedMap.get(evaluatorReproducedName);
+				else if (pairMap.containsKey(evaluatorName)) {
+					reproducedEvaluator = pairMap.get(evaluatorName).getClass().newInstance();
+					
+					reproducedEvaluator.getConfig().setReproducedVersion(reproducedVersion);
+					reproducedEvaluator.getConfig().setEvaluatorPort(serverConfig.getServerPort());
+					reproducedEvaluator.getConfig().setSaveAbility(false);
+					reproducedEvaluator.setAgent(true);
+					reproducedEvaluator.setTag(new EvaluateGUIData());
+					reproducedEvaluator.export(serverConfig.getServerPort());
+					
+					pairReproducedMap.put(evaluatorReproducedName, reproducedEvaluator);
+				}
+			}
+			else {
+				//Return evaluator client version. Next updated version.
+			}
+		}
+		catch (Throwable e) {
+			e.printStackTrace();
+			reproducedEvaluator = null;
+			
+			LogUtil.error("Service fail to get evaluator, caused by " + e.getMessage());
+		}
+		finally {
+			trans.unlockWrite();
+		}
+		
+		return reproducedEvaluator;
+	}
+
+
+	@Override
+	public boolean removeEvaluator(String evaluatorName, String account, String password, String reproducedVersion)
+			throws RemoteException {
+		// TODO Auto-generated method stub
+		if (reproducedVersion == null || reproducedVersion.isEmpty())
+			return false;
+		if (!validateAccount(account, password, DataConfig.ACCOUNT_EVALUATE_PRIVILEGE))
+			return false;
+		
+		boolean ret = true;
+		trans.lockWrite();
+		try {
+			String evaluatorReproducedName = evaluatorName + "-" + reproducedVersion;
+			
+			if (pairReproducedMap.containsKey(evaluatorReproducedName)) {
+				Evaluator reproducedEvaluator = pairReproducedMap.get(evaluatorReproducedName);
+				try {
+					reproducedEvaluator.close();
+				} catch (Throwable e) {e.printStackTrace();}
+				
+				pairReproducedMap.remove(evaluatorReproducedName);
+			}
+		}
+		catch (Throwable e) {
+			e.printStackTrace();
+			ret = false;
+			
+			LogUtil.error("Service fail to get evaluator, caused by " + e.getMessage());
+		}
+		finally {
+			trans.unlockWrite();
+		}
+		
+		return ret;
+	}
+
+
+	@Override
 	public String[] getEvaluatorNames() throws RemoteException {
 		// TODO Auto-generated method stub
 		List<String> evaluatorNames = Util.newList();
 		
 		trans.lockRead();
 		try {
-			Collection<EvaluatorPair> pairs = pairMap.values();
-			for (EvaluatorPair pair : pairs) {
-				evaluatorNames.add(pair.evaluator.getName());
+			Collection<Evaluator> evs = pairMap.values();
+			for (Evaluator ev : evs) {
+				evaluatorNames.add(ev.getName());
 			}
 		}
 		catch (Throwable e) {

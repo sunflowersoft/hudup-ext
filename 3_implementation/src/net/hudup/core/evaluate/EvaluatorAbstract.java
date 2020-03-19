@@ -211,6 +211,12 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 
 	
 	/**
+	 * Tag attached to this evaluator.
+	 */
+	protected Serializable tag = null;
+	
+	
+	/**
 	 * Default constructor.
 	 */
 	public EvaluatorAbstract() {
@@ -1327,6 +1333,20 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 
 
 	@Override
+	public Serializable getTag() throws RemoteException {
+		// TODO Auto-generated method stub
+		return tag;
+	}
+
+
+	@Override
+	public void setTag(Serializable tag) throws RemoteException {
+		// TODO Auto-generated method stub
+		this.tag = tag;
+	}
+
+
+	@Override
 	public synchronized void close() throws Exception {
 		// TODO Auto-generated method stub
 		try {
@@ -1364,6 +1384,8 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 			unexport();
 		}
 		catch (Throwable e) {e.printStackTrace();}
+		
+		tag = null;
 	}
 
 

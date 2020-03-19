@@ -1090,6 +1090,20 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluateListen
 
 
 	@Override
+	public Serializable getTag() throws RemoteException {
+		// TODO Auto-generated method stub
+		return remoteEvaluator.getTag();
+	}
+
+
+	@Override
+	public void setTag(Serializable tag) throws RemoteException {
+		// TODO Auto-generated method stub
+		remoteEvaluator.setTag(tag);
+	}
+
+	
+	@Override
 	public boolean updatePool(DatasetPoolExchanged pool) throws RemoteException {
 		// TODO Auto-generated method stub
 		return remoteEvaluator.updatePool(pool);

@@ -17,14 +17,20 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.Serializable;
+import java.rmi.Remote;
+import java.rmi.RemoteException;
+import java.util.Date;
 import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 
 import net.hudup.core.Util;
 import net.hudup.core.client.ConnectDlg;
@@ -34,7 +40,12 @@ import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.ui.SysConfigPane;
 import net.hudup.core.evaluate.Evaluator;
 import net.hudup.core.evaluate.EvaluatorConfig;
+import net.hudup.core.evaluate.EvaluatorEvent;
+import net.hudup.core.evaluate.EvaluatorListener;
+import net.hudup.core.logistic.DSUtil;
 import net.hudup.core.logistic.I18nUtil;
+import net.hudup.core.logistic.LogUtil;
+import net.hudup.core.logistic.NetUtil;
 import net.hudup.core.logistic.xURI;
 import net.hudup.core.logistic.ui.UIUtil;
 
@@ -45,7 +56,7 @@ import net.hudup.core.logistic.ui.UIUtil;
  * @version 1.0
  *
  */
-public class EvaluatorCP extends JFrame {
+public class EvaluatorCP extends JFrame implements EvaluatorListener {
 
 	
 	/**
@@ -77,6 +88,12 @@ public class EvaluatorCP extends JFrame {
 	 */
 	protected String password = null;
 	
+	
+	/**
+	 * Exported stub (EvaluatorListener,).
+	 */
+	protected Remote exportedStub = null;
+
 	
 	/**
 	 * Status of current evaluator.
@@ -129,16 +146,6 @@ public class EvaluatorCP extends JFrame {
     /**
 	 * Constructor with evaluator and bound URI.
 	 * @param service specified service.
-	 * @param bindUri bound URI.
-	 */
-	public EvaluatorCP(ServiceExt service, xURI bindUri) {
-		this(service, null, null, bindUri);
-	}
-	
-	
-    /**
-	 * Constructor with evaluator and bound URI.
-	 * @param service specified service.
 	 * @param account account.
 	 * @param password password.
 	 * @param bindUri bound URI.
@@ -150,6 +157,14 @@ public class EvaluatorCP extends JFrame {
 		this.password = password;
 		this.bindUri = bindUri;
 		
+		if (bindUri != null) { //Evaluator is remote
+			this.exportedStub = NetUtil.RegistryRemote.export(this, bindUri.getPort());
+			if (this.exportedStub != null)
+				LogUtil.info("Evaluator control panel exported at port " + bindUri.getPort());
+			else
+				LogUtil.info("Evaluator control panel failed to exported");
+		}
+
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setLocationRelativeTo(null);
 		setSize(600, 400);
@@ -163,18 +178,6 @@ public class EvaluatorCP extends JFrame {
 			public void windowClosed(WindowEvent e) {
 				// TODO Auto-generated method stub
 				super.windowClosed(e);
-				if (!paneConfig.isModified())
-					return;
-				
-				int confirm = JOptionPane.showConfirmDialog(
-						getThisEvaluatorCP(), 
-						"System properties are modified. Do you want to apply them?", 
-						"System properties are modified", 
-						JOptionPane.YES_NO_OPTION,
-						JOptionPane.QUESTION_MESSAGE);
-				
-				if (confirm == JOptionPane.YES_OPTION)
-					paneConfig.apply();
 			}
 			
 		});
@@ -186,12 +189,10 @@ public class EvaluatorCP extends JFrame {
         lblStatus = new JLabel();
         header.add(lblStatus, BorderLayout.NORTH);
         
+		JPanel evPane = new JPanel(new BorderLayout());
+        header.add(evPane, BorderLayout.CENTER);
+		
         cmbEvaluators = new JComboBox<EvaluatorItem>();
-        List<Evaluator> evaluators = getEvaluators();
-        for  (Evaluator evaluator : evaluators) {
-        	cmbEvaluators.addItem(new EvaluatorItem(evaluator));
-        }
-        header.add(cmbEvaluators, BorderLayout.CENTER);
         cmbEvaluators.addItemListener(new ItemListener() {
 			
 			@Override
@@ -203,70 +204,8 @@ public class EvaluatorCP extends JFrame {
 				updateMode();
 			}
 		});
+        evPane.add(cmbEvaluators, BorderLayout.CENTER);
         
-		JPanel headerTool = new JPanel(new BorderLayout());
-		header.add(headerTool, BorderLayout.SOUTH);
-		
-		JPanel headerTool1 = new JPanel();
-		headerTool.add(headerTool1, BorderLayout.WEST);
-		
-		btnRefresh = UIUtil.makeIconButton(
-			"refresh-16x16.png", 
-			"refresh", 
-			I18nUtil.message("refresh"), 
-			I18nUtil.message("refresh"), 
-			
-			new ActionListener() {
-				
-				@Override
-				public void actionPerformed(ActionEvent e) {
-			        cmbEvaluators.removeAllItems();
-			        List<Evaluator> evaluators = getEvaluators();
-			        for  (Evaluator evaluator : evaluators) {
-			        	cmbEvaluators.addItem(new EvaluatorItem(evaluator));
-			        }
-			        
-			        updateMode();
-				}
-			});
-		btnRefresh.setMargin(new Insets(0, 0 , 0, 0));
-		headerTool1.add(btnRefresh);
-
-		btnAdd = UIUtil.makeIconButton(
-			"add-16x16.png", 
-			"add", 
-			I18nUtil.message("add"), 
-			I18nUtil.message("add"), 
-			
-			new ActionListener() {
-				
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					// TODO Auto-generated method stub
-				}
-			});
-		btnAdd.setMargin(new Insets(0, 0 , 0, 0));
-		headerTool1.add(btnAdd);
-		
-		btnDelete = UIUtil.makeIconButton(
-			"delete-16x16.png", 
-			"delete", 
-			I18nUtil.message("delete"), 
-			I18nUtil.message("delete"), 
-			
-			new ActionListener() {
-				
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					// TODO Auto-generated method stub
-				}
-			});
-		btnDelete.setMargin(new Insets(0, 0 , 0, 0));
-		headerTool1.add(btnDelete);
-
-		JPanel headerTool2 = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-		headerTool.add(headerTool2, BorderLayout.EAST);
-
 		btnOpenStart = UIUtil.makeIconButton(
 			"open-start-16x16.png", 
 			"start", 
@@ -279,13 +218,95 @@ public class EvaluatorCP extends JFrame {
 				public void actionPerformed(ActionEvent e) {
 					// TODO Auto-generated method stub
 					EvaluatorItem evaluatorItem = (EvaluatorItem)cmbEvaluators.getSelectedItem();
-					if (evaluatorItem != null && evaluatorItem.evaluator != null)
-						new EvalCompoundGUI(evaluatorItem.evaluator, bindUri, null);
+					if (evaluatorItem == null || evaluatorItem.evaluator == null) {
+						JOptionPane.showMessageDialog(
+								getThisEvaluatorCP(), 
+								"Cannot open evaluator", 
+								"Cannot open evaluator", 
+								JOptionPane.ERROR_MESSAGE);
+						return;
+					}
+					
+					try {
+						Serializable tag = evaluatorItem.evaluator.getTag();
+						if ((tag == null) || !(tag instanceof EvaluateGUIData)) {
+							tag = new EvaluateGUIData();
+							evaluatorItem.evaluator.setTag(tag);
+							new EvalCompoundGUI(evaluatorItem.evaluator, bindUri, (EvaluateGUIData)tag);
+						}
+						else {
+							EvaluateGUIData data = (EvaluateGUIData)tag;
+							if (data.active) {
+								JOptionPane.showMessageDialog(
+									getThisEvaluatorCP(), 
+									"GUI of evaluator named '" + evaluatorItem.evaluator.getName() + "' is running.", 
+									"Evaluator GUI running", 
+									JOptionPane.INFORMATION_MESSAGE);
+							}
+							else {
+								new EvalCompoundGUI(evaluatorItem.evaluator, bindUri, data);
+							}
+						}
+					}
+					catch (Exception ex) {ex.printStackTrace();}
 				}
 			});
 		btnOpenStart.setMargin(new Insets(0, 0 , 0, 0));
-		headerTool2.add(btnOpenStart);
+        evPane.add(btnOpenStart, BorderLayout.EAST);
+
+		JPanel headerTool = new JPanel(new FlowLayout(FlowLayout.LEFT));
+		header.add(headerTool, BorderLayout.SOUTH);
 		
+		btnRefresh = UIUtil.makeIconButton(
+			"refresh-16x16.png", 
+			"refresh", 
+			I18nUtil.message("refresh"), 
+			I18nUtil.message("refresh"), 
+			
+			new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					refresh();
+				}
+			});
+		btnRefresh.setMargin(new Insets(0, 0 , 0, 0));
+		headerTool.add(btnRefresh);
+
+		btnAdd = UIUtil.makeIconButton(
+			"add-16x16.png", 
+			"add", 
+			I18nUtil.message("add"), 
+			I18nUtil.message("add"), 
+			
+			new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					// TODO Auto-generated method stub
+					reproduceEvaluator();
+				}
+			});
+		btnAdd.setMargin(new Insets(0, 0 , 0, 0));
+		headerTool.add(btnAdd);
+		
+		btnDelete = UIUtil.makeIconButton(
+			"delete-16x16.png", 
+			"delete", 
+			I18nUtil.message("delete"), 
+			I18nUtil.message("delete"), 
+			
+			new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					// TODO Auto-generated method stub
+					removeEvaluator();
+				}
+			});
+		btnDelete.setMargin(new Insets(0, 0 , 0, 0));
+		headerTool.add(btnDelete);
+
 		
 		JPanel body = new JPanel(new BorderLayout());
 		add(body, BorderLayout.CENTER);
@@ -338,7 +359,7 @@ public class EvaluatorCP extends JFrame {
 		});
 		footer.add(btnClose);
 		
-		updateMode();
+		refresh();
 	}
 	
 	
@@ -361,7 +382,7 @@ public class EvaluatorCP extends JFrame {
 		
 		if (service instanceof ServiceExt) {
 			try {
-				evaluators = ((ServiceExt)service).getEvaluators();
+				evaluators = ((ServiceExt)service).getEvaluators(account, password);
 			}
 			catch (Exception e) {
 				e.printStackTrace();
@@ -418,26 +439,27 @@ public class EvaluatorCP extends JFrame {
 		btnAdd.setEnabled(true);
 		try {
 			Evaluator evaluator = evaluatorItem.evaluator;
+			EvaluatorConfig config = evaluator.getConfig();
 			if (!evaluator.remoteIsStarted()) {
-				lblStatus.setText("stopped");
-				btnDelete.setEnabled(true);
+				lblStatus.setText("Status: stopped");
+				btnDelete.setEnabled(config == null || config.isReproduced());
 				btnOpenStart.setEnabled(true);
 				paneConfig.setEnabled(true);
 				paneConfig.btnLoad.setEnabled(true);
 				paneConfig.btnSave.setEnabled(true);
 			}
 			else if (evaluator.remoteIsRunning()) {
-				lblStatus.setText("running");
+				lblStatus.setText("Status: running...");
 				btnOpenStart.setEnabled(true);
 			}
 			else {
-				lblStatus.setText("paused");
+				lblStatus.setText("Status: paused");
 				btnOpenStart.setEnabled(true);
 			}
 			
-			EvaluatorConfig config = evaluator.getConfig();
 			if (config != null) {
-				config.setSaveAbility(bindUri == null /*|| evaluator.isTemplate()*/);
+				if (bindUri != null)
+					config.setSaveAbility(false);
 				paneConfig.update(evaluator.getConfig());
 			}
 		}
@@ -447,6 +469,231 @@ public class EvaluatorCP extends JFrame {
 	}
 	
 	
+	/**
+	 * Refreshing evaluators.
+	 */
+	protected void refresh() {
+		for (int i = 0; i < cmbEvaluators.getItemCount(); i++) {
+			EvaluatorItem item = cmbEvaluators.getItemAt(i);
+			try {
+				item.evaluator.removeEvaluatorListener(this);
+			}
+			catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		
+        cmbEvaluators.removeAllItems();
+        List<Evaluator> evaluators = getEvaluators();
+        for  (Evaluator evaluator : evaluators) {
+        	cmbEvaluators.addItem(new EvaluatorItem(evaluator));
+			try {
+				evaluator.addEvaluatorListener(this);
+			}
+			catch (Exception e) {
+				e.printStackTrace();
+			}
+        }
+        
+        updateMode();
+	}
+	
+	
+	/**
+	 * Duplicate / reproduce the selected evaluator.
+	 */
+	protected void reproduceEvaluator() {
+		if (!(service instanceof ServiceExt)) {
+			JOptionPane.showMessageDialog(
+				this, 
+				"This service does not support to reproduce evaluator", 
+				"Evaluator reproduction not supported", 
+				JOptionPane.ERROR_MESSAGE);
+        	return;
+		}
+		
+		EvaluatorItem evaluatorItem = (EvaluatorItem)cmbEvaluators.getSelectedItem();
+		if (evaluatorItem == null || evaluatorItem.evaluator == null) return;
+		Evaluator evaluator = evaluatorItem.evaluator;
+		
+		JDialog selectDlgNameDlg = new JDialog(UIUtil.getFrameForComponent(this), "Select a algorithm name", true);
+		selectDlgNameDlg.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		selectDlgNameDlg.setLocationRelativeTo(this);
+		
+		selectDlgNameDlg.setLayout(new BorderLayout());
+        JPanel header = new JPanel(new BorderLayout());
+        selectDlgNameDlg.add(header, BorderLayout.NORTH);
+		
+        header.add(new JLabel("Type reproduced version"), BorderLayout.WEST);
+        final JTextField txtVersionName = new JTextField("" + new Date().getTime());
+        header.add(txtVersionName, BorderLayout.CENTER);
+        
+        final StringBuffer versionName = new StringBuffer();
+        JPanel footer = new JPanel();
+        selectDlgNameDlg.add(footer, BorderLayout.SOUTH);
+        
+        JButton btnOK = new JButton("OK");
+        btnOK.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				String text = txtVersionName.getText();
+				if (text != null && !text.trim().isEmpty())
+					versionName.append(text.trim());
+				selectDlgNameDlg.dispose();
+			}
+		});
+        footer.add(btnOK);
+        
+        JButton btnCancel = new JButton("Cancel");
+        btnCancel.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				selectDlgNameDlg.dispose();
+			}
+		});
+        footer.add(btnCancel);
+        
+        selectDlgNameDlg.setSize(400, 150);
+        selectDlgNameDlg.setVisible(true);
+        
+        if (versionName.length() == 0) {
+			JOptionPane.showMessageDialog(
+					this, 
+					"Empty reproduced version", 
+					"Empty reproduced version", 
+					JOptionPane.ERROR_MESSAGE);
+        	return;
+        }
+        
+        try {
+        	String evaluatorName = evaluator.getName();
+            evaluator = ((ServiceExt)service).getEvaluator(evaluatorName, account, password, versionName.toString());
+            if (evaluator != null) {
+        		JOptionPane.showMessageDialog(
+    				this, 
+    				"Success to reproduce evaluator '" + evaluatorName + "'", 
+    				"Success to reproduce evaluator", 
+    				JOptionPane.INFORMATION_MESSAGE);
+        		
+        		refresh();
+        		return;
+            }
+        }
+        catch (Exception e) {
+        	e.printStackTrace();
+        }
+        
+		JOptionPane.showMessageDialog(
+			this, 
+			"Fail to reproduce evaluator", 
+			"Fail to reproduce evaluator", 
+			JOptionPane.ERROR_MESSAGE);
+	}
+	
+	
+	/**
+	 * Removing the evaluator.
+	 */
+	protected void removeEvaluator() {
+		if (!(service instanceof ServiceExt)) {
+			JOptionPane.showMessageDialog(
+				this, 
+				"This service does not support to reproduce evaluator", 
+				"Evaluator reproduction not supported", 
+				JOptionPane.ERROR_MESSAGE);
+        	return;
+		}
+		
+		EvaluatorItem evaluatorItem = (EvaluatorItem)cmbEvaluators.getSelectedItem();
+		if (evaluatorItem == null || evaluatorItem.evaluator == null) return;
+		Evaluator evaluator = evaluatorItem.evaluator;
+		
+		try {
+			EvaluatorConfig config = evaluator.getConfig();
+			if (!config.isReproduced()) {
+				JOptionPane.showMessageDialog(
+						this, 
+						"Cannot remove non-reproduced evaluator", 
+						"Evaluator removal fails", 
+						JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+			
+        	String evaluatorName = evaluator.getName();
+        	String versionName = config.getReproducedVersion();
+            boolean ret = ((ServiceExt)service).removeEvaluator(evaluatorName, account, password, versionName);
+            if (ret) {
+        		JOptionPane.showMessageDialog(
+    				this, 
+    				"Success to reproduce evaluator '" + evaluatorName + "'", 
+    				"Success to reproduce evaluator", 
+    				JOptionPane.INFORMATION_MESSAGE);
+        		
+        		refresh();
+        		return;
+            }
+		}
+        catch (Exception e) {
+        	e.printStackTrace();
+        }
+        
+		JOptionPane.showMessageDialog(
+			this, 
+			"Fail to remove evaluator", 
+			"Fail to remove evaluator", 
+			JOptionPane.ERROR_MESSAGE);
+	}
+	
+	
+	@Override
+	public void receivedEvaluator(EvaluatorEvent evt) throws RemoteException {
+		// TODO Auto-generated method stub
+		updateMode();
+	}
+
+
+	@Override
+	public void dispose() {
+		// TODO Auto-generated method stub
+		if (paneConfig.isModified()) {
+			int confirm = JOptionPane.showConfirmDialog(
+				getThisEvaluatorCP(),
+				"System properties are modified. Do you want to apply them?",
+				"System properties are modified",
+				JOptionPane.YES_NO_OPTION,
+				JOptionPane.QUESTION_MESSAGE);
+				
+			if (confirm == JOptionPane.YES_OPTION)
+				paneConfig.apply();
+		}
+		
+		for (int i = 0; i < cmbEvaluators.getItemCount(); i++) {
+			EvaluatorItem item = cmbEvaluators.getItemAt(i);
+			try {
+				item.evaluator.removeEvaluatorListener(this);
+			}
+			catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+
+		if (exportedStub != null) {
+			boolean ret = NetUtil.RegistryRemote.unexport(this);
+			if (ret)
+				LogUtil.info("Evaluator control panel unexported successfully");
+			else
+				LogUtil.info("Evaluator control panel unexported failedly");
+			exportedStub = null;
+		}
+
+		super.dispose();
+	}
+
+
 	/**
 	 * This class is item wrapper of evaluator for combo-box
 	 * @author Loc Nguyen
@@ -474,7 +721,11 @@ public class EvaluatorCP extends JFrame {
 				return "";
 			else {
 				try {
-					return evaluator.getName();
+					EvaluatorConfig config = evaluator.getConfig();
+					if (config.isReproduced())
+						return DSUtil.shortenVerbalName(evaluator.getName()) + "-" + config.getReproducedVersion();
+					else
+						return DSUtil.shortenVerbalName(evaluator.getName());
 				}
 				catch (Exception e) {
 					e.printStackTrace();
@@ -513,10 +764,7 @@ public class EvaluatorCP extends JFrame {
 		}
 		
 		EvaluatorCP ecp = null;
-		if (service instanceof ServiceExt)
-			ecp = new EvaluatorCP((ServiceExt)service, ConnectDlg.getBindUri());
-		else
-			ecp = new EvaluatorCP(service, connectDlg.getRemoteUsername(), connectDlg.getRemotePassword(), ConnectDlg.getBindUri());
+		ecp = new EvaluatorCP(service, connectDlg.getRemoteUsername(), connectDlg.getRemotePassword(), ConnectDlg.getBindUri());
 		ecp.setVisible(true);
 	}
 	
