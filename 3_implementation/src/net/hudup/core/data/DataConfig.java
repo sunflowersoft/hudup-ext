@@ -350,17 +350,17 @@ public class DataConfig extends PropList {
 	/**
 	 * Normal user privilege for access account
 	 */
-	public final static int ACCOUNT_ACCESS_PRIVILEGE = 0b00000001;
+	public final static int ACCOUNT_ACCESS_PRIVILEGE         = 0b00000001;
 	
 	/**
 	 * Evaluation privilege for access account
 	 */
-	public final static int ACCOUNT_EVALUATE_PRIVILEGE = 0b00000011;
+	public final static int ACCOUNT_EVALUATE_PRIVILEGE       = 0b00000011;
 
 	/**
 	 * Administration privilege for access account
 	 */
-	public final static int ACCOUNT_ADMIN_PRIVILEGE = 0b11111111;
+	public final static int ACCOUNT_ADMIN_PRIVILEGE          = 0b11111111;
 	
 	/**
 	 * Minimum rating field name

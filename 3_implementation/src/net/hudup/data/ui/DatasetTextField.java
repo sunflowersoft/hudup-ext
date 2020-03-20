@@ -18,12 +18,11 @@ import net.hudup.core.alg.KBase;
 import net.hudup.core.alg.ui.KBaseConfigDlg;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Dataset;
+import net.hudup.core.data.DatasetUtil;
 import net.hudup.core.data.KBasePointer;
 import net.hudup.core.data.KBasePointerImpl;
-import net.hudup.core.data.NullPointer;
 import net.hudup.core.data.Pointer;
 import net.hudup.core.logistic.ClipboardUtil;
-import net.hudup.core.logistic.xURI;
 import net.hudup.core.logistic.ui.TagTextField;
 import net.hudup.core.logistic.ui.UIUtil;
 
@@ -199,15 +198,7 @@ public class DatasetTextField extends TagTextField {
 			((Dataset)tag).clear();
 		
 		tag = dataset;
-		if (dataset == null)
-			setText("");
-		else {
-			xURI uriId = dataset.getConfig() != null ? dataset.getConfig().getUriId() : null;
-			if (uriId == null) //Null pointer
-				setText(NullPointer.NULL_POINTER);
-			else
-				setText(uriId.toString());
-		}
+		setText(DatasetUtil.extractUriIdText(dataset));
 	}
 	
 	

@@ -21,6 +21,11 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.Enumeration;
 import java.util.Random;
 
+import net.hudup.core.Constants;
+import net.hudup.core.data.DataConfig;
+import net.hudup.core.data.DatasetAbstract;
+import net.hudup.core.data.NullPointer;
+
 /**
  * This final class provides utility static methods for network programming. Some methods in this class are available on internet.
  * 
@@ -125,6 +130,44 @@ public class NetUtil {
         catch (Exception e) {
             return null;
         }
+	}
+	
+	
+	/**
+	 * Getting URI representative text form of URI identifier.
+	 * @param config specified configuration.
+	 * @return URI representative text form of URI identifier.
+	 */
+	public static String getUriIdTextInformal(DataConfig config) {
+		if (config == null) return NullPointer.NULL_POINTER;
+
+		xURI uriId = config.getUriId();
+		if (!config.containsKey(DatasetAbstract.INET_ADDR_FIELD)) {
+			if (uriId != null)
+				return uriId.toString();
+			else
+				return NullPointer.NULL_POINTER;
+		}
+		else {
+			try {
+				String addr = config.getAsString(DatasetAbstract.INET_ADDR_FIELD);
+				InetAddress iaCurrent = getLocalInetAddress();
+				if (iaCurrent != null && addr != null && !iaCurrent.getHostAddress().equals(addr)) {
+					String lastName = uriId != null ? uriId.getLastName() : null;
+					String uriText = "hdp://" + addr + ":" + Constants.DEFAULT_SERVER_PORT + "/somewhere";
+					uriText = lastName != null && !lastName.isEmpty() ? uriText + "/" + lastName : uriText;
+					return uriText;
+				}
+				else if (uriId != null)
+					return uriId.toString();
+				else
+					return NullPointer.NULL_POINTER;
+			}
+			catch (Exception e) {
+				e.printStackTrace();
+				return NullPointer.NULL_POINTER;
+			}
+		}
 	}
 	
 	
@@ -541,6 +584,15 @@ public class NetUtil {
 				return null;
 		}
 		
+	}
+	
+	
+	/**
+	 * Main method.
+	 * @param args arguments.
+	 */
+	public static void main(String[] args) {
+		System.out.println(getLocalInetAddress());
 	}
 	
 	

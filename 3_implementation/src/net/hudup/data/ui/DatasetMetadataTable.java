@@ -11,14 +11,17 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 
 import javax.swing.JDialog;
-import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.WindowConstants;
 import javax.swing.table.DefaultTableModel;
 
+import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Dataset;
+import net.hudup.core.data.DatasetAbstract;
 import net.hudup.core.data.DatasetMetadata;
+import net.hudup.core.logistic.ui.TextArea;
+import net.hudup.core.logistic.ui.TextField;
 import net.hudup.core.logistic.ui.UIUtil;
 
 /**
@@ -73,17 +76,31 @@ public class DatasetMetadataTable extends JTable {
 		JDialog dlg = new JDialog(UIUtil.getFrameForComponent(comp), "Dataset metadata", true);
 		dlg.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		
-		dlg.setSize(400, 200);
+		dlg.setSize(400, 250);
 		dlg.setLocationRelativeTo(UIUtil.getFrameForComponent(comp));
 		dlg.setLayout(new BorderLayout());
 
-		JLabel lblUriId = new JLabel("Metadata of dataset \"" + dataset.getConfig().getUriId() + "\"");
-		dlg.add(lblUriId, BorderLayout.NORTH);
+		TextField txtUriId = new TextField("Metadata of dataset \"" + dataset.getConfig().getUriId() + "\"");
+		txtUriId.setEditable(false);
+		txtUriId.setCaretPosition(0);
+		dlg.add(txtUriId, BorderLayout.NORTH);
 		
 		DatasetMetadataTable tblMetadata = new DatasetMetadataTable();
 		DatasetMetadata metadata = DatasetMetadata.create(dataset);
 		tblMetadata.update(metadata);
 		dlg.add(new JScrollPane(tblMetadata), BorderLayout.CENTER);
+		
+		TextArea info = new TextArea(3, 5);
+		info.setEditable(false);
+		dlg.add(new JScrollPane(info), BorderLayout.SOUTH);
+		StringBuffer infoBuffer = new StringBuffer();
+		if (dataset.getConfig() != null) {
+			DataConfig config = dataset.getConfig();
+			if (config.containsKey(DatasetAbstract.INET_ADDR_FIELD)) {
+				infoBuffer.append("Host address: " + config.getAsString(DatasetAbstract.INET_ADDR_FIELD));
+			}
+		}
+		info.setText(infoBuffer.toString());
 		
 		dlg.setVisible(true);
 	}

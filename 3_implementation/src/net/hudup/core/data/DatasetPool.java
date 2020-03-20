@@ -476,7 +476,7 @@ public class DatasetPool implements Serializable {
 	 * Converting normal dataset pool to exchanged dataset.
 	 * @return exchanged dataset pool.
 	 */
-	public DatasetPoolExchanged toDatasetExchangedPool() {
+	public DatasetPoolExchanged toDatasetPoolExchanged() {
 		List<DatasetPairExchanged> exchangeDspList = Util.newList();
 		for (DatasetPair pair : dspList) {
 			if (pair == null) continue;
@@ -531,7 +531,7 @@ public class DatasetPool implements Serializable {
 	 * Converting normal dataset pool to exchanged dataset in client. This method is called by evaluator GUI.
 	 * @return exchanged dataset pool in client.
 	 */
-	public DatasetPoolExchanged toDatasetExchangedPoolClient() {
+	public DatasetPoolExchanged toDatasetPoolExchangedClient() {
 		List<DatasetPairExchanged> exchangeDspList = Util.newList();
 		for (DatasetPair pair : dspList) {
 			if (pair == null) continue;

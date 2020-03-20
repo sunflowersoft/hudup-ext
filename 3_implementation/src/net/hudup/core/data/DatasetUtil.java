@@ -10,6 +10,7 @@ package net.hudup.core.data;
 import java.util.Set;
 
 import net.hudup.core.Util;
+import net.hudup.core.logistic.NetUtil;
 import net.hudup.core.parser.DatasetParser;
 
 /**
@@ -100,6 +101,22 @@ public final class DatasetUtil {
 		}
 		
 		return ids;
+	}
+	
+	
+	/**
+	 * Extracting text form of URI identifier of specified dataset.
+	 * @param dataset specified dataset.
+	 * @return text form of URI identifier of specified dataset.
+	 */
+	public static String extractUriIdText(Dataset dataset) {
+		if (dataset == null) return "";
+		
+		DataConfig config = dataset.getConfig();
+		if (config == null)
+			return NullPointer.NULL_POINTER;
+		else
+			return NetUtil.getUriIdTextInformal(config);
 	}
 	
 	

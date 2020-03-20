@@ -18,8 +18,8 @@ import net.hudup.core.Util;
 import net.hudup.core.client.ServiceExt;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.evaluate.Evaluator;
+import net.hudup.core.evaluate.EvaluatorConfig;
 import net.hudup.core.logistic.LogUtil;
-import net.hudup.evaluate.ui.EvaluateGUIData;
 import net.hudup.server.DefaultService;
 import net.hudup.server.PowerServerConfig;
 import net.hudup.server.Transaction;
@@ -70,7 +70,6 @@ public class DefaultServiceExt extends DefaultService implements ServiceExt {
 				
 				ev.getConfig().setEvaluatorPort(serverConfig.getServerPort());
 				ev.setAgent(true);
-				ev.setTag(new EvaluateGUIData());
 				ev.export(serverConfig.getServerPort());
 				
 				pairMap.put(ev.getName(), ev);
@@ -207,11 +206,12 @@ public class DefaultServiceExt extends DefaultService implements ServiceExt {
 				else if (pairMap.containsKey(evaluatorName)) {
 					reproducedEvaluator = pairMap.get(evaluatorName).getClass().newInstance();
 					
-					reproducedEvaluator.getConfig().setReproducedVersion(reproducedVersion);
-					reproducedEvaluator.getConfig().setEvaluatorPort(serverConfig.getServerPort());
-					reproducedEvaluator.getConfig().setSaveAbility(false);
+					EvaluatorConfig config = reproducedEvaluator.getConfig();
+					config.setReproducedVersion(null);
+					config.setReproducedVersion(reproducedVersion);
+					config.setEvaluatorPort(serverConfig.getServerPort());
+					config.setSaveAbility(false);
 					reproducedEvaluator.setAgent(true);
-					reproducedEvaluator.setTag(new EvaluateGUIData());
 					reproducedEvaluator.export(serverConfig.getServerPort());
 					
 					pairReproducedMap.put(evaluatorReproducedName, reproducedEvaluator);

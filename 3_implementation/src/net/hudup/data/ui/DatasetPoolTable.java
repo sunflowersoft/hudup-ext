@@ -35,7 +35,6 @@ import net.hudup.core.data.DatasetPool;
 import net.hudup.core.data.DatasetUtil;
 import net.hudup.core.data.KBasePointer;
 import net.hudup.core.data.KBasePointerImpl;
-import net.hudup.core.data.NullPointer;
 import net.hudup.core.data.Pointer;
 import net.hudup.core.logistic.ClipboardUtil;
 import net.hudup.core.logistic.I18nUtil;
@@ -679,30 +678,11 @@ class DatasetPoolTableModel extends DefaultTableModel {
 			
 			row.add(i + 1);
 			
-			Dataset trainingSet = pair.getTraining();
-			if (trainingSet != null)
-				row.add(trainingSet.getConfig().getUriId().toString());
-			else
-				row.add("");
-			
-			Dataset testingSet = pair.getTesting();
-			if (testingSet != null) {
-				xURI uriId = testingSet.getConfig() != null ? testingSet.getConfig().getUriId() : null;
-				if (uriId == null) //Null pointer
-					row.add(NullPointer.NULL_POINTER);
-				else
-					row.add(uriId.toString());
-			}
-			else
-				row.add("");
-			
-			if (pair.getWhole() != null)
-				row.add(pair.getWhole().getConfig().getUriId().toString());
-			else
-				row.add("");
+			row.add(DatasetUtil.extractUriIdText(pair.getTraining()));
+			row.add(DatasetUtil.extractUriIdText(pair.getTesting()));
+			row.add(DatasetUtil.extractUriIdText(pair.getWhole()));
 			
 			data.add(row);
-			
 		}
 		
 		this.setDataVector(data, columns);

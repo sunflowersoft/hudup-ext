@@ -517,7 +517,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 					// TODO Auto-generated method stub
 					boolean ret = true;
 					try {
-						ret = evaluator.updatePool(guiData.pool.toDatasetExchangedPoolClient());
+						ret = evaluator.updatePool(toDatasetPoolExchangedClient(guiData.pool));
 					} catch (Exception ex) {ex.printStackTrace();}
 					
 					if (ret) {
@@ -1033,7 +1033,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			guiData.pool.add(new DatasetPair(dataset, txtTestingBrowse.getDataset()));
 			if (bindUri == null) {
 				try {
-					evaluator.updatePool(guiData.pool.toDatasetExchangedPoolClient());
+					evaluator.updatePool(toDatasetPoolExchangedClient(guiData.pool));
 				} catch (Throwable e) {e.printStackTrace();}
 			}
 			else {
@@ -1072,7 +1072,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			guiData.pool = pool;
 			if (bindUri == null) {
 				try {
-					evaluator.updatePool(guiData.pool.toDatasetExchangedPoolClient());
+					evaluator.updatePool(toDatasetPoolExchangedClient(guiData.pool));
 				} catch (Throwable e) {e.printStackTrace();}
 			}
 			else {
@@ -1160,7 +1160,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			guiData.pool.add(new DatasetPair(txtTrainingBrowse.getDataset(), dataset));
 			if (bindUri == null) {
 				try {
-					evaluator.updatePool(guiData.pool.toDatasetExchangedPoolClient());
+					evaluator.updatePool(toDatasetPoolExchangedClient(guiData.pool));
 				} catch (Throwable e) {e.printStackTrace();}
 			}
 			else {
@@ -1271,9 +1271,9 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			clearResult();
 			boolean started = false;
 			if (bindUri == null)
-				started = evaluator.remoteStart0(algList, pool.toDatasetExchangedPoolClient(), null);
+				started = evaluator.remoteStart0(algList, toDatasetPoolExchangedClient(pool), null);
 			else
-				started = evaluator.remoteStart(AlgList.getAlgNameList(algList), pool.toDatasetExchangedPoolClient(), null);
+				started = evaluator.remoteStart(AlgList.getAlgNameList(algList), toDatasetPoolExchangedClient(pool), null);
 			if (!started) updateMode();
 		}
 		catch (Throwable e) {

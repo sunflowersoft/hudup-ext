@@ -459,7 +459,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 					
 					if (bindUri == null) {
 						try {
-							evaluator.updatePool(guiData.pool.toDatasetExchangedPoolClient());
+							evaluator.updatePool(toDatasetPoolExchangedClient(guiData.pool));
 						} catch (Throwable e) {e.printStackTrace();}
 					}
 					else {
@@ -560,7 +560,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 					// TODO Auto-generated method stub
 					boolean ret = true;
 					try {
-						ret = evaluator.updatePool(guiData.pool.toDatasetExchangedPoolClient());
+						ret = evaluator.updatePool(toDatasetPoolExchangedClient(guiData.pool));
 					} catch (Exception ex) {ex.printStackTrace();}
 					
 					if (ret) {
@@ -1064,9 +1064,9 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			clearResult();
 			boolean started = false;
 			if (bindUri == null)
-				started = evaluator.remoteStart0(lbAlgs.getAlgList(), guiData.pool.toDatasetExchangedPoolClient(), null);
+				started = evaluator.remoteStart0(lbAlgs.getAlgList(), toDatasetPoolExchangedClient(guiData.pool), null);
 			else
-				started = evaluator.remoteStart(lbAlgs.getAlgNameList(), guiData.pool.toDatasetExchangedPoolClient(), null);
+				started = evaluator.remoteStart(lbAlgs.getAlgNameList(), toDatasetPoolExchangedClient(guiData.pool), null);
 			if (!started) updateMode();
 		}
 		catch (Throwable e) {
@@ -1417,7 +1417,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			clearResult();
 			if (bindUri == null) {
 				try {
-					evaluator.updatePool(guiData.pool.toDatasetExchangedPoolClient());
+					evaluator.updatePool(toDatasetPoolExchangedClient(guiData.pool));
 				} catch (Throwable e) {e.printStackTrace();}
 				
 			}
@@ -1534,7 +1534,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			
 			if (bindUri == null) {
 				try {
-					evaluator.updatePool(guiData.pool.toDatasetExchangedPoolClient());
+					evaluator.updatePool(toDatasetPoolExchangedClient(guiData.pool));
 				} catch (Throwable e) {e.printStackTrace();}
 			}
 			else {

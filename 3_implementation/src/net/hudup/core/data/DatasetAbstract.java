@@ -34,6 +34,24 @@ public abstract class DatasetAbstract implements Dataset, DatasetRemote {
 
 
 	/**
+	 * In-memory field.
+	 */
+	public static final String ONLY_MEMORY_FIELD = "only_memory";
+	
+	
+	/**
+	 * In-memory default value.
+	 */
+	public static final boolean ONLY_MEMORY_DEFAULT = false;
+
+	
+	/**
+	 * Internet address field field.
+	 */
+	public static final String INET_ADDR_FIELD = "inet_addr";
+
+	
+	/**
 	 * The configuration of dataset.
 	 */
 	protected DataConfig config = null;

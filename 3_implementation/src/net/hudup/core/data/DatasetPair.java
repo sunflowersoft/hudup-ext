@@ -272,22 +272,28 @@ public class DatasetPair implements Serializable {
 	 */
 	public void reload() {
 		DataConfig config = null;
-		if (training != null) {
+		if ( (training != null) && !(training instanceof NullPointer) ) {
 			config = (DataConfig) training.getConfig().clone();
-			training.clear();
-			training = DatasetUtil.loadDataset(config);
+			if (!config.getAsBoolean(DatasetAbstract.ONLY_MEMORY_FIELD)) {
+				training.clear();
+				training = DatasetUtil.loadDataset(config);
+			}
 		}
 		
 		if ( (testing != null) && !(testing instanceof NullPointer) ) {
 			config = (DataConfig) testing.getConfig().clone();
-			testing.clear();
-			testing = DatasetUtil.loadDataset(config);
+			if (!config.getAsBoolean(DatasetAbstract.ONLY_MEMORY_FIELD)) {
+				testing.clear();
+				testing = DatasetUtil.loadDataset(config);
+			}
 		}
 		
-		if (whole != null) {
+		if ( (whole != null) && !(whole instanceof NullPointer) ) {
 			config = (DataConfig) whole.getConfig().clone();
-			whole.clear();
-			whole = DatasetUtil.loadDataset(config);
+			if (!config.getAsBoolean(DatasetAbstract.ONLY_MEMORY_FIELD)) {
+				whole.clear();
+				whole = DatasetUtil.loadDataset(config);
+			}
 		}
 		
 	}

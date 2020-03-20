@@ -154,6 +154,15 @@ public class DatasetPairExchanged implements Serializable {
 		
 		boolean exclusive = remoteDataset instanceof DatasetRemoteWrapper ?
 				((DatasetRemoteWrapper)remoteDataset).isExclusive() : true;
+
+		if (config.getAsBoolean(DatasetAbstract.ONLY_MEMORY_FIELD)) {
+			if (remoteDataset instanceof DatasetRemoteWrapper)
+				return (DatasetRemoteWrapper)remoteDataset;
+			else
+				return Util.getPluginManager().wrap(remoteDataset, exclusive);
+		}
+		else if (remoteDataset instanceof NullPointer) 
+			return Util.getPluginManager().wrap(remoteDataset, exclusive);
 		
 		try {
 			if (remoteDataset instanceof DatasetRemoteWrapper)

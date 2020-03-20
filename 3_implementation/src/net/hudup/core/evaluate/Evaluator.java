@@ -403,22 +403,6 @@ public interface Evaluator extends Remote, RemoteRunner, SetupAlgListener, Expor
     void setEvaluateStorePath(String evStorePath) throws RemoteException;
     
     
-    /**
-     * Getting tag.
-     * @return tag attached to this evaluator.
-     * @throws RemoteException if any error raises.
-     */
-    Serializable getTag() throws RemoteException;
-    
-    
-    /**
-     * Setting tag attached to this evaluator.
-     * @param tag tag attached to this evaluator.
-     * @throws RemoteException if any error raises.
-     */
-    void setTag(Serializable tag) throws RemoteException;
-    
-    
 //    /**
 //     * Testing RMI call.
 //     * @param o parameter.

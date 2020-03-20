@@ -157,7 +157,7 @@ public class Evaluator implements AccessPoint {
 			
 			DatasetPool pool = script.getPool();
 			LogUtil.info("Evaluation is running...");
-			ev.remoteStart0(algList, pool.toDatasetExchangedPoolClient(), beginTime);
+			ev.remoteStart0(algList, pool.toDatasetPoolExchangedClient(), beginTime);
 		}
 		catch (Exception e) {
 			e.printStackTrace();

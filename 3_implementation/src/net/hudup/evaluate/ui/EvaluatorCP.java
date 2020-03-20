@@ -17,7 +17,6 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.Serializable;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.Date;
@@ -198,10 +197,11 @@ public class EvaluatorCP extends JFrame implements EvaluatorListener {
 			@Override
 			public void itemStateChanged(ItemEvent e) {
 				// TODO Auto-generated method stub
-				if (e.getStateChange() != ItemEvent.SELECTED)
-					return;
-				
-				updateMode();
+				if (e.getStateChange() == ItemEvent.DESELECTED) {
+				}
+				else if (e.getStateChange() == ItemEvent.SELECTED) {
+					updateMode();
+				}
 			}
 		});
         evPane.add(cmbEvaluators, BorderLayout.CENTER);
@@ -227,28 +227,19 @@ public class EvaluatorCP extends JFrame implements EvaluatorListener {
 						return;
 					}
 					
-					try {
-						Serializable tag = evaluatorItem.evaluator.getTag();
-						if ((tag == null) || !(tag instanceof EvaluateGUIData)) {
-							tag = new EvaluateGUIData();
-							evaluatorItem.evaluator.setTag(tag);
-							new EvalCompoundGUI(evaluatorItem.evaluator, bindUri, (EvaluateGUIData)tag);
-						}
-						else {
-							EvaluateGUIData data = (EvaluateGUIData)tag;
-							if (data.active) {
-								JOptionPane.showMessageDialog(
-									getThisEvaluatorCP(), 
-									"GUI of evaluator named '" + evaluatorItem.evaluator.getName() + "' is running.", 
-									"Evaluator GUI running", 
-									JOptionPane.INFORMATION_MESSAGE);
-							}
-							else {
-								new EvalCompoundGUI(evaluatorItem.evaluator, bindUri, data);
-							}
-						}
+					if (evaluatorItem.guiData == null)
+						evaluatorItem.guiData = new EvaluateGUIData();
+					
+					if (evaluatorItem.guiData.active) {
+						JOptionPane.showMessageDialog(
+							getThisEvaluatorCP(), 
+							"GUI of evaluator named '" + DSUtil.shortenVerbalName(evaluatorItem.getName()) + "' is running.", 
+							"Evaluator GUI running", 
+							JOptionPane.INFORMATION_MESSAGE);
 					}
-					catch (Exception ex) {ex.printStackTrace();}
+					else {
+						new EvalCompoundGUI(evaluatorItem.evaluator, bindUri, evaluatorItem.guiData);
+					}
 				}
 			});
 		btnOpenStart.setMargin(new Insets(0, 0 , 0, 0));
@@ -319,16 +310,17 @@ public class EvaluatorCP extends JFrame implements EvaluatorListener {
 			private static final long serialVersionUID = 1L;
 
 			@Override
-			protected void onApply() {
+			public boolean apply() {
 				// TODO Auto-generated method stub
-				super.onApply();
-				if (service == null) return;
+				boolean ret = super.apply();
+				if (!ret) return false;
+				if (service == null) return ret;
 				
 				EvaluatorConfig config = (EvaluatorConfig) tblProp.getPropList();
-				if (config == null) return;
+				if (config == null) return ret;
 				
 				EvaluatorItem evaluatorItem = (EvaluatorItem) cmbEvaluators.getSelectedItem();
-				if (evaluatorItem == null || evaluatorItem.evaluator == null) return;
+				if (evaluatorItem == null || evaluatorItem.evaluator == null) return ret;
 				
 				try {
 					if (bindUri != null)
@@ -337,6 +329,8 @@ public class EvaluatorCP extends JFrame implements EvaluatorListener {
 				catch (Exception e) {
 					e.printStackTrace();
 				}
+				
+				return true;
 			}
 
 		};
@@ -420,6 +414,8 @@ public class EvaluatorCP extends JFrame implements EvaluatorListener {
 	 * Updating mode.
 	 */
 	protected void updateMode() {
+		checkConfigModified();
+		
 		lblStatus.setText("");
 		btnRefresh.setEnabled(false);
 		btnAdd.setEnabled(false);
@@ -472,32 +468,45 @@ public class EvaluatorCP extends JFrame implements EvaluatorListener {
 	/**
 	 * Refreshing evaluators.
 	 */
-	protected void refresh() {
-		for (int i = 0; i < cmbEvaluators.getItemCount(); i++) {
-			EvaluatorItem item = cmbEvaluators.getItemAt(i);
-			try {
-				item.evaluator.removeEvaluatorListener(this);
-			}
-			catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
+	protected synchronized void refresh() {
+		unsetupListeners();
 		
         cmbEvaluators.removeAllItems();
         List<Evaluator> evaluators = getEvaluators();
         for  (Evaluator evaluator : evaluators) {
         	cmbEvaluators.addItem(new EvaluatorItem(evaluator));
-			try {
-				evaluator.addEvaluatorListener(this);
-			}
-			catch (Exception e) {
-				e.printStackTrace();
-			}
         }
+        
+        setupListeners();
         
         updateMode();
 	}
 	
+	
+	/**
+	 * Refreshing evaluators.
+	 */
+	protected synchronized void refresh(String evaluatorName, String reproducedVersion) {
+		unsetupListeners();
+		
+        cmbEvaluators.removeAllItems();
+        List<Evaluator> evaluators = getEvaluators();
+        EvaluatorItem selectedItem = null;
+        for  (Evaluator evaluator : evaluators) {
+        	EvaluatorItem item = new EvaluatorItem(evaluator);
+        	cmbEvaluators.addItem(item);
+        	
+        	if (item.getName().equals(evaluatorName + "-" + reproducedVersion))
+        		selectedItem = item;
+        }
+        if (selectedItem != null)
+        	cmbEvaluators.setSelectedItem(selectedItem);
+
+        setupListeners();
+        
+        updateMode();
+	}
+
 	
 	/**
 	 * Duplicate / reproduce the selected evaluator.
@@ -579,7 +588,7 @@ public class EvaluatorCP extends JFrame implements EvaluatorListener {
     				"Success to reproduce evaluator", 
     				JOptionPane.INFORMATION_MESSAGE);
         		
-        		refresh();
+        		refresh(evaluatorName, versionName.toString());
         		return;
             }
         }
@@ -650,7 +659,7 @@ public class EvaluatorCP extends JFrame implements EvaluatorListener {
 	
 	
 	@Override
-	public void receivedEvaluator(EvaluatorEvent evt) throws RemoteException {
+	public synchronized void receivedEvaluator(EvaluatorEvent evt) throws RemoteException {
 		// TODO Auto-generated method stub
 		updateMode();
 	}
@@ -659,28 +668,10 @@ public class EvaluatorCP extends JFrame implements EvaluatorListener {
 	@Override
 	public void dispose() {
 		// TODO Auto-generated method stub
-		if (paneConfig.isModified()) {
-			int confirm = JOptionPane.showConfirmDialog(
-				getThisEvaluatorCP(),
-				"System properties are modified. Do you want to apply them?",
-				"System properties are modified",
-				JOptionPane.YES_NO_OPTION,
-				JOptionPane.QUESTION_MESSAGE);
-				
-			if (confirm == JOptionPane.YES_OPTION)
-				paneConfig.apply();
-		}
+		checkConfigModified();
 		
-		for (int i = 0; i < cmbEvaluators.getItemCount(); i++) {
-			EvaluatorItem item = cmbEvaluators.getItemAt(i);
-			try {
-				item.evaluator.removeEvaluatorListener(this);
-			}
-			catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-
+		unsetupListeners();
+		
 		if (exportedStub != null) {
 			boolean ret = NetUtil.RegistryRemote.unexport(this);
 			if (ret)
@@ -695,6 +686,60 @@ public class EvaluatorCP extends JFrame implements EvaluatorListener {
 
 
 	/**
+	 * Checking whether configuration is modified.
+	 */
+	private void checkConfigModified() {
+		if (paneConfig == null || !paneConfig.isModified()) return;
+		
+		int confirm = JOptionPane.showConfirmDialog(
+			getThisEvaluatorCP(),
+			"Evaluator properties are modified. Do you want to apply them?",
+			"Evaluator properties are modified",
+			JOptionPane.YES_NO_OPTION,
+			JOptionPane.QUESTION_MESSAGE);
+			
+		if (confirm == JOptionPane.YES_OPTION)
+			paneConfig.apply();
+	}
+	
+	
+	/**
+	 * Setting up listeners.
+	 */
+	protected void setupListeners() {
+		if (cmbEvaluators == null) return;
+		
+		for (int i = 0; i < cmbEvaluators.getItemCount(); i++) {
+			EvaluatorItem item = cmbEvaluators.getItemAt(i);
+			try {
+				item.evaluator.addEvaluatorListener(this);
+			}
+			catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	
+	/**
+	 * Unsetting up listeners.
+	 */
+	protected void unsetupListeners() {
+		if (cmbEvaluators == null) return;
+		
+		for (int i = 0; i < cmbEvaluators.getItemCount(); i++) {
+			EvaluatorItem item = cmbEvaluators.getItemAt(i);
+			try {
+				item.evaluator.removeEvaluatorListener(this);
+			}
+			catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	
+	/**
 	 * This class is item wrapper of evaluator for combo-box
 	 * @author Loc Nguyen
 	 * @version 1.0
@@ -707,31 +752,49 @@ public class EvaluatorCP extends JFrame implements EvaluatorListener {
 		public Evaluator evaluator = null;
 		
 		/**
+		 * Item name.
+		 */
+		private String name = null;
+		
+		/**
+		 * Evaluation GUI data.
+		 */
+		public EvaluateGUIData guiData = null;
+		
+		/**
 		 * Constructor with evaluator.
 		 * @param evaluator evaluator.
 		 */
 		public EvaluatorItem(Evaluator evaluator) {
 			this.evaluator = evaluator;
-		}
-
-		@Override
-		public String toString() {
-			// TODO Auto-generated method stub
-			if (evaluator == null)
-				return "";
-			else {
+			this.name = "";
+			if (evaluator != null) {
 				try {
 					EvaluatorConfig config = evaluator.getConfig();
 					if (config.isReproduced())
-						return DSUtil.shortenVerbalName(evaluator.getName()) + "-" + config.getReproducedVersion();
+						name = evaluator.getName() + "-" + config.getReproducedVersion();
 					else
-						return DSUtil.shortenVerbalName(evaluator.getName());
+						name = evaluator.getName();
 				}
 				catch (Exception e) {
 					e.printStackTrace();
+					name = "";
 				}
-				return "";
 			}
+		}
+
+		/**
+		 * Getting item name.
+		 * @return item name.
+		 */
+		public String getName() {
+			return name;
+		}
+		
+		@Override
+		public String toString() {
+			// TODO Auto-generated method stub
+			return DSUtil.shortenVerbalName(getName());
 		}
 		
 	}

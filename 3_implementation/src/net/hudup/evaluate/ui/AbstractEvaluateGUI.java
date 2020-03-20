@@ -7,6 +7,7 @@
  */
 package net.hudup.evaluate.ui;
 
+import java.net.InetAddress;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.Arrays;
@@ -21,8 +22,12 @@ import net.hudup.core.RegisterTable;
 import net.hudup.core.Util;
 import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.SetupAlgListener;
+import net.hudup.core.data.DataConfig;
+import net.hudup.core.data.DatasetAbstract;
+import net.hudup.core.data.DatasetPairExchanged;
 import net.hudup.core.data.DatasetPool;
 import net.hudup.core.data.DatasetPoolExchanged;
+import net.hudup.core.data.DatasetRemote;
 import net.hudup.core.evaluate.EvaluateInfo;
 import net.hudup.core.evaluate.EvaluateListener;
 import net.hudup.core.evaluate.EvaluateProcessor;
@@ -537,6 +542,48 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	 */
 	protected abstract void updateGUIData();
 
+	
+	/**
+	 * Converting normal dataset pool to exchanged dataset in client. This method is called by evaluator GUI.
+	 * @param pool normal dataset pool.
+	 * @return exchanged dataset in client.
+	 */
+	protected DatasetPoolExchanged toDatasetPoolExchangedClient(DatasetPool pool) {
+		if (pool == null) return null;
+		
+		DatasetPoolExchanged exchangedPool = pool.toDatasetPoolExchangedClient();
+		if (bindUri == null) return exchangedPool;
+		
+		for (DatasetPairExchanged pair : exchangedPool.dspList) {
+			setupDatasetExchanged(pair.training);
+			setupDatasetExchanged(pair.testing);
+			setupDatasetExchanged(pair.whole);
+		}
+		
+		return exchangedPool;
+	}
+	
+	
+	/**
+	 * Setting specified remote dataset.
+	 * @param remoteDataset specified remote dataset.
+	 */
+	private void setupDatasetExchanged(DatasetRemote remoteDataset) {
+		if (remoteDataset == null || bindUri == null) return;
+		
+		try {
+			DataConfig config = remoteDataset.remoteGetConfig();
+			config.put(DatasetAbstract.ONLY_MEMORY_FIELD, true);
+			
+			InetAddress ia = NetUtil.getLocalInetAddress();
+			if (ia != null)
+				config.put(DatasetAbstract.INET_ADDR_FIELD, ia.getHostAddress());
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
 	
 }
 

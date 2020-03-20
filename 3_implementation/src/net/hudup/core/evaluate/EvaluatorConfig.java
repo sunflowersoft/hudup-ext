@@ -112,7 +112,7 @@ public class EvaluatorConfig extends SysConfig {
 		//setAgent(EVALUATOR_AGENT_DEFAULT);
 		setSaveResultSummary(EVALUATOR_SAVE_RESULT_SUMMARY_DEFAULT);
 		
-		addInvisible(EVALUATOR_REPRODUCED_VERSION_FIELD);
+		addReadOnly(EVALUATOR_REPRODUCED_VERSION_FIELD);
 	}
 
 	

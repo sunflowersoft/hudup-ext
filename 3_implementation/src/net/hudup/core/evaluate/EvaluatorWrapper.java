@@ -487,20 +487,6 @@ public class EvaluatorWrapper implements Evaluator, Serializable {
 
 
 	@Override
-	public Serializable getTag() throws RemoteException {
-		// TODO Auto-generated method stub
-		return remoteEvaluator.getTag();
-	}
-
-
-	@Override
-	public void setTag(Serializable tag) throws RemoteException {
-		// TODO Auto-generated method stub
-		remoteEvaluator.setTag(tag);
-	}
-
-
-	@Override
 	protected void finalize() throws Throwable {
 		// TODO Auto-generated method stub
 		super.finalize();
