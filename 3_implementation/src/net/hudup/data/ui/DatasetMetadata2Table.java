@@ -11,15 +11,18 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 
 import javax.swing.JDialog;
-import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.WindowConstants;
 import javax.swing.table.DefaultTableModel;
 
+import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Dataset;
+import net.hudup.core.data.DatasetAbstract;
 import net.hudup.core.data.DatasetMetadata2;
 import net.hudup.core.logistic.MathUtil;
+import net.hudup.core.logistic.ui.TextArea;
+import net.hudup.core.logistic.ui.TextField;
 import net.hudup.core.logistic.ui.UIUtil;
 
 /**
@@ -75,18 +78,35 @@ public class DatasetMetadata2Table extends JTable {
 		JDialog dlg = new JDialog(UIUtil.getFrameForComponent(comp), "Dataset metadata", true);
 		dlg.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		
-		dlg.setSize(400, 200);
+		dlg.setSize(400, 250);
 		dlg.setLocationRelativeTo(UIUtil.getFrameForComponent(comp));
 		dlg.setLayout(new BorderLayout());
 
-		JLabel lblUriId = new JLabel("Metadata of dataset \"" + dataset.getConfig().getUriId() + "\"");
-		dlg.add(lblUriId, BorderLayout.NORTH);
+		TextField txtUriId = new TextField("Metadata of dataset \"" + dataset.getConfig().getUriId() + "\"");
+		txtUriId.setEditable(false);
+		txtUriId.setCaretPosition(0);
+		dlg.add(txtUriId, BorderLayout.NORTH);
 		
 		DatasetMetadata2Table tblMetadata2 = new DatasetMetadata2Table();
 		DatasetMetadata2 metadata2 = DatasetMetadata2.create(dataset);
 		tblMetadata2.update(metadata2);
 		dlg.add(new JScrollPane(tblMetadata2), BorderLayout.CENTER);
 		
+		TextArea info = new TextArea(3, 5);
+		info.setEditable(false);
+		dlg.add(new JScrollPane(info), BorderLayout.SOUTH);
+		StringBuffer infoBuffer = new StringBuffer();
+		if (dataset.getConfig() != null) {
+			DataConfig config = dataset.getConfig();
+			if (config.containsKey(DatasetAbstract.HARDWARE_ADDR_FIELD)) {
+				infoBuffer.append("Hardware address: " + config.getAsString(DatasetAbstract.HARDWARE_ADDR_FIELD));
+			}
+			if (config.containsKey(DatasetAbstract.HOST_ADDR_FIELD)) {
+				infoBuffer.append("\nHost address: " + config.getAsString(DatasetAbstract.HOST_ADDR_FIELD));
+			}
+		}
+		info.setText(infoBuffer.toString());
+
 		dlg.setVisible(true);
 	}
 	

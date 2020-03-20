@@ -63,6 +63,13 @@ public class DefaultServerExt extends DefaultServer {
 	@Override
 	protected PopupMenu createSysTrayMenuExt() {
 		// TODO Auto-generated method stub
+		try {
+			EvaluatorCP.class.getClass();
+		}
+		catch (Exception e) {
+			return null;
+		}
+		
         PopupMenu popup = new PopupMenu();
 
         MenuItem evItem = new MenuItem(I18nUtil.message("evaluator"));

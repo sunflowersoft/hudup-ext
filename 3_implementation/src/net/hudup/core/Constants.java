@@ -7,6 +7,9 @@
  */
 package net.hudup.core;
 
+import net.hudup.core.logistic.NetUtil;
+import net.hudup.core.logistic.NetUtil.InetHardware;
+
 /**
  * This utility final class defines essential constants used over Hudup framework.
  * @author Loc Nguyen
@@ -207,6 +210,18 @@ public final class Constants {
 
 	
 	/**
+	 * Hardware address.
+	 */
+	public static String hardwareAddress                       = null;
+	
+	
+	/**
+	 * Host address.
+	 */
+	public static String hostAddress                           = null;
+
+	
+	/**
 	 * Static code to load dynamic constant.
 	 */
 	static {
@@ -236,6 +251,24 @@ public final class Constants {
 		catch (Throwable e) {
 			System.out.println("Error when parsing log4j property");
 		}
+		
+		try {
+			InetHardware ih = NetUtil.getInetHardware();
+			if (ih != null && ih.ni != null && ih.inetAddr != null) {
+				hardwareAddress = ih.getMACAddress();
+				hostAddress = ih.inetAddr.getHostAddress();
+			}
+			if (Constants.hardwareAddress == null || Constants.hostAddress == null) {
+				Constants.hardwareAddress = null;
+				Constants.hostAddress = null;
+			}
+		}
+		catch (Throwable e) {
+			System.out.println("Error when getting MAC and host addresses");
+			hardwareAddress = null;
+			hostAddress = null;
+		}
+		
 	}
 	
 	

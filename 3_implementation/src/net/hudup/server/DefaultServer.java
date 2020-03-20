@@ -22,6 +22,7 @@ import java.util.Collection;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 
+import net.hudup.core.Constants;
 import net.hudup.core.Util;
 import net.hudup.core.client.ServerTrayIcon;
 import net.hudup.core.client.Service;
@@ -33,9 +34,11 @@ import net.hudup.core.data.UnitList;
 import net.hudup.core.evaluate.EvaluatorConfig;
 import net.hudup.core.logistic.I18nUtil;
 import net.hudup.core.logistic.LogUtil;
+import net.hudup.core.logistic.NetUtil;
 import net.hudup.core.logistic.NextUpdate;
 import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.xURI;
+import net.hudup.core.logistic.NetUtil.InetHardware;
 import net.hudup.core.logistic.ui.HelpContent;
 import net.hudup.core.logistic.ui.UIUtil;
 import net.hudup.data.ProviderImpl;
@@ -103,6 +106,23 @@ public class DefaultServer extends PowerServerImpl {
 	
 	@Override
 	protected void doWhenStart() {
+		try {
+			InetHardware ih = NetUtil.getInetHardware();
+			if (ih != null && ih.ni != null && ih.inetAddr != null) {
+				Constants.hardwareAddress = ih.getMACAddress();
+				Constants.hostAddress = ih.inetAddr.getHostAddress();
+			}
+			if (Constants.hardwareAddress == null || Constants.hostAddress == null) {
+				Constants.hardwareAddress = null;
+				Constants.hostAddress = null;
+			}
+		}
+		catch (Throwable e) {
+			LogUtil.error("Error when getting MAC and host addresses");
+			Constants.hardwareAddress = null;
+			Constants.hostAddress = null;
+		}
+
 		service.open(config);
 	}
 	

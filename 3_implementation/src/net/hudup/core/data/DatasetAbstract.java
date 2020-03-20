@@ -46,9 +46,15 @@ public abstract class DatasetAbstract implements Dataset, DatasetRemote {
 
 	
 	/**
-	 * Internet address field field.
+	 * Hardware address MAC field.
 	 */
-	public static final String INET_ADDR_FIELD = "inet_addr";
+	public static final String HARDWARE_ADDR_FIELD = "hardware_addr";
+
+	
+	/**
+	 * Host address field field.
+	 */
+	public static final String HOST_ADDR_FIELD = "host_addr";
 
 	
 	/**

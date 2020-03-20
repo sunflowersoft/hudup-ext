@@ -96,8 +96,11 @@ public class DatasetMetadataTable extends JTable {
 		StringBuffer infoBuffer = new StringBuffer();
 		if (dataset.getConfig() != null) {
 			DataConfig config = dataset.getConfig();
-			if (config.containsKey(DatasetAbstract.INET_ADDR_FIELD)) {
-				infoBuffer.append("Host address: " + config.getAsString(DatasetAbstract.INET_ADDR_FIELD));
+			if (config.containsKey(DatasetAbstract.HARDWARE_ADDR_FIELD)) {
+				infoBuffer.append("Hardware address: " + config.getAsString(DatasetAbstract.HARDWARE_ADDR_FIELD));
+			}
+			if (config.containsKey(DatasetAbstract.HOST_ADDR_FIELD)) {
+				infoBuffer.append("\nHost address: " + config.getAsString(DatasetAbstract.HOST_ADDR_FIELD));
 			}
 		}
 		info.setText(infoBuffer.toString());

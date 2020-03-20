@@ -586,8 +586,8 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 		this.btnDownload = UIUtil.makeIconButton(
 			"download-16x16.png", 
 			"download", 
-			I18nUtil.message("download"), 
-			I18nUtil.message("download"), 
+			I18nUtil.message("retrieve_dataset_ref"), 
+			I18nUtil.message("retrieve_dataset_ref"), 
 				
 			new ActionListener() {
 				

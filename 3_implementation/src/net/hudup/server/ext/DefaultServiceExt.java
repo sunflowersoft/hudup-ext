@@ -136,7 +136,7 @@ public class DefaultServiceExt extends DefaultService implements ServiceExt {
 				public int compare(Evaluator o1, Evaluator o2) {
 					// TODO Auto-generated method stub
 					try {
-						return o1.getName().compareToIgnoreCase(o2.getName());
+						return extractName(o1).compareToIgnoreCase(extractName(o2));
 					}
 					catch (Throwable e) {
 						// TODO Auto-generated catch block
@@ -160,6 +160,31 @@ public class DefaultServiceExt extends DefaultService implements ServiceExt {
 	}
 
 
+	/**
+	 * Extracting name of specified evaluator with reproduction support.
+	 * @param evaluator specified evaluator.
+	 * @return name of specified evaluator with reproduction support.
+	 */
+	private String extractName(Evaluator evaluator) {
+		String name = "";
+		if (evaluator != null) {
+			try {
+				EvaluatorConfig config = evaluator.getConfig();
+				if (config.isReproduced())
+					name = evaluator.getName() + "-" + config.getReproducedVersion();
+				else
+					name = evaluator.getName();
+			}
+			catch (Exception e) {
+				e.printStackTrace();
+				name = "";
+			}
+		}
+		
+		return name;
+	}
+	
+	
 	@Override
 	public Evaluator getEvaluator(String evaluatorName, String account, String password) throws RemoteException {
 		// TODO Auto-generated method stub

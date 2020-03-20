@@ -9,8 +9,9 @@ package net.hudup.core.data;
 
 import java.util.Set;
 
+import net.hudup.core.Constants;
 import net.hudup.core.Util;
-import net.hudup.core.logistic.NetUtil;
+import net.hudup.core.logistic.xURI;
 import net.hudup.core.parser.DatasetParser;
 
 /**
@@ -110,13 +111,41 @@ public final class DatasetUtil {
 	 * @return text form of URI identifier of specified dataset.
 	 */
 	public static String extractUriIdText(Dataset dataset) {
-		if (dataset == null) return "";
-		
-		DataConfig config = dataset.getConfig();
-		if (config == null)
-			return NullPointer.NULL_POINTER;
+		if (dataset == null)
+			return "";
 		else
-			return NetUtil.getUriIdTextInformal(config);
+			return extractUriIdText(dataset.getConfig());
+	}
+	
+	
+	/**
+	 * Getting URI representative text form of URI identifier.
+	 * @param config specified configuration.
+	 * @return URI representative text form of URI identifier.
+	 */
+	public static String extractUriIdText(DataConfig config) {
+		if (config == null) return NullPointer.NULL_POINTER;
+
+		xURI uriId = config.getUriId();
+		String uriIdText = uriId != null ? uriId.toString() : NullPointer.NULL_POINTER;
+		if (uriId == null || Constants.hardwareAddress == null || Constants.hostAddress == null) {
+			return uriIdText;
+		}
+		else {
+			String hardwareAddress = config.getAsString(DatasetAbstract.HARDWARE_ADDR_FIELD);
+			String hostAddress = config.getAsString(DatasetAbstract.HOST_ADDR_FIELD);
+
+			if (hardwareAddress == null || hostAddress == null)
+				return uriIdText;
+			else if (!Constants.hardwareAddress.equals(hardwareAddress)) {
+				String lastName = uriId.getLastName();
+				String newUriIdText = "hdp://" + hostAddress + ":" + Constants.DEFAULT_SERVER_PORT + "/somewhere";
+				newUriIdText = lastName != null && !lastName.isEmpty() ? newUriIdText + "/" + lastName : newUriIdText;
+				return newUriIdText;
+			}
+			else
+				return uriIdText;
+		}
 	}
 	
 	

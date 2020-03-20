@@ -36,6 +36,7 @@ import net.hudup.core.client.ConnectDlg;
 import net.hudup.core.client.Service;
 import net.hudup.core.client.ServiceExt;
 import net.hudup.core.data.DataConfig;
+import net.hudup.core.data.HiddenText2;
 import net.hudup.core.data.ui.SysConfigPane;
 import net.hudup.core.evaluate.Evaluator;
 import net.hudup.core.evaluate.EvaluatorConfig;
@@ -85,7 +86,7 @@ public class EvaluatorCP extends JFrame implements EvaluatorListener {
 	/**
 	 * Password.
 	 */
-	protected String password = null;
+	protected HiddenText2 password = null;
 	
 	
 	/**
@@ -153,7 +154,7 @@ public class EvaluatorCP extends JFrame implements EvaluatorListener {
 		super("Evaluator control panel");
 		this.service = service;
 		this.account = account;
-		this.password = password;
+		this.password = new HiddenText2(password);
 		this.bindUri = bindUri;
 		
 		if (bindUri != null) { //Evaluator is remote
@@ -236,10 +237,10 @@ public class EvaluatorCP extends JFrame implements EvaluatorListener {
 							"GUI of evaluator named '" + DSUtil.shortenVerbalName(evaluatorItem.getName()) + "' is running.", 
 							"Evaluator GUI running", 
 							JOptionPane.INFORMATION_MESSAGE);
+						return;
 					}
-					else {
-						new EvalCompoundGUI(evaluatorItem.evaluator, bindUri, evaluatorItem.guiData);
-					}
+					
+					EvalCompoundGUI.run(evaluatorItem.evaluator, bindUri, evaluatorItem.guiData, null);
 				}
 			});
 		btnOpenStart.setMargin(new Insets(0, 0 , 0, 0));
@@ -376,7 +377,7 @@ public class EvaluatorCP extends JFrame implements EvaluatorListener {
 		
 		if (service instanceof ServiceExt) {
 			try {
-				evaluators = ((ServiceExt)service).getEvaluators(account, password);
+				evaluators = ((ServiceExt)service).getEvaluators(account, password.getText());
 			}
 			catch (Exception e) {
 				e.printStackTrace();
@@ -398,7 +399,7 @@ public class EvaluatorCP extends JFrame implements EvaluatorListener {
 		for (String evaluatorName : evaluatorNames) {
 			Evaluator evaluator = null;
 			try {
-				evaluator = service.getEvaluator(evaluatorName, account, password);
+				evaluator = service.getEvaluator(evaluatorName, account, password.getText());
 			}
 			catch (Exception e) {
 				e.printStackTrace();
@@ -580,7 +581,7 @@ public class EvaluatorCP extends JFrame implements EvaluatorListener {
         
         try {
         	String evaluatorName = evaluator.getName();
-            evaluator = ((ServiceExt)service).getEvaluator(evaluatorName, account, password, versionName.toString());
+            evaluator = ((ServiceExt)service).getEvaluator(evaluatorName, account, password.getText(), versionName.toString());
             if (evaluator != null) {
         		JOptionPane.showMessageDialog(
     				this, 
@@ -634,7 +635,7 @@ public class EvaluatorCP extends JFrame implements EvaluatorListener {
 			
         	String evaluatorName = evaluator.getName();
         	String versionName = config.getReproducedVersion();
-            boolean ret = ((ServiceExt)service).removeEvaluator(evaluatorName, account, password, versionName);
+            boolean ret = ((ServiceExt)service).removeEvaluator(evaluatorName, account, password.getText(), versionName);
             if (ret) {
         		JOptionPane.showMessageDialog(
     				this, 

@@ -7,7 +7,6 @@
  */
 package net.hudup.evaluate.ui;
 
-import java.net.InetAddress;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.Arrays;
@@ -16,6 +15,7 @@ import java.util.List;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
+import net.hudup.core.Constants;
 import net.hudup.core.PluginChangedListener;
 import net.hudup.core.PluginStorage;
 import net.hudup.core.RegisterTable;
@@ -28,6 +28,7 @@ import net.hudup.core.data.DatasetPairExchanged;
 import net.hudup.core.data.DatasetPool;
 import net.hudup.core.data.DatasetPoolExchanged;
 import net.hudup.core.data.DatasetRemote;
+import net.hudup.core.data.DatasetUtil;
 import net.hudup.core.evaluate.EvaluateInfo;
 import net.hudup.core.evaluate.EvaluateListener;
 import net.hudup.core.evaluate.EvaluateProcessor;
@@ -570,14 +571,22 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	 */
 	private void setupDatasetExchanged(DatasetRemote remoteDataset) {
 		if (remoteDataset == null || bindUri == null) return;
+		if (DatasetUtil.getMostInnerDataset(remoteDataset) == null)
+			return;
 		
 		try {
 			DataConfig config = remoteDataset.remoteGetConfig();
-			config.put(DatasetAbstract.ONLY_MEMORY_FIELD, true);
+			if (config == null) return;
 			
-			InetAddress ia = NetUtil.getLocalInetAddress();
-			if (ia != null)
-				config.put(DatasetAbstract.INET_ADDR_FIELD, ia.getHostAddress());
+			if (!config.containsKey(DatasetAbstract.ONLY_MEMORY_FIELD))
+				config.put(DatasetAbstract.ONLY_MEMORY_FIELD, true);
+			
+			if (Constants.hardwareAddress != null && Constants.hostAddress != null &&
+					!config.containsKey(DatasetAbstract.HARDWARE_ADDR_FIELD) &&
+					!config.containsKey(DatasetAbstract.HOST_ADDR_FIELD)) {
+				config.put(DatasetAbstract.HARDWARE_ADDR_FIELD, Constants.hardwareAddress);
+				config.put(DatasetAbstract.HOST_ADDR_FIELD, Constants.hostAddress);
+			}
 		}
 		catch (Exception e) {
 			e.printStackTrace();

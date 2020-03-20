@@ -21,11 +21,6 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.Enumeration;
 import java.util.Random;
 
-import net.hudup.core.Constants;
-import net.hudup.core.data.DataConfig;
-import net.hudup.core.data.DatasetAbstract;
-import net.hudup.core.data.NullPointer;
-
 /**
  * This final class provides utility static methods for network programming. Some methods in this class are available on internet.
  * 
@@ -134,40 +129,89 @@ public class NetUtil {
 	
 	
 	/**
-	 * Getting URI representative text form of URI identifier.
-	 * @param config specified configuration.
-	 * @return URI representative text form of URI identifier.
+	 * This class represents internet address and hardware address.
+	 * @author Loc Nguyen
+	 * @version 13
 	 */
-	public static String getUriIdTextInformal(DataConfig config) {
-		if (config == null) return NullPointer.NULL_POINTER;
-
-		xURI uriId = config.getUriId();
-		if (!config.containsKey(DatasetAbstract.INET_ADDR_FIELD)) {
-			if (uriId != null)
-				return uriId.toString();
+	public static class InetHardware {
+		
+		/**
+		 * Network interface.
+		 */
+		public NetworkInterface ni = null;
+		
+		/**
+		 * Internet address.
+		 */
+		public InetAddress inetAddr = null;
+		
+		/**
+		 * Getting host address.
+		 */
+		public String getHostAddress() {
+			if (inetAddr == null)
+				return null;
 			else
-				return NullPointer.NULL_POINTER;
+				return inetAddr.getHostAddress();
 		}
-		else {
+		
+		/**
+		 * Getting MAC address. Refer to <a href="https://stackoverflow.com/questions/6164167/get-mac-address-on-local-machine-with-java">https://stackoverflow.com/questions/6164167/get-mac-address-on-local-machine-with-java</a>
+		 * @return MAC address.
+		 */
+		public String getMACAddress() {
+			if (ni == null) return null;
+			
 			try {
-				String addr = config.getAsString(DatasetAbstract.INET_ADDR_FIELD);
-				InetAddress iaCurrent = getLocalInetAddress();
-				if (iaCurrent != null && addr != null && !iaCurrent.getHostAddress().equals(addr)) {
-					String lastName = uriId != null ? uriId.getLastName() : null;
-					String uriText = "hdp://" + addr + ":" + Constants.DEFAULT_SERVER_PORT + "/somewhere";
-					uriText = lastName != null && !lastName.isEmpty() ? uriText + "/" + lastName : uriText;
-					return uriText;
-				}
-				else if (uriId != null)
-					return uriId.toString();
-				else
-					return NullPointer.NULL_POINTER;
+				byte[] mac = ni.getHardwareAddress();
+				if (mac == null) return null;
+				
+				StringBuilder txtMac = new StringBuilder();
+	            for (int i = 0; i < mac.length; i++) {
+	            	txtMac.append(String.format("%02X%s", mac[i], (i < mac.length - 1) ? ":" : ""));;
+	            }
+	            
+	            return txtMac.toString();
 			}
 			catch (Exception e) {
 				e.printStackTrace();
-				return NullPointer.NULL_POINTER;
+				return null;
 			}
 		}
+	}
+	
+	
+	/**
+	 * Getting internet and hardware addresses.
+	 * @return internet and hardware addresses.
+	 */
+	public static InetHardware getInetHardware() {
+		Enumeration<NetworkInterface> nis = null;
+		
+        try {
+            nis = NetworkInterface.getNetworkInterfaces();
+        } 
+        catch (Exception e) {
+            return null;
+        }
+
+        while (nis.hasMoreElements()) {
+            NetworkInterface ni = nis.nextElement();
+            Enumeration<InetAddress> addrs = ni.getInetAddresses();
+            while (addrs.hasMoreElements()) {
+                InetAddress addr = addrs.nextElement();
+                if (!addr.isLoopbackAddress() && addr.isSiteLocalAddress()
+                        && addr.getHostAddress().indexOf(":") == -1 ) {
+                	
+                	InetHardware ih = new InetHardware();
+                	ih.ni = ni;
+                	ih.inetAddr = addr;
+                    return ih;
+                }
+            }
+        }
+        
+        return null;
 	}
 	
 	
@@ -592,7 +636,7 @@ public class NetUtil {
 	 * @param args arguments.
 	 */
 	public static void main(String[] args) {
-		System.out.println(getLocalInetAddress());
+		System.out.println(getInetHardware().getMACAddress());
 	}
 	
 	
