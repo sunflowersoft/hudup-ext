@@ -23,6 +23,7 @@ import net.hudup.core.data.Exportable;
 import net.hudup.core.logistic.AgentSupport;
 import net.hudup.core.logistic.CounterElapsedTimeListener;
 import net.hudup.core.logistic.RemoteRunner;
+import net.hudup.core.logistic.Timestamp;
 
 /**
  * {@code Evaluator} is one of main objects of Hudup framework, which is responsible for executing and evaluation algorithms according to built-in and user-defined metrics.
@@ -290,10 +291,11 @@ public interface Evaluator extends Remote, RemoteRunner, SetupAlgListener, Expor
     /**
      * Updating resulted dataset pool.
      * @param pool specified dataset pool.
+     * @param timestamp time stamp.
      * @return true if successful.
      * @throws RemoteException if any error raises.
      */
-    boolean updatePool(DatasetPoolExchanged pool) throws RemoteException;
+    boolean updatePool(DatasetPoolExchanged pool, Timestamp timestamp) throws RemoteException;
     
     
     /**

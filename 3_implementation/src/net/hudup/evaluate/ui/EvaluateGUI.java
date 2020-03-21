@@ -70,6 +70,7 @@ import net.hudup.core.logistic.DSUtil;
 import net.hudup.core.logistic.I18nUtil;
 import net.hudup.core.logistic.Inspector;
 import net.hudup.core.logistic.LogUtil;
+import net.hudup.core.logistic.Timestamp;
 import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.xURI;
 import net.hudup.core.logistic.ui.TextField;
@@ -517,7 +518,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 					// TODO Auto-generated method stub
 					boolean ret = true;
 					try {
-						ret = evaluator.updatePool(toDatasetPoolExchangedClient(guiData.pool));
+						ret = evaluator.updatePool(toDatasetPoolExchangedClient(guiData.pool), null);
 					} catch (Exception ex) {ex.printStackTrace();}
 					
 					if (ret) {
@@ -1033,7 +1034,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			guiData.pool.add(new DatasetPair(dataset, txtTestingBrowse.getDataset()));
 			if (bindUri == null) {
 				try {
-					evaluator.updatePool(toDatasetPoolExchangedClient(guiData.pool));
+					evaluator.updatePool(toDatasetPoolExchangedClient(guiData.pool), null);
 				} catch (Throwable e) {e.printStackTrace();}
 			}
 			else {
@@ -1072,7 +1073,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			guiData.pool = pool;
 			if (bindUri == null) {
 				try {
-					evaluator.updatePool(toDatasetPoolExchangedClient(guiData.pool));
+					evaluator.updatePool(toDatasetPoolExchangedClient(guiData.pool), null);
 				} catch (Throwable e) {e.printStackTrace();}
 			}
 			else {
@@ -1160,7 +1161,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			guiData.pool.add(new DatasetPair(txtTrainingBrowse.getDataset(), dataset));
 			if (bindUri == null) {
 				try {
-					evaluator.updatePool(toDatasetPoolExchangedClient(guiData.pool));
+					evaluator.updatePool(toDatasetPoolExchangedClient(guiData.pool), null);
 				} catch (Throwable e) {e.printStackTrace();}
 			}
 			else {
@@ -1204,7 +1205,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			
 			if (bindUri == null) {
 				try {
-					evaluator.updatePool(null);
+					evaluator.updatePool(null, null);
 				} catch (Throwable e) {e.printStackTrace();}
 			}
 			else {
@@ -1271,7 +1272,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			clearResult();
 			boolean started = false;
 			if (bindUri == null)
-				started = evaluator.remoteStart0(algList, toDatasetPoolExchangedClient(pool), null);
+				started = evaluator.remoteStart0(algList, toDatasetPoolExchangedClient(pool), this.timestamp = new Timestamp());
 			else
 				started = evaluator.remoteStart(AlgList.getAlgNameList(algList), toDatasetPoolExchangedClient(pool), null);
 			if (!started) updateMode();
@@ -1289,25 +1290,31 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 	public synchronized void receivedEvaluator(EvaluatorEvent evt) throws RemoteException {
 		// TODO Auto-generated method stub
 		if (evt.getType() == EvaluatorEvent.Type.start || evt.getType() == EvaluatorEvent.Type.update_pool) {
+			Timestamp timestamp = evt.getTimestamp();
+
 			if (evt.getType() == EvaluatorEvent.Type.start) {
-				String algName = evt.getOtherResult().algName;
-				if (algName != null)
-					cmbAlgs.setDefaultSelected(algName);
+				if (timestamp == null || this.timestamp == null || bindUri != null || !this.timestamp.equals(timestamp)) {
+					String algName = evt.getOtherResult().algName;
+					if (algName != null)
+						cmbAlgs.setDefaultSelected(algName);
+				}
 			}
 
-			guiData.pool = evt.getPoolResult().toDatasetPoolClient();
-			guiData.pool = guiData.pool != null ? guiData.pool : new DatasetPool();
-			
-			if (guiData.pool.size() > 0) {
-				txtTrainingBrowse.setDataset(guiData.pool.get(0).getTraining(), bindUri == null);
-				txtTestingBrowse.setDataset(guiData.pool.get(0).getTesting(), bindUri == null);
-			}
-			else {
-				txtTrainingBrowse.setDataset(null, bindUri == null);
-				txtTestingBrowse.setDataset(null, bindUri == null);
+			if (timestamp == null || this.timestamp == null || bindUri != null || !this.timestamp.equals(timestamp)) {
+				guiData.pool = evt.getPoolResult().toDatasetPoolClient();
+				guiData.pool = guiData.pool != null ? guiData.pool : new DatasetPool();
+				if (guiData.pool.size() > 0) {
+					txtTrainingBrowse.setDataset(guiData.pool.get(0).getTraining(), bindUri == null);
+					txtTestingBrowse.setDataset(guiData.pool.get(0).getTesting(), bindUri == null);
+				}
+				else {
+					txtTrainingBrowse.setDataset(null, bindUri == null);
+					txtTestingBrowse.setDataset(null, bindUri == null);
+				}
 			}
 			
 			updateMode();
+			this.timestamp = null;
 		}
 		else if (evt.getType() == EvaluatorEvent.Type.pause ||
 				evt.getType() == EvaluatorEvent.Type.resume || 

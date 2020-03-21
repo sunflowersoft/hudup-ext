@@ -104,7 +104,7 @@ public class EvaluatorEvent extends EventObject {
 	 * @param type type of this event.
 	 */
 	public EvaluatorEvent(Evaluator evaluator, Type type) {
-		this(evaluator, type, null, null);
+		this(evaluator, type, null, null, null);
 	}
 
 	
@@ -115,7 +115,7 @@ public class EvaluatorEvent extends EventObject {
 	 * @param otherResult evaluation information as other result.
 	 */
 	public EvaluatorEvent(Evaluator evaluator, Type type, EvaluateInfo otherResult) {
-		this(evaluator, type, otherResult, null);
+		this(evaluator, type, otherResult, null, null);
 	}
 
 	
@@ -127,12 +127,26 @@ public class EvaluatorEvent extends EventObject {
 	 * @param poolResult specified pool result.
 	 */
 	public EvaluatorEvent(Evaluator evaluator, Type type, EvaluateInfo otherResult, DatasetPoolExchanged poolResult) {
+		this(evaluator, type, otherResult, poolResult, null);
+	}
+	
+	
+	/**
+	 * Constructor with specified evaluator, evaluation information, and time stamp. 
+	 * @param evaluator specified evaluator. This evaluator is invalid in remote call.
+	 * @param type specified type of evaluation event.
+	 * @param otherResult evaluation information as other result.
+	 * @param poolResult specified pool result.
+	 * @param timestamp times tamp.
+	 */
+	public EvaluatorEvent(Evaluator evaluator, Type type, EvaluateInfo otherResult, DatasetPoolExchanged poolResult, Timestamp timestamp) {
 		super(evaluator); //Test different hosts for RMI, evaluator wrapper can solve.
 		this.type = type;
 		this.otherResult = otherResult;
 		this.poolResult = poolResult;
+		this.timestamp = timestamp;
 	}
-	
+
 	
 	/**
 	 * Getting evaluator. This method is invalid in remote call.

@@ -46,6 +46,7 @@ import net.hudup.core.logistic.DSUtil;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.NetUtil;
 import net.hudup.core.logistic.SystemUtil;
+import net.hudup.core.logistic.Timestamp;
 import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.xURI;
 import net.hudup.core.logistic.ui.ProgressEvent;
@@ -284,11 +285,15 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 		this.counter.stop();
 		this.counter.start();
 
+		Timestamp timestamp = null;
+		if (parameter != null && parameter instanceof Timestamp)
+			timestamp = (Timestamp)parameter;
 		fireEvaluatorEvent(new EvaluatorEvent(
 				this, 
 				EvaluatorEvent.Type.start,
 				this.otherResult,
-				this.poolResult));
+				this.poolResult,
+				timestamp));
 		
 		return true;
 	}
@@ -850,7 +855,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 	
 	
 	@Override
-	public synchronized boolean updatePool(DatasetPoolExchanged pool) throws RemoteException {
+	public synchronized boolean updatePool(DatasetPoolExchanged pool, Timestamp timestamp) throws RemoteException {
 		// TODO Auto-generated method stub
 		if (isStarted() || this.pool != null) {
 			LogUtil.error("Evaluator is running and so it cannot update pool");
@@ -864,7 +869,8 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 					this, 
 					EvaluatorEvent.Type.update_pool,
 					this.otherResult,
-					this.poolResult));
+					this.poolResult,
+					timestamp));
 			return true;
 		}
 		else

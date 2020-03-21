@@ -16,9 +16,12 @@ import java.awt.event.ActionListener;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 
+import net.hudup.core.Constants;
 import net.hudup.core.logistic.I18nUtil;
 import net.hudup.core.logistic.LogUtil;
+import net.hudup.core.logistic.NetUtil;
 import net.hudup.core.logistic.xURI;
+import net.hudup.core.logistic.NetUtil.InetHardware;
 import net.hudup.core.logistic.ui.LoginDlg;
 import net.hudup.core.logistic.ui.UIUtil;
 import net.hudup.evaluate.ui.EvaluatorCP;
@@ -57,6 +60,30 @@ public class DefaultServerExt extends DefaultServer {
 	protected DefaultService createService() {
 		// TODO Auto-generated method stub
 		return new DefaultServiceExt(trans);
+	}
+
+
+	@Override
+	protected void doWhenStart() {
+		// TODO Auto-generated method stub
+		super.doWhenStart();
+		
+		try {
+			InetHardware ih = NetUtil.getInetHardware();
+			if (ih != null && ih.ni != null && ih.inetAddr != null) {
+				Constants.hardwareAddress = ih.getMACAddress();
+				Constants.hostAddress = ih.inetAddr.getHostAddress();
+			}
+			if (Constants.hardwareAddress == null || Constants.hostAddress == null) {
+				Constants.hardwareAddress = null;
+				Constants.hostAddress = null;
+			}
+		}
+		catch (Throwable e) {
+			LogUtil.error("Error when getting MAC and host addresses");
+			Constants.hardwareAddress = null;
+			Constants.hostAddress = null;
+		}
 	}
 
 

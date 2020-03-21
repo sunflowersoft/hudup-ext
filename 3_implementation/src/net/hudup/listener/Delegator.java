@@ -50,6 +50,7 @@ import net.hudup.core.logistic.DSUtil;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.NetUtil;
 import net.hudup.core.logistic.NextUpdate;
+import net.hudup.core.logistic.Timestamp;
 import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.xURI;
 import net.hudup.core.logistic.ui.ProgressEvent;
@@ -1090,9 +1091,9 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluateListen
 
 
 	@Override
-	public boolean updatePool(DatasetPoolExchanged pool) throws RemoteException {
+	public boolean updatePool(DatasetPoolExchanged pool, Timestamp timestamp) throws RemoteException {
 		// TODO Auto-generated method stub
-		return remoteEvaluator.updatePool(pool);
+		return remoteEvaluator.updatePool(pool, timestamp);
 	}
 
 	

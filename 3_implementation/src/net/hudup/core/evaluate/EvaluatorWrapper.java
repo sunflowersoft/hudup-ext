@@ -24,6 +24,7 @@ import net.hudup.core.logistic.CounterElapsedTimeListener;
 import net.hudup.core.logistic.DSUtil;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.NetUtil;
+import net.hudup.core.logistic.Timestamp;
 
 /**
  * This class is wrapper of remote evaluator.
@@ -317,9 +318,9 @@ public class EvaluatorWrapper implements Evaluator, Serializable {
 
 	
 	@Override
-	public boolean updatePool(DatasetPoolExchanged pool) throws RemoteException {
+	public boolean updatePool(DatasetPoolExchanged pool, Timestamp timestamp) throws RemoteException {
 		// TODO Auto-generated method stub
-		return remoteEvaluator.updatePool(pool);
+		return remoteEvaluator.updatePool(pool, timestamp);
 	}
 
 

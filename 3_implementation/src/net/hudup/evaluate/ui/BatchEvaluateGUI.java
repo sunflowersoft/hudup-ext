@@ -60,6 +60,7 @@ import net.hudup.core.logistic.CounterElapsedTimeEvent;
 import net.hudup.core.logistic.DSUtil;
 import net.hudup.core.logistic.I18nUtil;
 import net.hudup.core.logistic.LogUtil;
+import net.hudup.core.logistic.Timestamp;
 import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.xURI;
 import net.hudup.core.logistic.ui.SortableSelectableTable;
@@ -459,7 +460,8 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 					
 					if (bindUri == null) {
 						try {
-							evaluator.updatePool(toDatasetPoolExchangedClient(guiData.pool));
+							evaluator.updatePool(toDatasetPoolExchangedClient(guiData.pool),
+									getThisGUI().timestamp = new Timestamp());
 						} catch (Throwable e) {e.printStackTrace();}
 					}
 					else {
@@ -558,9 +560,11 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					// TODO Auto-generated method stub
+					if (bindUri == null) return;
+					
 					boolean ret = true;
 					try {
-						ret = evaluator.updatePool(toDatasetPoolExchangedClient(guiData.pool));
+						ret = evaluator.updatePool(toDatasetPoolExchangedClient(guiData.pool), null);
 					} catch (Exception ex) {ex.printStackTrace();}
 					
 					if (ret) {
@@ -594,6 +598,8 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					// TODO Auto-generated method stub
+					if (bindUri == null) return;
+
 					DatasetPoolExchanged poolResult = null;
 					try {
 						poolResult = evaluator.getDatasetPool();
@@ -1029,7 +1035,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 
 			if (bindUri == null) {
 				try {
-					evaluator.updatePool(null);
+					evaluator.updatePool(null, null);
 				} catch (Throwable e) {e.printStackTrace();}
 			}
 			else {
@@ -1064,7 +1070,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			clearResult();
 			boolean started = false;
 			if (bindUri == null)
-				started = evaluator.remoteStart0(lbAlgs.getAlgList(), toDatasetPoolExchangedClient(guiData.pool), null);
+				started = evaluator.remoteStart0(lbAlgs.getAlgList(), toDatasetPoolExchangedClient(guiData.pool), this.timestamp = new Timestamp());
 			else
 				started = evaluator.remoteStart(lbAlgs.getAlgNameList(), toDatasetPoolExchangedClient(guiData.pool), null);
 			if (!started) updateMode();
@@ -1081,20 +1087,26 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 	public synchronized void receivedEvaluator(EvaluatorEvent evt) throws RemoteException {
 		// TODO Auto-generated method stub
 		if (evt.getType() == EvaluatorEvent.Type.start || evt.getType() == EvaluatorEvent.Type.update_pool) {
+			Timestamp timestamp = evt.getTimestamp();
+			
 			if (evt.getType() == EvaluatorEvent.Type.start) {
-				List<String> algNames = evt.getOtherResult().algNames;
-				if (algNames != null && algNames.size() > 0)
-					lbAlgs.update(algRegTable.getAlgList(algNames));
-				else
-					lbAlgs.update(algRegTable.getAlgList());
+				if (timestamp == null || this.timestamp == null || bindUri != null || !this.timestamp.equals(timestamp)) {
+					List<String> algNames = evt.getOtherResult().algNames;
+					if (algNames != null && algNames.size() > 0)
+						lbAlgs.update(algRegTable.getAlgList(algNames));
+					else
+						lbAlgs.update(algRegTable.getAlgList());
+				}
 			}
 			
-			guiData.pool = evt.getPoolResult().toDatasetPoolClient();
-			guiData.pool = guiData.pool != null ? guiData.pool : new DatasetPool();
-			
-			tblDatasetPool.update(guiData.pool);
+			if (timestamp == null || this.timestamp == null || bindUri != null || !this.timestamp.equals(timestamp)) {
+				guiData.pool = evt.getPoolResult().toDatasetPoolClient();
+				guiData.pool = guiData.pool != null ? guiData.pool : new DatasetPool();
+				tblDatasetPool.update(guiData.pool);
+			}
 			
 			updateMode();
+			this.timestamp = null;
 		}
 		else if (evt.getType() == EvaluatorEvent.Type.pause ||
 				evt.getType() == EvaluatorEvent.Type.resume || 
@@ -1417,7 +1429,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			clearResult();
 			if (bindUri == null) {
 				try {
-					evaluator.updatePool(toDatasetPoolExchangedClient(guiData.pool));
+					evaluator.updatePool(toDatasetPoolExchangedClient(guiData.pool), null);
 				} catch (Throwable e) {e.printStackTrace();}
 				
 			}
@@ -1534,7 +1546,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			
 			if (bindUri == null) {
 				try {
-					evaluator.updatePool(toDatasetPoolExchangedClient(guiData.pool));
+					evaluator.updatePool(toDatasetPoolExchangedClient(guiData.pool), null);
 				} catch (Throwable e) {e.printStackTrace();}
 			}
 			else {
@@ -1590,8 +1602,8 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 	 */
 	private void updateGUI() {
 		try {
-			validate(); //This code line can be removed.
-			updateUI();
+//			validate(); //This code line can be removed.
+//			updateUI();
 		}
 		catch (Throwable e) {
 			e.printStackTrace();
