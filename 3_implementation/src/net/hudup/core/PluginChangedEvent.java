@@ -11,6 +11,7 @@ import java.util.EventObject;
 import java.util.List;
 
 import net.hudup.core.alg.Alg;
+import net.hudup.core.logistic.ui.PluginStorageManifest;
 
 /**
  * {@link PluginStorage} manages many {@link RegisterTable} (s) and each {@link RegisterTable} stores algorithms having the same type.

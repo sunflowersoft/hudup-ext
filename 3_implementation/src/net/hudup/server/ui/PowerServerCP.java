@@ -56,6 +56,8 @@ import net.hudup.core.data.ui.UnitTable.SelectionChangedEvent;
 import net.hudup.core.data.ui.UnitTable.SelectionChangedListener;
 import net.hudup.core.logistic.I18nUtil;
 import net.hudup.core.logistic.xURI;
+import net.hudup.core.logistic.ui.PluginStorageManifestPanel;
+import net.hudup.core.logistic.ui.PluginStorageManifestPanelRemote;
 import net.hudup.core.logistic.ui.UIUtil;
 import net.hudup.data.DatasetUtil2;
 import net.hudup.data.ProviderImpl;
@@ -348,7 +350,30 @@ public class PowerServerCP extends JFrame implements ServerStatusListener, Plugi
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					SysConfigDlgExt cfg = new SysConfigDlgExt(general, I18nUtil.message("system_configure"), getThisPowerServerCP());
+					SysConfigDlgExt cfg = new SysConfigDlgExt(general, I18nUtil.message("system_configure"), getThisPowerServerCP()) {
+
+						/**
+						 * Serial version UID for serializable class. 
+						 */
+						private static final long serialVersionUID = 1L;
+						
+						@Override
+						protected PluginStorageManifestPanel createPluginStorageManifest(Object... vars) {
+							// TODO Auto-generated method stub
+							if (bRemote) {
+								if (vars.length == 0)
+									return new PluginStorageManifestPanelRemote(server, null);
+								else if (vars[0] instanceof PluginChangedListener)
+									return new PluginStorageManifestPanelRemote(server, (PluginChangedListener)vars[0]);
+								else
+									return new PluginStorageManifestPanelRemote(server, null);
+							}
+							else
+								return super.createPluginStorageManifest(vars);
+						}
+						
+					};
+					
 					cfg.removeSysConfigPane();
 					try {
 						cfg.getPluginStorageManifest().setEnabled(!server.isStarted());
@@ -949,7 +974,7 @@ public class PowerServerCP extends JFrame implements ServerStatusListener, Plugi
 			btnPauseResume.setEnabled(true && !bRemote);
 			btnPauseResume.setText("Pause");
 			btnStop.setEnabled(true);
-			btnSystem.setEnabled(true && !bRemote);
+			btnSystem.setEnabled(true /*&& !bRemote*/);
 			
 			btnApplyConfig.setEnabled(false);
 			btnResetConfig.setEnabled(false);
@@ -986,7 +1011,7 @@ public class PowerServerCP extends JFrame implements ServerStatusListener, Plugi
 			btnPauseResume.setEnabled(true && !bRemote);
 			btnPauseResume.setText("Resume");
 			btnStop.setEnabled(true);
-			btnSystem.setEnabled(true && !bRemote);
+			btnSystem.setEnabled(true /*&& !bRemote*/);
 			
 			btnApplyConfig.setEnabled(false);
 			btnResetConfig.setEnabled(false);
@@ -1008,7 +1033,7 @@ public class PowerServerCP extends JFrame implements ServerStatusListener, Plugi
 			btnPauseResume.setEnabled(false);
 			btnPauseResume.setText("Pause");
 			btnStop.setEnabled(false);
-			btnSystem.setEnabled(true && !bRemote);
+			btnSystem.setEnabled(true /*&& !bRemote*/);
 			
 			btnApplyConfig.setEnabled(true);
 			btnResetConfig.setEnabled(true);

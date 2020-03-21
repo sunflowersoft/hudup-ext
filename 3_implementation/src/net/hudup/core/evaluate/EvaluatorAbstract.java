@@ -882,7 +882,6 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 		this.poolResult = returnedPool.toDatasetPoolExchanged();
 		this.poolResult.export(config.getEvaluatorPort(), false);
 		
-		//System.runFinalization();
 		return returnedPool;
 	}
 	

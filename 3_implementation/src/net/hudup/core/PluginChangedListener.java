@@ -9,6 +9,8 @@ package net.hudup.core;
 
 import java.util.EventListener;
 
+import net.hudup.core.logistic.ui.PluginStorageManifest;
+
 /**
  * {@link PluginStorage} manages many {@link RegisterTable} (s) and each {@link RegisterTable} stores algorithms having the same type.
  * For example, a register table manages recommendation algorithms (recommenders) whereas another manages metrics for evaluating recommenders.

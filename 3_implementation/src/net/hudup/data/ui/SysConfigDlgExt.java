@@ -20,10 +20,10 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
 import net.hudup.core.PluginChangedListener;
-import net.hudup.core.PluginStorageManifest.PluginStorageManifestPanel;
 import net.hudup.core.data.DataDriverList;
 import net.hudup.core.data.ui.DataDriverListTable;
 import net.hudup.core.data.ui.SysConfigPane;
+import net.hudup.core.logistic.ui.PluginStorageManifestPanel;
 import net.hudup.logistic.SystemPropertiesPane;
 
 /**
@@ -111,10 +111,7 @@ public class SysConfigDlgExt extends SysConfigDlg {
 		paneSysConfig.hideOkCancel();
 		body.add("Configuration", paneSysConfig);
 		
-		if (vars.length == 0)
-			paneRegister = new PluginStorageManifestPanel(null);
-		else if (vars[0] instanceof PluginChangedListener)
-			paneRegister = new PluginStorageManifestPanel((PluginChangedListener)vars[0]);
+		paneRegister = createPluginStorageManifest(vars);
 		body.add("Plugins", paneRegister);
 		
 		paneDataDriverList = DataDriverListTable.createPane(DataDriverList.get());
@@ -139,6 +136,21 @@ public class SysConfigDlgExt extends SysConfigDlg {
 		
 	}
 
+	
+	/**
+	 * Creating plug-in storage manifest.
+	 * @param vars additional parameters.
+	 * @return plug-in storage manifest.
+	 */
+	protected PluginStorageManifestPanel createPluginStorageManifest(Object...vars) {
+		if (vars.length == 0)
+			return new PluginStorageManifestPanel(null);
+		else if (vars[0] instanceof PluginChangedListener)
+			return new PluginStorageManifestPanel((PluginChangedListener)vars[0]);
+		else
+			return new PluginStorageManifestPanel(null);
+	}
+	
 	
 	/**
 	 * Removing system configuration panel.

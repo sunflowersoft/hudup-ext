@@ -1293,16 +1293,16 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 //			Timestamp timestamp = evt.getTimestamp();
 
 			if (evt.getType() == EvaluatorEvent.Type.start) {
-				if (timestamp == null || this.timestamp == null || bindUri != null || !this.timestamp.equals(timestamp)) {
+//				if (timestamp == null || this.timestamp == null || bindUri != null || !this.timestamp.equals(timestamp)) {
 					String algName = evt.getOtherResult().algName;
 					if (algName != null) {
 						updateAlgRegFromRemoteEvaluator(Arrays.asList(algName));
 						cmbAlgs.setDefaultSelected(algName);
 					}
-				}
+//				}
 			}
 
-			if (timestamp == null || this.timestamp == null || bindUri != null || !this.timestamp.equals(timestamp)) {
+//			if (timestamp == null || this.timestamp == null || bindUri != null || !this.timestamp.equals(timestamp)) {
 				guiData.pool = evt.getPoolResult().toDatasetPoolClient();
 				guiData.pool = guiData.pool != null ? guiData.pool : new DatasetPool();
 				if (guiData.pool.size() > 0) {
@@ -1313,7 +1313,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 					txtTrainingBrowse.setDataset(null, bindUri == null);
 					txtTestingBrowse.setDataset(null, bindUri == null);
 				}
-			}
+//			}
 			
 			updateMode();
 			this.timestamp = null;
