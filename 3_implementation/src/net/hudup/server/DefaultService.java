@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import net.hudup.core.ExtraStorage;
 import net.hudup.core.PluginStorage;
 import net.hudup.core.Util;
 import net.hudup.core.alg.Alg;
@@ -1561,8 +1560,9 @@ public class DefaultService implements Service, AutoCloseable {
 				
 				remoteAlg.export(serverConfig.getServerPort());
 				alg = Util.getPluginManager().wrap(remoteAlg, false);
-				if (!singleton)
-					ExtraStorage.addUnmanagedExportedObject(remoteAlg);
+				//Finalize method will unexport exported algorithms.
+//				if (!singleton)
+//					ExtraStorage.addUnmanagedExportedObject(remoteAlg);
 			}
 		}
 		catch (Throwable e) {

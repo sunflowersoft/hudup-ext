@@ -311,6 +311,13 @@ public class EvaluatorWrapper implements Evaluator, Serializable {
 
 
 	@Override
+	public Alg getEvaluatedAlg(String algName, boolean remote) throws RemoteException {
+		// TODO Auto-generated method stub
+		return remoteEvaluator.getEvaluatedAlg(algName, remote);
+	}
+
+
+	@Override
 	public void addEvaluatorListener(EvaluatorListener listener) throws RemoteException {
 		// TODO Auto-generated method stub
 		remoteEvaluator.addEvaluatorListener(listener);

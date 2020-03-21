@@ -36,8 +36,10 @@ import javax.swing.table.DefaultTableModel;
 
 import net.hudup.core.Constants;
 import net.hudup.core.PluginChangedEvent;
+import net.hudup.core.PluginStorage;
 import net.hudup.core.RegisterTable;
 import net.hudup.core.alg.Alg;
+import net.hudup.core.alg.DuplicatableAlg;
 import net.hudup.core.alg.SetupAlgEvent;
 import net.hudup.core.alg.ui.AlgListBox;
 import net.hudup.core.alg.ui.AlgListBox.AlgListChangedEvent;
@@ -353,11 +355,29 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 				// TODO Auto-generated method stub
 				super.addToContextMenu(contextMenu);
 				
-		    	final int selectedRow = getSelectedIndex();
-		    	if (selectedRow == -1) return;
+		    	final Alg selectedAlg = getSelectedAlg();
+		    	if (selectedAlg == null) return;
 				
+		    	if ((selectedAlg instanceof DuplicatableAlg) && 
+		    			!(PluginStorage.getNormalAlgReg().contains(selectedAlg.getName())) &&
+		    			algRegTable.contains(selectedAlg.getName())) {
+			    	
+		    		contextMenu.addSeparator();
+					JMenuItem miDiscard = UIUtil.makeMenuItem((String)null, "Discard algorithm", 
+						new ActionListener() {
+							
+							@Override
+							public void actionPerformed(ActionEvent e) {
+								algRegTable.unregister(selectedAlg.getName());
+								lbAlgs.remove(selectedAlg);
+								
+								updateMode();
+							}
+						});
+					contextMenu.add(miDiscard);
+		    	}
+
 		    	contextMenu.addSeparator();
-		    	
 				JMenuItem miTraining = UIUtil.makeMenuItem((String)null, "Add training", 
 					new ActionListener() {
 						
@@ -416,17 +436,17 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 				public void actionPerformed(ActionEvent e) {
 					// TODO Auto-generated method stub
 					
-					List<Alg> list = lbAlgs.getAlgList();
-					if (list.size() == 0) {
-						JOptionPane.showMessageDialog(
-								getThisGUI(), 
-								"List empty", 
-								"List empty", 
-								JOptionPane.ERROR_MESSAGE);
-						
-						return;
-						
-					}
+//					List<Alg> list = lbAlgs.getAlgList();
+//					if (list.size() == 0) {
+//						JOptionPane.showMessageDialog(
+//								getThisGUI(), 
+//								"List empty", 
+//								"List empty", 
+//								JOptionPane.ERROR_MESSAGE);
+//						
+//						return;
+//						
+//					}
 					
 					AlgListChooser dlg = new AlgListChooser(getThisGUI(), algRegTable.getAlgList(), lbAlgs.getAlgList());
 					if (!dlg.isOK())
@@ -1087,23 +1107,25 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 	public synchronized void receivedEvaluator(EvaluatorEvent evt) throws RemoteException {
 		// TODO Auto-generated method stub
 		if (evt.getType() == EvaluatorEvent.Type.start || evt.getType() == EvaluatorEvent.Type.update_pool) {
-			Timestamp timestamp = evt.getTimestamp();
+//			Timestamp timestamp = evt.getTimestamp();
 			
 			if (evt.getType() == EvaluatorEvent.Type.start) {
-				if (timestamp == null || this.timestamp == null || bindUri != null || !this.timestamp.equals(timestamp)) {
+//				if (timestamp == null || this.timestamp == null || bindUri != null || !this.timestamp.equals(timestamp)) {
 					List<String> algNames = evt.getOtherResult().algNames;
-					if (algNames != null && algNames.size() > 0)
+					if (algNames != null && algNames.size() > 0) {
+						updateAlgRegFromRemoteEvaluator(algNames);
 						lbAlgs.update(algRegTable.getAlgList(algNames));
+					}
 					else
 						lbAlgs.update(algRegTable.getAlgList());
-				}
+//				}
 			}
 			
-			if (timestamp == null || this.timestamp == null || bindUri != null || !this.timestamp.equals(timestamp)) {
+//			if (timestamp == null || this.timestamp == null || bindUri != null || !this.timestamp.equals(timestamp)) {
 				guiData.pool = evt.getPoolResult().toDatasetPoolClient();
 				guiData.pool = guiData.pool != null ? guiData.pool : new DatasetPool();
 				tblDatasetPool.update(guiData.pool);
-			}
+//			}
 			
 			updateMode();
 			this.timestamp = null;

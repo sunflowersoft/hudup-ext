@@ -187,4 +187,13 @@ public class SysConfigDlgExt extends SysConfigDlg {
 	}
 	
 	
+	/**
+	 * Getting plug-in storage manifest.
+	 * @return plug-in storage manifest.
+	 */
+	public PluginStorageManifestPanel getPluginStorageManifest() {
+		return paneRegister;
+	}
+	
+	
 }

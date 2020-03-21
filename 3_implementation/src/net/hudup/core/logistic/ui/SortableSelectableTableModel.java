@@ -26,6 +26,12 @@ public class SortableSelectableTableModel extends DefaultTableModel {
 	
 	
 	/**
+	 * Editable flag.
+	 */
+	protected boolean editable = true;
+	
+	
+	/**
 	 * Default constructor.
 	 */
 	public SortableSelectableTableModel() {
@@ -58,4 +64,22 @@ public class SortableSelectableTableModel extends DefaultTableModel {
 	}
 
 
+	/**
+	 * Checking whether this table is editable.
+	 * @return whether this table is editable.
+	 */
+	public boolean isEditable() {
+		return editable;
+	}
+	
+	
+	/**
+	 * Setting whether this table is editable.
+	 * @param editable editable flag.
+	 */
+	public void setEditable(boolean editable) {
+		this.editable = editable;
+	}
+	
+	
 }

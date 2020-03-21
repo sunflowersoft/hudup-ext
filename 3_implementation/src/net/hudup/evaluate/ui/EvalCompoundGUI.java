@@ -356,8 +356,8 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 		};
 		
 		cfg.update(thisConfig);
-		if ((batchEvaluateGUI.bindUri != null) || (batchEvaluateGUI.bindUri == null && agent))
-			cfg.removePluginStorageManifest();
+		if ((batchEvaluateGUI.bindUri != null) || (agent))
+			cfg.getPluginStorageManifest().setEnabled(false);
 		
 		cfg.setVisible(true);
 	}

@@ -103,6 +103,33 @@ public class SortableSelectableTable extends JTable {
 	
 	
 	/**
+	 * Checking whether this table is editable.
+	 * @return whether this table is editable.
+	 */
+	public boolean isEditable() {
+		return getSortableSelectableTableModel().isEditable();
+	}
+
+	
+	/**
+	 * Setting whether this table is editable.
+	 * @param editable editable flag.
+	 */
+	public void setEditable(boolean editable) {
+		getSortableSelectableTableModel().setEditable(editable);
+		
+    	TableColumnModel tcm = getColumnModel();
+		for (int i = 0; i < tcm.getColumnCount(); i++) {
+		    TableColumn tc = getColumnModel().getColumn(i);
+		    TableCellRenderer hr = tc.getHeaderRenderer();
+		    if ((hr != null) && (hr instanceof SelectableHeaderRenderer))
+		    	((SelectableHeaderRenderer)hr).setEnabled(editable);
+		}
+	}
+
+
+
+	/**
 	 * This interface represents listener for selecting event.
 	 * @author Loc Nguyen
 	 * @version 12.0

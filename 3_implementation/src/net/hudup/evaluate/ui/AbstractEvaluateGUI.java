@@ -214,7 +214,7 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 
 		if (referredAlg != null) {
 			try {
-				if (evaluator.acceptAlg(referredAlg))
+				if (bindUri != null && evaluator.acceptAlg(referredAlg))
 					algRegTable = new RegisterTable(Arrays.asList(referredAlg));
 			} catch (Throwable e) {e.printStackTrace();}
 		}
@@ -253,6 +253,8 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 		catch (RemoteException e) {e.printStackTrace();}
 		if (guiData.algNames == null || guiData.algNames.size() == 0)
 			guiData.algNames = algRegTable.getAlgNames();
+		else
+			updateAlgRegFromRemoteEvaluator(guiData.algNames);
 		
 		DatasetPool oldPool = guiData.pool; 
 		try {
@@ -590,6 +592,34 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 		}
 		catch (Exception e) {
 			e.printStackTrace();
+		}
+	}
+	
+	
+	/**
+	 * Update algorithm register table from list of algorithm names.
+	 * @param algNames list of algorithm names.
+	 */
+	protected void updateAlgRegFromRemoteEvaluator(List<String> algNames) {
+		if (bindUri == null || evaluator == null || algNames == null || algNames.size() == 0)
+			return;
+		
+		List<String> regAlgNames = algRegTable.getAlgNames();
+		for (String regAlgName : regAlgNames) {
+			if (!PluginStorage.getNormalAlgReg().contains(regAlgName))
+				algRegTable.unregister(regAlgName);
+		}
+		
+		for (String algName : algNames) {
+			if (algRegTable.contains(algName)) continue;
+			
+			try {
+				Alg alg = evaluator.getEvaluatedAlg(algName, true);
+				if (alg != null) algRegTable.register(alg);
+			}
+			catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
 	}
 	

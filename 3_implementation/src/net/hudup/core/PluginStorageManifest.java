@@ -113,6 +113,8 @@ public class PluginStorageManifest extends SortableSelectableTable {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				// TODO Auto-generated method stub
+				if (!isEditable()) return;
+				
 				if(SwingUtilities.isRightMouseButton(e) ) {
 					JPopupMenu contextMenu = createContextMenu();
 					if (contextMenu != null)
@@ -509,6 +511,56 @@ public class PluginStorageManifest extends SortableSelectableTable {
 		protected PluginStorageManifest tblRegister = null;
 		
 		/**
+		 * Register all button.
+		 */
+		protected JButton registerAll = null;
+
+		/**
+		 * Unregister all button.
+		 */
+		protected JButton unregisterAll = null;
+		
+		/**
+		 * Export all button.
+		 */
+		protected JButton exportAll = null;
+		
+		/**
+		 * Unexport all button.
+		 */
+		protected JButton unexportAll = null;
+		
+		/**
+		 * Remove all button.
+		 */
+		protected JButton removeAll = null;
+		
+		/**
+		 * Unremove all button.
+		 */
+		protected JButton unremoveAll = null;
+		
+		/**
+		 * Reloading button.
+		 */
+		protected JButton reloadAlg = null;
+		
+		/**
+		 * Importing button.
+		 */
+		protected JButton importAlg = null;
+		
+		/**
+		 * Applying button
+		 */
+		protected JButton apply = null;
+		
+		/**
+		 * Reseting button
+		 */
+		protected JButton reset = null;
+
+		/**
 		 * Constructor with plug-in changed listener.
 		 * @param listener plug-in changed listener.
 		 */
@@ -537,7 +589,7 @@ public class PluginStorageManifest extends SortableSelectableTable {
 			JPanel toolbar1Grp1Buttons = new JPanel();
 			toolbar1Grp1.add(toolbar1Grp1Buttons, BorderLayout.SOUTH);
 			
-			JButton registerAll = UIUtil.makeIconButton(
+			registerAll = UIUtil.makeIconButton(
 				"selectall-16x16.png", 
 				"register_all", "Register all", "Register all", 
 				new ActionListener() {
@@ -551,7 +603,7 @@ public class PluginStorageManifest extends SortableSelectableTable {
 			registerAll.setMargin(new Insets(0, 0 , 0, 0));
 			toolbar1Grp1Buttons.add(registerAll);
 
-			JButton unregisterAll = UIUtil.makeIconButton(
+			unregisterAll = UIUtil.makeIconButton(
 				"unselectall-16x16.png", 
 				"unregister_all", "Unregister all", "Unregister all", 
 				new ActionListener() {
@@ -573,7 +625,7 @@ public class PluginStorageManifest extends SortableSelectableTable {
 			JPanel toolbar1Grp2Buttons = new JPanel();
 			toolbar1Grp2.add(toolbar1Grp2Buttons, BorderLayout.SOUTH);
 
-			JButton exportAll = UIUtil.makeIconButton(
+			exportAll = UIUtil.makeIconButton(
 				"selectall-16x16.png", 
 				"export_all", "Export all", "Export all", 
 				new ActionListener() {
@@ -588,7 +640,7 @@ public class PluginStorageManifest extends SortableSelectableTable {
 			exportAll.setToolTipText("Only export normal algorithms");
 			toolbar1Grp2Buttons.add(exportAll);
 
-			JButton unexportAll = UIUtil.makeIconButton(
+			unexportAll = UIUtil.makeIconButton(
 				"unselectall-16x16.png", 
 				"unexport_all", "Unexport all", "Unexport all", 
 				new ActionListener() {
@@ -610,7 +662,7 @@ public class PluginStorageManifest extends SortableSelectableTable {
 			JPanel toolbar1Grp3Buttons = new JPanel();
 			toolbar1Grp3.add(toolbar1Grp3Buttons, BorderLayout.SOUTH);
 
-			JButton removeAll = UIUtil.makeIconButton(
+			removeAll = UIUtil.makeIconButton(
 				"selectall-16x16.png", 
 				"remove_all", "Remove all", "Remove all", 
 				new ActionListener() {
@@ -624,7 +676,7 @@ public class PluginStorageManifest extends SortableSelectableTable {
 			removeAll.setMargin(new Insets(0, 0 , 0, 0));
 			toolbar1Grp3Buttons.add(removeAll);
 
-			JButton unremoveAll = UIUtil.makeIconButton(
+			unremoveAll = UIUtil.makeIconButton(
 				"unselectall-16x16.png", 
 				"unremove_all", "Unremove all", "Unremove all", 
 				new ActionListener() {
@@ -646,7 +698,7 @@ public class PluginStorageManifest extends SortableSelectableTable {
 			toolbar2.add(toolbar2Grp1, BorderLayout.WEST);
 
 			//Reload plugin storage from built packages.
-			JButton reloadAlg = new JButton("Reload");
+			reloadAlg = new JButton("Reload");
 			reloadAlg.addActionListener(new ActionListener() {
 				
 				@Override
@@ -661,7 +713,7 @@ public class PluginStorageManifest extends SortableSelectableTable {
 			toolbar2Grp1.add(reloadAlg);
 
 			//Only import normal algorithms
-			JButton importAlg = new JButton("Import");
+			importAlg = new JButton("Import");
 			importAlg.addActionListener(new ActionListener() {
 				
 				@Override
@@ -692,7 +744,7 @@ public class PluginStorageManifest extends SortableSelectableTable {
 			JPanel toolbar2Grp2 = new JPanel();
 			toolbar2.add(toolbar2Grp2, BorderLayout.CENTER);
 			
-			JButton apply = new JButton("Apply");
+			apply = new JButton("Apply");
 			apply.addActionListener(new ActionListener() {
 				
 				@Override
@@ -703,7 +755,7 @@ public class PluginStorageManifest extends SortableSelectableTable {
 			});
 			toolbar2Grp2.add(apply);
 
-			JButton reset = new JButton("Reset");
+			reset = new JButton("Reset");
 			reset.addActionListener(new ActionListener() {
 				
 				@Override
@@ -745,6 +797,24 @@ public class PluginStorageManifest extends SortableSelectableTable {
 						JOptionPane.INFORMATION_MESSAGE);
 			}
 			return ret;
+		}
+
+		@Override
+		public void setEnabled(boolean enabled) {
+			// TODO Auto-generated method stub
+			super.setEnabled(enabled);
+			
+			tblRegister.setEditable(enabled);
+			registerAll.setEnabled(enabled);
+			unregisterAll.setEnabled(enabled);
+			exportAll.setEnabled(enabled);
+			unexportAll.setEnabled(enabled);
+			removeAll.setEnabled(enabled);
+			unremoveAll.setEnabled(enabled);
+			reloadAlg.setEnabled(enabled);
+			importAlg.setEnabled(enabled);
+			apply.setEnabled(enabled);
+			reset.setEnabled(enabled);
 		}
 		
 	}
@@ -1005,7 +1075,9 @@ class RegisterTM extends SortableSelectableTableModel {
 	@Override
 	public boolean isCellEditable(int row, int column) {
 		// TODO Auto-generated method stub
-		if (column == 4 || column == 5 || column == 6)
+		if (!isEditable())
+			return false;
+		else if (column == 4 || column == 5 || column == 6)
 			return true;
 		else
 			return false;

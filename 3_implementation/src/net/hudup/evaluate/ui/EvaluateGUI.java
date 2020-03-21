@@ -1290,13 +1290,15 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 	public synchronized void receivedEvaluator(EvaluatorEvent evt) throws RemoteException {
 		// TODO Auto-generated method stub
 		if (evt.getType() == EvaluatorEvent.Type.start || evt.getType() == EvaluatorEvent.Type.update_pool) {
-			Timestamp timestamp = evt.getTimestamp();
+//			Timestamp timestamp = evt.getTimestamp();
 
 			if (evt.getType() == EvaluatorEvent.Type.start) {
 				if (timestamp == null || this.timestamp == null || bindUri != null || !this.timestamp.equals(timestamp)) {
 					String algName = evt.getOtherResult().algName;
-					if (algName != null)
+					if (algName != null) {
+						updateAlgRegFromRemoteEvaluator(Arrays.asList(algName));
 						cmbAlgs.setDefaultSelected(algName);
+					}
 				}
 			}
 

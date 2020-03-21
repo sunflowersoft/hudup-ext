@@ -594,6 +594,13 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluateListen
 
 
 	@Override
+	public Alg getEvaluatedAlg(String algName, boolean remote) throws RemoteException {
+		// TODO Auto-generated method stub
+		return remoteEvaluator.getEvaluatedAlg(algName, remote);
+	}
+
+
+	@Override
 	public EvaluatorConfig getConfig() throws RemoteException {
 		return remoteEvaluator.getConfig();
 	}

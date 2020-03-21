@@ -350,11 +350,18 @@ public class PowerServerCP extends JFrame implements ServerStatusListener, Plugi
 				public void actionPerformed(ActionEvent e) {
 					SysConfigDlgExt cfg = new SysConfigDlgExt(general, I18nUtil.message("system_configure"), getThisPowerServerCP());
 					cfg.removeSysConfigPane();
+					try {
+						cfg.getPluginStorageManifest().setEnabled(!server.isStarted());
+					}
+					catch (Exception e1) {
+						e1.printStackTrace();
+					}
+					
 					cfg.setVisible(true);
 				}
 			});
 		this.btnSystem.setMargin(new Insets(0, 0 , 0, 0));
-		if (bRemote) this.btnSystem.setVisible(false);
+//		if (bRemote) this.btnSystem.setVisible(false);
 		configGrp1.add(this.btnSystem, BorderLayout.EAST);
 		
 		JPanel configGrp2 = new JPanel(new BorderLayout());
@@ -942,7 +949,7 @@ public class PowerServerCP extends JFrame implements ServerStatusListener, Plugi
 			btnPauseResume.setEnabled(true && !bRemote);
 			btnPauseResume.setText("Pause");
 			btnStop.setEnabled(true);
-			btnSystem.setEnabled(false);
+			btnSystem.setEnabled(true && !bRemote);
 			
 			btnApplyConfig.setEnabled(false);
 			btnResetConfig.setEnabled(false);
@@ -979,7 +986,7 @@ public class PowerServerCP extends JFrame implements ServerStatusListener, Plugi
 			btnPauseResume.setEnabled(true && !bRemote);
 			btnPauseResume.setText("Resume");
 			btnStop.setEnabled(true);
-			btnSystem.setEnabled(false);
+			btnSystem.setEnabled(true && !bRemote);
 			
 			btnApplyConfig.setEnabled(false);
 			btnResetConfig.setEnabled(false);

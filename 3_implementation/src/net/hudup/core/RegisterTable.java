@@ -85,6 +85,8 @@ public final class RegisterTable implements Cloneable, Serializable {
 	 * @param algs specified collection of algorithms. These algorithms are registered.
 	 */
 	public RegisterTable(Collection<Alg> algs) {
+		if (algs == null) return;
+		
 		for (Alg alg : algs) {
 			register(alg);
 		}
@@ -96,6 +98,8 @@ public final class RegisterTable implements Cloneable, Serializable {
 	 * @param algList specified list of algorithms. These algorithms are registered.
 	 */
 	public RegisterTable(AlgList algList) {
+		if (algList == null) return;
+
 		for (int i = 0; i < algList.size(); i++) {
 			Alg alg = algList.get(i);
 			register(alg);

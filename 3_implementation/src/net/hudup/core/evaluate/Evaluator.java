@@ -289,6 +289,27 @@ public interface Evaluator extends Remote, RemoteRunner, SetupAlgListener, Expor
     
     
     /**
+     * Getting registered cloned plug-in algorithm.
+     * @param algClass specified algorithm class.
+     * @param algName algorithm name.
+     * @param remote true if getting remotely.
+     * @return registered plug-in algorithm. It is exported if remote parameter is true.
+     * @throws RemoteException if any error raises.
+     */
+    Alg getPluginAlg(Class<? extends Alg> algClass, String algName, boolean remote) throws RemoteException;
+
+    
+    /**
+     * Getting evaluated algorithm.
+     * @param algName algorithm name.
+     * @param remote true if getting remotely.
+     * @return evaluated algorithm. It is exported if remote parameter is true.
+     * @throws RemoteException if any error raises.
+     */
+    Alg getEvaluatedAlg(String algName, boolean remote) throws RemoteException;
+
+    
+    /**
      * Updating resulted dataset pool.
      * @param pool specified dataset pool.
      * @param timestamp time stamp.
@@ -304,17 +325,6 @@ public interface Evaluator extends Remote, RemoteRunner, SetupAlgListener, Expor
      * @throws RemoteException if any error raises.
      */
     boolean reloadPool() throws RemoteException;
-
-    
-    /**
-     * Getting registered cloned plug-in algorithm.
-     * @param algClass specified algorithm class.
-     * @param algName algorithm name.
-     * @param remote true if getting remotely.
-     * @return registered cloned plug-in algorithm.
-     * @throws RemoteException if any error raises.
-     */
-    Alg getPluginAlg(Class<? extends Alg> algClass, String algName, boolean remote) throws RemoteException;
 
     
 	/**

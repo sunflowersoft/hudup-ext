@@ -151,7 +151,13 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
     protected List<Alg> algList = null;
     
     
-    /**
+	/**
+	 * Resulted algorithm register table.
+	 */
+	protected RegisterTable algRegResult = null;
+
+	
+	/**
      * List of unsetup algorithms that are evaluated by this evaluator. This list is not important.
      */
     protected List<Alg> delayUnsetupAlgs = Util.newList();
@@ -176,16 +182,16 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 	
 	
 	/**
-	 * Information of resulted metrics.
-	 */
-	protected EvaluateInfo otherResult = new EvaluateInfo();
-	
-	
-	/**
 	 * Resulted dataset pool.
 	 */
 	protected DatasetPoolExchanged poolResult = null;
 
+	
+	/**
+	 * Information of resulted metrics.
+	 */
+	protected EvaluateInfo otherResult = new EvaluateInfo();
+	
 	
 	/**
      * The list of original metrics used to evaluate algorithms in {@link #algList}.
@@ -264,6 +270,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 		} catch (Throwable e) {e.printStackTrace();} 
 		
 		this.algList = algList;
+		this.algRegResult = this.algList != null ? new RegisterTable(this.algList) : null;
 		
 		this.result = null;
 		this.parameter = parameter;
@@ -764,26 +771,52 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 	@Override
 	public Alg getPluginAlg(Class<? extends Alg> algClass, String algName, boolean remote) throws RemoteException {
 		// TODO Auto-generated method stub
-		Alg alg = PluginStorage.lookupTable(algClass).query(algName);
-		if (alg == null) return null;
-		if (!acceptAlg(alg)) return null;
-		
-		if (!remote)
-			return alg;
-		else if (alg instanceof AlgRemote) {
-			AlgRemote remoteAlg = (AlgRemote)alg;
-			synchronized (remoteAlg) {
-				remoteAlg.export(config.getEvaluatorPort());
-			}
-			
-			return Util.getPluginManager().wrap(remoteAlg, false);
-		}
-		else
-			return alg;
-		
+		return getAlg(PluginStorage.lookupTable(algClass), algName, remote);
 	}
 
 
+	@Override
+	public Alg getEvaluatedAlg(String algName, boolean remote) throws RemoteException {
+		// TODO Auto-generated method stub
+		return getAlg(algRegResult, algName, remote);
+	}
+
+
+	/**
+	 * Retrieving algorithm from register table.
+	 * @param algReg register table.
+	 * @param algName algorithm name.
+	 * @param remote true if getting remotely.
+	 * @return algorithm. It is exported if remote parameter is true.
+	 */
+	private Alg getAlg(RegisterTable algReg, String algName, boolean remote) {
+		if (algReg == null) return null;
+		
+		Alg alg = algReg.query(algName);
+		if (alg == null) return null;
+		try {
+			if (!acceptAlg(alg)) return null;
+			
+			if (!remote)
+				return alg;
+			else if (alg instanceof AlgRemote) {
+				AlgRemote remoteAlg = (AlgRemote)alg;
+				synchronized (remoteAlg) {
+					remoteAlg.export(config.getEvaluatorPort());
+				}
+				
+				return Util.getPluginManager().wrap(remoteAlg, false);
+			}
+			else
+				return alg;
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	
 	/**
 	 * Updating exchanged pool result.
 	 * @param pool specified exchanged pool.
