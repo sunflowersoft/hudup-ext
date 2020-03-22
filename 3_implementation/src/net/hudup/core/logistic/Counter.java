@@ -300,13 +300,15 @@ public class Counter extends AbstractRunner implements Serializable {
      * @param evt elapsed time event.
      */
     protected void fireElapsedTimeEvent(CounterElapsedTimeEvent evt) {
-    	CounterElapsedTimeListener[] listeners = getElapsedTimeListeners();
-		for (CounterElapsedTimeListener listener : listeners) {
-			try {
-				listener.receivedElapsedTime(evt);
-			}
-			catch (Throwable e) {
-				e.printStackTrace();
+		synchronized (listenerList) {
+	    	CounterElapsedTimeListener[] listeners = getElapsedTimeListeners();
+			for (CounterElapsedTimeListener listener : listeners) {
+				try {
+					listener.receivedElapsedTime(evt);
+				}
+				catch (Throwable e) {
+					e.printStackTrace();
+				}
 			}
 		}
     }

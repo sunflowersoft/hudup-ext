@@ -46,6 +46,7 @@ import net.hudup.core.logistic.DSUtil;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.NetUtil;
 import net.hudup.core.logistic.SystemUtil;
+import net.hudup.core.logistic.TaskQueue;
 import net.hudup.core.logistic.Timestamp;
 import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.xURI;
@@ -145,34 +146,34 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
     protected EventListenerList listenerList = new EventListenerList();
 
     
+	/**
+     * The list of original metrics used to evaluate algorithms in {@link #evAlgList}.
+     */
+	protected NoneWrapperMetricList metricList = null;
+
+	
+    /**
+     * Exported stub as remote evaluator. It must be serializable.
+     */
+    protected Evaluator exportedStub = null;
+
+	
     /**
      * List of algorithms that are evaluated by this evaluator.
      */
-    protected List<Alg> algList = null;
+    protected List<Alg> evAlgList = null;
     
-    
-	/**
-	 * Resulted algorithm register table.
-	 */
-	protected RegisterTable algRegResult = null;
-
-	
-	/**
-     * List of unsetup algorithms that are evaluated by this evaluator. This list is not important.
-     */
-    protected List<Alg> delayUnsetupAlgs = Util.newList();
-
     
     /**
      * This {@code dataset pool} contains many training and testing datasets, which is fed to evaluator, which allows evaluator assesses algorithm on many testing datasets.
      */
-    protected DatasetPool pool = null;
+    protected DatasetPool evPool = null;
     
     
     /**
      * Additional parameter for this evaluator.
      */
-    protected Serializable parameter = null;
+    protected Serializable evParameter = null;
     
     
 	/**
@@ -188,27 +189,27 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 
 	
 	/**
+	 * Resulted algorithm register table.
+	 */
+	protected RegisterTable algRegResult = null;
+
+	
+	/**
 	 * Information of resulted metrics.
 	 */
 	protected EvaluateInfo otherResult = new EvaluateInfo();
 	
 	
 	/**
-     * The list of original metrics used to evaluate algorithms in {@link #algList}.
+     * List of unsetup algorithms that are evaluated by this evaluator. This list is not important.
      */
-	protected NoneWrapperMetricList metricList = null;
+    protected List<Alg> delayUnsetupAlgs = Util.newList();
 
-	
+    
     /**
-     * Exported stub as remote evaluator. It must be serializable.
+     * Internal task queue.
      */
-    protected Evaluator exportedStub = null;
-
-	
-    /**
-     * Evaluation processor.
-     */
-    protected EvaluateProcessor evProcessor = null;
+    protected TaskQueue taskQueue = new TaskQueue();
     
     
 	/**
@@ -217,6 +218,12 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 	protected Counter counter = null;
 
 	
+    /**
+     * Evaluation processor.
+     */
+    protected EvaluateProcessor evProcessor = null;
+    
+    
 	/**
 	 * Default constructor.
 	 */
@@ -249,7 +256,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 	@Override
 	public synchronized boolean remoteStart0(List<Alg> algList, DatasetPoolExchanged pool, Serializable parameter) throws RemoteException {
 		// TODO Auto-generated method stub
-		if (isStarted() || this.algList != null || this.pool != null) {
+		if (isStarted() || this.evAlgList != null || this.evPool != null) {
 			LogUtil.error("Evaluator is running and so evaluation is not run");
 			return false;
 		}
@@ -259,8 +266,8 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 			return false;
 		}
 
-		this.pool = updatePoolResult(pool);
-		if (this.pool == null) {
+		this.evPool = updatePoolResult(pool);
+		if (this.evPool == null) {
 			LogUtil.error("Cannot create pool");
 			return false;
 		}
@@ -269,17 +276,17 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 			clearDelayUnsetupAlgs(); //This code line is important.
 		} catch (Throwable e) {e.printStackTrace();} 
 		
-		this.algList = algList;
-		this.algRegResult = this.algList != null ? new RegisterTable(this.algList) : null;
+		this.evAlgList = algList;
+		this.algRegResult = this.evAlgList != null ? new RegisterTable(this.evAlgList) : null;
 		
 		this.result = null;
-		this.parameter = parameter;
+		this.evParameter = parameter;
 		
 		String evStorePath = this.otherResult.evStorePath;
 		this.otherResult.reset();
 		this.otherResult.evStorePath = evStorePath;
-		this.otherResult.algNames = Util.newList(this.algList.size());
-		for (Alg alg : this.algList) {
+		this.otherResult.algNames = Util.newList(this.evAlgList.size());
+		for (Alg alg : this.evAlgList) {
 			this.otherResult.algNames.add(alg.getName());
 		}
 		this.otherResult.algName = this.otherResult.algNames.get(0);
@@ -291,6 +298,8 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 		
 		this.counter.stop();
 		this.counter.start();
+		this.taskQueue.stop();
+		this.taskQueue.start();
 
 		Timestamp timestamp = null;
 		if (parameter != null && parameter instanceof Timestamp)
@@ -324,8 +333,8 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 	protected void run0() {
 		otherResult.progressStep = 0;
 		otherResult.progressTotal = 0;
-		for (int i = 0; i < pool.size(); i++) {
-			Dataset testing = pool.get(i).getTesting();
+		for (int i = 0; i < evPool.size(); i++) {
+			Dataset testing = evPool.get(i).getTesting();
 			Fetcher<Profile> fetcher = fetchTesting(testing);
 			try {
 				otherResult.progressTotal += fetcher.getMetadata().getSize();
@@ -336,20 +345,20 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 				e.printStackTrace();
 			}
 		}
-		otherResult.progressTotal *= algList.size();
+		otherResult.progressTotal *= evAlgList.size();
 		
 		result = new Metrics();
 		
 		Thread current = Thread.currentThread();
-		for (int i = 0; current == thread && algList != null && i < algList.size(); i++) {
-			Alg alg = algList.get(i);
+		for (int i = 0; current == thread && evAlgList != null && i < evAlgList.size(); i++) {
+			Alg alg = evAlgList.get(i);
 			otherResult.algName = alg.getName();
 			
-			for (int j = 0; current == thread && pool != null && j < pool.size(); j++) {
+			for (int j = 0; current == thread && evPool != null && j < evPool.size(); j++) {
 				
 				Fetcher<Profile> testingFetcher = null;
 				try {
-					DatasetPair dsPair = pool.get(j);
+					DatasetPair dsPair = evPool.get(j);
 					Dataset     training = dsPair.getTraining();
 					Dataset     testing = dsPair.getTesting();
 					int         datasetId = j + 1;
@@ -889,7 +898,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 	@Override
 	public synchronized boolean updatePool(DatasetPoolExchanged pool, Timestamp timestamp) throws RemoteException {
 		// TODO Auto-generated method stub
-		if (isStarted() || this.pool != null) {
+		if (isStarted() || this.evPool != null) {
 			LogUtil.error("Evaluator is running and so it cannot update pool");
 			return false;
 		}
@@ -934,10 +943,11 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 	@Override
 	protected void clear() {
 		// TODO Auto-generated method stub
-		this.algList = null;
-		this.pool = null;
-		this.parameter = null;
+		this.evAlgList = null;
+		this.evPool = null;
+		this.evParameter = null;
 		
+		this.taskQueue.stop();
 		this.counter.stop();
 	}
 
@@ -963,10 +973,9 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 			e.printStackTrace();
 		}
 		
-		this.counter.stop();
-		if (algList != null) {
+		if (evAlgList != null) {
 			synchronized (delayUnsetupAlgs) {
-				for (Alg alg : algList) {
+				for (Alg alg : evAlgList) {
 					for (Alg delayUnsetupAlg : delayUnsetupAlgs) {
 						if (!alg.getName().equals(delayUnsetupAlg.getName())) {
 							try {
@@ -979,6 +988,9 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 		}
 		
 		fireEvaluateEvent(new EvaluateEvent(this, Type.done, result));
+		
+		this.taskQueue.stop();
+		this.counter.stop();
 		
 		return true;
 	}
@@ -1037,14 +1049,30 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
      * @param evt event from this evaluator.
      */
     protected void fireEvaluatorEvent(EvaluatorEvent evt) {
-		EvaluatorListener[] listeners = getEvaluatorListeners();
-		for (EvaluatorListener listener : listeners) {
-			try {
-				listener.receivedEvaluator(evt);
+		synchronized (listenerList) {
+			
+			EvaluatorListener[] listeners = getEvaluatorListeners();
+			for (EvaluatorListener listener : listeners) {
+				if (taskQueue.isRunning()) {
+					taskQueue.addTask(new TaskQueue.Task() {
+						
+						@Override
+						public void doTask() throws Exception {
+							listener.receivedEvaluator(evt);
+						}
+						
+					});
+				}
+				else {
+					try {
+						listener.receivedEvaluator(evt);
+					}
+					catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
 			}
-			catch (Throwable e) {
-				e.printStackTrace();
-			}
+			
 		}
     }
 
@@ -1081,50 +1109,66 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
      * @param evt event from this evaluator.
      */
     protected void fireEvaluateEvent(EvaluateEvent evt) {
-		EvaluateListener[] listeners = getEvaluateListeners();
-		for (EvaluateListener listener : listeners) {
+		synchronized (listenerList) {
+			
+			EvaluateListener[] listeners = getEvaluateListeners();
+			for (EvaluateListener listener : listeners) {
+				if (taskQueue.isRunning()) {
+					taskQueue.addTask(new TaskQueue.Task() {
+						
+						@Override
+						public void doTask() throws Exception {
+							listener.receivedEvaluation(evt);
+						}
+						
+					});
+				}
+				else {
+					try {
+						listener.receivedEvaluation(evt);
+					}
+					catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		
+			if (otherResult.evStorePath != null && evAlgList != null) {
+				boolean saveResultSummary = false;
+				try {
+					saveResultSummary = config.isSaveResultSummary();
+				} catch (Throwable e) {e.printStackTrace();}
+				
+				evt.setMetrics(result); //Important code line, saving all metrics.
+				evProcessor.saveEvaluateResult(otherResult.evStorePath, evt, evAlgList, saveResultSummary);
+			}
+			
+			
+			//Backing up evaluation results.
+			boolean backup = isBackup() || (otherResult.evStorePath == null && listeners.length == 0);
+			if (!backup) return;
+			
+			if (evt.getType() != Type.done && evt.getType() != Type.done_one)
+				return;
+			if (this.result == null || this.evAlgList == null)
+				return;
+			
 			try {
-				listener.receivedEvaluation(evt);
+				xURI backupDir = xURI.create(Constants.BACKUP_DIRECTORY);
+				UriAdapter backupAdapter = new UriAdapter(backupDir);
+				if (!backupAdapter.exists(backupDir)) backupAdapter.create(backupDir, true);
+				xURI analyzeBackupFile = backupDir.concat("evaluator-analyze-backup-" + new Date().getTime() + "." + Constants.DEFAULT_EXT);
+				
+				MetricsUtil util = new MetricsUtil(this.result, new RegisterTable(this.evAlgList), this);
+				Writer writer = backupAdapter.getWriter(analyzeBackupFile, false);
+				writer.write(util.createPlainText());
+				writer.close();
+				backupAdapter.close();
 			}
 			catch (Throwable e) {
 				e.printStackTrace();
 			}
-		}
-		
-		if (otherResult.evStorePath != null && algList != null) {
-			boolean saveResultSummary = false;
-			try {
-				saveResultSummary = config.isSaveResultSummary();
-			} catch (Throwable e) {e.printStackTrace();}
 			
-			evt.setMetrics(result); //Important code line, saving all metrics.
-			evProcessor.saveEvaluateResult(otherResult.evStorePath, evt, algList, saveResultSummary);
-		}
-		
-		
-		//Backing up evaluation results.
-		boolean backup = isBackup() || (otherResult.evStorePath == null && listeners.length == 0);
-		if (!backup) return;
-		
-		if (evt.getType() != Type.done && evt.getType() != Type.done_one)
-			return;
-		if (this.result == null || this.algList == null)
-			return;
-		
-		try {
-			xURI backupDir = xURI.create(Constants.BACKUP_DIRECTORY);
-			UriAdapter backupAdapter = new UriAdapter(backupDir);
-			if (!backupAdapter.exists(backupDir)) backupAdapter.create(backupDir, true);
-			xURI analyzeBackupFile = backupDir.concat("evaluator-analyze-backup-" + new Date().getTime() + "." + Constants.DEFAULT_EXT);
-			
-			MetricsUtil util = new MetricsUtil(this.result, new RegisterTable(this.algList), this);
-			Writer writer = backupAdapter.getWriter(analyzeBackupFile, false);
-			writer.write(util.createPlainText());
-			writer.close();
-			backupAdapter.close();
-		}
-		catch (Throwable e) {
-			e.printStackTrace();
 		}
     }
 
@@ -1161,18 +1205,31 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
      * @param evt the specified for evaluation progress.
      */
     protected void fireEvaluateProgressEvent(EvaluateProgressEvent evt) {
-    	if (!isStarted()) return;
-
-    	EvaluateProgressListener[] listeners = getEvaluateProgressListeners();
-		for (EvaluateProgressListener listener : listeners) {
-			try {
-				listener.receivedProgress(evt);
+		synchronized (listenerList) {
+			
+	    	EvaluateProgressListener[] listeners = getEvaluateProgressListeners();
+			for (EvaluateProgressListener listener : listeners) {
+				if (taskQueue.isRunning()) {
+					taskQueue.addTask(new TaskQueue.Task() {
+						
+						@Override
+						public void doTask() throws Exception {
+							listener.receivedProgress(evt);
+						}
+						
+					});
+				}
+				else {
+					try {
+						listener.receivedProgress(evt);
+					}
+					catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
 			}
-			catch (Throwable e) {
-				e.printStackTrace();
-			}
+			
 		}
-	
     }
 
 
@@ -1208,50 +1265,64 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
      * @param evt the specified for setup algorithm event.
      */
     protected void fireSetupAlgEvent(SetupAlgEvent evt) {
-    	if (!isStarted()) return;
-
-    	SetupAlgListener[] listeners = getSetupAlgListeners();
-		for (SetupAlgListener listener : listeners) {
+		synchronized (listenerList) {
+			
+	    	SetupAlgListener[] listeners = getSetupAlgListeners();
+			for (SetupAlgListener listener : listeners) {
+				if (taskQueue.isRunning()) {
+					taskQueue.addTask(new TaskQueue.Task() {
+						
+						@Override
+						public void doTask() throws Exception {
+							listener.receivedSetup(evt);
+						}
+						
+					});
+				}
+				else {
+					try {
+						listener.receivedSetup(evt);
+					}
+					catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		
+			if (otherResult.evStorePath != null) {
+				boolean saveResultSummary = false;
+				try {
+					saveResultSummary = config.isSaveResultSummary();
+				} catch (Throwable e) {e.printStackTrace();}
+	
+				evProcessor.saveSetupResult(otherResult.evStorePath, evt, saveResultSummary);
+			}
+			
+			
+			//Backing up evaluation results.
+			boolean backup = isBackup() || (otherResult.evStorePath == null && listeners.length == 0);
+			if (!backup || evt.getType() != SetupAlgEvent.Type.done)
+				return;
 			try {
-				listener.receivedSetup(evt);
+				String info = "========== Algorithm \"" + evt.getAlgName() + "\" ==========\n";
+				info = info + evt.translate() + "\n\n\n\n";
+	
+				xURI backupDir = xURI.create(Constants.BACKUP_DIRECTORY);
+				UriAdapter backupAdapter = new UriAdapter(backupDir);
+				if (!backupAdapter.exists(backupDir)) backupAdapter.create(backupDir, true);
+				xURI analyzeBackupFile = backupDir.concat(
+						"evaluator-" + evt.getAlgName() + "-backup-" + new Date().getTime() +
+						EvaluateProcessor.SETUP_DONE_FILE_EXTENSION);
+				
+				Writer writer = backupAdapter.getWriter(analyzeBackupFile, false);
+				writer.write(info.toCharArray());
+				writer.close();
+				backupAdapter.close();
 			}
 			catch (Throwable e) {
 				e.printStackTrace();
 			}
-		}
-	
-		if (otherResult.evStorePath != null) {
-			boolean saveResultSummary = false;
-			try {
-				saveResultSummary = config.isSaveResultSummary();
-			} catch (Throwable e) {e.printStackTrace();}
-
-			evProcessor.saveSetupResult(otherResult.evStorePath, evt, saveResultSummary);
-		}
-		
-		
-		//Backing up evaluation results.
-		boolean backup = isBackup() || (otherResult.evStorePath == null && listeners.length == 0);
-		if (!backup || evt.getType() != SetupAlgEvent.Type.done)
-			return;
-		try {
-			String info = "========== Algorithm \"" + evt.getAlgName() + "\" ==========\n";
-			info = info + evt.translate() + "\n\n\n\n";
-
-			xURI backupDir = xURI.create(Constants.BACKUP_DIRECTORY);
-			UriAdapter backupAdapter = new UriAdapter(backupDir);
-			if (!backupAdapter.exists(backupDir)) backupAdapter.create(backupDir, true);
-			xURI analyzeBackupFile = backupDir.concat(
-					"evaluator-" + evt.getAlgName() + "-backup-" + new Date().getTime() +
-					EvaluateProcessor.SETUP_DONE_FILE_EXTENSION);
 			
-			Writer writer = backupAdapter.getWriter(analyzeBackupFile, false);
-			writer.write(info.toCharArray());
-			writer.close();
-			backupAdapter.close();
-		}
-		catch (Throwable e) {
-			e.printStackTrace();
 		}
     }
 
@@ -1382,9 +1453,9 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 				poolResult.clear(true);
 			poolResult = null;
 
-			if (pool != null)
-				pool.clear();
-			pool = null;
+			if (evPool != null)
+				evPool.clear();
+			evPool = null;
 		}
 		catch (Throwable e) {e.printStackTrace();}
 
@@ -1486,6 +1557,8 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 		fireEvaluatorEvent(new EvaluatorEvent(
 				this, 
 				EvaluatorEvent.Type.stop)); // firing stop event.
+		
+		this.taskQueue.stop();
 		this.counter.stop();
 		
 		return true;

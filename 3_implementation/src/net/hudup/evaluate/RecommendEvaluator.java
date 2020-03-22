@@ -122,27 +122,27 @@ public class RecommendEvaluator extends EvaluatorAbstract {
 	@Override
 	protected void run0() {
 		otherResult.progressStep = 0;
-		otherResult.progressTotal = pool.getTotalTestingUserNumber() * algList.size();
+		otherResult.progressTotal = evPool.getTotalTestingUserNumber() * evAlgList.size();
 		result = new Metrics();
 		
 		Thread current = Thread.currentThread();
 		
-		for (int i = 0; current == thread && algList != null && i < algList.size(); i++) {
+		for (int i = 0; current == thread && evAlgList != null && i < evAlgList.size(); i++) {
 			try {
-				if (!acceptAlg(algList.get(i))) continue;
+				if (!acceptAlg(evAlgList.get(i))) continue;
 			} catch (Throwable e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 				continue;
 			}
-			Recommender recommender = (Recommender)algList.get(i);
+			Recommender recommender = (Recommender)evAlgList.get(i);
 			otherResult.algName = recommender.getName();
 			
-			for (int j = 0; current == thread && pool != null && j < pool.size(); j++) {
+			for (int j = 0; current == thread && evPool != null && j < evPool.size(); j++) {
 				
 				Fetcher<RatingVector> testingUsers = null;
 				try {
-					DatasetPair dsPair = pool.get(j);
+					DatasetPair dsPair = evPool.get(j);
 					Dataset     training = dsPair.getTraining();
 					Dataset     testing = dsPair.getTesting();
 					int         datasetId = j + 1;

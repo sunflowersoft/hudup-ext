@@ -391,7 +391,7 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 		}
 		else {
 			stop();
-			clear();
+//			clear();
 
 			unsetupListeners(evaluator);
 			

@@ -1089,8 +1089,12 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			
 			clearResult();
 			boolean started = false;
-			if (bindUri == null)
-				started = evaluator.remoteStart0(lbAlgs.getAlgList(), toDatasetPoolExchangedClient(guiData.pool), this.timestamp = new Timestamp());
+			if (bindUri == null) {
+//				synchronized (this) {
+					started = evaluator.remoteStart0(lbAlgs.getAlgList(), toDatasetPoolExchangedClient(guiData.pool), this.timestamp = new Timestamp());
+//					try {wait();} catch (Exception e) {e.printStackTrace();}
+//				}
+			}
 			else
 				started = evaluator.remoteStart(lbAlgs.getAlgNameList(), toDatasetPoolExchangedClient(guiData.pool), null);
 			if (!started) updateMode();
@@ -1106,6 +1110,8 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 	@Override
 	public synchronized void receivedEvaluator(EvaluatorEvent evt) throws RemoteException {
 		// TODO Auto-generated method stub
+//		if (bindUri == null) try {notify();} catch (Exception e) {e.printStackTrace();}
+		
 		if (evt.getType() == EvaluatorEvent.Type.start || evt.getType() == EvaluatorEvent.Type.update_pool) {
 //			Timestamp timestamp = evt.getTimestamp();
 			
