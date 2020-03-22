@@ -507,6 +507,35 @@ public class AttributeList implements Cloneable, TextParsable, Serializable, Tra
 	
 	
 	/**
+	 * Creating the improved attribute list of a rating that a user gives on an item. Such attribute list has four attributes whose names are specified by constants as follows:
+	 * <ul>
+	 * <li>{@link DataConfig#USERID_FIELD}</li>
+	 * <li>{@link DataConfig#ITEMID_FIELD}</li>
+	 * <li>{@link DataConfig#RATING_FIELD}</li>
+	 * <li>{@link DataConfig#RATING_DATE_FIELD}</li>
+	 * </ul>
+	 * @return Improved attribute list of rating. Such attribute list forms a structure of a rating storage such as a table of rating in database.
+	 */
+	public static AttributeList defaultRatingAttributeList2() {
+		AttributeList attributes = new AttributeList();
+		//
+		Attribute userId = new Attribute(DataConfig.USERID_FIELD, Type.integer);
+		attributes.add(userId);
+		//
+		Attribute itemId = new Attribute(DataConfig.ITEMID_FIELD, Type.integer);
+		attributes.add(itemId);
+		//
+		Attribute rating = new Attribute(DataConfig.RATING_FIELD, Type.real);
+		attributes.add(rating);
+		//
+		Attribute ratingDate = new Attribute(DataConfig.RATING_DATE_FIELD, Type.date);
+		attributes.add(ratingDate);
+		
+		return attributes;
+	}
+
+	
+	/**
 	 * Creating the default attribute list of nominal. Recall that nominal indicates discrete and non-number data such as weekdays {Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday}.
 	 * Such attribute list has five attributes whose names are specified by constants as follows:
 	 * <ul>
@@ -698,6 +727,40 @@ public class AttributeList implements Cloneable, TextParsable, Serializable, Tra
 		//
 		Attribute ctxValue = new Attribute(DataConfig.CTX_VALUE_FIELD, Type.integer);
 		attributes.add(ctxValue);
+		
+		return attributes;
+	}
+
+	
+	/**
+	 * Creating the improved attribute list of context.
+	 * Such attribute list has four attributes whose names are specified by constants as follows:
+	 * <ul>
+	 * <li>{@link DataConfig#USERID_FIELD}</li>
+	 * <li>{@link DataConfig#ITEMID_FIELD}</li>
+	 * <li>{@link DataConfig#CTX_TEMPLATEID_FIELD}</li>
+	 * <li>{@link DataConfig#CTX_VALUE_FIELD}</li>
+	 * <li>{@link DataConfig#RATING_DATE_FIELD}</li>
+	 * </ul>
+	 * @return Default attribute list of context. Such attribute list forms a structure of a context storage such as a table of context in database.
+	 */
+	public static AttributeList defaultContextAttributeList2() {
+		AttributeList attributes = new AttributeList();
+		//
+		Attribute ctxUserId = new Attribute(DataConfig.USERID_FIELD, Type.integer);
+		attributes.add(ctxUserId);
+		//
+		Attribute ctxItemId = new Attribute(DataConfig.ITEMID_FIELD, Type.integer);
+		attributes.add(ctxItemId);
+		//
+		Attribute ctxTemplateId = new Attribute(DataConfig.CTX_TEMPLATEID_FIELD, Type.integer);
+		attributes.add(ctxTemplateId);
+		//
+		Attribute ctxValue = new Attribute(DataConfig.CTX_VALUE_FIELD, Type.integer);
+		attributes.add(ctxValue);
+		//
+		Attribute ratingDate = new Attribute(DataConfig.RATING_DATE_FIELD, Type.date);
+		attributes.add(ratingDate);
 		
 		return attributes;
 	}

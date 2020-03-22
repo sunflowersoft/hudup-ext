@@ -78,7 +78,7 @@ public class FactoryImpl implements Factory {
 		if (dataDriver.isFlatServer())
 			providerAssoc = new FlatProviderAssoc(config);
 		else if (dataDriver.isDbServer())
-			providerAssoc = new DbProviderAssoc(config);
+			providerAssoc = new DbProviderAssocExt(config);
 		else if (dataDriver.isHudupServer()) {
 			xURI uri = config.getStoreUri();
 			if (dataDriver.getType() == DataType.hudup_rmi) {

@@ -911,8 +911,14 @@ public class Profile implements Cloneable, TextParsable, Serializable {
 			
 			try {
 				value = createValue(new Attribute("getValueAsDate", Type.date), value, df);
-				if (value == null)
-					return null;
+				if (value == null) {
+					//Try to get number as miliseconds and then convert to date. Added by Loc Nguyen: 2020.03.22.
+					value = createValue(new Attribute("getValueAsNumber", Type.real), getValue(index));
+					if (value != null && value instanceof Number)
+						return new Date(((Number)value).longValue());
+					else
+						return null;
+				}
 				else if (value instanceof Date)
 					return (Date) value;
 				else

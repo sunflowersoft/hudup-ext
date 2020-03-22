@@ -387,7 +387,7 @@ public class ProviderImpl implements Provider {
 	 * @param ratedDate rating date.
 	 * @return whether insert successfully.
 	 */
-	private boolean insertRatingValue(int userId, int itemId, double ratingValue, Date ratedDate) {
+	protected boolean insertRatingValue(int userId, int itemId, double ratingValue, Date ratedDate) {
 		if (!containsUserProfile(userId)) {
 			Profile user = new Profile(getUserAttributes());
 			user.setValue(DataConfig.USERID_FIELD, userId);
@@ -418,7 +418,7 @@ public class ProviderImpl implements Provider {
 	 * @param ratedDate rating date.
 	 * @return whether update successfully 
 	 */
-	private boolean updateRatingValue(int userId, int itemId, double ratingValue, Date ratedDate) {
+	protected boolean updateRatingValue(int userId, int itemId, double ratingValue, Date ratedDate) {
 		Profile profile = new Profile(assoc.getAttributes(getConfig().getRatingUnit()));
 		profile.setValue(DataConfig.USERID_FIELD, userId);
 		profile.setValue(DataConfig.ITEMID_FIELD, itemId);
@@ -1390,7 +1390,7 @@ public class ProviderImpl implements Provider {
 		Profile accProfile = new Profile(getProfileAttributes(config.getAccountUnit()));
 		accProfile.setValue(DataConfig.ACCOUNT_NAME_FIELD, "admin");
 		accProfile.setValue(DataConfig.ACCOUNT_PASSWORD_FIELD, Util.getCipher().md5Encrypt("admin"));
-		accProfile.setValue(DataConfig.ACCOUNT_PRIVILEGES_FIELD, "3");
+		accProfile.setValue(DataConfig.ACCOUNT_PRIVILEGES_FIELD, "255");
 		result &= insertAccount(accProfile);
 		
 		return result;
@@ -1685,7 +1685,7 @@ public class ProviderImpl implements Provider {
 		}
 
 		
-		// 5. Inserting items
+		// 5. Inserting ratings
 		Fetcher<RatingTriple> triples = src.getRatings();
 		try {
 			deleteUnitData(thisConfig.getRatingUnit());
@@ -2025,7 +2025,7 @@ public class ProviderImpl implements Provider {
 		}
 
 		
-		// 5. Inserting items
+		// 5. Inserting ratings
 		Fetcher<RatingVector> ratings = src.fetchUserRatings();
 		try {
 			deleteUnitData(thisConfig.getRatingUnit());

@@ -141,6 +141,13 @@ public class Counter extends AbstractRunner implements Serializable {
 		if (assocTxtTime != null) assocTxtTime.setText(formatTime(newElapsedTime));
 		
 		fireElapsedTimeEvent(new CounterElapsedTimeEvent(this, newElapsedTime));
+		
+		try {
+			Thread.sleep(PERIOD);
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	

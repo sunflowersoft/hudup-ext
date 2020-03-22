@@ -70,7 +70,8 @@ public class RatingMulti extends Rating {
 		int n = history.size();
 		int index = -1;
 		for (int i = n-1; i >= 0; i--) {
-			if(history.get(i).ratedDate.before(rating.ratedDate)) {
+			if(history.get(i).ratedDate != null && rating.ratedDate != null &&
+					history.get(i).ratedDate.before(rating.ratedDate)) {
 				index = i;
 				break;
 			}

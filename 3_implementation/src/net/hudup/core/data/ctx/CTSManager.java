@@ -8,6 +8,7 @@
 package net.hudup.core.data.ctx;
 
 import java.io.Serializable;
+import java.util.Date;
 
 import net.hudup.core.alg.Alg;
 import net.hudup.core.data.AutoCloseable;
@@ -84,6 +85,16 @@ public interface CTSManager extends Alg, Inspectable, AutoCloseable {
 	 * @return context list represented by {@link ContextList} relevant to a specified user and a specified item.
 	 */
 	ContextList getContexts(int userId, int itemId);
+
+	
+	/**
+	 * Retrieving a list of contexts relevant to a specified user, a specified item, and rated date.
+	 * @param userId specified user identification (user ID).
+	 * @param itemId specified item identification (item ID).
+	 * @param ratedDate rated date.
+	 * @return context list represented by {@link ContextList} relevant to a specified user, a specified item, and rated date.
+	 */
+	ContextList getContexts(int userId, int itemId, Date ratedDate);
 
 	
 	/**

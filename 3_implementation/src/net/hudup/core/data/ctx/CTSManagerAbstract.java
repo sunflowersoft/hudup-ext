@@ -9,6 +9,7 @@ package net.hudup.core.data.ctx;
 
 import java.io.Serializable;
 import java.rmi.RemoteException;
+import java.util.Date;
 
 import net.hudup.core.alg.AlgAbstract;
 import net.hudup.core.data.Attribute;
@@ -210,6 +211,13 @@ public abstract class CTSManagerAbstract extends AlgAbstract implements CTSManag
 	public ContextList remoteGetContexts(int userId, int itemId) throws RemoteException {
 		// TODO Auto-generated method stub
 		return getContexts(userId, itemId);
+	}
+
+
+	@Override
+	public ContextList remoteGetContexts(int userId, int itemId, Date ratedDate) throws RemoteException {
+		// TODO Auto-generated method stub
+		return getContexts(userId, itemId, ratedDate);
 	}
 
 

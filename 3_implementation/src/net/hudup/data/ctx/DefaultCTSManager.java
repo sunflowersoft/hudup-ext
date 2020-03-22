@@ -9,6 +9,7 @@ package net.hudup.data.ctx;
 
 import java.io.Serializable;
 import java.rmi.RemoteException;
+import java.util.Date;
 import java.util.Map;
 
 import net.hudup.core.Util;
@@ -250,6 +251,55 @@ public class DefaultCTSManager extends CTSManagerAbstract {
 		Profile condition = new Profile(assoc.getAttributes(getConfig().getContextUnit()));
 		condition.setValue(DataConfig.USERID_FIELD, userId);
 		condition.setValue(DataConfig.ITEMID_FIELD, itemId);
+		
+		Fetcher<Profile> fetcher = assoc.getProfiles(getConfig().getContextUnit(), condition);
+		try {
+			while (fetcher.next()) {
+				Profile profile = fetcher.pick();
+				if (profile == null)
+					continue;
+				
+				int ctxTemplateId = profile.getValueAsInt(DataConfig.CTX_TEMPLATEID_FIELD);
+				if (ctxTemplateId < 0)
+					continue;
+				
+				Object value = profile.getValue(DataConfig.CTX_VALUE_FIELD);
+				if (value == null || !(value instanceof Serializable))
+					value = null;
+				
+				Context context = createContext(ctxTemplateId, (Serializable) value);
+				if (context != null)
+					contexts.add(context);
+			}
+		}
+		catch (Throwable e) {
+			e.printStackTrace();
+		}
+		finally {
+			try {
+				if (fetcher != null)
+					fetcher.close();
+			}
+			catch (Throwable e) {
+				e.printStackTrace();
+			}
+		}
+		
+		return contexts;
+	}
+
+	
+	@Override
+	public ContextList getContexts(int userId, int itemId, Date ratedDate) {
+		// TODO Auto-generated method stub
+		if (ratedDate == null) return getContexts(userId, itemId);
+		
+		ContextList contexts = new ContextList();
+		
+		Profile condition = new Profile(assoc.getAttributes(getConfig().getContextUnit()));
+		condition.setValue(DataConfig.USERID_FIELD, userId);
+		condition.setValue(DataConfig.ITEMID_FIELD, itemId);
+		condition.setValue(DataConfig.RATING_DATE_FIELD, ratedDate);
 		
 		Fetcher<Profile> fetcher = assoc.getProfiles(getConfig().getContextUnit(), condition);
 		try {

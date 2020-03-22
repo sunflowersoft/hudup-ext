@@ -20,6 +20,7 @@ import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.rmi.RemoteException;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.Vector;
@@ -118,6 +119,7 @@ public class Test {
 //		AlgDesc2List list = new AlgDesc2List();
 //		list.addAll2(PluginStorage.getNormalAlgReg().getAlgList());
 		//AlgDesc2Table.showDlg(null, list);
+		System.out.println(new Date(1));
 		UIManager.LookAndFeelInfo[] looks = UIManager.getInstalledLookAndFeels();
 		for (UIManager.LookAndFeelInfo look : looks) {
 			System.out.println(look.getClassName());
