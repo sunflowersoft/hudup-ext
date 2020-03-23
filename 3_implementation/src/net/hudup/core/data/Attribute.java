@@ -26,7 +26,8 @@ import net.hudup.core.parser.TextParserUtil;
  * <li>{@code integer}: integer number.</li>
  * <li>{@code real}: real number.</li>
  * <li>{@code string}: text data.</li>
- * <li>{@code date}: date and time.</li>
+ * <li>{@code date}: date.</li>
+ * <li>{@code time}: time and time stamp.</li>
  * <li>{@code object}: any type.</li>
  * </ul>
  * Attribute provides many methods for processing data type and retrieving information from data type.
@@ -56,7 +57,8 @@ public class Attribute implements Cloneable, TextParsable, Serializable {
 	 * <li>{@code integer}: integer number.</li>
 	 * <li>{@code real}: real number.</li>
 	 * <li>{@code string}: text data.</li>
-	 * <li>{@code date}: date and time.</li>
+	 * <li>{@code date}: date.</li>
+	 * <li>{@code time}: time and time stamp.</li>
 	 * <li>{@code object}: any type.</li>
 	 * </ul>
 	 * 
@@ -65,7 +67,7 @@ public class Attribute implements Cloneable, TextParsable, Serializable {
 	 *
 	 */
 	public static enum Type {
-		bit, nominal, integer, real, string, date, object
+		bit, nominal, integer, real, string, date, time, object
 	};
 	
 	
@@ -420,7 +422,8 @@ public class Attribute implements Cloneable, TextParsable, Serializable {
 	 */
 	public static boolean isNumber(Type type) {
 		return type == Type.integer || 
-				type == Type.real;
+				type == Type.real ||
+				type == Type.time;
 	}
 
 	
@@ -490,8 +493,8 @@ public class Attribute implements Cloneable, TextParsable, Serializable {
 		return type == Type.bit || 
 				type == Type.nominal || 
 				type == Type.integer || 
-				type == Type.real;
-
+				type == Type.real ||
+				type == Type.time;
 	}
 
 	
@@ -552,7 +555,7 @@ public class Attribute implements Cloneable, TextParsable, Serializable {
 		else if (obj instanceof Integer)
 			return Type.integer;
 		else if (obj instanceof Long)
-			return Type.integer;
+			return Type.time;
 		else if (obj instanceof Float)
 			return Type.real;
 		else if (obj instanceof Double)
@@ -584,7 +587,7 @@ public class Attribute implements Cloneable, TextParsable, Serializable {
 		else if (objClass.equals(Integer.class) || objClass.equals(int.class))
 			return Type.integer;
 		else if (objClass.equals(Long.class) || objClass.equals(long.class))
-			return Type.integer;
+			return Type.time;
 		else if (objClass.equals(Float.class) || objClass.equals(float.class))
 			return Type.real;
 		else if (objClass.equals(Double.class) || objClass.equals(double.class))
@@ -625,6 +628,8 @@ public class Attribute implements Cloneable, TextParsable, Serializable {
 		case 5:
 			return Type.date;
 		case 6:
+			return Type.time;
+		case 7:
 			return Type.object;
 		default:
 			return Type.object;
@@ -648,7 +653,7 @@ public class Attribute implements Cloneable, TextParsable, Serializable {
 		else if (stype.equals("nominal"))
 			return Type.nominal;
 		else if (stype.equals("byte") || stype.equals("integer") || stype.equals("int") || 
-				stype.equals("long") || stype.equals("short"))
+				stype.equals("short"))
 			return Type.integer;
 		else if (stype.equals("real") || stype.equals("decimal") || 
 				stype.equals("float") || stype.equals("double"))
@@ -659,6 +664,8 @@ public class Attribute implements Cloneable, TextParsable, Serializable {
 			return Type.string;
 		else if (stype.equals("date"))
 			return Type.date;
+		else if (stype.equals("time") || stype.equals("long"))
+			return Type.time;
 		else if (stype.equals("object"))
 			return Type.object;
 		else
@@ -688,10 +695,12 @@ public class Attribute implements Cloneable, TextParsable, Serializable {
 			return 4;
 		case date:
 			return 5;
+		case time:
+			return 6;
 		case object:
-			return 6;
+			return 7;
 		default:
-			return 6;
+			return 7;
 		}
 		
 	}
@@ -718,6 +727,8 @@ public class Attribute implements Cloneable, TextParsable, Serializable {
 			return "string";
 		case date:
 			return "date";
+		case time:
+			return "time";
 		case object:
 			return "object";
 		default:
@@ -748,6 +759,8 @@ public class Attribute implements Cloneable, TextParsable, Serializable {
 			return String.class;
 		case date:
 			return Date.class;
+		case time:
+			return Long.class;
 		case object:
 			return Object.class;
 		default:

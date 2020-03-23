@@ -514,7 +514,7 @@ public class EvaluatorCP extends JFrame implements EvaluatorListener {
         cmbEvaluators.removeAllItems();
         List<Evaluator> evaluators = getEvaluators();
         EvaluatorItem selectedItem = null;
-        for  (Evaluator evaluator : evaluators) {
+        for (Evaluator evaluator : evaluators) {
         	EvaluatorItem item = new EvaluatorItem(evaluator);
         	cmbEvaluators.addItem(item);
         	

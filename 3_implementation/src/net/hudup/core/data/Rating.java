@@ -9,6 +9,7 @@ package net.hudup.core.data;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 import net.hudup.core.Cloneable;
 import net.hudup.core.Constants;
@@ -122,8 +123,20 @@ public class Rating implements Cloneable, Serializable, TextParsable {
 	 * Getting rated date as {@link Date} object.
 	 * @return rated date as {@link Date} object.
 	 */
-	public Date getRateDate() {
+	public Date getRatedDate() {
 		return new Date(ratedDate);
+	}
+	
+	
+	/**
+	 * Getting rating list.
+	 * @return rating list.
+	 */
+	public List<Rating> getRatingList() {
+		List<Rating> ratingList = Util.newList(1);
+		ratingList.add(this);
+		
+		return ratingList;
 	}
 	
 	

@@ -364,9 +364,7 @@ public class ProviderImpl implements Provider {
 				Rating rating = new Rating(ratingValue);
 				RatingTriple triple = new RatingTriple(userId, itemId, rating);
 				
-				long ratedDate = u.getValueAsTime(DataConfig.RATING_DATE_FIELD, null);
-				if (ratedDate > 0)
-					rating.ratedDate = ratedDate; 
+				rating.ratedDate = u.getValueAsTime(DataConfig.RATING_DATE_FIELD); 
 				
 				ContextList contexts = ctsManager.getContexts(userId, itemId);
 				if (contexts != null && contexts.size() > 0)
@@ -621,9 +619,7 @@ public class ProviderImpl implements Provider {
 				user.put(itemId, ratingValue);
 				Rating rating = user.get(itemId);
 				
-				long ratedDate = profile.getValueAsTime(DataConfig.RATING_DATE_FIELD, null);
-				if (ratedDate > 0)
-					rating.ratedDate = ratedDate; 
+				rating.ratedDate = profile.getValueAsTime(DataConfig.RATING_DATE_FIELD); 
 				
 				ContextList contexts = ctsManager.getContexts(userId, itemId);
 				if (contexts != null && contexts.size() > 0)
@@ -778,9 +774,7 @@ public class ProviderImpl implements Provider {
 				item.put(userId, ratingValue);
 				Rating rating = item.get(userId);
 				
-				long ratedDate = profile.getValueAsTime(DataConfig.RATING_DATE_FIELD, null);
-				if (ratedDate > 0)
-					rating.ratedDate = ratedDate; 
+				rating.ratedDate = profile.getValueAsTime(DataConfig.RATING_DATE_FIELD); 
 				
 				ContextList contexts = ctsManager.getContexts(userId, itemId);
 				if (contexts != null && contexts.size() > 0)

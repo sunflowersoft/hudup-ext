@@ -657,12 +657,6 @@ class FlatProviderAssoc extends ProviderAssocAbstract {
 				record.add(df.format(value));
 			}
 			else {
-				String attName = profile.getAtt(i).getName();
-				if (attName != null && attName.equalsIgnoreCase(DataConfig.RATING_DATE_FIELD) &&
-					value instanceof Number) {
-					value = ((Number)value).longValue();
-				}
-					
 				record.add(value.toString());
 			}
 		}

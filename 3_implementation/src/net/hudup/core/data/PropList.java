@@ -426,6 +426,8 @@ public class PropList implements TextParsable, Serializable, Cloneable {
 			return Boolean.class;
 		else if(isIntValue(key))
 			return Integer.class;
+		else if(isTimeValue(key))
+			return Long.class;
 		else if(isRealValue(key))
 			return Double.class;
 		else if(isHiddenValue(key))
@@ -458,6 +460,8 @@ public class PropList implements TextParsable, Serializable, Cloneable {
 			return Boolean.parseBoolean(sValue);
 		else if(isIntValue(key))
 			return Integer.parseInt(sValue);
+		else if(isTimeValue(key))
+			return Long.parseLong(sValue);
 		else if(isRealValue(key))
 			return Double.parseDouble(sValue);
 		else if(isHiddenValue(key))
@@ -494,7 +498,7 @@ public class PropList implements TextParsable, Serializable, Cloneable {
 		if (!containsKey(key))
 			return Constants.UNUSED;
 		
-		if (isRealValue(key) || isIntValue(key))
+		if (isRealValue(key) || isIntValue(key) || isTimeValue(key))
 			return ((Number) get(key)).doubleValue();
 		else
 			return Double.parseDouble(get(key).toString());
@@ -526,10 +530,26 @@ public class PropList implements TextParsable, Serializable, Cloneable {
 		if (!containsKey(key))
 			return -1;
 		
-		if (isIntValue(key) || isRealValue(key))
+		if (isIntValue(key) || isTimeValue(key) || isRealValue(key))
 			return ((Number) get(key)).intValue();
 		else
 			return Integer.parseInt(get(key).toString());
+	}
+
+	
+	/**
+	 * Getting value associated with the specified key as a time.
+	 * @param key Specified key
+	 * @return Value as time
+	 */
+	public long getAsTime(String key) {
+		if (!containsKey(key))
+			return -1;
+		
+		if (isIntValue(key) || isTimeValue(key) || isRealValue(key))
+			return ((Number) get(key)).longValue();
+		else
+			return Long.parseLong(get(key).toString());
 	}
 
 	
@@ -670,10 +690,23 @@ public class PropList implements TextParsable, Serializable, Cloneable {
 			return false;
 		
 		Serializable value = get(key);
-		return  (value instanceof Long) ||
-				(value instanceof Integer) || 
+		return  (value instanceof Integer) || 
 				(value instanceof Short) || 
 				(value instanceof Byte);
+	}
+
+	
+	/**
+	 * Testing whether value associated with the specified key is time.
+	 * @param key Specified key
+	 * @return whether is time value
+	 */
+	public boolean isTimeValue(String key) {
+		if (!containsKey(key))
+			return false;
+		
+		Serializable value = get(key);
+		return value instanceof Long;
 	}
 
 	
@@ -1109,6 +1142,8 @@ public class PropList implements TextParsable, Serializable, Cloneable {
 				rootPropList.put(key, Boolean.parseBoolean(value));
 			else if(type.equals(Attribute.toTypeString(Type.integer)))
 				rootPropList.put(key, Integer.parseInt(value));
+			else if(type.equals(Attribute.toTypeString(Type.time)))
+				rootPropList.put(key, Long.parseLong(value));
 			else if(type.equals(Attribute.toTypeString(Type.real)))
 				rootPropList.put(key, Double.parseDouble(value));
 			else if(type.equals(Attribute.toTypeString(Type.string)))
@@ -1236,6 +1271,13 @@ public class PropList implements TextParsable, Serializable, Cloneable {
 			else if (rootPropList.isIntValue(key)) {
 				int value = rootPropList.getAsInt(key);
 				newElement.setAttribute(ELEMENT_TYPE, Attribute.toTypeString(Type.integer));
+				newElement.setAttribute(ELEMENT_VALUE, value + "");
+				
+				rootElement.appendChild(newElement);
+			}
+			else if (rootPropList.isTimeValue(key)) {
+				int value = rootPropList.getAsInt(key);
+				newElement.setAttribute(ELEMENT_TYPE, Attribute.toTypeString(Type.time));
 				newElement.setAttribute(ELEMENT_VALUE, value + "");
 				
 				rootElement.appendChild(newElement);

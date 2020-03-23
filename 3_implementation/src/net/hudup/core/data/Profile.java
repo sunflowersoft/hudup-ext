@@ -495,17 +495,42 @@ public class Profile implements Cloneable, TextParsable, Serializable {
 						SimpleDateFormat df = new SimpleDateFormat(Constants.DATE_FORMAT);
 						newValue = df.parse(string);
 					} 
-					catch (Throwable e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-						newValue = null;
-					}
+					catch (Throwable e) {e.printStackTrace(); newValue = null;}
 				}
-				
 			}
 			
 			break;
 			
+		case time:
+			if (value instanceof Number)
+				newValue = ((Number)value).longValue();
+			if (value instanceof Date)
+				newValue = ((Date)value).getTime();
+			else if (value instanceof java.sql.Date) 
+				newValue = ((java.sql.Date)value).getTime();
+			else if (value instanceof Calendar)
+				newValue = ((Calendar)value).getTimeInMillis();
+			else if (value instanceof String || value instanceof Nominal) {
+				String string = value instanceof Nominal ? 
+					((Nominal)value).getValue().trim() : ((String)value).trim();
+				
+				if (!string.isEmpty()) {
+					try {newValue = Long.parseLong(string);}
+					catch (Exception e) {newValue = null;}
+					
+					if (newValue == null) {
+						Date date = null;
+						try {
+							SimpleDateFormat df = new SimpleDateFormat(Constants.DATE_FORMAT);
+							date = df.parse(string);
+						}catch (Throwable e) {date = null;}
+						if (date != null) newValue = date.getTime();
+					}
+				}
+			}
+			
+			break;
+
 		case object:
 			newValue = value;
 			break;
@@ -549,7 +574,6 @@ public class Profile implements Cloneable, TextParsable, Serializable {
 					newValue = df.parse(string);
 				} 
 				catch (ParseException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 					newValue = null;
 				} // end try
@@ -733,7 +757,10 @@ public class Profile implements Cloneable, TextParsable, Serializable {
 			}
 			
 		case date:
-			return Constants.UNUSED;
+			return ((Date)value).getTime();
+			
+		case time:
+			return ((Long)value).doubleValue();
 			
 		case object:
 			return Constants.UNUSED;
@@ -810,8 +837,11 @@ public class Profile implements Cloneable, TextParsable, Serializable {
 			}
 			
 		case date:
-			return 0;
+			return (int)((Date)value).getTime();
 			
+		case time:
+			return ((Long)value).intValue();
+
 		case object:
 			return 0;
 		}
@@ -871,7 +901,10 @@ public class Profile implements Cloneable, TextParsable, Serializable {
 			}
 			
 		case date:
-			return false;
+			return ((Date)value).getTime() == 0;
+			
+		case time:
+			return ((Long)value) == 0;
 			
 		case object:
 			return false;
@@ -912,8 +945,8 @@ public class Profile implements Cloneable, TextParsable, Serializable {
 			try {
 				value = createValue(new Attribute("getValueAsDate", Type.date), value, df);
 				if (value == null) {
-					//Try to get number as miliseconds and then convert to date. Added by Loc Nguyen: 2020.03.22.
-					value = createValue(new Attribute("getValueAsNumber", Type.real), getValue(index));
+					//Try to get value as time in miliseconds and then convert to date. Added by Loc Nguyen: 2020.03.22.
+					value = createValue(new Attribute("getValueAsTime", Type.time), getValue(index));
 					if (value != null && value instanceof Number)
 						return new Date(((Number)value).longValue());
 					else
@@ -934,26 +967,6 @@ public class Profile implements Cloneable, TextParsable, Serializable {
 	
 
 	/**
-	 * Getting value at specified index as date-time in miliseconds. The returned value is formatted according to specified date format.
-	 * @param index specified index.
-	 * @param df specified date format.
-	 * @return date-time in miliseconds value by index.
-	 */
-	public long getValueAsTime(int index, DateFormat df) {
-		double time = getValueAsReal(index);
-		if (Util.isUsed(time))
-			return (long)time;
-		else {
-			Date date = getValueAsDate(index, df);
-			if (date != null)
-				return date.getTime();
-			else
-				return 0;
-		}
-	}
-	
-	
-	/**
 	 * Getting value of attribute having specified name as date-time object.
 	 * The returned value is formatted by the specified date format.
 	 * @param attName specified attribute name.
@@ -970,16 +983,65 @@ public class Profile implements Cloneable, TextParsable, Serializable {
 	
 	
 	/**
-	 * Getting value of attribute having specified name as date-time in miliseconds.
+	 * Getting value at specified index as time in miliseconds.
+	 * @param index specified index.
+	 * @return time in miliseconds value by index.
+	 */
+	public long getValueAsTime(int index) {
+		if (isMissing(index))
+			return -1;
+		
+		Attribute att = attRef.get(index);
+		Object value = attValues.get(index);
+		
+		Type attType = att.getType();
+		switch (attType) {
+		
+		case bit:
+			return (Byte)value;
+			
+		case nominal:
+			return (Integer)value;
+			
+		case integer:
+			return (Integer)value;
+			
+		case real:
+			return ((Double)value).longValue();
+			
+		case string:
+			try {
+				return Long.parseLong((String)value);
+			}
+			catch (Throwable e) {
+				e.printStackTrace();
+				return 0;
+			}
+			
+		case date:
+			return ((Date)value).getTime();
+			
+		case time:
+			return (Long)value;
+
+		case object:
+			return 0;
+		}
+		
+		return -1;
+	}
+	
+	
+	/**
+	 * Getting value of attribute having specified name as time in miliseconds.
 	 * The returned value is formatted by the specified date format.
 	 * @param attName specified attribute name.
-	 * @param df specified date format.
-	 * @return value of attribute having specified name as date-time in miliseconds.
+	 * @return value of attribute having specified name as time in miliseconds.
 	 */
-	public long getValueAsTime(String attName, DateFormat df) {
+	public long getValueAsTime(String attName) {
 		int index = indexOf(attName);
 		if (index != -1)
-			return getValueAsTime(index, df);
+			return getValueAsTime(index);
 		else
 			return 0;
 	}

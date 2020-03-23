@@ -367,7 +367,7 @@ public class SnapshotImplExt extends SnapshotImpl {
 						continue;
 					
 					Rating monoRating = new Rating(ratingValue);
-					monoRating.ratedDate = profile.getValueAsTime(DataConfig.RATING_DATE_FIELD, null);
+					monoRating.ratedDate = profile.getValueAsTime(DataConfig.RATING_DATE_FIELD);
 					
 					RatingVector user = null;
 					if (userRatingMap.containsKey(userId))

@@ -78,10 +78,7 @@ public class RatingMulti extends Rating {
 		int n = history.size();
 		int index = -1;
 		for (int i = n-1; i >= 0; i--) {
-			Date thisDate = new Date(history.get(i).ratedDate);
-			Date thatDate = new Date(rating.ratedDate);
-
-			if(thisDate.before(thatDate)) {
+			if(history.get(i).ratedDate < rating.ratedDate) {
 				index = i;
 				break;
 			}
@@ -147,6 +144,16 @@ public class RatingMulti extends Rating {
 	}
 	
 	
+	@Override
+	public List<Rating> getRatingList() {
+		// TODO Auto-generated method stub
+		if (history.size() > 0)
+			return history;
+		else
+			return super.getRatingList();
+	}
+
+
 	/**
 	 * Clearing this {@link RatingMulti}, which means that the rating history is make empty.
 	 */
@@ -154,6 +161,7 @@ public class RatingMulti extends Rating {
 		history.clear();
 		updateCurrentRating();
 	}
+	
 	
 	@Override
 	public Object clone() {

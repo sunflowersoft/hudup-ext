@@ -40,6 +40,7 @@ import net.hudup.core.data.ctx.CTSManager;
 import net.hudup.core.data.ctx.ContextTemplate;
 import net.hudup.core.data.ctx.ContextTemplateSchema;
 import net.hudup.core.data.ui.ProfileTable;
+import net.hudup.core.logistic.ui.TextField;
 import net.hudup.core.logistic.ui.UIUtil;
 import net.hudup.data.ProviderImpl;
 import net.hudup.data.ctx.DefaultCTSManager;
@@ -164,11 +165,13 @@ public class DatasetViewer extends JDialog {
 		
 		setLayout(new BorderLayout());
 		
-		JPanel header = new JPanel();
+		JPanel header = new JPanel(new BorderLayout());
 		add(header, BorderLayout.NORTH);
 		
-		JLabel datasetId = new JLabel("Dataset \"" + dataset.getConfig().getUriId() + "\"");
-		header.add(datasetId);
+		TextField datasetId = new TextField("Dataset \"" + dataset.getConfig().getUriId() + "\"");
+		datasetId.setEditable(false);
+		datasetId.setCaretPosition(0);
+		header.add(datasetId, BorderLayout.CENTER);
 		
 		final JPanel body = new JPanel(new BorderLayout());
 		add(body, BorderLayout.CENTER);

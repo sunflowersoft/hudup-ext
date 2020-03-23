@@ -187,7 +187,8 @@ public class DefaultCTSManager extends CTSManagerAbstract {
 		// Create context template
 		ContextTemplate template = ContextTemplateImpl.create(
 				templateId, 
-				profile.getValueAsString(DataConfig.CTX_NAME_FIELD), Type.integer);
+				profile.getValueAsString(DataConfig.CTX_NAME_FIELD),
+				Attribute.fromInt(profile.getValueAsInt(DataConfig.CTX_TYPE_FIELD)) /*Type.integer*/); //Fixing bug by Loc Nguyen: 2020.03.24
 		
 		
 		try {

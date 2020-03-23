@@ -53,7 +53,7 @@ public class AttributeListTable extends JTable {
 	 * Supported attribute type.
 	 */
 	private final static Type SUPPORT_TYPE [] = {
-		Type.bit, Type.nominal, Type.integer, Type.real, Type.string, Type.date};
+		Type.bit, Type.nominal, Type.integer, Type.real, Type.string, Type.date, Type.time};
 
 	
 	/**
