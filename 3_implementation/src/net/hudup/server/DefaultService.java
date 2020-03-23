@@ -1467,27 +1467,35 @@ public class DefaultService implements Service, AutoCloseable {
 	@Override
 	public Evaluator getEvaluator(String evaluatorName, String account, String password) throws RemoteException {
 		// TODO Auto-generated method stub
+		if (!validateAccount(account, password, DataConfig.ACCOUNT_EVALUATE_PRIVILEGE))
+			return null;
+		else
+			return getEvaluator(evaluatorName);
+	}
+
+
+	/**
+	 * Getting evaluator with specified evaluator name.
+	 * @param evaluatorName specified evaluator name.
+	 * @return evaluator with specified evaluator name.
+	 * @throws RemoteException if any error raises.
+	 */
+	public Evaluator getEvaluator(String evaluatorName) throws RemoteException {
 		Evaluator evaluator = null;
-		
 		trans.lockWrite();
 		try {
-			if (validateAccount(account, password, DataConfig.ACCOUNT_EVALUATE_PRIVILEGE)) {
-				List<Evaluator> evList = Util.getPluginManager().discover(Evaluator.class);
-				for (Evaluator ev : evList) {
-					if (ev.getName().equals(evaluatorName)) {
-						evaluator = ev;
-						break;
-					}
-				}
-				
-				if (evaluator != null) {
-					evaluator.export(serverConfig.getServerPort());
-					
-					this.evaluatorConfigMap.put(evaluator.getName(), evaluator.getConfig());
+			List<Evaluator> evList = Util.getPluginManager().discover(Evaluator.class);
+			for (Evaluator ev : evList) {
+				if (ev.getName().equals(evaluatorName)) {
+					evaluator = ev;
+					break;
 				}
 			}
-			else {
-				//Return evaluator client version. Next updated version.
+			
+			if (evaluator != null) {
+				evaluator.export(serverConfig.getServerPort());
+				
+				this.evaluatorConfigMap.put(evaluator.getName(), evaluator.getConfig());
 			}
 		}
 		catch (Throwable e) {
@@ -1502,8 +1510,8 @@ public class DefaultService implements Service, AutoCloseable {
 		
 		return evaluator;
 	}
-
-
+	
+	
 	@Override
 	public String[] getEvaluatorNames() throws RemoteException {
 		// TODO Auto-generated method stub

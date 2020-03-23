@@ -29,7 +29,7 @@ import net.hudup.core.logistic.xURI;
  * @version 10.0
  *
  */
-public class Metrics implements Serializable {
+public class Metrics implements Serializable /*, Exportable*/ {
 
 	
 	/**
@@ -973,6 +973,54 @@ public class Metrics implements Serializable {
 		
 		return buffer.toString();
 	}
+
+
+//	@Override
+//	public Remote export(int serverPort) throws RemoteException {
+//		// TODO Auto-generated method stub
+//		List<MetricWrapper> newMetricWrapperList = Util.newList(metricWrapperList.size());
+//		for (MetricWrapper wrapper : metricWrapperList) {
+//			try {
+//				wrapper.export(serverPort);
+//			}
+//			catch (Exception e) {
+//				e.printStackTrace();
+//			}
+//		}
+//		
+//		System.out.println("Metrics does not return remote object when exporting its metric wrappers.");
+//		return null;
+//	}
+//
+//
+//	@Override
+//	public void unexport() throws RemoteException {
+//		// TODO Auto-generated method stub
+//		for (MetricWrapper wrapper : metricWrapperList) {
+//			try {
+//				wrapper.unexport();
+//			}
+//			catch (Exception e) {
+//				e.printStackTrace();
+//			}
+//		}
+//	}
+//
+//
+//	@Override
+//	public void forceUnexport() throws RemoteException {
+//		// TODO Auto-generated method stub
+//		
+//	}
+//
+//
+//	@Override
+//	public Remote getExportedStub() throws RemoteException {
+//		// TODO Auto-generated method stub
+//		LogUtil.warn("Metrics does not support method #getExportedStub()");
+//		
+//		return null;
+//	}
 
 
 }

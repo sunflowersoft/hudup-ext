@@ -16,18 +16,20 @@ import net.hudup.core.data.Dataset;
 import net.hudup.core.data.RatingVector;
 import net.hudup.core.evaluate.MetaMetric;
 import net.hudup.core.evaluate.MetricValue;
+import net.hudup.core.evaluate.RealMeanMetricValue;
 import net.hudup.core.evaluate.RealMetricValue;
 import net.hudup.core.evaluate.recommend.ClassificationAccuracy;
 import net.hudup.core.logistic.NextUpdate;
 
 /**
- * This class represents F1 metric.
+ * This class represents F1 metric for each vector which means that this F1 is calculated for each rating vector and then make average over all.
+ * This calculation way is not exactly correct for whole dataset and may datasets but acceptable.
  * 
  * @author Loc Nguyen
  * @version 10.0
  *
  */
-public class F1 extends ClassificationAccuracy {
+public class F1Each extends ClassificationAccuracy {
 
 
 	/**
@@ -39,7 +41,7 @@ public class F1 extends ClassificationAccuracy {
 	/**
 	 * Default constructor.
 	 */
-	public F1() {
+	public F1Each() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
@@ -48,7 +50,7 @@ public class F1 extends ClassificationAccuracy {
 	@Override
 	public String getName() {
 		// TODO Auto-generated method stub
-		return "F1.recommend";
+		return "F1Each.recommend";
 	}
 
 	
@@ -62,7 +64,7 @@ public class F1 extends ClassificationAccuracy {
 	@Override
 	public String getDescription() throws RemoteException {
 		// TODO Auto-generated method stub
-		return "F1 for recommendation algorithm";
+		return "F1 with each vector for recommendation algorithm";
 	}
 
 	
@@ -93,14 +95,14 @@ public class F1 extends ClassificationAccuracy {
 		
 		double precision = (double)Nrs.size() / (double)Ns.size();
 		double recall = (double)Nrs.size() / (double)Nr.size();
-		return new RealMetricValue(2*precision*recall / (precision+recall));
+		return new RealMeanMetricValue(2*precision*recall / (precision+recall));
 	}
 
 
 	@Override
 	public Alg newInstance() {
 		// TODO Auto-generated method stub
-		return new F1();
+		return new F1Each();
 	}
 
 

@@ -314,7 +314,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			evaluator.clearDelayUnsetupAlgs();
 			
 			algRegTable.clear();
-			algRegTable.register(EvaluatorAbstract.extractAlgFromPluginStorage(evaluator)); //Algorithms are not cloned because of saving memory when evaluator GUI keep algorithms for a long time.
+			algRegTable.register(EvaluatorAbstract.extractNormalAlgFromPluginStorage(evaluator)); //Algorithms are not cloned because of saving memory when evaluator GUI keep algorithms for a long time.
 			lbAlgs.update(algRegTable.getAlgList());
 			
 			updateMode();
@@ -480,8 +480,11 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 					
 					if (bindUri == null) {
 						try {
-							evaluator.updatePool(toDatasetPoolExchangedClient(guiData.pool),
-									getThisGUI().timestamp = new Timestamp());
+//							synchronized (this) {
+								evaluator.updatePool(toDatasetPoolExchangedClient(guiData.pool),
+										getThisGUI().timestamp = new Timestamp());
+//								wait();
+//							}
 						} catch (Throwable e) {e.printStackTrace();}
 					}
 					else {
@@ -584,7 +587,10 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 					
 					boolean ret = true;
 					try {
-						ret = evaluator.updatePool(toDatasetPoolExchangedClient(guiData.pool), null);
+//						synchronized (this) {
+							ret = evaluator.updatePool(toDatasetPoolExchangedClient(guiData.pool), null);
+//							wait();
+//						}
 					} catch (Exception ex) {ex.printStackTrace();}
 					
 					if (ret) {
@@ -1055,7 +1061,10 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 
 			if (bindUri == null) {
 				try {
-					evaluator.updatePool(null, null);
+//					synchronized (this) {
+						evaluator.updatePool(null, null);
+//						wait();
+//					}
 				} catch (Throwable e) {e.printStackTrace();}
 			}
 			else {
@@ -1089,14 +1098,14 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			
 			clearResult();
 			boolean started = false;
-			if (bindUri == null) {
-//				synchronized (this) {
+//			synchronized (this) {
+				if (bindUri == null)
 					started = evaluator.remoteStart0(lbAlgs.getAlgList(), toDatasetPoolExchangedClient(guiData.pool), this.timestamp = new Timestamp());
-//					try {wait();} catch (Exception e) {e.printStackTrace();}
-//				}
-			}
-			else
-				started = evaluator.remoteStart(lbAlgs.getAlgNameList(), toDatasetPoolExchangedClient(guiData.pool), null);
+				else
+					started = evaluator.remoteStart(lbAlgs.getAlgNameList(), toDatasetPoolExchangedClient(guiData.pool), null);
+				
+//				try {wait();} catch (Exception e) {e.printStackTrace();}
+//			}
 			if (!started) updateMode();
 		}
 		catch (Throwable e) {
@@ -1110,7 +1119,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 	@Override
 	public synchronized void receivedEvaluator(EvaluatorEvent evt) throws RemoteException {
 		// TODO Auto-generated method stub
-//		if (bindUri == null) try {notify();} catch (Exception e) {e.printStackTrace();}
+//		try {notifyAll();} catch (Exception e) {e.printStackTrace();}
 		
 		if (evt.getType() == EvaluatorEvent.Type.start || evt.getType() == EvaluatorEvent.Type.update_pool) {
 //			Timestamp timestamp = evt.getTimestamp();
@@ -1457,7 +1466,10 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			clearResult();
 			if (bindUri == null) {
 				try {
-					evaluator.updatePool(toDatasetPoolExchangedClient(guiData.pool), null);
+//					synchronized (this) {
+						evaluator.updatePool(toDatasetPoolExchangedClient(guiData.pool), null);
+//						wait();
+//					}
 				} catch (Throwable e) {e.printStackTrace();}
 				
 			}
@@ -1574,7 +1586,10 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			
 			if (bindUri == null) {
 				try {
-					evaluator.updatePool(toDatasetPoolExchangedClient(guiData.pool), null);
+//					synchronized (this) {
+						evaluator.updatePool(toDatasetPoolExchangedClient(guiData.pool), null);
+//						wait();
+//					}
 				} catch (Throwable e) {e.printStackTrace();}
 			}
 			else {

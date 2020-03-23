@@ -934,6 +934,26 @@ public class Profile implements Cloneable, TextParsable, Serializable {
 	
 
 	/**
+	 * Getting value at specified index as date-time in miliseconds. The returned value is formatted according to specified date format.
+	 * @param index specified index.
+	 * @param df specified date format.
+	 * @return date-time in miliseconds value by index.
+	 */
+	public long getValueAsTime(int index, DateFormat df) {
+		double time = getValueAsReal(index);
+		if (Util.isUsed(time))
+			return (long)time;
+		else {
+			Date date = getValueAsDate(index, df);
+			if (date != null)
+				return date.getTime();
+			else
+				return 0;
+		}
+	}
+	
+	
+	/**
 	 * Getting value of attribute having specified name as date-time object.
 	 * The returned value is formatted by the specified date format.
 	 * @param attName specified attribute name.
@@ -948,6 +968,22 @@ public class Profile implements Cloneable, TextParsable, Serializable {
 			return null;
 	}
 	
+	
+	/**
+	 * Getting value of attribute having specified name as date-time in miliseconds.
+	 * The returned value is formatted by the specified date format.
+	 * @param attName specified attribute name.
+	 * @param df specified date format.
+	 * @return value of attribute having specified name as date-time in miliseconds.
+	 */
+	public long getValueAsTime(String attName, DateFormat df) {
+		int index = indexOf(attName);
+		if (index != -1)
+			return getValueAsTime(index, df);
+		else
+			return 0;
+	}
+
 	
 	/**
 	 * Getting value at specified index as normalized number of nominal.

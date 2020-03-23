@@ -112,7 +112,17 @@ public class DefaultServiceExt extends DefaultService implements ServiceExt {
 	public List<Evaluator> getEvaluators(String account, String password) throws RemoteException {
 		if (!validateAccount(account, password, DataConfig.ACCOUNT_EVALUATE_PRIVILEGE))
 			return Util.newList();
-		
+		else
+			return getEvaluators();
+	}
+
+
+	/**
+	 * Getting list of evaluator pairs.
+	 * @return list of evaluator pairs.
+	 * @throws RemoteException if any error raises.
+	 */
+	public List<Evaluator> getEvaluators() throws RemoteException {
 		List<Evaluator> evList = Util.newList();
 		trans.lockWrite();
 		try {
@@ -158,31 +168,6 @@ public class DefaultServiceExt extends DefaultService implements ServiceExt {
 		
 		return evList;
 	}
-
-
-	/**
-	 * Extracting name of specified evaluator with reproduction support.
-	 * @param evaluator specified evaluator.
-	 * @return name of specified evaluator with reproduction support.
-	 */
-	private String extractName(Evaluator evaluator) {
-		String name = "";
-		if (evaluator != null) {
-			try {
-				EvaluatorConfig config = evaluator.getConfig();
-				if (config.isReproduced())
-					name = evaluator.getName() + "-" + config.getReproducedVersion();
-				else
-					name = evaluator.getName();
-			}
-			catch (Exception e) {
-				e.printStackTrace();
-				name = "";
-			}
-		}
-		
-		return name;
-	}
 	
 	
 	@Override
@@ -190,7 +175,14 @@ public class DefaultServiceExt extends DefaultService implements ServiceExt {
 		// TODO Auto-generated method stub
 		if (!validateAccount(account, password, DataConfig.ACCOUNT_EVALUATE_PRIVILEGE))
 			return null;
-		
+		else
+			return getEvaluator(evaluatorName);
+	}
+
+
+	@Override
+	public Evaluator getEvaluator(String evaluatorName) throws RemoteException {
+		// TODO Auto-generated method stub
 		Evaluator evaluator = null;
 		trans.lockWrite();
 		try {
@@ -217,13 +209,33 @@ public class DefaultServiceExt extends DefaultService implements ServiceExt {
 		// TODO Auto-generated method stub
 		if (!validateAccount(account, password, DataConfig.ACCOUNT_EVALUATE_PRIVILEGE))
 			return null;
+		
+		if (reproducedVersion != null && !reproducedVersion.isEmpty()) {
+			String evaluatorReproducedName = evaluatorName + "-" + reproducedVersion;
+			if (!pairReproducedMap.containsKey(evaluatorReproducedName)) {
+				if (!validateAccount(account, password, DataConfig.ACCOUNT_ADMIN_PRIVILEGE))
+					return null;
+			}
+		}
 
+		return getEvaluator(evaluatorName, reproducedVersion);
+	}
+
+
+	/**
+	 * Getting a evaluator with name and reproduced version.
+	 * @param evaluatorName evaluator name.
+	 * @param reproducedVersion reproduced version.
+	 * @return evaluator with reproduced version.
+	 * @throws RemoteException if any error raises.
+	 */
+	public Evaluator getEvaluator(String evaluatorName, String reproducedVersion) throws RemoteException {
 		Evaluator reproducedEvaluator = null;
 		trans.lockWrite();
 		try {
 			if (reproducedVersion == null || reproducedVersion.isEmpty())
-				reproducedEvaluator = getEvaluator(evaluatorName, account, password);
-			else if (validateAccount(account, password, DataConfig.ACCOUNT_EVALUATE_PRIVILEGE)) {
+				reproducedEvaluator = getEvaluator(evaluatorName);
+			else {
 				String evaluatorReproducedName = evaluatorName + "-" + reproducedVersion;
 				
 				if (pairReproducedMap.containsKey(evaluatorReproducedName))
@@ -242,9 +254,6 @@ public class DefaultServiceExt extends DefaultService implements ServiceExt {
 					pairReproducedMap.put(evaluatorReproducedName, reproducedEvaluator);
 				}
 			}
-			else {
-				//Return evaluator client version. Next updated version.
-			}
 		}
 		catch (Throwable e) {
 			e.printStackTrace();
@@ -258,17 +267,30 @@ public class DefaultServiceExt extends DefaultService implements ServiceExt {
 		
 		return reproducedEvaluator;
 	}
-
-
+	
+	
 	@Override
 	public boolean removeEvaluator(String evaluatorName, String account, String password, String reproducedVersion)
 			throws RemoteException {
 		// TODO Auto-generated method stub
-		if (reproducedVersion == null || reproducedVersion.isEmpty())
-			return false;
 		if (!validateAccount(account, password, DataConfig.ACCOUNT_EVALUATE_PRIVILEGE))
 			return false;
-		
+		else
+			return removeEvaluator(evaluatorName, reproducedVersion);
+	}
+
+
+	/**
+	 * Removing a evaluator with name reproduced version.
+	 * @param evaluatorName evaluator name.
+	 * @param reproducedVersion reproduced version.
+	 * @return evaluator with reproduced version.
+	 * @throws RemoteException if any error raises.
+	 */
+	public boolean removeEvaluator(String evaluatorName, String reproducedVersion) throws RemoteException {
+		if (reproducedVersion == null || reproducedVersion.isEmpty())
+			return false;
+
 		boolean ret = true;
 		trans.lockWrite();
 		try {
@@ -296,7 +318,7 @@ public class DefaultServiceExt extends DefaultService implements ServiceExt {
 		return ret;
 	}
 
-
+	
 	@Override
 	public String[] getEvaluatorNames() throws RemoteException {
 		// TODO Auto-generated method stub
@@ -330,4 +352,29 @@ public class DefaultServiceExt extends DefaultService implements ServiceExt {
 	}
 
 
+	/**
+	 * Extracting name of specified evaluator with reproduction support.
+	 * @param evaluator specified evaluator.
+	 * @return name of specified evaluator with reproduction support.
+	 */
+	private String extractName(Evaluator evaluator) {
+		String name = "";
+		if (evaluator != null) {
+			try {
+				EvaluatorConfig config = evaluator.getConfig();
+				if (config.isReproduced())
+					name = evaluator.getName() + "-" + config.getReproducedVersion();
+				else
+					name = evaluator.getName();
+			}
+			catch (Exception e) {
+				e.printStackTrace();
+				name = "";
+			}
+		}
+		
+		return name;
+	}
+	
+	
 }

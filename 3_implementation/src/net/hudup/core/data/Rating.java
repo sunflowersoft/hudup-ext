@@ -60,7 +60,7 @@ public class Rating implements Cloneable, Serializable, TextParsable {
 	 * The date that a user rates on an item. Of course it contains year, month, day, hour, minute, second, etc.
 	 * This variable is public for fast accessing.
 	 */
-	public Date ratedDate = new Date();
+	public long ratedDate = 0;
 	
 	
 	/**
@@ -118,17 +118,21 @@ public class Rating implements Cloneable, Serializable, TextParsable {
 	}
 	
 	
+	/**
+	 * Getting rated date as {@link Date} object.
+	 * @return rated date as {@link Date} object.
+	 */
+	public Date getRateDate() {
+		return new Date(ratedDate);
+	}
+	
+	
 	@Override
 	public Object clone() {
 		// TODO Auto-generated method stub
 		Rating rating = new Rating(this.value);
 		rating.contexts = (ContextList) this.contexts.clone();
-		if (this.ratedDate == null) { //Fixing null rated date on April 16, 2019
-			System.out.println("Null rated date");
-			rating.ratedDate = new Date();
-		}
-		else
-			rating.ratedDate = new Date(this.ratedDate.getTime());
+		rating.ratedDate = this.ratedDate;
 		
 		return rating;
 	}

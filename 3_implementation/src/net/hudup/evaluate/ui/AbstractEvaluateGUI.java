@@ -225,7 +225,7 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 			}
 			else {
 				try {
-					algRegTable = EvaluatorAbstract.extractAlgFromPluginStorage(evaluator);
+					algRegTable = EvaluatorAbstract.extractNormalAlgFromPluginStorage(evaluator);
 				} catch (Throwable e) {e.printStackTrace();}
 			}
 		}
@@ -309,14 +309,15 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	 */
 	protected void pauseResume() {
 		try {
-			if (evaluator.remoteIsPaused()) {
-				if (!evaluator.remoteResume())
-					updateMode();
-			}
-			else if (evaluator.remoteIsRunning()) {
-				if (!evaluator.remotePause())
-					updateMode();
-			}
+			boolean ret = true;
+//			synchronized (this) {
+				if (evaluator.remoteIsPaused())
+					ret = evaluator.remoteResume();
+				else if (evaluator.remoteIsRunning())
+					ret = evaluator.remotePause();
+//				wait();
+//			}
+			if (!ret) updateMode();
 		}
 		catch (Throwable e) {
 			e.printStackTrace();
@@ -330,8 +331,12 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	 */
 	protected void stop() {
 		try {
-			if (!evaluator.remoteStop())
-				updateMode();
+			boolean ret = true;
+//			synchronized (this) {
+				ret = evaluator.remoteStop();
+//				wait();
+//			}
+			if (!ret) updateMode();
 		}
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
@@ -346,8 +351,12 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	 */
 	protected void forceStop() {
 		try {
-			if (!evaluator.remoteForceStop())
-				updateMode();
+			boolean ret = true;
+//			synchronized (this) {
+				ret = evaluator.remoteForceStop();
+//				wait();
+//			}
+			if (!ret) updateMode();
 		}
 		catch (Throwable e) {
 			// TODO Auto-generated catch block

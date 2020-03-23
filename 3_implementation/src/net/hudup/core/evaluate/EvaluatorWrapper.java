@@ -254,9 +254,9 @@ public class EvaluatorWrapper implements Evaluator, Serializable {
 	
 	@Deprecated
 	@Override
-	public RegisterTable extractAlgFromPluginStorage0() throws RemoteException {
+	public RegisterTable extractNormalAlgFromPluginStorage0() throws RemoteException {
 		// TODO Auto-generated method stub
-		return remoteEvaluator.extractAlgFromPluginStorage0();
+		return remoteEvaluator.extractNormalAlgFromPluginStorage0();
 	}
 
 	

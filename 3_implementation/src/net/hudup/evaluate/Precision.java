@@ -88,7 +88,7 @@ public class Precision extends ClassificationAccuracy {
 				Nrs.remove(fieldId);
 		}
 		
-		return new FractionMetricValue(Nrs.size(), Ns.size());
+		return new FractionMetricValue(Nrs.size(), Ns.size()); //This is more exact for overall dataset and can solve problem of zero vector.
 	}
 
 

@@ -499,7 +499,7 @@ public class AttributeList implements Cloneable, TextParsable, Serializable, Tra
 		Attribute rating = new Attribute(DataConfig.RATING_FIELD, Type.real);
 		attributes.add(rating);
 		//
-		Attribute ratingDate = new Attribute(DataConfig.RATING_DATE_FIELD, Type.date);
+		Attribute ratingDate = new Attribute(DataConfig.RATING_DATE_FIELD, Type.real);
 		attributes.add(ratingDate);
 		
 		return attributes;
@@ -528,7 +528,7 @@ public class AttributeList implements Cloneable, TextParsable, Serializable, Tra
 		Attribute rating = new Attribute(DataConfig.RATING_FIELD, Type.real);
 		attributes.add(rating);
 		//
-		Attribute ratingDate = new Attribute(DataConfig.RATING_DATE_FIELD, Type.date);
+		Attribute ratingDate = new Attribute(DataConfig.RATING_DATE_FIELD, Type.real);
 		attributes.add(ratingDate);
 		
 		return attributes;
@@ -759,7 +759,7 @@ public class AttributeList implements Cloneable, TextParsable, Serializable, Tra
 		Attribute ctxValue = new Attribute(DataConfig.CTX_VALUE_FIELD, Type.integer);
 		attributes.add(ctxValue);
 		//
-		Attribute ratingDate = new Attribute(DataConfig.RATING_DATE_FIELD, Type.date);
+		Attribute ratingDate = new Attribute(DataConfig.RATING_DATE_FIELD, Type.real);
 		attributes.add(ratingDate);
 		
 		return attributes;

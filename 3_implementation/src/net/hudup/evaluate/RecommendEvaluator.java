@@ -150,7 +150,7 @@ public class RecommendEvaluator extends EvaluatorAbstract {
 					otherResult.datasetId = datasetId;
 					
 					// Adding default metrics to metric result
-					result.add( recommender.getName(), datasetId, datasetUri, ((NoneWrapperMetricList)metricList.clone()).sort().list() );
+					result.add( recommender.getName(), datasetId, datasetUri, ((NoneWrapperMetricList)evMetricList.clone()).sort().list() );
 					
 					otherResult.inAlgSetup = true;
 					recommender.addSetupListener(this);
@@ -330,11 +330,11 @@ public class RecommendEvaluator extends EvaluatorAbstract {
 			thread = null;
 			paused = false;
 			
+			clear();
+
 			//Fire evaluation finished event (done event).
 			fireEvaluateEvent(new EvaluateEvent(this, Type.done, result));
 			
-			clear();
-
 			notifyAll();
 		}
 		
@@ -480,6 +480,9 @@ public class RecommendEvaluator extends EvaluatorAbstract {
 
 		MAE mae = new MAE();
 		metricList.add(mae);
+
+		MAERatio maeRatio = new MAERatio();
+		metricList.add(maeRatio);
 
 //		NMAE nmae = new NMAE();
 //		metricList.add(nmae);

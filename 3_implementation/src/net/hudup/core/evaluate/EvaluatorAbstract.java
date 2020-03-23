@@ -26,6 +26,7 @@ import net.hudup.core.Util;
 import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.AlgDesc2;
 import net.hudup.core.alg.AlgDesc2List;
+import net.hudup.core.alg.AlgList;
 import net.hudup.core.alg.AlgRemote;
 import net.hudup.core.alg.SetupAlgEvent;
 import net.hudup.core.alg.SetupAlgListener;
@@ -146,12 +147,6 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
     protected EventListenerList listenerList = new EventListenerList();
 
     
-	/**
-     * The list of original metrics used to evaluate algorithms in {@link #evAlgList}.
-     */
-	protected NoneWrapperMetricList metricList = null;
-
-	
     /**
      * Exported stub as remote evaluator. It must be serializable.
      */
@@ -170,13 +165,37 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
     protected DatasetPool evPool = null;
     
     
+	/**
+     * The list of original metrics used to evaluate algorithms in {@link #evAlgList}.
+     */
+	protected NoneWrapperMetricList evMetricList = null;
+
+	
     /**
      * Additional parameter for this evaluator.
      */
     protected Serializable evParameter = null;
     
     
+    /**
+     * Internal task queue.
+     */
+    protected TaskQueue evTaskQueue = new TaskQueue();
+    
+    
 	/**
+	 * Internal counter.
+	 */
+	protected Counter evCounter = null;
+
+	
+    /**
+     * Evaluation processor.
+     */
+    protected EvaluateProcessor evProcessor = null;
+
+    
+    /**
      * The list of metrics resulted from the evaluation process.
      */
 	protected volatile Metrics result = null;
@@ -206,24 +225,6 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
     protected List<Alg> delayUnsetupAlgs = Util.newList();
 
     
-    /**
-     * Internal task queue.
-     */
-    protected TaskQueue taskQueue = new TaskQueue();
-    
-    
-	/**
-	 * Internal counter.
-	 */
-	protected Counter counter = null;
-
-	
-    /**
-     * Evaluation processor.
-     */
-    protected EvaluateProcessor evProcessor = null;
-    
-    
 	/**
 	 * Default constructor.
 	 */
@@ -240,16 +241,16 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 		}
 		
 		try {
-			this.metricList = defaultMetrics();
-			this.metricList.syncWithPlugin();
-			this.metricList.sort();
+			this.evMetricList = defaultMetrics();
+			this.evMetricList.syncWithPlugin();
+			this.evMetricList.sort();
 		}
 		catch (Exception e) {
 			e.printStackTrace();
 		}
 		
 		this.evProcessor = new EvaluateProcessor(this);
-		this.counter = new Counter(otherResult);
+		this.evCounter = new Counter(otherResult);
 	}
 	
 	
@@ -296,10 +297,10 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 			return false;
 		}
 		
-		this.counter.stop();
-		this.counter.start();
-		this.taskQueue.stop();
-		this.taskQueue.start();
+		this.evTaskQueue.stop();
+		this.evTaskQueue.start();
+		this.evCounter.stop();
+		this.evCounter.start();
 
 		Timestamp timestamp = null;
 		if (parameter != null && parameter instanceof Timestamp)
@@ -366,7 +367,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 					otherResult.datasetId = datasetId;
 					
 					// Adding default metrics to metric result. Pay attention to cloning metrics list.
-					result.add( alg.getName(), datasetId, datasetUri, ((NoneWrapperMetricList)metricList.clone()).sort().list() );
+					result.add( alg.getName(), datasetId, datasetUri, ((NoneWrapperMetricList)evMetricList.clone()).sort().list() );
 					
 					otherResult.inAlgSetup = true;
 					if (alg instanceof AlgRemote) {
@@ -500,10 +501,10 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 			thread = null;
 			paused = false;
 			
-			fireEvaluateEvent(new EvaluateEvent(this, Type.done, result));
-			
 			clear();
 
+			fireEvaluateEvent(new EvaluateEvent(this, Type.done, result));
+			
 			notifyAll();
 		}
 		
@@ -636,8 +637,8 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 
 	@Override
 	public List<String> getMetricNameList() throws RemoteException {
-		synchronized(metricList) {
-			return this.metricList.nameList();
+		synchronized(evMetricList) {
+			return this.evMetricList.nameList();
 		}
 	}
 
@@ -660,17 +661,17 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 				newMetricList.add(registeredMetric); //This code line is important to remote setting.
 		}
 		
-		synchronized(this.metricList) {
-			this.metricList.clear();
-			this.metricList.addAll(newMetricList);
-			this.metricList.sort();
+		synchronized(this.evMetricList) {
+			this.evMetricList.clear();
+			this.evMetricList.addAll(newMetricList);
+			this.evMetricList.sort();
 		}
 	}
 	
 	
 	@Deprecated
 	@Override
-	public RegisterTable extractAlgFromPluginStorage0() throws RemoteException {
+	public RegisterTable extractNormalAlgFromPluginStorage0() throws RemoteException {
 		List<Alg> algList = PluginStorage.getNormalAlgReg().getAlgList(new AlgFilter() {
 			
 			/**
@@ -702,7 +703,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 	 * @param evaluator specified evaluator.
 	 * @return register table to store algorithms extracted from plug-in storage.
 	 */
-	public static RegisterTable extractAlgFromPluginStorage(Evaluator evaluator) {
+	public static RegisterTable extractNormalAlgFromPluginStorage(Evaluator evaluator) {
 		List<Alg> algList = PluginStorage.getNormalAlgReg().getAlgList(new AlgFilter() {
 			
 			/**
@@ -744,17 +745,22 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 	public List<String> getPluginAlgNames(Class<? extends Alg> algClass) throws RemoteException {
 		// TODO Auto-generated method stub
     	RegisterTable algReg = PluginStorage.lookupTable(algClass);
-    	List<String> algNames = Util.newList();
-    	if (algReg == null) return algNames;
+    	if (algReg == null) return Util.newList();
     	
+    	String tableName = PluginStorage.lookupTableName(algClass);
     	List<Alg> algList = algReg.getAlgList();
-    	for (Alg alg : algList) {
-    		try {
-    			if (acceptAlg(alg)) algNames.add(alg.getName());
-    		} catch (Throwable e) {e.printStackTrace();}
+    	if (tableName != null && tableName.equals(PluginStorage.NORMAL_ALG)) {
+        	List<String> algNames = Util.newList();
+	    	for (Alg alg : algList) {
+	    		try {
+	    			if (acceptAlg(alg)) algNames.add(alg.getName());
+	    		} catch (Throwable e) {e.printStackTrace();}
+	    	}
+	    	
+			return algNames;
     	}
-    	
-		return algNames;
+    	else
+    		return AlgList.getAlgNameList(algList); 
 	}
 
 
@@ -766,11 +772,16 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
     	if (algReg == null) return algDescs;
 		
     	List<Alg> algList = algReg.getAlgList();
+    	String tableName = PluginStorage.lookupTableName(algClass);
     	for (Alg alg : algList) {
-    		try {
-    			if (acceptAlg(alg))
-    				algDescs.add(alg);
-    		} catch (Throwable e) {e.printStackTrace();}
+        	if (tableName != null && tableName.equals(PluginStorage.NORMAL_ALG)) {
+	    		try {
+	    			if (acceptAlg(alg))
+	    				algDescs.add(alg);
+	    		} catch (Throwable e) {e.printStackTrace();}
+        	}
+        	else
+        		algDescs.add(alg);
     	}
     	
 		return algDescs;
@@ -947,8 +958,8 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 		this.evPool = null;
 		this.evParameter = null;
 		
-		this.taskQueue.stop();
-		this.counter.stop();
+		this.evCounter.stop();
+		this.evTaskQueue.stop();
 	}
 
 	
@@ -987,10 +998,10 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 			}
 		}
 		
+		thread = null;
+		paused = false;
+		clear();
 		fireEvaluateEvent(new EvaluateEvent(this, Type.done, result));
-		
-		this.taskQueue.stop();
-		this.counter.stop();
 		
 		return true;
 	}
@@ -1053,24 +1064,24 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 			
 			EvaluatorListener[] listeners = getEvaluatorListeners();
 			for (EvaluatorListener listener : listeners) {
-				if (taskQueue.isRunning()) {
-					taskQueue.addTask(new TaskQueue.Task() {
-						
-						@Override
-						public void doTask() throws Exception {
-							listener.receivedEvaluator(evt);
-						}
-						
-					});
-				}
-				else {
+//				if (taskQueue.isRunning()) {
+//					taskQueue.addTask(new TaskQueue.Task() {
+//						
+//						@Override
+//						public void doTask() throws Exception {
+//							listener.receivedEvaluator(evt);
+//						}
+//						
+//					});
+//				}
+//				else {
 					try {
 						listener.receivedEvaluator(evt);
 					}
 					catch (Exception e) {
 						e.printStackTrace();
 					}
-				}
+//				}
 			}
 			
 		}
@@ -1113,8 +1124,8 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 			
 			EvaluateListener[] listeners = getEvaluateListeners();
 			for (EvaluateListener listener : listeners) {
-				if (taskQueue.isRunning()) {
-					taskQueue.addTask(new TaskQueue.Task() {
+				if ((!config.isTiedSync()) && evTaskQueue.isRunning()) {
+					evTaskQueue.addTask(new TaskQueue.Task() {
 						
 						@Override
 						public void doTask() throws Exception {
@@ -1209,8 +1220,8 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 			
 	    	EvaluateProgressListener[] listeners = getEvaluateProgressListeners();
 			for (EvaluateProgressListener listener : listeners) {
-				if (taskQueue.isRunning()) {
-					taskQueue.addTask(new TaskQueue.Task() {
+				if ((!config.isTiedSync()) && evTaskQueue.isRunning()) {
+					evTaskQueue.addTask(new TaskQueue.Task() {
 						
 						@Override
 						public void doTask() throws Exception {
@@ -1269,8 +1280,8 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 			
 	    	SetupAlgListener[] listeners = getSetupAlgListeners();
 			for (SetupAlgListener listener : listeners) {
-				if (taskQueue.isRunning()) {
-					taskQueue.addTask(new TaskQueue.Task() {
+				if ((!config.isTiedSync()) && evTaskQueue.isRunning()) {
+					evTaskQueue.addTask(new TaskQueue.Task() {
 						
 						@Override
 						public void doTask() throws Exception {
@@ -1329,13 +1340,13 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
     
     @Override
 	public void addElapsedTimeListener(CounterElapsedTimeListener listener) throws RemoteException {
-		counter.addElapsedTimeListener(listener);
+		evCounter.addElapsedTimeListener(listener);
     }
 
     
     @Override
     public void removeElapsedTimeListener(CounterElapsedTimeListener listener) throws RemoteException {
-		counter.removeElapsedTimeListener(listener);
+		evCounter.removeElapsedTimeListener(listener);
     }
 
     
@@ -1526,7 +1537,9 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 		// TODO Auto-generated method stub
 		if (!pause()) return false;
 
-		counter.pause();
+		evCounter.pause();
+		evTaskQueue.pause();
+
 		fireEvaluatorEvent(new EvaluatorEvent(
 				this, 
 				EvaluatorEvent.Type.pause)); // firing paused event.
@@ -1540,7 +1553,9 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 		// TODO Auto-generated method stub
 		if (!resume()) return false;
 
-		counter.resume();
+		evTaskQueue.resume();
+		evCounter.resume();
+
 		fireEvaluatorEvent(new EvaluatorEvent(
 				this, 
 				EvaluatorEvent.Type.resume)); // firing resume event.
@@ -1554,12 +1569,12 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 		// TODO Auto-generated method stub
 		if (!stop()) return false;
 
+		this.evCounter.stop();
+		this.evTaskQueue.stop();
+		
 		fireEvaluatorEvent(new EvaluatorEvent(
 				this, 
 				EvaluatorEvent.Type.stop)); // firing stop event.
-		
-		this.taskQueue.stop();
-		this.counter.stop();
 		
 		return true;
 	}

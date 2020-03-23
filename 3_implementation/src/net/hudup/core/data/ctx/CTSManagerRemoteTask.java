@@ -9,10 +9,9 @@ package net.hudup.core.data.ctx;
 
 import java.io.Serializable;
 import java.rmi.RemoteException;
-import java.util.Date;
 
-import net.hudup.core.data.AutoCloseable;
 import net.hudup.core.alg.AlgRemoteTask;
+import net.hudup.core.data.AutoCloseable;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.Profile;
@@ -89,7 +88,7 @@ public interface CTSManagerRemoteTask extends AlgRemoteTask, AutoCloseable {
 	 * @return context list represented by {@link ContextList} relevant to a specified user, a specified item, and rated date.
 	 * @throws RemoteException if any error raises.
 	 */
-	ContextList remoteGetContexts(int userId, int itemId, Date ratedDate) throws RemoteException;
+	ContextList remoteGetContexts(int userId, int itemId, long ratedDate) throws RemoteException;
 
 	
 	/**

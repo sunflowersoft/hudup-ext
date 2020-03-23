@@ -41,6 +41,14 @@ public class RatingMulti extends Rating {
 	
 	
 	/**
+	 * Default constructor.
+	 */
+	protected RatingMulti() {
+		super();
+	}
+	
+	
+	/**
 	 * Constructor with specified rating value.
 	 * @param ratingValue specified rating value.
 	 */
@@ -70,8 +78,10 @@ public class RatingMulti extends Rating {
 		int n = history.size();
 		int index = -1;
 		for (int i = n-1; i >= 0; i--) {
-			if(history.get(i).ratedDate != null && rating.ratedDate != null &&
-					history.get(i).ratedDate.before(rating.ratedDate)) {
+			Date thisDate = new Date(history.get(i).ratedDate);
+			Date thatDate = new Date(rating.ratedDate);
+
+			if(thisDate.before(thatDate)) {
 				index = i;
 				break;
 			}
@@ -90,7 +100,7 @@ public class RatingMulti extends Rating {
 	 * Although this class keeps a history of ratings in variable {@link #history}, there is always a current rating that user gave on item latest.
 	 * Such rating is called current rating. This method updates the current rating.
 	 */
-	private void updateCurrentRating() {
+	protected void updateCurrentRating() {
 		int n = history.size();
 		if (n > 0) {
 			Rating lastRating = history.get(n-1);
@@ -101,7 +111,7 @@ public class RatingMulti extends Rating {
 		else {
 			this.value = Constants.UNUSED;
 			this.contexts.clear();
-			this.ratedDate = new Date();
+			this.ratedDate = new Date().getTime();
 		}
 	}
 	
@@ -145,5 +155,35 @@ public class RatingMulti extends Rating {
 		updateCurrentRating();
 	}
 	
+	@Override
+	public Object clone() {
+		List<Rating> history = Util.newList(this.history.size());
+		for (Rating rating : this.history) {
+			Rating clonedRating = (Rating)rating.clone();
+			history.add(clonedRating);
+		}
+		
+		RatingMulti clonedRating = new RatingMulti();
+		clonedRating.history = history;
+		clonedRating.updateCurrentRating();
+		
+		return clonedRating;
+	}
+
+
+	@Override
+	public void assign(Rating that) {
+		// TODO Auto-generated method stub
+		if (that instanceof RatingMulti) {
+			this.history = ((RatingMulti)that).history;
+		}
+		else {
+			this.history.clear();
+			this.history.add(that);
+		}
+		
+		this.updateCurrentRating();
+	}
+
 	
 }

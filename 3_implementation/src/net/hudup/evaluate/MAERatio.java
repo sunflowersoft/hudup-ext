@@ -10,22 +10,21 @@ package net.hudup.evaluate;
 import java.rmi.RemoteException;
 import java.util.Set;
 
-import net.hudup.core.Util;
 import net.hudup.core.alg.Alg;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.RatingVector;
 import net.hudup.core.evaluate.FractionMetricValue;
 import net.hudup.core.evaluate.MetricValue;
-import net.hudup.core.evaluate.recommend.ClassificationAccuracy;
+import net.hudup.core.evaluate.recommend.PredictiveAccuracy;
 
 /**
- * This class represents Recall metric for recommendation algorithms.
+ * This class represents ratio mean absolute error for evaluating recommendation algorithm.
  * 
  * @author Loc Nguyen
  * @version 10.0
  *
  */
-public class Recall extends ClassificationAccuracy {
+public class MAERatio extends PredictiveAccuracy {
 
 	
 	/**
@@ -37,7 +36,7 @@ public class Recall extends ClassificationAccuracy {
 	/**
 	 * Default constructor.
 	 */
-	public Recall() {
+	public MAERatio() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
@@ -46,56 +45,62 @@ public class Recall extends ClassificationAccuracy {
 	@Override
 	public String getName() {
 		// TODO Auto-generated method stub
-		return "Recall.recommend";
+		return "MAERatio.recommend";
 	}
 
 	
 	@Override
 	public String getTypeName() throws RemoteException {
 		// TODO Auto-generated method stub
-		return "Classification accuracy";
+		return "Predictive accuracy";
 	}
 	
 	
 	@Override
 	public String getDescription() throws RemoteException {
 		// TODO Auto-generated method stub
-		return "Recall for recommendation algorithm";
+		return "Ratio Mean Absolute Error for recommendation algorithm";
 	}
 
 	
 	@Override
 	protected MetricValue calc(RatingVector recommended, RatingVector vTesting, Dataset testing) {
 		// TODO Auto-generated method stub
-		
-		if (vTesting == null || vTesting.size() == 0)
+		if (vTesting == null)
 			return null;
+
+		double     mae = 0;
+		int        n = 0;
+		Set<Integer> fieldIds = recommended.fieldIds(true);
 		
-		RatingVector Nr = extractRelevant(vTesting, true, testing);
-		if (Nr == null || Nr.size() == 0)
-			return null;
-		
-		RatingVector Nrs = extractRelevant(recommended, true, testing);
-		if (Nrs == null || Nrs.size() == 0)
-			return new FractionMetricValue(0, Nr.size());
-		
-		
-		Set<Integer> fieldIds = Util.newSet();
-		fieldIds.addAll(Nrs.fieldIds());
 		for (int fieldId : fieldIds) {
-			if (!Nr.isRated(fieldId))
-				Nrs.remove(fieldId);
+			if (!vTesting.isRated(fieldId))
+				continue;
+			
+			double v1 = vTesting.get(fieldId).value;
+			double v2 = recommended.get(fieldId).value;
+			double dev = Math.abs(v2 - v1);
+			
+			if (v1 == 0)
+				dev = dev == 0 ? 0 : 1;
+			else
+				dev = dev / Math.abs(v1);
+			
+			mae += dev;
+			n++;
 		}
 		
-		return new FractionMetricValue(Nrs.size(), Nr.size()); //This is more exact for overall dataset and can solve problem of zero vector.
-
+		if (n > 0)
+			return new FractionMetricValue(mae, n);
+		else
+			return null;
 	}
 
 
 	@Override
 	public Alg newInstance() {
 		// TODO Auto-generated method stub
-		return new Recall();
+		return new MAERatio();
 	}
 
 

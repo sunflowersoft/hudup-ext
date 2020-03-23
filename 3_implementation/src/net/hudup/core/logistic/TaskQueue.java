@@ -54,15 +54,19 @@ public class TaskQueue extends AbstractRunner {
 	@Override
 	protected void task() {
 		// TODO Auto-generated method stub
-		synchronized (taskList) {
-			while (taskList.size() > 0) {
-				try {
-					Task task = taskList.remove(0);
-					if (task != null) task.doTask();
-				}
-				catch (Exception e) {
-					e.printStackTrace();
-				}
+		while (true) {
+			Task task = null;
+			
+			synchronized (taskList) {
+				if (taskList.size() == 0) break;
+				task = taskList.remove(0);
+			}
+			
+			try {
+				if (task != null) task.doTask();
+			}
+			catch (Exception e) {
+				e.printStackTrace();
 			}
 		}
 

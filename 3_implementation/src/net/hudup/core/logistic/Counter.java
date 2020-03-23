@@ -142,12 +142,12 @@ public class Counter extends AbstractRunner implements Serializable {
 		
 		fireElapsedTimeEvent(new CounterElapsedTimeEvent(this, newElapsedTime));
 		
-		try {
-			Thread.sleep(PERIOD);
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-		}
+//		try {
+//			if (PERIOD <= 1000) Thread.sleep(PERIOD);
+//		}
+//		catch (Exception e) {
+//			e.printStackTrace();
+//		}
 	}
 
 	

@@ -8,7 +8,6 @@
 package net.hudup.data;
 
 import java.io.Serializable;
-import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -365,9 +364,9 @@ public class ProviderImpl implements Provider {
 				Rating rating = new Rating(ratingValue);
 				RatingTriple triple = new RatingTriple(userId, itemId, rating);
 				
-				Object ratedDate = u.getValue(DataConfig.RATING_DATE_FIELD);
-				if (ratedDate != null && ratedDate instanceof Date)
-					rating.ratedDate = (Date) ratedDate; 
+				long ratedDate = u.getValueAsTime(DataConfig.RATING_DATE_FIELD, null);
+				if (ratedDate > 0)
+					rating.ratedDate = ratedDate; 
 				
 				ContextList contexts = ctsManager.getContexts(userId, itemId);
 				if (contexts != null && contexts.size() > 0)
@@ -387,7 +386,7 @@ public class ProviderImpl implements Provider {
 	 * @param ratedDate rating date.
 	 * @return whether insert successfully.
 	 */
-	protected boolean insertRatingValue(int userId, int itemId, double ratingValue, Date ratedDate) {
+	protected boolean insertRatingValue(int userId, int itemId, double ratingValue, long ratedDate) {
 		if (!containsUserProfile(userId)) {
 			Profile user = new Profile(getUserAttributes());
 			user.setValue(DataConfig.USERID_FIELD, userId);
@@ -418,7 +417,7 @@ public class ProviderImpl implements Provider {
 	 * @param ratedDate rating date.
 	 * @return whether update successfully 
 	 */
-	protected boolean updateRatingValue(int userId, int itemId, double ratingValue, Date ratedDate) {
+	protected boolean updateRatingValue(int userId, int itemId, double ratingValue, long ratedDate) {
 		Profile profile = new Profile(assoc.getAttributes(getConfig().getRatingUnit()));
 		profile.setValue(DataConfig.USERID_FIELD, userId);
 		profile.setValue(DataConfig.ITEMID_FIELD, itemId);
@@ -622,9 +621,9 @@ public class ProviderImpl implements Provider {
 				user.put(itemId, ratingValue);
 				Rating rating = user.get(itemId);
 				
-				Object ratedDate = profile.getValue(DataConfig.RATING_DATE_FIELD);
-				if (ratedDate != null && ratedDate instanceof Date)
-					rating.ratedDate = (Date) ratedDate; 
+				long ratedDate = profile.getValueAsTime(DataConfig.RATING_DATE_FIELD, null);
+				if (ratedDate > 0)
+					rating.ratedDate = ratedDate; 
 				
 				ContextList contexts = ctsManager.getContexts(userId, itemId);
 				if (contexts != null && contexts.size() > 0)
@@ -779,9 +778,9 @@ public class ProviderImpl implements Provider {
 				item.put(userId, ratingValue);
 				Rating rating = item.get(userId);
 				
-				Object ratedDate = profile.getValue(DataConfig.RATING_DATE_FIELD);
-				if (ratedDate != null && ratedDate instanceof Date)
-					rating.ratedDate = (Date) ratedDate; 
+				long ratedDate = profile.getValueAsTime(DataConfig.RATING_DATE_FIELD, null);
+				if (ratedDate > 0)
+					rating.ratedDate = ratedDate; 
 				
 				ContextList contexts = ctsManager.getContexts(userId, itemId);
 				if (contexts != null && contexts.size() > 0)

@@ -9,7 +9,6 @@ package net.hudup.core.data.ctx;
 
 import java.io.Serializable;
 import java.rmi.RemoteException;
-import java.util.Date;
 
 import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.AlgRemoteWrapper;
@@ -123,7 +122,7 @@ public class CTSManagerRemoteWrapper extends AlgRemoteWrapper implements CTSMana
 
 	
 	@Override
-	public ContextList getContexts(int userId, int itemId, Date ratedDate) {
+	public ContextList getContexts(int userId, int itemId, long ratedDate) {
 		// TODO Auto-generated method stub
 		try {
 			return ((CTSManagerRemote)remoteAlg).remoteGetContexts(userId, itemId, ratedDate);
@@ -338,7 +337,7 @@ public class CTSManagerRemoteWrapper extends AlgRemoteWrapper implements CTSMana
 
 	
 	@Override
-	public ContextList remoteGetContexts(int userId, int itemId, Date ratedDate) throws RemoteException {
+	public ContextList remoteGetContexts(int userId, int itemId, long ratedDate) throws RemoteException {
 		// TODO Auto-generated method stub
 		return ((CTSManagerRemote)remoteAlg).remoteGetContexts(userId, itemId, ratedDate);
 	}

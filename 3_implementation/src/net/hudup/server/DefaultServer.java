@@ -131,7 +131,7 @@ public class DefaultServer extends PowerServerImpl {
 		// TODO Auto-generated method stub
 		
 		// Task 1
-		if (config.isRecommenderPeriodLearn()) { //This method is used to prevent time consuming to learn internal recommender.
+		if (config.isPeriodLearn()) { //This method is used to prevent time consuming to learn internal recommender.
 			if (!config.isDatasetEmpty()) {
 				DefaultService newService = createService();
 				newService.open(config); //This statement is important, which takes much time.
@@ -312,6 +312,18 @@ public class DefaultServer extends PowerServerImpl {
 				}
 			});
             
+//            trayIcon.addMouseListener(new MouseAdapter() {
+//
+//				@Override
+//				public void mouseClicked(MouseEvent e) {
+//					// TODO Auto-generated method stub
+//					super.mouseClicked(e);
+//					if(!SwingUtilities.isLeftMouseButton(e) || e.getClickCount() >= 2)
+//						return;
+//				}
+//            	
+//			});
+			
 			SystemTray tray = SystemTray.getSystemTray();
 			tray.add(trayIcon);
 

@@ -243,7 +243,7 @@ public interface Evaluator extends Remote, RemoteRunner, SetupAlgListener, Expor
 	 * @throws RemoteException if any error raises.
 	 */
 	@Deprecated
-	RegisterTable extractAlgFromPluginStorage0() throws RemoteException;
+	RegisterTable extractNormalAlgFromPluginStorage0() throws RemoteException;
 
 	
 	/**

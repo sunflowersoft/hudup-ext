@@ -413,7 +413,7 @@ class DbProviderAssoc extends ProviderAssocAbstract {
 				norm(DataConfig.USERID_FIELD) + " " + toSqlTypeName(Type.integer) + " not null, " +
 				norm(DataConfig.ITEMID_FIELD) + " " + toSqlTypeName(Type.integer) + " not null, " +
 				norm(DataConfig.RATING_FIELD) + " " + toSqlTypeName(Type.real) + " not null, " +
-				norm(DataConfig.RATING_DATE_FIELD) + " " + toSqlTypeName(Type.date) + ", " +
+				norm(DataConfig.RATING_DATE_FIELD) + " " + toSqlTypeName(Type.real) + ", " +
 				"primary key (" + norm(DataConfig.USERID_FIELD) + ", " + norm(DataConfig.ITEMID_FIELD) + ") )";
 	}
 	
@@ -2830,7 +2830,7 @@ class DbProviderAssocExt extends DbProviderAssoc {
 				norm(DataConfig.USERID_FIELD) + " " + toSqlTypeName(Type.integer) + " not null, " +
 				norm(DataConfig.ITEMID_FIELD) + " " + toSqlTypeName(Type.integer) + " not null, " +
 				norm(DataConfig.RATING_FIELD) + " " + toSqlTypeName(Type.real) + " not null, " +
-				norm(DataConfig.RATING_DATE_FIELD) + " " + toSqlTypeName(Type.date);
+				norm(DataConfig.RATING_DATE_FIELD) + " " + toSqlTypeName(Type.real);
 	}
 
 	
@@ -2841,7 +2841,7 @@ class DbProviderAssocExt extends DbProviderAssoc {
 			norm(DataConfig.ITEMID_FIELD) + " " + toSqlTypeName(Type.integer) + " not null, " +
 			norm(DataConfig.CTX_TEMPLATEID_FIELD) + " " + toSqlTypeName(Type.integer) + " not null, " +
 			norm(DataConfig.CTX_VALUE_FIELD) + " " + toSqlTypeName(Type.string) + ", " +
-			norm(DataConfig.RATING_DATE_FIELD) + " " + toSqlTypeName(Type.date);
+			norm(DataConfig.RATING_DATE_FIELD) + " " + toSqlTypeName(Type.real);
 	}
 
 	

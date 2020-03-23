@@ -85,6 +85,18 @@ public class EvaluatorConfig extends SysConfig {
 
 	
 	/**
+	 * This constant specifies tied synchronized with client.
+	 */
+	public final static String EVALUATOR_TIED_SYNC_FIELD = changeCase("tied_sync");
+
+	
+	/**
+	 * By default, tied synchronized with client is false.
+	 */
+	public final static boolean EVALUATOR_TIED_SYNC_DEFAULT = false;
+
+	
+	/**
 	 * Default constructor.
 	 */
 	public EvaluatorConfig() {
@@ -111,6 +123,7 @@ public class EvaluatorConfig extends SysConfig {
 		setEvaluatorPort(Constants.DEFAULT_EVALUATOR_PORT);
 		//setAgent(EVALUATOR_AGENT_DEFAULT);
 		setSaveResultSummary(EVALUATOR_SAVE_RESULT_SUMMARY_DEFAULT);
+		setTiedSync(EVALUATOR_TIED_SYNC_DEFAULT);
 		
 		addReadOnly(EVALUATOR_REPRODUCED_VERSION_FIELD);
 	}
@@ -228,4 +241,22 @@ public class EvaluatorConfig extends SysConfig {
 	}
 	
 	
+	/**
+	 * Checking whether tied synchronized with client is true. 
+	 * @return whether tied synchronized with client is true.
+	 */
+	public boolean isTiedSync() {
+		return getAsBoolean(EVALUATOR_TIED_SYNC_FIELD);
+	}
+	
+	
+	/**
+	 * Setting whether tied synchronized with client is true.
+	 * @param tiedSync whether tied synchronized with client is true.
+	 */
+	public void setTiedSync(boolean tiedSync) {
+		put(EVALUATOR_TIED_SYNC_FIELD, tiedSync);
+	}
+
+
 }

@@ -71,9 +71,9 @@ public class ProviderImplExt extends ProviderImpl {
 				Rating rating = new Rating(ratingValue);
 				RatingTriple triple = new RatingTriple(userId, itemId, rating);
 				
-				Object ratedDate = u.getValue(DataConfig.RATING_DATE_FIELD);
-				if (ratedDate != null && ratedDate instanceof Date)
-					rating.ratedDate = (Date) ratedDate; 
+				long ratedDate = u.getValueAsTime(DataConfig.RATING_DATE_FIELD, null);
+				if (ratedDate > 0)
+					rating.ratedDate = ratedDate; 
 				
 				ContextList contexts = ctsManager.getContexts(userId, itemId, rating.ratedDate);
 				if (contexts != null && contexts.size() > 0)
@@ -93,7 +93,7 @@ public class ProviderImplExt extends ProviderImpl {
 	 * @param ratedDate rating date.
 	 * @return whether update successfully.
 	 */
-	protected boolean insertContext(int userId, int itemId, Context context, Date ratedDate) {
+	protected boolean insertContext(int userId, int itemId, Context context, long ratedDate) {
 		Profile profile = new Profile(assoc.getAttributes(getConfig().getContextUnit()));
 		profile.setValue(DataConfig.USERID_FIELD, userId);
 		profile.setValue(DataConfig.ITEMID_FIELD, itemId);
@@ -235,9 +235,9 @@ public class ProviderImplExt extends ProviderImpl {
 				
 				Rating rating = new Rating(ratingValue);
 				
-				Object ratedDate = profile.getValue(DataConfig.RATING_DATE_FIELD);
-				if (ratedDate != null && ratedDate instanceof Date)
-					rating.ratedDate = (Date) ratedDate; 
+				long ratedDate = profile.getValueAsTime(DataConfig.RATING_DATE_FIELD, null);
+				if (ratedDate > 0)
+					rating.ratedDate = ratedDate; 
 				
 				ContextList contexts = ctsManager.getContexts(userId, itemId, rating.ratedDate);
 				if (contexts != null && contexts.size() > 0)
@@ -297,9 +297,9 @@ public class ProviderImplExt extends ProviderImpl {
 				
 				Rating rating = new Rating(ratingValue);
 				
-				Object ratedDate = profile.getValue(DataConfig.RATING_DATE_FIELD);
-				if (ratedDate != null && ratedDate instanceof Date)
-					rating.ratedDate = (Date) ratedDate; 
+				long ratedDate = profile.getValueAsTime(DataConfig.RATING_DATE_FIELD, null);
+				if (ratedDate > 0)
+					rating.ratedDate = ratedDate; 
 				
 				ContextList contexts = ctsManager.getContexts(userId, itemId, rating.ratedDate);
 				if (contexts != null && contexts.size() > 0)

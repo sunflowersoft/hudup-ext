@@ -20,9 +20,8 @@ import net.hudup.core.Constants;
 import net.hudup.core.logistic.I18nUtil;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.NetUtil;
-import net.hudup.core.logistic.xURI;
 import net.hudup.core.logistic.NetUtil.InetHardware;
-import net.hudup.core.logistic.ui.LoginDlg;
+import net.hudup.core.logistic.xURI;
 import net.hudup.core.logistic.ui.UIUtil;
 import net.hudup.evaluate.ui.EvaluatorCP;
 import net.hudup.server.DefaultServer;
@@ -130,22 +129,28 @@ public class DefaultServerExt extends DefaultServer {
 	 * Showing evaluator.
 	 */
 	protected void showEvaluator() {
-		final DefaultServiceExt finalService = ((DefaultServiceExt)service);
+		if ((service == null) || !(service instanceof DefaultServiceExt)) {
+			LogUtil.error("Service is not initialized yet or not extended service");
+			JOptionPane.showMessageDialog(
+					null, 
+					"Service is not initialized yet or not extended service", 
+					"Evaluator control panel now shown", 
+					JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+		
 		try {
-			if (finalService == null || !isRunning()) {
-				LogUtil.error("Service is not initialized yet or server is not running");
+			if (!isRunning()) {
+				LogUtil.error("Server is not running");
 				JOptionPane.showMessageDialog(
 						null, 
-						"Service is not initialized yet or server is not running", 
-						"Evaluator now shown", 
-						JOptionPane.INFORMATION_MESSAGE);
+						"Server is not running", 
+						"Evaluator control panel now shown", 
+						JOptionPane.ERROR_MESSAGE);
 				return;
 			}
 			
-			LoginDlg dlgLogin = new LoginDlg(null, "Retype admin account and password");
-			if (!dlgLogin.wasLogin()) return;
-			
-			EvaluatorCP ecp = new EvaluatorCP(finalService, dlgLogin.getUsername(), dlgLogin.getPassword(), null);
+			EvaluatorCP ecp = new EvaluatorCP((DefaultServiceExt)service);
 			ecp.setVisible(true);
 		}
 		catch (Exception e) {

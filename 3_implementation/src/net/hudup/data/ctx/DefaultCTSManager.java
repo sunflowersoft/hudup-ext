@@ -9,7 +9,6 @@ package net.hudup.data.ctx;
 
 import java.io.Serializable;
 import java.rmi.RemoteException;
-import java.util.Date;
 import java.util.Map;
 
 import net.hudup.core.Util;
@@ -290,9 +289,9 @@ public class DefaultCTSManager extends CTSManagerAbstract {
 
 	
 	@Override
-	public ContextList getContexts(int userId, int itemId, Date ratedDate) {
+	public ContextList getContexts(int userId, int itemId, long ratedDate) {
 		// TODO Auto-generated method stub
-		if (ratedDate == null) return getContexts(userId, itemId);
+		if (ratedDate <= 0) return getContexts(userId, itemId);
 		
 		ContextList contexts = new ContextList();
 		

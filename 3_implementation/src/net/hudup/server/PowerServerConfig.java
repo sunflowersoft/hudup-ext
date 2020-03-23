@@ -73,13 +73,13 @@ public class PowerServerConfig extends ServerConfig {
 	 * This constant specifies key name of periodical recommender learning.
 	 * The field is used to prevent time consuming to learn internal recommender in some cases.
 	 */
-	public final static String RECOMMENDER_PERIOD_LEARN_FIELD = changeCase("recommender_period_learn");
+	public final static String PERIOD_LEARN_FIELD = changeCase("period_learn");
 
 	
 	/**
 	 * By default, it is necessary to learn periodically internal recommender.
 	 */
-	public final static boolean RECOMMENDER_PERIOD_LEARN_DEFAULT = true;
+	public final static boolean PERIOD_LEARN_DEFAULT = true;
 
 	
 	/**
@@ -129,7 +129,7 @@ public class PowerServerConfig extends ServerConfig {
 			setRecommender(new GreenFallCF());
 			setParser(new SemiScannerParser());
 		}
-		setRecommenderPeriodLearn(RECOMMENDER_PERIOD_LEARN_DEFAULT);
+		setPeriodLearn(PERIOD_LEARN_DEFAULT);
 		setDatasetEmpty(DATASET_EMPTY_DEFAULT);
 	}
 
@@ -157,8 +157,8 @@ public class PowerServerConfig extends ServerConfig {
 	 * Setting flag to learn periodically recommender.
 	 * @param flag flag to learn periodically recommender.
 	 */
-	public void setRecommenderPeriodLearn(boolean flag) {
-		put(RECOMMENDER_PERIOD_LEARN_FIELD, flag);
+	public void setPeriodLearn(boolean flag) {
+		put(PERIOD_LEARN_FIELD, flag);
 	}
 	
 	
@@ -166,8 +166,8 @@ public class PowerServerConfig extends ServerConfig {
 	 * Getting flag to learn periodically recommender.
 	 * @return flag to learn periodically recommender.
 	 */
-	public boolean isRecommenderPeriodLearn() {
-		return getAsBoolean(RECOMMENDER_PERIOD_LEARN_FIELD);
+	public boolean isPeriodLearn() {
+		return getAsBoolean(PERIOD_LEARN_FIELD);
 	}
 
 	

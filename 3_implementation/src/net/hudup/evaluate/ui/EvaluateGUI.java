@@ -333,7 +333,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			evaluator.clearDelayUnsetupAlgs();
 
 			algRegTable.clear();
-			algRegTable.register(EvaluatorAbstract.extractAlgFromPluginStorage(evaluator)); //Algorithms are not cloned because of saving memory when evaluator GUI keep algorithms for a long time.
+			algRegTable.register(EvaluatorAbstract.extractNormalAlgFromPluginStorage(evaluator)); //Algorithms are not cloned because of saving memory when evaluator GUI keep algorithms for a long time.
 			cmbAlgs.update(algRegTable.getAlgList());
 			updateMode();
 		}
@@ -518,7 +518,10 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 					// TODO Auto-generated method stub
 					boolean ret = true;
 					try {
-						ret = evaluator.updatePool(toDatasetPoolExchangedClient(guiData.pool), null);
+//						synchronized (this) {
+							ret = evaluator.updatePool(toDatasetPoolExchangedClient(guiData.pool), null);
+//							wait();
+//						}
 					} catch (Exception ex) {ex.printStackTrace();}
 					
 					if (ret) {
@@ -1034,7 +1037,10 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			guiData.pool.add(new DatasetPair(dataset, txtTestingBrowse.getDataset()));
 			if (bindUri == null) {
 				try {
-					evaluator.updatePool(toDatasetPoolExchangedClient(guiData.pool), null);
+//					synchronized (this) {
+						evaluator.updatePool(toDatasetPoolExchangedClient(guiData.pool), null);
+//						wait();
+//					}
 				} catch (Throwable e) {e.printStackTrace();}
 			}
 			else {
@@ -1073,7 +1079,10 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			guiData.pool = pool;
 			if (bindUri == null) {
 				try {
-					evaluator.updatePool(toDatasetPoolExchangedClient(guiData.pool), null);
+//					synchronized (this) {
+						evaluator.updatePool(toDatasetPoolExchangedClient(guiData.pool), null);
+//						wait();
+//					}
 				} catch (Throwable e) {e.printStackTrace();}
 			}
 			else {
@@ -1161,7 +1170,10 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			guiData.pool.add(new DatasetPair(txtTrainingBrowse.getDataset(), dataset));
 			if (bindUri == null) {
 				try {
-					evaluator.updatePool(toDatasetPoolExchangedClient(guiData.pool), null);
+//					synchronized (this) {
+						evaluator.updatePool(toDatasetPoolExchangedClient(guiData.pool), null);
+//						wait();
+//					}
 				} catch (Throwable e) {e.printStackTrace();}
 			}
 			else {
@@ -1205,7 +1217,10 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			
 			if (bindUri == null) {
 				try {
-					evaluator.updatePool(null, null);
+//					synchronized (this) {
+						evaluator.updatePool(null, null);
+//						wait();
+//					}
 				} catch (Throwable e) {e.printStackTrace();}
 			}
 			else {
@@ -1271,10 +1286,14 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			
 			clearResult();
 			boolean started = false;
-			if (bindUri == null)
-				started = evaluator.remoteStart0(algList, toDatasetPoolExchangedClient(pool), this.timestamp = new Timestamp());
-			else
-				started = evaluator.remoteStart(AlgList.getAlgNameList(algList), toDatasetPoolExchangedClient(pool), null);
+//			synchronized (this) {
+				if (bindUri == null)
+					started = evaluator.remoteStart0(algList, toDatasetPoolExchangedClient(pool), this.timestamp = new Timestamp());
+				else
+					started = evaluator.remoteStart(AlgList.getAlgNameList(algList), toDatasetPoolExchangedClient(pool), null);
+				
+//				try {wait();} catch (Exception e) {e.printStackTrace();}
+//			}
 			if (!started) updateMode();
 		}
 		catch (Throwable e) {
@@ -1289,6 +1308,8 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 	@Override
 	public synchronized void receivedEvaluator(EvaluatorEvent evt) throws RemoteException {
 		// TODO Auto-generated method stub
+		try {notifyAll();} catch (Exception e) {e.printStackTrace();}
+
 		if (evt.getType() == EvaluatorEvent.Type.start || evt.getType() == EvaluatorEvent.Type.update_pool) {
 //			Timestamp timestamp = evt.getTimestamp();
 

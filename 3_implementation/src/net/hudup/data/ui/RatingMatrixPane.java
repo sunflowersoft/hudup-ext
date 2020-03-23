@@ -295,7 +295,7 @@ class RatingPane extends JPanel {
 		if (rating != null) {
 			this.rating = rating;
 			txtValue.setValue(rating.value);
-			txtDate.setValue(rating.ratedDate);
+			txtDate.setValue(new Date(rating.ratedDate));
 			tblContextList.set(rating.contexts);
 		}
 	}
@@ -313,7 +313,7 @@ class RatingPane extends JPanel {
 		
 		if (rating != null) {
 			rating.value = ((Number)txtValue.getValue()).doubleValue();
-			rating.ratedDate = (Date)txtDate.getValue();
+			rating.ratedDate = txtDate.getValue() != null ? ((Date)txtDate.getValue()).getTime() : 0;
 			return true & tblContextList.apply();
 		}
 		else
