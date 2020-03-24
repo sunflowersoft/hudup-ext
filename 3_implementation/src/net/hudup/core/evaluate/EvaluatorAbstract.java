@@ -283,9 +283,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 		this.result = null;
 		this.evParameter = parameter;
 		
-		String evStorePath = this.otherResult.evStorePath;
 		this.otherResult.reset();
-		this.otherResult.evStorePath = evStorePath;
 		this.otherResult.algNames = Util.newList(this.evAlgList.size());
 		for (Alg alg : this.evAlgList) {
 			this.otherResult.algNames.add(alg.getName());
@@ -1144,19 +1142,20 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 				}
 			}
 		
-			if (otherResult.evStorePath != null && evAlgList != null) {
+			String evStorePath = config.getAsString(DataConfig.STORE_URI_FIELD);
+			if (evStorePath != null && evAlgList != null) {
 				boolean saveResultSummary = false;
 				try {
 					saveResultSummary = config.isSaveResultSummary();
 				} catch (Throwable e) {e.printStackTrace();}
 				
 				evt.setMetrics(result); //Important code line, saving all metrics.
-				evProcessor.saveEvaluateResult(otherResult.evStorePath, evt, evAlgList, saveResultSummary);
+				evProcessor.saveEvaluateResult(evStorePath, evt, evAlgList, saveResultSummary);
 			}
 			
 			
 			//Backing up evaluation results.
-			boolean backup = isBackup() || (otherResult.evStorePath == null && listeners.length == 0);
+			boolean backup = isBackup() || (evStorePath == null && listeners.length == 0);
 			if (!backup) return;
 			
 			if (evt.getType() != Type.done && evt.getType() != Type.done_one)
@@ -1300,18 +1299,19 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 				}
 			}
 		
-			if (otherResult.evStorePath != null) {
+			String evStorePath = config.getAsString(DataConfig.STORE_URI_FIELD);
+			if (evStorePath != null) {
 				boolean saveResultSummary = false;
 				try {
 					saveResultSummary = config.isSaveResultSummary();
 				} catch (Throwable e) {e.printStackTrace();}
 	
-				evProcessor.saveSetupResult(otherResult.evStorePath, evt, saveResultSummary);
+				evProcessor.saveSetupResult(evStorePath, evt, saveResultSummary);
 			}
 			
 			
 			//Backing up evaluation results.
-			boolean backup = isBackup() || (otherResult.evStorePath == null && listeners.length == 0);
+			boolean backup = isBackup() || (evStorePath == null && listeners.length == 0);
 			if (!backup || evt.getType() != SetupAlgEvent.Type.done)
 				return;
 			try {
@@ -1349,11 +1349,21 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 		evCounter.removeElapsedTimeListener(listener);
     }
 
-    
+
     @Override
+	public String getEvaluateStorePath() throws RemoteException {
+		// TODO Auto-generated method stub
+   		return config.getAsString(DataConfig.STORE_URI_FIELD);
+	}
+
+	
+	@Override
 	public void setEvaluateStorePath(String evStorePath) throws RemoteException {
 		// TODO Auto-generated method stub
-		this.otherResult.evStorePath = evStorePath;
+    	if (evStorePath == null)
+    		config.remove(DataConfig.STORE_URI_FIELD);
+    	else
+    		config.put(DataConfig.STORE_URI_FIELD, evStorePath);
 	}
 
 
@@ -1471,7 +1481,6 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 		catch (Throwable e) {e.printStackTrace();}
 
 		try {
-			otherResult.evStorePath = null;
 			evProcessor.clear();
 		}
 		catch (Throwable e) {e.printStackTrace();}

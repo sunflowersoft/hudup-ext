@@ -408,6 +408,14 @@ public interface Evaluator extends Remote, RemoteRunner, SetupAlgListener, Expor
 
     
     /**
+     * Getting evaluation store path.
+     * @return evaluation store path.
+     * @throws RemoteException if any error raises.
+     */
+	public String getEvaluateStorePath() throws RemoteException;
+	
+	
+    /**
      * Setting evaluation store path. This method is only called locally because of different file systems in network.
      * @param evStorePath evaluation store path.
      * @throws RemoteException if any error raises.

@@ -267,6 +267,18 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 			else
 				guiData.pool = new DatasetPool();
 		}
+		
+		if (bindUri == null) {
+			String evStorePath = null;
+			try {
+				evStorePath = evaluator.getEvaluateStorePath();
+			} catch (Throwable e) {e.printStackTrace();}
+			
+			if (guiData.txtRunSaveBrowse == null)
+				guiData.txtRunSaveBrowse = evStorePath;
+			else if (evStorePath != null && !evStorePath.equals(guiData.txtRunSaveBrowse))
+				guiData.txtRunSaveBrowse = evStorePath;
+		}
 	}
 	
 	

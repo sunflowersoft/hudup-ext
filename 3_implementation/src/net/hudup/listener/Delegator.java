@@ -1071,6 +1071,13 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluateListen
 
 
 	@Override
+	public String getEvaluateStorePath() throws RemoteException {
+		// TODO Auto-generated method stub
+		return remoteEvaluator.getEvaluateStorePath();
+	}
+
+
+	@Override
 	public void setEvaluateStorePath(String evStorePath) throws RemoteException {
 		// TODO Auto-generated method stub
 		remoteEvaluator.setEvaluateStorePath(evStorePath);

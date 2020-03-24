@@ -518,6 +518,9 @@ public class EvaluatorCP extends JFrame implements EvaluatorListener {
         	EvaluatorItem item = new EvaluatorItem(evaluator);
         	cmbEvaluators.addItem(item);
         	
+        	if (service != null && service instanceof DefaultServiceExt)
+        		item.guiData = ((DefaultServiceExt)service).getEvaluateGUIData(evaluator);
+        	
         	if (item.getName().equals(evaluatorName + "-" + reproducedVersion))
         		selectedItem = item;
         }

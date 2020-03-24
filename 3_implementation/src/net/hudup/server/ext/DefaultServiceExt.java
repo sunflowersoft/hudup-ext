@@ -20,6 +20,7 @@ import net.hudup.core.data.DataConfig;
 import net.hudup.core.evaluate.Evaluator;
 import net.hudup.core.evaluate.EvaluatorConfig;
 import net.hudup.core.logistic.LogUtil;
+import net.hudup.evaluate.ui.EvaluateGUIData;
 import net.hudup.server.DefaultService;
 import net.hudup.server.PowerServerConfig;
 import net.hudup.server.Transaction;
@@ -45,6 +46,12 @@ public class DefaultServiceExt extends DefaultService implements ServiceExt {
 	 */
 	protected Map<String, Evaluator> pairReproducedMap = Util.newMap();
 
+	
+	/**
+	 * Internal map of evaluation GUI data.
+	 */
+	protected Map<String, EvaluateGUIData> guiDataMap = Util.newMap();
+	
 	
 	/**
 	 * Constructor with specified transaction.
@@ -73,6 +80,7 @@ public class DefaultServiceExt extends DefaultService implements ServiceExt {
 				ev.export(serverConfig.getServerPort());
 				
 				pairMap.put(ev.getName(), ev);
+				guiDataMap.put(ev.getName(), new EvaluateGUIData());
 			}
 			catch (Throwable e) {e.printStackTrace();}
 		}
@@ -105,6 +113,8 @@ public class DefaultServiceExt extends DefaultService implements ServiceExt {
 			}
 			pairReproducedMap.clear();
 		}
+		
+		if (guiDataMap != null) guiDataMap.clear(); 
 	}
 
 	
@@ -252,6 +262,7 @@ public class DefaultServiceExt extends DefaultService implements ServiceExt {
 					reproducedEvaluator.export(serverConfig.getServerPort());
 					
 					pairReproducedMap.put(evaluatorReproducedName, reproducedEvaluator);
+					guiDataMap.put(evaluatorReproducedName, new EvaluateGUIData());
 				}
 			}
 		}
@@ -374,6 +385,17 @@ public class DefaultServiceExt extends DefaultService implements ServiceExt {
 		}
 		
 		return name;
+	}
+	
+	
+	/**
+	 * Getting evaluation GUI data of specified evaluator.
+	 * @param evaluator specified evaluator.
+	 * @return evaluation GUI data of specified evaluator.
+	 */
+	public EvaluateGUIData getEvaluateGUIData(Evaluator evaluator) {
+		String evaluatorName = extractName(evaluator);
+		return guiDataMap.get(evaluatorName);
 	}
 	
 	

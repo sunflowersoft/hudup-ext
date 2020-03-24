@@ -1627,7 +1627,9 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 	protected void updateGUIData() {
 		// TODO Auto-generated method stub
 		guiData.algNames = lbAlgs.getAlgNameList();
+		
 		guiData.txtRunSaveBrowse = this.chkRunSave.isSelected() ? this.txtRunSaveBrowse.getText() : null;
+		
 		guiData.chkVerbal = this.chkVerbal.isSelected();
 	}
 

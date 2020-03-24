@@ -1645,7 +1645,9 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			guiData.algName = cmbAlgs.getSelectedAlg().getName();
 		else
 			guiData.algName = null;
+		
 		guiData.txtRunSaveBrowse = this.chkRunSave.isSelected() ? this.txtRunSaveBrowse.getText() : null;
+		
 		guiData.chkVerbal = this.chkVerbal.isSelected();
 	}
 

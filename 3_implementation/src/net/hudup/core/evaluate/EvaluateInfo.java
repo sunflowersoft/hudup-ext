@@ -79,10 +79,10 @@ public class EvaluateInfo implements Serializable {
 	public long elapsedTime = 0;
 	
 	
-	/**
-	 * Directory to store evaluation results. If null, evaluation results are not stored.
-	 */
-	public String evStorePath = null;
+//	/**
+//	 * Directory to store evaluation results. If null, evaluation results are not stored.
+//	 */
+//	public String evStorePath = null;
 	
 	
 	/**
@@ -98,7 +98,7 @@ public class EvaluateInfo implements Serializable {
 		vCurrentCount = 0;
 		inAlgSetup = false;
 		elapsedTime = 0;
-		evStorePath = null;
+//		evStorePath = null;
 	}
 	
 	
