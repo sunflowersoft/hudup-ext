@@ -311,8 +311,8 @@ public class EstimateEvaluator extends RecommendEvaluator {
 		MAE mae = new MAE();
 		metricList.add(mae);
 
-		MAERatio maeRatio = new MAERatio();
-		metricList.add(maeRatio);
+//		MAERatio maeRatio = new MAERatio();
+//		metricList.add(maeRatio);
 
 		MSE mse = new MSE();
 		metricList.add(mse);
