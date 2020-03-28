@@ -228,7 +228,7 @@ public class MovielensParser extends SnapshotParser {
 							return;
 					}
 					catch (NumberFormatException e) {
-						e.printStackTrace();
+						LogUtil.trace(e);
 						LogUtil.error("Processing rating line causes error " + e.getMessage());
 						return;
 					}
@@ -259,7 +259,7 @@ public class MovielensParser extends SnapshotParser {
 		} 
 		catch (Exception e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		finally {
 			try {
@@ -267,7 +267,7 @@ public class MovielensParser extends SnapshotParser {
 					reader.close();
 			}
 			catch (Exception e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 			if (adapter != null)
 				adapter.close();
@@ -346,7 +346,7 @@ public class MovielensParser extends SnapshotParser {
 			memProfiles = MemProfiles.assign(attList, profileMap);
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		finally {
 			try {
@@ -354,7 +354,7 @@ public class MovielensParser extends SnapshotParser {
 					reader.close();
 			}
 			catch (Exception e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 			
 			if (adapter != null)
@@ -436,7 +436,7 @@ public class MovielensParser extends SnapshotParser {
 			
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		finally {
 			try {
@@ -444,7 +444,7 @@ public class MovielensParser extends SnapshotParser {
 					reader.close();
 			}
 			catch (Exception e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 			
 			if (adapter != null)
@@ -579,7 +579,7 @@ public class MovielensParser extends SnapshotParser {
 			
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		finally {
 			try {
@@ -587,7 +587,7 @@ public class MovielensParser extends SnapshotParser {
 					reader.close();
 			}
 			catch (Exception e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 			
 			if (adapter != null)
@@ -725,7 +725,7 @@ public class MovielensParser extends SnapshotParser {
 			
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		finally {
 			try {
@@ -733,7 +733,7 @@ public class MovielensParser extends SnapshotParser {
 					reader.close();
 			}
 			catch (Exception e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 			
 			if (adapter != null)

@@ -236,7 +236,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 			this.config = new EvaluatorConfig(xURI.create(evalconfigPath));
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			this.config = new EvaluatorConfig(xURI.create(EvaluatorConfig.EVALCONFIG_FILEPATH_DEFAULT));
 		}
 		
@@ -246,7 +246,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 			this.evMetricList.sort();
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 		this.evProcessor = new EvaluateProcessor(this);
@@ -275,7 +275,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 		
 		try {
 			clearDelayUnsetupAlgs(); //This code line is important.
-		} catch (Throwable e) {e.printStackTrace();} 
+		} catch (Throwable e) {LogUtil.trace(e);} 
 		
 		this.evAlgList = algList;
 		this.algRegResult = this.evAlgList != null ? new RegisterTable(this.evAlgList) : null;
@@ -321,7 +321,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 			run0();
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 	}
 
@@ -341,7 +341,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 			}
 			catch (Exception e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 		}
 		otherResult.progressTotal *= evAlgList.size();
@@ -474,18 +474,18 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 					
 				} // end try
 				catch (Throwable e) {
-					e.printStackTrace();
+					LogUtil.trace(e);
 				}
 				finally {
 					try {
 						if (testingFetcher != null)
 							testingFetcher.close();
 						testingFetcher = null;
-					} catch (Throwable e) {e.printStackTrace();}
+					} catch (Throwable e) {LogUtil.trace(e);}
 					
 					try {
 						unsetupAlgSupportDelay(alg);
-					} catch (Throwable e) {e.printStackTrace();}
+					} catch (Throwable e) {LogUtil.trace(e);}
 				}
 				
 				SystemUtil.enhanceAuto();
@@ -537,7 +537,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 		if (!config.getAsBoolean(DataConfig.DELAY_UNSETUP)) {
 			try {
 				unsetupAlg(alg);
-			} catch (Throwable e) {e.printStackTrace();}
+			} catch (Throwable e) {LogUtil.trace(e);}
 		}
 		else {
 			synchronized (delayUnsetupAlgs) {
@@ -553,7 +553,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 			for (Alg alg : delayUnsetupAlgs) {
 				try {
 					unsetupAlg(alg);
-				} catch (Throwable e) {e.printStackTrace();}
+				} catch (Throwable e) {LogUtil.trace(e);}
 			}
 			
 			delayUnsetupAlgs.clear();
@@ -686,7 +686,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 				} 
 				catch (Throwable e) {
 					// TODO Auto-generated catch block
-					e.printStackTrace();
+					LogUtil.trace(e);
 					return false;
 				}
 			}
@@ -718,7 +718,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 					return evaluator.acceptAlg(alg);
 				} 
 				catch (Throwable e) {
-					e.printStackTrace();
+					LogUtil.trace(e);
 					LogUtil.error("Evaluator does not accept algorithm '" + alg.getName() + "' due to " + e.getMessage());
 					return false;
 				}
@@ -752,7 +752,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 	    	for (Alg alg : algList) {
 	    		try {
 	    			if (acceptAlg(alg)) algNames.add(alg.getName());
-	    		} catch (Throwable e) {e.printStackTrace();}
+	    		} catch (Throwable e) {LogUtil.trace(e);}
 	    	}
 	    	
 			return algNames;
@@ -776,7 +776,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 	    		try {
 	    			if (acceptAlg(alg))
 	    				algDescs.add(alg);
-	    		} catch (Throwable e) {e.printStackTrace();}
+	    		} catch (Throwable e) {LogUtil.trace(e);}
         	}
         	else
         		algDescs.add(alg);
@@ -801,7 +801,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 
 
 	/**
-	 * Retrieving algorithm from register table.
+	 * Retrieving algorithm from register table. Current version only exports normal algorithms.
 	 * @param algReg register table.
 	 * @param algName algorithm name.
 	 * @param remote true if getting remotely.
@@ -812,10 +812,15 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 		
 		Alg alg = algReg.query(algName);
 		if (alg == null) return null;
+		
 		try {
-			if (!acceptAlg(alg)) return null;
+			boolean isNormalAlg = PluginStorage.isNormalAlg(alg);
 			
-			if (!remote)
+			if (!isNormalAlg)
+				return alg;
+			else if (!acceptAlg(alg))
+				return null;
+			else if (!remote)
 				return alg;
 			else if (alg instanceof AlgRemote) {
 				AlgRemote remoteAlg = (AlgRemote)alg;
@@ -829,7 +834,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 				return alg;
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			return null;
 		}
 	}
@@ -979,7 +984,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 		} 
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 		if (evAlgList != null) {
@@ -989,7 +994,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 						if (!alg.getName().equals(delayUnsetupAlg.getName())) {
 							try {
 								unsetupAlg(alg);
-							} catch (Throwable e) {e.printStackTrace();}
+							} catch (Throwable e) {LogUtil.trace(e);}
 						}
 					}
 				}
@@ -1077,7 +1082,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 						listener.receivedEvaluator(evt);
 					}
 					catch (Exception e) {
-						e.printStackTrace();
+						LogUtil.trace(e);
 					}
 //				}
 			}
@@ -1137,7 +1142,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 						listener.receivedEvaluation(evt);
 					}
 					catch (Exception e) {
-						e.printStackTrace();
+						LogUtil.trace(e);
 					}
 				}
 			}
@@ -1147,7 +1152,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 				boolean saveResultSummary = false;
 				try {
 					saveResultSummary = config.isSaveResultSummary();
-				} catch (Throwable e) {e.printStackTrace();}
+				} catch (Throwable e) {LogUtil.trace(e);}
 				
 				evt.setMetrics(result); //Important code line, saving all metrics.
 				evProcessor.saveEvaluateResult(evStorePath, evt, evAlgList, saveResultSummary);
@@ -1176,7 +1181,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 				backupAdapter.close();
 			}
 			catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 			
 		}
@@ -1234,7 +1239,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 						listener.receivedProgress(evt);
 					}
 					catch (Exception e) {
-						e.printStackTrace();
+						LogUtil.trace(e);
 					}
 				}
 			}
@@ -1294,7 +1299,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 						listener.receivedSetup(evt);
 					}
 					catch (Exception e) {
-						e.printStackTrace();
+						LogUtil.trace(e);
 					}
 				}
 			}
@@ -1304,7 +1309,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 				boolean saveResultSummary = false;
 				try {
 					saveResultSummary = config.isSaveResultSummary();
-				} catch (Throwable e) {e.printStackTrace();}
+				} catch (Throwable e) {LogUtil.trace(e);}
 	
 				evProcessor.saveSetupResult(evStorePath, evt, saveResultSummary);
 			}
@@ -1331,7 +1336,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 				backupAdapter.close();
 			}
 			catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 			
 		}
@@ -1379,7 +1384,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 				backup = Boolean.parseBoolean(bkText);
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			backup = false;
 		}
 		return backup;
@@ -1395,7 +1400,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 		}
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		return DSUtil.shortenVerbalName(evaluatorName);
 	}
@@ -1462,12 +1467,12 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 		try {
 			stop();
 		}
-		catch (Throwable e) {e.printStackTrace();}
+		catch (Throwable e) {LogUtil.trace(e);}
 
 		try {
 			clearDelayUnsetupAlgs();
 		}
-		catch (Throwable e) {e.printStackTrace();}
+		catch (Throwable e) {LogUtil.trace(e);}
 		
 		try {
 			if (poolResult != null)
@@ -1478,21 +1483,21 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 				evPool.clear();
 			evPool = null;
 		}
-		catch (Throwable e) {e.printStackTrace();}
+		catch (Throwable e) {LogUtil.trace(e);}
 
 		try {
 			evProcessor.clear();
 		}
-		catch (Throwable e) {e.printStackTrace();}
+		catch (Throwable e) {LogUtil.trace(e);}
 
 		try {
 			config.save();
-		} catch (Throwable e) {e.printStackTrace();}
+		} catch (Throwable e) {LogUtil.trace(e);}
 
 		try {
 			unexport();
 		}
-		catch (Throwable e) {e.printStackTrace();}
+		catch (Throwable e) {LogUtil.trace(e);}
 	}
 
 
@@ -1505,7 +1510,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 			close();
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 	}
 

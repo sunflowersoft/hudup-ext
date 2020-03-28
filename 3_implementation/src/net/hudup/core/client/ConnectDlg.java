@@ -32,6 +32,7 @@ import javax.swing.text.NumberFormatter;
 
 import net.hudup.core.Constants;
 import net.hudup.core.Util;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.NetUtil;
 import net.hudup.core.logistic.xURI;
 import net.hudup.core.logistic.ui.TextArea;
@@ -392,7 +393,7 @@ public abstract class ConnectDlg extends JDialog {
 				}
 				catch (RemoteException e) {
 					// TODO Auto-generated catch block
-					e.printStackTrace();
+					LogUtil.trace(e);
 				}
 				
 				return null;

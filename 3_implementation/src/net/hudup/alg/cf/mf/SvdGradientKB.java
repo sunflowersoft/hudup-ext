@@ -35,6 +35,7 @@ import net.hudup.core.data.PropList;
 import net.hudup.core.data.RatingMatrix;
 import net.hudup.core.data.RatingMatrixMetadata;
 import net.hudup.core.logistic.Inspector;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.Vector;
 import net.hudup.core.logistic.xURI;
@@ -492,7 +493,7 @@ public abstract class SvdGradientKB extends KBaseRecommendIntegrated {
 			}
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			destroyDataStructure();
 		}
 		finally {
@@ -501,7 +502,7 @@ public abstract class SvdGradientKB extends KBaseRecommendIntegrated {
 					buffer.close();
 			}
 			catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 			
 			adapter.close();
@@ -517,7 +518,7 @@ public abstract class SvdGradientKB extends KBaseRecommendIntegrated {
 			if (isEmpty()) return;
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			return;
 		}
 		
@@ -547,7 +548,7 @@ public abstract class SvdGradientKB extends KBaseRecommendIntegrated {
 
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		finally {
 			try {
@@ -555,7 +556,7 @@ public abstract class SvdGradientKB extends KBaseRecommendIntegrated {
 					printer.close();
 			}
 			catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 			
 			if (adapter != null)
@@ -660,7 +661,7 @@ public abstract class SvdGradientKB extends KBaseRecommendIntegrated {
 			if (isEmpty()) return null;
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			return null;
 		}
 		

@@ -12,6 +12,7 @@ import java.util.List;
 
 import net.hudup.core.Util;
 import net.hudup.core.data.ui.UnitListBox;
+import net.hudup.core.logistic.LogUtil;
 
 /**
  * This class represents a list of many units. As a convention, it is called unit list.
@@ -330,7 +331,7 @@ public class UnitList {
 			providerAssoc.close();
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			result = false;
 		}
 		

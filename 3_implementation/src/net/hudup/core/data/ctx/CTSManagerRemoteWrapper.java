@@ -64,7 +64,7 @@ public class CTSManagerRemoteWrapper extends AlgRemoteWrapper implements CTSMana
 		// TODO Auto-generated method stub
 		try {
 			((CTSManagerRemote)remoteAlg).remoteSetup(config);
-		} catch (Exception e) {e.printStackTrace();}
+		} catch (Exception e) {LogUtil.trace(e);}
 	}
 
 	
@@ -73,7 +73,7 @@ public class CTSManagerRemoteWrapper extends AlgRemoteWrapper implements CTSMana
 		// TODO Auto-generated method stub
 		try {
 			return ((CTSManagerRemote)remoteAlg).remoteGetCTSchema();
-		} catch (Exception e) {e.printStackTrace();}
+		} catch (Exception e) {LogUtil.trace(e);}
 		
 		return null;
 	}
@@ -84,7 +84,7 @@ public class CTSManagerRemoteWrapper extends AlgRemoteWrapper implements CTSMana
 		// TODO Auto-generated method stub
 		try {
 			return ((CTSManagerRemote)remoteAlg).remoteCreateContextTemplateUnit();
-		} catch (Exception e) {e.printStackTrace();}
+		} catch (Exception e) {LogUtil.trace(e);}
 		
 		return false;
 	}
@@ -95,7 +95,7 @@ public class CTSManagerRemoteWrapper extends AlgRemoteWrapper implements CTSMana
 		// TODO Auto-generated method stub
 		try {
 			((CTSManagerRemote)remoteAlg).remoteReload();
-		} catch (Exception e) {e.printStackTrace();}
+		} catch (Exception e) {LogUtil.trace(e);}
 	}
 
 	
@@ -104,7 +104,7 @@ public class CTSManagerRemoteWrapper extends AlgRemoteWrapper implements CTSMana
 		// TODO Auto-generated method stub
 		try {
 			return ((CTSManagerRemote)remoteAlg).remoteCreateContext(ctxTemplateId, assignedValue);
-		} catch (Exception e) {e.printStackTrace();}
+		} catch (Exception e) {LogUtil.trace(e);}
 		
 		return null;
 	}
@@ -115,7 +115,7 @@ public class CTSManagerRemoteWrapper extends AlgRemoteWrapper implements CTSMana
 		// TODO Auto-generated method stub
 		try {
 			return ((CTSManagerRemote)remoteAlg).remoteGetContexts(userId, itemId);
-		} catch (Exception e) {e.printStackTrace();}
+		} catch (Exception e) {LogUtil.trace(e);}
 		
 		return new ContextList();
 	}
@@ -126,7 +126,7 @@ public class CTSManagerRemoteWrapper extends AlgRemoteWrapper implements CTSMana
 		// TODO Auto-generated method stub
 		try {
 			return ((CTSManagerRemote)remoteAlg).remoteGetContexts(userId, itemId, ratedDate);
-		} catch (Exception e) {e.printStackTrace();}
+		} catch (Exception e) {LogUtil.trace(e);}
 		
 		return new ContextList();
 	}
@@ -137,7 +137,7 @@ public class CTSManagerRemoteWrapper extends AlgRemoteWrapper implements CTSMana
 		// TODO Auto-generated method stub
 		try {
 			return ((CTSManagerRemote)remoteAlg).remoteProfileOf(context);
-		} catch (Exception e) {e.printStackTrace();}
+		} catch (Exception e) {LogUtil.trace(e);}
 		
 		return null;
 	}
@@ -148,7 +148,7 @@ public class CTSManagerRemoteWrapper extends AlgRemoteWrapper implements CTSMana
 		// TODO Auto-generated method stub
 		try {
 			return ((CTSManagerRemote)remoteAlg).remoteProfileOf(ctxTemplateId, ctxValue);
-		} catch (Exception e) {e.printStackTrace();}
+		} catch (Exception e) {LogUtil.trace(e);}
 		
 		return null;
 	}
@@ -159,7 +159,7 @@ public class CTSManagerRemoteWrapper extends AlgRemoteWrapper implements CTSMana
 		// TODO Auto-generated method stub
 		try {
 			return ((CTSManagerRemote)remoteAlg).remoteProfilesOf(ctxTemplateId);
-		} catch (Exception e) {e.printStackTrace();}
+		} catch (Exception e) {LogUtil.trace(e);}
 		
 		return MemProfiles.createEmpty();
 	}
@@ -170,7 +170,7 @@ public class CTSManagerRemoteWrapper extends AlgRemoteWrapper implements CTSMana
 		// TODO Auto-generated method stub
 		try {
 			return ((CTSManagerRemote)remoteAlg).remoteCreateCTSProfiles();
-		} catch (Exception e) {e.printStackTrace();}
+		} catch (Exception e) {LogUtil.trace(e);}
 		
 		return CTSMemMultiProfiles.create();
 	}
@@ -181,7 +181,7 @@ public class CTSManagerRemoteWrapper extends AlgRemoteWrapper implements CTSMana
 		// TODO Auto-generated method stub
 		try {
 			return ((CTSManagerRemote)remoteAlg).remoteCommitCTSchema();
-		} catch (Exception e) {e.printStackTrace();}
+		} catch (Exception e) {LogUtil.trace(e);}
 		
 		return false;
 	}
@@ -192,7 +192,7 @@ public class CTSManagerRemoteWrapper extends AlgRemoteWrapper implements CTSMana
 		// TODO Auto-generated method stub
 		try {
 			return ((CTSManagerRemote)remoteAlg).remoteImportCTSchema(ctsm);
-		} catch (Exception e) {e.printStackTrace();}
+		} catch (Exception e) {LogUtil.trace(e);}
 		
 		return false;
 	}
@@ -203,7 +203,7 @@ public class CTSManagerRemoteWrapper extends AlgRemoteWrapper implements CTSMana
 		// TODO Auto-generated method stub
 		try {
 			return ((CTSManagerRemote)remoteAlg).remoteImportCTSchema(dataset);
-		} catch (Exception e) {e.printStackTrace();}
+		} catch (Exception e) {LogUtil.trace(e);}
 		
 		return false;
 	}
@@ -214,7 +214,7 @@ public class CTSManagerRemoteWrapper extends AlgRemoteWrapper implements CTSMana
 		// TODO Auto-generated method stub
 		try {
 			((CTSManagerRemote)remoteAlg).remoteDefaultCTSchema();
-		} catch (Exception e) {e.printStackTrace();}
+		} catch (Exception e) {LogUtil.trace(e);}
 	}
 	
 	
@@ -257,14 +257,14 @@ public class CTSManagerRemoteWrapper extends AlgRemoteWrapper implements CTSMana
 		if (exclusive && (remoteAlg != null)) {
 			try {
 				((CTSManagerRemote)remoteAlg).close();
-			} catch (Exception e) {e.printStackTrace();}
+			} catch (Exception e) {LogUtil.trace(e);}
 			remoteAlg = null;
 		}
 		
 		try {
 			unexport();
 		}
-		catch (Throwable e) {e.printStackTrace();}
+		catch (Throwable e) {LogUtil.trace(e);}
 	}
 
 	
@@ -281,7 +281,7 @@ public class CTSManagerRemoteWrapper extends AlgRemoteWrapper implements CTSMana
 		try {
 			close();
 		}
-		catch (Throwable e) {e.printStackTrace();}
+		catch (Throwable e) {LogUtil.trace(e);}
 	}
 
 

@@ -147,7 +147,7 @@ public class Firer implements PluginManager {
 			adapter.close();
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 		try {
@@ -155,7 +155,7 @@ public class Firer implements PluginManager {
 			p.setProperty("derby.system.home", Constants.DATABASE_DIRECTORY + "/derby");
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 		
@@ -186,7 +186,7 @@ public class Firer implements PluginManager {
 			PluginStorage.clear();
 			discover(Util.getLoadablePackages());
 		}
-		catch (Throwable e) {e.printStackTrace();}
+		catch (Throwable e) {LogUtil.trace(e);}
 	}
 
 
@@ -208,7 +208,7 @@ public class Firer implements PluginManager {
 			nextUpdateLog = new AdapterWriter(xURI.create(Constants.LOGS_DIRECTORY +"/nextupdate.log"), false);
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 
 		
@@ -221,7 +221,7 @@ public class Firer implements PluginManager {
 				else
 					reflections.merge(tempReflections);
 			}
-			catch (Exception e) {e.printStackTrace();}
+			catch (Exception e) {LogUtil.trace(e);}
 		}
 		if (reflections == null) {
 			LogUtil.error("Null reflection for discovering classes.");
@@ -262,7 +262,7 @@ public class Firer implements PluginManager {
 			
 				registerAlg(alg);
 			}
-			catch (Exception e) {e.printStackTrace();}
+			catch (Exception e) {LogUtil.trace(e);}
 		}
 			
 		for (Class<? extends Alg> compositeAlgClass : compositeAlgClassList) {
@@ -283,7 +283,7 @@ public class Firer implements PluginManager {
 
 				registerAlg(compositeAlg);
 			}
-			catch (Exception e) {e.printStackTrace();}
+			catch (Exception e) {LogUtil.trace(e);}
 		}
 		
 		
@@ -292,7 +292,7 @@ public class Firer implements PluginManager {
 			nextUpdateLog = null;
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 	}
 	
@@ -312,7 +312,7 @@ public class Firer implements PluginManager {
 				else
 					reflections.merge(tempReflections);
 			}
-			catch (Exception e) {e.printStackTrace();}
+			catch (Exception e) {LogUtil.trace(e);}
 		}
 		if (reflections == null) return Util.newList();
 		
@@ -342,7 +342,7 @@ public class Firer implements PluginManager {
 				instances.add(instance);
 			}
 			catch (Exception e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 			
 		}
@@ -360,7 +360,7 @@ public class Firer implements PluginManager {
 			storeUrl = storeUri.getURI().toURL();
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			storeUrl = null;
 		}
 		if (storeUrl == null) return Util.newList();
@@ -375,7 +375,7 @@ public class Firer implements PluginManager {
 		discover(storeUri, rootPath, adapter, classLoader, referredClass, outObjList);
 		try {
 			classLoader.close();
-		} catch (Throwable e) {e.printStackTrace();}
+		} catch (Throwable e) {LogUtil.trace(e);}
 		
 		return outObjList;
 	}
@@ -486,7 +486,7 @@ public class Firer implements PluginManager {
 				}
 			}
 		}
-		catch (Throwable e) {e.printStackTrace();}
+		catch (Throwable e) {LogUtil.trace(e);}
 	}
 
 
@@ -497,7 +497,7 @@ public class Firer implements PluginManager {
 		try {
 			UIUtil.randomLookAndFeel();
 		}
-		catch (Throwable e) {e.printStackTrace();}
+		catch (Throwable e) {LogUtil.trace(e);}
 	}
 	
 	

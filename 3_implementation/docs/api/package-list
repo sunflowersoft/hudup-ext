@@ -24,6 +24,7 @@ net.hudup.data
 net.hudup.data.bit
 net.hudup.data.ctx
 net.hudup.data.ctx.ui
+net.hudup.data.ext
 net.hudup.data.ui
 net.hudup.data.ui.toolkit
 net.hudup.evaluate
@@ -34,6 +35,7 @@ net.hudup.logistic
 net.hudup.logistic.math
 net.hudup.logistic.math.ui
 net.hudup.parser
+net.hudup.parser.ext
 net.hudup.phoebe.math
 net.hudup.phoebe.math.ui
 net.hudup.server

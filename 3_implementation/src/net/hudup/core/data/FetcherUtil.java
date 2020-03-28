@@ -9,6 +9,8 @@ package net.hudup.core.data;
 
 import java.util.Collection;
 
+import net.hudup.core.logistic.LogUtil;
+
 /**
  * This utility class provides utility methods to process on {@link Fetcher}.
  * 
@@ -37,7 +39,7 @@ public class FetcherUtil {
 			
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		finally {
 			try {
@@ -47,7 +49,7 @@ public class FetcherUtil {
 					fetcher.reset();
 			}
 			catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 		}
 		

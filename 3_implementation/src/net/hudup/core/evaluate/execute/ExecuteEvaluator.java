@@ -22,6 +22,7 @@ import net.hudup.core.evaluate.HudupRecallMetric;
 import net.hudup.core.evaluate.NoneWrapperMetricList;
 import net.hudup.core.evaluate.SetupTimeMetric;
 import net.hudup.core.evaluate.SpeedMetric;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.NextUpdate;
 
 /**
@@ -57,7 +58,7 @@ public abstract class ExecuteEvaluator extends EvaluatorAbstract {
 		}
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 	}
 
@@ -68,7 +69,7 @@ public abstract class ExecuteEvaluator extends EvaluatorAbstract {
 		try {
 			((ExecutableAlg)alg).unsetup();
 		}
-		catch (Throwable e) {e.printStackTrace();}
+		catch (Throwable e) {LogUtil.trace(e);}
 	}
 
 	
@@ -97,7 +98,7 @@ public abstract class ExecuteEvaluator extends EvaluatorAbstract {
 				return null;
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 		return null;

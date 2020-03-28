@@ -33,6 +33,7 @@ import net.hudup.core.alg.AlgList;
 import net.hudup.core.alg.ui.AlgConfigDlg;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Exportable;
+import net.hudup.core.logistic.LogUtil;
 
 /**
  * {@link PluginStorage} manages many {@link RegisterTable} (s) and each {@link RegisterTable} stores algorithms having the same type.
@@ -318,7 +319,7 @@ public class PluginStorageManifest extends SortableSelectableTable {
 						}
 					} 
 					catch (Throwable e) {
-						e.printStackTrace();
+						LogUtil.trace(e);
 						changed = true;
 					}
 				}
@@ -332,7 +333,7 @@ public class PluginStorageManifest extends SortableSelectableTable {
 			if (alg instanceof Exportable) {
 				try {
 					((Exportable)alg).unexport(); //Finalize method will call unsetup method if unsetup method exists in this algorithm.
-				} catch (Throwable e) {e.printStackTrace();}
+				} catch (Throwable e) {LogUtil.trace(e);}
 			}
 		}
 		
@@ -435,7 +436,7 @@ public class PluginStorageManifest extends SortableSelectableTable {
 				listener.pluginChanged(evt);
 			}
 			catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 		}
 	
@@ -455,7 +456,7 @@ public class PluginStorageManifest extends SortableSelectableTable {
 					return false;
 			}
 			catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 		}
 		
@@ -560,7 +561,7 @@ class RegisterTM extends SortableSelectableTableModel {
 				try {
 					exported = ((Exportable)alg).getExportedStub() != null;
 				} catch (Throwable e) {
-					e.printStackTrace();
+					LogUtil.trace(e);
 					exported = false;
 				}
 			}
@@ -598,7 +599,7 @@ class RegisterTM extends SortableSelectableTableModel {
 				try {
 					exported = ((Exportable)alg).getExportedStub() != null;
 				} catch (Throwable e) {
-					e.printStackTrace();
+					LogUtil.trace(e);
 					exported = false;
 				}
 			}

@@ -11,6 +11,7 @@ import net.hudup.core.client.ClientUtil;
 import net.hudup.core.client.PowerServer;
 import net.hudup.core.client.Server;
 import net.hudup.core.client.ServerStatusListener;
+import net.hudup.core.logistic.LogUtil;
 
 /**
  * This class is the model of remote power server together with remote information (host, port, access account, access password, etc.) that are bound to listener or balancer.
@@ -84,7 +85,7 @@ public class BindServer {
 			server.removeStatusListener(bind);
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 		rInfo = null;
@@ -155,7 +156,7 @@ public class BindServer {
 		} 
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 		return null;

@@ -8,7 +8,6 @@
 package net.hudup.evaluate.ui;
 
 import java.awt.BorderLayout;
-import java.awt.Container;
 import java.awt.Image;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
@@ -25,7 +24,6 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
-import javax.swing.JTabbedPane;
 
 import net.hudup.core.Constants;
 import net.hudup.core.PluginChangedEvent;
@@ -71,10 +69,10 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 	private EvaluatorConfig thisConfig = null;
 	
 	
-	/**
-	 * Body panel.
-	 */
-	private JTabbedPane body = null;
+//	/**
+//	 * Body panel.
+//	 */
+//	private JTabbedPane body = null;
 	
 	
 	/**
@@ -106,7 +104,7 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 			this.thisConfig.setSaveAbility(bindUri == null); //Save only local configuration.
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			LogUtil.error("Error in getting evaluator configuration");
 		}
 		this.batchEvaluateGUI = new BatchEvaluateGUI(evaluator, bindUri, referredData);
@@ -130,15 +128,17 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 		setLocationRelativeTo(null);
 	    setJMenuBar(createMenuBar());
 	    
-		Container content = getContentPane();
-		content.setLayout(new BorderLayout(2, 2));
+		setLayout(new BorderLayout());
 		
-		this.body = new JTabbedPane();
-		content.add(this.body, BorderLayout.CENTER);
-		
-		this.body.add(I18nUtil.message("evaluate_batch"), this.batchEvaluateGUI);
+		add(this.batchEvaluateGUI, BorderLayout.CENTER);
 		
 		setTitle(I18nUtil.message("evaluator"));
+		
+//		Container content = getContentPane();
+//		content.setLayout(new BorderLayout(2, 2));
+//		this.body = new JTabbedPane();
+//		content.add(this.body, BorderLayout.CENTER);
+//		this.body.add(I18nUtil.message("evaluate_batch"), this.batchEvaluateGUI);
 		
 //		this.body.addMouseListener(new MouseAdapter() {
 //			@Override
@@ -200,7 +200,7 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 		try {
 			agent = batchEvaluateGUI.evaluator.isAgent();
 		}
-		catch (Throwable e) {e.printStackTrace();}
+		catch (Throwable e) {LogUtil.trace(e);}
 		if (batchEvaluateGUI.bindUri != null || !agent) {
 			JMenuItem mniSwitchEvaluator = new JMenuItem(
 				new AbstractAction(I18nUtil.message("switch_evaluator")) {
@@ -256,7 +256,7 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 //			agent = batchEvaluateGUI.evaluator.isAgent();
 //		}
 //		catch (Throwable e) {
-//			e.printStackTrace();
+//			LogUtil.trace(e);
 //		}
 //		if (agent && batchEvaluateGUI.bindUri == null)
 //			return null;
@@ -301,7 +301,7 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 				switchRemoteEvaluator(batchEvaluateGUI.getEvaluator().getName(), this);
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 	}
 	
@@ -324,7 +324,7 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 			agent = batchEvaluateGUI.evaluator.isAgent();
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 		SysConfigDlgExt cfg = new SysConfigDlgExt(this, I18nUtil.message("system_configure"), this) {
@@ -346,7 +346,7 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 					try {
 						if (batchEvaluateGUI.bindUri != null)
 							batchEvaluateGUI.evaluator.setConfig(thisConfig);
-					} catch (Throwable e) {e.printStackTrace();}
+					} catch (Throwable e) {LogUtil.trace(e);}
 				}
 				
 				if (paneRegister != null && paneRegister.isModified())
@@ -370,7 +370,7 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 			try {
 				agent = batchEvaluateGUI.evaluator.isAgent();
 			} 
-			catch (Exception e) {e.printStackTrace();}
+			catch (Exception e) {LogUtil.trace(e);}
 	
 			batchEvaluateGUI.dispose();
 			if (!agent || batchEvaluateGUI.bindUri != null)
@@ -432,7 +432,7 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 				}
 				catch (Throwable e) {
 					// TODO Auto-generated catch block
-					e.printStackTrace();
+					LogUtil.trace(e);
 					return -1;
 				}
 			}
@@ -449,7 +449,7 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 				}
 				catch (Throwable e) {
 					// TODO Auto-generated catch block
-					e.printStackTrace();
+					LogUtil.trace(e);
 				}
 			}
 		}
@@ -561,7 +561,7 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 						run(ev, bindUri, null, null);
 					}
 					catch (Exception e) {
-						e.printStackTrace();
+						LogUtil.trace(e);
 						JOptionPane.showMessageDialog(
 								this, "Can't get remote evaluator", "Connection to evaluator fail", JOptionPane.ERROR_MESSAGE);
 					}
@@ -600,7 +600,7 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 		}
 		catch (Exception e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 	}
 
@@ -652,7 +652,7 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 		}
 		catch (Exception e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 	}
 

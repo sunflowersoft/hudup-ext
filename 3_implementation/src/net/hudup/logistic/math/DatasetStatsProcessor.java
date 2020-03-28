@@ -18,6 +18,7 @@ import net.hudup.core.data.Fetcher;
 import net.hudup.core.data.Pair;
 import net.hudup.core.data.Rating;
 import net.hudup.core.data.RatingVector;
+import net.hudup.core.logistic.LogUtil;
 
 /**
  * This is utility class which calculates probabilities on dataset.
@@ -131,14 +132,14 @@ public class DatasetStatsProcessor implements Serializable {
 				prob = (double)count / (double)total;
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			prob = Constants.UNUSED;
 		}
 		finally {
 			try {
 				userRatings.close();
 			} 
-			catch (Exception e) {e.printStackTrace();}
+			catch (Exception e) {LogUtil.trace(e);}
 		}
 		
 		return prob;
@@ -194,14 +195,14 @@ public class DatasetStatsProcessor implements Serializable {
 			
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			prob = Constants.UNUSED;
 		}
 		finally {
 			try {
 				if (autoClose) ratings.close();
 			} 
-			catch (Exception e) {e.printStackTrace();}
+			catch (Exception e) {LogUtil.trace(e);}
 		}
 		
 		return prob;

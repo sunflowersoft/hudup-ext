@@ -93,7 +93,7 @@ public abstract class AbstractDelegator extends ProtocolImpl implements Runner, 
 						new InputStreamReader(socket.getInputStream()));
 			}
 			catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 				LogUtil.error("Delegator fail to listen from client " + socket + ", caused by " + e.getMessage());
 			}
 			
@@ -126,7 +126,7 @@ public abstract class AbstractDelegator extends ProtocolImpl implements Runner, 
 				}
 			}
 			catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 				LogUtil.info("Error by writing data to client.");
 				
 				try {
@@ -147,7 +147,7 @@ public abstract class AbstractDelegator extends ProtocolImpl implements Runner, 
 					}
 					catch (Throwable e) {
 						// TODO Auto-generated catch block
-						e.printStackTrace();
+						LogUtil.trace(e);
 					}
 				}
 			}
@@ -163,7 +163,7 @@ public abstract class AbstractDelegator extends ProtocolImpl implements Runner, 
 					in.close();
 			}
 			catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 				LogUtil.error("Delegator fail to close input stream, causes error " + e.getMessage());
 			}
 			
@@ -172,7 +172,7 @@ public abstract class AbstractDelegator extends ProtocolImpl implements Runner, 
 					out.close();
 			}
 			catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 				LogUtil.error("Delegator fail to close output stream, causes error " + e.getMessage());
 			}
 
@@ -182,7 +182,7 @@ public abstract class AbstractDelegator extends ProtocolImpl implements Runner, 
 				socket = null;
 			}
 			catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 				LogUtil.error("Delegator fail to close socket, causes error " + e.getMessage());
 			}
 
@@ -254,7 +254,7 @@ public abstract class AbstractDelegator extends ProtocolImpl implements Runner, 
 		} 
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 			LogUtil.error("Delegator fail to start, causes error " + e.getMessage());
 		}
 		
@@ -273,7 +273,7 @@ public abstract class AbstractDelegator extends ProtocolImpl implements Runner, 
 		}
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 			LogUtil.error("Delegator fail to pause, causes error " + e.getMessage());
 		}
 		
@@ -301,7 +301,7 @@ public abstract class AbstractDelegator extends ProtocolImpl implements Runner, 
 		} 
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 			LogUtil.error("Delegator fail to close socket when stop, causes error " + e.getMessage());
 		}
 		
@@ -315,7 +315,7 @@ public abstract class AbstractDelegator extends ProtocolImpl implements Runner, 
 		} 
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 			LogUtil.error("Delegator fail to stop, causes error " + e.getMessage());
 		}
 		
@@ -415,7 +415,7 @@ public abstract class AbstractDelegator extends ProtocolImpl implements Runner, 
 			}
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			request = null;
 			
 			LogUtil.error("Delegator fail to parse request, causes error " + e.getMessage());

@@ -21,52 +21,57 @@ public final class Constants {
 	/**
 	 * Current version of Hudup framework.
 	 */
-	public final static String  VERSION            = "v12";
+	public final static String  VERSION                  = "v13";
 	
 	/**
 	 * Unused double number.
 	 */
-	public final static double   UNUSED             = Double.NaN;
+	public final static double   UNUSED                  = Double.NaN;
+	
+	/**
+	 * Unused double number.
+	 */
+	public static boolean   DEBUG                        = true;
 	
 	/**
 	 * Default minimum rating value in rating matrix.
 	 */
-	public final static double DEFAULT_MIN_RATING = 1;
+	public final static double DEFAULT_MIN_RATING        = 1;
 	
 	/**
 	 * Default maximum rating value in rating matrix.
 	 */
-	public final static double DEFAULT_MAX_RATING      = 5;
+	public final static double DEFAULT_MAX_RATING        = 5;
 	
 	/**
 	 * Default extension of default file. Such default file is called Hudup file &quot;.hdp&quot;.
 	 */
-	public final static String DEFAULT_EXT             = "hdp";
+	public final static String DEFAULT_EXT               = "hdp";
 	
 	/**
 	 * Default evaluator name.
 	 */
-	public final static String DEFAULT_EVALUATOR_NAME  = "Recommendation Evaluator";
+	public final static String DEFAULT_EVALUATOR_NAME    = "Recommendation Evaluator";
 
 	/**
 	 * The maximum number digits in decimal precision.
 	 */
-	public static int          DECIMAL_PRECISION       = 12;
+	public static int          DECIMAL_PRECISION         = 12;
 	
 	/**
 	 * Default date format.
 	 */
-	public final static String  DATE_FORMAT            = "yyyy-MM-dd HH-mm-ss";
+	public final static String  DATE_FORMAT              = "yyyy-MM-dd HH-mm-ss";
 	
 	/**
 	 * Maximum verbal name length.
 	 */
-	public static int MAX_VERBAL_NAME_LENGTH           = 32;
+	public static int MAX_VERBAL_NAME_LENGTH             = 32;
 	
 	/**
 	 * Logging utility.
 	 */
-	public static boolean LOG4J                        = true;
+	public static boolean LOG4J                          = true;
 	
 	
 	/**
@@ -225,6 +230,15 @@ public final class Constants {
 	 * Static code to load dynamic constant.
 	 */
 	static {
+		try {
+			String debug = Util.getHudupProperty("debug");
+			if (debug != null)
+				DEBUG = Boolean.parseBoolean(debug);
+		}
+		catch (Throwable e) {
+			System.out.println("Error when parsing debug property");
+		}
+
 		try {
 			String decimal = Util.getHudupProperty("decimal_precision");
 			if (decimal != null)

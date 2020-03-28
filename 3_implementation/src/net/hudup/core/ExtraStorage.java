@@ -3,6 +3,7 @@ package net.hudup.core;
 import java.util.List;
 
 import net.hudup.core.data.Exportable;
+import net.hudup.core.logistic.LogUtil;
 
 /**
  * This class is storage to store extra objects besides plug-in storage.
@@ -28,7 +29,7 @@ public class ExtraStorage {
 			for (Exportable obj : unmanagedExportedObjects) {
 				try {
 					obj.unexport();
-				} catch (Throwable e) {e.printStackTrace();}
+				} catch (Throwable e) {LogUtil.trace(e);}
 			}
 			
 			unmanagedExportedObjects.clear();
@@ -54,10 +55,8 @@ public class ExtraStorage {
 	public final static void removeUnmanagedExportedObject(Exportable obj) {
 		synchronized (unmanagedExportedObjects) {
 			try {
-				if (unmanagedExportedObjects.size() == 0) return;
-				
 				unmanagedExportedObjects.remove(obj);
-			} catch (Throwable e) {e.printStackTrace();}
+			} catch (Throwable e) {LogUtil.trace(e);}
 		}
 	}
 

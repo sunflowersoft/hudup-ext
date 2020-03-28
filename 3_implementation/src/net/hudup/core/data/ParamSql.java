@@ -14,6 +14,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 import net.hudup.core.Util;
+import net.hudup.core.logistic.LogUtil;
 
 /**
  * This class represents a SQL statement having parameters, called {@code parametric SQL}.
@@ -269,7 +270,7 @@ public class ParamSql implements Serializable {
 		} 
 		catch (SQLException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 		return null;

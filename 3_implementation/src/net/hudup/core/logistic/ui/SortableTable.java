@@ -14,6 +14,8 @@ import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 
+import net.hudup.core.logistic.LogUtil;
+
 /**
  * This Java table that supports sorting.
  * 
@@ -120,7 +122,7 @@ public class SortableTable extends JTable {
 			}
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			return getDefaultRenderer(Object.class);
 		}
 	}
@@ -145,7 +147,7 @@ public class SortableTable extends JTable {
 			}
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			return getDefaultEditor(Object.class);
 		}
     }

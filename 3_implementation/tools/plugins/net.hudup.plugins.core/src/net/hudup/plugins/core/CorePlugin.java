@@ -117,7 +117,7 @@ public final class CorePlugin extends ApplicationPlugin implements Application {
 				} 
 	        	catch (Throwable e) {
 					// TODO Auto-generated catch block
-					e.printStackTrace();
+					net.rem.regression2;
 				}
 	        	
 	        }

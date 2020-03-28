@@ -15,6 +15,7 @@ import java.util.Set;
 
 import net.hudup.core.Cloneable;
 import net.hudup.core.Util;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.parser.TextParsable;
 import net.hudup.core.parser.TextParserUtil;
 
@@ -225,7 +226,7 @@ public abstract class ObjectVector<E extends Serializable> implements Cloneable,
 			result.setId(this.id);
 		} 
 		catch (Exception e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			result = null;
 		}
 		

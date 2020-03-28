@@ -119,7 +119,7 @@ public class ScannerImpl extends Scanner {
 			}
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			returnUserId = -1;
 		}
 		finally {
@@ -128,7 +128,7 @@ public class ScannerImpl extends Scanner {
 			} 
 			catch (Throwable e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 		}
 		
@@ -176,7 +176,7 @@ public class ScannerImpl extends Scanner {
 			}
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			returnItemId = -1;
 		}
 		finally {
@@ -185,7 +185,7 @@ public class ScannerImpl extends Scanner {
 			} 
 			catch (Throwable e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 		}
 		

@@ -20,6 +20,7 @@ import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Fetcher;
 import net.hudup.core.data.Profile;
 import net.hudup.core.data.RatingVector;
+import net.hudup.core.logistic.LogUtil;
 
 /**
  * This class sets up the neighbor collaborative filtering (Neighbor CF) algorithm for users. It extends directly {@link NeighborCF} class.
@@ -142,7 +143,7 @@ public class NeighborCFUserBased extends NeighborCF implements DuplicatableAlg {
 				userRatings.reset();
 			}
 			catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 			if (!calculated) continue;
 			
@@ -157,7 +158,7 @@ public class NeighborCFUserBased extends NeighborCF implements DuplicatableAlg {
 		} 
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		localUserSimCache.clear();
 		

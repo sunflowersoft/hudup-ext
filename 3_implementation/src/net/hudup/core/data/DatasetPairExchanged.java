@@ -11,6 +11,7 @@ import java.io.Serializable;
 import java.util.UUID;
 
 import net.hudup.core.Util;
+import net.hudup.core.logistic.LogUtil;
 
 /**
  * This class is the exchanged data for dataset pair.
@@ -101,7 +102,7 @@ public class DatasetPairExchanged implements Serializable {
 				}
 				else
 					training.remoteClear();
-			} catch (Throwable e) {e.printStackTrace();}
+			} catch (Throwable e) {LogUtil.trace(e);}
 		}
 		training = null;
 		trainingUUID = null;
@@ -116,7 +117,7 @@ public class DatasetPairExchanged implements Serializable {
 				}
 				else
 					testing.remoteClear();
-			} catch (Throwable e) {e.printStackTrace();}
+			} catch (Throwable e) {LogUtil.trace(e);}
 		}
 		testing = null;
 		testingUUID = null;
@@ -131,7 +132,7 @@ public class DatasetPairExchanged implements Serializable {
 				}
 				else
 					whole.remoteClear();
-			} catch (Throwable e) {e.printStackTrace();}
+			} catch (Throwable e) {LogUtil.trace(e);}
 		}
 		whole = null;
 		wholeUUID = null;
@@ -149,7 +150,7 @@ public class DatasetPairExchanged implements Serializable {
 		DataConfig config = null;
 		try {
 			config = (DataConfig) remoteDataset.remoteGetConfig().clone();
-		} catch (Throwable e) {e.printStackTrace();}
+		} catch (Throwable e) {LogUtil.trace(e);}
 		if (config == null) return null;
 		
 		boolean exclusive = remoteDataset instanceof DatasetRemoteWrapper ?
@@ -169,7 +170,7 @@ public class DatasetPairExchanged implements Serializable {
 				((DatasetRemoteWrapper)remoteDataset).forceClear();
 			else
 				remoteDataset.remoteClear();
-		} catch (Throwable e) {e.printStackTrace();}
+		} catch (Throwable e) {LogUtil.trace(e);}
 
 		Dataset dataset = DatasetUtil.loadDataset(config);
 		if ((dataset == null) || !(dataset instanceof DatasetRemote))

@@ -20,6 +20,7 @@ import net.hudup.core.Cloneable;
 import net.hudup.core.Constants;
 import net.hudup.core.Util;
 import net.hudup.core.data.Attribute.Type;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.MinMax;
 import net.hudup.core.parser.TextParsable;
 import net.hudup.core.parser.TextParserUtil;
@@ -495,7 +496,7 @@ public class Profile implements Cloneable, TextParsable, Serializable {
 						SimpleDateFormat df = new SimpleDateFormat(Constants.DATE_FORMAT);
 						newValue = df.parse(string);
 					} 
-					catch (Throwable e) {e.printStackTrace(); newValue = null;}
+					catch (Throwable e) {LogUtil.trace(e); newValue = null;}
 				}
 			}
 			
@@ -574,7 +575,7 @@ public class Profile implements Cloneable, TextParsable, Serializable {
 					newValue = df.parse(string);
 				} 
 				catch (ParseException e) {
-					e.printStackTrace();
+					LogUtil.trace(e);
 					newValue = null;
 				} // end try
 				
@@ -600,7 +601,7 @@ public class Profile implements Cloneable, TextParsable, Serializable {
 		} 
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 			newValue = null;
 		}
 		
@@ -626,7 +627,7 @@ public class Profile implements Cloneable, TextParsable, Serializable {
 		} 
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 			newValue = null;
 		}
 		
@@ -752,7 +753,7 @@ public class Profile implements Cloneable, TextParsable, Serializable {
 				return Double.parseDouble((String)value);
 			}
 			catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 				return Constants.UNUSED;
 			}
 			
@@ -832,7 +833,7 @@ public class Profile implements Cloneable, TextParsable, Serializable {
 				return Integer.parseInt((String)value);
 			}
 			catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 				return 0;
 			}
 			
@@ -896,7 +897,7 @@ public class Profile implements Cloneable, TextParsable, Serializable {
 				return Boolean.parseBoolean((String)value);
 			}
 			catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 				return false;
 			}
 			
@@ -959,7 +960,7 @@ public class Profile implements Cloneable, TextParsable, Serializable {
 			} 
 			catch (Throwable e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 			return null;
 		}
@@ -1014,7 +1015,7 @@ public class Profile implements Cloneable, TextParsable, Serializable {
 				return Long.parseLong((String)value);
 			}
 			catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 				return 0;
 			}
 			
@@ -1034,7 +1035,6 @@ public class Profile implements Cloneable, TextParsable, Serializable {
 	
 	/**
 	 * Getting value of attribute having specified name as time in miliseconds.
-	 * The returned value is formatted by the specified date format.
 	 * @param attName specified attribute name.
 	 * @return value of attribute having specified name as time in miliseconds.
 	 */
@@ -1046,6 +1046,30 @@ public class Profile implements Cloneable, TextParsable, Serializable {
 			return 0;
 	}
 
+	
+	/**
+	 * Getting value at specified index as long number. In Hudup framework, long number is also time in mili-seconds.
+	 * @param index specified index.
+	 * @return long number by index.
+	 */
+	public long getValueAsLong(int index) {
+		return getValueAsTime(index);
+	}
+	
+	
+	/**
+	 * Getting value of attribute having specified name as long number. In Hudup framework, long number is also time in mili-seconds.
+	 * @param attName specified attribute name.
+	 * @return value of attribute having specified name as long number.
+	 */
+	public long getValueAsLong(String attName) {
+		int index = indexOf(attName);
+		if (index != -1)
+			return getValueAsLong(index);
+		else
+			return 0;
+	}
+	
 	
 	/**
 	 * Getting value at specified index as normalized number of nominal.
@@ -1195,7 +1219,7 @@ public class Profile implements Cloneable, TextParsable, Serializable {
 				} 
 				catch (Exception e) {
 					// TODO Auto-generated catch block
-					e.printStackTrace();
+					LogUtil.trace(e);
 				}
 				profile.setValue(i, value);
 			}
@@ -1203,7 +1227,7 @@ public class Profile implements Cloneable, TextParsable, Serializable {
 		}
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		return null;
 	}

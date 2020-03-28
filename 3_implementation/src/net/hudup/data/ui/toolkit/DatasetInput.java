@@ -25,6 +25,7 @@ import net.hudup.core.data.Provider;
 import net.hudup.core.data.Unit;
 import net.hudup.core.data.ui.DataConfigTextField;
 import net.hudup.core.data.ui.UnitTable;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.ui.UIUtil;
 import net.hudup.data.DatasetUtil2;
 import net.hudup.data.ProviderImpl;
@@ -232,7 +233,7 @@ public class DatasetInput extends JPanel implements Dispose {
 		}
 		catch (Exception e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		unitTable = Util.getFactory().createUnitTable(config.getStoreUri());
 		body.add(unitTable.getComponent(), BorderLayout.CENTER);

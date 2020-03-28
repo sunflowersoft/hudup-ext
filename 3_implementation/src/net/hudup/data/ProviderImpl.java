@@ -42,6 +42,7 @@ import net.hudup.core.data.UserRating;
 import net.hudup.core.data.ctx.CTSManager;
 import net.hudup.core.data.ctx.Context;
 import net.hudup.core.data.ctx.ContextList;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.ui.ProgressEvent;
 import net.hudup.core.logistic.ui.ProgressListener;
 import net.hudup.core.parser.DatasetParser;
@@ -87,7 +88,7 @@ public class ProviderImpl implements Provider {
 			complete();
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 	}
 
@@ -627,7 +628,7 @@ public class ProviderImpl implements Provider {
 			}
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		finally {
 			try {
@@ -635,7 +636,7 @@ public class ProviderImpl implements Provider {
 					fetcher.close();
 			}
 			catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 		}
 		
@@ -782,7 +783,7 @@ public class ProviderImpl implements Provider {
 			}
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		finally {
 			try {
@@ -790,7 +791,7 @@ public class ProviderImpl implements Provider {
 					fetcher.close();
 			}
 			catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 		}
 		
@@ -1026,7 +1027,7 @@ public class ProviderImpl implements Provider {
 			}
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			attributeMap = null;
 		}
 		finally {
@@ -1035,7 +1036,7 @@ public class ProviderImpl implements Provider {
 					fetcher.close();
 			}
 			catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 			
 		}
@@ -1465,7 +1466,7 @@ public class ProviderImpl implements Provider {
 //				this.ctsManager.importCTSchema(src.getCTSManager());
 //			}
 //			catch (Throwable e) {
-//				e.printStackTrace();
+//				LogUtil.trace(e);
 //			}
 			
 			// Importing user and item attributes
@@ -1494,7 +1495,7 @@ public class ProviderImpl implements Provider {
 				result &= true;
 			}
 			catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 				result &= false;
 			}
 		}
@@ -1519,7 +1520,7 @@ public class ProviderImpl implements Provider {
 			result &= true;
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			result &= false;
 		}
 		finally {
@@ -1528,7 +1529,7 @@ public class ProviderImpl implements Provider {
 			} 
 			catch (Throwable e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 		}
 		if (registeredListener != null) {
@@ -1560,7 +1561,7 @@ public class ProviderImpl implements Provider {
 			result &= true;
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			result &= false;
 		}
 		finally {
@@ -1569,7 +1570,7 @@ public class ProviderImpl implements Provider {
 			} 
 			catch (Throwable e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 		}
 		
@@ -1595,7 +1596,7 @@ public class ProviderImpl implements Provider {
 			}
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			result &= false;
 		}
 
@@ -1629,7 +1630,7 @@ public class ProviderImpl implements Provider {
 			result &= true;
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			
 			result &= false;
 		}
@@ -1639,7 +1640,7 @@ public class ProviderImpl implements Provider {
 			} 
 			catch (Throwable e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 		}
 
@@ -1666,7 +1667,7 @@ public class ProviderImpl implements Provider {
 			result &= true;
 		}
 		catch(Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			result &= false;
 		}
 		
@@ -1695,7 +1696,7 @@ public class ProviderImpl implements Provider {
 			result &= true;
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			
 			result &= false;
 		}
@@ -1705,7 +1706,7 @@ public class ProviderImpl implements Provider {
 			} 
 			catch (Throwable e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 		}
 		if (registeredListener != null) {
@@ -1721,7 +1722,7 @@ public class ProviderImpl implements Provider {
 			this.ctsManager.importCTSchema(src.getCTSManager());
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		if (registeredListener != null) {
 			try {
@@ -1747,7 +1748,7 @@ public class ProviderImpl implements Provider {
 			result &= true;
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			
 			result &= false;
 		}
@@ -1757,7 +1758,7 @@ public class ProviderImpl implements Provider {
 			} 
 			catch (Throwable e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 		}
 		if (registeredListener != null) {
@@ -1798,7 +1799,7 @@ public class ProviderImpl implements Provider {
 //				this.ctsManager.importCTSchema(src);
 //			}
 //			catch (Throwable e) {
-//				e.printStackTrace();
+//				LogUtil.trace(e);
 //			}
 			
 			// Importing user and item attributes
@@ -1827,7 +1828,7 @@ public class ProviderImpl implements Provider {
 				result &= true;
 			}
 			catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 				result &= false;
 			}
 			
@@ -1855,7 +1856,7 @@ public class ProviderImpl implements Provider {
 			result &= true;
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			result &= false;
 		}
 		if (registeredListener != null) {
@@ -1894,7 +1895,7 @@ public class ProviderImpl implements Provider {
 			result &= true;
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			result &= false;
 		}
 		finally {
@@ -1903,7 +1904,7 @@ public class ProviderImpl implements Provider {
 			} 
 			catch (Throwable e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 		}
 		
@@ -1929,7 +1930,7 @@ public class ProviderImpl implements Provider {
 			}
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			result &= false;
 		}
 
@@ -1969,7 +1970,7 @@ public class ProviderImpl implements Provider {
 			result &= true;
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			
 			result &= false;
 		}
@@ -1979,7 +1980,7 @@ public class ProviderImpl implements Provider {
 			} 
 			catch (Throwable e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 		}
 
@@ -2006,7 +2007,7 @@ public class ProviderImpl implements Provider {
 			result &= true;
 		}
 		catch(Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			result &= false;
 		}
 		
@@ -2039,7 +2040,7 @@ public class ProviderImpl implements Provider {
 			result &= true;
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			
 			result &= false;
 		}
@@ -2049,7 +2050,7 @@ public class ProviderImpl implements Provider {
 			} 
 			catch (Throwable e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 		}
 		if (registeredListener != null) {
@@ -2065,7 +2066,7 @@ public class ProviderImpl implements Provider {
 			this.ctsManager.importCTSchema(src);
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		if (registeredListener != null) {
 			try {
@@ -2091,7 +2092,7 @@ public class ProviderImpl implements Provider {
 			result &= true;
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			
 			result &= false;
 		}
@@ -2101,7 +2102,7 @@ public class ProviderImpl implements Provider {
 			} 
 			catch (Throwable e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 		}
 		if (registeredListener != null) {
@@ -2135,7 +2136,7 @@ public class ProviderImpl implements Provider {
 				return importData(dataset, create, registeredListener);
 			}
 			catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 				return false;
 			}
 		}
@@ -2154,7 +2155,7 @@ public class ProviderImpl implements Provider {
 		} 
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 		try {
@@ -2165,7 +2166,7 @@ public class ProviderImpl implements Provider {
 		} 
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 
 	}
@@ -2189,7 +2190,7 @@ public class ProviderImpl implements Provider {
 			close();
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 	}
 

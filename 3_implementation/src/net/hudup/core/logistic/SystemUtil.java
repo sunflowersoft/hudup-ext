@@ -30,14 +30,14 @@ public final class SystemUtil {
 			System.runFinalization();
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 		try {
 			System.gc();
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 		// Do more
@@ -53,7 +53,7 @@ public final class SystemUtil {
 			LogUtil.info("SystemUtil#enhanceAuto() automatically calls system enhancement at thread " + Thread.currentThread());
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 	}
 	
@@ -103,7 +103,7 @@ public final class SystemUtil {
 				);
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 		return props;
@@ -129,7 +129,7 @@ public final class SystemUtil {
 		    return Integer.parseInt(version);
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 		return -1;

@@ -95,7 +95,7 @@ public final class I18nUtil {
 			loadMessages(sysProperties, language, country);
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 	}
 	
@@ -208,7 +208,7 @@ public final class I18nUtil {
 			} 
 			catch (Throwable e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 			
 			return key;
@@ -232,7 +232,7 @@ public final class I18nUtil {
 //			return i18n.getMessage(key);
 //		}
 //		catch (Throwable e) {
-//			e.printStackTrace();
+//			LogUtil.trace(e);
 //		}
 //		
 //		return key;
@@ -278,7 +278,7 @@ public final class I18nUtil {
 			}
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 	}
 	
@@ -326,7 +326,7 @@ public final class I18nUtil {
 			bundle = null;
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			bundle = null;
 		}
 		
@@ -375,7 +375,7 @@ public final class I18nUtil {
 				bundle = new PropertyResourceBundle(new InputStreamReader(is, "utf-8"));
 			}
 			catch (Exception e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 			finally {
 				is.close();

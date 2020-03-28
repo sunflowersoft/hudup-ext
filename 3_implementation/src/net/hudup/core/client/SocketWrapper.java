@@ -790,7 +790,7 @@ public class SocketWrapper extends ProtocolImpl implements Service {
 			
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			responseText = null;
 			
 			LogUtil.error("Socket warapper fail to send request to server, caused by " + e.getMessage());
@@ -802,7 +802,7 @@ public class SocketWrapper extends ProtocolImpl implements Service {
 					out.close();
 				}
 				catch (Throwable e) {
-					e.printStackTrace();
+					LogUtil.trace(e);
 					LogUtil.error("Socket wrapper fail to close output stream, causes error " + e.getMessage());
 				}
 			}
@@ -812,7 +812,7 @@ public class SocketWrapper extends ProtocolImpl implements Service {
 					in.close();
 				}
 				catch (Throwable e) {
-					e.printStackTrace();
+					LogUtil.trace(e);
 					LogUtil.error("Socket wrapper fail to close input stream, causes error " + e.getMessage());
 				}
 			}
@@ -822,7 +822,7 @@ public class SocketWrapper extends ProtocolImpl implements Service {
 					socket.close();
 				}
 				catch (Throwable e) {
-					e.printStackTrace();
+					LogUtil.trace(e);
 					LogUtil.error("Socket wrapper fail to close socket, causes error " + e.getMessage());
 				}
 			}

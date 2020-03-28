@@ -11,6 +11,7 @@ import java.rmi.Naming;
 
 import net.hudup.core.Constants;
 import net.hudup.core.data.DataConfig;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.xURI;
 
 /**
@@ -123,7 +124,7 @@ public final class ClientUtil {
 			return gateway.getRemoteService(username, password);
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 		return null;
@@ -153,7 +154,7 @@ public final class ClientUtil {
 			return gateway.getRemoteServer(username, password);
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 		return null;

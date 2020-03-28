@@ -33,6 +33,7 @@ import net.hudup.core.data.RatingTriple;
 import net.hudup.core.data.RatingVector;
 import net.hudup.core.logistic.DSUtil;
 import net.hudup.core.logistic.LineProcessor;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.RatingFilter;
 import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.ValueTriple;
@@ -438,7 +439,7 @@ public class BnetUtil {
 		} 
 		catch (Exception e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 	}
 	
@@ -455,7 +456,7 @@ public class BnetUtil {
 			return new Bnet(uri.toURL());
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 		} 
 		
 		return null;
@@ -532,7 +533,7 @@ public class BnetUtil {
 		} 
 		catch (IOException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 		return MT;
@@ -571,7 +572,7 @@ public class BnetUtil {
 		} 
 		catch (Exception e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		finally {
 			try {
@@ -579,7 +580,7 @@ public class BnetUtil {
 					writer.close();
 			}
 			catch (Exception e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 		}
 		

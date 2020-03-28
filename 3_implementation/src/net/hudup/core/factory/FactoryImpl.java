@@ -78,7 +78,7 @@ public class FactoryImpl implements Factory {
 		if (dataDriver.isFlatServer())
 			providerAssoc = new FlatProviderAssoc(config);
 		else if (dataDriver.isDbServer())
-			providerAssoc = new DbProviderAssocExt(config);
+			providerAssoc = new DbProviderAssoc(config);
 		else if (dataDriver.isHudupServer()) {
 			xURI uri = config.getStoreUri();
 			if (dataDriver.getType() == DataType.hudup_rmi) {
@@ -400,7 +400,7 @@ class FlatUnitTable extends ProfileTable implements UnitTable, AutoCloseable {
 			this.unit = unit;
 		}
 		catch (Exception e){
-			e.printStackTrace();
+			LogUtil.trace(e);
 			this.providerAssoc = null;
 			this.unit = null;
 		}
@@ -469,7 +469,7 @@ class FlatUnitTable extends ProfileTable implements UnitTable, AutoCloseable {
 				listener.respond(evt);
 			}
 			catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 		}
 	
@@ -495,7 +495,7 @@ class FlatUnitTable extends ProfileTable implements UnitTable, AutoCloseable {
 			close();
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 	}
 
@@ -628,7 +628,7 @@ class DBUnitTable extends DBTable implements UnitTable {
 		} 
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 	}
@@ -646,7 +646,7 @@ class DBUnitTable extends DBTable implements UnitTable {
 		} 
 		catch (SQLException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 	}
 
@@ -659,7 +659,7 @@ class DBUnitTable extends DBTable implements UnitTable {
 		} 
 		catch (SQLException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 	}
 
@@ -711,7 +711,7 @@ class DBUnitTable extends DBTable implements UnitTable {
 				listener.respond(evt);
 			}
 			catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 		}
 	

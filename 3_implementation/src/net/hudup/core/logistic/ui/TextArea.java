@@ -23,6 +23,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.text.Document;
 
 import net.hudup.core.logistic.ClipboardUtil;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.xURI;
 
@@ -190,7 +191,7 @@ public class TextArea extends JTextArea {
 			while (read >= 0);
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 		setText(textBuffer.toString());
@@ -224,7 +225,7 @@ public class TextArea extends JTextArea {
 			reader.close();
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 		adapter.close();

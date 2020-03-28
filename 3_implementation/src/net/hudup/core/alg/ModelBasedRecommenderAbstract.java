@@ -16,6 +16,7 @@ import net.hudup.core.data.Dataset;
 import net.hudup.core.data.Datasource;
 import net.hudup.core.data.KBasePointer;
 import net.hudup.core.data.Pointer;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.xURI;
 
 
@@ -54,7 +55,7 @@ public abstract class ModelBasedRecommenderAbstract extends RecommenderAbstract 
 				kb = newKB();
 			kb.setConfig(config); //This code line is important.
 		}
-		catch (Throwable e) {e.printStackTrace();}
+		catch (Throwable e) {LogUtil.trace(e);}
 	}
 
 
@@ -88,7 +89,7 @@ public abstract class ModelBasedRecommenderAbstract extends RecommenderAbstract 
 		if (kb != null) {
 			try {
 				kb.close();
-			} catch (Throwable e) {e.printStackTrace();}
+			} catch (Throwable e) {LogUtil.trace(e);}
 		}
 	}
 

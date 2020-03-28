@@ -22,6 +22,7 @@ import net.hudup.core.data.Nominal;
 import net.hudup.core.data.Profile;
 import net.hudup.core.data.Rating;
 import net.hudup.core.data.RatingVector;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.parser.TextParserUtil;
 
 /**
@@ -360,7 +361,7 @@ public class Request extends ProtocolParam {
 					field.set(request, value);
 			}
 			catch (Exception e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 			
 		}

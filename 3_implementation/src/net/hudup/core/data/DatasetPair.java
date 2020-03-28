@@ -10,6 +10,8 @@ package net.hudup.core.data;
 import java.io.Serializable;
 import java.util.UUID;
 
+import net.hudup.core.logistic.LogUtil;
+
 /**
  * This contains a pair of dataset such as training dataset and testing dataset.
  * Note, training dataset is the dataset used to build up some model like knowledge database ({@code KBase}) whereas testing dataset is the dataset used to test or evaluate such model.
@@ -219,7 +221,7 @@ public class DatasetPair implements Serializable {
 		}
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 		return 0;
@@ -240,7 +242,7 @@ public class DatasetPair implements Serializable {
 		}
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		return 0;
 	}

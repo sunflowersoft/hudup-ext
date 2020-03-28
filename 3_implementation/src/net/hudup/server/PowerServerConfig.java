@@ -13,6 +13,7 @@ import net.hudup.core.Util;
 import net.hudup.core.alg.Recommender;
 import net.hudup.core.client.ServerConfig;
 import net.hudup.core.data.HiddenText;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.xURI;
 import net.hudup.parser.SemiScannerParser;
 import net.hudup.parser.SnapshotParserImpl;
@@ -124,7 +125,7 @@ public class PowerServerConfig extends ServerConfig {
 			setParser(new SnapshotParserImpl());
 		} 
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			putDefaultUnitList(xURI.create("jdbc:derby:hudup;create=true"));
 			setRecommender(new GreenFallCF());
 			setParser(new SemiScannerParser());

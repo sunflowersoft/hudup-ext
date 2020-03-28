@@ -12,6 +12,7 @@ import javax.swing.JComboBox;
 import net.hudup.core.data.DataDriver;
 import net.hudup.core.data.DataDriver.DataType;
 import net.hudup.core.data.DataDriverList;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.parser.DatasetParser;
 
 /**
@@ -72,7 +73,7 @@ public class DataDriverComboBox extends JComboBox<DataDriver> {
 				DataDriver dataDriver = dataDriverList.get(i);
 				if (parser == null || parser.support(dataDriver))
 					this.addItem(dataDriver);
-			} catch (Throwable e) {e.printStackTrace();}
+			} catch (Throwable e) {LogUtil.trace(e);}
 		}
 		
 	}

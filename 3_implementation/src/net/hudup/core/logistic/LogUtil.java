@@ -69,4 +69,16 @@ public class LogUtil {
 	}
 
 
+	/**
+	 * Tracing specified exception.
+	 * @param e specified exception.
+	 */
+	public static void trace(Throwable e) {
+		if (Constants.DEBUG)
+			e.printStackTrace();
+		else
+			System.out.println("Error by " + e.getMessage());
+	}
+	
+	
 }

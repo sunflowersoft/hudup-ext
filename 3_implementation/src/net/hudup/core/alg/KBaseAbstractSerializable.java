@@ -12,6 +12,7 @@ import java.io.ObjectOutputStream;
 import java.rmi.RemoteException;
 
 import net.hudup.core.data.DataConfig;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.xURI;
 
@@ -78,7 +79,7 @@ public abstract class KBaseAbstractSerializable extends KBaseAbstract {
 		if (nut != null) {
 			try {
 				nut.close();
-			} catch (Throwable e) {e.printStackTrace();}
+			} catch (Throwable e) {LogUtil.trace(e);}
 			nut = null;
 		}
 	}
@@ -112,7 +113,7 @@ public abstract class KBaseAbstractSerializable extends KBaseAbstract {
 			input.close();
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			if (nut != null) {
 				try {
 					nut.close();
@@ -144,7 +145,7 @@ public abstract class KBaseAbstractSerializable extends KBaseAbstract {
 			return true;
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 		return false;

@@ -150,7 +150,7 @@ public class Evaluator implements AccessPoint {
 						}
 					}
 					catch (Exception e) {
-						e.printStackTrace();
+						LogUtil.trace(e);
 					}
 				}
 			});
@@ -160,7 +160,7 @@ public class Evaluator implements AccessPoint {
 			ev.remoteStart0(algList, pool.toDatasetPoolExchangedClient(), beginTime);
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 	}

@@ -81,7 +81,7 @@ public class Balancer extends Listener {
 			} 
 			catch (Throwable e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LogUtil.trace(e);
 				LogUtil.error("Listener/Balancer (socket server) failed to bind list of remote servers, caused by " + e.getMessage());
 			}
 			
@@ -109,7 +109,7 @@ public class Balancer extends Listener {
 			new BalancerCP(this);
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			
 			/*
 			 * It is possible that current Java environment does not support GUI.
@@ -170,7 +170,7 @@ public class Balancer extends Listener {
 					} 
 					catch (RemoteException re) {
 						// TODO Auto-generated catch block
-						re.printStackTrace();
+						LogUtil.trace(re);
 					}
 				}
 			});

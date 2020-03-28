@@ -187,7 +187,7 @@ public abstract class AbstractEvaluateUI implements EvaluateListener, EvaluatePr
 			}
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			updateMode();
 		}
 	}
@@ -204,7 +204,7 @@ public abstract class AbstractEvaluateUI implements EvaluateListener, EvaluatePr
 		}
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 			updateMode(); //Added date: 2019.08.12 by Loc Nguyen
 		}
 	}
@@ -228,7 +228,7 @@ public abstract class AbstractEvaluateUI implements EvaluateListener, EvaluatePr
 		}
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 			updateMode(); //Added date: 2019.08.12 by Loc Nguyen
 		}
 	}
@@ -252,7 +252,7 @@ public abstract class AbstractEvaluateUI implements EvaluateListener, EvaluatePr
 			} 
 			catch (Throwable e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 		}
 		
@@ -278,7 +278,7 @@ public abstract class AbstractEvaluateUI implements EvaluateListener, EvaluatePr
 			return true;
 		}
 		catch (IOException e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 		return false;
@@ -325,7 +325,7 @@ public abstract class AbstractEvaluateUI implements EvaluateListener, EvaluatePr
 			}
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 	}
 	
@@ -344,7 +344,7 @@ public abstract class AbstractEvaluateUI implements EvaluateListener, EvaluatePr
 		}
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 			return false;
 		}
 	}
@@ -357,7 +357,7 @@ public abstract class AbstractEvaluateUI implements EvaluateListener, EvaluatePr
 		else { //Evaluator is local
 			try {
 				return evaluator.getConfig().getEvaluatorPort();
-			} catch (Throwable e) {e.printStackTrace();}
+			} catch (Throwable e) {LogUtil.trace(e);}
 			
 			return -1;
 		}
@@ -375,7 +375,7 @@ public abstract class AbstractEvaluateUI implements EvaluateListener, EvaluatePr
 			evaluator.addSetupAlgListener(this);
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 	}
 	
@@ -391,7 +391,7 @@ public abstract class AbstractEvaluateUI implements EvaluateListener, EvaluatePr
 			evaluator.removeSetupAlgListener(this);
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 	}
 

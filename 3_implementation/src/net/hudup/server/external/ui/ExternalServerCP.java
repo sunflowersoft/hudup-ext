@@ -26,6 +26,7 @@ import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.DataDriverList;
 import net.hudup.core.data.ExternalConfig;
 import net.hudup.core.data.ui.SysConfigPane;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.xURI;
 import net.hudup.data.ui.ExternalConfigurator;
 import net.hudup.server.external.ExternalServerConfig;
@@ -264,7 +265,7 @@ public class ExternalServerCP extends PowerServerCP {
 			svrConfig = server.getConfig();
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			svrConfig = null;
 		}
 		if (svrConfig == null)
@@ -322,7 +323,7 @@ public class ExternalServerCP extends PowerServerCP {
 		} 
 		catch (RemoteException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 	}

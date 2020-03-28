@@ -12,6 +12,7 @@ import java.util.List;
 
 import net.hudup.core.Util;
 import net.hudup.core.logistic.DSUtil;
+import net.hudup.core.logistic.LogUtil;
 
 /**
  * This represents an associator utility (helper) classes for dataset.
@@ -80,14 +81,14 @@ public final class DatasetAssoc {
 			
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		finally {
 			try {
 				fetcher.close();
 			}
 			catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 		}
 	
@@ -136,7 +137,7 @@ public final class DatasetAssoc {
 			ratings.close();
 		}
 		catch (RemoteException e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 		if (rowIdList.size() == 0)

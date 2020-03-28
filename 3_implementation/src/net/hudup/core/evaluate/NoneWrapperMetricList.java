@@ -18,6 +18,7 @@ import net.hudup.core.PluginStorage;
 import net.hudup.core.RegisterTable;
 import net.hudup.core.Util;
 import net.hudup.core.alg.Alg;
+import net.hudup.core.logistic.LogUtil;
 
 /**
  * This class represents a list of metrics with note that these metrics are not wrappers.
@@ -205,7 +206,7 @@ public class NoneWrapperMetricList implements Cloneable, Serializable {
 					newMetaMetric.setup(metaList.toArray());
 					result.add(newMetaMetric);
 				}
-				catch (Exception e) {e.printStackTrace();}
+				catch (Exception e) {LogUtil.trace(e);}
 			}
 			
 			

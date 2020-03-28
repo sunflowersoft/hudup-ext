@@ -11,6 +11,7 @@ import java.util.List;
 
 import net.hudup.core.Util;
 import net.hudup.core.data.DataDriver.DataType;
+import net.hudup.core.logistic.LogUtil;
 
 /**
  * This class contains a list of {@link DataDriver} and provides utility method on processing such list such as adding new data driver and finding a data driver.
@@ -150,7 +151,7 @@ public final class DataDriverList {
 			add(new DataDriver(DataType.postgresql));
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 	}
 	

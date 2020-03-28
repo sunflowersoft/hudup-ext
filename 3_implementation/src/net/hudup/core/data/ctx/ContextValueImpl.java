@@ -15,6 +15,7 @@ import net.hudup.core.data.Attribute;
 import net.hudup.core.data.Attribute.Type;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Profile;
+import net.hudup.core.logistic.LogUtil;
 
 /**
  * This class is default implementation of context value.
@@ -120,7 +121,7 @@ public class ContextValueImpl implements ContextValue {
 		} 
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 			newValue = null;
 		}
 		if (newValue == null)

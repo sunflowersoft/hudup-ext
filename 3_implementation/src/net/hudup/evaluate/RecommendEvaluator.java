@@ -33,6 +33,7 @@ import net.hudup.core.evaluate.NoneWrapperMetricList;
 import net.hudup.core.evaluate.SetupTimeMetric;
 import net.hudup.core.evaluate.SpeedMetric;
 import net.hudup.core.evaluate.recommend.Accuracy;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.NextUpdate;
 import net.hudup.core.logistic.SystemUtil;
 import net.hudup.core.logistic.xURI;
@@ -132,7 +133,7 @@ public class RecommendEvaluator extends EvaluatorAbstract {
 				if (!acceptAlg(evAlgList.get(i))) continue;
 			} catch (Throwable e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LogUtil.trace(e);
 				continue;
 			}
 			Recommender recommender = (Recommender)evAlgList.get(i);
@@ -305,18 +306,18 @@ public class RecommendEvaluator extends EvaluatorAbstract {
 					
 				} // end try
 				catch (Throwable e) {
-					e.printStackTrace();
+					LogUtil.trace(e);
 				}
 				finally {
 					try {
 						if (testingUsers != null)
 							testingUsers.close();
 						testingUsers = null;
-					} catch (Throwable e) {e.printStackTrace();}
+					} catch (Throwable e) {LogUtil.trace(e);}
 					
 					try {
 						unsetupAlgSupportDelay(recommender);
-					} catch (Throwable e) {e.printStackTrace();}
+					} catch (Throwable e) {LogUtil.trace(e);}
 				}
 				
 				SystemUtil.enhanceAuto();
@@ -368,7 +369,7 @@ public class RecommendEvaluator extends EvaluatorAbstract {
 			
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			return 0;
 		}
 		finally {
@@ -378,7 +379,7 @@ public class RecommendEvaluator extends EvaluatorAbstract {
 			} 
 			catch (Throwable e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 		}
 
@@ -406,7 +407,7 @@ public class RecommendEvaluator extends EvaluatorAbstract {
 		} 
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 			nRatedItems = 0;
 		}
 		finally {
@@ -416,7 +417,7 @@ public class RecommendEvaluator extends EvaluatorAbstract {
 			} 
 			catch (Throwable e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 		}
 		
@@ -436,7 +437,7 @@ public class RecommendEvaluator extends EvaluatorAbstract {
 //			}
 //		}
 //		catch (Throwable e) {
-//			e.printStackTrace();
+//			LogUtil.trace(e);
 //			nRatedItems = 0;
 //		}
 //		finally {
@@ -446,7 +447,7 @@ public class RecommendEvaluator extends EvaluatorAbstract {
 //			} 
 //			catch (Throwable e) {
 //				// TODO Auto-generated catch block
-//				e.printStackTrace();
+//				LogUtil.trace(e);
 //			}
 //		}
 //		
@@ -533,7 +534,7 @@ public class RecommendEvaluator extends EvaluatorAbstract {
 		try {
 			((Recommender)alg).setup(training);
 		}
-		catch (Throwable e) {e.printStackTrace();}
+		catch (Throwable e) {LogUtil.trace(e);}
 	}
 
 
@@ -543,7 +544,7 @@ public class RecommendEvaluator extends EvaluatorAbstract {
 		try {
 			((Recommender)alg).unsetup();
 		}
-		catch (Throwable e) {e.printStackTrace();}
+		catch (Throwable e) {LogUtil.trace(e);}
 	}
 
 

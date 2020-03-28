@@ -168,7 +168,7 @@ public class Test {
 				instances.add(instance);
 			}
 			catch (Exception e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 			
 		}
@@ -192,7 +192,7 @@ public class Test {
 				formalJarUrlList.add(formalJarUrl);
 			}
 			catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 		}
 		
@@ -204,14 +204,14 @@ public class Test {
 			//System.out.println(c.toString());
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		Reflections2 reflections = new Reflections2("net", classLoader);
 		
 		List<T> instances = getInstances(referredClass, reflections);
 		try {
 			classLoader.close();
-		} catch (Throwable e) {e.printStackTrace();}
+		} catch (Throwable e) {LogUtil.trace(e);}
 		return instances;
 	}
 
@@ -518,7 +518,7 @@ class PluginStorageManifest2 extends JTable {
 						}
 					} 
 					catch (Throwable e) {
-						e.printStackTrace();
+						LogUtil.trace(e);
 						changed = true;
 					}
 				}
@@ -532,7 +532,7 @@ class PluginStorageManifest2 extends JTable {
 			if (alg instanceof Exportable) {
 				try {
 					((Exportable)alg).unexport(); //Finalize method will call unsetup method if unsetup method exists in this algorithm.
-				} catch (Throwable e) {e.printStackTrace();}
+				} catch (Throwable e) {LogUtil.trace(e);}
 			}
 		}
 		
@@ -635,7 +635,7 @@ class PluginStorageManifest2 extends JTable {
 				listener.pluginChanged(evt);
 			}
 			catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 		}
 	
@@ -655,7 +655,7 @@ class PluginStorageManifest2 extends JTable {
 					return false;
 			}
 			catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 		}
 		
@@ -1034,7 +1034,7 @@ class RegisterTM2 extends DefaultTableModel {
 				try {
 					exported = ((Exportable)alg).getExportedStub() != null;
 				} catch (Throwable e) {
-					e.printStackTrace();
+					LogUtil.trace(e);
 					exported = false;
 				}
 			}
@@ -1072,7 +1072,7 @@ class RegisterTM2 extends DefaultTableModel {
 				try {
 					exported = ((Exportable)alg).getExportedStub() != null;
 				} catch (Throwable e) {
-					e.printStackTrace();
+					LogUtil.trace(e);
 					exported = false;
 				}
 			}
@@ -1530,7 +1530,7 @@ class MetricsOptionTM2 extends DefaultTableModel {
 				
 				data.add(row);
 			}
-			catch (Throwable e) {e.printStackTrace();}
+			catch (Throwable e) {LogUtil.trace(e);}
 		}
 		
 		setDataVector(data, createColumns());
@@ -1707,7 +1707,7 @@ class MetricsTable2 extends JTable {
 			datasetId = Integer.parseInt(datasetId.toString());
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			return null;
 		}
 		
@@ -1843,7 +1843,7 @@ class MetricsTM2 extends DefaultTableModel {
 					
 				data.add(row);
 			}
-			catch (Throwable e) {e.printStackTrace();}
+			catch (Throwable e) {LogUtil.trace(e);}
 		}
 		
 		
@@ -1851,7 +1851,7 @@ class MetricsTM2 extends DefaultTableModel {
 			setDataVector(data, columns);
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 	}
 	
@@ -1869,7 +1869,7 @@ class MetricsTM2 extends DefaultTableModel {
 			setDataVector(data, columns);
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 	}
 	
@@ -2606,7 +2606,7 @@ class ImportAlgDlag extends JDialog {
 					((AlgRemoteWrapper)alg).setExclusive(true);
 					try {
 						((AlgRemoteWrapper)alg).unexport();
-					} catch (Throwable e) {e.printStackTrace();}
+					} catch (Throwable e) {LogUtil.trace(e);}
 				}
 			}
 		}
@@ -2662,7 +2662,7 @@ class ImportAlgDlag extends JDialog {
 					((AlgRemoteWrapper)alg).setExclusive(true);
 					try {
 						((AlgRemoteWrapper)alg).unexport();
-					} catch (Throwable e) {e.printStackTrace();}
+					} catch (Throwable e) {LogUtil.trace(e);}
 				}
 			}
 		}
@@ -2805,7 +2805,7 @@ class ImportAlgDlag extends JDialog {
 				((AlgRemoteWrapper)remainAlg).setExclusive(true);
 				try {
 					((AlgRemoteWrapper)remainAlg).unexport();
-				} catch (Throwable e) {e.printStackTrace();}
+				} catch (Throwable e) {LogUtil.trace(e);}
 			}
 		}
 		this.leftList.clear();
@@ -2843,7 +2843,7 @@ class ImportAlgDlag extends JDialog {
 				((AlgRemoteWrapper)alg).setExclusive(true);
 				try {
 					((AlgRemoteWrapper)alg).unexport();
-				} catch (Throwable e) {e.printStackTrace();}
+				} catch (Throwable e) {LogUtil.trace(e);}
 			}
 		}
 		

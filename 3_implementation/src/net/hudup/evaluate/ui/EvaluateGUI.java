@@ -338,7 +338,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			updateMode();
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			updateMode();
 		}
 	}
@@ -1002,7 +1002,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			openTrainingSet(config);
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 	}
 	
@@ -1041,7 +1041,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 						evaluator.updatePool(toDatasetPoolExchangedClient(guiData.pool), null);
 //						wait();
 //					}
-				} catch (Throwable e) {e.printStackTrace();}
+				} catch (Throwable e) {LogUtil.trace(e);}
 			}
 			else {
 				txtTrainingBrowse.setDataset(dataset, false);
@@ -1050,7 +1050,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 		}
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 			updateMode();
 		}
 	}
@@ -1083,7 +1083,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 						evaluator.updatePool(toDatasetPoolExchangedClient(guiData.pool), null);
 //						wait();
 //					}
-				} catch (Throwable e) {e.printStackTrace();}
+				} catch (Throwable e) {LogUtil.trace(e);}
 			}
 			else {
 				txtTrainingBrowse.setDataset(guiData.pool.get(0).getTraining(), false);
@@ -1092,7 +1092,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			}
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			updateMode();
 		}
 	}
@@ -1130,7 +1130,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 		}
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 	}
 	
@@ -1174,7 +1174,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 						evaluator.updatePool(toDatasetPoolExchangedClient(guiData.pool), null);
 //						wait();
 //					}
-				} catch (Throwable e) {e.printStackTrace();}
+				} catch (Throwable e) {LogUtil.trace(e);}
 			}
 			else {
 				txtTestingBrowse.setDataset(dataset, false);
@@ -1183,7 +1183,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 		}
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 			updateMode();
 		}
 	}
@@ -1201,7 +1201,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 		}
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 	}
 	
@@ -1221,7 +1221,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 						evaluator.updatePool(null, null);
 //						wait();
 //					}
-				} catch (Throwable e) {e.printStackTrace();}
+				} catch (Throwable e) {LogUtil.trace(e);}
 			}
 			else {
 				this.txtTrainingBrowse.setDataset(null, false);
@@ -1232,7 +1232,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 		}
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 			updateMode();
 		}
 	}
@@ -1292,13 +1292,13 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 				else
 					started = evaluator.remoteStart(AlgList.getAlgNameList(algList), toDatasetPoolExchangedClient(pool), null);
 				
-//				try {wait();} catch (Exception e) {e.printStackTrace();}
+//				try {wait();} catch (Exception e) {LogUtil.trace(e);}
 //			}
 			if (!started) updateMode();
 		}
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 			LogUtil.error("Error in evaluation");
 			updateMode(); //Added date: 2019.08.12 by Loc Nguyen
 		}
@@ -1308,7 +1308,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 	@Override
 	public synchronized void receivedEvaluator(EvaluatorEvent evt) throws RemoteException {
 		// TODO Auto-generated method stub
-		try {notifyAll();} catch (Exception e) {e.printStackTrace();}
+		try {notifyAll();} catch (Exception e) {LogUtil.trace(e);}
 
 		if (evt.getType() == EvaluatorEvent.Type.start || evt.getType() == EvaluatorEvent.Type.update_pool) {
 //			Timestamp timestamp = evt.getTimestamp();
@@ -1358,7 +1358,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			boolean saveResultSummary = false;
 			try {
 				saveResultSummary = evaluator.getConfig().isSaveResultSummary();
-			} catch (Throwable e) {e.printStackTrace();}
+			} catch (Throwable e) {LogUtil.trace(e);}
 
 			evProcessor.saveEvaluateResult(txtRunSaveBrowse.getText(), evt, Arrays.asList(getAlg()), saveResultSummary, EV_RESULT_FILENAME_PREFIX);
 		}
@@ -1422,7 +1422,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			boolean saveResultSummary = false;
 			try {
 				saveResultSummary = evaluator.getConfig().isSaveResultSummary();
-			} catch (Throwable e) {e.printStackTrace();}
+			} catch (Throwable e) {LogUtil.trace(e);}
 
 			evProcessor.saveSetupResult(this.txtRunSaveBrowse.getText(), evt, saveResultSummary, EV_RESULT_FILENAME_PREFIX);
 		}
@@ -1525,7 +1525,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			this.statusBar.setTextPane0(DSUtil.shortenVerbalName(evaluator.getName()));
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			
 			boolean flag = cmbAlgs.getItemCount() > 0 &&
 				txtTrainingBrowse.getDataset() != null && txtTestingBrowse.getDataset() != null;
@@ -1633,7 +1633,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			this.timestamp = null;
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 	}
 	
@@ -1667,7 +1667,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			return new RecommenderInspector(evaluator, recommender);
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 		return null;

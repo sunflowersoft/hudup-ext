@@ -52,6 +52,7 @@ import net.hudup.core.data.ctx.ContextTemplateSchemaImpl;
 import net.hudup.core.data.ctx.ContextValue;
 import net.hudup.core.data.ctx.ContextValueImpl;
 import net.hudup.core.logistic.DSUtil;
+import net.hudup.core.logistic.LogUtil;
 
 /**
  * This class is the default implementation of {@link Snapshot}.
@@ -772,7 +773,7 @@ public class SnapshotImpl extends Snapshot {
 		}
 		
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		finally {
 			provider.close();
@@ -815,7 +816,7 @@ public class SnapshotImpl extends Snapshot {
 			}
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		finally {
 			try {
@@ -823,7 +824,7 @@ public class SnapshotImpl extends Snapshot {
 					userReader.close();
 			}
 			catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 		}
 		
@@ -849,7 +850,7 @@ public class SnapshotImpl extends Snapshot {
 			}
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		finally {
 			try {
@@ -857,7 +858,7 @@ public class SnapshotImpl extends Snapshot {
 					itemReader.close();
 			}
 			catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 		}
 		
@@ -910,7 +911,7 @@ public class SnapshotImpl extends Snapshot {
 			}//End if
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		finally {
 			try {
@@ -918,7 +919,7 @@ public class SnapshotImpl extends Snapshot {
 					attMapReader.close();
 			}
 			catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 		}
 		
@@ -973,7 +974,7 @@ public class SnapshotImpl extends Snapshot {
 			}//End if
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		finally {
 			try {
@@ -981,7 +982,7 @@ public class SnapshotImpl extends Snapshot {
 					ratingReader.close();
 			}
 			catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 		}
 		
@@ -1032,7 +1033,7 @@ public class SnapshotImpl extends Snapshot {
 			}//End if
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		finally {
 			try {
@@ -1040,7 +1041,7 @@ public class SnapshotImpl extends Snapshot {
 					ctxReader.close();
 			}
 			catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 		}
 		
@@ -1064,7 +1065,7 @@ public class SnapshotImpl extends Snapshot {
 			}//End if
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		finally {
 			try {
@@ -1072,7 +1073,7 @@ public class SnapshotImpl extends Snapshot {
 					sampleReader.close();
 			}
 			catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 		}
 
@@ -1095,7 +1096,7 @@ public class SnapshotImpl extends Snapshot {
 			snapshot.enhance();
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			if (snapshot != null)
 				snapshot.clear();
 			
@@ -1107,7 +1108,7 @@ public class SnapshotImpl extends Snapshot {
 				assoc.close();
 			}
 			catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 		}
 		

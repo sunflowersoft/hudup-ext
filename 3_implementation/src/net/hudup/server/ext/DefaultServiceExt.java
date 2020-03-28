@@ -82,7 +82,7 @@ public class DefaultServiceExt extends DefaultService implements ServiceExt {
 				pairMap.put(ev.getName(), ev);
 				guiDataMap.put(ev.getName(), new EvaluateGUIData());
 			}
-			catch (Throwable e) {e.printStackTrace();}
+			catch (Throwable e) {LogUtil.trace(e);}
 		}
 
 		return opened;
@@ -99,7 +99,7 @@ public class DefaultServiceExt extends DefaultService implements ServiceExt {
 			for (Evaluator ev : evs) {
 				try {
 					ev.close();
-				} catch (Throwable e) {e.printStackTrace();}
+				} catch (Throwable e) {LogUtil.trace(e);}
 			}
 			pairMap.clear();
 		}
@@ -109,7 +109,7 @@ public class DefaultServiceExt extends DefaultService implements ServiceExt {
 			for (Evaluator ev : evs) {
 				try {
 					ev.close();
-				} catch (Throwable e) {e.printStackTrace();}
+				} catch (Throwable e) {LogUtil.trace(e);}
 			}
 			pairReproducedMap.clear();
 		}
@@ -160,14 +160,14 @@ public class DefaultServiceExt extends DefaultService implements ServiceExt {
 					}
 					catch (Throwable e) {
 						// TODO Auto-generated catch block
-						e.printStackTrace();
+						LogUtil.trace(e);
 						return -1;
 					}
 				}
 			});
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			evList = Util.newList();
 			
 			LogUtil.error("Service fail to get evaluator list, caused by " + e.getMessage());
@@ -200,7 +200,7 @@ public class DefaultServiceExt extends DefaultService implements ServiceExt {
 				evaluator = pairMap.get(evaluatorName);
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			evaluator = null;
 			
 			LogUtil.error("Service fail to get evaluator, caused by " + e.getMessage());
@@ -267,7 +267,7 @@ public class DefaultServiceExt extends DefaultService implements ServiceExt {
 			}
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			reproducedEvaluator = null;
 			
 			LogUtil.error("Service fail to get evaluator, caused by " + e.getMessage());
@@ -311,13 +311,13 @@ public class DefaultServiceExt extends DefaultService implements ServiceExt {
 				Evaluator reproducedEvaluator = pairReproducedMap.get(evaluatorReproducedName);
 				try {
 					reproducedEvaluator.close();
-				} catch (Throwable e) {e.printStackTrace();}
+				} catch (Throwable e) {LogUtil.trace(e);}
 				
 				pairReproducedMap.remove(evaluatorReproducedName);
 			}
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			ret = false;
 			
 			LogUtil.error("Service fail to get evaluator, caused by " + e.getMessage());
@@ -343,7 +343,7 @@ public class DefaultServiceExt extends DefaultService implements ServiceExt {
 			}
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			LogUtil.error("Service fail to get evaluator, caused by " + e.getMessage());
 		}
 		finally {
@@ -379,7 +379,7 @@ public class DefaultServiceExt extends DefaultService implements ServiceExt {
 					name = evaluator.getName();
 			}
 			catch (Exception e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 				name = "";
 			}
 		}

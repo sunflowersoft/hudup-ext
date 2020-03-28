@@ -83,7 +83,7 @@ public abstract class ExternalQueryAbstract extends AlgAbstract implements Exter
 		// TODO Auto-generated method stub
 		try {
 			unexport();
-		} catch (Throwable e) {e.printStackTrace();}
+		} catch (Throwable e) {LogUtil.trace(e);}
 	}
 
 
@@ -103,7 +103,7 @@ public abstract class ExternalQueryAbstract extends AlgAbstract implements Exter
 			close();
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 	}
 

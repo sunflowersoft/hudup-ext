@@ -19,6 +19,7 @@ import java.rmi.RemoteException;
 import javax.swing.GrayFilter;
 
 import net.hudup.core.logistic.I18nUtil;
+import net.hudup.core.logistic.LogUtil;
 
 /**
  * When server started, there is its icon shown on system tray of current operating system such as Windows and Linux.
@@ -102,7 +103,7 @@ public class ServerTrayIcon extends TrayIcon implements ServerStatusListener {
 		} 
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 		updateStatus();
@@ -130,7 +131,7 @@ public class ServerTrayIcon extends TrayIcon implements ServerStatusListener {
 			}
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 	}
 	
@@ -154,7 +155,7 @@ public class ServerTrayIcon extends TrayIcon implements ServerStatusListener {
 //			return I18nUtil.getMessage(server.getConfig(), key);
 //		}
 //		catch (Throwable e) {
-//			e.printStackTrace();
+//			LogUtil.trace(e);
 //		}
 //		
 //		return key;

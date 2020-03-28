@@ -11,6 +11,7 @@ import java.util.Map;
 
 import net.hudup.core.Util;
 import net.hudup.core.client.Protocol;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.xURI;
 
 /**
@@ -50,7 +51,7 @@ public class HttpUtil {
 			return xURI.parseParameterText(content.substring(mark + 1));
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			return Util.newMap();
 		}
 	}
@@ -85,7 +86,7 @@ public class HttpUtil {
 			action = action.trim();
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			return null;
 		}
 		
@@ -134,7 +135,7 @@ public class HttpUtil {
 				return path;
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			return null;
 		}
 	}
@@ -169,7 +170,7 @@ public class HttpUtil {
 				return content;
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			return null;
 		}
 	}

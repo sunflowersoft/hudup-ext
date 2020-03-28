@@ -23,6 +23,7 @@ import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.AlgDesc2;
 import net.hudup.core.alg.NoteAlg;
 import net.hudup.core.data.ui.PropPane;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.ui.TextArea;
 import net.hudup.core.logistic.ui.UIUtil;
 
@@ -194,7 +195,7 @@ public class AlgConfigDlg extends JDialog {
 			}
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 
 		paneNote.setVisible(false);

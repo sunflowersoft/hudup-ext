@@ -21,6 +21,7 @@ import net.hudup.core.data.Pair;
 import net.hudup.core.data.Profile;
 import net.hudup.core.data.Provider;
 import net.hudup.core.data.UnitList;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.ui.ProgressEvent;
 import net.hudup.core.logistic.ui.ProgressListener;
 
@@ -401,7 +402,7 @@ public class DatasetSampler implements AutoCloseable {
 				listener.receiveProgress(evt);
 			}
 			catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 		}
     }
@@ -415,7 +416,7 @@ public class DatasetSampler implements AutoCloseable {
 				provider.close();
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		provider = null;
 	}
@@ -430,7 +431,7 @@ public class DatasetSampler implements AutoCloseable {
 			close();
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 	}
 

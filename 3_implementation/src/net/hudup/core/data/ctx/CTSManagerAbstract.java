@@ -125,7 +125,7 @@ public abstract class CTSManagerAbstract extends AlgAbstract implements CTSManag
 			return Integer.parseInt(snum);
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 		return -1;
@@ -151,7 +151,7 @@ public abstract class CTSManagerAbstract extends AlgAbstract implements CTSManag
 		// TODO Auto-generated method stub
 		try {
 			unexport();
-		} catch (Throwable e) {e.printStackTrace();}
+		} catch (Throwable e) {LogUtil.trace(e);}
 	}
 
 
@@ -167,7 +167,7 @@ public abstract class CTSManagerAbstract extends AlgAbstract implements CTSManag
 		// TODO Auto-generated method stub
 		try {
 			close();
-		} catch (Throwable e) {e.printStackTrace();}
+		} catch (Throwable e) {LogUtil.trace(e);}
 	}
 
 	

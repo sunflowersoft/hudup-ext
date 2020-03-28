@@ -66,7 +66,7 @@ public class RecommenderRemoteWrapper extends AlgRemoteWrapper implements Recomm
 		String desc = "";
 		try {
 			desc = getDescription();
-		} catch (Exception e) {e.printStackTrace();}
+		} catch (Exception e) {LogUtil.trace(e);}
 		
 		return new DescriptionDlg(UIUtil.getFrameForComponent(null), "Inspector", desc);
 	}

@@ -18,6 +18,7 @@ import net.hudup.core.Util;
 import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.SetupAlgEvent;
 import net.hudup.core.evaluate.EvaluateEvent.Type;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.UriAdapter.AdapterWriteChannel;
 import net.hudup.core.logistic.xURI;
@@ -146,7 +147,7 @@ public class EvaluateProcessor {
 						String info = evt.translate(algName, -1) + "\n\n\n\n";
 						ByteBuffer buffer = ByteBuffer.wrap(info.getBytes());
 						channel.write(buffer);
-					} catch (Throwable e) {e.printStackTrace();}
+					} catch (Throwable e) {LogUtil.trace(e);}
 				}
 				else {
 					Map<Integer, Metrics> map = evt.getMetrics().gets(algName);
@@ -158,7 +159,7 @@ public class EvaluateProcessor {
 							String info = evt.translate(algName, datasetId) + "\n\n\n\n";
 							ByteBuffer buffer = ByteBuffer.wrap(info.getBytes());
 							channel.write(buffer);
-						} catch (Throwable e) {e.printStackTrace();}
+						} catch (Throwable e) {LogUtil.trace(e);}
 						
 						if (evt.getType() == Type.done_one)
 							closeIOChannel(key);
@@ -174,7 +175,7 @@ public class EvaluateProcessor {
 			
 			try {
 				util.createExcel(store.concat(prefix + METRICS_ANALYZE_EXCEL_FILE_NAME));
-			} catch (Throwable e) {e.printStackTrace();}
+			} catch (Throwable e) {LogUtil.trace(e);}
 			
 			// Begin exporting plain text. It is possible to remove this snippet.
 			String key = prefix + METRICS_ANALYZE_EXCEL_FILE_NAME2;
@@ -182,7 +183,7 @@ public class EvaluateProcessor {
 				ByteChannel channel = getIOChannel(store, key, false);
 				ByteBuffer buffer = ByteBuffer.wrap(util.createPlainText().getBytes());
 				channel.write(buffer);
-			} catch (Throwable e) {e.printStackTrace();}
+			} catch (Throwable e) {LogUtil.trace(e);}
 			closeIOChannel(key);
 			// End exporting plain text. It is possible to remove this snippet.
 			
@@ -248,7 +249,7 @@ public class EvaluateProcessor {
 			ByteChannel channel = getIOChannel(store, key, true);
 			ByteBuffer buffer = ByteBuffer.wrap(info.getBytes());
 			channel.write(buffer);
-		} catch (Throwable e) {e.printStackTrace();}
+		} catch (Throwable e) {LogUtil.trace(e);}
 		
 		closeIOChannel(key);
 	}
@@ -285,7 +286,7 @@ public class EvaluateProcessor {
 			} 
 			catch (Throwable e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 		}
 		
@@ -309,7 +310,7 @@ public class EvaluateProcessor {
 			channel.close();
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			closed = false;
 		}
 		ioChannels.remove(key);
@@ -338,7 +339,7 @@ public class EvaluateProcessor {
 			clear();
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 	}
 

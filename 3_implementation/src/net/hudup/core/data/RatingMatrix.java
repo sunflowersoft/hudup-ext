@@ -16,6 +16,7 @@ import java.util.List;
 
 import net.hudup.core.Constants;
 import net.hudup.core.Util;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.MathUtil;
 import net.hudup.core.logistic.Vector;
 import net.hudup.core.parser.TextParserUtil;
@@ -308,7 +309,7 @@ public class RatingMatrix implements Serializable {
 			printer.flush();
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 	}
 	
@@ -369,7 +370,7 @@ public class RatingMatrix implements Serializable {
 			
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 	}

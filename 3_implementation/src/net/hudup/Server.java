@@ -13,6 +13,7 @@ import java.rmi.RemoteException;
 import net.hudup.core.AccessPoint;
 import net.hudup.core.Util;
 import net.hudup.core.client.PowerServer;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.xURI;
 import net.hudup.data.ui.toolkit.DatasetToolkit;
@@ -67,7 +68,7 @@ public final class Server implements AccessPoint {
 			adapter.close();
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 
 		PowerServer server = null;
@@ -91,7 +92,7 @@ public final class Server implements AccessPoint {
 		} 
 		catch (RemoteException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 		

@@ -33,6 +33,7 @@ import net.hudup.core.data.UnitList;
 import net.hudup.core.data.ui.DataConfigTextField;
 import net.hudup.core.data.ui.UnitComboBox;
 import net.hudup.core.data.ui.UnitTextField;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.ui.JCheckList;
 import net.hudup.core.logistic.ui.ProgressEvent;
 import net.hudup.core.logistic.ui.ProgressListener;
@@ -219,7 +220,7 @@ public class DatasetSampling extends JPanel implements ProgressListener, Dispose
 				ratios.add(Double.parseDouble(list.get(i)));
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 		return ratios;
@@ -444,7 +445,7 @@ public class DatasetSampling extends JPanel implements ProgressListener, Dispose
 							"Sampling dataset failed",
 							JOptionPane.ERROR_MESSAGE);
 
-					e.printStackTrace();
+					LogUtil.trace(e);
 				}
 				
 				enableControls(true);
@@ -498,7 +499,7 @@ public class DatasetSampling extends JPanel implements ProgressListener, Dispose
 			runningThread.stop();
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 	}
 

@@ -14,6 +14,7 @@ import net.hudup.core.data.Attribute;
 import net.hudup.core.data.Attribute.Type;
 import net.hudup.core.data.AttributeList;
 import net.hudup.core.data.DataConfig;
+import net.hudup.core.logistic.LogUtil;
 
 /**
  * This class is the default implementation of hierarchical context template.
@@ -427,7 +428,7 @@ public class ContextTemplateImpl implements HierContextTemplate {
 				((HierContextTemplate)template).process(processor);
 			}
 			catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 		}
 	}

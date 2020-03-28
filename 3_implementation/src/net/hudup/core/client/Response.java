@@ -26,6 +26,7 @@ import net.hudup.core.data.Profile;
 import net.hudup.core.data.RatingVector;
 import net.hudup.core.data.Snapshot;
 import net.hudup.core.evaluate.Evaluator;
+import net.hudup.core.logistic.LogUtil;
 
 /**
  * {@code Response} class represents result of Hudup services such as recommendation task, updating database, information retrieval.
@@ -519,7 +520,7 @@ public class Response extends ProtocolParam {
 		}
 		catch (IOException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 	}
@@ -536,7 +537,7 @@ public class Response extends ProtocolParam {
 			return (Response)objectIn.readObject();
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 		return null;

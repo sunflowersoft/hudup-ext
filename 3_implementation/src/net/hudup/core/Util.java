@@ -27,6 +27,7 @@ import java.util.Vector;
 
 import net.hudup.core.factory.Factory;
 import net.hudup.core.factory.FactoryImpl;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.xURI;
 import net.hudup.core.parser.JsonParser;
@@ -76,7 +77,7 @@ public final class Util {
 			}
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 
 		
@@ -90,7 +91,7 @@ public final class Util {
 			}
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 		try {
@@ -103,7 +104,7 @@ public final class Util {
 			}
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 		try {
@@ -111,7 +112,7 @@ public final class Util {
 			pluginManager = (PluginManager) Class.forName(pluginManagerText).newInstance();
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			pluginManager = new Firer();
 		}
 	}
@@ -226,7 +227,7 @@ public final class Util {
 		} 
 		catch (Exception e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 		return instance;
@@ -256,7 +257,7 @@ public final class Util {
 		} 
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 			instance = null;
 		}
 		
@@ -346,7 +347,7 @@ public final class Util {
 				return (Factory)Class.forName(factoryClassName).newInstance();
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 		return new FactoryImpl();
@@ -366,7 +367,7 @@ public final class Util {
 				return (Cipher)Class.forName(cipherClassName).newInstance();
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 		return new CipherImpl();
@@ -386,7 +387,7 @@ public final class Util {
 				return (JsonParser)Class.forName(jsonParserClassName).newInstance();
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 		return new JsonParserImpl();

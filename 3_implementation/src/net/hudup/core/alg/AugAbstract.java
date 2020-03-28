@@ -19,6 +19,7 @@ import net.hudup.core.data.Fetcher;
 import net.hudup.core.data.KBasePointer;
 import net.hudup.core.data.Pointer;
 import net.hudup.core.data.Profile;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.NextUpdate;
 import net.hudup.core.logistic.xURI;
 
@@ -55,7 +56,7 @@ public abstract class AugAbstract extends ExecutableAlgAbstract implements Aug, 
 				kb = newKB();
 			kb.setConfig(config); //This code line is important.
 		}
-		catch (Throwable e) {e.printStackTrace();}
+		catch (Throwable e) {LogUtil.trace(e);}
 	}
 
 
@@ -113,7 +114,7 @@ public abstract class AugAbstract extends ExecutableAlgAbstract implements Aug, 
 		if (kb != null) {
 			try {
 				kb.close();
-			} catch (Throwable e) {e.printStackTrace();}
+			} catch (Throwable e) {LogUtil.trace(e);}
 		}
 	}
 

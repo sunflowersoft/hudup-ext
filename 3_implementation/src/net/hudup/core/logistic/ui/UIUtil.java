@@ -53,7 +53,7 @@ public final class UIUtil {
 			return Toolkit.getDefaultToolkit().getImage(url);
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 		return null;
@@ -79,7 +79,7 @@ public final class UIUtil {
 			imageURL = UIUtil.class.getResource(path);
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			imageURL = null;
 		}
 		
@@ -130,7 +130,7 @@ public final class UIUtil {
 		    }
 	    }
 	    catch (Exception e) {
-	    	e.printStackTrace();
+	    	LogUtil.trace(e);
 	    }
 	    
 	    return button;
@@ -186,7 +186,7 @@ public final class UIUtil {
 		    }
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 	    return item;
@@ -251,7 +251,7 @@ public final class UIUtil {
 				lfRnd = Boolean.parseBoolean(lfText);
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			lfRnd = false;
 		}
 		if (!lfRnd) return;

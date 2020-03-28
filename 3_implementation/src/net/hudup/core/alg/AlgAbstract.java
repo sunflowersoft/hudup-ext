@@ -15,6 +15,7 @@ import javax.swing.event.EventListenerList;
 import net.hudup.core.ExtraStorage;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.logistic.DSUtil;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.NetUtil;
 
 /**
@@ -168,7 +169,7 @@ public abstract class AlgAbstract implements Alg, AlgRemote {
 				listener.receivedSetup(evt);
 			}
 			catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 		}
 	}
@@ -238,7 +239,7 @@ public abstract class AlgAbstract implements Alg, AlgRemote {
 		try {
 			unexport();
 		}
-		catch (Throwable e) {e.printStackTrace();}
+		catch (Throwable e) {LogUtil.trace(e);}
 		
 	}
 	

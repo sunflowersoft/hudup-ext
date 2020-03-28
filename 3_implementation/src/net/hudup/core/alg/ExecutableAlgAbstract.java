@@ -18,6 +18,7 @@ import net.hudup.core.data.Dataset;
 import net.hudup.core.data.Fetcher;
 import net.hudup.core.data.Profile;
 import net.hudup.core.logistic.Inspector;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.ui.DescriptionDlg;
 import net.hudup.core.logistic.ui.UIUtil;
 
@@ -107,7 +108,7 @@ public abstract class ExecutableAlgAbstract extends AlgAbstract implements Execu
 				sample.close();
 		}
 		catch(Exception e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		finally {
 			sample = null;
@@ -125,7 +126,7 @@ public abstract class ExecutableAlgAbstract extends AlgAbstract implements Execu
 		String desc = "";
 		try {
 			desc = getDescription();
-		} catch (Exception e) {e.printStackTrace();}
+		} catch (Exception e) {LogUtil.trace(e);}
 		
 		return new DescriptionDlg(UIUtil.getFrameForComponent(null), "Inspector", desc);
 	}
@@ -153,7 +154,7 @@ public abstract class ExecutableAlgAbstract extends AlgAbstract implements Execu
 			}
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			attList = null;
 		}
 		
@@ -177,7 +178,7 @@ public abstract class ExecutableAlgAbstract extends AlgAbstract implements Execu
 			unsetup();
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 	}

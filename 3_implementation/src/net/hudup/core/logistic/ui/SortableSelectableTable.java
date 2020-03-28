@@ -30,6 +30,7 @@ import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 
 import net.hudup.core.Util;
+import net.hudup.core.logistic.LogUtil;
 
 /**
  * This is Java table that supports both sortable ability and selectable ability.
@@ -328,7 +329,7 @@ public class SortableSelectableTable extends JTable {
 			}
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			return getDefaultRenderer(Object.class);
 		}
 	}
@@ -353,7 +354,7 @@ public class SortableSelectableTable extends JTable {
 			}
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			return getDefaultEditor(Object.class);
 		}
     }

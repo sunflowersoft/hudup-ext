@@ -125,7 +125,7 @@ public class KBaseRemoteWrapper implements KBase, KBaseRemote {
 		// TODO Auto-generated method stub
 		try {
 			return remoteKBase.queryConfig();
-		} catch (Exception e) { e.printStackTrace(); }
+		} catch (Exception e) { LogUtil.trace(e); }
 		
 		return null;
 	}
@@ -177,7 +177,7 @@ public class KBaseRemoteWrapper implements KBase, KBaseRemote {
 		// TODO Auto-generated method stub
 		try {
 			return remoteKBase.queryName();
-		} catch (Exception e) { e.printStackTrace(); }
+		} catch (Exception e) { LogUtil.trace(e); }
 		
 		return null;
 	}
@@ -254,7 +254,7 @@ public class KBaseRemoteWrapper implements KBase, KBaseRemote {
 			try {
 				//if (!remoteKBase.isAgent())
 					remoteKBase.unexport();
-			} catch (Exception e) {e.printStackTrace();}
+			} catch (Exception e) {LogUtil.trace(e);}
 		}
 		remoteKBase = null;
 
@@ -272,7 +272,7 @@ public class KBaseRemoteWrapper implements KBase, KBaseRemote {
 			try {
 				//if (!remoteKBase.isAgent())
 					remoteKBase.unexport();
-			} catch (Exception e) {e.printStackTrace();}
+			} catch (Exception e) {LogUtil.trace(e);}
 		}
 		remoteKBase = null;
 
@@ -316,11 +316,11 @@ public class KBaseRemoteWrapper implements KBase, KBaseRemote {
 		
 		try {
 			if (!isEmpty()) close();
-		} catch (Throwable e) {e.printStackTrace();}
+		} catch (Throwable e) {LogUtil.trace(e);}
 		
 		try {
 			unexport();;
-		} catch (Throwable e) {e.printStackTrace();}
+		} catch (Throwable e) {LogUtil.trace(e);}
 	}
 
 

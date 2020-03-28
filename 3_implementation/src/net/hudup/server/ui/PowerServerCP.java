@@ -55,6 +55,7 @@ import net.hudup.core.data.ui.UnitTable;
 import net.hudup.core.data.ui.UnitTable.SelectionChangedEvent;
 import net.hudup.core.data.ui.UnitTable.SelectionChangedListener;
 import net.hudup.core.logistic.I18nUtil;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.xURI;
 import net.hudup.core.logistic.ui.PluginStorageManifestPanel;
 import net.hudup.core.logistic.ui.PluginStorageManifestPanelRemote;
@@ -253,7 +254,7 @@ public class PowerServerCP extends JFrame implements ServerStatusListener, Plugi
 			setVisible(true);
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 	}
@@ -295,7 +296,7 @@ public class PowerServerCP extends JFrame implements ServerStatusListener, Plugi
 						throw new Exception();
 				}
 				catch (Throwable e) {
-					e.printStackTrace();
+					LogUtil.trace(e);
 					
 					try {
 			        	UnicastRemoteObject.unexportObject(this, true);
@@ -717,7 +718,7 @@ public class PowerServerCP extends JFrame implements ServerStatusListener, Plugi
 		} 
 		catch (Exception e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 	}
 	
@@ -736,7 +737,7 @@ public class PowerServerCP extends JFrame implements ServerStatusListener, Plugi
 				updateControls();
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 	}
 	
@@ -753,7 +754,7 @@ public class PowerServerCP extends JFrame implements ServerStatusListener, Plugi
 		}
 		catch (Exception e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 	}
@@ -782,7 +783,7 @@ public class PowerServerCP extends JFrame implements ServerStatusListener, Plugi
 		} 
 		catch (RemoteException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 	}
@@ -800,7 +801,7 @@ public class PowerServerCP extends JFrame implements ServerStatusListener, Plugi
 		} 
 		catch (Exception e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 	}
 	
@@ -839,7 +840,7 @@ public class PowerServerCP extends JFrame implements ServerStatusListener, Plugi
 			}
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 	}
 	
@@ -879,7 +880,7 @@ public class PowerServerCP extends JFrame implements ServerStatusListener, Plugi
 			
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 	}
 
@@ -922,7 +923,7 @@ public class PowerServerCP extends JFrame implements ServerStatusListener, Plugi
 					JOptionPane.INFORMATION_MESSAGE);
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 	}
 	
@@ -998,7 +999,7 @@ public class PowerServerCP extends JFrame implements ServerStatusListener, Plugi
 				paneConfig.update(config);
 			}
 			catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 			
 		}
@@ -1052,7 +1053,7 @@ public class PowerServerCP extends JFrame implements ServerStatusListener, Plugi
 				updateAccData();
 			}
 			catch (Exception e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 			
 			unitList.setListData(new Unit[0]);
@@ -1121,7 +1122,7 @@ public class PowerServerCP extends JFrame implements ServerStatusListener, Plugi
 		}
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 		if (bRemote) {
@@ -1131,7 +1132,7 @@ public class PowerServerCP extends JFrame implements ServerStatusListener, Plugi
 			}
 			catch (Throwable e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 			
 			try {
@@ -1140,7 +1141,7 @@ public class PowerServerCP extends JFrame implements ServerStatusListener, Plugi
 			}
 			catch (Throwable e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 		}
 		
@@ -1166,7 +1167,7 @@ public class PowerServerCP extends JFrame implements ServerStatusListener, Plugi
 		// TODO Auto-generated method stub
 		try {
 			return !server.isStarted();
-		} catch (Throwable e) {e.printStackTrace();}
+		} catch (Throwable e) {LogUtil.trace(e);}
 		
 		return false;
 	}
@@ -1200,7 +1201,7 @@ public class PowerServerCP extends JFrame implements ServerStatusListener, Plugi
 		else {
 			try {
 				return ((PowerServerConfig)server.getConfig()).getServerPort();
-			} catch (Throwable e) {e.printStackTrace();}
+			} catch (Throwable e) {LogUtil.trace(e);}
 			
 			return -1;
 		}

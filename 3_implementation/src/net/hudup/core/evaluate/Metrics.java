@@ -18,6 +18,7 @@ import java.util.Set;
 import net.hudup.core.Util;
 import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.AlgRemote;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.xURI;
 
 /**
@@ -123,7 +124,7 @@ public class Metrics implements Serializable /*, Exportable*/ {
 				}
 			}
 			catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 		}
 		
@@ -157,7 +158,7 @@ public class Metrics implements Serializable /*, Exportable*/ {
 				} 
 				catch (Throwable e) {
 					// TODO Auto-generated catch block
-					e.printStackTrace();
+					LogUtil.trace(e);
 				}
 			}
 		}
@@ -190,7 +191,7 @@ public class Metrics implements Serializable /*, Exportable*/ {
 			try {
 				algDesc = ((AlgRemote)alg).getDescription();
 			}
-			catch (Exception e) { e.printStackTrace(); }
+			catch (Exception e) { LogUtil.trace(e); }
 			
 			Map<Integer, String> descMap = null;
 			if (this.algDatasetDescMap.containsKey(algName))
@@ -275,7 +276,7 @@ public class Metrics implements Serializable /*, Exportable*/ {
 				}
 			}
 			catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 		}
 		
@@ -299,7 +300,7 @@ public class Metrics implements Serializable /*, Exportable*/ {
 				}
 			}
 			catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 		}
 		
@@ -325,7 +326,7 @@ public class Metrics implements Serializable /*, Exportable*/ {
 				}
 			}
 			catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 		}
 		
@@ -347,7 +348,7 @@ public class Metrics implements Serializable /*, Exportable*/ {
 				names.add(wrapper.getMetric().getName());
 			}
 			catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 		}
 		
@@ -373,7 +374,7 @@ public class Metrics implements Serializable /*, Exportable*/ {
 				}
 			}
 			catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 		}
 		
@@ -400,7 +401,7 @@ public class Metrics implements Serializable /*, Exportable*/ {
 				}
 			}
 			catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 		}
 		
@@ -453,7 +454,7 @@ public class Metrics implements Serializable /*, Exportable*/ {
 				}
 			}
 			catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 		}
 		
@@ -516,7 +517,7 @@ public class Metrics implements Serializable /*, Exportable*/ {
 			}
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 		return -1;
@@ -578,7 +579,7 @@ public class Metrics implements Serializable /*, Exportable*/ {
 				}
 			}
 			catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 		}
 		
@@ -638,7 +639,7 @@ public class Metrics implements Serializable /*, Exportable*/ {
 					} 
 					catch (Throwable e) {
 						// TODO Auto-generated catch block
-						e.printStackTrace();
+						LogUtil.trace(e);
 					}
 				} // end for j
 				
@@ -681,7 +682,7 @@ public class Metrics implements Serializable /*, Exportable*/ {
 				return false;
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 		return false;
@@ -984,7 +985,7 @@ public class Metrics implements Serializable /*, Exportable*/ {
 //				wrapper.export(serverPort);
 //			}
 //			catch (Exception e) {
-//				e.printStackTrace();
+//				LogUtil.trace(e);
 //			}
 //		}
 //		
@@ -1001,7 +1002,7 @@ public class Metrics implements Serializable /*, Exportable*/ {
 //				wrapper.unexport();
 //			}
 //			catch (Exception e) {
-//				e.printStackTrace();
+//				LogUtil.trace(e);
 //			}
 //		}
 //	}

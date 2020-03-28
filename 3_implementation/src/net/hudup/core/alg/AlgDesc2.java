@@ -15,6 +15,7 @@ import net.hudup.core.RegisterTable;
 import net.hudup.core.Util;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Exportable;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.parser.TextParserUtil;
 
 /**
@@ -185,7 +186,7 @@ public class AlgDesc2 extends AlgDesc {
 		if (alg instanceof AlgRemote) {
 			try {
 				baseRemoteInterfaceNames = ((AlgRemote)alg).getBaseRemoteInterfaceNames();
-			} catch (Throwable e) {e.printStackTrace();}
+			} catch (Throwable e) {LogUtil.trace(e);}
 		}
 		baseRemoteInterfaceNames = baseRemoteInterfaceNames != null ? baseRemoteInterfaceNames : new String[0];
 		
@@ -199,7 +200,7 @@ public class AlgDesc2 extends AlgDesc {
 		try {
 			isExported = isExportable && (((Exportable)alg).getExportedStub() != null);
 		} catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			isExported = false;
 		}
 		

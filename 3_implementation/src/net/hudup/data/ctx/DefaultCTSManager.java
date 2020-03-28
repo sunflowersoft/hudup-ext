@@ -38,6 +38,7 @@ import net.hudup.core.data.ctx.ContextTemplateSchemaImpl;
 import net.hudup.core.data.ctx.ContextValue;
 import net.hudup.core.data.ctx.HierContextTemplate;
 import net.hudup.core.logistic.Inspector;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.parser.TextParserUtil;
 import net.hudup.data.ctx.ui.CTScreator;
 
@@ -87,7 +88,7 @@ public class DefaultCTSManager extends CTSManagerAbstract {
 		} 
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 		this.assoc = Util.getFactory().createProviderAssoc(config);
@@ -148,7 +149,7 @@ public class DefaultCTSManager extends CTSManagerAbstract {
 			}
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		finally {
 			try {
@@ -157,7 +158,7 @@ public class DefaultCTSManager extends CTSManagerAbstract {
 			} 
 			catch (Throwable e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 			
 		}
@@ -226,7 +227,7 @@ public class DefaultCTSManager extends CTSManagerAbstract {
 			return template;
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 		return null;
@@ -273,7 +274,7 @@ public class DefaultCTSManager extends CTSManagerAbstract {
 			}
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		finally {
 			try {
@@ -281,7 +282,7 @@ public class DefaultCTSManager extends CTSManagerAbstract {
 					fetcher.close();
 			}
 			catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 		}
 		
@@ -322,7 +323,7 @@ public class DefaultCTSManager extends CTSManagerAbstract {
 			}
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		finally {
 			try {
@@ -330,7 +331,7 @@ public class DefaultCTSManager extends CTSManagerAbstract {
 					fetcher.close();
 			}
 			catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 		}
 		
@@ -358,7 +359,7 @@ public class DefaultCTSManager extends CTSManagerAbstract {
 			return assoc.getProfile(profileUnit, condition);
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 		return null;
@@ -403,7 +404,7 @@ public class DefaultCTSManager extends CTSManagerAbstract {
 			
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		finally {
 			try {
@@ -411,7 +412,7 @@ public class DefaultCTSManager extends CTSManagerAbstract {
 					fetcher.close();
 			}
 			catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 		}
 		
@@ -546,7 +547,7 @@ public class DefaultCTSManager extends CTSManagerAbstract {
 						}
 					}
 					catch (Throwable e) {
-						e.printStackTrace();
+						LogUtil.trace(e);
 					}
 					finally {
 						try {
@@ -554,7 +555,7 @@ public class DefaultCTSManager extends CTSManagerAbstract {
 						} 
 						catch (Throwable e) {
 							// TODO Auto-generated catch block
-							e.printStackTrace();
+							LogUtil.trace(e);
 						}
 					}
 					
@@ -611,7 +612,7 @@ public class DefaultCTSManager extends CTSManagerAbstract {
 						}
 					}
 					catch (Throwable e) {
-						e.printStackTrace();
+						LogUtil.trace(e);
 					}
 					finally {
 						try {
@@ -619,7 +620,7 @@ public class DefaultCTSManager extends CTSManagerAbstract {
 						} 
 						catch (Throwable e) {
 							// TODO Auto-generated catch block
-							e.printStackTrace();
+							LogUtil.trace(e);
 						}
 					}
 					
@@ -666,12 +667,12 @@ public class DefaultCTSManager extends CTSManagerAbstract {
 	public void close() throws Exception {
 		try {
 			super.close();
-		} catch (Throwable e) {e.printStackTrace();}
+		} catch (Throwable e) {LogUtil.trace(e);}
 		
 		if (assoc != null) {
 			try {
 				assoc.close();
-			} catch (Throwable e) {e.printStackTrace();}
+			} catch (Throwable e) {LogUtil.trace(e);}
 		}
 		assoc = null;
 		

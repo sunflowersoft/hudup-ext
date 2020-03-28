@@ -320,7 +320,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			updateMode();
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			updateMode();
 		}
 	}
@@ -409,7 +409,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 					}
 				}
 				catch (Throwable e) {
-					e.printStackTrace();
+					LogUtil.trace(e);
 				}
 			}
 		});
@@ -485,7 +485,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 										getThisGUI().timestamp = new Timestamp());
 //								wait();
 //							}
-						} catch (Throwable e) {e.printStackTrace();}
+						} catch (Throwable e) {LogUtil.trace(e);}
 					}
 					else {
 						updateMode();
@@ -1044,7 +1044,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			evaluator.reloadPool();
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			updateMode();
 		}
 	}
@@ -1065,7 +1065,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 						evaluator.updatePool(null, null);
 //						wait();
 //					}
-				} catch (Throwable e) {e.printStackTrace();}
+				} catch (Throwable e) {LogUtil.trace(e);}
 			}
 			else {
 				guiData.pool = new DatasetPool();
@@ -1074,7 +1074,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			}
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			updateMode();
 		}
 	}
@@ -1104,12 +1104,12 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 				else
 					started = evaluator.remoteStart(lbAlgs.getAlgNameList(), toDatasetPoolExchangedClient(guiData.pool), null);
 				
-//				try {wait();} catch (Exception e) {e.printStackTrace();}
+//				try {wait();} catch (Exception e) {LogUtil.trace(e);}
 //			}
 			if (!started) updateMode();
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			LogUtil.error("Error in evaluation");
 			updateMode(); //Added date: 2019.08.12 by Loc Nguyen
 		}
@@ -1119,7 +1119,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 	@Override
 	public synchronized void receivedEvaluator(EvaluatorEvent evt) throws RemoteException {
 		// TODO Auto-generated method stub
-//		try {notifyAll();} catch (Exception e) {e.printStackTrace();}
+//		try {notifyAll();} catch (Exception e) {LogUtil.trace(e);}
 		
 		if (evt.getType() == EvaluatorEvent.Type.start || evt.getType() == EvaluatorEvent.Type.update_pool) {
 //			Timestamp timestamp = evt.getTimestamp();
@@ -1164,7 +1164,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			boolean saveResultSummary = false;
 			try {
 				saveResultSummary = evaluator.getConfig().isSaveResultSummary();
-			} catch (Throwable e) {e.printStackTrace();}
+			} catch (Throwable e) {LogUtil.trace(e);}
 			
 			evProcessor.saveEvaluateResult(txtRunSaveBrowse.getText(), evt, lbAlgs.getAlgList(), saveResultSummary, EV_RESULT_FILENAME_PREFIX);
 		}
@@ -1227,7 +1227,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			boolean saveResultSummary = false;
 			try {
 				saveResultSummary = evaluator.getConfig().isSaveResultSummary();
-			} catch (Throwable e) {e.printStackTrace();}
+			} catch (Throwable e) {LogUtil.trace(e);}
 
 			evProcessor.saveSetupResult(txtRunSaveBrowse.getText(), evt, saveResultSummary, EV_RESULT_FILENAME_PREFIX);
 		}
@@ -1331,7 +1331,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			this.statusBar.setTextPane0(DSUtil.shortenVerbalName(evaluator.getName()));
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			
 			boolean flag = lbAlgs.getAlgList().size() > 0 && guiData.pool.size() > 0;
 			setInternalEnable(flag);
@@ -1470,7 +1470,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 						evaluator.updatePool(toDatasetPoolExchangedClient(guiData.pool), null);
 //						wait();
 //					}
-				} catch (Throwable e) {e.printStackTrace();}
+				} catch (Throwable e) {LogUtil.trace(e);}
 				
 			}
 			else {
@@ -1480,7 +1480,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 		}
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 			updateMode();
 		}
 			
@@ -1551,7 +1551,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
         			"URI saved successfully", "URI saved successfully", JOptionPane.INFORMATION_MESSAGE);
         }
 		catch(Exception e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
         finally {
         	try {
@@ -1559,7 +1559,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
         			writer.close();
         	}
         	catch (Exception e) {
-        		e.printStackTrace();
+        		LogUtil.trace(e);
         	}
         	
         	if (adapter != null)
@@ -1590,7 +1590,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 						evaluator.updatePool(toDatasetPoolExchangedClient(guiData.pool), null);
 //						wait();
 //					}
-				} catch (Throwable e) {e.printStackTrace();}
+				} catch (Throwable e) {LogUtil.trace(e);}
 			}
 			else {
 				this.tblDatasetPool.update(guiData.pool);
@@ -1599,7 +1599,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			updateMode();
 		}
 	}
@@ -1618,7 +1618,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			this.timestamp = null;
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 	}
 
@@ -1651,7 +1651,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 //			updateUI();
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 	}
 	

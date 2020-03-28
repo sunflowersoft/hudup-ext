@@ -43,7 +43,7 @@ public class ClipboardUtil implements ClipboardOwner {
 			this.clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			this.clipboard = null;
 		}
 	}
@@ -62,7 +62,7 @@ public class ClipboardUtil implements ClipboardOwner {
 		    clipboard.setContents(stringSelection, this);
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 	}
 	
@@ -89,7 +89,7 @@ public class ClipboardUtil implements ClipboardOwner {
 		} 
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 			
 		}
 		

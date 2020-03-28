@@ -164,7 +164,7 @@ public class RecommendContextPrefilterImpl extends CompositeRecommenderAbstract 
 		} 
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 			return null;
 		}
 		
@@ -182,7 +182,7 @@ public class RecommendContextPrefilterImpl extends CompositeRecommenderAbstract 
 		} 
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 			return null;
 		}
 		

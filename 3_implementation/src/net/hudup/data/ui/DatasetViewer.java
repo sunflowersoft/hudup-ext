@@ -40,6 +40,7 @@ import net.hudup.core.data.ctx.CTSManager;
 import net.hudup.core.data.ctx.ContextTemplate;
 import net.hudup.core.data.ctx.ContextTemplateSchema;
 import net.hudup.core.data.ui.ProfileTable;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.ui.TextField;
 import net.hudup.core.logistic.ui.UIUtil;
 import net.hudup.data.ProviderImpl;
@@ -452,7 +453,7 @@ public class DatasetViewer extends JDialog {
 						});
 					contextMenu.add(miProfile);
 				}
-				catch (Throwable e) {e.printStackTrace();}
+				catch (Throwable e) {LogUtil.trace(e);}
 			}
 			
 		};

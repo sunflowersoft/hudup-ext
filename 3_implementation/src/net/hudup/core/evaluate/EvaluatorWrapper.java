@@ -139,7 +139,7 @@ public class EvaluatorWrapper implements Evaluator, Serializable {
 			try {
 				if (!remoteEvaluator.isAgent())
 					remoteEvaluator.close();
-			} catch (Exception e) {e.printStackTrace();}
+			} catch (Exception e) {LogUtil.trace(e);}
 		}
 		remoteEvaluator = null;
 		
@@ -424,7 +424,7 @@ public class EvaluatorWrapper implements Evaluator, Serializable {
 		}
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		return DSUtil.shortenVerbalName(evaluatorName);
 	}
@@ -452,7 +452,7 @@ public class EvaluatorWrapper implements Evaluator, Serializable {
 			try {
 				if (!remoteEvaluator.isAgent())
 					remoteEvaluator.unexport();
-			} catch (Exception e) {e.printStackTrace();}
+			} catch (Exception e) {LogUtil.trace(e);}
 		}
 		remoteEvaluator = null;
 		
@@ -473,7 +473,7 @@ public class EvaluatorWrapper implements Evaluator, Serializable {
 			try {
 				if (!remoteEvaluator.isAgent())
 					remoteEvaluator.unexport();
-			} catch (Exception e) {e.printStackTrace();}
+			} catch (Exception e) {LogUtil.trace(e);}
 		}
 		remoteEvaluator = null;
 		
@@ -510,7 +510,7 @@ public class EvaluatorWrapper implements Evaluator, Serializable {
 			close();
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 	}
 

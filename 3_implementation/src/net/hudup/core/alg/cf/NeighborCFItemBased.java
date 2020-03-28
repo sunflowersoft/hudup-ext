@@ -18,6 +18,7 @@ import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Fetcher;
 import net.hudup.core.data.Profile;
 import net.hudup.core.data.RatingVector;
+import net.hudup.core.logistic.LogUtil;
 
 
 /**
@@ -131,7 +132,7 @@ public class NeighborCFItemBased extends NeighborCF implements DuplicatableAlg {
 				itemRatings.reset();
 			}
 			catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 			if (!calculated) continue;
 			
@@ -147,7 +148,7 @@ public class NeighborCFItemBased extends NeighborCF implements DuplicatableAlg {
 		} 
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 		return result.size() == 0 ? null : result;

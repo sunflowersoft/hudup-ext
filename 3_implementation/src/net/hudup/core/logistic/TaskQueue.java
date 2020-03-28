@@ -22,7 +22,7 @@ public class TaskQueue extends AbstractRunner {
 
 	
 	/**
-	 * This interface represents a task whose main declared method is {@link #doTask(Object...)}.
+	 * This interface represents a task whose main declared method is {@link #doTask()}.
 	 * @author Loc Nguyen
 	 * @version 13.0
 	 */
@@ -66,7 +66,7 @@ public class TaskQueue extends AbstractRunner {
 				if (task != null) task.doTask();
 			}
 			catch (Exception e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 		}
 

@@ -188,7 +188,7 @@ public class xURI implements Serializable, net.hudup.core.Cloneable {
 		} 
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 		return null;
@@ -231,7 +231,7 @@ public class xURI implements Serializable, net.hudup.core.Cloneable {
     		return new xURI(file.toURI());
     	}
     	catch (Exception e) {
-    		e.printStackTrace();
+    		LogUtil.trace(e);
     	}
     	
     	return null;
@@ -249,7 +249,7 @@ public class xURI implements Serializable, net.hudup.core.Cloneable {
     		uri = path.toUri();
     	}
     	catch (Throwable e) {
-    		e.printStackTrace();
+    		LogUtil.trace(e);
     		
     		uri = null;
     	}
@@ -297,7 +297,7 @@ public class xURI implements Serializable, net.hudup.core.Cloneable {
 		} 
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 			uri = null;
 		}
 		
@@ -343,7 +343,7 @@ public class xURI implements Serializable, net.hudup.core.Cloneable {
 		} 
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 			uri = null;
 		}
 		
@@ -367,7 +367,7 @@ public class xURI implements Serializable, net.hudup.core.Cloneable {
 		} 
     	catch (Throwable e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 			uri = null;
 		}
     	
@@ -534,7 +534,7 @@ public class xURI implements Serializable, net.hudup.core.Cloneable {
 		} 
 		catch (UnsupportedEncodingException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 		return text;
@@ -556,7 +556,7 @@ public class xURI implements Serializable, net.hudup.core.Cloneable {
 		} 
 		catch (UnsupportedEncodingException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 		return text;

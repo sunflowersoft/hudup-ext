@@ -7,6 +7,8 @@
  */
 package net.hudup.core.data;
 
+import net.hudup.core.logistic.LogUtil;
+
 /**
  * This abstract class implements partially the {@link ProviderAssoc} interface.
  * It add the internal configuration {@link #config} for {@link ProviderAssoc}.
@@ -48,7 +50,7 @@ public abstract class ProviderAssocAbstract implements ProviderAssoc {
 			close();
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 	}
 

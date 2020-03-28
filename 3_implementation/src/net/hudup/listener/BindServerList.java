@@ -13,6 +13,7 @@ import net.hudup.core.Util;
 import net.hudup.core.client.ActiveMeasure;
 import net.hudup.core.client.PowerServer;
 import net.hudup.core.client.ServerStatusListener;
+import net.hudup.core.logistic.LogUtil;
 
 /**
  * This class is the list of bound servers. Each bound server is represented by {@link BindServer} class.
@@ -53,7 +54,7 @@ public class BindServerList {
 			return bindServers.get(index);
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 		return null;
@@ -96,7 +97,7 @@ public class BindServerList {
 			} 
 			catch (Throwable e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 			
 		}
@@ -126,7 +127,7 @@ public class BindServerList {
 			bindServers.remove(index);
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 	}
 	
@@ -140,7 +141,7 @@ public class BindServerList {
 				bindServer.unbind();
 			}
 			catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 		}
 		
@@ -195,7 +196,7 @@ public class BindServerList {
 				validate = server.ping();
 			}
 			catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 				validate = false;
 			}
 			
@@ -325,7 +326,7 @@ public class BindServerList {
 				alive = bindServer.getServer().ping();
 			}
 			catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 				alive = false;
 			}
 			
@@ -342,7 +343,7 @@ public class BindServerList {
 			unbindAll();
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 		super.finalize();

@@ -16,6 +16,7 @@ import net.hudup.core.Util;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.ExternalRecord;
 import net.hudup.core.data.Fetcher;
+import net.hudup.core.logistic.LogUtil;
 
 /**
  * This class is Java table for external record.
@@ -125,7 +126,7 @@ class ExternalRecordTableModel extends DefaultTableModel {
 			}
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		finally {
 			try {
@@ -133,7 +134,7 @@ class ExternalRecordTableModel extends DefaultTableModel {
 			} 
 			catch (Throwable e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 		}
 		

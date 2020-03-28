@@ -28,6 +28,7 @@ import net.hudup.core.alg.Alg;
 import net.hudup.core.evaluate.MetaMetric;
 import net.hudup.core.evaluate.Metric;
 import net.hudup.core.evaluate.MetricWrapper;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.ui.SortableTable;
 import net.hudup.core.logistic.ui.SortableTableModel;
 import net.hudup.core.logistic.ui.UIUtil;
@@ -355,7 +356,7 @@ class MetricsOptionTM extends SortableTableModel {
 				
 				data.add(row);
 			}
-			catch (Throwable e) {e.printStackTrace();}
+			catch (Throwable e) {LogUtil.trace(e);}
 		}
 		
 		setDataVector(data, createColumns());

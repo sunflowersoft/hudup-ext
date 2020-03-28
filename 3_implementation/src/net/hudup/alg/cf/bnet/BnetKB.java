@@ -40,6 +40,7 @@ import net.hudup.core.data.Dataset;
 import net.hudup.core.data.Fetcher;
 import net.hudup.core.data.RatingVector;
 import net.hudup.core.logistic.Inspector;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.NextUpdate;
 import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.xURI;
@@ -309,7 +310,7 @@ public abstract class BnetKB extends KBaseAbstract {
 					bnetContent.setText(buffer.toString());
 			}
 			catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 				bnetContent.setText("Error Bayesian network");
 			}
 				
@@ -465,7 +466,7 @@ public abstract class BnetKB extends KBaseAbstract {
 			return new DataBaseCases("Rating matrix database", caseList);
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 		return null;
@@ -525,14 +526,14 @@ public abstract class BnetKB extends KBaseAbstract {
 			
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			averageRatingCount = 0;
 		}
 		finally {
 			try {
 				if (autoCloseFetcher) fetcher.close();
 			} 
-			catch (Throwable e) {e.printStackTrace();}
+			catch (Throwable e) {LogUtil.trace(e);}
 		}
 		
 		return averageRatingCount;
@@ -560,14 +561,14 @@ public abstract class BnetKB extends KBaseAbstract {
 			}
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			maxRatingCount = 0;
 		}
 		finally {
 			try {
 				if (autoCloseFetcher) fetcher.close();
 			} 
-			catch (Throwable e) {e.printStackTrace();}
+			catch (Throwable e) {LogUtil.trace(e);}
 		}
 		
 		return maxRatingCount;

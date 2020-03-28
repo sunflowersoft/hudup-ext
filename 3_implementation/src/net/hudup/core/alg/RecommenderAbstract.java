@@ -81,7 +81,7 @@ public abstract class RecommenderAbstract extends AlgAbstract implements Recomme
 			dataset = getDataset(); //This is training dataset.
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			dataset = null;
 		}
 		
@@ -148,7 +148,7 @@ public abstract class RecommenderAbstract extends AlgAbstract implements Recomme
 		String desc = "";
 		try {
 			desc = getDescription();
-		} catch (Exception e) {e.printStackTrace();}
+		} catch (Exception e) {LogUtil.trace(e);}
 		
 		return new DescriptionDlg(UIUtil.getFrameForComponent(null), "Inspector", desc);
 	}
@@ -170,7 +170,7 @@ public abstract class RecommenderAbstract extends AlgAbstract implements Recomme
 			unsetup();
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 	}

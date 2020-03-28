@@ -20,6 +20,7 @@ import net.hudup.core.Util;
 import net.hudup.core.data.ctx.ContextList;
 import net.hudup.core.logistic.ListMap;
 import net.hudup.core.logistic.ListSet;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.MathUtil;
 import net.hudup.core.parser.TextParsable;
 import net.hudup.core.parser.TextParserUtil;
@@ -752,7 +753,7 @@ public class RatingVector implements Cloneable, TextParsable, Serializable {
 				result.ratedMap = new ListMap<Integer, Rating>();
 		} 
 		catch (Exception e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		result.setId(this.id);
 		return result;
@@ -925,7 +926,7 @@ public class RatingVector implements Cloneable, TextParsable, Serializable {
 			}
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		finally {
 			try {
@@ -936,7 +937,7 @@ public class RatingVector implements Cloneable, TextParsable, Serializable {
 			} 
 			catch (Throwable e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 		}
 		

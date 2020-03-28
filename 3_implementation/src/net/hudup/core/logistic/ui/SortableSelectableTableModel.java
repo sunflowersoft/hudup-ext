@@ -9,6 +9,8 @@ package net.hudup.core.logistic.ui;
 
 import javax.swing.table.DefaultTableModel;
 
+import net.hudup.core.logistic.LogUtil;
+
 /**
  * This is Java table model that supports both sortable ability and selectable ability.
  * 
@@ -58,7 +60,7 @@ public class SortableSelectableTableModel extends DefaultTableModel {
 			}
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			return Object.class;
 		}
 	}

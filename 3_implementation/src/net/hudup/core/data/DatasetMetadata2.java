@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Set;
 
 import net.hudup.core.evaluate.recommend.Accuracy;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.MathUtil;
 import net.hudup.core.parser.TextParserUtil;
 
@@ -406,7 +407,7 @@ public class DatasetMetadata2 extends DatasetMetadata {
 			}
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			//metadata2 = new DatasetMetadata2();
 		}
 		finally {
@@ -416,7 +417,7 @@ public class DatasetMetadata2 extends DatasetMetadata {
 			} 
 			catch (Throwable e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 		}
 
@@ -466,7 +467,7 @@ public class DatasetMetadata2 extends DatasetMetadata {
 				metadata2.itemAverageRelevantRatingCount = (double)relevantRateCount / n;
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			//metadata2 = new DatasetMetadata2();
 		}
 		finally {
@@ -476,7 +477,7 @@ public class DatasetMetadata2 extends DatasetMetadata {
 			} 
 			catch (Throwable e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 		}
 		
@@ -505,7 +506,7 @@ public class DatasetMetadata2 extends DatasetMetadata {
 				metadata2.sampleCoverRatio = (double)metadata2.sampleCellCount / (metadata2.sampleRowCount*metadata2.sampleColumnCount);
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			//metadata2 = new DatasetMetadata2();
 		}
 		finally {
@@ -515,7 +516,7 @@ public class DatasetMetadata2 extends DatasetMetadata {
 			} 
 			catch (Throwable e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 		}
 

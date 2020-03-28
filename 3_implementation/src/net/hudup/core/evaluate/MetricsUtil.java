@@ -38,6 +38,7 @@ import net.hudup.core.Util;
 import net.hudup.core.alg.Alg;
 import net.hudup.core.data.PropList;
 import net.hudup.core.logistic.Counter;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.MathUtil;
 import net.hudup.core.logistic.SystemUtil;
 import net.hudup.core.logistic.UriAdapter;
@@ -354,7 +355,7 @@ public class MetricsUtil {
 		EvaluateInfo otherResult = null;
 		try {
 			otherResult = referredEvaluator.getOtherResult();
-		} catch (Throwable e) {e.printStackTrace();}
+		} catch (Throwable e) {LogUtil.trace(e);}
 		if (otherResult == null) return new JTable();
 		
 		Vector<Vector<Object>> data = Util.newVector();
@@ -1074,7 +1075,7 @@ public class MetricsUtil {
 			os.close();
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		adapter.close();
 	}
@@ -1312,7 +1313,7 @@ public class MetricsUtil {
         			"URI saved successfully", JOptionPane.INFORMATION_MESSAGE);
         }
 		catch(Exception e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
         
 	}

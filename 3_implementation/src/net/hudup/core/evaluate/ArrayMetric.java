@@ -9,6 +9,8 @@ package net.hudup.core.evaluate;
 
 import java.rmi.RemoteException;
 
+import net.hudup.core.logistic.LogUtil;
+
 /**
  * This abstract class represents any metric having one internal array for calculate evaluation value such as error range.
  * 
@@ -59,7 +61,7 @@ public abstract class ArrayMetric extends DefaultMetric {
 			}
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		return false;
 	}

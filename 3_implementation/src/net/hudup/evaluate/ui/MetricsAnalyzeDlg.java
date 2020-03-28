@@ -30,6 +30,7 @@ import net.hudup.core.RegisterTable;
 import net.hudup.core.evaluate.Evaluator;
 import net.hudup.core.evaluate.Metrics;
 import net.hudup.core.evaluate.MetricsUtil;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.ui.TextArea;
 import net.hudup.core.logistic.ui.UIUtil;
 
@@ -338,7 +339,7 @@ public class MetricsAnalyzeDlg extends JDialog {
 		JTable tblGeneral = new JTable();
 		try {
 			tblGeneral = util.createDatasetTable();
-		} catch (Exception e) {e.printStackTrace();}
+		} catch (Exception e) {LogUtil.trace(e);}
 		
 		zoom(title, label, tblGeneral);
 	}
@@ -356,7 +357,7 @@ public class MetricsAnalyzeDlg extends JDialog {
 		JTable tblDetail = new JTable();
 		try {
 			tblDetail = util.createDatasetTable(datasetId);
-		} catch (Exception e) {e.printStackTrace();}
+		} catch (Exception e) {LogUtil.trace(e);}
 		
 		zoom(title, label, tblDetail);
 	}
@@ -374,7 +375,7 @@ public class MetricsAnalyzeDlg extends JDialog {
 		JTable tblMetric = new JTable();
 		try {
 			tblMetric = util.createMetricTable(metricName);
-		} catch (Exception e) {e.printStackTrace();}
+		} catch (Exception e) {LogUtil.trace(e);}
 		
 		zoom(title, label, tblMetric);
 	}

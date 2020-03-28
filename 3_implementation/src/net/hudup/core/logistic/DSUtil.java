@@ -497,7 +497,7 @@ public final class DSUtil {
 			
 		} 
 		catch (Exception e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 	}
 	

@@ -43,6 +43,7 @@ import net.hudup.core.data.HiddenText;
 import net.hudup.core.data.PropList;
 import net.hudup.core.data.ctx.CTSManager;
 import net.hudup.core.logistic.ClipboardUtil;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.xURI;
 import net.hudup.core.logistic.ui.UIUtil;
@@ -131,7 +132,7 @@ public class PropTable extends JTable {
 				getPropTableModel().userEdit(this, row);
 			}
 			catch (Exception e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 			
 		}

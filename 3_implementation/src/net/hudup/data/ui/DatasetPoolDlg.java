@@ -31,6 +31,7 @@ import net.hudup.core.alg.Alg;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.DatasetPair;
 import net.hudup.core.data.DatasetPool;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.xURI;
 import net.hudup.core.logistic.ui.UIUtil;
@@ -351,7 +352,7 @@ public class DatasetPoolDlg extends JDialog {
 		}
 		catch (Exception e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 			
 	}
@@ -416,7 +417,7 @@ public class DatasetPoolDlg extends JDialog {
         			"URI saved successfully", "URI saved successfully", JOptionPane.INFORMATION_MESSAGE);
         }
 		catch(Exception e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
         finally {
         	try {
@@ -424,7 +425,7 @@ public class DatasetPoolDlg extends JDialog {
         			writer.close();
         	}
         	catch (Exception e) {
-        		e.printStackTrace();
+        		LogUtil.trace(e);
         	}
         	
         	if (adapter != null)

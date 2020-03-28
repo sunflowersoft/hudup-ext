@@ -12,6 +12,7 @@ import java.util.Map;
 
 import net.hudup.core.PluginStorage;
 import net.hudup.core.Util;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.xURI;
 import net.hudup.core.parser.DatasetParser;
 import net.hudup.core.parser.TextParserUtil;
@@ -1270,7 +1271,7 @@ public class DataConfig extends PropList {
 				}
 			}
 			catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 			
 			return value;

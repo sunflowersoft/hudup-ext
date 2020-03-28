@@ -14,6 +14,7 @@ import java.rmi.RemoteException;
 import net.hudup.core.data.ctx.Context;
 import net.hudup.core.data.ctx.ContextList;
 import net.hudup.core.data.ctx.ContextTemplateSchema;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.NetUtil;
 
 /**
@@ -95,7 +96,7 @@ public abstract class DatasetAbstract implements Dataset, DatasetRemote {
 		try {
 			unexport();
 		}
-		catch (Throwable e) {e.printStackTrace();}
+		catch (Throwable e) {LogUtil.trace(e);}
 	}
 
 
@@ -166,7 +167,7 @@ public abstract class DatasetAbstract implements Dataset, DatasetRemote {
 			unexport();
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 	}
 

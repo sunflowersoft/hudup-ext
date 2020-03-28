@@ -109,7 +109,7 @@ public class ExternalQueryRemoteWrapper extends AlgRemoteWrapper implements Exte
 		if (exclusive && remoteAlg != null) {
 			try {
 				((ExternalQueryRemote)remoteAlg).close();
-			} catch (Throwable e) {e.printStackTrace();}
+			} catch (Throwable e) {LogUtil.trace(e);}
 		}
 
 		super.unexport();
@@ -135,7 +135,7 @@ public class ExternalQueryRemoteWrapper extends AlgRemoteWrapper implements Exte
 		// TODO Auto-generated method stub
 		try {
 			unexport();
-		} catch (Throwable e) {e.printStackTrace();}
+		} catch (Throwable e) {LogUtil.trace(e);}
 	}
 
 
@@ -153,7 +153,7 @@ public class ExternalQueryRemoteWrapper extends AlgRemoteWrapper implements Exte
 		
 		try {
 			close();
-		} catch (Throwable e) {e.printStackTrace();}
+		} catch (Throwable e) {LogUtil.trace(e);}
 	}
 
 

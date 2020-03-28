@@ -37,6 +37,7 @@ import net.hudup.core.client.ServerStatusEvent.Status;
 import net.hudup.core.client.ServerStatusListener;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.ui.SysConfigPane;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.xURI;
 import net.hudup.core.logistic.ui.UIUtil;
 
@@ -170,7 +171,7 @@ public class ListenerCP extends JFrame implements ServerStatusListener {
 			setVisible(true);
 		}
 		catch (RemoteException e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 		
@@ -186,7 +187,7 @@ public class ListenerCP extends JFrame implements ServerStatusListener {
 					} 
 					catch (Throwable e) {
 						// TODO Auto-generated catch block
-						e.printStackTrace();
+						LogUtil.trace(e);
 					}
 				}
 				
@@ -232,7 +233,7 @@ public class ListenerCP extends JFrame implements ServerStatusListener {
 						throw new Exception();
 				}
 				catch (Throwable e) {
-					e.printStackTrace();
+					LogUtil.trace(e);
 					
 					try {
 			        	UnicastRemoteObject.unexportObject(this, true);
@@ -399,7 +400,7 @@ public class ListenerCP extends JFrame implements ServerStatusListener {
 				updateControls();
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 	}
 	
@@ -418,7 +419,7 @@ public class ListenerCP extends JFrame implements ServerStatusListener {
 				updateControls();
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 	}
 
@@ -434,7 +435,7 @@ public class ListenerCP extends JFrame implements ServerStatusListener {
 				updateControls();
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 	}
 
@@ -451,7 +452,7 @@ public class ListenerCP extends JFrame implements ServerStatusListener {
 		} 
 		catch (Exception e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 	}
 
@@ -490,7 +491,7 @@ public class ListenerCP extends JFrame implements ServerStatusListener {
 			}
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 	}
 	
@@ -530,7 +531,7 @@ public class ListenerCP extends JFrame implements ServerStatusListener {
 			
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 	}
 	
@@ -597,7 +598,7 @@ public class ListenerCP extends JFrame implements ServerStatusListener {
 				paneConfig.update(listener.getConfig());
 			}
 			catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 		}
 		else if (status == Status.paused) {
@@ -664,7 +665,7 @@ public class ListenerCP extends JFrame implements ServerStatusListener {
 		} 
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 		if (bRemote) {
@@ -674,7 +675,7 @@ public class ListenerCP extends JFrame implements ServerStatusListener {
 			}
 			catch (Throwable e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 			
 			try {
@@ -683,7 +684,7 @@ public class ListenerCP extends JFrame implements ServerStatusListener {
 			}
 			catch (Throwable e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 		}
 		

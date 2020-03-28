@@ -87,7 +87,7 @@ public class UriAdapter implements UriAssoc, AutoCloseable {
 			close();
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 		assoc = Util.getFactory().createUriAssoc(config.getStoreUri());
@@ -127,7 +127,7 @@ public class UriAdapter implements UriAssoc, AutoCloseable {
 				uri = Paths.get(urispec).toAbsolutePath().toUri();
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			uri = null;
 		}
 		if (uri == null)
@@ -349,7 +349,7 @@ public class UriAdapter implements UriAssoc, AutoCloseable {
 			
 		} 
 		catch (Exception e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		finally {
 			try {
@@ -357,7 +357,7 @@ public class UriAdapter implements UriAssoc, AutoCloseable {
 					reader.close();
 			}
 			catch (Exception e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 		}
 		
@@ -387,7 +387,7 @@ public class UriAdapter implements UriAssoc, AutoCloseable {
 			});
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		finally {
 			try {
@@ -395,7 +395,7 @@ public class UriAdapter implements UriAssoc, AutoCloseable {
 					reader.close();
 			}
 			catch (Exception e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 		}
 		
@@ -420,7 +420,7 @@ public class UriAdapter implements UriAssoc, AutoCloseable {
 		} 
 		catch (Exception e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 			result = false;
 		}
 		finally {
@@ -429,7 +429,7 @@ public class UriAdapter implements UriAssoc, AutoCloseable {
 					writer.close();
 			}
 			catch (Exception e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 		}
 		
@@ -445,7 +445,7 @@ public class UriAdapter implements UriAssoc, AutoCloseable {
 				assoc.close();
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		assoc = null;
 	}
@@ -460,7 +460,7 @@ public class UriAdapter implements UriAssoc, AutoCloseable {
 			close();
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 	}
@@ -567,7 +567,7 @@ public class UriAdapter implements UriAssoc, AutoCloseable {
 				close();
 			}
 			catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 		}
 
@@ -645,7 +645,7 @@ public class UriAdapter implements UriAssoc, AutoCloseable {
 				close();
 			}
 			catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 		}
 		
@@ -724,7 +724,7 @@ public class UriAdapter implements UriAssoc, AutoCloseable {
 				try {
 					channel.close();
 				}
-				catch (Throwable e) {e.printStackTrace();}
+				catch (Throwable e) {LogUtil.trace(e);}
 			}
 			channel = null;
 			
@@ -743,7 +743,7 @@ public class UriAdapter implements UriAssoc, AutoCloseable {
 				close();
 			}
 			catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 		}
 		

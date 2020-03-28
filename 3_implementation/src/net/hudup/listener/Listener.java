@@ -113,7 +113,7 @@ public class Listener extends SocketServer implements ServerStatusListener, Gate
 		}
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 			LogUtil.error("Listener/Balancer (socket server) failed to be constructed in constructor method, caused by " + e.getMessage());
 			System.exit(0);
 		}
@@ -142,7 +142,7 @@ public class Listener extends SocketServer implements ServerStatusListener, Gate
 			} 
 			catch (Throwable e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LogUtil.trace(e);
 				LogUtil.error("Listener/Balancer (socket server) failed to bind remote server, caused by " + e.getMessage());
 			}
 			
@@ -196,7 +196,7 @@ public class Listener extends SocketServer implements ServerStatusListener, Gate
     		registry = null;
     	}
     	catch (Throwable e) {
-    		e.printStackTrace();
+    		LogUtil.trace(e);
     		LogUtil.error("Listener/Balancer (socket server) failed to shutdown, caused by" + e.getMessage());
     	}
 
@@ -288,7 +288,7 @@ public class Listener extends SocketServer implements ServerStatusListener, Gate
 				validated = bindServer.validateAccount(account, password, privileges);
 			}
 			catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 				validated = false;
 			}
 		}
@@ -328,7 +328,7 @@ public class Listener extends SocketServer implements ServerStatusListener, Gate
 				validated = bindServer.validateAccount(account, password, DataConfig.ACCOUNT_ADMIN_PRIVILEGE);
 			}
 			catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 				validated = false;
 			}
 		}
@@ -442,7 +442,7 @@ public class Listener extends SocketServer implements ServerStatusListener, Gate
 					} 
 					catch (RemoteException re) {
 						// TODO Auto-generated catch block
-						re.printStackTrace();
+						LogUtil.trace(re);
 					}
 				}
 			});
@@ -486,7 +486,7 @@ public class Listener extends SocketServer implements ServerStatusListener, Gate
 			new ListenerCP(this);
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			
 			/*
 			 * It is possible that current Java environment does not support GUI.

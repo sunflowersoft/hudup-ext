@@ -13,6 +13,7 @@ import java.util.List;
 import net.hudup.core.Cloneable;
 import net.hudup.core.Constants;
 import net.hudup.core.Util;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.parser.TextParsable;
 import net.hudup.core.parser.TextParserUtil;
 
@@ -179,7 +180,7 @@ public class DatasetMetadata implements Serializable, TextParsable, Cloneable {
 			metadata.numberOfUsers = userIds.getMetadata().getSize();
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		finally {
 			try {
@@ -188,7 +189,7 @@ public class DatasetMetadata implements Serializable, TextParsable, Cloneable {
 			} 
 			catch (Throwable e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 		}
 		
@@ -198,7 +199,7 @@ public class DatasetMetadata implements Serializable, TextParsable, Cloneable {
 			metadata.numberOfRatingUsers = vUserRatings.getMetadata().getSize();
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		finally {
 			try {
@@ -207,7 +208,7 @@ public class DatasetMetadata implements Serializable, TextParsable, Cloneable {
 			} 
 			catch (Throwable e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 		}
 
@@ -218,7 +219,7 @@ public class DatasetMetadata implements Serializable, TextParsable, Cloneable {
 			metadata.numberOfItems = itemIds.getMetadata().getSize();
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		finally {
 			try {
@@ -227,7 +228,7 @@ public class DatasetMetadata implements Serializable, TextParsable, Cloneable {
 			} 
 			catch (Throwable e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 		}
 		
@@ -237,7 +238,7 @@ public class DatasetMetadata implements Serializable, TextParsable, Cloneable {
 			metadata.numberOfRatedItems = vItemRatings.getMetadata().getSize();
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		finally {
 			try {
@@ -246,7 +247,7 @@ public class DatasetMetadata implements Serializable, TextParsable, Cloneable {
 			} 
 			catch (Throwable e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 		}
 		

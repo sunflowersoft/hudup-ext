@@ -31,6 +31,7 @@ import net.hudup.core.data.ProviderAssoc;
 import net.hudup.core.data.ProviderAssoc.CsvWriter;
 import net.hudup.core.data.Rating;
 import net.hudup.core.data.UnitList;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.ui.ProgressEvent;
 import net.hudup.core.logistic.ui.ProgressListener;
 
@@ -81,7 +82,7 @@ public class DefaultExternalQuery extends ExternalQueryAbstract {
 		} 
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 		try {
@@ -93,7 +94,7 @@ public class DefaultExternalQuery extends ExternalQueryAbstract {
 			return true;
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			
 			try {
 				close();
@@ -222,7 +223,7 @@ public class DefaultExternalQuery extends ExternalQueryAbstract {
 			
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		finally {
 			try {
@@ -230,7 +231,7 @@ public class DefaultExternalQuery extends ExternalQueryAbstract {
 					userFetcher.close();
 			}
 			catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 		}
 		if (registeredListener != null)
@@ -278,7 +279,7 @@ public class DefaultExternalQuery extends ExternalQueryAbstract {
 			
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		finally {
 			try {
@@ -286,7 +287,7 @@ public class DefaultExternalQuery extends ExternalQueryAbstract {
 					itemFetcher.close();
 			}
 			catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 		}
 		if (registeredListener != null)
@@ -335,7 +336,7 @@ public class DefaultExternalQuery extends ExternalQueryAbstract {
 					internalItemId = Integer.parseInt(itemMap.internalRecord.value.toString());
 				}
 				catch (Throwable e) {
-					e.printStackTrace();
+					LogUtil.trace(e);
 					continue;
 				}
 				if (internalUserId < 0 || internalItemId < 0)
@@ -346,7 +347,7 @@ public class DefaultExternalQuery extends ExternalQueryAbstract {
 			
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		finally {
 			try {
@@ -354,7 +355,7 @@ public class DefaultExternalQuery extends ExternalQueryAbstract {
 					ratingFetcher.close();
 			}
 			catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 		}
 		if (registeredListener != null)
@@ -431,7 +432,7 @@ public class DefaultExternalQuery extends ExternalQueryAbstract {
 			
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		finally {
 			try {
@@ -439,7 +440,7 @@ public class DefaultExternalQuery extends ExternalQueryAbstract {
 					userFetcher.close();
 			}
 			catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 		}
 		if (registeredListener != null)
@@ -487,7 +488,7 @@ public class DefaultExternalQuery extends ExternalQueryAbstract {
 			
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		finally {
 			try {
@@ -495,7 +496,7 @@ public class DefaultExternalQuery extends ExternalQueryAbstract {
 					itemFetcher.close();
 			}
 			catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 		}
 		if (registeredListener != null)
@@ -544,7 +545,7 @@ public class DefaultExternalQuery extends ExternalQueryAbstract {
 					internalItemId = Integer.parseInt(itemMap.internalRecord.value.toString());
 				}
 				catch (Throwable e) {
-					e.printStackTrace();
+					LogUtil.trace(e);
 					continue;
 				}
 				if (internalUserId < 0 || internalItemId < 0)
@@ -555,7 +556,7 @@ public class DefaultExternalQuery extends ExternalQueryAbstract {
 			
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		finally {
 			try {
@@ -563,7 +564,7 @@ public class DefaultExternalQuery extends ExternalQueryAbstract {
 					ratingFetcher.close();
 			}
 			catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 		}
 		if (registeredListener != null)
@@ -578,7 +579,7 @@ public class DefaultExternalQuery extends ExternalQueryAbstract {
 			csvRatingWriter.close();
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 	}
@@ -683,14 +684,14 @@ public class DefaultExternalQuery extends ExternalQueryAbstract {
 				internalProvider.close();
 			internalProvider = null;
 		}
-		catch (Throwable e) {e.printStackTrace();}
+		catch (Throwable e) {LogUtil.trace(e);}
 		
 		try {
 			if (externalProvider != null)
 				externalProvider.close();
 			externalProvider = null;
 		}
-		catch (Throwable e) {e.printStackTrace();}
+		catch (Throwable e) {LogUtil.trace(e);}
 		
 	}
 
@@ -816,7 +817,7 @@ public class DefaultExternalQuery extends ExternalQueryAbstract {
 			return true;
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 		return false;

@@ -44,6 +44,7 @@ import net.hudup.core.Util;
 import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.DuplicatableAlg;
 import net.hudup.core.logistic.DSUtil;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.ui.UIUtil;
 
 /**
@@ -627,7 +628,7 @@ public class AlgListBox extends JList<Alg> implements AlgListUI {
 				listener.algListChanged(evt);
 			}
 			catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 		}
     }

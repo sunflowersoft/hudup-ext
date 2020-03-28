@@ -17,6 +17,7 @@ import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.Fetcher;
 import net.hudup.core.data.RatingVector;
+import net.hudup.core.logistic.LogUtil;
 
 /**
  * This class sets up an advanced version of 2-dimensional neighbor collaborative filtering (Neighbor CF) algorithm.
@@ -117,7 +118,7 @@ public class NeighborCF2d extends NeighborCFUserBased {
 				userRatings.reset();
 			}
 			catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 			
 			//Estimation according to item-based matrix.
@@ -153,7 +154,7 @@ public class NeighborCF2d extends NeighborCFUserBased {
 					itemRatings.reset();
 				}
 				catch (Throwable e) {
-					e.printStackTrace();
+					LogUtil.trace(e);
 				}
 			}
 			
@@ -171,7 +172,7 @@ public class NeighborCF2d extends NeighborCFUserBased {
 		} 
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 		return result.size() == 0 ? null : result;
@@ -302,7 +303,7 @@ class NeighborCF2dDeprecated extends NeighborCFUserBased {
 						vItemRatings.reset();
 					}
 					catch (RemoteException e) {
-						e.printStackTrace();
+						LogUtil.trace(e);
 					}
 					
 					
@@ -310,7 +311,7 @@ class NeighborCF2dDeprecated extends NeighborCFUserBased {
 				vUserRatings.reset();
 			}
 			catch (RemoteException e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 			
 			
@@ -325,7 +326,7 @@ class NeighborCF2dDeprecated extends NeighborCFUserBased {
 		} 
 		catch (RemoteException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 		if (result.size() == 0)

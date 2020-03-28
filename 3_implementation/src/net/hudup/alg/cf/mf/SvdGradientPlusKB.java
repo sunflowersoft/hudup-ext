@@ -19,6 +19,7 @@ import net.hudup.core.Util;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.PropList;
 import net.hudup.core.data.RatingMatrix;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.NextUpdate;
 import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.Vector;
@@ -301,7 +302,7 @@ public abstract class SvdGradientPlusKB extends SvdGradientKB {
 			}
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			destroyDataStructure();
 		}
 		finally {
@@ -310,7 +311,7 @@ public abstract class SvdGradientPlusKB extends SvdGradientKB {
 					buffer.close();
 			}
 			catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 			
 			if (adapter != null)
@@ -329,7 +330,7 @@ public abstract class SvdGradientPlusKB extends SvdGradientKB {
 			if (isEmpty()) return;
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			return;
 		}
 
@@ -358,7 +359,7 @@ public abstract class SvdGradientPlusKB extends SvdGradientKB {
 
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		finally {
 			try {
@@ -366,7 +367,7 @@ public abstract class SvdGradientPlusKB extends SvdGradientKB {
 					printer.close();
 			}
 			catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 			
 			if (adapter != null)

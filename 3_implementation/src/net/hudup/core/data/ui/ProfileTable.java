@@ -33,6 +33,7 @@ import net.hudup.core.data.AttributeList;
 import net.hudup.core.data.Fetcher;
 import net.hudup.core.data.FetcherUtil;
 import net.hudup.core.data.Profile;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.NextUpdate;
 
 /**
@@ -417,7 +418,7 @@ class ProfileTableModel extends DefaultTableModel implements TableModelListener 
 		} 
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 		update(profiles);

@@ -44,8 +44,8 @@ public class HiddenText2 implements Serializable {
 	
 	
 	/**
-	 * Getting real content.
-	 * @return Real content text
+	 * Getting real content as descrypted text.
+	 * @return Real content text as descrypted text.
 	 */
 	public String getText() {
 		if (encryptedText == null)
@@ -56,8 +56,8 @@ public class HiddenText2 implements Serializable {
 	
 	
 	/**
-	 * Setting real content. The specified text will be assigned to the real content {@link #text}.
-	 * @param text Specified text
+	 * Setting real content into this class as encrypted. The specified text (real content) will be encrypted and assigned to {@link #encryptedText}.
+	 * @param text real content.
 	 */
 	public void setText(String text) {
 		if (text == null)

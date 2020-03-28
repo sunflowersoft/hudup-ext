@@ -17,6 +17,7 @@ import net.hudup.core.data.Dataset;
 import net.hudup.core.data.HiddenText;
 import net.hudup.core.data.RatingVector;
 import net.hudup.core.data.ServerPointer;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.xURI;
 
 /**
@@ -107,7 +108,7 @@ public class SocketRecommender extends ServiceRecommenderAbstract implements Soc
 			}
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 		super.unsetup();
@@ -126,7 +127,7 @@ public class SocketRecommender extends ServiceRecommenderAbstract implements Soc
 			} 
 			catch (Throwable e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LogUtil.trace(e);
 				return null;
 			}
 		}
@@ -145,7 +146,7 @@ public class SocketRecommender extends ServiceRecommenderAbstract implements Soc
 			} 
 			catch (Throwable e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LogUtil.trace(e);
 				return null;
 			}
 		}

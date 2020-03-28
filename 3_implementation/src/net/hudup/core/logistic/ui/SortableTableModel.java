@@ -11,6 +11,8 @@ import java.util.Vector;
 
 import javax.swing.table.DefaultTableModel;
 
+import net.hudup.core.logistic.LogUtil;
+
 /**
  * This Java table model that supports sorting.
  * 
@@ -104,7 +106,7 @@ public class SortableTableModel extends DefaultTableModel {
 			}
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			return Object.class;
 		}
 	}

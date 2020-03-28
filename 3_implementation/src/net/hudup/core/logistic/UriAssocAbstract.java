@@ -71,7 +71,7 @@ public abstract class UriAssocAbstract implements UriAssoc {
 				newUri = xURI.create(subUriText);
 			}
 			catch (Exception e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 				newUri = null;
 			}
 			
@@ -101,7 +101,7 @@ public abstract class UriAssocAbstract implements UriAssoc {
 				} 
 				catch (IOException e) {
 					// TODO Auto-generated catch block
-					e.printStackTrace();
+					LogUtil.trace(e);
 					return false;
 				}
 			}
@@ -144,15 +144,22 @@ public abstract class UriAssocAbstract implements UriAssoc {
 			if (isStore)
 				return Files.createDirectories(path) != null;
 			else {
-				Files.newOutputStream(path, 
-						StandardOpenOption.CREATE, 
-						StandardOpenOption.TRUNCATE_EXISTING).close();
-				return true;
+//				try {
+					Files.newOutputStream(path, 
+							StandardOpenOption.CREATE, 
+							StandardOpenOption.TRUNCATE_EXISTING).close();
+					return true;
+//				}
+//				catch (Exception e) {
+//					System.out.println("Impossible to write this special file but it can be created.");
+//					Files.deleteIfExists(path);
+//					return Files.createFile(path) != null;
+//				}
 			}
 		}
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 		return false;
@@ -177,7 +184,7 @@ public abstract class UriAssocAbstract implements UriAssoc {
 				} 
 				catch (Throwable e) {
 					// TODO Auto-generated catch block
-					e.printStackTrace();
+					LogUtil.trace(e);
 				}
 			}
 			
@@ -190,7 +197,7 @@ public abstract class UriAssocAbstract implements UriAssoc {
 			} 
 			catch (Throwable e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 
 			return create(uri, false);
@@ -214,7 +221,7 @@ public abstract class UriAssocAbstract implements UriAssoc {
 		} 
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 		return false;
@@ -275,7 +282,7 @@ public abstract class UriAssocAbstract implements UriAssoc {
 			} 
 			catch (Throwable e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 			
 			return false;
@@ -298,7 +305,7 @@ public abstract class UriAssocAbstract implements UriAssoc {
 		} 
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 		return false;
@@ -357,7 +364,7 @@ public abstract class UriAssocAbstract implements UriAssoc {
 		} 
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 		return null;
@@ -381,7 +388,7 @@ public abstract class UriAssocAbstract implements UriAssoc {
 		} 
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 		return null;
@@ -398,7 +405,7 @@ public abstract class UriAssocAbstract implements UriAssoc {
 		} 
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 		return null;
@@ -422,7 +429,7 @@ public abstract class UriAssocAbstract implements UriAssoc {
 		} 
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 		return null;
@@ -439,7 +446,7 @@ public abstract class UriAssocAbstract implements UriAssoc {
 		} 
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 		return null;
@@ -465,7 +472,7 @@ public abstract class UriAssocAbstract implements UriAssoc {
 		} 
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 		return null;
@@ -520,7 +527,7 @@ public abstract class UriAssocAbstract implements UriAssoc {
 			}
 			catch (Throwable e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LogUtil.trace(e);
 			} 
 			
 		} // end for
@@ -569,7 +576,7 @@ public abstract class UriAssocAbstract implements UriAssoc {
 		} 
 		catch (Exception e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 		DirectoryStream<Path> ds = null;
@@ -579,7 +586,7 @@ public abstract class UriAssocAbstract implements UriAssoc {
 		} 
 		catch (Exception e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 			return;
 		}
 		
@@ -592,7 +599,7 @@ public abstract class UriAssocAbstract implements UriAssoc {
 			}
 			catch (Exception e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LogUtil.trace(e);
 			} 
 		}
 		
@@ -601,7 +608,7 @@ public abstract class UriAssocAbstract implements UriAssoc {
 		} 
 		catch (IOException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 	}
@@ -643,7 +650,7 @@ public abstract class UriAssocAbstract implements UriAssoc {
 			close();
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 	}
 

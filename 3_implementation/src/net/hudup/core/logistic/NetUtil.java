@@ -147,6 +147,7 @@ public class NetUtil {
 		
 		/**
 		 * Getting host address.
+		 * @return host address.
 		 */
 		public String getHostAddress() {
 			if (inetAddr == null)
@@ -174,7 +175,7 @@ public class NetUtil {
 	            return txtMac.toString();
 			}
 			catch (Exception e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 				return null;
 			}
 		}
@@ -287,7 +288,7 @@ public class NetUtil {
 			}
 			catch (Exception e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LogUtil.trace(e);
 				try {
 					if (stub != null)
 						UnicastRemoteObject.unexportObject(remote, true);
@@ -329,11 +330,11 @@ public class NetUtil {
 	        	return true;
 			}
 			catch (NoSuchObjectException e) {
-				//e.printStackTrace();
+				//LogUtil.trace(e);
 				return true;
 			}
 			catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 			
 			return false;
@@ -377,7 +378,7 @@ public class NetUtil {
 				}
 			}
 			catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 				
 				try {
 		        	if (stub != null)
@@ -428,7 +429,7 @@ public class NetUtil {
 				}
 			}
 			catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 				
 				try {
 		        	if (stub != null)
@@ -476,11 +477,11 @@ public class NetUtil {
 	        		result = result && UnicastRemoteObject.unexportObject(remote, true);
 			}
 			catch (NoSuchObjectException e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 				result = result && true;
 			}
 			catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 				result = result && false;
 			}
 			
@@ -489,11 +490,11 @@ public class NetUtil {
 	        		result = result && UnicastRemoteObject.unexportObject(registry, true);
 			}
 			catch (NoSuchObjectException e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 				result = result && true;
 			}
 			catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 				result = result && false;
 			}
 			
@@ -519,7 +520,7 @@ public class NetUtil {
 			}
 			catch (Exception e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 			
 			return null;
@@ -554,12 +555,12 @@ public class NetUtil {
 					result = result && true;
 				}
 				catch (NotBoundException e) {
-					e.printStackTrace();
+					LogUtil.trace(e);
 					result = result && true;
 				}
 				catch (Exception e) {
 					// TODO Auto-generated catch block
-					e.printStackTrace();
+					LogUtil.trace(e);
 					result = result && false;
 				}
 			}
@@ -583,12 +584,12 @@ public class NetUtil {
 					result = result && true;
 				}
 				catch (NotBoundException e) {
-					e.printStackTrace();
+					LogUtil.trace(e);
 					result = result && true;
 				}
 				catch (Exception e) {
 					// TODO Auto-generated catch block
-					e.printStackTrace();
+					LogUtil.trace(e);
 					result = result && false;
 				}
 			}
@@ -608,7 +609,7 @@ public class NetUtil {
 				registry = LocateRegistry.getRegistry(port);
 			}
 			catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 				registry = null;
 			}
 			
@@ -619,7 +620,7 @@ public class NetUtil {
 					registry = LocateRegistry.createRegistry(port);
 				}
 				catch (Throwable e) {
-					e.printStackTrace();
+					LogUtil.trace(e);
 					registry = null;
 				}
 				return registry;

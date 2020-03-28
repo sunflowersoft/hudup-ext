@@ -12,6 +12,7 @@ import java.rmi.RemoteException;
 import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.ExecutableAlg;
 import net.hudup.core.logistic.BaseClass;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.xURI;
 
 /**
@@ -112,7 +113,7 @@ public class MetricWrapper2 extends MetricWrapper {
 		try {
 			algDesc = (alg instanceof ExecutableAlg) ? ((ExecutableAlg)alg).getDescription() : "";
 		}
-		catch (Exception e) { e.printStackTrace(); algDesc = ""; }
+		catch (Exception e) { LogUtil.trace(e); algDesc = ""; }
 		wrapper.setup(metric, alg.getName(), datasetId, algDesc);
 		wrapper.setDatasetUri(datasetUri);
 		

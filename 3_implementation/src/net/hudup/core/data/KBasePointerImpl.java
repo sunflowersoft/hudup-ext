@@ -11,6 +11,7 @@ import net.hudup.core.PluginStorage;
 import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.KBase;
 import net.hudup.core.alg.ModelBasedAlg;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.xURI;
 
 /**
@@ -56,7 +57,7 @@ public class KBasePointerImpl extends PointerAbstract implements KBasePointer, K
 				kbase = ((ModelBasedAlg)alg).createKBase(dataset);
 			}
 			catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 				kbase = null;
 			}
 		}
@@ -67,7 +68,7 @@ public class KBasePointerImpl extends PointerAbstract implements KBasePointer, K
 				kbase = null;
 			}
 		}
-		catch (Throwable e) {e.printStackTrace(); kbase = null;}
+		catch (Throwable e) {LogUtil.trace(e); kbase = null;}
 		
 		return kbase;
 	}

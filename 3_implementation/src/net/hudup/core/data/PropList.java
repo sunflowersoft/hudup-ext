@@ -40,6 +40,7 @@ import net.hudup.core.alg.AlgDesc;
 import net.hudup.core.alg.AlgDescList;
 import net.hudup.core.alg.AlgList;
 import net.hudup.core.data.Attribute.Type;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.xURI;
 import net.hudup.core.parser.TextParsable;
@@ -398,7 +399,7 @@ public class PropList implements TextParsable, Serializable, Cloneable {
 			removeReadOnly(key);
 			removeInvisible(key);
 //			removeUnsaved(key);
-		} catch (Throwable e) {e.printStackTrace();}
+		} catch (Throwable e) {LogUtil.trace(e);}
 	}
 	
 	
@@ -546,7 +547,23 @@ public class PropList implements TextParsable, Serializable, Cloneable {
 		if (!containsKey(key))
 			return -1;
 		
-		if (isIntValue(key) || isTimeValue(key) || isRealValue(key))
+		if (isIntValue(key) || isLongValue(key) || isTimeValue(key) || isRealValue(key))
+			return ((Number) get(key)).longValue();
+		else
+			return Long.parseLong(get(key).toString());
+	}
+
+	
+	/**
+	 * Getting value associated with the specified key as a long number. In Hudup framework, long number is also time in mili-seconds.
+	 * @param key Specified key
+	 * @return Value as a long number.
+	 */
+	public long getAsLong(String key) {
+		if (!containsKey(key))
+			return -1;
+		
+		if (isIntValue(key) || isLongValue(key) || isTimeValue(key) || isRealValue(key))
 			return ((Number) get(key)).longValue();
 		else
 			return Long.parseLong(get(key).toString());
@@ -702,6 +719,20 @@ public class PropList implements TextParsable, Serializable, Cloneable {
 	 * @return whether is time value
 	 */
 	public boolean isTimeValue(String key) {
+		if (!containsKey(key))
+			return false;
+		
+		Serializable value = get(key);
+		return value instanceof Long;
+	}
+
+	
+	/**
+	 * Testing whether value associated with the specified key is long number. In Hudup framework, long number is also time in mili-seconds.
+	 * @param key Specified key
+	 * @return whether is long value.
+	 */
+	public boolean isLongValue(String key) {
 		if (!containsKey(key))
 			return false;
 		
@@ -989,7 +1020,7 @@ public class PropList implements TextParsable, Serializable, Cloneable {
 		} 
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 			result = false;
 		}
 		finally {
@@ -998,7 +1029,7 @@ public class PropList implements TextParsable, Serializable, Cloneable {
 					reader.close();
 			}
 			catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 			
 			if (adapter != null)
@@ -1032,7 +1063,7 @@ public class PropList implements TextParsable, Serializable, Cloneable {
 		} 
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 			result = false;
 		}
 		finally {
@@ -1041,7 +1072,7 @@ public class PropList implements TextParsable, Serializable, Cloneable {
 					writer.close();
 			}
 			catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 			
 			if (adapter != null)
@@ -1098,7 +1129,7 @@ public class PropList implements TextParsable, Serializable, Cloneable {
 			parserXml(rootElement, configTempList);
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 		this.putAll(configTempList.convertAfterLoad());
@@ -1238,7 +1269,7 @@ public class PropList implements TextParsable, Serializable, Cloneable {
         	return true;
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 		return false;
@@ -1425,7 +1456,7 @@ public class PropList implements TextParsable, Serializable, Cloneable {
 		}
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 		return false;
@@ -1468,7 +1499,7 @@ public class PropList implements TextParsable, Serializable, Cloneable {
 		} 
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 		return false;

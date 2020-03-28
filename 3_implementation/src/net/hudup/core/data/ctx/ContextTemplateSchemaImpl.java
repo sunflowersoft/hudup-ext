@@ -16,6 +16,7 @@ import net.hudup.core.data.Attribute;
 import net.hudup.core.data.Attribute.Type;
 import net.hudup.core.data.AttributeList;
 import net.hudup.core.data.DataConfig;
+import net.hudup.core.logistic.LogUtil;
 
 /**
  * This class is default implementation of context template schema (CTS).
@@ -306,7 +307,7 @@ public class ContextTemplateSchemaImpl implements ContextTemplateSchema {
 			clear();
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 	}

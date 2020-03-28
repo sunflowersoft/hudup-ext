@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.UUID;
 
 import net.hudup.core.Util;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.NetUtil;
 
 /**
@@ -105,7 +106,7 @@ public class DatasetPoolExchanged  implements Serializable {
 				
 				try {
 					((DatasetRemoteWrapper)newTraining).exportInside(serverPort);
-				} catch (RemoteException e) {e.printStackTrace();}
+				} catch (RemoteException e) {LogUtil.trace(e);}
 			}
 			
 			
@@ -118,7 +119,7 @@ public class DatasetPoolExchanged  implements Serializable {
 				
 				try {
 					((DatasetRemoteWrapper)newTesting).exportInside(serverPort);
-				} catch (RemoteException e) {e.printStackTrace();}
+				} catch (RemoteException e) {LogUtil.trace(e);}
 			}
 			
 			
@@ -131,7 +132,7 @@ public class DatasetPoolExchanged  implements Serializable {
 				
 				try {
 					((DatasetRemoteWrapper)newWhole).exportInside(serverPort);
-				} catch (RemoteException e) {e.printStackTrace();}
+				} catch (RemoteException e) {LogUtil.trace(e);}
 			}
 
 			

@@ -42,6 +42,7 @@ import net.hudup.core.data.UnitList;
 import net.hudup.core.data.ui.DataDriverComboBox;
 import net.hudup.core.data.ui.DatasetParserComboBox;
 import net.hudup.core.data.ui.UnitListBox;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.xURI;
 import net.hudup.core.parser.DatasetParser;
@@ -420,7 +421,7 @@ public class UriChooser extends JDialog {
 				dataDriver = DataDriver.create(store);
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			dataDriver = null;
 		}
 		

@@ -22,6 +22,7 @@ import java.util.Set;
 
 import net.hudup.core.Constants;
 import net.hudup.core.Util;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.MathUtil;
 import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.xURI;
@@ -551,7 +552,7 @@ public final class TextParserUtil {
 			}
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 	}
 	
@@ -590,7 +591,7 @@ public final class TextParserUtil {
 			}
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 		
@@ -623,7 +624,7 @@ public final class TextParserUtil {
 			} 
 			catch (Exception e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 			
 		}
@@ -706,7 +707,7 @@ public final class TextParserUtil {
 		}
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 			v = null;
 		} 
 	
@@ -726,7 +727,7 @@ public final class TextParserUtil {
 		}
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 			return null;
 		}
 	}

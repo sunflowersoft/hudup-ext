@@ -16,6 +16,8 @@ import org.apache.commons.io.output.WriterOutputStream;
 import com.cedarsoftware.util.io.JsonReader;
 import com.cedarsoftware.util.io.JsonWriter;
 
+import net.hudup.core.logistic.LogUtil;
+
 /**
  * This utility class is used to process (read, write, etc.) JSON string, JSON archive (file).
  * JSON (JavaScript Object Notation) is a human-read format used for interchange between many protocols, available at <a href="http://www.json.org/">http://www.json.org</a>.
@@ -36,7 +38,7 @@ public class JsonParserImpl implements JsonParser {
 		} 
 		catch (Exception e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 		return null;
@@ -53,7 +55,7 @@ public class JsonParserImpl implements JsonParser {
 			jsonWriter.flush();
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			result = false;
 		}
 		finally {
@@ -71,7 +73,7 @@ public class JsonParserImpl implements JsonParser {
 		}
 		catch (Exception e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 		return null;
@@ -87,7 +89,7 @@ public class JsonParserImpl implements JsonParser {
 			parsedObject = jsonReader.readObject();
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			parsedObject = null;
 		}
 		finally {
@@ -146,7 +148,7 @@ public class JsonParserImpl implements JsonParser {
 //			return gson.fromJson(json, type);
 //		}
 //		catch (Throwable e) {
-//			e.printStackTrace();
+//			LogUtil.trace(e);
 //		}
 //		return null;
 //	}
@@ -168,7 +170,7 @@ public class JsonParserImpl implements JsonParser {
 //			return gson.fromJson(reader, type);
 //		}
 //		catch (Throwable e) {
-//			e.printStackTrace();
+//			LogUtil.trace(e);
 //		}
 //		return null;
 //	}

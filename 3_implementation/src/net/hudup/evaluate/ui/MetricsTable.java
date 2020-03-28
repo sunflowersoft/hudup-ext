@@ -29,6 +29,7 @@ import net.hudup.core.evaluate.MetricWrapper;
 import net.hudup.core.evaluate.Metrics;
 import net.hudup.core.evaluate.MetricsUtil;
 import net.hudup.core.logistic.ClipboardUtil;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.ui.DescriptionDlg;
 import net.hudup.core.logistic.ui.SortableTable;
 import net.hudup.core.logistic.ui.SortableTableModel;
@@ -149,7 +150,7 @@ public class MetricsTable extends SortableTable {
 			datasetId = Integer.parseInt(datasetId.toString());
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			return null;
 		}
 		
@@ -325,7 +326,7 @@ class MetricsTM extends SortableTableModel {
 					
 				data.add(row);
 			}
-			catch (Throwable e) {e.printStackTrace();}
+			catch (Throwable e) {LogUtil.trace(e);}
 		}
 		
 		
@@ -333,7 +334,7 @@ class MetricsTM extends SortableTableModel {
 			setDataVector(data, columns);
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 	}
 	
@@ -351,7 +352,7 @@ class MetricsTM extends SortableTableModel {
 			setDataVector(data, columns);
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 	}
 	

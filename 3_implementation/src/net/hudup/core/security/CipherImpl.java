@@ -16,6 +16,7 @@ import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.xURI;
 import sun.misc.BASE64Decoder;
@@ -63,7 +64,7 @@ public class CipherImpl implements Cipher {
 	        return toHex(code);
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			return data;
 		}
 		
@@ -83,7 +84,7 @@ public class CipherImpl implements Cipher {
 	        return text;
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			return encrypted;
 		}
 		
@@ -134,7 +135,7 @@ public class CipherImpl implements Cipher {
 		} 
 		catch (NoSuchAlgorithmException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 		return null;
@@ -156,7 +157,7 @@ public class CipherImpl implements Cipher {
 		} 
 		catch (Exception e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 	}
 	
@@ -191,7 +192,7 @@ public class CipherImpl implements Cipher {
 		    return new SecretKeySpec(encoded, CALG); 
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 		return null;
@@ -230,7 +231,7 @@ public class CipherImpl implements Cipher {
 			return KeyGenerator.getInstance(CALG).generateKey();
 		} catch (NoSuchAlgorithmException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		return null;
 	}

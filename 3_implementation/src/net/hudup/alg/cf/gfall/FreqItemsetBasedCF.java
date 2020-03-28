@@ -43,6 +43,7 @@ import net.hudup.core.evaluate.recommend.Accuracy;
 import net.hudup.core.logistic.DSUtil;
 import net.hudup.core.logistic.Inspector;
 import net.hudup.core.logistic.LineProcessor;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.MinMax;
 import net.hudup.core.logistic.RatingFilter;
 import net.hudup.core.logistic.UriAdapter;
@@ -405,7 +406,7 @@ abstract class FreqItemsetKB extends KBaseAbstract {
 			
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		finally {
 			try {
@@ -413,7 +414,7 @@ abstract class FreqItemsetKB extends KBaseAbstract {
 					resultReader.close();
 			}
 			catch (Exception e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 
 			try {
@@ -421,7 +422,7 @@ abstract class FreqItemsetKB extends KBaseAbstract {
 					bitMapReader.close();
 			}
 			catch (Exception e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 			
 			if (adapter != null)
@@ -502,7 +503,7 @@ abstract class FreqItemsetKB extends KBaseAbstract {
 			
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		finally {
 			try {
@@ -510,7 +511,7 @@ abstract class FreqItemsetKB extends KBaseAbstract {
 					resultWriter.close();
 			}
 			catch (Exception e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 
 			try {
@@ -518,7 +519,7 @@ abstract class FreqItemsetKB extends KBaseAbstract {
 					bitMapWriter.close();
 			}
 			catch (Exception e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 			
 			if (adapter != null)

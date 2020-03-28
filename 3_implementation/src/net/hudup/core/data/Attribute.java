@@ -499,6 +499,44 @@ public class Attribute implements Cloneable, TextParsable, Serializable {
 
 	
 	/**
+	 * Testing whether the attribute is time type in mili-seconds.
+	 * @return whether the attribute is time type in mili-seconds.
+	 */
+	public boolean isTime() {
+		return isTime(type);
+	}
+
+	
+	/**
+	 * Testing whether the specified type is time type in mili-seconds.
+	 * @param type type.
+	 * @return whether the specified type is time type in mili-seconds.
+	 */
+	public static boolean isTime(Type type) {
+		return type == Type.time;
+	}
+	
+	
+	/**
+	 * Testing whether the attribute is long number. In Hudup framework, long number is also time in mili-seconds.
+	 * @return whether the attribute is long number.
+	 */
+	public boolean isLong() {
+		return isLong(type);
+	}
+
+	
+	/**
+	 * Testing whether the specified type is long number. In Hudup framework, long number is also time in mili-seconds.
+	 * @param type type.
+	 * @return whether the specified type is long number.
+	 */
+	public static boolean isLong(Type type) {
+		return type == Type.time;
+	}
+
+	
+	/**
 	 * Retrieving a string array of discrete values when this attribute has category type.
 	 * For example, if this attribute has binary (bit) type, the method returns the array <code>{&quot;0&quot;, &quot;1&quot;}</code>.
 	 * If this attribute indicates weekdays (nominal type), the method returns the array <code>{&quot;Monday&quot;, &quot;Tuesday&quot;, &quot;Wednesday&quot;, &quot;Thursday&quot;, &quot;Friday&quot;, &quot;Saturday&quot;, &quot;Sunday&quot;}</code>.

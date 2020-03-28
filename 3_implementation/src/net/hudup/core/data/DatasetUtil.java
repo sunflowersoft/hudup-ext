@@ -11,6 +11,7 @@ import java.util.Set;
 
 import net.hudup.core.Constants;
 import net.hudup.core.Util;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.xURI;
 import net.hudup.core.parser.DatasetParser;
 
@@ -44,7 +45,7 @@ public final class DatasetUtil {
 			return parser.parse(config);
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			
 		}
 		return null;
@@ -92,13 +93,13 @@ public final class DatasetUtil {
 				if (count > 0) ids.add(vRating.id());
 			}
 		}
-		catch (Throwable e) {e.printStackTrace();}
+		catch (Throwable e) {LogUtil.trace(e);}
 		
 		if (autoClose) {
 			try {
 				fetcher.close();
 			}
-			catch (Throwable e) {e.printStackTrace();}
+			catch (Throwable e) {LogUtil.trace(e);}
 		}
 		
 		return ids;

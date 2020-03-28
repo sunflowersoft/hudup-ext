@@ -119,7 +119,7 @@ public class DefaultServer extends PowerServerImpl {
 			service.evaluatorConfigMap.clear();
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 		service.close();
@@ -152,7 +152,7 @@ public class DefaultServer extends PowerServerImpl {
 		} 
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 			LogUtil.error("Server fail to initialize storage system, error is " + e.getMessage());
 		}
 	}
@@ -172,12 +172,12 @@ public class DefaultServer extends PowerServerImpl {
 				// TODO Auto-generated catch block
 				if (e instanceof SQLException) {
 					if (! ((SQLException)e).getSQLState().equals("XJ015") ) {
-						e.printStackTrace();
+						LogUtil.trace(e);
 						LogUtil.error("Server fail to destroy storage system (shutdown Derby engine), error is " + e.getMessage());
 					}
 				}
 				else {
-					e.printStackTrace();
+					LogUtil.trace(e);
 					LogUtil.error("Server fail to destroy storage system (shutdown Derby engine), error is " + e.getMessage());
 				}
 			}
@@ -330,7 +330,7 @@ public class DefaultServer extends PowerServerImpl {
 			return true;
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			LogUtil.error("Server fail to create system tray fail, caused by" + e.getMessage());
 		}
 		
@@ -355,7 +355,7 @@ public class DefaultServer extends PowerServerImpl {
 			new PowerServerCP(this);
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			LogUtil.error("Server fail to show control panel, caused by " + e.getMessage());
 			
 			/*
@@ -461,7 +461,7 @@ public class DefaultServer extends PowerServerImpl {
 			}
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			LogUtil.error("Server require set up cause error " + e.getMessage());
 			return true;
 		}

@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Set;
 
 import net.hudup.core.Util;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.parser.TextParsable;
 import net.hudup.core.parser.TextParserUtil;
 
@@ -94,7 +95,7 @@ public class MemFetcher<E /*extends Serializable*/> implements Fetcher<E> {
 		} 
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 	
 		update(data);
@@ -222,7 +223,7 @@ public class MemFetcher<E /*extends Serializable*/> implements Fetcher<E> {
 			update(dataList);
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 	}
 

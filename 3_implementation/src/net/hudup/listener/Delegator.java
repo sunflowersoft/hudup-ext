@@ -104,7 +104,7 @@ public class Delegator extends AbstractDelegator {
 		} 
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 			this.remoteService = null;
 			
 			LogUtil.error("Delegator fail to be constructed in constructor method, causes error " + e.getMessage());
@@ -120,7 +120,7 @@ public class Delegator extends AbstractDelegator {
 		} 
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 			LogUtil.error("Delegator fail to increase server request, causes error " + e.getMessage());
 		}
 		
@@ -131,7 +131,7 @@ public class Delegator extends AbstractDelegator {
 		} 
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 			LogUtil.error("Delegator fail to decrease server request, causes error " + e.getMessage());
 		}
 		
@@ -204,7 +204,7 @@ public class Delegator extends AbstractDelegator {
 			return true;
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			LogUtil.error("Delegator fail to handle request, error is " + e.getMessage());
 		}
 		
@@ -371,7 +371,7 @@ public class Delegator extends AbstractDelegator {
 				return Response.create(remoteService.getAlgDescs());
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			LogUtil.error("Delegator fail to process request, error is " + e.getMessage());
 		}
 		
@@ -386,7 +386,7 @@ public class Delegator extends AbstractDelegator {
 			return remoteServer.validateAccount(account, password, privileges);
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 		return false;
@@ -478,7 +478,7 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluateListen
 			export(delegator.socketServer.getConfig().getAsInt(ListenerConfig.EXPORT_PORT_FIELD));
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 	}
 	
@@ -658,7 +658,7 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluateListen
 				listener.receivedEvaluator(evt);
 			}
 			catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 		}
     }
@@ -709,7 +709,7 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluateListen
 				listener.receivedEvaluation(evt);
 			}
 			catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 		}
 	
@@ -762,7 +762,7 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluateListen
 				listener.receivedProgress(evt);
 			}
 			catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 		}
 	
@@ -815,7 +815,7 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluateListen
 				listener.receivedSetup(evt);
 			}
 			catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 		}
 	
@@ -875,7 +875,7 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluateListen
 				listener.receivedElapsedTime(evt);
 			}
 			catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 		}
     }
@@ -1024,7 +1024,7 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluateListen
 				remoteEvaluator.addEvaluateProgressListener(this);
 				remoteEvaluator.addSetupAlgListener(this);
 				remoteEvaluator.addElapsedTimeListener(this);
-			} catch (Exception e) {e.printStackTrace();}
+			} catch (Exception e) {LogUtil.trace(e);}
 			
 			socketServer.addRunner(this);
 			remoteServer.incRequest();
@@ -1049,7 +1049,7 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluateListen
 				remoteEvaluator.removeElapsedTimeListener(this);
 				if (!remoteEvaluator.isAgent())
 					remoteEvaluator.unexport();
-			} catch (Exception e) {e.printStackTrace();}
+			} catch (Exception e) {LogUtil.trace(e);}
 			
 			socketServer.removeRunner(this);
 			boolean ret = NetUtil.RegistryRemote.unexport(this);
@@ -1125,7 +1125,7 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluateListen
 			unexport();
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 	}
 
@@ -1139,7 +1139,7 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluateListen
 		}
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		return DSUtil.shortenVerbalName(evaluatorName);
 	}
@@ -1154,7 +1154,7 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluateListen
 			close();
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 	}
 			

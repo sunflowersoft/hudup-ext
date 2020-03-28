@@ -40,6 +40,7 @@ import net.hudup.core.data.Nominal;
 import net.hudup.core.data.NominalList;
 import net.hudup.core.data.ObjectPair;
 import net.hudup.core.data.Pointer;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.xURI;
 import net.hudup.core.parser.DatasetParser;
@@ -170,7 +171,7 @@ public final class DatasetUtil2 {
 			
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 		return chooseConfig(
@@ -292,7 +293,7 @@ public final class DatasetUtil2 {
 				defaultConfig.setParser(new RmiServerIndicator());
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 		return chooseConfig(
@@ -318,7 +319,7 @@ public final class DatasetUtil2 {
 		} 
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		adapter.close();
 		
@@ -461,12 +462,12 @@ public final class DatasetUtil2 {
 					list.add(pair);
 				}
 				catch (Exception e) {
-					e.printStackTrace();
+					LogUtil.trace(e);
 				}
 			}
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 		Set<String> attNames = map.keySet();
@@ -504,7 +505,7 @@ public final class DatasetUtil2 {
 			reader.close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 		return attributeMap;
@@ -543,7 +544,7 @@ public final class DatasetUtil2 {
 				}
 			}
 			catch (Exception e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 		}
 		
@@ -551,7 +552,7 @@ public final class DatasetUtil2 {
 			buffer.flush();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 	}
@@ -579,7 +580,7 @@ public final class DatasetUtil2 {
 			writer.close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 	}

@@ -18,6 +18,7 @@ import net.hudup.core.data.AttributeList;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.Fetcher;
 import net.hudup.core.data.Profile;
+import net.hudup.core.logistic.LogUtil;
 
 /**
  * Table to show user/item profiles.
@@ -127,7 +128,7 @@ class UserProfileTableModel extends DefaultTableModel {
 			}
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		finally {
 			try {
@@ -135,7 +136,7 @@ class UserProfileTableModel extends DefaultTableModel {
 			} 
 			catch (Throwable e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 		}
 		

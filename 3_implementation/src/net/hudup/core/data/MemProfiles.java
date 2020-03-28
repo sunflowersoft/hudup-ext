@@ -14,6 +14,7 @@ import java.util.Set;
 
 import net.hudup.core.Util;
 import net.hudup.core.data.Attribute.Type;
+import net.hudup.core.logistic.LogUtil;
 
 /**
  * This class represents a collection of many profiles. It can be considered as a table or storage in memory.
@@ -143,7 +144,7 @@ public class MemProfiles implements Profiles {
 				profileMap.put(profileId, profile);
 			}
 			catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 			
 		}
@@ -306,7 +307,7 @@ public class MemProfiles implements Profiles {
 			}
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		finally {
 			try {
@@ -317,7 +318,7 @@ public class MemProfiles implements Profiles {
 			} 
 			catch (Throwable e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 		}
 	
@@ -338,7 +339,7 @@ public class MemProfiles implements Profiles {
 			clear();
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 	}
 

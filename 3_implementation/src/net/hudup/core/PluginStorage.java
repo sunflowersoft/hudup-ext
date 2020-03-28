@@ -17,6 +17,7 @@ import net.hudup.core.data.ExternalQuery;
 import net.hudup.core.data.ctx.CTSManager;
 import net.hudup.core.evaluate.Evaluator;
 import net.hudup.core.evaluate.Metric;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.parser.DatasetParser;
 
 /**
@@ -196,7 +197,7 @@ public class PluginStorage implements Serializable {
 							if (alg instanceof Exportable)
 								((Exportable)alg).unexport();
 						}
-						catch (Throwable e) {e.printStackTrace();}
+						catch (Throwable e) {LogUtil.trace(e);}
 					}
 					
 					registeredTable.clear();
@@ -208,12 +209,12 @@ public class PluginStorage implements Serializable {
 						if (alg instanceof Exportable)
 							((Exportable)alg).unexport();
 					}
-					catch (Throwable e) {e.printStackTrace();}
+					catch (Throwable e) {LogUtil.trace(e);}
 				}
 				nextUpdateList.clear();
 			}
 		}
-		catch (Throwable e) {e.printStackTrace();}
+		catch (Throwable e) {LogUtil.trace(e);}
 	}
 	
 	
@@ -230,6 +231,46 @@ public class PluginStorage implements Serializable {
 				new RegisterTableList.RegisterTableItem(CTS_MANAGER, ctsmReg)); 
 	}
 	
+	
+	/**
+	 * Testing whether the specified algorithm is normal algorithm.
+	 * @param alg specified algorithm.
+	 * @return whether the specified algorithm is normal algorithm.
+	 */
+	public final static boolean isNormalAlg(Alg alg) {
+		if (alg == null)
+			return false;
+		else if (alg instanceof DatasetParser)
+			return false;
+		else if (alg instanceof Metric)
+			return false;
+		else if (alg instanceof ExternalQuery)
+			return false;
+		else if (alg instanceof CTSManager)
+			return false;
+		else
+			return true;
+	}
+	
+	
+	/**
+	 * Testing whether the specified algorithm class is class of normal algorithm.
+	 * @param algClass specified algorithm class.
+	 * @return whether the specified algorithm class is class of normal algorithm.
+	 */
+	public final static boolean isNormalAlg(Class<? extends Alg> algClass) {
+		if (DatasetParser.class.isAssignableFrom(algClass))
+			return false;
+		else if (Metric.class.isAssignableFrom(algClass))
+			return false;
+		else if (ExternalQuery.class.isAssignableFrom(algClass))
+			return false;
+		else if (CTSManager.class.isAssignableFrom(algClass))
+			return false;
+		else
+			return true;
+	}
+
 	
 	/**
 	 * Looking up class.
@@ -417,7 +458,7 @@ public class PluginStorage implements Serializable {
 		List<String> algEvNames = Util.newList();
 		try {
 			algEvNames = evaluator.getPluginAlgNames(algClass);
-		} catch (Exception e) {e.printStackTrace();}
+		} catch (Exception e) {LogUtil.trace(e);}
 		
 		RegisterTable algReg = PluginStorage.lookupTable(algClass);
 		for (String algEvName : algEvNames) {
@@ -450,7 +491,7 @@ public class PluginStorage implements Serializable {
 			if (alg instanceof Exportable) {
 				try {
 					((Exportable)alg).unexport(); //Finalize method will call unsetup method if unsetup method exists in this algorithm.
-				} catch (Throwable e) {e.printStackTrace();}
+				} catch (Throwable e) {LogUtil.trace(e);}
 			}
 			
 			algReg.unregister(algName);
@@ -462,7 +503,7 @@ public class PluginStorage implements Serializable {
 				if (nextUpdateAlg instanceof Exportable) {
 					try {
 						((Exportable)nextUpdateAlg).unexport(); //Finalize method will call unsetup method if unsetup method exists in this algorithm.
-					} catch (Throwable e) {e.printStackTrace();}
+					} catch (Throwable e) {LogUtil.trace(e);}
 				}
 				
 				nextUpdateList.remove(nextUpdateAlg);

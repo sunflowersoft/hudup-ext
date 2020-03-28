@@ -17,6 +17,7 @@ import net.hudup.core.data.Dataset;
 import net.hudup.core.data.Datasource;
 import net.hudup.core.data.Pointer;
 import net.hudup.core.logistic.Inspector;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.NetUtil;
 import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.UriFilter;
@@ -181,7 +182,7 @@ public abstract class KBaseAbstract implements KBase, KBaseRemote {
 		
 		try {
 			close();
-		} catch (Throwable e) {e.printStackTrace();}
+		} catch (Throwable e) {LogUtil.trace(e);}
 	}
 
 
@@ -298,7 +299,7 @@ public abstract class KBaseAbstract implements KBase, KBaseRemote {
 				listener.receivedSetup(evt);
 			}
 			catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 		}
 	}
@@ -369,11 +370,11 @@ public abstract class KBaseAbstract implements KBase, KBaseRemote {
 		
 		try {
 			if (!isEmpty()) close();
-		} catch (Throwable e) {e.printStackTrace();}
+		} catch (Throwable e) {LogUtil.trace(e);}
 		
 		try {
 			unexport();
-		} catch (Throwable e) {e.printStackTrace();}
+		} catch (Throwable e) {LogUtil.trace(e);}
 	}
 
 

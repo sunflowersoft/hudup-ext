@@ -198,7 +198,7 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 					
 					config.setEvaluatorPort(evaluatorPort);
 				}
-			} catch (Throwable e) {e.printStackTrace();}
+			} catch (Throwable e) {LogUtil.trace(e);}
 		}
 
 		setupListeners(evaluator);
@@ -216,7 +216,7 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 			try {
 				if (bindUri != null && evaluator.acceptAlg(referredAlg))
 					algRegTable = new RegisterTable(Arrays.asList(referredAlg));
-			} catch (Throwable e) {e.printStackTrace();}
+			} catch (Throwable e) {LogUtil.trace(e);}
 		}
 		else {
 			if (bindUri != null) {
@@ -226,7 +226,7 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 			else {
 				try {
 					algRegTable = EvaluatorAbstract.extractNormalAlgFromPluginStorage(evaluator);
-				} catch (Throwable e) {e.printStackTrace();}
+				} catch (Throwable e) {LogUtil.trace(e);}
 			}
 		}
 		if (algRegTable == null) algRegTable = new RegisterTable();
@@ -237,11 +237,11 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 		
 		try {
 			result = evaluator.getResult(); //From server
-		} catch (RemoteException e) {e.printStackTrace();}
+		} catch (RemoteException e) {LogUtil.trace(e);}
 
 		try {
 			otherResult = evaluator.getOtherResult(); //From server
-		} catch (RemoteException e) {e.printStackTrace();}
+		} catch (RemoteException e) {LogUtil.trace(e);}
 		if (otherResult == null) otherResult = new EvaluateInfo();
 
 		try {
@@ -250,7 +250,7 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 				guiData.algNames = otherResult.algNames;
 			}
 		}
-		catch (RemoteException e) {e.printStackTrace();}
+		catch (RemoteException e) {LogUtil.trace(e);}
 		if (guiData.algNames == null || guiData.algNames.size() == 0)
 			guiData.algNames = algRegTable.getAlgNames();
 		else
@@ -260,7 +260,7 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 		try {
 			DatasetPoolExchanged pool = evaluator.getDatasetPool();
 			guiData.pool = pool != null ? pool.toDatasetPoolClient() : null;
-		} catch (Throwable e) {e.printStackTrace();}
+		} catch (Throwable e) {LogUtil.trace(e);}
 		if (guiData.pool == null) {
 			if (oldPool != null)
 				guiData.pool = oldPool;
@@ -272,7 +272,7 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 			String evStorePath = null;
 			try {
 				evStorePath = evaluator.getEvaluateStorePath();
-			} catch (Throwable e) {e.printStackTrace();}
+			} catch (Throwable e) {LogUtil.trace(e);}
 			
 			if (guiData.txtRunSaveBrowse == null)
 				guiData.txtRunSaveBrowse = evStorePath;
@@ -332,7 +332,7 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 			if (!ret) updateMode();
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			updateMode();
 		}
 	}
@@ -352,7 +352,7 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 		}
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 			updateMode(); //Added date: 2019.08.12 by Loc Nguyen
 		}
 	}
@@ -372,7 +372,7 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 		}
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 			updateMode(); //Added date: 2019.08.12 by Loc Nguyen
 		}
 	}
@@ -395,7 +395,7 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 			wrapper = evaluator.isWrapper();
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 		if (agent) {
@@ -405,7 +405,7 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 				try {
 					evaluator.close(); //The close() method also unexports evaluator wrapper.
 				}
-				catch (Exception e) {e.printStackTrace();}
+				catch (Exception e) {LogUtil.trace(e);}
 			}
 			else
 				unsetupListeners(evaluator);
@@ -419,7 +419,7 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 			try {
 				evaluator.close(); //The close() method also unexports evaluator.
 			}
-			catch (Exception e) {e.printStackTrace();}
+			catch (Exception e) {LogUtil.trace(e);}
 		}
 		
 		this.evProcessor.clear();
@@ -484,7 +484,7 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 		}
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 			LogUtil.error("Error in setting metrics");
 		}
 	}
@@ -498,7 +498,7 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 		}
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 			return false;
 		}
 	}
@@ -518,7 +518,7 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 		else { //Evaluator is local
 			try {
 				return evaluator.getConfig().getEvaluatorPort();
-			} catch (Throwable e) {e.printStackTrace();}
+			} catch (Throwable e) {LogUtil.trace(e);}
 			
 			return -1;
 		}
@@ -538,7 +538,7 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 			evaluator.addElapsedTimeListener(this);
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 	}
 	
@@ -556,7 +556,7 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 			evaluator.removeElapsedTimeListener(this);
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 	}
 
@@ -612,7 +612,7 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 			}
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 	}
 	
@@ -639,7 +639,7 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 				if (alg != null) algRegTable.register(alg);
 			}
 			catch (Exception e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 		}
 	}

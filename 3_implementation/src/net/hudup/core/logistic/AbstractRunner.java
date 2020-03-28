@@ -46,7 +46,7 @@ public abstract class AbstractRunner implements Runner {
 				task();
 			}
 			catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 
 			synchronized (this) {
@@ -56,7 +56,7 @@ public abstract class AbstractRunner implements Runner {
 						wait();
 					}
 					catch (Throwable e) {
-						e.printStackTrace();
+						LogUtil.trace(e);
 					}
 				}
 			}
@@ -106,7 +106,7 @@ public abstract class AbstractRunner implements Runner {
 		} 
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 		return true;
@@ -146,7 +146,7 @@ public abstract class AbstractRunner implements Runner {
 		} 
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 		return true;

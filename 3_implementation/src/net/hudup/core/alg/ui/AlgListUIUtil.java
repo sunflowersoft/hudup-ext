@@ -21,6 +21,7 @@ import net.hudup.core.alg.KBase;
 import net.hudup.core.alg.ModelBasedAlg;
 import net.hudup.core.logistic.Inspectable;
 import net.hudup.core.logistic.Inspector;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.NextUpdate;
 import net.hudup.core.logistic.ui.UIUtil;
 
@@ -100,7 +101,7 @@ public final class AlgListUIUtil {
 			KBase kb = null;
 			try {
 				kb = ((ModelBasedAlg)alg).getKBase();
-			} catch (Throwable e) {e.printStackTrace(); kb = null;}
+			} catch (Throwable e) {LogUtil.trace(e); kb = null;}
 			
 			boolean empty = false;
 			if (kb == null)
@@ -109,7 +110,7 @@ public final class AlgListUIUtil {
 				try {
 					empty = kb.isEmpty();
 				}
-				catch (Throwable e) {e.printStackTrace(); empty = true;}
+				catch (Throwable e) {LogUtil.trace(e); empty = true;}
 			}
 			
 			final KBase kbase = kb;

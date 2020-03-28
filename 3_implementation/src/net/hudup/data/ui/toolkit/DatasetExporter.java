@@ -23,6 +23,7 @@ import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.DataDriverList;
 import net.hudup.core.data.Provider;
 import net.hudup.core.data.ui.DataConfigTextField;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.ui.ProgressEvent;
 import net.hudup.core.logistic.ui.ProgressListener;
 import net.hudup.data.ProviderImpl;
@@ -311,7 +312,7 @@ public class DatasetExporter extends JPanel implements ProgressListener, Dispose
 			runningThread.stop();
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 	}
 

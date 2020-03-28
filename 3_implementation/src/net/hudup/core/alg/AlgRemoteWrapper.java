@@ -130,7 +130,7 @@ public class AlgRemoteWrapper implements Alg, AlgRemote, Serializable {
 		// TODO Auto-generated method stub
 		try {
 			return remoteAlg.queryConfig();
-		} catch (Exception e) { e.printStackTrace(); }
+		} catch (Exception e) { LogUtil.trace(e); }
 		
 		return null;
 	}
@@ -163,7 +163,7 @@ public class AlgRemoteWrapper implements Alg, AlgRemote, Serializable {
 		// TODO Auto-generated method stub
 		try {
 			return remoteAlg.queryName();
-		} catch (Exception e) { e.printStackTrace(); }
+		} catch (Exception e) { LogUtil.trace(e); }
 		
 		return null;
 	}
@@ -235,7 +235,7 @@ public class AlgRemoteWrapper implements Alg, AlgRemote, Serializable {
 			try {
 				//if (!remoteAlg.isAgent())
 					remoteAlg.unexport();
-			} catch (Exception e) {e.printStackTrace();}
+			} catch (Exception e) {LogUtil.trace(e);}
 		}
 		remoteAlg = null;
 		
@@ -253,7 +253,7 @@ public class AlgRemoteWrapper implements Alg, AlgRemote, Serializable {
 			try {
 				//if (!remoteAlg.isAgent())
 					remoteAlg.unexport();
-			} catch (Exception e) {e.printStackTrace();}
+			} catch (Exception e) {LogUtil.trace(e);}
 		}
 		remoteAlg = null;
 		
@@ -306,7 +306,7 @@ public class AlgRemoteWrapper implements Alg, AlgRemote, Serializable {
 			unexport();
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 	}
 

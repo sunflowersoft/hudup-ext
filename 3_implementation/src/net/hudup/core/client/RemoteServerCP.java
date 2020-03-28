@@ -30,6 +30,7 @@ import javax.swing.JPanel;
 import net.hudup.core.client.ServerStatusEvent.Status;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.ui.PropPane;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.NextUpdate;
 import net.hudup.core.logistic.xURI;
 import net.hudup.core.logistic.ui.UIUtil;
@@ -249,7 +250,7 @@ public class RemoteServerCP extends JFrame implements ServerStatusListener {
 			setVisible(true);
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 		
@@ -273,7 +274,7 @@ public class RemoteServerCP extends JFrame implements ServerStatusListener {
 					throw new Exception();
 			}
 			catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 				
 				try {
 		        	UnicastRemoteObject.unexportObject(this, true);
@@ -314,7 +315,7 @@ public class RemoteServerCP extends JFrame implements ServerStatusListener {
 		} 
 		catch (Exception e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 	}
 	
@@ -333,7 +334,7 @@ public class RemoteServerCP extends JFrame implements ServerStatusListener {
 				updateControls();
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 	}
 	
@@ -350,7 +351,7 @@ public class RemoteServerCP extends JFrame implements ServerStatusListener {
 		}
 		catch (Exception e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 	}
 	
@@ -387,7 +388,7 @@ public class RemoteServerCP extends JFrame implements ServerStatusListener {
 					JOptionPane.INFORMATION_MESSAGE);
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 	}
 	
@@ -415,7 +416,7 @@ public class RemoteServerCP extends JFrame implements ServerStatusListener {
 					JOptionPane.INFORMATION_MESSAGE);
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 	}
 	
@@ -483,7 +484,7 @@ public class RemoteServerCP extends JFrame implements ServerStatusListener {
 				paneConfig.update(server.getConfig());
 			}
 			catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 		}
 		else if (status == Status.paused) {
@@ -544,7 +545,7 @@ public class RemoteServerCP extends JFrame implements ServerStatusListener {
     			server.removeStatusListener(this);
     	}
     	catch (Throwable e) {
-    		e.printStackTrace();
+    		LogUtil.trace(e);
     	}
 		
     	try {
@@ -552,7 +553,7 @@ public class RemoteServerCP extends JFrame implements ServerStatusListener {
     			UnicastRemoteObject.unexportObject(this, true);
     	}
     	catch (Throwable e) {
-    		e.printStackTrace();
+    		LogUtil.trace(e);
     	}
 
     	try {
@@ -560,7 +561,7 @@ public class RemoteServerCP extends JFrame implements ServerStatusListener {
     			UnicastRemoteObject.unexportObject(registry, true);
     	}
     	catch (Throwable e) {
-    		e.printStackTrace();
+    		LogUtil.trace(e);
     	}
     	
     	

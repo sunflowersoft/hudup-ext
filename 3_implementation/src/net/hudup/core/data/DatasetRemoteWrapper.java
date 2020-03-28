@@ -79,7 +79,7 @@ public class DatasetRemoteWrapper implements Dataset, DatasetRemote {
 		try {
 			return remoteDataset.remoteGetConfig();
 		}
-		catch (Exception e) {e.printStackTrace();}
+		catch (Exception e) {LogUtil.trace(e);}
 		
 		return null;
 	}
@@ -103,7 +103,7 @@ public class DatasetRemoteWrapper implements Dataset, DatasetRemote {
 		try {
 			return FetcherUtil.fixFetcherSerialized(remoteDataset.remoteFetchUserIds());
 		}
-		catch (Exception e) {e.printStackTrace();}
+		catch (Exception e) {LogUtil.trace(e);}
 		
 		return new MemFetcher<>();
 	}
@@ -115,7 +115,7 @@ public class DatasetRemoteWrapper implements Dataset, DatasetRemote {
 		try {
 			return remoteDataset.remoteGetUserId(externalUserId);
 		}
-		catch (Exception e) {e.printStackTrace();}
+		catch (Exception e) {LogUtil.trace(e);}
 		
 		return -1;
 	}
@@ -127,7 +127,7 @@ public class DatasetRemoteWrapper implements Dataset, DatasetRemote {
 		try {
 			return remoteDataset.remoteGetUserExternalRecord(userId);
 		}
-		catch (Exception e) {e.printStackTrace();}
+		catch (Exception e) {LogUtil.trace(e);}
 
 		return null;
 	}
@@ -139,7 +139,7 @@ public class DatasetRemoteWrapper implements Dataset, DatasetRemote {
 		try {
 			return FetcherUtil.fixFetcherSerialized(remoteDataset.remoteFetchItemIds());
 		}
-		catch (Exception e) {e.printStackTrace();}
+		catch (Exception e) {LogUtil.trace(e);}
 		
 		return new MemFetcher<>();
 	}
@@ -151,7 +151,7 @@ public class DatasetRemoteWrapper implements Dataset, DatasetRemote {
 		try {
 			return remoteDataset.remoteGetItemId(externalItemId);
 		}
-		catch (Exception e) {e.printStackTrace();}
+		catch (Exception e) {LogUtil.trace(e);}
 
 		return -1;
 	}
@@ -163,7 +163,7 @@ public class DatasetRemoteWrapper implements Dataset, DatasetRemote {
 		try {
 			return remoteDataset.remoteGetItemExternalRecord(itemId);
 		}
-		catch (Exception e) {e.printStackTrace();}
+		catch (Exception e) {LogUtil.trace(e);}
 
 		return null;
 	}
@@ -175,7 +175,7 @@ public class DatasetRemoteWrapper implements Dataset, DatasetRemote {
 		try {
 			return remoteDataset.remoteGetRating(userId, itemId);
 		}
-		catch (Exception e) {e.printStackTrace();}
+		catch (Exception e) {LogUtil.trace(e);}
 
 		return null;
 	}
@@ -187,7 +187,7 @@ public class DatasetRemoteWrapper implements Dataset, DatasetRemote {
 		try {
 			return remoteDataset.remoteGetUserRating(userId);
 		}
-		catch (Exception e) {e.printStackTrace();}
+		catch (Exception e) {LogUtil.trace(e);}
 
 		return null;
 	}
@@ -199,7 +199,7 @@ public class DatasetRemoteWrapper implements Dataset, DatasetRemote {
 		try {
 			return FetcherUtil.fixFetcherSerialized(remoteDataset.remoteFetchUserRatings());
 		}
-		catch (Exception e) {e.printStackTrace();}
+		catch (Exception e) {LogUtil.trace(e);}
 		
 		return new MemFetcher<>();
 	}
@@ -211,7 +211,7 @@ public class DatasetRemoteWrapper implements Dataset, DatasetRemote {
 		try {
 			return remoteDataset.remoteGetItemRating(itemId);
 		}
-		catch (Exception e) {e.printStackTrace();}
+		catch (Exception e) {LogUtil.trace(e);}
 
 		return null;
 	}
@@ -223,7 +223,7 @@ public class DatasetRemoteWrapper implements Dataset, DatasetRemote {
 		try {
 			return FetcherUtil.fixFetcherSerialized(remoteDataset.remoteFetchItemRatings());
 		}
-		catch (Exception e) {e.printStackTrace();}
+		catch (Exception e) {LogUtil.trace(e);}
 		
 		return new MemFetcher<>();
 	}
@@ -235,7 +235,7 @@ public class DatasetRemoteWrapper implements Dataset, DatasetRemote {
 		try {
 			return remoteDataset.remoteCreateUserMatrix();
 		}
-		catch (Exception e) {e.printStackTrace();}
+		catch (Exception e) {LogUtil.trace(e);}
 
 		return null;
 	}
@@ -247,7 +247,7 @@ public class DatasetRemoteWrapper implements Dataset, DatasetRemote {
 		try {
 			return remoteDataset.remoteCreateItemMatrix();
 		}
-		catch (Exception e) {e.printStackTrace();}
+		catch (Exception e) {LogUtil.trace(e);}
 
 		return null;
 	}
@@ -259,7 +259,7 @@ public class DatasetRemoteWrapper implements Dataset, DatasetRemote {
 		try {
 			return remoteDataset.remoteGetUserProfile(userId);
 		}
-		catch (Exception e) {e.printStackTrace();}
+		catch (Exception e) {LogUtil.trace(e);}
 
 		return null;
 	}
@@ -271,7 +271,7 @@ public class DatasetRemoteWrapper implements Dataset, DatasetRemote {
 		try {
 			return FetcherUtil.fixFetcherSerialized(remoteDataset.remoteFetchUserProfiles());
 		}
-		catch (Exception e) {e.printStackTrace();}
+		catch (Exception e) {LogUtil.trace(e);}
 		
 		return new MemFetcher<>();
 	}
@@ -283,7 +283,7 @@ public class DatasetRemoteWrapper implements Dataset, DatasetRemote {
 		try {
 			return remoteDataset.remoteGetUserAttributes();
 		}
-		catch (Exception e) {e.printStackTrace();}
+		catch (Exception e) {LogUtil.trace(e);}
 
 		return new AttributeList();
 	}
@@ -295,7 +295,7 @@ public class DatasetRemoteWrapper implements Dataset, DatasetRemote {
 		try {
 			return remoteDataset.remoteGetItemProfile(itemId);
 		}
-		catch (Exception e) {e.printStackTrace();}
+		catch (Exception e) {LogUtil.trace(e);}
 
 		return null;
 	}
@@ -307,7 +307,7 @@ public class DatasetRemoteWrapper implements Dataset, DatasetRemote {
 		try {
 			return FetcherUtil.fixFetcherSerialized(remoteDataset.remoteFetchItemProfiles());
 		}
-		catch (Exception e) {e.printStackTrace();}
+		catch (Exception e) {LogUtil.trace(e);}
 		
 		return new MemFetcher<>();
 	}
@@ -319,7 +319,7 @@ public class DatasetRemoteWrapper implements Dataset, DatasetRemote {
 		try {
 			return remoteDataset.remoteGetItemAttributes();
 		}
-		catch (Exception e) {e.printStackTrace();}
+		catch (Exception e) {LogUtil.trace(e);}
 
 		return new AttributeList();
 	}
@@ -331,7 +331,7 @@ public class DatasetRemoteWrapper implements Dataset, DatasetRemote {
 		try {
 			return remoteDataset.remoteProfileOf(context);
 		}
-		catch (Exception e) {e.printStackTrace();}
+		catch (Exception e) {LogUtil.trace(e);}
 
 		return null;
 	}
@@ -343,7 +343,7 @@ public class DatasetRemoteWrapper implements Dataset, DatasetRemote {
 		try {
 			return remoteDataset.remoteProfilesOf(ctxTemplateId);
 		}
-		catch (Exception e) {e.printStackTrace();}
+		catch (Exception e) {LogUtil.trace(e);}
 
 		return new MemProfiles();
 	}
@@ -355,7 +355,7 @@ public class DatasetRemoteWrapper implements Dataset, DatasetRemote {
 		try {
 			return FetcherUtil.fixFetcherSerialized(remoteDataset.remoteFetchSample());
 		}
-		catch (Exception e) {e.printStackTrace();}
+		catch (Exception e) {LogUtil.trace(e);}
 		
 		return new MemFetcher<>();
 	}
@@ -380,7 +380,7 @@ public class DatasetRemoteWrapper implements Dataset, DatasetRemote {
 		try {
 			return remoteDataset.remoteCatchup();
 		}
-		catch (Exception e) {e.printStackTrace();}
+		catch (Exception e) {LogUtil.trace(e);}
 
 		return null;
 	}
@@ -392,7 +392,7 @@ public class DatasetRemoteWrapper implements Dataset, DatasetRemote {
 		try {
 			return remoteDataset.remoteSelectByContexts(contexts);
 		}
-		catch (Exception e) {e.printStackTrace();}
+		catch (Exception e) {LogUtil.trace(e);}
 
 		return null;
 	}
@@ -404,7 +404,7 @@ public class DatasetRemoteWrapper implements Dataset, DatasetRemote {
 		try {
 			return remoteDataset.remoteIsExclusive();
 		}
-		catch (Exception e) {e.printStackTrace();}
+		catch (Exception e) {LogUtil.trace(e);}
 
 		return false;
 	}
@@ -428,7 +428,7 @@ public class DatasetRemoteWrapper implements Dataset, DatasetRemote {
 		try {
 			return remoteDataset.remoteGetCTSchema();
 		}
-		catch (Exception e) {e.printStackTrace();}
+		catch (Exception e) {LogUtil.trace(e);}
 
 		return null;
 	}
@@ -478,7 +478,7 @@ public class DatasetRemoteWrapper implements Dataset, DatasetRemote {
 		else if (remoteDataset instanceof Exportable) {
 			try {
 				return ((Exportable)remoteDataset).export(serverPort);
-			} catch (Exception e) {e.printStackTrace();}
+			} catch (Exception e) {LogUtil.trace(e);}
 			
 			return null;
 		}
@@ -493,7 +493,7 @@ public class DatasetRemoteWrapper implements Dataset, DatasetRemote {
 		if (exclusive && remoteDataset != null) {
 			try {
 				remoteDataset.unexport();
-			} catch (Exception e) {e.printStackTrace();}
+			} catch (Exception e) {LogUtil.trace(e);}
 		}
 		remoteDataset = null;
 		
@@ -510,7 +510,7 @@ public class DatasetRemoteWrapper implements Dataset, DatasetRemote {
 		if (remoteDataset != null) {
 			try {
 				remoteDataset.unexport();
-			} catch (Exception e) {e.printStackTrace();}
+			} catch (Exception e) {LogUtil.trace(e);}
 		}
 		remoteDataset = null;
 
@@ -530,13 +530,13 @@ public class DatasetRemoteWrapper implements Dataset, DatasetRemote {
 		if (exclusive && remoteDataset != null) {
 			try {
 				remoteDataset.remoteClear();
-			} catch (Exception e) {e.printStackTrace();}
+			} catch (Exception e) {LogUtil.trace(e);}
 		}
 		
 		try {
 			unexport();
 		}
-		catch (Throwable e) {e.printStackTrace();}
+		catch (Throwable e) {LogUtil.trace(e);}
 	}
 
 	
@@ -548,13 +548,13 @@ public class DatasetRemoteWrapper implements Dataset, DatasetRemote {
 		if (remoteDataset != null) {
 			try {
 				remoteDataset.remoteClear();
-			} catch (Exception e) {e.printStackTrace();}
+			} catch (Exception e) {LogUtil.trace(e);}
 		}
 		
 		try {
 			forceUnexport();
 		}
-		catch (Throwable e) {e.printStackTrace();}
+		catch (Throwable e) {LogUtil.trace(e);}
 	}
 
 	
@@ -575,7 +575,7 @@ public class DatasetRemoteWrapper implements Dataset, DatasetRemote {
 			unexport();
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 	}
 

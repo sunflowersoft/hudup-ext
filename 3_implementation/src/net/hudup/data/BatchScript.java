@@ -20,6 +20,7 @@ import net.hudup.core.data.DatasetPool;
 import net.hudup.core.data.DatasetUtil;
 import net.hudup.core.data.NullPointer;
 import net.hudup.core.data.PropList;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.xURI;
 import net.hudup.core.parser.TextParserUtil;
@@ -313,7 +314,7 @@ public class BatchScript implements Serializable {
     		}
     		catch (Throwable e) {
     			
-    			e.printStackTrace();
+    			LogUtil.trace(e);
     		}
     		
     	}

@@ -18,6 +18,7 @@ import net.hudup.core.data.Fetcher;
 import net.hudup.core.data.Pair;
 import net.hudup.core.data.RatingVector;
 import net.hudup.core.evaluate.recommend.Accuracy;
+import net.hudup.core.logistic.LogUtil;
 
 /**
  * This class implements basically the memory-based recommendation algorithm represented by the interface {@code MemoryBasedRecomender}.
@@ -146,7 +147,7 @@ public abstract class MemoryBasedRecommenderAbstract extends RecommenderAbstract
 			}
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		finally {
 			try {
@@ -154,7 +155,7 @@ public abstract class MemoryBasedRecommenderAbstract extends RecommenderAbstract
 			} 
 			catch (Throwable e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 			
 		}
@@ -240,7 +241,7 @@ public abstract class MemoryBasedRecommenderAbstract extends RecommenderAbstract
 //			}
 //		}
 //		catch (Throwable e) {
-//			e.printStackTrace();
+//			LogUtil.trace(e);
 //		}
 //		finally {
 //			try {
@@ -248,7 +249,7 @@ public abstract class MemoryBasedRecommenderAbstract extends RecommenderAbstract
 //			} 
 //			catch (Throwable e) {
 //				// TODO Auto-generated catch block
-//				e.printStackTrace();
+//				LogUtil.trace(e);
 //			}
 //			
 //		}
@@ -292,7 +293,7 @@ public abstract class MemoryBasedRecommenderAbstract extends RecommenderAbstract
 //			}
 //		}
 //		catch (Throwable e) {
-//			e.printStackTrace();
+//			LogUtil.trace(e);
 //		}
 //		finally {
 //			try {
@@ -300,7 +301,7 @@ public abstract class MemoryBasedRecommenderAbstract extends RecommenderAbstract
 //			} 
 //			catch (Throwable e) {
 //				// TODO Auto-generated catch block
-//				e.printStackTrace();
+//				LogUtil.trace(e);
 //			}
 //			
 //		}

@@ -23,6 +23,7 @@ import net.hudup.core.data.DataDriverList;
 import net.hudup.core.data.ExternalConfig;
 import net.hudup.core.data.ExternalQuery;
 import net.hudup.core.data.ui.DataConfigTextField;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.ui.ProgressEvent;
 import net.hudup.core.logistic.ui.ProgressListener;
 import net.hudup.data.DefaultExternalQuery;
@@ -251,7 +252,7 @@ public class ExternalImporter extends JPanel implements ProgressListener, Dispos
 						externalQuery.close();
 					}
 				}
-				catch (Throwable e) {e.printStackTrace();}
+				catch (Throwable e) {LogUtil.trace(e);}
 				
 				JOptionPane.showMessageDialog(
 						getThis(), 
@@ -315,7 +316,7 @@ public class ExternalImporter extends JPanel implements ProgressListener, Dispos
 			runningThread.stop();
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 	}
 

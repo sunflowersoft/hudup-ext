@@ -78,7 +78,7 @@ public class SocketConnection extends SocketWrapper implements AutoCloseable {
 			return validated;
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			close();
 			LogUtil.error("Socket connects to server fail caused by error " + e.getMessage());
 		}
@@ -120,7 +120,7 @@ public class SocketConnection extends SocketWrapper implements AutoCloseable {
 			}
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			LogUtil.error("Socket sends request to server, causes error " + e.getMessage());
 		}
 		
@@ -140,7 +140,7 @@ public class SocketConnection extends SocketWrapper implements AutoCloseable {
 			}
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			LogUtil.error("Socket connection fail to close input stream, causes error " + e.getMessage());
 		}
 		
@@ -151,7 +151,7 @@ public class SocketConnection extends SocketWrapper implements AutoCloseable {
 			}
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			LogUtil.error("Socket connection fail to close output stream, causes error " + e.getMessage());
 		}
 
@@ -162,7 +162,7 @@ public class SocketConnection extends SocketWrapper implements AutoCloseable {
 			}
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			LogUtil.error("Socket connection fail to close socket, causes error " + e.getMessage());
 		}
 	}
@@ -177,7 +177,7 @@ public class SocketConnection extends SocketWrapper implements AutoCloseable {
 			close();
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 	}
 	

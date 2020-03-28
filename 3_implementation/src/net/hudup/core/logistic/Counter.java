@@ -146,7 +146,7 @@ public class Counter extends AbstractRunner implements Serializable {
 //			if (PERIOD <= 1000) Thread.sleep(PERIOD);
 //		}
 //		catch (Exception e) {
-//			e.printStackTrace();
+//			LogUtil.trace(e);
 //		}
 	}
 
@@ -307,7 +307,7 @@ public class Counter extends AbstractRunner implements Serializable {
 					listener.receivedElapsedTime(evt);
 				}
 				catch (Throwable e) {
-					e.printStackTrace();
+					LogUtil.trace(e);
 				}
 			}
 		}

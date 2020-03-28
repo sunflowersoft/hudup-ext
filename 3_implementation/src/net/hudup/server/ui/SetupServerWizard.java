@@ -37,6 +37,7 @@ import net.hudup.core.data.UnitList;
 import net.hudup.core.data.ui.DataConfigTextField;
 import net.hudup.core.data.ui.SysConfigPane;
 import net.hudup.core.data.ui.UnitTable;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.ui.UIUtil;
 import net.hudup.data.DatasetUtil2;
 import net.hudup.data.ProviderImpl;
@@ -612,7 +613,7 @@ public class SetupServerWizard extends JDialog {
 				preUserAtt = provider.getProfileAttributes(config.getUserUnit());
 			}
 			catch (Throwable e) {
-				e.printStackTrace(); //Exception here is not a problem.
+				LogUtil.trace(e); //Exception here is not a problem.
 				preUserAtt = null;
 			}
 			
@@ -631,7 +632,7 @@ public class SetupServerWizard extends JDialog {
 				preItemAtt = provider.getProfileAttributes(config.getItemUnit());
 			}
 			catch (Throwable e) {
-				e.printStackTrace(); //Exception here is not a problem.
+				LogUtil.trace(e); //Exception here is not a problem.
 				preItemAtt = null;
 			}
 			

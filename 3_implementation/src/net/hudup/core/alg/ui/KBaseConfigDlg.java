@@ -22,6 +22,7 @@ import javax.swing.WindowConstants;
 import net.hudup.core.alg.KBase;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.ui.PropPane;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.xURI;
 import net.hudup.core.logistic.ui.TextArea;
 import net.hudup.core.logistic.ui.UIUtil;
@@ -158,7 +159,7 @@ public class KBaseConfigDlg extends JDialog {
 					ret = ret && kbaseCfg.save(kbaseCfgUri);
 				}
 				catch (Throwable e) {
-					e.printStackTrace();
+					LogUtil.trace(e);
 					ret = ret && false;
 				}
 				

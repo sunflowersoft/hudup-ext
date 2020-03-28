@@ -30,6 +30,7 @@ import javax.swing.JPanel;
 import net.hudup.core.Constants;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.ui.PropPane;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.NextUpdate;
 import net.hudup.core.logistic.ui.UIUtil;
 
@@ -240,7 +241,7 @@ public class LightRemoteServerCP extends JFrame {
 						} 
 						catch (Throwable e) {
 							// TODO Auto-generated catch block
-							e.printStackTrace();
+							LogUtil.trace(e);
 						}
 					}
 				}, 
@@ -251,7 +252,7 @@ public class LightRemoteServerCP extends JFrame {
 			setVisible(true);
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 		
@@ -267,7 +268,7 @@ public class LightRemoteServerCP extends JFrame {
 			updateControls();
 		} catch (RemoteException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 	}
 	
@@ -284,7 +285,7 @@ public class LightRemoteServerCP extends JFrame {
 			updateControls();
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 	}
 	
@@ -298,7 +299,7 @@ public class LightRemoteServerCP extends JFrame {
 			updateControls();
 		} catch (RemoteException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 	}
 	
@@ -335,7 +336,7 @@ public class LightRemoteServerCP extends JFrame {
 					JOptionPane.INFORMATION_MESSAGE);
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 	}
 	
@@ -363,7 +364,7 @@ public class LightRemoteServerCP extends JFrame {
 					JOptionPane.INFORMATION_MESSAGE);
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 	}
 
@@ -439,7 +440,7 @@ public class LightRemoteServerCP extends JFrame {
 			paneConfig.update(server.getConfig());
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 		
@@ -713,7 +714,7 @@ public class LightRemoteServerCP extends JFrame {
 					connected = false;
 			}
 			catch (Exception e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 				connected = false;
 			}
 		}
@@ -737,7 +738,7 @@ public class LightRemoteServerCP extends JFrame {
 					connected = false;
 			}
 			catch (Exception e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 				connected = false;
 			}
 			finally {

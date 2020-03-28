@@ -27,6 +27,7 @@ import net.hudup.core.evaluate.Metrics;
 import net.hudup.core.evaluate.NoneWrapperMetricList;
 import net.hudup.core.evaluate.SetupTimeMetric;
 import net.hudup.core.evaluate.SpeedMetric;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.SystemUtil;
 import net.hudup.core.logistic.xURI;
 
@@ -70,7 +71,7 @@ public class EstimateEvaluator extends RecommendEvaluator {
 				if (!acceptAlg(evAlgList.get(i))) continue;
 			} catch (Throwable e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LogUtil.trace(e);
 				continue;
 			}
 			Recommender recommender = (Recommender)evAlgList.get(i);
@@ -227,18 +228,18 @@ public class EstimateEvaluator extends RecommendEvaluator {
 					
 				} // end try
 				catch (Throwable e) {
-					e.printStackTrace();
+					LogUtil.trace(e);
 				}
 				finally {
 					try {
 						if (testingUsers != null)
 							testingUsers.close();
 						testingUsers = null;
-					} catch (Throwable e) {e.printStackTrace();}
+					} catch (Throwable e) {LogUtil.trace(e);}
 					
 					try {
 						unsetupAlgSupportDelay(recommender);
-					} catch (Throwable e) {e.printStackTrace();}
+					} catch (Throwable e) {LogUtil.trace(e);}
 				}
 				
 				SystemUtil.enhanceAuto();

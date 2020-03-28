@@ -24,6 +24,7 @@ import net.hudup.core.data.Pair;
 import net.hudup.core.data.Profile;
 import net.hudup.core.data.Profiles;
 import net.hudup.core.data.RatingVector;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.MinMax;
 
 /**
@@ -454,7 +455,7 @@ public class BitData implements Cloneable, net.hudup.core.data.AutoCloseable, Se
 			clear();
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 	}
 	

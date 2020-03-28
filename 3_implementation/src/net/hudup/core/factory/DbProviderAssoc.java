@@ -54,7 +54,80 @@ import net.hudup.core.parser.TextParserUtil;
  * @version 10.0
  *
  */
-class DbProviderAssoc extends ProviderAssocAbstract {
+class DbProviderAssoc extends DbProviderAssoc0 {
+
+	
+	/**
+	 * Constructor with specified configuration.
+	 * @param config specified configuration.
+	 */
+	public DbProviderAssoc(DataConfig config) {
+		super(config);
+		// TODO Auto-generated constructor stub
+	}
+
+	
+	@Override
+	public String genRatingCreateSql() {
+		return 	"create table " + norm(config.getRatingUnit()) + " ( " + 
+				norm(DataConfig.USERID_FIELD) + " " + toSqlTypeName(Type.integer) + " not null, " +
+				norm(DataConfig.ITEMID_FIELD) + " " + toSqlTypeName(Type.integer) + " not null, " +
+				norm(DataConfig.RATING_FIELD) + " " + toSqlTypeName(Type.real) + " not null, " +
+				norm(DataConfig.RATING_DATE_FIELD) + " " + toSqlTypeName(Type.time);
+	}
+
+	
+	@Override
+	public String genContextCreateSql() {
+		return "create table " + norm(config.getContextUnit()) + " ( " + 
+			norm(DataConfig.USERID_FIELD) + " " + toSqlTypeName(Type.integer) + " not null, " +
+			norm(DataConfig.ITEMID_FIELD) + " " + toSqlTypeName(Type.integer) + " not null, " +
+			norm(DataConfig.CTX_TEMPLATEID_FIELD) + " " + toSqlTypeName(Type.integer) + " not null, " +
+			norm(DataConfig.CTX_VALUE_FIELD) + " " + toSqlTypeName(Type.string) + ", " +
+			norm(DataConfig.RATING_DATE_FIELD) + " " + toSqlTypeName(Type.time);
+	}
+
+	
+	@Override
+	public ParamSql genContextInsertSql() {
+		return new ParamSql( 
+			"insert into " + norm(config.getContextUnit()) + 
+			" (" +
+				norm(DataConfig.USERID_FIELD) + ", " + 
+				norm(DataConfig.ITEMID_FIELD) + ", " + 
+				norm(DataConfig.CTX_TEMPLATEID_FIELD) + ", " + 
+				norm(DataConfig.CTX_VALUE_FIELD) + ", " +
+				norm(DataConfig.RATING_DATE_FIELD) + 
+			") values (?, ?, ?, ?, ?) ",
+			new int[] { 0, 1, 2, 3, 4 });
+	}
+
+	
+	@Override
+	public ParamSql genContextUpdateSql() {
+		return new ParamSql(
+				"update " + norm(config.getContextUnit()) + 
+				" set " + norm(DataConfig.CTX_VALUE_FIELD) + " = ?, " + 
+					norm(DataConfig.RATING_DATE_FIELD) + " = ? " +
+				" where " + norm(DataConfig.USERID_FIELD) + " = ? " +
+					" and " + norm(DataConfig.ITEMID_FIELD) + " = ? " +
+					" and " + norm(DataConfig.CTX_TEMPLATEID_FIELD) + " = ? " ,
+				new int [] { 3, 4, 0, 1, 2 }
+			);
+	}
+
+
+}
+
+
+/**
+ * Base associator of provider for database.
+ * 
+ * @author Loc Nguyen
+ * @version 10.0
+ *
+ */
+class DbProviderAssoc0 extends ProviderAssocAbstract {
 
 	
 	/**
@@ -68,9 +141,9 @@ class DbProviderAssoc extends ProviderAssocAbstract {
 	 * 
 	 * @param config specified configuration.
 	 */
-	public DbProviderAssoc(DataConfig config) {
+	public DbProviderAssoc0(DataConfig config) {
 		super(config);
-		this.conn = DbProviderAssoc.createConnection(config);
+		this.conn = createConnection(config);
 	}
 
 	
@@ -144,7 +217,7 @@ class DbProviderAssoc extends ProviderAssocAbstract {
 		    rs.close();
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 		return sqlTypeName;
@@ -1883,7 +1956,7 @@ class DbProviderAssoc extends ProviderAssocAbstract {
 			rs.close();
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			LogUtil.error("Get database metadata error: " + e.getMessage());
 		}
 		
@@ -1916,7 +1989,7 @@ class DbProviderAssoc extends ProviderAssocAbstract {
 			
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		finally {
 			closeResultSet(rs);
@@ -1943,7 +2016,7 @@ class DbProviderAssoc extends ProviderAssocAbstract {
 			rs.close();
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 		return keys;
@@ -1985,7 +2058,7 @@ class DbProviderAssoc extends ProviderAssocAbstract {
 		}
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 		return attList;
@@ -2020,7 +2093,7 @@ class DbProviderAssoc extends ProviderAssocAbstract {
 			rs.close();
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 		return attList;
@@ -2037,7 +2110,7 @@ class DbProviderAssoc extends ProviderAssocAbstract {
 			attributes = getAttributes(rs);
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		finally {
 			closeResultSet(rs);
@@ -2075,7 +2148,7 @@ class DbProviderAssoc extends ProviderAssocAbstract {
 			rs = null;
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		finally {
 			closeResultSet(rs);
@@ -2122,7 +2195,7 @@ class DbProviderAssoc extends ProviderAssocAbstract {
 					profile.setValue(i, value);
 			}
 			catch (Exception e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 			
 		}
@@ -2216,7 +2289,7 @@ class DbProviderAssoc extends ProviderAssocAbstract {
 				} 
 				catch (Throwable e) {
 					// TODO Auto-generated catch block
-					e.printStackTrace();
+					LogUtil.trace(e);
 				}
 				
 				return null;
@@ -2281,7 +2354,7 @@ class DbProviderAssoc extends ProviderAssocAbstract {
 			return rs;
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 		return null;
@@ -2349,7 +2422,7 @@ class DbProviderAssoc extends ProviderAssocAbstract {
 			
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 		return null;
@@ -2370,7 +2443,7 @@ class DbProviderAssoc extends ProviderAssocAbstract {
 			return true;
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 		return false;
@@ -2401,7 +2474,7 @@ class DbProviderAssoc extends ProviderAssocAbstract {
 				Type type = att.getType();
 				
 				if (profile.isMissing(index)) {
-					stm.setNull(i + 1, DbProviderAssoc.toSqlType(type));
+					stm.setNull(i + 1, toSqlType(type));
 					continue;
 				}
 				
@@ -2439,7 +2512,7 @@ class DbProviderAssoc extends ProviderAssocAbstract {
 			return true;
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			
 		}
 		return false;
@@ -2470,7 +2543,7 @@ class DbProviderAssoc extends ProviderAssocAbstract {
 			closeResultSet(rs);
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 
 		return max;
@@ -2498,7 +2571,7 @@ class DbProviderAssoc extends ProviderAssocAbstract {
 			return contain;
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 		return false;
@@ -2527,7 +2600,7 @@ class DbProviderAssoc extends ProviderAssocAbstract {
 				conn.close();
 			}
 			catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 		}
 		conn = null;
@@ -2558,7 +2631,7 @@ class DbProviderAssoc extends ProviderAssocAbstract {
 		} 
 		catch (Exception e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 		return null;
@@ -2582,7 +2655,7 @@ class DbProviderAssoc extends ProviderAssocAbstract {
 		} 
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 	}
 	
@@ -2626,7 +2699,7 @@ class DbProviderAssoc extends ProviderAssocAbstract {
 			} 
 			catch (Throwable e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LogUtil.trace(e);
 				LogUtil.error("DbFetcher initialized fail, error " + e.getMessage());
 			}
 		}
@@ -2640,7 +2713,7 @@ class DbProviderAssoc extends ProviderAssocAbstract {
 			}
 			catch (Throwable e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LogUtil.trace(e);
 				return false;
 			}
 		}
@@ -2660,7 +2733,7 @@ class DbProviderAssoc extends ProviderAssocAbstract {
 			} 
 			catch (Throwable e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 		}
 
@@ -2691,7 +2764,7 @@ class DbProviderAssoc extends ProviderAssocAbstract {
 				close();
 			}
 			catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 		}
 
@@ -2728,7 +2801,7 @@ class DbProviderAssoc extends ProviderAssocAbstract {
 				reset();
 			}
 			catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 			finally {
 				try {
@@ -2736,7 +2809,7 @@ class DbProviderAssoc extends ProviderAssocAbstract {
 				} 
 				catch (Throwable e) {
 					// TODO Auto-generated catch block
-					e.printStackTrace();
+					LogUtil.trace(e);
 				}
 			}
 			
@@ -2777,7 +2850,7 @@ class DbProviderAssoc extends ProviderAssocAbstract {
 			} 
 			catch (RemoteException e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 		}
 
@@ -2791,7 +2864,7 @@ class DbProviderAssoc extends ProviderAssocAbstract {
 				} 
 				catch (NoSuchObjectException e) {
 					// TODO Auto-generated catch block
-					e.printStackTrace();
+					LogUtil.trace(e);
 					LogUtil.error("No such object exported, error " + e.getMessage());
 				}
 			}
@@ -2806,74 +2879,3 @@ class DbProviderAssoc extends ProviderAssocAbstract {
 
 
 
-/**
- * This class is extended associator which supports dyadic database.
- * 
- * @author Loc Nguyen
- * @version 2.0
- *
- */
-class DbProviderAssocExt extends DbProviderAssoc {
-
-	
-	/**
-	 * Constructor with specified configuration.
-	 * @param config specified configuration.
-	 */
-	public DbProviderAssocExt(DataConfig config) {
-		super(config);
-		// TODO Auto-generated constructor stub
-	}
-
-	
-	@Override
-	public String genRatingCreateSql() {
-		return 	"create table " + norm(config.getRatingUnit()) + " ( " + 
-				norm(DataConfig.USERID_FIELD) + " " + toSqlTypeName(Type.integer) + " not null, " +
-				norm(DataConfig.ITEMID_FIELD) + " " + toSqlTypeName(Type.integer) + " not null, " +
-				norm(DataConfig.RATING_FIELD) + " " + toSqlTypeName(Type.real) + " not null, " +
-				norm(DataConfig.RATING_DATE_FIELD) + " " + toSqlTypeName(Type.time);
-	}
-
-	
-	@Override
-	public String genContextCreateSql() {
-		return "create table " + norm(config.getContextUnit()) + " ( " + 
-			norm(DataConfig.USERID_FIELD) + " " + toSqlTypeName(Type.integer) + " not null, " +
-			norm(DataConfig.ITEMID_FIELD) + " " + toSqlTypeName(Type.integer) + " not null, " +
-			norm(DataConfig.CTX_TEMPLATEID_FIELD) + " " + toSqlTypeName(Type.integer) + " not null, " +
-			norm(DataConfig.CTX_VALUE_FIELD) + " " + toSqlTypeName(Type.string) + ", " +
-			norm(DataConfig.RATING_DATE_FIELD) + " " + toSqlTypeName(Type.time);
-	}
-
-	
-	@Override
-	public ParamSql genContextInsertSql() {
-		return new ParamSql( 
-			"insert into " + norm(config.getContextUnit()) + 
-			" (" +
-				norm(DataConfig.USERID_FIELD) + ", " + 
-				norm(DataConfig.ITEMID_FIELD) + ", " + 
-				norm(DataConfig.CTX_TEMPLATEID_FIELD) + ", " + 
-				norm(DataConfig.CTX_VALUE_FIELD) + ", " +
-				norm(DataConfig.RATING_DATE_FIELD) + 
-			") values (?, ?, ?, ?, ?) ",
-			new int[] { 0, 1, 2, 3, 4 });
-	}
-
-	
-	@Override
-	public ParamSql genContextUpdateSql() {
-		return new ParamSql(
-				"update " + norm(config.getContextUnit()) + 
-				" set " + norm(DataConfig.CTX_VALUE_FIELD) + " = ?, " + 
-					norm(DataConfig.RATING_DATE_FIELD) + " = ? " +
-				" where " + norm(DataConfig.USERID_FIELD) + " = ? " +
-					" and " + norm(DataConfig.ITEMID_FIELD) + " = ? " +
-					" and " + norm(DataConfig.CTX_TEMPLATEID_FIELD) + " = ? " ,
-				new int [] { 3, 4, 0, 1, 2 }
-			);
-	}
-
-
-}

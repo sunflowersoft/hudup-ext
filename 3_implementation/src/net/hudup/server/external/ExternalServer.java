@@ -70,7 +70,7 @@ public class ExternalServer extends DefaultServer {
 			LogUtil.info("External server imported external data successfully (in server tasks)");
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			LogUtil.error("External server fail to import external data (in server tasks), caused by " + e.getMessage());
 			
 		}
@@ -88,7 +88,7 @@ public class ExternalServer extends DefaultServer {
 			new ExternalServerCP(this);
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			LogUtil.error("External server fail to show control panel, caused by " + e.getMessage());
 			
 			/*

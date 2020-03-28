@@ -18,6 +18,7 @@ import net.hudup.core.data.Dataset;
 import net.hudup.core.data.DatasetMetadata;
 import net.hudup.core.data.ServerPointer;
 import net.hudup.core.data.ServerPointerImpl;
+import net.hudup.core.logistic.LogUtil;
 
 /**
  * There are two typical {@code Dataset} such as {@code Snapshot} and {@code Scanner}.
@@ -78,7 +79,7 @@ public class SocketServerIndicator extends Indicator {
 			return pointer;
 		}
 		catch (RemoteException e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 		return null;

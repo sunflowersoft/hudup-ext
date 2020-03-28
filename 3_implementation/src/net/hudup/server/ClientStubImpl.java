@@ -17,6 +17,7 @@ import net.hudup.core.Util;
 import net.hudup.core.client.ClientStub;
 import net.hudup.core.data.ExternalItemInfo;
 import net.hudup.core.data.ExternalQuery;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.parser.TextParserUtil;
 
 /**
@@ -115,7 +116,7 @@ public class ClientStubImpl implements ClientStub {
 				this.itemInfo.put(itemId, itemInfo);
 			}
 			catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 		}
 		
@@ -178,7 +179,7 @@ public class ClientStubImpl implements ClientStub {
 				itemInfos.put(itemId, itemInfo);
 			}
 			catch (Exception e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 		}
 		

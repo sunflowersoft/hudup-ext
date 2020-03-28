@@ -12,6 +12,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.io.Writer;
+import java.nio.file.AccessDeniedException;
+import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -45,6 +47,7 @@ import net.hudup.core.data.UnitList;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.NextUpdate;
 import net.hudup.core.logistic.UriAdapter;
+import net.hudup.core.logistic.UriAssocAbstract;
 import net.hudup.core.logistic.xURI;
 
 /**
@@ -95,7 +98,7 @@ class FlatProviderAssoc extends ProviderAssocAbstract {
 			writeHeader(writer, attList);
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			result = false;
 		}
 		finally {
@@ -105,7 +108,7 @@ class FlatProviderAssoc extends ProviderAssocAbstract {
 			} 
 			catch (Throwable e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 		}
 		
@@ -136,7 +139,7 @@ class FlatProviderAssoc extends ProviderAssocAbstract {
 
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			LogUtil.error("Get file system metadata error: " + e.getMessage());
 		}
 		
@@ -203,14 +206,14 @@ class FlatProviderAssoc extends ProviderAssocAbstract {
 			}
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		finally {
 			try {
 				fetcher.close();
 			}
 			catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 		}
 		
@@ -251,7 +254,7 @@ class FlatProviderAssoc extends ProviderAssocAbstract {
 		} 
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		finally {
 			try {
@@ -259,7 +262,7 @@ class FlatProviderAssoc extends ProviderAssocAbstract {
 					reader.close();
 			}
 			catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 		}
 		
@@ -296,7 +299,7 @@ class FlatProviderAssoc extends ProviderAssocAbstract {
 			
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			found = false;
 		}
 		finally {
@@ -305,7 +308,7 @@ class FlatProviderAssoc extends ProviderAssocAbstract {
 					reader.close();
 			}
 			catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 		}
 		
@@ -336,7 +339,7 @@ class FlatProviderAssoc extends ProviderAssocAbstract {
 			}
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			returnProfile = null;
 		}
 		finally {
@@ -345,7 +348,7 @@ class FlatProviderAssoc extends ProviderAssocAbstract {
 					reader.close();
 			}
 			catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 		}
 		
@@ -383,7 +386,7 @@ class FlatProviderAssoc extends ProviderAssocAbstract {
 			
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			
 		}
 		finally {
@@ -392,7 +395,7 @@ class FlatProviderAssoc extends ProviderAssocAbstract {
 					reader.close();
 			}
 			catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 		}
 		
@@ -429,7 +432,7 @@ class FlatProviderAssoc extends ProviderAssocAbstract {
 			}
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		finally {
 			try {
@@ -437,7 +440,7 @@ class FlatProviderAssoc extends ProviderAssocAbstract {
 					fetcher.close();
 			}
 			catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 		}
 		
@@ -471,7 +474,7 @@ class FlatProviderAssoc extends ProviderAssocAbstract {
 			
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			
 			maxId = -1;
 		}
@@ -481,7 +484,7 @@ class FlatProviderAssoc extends ProviderAssocAbstract {
 					reader.close();
 			}
 			catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 		}
 		
@@ -501,7 +504,7 @@ class FlatProviderAssoc extends ProviderAssocAbstract {
 			
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			result = false;
 		}
 		finally {
@@ -510,7 +513,7 @@ class FlatProviderAssoc extends ProviderAssocAbstract {
 					writer.close();
 			}
 			catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 		}
 
@@ -563,7 +566,7 @@ class FlatProviderAssoc extends ProviderAssocAbstract {
 			writer = null;
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			
 			result = false;
 		}
@@ -576,7 +579,7 @@ class FlatProviderAssoc extends ProviderAssocAbstract {
 					writer.close();
 			}
 			catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 		}
 		
@@ -619,7 +622,7 @@ class FlatProviderAssoc extends ProviderAssocAbstract {
 			
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			result = false;
 		}
 		finally {
@@ -631,7 +634,7 @@ class FlatProviderAssoc extends ProviderAssocAbstract {
 					writer.close();
 			}
 			catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 			}
 		}
 		
@@ -704,7 +707,7 @@ class FlatProviderAssoc extends ProviderAssocAbstract {
 			} 
 			catch (Throwable e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LogUtil.trace(e);
 				equal = false;
 				break;
 			}
@@ -741,7 +744,7 @@ class FlatProviderAssoc extends ProviderAssocAbstract {
 			} 
 			catch (Throwable e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LogUtil.trace(e);
 				equal = false;
 				break;
 			}
@@ -780,7 +783,7 @@ class FlatProviderAssoc extends ProviderAssocAbstract {
 		} 
 		catch (IOException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 	}
 	
@@ -813,7 +816,7 @@ class FlatProviderAssoc extends ProviderAssocAbstract {
 		} 
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		
 		return null;
@@ -839,7 +842,7 @@ class FlatProviderAssoc extends ProviderAssocAbstract {
 				} 
 				catch (Exception e) {
 					// TODO Auto-generated catch block
-					e.printStackTrace();
+					LogUtil.trace(e);
 				}
 				profile.setValue(i, value);
 			}
@@ -847,7 +850,7 @@ class FlatProviderAssoc extends ProviderAssocAbstract {
 		}
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		return null;
 	}
@@ -885,7 +888,7 @@ class FlatProviderAssoc extends ProviderAssocAbstract {
 				Workbook workbook = Workbook.getWorkbook(is);
 				is.close();
 				return new ExcelReader(workbook);
-			} catch (Throwable e) {e.printStackTrace();}
+			} catch (Throwable e) {LogUtil.trace(e);}
 			return null;
 		}
 		else
@@ -912,7 +915,17 @@ class FlatProviderAssoc extends ProviderAssocAbstract {
 			String scheme = unitURI.getScheme();
 			if (scheme == null || scheme.isEmpty() || !scheme.equals("file"))
 				return new DefaultCsvWriter(adapter.getWriter(unitURI, append));
-			return new DefaultCsvWriter(adapter.getWriter(unitURI, append));
+			else {
+				try {
+					OutputStream os = adapter.getOutputStream(unitURI, false);
+					WritableWorkbook workbook = Workbook.createWorkbook(os);
+					return new ExcelWriter(workbook, false);
+				}
+				catch (Exception e) {
+					LogUtil.trace(e);
+					return new DefaultCsvWriter(adapter.getWriter(unitURI, append));
+				}
+			}
 		}
 		else
 			return new DefaultCsvWriter(adapter.getWriter(unitURI, append));
@@ -983,7 +996,7 @@ class DefaultCsvReader implements CsvReader {
 		
 		try {
 			csvReader.close();
-		} catch (Throwable e) {e.printStackTrace();}
+		} catch (Throwable e) {LogUtil.trace(e);}
 		csvReader = null;
 	}
 
@@ -995,7 +1008,7 @@ class DefaultCsvReader implements CsvReader {
 		
 		try {
 			close();
-		} catch (Throwable e) {e.printStackTrace();}
+		} catch (Throwable e) {LogUtil.trace(e);}
 	}
 
 
@@ -1050,7 +1063,7 @@ class DefaultCsvWriter implements CsvWriter {
 		
 		try {
 			csvWriter.close();
-		} catch (Throwable e) {e.printStackTrace();}
+		} catch (Throwable e) {LogUtil.trace(e);}
 		csvWriter = null;
 	}
 
@@ -1062,7 +1075,7 @@ class DefaultCsvWriter implements CsvWriter {
 		
 		try {
 			close();
-		} catch (Throwable e) {e.printStackTrace();}
+		} catch (Throwable e) {LogUtil.trace(e);}
 	}
 
 
@@ -1128,11 +1141,12 @@ class ExcelReader implements CsvReader {
 			sheet = workbook.getSheet(0);
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 			sheet = null;
 		}
 		if (sheet == null) return false;
 		if (sheet.getColumns() == 0) return false;
+		if (sheet.getRows() == 0) return false;
 		
 		currentRow = 0;
 		attList = extractAttributeList(sheet);
@@ -1147,7 +1161,7 @@ class ExcelReader implements CsvReader {
 		
 		String[] headers = new String[attList.size()];
 		for (int j = 0; j < headers.length; j++) {
-			headers[j] = attList.get(j).getName();
+			headers[j] = attList.get(j).toText();
 		}
 		
 		return headers;
@@ -1159,7 +1173,8 @@ class ExcelReader implements CsvReader {
 		// TODO Auto-generated method stub
 		currentProfile = null;
 		if (attList == null) return false;
-
+		if (currentRow >= sheet.getRows() - 1) return false;
+		
 		currentRow ++;
 		currentProfile = new String[attList.size()];
 		for (int j = 0; j < currentProfile.length; j++) {
@@ -1208,7 +1223,7 @@ class ExcelReader implements CsvReader {
 		
 		try {
 			close();
-		} catch (Throwable e) {e.printStackTrace();}
+		} catch (Throwable e) {LogUtil.trace(e);}
 	}
 
 
@@ -1237,11 +1252,15 @@ class ExcelReader implements CsvReader {
 
 /**
  * This is writer for writing Excel file.
+ * TrueZip and then {@link Files#newOutputStream(java.nio.file.Path, java.nio.file.OpenOption...)}
+ * called from {@link UriAssocAbstract#create(xURI, boolean)} throws {@link AccessDeniedException} to write Excel files.
+ * Therefore, this class will be improved later. In current version, only reading Excel files.
  * 
  * @author Loc Nguyen
  * @version 12.0
  *
  */
+@NextUpdate
 class ExcelWriter implements CsvWriter {
 
 	
@@ -1322,7 +1341,7 @@ class ExcelWriter implements CsvWriter {
 			WritableCell cell = createCell(record[j], this.currentRow, j);
 			try {
 				sheet.addCell(cell);
-			} catch (Throwable e) {e.printStackTrace();}
+			} catch (Throwable e) {LogUtil.trace(e);}
 		}
 		
 		try {
@@ -1332,7 +1351,7 @@ class ExcelWriter implements CsvWriter {
 			return true;
 		}
 		catch (Throwable e) {
-			e.printStackTrace();
+			LogUtil.trace(e);
 		}
 		return false;
 	}
@@ -1354,14 +1373,14 @@ class ExcelWriter implements CsvWriter {
 		if (att.isNumber()) {
 			try {
 				return new jxl.write.Number(column, row, Double.parseDouble(svalue));
-			} catch (Throwable e) {e.printStackTrace();}
+			} catch (Throwable e) {LogUtil.trace(e);}
 			return new Label(column, row, svalue);
 		}
 		else if (att.getType() == Type.date) {
 			try {
 				SimpleDateFormat df = new SimpleDateFormat(Constants.DATE_FORMAT);
 				return new DateTime(column, row, df.parse(svalue));
-			} catch (Throwable e) {e.printStackTrace();}
+			} catch (Throwable e) {LogUtil.trace(e);}
 			return new Label(column, row, svalue);
 		}
 		else
@@ -1375,14 +1394,14 @@ class ExcelWriter implements CsvWriter {
 		if (workbook != null) {
 			try {
 				workbook.close();
-			} catch (Throwable e) {e.printStackTrace();}
+			} catch (Throwable e) {LogUtil.trace(e);}
 		}
 		workbook = null;
 		
 		if (os != null) {
 			try {
 				os.close();
-			} catch (Throwable e) {e.printStackTrace();}
+			} catch (Throwable e) {LogUtil.trace(e);}
 		}
 		os = null;
 
@@ -1398,7 +1417,7 @@ class ExcelWriter implements CsvWriter {
 		
 		try {
 			close();
-		} catch (Throwable e) {e.printStackTrace();}
+		} catch (Throwable e) {LogUtil.trace(e);}
 	}
 
 

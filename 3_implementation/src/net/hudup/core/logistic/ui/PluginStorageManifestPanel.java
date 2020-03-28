@@ -719,7 +719,7 @@ class ImportAlgDlg extends JDialog {
 			try {
 				algDescList = service.getAlgDescs();
 			} catch (Throwable e) {
-				e.printStackTrace();
+				LogUtil.trace(e);
 				algDescList = new AlgDesc2List();
 			}
 
@@ -809,7 +809,7 @@ class ImportAlgDlg extends JDialog {
 							Class.forName(iName);
 						}
 						catch (Throwable e) {
-							e.printStackTrace();
+							LogUtil.trace(e);
 							LogUtil.error("Interface '" + iName + "' not exists, error by " + e.getMessage());
 							localExist = localExist && false;
 						}
@@ -824,7 +824,7 @@ class ImportAlgDlg extends JDialog {
 					alg = service.getAlg(algDesc.algName);
 				}
 				catch (Throwable e) {
-					e.printStackTrace();
+					LogUtil.trace(e);
 					LogUtil.error("Retrieving remote algorithm error by: " + e.getMessage());
 					alg = null;
 				}
@@ -915,7 +915,7 @@ class ImportAlgDlg extends JDialog {
 		if ((alg != null) && (alg instanceof AlgRemoteWrapper)) {
 			try {
 				((AlgRemoteWrapper)alg).forceUnexport();
-			} catch (Throwable e) {e.printStackTrace();}
+			} catch (Throwable e) {LogUtil.trace(e);}
 		}
 		
 	}
