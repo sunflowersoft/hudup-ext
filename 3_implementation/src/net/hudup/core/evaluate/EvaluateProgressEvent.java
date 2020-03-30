@@ -27,10 +27,10 @@ public class EvaluateProgressEvent extends EventObject {
 	private static final long serialVersionUID = 1L;
 
 	
-	/**
-	 * Referred evaluator.
-	 */
-	protected Evaluator evaluator = null;
+//	/**
+//	 * Referred evaluator.
+//	 */
+//	protected Evaluator evaluator = null;
 
 	
 	/**
@@ -71,28 +71,31 @@ public class EvaluateProgressEvent extends EventObject {
 	
 	/**
 	 * Constructor with specified evaluator, total number of steps in progress, and current step.
-	 * @param evaluator specified evaluator.
+	 * @param evaluator specified evaluator. This evaluator is invalid in remote call because the source is transient variable.
 	 * @param progressTotal total number of steps in progress.
 	 * @param progressStep current step.
 	 */
 	@NextUpdate
 	public EvaluateProgressEvent(Evaluator evaluator, int progressTotal, int progressStep) {
-		super(evaluator); //Test different hosts for RMI, evaluator wrapper can solve.
+		super(evaluator);
 		
+//		this.evaluator = evaluator;
 		this.progressTotal = progressTotal;
 		this.progressStep = progressStep;
 	}
 	
 	
 	/**
-	 * Getting evaluator.
+	 * Getting evaluator. This method cannot be called remotely because the source is transient variable.
 	 * @return evaluator.
 	 */
 	@SuppressWarnings("unused")
 	@Deprecated
 	private Evaluator getEvaluator() {
 		Object source = getSource();
-		if (source instanceof Evaluator)
+		if (source == null)
+			return null;
+		else if (source instanceof Evaluator)
 			return (Evaluator)source;
 		else
 			return null;

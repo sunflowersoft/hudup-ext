@@ -50,7 +50,7 @@ Email: ng_phloc@yahoo.com,
 Tel: 84-975250362
 
 ---
-P/S: Current version of JRE and JDK is 1.8.0. Current version of Hudup is 12. The last built date is September 5, 2019.
+P/S: Current version of JRE and JDK is 1.8.0. Current version of Hudup is ${version}. The last built date is March 30, 2020.
 
 	   
 --------------------

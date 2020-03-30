@@ -9,6 +9,7 @@ package net.hudup.core.evaluate;
 
 import java.util.List;
 
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.Vector;
 
 /**
@@ -77,9 +78,14 @@ public abstract class RealTwoArrayMetricValue extends TwoArrayMetricValue {
 	 */
 	public Vector toVector0() {
 		Vector v0 = new Vector(array0.size(), 0);
-		for (int i = 0; i < array0.size(); i++) {
-			RealMetricValue value = (RealMetricValue) array0.get(i);
-			v0.set(i, MetricValue.extractRealValue(value));
+		for (int i = 0; i < v0.dim(); i++) {
+			try {
+				RealMetricValue value = (RealMetricValue) array0.get(i);
+				v0.set(i, MetricValue.extractRealValue(value));
+			}
+			catch (Exception e) {
+				LogUtil.trace(e);
+			}
 		}
 		return v0;
 	}
@@ -91,9 +97,14 @@ public abstract class RealTwoArrayMetricValue extends TwoArrayMetricValue {
 	 */
 	public Vector toVector1() {
 		Vector v1 = new Vector(array1.size(), 0);
-		for (int i = 0; i < array1.size(); i++) {
-			RealMetricValue value = (RealMetricValue) array1.get(i);
-			v1.set(i, MetricValue.extractRealValue(value));
+		for (int i = 0; i < v1.dim(); i++) {
+			try {
+				RealMetricValue value = (RealMetricValue) array1.get(i);
+				v1.set(i, MetricValue.extractRealValue(value));
+			}
+			catch (Exception e) {
+				LogUtil.trace(e);
+			}
 		}
 		return v1;
 	}

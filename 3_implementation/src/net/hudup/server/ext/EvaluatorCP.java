@@ -42,6 +42,7 @@ import net.hudup.core.evaluate.Evaluator;
 import net.hudup.core.evaluate.EvaluatorConfig;
 import net.hudup.core.evaluate.EvaluatorEvent;
 import net.hudup.core.evaluate.EvaluatorListener;
+import net.hudup.core.evaluate.ui.EvaluateGUIData;
 import net.hudup.core.logistic.DSUtil;
 import net.hudup.core.logistic.I18nUtil;
 import net.hudup.core.logistic.LogUtil;
@@ -49,7 +50,6 @@ import net.hudup.core.logistic.NetUtil;
 import net.hudup.core.logistic.xURI;
 import net.hudup.core.logistic.ui.UIUtil;
 import net.hudup.evaluate.ui.EvalCompoundGUI;
-import net.hudup.evaluate.ui.EvaluateGUIData;
 import net.hudup.server.DefaultService;
 
 /**

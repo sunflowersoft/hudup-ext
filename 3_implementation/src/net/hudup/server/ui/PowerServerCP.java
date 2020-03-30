@@ -202,19 +202,13 @@ public class PowerServerCP extends JFrame implements ServerStatusListener, Plugi
 	 */
 	protected xURI bindUri = null;
 	
-	/**
-	 * If true, the power server is remote.
-	 */
-	protected boolean bRemote = false;
-	
 	
 	/**
 	 * Constructor with specified server and binded URI of such server.
 	 * @param server specified server
-	 * @param bindUri binded URI of such server.
-	 * @param bRemote if true then the server is remote.
+	 * @param bindUri binded URI of such server. If it is not null, the server is remote.
 	 */
-	public PowerServerCP(PowerServer server, xURI bindUri, boolean bRemote) {
+	public PowerServerCP(PowerServer server, xURI bindUri) {
 		super("Server control panel");
 		try {
 			setDefaultCloseOperation(DISPOSE_ON_CLOSE);
@@ -237,7 +231,6 @@ public class PowerServerCP extends JFrame implements ServerStatusListener, Plugi
 
 			this.server = server;
 			this.bindUri = bindUri;
-			this.bRemote = bRemote;
 			
 			Container container = getContentPane();
 			JTabbedPane main = new JTabbedPane();
@@ -265,7 +258,7 @@ public class PowerServerCP extends JFrame implements ServerStatusListener, Plugi
 	 * @param server specified power server.
 	 */
 	public PowerServerCP(PowerServer server) {
-		this(server, null, false);
+		this(server, null);
 	}
 	
 	
@@ -276,50 +269,43 @@ public class PowerServerCP extends JFrame implements ServerStatusListener, Plugi
 	protected void bindServer() throws RemoteException {
 		boolean result = false;
 		
-		if (!bRemote) {
-			bindUri = null;
+		if (bindUri == null) {
 			registry = null;
-			
 			result = server.addStatusListener(this);
 		}
 		else {
 			btnExitServer.setVisible(false);
 			
-			if (bindUri != null) {
-			
+			try {
+				registry = LocateRegistry.createRegistry(bindUri.getPort());
+				UnicastRemoteObject.exportObject(this, bindUri.getPort());
+				
+				result = server.addStatusListener(this);
+				if (!result)
+					throw new Exception();
+			}
+			catch (Throwable e) {
+				LogUtil.trace(e);
+				
 				try {
-					registry = LocateRegistry.createRegistry(bindUri.getPort());
-					UnicastRemoteObject.exportObject(this, bindUri.getPort());
-					
-					result = server.addStatusListener(this);
-					if (!result)
-						throw new Exception();
+		        	UnicastRemoteObject.unexportObject(this, true);
 				}
-				catch (Throwable e) {
-					LogUtil.trace(e);
-					
-					try {
-			        	UnicastRemoteObject.unexportObject(this, true);
-					}
-					catch (Throwable e1) {
-						e1.printStackTrace();
-					}
-					
-					try {
-			    		UnicastRemoteObject.unexportObject(registry, true);
-					}
-					catch (Throwable e1) {
-						e1.printStackTrace();
-					}
-					
-					registry = null;
-					bindUri = null;
-					result = false;
+				catch (Throwable e1) {
+					e1.printStackTrace();
 				}
-			
-			} // if (bindUri != null)
+				
+				try {
+		    		UnicastRemoteObject.unexportObject(registry, true);
+				}
+				catch (Throwable e1) {
+					e1.printStackTrace();
+				}
+				
+				registry = null;
+				bindUri = null;
+				result = false;
+			}
 		}
-		
 		
 		if (result)
 			btnRefresh.setVisible(false);
@@ -361,7 +347,7 @@ public class PowerServerCP extends JFrame implements ServerStatusListener, Plugi
 						@Override
 						protected PluginStorageManifestPanel createPluginStorageManifest(Object... vars) {
 							// TODO Auto-generated method stub
-							if (bRemote) {
+							if (bindUri != null) {
 								if (vars.length == 0)
 									return new PluginStorageManifestPanelRemote(server, null);
 								else if (vars[0] instanceof PluginChangedListener)
@@ -776,7 +762,7 @@ public class PowerServerCP extends JFrame implements ServerStatusListener, Plugi
 			
 			SetupServerWizard dlg = new SetupServerWizard(this,
 					(PowerServerConfig)server.getConfig());
-			if (bRemote)
+			if (bindUri != null)
 				server.setConfig(dlg.getServerConfig());
 			
 			
@@ -793,7 +779,7 @@ public class PowerServerCP extends JFrame implements ServerStatusListener, Plugi
 	 * Exiting remote server.
 	 */
 	protected void exit() {
-		if (bRemote)
+		if (bindUri != null)
 			return;
 		
 		try {
@@ -972,7 +958,7 @@ public class PowerServerCP extends JFrame implements ServerStatusListener, Plugi
 			btnSetupServer.setEnabled(false);
 			btnExitServer.setEnabled(true);
 			btnStart.setEnabled(false);
-			btnPauseResume.setEnabled(true && !bRemote);
+			btnPauseResume.setEnabled(true && bindUri == null);
 			btnPauseResume.setText("Pause");
 			btnStop.setEnabled(true);
 			btnSystem.setEnabled(true /*&& !bRemote*/);
@@ -1009,7 +995,7 @@ public class PowerServerCP extends JFrame implements ServerStatusListener, Plugi
 			btnSetupServer.setEnabled(false);
 			btnExitServer.setEnabled(true);
 			btnStart.setEnabled(false);
-			btnPauseResume.setEnabled(true && !bRemote);
+			btnPauseResume.setEnabled(true && bindUri == null);
 			btnPauseResume.setText("Resume");
 			btnStop.setEnabled(true);
 			btnSystem.setEnabled(true /*&& !bRemote*/);
@@ -1069,7 +1055,7 @@ public class PowerServerCP extends JFrame implements ServerStatusListener, Plugi
 			paneConfig.update(server.getConfig());
 		}
 		else if (state == Status.exit) {
-			if (bRemote) {
+			if (bindUri != null) {
 				server = null;
 				dispose();
 			}
@@ -1104,7 +1090,7 @@ public class PowerServerCP extends JFrame implements ServerStatusListener, Plugi
 	@Override
 	public void statusChanged(ServerStatusEvent evt) throws RemoteException {
 		// TODO Auto-generated method stub
-		if (bRemote)
+		if (bindUri != null)
 			updateControls(evt.getStatus());
 		else if (!evt.getShutdownHookStatus())
 			updateControls(evt.getStatus());
@@ -1125,13 +1111,11 @@ public class PowerServerCP extends JFrame implements ServerStatusListener, Plugi
 			LogUtil.trace(e);
 		}
 		
-		if (bRemote) {
+		if (bindUri != null) {
 			try {
-				if (bindUri != null)
-					UnicastRemoteObject.unexportObject(this, true);
+				UnicastRemoteObject.unexportObject(this, true);
 			}
 			catch (Throwable e) {
-				// TODO Auto-generated catch block
 				LogUtil.trace(e);
 			}
 			
@@ -1192,11 +1176,8 @@ public class PowerServerCP extends JFrame implements ServerStatusListener, Plugi
 	@Override
 	public int getPort() {
 		// TODO Auto-generated method stub
-		if (bRemote) {
-			if (bindUri != null)
-				return bindUri.getPort();
-			else
-				return -1;
+		if (bindUri != null) {
+			return bindUri.getPort();
 		}
 		else {
 			try {
@@ -1217,7 +1198,7 @@ public class PowerServerCP extends JFrame implements ServerStatusListener, Plugi
 		
 		Server server = dlg.getServer();
 		if (server != null)
-			new PowerServerCP((PowerServer)server, ConnectDlg.getBindUri(), true);
+			new PowerServerCP((PowerServer)server, ConnectDlg.getBindUri());
 		else {
 			JOptionPane.showMessageDialog(
 					null, "Can't retrieve server", "Can't retrieve server", JOptionPane.ERROR_MESSAGE);

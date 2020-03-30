@@ -9,6 +9,7 @@ package net.hudup.core.evaluate;
 
 import java.util.List;
 
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.Vector;
 
 /**
@@ -64,9 +65,14 @@ public abstract class RealArrayMetricValue extends ArrayMetricValue {
 	 */
 	public Vector toVector() {
 		Vector v = new Vector(array.size(), 0);
-		for (int i = 0; i < array.size(); i++) {
-			RealMetricValue value = (RealMetricValue) array.get(i);
-			v.set(i, MetricValue.extractRealValue(value));
+		for (int i = 0; i < v.dim(); i++) {
+			try {
+				RealMetricValue value = (RealMetricValue) array.get(i);
+				v.set(i, MetricValue.extractRealValue(value));
+			}
+			catch (Exception e) {
+				LogUtil.trace(e);
+			}
 		}
 		return v;
 	}

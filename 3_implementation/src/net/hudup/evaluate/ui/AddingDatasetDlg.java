@@ -18,6 +18,7 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.SwingWorker;
 
 import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.AlgDesc2;
@@ -30,8 +31,10 @@ import net.hudup.core.data.DatasetUtil;
 import net.hudup.core.data.Pointer;
 import net.hudup.core.data.ui.DataConfigTextField;
 import net.hudup.core.logistic.I18nUtil;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.xURI;
 import net.hudup.core.logistic.ui.UIUtil;
+import net.hudup.core.logistic.ui.WaitDialog;
 import net.hudup.data.DatasetUtil2;
 
 /**
@@ -376,15 +379,29 @@ public class AddingDatasetDlg extends JDialog {
 			}
 		}
 		
-		Dataset trainingSet = DatasetUtil.loadDataset(trainingCfg);
+		JDialog dlgWait1 = WaitDialog.createDialog(this); dlgWait1.setUndecorated(true);
+		SwingWorker<Dataset, Dataset> worker1 = new SwingWorker<Dataset, Dataset>() {
+			@Override
+			protected Dataset doInBackground() throws Exception {
+				return DatasetUtil.loadDataset(trainingCfg);
+			}
+
+			@Override
+			protected void done() {
+				super.done(); dlgWait1.dispose();
+			}
+		};
+		worker1.execute(); dlgWait1.setVisible(true);
+		Dataset trainingSet = null;
+		try {
+			trainingSet = worker1.get();
+		} catch (Exception e) {LogUtil.trace(e);}
 		if (trainingSet == null) {
-			
 			JOptionPane.showMessageDialog(
-					this, 
-					"Training dataset is null", 
-					"Invalid training dataset", 
-					JOptionPane.ERROR_MESSAGE);
-			
+				this, 
+				"Training dataset is null", 
+				"Invalid training dataset", 
+				JOptionPane.ERROR_MESSAGE);
 			clear();
 			return;
 		}
@@ -396,14 +413,29 @@ public class AddingDatasetDlg extends JDialog {
 		}
 
 		
-		Dataset testingSet = DatasetUtil.loadDataset(testingCfg);
+		JDialog dlgWait2 = WaitDialog.createDialog(this); dlgWait2.setUndecorated(true);
+		SwingWorker<Dataset, Dataset> worker2 = new SwingWorker<Dataset, Dataset>() {
+			@Override
+			protected Dataset doInBackground() throws Exception {
+				return DatasetUtil.loadDataset(testingCfg);
+			}
+
+			@Override
+			protected void done() {
+				super.done(); dlgWait2.dispose();
+			}
+		};
+		worker2.execute(); dlgWait2.setVisible(true);
+		Dataset testingSet = null;
+		try {
+			testingSet = worker2.get();
+		} catch (Exception e) {LogUtil.trace(e);}
 		if (testingSet == null) {
 			JOptionPane.showMessageDialog(
-					this, 
-					"Testing dataset is null", 
-					"Invalid testing dataset", 
-					JOptionPane.ERROR_MESSAGE);
-			
+				this, 
+				"Testing dataset is null", 
+				"Invalid testing dataset", 
+				JOptionPane.ERROR_MESSAGE);
 			clear();
 			return;
 		}

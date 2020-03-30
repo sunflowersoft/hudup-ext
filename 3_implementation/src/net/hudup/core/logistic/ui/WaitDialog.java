@@ -8,7 +8,8 @@
 package net.hudup.core.logistic.ui;
 
 import java.awt.BorderLayout;
-import java.awt.Frame;
+import java.awt.Component;
+import java.awt.Cursor;
 import java.io.Serializable;
 
 import javax.swing.JDialog;
@@ -24,7 +25,6 @@ import net.hudup.core.logistic.AbstractRunner;
  * @version 12.0
  *
  */
-@Deprecated
 public class WaitDialog implements Serializable {
 
 	
@@ -35,6 +35,12 @@ public class WaitDialog implements Serializable {
 	
 	
 	/**
+	 * Parent component of waiting dialog.
+	 */
+	protected Component comp = null;
+	
+	
+	/**
 	 * Waiting dialog.
 	 */
 	protected JDialog waitDlg = null;
@@ -42,23 +48,25 @@ public class WaitDialog implements Serializable {
 	
 	/**
 	 * Default constructor.
+	 * @param comp parent component.
 	 */
-	public WaitDialog() {
-
+	public WaitDialog(Component comp) {
+		this.comp = comp;
 	}
 
 	
 	/**
 	 * Starting method.
+	 * @return this waiting dialog.
 	 */
-	public synchronized void start() {
-		if (waitDlg != null) return;
+	public synchronized WaitDialog start() {
+		if (waitDlg != null) return this;
 		
 		AbstractRunner runner = new AbstractRunner() {
 			
 			@Override
 			protected void task() {
-				waitDlg = createDialog();
+				waitDlg = createDialog(comp);
 				waitDlg.setVisible(true);
 				waitDlg = null;
 				thread = null;
@@ -72,31 +80,38 @@ public class WaitDialog implements Serializable {
 		};
 		
 		runner.start();
+		
+		return this;
 	}
 	
 	
 	/**
 	 * Stopping method.
+	 * @return this waiting dialog.
 	 */
-	public synchronized void stop() {
+	public synchronized WaitDialog stop() {
 		if (waitDlg != null)
 			waitDlg.dispose(); 
 		waitDlg = null;
+		
+		return this;
 	}
 	
 	
 	/**
 	 * Creating dialog for waiting.
+	 * @param comp parent component.
 	 * @return dialog for waiting.
 	 */
-	protected static JDialog createDialog() {
-		JDialog waitDlg = new JDialog((Frame)null, "Please wait...", true);
+	public static JDialog createDialog(Component comp) {
+		JDialog waitDlg = new JDialog(UIUtil.getFrameForComponent(comp), "Please wait...", true);
 		waitDlg.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		waitDlg.setLocationRelativeTo(null);
 		waitDlg.setSize(300, 200);
 		waitDlg.setLayout(new BorderLayout());
 		waitDlg.add(new JLabel("Please wait..."), BorderLayout.CENTER);
 		
+		waitDlg.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 		return waitDlg;
 	}
 	

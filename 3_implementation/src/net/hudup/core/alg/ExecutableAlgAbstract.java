@@ -60,7 +60,7 @@ public abstract class ExecutableAlgAbstract extends AlgAbstract implements Execu
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public synchronized void setup(Dataset dataset, Object...info) throws RemoteException {
+	public /*synchronized*/ void setup(Dataset dataset, Object...info) throws RemoteException {
 		// TODO Auto-generated method stub
 		unsetup();
 		this.dataset = dataset;
@@ -69,7 +69,7 @@ public abstract class ExecutableAlgAbstract extends AlgAbstract implements Execu
 		else
 			this.sample = dataset.fetchSample();
 		
-		learn();
+		learnStart();
 		
 		SetupAlgEvent evt = new SetupAlgEvent(
 				this,
@@ -92,15 +92,6 @@ public abstract class ExecutableAlgAbstract extends AlgAbstract implements Execu
 	}
 
 
-	/**
-	 * Main method to learn parameters. As usual, it is called by {@link #setup(Dataset, Object...)}.
-	 * @param info additional parameter.
-	 * @return the parameter to be learned. Return null if learning is failed.
-	 * @exception RemoteException if any error occurs.
-	 */
-	protected abstract Object learn(Object...info) throws RemoteException;
-
-	
 	@Override
 	public synchronized void unsetup() throws RemoteException {
 		try {

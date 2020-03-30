@@ -14,7 +14,6 @@ import java.util.EventObject;
 import java.util.List;
 
 import net.hudup.core.data.RatingVector;
-import net.hudup.core.logistic.NextUpdate;
 import net.hudup.core.parser.TextParsable;
 
 /**
@@ -82,12 +81,11 @@ public class EvaluateEvent extends EventObject {
 	
 	/**
 	 * Constructor with specified evaluator and event type.
-	 * @param evaluator reference to an {@link Evaluator}. This evaluator is invalid in remote call.
+	 * @param evaluator reference to an evaluator. This evaluator is invalid in remote call because the source object is transient variable.
 	 * @param type type of this event.
 	 */
-	@NextUpdate
 	public EvaluateEvent(Evaluator evaluator, Type type) {
-		super(evaluator); //Test different hosts for RMI, evaluator wrapper can solve.
+		super(evaluator);
 		
 		this.type = type;
 	}
@@ -95,7 +93,7 @@ public class EvaluateEvent extends EventObject {
 	
 	/**
 	 * Constructor with specified evaluator, type of evaluation event, and list of metrics. 
-	 * @param evaluator specified evaluator. This evaluator is invalid in remote call.
+	 * @param evaluator specified evaluator. This evaluator is invalid in remote call because the source object is transient variable.
 	 * @param type specified type of evaluation event.
 	 * @param metrics specified list of metrics.
 	 */
@@ -108,7 +106,7 @@ public class EvaluateEvent extends EventObject {
 	
 	/**
 	 * Constructor with specified evaluator, type of evaluation event, list of metrics, and additional parameters. 
-	 * @param evaluator specified evaluator. This evaluator is invalid in remote call.
+	 * @param evaluator specified evaluator. This evaluator is invalid in remote call because the source is transient variable.
 	 * @param type specified type of evaluation event.
 	 * @param metrics specified list of metrics.
 	 * @param params additional parameters.
@@ -121,14 +119,16 @@ public class EvaluateEvent extends EventObject {
 
 	
 	/**
-	 * Getting evaluator. This method is invalid in remote call.
-	 * @return {@link Evaluator} that fires this event.
+	 * Getting evaluator. This method is invalid in remote call because the source is transient variable.
+	 * @return evaluator that fires this event.
 	 */
 	@SuppressWarnings("unused")
 	@Deprecated
 	private Evaluator getEvaluator() {
 		Object source = getSource();
-		if (source instanceof Evaluator)
+		if (source == null)
+			return null;
+		else if (source instanceof Evaluator)
 			return (Evaluator)source;
 		else
 			return null;

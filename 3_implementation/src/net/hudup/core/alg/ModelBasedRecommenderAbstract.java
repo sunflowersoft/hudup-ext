@@ -54,6 +54,8 @@ public abstract class ModelBasedRecommenderAbstract extends RecommenderAbstract 
 			if (kb == null)
 				kb = newKB();
 			kb.setConfig(config); //This code line is important.
+			
+			kb.addSetupListener(this); //Loc Nguyen added: 2020.03.30
 		}
 		catch (Throwable e) {LogUtil.trace(e);}
 	}
@@ -160,6 +162,62 @@ public abstract class ModelBasedRecommenderAbstract extends RecommenderAbstract 
 		config.setStoreUri(store);
 		
 		return config;
+	}
+
+
+	@Override
+	public Object learnStart(Object... info) throws RemoteException {
+		// TODO Auto-generated method stub
+		return kb.learnStart(info);
+	}
+
+
+	@Override
+	public synchronized boolean learnPause() throws RemoteException {
+		// TODO Auto-generated method stub
+		return kb.learnPause();
+	}
+
+
+	@Override
+	public synchronized boolean learnResume() throws RemoteException {
+		// TODO Auto-generated method stub
+		return kb.learnResume();
+	}
+
+
+	@Override
+	public synchronized boolean learnStop() throws RemoteException {
+		// TODO Auto-generated method stub
+		return kb.learnStop();
+	}
+
+
+	@Override
+	public boolean learnForceStop() throws RemoteException {
+		// TODO Auto-generated method stub
+		return kb.learnForceStop();
+	}
+
+
+	@Override
+	public boolean isLearnStarted() throws RemoteException {
+		// TODO Auto-generated method stub
+		return kb.isLearnStarted();
+	}
+
+
+	@Override
+	public boolean isLearnPaused() throws RemoteException {
+		// TODO Auto-generated method stub
+		return kb.isLearnPaused();
+	}
+
+
+	@Override
+	public boolean isLearnRunning() throws RemoteException {
+		// TODO Auto-generated method stub
+		return kb.isLearnRunning();
 	}
 	
 

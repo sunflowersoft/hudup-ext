@@ -57,7 +57,19 @@ public abstract class AlgAbstract implements Alg, AlgRemote {
     protected EventListenerList listenerList = new EventListenerList();
     
 
-	/**
+    /**
+     * Flag to indicate whether algorithm learning process was started.
+     */
+    protected volatile boolean learnStarted = false;
+    
+    
+    /**
+     * Flag to indicate whether algorithm learning process was paused.
+     */
+    protected volatile boolean learnPaused = false;
+
+    
+    /**
 	 * Default constructor.
 	 */
 	public AlgAbstract() {
@@ -65,6 +77,113 @@ public abstract class AlgAbstract implements Alg, AlgRemote {
 	}
 
 	
+	@Override
+	public Object learnStart(Object... info) throws RemoteException {
+		if (isLearnStarted()) return null;
+		
+		learnStarted = true;
+		
+		while (learnStarted) {
+			
+			//Do something here.
+			
+			synchronized (this) {
+				while (learnPaused) {
+					notifyAll();
+					try {
+						wait();
+					} catch (Exception e) {LogUtil.trace(e);}
+				}
+			}
+			
+			learnStarted = false; //Pseudo-code to stop learning process.
+		}
+		
+		synchronized (this) {
+			learnStarted = true;
+			learnPaused = false;
+			
+			notifyAll();
+		}
+		
+		return null;
+	}
+
+
+	@Override
+	public synchronized boolean learnPause() throws RemoteException {
+		if (!isLearnRunning()) return false;
+		
+		learnPaused  = true;
+		
+		try {
+			wait();
+		} 
+		catch (Throwable e) {
+			LogUtil.trace(e);
+		}
+		
+		return true;
+	}
+
+
+	@Override
+	public synchronized boolean learnResume() throws RemoteException {
+		if (!isLearnPaused()) return false;
+		
+		learnPaused = false;
+		notifyAll();
+		
+		return true;
+	}
+
+
+	@Override
+	public synchronized boolean learnStop() throws RemoteException {
+		if (!isLearnStarted()) return false;
+		
+		learnStarted = false;
+		
+		if (learnPaused) {
+			learnPaused = false;
+			notifyAll();
+		}
+		
+		try {
+			wait();
+		} 
+		catch (Throwable e) {
+			LogUtil.trace(e);
+		}
+		
+		return true;
+	}
+
+
+	@Override
+	public boolean learnForceStop() throws RemoteException {
+		return learnStop();
+	}
+
+
+	@Override
+	public boolean isLearnStarted() throws RemoteException {
+		return learnStarted;
+	}
+
+
+	@Override
+	public boolean isLearnPaused() throws RemoteException {
+		return learnStarted && learnPaused;
+	}
+
+
+	@Override
+	public boolean isLearnRunning() throws RemoteException {
+		return learnStarted && !learnPaused;
+	}
+
+
 	@Override
 	public DataConfig getConfig() {
 		// TODO Auto-generated method stub
@@ -163,13 +282,15 @@ public abstract class AlgAbstract implements Alg, AlgRemote {
 	@Override
 	public void fireSetupEvent(SetupAlgEvent evt) throws RemoteException {
 		// TODO Auto-generated method stub
-		SetupAlgListener[] listeners = getSetupListeners();
-		for (SetupAlgListener listener : listeners) {
-			try {
-				listener.receivedSetup(evt);
-			}
-			catch (Throwable e) {
-				LogUtil.trace(e);
+		synchronized (listenerList) {
+			SetupAlgListener[] listeners = getSetupListeners();
+			for (SetupAlgListener listener : listeners) {
+				try {
+					listener.receivedSetup(evt);
+				}
+				catch (Throwable e) {
+					LogUtil.trace(e);
+				}
 			}
 		}
 	}

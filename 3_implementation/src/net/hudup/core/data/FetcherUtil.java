@@ -57,11 +57,12 @@ public class FetcherUtil {
 	
 	
 	/**
-	 * Fixing the problem of serializing memory fetcher.
+	 * Fixing the problem of serializing memory fetcher. This method is now deprecated because the problem of serialization is solved in {@link MemFetcher#next()}.
 	 * @param <T> type of elements.
 	 * @param fetcher specified fetcher.
 	 * @return the specified fetcher itself.
 	 */
+	@Deprecated
 	public static <T> Fetcher<T> fixFetcherSerialized(Fetcher<T> fetcher) {
 		if ((fetcher == null) || !(fetcher instanceof MemFetcher<?>))
 			return fetcher;

@@ -14,6 +14,7 @@ import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.DatasetRemote;
 import net.hudup.core.data.DatasetRemoteWrapper;
+import net.hudup.core.evaluate.Evaluator;
 
 /**
  * This class represents an event fired by a source (often evaluator) for successful setting up an algorithm.
@@ -64,7 +65,7 @@ public class SetupAlgEvent extends EventObject {
 	/**
 	 * Training dataset. It must be serializable in remote call.
 	 */
-	private DatasetRemote trainingDataset = null;
+	protected DatasetRemote trainingDataset = null;
 	
 	
 	/**
@@ -74,16 +75,43 @@ public class SetupAlgEvent extends EventObject {
 	
 	
 	/**
+	 * Current step in progress.
+	 */
+	protected int progressStep = 0;
+	
+	
+	/**
+	 * Total estimated number of steps in progress.
+	 */
+	protected int progressTotalEstimated = 0;
+	
+	
+	/**
 	 * Constructor with a source of event, algorithm name, training dataset, and setting up result.
-	 * @param source source of event. Usually, it is an evaluator.
+	 * @param source source of event. It is usually an evaluator but it can be the algorithm itself.
 	 * @param type type of event.
 	 * @param algName name of the algorithm issuing the setup result.
 	 * @param trainingDataset training dataset.
 	 * @param setupResult specified result.
 	 */
-	public SetupAlgEvent(Serializable source, Type type, String algName, Dataset trainingDataset, Serializable setupResult) {
+	public SetupAlgEvent(Object source, Type type, String algName, Dataset trainingDataset, Serializable setupResult) {
+		this(source, type, algName, trainingDataset, setupResult, 0, 0);
+	}
+
+	
+	/**
+	 * Constructor with a source of event, algorithm name, training dataset, setting up result, progress step, and progress total.
+	 * @param source source of event. It is usually an evaluator but it can be the algorithm itself. This source is invalid in remote call because the source is transient variable.
+	 * @param type type of event.
+	 * @param algName name of the algorithm issuing the setup result.
+	 * @param trainingDataset training dataset.
+	 * @param setupResult specified result.
+	 * @param progressStep progress step.
+	 * @param progressTotalEstimated progress total estimated.
+	 */
+	public SetupAlgEvent(Object source, Type type, String algName, Dataset trainingDataset, Serializable setupResult,
+			int progressStep, int progressTotalEstimated) {
 		super(source);
-		// TODO Auto-generated constructor stub
 		this.algName = algName;
 		
 		this.type = type;
@@ -92,6 +120,26 @@ public class SetupAlgEvent extends EventObject {
 		else if (trainingDataset instanceof DatasetRemote)
 			this.trainingDataset = new DatasetRemoteWrapper((DatasetRemote)trainingDataset, false);
 		this.setupResult = setupResult;
+		
+		this.progressStep = progressStep;
+		this.progressTotalEstimated = progressTotalEstimated;
+	}
+	
+	
+	/**
+	 * Getting evaluator. This method cannot be called remotely because the source is transient variable.
+	 * @return evaluator.
+	 */
+	@SuppressWarnings("unused")
+	@Deprecated
+	private Evaluator getEvaluator() {
+		Object source = getSource();
+		if (source == null)
+			return null;
+		else if (source instanceof Evaluator)
+			return (Evaluator)source;
+		else
+			return null;
 	}
 
 	
@@ -130,6 +178,24 @@ public class SetupAlgEvent extends EventObject {
 		return setupResult;
 	}
 	
+	
+	/**
+	 * Getting progress step.
+	 * @return progress step.
+	 */
+	public int getProgressStep() {
+		return progressStep;
+	}
+	
+	
+	/**
+	 * Getting progress total in estimation.
+	 * @return progress total in estimation.
+	 */
+	public int getProgressTotalEstimated() {
+		return progressTotalEstimated;
+	}
+
 	
 	/**
 	 * Translating this event into text.

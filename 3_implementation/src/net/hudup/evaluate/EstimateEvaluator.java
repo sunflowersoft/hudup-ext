@@ -67,14 +67,14 @@ public class EstimateEvaluator extends RecommendEvaluator {
 		
 		Thread current = Thread.currentThread();
 		for (int i = 0; current == thread && evAlgList != null && i < evAlgList.size(); i++) {
-			try {
-				if (!acceptAlg(evAlgList.get(i))) continue;
-			} catch (Throwable e) {
-				// TODO Auto-generated catch block
-				LogUtil.trace(e);
-				continue;
-			}
+//			try {
+//				if (!acceptAlg(evAlgList.get(i))) continue;
+//			} catch (Throwable e) {
+//				LogUtil.trace(e);
+//				continue;
+//			}
 			Recommender recommender = (Recommender)evAlgList.get(i);
+			evAlg = recommender;
 			otherResult.algName = recommender.getName();
 			
 			for (int j = 0; current == thread && evPool != null && j < evPool.size(); j++) {
@@ -94,6 +94,7 @@ public class EstimateEvaluator extends RecommendEvaluator {
 					otherResult.inAlgSetup = true;
 					recommender.addSetupListener(this);
 					SetupAlgEvent setupEvt = new SetupAlgEvent(recommender, SetupAlgEvent.Type.doing, recommender.getName(), null, "not supported yet");
+					otherResult.statuses = extractSetupInfo(setupEvt);
 					fireSetupAlgEvent(setupEvt);
 					
 					long beginSetupTime = System.currentTimeMillis();
@@ -112,6 +113,7 @@ public class EstimateEvaluator extends RecommendEvaluator {
 					fireEvaluateEvent(new EvaluateEvent(this, Type.doing, setupMetrics)); // firing setup time metric
 
 					setupEvt = new SetupAlgEvent(recommender, SetupAlgEvent.Type.done, recommender.getName(), null, "not supported yet");
+					otherResult.statuses = extractSetupInfo(setupEvt);
 					fireSetupAlgEvent(setupEvt);
 					recommender.removeSetupListener(this);
 					otherResult.inAlgSetup = false;
@@ -135,6 +137,7 @@ public class EstimateEvaluator extends RecommendEvaluator {
 						progressEvt.setDatasetId(datasetId);
 						progressEvt.setCurrentCount(otherResult.vCurrentCount);
 						progressEvt.setCurrentTotal(otherResult.vCurrentTotal);
+						otherResult.statuses = extractEvaluateProgressInfo(progressEvt);
 						//Fire progress event.
 						fireEvaluateProgressEvent(progressEvt);
 						

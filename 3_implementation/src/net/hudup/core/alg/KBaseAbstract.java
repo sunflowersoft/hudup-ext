@@ -68,6 +68,18 @@ public abstract class KBaseAbstract implements KBase, KBaseRemote {
 
     
     /**
+     * Flag to indicate whether algorithm learning process was started.
+     */
+    protected volatile boolean learnStarted = false;
+    
+    
+    /**
+     * Flag to indicate whether algorithm learning process was paused.
+     */
+    protected volatile boolean learnPaused = false;
+
+    
+    /**
 	 * Default constructor.
 	 */
 	protected KBaseAbstract() {
@@ -76,7 +88,7 @@ public abstract class KBaseAbstract implements KBase, KBaseRemote {
 	
 	
 	@Override
-	public void load() throws RemoteException {
+	public synchronized void load() throws RemoteException {
 		// TODO Auto-generated method stub
 		
 		xURI store = config.getStoreUri();
@@ -95,7 +107,7 @@ public abstract class KBaseAbstract implements KBase, KBaseRemote {
 
 
 	@Override
-	public void learn(Dataset dataset, Alg alg) throws RemoteException {
+	public synchronized void learn(Dataset dataset, Alg alg) throws RemoteException {
 		// TODO Auto-generated method stub
 		config.setMetadata(dataset.getConfig().getMetadata());
 		config.put(KBASE_NAME, getName());
@@ -124,7 +136,7 @@ public abstract class KBaseAbstract implements KBase, KBaseRemote {
 	
 	
 	@Override
-	public void save(DataConfig storeConfig) throws RemoteException {
+	public synchronized void save(DataConfig storeConfig) throws RemoteException {
 		// TODO Auto-generated method stub
 
 		UriAdapter adapter = new UriAdapter(storeConfig);
@@ -156,7 +168,7 @@ public abstract class KBaseAbstract implements KBase, KBaseRemote {
 
 
 	@Override
-	public void clear() throws RemoteException {
+	public synchronized void clear() throws RemoteException {
 		// TODO Auto-generated method stub
 		
 		xURI store = config.getStoreUri();
@@ -191,7 +203,7 @@ public abstract class KBaseAbstract implements KBase, KBaseRemote {
 	 * @see net.hudup.core.alg.KBaseRemoteTask#close()
 	 */
 	@Override
-	public void close() throws Exception {
+	public synchronized void close() throws Exception {
 		// TODO Auto-generated method stub
 		datasource.close();
 		
@@ -241,7 +253,7 @@ public abstract class KBaseAbstract implements KBase, KBaseRemote {
 
 
 	@Override
-	public void setConfig(DataConfig config) {
+	public synchronized void setConfig(DataConfig config) {
 		this.config = config;
 	}
 
@@ -293,13 +305,15 @@ public abstract class KBaseAbstract implements KBase, KBaseRemote {
 	@Override
 	public void fireSetupEvent(SetupAlgEvent evt) throws RemoteException {
 		// TODO Auto-generated method stub
-		SetupAlgListener[] listeners = getSetupListeners();
-		for (SetupAlgListener listener : listeners) {
-			try {
-				listener.receivedSetup(evt);
-			}
-			catch (Throwable e) {
-				LogUtil.trace(e);
+		synchronized (listenerList) {
+			SetupAlgListener[] listeners = getSetupListeners();
+			for (SetupAlgListener listener : listeners) {
+				try {
+					listener.receivedSetup(evt);
+				}
+				catch (Throwable e) {
+					LogUtil.trace(e);
+				}
 			}
 		}
 	}
@@ -375,6 +389,113 @@ public abstract class KBaseAbstract implements KBase, KBaseRemote {
 		try {
 			unexport();
 		} catch (Throwable e) {LogUtil.trace(e);}
+	}
+
+
+	@Override
+	public Object learnStart(Object... info) throws RemoteException {
+		if (isLearnStarted()) return null;
+		
+		learnStarted = true;
+		
+		while (learnStarted) {
+			
+			//Do something here.
+			
+			synchronized (this) {
+				while (learnPaused) {
+					notifyAll();
+					try {
+						wait();
+					} catch (Exception e) {LogUtil.trace(e);}
+				}
+			}
+			
+			learnStarted = false; //Pseudo-code to stop learning process.
+		}
+		
+		synchronized (this) {
+			learnStarted = true;
+			learnPaused = false;
+			
+			notifyAll();
+		}
+		
+		return null;
+	}
+
+
+	@Override
+	public synchronized boolean learnPause() throws RemoteException {
+		if (!isLearnRunning()) return false;
+		
+		learnPaused  = true;
+		
+		try {
+			wait();
+		} 
+		catch (Throwable e) {
+			LogUtil.trace(e);
+		}
+		
+		return true;
+	}
+
+
+	@Override
+	public synchronized boolean learnResume() throws RemoteException {
+		if (!isLearnPaused()) return false;
+		
+		learnPaused = false;
+		notifyAll();
+		
+		return true;
+	}
+
+
+	@Override
+	public synchronized boolean learnStop() throws RemoteException {
+		if (!isLearnStarted()) return false;
+		
+		learnStarted = false;
+		
+		if (learnPaused) {
+			learnPaused = false;
+			notifyAll();
+		}
+		
+		try {
+			wait();
+		} 
+		catch (Throwable e) {
+			LogUtil.trace(e);
+		}
+		
+		return true;
+	}
+
+
+	@Override
+	public synchronized boolean learnForceStop() throws RemoteException {
+		return learnStop();
+	}
+
+
+	@Override
+	public boolean isLearnStarted() throws RemoteException {
+		return learnStarted;
+	}
+
+
+	@Override
+	public boolean isLearnPaused() throws RemoteException {
+		return learnStarted && learnPaused;
+	}
+
+
+	@Override
+	public boolean isLearnRunning() throws RemoteException {
+		return learnStarted && !learnPaused;
 	}
 
 

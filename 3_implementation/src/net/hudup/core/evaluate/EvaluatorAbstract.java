@@ -40,11 +40,14 @@ import net.hudup.core.data.DatasetRemoteWrapper;
 import net.hudup.core.data.Fetcher;
 import net.hudup.core.data.Profile;
 import net.hudup.core.evaluate.EvaluateEvent.Type;
+import net.hudup.core.evaluate.ui.AbstractEvaluateGUI;
 import net.hudup.core.logistic.AbstractRunner;
 import net.hudup.core.logistic.Counter;
 import net.hudup.core.logistic.CounterElapsedTimeListener;
 import net.hudup.core.logistic.DSUtil;
+import net.hudup.core.logistic.I18nUtil;
 import net.hudup.core.logistic.LogUtil;
+import net.hudup.core.logistic.MathUtil;
 import net.hudup.core.logistic.NetUtil;
 import net.hudup.core.logistic.SystemUtil;
 import net.hudup.core.logistic.TaskQueue;
@@ -160,6 +163,12 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
     
     
     /**
+     * Current evaluated algorithm.
+     */
+	protected Alg evAlg = null;
+
+	
+	/**
      * This {@code dataset pool} contains many training and testing datasets, which is fed to evaluator, which allows evaluator assesses algorithm on many testing datasets.
      */
     protected DatasetPool evPool = null;
@@ -350,8 +359,8 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 		
 		Thread current = Thread.currentThread();
 		for (int i = 0; current == thread && evAlgList != null && i < evAlgList.size(); i++) {
-			Alg alg = evAlgList.get(i);
-			otherResult.algName = alg.getName();
+			evAlg = evAlgList.get(i);
+			otherResult.algName = evAlg.getName();
 			
 			for (int j = 0; current == thread && evPool != null && j < evPool.size(); j++) {
 				
@@ -365,33 +374,35 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 					otherResult.datasetId = datasetId;
 					
 					// Adding default metrics to metric result. Pay attention to cloning metrics list.
-					result.add( alg.getName(), datasetId, datasetUri, ((NoneWrapperMetricList)evMetricList.clone()).sort().list() );
+					result.add( evAlg.getName(), datasetId, datasetUri, ((NoneWrapperMetricList)evMetricList.clone()).sort().list() );
 					
 					otherResult.inAlgSetup = true;
-					if (alg instanceof AlgRemote) {
-						((AlgRemote)alg).addSetupListener(this);
-						SetupAlgEvent setupEvt = new SetupAlgEvent(alg, SetupAlgEvent.Type.doing, alg.getName(), null, "not supported yet");
+					if (evAlg instanceof AlgRemote) {
+						((AlgRemote)evAlg).addSetupListener(this);
+						SetupAlgEvent setupEvt = new SetupAlgEvent(evAlg, SetupAlgEvent.Type.doing, evAlg.getName(), null, "fired");
+						otherResult.statuses = extractSetupInfo(setupEvt);
 						fireSetupAlgEvent(setupEvt);
 					}
 					
 					long beginSetupTime = System.currentTimeMillis();
 					// 
-					setupAlg(alg, training);
+					setupAlg(evAlg, training);
 					//
 					long endSetupTime = System.currentTimeMillis();
 					long setupElapsed = endSetupTime - beginSetupTime;
 					Metrics setupMetrics = result.recalc(
-							alg, 
+							evAlg, 
 							datasetId, 
 							SetupTimeMetric.class, 
 							new Object[] { setupElapsed / 1000.0f }
 						); // calculating setup time metric
 					fireEvaluateEvent(new EvaluateEvent(this, Type.doing, setupMetrics)); // firing setup time metric
 					
-					if (alg instanceof AlgRemote) {
-						SetupAlgEvent setupEvt = new SetupAlgEvent(alg, SetupAlgEvent.Type.done, alg.getName(), null, "not supported yet");
+					if (evAlg instanceof AlgRemote) {
+						SetupAlgEvent setupEvt = new SetupAlgEvent(evAlg, SetupAlgEvent.Type.done, evAlg.getName(), null, "fired");
+						otherResult.statuses = extractSetupInfo(setupEvt);
 						fireSetupAlgEvent(setupEvt);
-						((AlgRemote)alg).removeSetupListener(this);
+						((AlgRemote)evAlg).removeSetupListener(this);
 					}
 					otherResult.inAlgSetup = false;
 					
@@ -406,25 +417,26 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 						otherResult.progressStep++;
 						otherResult.vCurrentCount++;
 						EvaluateProgressEvent progressEvt = new EvaluateProgressEvent(this, otherResult.progressTotal, otherResult.progressStep);
-						progressEvt.setAlgName(alg.getName());
+						progressEvt.setAlgName(evAlg.getName());
 						progressEvt.setDatasetId(datasetId);
 						progressEvt.setCurrentCount(otherResult.vCurrentCount);
 						progressEvt.setCurrentTotal(otherResult.vCurrentTotal);
+						otherResult.statuses = extractEvaluateProgressInfo(progressEvt);
 						fireEvaluateProgressEvent(progressEvt);
 						
 						Profile testingProfile = testingFetcher.pick();
 						if (testingProfile == null)
 							continue;
 						
-						Profile param = prepareExecuteAlg(alg, testingProfile);
+						Profile param = prepareExecuteAlg(evAlg, testingProfile);
 						//
 						long beginRecommendTime = System.currentTimeMillis();
-						Serializable executedResult = executeAlg(alg, param);
+						Serializable executedResult = executeAlg(evAlg, param);
 						long endRecommendTime = System.currentTimeMillis();
 						//
 						long recommendElapsed = endRecommendTime - beginRecommendTime;
 						Metrics speedMetrics = result.recalc(
-								alg, 
+								evAlg, 
 								datasetId, 
 								SpeedMetric.class, 
 								new Object[] { recommendElapsed / 1000.0f }
@@ -436,9 +448,9 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 						
 						if (executedResult != null) { // successful recommendation
 							Metrics executedMetrics = result.recalc(
-									alg, 
+									evAlg, 
 									datasetId,
-									new Object[] { executedResult, extractTestValue(alg, testingProfile) }
+									new Object[] { executedResult, extractTestValue(evAlg, testingProfile) }
 								); // calculating execution metric
 							
 							vExecutedCount++;
@@ -448,7 +460,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 									Type.doing, 
 									executedMetrics, 
 									executedResult, 
-									extractTestValue(alg, testingProfile))); // firing execution metric
+									extractTestValue(evAlg, testingProfile))); // firing execution metric
 						}
 						
 						
@@ -462,14 +474,14 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 					} // User id iterate
 					
 					Metrics hudupRecallMetrics = result.recalc(
-							alg, 
+							evAlg, 
 							datasetId, 
 							HudupRecallMetric.class, 
 							new Object[] { new FractionMetricValue(vExecutedCount, otherResult.vCurrentTotal) }
 						);
 					fireEvaluateEvent(new EvaluateEvent(this, Type.doing, hudupRecallMetrics));
 					
-					Metrics doneOneMetrics = result.gets(alg.getName(), datasetId);
+					Metrics doneOneMetrics = result.gets(evAlg.getName(), datasetId);
 					fireEvaluateEvent(new EvaluateEvent(this, Type.done_one, doneOneMetrics));
 					
 				} // end try
@@ -484,7 +496,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 					} catch (Throwable e) {LogUtil.trace(e);}
 					
 					try {
-						unsetupAlgSupportDelay(alg);
+						unsetupAlgSupportDelay(evAlg);
 					} catch (Throwable e) {LogUtil.trace(e);}
 				}
 				
@@ -611,6 +623,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 	public void receivedSetup(SetupAlgEvent evt) throws RemoteException {
 		// TODO Auto-generated method stub
 		fireSetupAlgEvent(evt);
+		otherResult.statuses = extractSetupInfo(evt);
 	}
 	
 	
@@ -958,6 +971,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 	protected void clear() {
 		// TODO Auto-generated method stub
 		this.evAlgList = null;
+		this.evAlg = null;
 		this.evPool = null;
 		this.evParameter = null;
 		
@@ -1067,7 +1081,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 			
 			EvaluatorListener[] listeners = getEvaluatorListeners();
 			for (EvaluatorListener listener : listeners) {
-//				if (taskQueue.isRunning()) {
+//				if ((!config.isTiedSync()) && evTaskQueue.isRunning() && (!(listener instanceof AbstractEvaluateGUI))) {
 //					taskQueue.addTask(new TaskQueue.Task() {
 //						
 //						@Override
@@ -1127,7 +1141,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 			
 			EvaluateListener[] listeners = getEvaluateListeners();
 			for (EvaluateListener listener : listeners) {
-				if ((!config.isTiedSync()) && evTaskQueue.isRunning()) {
+				if ((!config.isTiedSync()) && evTaskQueue.isRunning() && (!(listener instanceof AbstractEvaluateGUI))) {
 					evTaskQueue.addTask(new TaskQueue.Task() {
 						
 						@Override
@@ -1224,7 +1238,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 			
 	    	EvaluateProgressListener[] listeners = getEvaluateProgressListeners();
 			for (EvaluateProgressListener listener : listeners) {
-				if ((!config.isTiedSync()) && evTaskQueue.isRunning()) {
+				if ((!config.isTiedSync()) && evTaskQueue.isRunning() && (!(listener instanceof AbstractEvaluateGUI))) {
 					evTaskQueue.addTask(new TaskQueue.Task() {
 						
 						@Override
@@ -1284,7 +1298,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 			
 	    	SetupAlgListener[] listeners = getSetupAlgListeners();
 			for (SetupAlgListener listener : listeners) {
-				if ((!config.isTiedSync()) && evTaskQueue.isRunning()) {
+				if ((!config.isTiedSync()) && evTaskQueue.isRunning() && (!(listener instanceof AbstractEvaluateGUI))) {
 					evTaskQueue.addTask(new TaskQueue.Task() {
 						
 						@Override
@@ -1549,7 +1563,16 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 	@Override
 	public synchronized boolean remotePause() throws RemoteException {
 		// TODO Auto-generated method stub
-		if (!pause()) return false;
+		if (otherResult.inAlgSetup && evAlg != null && evAlg instanceof AlgRemote) {
+			if (!((AlgRemote)evAlg).learnPause()) {
+				if (!pause()) return false;
+			}
+			else
+				paused = true;
+		}
+		else {
+			if (!pause()) return false;
+		}
 
 		evCounter.pause();
 		evTaskQueue.pause();
@@ -1565,8 +1588,18 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 	@Override
 	public synchronized boolean remoteResume() throws RemoteException {
 		// TODO Auto-generated method stub
-		if (!resume()) return false;
+		if (otherResult.inAlgSetup && evAlg != null && evAlg instanceof AlgRemote) {
+			if (!((AlgRemote)evAlg).learnResume()) {
+				if (!resume()) return false;
+			}
+			else
+				paused = false;
+		}
+		else {
+			if (!resume()) return false;
+		}
 
+		
 		evTaskQueue.resume();
 		evCounter.resume();
 
@@ -1580,7 +1613,10 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 	
 	@Override
 	public synchronized boolean remoteStop() throws RemoteException {
-		// TODO Auto-generated method stub
+		if (otherResult.inAlgSetup && evAlg != null && evAlg instanceof AlgRemote) {
+			((AlgRemote)evAlg).learnStop();
+		}
+		
 		if (!stop()) return false;
 
 		this.evCounter.stop();
@@ -1629,4 +1665,76 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 //	}
 			
 
+	/**
+	 * Extracting information from specified evaluation progress event.
+	 * @param evt specified evaluation progress event.
+	 * @return information from evaluation progress event as string array.
+	 */
+	public static String[] extractEvaluateProgressInfo(EvaluateProgressEvent evt) {
+		int progressTotal = evt.getProgressTotal();
+		int progressStep = evt.getProgressStep();
+		String algName = evt.getAlgName();
+		int datasetId = evt.getDatasetId();
+		int vCurrentCount = evt.getCurrentCount();
+		int vCurrentTotal = evt.getCurrentTotal();
+		
+		String status1 =
+				I18nUtil.message("algorithm") + " '" + DSUtil.shortenVerbalName(algName) + "' " +
+				I18nUtil.message("dataset") + " '" + datasetId + "': " + 
+				vCurrentCount + "/" + vCurrentTotal;
+		
+		String status2 =
+				I18nUtil.message("total") + ": " + progressStep + "/" + progressTotal;
+		
+		return new String[] {status1, status2};
+	}
+	
+	
+	/**
+	 * Extracting information from specified setting up algorithm event.
+	 * @param evt specified setting up algorithm event.
+	 * @return information from specified setting up algorithm event.
+	 */
+	public static String[] extractSetupInfo(SetupAlgEvent evt) {
+		String algName = evt.getAlgName();
+		if (algName == null) return new String[] {""};
+
+		String datasetName = null;
+		try {
+			if (evt.getTrainingDataset() != null) {
+				xURI storeUri = evt.getTrainingDataset().getConfig().getStoreUri();
+				if (storeUri != null) datasetName = storeUri.getLastName();
+				datasetName = datasetName == null || datasetName.isEmpty() ? null : datasetName;
+			}
+		}
+		catch (Exception e) {
+			LogUtil.trace(e);
+			datasetName = null;
+		}
+		
+		String status = "";
+		if (evt.getType() == SetupAlgEvent.Type.doing) {
+			status = I18nUtil.message("setting_up_algorithm") + " '" + DSUtil.shortenVerbalName(algName) + "'";
+			if (datasetName != null)
+				status += " on training set '" + DSUtil.shortenVerbalName(datasetName) + "'";
+			
+			if (evt.getProgressTotalEstimated() > 0)
+				status += ": " + MathUtil.format((double)evt.getProgressStep() / evt.getProgressTotalEstimated() * 100.0) + "%";
+			else
+				status += ". " + I18nUtil.message("please_wait") + "...";
+		}
+		else if (evt.getType() == SetupAlgEvent.Type.done) {
+			if (evt.getProgressTotalEstimated() > 0) {
+				status = I18nUtil.message("setting_up_algorithm") + " '" + DSUtil.shortenVerbalName(algName) + "'";
+				if (datasetName != null)
+					status += " on training set '" + DSUtil.shortenVerbalName(datasetName) + "'";
+
+				status += " done " + MathUtil.format((double)evt.getProgressStep() / evt.getProgressTotalEstimated() * 100.0) + "%";
+			}
+		}
+		
+		return new String[] {status};
+	}
+	
+	
 }

@@ -123,24 +123,18 @@ public class BalancerCP extends JFrame implements ServerStatusListener {
 
 	/**
 	 * Binded URI of this control panel as remote RMI object. It is URI pointing to where this control panel is located.
+	 * If it is not null, this control panel associates with remote balancer on remote host.
 	 */
 	private xURI bindUri = null;
 	
-	/**
-	 * If this flag is true, this control panel associates with remote balancer on remote host.
-	 * If this flag is false, this control panel associates with local balancer on the same host.
-	 */
-	private boolean bRemote = false;
 
 	
 	/**
 	 * Constructor with reference to specified balancer and binded URI of this control panel as remote RMI object.
 	 * @param listener specified balancer.
-	 * @param bindUri binded URI of this control panel as remote RMI object.
-	 * @param bRemote if this flag is true, this control panel associates with remote balancer on remote host.
-	 * If this flag is false, this control panel associates with local balancer on the same host.
+	 * @param bindUri binded URI of this control panel as remote RMI object. If it is not null, this control panel associates with remote balancer on remote host.
 	 */
-	public BalancerCP(Server listener, xURI bindUri, boolean bRemote) {
+	public BalancerCP(Server listener, xURI bindUri) {
 		super("Balancer control panel");
 		try {
 			setDefaultCloseOperation(DISPOSE_ON_CLOSE);
@@ -163,7 +157,6 @@ public class BalancerCP extends JFrame implements ServerStatusListener {
 			
 			this.listener = listener;
 			this.bindUri = bindUri;
-			this.bRemote = bRemote;
 			
 			Container container = getContentPane();
 			JTabbedPane main = new JTabbedPane();
@@ -180,7 +173,7 @@ public class BalancerCP extends JFrame implements ServerStatusListener {
 			LogUtil.trace(e);
 		}
 		
-		if(!this.bRemote) {
+		if(bindUri == null) {
 			Runtime.getRuntime().addShutdownHook(new Thread() {
 	
 				@Override
@@ -206,7 +199,7 @@ public class BalancerCP extends JFrame implements ServerStatusListener {
 	 * @param listener local balancer.
 	 */
 	public BalancerCP(Server listener) {
-		this(listener, null, false);
+		this(listener, null);
 	}
 
 	
@@ -217,49 +210,42 @@ public class BalancerCP extends JFrame implements ServerStatusListener {
 	private void bindServer() throws RemoteException {
 		boolean result = false;
 		
-		if (!bRemote) {
-			bindUri = null;
+		if (bindUri == null) {
 			registry = null;
-			
 			result = listener.addStatusListener(this);
 		}
 		else {
 			btnExitListener.setVisible(false);
 			
-			if (bindUri != null) {
-			
+			try {
+				registry = LocateRegistry.createRegistry(bindUri.getPort());
+				UnicastRemoteObject.exportObject(this, bindUri.getPort());
+				
+				result = listener.addStatusListener(this);
+				if (!result)
+					throw new Exception();
+			}
+			catch (Throwable e) {
+				LogUtil.trace(e);
+				
 				try {
-					registry = LocateRegistry.createRegistry(bindUri.getPort());
-					UnicastRemoteObject.exportObject(this, bindUri.getPort());
-					
-					result = listener.addStatusListener(this);
-					if (!result)
-						throw new Exception();
+		        	UnicastRemoteObject.unexportObject(this, true);
 				}
-				catch (Throwable e) {
-					LogUtil.trace(e);
-					
-					try {
-			        	UnicastRemoteObject.unexportObject(this, true);
-					}
-					catch (Throwable e1) {
-						e1.printStackTrace();
-					}
-					
-					try {
-			    		UnicastRemoteObject.unexportObject(registry, true);
-					}
-					catch (Throwable e1) {
-						e1.printStackTrace();
-					}
-					
-					registry = null;
-					bindUri = null;
-					result = false;
+				catch (Throwable e1) {
+					e1.printStackTrace();
 				}
-			
-			} // if (bindUri_ != null)
-			
+				
+				try {
+		    		UnicastRemoteObject.unexportObject(registry, true);
+				}
+				catch (Throwable e1) {
+					e1.printStackTrace();
+				}
+				
+				registry = null;
+				bindUri = null;
+				result = false;
+			}
 		}
 		
 		
@@ -462,7 +448,7 @@ public class BalancerCP extends JFrame implements ServerStatusListener {
 	 * Exit balancer remotely. After exiting, balancer is destroyed and cannot be re-started.
 	 */
 	private void exit() {
-		if (bRemote)
+		if (bindUri != null)
 			return;
 
 		try {
@@ -651,7 +637,7 @@ public class BalancerCP extends JFrame implements ServerStatusListener {
 
 			btnExitListener.setEnabled(true);
 			btnStart.setEnabled(false);
-			btnPauseResume.setEnabled(true && !bRemote);
+			btnPauseResume.setEnabled(true && bindUri == null);
 			btnPauseResume.setText("Pause");
 			btnStop.setEnabled(true);
 			
@@ -672,7 +658,7 @@ public class BalancerCP extends JFrame implements ServerStatusListener {
 
 			btnExitListener.setEnabled(true);
 			btnStart.setEnabled(false);
-			btnPauseResume.setEnabled(true && !bRemote);
+			btnPauseResume.setEnabled(true && bindUri == null);
 			btnPauseResume.setText("Resume");
 			btnStop.setEnabled(true);
 			
@@ -702,7 +688,7 @@ public class BalancerCP extends JFrame implements ServerStatusListener {
 			
 		}
 		else if (status == Status.exit) {
-			if (bRemote) {
+			if (bindUri != null) {
 				listener = null;
 				dispose();
 			}
@@ -715,7 +701,7 @@ public class BalancerCP extends JFrame implements ServerStatusListener {
 	public void statusChanged(ServerStatusEvent evt) 
 			throws RemoteException {
 		// TODO Auto-generated method stub
-		if (bRemote)
+		if (bindUri != null)
 			updateControls(evt.getStatus());
 		else if (!evt.getShutdownHookStatus())
 			updateControls(evt.getStatus());
@@ -736,10 +722,9 @@ public class BalancerCP extends JFrame implements ServerStatusListener {
 			LogUtil.trace(e);
 		}
 		
-		if (bRemote) {
+		if (bindUri != null) {
 			try {
-				if (bindUri != null)
-					UnicastRemoteObject.unexportObject(this, true);
+				UnicastRemoteObject.unexportObject(this, true);
 			}
 			catch (Throwable e) {
 				// TODO Auto-generated catch block
@@ -775,7 +760,7 @@ public class BalancerCP extends JFrame implements ServerStatusListener {
 		
 		Server server = dlg.getServer();
 		if (server != null)
-			new BalancerCP(server, ConnectDlg.getBindUri(), true);
+			new BalancerCP(server, ConnectDlg.getBindUri());
 		else {
 			JOptionPane.showMessageDialog(
 					null, "Can't retrieve balancer", "Can't retrieve balancer", JOptionPane.ERROR_MESSAGE);

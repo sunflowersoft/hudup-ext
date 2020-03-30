@@ -5,7 +5,7 @@
  * Email: ng_phloc@yahoo.com
  * Phone: +84-975250362
  */
-package net.hudup.evaluate.ui;
+package net.hudup.core.evaluate.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Component;

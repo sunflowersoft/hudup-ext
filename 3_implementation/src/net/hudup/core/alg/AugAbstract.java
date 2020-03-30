@@ -94,7 +94,7 @@ public abstract class AugAbstract extends ExecutableAlgAbstract implements Aug, 
 		else
 			this.sample = dataset.fetchSample();
 		
-		learn();
+		learnStart();
 		
 		SetupAlgEvent evt = new SetupAlgEvent(
 				this,

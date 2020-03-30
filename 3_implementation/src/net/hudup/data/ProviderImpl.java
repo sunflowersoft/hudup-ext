@@ -34,6 +34,7 @@ import net.hudup.core.data.Profile;
 import net.hudup.core.data.Provider;
 import net.hudup.core.data.ProviderAssoc;
 import net.hudup.core.data.Rating;
+import net.hudup.core.data.RatingMulti;
 import net.hudup.core.data.RatingTriple;
 import net.hudup.core.data.RatingVector;
 import net.hudup.core.data.Unit;
@@ -367,7 +368,7 @@ public class ProviderImpl implements Provider {
 				
 				rating.ratedDate = u.getValueAsTime(DataConfig.RATING_DATE_FIELD); 
 				
-				ContextList contexts = ctsManager.getContexts(userId, itemId);
+				ContextList contexts = ctsManager.getContexts(userId, itemId, rating.ratedDate);
 				if (contexts != null && contexts.size() > 0)
 					rating.contexts = contexts;
 				
@@ -428,18 +429,20 @@ public class ProviderImpl implements Provider {
 	
 	
 	/**
-	 * Inserting context with user identifier and item identifier.
+	 * Inserting context with user identifier, item identifier, and rated date.
 	 * @param userId user identifier.
 	 * @param itemId item identifier.
 	 * @param context specified context.
-	 * @return whether update successfully.
+	 * @param ratedDate rating date.
+	 * @return whether insert successfully.
 	 */
-	private boolean insertContext(int userId, int itemId, Context context) {
+	private boolean insertContext(int userId, int itemId, Context context, long ratedDate) {
 		Profile profile = new Profile(assoc.getAttributes(getConfig().getContextUnit()));
 		profile.setValue(DataConfig.USERID_FIELD, userId);
 		profile.setValue(DataConfig.ITEMID_FIELD, itemId);
 		profile.setValue(DataConfig.CTX_TEMPLATEID_FIELD, context.getTemplate().getId());
 		profile.setValue(DataConfig.CTX_VALUE_FIELD, context.getValue());
+		profile.setValue(DataConfig.RATING_DATE_FIELD, ratedDate);
 
 		return assoc.insertProfile(getConfig().getContextUnit(), profile);
 	}
@@ -450,15 +453,17 @@ public class ProviderImpl implements Provider {
 	 * @param userId user identifier.
 	 * @param itemId item identifier.
 	 * @param context specified context.
-	 * @return update SQL
+	 * @param ratedDate rating date.
+	 * @return whether update successfully.
 	 */
 	@SuppressWarnings("unused")
-	private boolean updateContext(int userId, int itemId, Context context) {
+	private boolean updateContext(int userId, int itemId, Context context, long ratedDate) {
 		Profile profile = new Profile(assoc.getAttributes(getConfig().getContextUnit()));
 		profile.setValue(DataConfig.USERID_FIELD, userId);
 		profile.setValue(DataConfig.ITEMID_FIELD, itemId);
 		profile.setValue(DataConfig.CTX_TEMPLATEID_FIELD, context.getTemplate().getId());
 		profile.setValue(DataConfig.CTX_VALUE_FIELD, context.getValue());
+		profile.setValue(DataConfig.RATING_DATE_FIELD, ratedDate);
 
 		return assoc.updateProfile(getConfig().getContextUnit(), profile);
 	}
@@ -466,28 +471,40 @@ public class ProviderImpl implements Provider {
 	
 	@Override
 	public boolean insertRating(int userId, int itemId, Rating rating) {
-		if (!rating.isRated())
-			return false;
-		
-		boolean result = true;
-		result &= insertRatingValue(userId, itemId, rating.value, rating.ratedDate);
-		
-		if (rating.contexts == null || rating.contexts.size() == 0)
-			return result;
-		
-		for (int i = 0; i < rating.contexts.size(); i++) {
-			Context context = rating.contexts.get(i);
-			if (context.getValue() == null || context.getTemplate() == null || context.getTemplate().getId() == -1)
-				continue;
+		// TODO Auto-generated method stub
+		if (rating instanceof RatingMulti) {
+			boolean result = true;
+			RatingMulti mrating = (RatingMulti)rating;
+			for (int i = 0; i < mrating.size(); i++) {
+				Rating r = mrating.get(0);
+				result &= insertRating(userId, itemId, r); //Call recursively.
+			}
 			
-			result &= insertContext(userId, itemId, context);
+			return result;
 		}
-		
-		
-		return result;
+		else {
+			if (!rating.isRated())
+				return false;
+			
+			boolean result = true;
+			result &= insertRatingValue(userId, itemId, rating.value, rating.ratedDate);
+			
+			if (rating.contexts == null || rating.contexts.size() == 0)
+				return result;
+			
+			for (int i = 0; i < rating.contexts.size(); i++) {
+				Context context = rating.contexts.get(i);
+				if (context.getValue() == null || context.getTemplate() == null || context.getTemplate().getId() == -1)
+					continue;
+				
+				result &= insertContext(userId, itemId, context, rating.ratedDate);
+			}
+			
+			return result;
+		}
 	}
-	
-	
+
+
 	@Override
 	public boolean insertRating(RatingVector vRating) {
 		// TODO Auto-generated method stub
@@ -509,37 +526,49 @@ public class ProviderImpl implements Provider {
 	@Override
 	public boolean updateRating(int userId, int itemId, Rating rating) {
 		// TODO Auto-generated method stub
-		if (!rating.isRated())
-			return false;
-		
-		boolean result = true;
-		boolean update = containsRating(userId, itemId);
-		if (update)
-			result &= updateRatingValue(userId, itemId, rating.value, rating.ratedDate);
-		else
-			result &= insertRatingValue(userId, itemId, rating.value, rating.ratedDate);
-		
-		if (rating.contexts == null || rating.contexts.size() == 0)
-			return result;
-		
-		for (int i = 0; i < rating.contexts.size(); i++) {
-			Context context = rating.contexts.get(i);
-			if (context.getValue() == null || context.getTemplate() == null || context.getTemplate().getId() == -1)
-				continue;
-			
-			// Removing all context if update
-			if (update) {
-				Profile profile = new Profile(assoc.getAttributes(getConfig().getContextUnit()));
-				profile.setValue(DataConfig.USERID_FIELD, userId);
-				profile.setValue(DataConfig.ITEMID_FIELD, itemId);
-
-				assoc.deleteProfile(getConfig().getContextUnit(), profile);
+		if (rating instanceof RatingMulti) {
+			boolean result = true;
+			RatingMulti mrating = (RatingMulti)rating;
+			for (int i = 0; i < mrating.size(); i++) {
+				Rating r = mrating.get(0);
+				result &= updateRating(userId, itemId, r); //Call recursively.
 			}
 			
-			result &= insertContext(userId, itemId, context);
+			return result;
 		}
-		
-		return result;
+		else {
+			if (!rating.isRated())
+				return false;
+			
+			boolean result = true;
+			boolean update = containsRating(userId, itemId);
+			if (update)
+				result &= updateRatingValue(userId, itemId, rating.value, rating.ratedDate);
+			else
+				result &= insertRatingValue(userId, itemId, rating.value, rating.ratedDate);
+			
+			if (rating.contexts == null || rating.contexts.size() == 0)
+				return result;
+			
+			for (int i = 0; i < rating.contexts.size(); i++) {
+				Context context = rating.contexts.get(i);
+				if (context.getValue() == null || context.getTemplate() == null || context.getTemplate().getId() == -1)
+					continue;
+				
+				// Removing all context if update
+				if (update) {
+					Profile profile = new Profile(assoc.getAttributes(getConfig().getContextUnit()));
+					profile.setValue(DataConfig.USERID_FIELD, userId);
+					profile.setValue(DataConfig.ITEMID_FIELD, itemId);
+
+					assoc.deleteProfile(getConfig().getContextUnit(), profile);
+				}
+				
+				result &= insertContext(userId, itemId, context, rating.ratedDate);
+			}
+			
+			return result;
+		}
 	}
 
 	

@@ -23,7 +23,7 @@ import net.hudup.core.logistic.NetUtil;
 import net.hudup.core.logistic.NetUtil.InetHardware;
 import net.hudup.core.logistic.xURI;
 import net.hudup.core.logistic.ui.UIUtil;
-import net.hudup.evaluate.ui.AbstractEvaluateGUI;
+import net.hudup.evaluate.ui.BatchEvaluateGUI;
 import net.hudup.server.DefaultServer;
 import net.hudup.server.DefaultService;
 import net.hudup.server.PowerServerConfig;
@@ -91,7 +91,7 @@ public class DefaultServerExt extends DefaultServer {
 		// TODO Auto-generated method stub
 		
 		try {
-			AbstractEvaluateGUI.class.getClass();
+			BatchEvaluateGUI.class.getClass();
 		}
 		catch (Exception e) {
 			LogUtil.error("There is no evaluator package, error by " + e.getMessage());

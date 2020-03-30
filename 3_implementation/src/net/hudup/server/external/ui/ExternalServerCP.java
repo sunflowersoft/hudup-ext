@@ -57,12 +57,10 @@ public class ExternalServerCP extends PowerServerCP {
 	/**
 	 * Constructor with specified server and binded URI of such server.
 	 * @param server specified server
-	 * @param bindUri binded URI of such server.
-	 * @param bRemote if true then the server is remote.
+	 * @param bindUri binded URI of such server. If it is not null, the server is remote. 
 	 */
-	public ExternalServerCP(PowerServer server, xURI bindUri,
-			boolean bRemote) {
-		super(server, bindUri, bRemote);
+	public ExternalServerCP(PowerServer server, xURI bindUri) {
+		super(server, bindUri);
 		// TODO Auto-generated constructor stub
 	}
 
@@ -316,7 +314,7 @@ public class ExternalServerCP extends PowerServerCP {
 			
 			SetupExternalServerWizard dlg = new SetupExternalServerWizard(this,
 					(ExternalServerConfig)server.getConfig());
-			if (bRemote)
+			if (bindUri != null)
 				server.setConfig(dlg.getServerConfig());
 			
 			

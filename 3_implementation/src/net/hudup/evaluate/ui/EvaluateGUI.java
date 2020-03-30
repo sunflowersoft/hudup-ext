@@ -36,6 +36,7 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
+import javax.swing.SwingWorker;
 
 import net.hudup.core.PluginChangedEvent;
 import net.hudup.core.RegisterTable;
@@ -63,6 +64,8 @@ import net.hudup.core.evaluate.Evaluator;
 import net.hudup.core.evaluate.EvaluatorAbstract;
 import net.hudup.core.evaluate.EvaluatorEvent;
 import net.hudup.core.evaluate.Metrics;
+import net.hudup.core.evaluate.ui.AbstractEvaluateGUI;
+import net.hudup.core.evaluate.ui.EvaluateGUIData;
 import net.hudup.core.logistic.ClipboardUtil;
 import net.hudup.core.logistic.Counter;
 import net.hudup.core.logistic.CounterElapsedTimeEvent;
@@ -75,6 +78,7 @@ import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.xURI;
 import net.hudup.core.logistic.ui.TextField;
 import net.hudup.core.logistic.ui.UIUtil;
+import net.hudup.core.logistic.ui.WaitDialog;
 import net.hudup.data.DatasetUtil2;
 import net.hudup.data.ui.DatasetTextField;
 import net.hudup.data.ui.StatusBar;
@@ -924,16 +928,14 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 		footer.add(statusPane, BorderLayout.SOUTH);
 
 		this.statusBar = new StatusBar();
-		if (otherResult.inAlgSetup) {
-			this.statusBar.setTextPane1(I18nUtil.message("setting_up_algorithm") + " '" + DSUtil.shortenVerbalName(otherResult.algName) + "'. " + I18nUtil.message("please_wait") + "...");
-		}
-		else if (otherResult.progressTotal > 0) {
-			this.statusBar.setTextPane1(
-					I18nUtil.message("algorithm") + " '" + DSUtil.shortenVerbalName(otherResult.algName) + "' " +
-					I18nUtil.message("dataset") + " '" + otherResult.datasetId + "': " + 
-					otherResult.vCurrentCount + "/" + otherResult.vCurrentTotal);
-			
-			this.statusBar.setTextPane2(I18nUtil.message("total") + ": " + otherResult.progressStep + "/" + otherResult.progressTotal);
+		try {
+			this.statusBar.setTextPane0(DSUtil.shortenVerbalName(evaluator.getName()));
+		} catch (Exception e) {LogUtil.trace(e);}
+		if (otherResult.statuses != null && otherResult.statuses.length > 0) {
+			if (otherResult.statuses[0] != null)
+				this.statusBar.setTextPane1(otherResult.statuses[0]);
+			if (otherResult.statuses.length > 1 && otherResult.statuses[1] != null)
+				this.statusBar.setTextPane2(otherResult.statuses[1]);
 		}
 		if (otherResult.elapsedTime > 0) {
 			String elapsedTimeText = Counter.formatTime(otherResult.elapsedTime);
@@ -1016,14 +1018,26 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			if (evaluator.remoteIsStarted())
 				return;
 		
-			Dataset dataset = DatasetUtil.loadDataset(config);
+			JDialog dlgWait = WaitDialog.createDialog(this); dlgWait.setUndecorated(true);
+			SwingWorker<Dataset, Dataset> worker = new SwingWorker<Dataset, Dataset>() {
+				@Override
+				protected Dataset doInBackground() throws Exception {
+					return DatasetUtil.loadDataset(config);
+				}
+
+				@Override
+				protected void done() {
+					super.done(); dlgWait.dispose();
+				}
+			};
+			worker.execute(); dlgWait.setVisible(true);
+			Dataset dataset = worker.get();
 			if (dataset == null) {
 				JOptionPane.showMessageDialog(
 					this, 
 					"Training set not parsed", 
 					"Training set not parsed", 
 					JOptionPane.ERROR_MESSAGE);
-				
 				return;
 			}
 			
@@ -1144,7 +1158,20 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			if (evaluator.remoteIsStarted())
 				return;
 			
-			Dataset dataset = DatasetUtil.loadDataset(config);
+			JDialog dlgWait = WaitDialog.createDialog(this); dlgWait.setUndecorated(true);
+			SwingWorker<Dataset, Dataset> worker = new SwingWorker<Dataset, Dataset>() {
+				@Override
+				protected Dataset doInBackground() throws Exception {
+					return DatasetUtil.loadDataset(config);
+				}
+
+				@Override
+				protected void done() {
+					super.done(); dlgWait.dispose();
+				}
+			};
+			worker.execute(); dlgWait.setVisible(true);
+			Dataset dataset = worker.get();
 			if (dataset == null) {
 				JOptionPane.showMessageDialog(
 					this, 
@@ -1197,7 +1224,20 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			
 			clearResult();
 
-			evaluator.reloadPool();
+			JDialog dlgWait = WaitDialog.createDialog(this); dlgWait.setUndecorated(true);
+			SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
+				@Override
+				protected Void doInBackground() throws Exception {
+					evaluator.reloadPool();
+					return null;
+				}
+				
+				@Override
+				protected void done() {
+					super.done(); dlgWait.dispose();
+				}
+			};
+			worker.execute(); dlgWait.setVisible(true);
 		}
 		catch (Throwable e) {
 			// TODO Auto-generated catch block
@@ -1374,42 +1414,24 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 	
 	@Override
 	public synchronized void receivedProgress(EvaluateProgressEvent evt) throws RemoteException {
-		// TODO Auto-generated method stub
+		if (this.prgRunning.getMaximum() < evt.getProgressTotal())
+			this.prgRunning.setMaximum(evt.getProgressTotal());
+		if (this.prgRunning.getValue() < evt.getProgressStep()) 
+			this.prgRunning.setValue(evt.getProgressStep());
 
-		int progressTotal = evt.getProgressTotal();
-		int progressStep = evt.getProgressStep();
-		String algName = evt.getAlgName();
-		int datasetId = evt.getDatasetId();
-		int vCurrentCount = evt.getCurrentCount();
-		int vCurrentTotal = evt.getCurrentTotal();
-		
-		if (this.prgRunning.getMaximum() < progressTotal)
-			this.prgRunning.setMaximum(progressTotal);
-		if (this.prgRunning.getValue() < progressStep) 
-			this.prgRunning.setValue(progressStep);
-		
-		statusBar.setTextPane1(
-				I18nUtil.message("algorithm") + " '" + DSUtil.shortenVerbalName(algName) + "' " +
-				I18nUtil.message("dataset") + " '" + datasetId + "': " + 
-				vCurrentCount + "/" + vCurrentTotal);
-
-		statusBar.setTextPane2(I18nUtil.message("total") + ": " + progressStep + "/" + progressTotal);
+		String[] statuses = EvaluatorAbstract.extractEvaluateProgressInfo(evt);
+		statusBar.setTextPane1(statuses != null && statuses.length > 0 ? statuses[0] : "");
+		statusBar.setTextPane2(statuses != null && statuses.length > 1 ? statuses[1] : "");
 	}
 
 
 	@Override
 	public synchronized void receivedSetup(SetupAlgEvent evt) throws RemoteException {
-		// TODO Auto-generated method stub
+		String[] statuses = EvaluatorAbstract.extractSetupInfo(evt);
+		statusBar.setTextPane1(statuses != null && statuses.length > 0 ? statuses[0] : "");
+		
 		String algName = evt.getAlgName();
 		if (algName == null) return;
-
-		if (evt.getType() == SetupAlgEvent.Type.doing) {
-			this.statusBar.setTextPane1(I18nUtil.message("setting_up_algorithm") + " '" + DSUtil.shortenVerbalName(algName) + "'. " + I18nUtil.message("please_wait") + "...");
-		}
-		else if (evt.getType() == SetupAlgEvent.Type.done) {
-			this.statusBar.setTextPane1("");
-		}
-
 		
 		if (chkVerbal.isSelected()) {
 			String info = "========== Algorithm \"" + algName + "\" ==========\n";
@@ -1518,11 +1540,6 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			
 			if (chkRunSave.isSelected() && (txtRunSaveBrowse.getText() == null || txtRunSaveBrowse.getText().isEmpty()))
 				chkRunSave.setSelected(false);
-			
-			if (result == null)
-				statusBar.clearText();
-			
-			this.statusBar.setTextPane0(DSUtil.shortenVerbalName(evaluator.getName()));
 		}
 		catch (Throwable e) {
 			LogUtil.trace(e);
@@ -1628,7 +1645,8 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			this.txtRunInfo.setText("");
 			this.result = null;
 			this.tblMetrics.clear();
-			this.statusBar.getLastPane().setText(""); //Clearing elapsed time information.
+			this.statusBar.clearText();
+			this.statusBar.setTextPane0(DSUtil.shortenVerbalName(evaluator.getName()));
 			
 			this.timestamp = null;
 		}

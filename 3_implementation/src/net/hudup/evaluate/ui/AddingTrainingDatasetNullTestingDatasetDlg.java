@@ -10,7 +10,9 @@ package net.hudup.evaluate.ui;
 import java.awt.Component;
 import java.util.List;
 
+import javax.swing.JDialog;
 import javax.swing.JOptionPane;
+import javax.swing.SwingWorker;
 
 import net.hudup.core.alg.Alg;
 import net.hudup.core.data.DataConfig;
@@ -19,7 +21,9 @@ import net.hudup.core.data.DatasetPair;
 import net.hudup.core.data.DatasetPool;
 import net.hudup.core.data.DatasetUtil;
 import net.hudup.core.data.NullPointer;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.xURI;
+import net.hudup.core.logistic.ui.WaitDialog;
 import net.hudup.data.DatasetUtil2;
 
 /**
@@ -94,15 +98,29 @@ public class AddingTrainingDatasetNullTestingDatasetDlg extends AddingDatasetDlg
 			}
 		}
 
-		Dataset trainingSet = DatasetUtil.loadDataset(trainingCfg);
+		JDialog dlgWait = WaitDialog.createDialog(this); dlgWait.setUndecorated(true);
+		SwingWorker<Dataset, Dataset> worker = new SwingWorker<Dataset, Dataset>() {
+			@Override
+			protected Dataset doInBackground() throws Exception {
+				return DatasetUtil.loadDataset(trainingCfg);
+			}
+
+			@Override
+			protected void done() {
+				super.done(); dlgWait.dispose();
+			}
+		};
+		worker.execute(); dlgWait.setVisible(true);
+		Dataset trainingSet = null;
+		try {
+			trainingSet = worker.get();
+		} catch (Exception e) {LogUtil.trace(e);}
 		if (trainingSet == null) {
-			
 			JOptionPane.showMessageDialog(
-					this, 
-					"Training dataset is null", 
-					"Invalid training dataset", 
-					JOptionPane.ERROR_MESSAGE);
-			
+				this, 
+				"Training dataset is null", 
+				"Invalid training dataset", 
+				JOptionPane.ERROR_MESSAGE);
 			clear();
 			return;
 		}

@@ -485,7 +485,9 @@ public class AttributeList implements Cloneable, TextParsable, Serializable, Tra
 	 * </ul>
 	 * @return Default attribute list of rating. Such attribute list forms a structure of a rating storage such as a table of rating in database.
 	 */
-	public static AttributeList defaultRatingAttributeList() {
+	@SuppressWarnings("unused")
+	@Deprecated
+	private static AttributeList defaultRatingAttributeList0() {
 		AttributeList attributes = new AttributeList();
 		//
 		Attribute userId = new Attribute(DataConfig.USERID_FIELD, Type.integer);
@@ -516,7 +518,7 @@ public class AttributeList implements Cloneable, TextParsable, Serializable, Tra
 	 * </ul>
 	 * @return Improved attribute list of rating. Such attribute list forms a structure of a rating storage such as a table of rating in database.
 	 */
-	public static AttributeList defaultRatingAttributeList2() {
+	public static AttributeList defaultRatingAttributeList() {
 		AttributeList attributes = new AttributeList();
 		//
 		Attribute userId = new Attribute(DataConfig.USERID_FIELD, Type.integer);
@@ -710,7 +712,9 @@ public class AttributeList implements Cloneable, TextParsable, Serializable, Tra
 	 * </ul>
 	 * @return Default attribute list of context. Such attribute list forms a structure of a context storage such as a table of context in database.
 	 */
-	public static AttributeList defaultContextAttributeList() {
+	@SuppressWarnings("unused")
+	@Deprecated
+	private static AttributeList defaultContextAttributeList0() {
 		AttributeList attributes = new AttributeList();
 		//
 		Attribute ctxUserId = new Attribute(DataConfig.USERID_FIELD, Type.integer);
@@ -744,7 +748,7 @@ public class AttributeList implements Cloneable, TextParsable, Serializable, Tra
 	 * </ul>
 	 * @return Default attribute list of context. Such attribute list forms a structure of a context storage such as a table of context in database.
 	 */
-	public static AttributeList defaultContextAttributeList2() {
+	public static AttributeList defaultContextAttributeList() {
 		AttributeList attributes = new AttributeList();
 		//
 		Attribute ctxUserId = new Attribute(DataConfig.USERID_FIELD, Type.integer);

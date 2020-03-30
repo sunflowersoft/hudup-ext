@@ -5,7 +5,7 @@
  * Email: ng_phloc@yahoo.com
  * Phone: +84-975250362
  */
-package net.hudup.evaluate.ui;
+package net.hudup.core.evaluate.ui;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
@@ -119,6 +119,12 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	 * Time stamp.
 	 */
 	protected Timestamp timestamp = null;
+	
+	
+//	/**
+//	 * Waiting timer.
+//	 */
+//	protected WaitTimer waitTimer = null;
 	
 	
 	/**
@@ -279,6 +285,9 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 			else if (evStorePath != null && !evStorePath.equals(guiData.txtRunSaveBrowse))
 				guiData.txtRunSaveBrowse = evStorePath;
 		}
+		
+		
+//		waitTimer = new WaitTimer(); //Setting waiting timer.
 	}
 	
 	
@@ -426,6 +435,8 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 		updateGUIData();
 		guiData.active = false;
 		
+//		if (waitTimer != null) waitTimer.cancel(); //Destroying waiting timer.
+		
 		if (exportedStub != null) {
 			boolean ret = NetUtil.RegistryRemote.unexport(this);
 			if (ret)
@@ -525,6 +536,15 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	}
 
 
+	/**
+	 * Getting bound URI.
+	 * @return bound URI.
+	 */
+	public xURI getBindUri() {
+		return bindUri;
+	}
+	
+	
 	/**
 	 * Add this GUI as listeners to specified evaluator.
 	 * @param evaluator specified evaluator.

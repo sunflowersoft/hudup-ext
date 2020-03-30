@@ -118,24 +118,19 @@ public class ListenerCP extends JFrame implements ServerStatusListener {
 
 	/**
 	 * Binded URI of this control panel as remote RMI object. It is URI pointing to where this control panel is located.
+	 * If it is not null, this control panel associates with remote listener on remote host.
 	 */
 	private xURI bindUri = null;
 	
-	/**
-	 * If this flag is true, this control panel associates with remote listener on remote host.
-	 * If this flag is false, this control panel associates with local listener on the same host.
-	 */
-	private boolean bRemote = false;
-
 	
 	/**
 	 * Constructor with reference to specified listener and binded URI of this control panel as remote RMI object.
 	 * @param listener specified listener.
-	 * @param bindUri binded URI of this control panel as remote RMI object.
+	 * @param bindUri binded URI of this control panel as remote RMI object. If it is not null, this control panel associates with remote listener on remote host.
 	 * @param bRemote if this flag is true, this control panel associates with remote listener on remote host.
 	 * If this flag is false, this control panel associates with local listener on the same host.
 	 */
-	public ListenerCP(Server listener, xURI bindUri, boolean bRemote) {
+	public ListenerCP(Server listener, xURI bindUri) {
 		super("Listener control panel");
 		try {
 			setDefaultCloseOperation(DISPOSE_ON_CLOSE);
@@ -157,7 +152,6 @@ public class ListenerCP extends JFrame implements ServerStatusListener {
 			
 			this.listener = listener;
 			this.bindUri = bindUri;
-			this.bRemote = bRemote;
 			
 			Container container = getContentPane();
 			JTabbedPane main = new JTabbedPane();
@@ -175,7 +169,7 @@ public class ListenerCP extends JFrame implements ServerStatusListener {
 		}
 		
 		
-		if(!this.bRemote) {
+		if(bindUri == null) {
 			
 			Runtime.getRuntime().addShutdownHook(new Thread() {
 	
@@ -202,7 +196,7 @@ public class ListenerCP extends JFrame implements ServerStatusListener {
 	 * @param listener local listener
 	 */
 	public ListenerCP(Server listener) {
-		this(listener, null, false);
+		this(listener, null);
 	}
 
 	
@@ -213,48 +207,42 @@ public class ListenerCP extends JFrame implements ServerStatusListener {
 	private void bindServer() throws RemoteException {
 		boolean result = false;
 		
-		if (!bRemote) {
-			bindUri = null;
+		if (bindUri == null) {
 			registry = null;
-			
 			result = listener.addStatusListener(this);
 		}
 		else {
 			btnExitListener.setVisible(false);
 			
-			if (bindUri != null) {
-			
+			try {
+				registry = LocateRegistry.createRegistry(bindUri.getPort());
+				UnicastRemoteObject.exportObject(this, bindUri.getPort());
+				
+				result = listener.addStatusListener(this);
+				if (!result)
+					throw new Exception();
+			}
+			catch (Throwable e) {
+				LogUtil.trace(e);
+				
 				try {
-					registry = LocateRegistry.createRegistry(bindUri.getPort());
-					UnicastRemoteObject.exportObject(this, bindUri.getPort());
-					
-					result = listener.addStatusListener(this);
-					if (!result)
-						throw new Exception();
+		        	UnicastRemoteObject.unexportObject(this, true);
 				}
-				catch (Throwable e) {
-					LogUtil.trace(e);
-					
-					try {
-			        	UnicastRemoteObject.unexportObject(this, true);
-					}
-					catch (Throwable e1) {
-						e1.printStackTrace();
-					}
-					
-					try {
-			    		UnicastRemoteObject.unexportObject(registry, true);
-					}
-					catch (Throwable e1) {
-						e1.printStackTrace();
-					}
-					
-					registry = null;
-					bindUri = null;
-					result = false;
+				catch (Throwable e1) {
+					e1.printStackTrace();
 				}
-			
-			} // if (bindUri_ != null)
+				
+				try {
+		    		UnicastRemoteObject.unexportObject(registry, true);
+				}
+				catch (Throwable e1) {
+					e1.printStackTrace();
+				}
+				
+				registry = null;
+				bindUri = null;
+				result = false;
+			}
 			
 		}
 			
@@ -444,7 +432,7 @@ public class ListenerCP extends JFrame implements ServerStatusListener {
 	 * Exit listener remotely. After exiting, listener is destroyed and cannot be re-started.
 	 */
 	private void exit() {
-		if (bRemote)
+		if (bindUri != null)
 			return;
 
 		try {
@@ -586,7 +574,7 @@ public class ListenerCP extends JFrame implements ServerStatusListener {
 
 			btnExitListener.setEnabled(true);
 			btnStart.setEnabled(false);
-			btnPauseResume.setEnabled(true && !bRemote);
+			btnPauseResume.setEnabled(true && bindUri == null);
 			btnPauseResume.setText("Pause");
 			btnStop.setEnabled(true);
 			
@@ -606,7 +594,7 @@ public class ListenerCP extends JFrame implements ServerStatusListener {
 
 			btnExitListener.setEnabled(true);
 			btnStart.setEnabled(false);
-			btnPauseResume.setEnabled(true && !bRemote);
+			btnPauseResume.setEnabled(true && bindUri == null);
 			btnPauseResume.setText("Resume");
 			btnStop.setEnabled(true);
 			
@@ -633,7 +621,7 @@ public class ListenerCP extends JFrame implements ServerStatusListener {
 			paneConfig.update(listener.getConfig());
 		}
 		else if (status == Status.exit) {
-			if (bRemote) {
+			if (bindUri != null) {
 				listener = null;
 				dispose();
 			}
@@ -647,7 +635,7 @@ public class ListenerCP extends JFrame implements ServerStatusListener {
 	public void statusChanged(ServerStatusEvent evt) 
 			throws RemoteException {
 		// TODO Auto-generated method stub
-		if (bRemote)
+		if (bindUri != null)
 			updateControls(evt.getStatus());
 		else if (!evt.getShutdownHookStatus())
 			updateControls(evt.getStatus());
@@ -668,10 +656,9 @@ public class ListenerCP extends JFrame implements ServerStatusListener {
 			LogUtil.trace(e);
 		}
 		
-		if (bRemote) {
+		if (bindUri != null) {
 			try {
-				if (bindUri != null)
-					UnicastRemoteObject.unexportObject(this, true);
+				UnicastRemoteObject.unexportObject(this, true);
 			}
 			catch (Throwable e) {
 				// TODO Auto-generated catch block
@@ -708,7 +695,7 @@ public class ListenerCP extends JFrame implements ServerStatusListener {
 		
 		Server server = dlg.getServer();
 		if (server != null)
-			new ListenerCP(server, ConnectDlg.getBindUri(), true);
+			new ListenerCP(server, ConnectDlg.getBindUri());
 		else {
 			JOptionPane.showMessageDialog(
 					null, "Can't retrieve listener", "Can't retrieve listener", JOptionPane.ERROR_MESSAGE);

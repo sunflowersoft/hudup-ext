@@ -86,6 +86,56 @@ public class AlgRemoteWrapper implements Alg, AlgRemote, Serializable {
 	}
 
 	
+	@Override
+	public Object learnStart(Object... info) throws RemoteException {
+		return remoteAlg.learnStart(info);
+	}
+
+
+	@Override
+	public boolean learnPause() throws RemoteException {
+		return remoteAlg.learnPause();
+	}
+
+
+	@Override
+	public boolean learnResume() throws RemoteException {
+		return remoteAlg.learnResume();
+	}
+
+
+	@Override
+	public boolean learnStop() throws RemoteException {
+		return remoteAlg.learnStop();
+	}
+
+
+	@Override
+	public boolean learnForceStop() throws RemoteException {
+		return remoteAlg.learnForceStop();
+	}
+
+
+	@Override
+	public boolean isLearnStarted() throws RemoteException {
+		return remoteAlg.isLearnStarted();
+	}
+
+
+	@Override
+	public boolean isLearnPaused() throws RemoteException {
+		// TODO Auto-generated method stub
+		return remoteAlg.isLearnPaused();
+	}
+
+
+	@Override
+	public boolean isLearnRunning() throws RemoteException {
+		// TODO Auto-generated method stub
+		return remoteAlg.isLearnRunning();
+	}
+
+
 	/**
 	 * Getting exclusive mode.
 	 * @return exclusive mode.

@@ -100,7 +100,7 @@ public class EvaluatorEvent extends EventObject {
 	
 	/**
 	 * Constructor with specified evaluator and event type.
-	 * @param evaluator reference to evaluator. This evaluator is invalid in remote call.
+	 * @param evaluator reference to evaluator. This evaluator is invalid in remote call because the source is transient variable.
 	 * @param type type of this event.
 	 */
 	public EvaluatorEvent(Evaluator evaluator, Type type) {
@@ -110,7 +110,7 @@ public class EvaluatorEvent extends EventObject {
 	
 	/**
 	 * Constructor with specified evaluator and evaluation information. 
-	 * @param evaluator specified evaluator. This evaluator is invalid in remote call.
+	 * @param evaluator specified evaluator. This evaluator is invalid in remote call because the source is transient variable.
 	 * @param type specified type of evaluation event.
 	 * @param otherResult evaluation information as other result.
 	 */
@@ -121,7 +121,7 @@ public class EvaluatorEvent extends EventObject {
 	
 	/**
 	 * Constructor with specified evaluator, evaluation information, and time stamp. 
-	 * @param evaluator specified evaluator. This evaluator is invalid in remote call.
+	 * @param evaluator specified evaluator. This evaluator is invalid in remote call because the source is transient variable.
 	 * @param type specified type of evaluation event.
 	 * @param otherResult evaluation information as other result.
 	 * @param poolResult specified pool result.
@@ -133,14 +133,14 @@ public class EvaluatorEvent extends EventObject {
 	
 	/**
 	 * Constructor with specified evaluator, evaluation information, and time stamp. 
-	 * @param evaluator specified evaluator. This evaluator is invalid in remote call.
+	 * @param evaluator specified evaluator. This evaluator is invalid in remote call because the source is transient variable.
 	 * @param type specified type of evaluation event.
 	 * @param otherResult evaluation information as other result.
 	 * @param poolResult specified pool result.
 	 * @param timestamp times tamp.
 	 */
 	public EvaluatorEvent(Evaluator evaluator, Type type, EvaluateInfo otherResult, DatasetPoolExchanged poolResult, Timestamp timestamp) {
-		super(evaluator); //Test different hosts for RMI, evaluator wrapper can solve.
+		super(evaluator);
 		this.type = type;
 		this.otherResult = otherResult;
 		this.poolResult = poolResult;
@@ -149,14 +149,16 @@ public class EvaluatorEvent extends EventObject {
 
 	
 	/**
-	 * Getting evaluator. This method is invalid in remote call.
-	 * @return {@link Evaluator} that fires this event.
+	 * Getting evaluator. This method cannot be called remotely because the source is transient variable.
+	 * @return evaluator that fires this event.
 	 */
 	@SuppressWarnings("unused")
 	@Deprecated
 	private Evaluator getEvaluator() {
 		Object source = getSource();
-		if (source instanceof Evaluator)
+		if (source == null)
+			return null;
+		else if (source instanceof Evaluator)
 			return (Evaluator)source;
 		else
 			return null;

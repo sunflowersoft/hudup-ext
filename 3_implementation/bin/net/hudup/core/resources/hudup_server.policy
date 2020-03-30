@@ -21,6 +21,7 @@ grant {
     permission java.io.FilePermission "./working/-", "read, write, delete";
 
     permission java.sql.SQLPermission "setLog";
+    permission java.sql.SQLPermission "deregisterDriver";
 
     permission java.util.PropertyPermission "*", "read, write";
 

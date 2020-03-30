@@ -39,6 +39,7 @@ import net.hudup.core.evaluate.EvaluatorConfig;
 import net.hudup.core.evaluate.MetaMetric;
 import net.hudup.core.evaluate.Metric;
 import net.hudup.core.evaluate.NoneWrapperMetricList;
+import net.hudup.core.evaluate.ui.EvaluateGUIData;
 import net.hudup.core.logistic.I18nUtil;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.xURI;
@@ -198,10 +199,10 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 
 		boolean agent = false;
 		try {
-			agent = batchEvaluateGUI.evaluator.isAgent();
+			agent = batchEvaluateGUI.getEvaluator().isAgent();
 		}
 		catch (Throwable e) {LogUtil.trace(e);}
-		if (batchEvaluateGUI.bindUri != null || !agent) {
+		if (batchEvaluateGUI.getBindUri() != null || !agent) {
 			JMenuItem mniSwitchEvaluator = new JMenuItem(
 				new AbstractAction(I18nUtil.message("switch_evaluator")) {
 
@@ -295,7 +296,7 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 		}
 	
 		try {
-			if (batchEvaluateGUI.bindUri == null)
+			if (batchEvaluateGUI.getBindUri() == null)
 				switchEvaluator(batchEvaluateGUI.getEvaluator().getName(), this);
 			else
 				switchRemoteEvaluator(batchEvaluateGUI.getEvaluator().getName(), this);
@@ -321,7 +322,7 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 		
 		boolean agent = false;
 		try {
-			agent = batchEvaluateGUI.evaluator.isAgent();
+			agent = batchEvaluateGUI.getEvaluator().isAgent();
 		}
 		catch (Throwable e) {
 			LogUtil.trace(e);
@@ -344,8 +345,8 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 					paneSysConfig.apply();
 					
 					try {
-						if (batchEvaluateGUI.bindUri != null)
-							batchEvaluateGUI.evaluator.setConfig(thisConfig);
+						if (batchEvaluateGUI.getBindUri() != null)
+							batchEvaluateGUI.getEvaluator().setConfig(thisConfig);
 					} catch (Throwable e) {LogUtil.trace(e);}
 				}
 				
@@ -356,7 +357,7 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 		};
 		
 		cfg.update(thisConfig);
-		if ((batchEvaluateGUI.bindUri != null) || (agent))
+		if ((batchEvaluateGUI.getBindUri() != null) || (agent))
 			cfg.getPluginStorageManifest().setEnabled(false);
 		
 		cfg.setVisible(true);
@@ -368,18 +369,18 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 		try {
 			boolean agent = false;
 			try {
-				agent = batchEvaluateGUI.evaluator.isAgent();
+				agent = batchEvaluateGUI.getEvaluator().isAgent();
 			} 
 			catch (Exception e) {LogUtil.trace(e);}
 	
 			batchEvaluateGUI.dispose();
-			if (!agent || batchEvaluateGUI.bindUri != null)
+			if (!agent || batchEvaluateGUI.getBindUri() != null)
 				PluginStorage.clear();
 			
 			super.dispose();
 		}
 		catch (Throwable e) {
-			if (batchEvaluateGUI.bindUri != null)
+			if (batchEvaluateGUI.getBindUri() != null)
 				System.exit(0);
 		}
 	}

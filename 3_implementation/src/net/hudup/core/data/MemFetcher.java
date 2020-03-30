@@ -126,6 +126,8 @@ public class MemFetcher<E /*extends Serializable*/> implements Fetcher<E> {
 	@Override
 	public boolean next() {
 		// TODO Auto-generated method stub
+		if (iterator == null) reset(); //Solving the problem of serialization. Added by Loc Nguyen: 2020.03.29.
+		
 		if (iterator.hasNext()) {
 			current = iterator.next();
 			return true;

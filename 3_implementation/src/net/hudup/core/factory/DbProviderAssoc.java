@@ -54,80 +54,7 @@ import net.hudup.core.parser.TextParserUtil;
  * @version 10.0
  *
  */
-class DbProviderAssoc extends DbProviderAssoc0 {
-
-	
-	/**
-	 * Constructor with specified configuration.
-	 * @param config specified configuration.
-	 */
-	public DbProviderAssoc(DataConfig config) {
-		super(config);
-		// TODO Auto-generated constructor stub
-	}
-
-	
-	@Override
-	public String genRatingCreateSql() {
-		return 	"create table " + norm(config.getRatingUnit()) + " ( " + 
-				norm(DataConfig.USERID_FIELD) + " " + toSqlTypeName(Type.integer) + " not null, " +
-				norm(DataConfig.ITEMID_FIELD) + " " + toSqlTypeName(Type.integer) + " not null, " +
-				norm(DataConfig.RATING_FIELD) + " " + toSqlTypeName(Type.real) + " not null, " +
-				norm(DataConfig.RATING_DATE_FIELD) + " " + toSqlTypeName(Type.time);
-	}
-
-	
-	@Override
-	public String genContextCreateSql() {
-		return "create table " + norm(config.getContextUnit()) + " ( " + 
-			norm(DataConfig.USERID_FIELD) + " " + toSqlTypeName(Type.integer) + " not null, " +
-			norm(DataConfig.ITEMID_FIELD) + " " + toSqlTypeName(Type.integer) + " not null, " +
-			norm(DataConfig.CTX_TEMPLATEID_FIELD) + " " + toSqlTypeName(Type.integer) + " not null, " +
-			norm(DataConfig.CTX_VALUE_FIELD) + " " + toSqlTypeName(Type.string) + ", " +
-			norm(DataConfig.RATING_DATE_FIELD) + " " + toSqlTypeName(Type.time);
-	}
-
-	
-	@Override
-	public ParamSql genContextInsertSql() {
-		return new ParamSql( 
-			"insert into " + norm(config.getContextUnit()) + 
-			" (" +
-				norm(DataConfig.USERID_FIELD) + ", " + 
-				norm(DataConfig.ITEMID_FIELD) + ", " + 
-				norm(DataConfig.CTX_TEMPLATEID_FIELD) + ", " + 
-				norm(DataConfig.CTX_VALUE_FIELD) + ", " +
-				norm(DataConfig.RATING_DATE_FIELD) + 
-			") values (?, ?, ?, ?, ?) ",
-			new int[] { 0, 1, 2, 3, 4 });
-	}
-
-	
-	@Override
-	public ParamSql genContextUpdateSql() {
-		return new ParamSql(
-				"update " + norm(config.getContextUnit()) + 
-				" set " + norm(DataConfig.CTX_VALUE_FIELD) + " = ?, " + 
-					norm(DataConfig.RATING_DATE_FIELD) + " = ? " +
-				" where " + norm(DataConfig.USERID_FIELD) + " = ? " +
-					" and " + norm(DataConfig.ITEMID_FIELD) + " = ? " +
-					" and " + norm(DataConfig.CTX_TEMPLATEID_FIELD) + " = ? " ,
-				new int [] { 3, 4, 0, 1, 2 }
-			);
-	}
-
-
-}
-
-
-/**
- * Base associator of provider for database.
- * 
- * @author Loc Nguyen
- * @version 10.0
- *
- */
-class DbProviderAssoc0 extends ProviderAssocAbstract {
+class DbProviderAssoc extends ProviderAssocAbstract {
 
 	
 	/**
@@ -141,7 +68,7 @@ class DbProviderAssoc0 extends ProviderAssocAbstract {
 	 * 
 	 * @param config specified configuration.
 	 */
-	public DbProviderAssoc0(DataConfig config) {
+	public DbProviderAssoc(DataConfig config) {
 		super(config);
 		this.conn = createConnection(config);
 	}
@@ -479,23 +406,36 @@ class DbProviderAssoc0 extends ProviderAssocAbstract {
 	}
 
 	
+//	/**
+//	 * Generating rating creation table SQL.
+//	 * @return rating creation table SQL.
+//	 */
+//	public String genRatingCreateSql() {
+//		return 	"create table " + norm(config.getRatingUnit()) + " ( " + 
+//				norm(DataConfig.USERID_FIELD) + " " + toSqlTypeName(Type.integer) + " not null, " +
+//				norm(DataConfig.ITEMID_FIELD) + " " + toSqlTypeName(Type.integer) + " not null, " +
+//				norm(DataConfig.RATING_FIELD) + " " + toSqlTypeName(Type.real) + " not null, " +
+//				norm(DataConfig.RATING_DATE_FIELD) + " " + toSqlTypeName(Type.time) + ", " +
+//				"primary key (" + norm(DataConfig.USERID_FIELD) + ", " + norm(DataConfig.ITEMID_FIELD) + ") )";
+//	}
+	
+	
 	/**
-	 * 
-	 * @return create SQL
+	 * Generating rating creation table SQL.
+	 * @return rating creation table SQL.
 	 */
 	public String genRatingCreateSql() {
 		return 	"create table " + norm(config.getRatingUnit()) + " ( " + 
 				norm(DataConfig.USERID_FIELD) + " " + toSqlTypeName(Type.integer) + " not null, " +
 				norm(DataConfig.ITEMID_FIELD) + " " + toSqlTypeName(Type.integer) + " not null, " +
 				norm(DataConfig.RATING_FIELD) + " " + toSqlTypeName(Type.real) + " not null, " +
-				norm(DataConfig.RATING_DATE_FIELD) + " " + toSqlTypeName(Type.time) + ", " +
-				"primary key (" + norm(DataConfig.USERID_FIELD) + ", " + norm(DataConfig.ITEMID_FIELD) + ") )";
+				norm(DataConfig.RATING_DATE_FIELD) + " " + toSqlTypeName(Type.time);
 	}
-	
+
 	
 	/**
-	 * 
-	 * @return select SQL
+	 * Generate rating select SQL.
+	 * @return rating select SQL
 	 */
 	public String genRatingSelectSql() {
 		return "select * from " + norm(config.getRatingUnit());
@@ -503,8 +443,8 @@ class DbProviderAssoc0 extends ProviderAssocAbstract {
 
 
 	/**
-	 * 
-	 * @return insert SQL
+	 * Generate rating insert SQL.
+	 * @return rating insert SQL.
 	 */
 	public ParamSql genRatingInsertSql() {
 		return new ParamSql(
@@ -516,8 +456,8 @@ class DbProviderAssoc0 extends ProviderAssocAbstract {
 
 	
 	/**
-	 * 
-	 * @return update SQL
+	 * Generate rating update SQL.
+	 * @return rating update SQL.
 	 */
 	public ParamSql genRatingUpdateSql() {
 		return new ParamSql(
@@ -530,7 +470,7 @@ class DbProviderAssoc0 extends ProviderAssocAbstract {
 
 	
 	/**
-	 * 
+	 * Generate rating delete SQL.
 	 * @param userId user identifier.
 	 * @param itemId item identifier.
 	 * @return delete SQL
@@ -544,8 +484,8 @@ class DbProviderAssoc0 extends ProviderAssocAbstract {
 	
 	
 	/**
-	 * 
-	 * @return delete SQL
+	 * Generate rating delete parameterized SQL.
+	 * @return rating delete parameterized SQL.
 	 */
 	public ParamSql genRatingDeleteSql() {
 		return new ParamSql(
@@ -1507,9 +1447,26 @@ class DbProviderAssoc0 extends ProviderAssocAbstract {
 	}
 
 	
+//	/**
+//	 * Generating context creation table SQL.
+//	 * @return context creation table SQL.
+//	 */
+//	public String genContextCreateSql() {
+//		return "create table " + norm(config.getContextUnit()) + " ( " + 
+//			norm(DataConfig.USERID_FIELD) + " " + toSqlTypeName(Type.integer) + " not null, " +
+//			norm(DataConfig.ITEMID_FIELD) + " " + toSqlTypeName(Type.integer) + " not null, " +
+//			norm(DataConfig.CTX_TEMPLATEID_FIELD) + " " + toSqlTypeName(Type.integer) + " not null, " +
+//			norm(DataConfig.CTX_VALUE_FIELD) + " " + toSqlTypeName(Type.string) + ", " +
+//			"primary key (" + 
+//				norm(DataConfig.USERID_FIELD) + ", " + 
+//				norm(DataConfig.ITEMID_FIELD) + ", " + 
+//				norm(DataConfig.CTX_TEMPLATEID_FIELD) + ") )";
+//	}
+
+	
 	/**
-	 * 
-	 * @return create SQL
+	 * Generating context creation table SQL.
+	 * @return context creation table SQL.
 	 */
 	public String genContextCreateSql() {
 		return "create table " + norm(config.getContextUnit()) + " ( " + 
@@ -1517,10 +1474,7 @@ class DbProviderAssoc0 extends ProviderAssocAbstract {
 			norm(DataConfig.ITEMID_FIELD) + " " + toSqlTypeName(Type.integer) + " not null, " +
 			norm(DataConfig.CTX_TEMPLATEID_FIELD) + " " + toSqlTypeName(Type.integer) + " not null, " +
 			norm(DataConfig.CTX_VALUE_FIELD) + " " + toSqlTypeName(Type.string) + ", " +
-			"primary key (" + 
-				norm(DataConfig.USERID_FIELD) + ", " + 
-				norm(DataConfig.ITEMID_FIELD) + ", " + 
-				norm(DataConfig.CTX_TEMPLATEID_FIELD) + ") )";
+			norm(DataConfig.RATING_DATE_FIELD) + " " + toSqlTypeName(Type.time);
 	}
 
 	
@@ -1561,9 +1515,26 @@ class DbProviderAssoc0 extends ProviderAssocAbstract {
 	}
 
 	
+//	/**
+//	 * Generating context insert SQL.
+//	 * @return context insert SQL.
+//	 */
+//	public ParamSql genContextInsertSql() {
+//		return new ParamSql( 
+//			"insert into " + norm(config.getContextUnit()) + 
+//			" (" +
+//				norm(DataConfig.USERID_FIELD) + ", " + 
+//				norm(DataConfig.ITEMID_FIELD) + ", " + 
+//				norm(DataConfig.CTX_TEMPLATEID_FIELD) + ", " + 
+//				norm(DataConfig.CTX_VALUE_FIELD) + 
+//			") values (?, ?, ?, ?) ",
+//			new int[] { 0, 1, 2, 3 });
+//	}
+
+	
 	/**
-	 * 
-	 * @return insert SQL
+	 * Generating context insert SQL.
+	 * @return context insert SQL.
 	 */
 	public ParamSql genContextInsertSql() {
 		return new ParamSql( 
@@ -1572,24 +1543,42 @@ class DbProviderAssoc0 extends ProviderAssocAbstract {
 				norm(DataConfig.USERID_FIELD) + ", " + 
 				norm(DataConfig.ITEMID_FIELD) + ", " + 
 				norm(DataConfig.CTX_TEMPLATEID_FIELD) + ", " + 
-				norm(DataConfig.CTX_VALUE_FIELD) + 
-			") values (?, ?, ?, ?) ",
-			new int[] { 0, 1, 2, 3 });
+				norm(DataConfig.CTX_VALUE_FIELD) + ", " +
+				norm(DataConfig.RATING_DATE_FIELD) + 
+			") values (?, ?, ?, ?, ?) ",
+			new int[] { 0, 1, 2, 3, 4 });
 	}
 
 	
+//	/**
+//	 * Generating context update SQL.
+//	 * @return context update SQL.
+//	 */
+//	public ParamSql genContextUpdateSql() {
+//		return new ParamSql(
+//				"update " + norm(config.getContextUnit()) + 
+//				" set " + norm(DataConfig.CTX_VALUE_FIELD) + " = ? " +
+//				" where " + norm(DataConfig.USERID_FIELD) + " = ? " +
+//				" and " + norm(DataConfig.ITEMID_FIELD) + " = ? " +
+//				" and " + norm(DataConfig.CTX_TEMPLATEID_FIELD) + " = ? " ,
+//				new int [] { 3, 0, 1, 2 }
+//			);
+//	}
+
+	
 	/**
-	 * 
-	 * @return update SQL
+	 * Generating context update SQL.
+	 * @return context update SQL.
 	 */
 	public ParamSql genContextUpdateSql() {
 		return new ParamSql(
 				"update " + norm(config.getContextUnit()) + 
-				" set " + norm(DataConfig.CTX_VALUE_FIELD) + " = ? " +
+				" set " + norm(DataConfig.CTX_VALUE_FIELD) + " = ?, " + 
+					norm(DataConfig.RATING_DATE_FIELD) + " = ? " +
 				" where " + norm(DataConfig.USERID_FIELD) + " = ? " +
-				" and " + norm(DataConfig.ITEMID_FIELD) + " = ? " +
-				" and " + norm(DataConfig.CTX_TEMPLATEID_FIELD) + " = ? " ,
-				new int [] { 3, 0, 1, 2 }
+					" and " + norm(DataConfig.ITEMID_FIELD) + " = ? " +
+					" and " + norm(DataConfig.CTX_TEMPLATEID_FIELD) + " = ? " ,
+				new int [] { 3, 4, 0, 1, 2 }
 			);
 	}
 

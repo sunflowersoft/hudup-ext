@@ -324,4 +324,52 @@ public class KBaseRemoteWrapper implements KBase, KBaseRemote {
 	}
 
 
+	@Override
+	public Object learnStart(Object... info) throws RemoteException {
+		return remoteKBase.learnStart(info);
+	}
+
+
+	@Override
+	public boolean learnPause() throws RemoteException {
+		return remoteKBase.learnPause();
+	}
+
+
+	@Override
+	public boolean learnResume() throws RemoteException {
+		return remoteKBase.learnResume();
+	}
+
+
+	@Override
+	public boolean learnStop() throws RemoteException {
+		return remoteKBase.learnStop();
+	}
+
+
+	@Override
+	public boolean learnForceStop() throws RemoteException {
+		return remoteKBase.learnForceStop();
+	}
+
+
+	@Override
+	public boolean isLearnStarted() throws RemoteException {
+		return remoteKBase.isLearnStarted();
+	}
+
+
+	@Override
+	public boolean isLearnPaused() throws RemoteException {
+		return remoteKBase.isLearnPaused();
+	}
+
+
+	@Override
+	public boolean isLearnRunning() throws RemoteException {
+		return remoteKBase.isLearnRunning();
+	}
+
+
 }

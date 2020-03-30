@@ -101,7 +101,8 @@ public class DatasetRemoteWrapper implements Dataset, DatasetRemote {
 	public Fetcher<Integer> fetchUserIds() {
 		// TODO Auto-generated method stub
 		try {
-			return FetcherUtil.fixFetcherSerialized(remoteDataset.remoteFetchUserIds());
+			//return FetcherUtil.fixFetcherSerialized(remoteDataset.remoteFetchUserIds());
+			return remoteDataset.remoteFetchUserIds();
 		}
 		catch (Exception e) {LogUtil.trace(e);}
 		
@@ -137,7 +138,8 @@ public class DatasetRemoteWrapper implements Dataset, DatasetRemote {
 	public Fetcher<Integer> fetchItemIds() {
 		// TODO Auto-generated method stub
 		try {
-			return FetcherUtil.fixFetcherSerialized(remoteDataset.remoteFetchItemIds());
+			//return FetcherUtil.fixFetcherSerialized(remoteDataset.remoteFetchItemIds());
+			return remoteDataset.remoteFetchItemIds();
 		}
 		catch (Exception e) {LogUtil.trace(e);}
 		
@@ -197,7 +199,8 @@ public class DatasetRemoteWrapper implements Dataset, DatasetRemote {
 	public Fetcher<RatingVector> fetchUserRatings() {
 		// TODO Auto-generated method stub
 		try {
-			return FetcherUtil.fixFetcherSerialized(remoteDataset.remoteFetchUserRatings());
+			//return FetcherUtil.fixFetcherSerialized(remoteDataset.remoteFetchUserRatings());
+			return remoteDataset.remoteFetchUserRatings();
 		}
 		catch (Exception e) {LogUtil.trace(e);}
 		
@@ -221,7 +224,8 @@ public class DatasetRemoteWrapper implements Dataset, DatasetRemote {
 	public Fetcher<RatingVector> fetchItemRatings() {
 		// TODO Auto-generated method stub
 		try {
-			return FetcherUtil.fixFetcherSerialized(remoteDataset.remoteFetchItemRatings());
+			//return FetcherUtil.fixFetcherSerialized(remoteDataset.remoteFetchItemRatings());
+			return remoteDataset.remoteFetchItemRatings();
 		}
 		catch (Exception e) {LogUtil.trace(e);}
 		
@@ -269,7 +273,8 @@ public class DatasetRemoteWrapper implements Dataset, DatasetRemote {
 	public Fetcher<Profile> fetchUserProfiles() {
 		// TODO Auto-generated method stub
 		try {
-			return FetcherUtil.fixFetcherSerialized(remoteDataset.remoteFetchUserProfiles());
+			//return FetcherUtil.fixFetcherSerialized(remoteDataset.remoteFetchUserProfiles());
+			return remoteDataset.remoteFetchUserProfiles();
 		}
 		catch (Exception e) {LogUtil.trace(e);}
 		
@@ -305,7 +310,8 @@ public class DatasetRemoteWrapper implements Dataset, DatasetRemote {
 	public Fetcher<Profile> fetchItemProfiles() {
 		// TODO Auto-generated method stub
 		try {
-			return FetcherUtil.fixFetcherSerialized(remoteDataset.remoteFetchItemProfiles());
+			//return FetcherUtil.fixFetcherSerialized(remoteDataset.remoteFetchItemProfiles());
+			return remoteDataset.remoteFetchItemProfiles();
 		}
 		catch (Exception e) {LogUtil.trace(e);}
 		
@@ -353,7 +359,8 @@ public class DatasetRemoteWrapper implements Dataset, DatasetRemote {
 	public Fetcher<Profile> fetchSample() {
 		// TODO Auto-generated method stub
 		try {
-			return FetcherUtil.fixFetcherSerialized(remoteDataset.remoteFetchSample());
+			//return FetcherUtil.fixFetcherSerialized(remoteDataset.remoteFetchSample());
+			return remoteDataset.remoteFetchSample();
 		}
 		catch (Exception e) {LogUtil.trace(e);}
 		
