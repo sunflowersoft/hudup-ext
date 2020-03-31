@@ -132,7 +132,6 @@ public class RecommendEvaluator extends EvaluatorAbstract {
 //			try {
 //				if (!acceptAlg(evAlgList.get(i))) continue;
 //			} catch (Throwable e) {
-//				// TODO Auto-generated catch block
 //				LogUtil.trace(e);
 //				continue;
 //			}
@@ -170,7 +169,7 @@ public class RecommendEvaluator extends EvaluatorAbstract {
 							recommender, 
 							datasetId, 
 							SetupTimeMetric.class, 
-							new Object[] { setupElapsed / 1000.0f }
+							new Object[] { setupElapsed / 1000.0 }
 						); // calculating setup time metric
 					//Fire doing event with setup time metric.
 					fireEvaluateEvent(new EvaluateEvent(this, Type.doing, setupMetrics)); // firing setup time metric
@@ -187,8 +186,8 @@ public class RecommendEvaluator extends EvaluatorAbstract {
 					//Initializing parameters for setting up maximum recommendation number by binomial distribution. Added date: 2019.08.23 by Loc Nguyen.
 					double relevantSparseRatio = 0;
 					int totalRatedCount = 0;
-					Dataset trainingData = recommender.getDataset(); //It is not pointer.
-					if (!config.isRecommendAll()) {
+					Dataset trainingData = recommender.getDataset(); //It is not pointer. Please pay attention that it is not always the same to dsPair.getTraining().
+					if (!config.isRecommendAll() && config.getMaxRecommend() <= 0) {
 						trainingData = trainingData != null ? trainingData : testing; //This is work-around solution, using testing for estimating recommendation number.
 						relevantSparseRatio = calcRelevantSparseRatio(trainingData);
 						totalRatedCount = countRatedItems(trainingData);
@@ -223,12 +222,16 @@ public class RecommendEvaluator extends EvaluatorAbstract {
 						RecommendParam param = new RecommendParam(testingUser.id());
 						//Setting up maximum recommendation number by binomial distribution. Added date: 2019.08.23 by Loc Nguyen.
 						int maxRecommend = 0;
-						if (!config.isRecommendAll() && trainingData != null) {
-							int ratedCount = 0;
-							RatingVector trainingUser = trainingData.getUserRating(testingUser.id());
-							if (trainingUser != null) ratedCount = trainingUser.count(true); 
-							maxRecommend = (int)(relevantSparseRatio*(totalRatedCount-ratedCount)+0.5);
-							trainingData = null;
+						if (!config.isRecommendAll()) {
+							if (config.getMaxRecommend() > 0)
+								maxRecommend = config.getMaxRecommend(); //Used for scanner which cannot calculate relevant-sparse ratio.
+							else if (trainingData != null) {
+								int ratedCount = 0;
+								RatingVector trainingUser = trainingData.getUserRating(testingUser.id());
+								if (trainingUser != null) ratedCount = trainingUser.count(true); 
+								maxRecommend = (int)(relevantSparseRatio*(totalRatedCount-ratedCount)+0.5);
+								trainingData = null;
+							}
 						}
 						vExactCurrentTotal++; //Increase exact total vector count.
 						
@@ -244,7 +247,7 @@ public class RecommendEvaluator extends EvaluatorAbstract {
 								recommender.getName(), 
 								datasetId, 
 								SpeedMetric.class, 
-								new Object[] { recommendElapsed / 1000.0f }
+								new Object[] { recommendElapsed / 1000.0 }
 							); // calculating time speed metric
 						
 						//Fire doing event with speed metric.

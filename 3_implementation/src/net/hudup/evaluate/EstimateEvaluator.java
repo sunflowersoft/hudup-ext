@@ -107,7 +107,7 @@ public class EstimateEvaluator extends RecommendEvaluator {
 							recommender, 
 							datasetId, 
 							SetupTimeMetric.class, 
-							new Object[] { setupElapsed / 1000.0f }
+							new Object[] { setupElapsed / 1000.0 }
 						); // calculating setup time metric
 					//Fire doing event with setup time metric.
 					fireEvaluateEvent(new EvaluateEvent(this, Type.doing, setupMetrics)); // firing setup time metric
@@ -165,7 +165,7 @@ public class EstimateEvaluator extends RecommendEvaluator {
 								recommender.getName(), 
 								datasetId, 
 								SpeedMetric.class, 
-								new Object[] { recommendElapsed / 1000.0f }
+								new Object[] { recommendElapsed / 1000.0 }
 							); // calculating time speed metric
 						
 						//Fire doing event with speed metric.

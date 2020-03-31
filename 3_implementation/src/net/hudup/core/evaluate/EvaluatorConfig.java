@@ -8,7 +8,6 @@
 package net.hudup.core.evaluate;
 
 import net.hudup.core.Constants;
-import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.SysConfig;
 import net.hudup.core.logistic.xURI;
 
@@ -55,15 +54,35 @@ public class EvaluatorConfig extends SysConfig {
 
 	
 	/**
+	 * Flag indicates whether to recommend all items
+	 */
+	public final static String RECOMMEND_ALL_FIELD            = changeCase("recommend_all");
+
+	
+	/**
 	 * By default, do not recommend all items.
 	 */
 	public final static boolean RECOMMEND_ALL_DEFAULT = false;
 
 	
-//	/**
-//	 * By default, agent field is false. If agent mode is true, no GUI can close evaluator.
-//	 */
-//	public final static boolean EVALUATOR_AGENT_DEFAULT = false;
+	/**
+	 * By default, agent field is false. If agent mode is true, no GUI can close evaluator.
+	 */
+	public final static boolean EVALUATOR_AGENT_DEFAULT = false;
+
+	
+	/**
+	 * Maximum recommended items. This field is effected if recommendation all field is false.
+	 * If it is 0 and recommendation all field is false, evaluator will have heuristic mechanism to calculate the real maximum recommended items.
+	 */
+	public final static String MAX_RECOMMEND_FIELD  = "max_recommend";
+	
+	
+	/**
+	 * Default maximum recommended items. This field is effected if recommendation all field is false.
+	 * If it is 0 and recommendation all field is false, evaluator will have heuristic mechanism to calculate the real maximum recommended items.
+	 */
+	public final static int MAX_RECOMMEND_DEFAULT  = 0;
 
 	
 	/**
@@ -120,6 +139,7 @@ public class EvaluatorConfig extends SysConfig {
 		super.reset();
 		
 		setRecommendAll(RECOMMEND_ALL_DEFAULT);
+		setMaxRecommend(MAX_RECOMMEND_DEFAULT);
 		setEvaluatorPort(Constants.DEFAULT_EVALUATOR_PORT);
 		//setAgent(EVALUATOR_AGENT_DEFAULT);
 		setSaveResultSummary(EVALUATOR_SAVE_RESULT_SUMMARY_DEFAULT);
@@ -134,7 +154,7 @@ public class EvaluatorConfig extends SysConfig {
 	 * @return whether to recommend all.
 	 */
 	public boolean isRecommendAll() {
-		return getAsBoolean(DataConfig.RECOMMEND_ALL_FIELD);
+		return getAsBoolean(RECOMMEND_ALL_FIELD);
 	}
 	
 	
@@ -143,9 +163,27 @@ public class EvaluatorConfig extends SysConfig {
 	 * @param all true if recommending all.
 	 */
 	public void setRecommendAll(boolean all) {
-		put(DataConfig.RECOMMEND_ALL_FIELD, all);
+		put(RECOMMEND_ALL_FIELD, all);
 	}
 	
+	
+	/**
+	 * Getting the maximum number of recommended items.
+	 * @return the maximum number of recommended items.
+	 */
+	public int getMaxRecommend() {
+		return getAsInt(MAX_RECOMMEND_FIELD);
+	}
+	
+	
+	/**
+	 * Setting the maximum number of recommended items.
+	 * @param maxRecommend the maximum number of recommended items.
+	 */
+	public void setMaxRecommend(int maxRecommend) {
+		put(MAX_RECOMMEND_FIELD, maxRecommend);
+	}
+
 	
 	/**
 	 * Setting evaluator port by specified port.

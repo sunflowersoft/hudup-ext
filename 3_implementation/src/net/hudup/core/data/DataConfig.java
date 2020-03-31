@@ -170,11 +170,6 @@ public class DataConfig extends PropList {
 	public final static String MAX_RATING_FIELD               = changeCase("max_rating");
 	
 	/**
-	 * Flag indicates whether to recommend all items
-	 */
-	public final static String RECOMMEND_ALL_FIELD            = changeCase("recommend_all");
-	
-	/**
 	 * Position field name
 	 */
 	public final static String POSITION_FIELD                 = changeCase("position");

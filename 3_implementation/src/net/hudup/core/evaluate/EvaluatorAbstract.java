@@ -1479,7 +1479,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 	public synchronized void close() throws Exception {
 		// TODO Auto-generated method stub
 		try {
-			stop();
+			remoteStop();
 		}
 		catch (Throwable e) {LogUtil.trace(e);}
 
