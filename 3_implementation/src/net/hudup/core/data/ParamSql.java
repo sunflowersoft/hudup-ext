@@ -66,8 +66,8 @@ public class ParamSql implements Serializable {
 	 * Default constructor.
 	 */
 	public ParamSql() {
-		if (!(indexes instanceof Serializable))
-			throw new RuntimeException("Not serializable class");
+//		if (!(indexes instanceof Serializable))
+//			throw new RuntimeException("Not serializable class");
 	}
 	
 	

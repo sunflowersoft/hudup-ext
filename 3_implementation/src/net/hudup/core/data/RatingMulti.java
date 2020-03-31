@@ -7,7 +7,6 @@
  */
 package net.hudup.core.data;
 
-import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
@@ -63,8 +62,8 @@ public class RatingMulti extends Rating {
 	 * @param rating specified rating.
 	 */
 	public RatingMulti(Rating rating) {
-		if (!(history instanceof Serializable))
-			throw new RuntimeException("List is not serializable");
+//		if (!(history instanceof Serializable))
+//			throw new RuntimeException("List is not serializable");
 		
 		addRating(rating);
 	}

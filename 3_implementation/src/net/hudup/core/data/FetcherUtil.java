@@ -7,8 +7,11 @@
  */
 package net.hudup.core.data;
 
+import java.io.Serializable;
 import java.util.Collection;
+import java.util.List;
 
+import net.hudup.core.Util;
 import net.hudup.core.logistic.LogUtil;
 
 /**
@@ -62,14 +65,15 @@ public class FetcherUtil {
 	 * @param fetcher specified fetcher.
 	 * @return the specified fetcher itself.
 	 */
-	@Deprecated
 	public static <T> Fetcher<T> fixFetcherSerialized(Fetcher<T> fetcher) {
 		if ((fetcher == null) || !(fetcher instanceof MemFetcher<?>))
 			return fetcher;
 		
 		MemFetcher<T> memFetcher = (MemFetcher<T>)fetcher;
-		if (memFetcher.iterator == null && memFetcher.data != null) {
-			memFetcher.update(memFetcher.data);
+		if ((memFetcher.data != null) && (!(memFetcher.data instanceof Serializable))) {
+			List<T> newData = Util.newList(memFetcher.data.size());
+			newData.addAll(memFetcher.data);
+			memFetcher.update(newData);
 		}
 		
 		return memFetcher;

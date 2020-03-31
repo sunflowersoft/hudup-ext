@@ -1266,7 +1266,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 				btnConfigAlgs.setEnabled(true);
 				btnAddDataset.setEnabled(true);
 				btnLoadBatchScript.setEnabled(true);
-				btnUpload.setEnabled(guiData.pool.size() > 0);
+				btnUpload.setEnabled(true);
 				btnDownload.setEnabled(true);
 				
 				prgRunning.setMaximum(0);
@@ -1333,6 +1333,8 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			
 			btnConfigAlgs.setEnabled(algRegTable.size() > 0);
 			btnAddDataset.setEnabled(true);
+			btnUpload.setEnabled(lbAlgs.getAlgList().size() > 0);
+			btnDownload.setEnabled(lbAlgs.getAlgList().size() > 0);
 		}
 		
 		updateGUI();
@@ -1355,7 +1357,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 		
 		this.btnRefresh.setEnabled(flag && guiData.pool.size() > 0);
 		this.btnClear.setEnabled(flag && guiData.pool.size() > 0);
-		this.btnUpload.setEnabled(flag && guiData.pool.size() > 0);
+		this.btnUpload.setEnabled(flag);
 		this.btnDownload.setEnabled(flag);
 
 		this.btnRun.setEnabled(flag && guiData.pool.size() > 0);

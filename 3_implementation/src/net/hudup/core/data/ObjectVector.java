@@ -58,8 +58,8 @@ public abstract class ObjectVector<E extends Serializable> implements Cloneable,
 		super();
 		// TODO Auto-generated constructor stub
 		
-		if (!(ratedMap instanceof Serializable))
-			throw new RuntimeException("RatingVector isn't serializable class");
+//		if (!(ratedMap instanceof Serializable))
+//			throw new RuntimeException("RatingVector isn't serializable class");
 	}
 
 	

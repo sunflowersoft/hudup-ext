@@ -52,8 +52,8 @@ public class ListMap<K, V> implements Map<K, V>, Serializable {
 	public ListMap() {
 		super();
 		// TODO Auto-generated constructor stub
-		if (!(map instanceof Serializable) || !(keys instanceof Serializable))
-			throw new RuntimeException("ListMap isn't serializable class");
+//		if (!(map instanceof Serializable) || !(keys instanceof Serializable))
+//			throw new RuntimeException("ListMap isn't serializable class");
 	}
 
 	

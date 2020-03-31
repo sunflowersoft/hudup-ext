@@ -93,8 +93,8 @@ public class DatasetParserRemoteWrapper extends AlgRemoteWrapper implements Data
 	@Override
 	public DataConfig createDefaultConfig() {
 		// TODO Auto-generated method stub
-		if (remoteAlg instanceof DatasetParserAbstract)
-			return ((DatasetParserAbstract)remoteAlg).createDefaultConfig();
+		if (remoteAlg instanceof DatasetParser)
+			return ((DatasetParser)remoteAlg).createDefaultConfig();
 		else {
 			LogUtil.warn("Wrapper of remote dataset parser does not support createDefaultConfig()");
 			return null;

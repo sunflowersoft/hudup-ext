@@ -43,8 +43,8 @@ public class ContextList implements Serializable, Cloneable {
 	 * Default constructor.
 	 */
 	public ContextList() {
-		if (!(list instanceof Serializable))
-			throw new RuntimeException("List is not serializable");
+//		if (!(list instanceof Serializable))
+//			throw new RuntimeException("List is not serializable");
 	}
 	
 	

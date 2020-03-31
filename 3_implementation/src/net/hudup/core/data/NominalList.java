@@ -47,8 +47,8 @@ public class NominalList implements Serializable, Cloneable, TextParsable {
 	 * Default constructor.
 	 */
 	public NominalList() {
-		if (!(map instanceof Serializable))
-			throw new RuntimeException("Not serializable object");
+//		if (!(map instanceof Serializable))
+//			throw new RuntimeException("Not serializable object");
 	}
 	
 	

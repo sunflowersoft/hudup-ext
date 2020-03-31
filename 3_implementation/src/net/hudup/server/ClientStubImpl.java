@@ -7,7 +7,6 @@
  */
 package net.hudup.server;
 
-import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -53,8 +52,8 @@ public class ClientStubImpl implements ClientStub {
 	 * Default constructor.
 	 */
 	public ClientStubImpl() {
-		if (!(itemInfo instanceof Serializable))
-			throw new RuntimeException("Invalid field");
+//		if (!(itemInfo instanceof Serializable))
+//			throw new RuntimeException("Invalid field");
 	}
 	
 	
@@ -64,8 +63,8 @@ public class ClientStubImpl implements ClientStub {
 	 * @param itemInfos external item formation.
 	 */
 	public ClientStubImpl(String regName, Map<Integer, ExternalItemInfo> itemInfos) {
-		if (!(itemInfos instanceof Serializable))
-			throw new RuntimeException("Invalid field");
+//		if (!(itemInfos instanceof Serializable))
+//			throw new RuntimeException("Invalid field");
 		
 		this.regName = regName;
 		this.itemInfo = itemInfos;

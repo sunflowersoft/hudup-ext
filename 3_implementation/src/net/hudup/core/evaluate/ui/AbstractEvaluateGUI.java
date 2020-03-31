@@ -220,7 +220,7 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 
 		if (referredAlg != null) {
 			try {
-				if (bindUri != null && evaluator.acceptAlg(referredAlg))
+				if (evaluator.acceptAlg(referredAlg))
 					algRegTable = new RegisterTable(Arrays.asList(referredAlg));
 			} catch (Throwable e) {LogUtil.trace(e);}
 		}

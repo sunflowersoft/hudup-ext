@@ -85,8 +85,8 @@ public class Profile implements Cloneable, TextParsable, Serializable {
 	 * Initializing empty profile in which all its values are null.
 	 */
 	private void init() {
-		if (!(attValues instanceof Serializable))
-			throw new RuntimeException("Value isn't serializable class");
+//		if (!(attValues instanceof Serializable))
+//			throw new RuntimeException("Value isn't serializable class");
 		
 		attValues.clear();
 		for (int i = 0; i < attRef.size(); i++) {
@@ -605,8 +605,8 @@ public class Profile implements Cloneable, TextParsable, Serializable {
 			newValue = null;
 		}
 		
-		if (newValue != null && !(newValue instanceof Serializable))
-			throw new RuntimeException("Value isn't serializable class");
+//		if (newValue != null && !(newValue instanceof Serializable))
+//			throw new RuntimeException("Value isn't serializable class");
 		
 		attValues.set(index, newValue);
 	}
@@ -631,8 +631,8 @@ public class Profile implements Cloneable, TextParsable, Serializable {
 			newValue = null;
 		}
 		
-		if (newValue != null && !(newValue instanceof Serializable))
-			throw new RuntimeException("Value isn't serializable class");
+//		if (newValue != null && !(newValue instanceof Serializable))
+//			throw new RuntimeException("Value isn't serializable class");
 		
 		attValues.set(index, newValue);
 	}

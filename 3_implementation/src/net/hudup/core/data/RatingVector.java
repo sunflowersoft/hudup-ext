@@ -99,8 +99,8 @@ public class RatingVector implements Cloneable, TextParsable, Serializable {
 		if (sequence)
 			ratedMap = new ListMap<Integer, Rating>();
 		
-		if (!(ratedMap instanceof Serializable))
-			throw new RuntimeException("RatingVector isn't serializable class");
+//		if (!(ratedMap instanceof Serializable))
+//			throw new RuntimeException("RatingVector isn't serializable class");
 	}
 	
 	

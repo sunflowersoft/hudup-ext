@@ -125,8 +125,8 @@ public class Attribute implements Cloneable, TextParsable, Serializable {
 	 * Default constructor.
 	 */
 	public Attribute() {
-		if (!(nominalList instanceof Serializable))
-			throw new RuntimeException("RatingVector isn't serializable class");
+//		if (!(nominalList instanceof Serializable))
+//			throw new RuntimeException("RatingVector isn't serializable class");
 	}
 	
 	

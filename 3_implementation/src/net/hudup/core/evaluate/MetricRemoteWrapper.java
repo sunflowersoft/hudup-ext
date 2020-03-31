@@ -126,8 +126,8 @@ public class MetricRemoteWrapper extends AlgRemoteWrapper implements Metric, Met
 	@Override
 	public DataConfig createDefaultConfig() {
 		// TODO Auto-generated method stub
-		if (remoteAlg instanceof MetricAbstract)
-			return ((MetricAbstract)remoteAlg).createDefaultConfig();
+		if (remoteAlg instanceof Metric)
+			return ((Metric)remoteAlg).createDefaultConfig();
 		else {
 			LogUtil.warn("Wrapper of remote metric does not support createDefaultConfig()");
 			return null;

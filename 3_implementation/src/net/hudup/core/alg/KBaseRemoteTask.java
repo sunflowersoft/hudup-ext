@@ -20,7 +20,7 @@ import net.hudup.core.data.Dataset;
  * @version 12.0
  *
  */
-public interface KBaseRemoteTask extends AlgRemoteTask, AutoCloseable {
+public interface KBaseRemoteTask extends AutoCloseable {
 	
 	
 	/**

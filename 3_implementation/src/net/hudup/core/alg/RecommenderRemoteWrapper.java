@@ -154,8 +154,8 @@ public class RecommenderRemoteWrapper extends AlgRemoteWrapper implements Recomm
 	@Override
 	public DataConfig createDefaultConfig() {
 		// TODO Auto-generated method stub
-		if (remoteAlg instanceof RecommenderAbstract)
-			return ((RecommenderAbstract)remoteAlg).createDefaultConfig();
+		if (remoteAlg instanceof Recommender)
+			return ((Recommender)remoteAlg).createDefaultConfig();
 		else {
 			LogUtil.warn("Wrapper of remote recommendation algorithm does not support createDefaultConfig()");
 			return null;

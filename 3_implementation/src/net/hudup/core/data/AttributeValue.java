@@ -54,8 +54,8 @@ public class AttributeValue implements Serializable, TextParsable, Cloneable {
 		this.attribute = attribute;
 		this.value = value;
 		
-		if (!(value instanceof Serializable))
-			throw new RuntimeException("Not serialozable object");
+//		if (!(value instanceof Serializable))
+//			throw new RuntimeException("Not serialozable object");
 	}
 
 

@@ -128,17 +128,17 @@ public class SnapshotImpl extends Snapshot {
 	 * Default constructor.
 	 */
 	public SnapshotImpl() {
-		if ( !(userRatingMap instanceof Serializable) || 
-				!(userProfiles instanceof Serializable) ||
-				!(externalUserRecordMap instanceof Serializable) ||
-			 	!(itemRatingMap instanceof Serializable) ||
-				!(externalItemRecordMap instanceof Serializable) ||
-			 	!(itemProfiles instanceof Serializable) ||
-			 	!(ctSchema instanceof Serializable) ||
-			 	!(ctsProfiles instanceof Serializable) ||
-		 		!(sampleProfiles instanceof Serializable) )
-			
-			 throw new RuntimeException("Not serializable class");
+//		if ( !(userRatingMap instanceof Serializable) || 
+//				!(userProfiles instanceof Serializable) ||
+//				!(externalUserRecordMap instanceof Serializable) ||
+//			 	!(itemRatingMap instanceof Serializable) ||
+//				!(externalItemRecordMap instanceof Serializable) ||
+//			 	!(itemProfiles instanceof Serializable) ||
+//			 	!(ctSchema instanceof Serializable) ||
+//			 	!(ctsProfiles instanceof Serializable) ||
+//		 		!(sampleProfiles instanceof Serializable) )
+//			
+//			 throw new RuntimeException("Not serializable class");
 	}
 	
 

@@ -14,7 +14,7 @@ package net.hudup.core.data;
  * @version 1.0
  *
  */
-public interface ServerPointerRemote extends PointerRemote {
+public interface ServerPointerRemote extends ServerPointerRemoteTask, PointerRemote {
 
 
 }

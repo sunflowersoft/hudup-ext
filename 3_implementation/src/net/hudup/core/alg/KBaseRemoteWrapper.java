@@ -141,8 +141,8 @@ public class KBaseRemoteWrapper implements KBase, KBaseRemote {
 	@Override
 	public void setConfig(DataConfig config) {
 		// TODO Auto-generated method stub
-		if (remoteKBase instanceof KBaseAbstract)
-			((KBaseAbstract)remoteKBase).setConfig(config);
+		if (remoteKBase instanceof KBase)
+			((KBase)remoteKBase).setConfig(config);
 		else {
 			LogUtil.info("KBase wrapper does not support method setConfig(DataConfig)");
 		}
@@ -152,8 +152,8 @@ public class KBaseRemoteWrapper implements KBase, KBaseRemote {
 	@Override
 	public Datasource getDatasource() {
 		// TODO Auto-generated method stub
-		if (remoteKBase instanceof KBaseAbstract)
-			return ((KBaseAbstract)remoteKBase).getDatasource();
+		if (remoteKBase instanceof KBase)
+			return ((KBase)remoteKBase).getDatasource();
 		else {
 			LogUtil.info("KBase wrapper does not support method getDatasource()");
 			return null;
@@ -164,8 +164,8 @@ public class KBaseRemoteWrapper implements KBase, KBaseRemote {
 	@Override
 	public Inspector getInspector() {
 		// TODO Auto-generated method stub
-		if (remoteKBase instanceof KBaseAbstract)
-			return ((KBaseAbstract)remoteKBase).getInspector();
+		if (remoteKBase instanceof KBase)
+			return ((KBase)remoteKBase).getInspector();
 		else {
 			return new Inspector.NullInspector();
 		}

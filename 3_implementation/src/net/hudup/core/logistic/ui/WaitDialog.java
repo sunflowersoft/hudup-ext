@@ -17,6 +17,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 
 import net.hudup.core.logistic.AbstractRunner;
+import net.hudup.core.logistic.I18nUtil;
 
 /**
  * This class shows a waiting dialog.
@@ -107,10 +108,12 @@ public class WaitDialog implements Serializable {
 		JDialog waitDlg = new JDialog(UIUtil.getFrameForComponent(comp), "Please wait...", true);
 		waitDlg.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		waitDlg.setLocationRelativeTo(null);
-		waitDlg.setSize(300, 200);
+		waitDlg.setSize(200, 100);
 		waitDlg.setLayout(new BorderLayout());
-		waitDlg.add(new JLabel("Please wait..."), BorderLayout.CENTER);
+		waitDlg.add(new JLabel(I18nUtil.message("please_wait") + "..."), BorderLayout.NORTH);
 		
+		waitDlg.add(new JLabel(UIUtil.getImageIcon("wait-64x64.gif", I18nUtil.message("please_wait"))), BorderLayout.CENTER);
+
 		waitDlg.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 		return waitDlg;
 	}

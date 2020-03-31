@@ -22,6 +22,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+import javax.swing.SwingWorker;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -39,6 +40,7 @@ import net.hudup.core.data.ui.SysConfigPane;
 import net.hudup.core.data.ui.UnitTable;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.ui.UIUtil;
+import net.hudup.core.logistic.ui.WaitDialog;
 import net.hudup.data.DatasetUtil2;
 import net.hudup.data.ProviderImpl;
 import net.hudup.data.ui.AttributeListTable;
@@ -919,17 +921,22 @@ public class SetupServerWizard extends JDialog {
 					return;
 				}
 				
-				JDialog wait = new JDialog(getWizard(), "Please waiting...", false);
-				wait.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-				wait.setLocationRelativeTo(getWizard());
-				wait.setSize(200, 100);
-				wait.setVisible(true);
-				
-				provider.importData(srcConfig, false, null);
-				
+				JDialog dlgWait = WaitDialog.createDialog(getWizard()); dlgWait.setUndecorated(true);
+				SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
+					@Override
+					protected Void doInBackground() throws Exception {
+						provider.importData(srcConfig, false, null);
+						return null;
+					}
+					
+					@Override
+					protected void done() {
+						super.done(); dlgWait.dispose();
+					}
+				};
+				worker.execute(); dlgWait.setVisible(true);
+
 				unitList.connectUpdate(config);
-				
-				wait.dispose();
 				
 				JOptionPane.showMessageDialog(
 						getWizard(), 

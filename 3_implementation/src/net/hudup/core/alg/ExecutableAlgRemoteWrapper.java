@@ -148,8 +148,8 @@ public class ExecutableAlgRemoteWrapper extends AlgRemoteWrapper implements Exec
 	@Override
 	public DataConfig createDefaultConfig() {
 		// TODO Auto-generated method stub
-		if (remoteAlg instanceof ExecutableAlgAbstract)
-			return ((ExecutableAlgAbstract)remoteAlg).createDefaultConfig();
+		if (remoteAlg instanceof ExecutableAlg)
+			return ((ExecutableAlg)remoteAlg).createDefaultConfig();
 		else {
 			LogUtil.warn("Wrapper of remote executable algorithm does not support createDefaultConfig()");
 			return null;

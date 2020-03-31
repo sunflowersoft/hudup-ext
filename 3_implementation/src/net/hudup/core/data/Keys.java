@@ -52,8 +52,8 @@ public class Keys implements Cloneable, TextParsable, Serializable {
 		super();
 		// TODO Auto-generated constructor stub
 		
-		if (!(list instanceof Serializable))
-			throw new RuntimeException("Keys isn't serializable class");
+//		if (!(list instanceof Serializable))
+//			throw new RuntimeException("Keys isn't serializable class");
 	}
 
 

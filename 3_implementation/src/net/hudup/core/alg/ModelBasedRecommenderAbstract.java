@@ -55,7 +55,9 @@ public abstract class ModelBasedRecommenderAbstract extends RecommenderAbstract 
 				kb = newKB();
 			kb.setConfig(config); //This code line is important.
 			
-			kb.addSetupListener(this); //Loc Nguyen added: 2020.03.30
+			//Loc Nguyen added: 2020.03.30
+			if (kb instanceof KBaseRemote)
+				((KBaseRemote)kb).addSetupListener(this);
 		}
 		catch (Throwable e) {LogUtil.trace(e);}
 	}
@@ -168,56 +170,80 @@ public abstract class ModelBasedRecommenderAbstract extends RecommenderAbstract 
 	@Override
 	public Object learnStart(Object... info) throws RemoteException {
 		// TODO Auto-generated method stub
-		return kb.learnStart(info);
+		if ((kb != null) && (kb instanceof KBaseRemote))
+			return ((KBaseRemote)kb).learnStart(info);
+		else
+			return super.learnStart(info);
 	}
 
 
 	@Override
 	public synchronized boolean learnPause() throws RemoteException {
 		// TODO Auto-generated method stub
-		return kb.learnPause();
+		if ((kb != null) && (kb instanceof KBaseRemote))
+			return ((KBaseRemote)kb).learnPause();
+		else
+			return super.learnPause();
 	}
 
 
 	@Override
 	public synchronized boolean learnResume() throws RemoteException {
 		// TODO Auto-generated method stub
-		return kb.learnResume();
+		if ((kb != null) && (kb instanceof KBaseRemote))
+			return ((KBaseRemote)kb).learnResume();
+		else
+			return super.learnResume();
 	}
 
 
 	@Override
 	public synchronized boolean learnStop() throws RemoteException {
 		// TODO Auto-generated method stub
-		return kb.learnStop();
+		if ((kb != null) && (kb instanceof KBaseRemote))
+			return ((KBaseRemote)kb).learnStop();
+		else
+			return super.learnStop();
 	}
 
 
 	@Override
 	public boolean learnForceStop() throws RemoteException {
 		// TODO Auto-generated method stub
-		return kb.learnForceStop();
+		if ((kb != null) && (kb instanceof KBaseRemote))
+			return ((KBaseRemote)kb).learnForceStop();
+		else
+			return super.learnForceStop();
 	}
 
 
 	@Override
 	public boolean isLearnStarted() throws RemoteException {
 		// TODO Auto-generated method stub
-		return kb.isLearnStarted();
+		if ((kb != null) && (kb instanceof KBaseRemote))
+			return ((KBaseRemote)kb).isLearnStarted();
+		else
+			return super.isLearnStarted();
 	}
 
 
 	@Override
 	public boolean isLearnPaused() throws RemoteException {
 		// TODO Auto-generated method stub
-		return kb.isLearnPaused();
+		if ((kb != null) && (kb instanceof KBaseRemote))
+			return ((KBaseRemote)kb).isLearnPaused();
+		else
+			return super.isLearnPaused();
 	}
 
 
 	@Override
 	public boolean isLearnRunning() throws RemoteException {
 		// TODO Auto-generated method stub
-		return kb.isLearnRunning();
+		if ((kb != null) && (kb instanceof KBaseRemote))
+			return ((KBaseRemote)kb).isLearnRunning();
+		else
+			return super.isLearnRunning();
 	}
 	
 

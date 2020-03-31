@@ -46,8 +46,8 @@ public class ListSet<E> implements Set<E>, Serializable {
 		super();
 		// TODO Auto-generated constructor stub
 		
-		if (!(list instanceof Serializable))
-			throw new RuntimeException("ListSet isn't serializable class");
+//		if (!(list instanceof Serializable))
+//			throw new RuntimeException("ListSet isn't serializable class");
 	}
 
 

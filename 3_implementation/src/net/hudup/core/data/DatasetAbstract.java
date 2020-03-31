@@ -182,7 +182,7 @@ public abstract class DatasetAbstract implements Dataset, DatasetRemote {
 	@Override
 	public Fetcher<Integer> remoteFetchUserIds() throws RemoteException {
 		// TODO Auto-generated method stub
-		return fetchUserIds();
+		return FetcherUtil.fixFetcherSerialized(fetchUserIds());
 	}
 
 
@@ -203,7 +203,7 @@ public abstract class DatasetAbstract implements Dataset, DatasetRemote {
 	@Override
 	public Fetcher<Integer> remoteFetchItemIds() throws RemoteException {
 		// TODO Auto-generated method stub
-		return fetchItemIds();
+		return FetcherUtil.fixFetcherSerialized(fetchItemIds());
 	}
 
 
@@ -238,7 +238,7 @@ public abstract class DatasetAbstract implements Dataset, DatasetRemote {
 	@Override
 	public Fetcher<RatingVector> remoteFetchUserRatings() throws RemoteException {
 		// TODO Auto-generated method stub
-		return fetchUserRatings();
+		return FetcherUtil.fixFetcherSerialized(fetchUserRatings());
 	}
 
 
@@ -252,7 +252,7 @@ public abstract class DatasetAbstract implements Dataset, DatasetRemote {
 	@Override
 	public Fetcher<RatingVector> remoteFetchItemRatings() throws RemoteException {
 		// TODO Auto-generated method stub
-		return fetchItemRatings();
+		return FetcherUtil.fixFetcherSerialized(fetchItemRatings());
 	}
 
 
@@ -280,7 +280,7 @@ public abstract class DatasetAbstract implements Dataset, DatasetRemote {
 	@Override
 	public Fetcher<Profile> remoteFetchUserProfiles() throws RemoteException {
 		// TODO Auto-generated method stub
-		return fetchUserProfiles();
+		return FetcherUtil.fixFetcherSerialized(fetchUserProfiles());
 	}
 
 
@@ -301,7 +301,7 @@ public abstract class DatasetAbstract implements Dataset, DatasetRemote {
 	@Override
 	public Fetcher<Profile> remoteFetchItemProfiles() throws RemoteException {
 		// TODO Auto-generated method stub
-		return fetchItemProfiles();
+		return FetcherUtil.fixFetcherSerialized(fetchItemProfiles());
 	}
 
 
@@ -329,7 +329,7 @@ public abstract class DatasetAbstract implements Dataset, DatasetRemote {
 	@Override
 	public Fetcher<Profile> remoteFetchSample() throws RemoteException {
 		// TODO Auto-generated method stub
-		return fetchSample();
+		return FetcherUtil.fixFetcherSerialized(fetchSample());
 	}
 
 

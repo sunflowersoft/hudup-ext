@@ -316,8 +316,8 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 		setVerbal(guiData != null ? guiData.chkVerbal : false);
 		
 		if (guiData.pool.size() > 0) {
-			this.txtTrainingBrowse.setDataset(guiData.pool.get(0).getTraining(), bindUri == null);
-			this.txtTestingBrowse.setDataset(guiData.pool.get(0).getTesting(), bindUri == null);
+			this.txtTrainingBrowse.setDataset(guiData.pool.get(0).getTraining(), false);
+			this.txtTestingBrowse.setDataset(guiData.pool.get(0).getTesting(), false);
 		}
 	}
 
@@ -630,17 +630,17 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			btnTrainingBrowse.setText(I18nUtil.message("training_set_kbase"));
 			Dataset dataset = txtTrainingBrowse.getDataset();
 			if (dataset != null && (dataset instanceof Pointer))
-				txtTrainingBrowse.setDataset(null, bindUri == null);
+				txtTrainingBrowse.setDataset(null, false);
 		}
 		else if (alg instanceof CompositeAlg) {
 			btnTrainingBrowse.setText(I18nUtil.message("any_source"));
 			Dataset dataset = txtTrainingBrowse.getDataset();
 			if (dataset != null && (dataset instanceof Pointer))
-				txtTrainingBrowse.setDataset(null, bindUri == null);
+				txtTrainingBrowse.setDataset(null, false);
 		}
 		else if (alg instanceof ServiceAlg) {
 			btnTrainingBrowse.setText(I18nUtil.message("service_pointer"));
-			txtTrainingBrowse.setDataset(null, bindUri == null);
+			txtTrainingBrowse.setDataset(null, false);
 		}
 		else
 			btnTrainingBrowse.setText(I18nUtil.message("training_set"));
@@ -1047,8 +1047,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			}
 			
 			clearResult();
-			guiData.pool = new DatasetPool();
-			guiData.pool.add(new DatasetPair(dataset, txtTestingBrowse.getDataset()));
+			addTrainingToPool(dataset);
 			if (bindUri == null) {
 				try {
 //					synchronized (this) {
@@ -1193,8 +1192,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			}
 	
 			clearResult();
-			guiData.pool = new DatasetPool();
-			guiData.pool.add(new DatasetPair(txtTrainingBrowse.getDataset(), dataset));
+			addTestingToPool(dataset);
 			if (bindUri == null) {
 				try {
 //					synchronized (this) {
@@ -1311,16 +1309,17 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 				return;
 			
 			Alg alg = getAlg();
-			Dataset training = txtTrainingBrowse.getDataset();
-			Dataset testing = txtTestingBrowse.getDataset();
-			if (alg == null || training == null || testing == null)
+			if (alg == null || guiData.pool == null || guiData.pool.size() == 0)
+				return;
+
+			Dataset training = guiData.pool.get(0).getTraining();
+			Dataset testing = guiData.pool.get(0).getTesting();
+			if (training == null || testing == null)
 				return;
 			
 			if (!DatasetUtil2.validateTrainingset(this, training, new Alg[] { getAlg() }))
 				return;
 			
-			DatasetPool pool = new DatasetPool(training, testing);
-				
 			List<Alg> algList = Util.newList();
 			algList.add(alg);
 			
@@ -1328,9 +1327,9 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			boolean started = false;
 //			synchronized (this) {
 				if (bindUri == null)
-					started = evaluator.remoteStart0(algList, toDatasetPoolExchangedClient(pool), this.timestamp = new Timestamp());
+					started = evaluator.remoteStart0(algList, toDatasetPoolExchangedClient(guiData.pool), this.timestamp = new Timestamp());
 				else
-					started = evaluator.remoteStart(AlgList.getAlgNameList(algList), toDatasetPoolExchangedClient(pool), null);
+					started = evaluator.remoteStart(AlgList.getAlgNameList(algList), toDatasetPoolExchangedClient(guiData.pool), null);
 				
 //				try {wait();} catch (Exception e) {LogUtil.trace(e);}
 //			}
@@ -1367,12 +1366,12 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 				guiData.pool = evt.getPoolResult().toDatasetPoolClient();
 				guiData.pool = guiData.pool != null ? guiData.pool : new DatasetPool();
 				if (guiData.pool.size() > 0) {
-					txtTrainingBrowse.setDataset(guiData.pool.get(0).getTraining(), bindUri == null);
-					txtTestingBrowse.setDataset(guiData.pool.get(0).getTesting(), bindUri == null);
+					txtTrainingBrowse.setDataset(guiData.pool.get(0).getTraining(), false);
+					txtTestingBrowse.setDataset(guiData.pool.get(0).getTesting(), false);
 				}
 				else {
-					txtTrainingBrowse.setDataset(null, bindUri == null);
-					txtTestingBrowse.setDataset(null, bindUri == null);
+					txtTrainingBrowse.setDataset(null, false);
+					txtTestingBrowse.setDataset(null, false);
 				}
 //			}
 			
@@ -1464,11 +1463,11 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 
 	@Override
 	protected synchronized void updateMode() {
+		Dataset training = txtTrainingBrowse.getDataset();
+		Dataset testing = txtTestingBrowse.getDataset();
+		
 		try {
 			evProcessor.closeIOChannels();
-			
-			Dataset training = txtTrainingBrowse.getDataset();
-			Dataset testing = txtTestingBrowse.getDataset();
 			
 			if (cmbAlgs.getItemCount() == 0) {
 				setInternalEnable(false);
@@ -1488,6 +1487,8 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 				btnTestingBrowse.setEnabled(true);
 				btnRefresh.setEnabled(training != null || testing != null);
 				btnClear.setEnabled(training != null || testing != null);
+				btnUpload.setEnabled((training == null && testing == null) || (training != null && testing != null));
+				btnDownload.setEnabled(true);
 				
 				prgRunning.setMaximum(0);
 				prgRunning.setValue(0);
@@ -1545,13 +1546,16 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			LogUtil.trace(e);
 			
 			boolean flag = cmbAlgs.getItemCount() > 0 &&
-				txtTrainingBrowse.getDataset() != null && txtTestingBrowse.getDataset() != null;
+				training != null && testing != null;
 			setInternalEnable(flag);
 			setResultVisible(flag);
 			
 			cmbAlgs.setEnabled(algRegTable.size() > 0);
 			btnTrainingBrowse.setEnabled(true);
 			btnTestingBrowse.setEnabled(true);
+			btnUpload.setEnabled(
+					flag && ((training == null && testing == null) || (training != null && testing != null)) );
+			btnDownload.setEnabled(cmbAlgs.getItemCount() > 0);
 		}
 	}
 	
@@ -1580,7 +1584,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 		this.btnClear.setEnabled(
 			flag && (trainingSet != null || testingSet != null));
 		this.btnUpload.setEnabled(
-			flag && (trainingSet != null || testingSet != null));
+			flag && ((trainingSet == null && testingSet == null) || (trainingSet != null && testingSet != null)) );
 		this.btnDownload.setEnabled(flag);
 
 		this.btnRun.setEnabled(
@@ -1671,6 +1675,44 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 
 	
 	/**
+	 * Add training dataset to pool.
+	 * @param training specified training dataset.
+	 */
+	private void addTrainingToPool(Dataset training) {
+		if (training == null) return;
+		if (guiData.pool == null) guiData.pool = new DatasetPool();
+		
+		if (guiData.pool.size() == 0) {
+			guiData.pool.add(new DatasetPair(training, null));
+		}
+		else {
+			DatasetPair pair = guiData.pool.get(0);
+			pair.setTraining(training);
+			pair.setTrainingUUID(null);
+		}
+	}
+
+	
+	/**
+	 * Add testing dataset to pool.
+	 * @param testing specified testing dataset.
+	 */
+	private void addTestingToPool(Dataset testing) {
+		if (testing == null) return;
+		if (guiData.pool == null) guiData.pool = new DatasetPool();
+		
+		if (guiData.pool.size() == 0) {
+			guiData.pool.add(new DatasetPair(null, testing));
+		}
+		else {
+			DatasetPair pair = guiData.pool.get(0);
+			pair.setTesting(testing);
+			pair.setTestingUUID(null);
+		}
+	}
+
+	
+	/**
 	 * Creating inspector for recommendation algorithm.
 	 * @param recommender specified recommendation algorithm.
 	 * @return inspector for recommendation algorithm.
@@ -1743,5 +1785,6 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 		
 	}
 	
+
 	
 }

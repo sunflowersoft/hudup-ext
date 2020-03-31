@@ -20,6 +20,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+import javax.swing.SwingWorker;
 import javax.swing.WindowConstants;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -41,6 +42,7 @@ import net.hudup.core.data.ui.DataConfigTextField;
 import net.hudup.core.data.ui.SysConfigPane;
 import net.hudup.core.data.ui.UnitTable;
 import net.hudup.core.logistic.ui.UIUtil;
+import net.hudup.core.logistic.ui.WaitDialog;
 import net.hudup.data.DatasetUtil2;
 import net.hudup.data.DefaultExternalQuery;
 import net.hudup.data.ProviderImpl;
@@ -894,17 +896,22 @@ public class DatasetCreator extends JPanel implements Dispose {
 					return;
 				}
 				
-				JDialog wait = new JDialog(UIUtil.getFrameForComponent(getCreator()), "Please waiting...", false);
-				wait.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
-				wait.setLocationRelativeTo(UIUtil.getFrameForComponent(getCreator()));
-				wait.setSize(200, 100);
-				wait.setVisible(true);
-				
-				provider.importData(srcConfig, false, null);
+				JDialog dlgWait = WaitDialog.createDialog(UIUtil.getFrameForComponent(getCreator())); dlgWait.setUndecorated(true);
+				SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
+					@Override
+					protected Void doInBackground() throws Exception {
+						provider.importData(srcConfig, false, null);
+						return null;
+					}
+					
+					@Override
+					protected void done() {
+						super.done(); dlgWait.dispose();
+					}
+				};
+				worker.execute(); dlgWait.setVisible(true);
 				
 				unitList.connectUpdate(config);
-				
-				wait.dispose();
 				
 				JOptionPane.showMessageDialog(
 						getCreator(), 

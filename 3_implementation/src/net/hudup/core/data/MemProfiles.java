@@ -7,7 +7,6 @@
  */
 package net.hudup.core.data;
 
-import java.io.Serializable;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
@@ -49,9 +48,9 @@ public class MemProfiles implements Profiles {
 	 * Default constructor.
 	 */
 	protected MemProfiles() {
-		if ( !(attList instanceof Serializable) || 
-			 !(profileMap instanceof Serializable))
-			throw new RuntimeException("Not serializable class");
+//		if ( !(attList instanceof Serializable) || 
+//			 !(profileMap instanceof Serializable))
+//			throw new RuntimeException("Not serializable class");
 	}
 	
 	

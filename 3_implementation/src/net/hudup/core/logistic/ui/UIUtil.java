@@ -39,28 +39,6 @@ public final class UIUtil {
 
 	
 	/**
-	 * Creating an image from image name.
-	 * The directory of such image is specified by constants {@link Constants#IMAGES_PACKAGE}.
-	 * @param imageName image name.
-	 * @return image from image name.
-	 */
-	public static Image getImage(String imageName) {
-		URL url = getImageUrl(imageName);
-		if (url == null)
-			return null;
-		
-		try {
-			return Toolkit.getDefaultToolkit().getImage(url);
-		}
-		catch (Throwable e) {
-			LogUtil.trace(e);
-		}
-		
-		return null;
-	}
-	
-	
-	/**
 	 * Retrieving URL of an image from image name.
 	 * The directory of such image is specified by constants {@link Constants#IMAGES_PACKAGE}.
 	 * @param imageName image name.
@@ -84,6 +62,43 @@ public final class UIUtil {
 		}
 		
 		return imageURL;
+	}
+	
+	
+	/**
+	 * Creating an image from image name.
+	 * The directory of such image is specified by constants {@link Constants#IMAGES_PACKAGE}.
+	 * @param imageName image name.
+	 * @return image from image name.
+	 */
+	public static Image getImage(String imageName) {
+		URL url = getImageUrl(imageName);
+		if (url == null)
+			return null;
+		
+		try {
+			return Toolkit.getDefaultToolkit().getImage(url);
+		}
+		catch (Throwable e) {
+			LogUtil.trace(e);
+		}
+		
+		return null;
+	}
+	
+	
+	/**
+	 * Creating an icon from icon name.
+	 * The directory of such icon is specified by constants {@link Constants#IMAGES_PACKAGE}.
+	 * @param iconName icon name.
+	 * @param alt alternative name.
+	 * @return icon from icon name.
+	 */
+	public static ImageIcon getImageIcon(String iconName, String alt) {
+		if (alt == null)
+			return new ImageIcon(getImageUrl(iconName));
+		else
+			return new ImageIcon(getImageUrl(iconName), alt);
 	}
 	
 	

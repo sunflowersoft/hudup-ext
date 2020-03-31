@@ -189,8 +189,8 @@ public class AlgRemoteWrapper implements Alg, AlgRemote, Serializable {
 	@Override
 	public void resetConfig() {
 		// TODO Auto-generated method stub
-		if (remoteAlg instanceof AlgAbstract)
-			((AlgAbstract)remoteAlg).resetConfig();
+		if (remoteAlg instanceof Alg)
+			((Alg)remoteAlg).resetConfig();
 		else
 			LogUtil.error("resetConfig() not supported");
 	}
@@ -199,8 +199,8 @@ public class AlgRemoteWrapper implements Alg, AlgRemote, Serializable {
 	@Override
 	public DataConfig createDefaultConfig() {
 		// TODO Auto-generated method stub
-		if (remoteAlg instanceof AlgAbstract)
-			return ((AlgAbstract)remoteAlg).createDefaultConfig();
+		if (remoteAlg instanceof Alg)
+			return ((Alg)remoteAlg).createDefaultConfig();
 		else {
 			LogUtil.warn("createDefaultConfig() not supported");
 			return null;

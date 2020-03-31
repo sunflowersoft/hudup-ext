@@ -178,11 +178,11 @@ public class PropList implements TextParsable, Serializable, Cloneable {
 	 * Default constructor.
 	 */
 	public PropList() {
-		if (!(propMap instanceof Serializable) || !(readOnlyKeys instanceof Serializable)
-				|| !(invisibleKeys instanceof Serializable)
-//				|| !(unsavedKeys instanceof Serializable)
-			)
-			throw new RuntimeException("Not serializable class");
+//		if (!(propMap instanceof Serializable) || !(readOnlyKeys instanceof Serializable)
+//				|| !(invisibleKeys instanceof Serializable)
+////				|| !(unsavedKeys instanceof Serializable)
+//			)
+//			throw new RuntimeException("Not serializable class");
 	}
 	
 	

@@ -54,8 +54,8 @@ public class AttributeList implements Cloneable, TextParsable, Serializable, Tra
 		super();
 		// TODO Auto-generated constructor stub
 		
-		if (!(list instanceof Serializable))
-			throw new RuntimeException("RatingVector isn't serializable class");
+//		if (!(list instanceof Serializable))
+//			throw new RuntimeException("RatingVector isn't serializable class");
 	}
 
 

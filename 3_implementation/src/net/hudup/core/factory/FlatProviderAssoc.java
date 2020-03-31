@@ -12,8 +12,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.io.Writer;
-import java.nio.file.AccessDeniedException;
-import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -21,11 +19,13 @@ import java.util.List;
 import jxl.Cell;
 import jxl.Sheet;
 import jxl.Workbook;
+import jxl.WorkbookSettings;
 import jxl.write.DateTime;
 import jxl.write.Label;
 import jxl.write.WritableCell;
 import jxl.write.WritableSheet;
 import jxl.write.WritableWorkbook;
+import jxl.write.biff.WritableWorkbookImpl;
 import net.hudup.core.Constants;
 import net.hudup.core.Util;
 import net.hudup.core.data.Attribute;
@@ -47,7 +47,6 @@ import net.hudup.core.data.UnitList;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.NextUpdate;
 import net.hudup.core.logistic.UriAdapter;
-import net.hudup.core.logistic.UriAssocAbstract;
 import net.hudup.core.logistic.xURI;
 
 /**
@@ -917,9 +916,7 @@ class FlatProviderAssoc extends ProviderAssocAbstract {
 				return new DefaultCsvWriter(adapter.getWriter(unitURI, append));
 			else {
 				try {
-					OutputStream os = adapter.getOutputStream(unitURI, false);
-					WritableWorkbook workbook = Workbook.createWorkbook(os);
-					return new ExcelWriter(workbook, false);
+					return new ExcelWriter(adapter, unitURI, append);
 				}
 				catch (Exception e) {
 					LogUtil.trace(e);
@@ -1252,15 +1249,11 @@ class ExcelReader implements CsvReader {
 
 /**
  * This is writer for writing Excel file.
- * TrueZip and then {@link Files#newOutputStream(java.nio.file.Path, java.nio.file.OpenOption...)}
- * called from {@link UriAssocAbstract#create(xURI, boolean)} throws {@link AccessDeniedException} to write Excel files.
- * Therefore, this class will be improved later. In current version, only reading Excel files.
  * 
  * @author Loc Nguyen
  * @version 12.0
  *
  */
-@NextUpdate
 class ExcelWriter implements CsvWriter {
 
 	
@@ -1289,38 +1282,66 @@ class ExcelWriter implements CsvWriter {
 
 	
 	/**
-	 * Output stream.
-	 */
-	protected OutputStream os = null;
-	
-	
-	/**
-	 * Constructor with specified workbook.
-	 * @param workbook specified workbook.
+	 * Constructor with specified URI and append mode.
+	 * @param uri URI of excel file.
 	 * @param append append mode.
+	 * @throws Exception if any error raises.
 	 */
-	public ExcelWriter(WritableWorkbook workbook, boolean append) {
-		this(workbook, append, null);
+	public ExcelWriter(xURI uri, boolean append) throws Exception {
+		this(new UriAdapter(uri), uri, append);
 	}
 	
 	
 	/**
-	 * Constructor with specified workbook and attribute list.
-	 * @param workbook specified workbook.
+	 * Constructor with specified adapter, URI, and append mode.
+	 * @param adapter adapter.
+	 * @param uri URI of excel file.
 	 * @param append append mode.
-	 * @param attList specified attribute list.
+	 * @throws Exception if any error raises.
 	 */
-	public ExcelWriter(WritableWorkbook workbook, boolean append, AttributeList attList) {
-		this.workbook = workbook;
+	public ExcelWriter(UriAdapter adapter, xURI uri, boolean append) throws Exception {
+		Sheet tempSheet = null;
+		if (adapter.exists(uri)) {
+			InputStream is = null;
+			try {
+				is = adapter.getInputStream(uri);
+				Workbook tempWorkbook = Workbook.getWorkbook(is);
+				tempSheet = tempWorkbook.getNumberOfSheets() > 0 ? tempWorkbook.getSheet(0) : null;
+				is.close(); is = null;
+			}
+			catch (Exception e) {tempSheet = null; /*LogUtil.trace(e);*/}
+			finally {
+				if (is != null) {
+					try {
+						is.close();
+					} catch (Exception e) {LogUtil.trace(e);}
+				}
+			}
+		}
+		
+		OutputStream os = adapter.getOutputStream(uri, false);
+		this.workbook = new WritableWorkbookImpl(os, true, new WorkbookSettings());
 		if (workbook.getNumberOfSheets() > 0)
 			this.sheet = workbook.getSheet(0);
-		else
+		else {
 			this.sheet = workbook.createSheet("First", 0);
+			if (tempSheet != null) {
+				if (attList == null) attList = ExcelReader.extractAttributeList(tempSheet);
+
+				int m = tempSheet.getRows();
+				int n = tempSheet.getColumns();
+				for (int i = 0; i < m; i++) {
+					for (int j = 0; j < n; j++) {
+						Cell cell = tempSheet.getCell(j, i);
+						if (cell == null) continue;
+						
+						this.sheet.addCell(createCell(cell.getContents(), i, j));
+					}
+				}
+			}
+		}
 		
-		if (attList == null)
-			this.attList = ExcelReader.extractAttributeList(this.sheet);
-		else
-			this.attList = attList;
+		if (attList == null) attList = ExcelReader.extractAttributeList(this.sheet);
 		
 		if (append)
 			this.currentRow = this.sheet.getRows() - 1;
@@ -1366,7 +1387,7 @@ class ExcelWriter implements CsvWriter {
 	 */
 	private WritableCell createCell(String svalue, int row, int column) {
 		if (svalue == null) return null;
-		if (attList == null || attList.size() == 0 || attList.size() <= column)
+		if (attList == null || attList.size() == 0 || attList.size() <= column || row == 0)
 			return new Label(column, row, svalue);
 		
 		Attribute att = attList.get(column);
@@ -1398,13 +1419,6 @@ class ExcelWriter implements CsvWriter {
 		}
 		workbook = null;
 		
-		if (os != null) {
-			try {
-				os.close();
-			} catch (Throwable e) {LogUtil.trace(e);}
-		}
-		os = null;
-
 		attList = null;
 		currentRow = -1;
 	}

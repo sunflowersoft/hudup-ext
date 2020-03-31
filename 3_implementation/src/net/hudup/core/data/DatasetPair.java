@@ -109,6 +109,15 @@ public class DatasetPair implements Serializable {
 	
 	
 	/**
+	 * Setting training UUID.
+	 * @param trainingUUID specified training UUID.
+	 */
+	public void setTrainingUUID(UUID trainingUUID) {
+		this.trainingUUID = trainingUUID;
+	}
+	
+	
+	/**
 	 * Getting testing dataset.
 	 * @return testing dataset.
 	 */
@@ -127,6 +136,15 @@ public class DatasetPair implements Serializable {
 
 	
 	/**
+	 * Setting testing UUID.
+	 * @param testingUUID specified testing UUID.
+	 */
+	public void setTestingUUID(UUID testingUUID) {
+		this.testingUUID = testingUUID;
+	}
+	
+	
+	/**
 	 * Getting the whole (entire) dataset.
 	 * @return whole (entire) dataset from which training dataset and testing dataset are extracted.
 	 */
@@ -143,6 +161,15 @@ public class DatasetPair implements Serializable {
 		this.whole = whole;
 	}
 
+	
+	/**
+	 * Setting whole UUID.
+	 * @param wholeUUID specified whole UUID.
+	 */
+	public void setWholeUUID(UUID wholeUUID) {
+		this.wholeUUID = wholeUUID;
+	}
+	
 	
 	/**
 	 * Testing whether this dataset pair is valid. The dataset pair is valid if its both training dataset and testing dataset are not null. 

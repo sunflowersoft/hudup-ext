@@ -108,11 +108,11 @@ public class MemFetcher<E /*extends Serializable*/> implements Fetcher<E> {
 	 * @param data specified data collection.
 	 */
 	public void update(Collection<E> data) {
-		if (!(data instanceof Serializable)) {
-			List<E> newData = Util.newList(data.size());
-			newData.addAll(data);
-			data = newData;
-		}
+//		if (!(data instanceof Serializable)) {
+//			List<E> newData = Util.newList(data.size());
+//			newData.addAll(data);
+//			data = newData;
+//		}
 		
 		this.data = data;
 		this.iterator = data.iterator();

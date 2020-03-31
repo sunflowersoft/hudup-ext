@@ -84,8 +84,8 @@ public class ExternalQueryRemoteWrapper extends AlgRemoteWrapper implements Exte
 	@Override
 	public synchronized void resetConfig() {
 		// TODO Auto-generated method stub
-		if (remoteAlg instanceof ExternalQueryAbstract)
-			((ExternalQueryAbstract)remoteAlg).resetConfig();
+		if (remoteAlg instanceof ExternalQuery)
+			((ExternalQuery)remoteAlg).resetConfig();
 		else
 			LogUtil.info("External query remote wrapper does not support method resetConfig()");
 	}
@@ -94,8 +94,8 @@ public class ExternalQueryRemoteWrapper extends AlgRemoteWrapper implements Exte
 	@Override
 	public DataConfig createDefaultConfig() {
 		// TODO Auto-generated method stub
-		if (remoteAlg instanceof ExternalQueryAbstract)
-			return ((ExternalQueryAbstract)remoteAlg).createDefaultConfig();
+		if (remoteAlg instanceof ExternalQuery)
+			return ((ExternalQuery)remoteAlg).createDefaultConfig();
 		else {
 			LogUtil.info("External query wrapper does not support method createDefaultConfig()");
 			return null;

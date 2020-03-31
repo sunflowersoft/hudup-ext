@@ -88,8 +88,8 @@ public class DatasetRemoteWrapper implements Dataset, DatasetRemote {
 	@Override
 	public void setConfig(DataConfig config) {
 		// TODO Auto-generated method stub
-		if (remoteDataset instanceof DatasetAbstract) {
-			((DatasetAbstract)remoteDataset).setConfig(config);
+		if (remoteDataset instanceof Dataset) {
+			((Dataset)remoteDataset).setConfig(config);
 		}
 		else {
 			LogUtil.warn("DatasetRemoteWrapper.setConfig() not supported");
@@ -101,8 +101,10 @@ public class DatasetRemoteWrapper implements Dataset, DatasetRemote {
 	public Fetcher<Integer> fetchUserIds() {
 		// TODO Auto-generated method stub
 		try {
-			//return FetcherUtil.fixFetcherSerialized(remoteDataset.remoteFetchUserIds());
-			return remoteDataset.remoteFetchUserIds();
+			if (remoteDataset instanceof Dataset)
+				return ((Dataset)remoteDataset).fetchUserIds();
+			else
+				return remoteDataset.remoteFetchUserIds();
 		}
 		catch (Exception e) {LogUtil.trace(e);}
 		
@@ -138,8 +140,10 @@ public class DatasetRemoteWrapper implements Dataset, DatasetRemote {
 	public Fetcher<Integer> fetchItemIds() {
 		// TODO Auto-generated method stub
 		try {
-			//return FetcherUtil.fixFetcherSerialized(remoteDataset.remoteFetchItemIds());
-			return remoteDataset.remoteFetchItemIds();
+			if (remoteDataset instanceof Dataset)
+				return ((Dataset)remoteDataset).fetchItemIds();
+			else
+				return remoteDataset.remoteFetchItemIds();
 		}
 		catch (Exception e) {LogUtil.trace(e);}
 		
@@ -199,8 +203,10 @@ public class DatasetRemoteWrapper implements Dataset, DatasetRemote {
 	public Fetcher<RatingVector> fetchUserRatings() {
 		// TODO Auto-generated method stub
 		try {
-			//return FetcherUtil.fixFetcherSerialized(remoteDataset.remoteFetchUserRatings());
-			return remoteDataset.remoteFetchUserRatings();
+			if (remoteDataset instanceof Dataset)
+				return ((Dataset)remoteDataset).fetchUserRatings();
+			else
+				return remoteDataset.remoteFetchUserRatings();
 		}
 		catch (Exception e) {LogUtil.trace(e);}
 		
@@ -224,8 +230,10 @@ public class DatasetRemoteWrapper implements Dataset, DatasetRemote {
 	public Fetcher<RatingVector> fetchItemRatings() {
 		// TODO Auto-generated method stub
 		try {
-			//return FetcherUtil.fixFetcherSerialized(remoteDataset.remoteFetchItemRatings());
-			return remoteDataset.remoteFetchItemRatings();
+			if (remoteDataset instanceof Dataset)
+				return ((Dataset)remoteDataset).fetchItemRatings();
+			else
+				return remoteDataset.remoteFetchItemRatings();
 		}
 		catch (Exception e) {LogUtil.trace(e);}
 		
@@ -273,8 +281,10 @@ public class DatasetRemoteWrapper implements Dataset, DatasetRemote {
 	public Fetcher<Profile> fetchUserProfiles() {
 		// TODO Auto-generated method stub
 		try {
-			//return FetcherUtil.fixFetcherSerialized(remoteDataset.remoteFetchUserProfiles());
-			return remoteDataset.remoteFetchUserProfiles();
+			if (remoteDataset instanceof Dataset)
+				return ((Dataset)remoteDataset).fetchUserProfiles();
+			else
+				return remoteDataset.remoteFetchUserProfiles();
 		}
 		catch (Exception e) {LogUtil.trace(e);}
 		
@@ -310,8 +320,10 @@ public class DatasetRemoteWrapper implements Dataset, DatasetRemote {
 	public Fetcher<Profile> fetchItemProfiles() {
 		// TODO Auto-generated method stub
 		try {
-			//return FetcherUtil.fixFetcherSerialized(remoteDataset.remoteFetchItemProfiles());
-			return remoteDataset.remoteFetchItemProfiles();
+			if (remoteDataset instanceof Dataset)
+				return ((Dataset)remoteDataset).fetchItemProfiles();
+			else
+				return remoteDataset.remoteFetchItemProfiles();
 		}
 		catch (Exception e) {LogUtil.trace(e);}
 		
@@ -359,8 +371,10 @@ public class DatasetRemoteWrapper implements Dataset, DatasetRemote {
 	public Fetcher<Profile> fetchSample() {
 		// TODO Auto-generated method stub
 		try {
-			//return FetcherUtil.fixFetcherSerialized(remoteDataset.remoteFetchSample());
-			return remoteDataset.remoteFetchSample();
+			if (remoteDataset instanceof Dataset)
+				return ((Dataset)remoteDataset).fetchSample();
+			else
+				return remoteDataset.remoteFetchSample();
 		}
 		catch (Exception e) {LogUtil.trace(e);}
 		
@@ -370,7 +384,7 @@ public class DatasetRemoteWrapper implements Dataset, DatasetRemote {
 	
 	@Override
 	public Object clone() {
-		if (remoteDataset instanceof DatasetAbstract) {
+		if (remoteDataset instanceof Dataset) {
 			DatasetAbstract newDataset = (DatasetAbstract) ((DatasetAbstract)remoteDataset).clone();
 			return new DatasetRemoteWrapper(newDataset, exclusive);
 		}
@@ -420,8 +434,8 @@ public class DatasetRemoteWrapper implements Dataset, DatasetRemote {
 	@Override
 	public void setExclusive(boolean exclusive) {
 		// TODO Auto-generated method stub
-		if (remoteDataset instanceof DatasetAbstract) {
-			((DatasetAbstract)remoteDataset).setExclusive(exclusive);
+		if (remoteDataset instanceof Dataset) {
+			((Dataset)remoteDataset).setExclusive(exclusive);
 		}
 		else {
 			LogUtil.warn("DatasetRemoteWrapper.setExclusive(boolean) not supported");
@@ -444,8 +458,8 @@ public class DatasetRemoteWrapper implements Dataset, DatasetRemote {
 	@Override
 	public Provider getProvider() {
 		// TODO Auto-generated method stub
-		if (remoteDataset instanceof DatasetAbstract) {
-			return ((DatasetAbstract)remoteDataset).getProvider();
+		if (remoteDataset instanceof Dataset) {
+			return ((Dataset)remoteDataset).getProvider();
 		}
 		else {
 			LogUtil.warn("DatasetRemoteWrapper.getProvider() not supported");
@@ -462,6 +476,15 @@ public class DatasetRemoteWrapper implements Dataset, DatasetRemote {
 		return (DatasetRemote)remoteDataset;
 	}
 
+	
+	/**
+	 * Testing whether this wrapper wraps a stub remote dataset.
+	 * @return whether this wrapper wraps a stub remote dataset.
+	 */
+	protected boolean isRemote() {
+		return ((remoteDataset != null) && !(remoteDataset instanceof Dataset));
+	}
+	
 	
 	@Override
 	public synchronized Remote export(int serverPort) throws RemoteException {
