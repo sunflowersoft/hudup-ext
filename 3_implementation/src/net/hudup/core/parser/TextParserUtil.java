@@ -162,6 +162,8 @@ public final class TextParserUtil {
 	 * @return The encrypted text derived from the special text in which every reserved character is replaced by a special string. 
 	 */
 	public static String encryptReservedChars(String text) {
+		if (!Constants.ENCRYPT_CHARS) return text;
+		
 		int n = RESERVED_CHARS.length;
 		for (int i = 0; i < n; i++) {
 			text = text.replace(

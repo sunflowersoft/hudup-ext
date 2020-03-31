@@ -34,6 +34,11 @@ public final class Constants {
 	public static boolean   DEBUG                        = true;
 	
 	/**
+	 * Unused double number.
+	 */
+	public static boolean   ENCRYPT_CHARS                = true;
+	
+	/**
 	 * Default minimum rating value in rating matrix.
 	 */
 	public final static double DEFAULT_MIN_RATING        = 1;
@@ -234,6 +239,15 @@ public final class Constants {
 			String debug = Util.getHudupProperty("debug");
 			if (debug != null)
 				DEBUG = Boolean.parseBoolean(debug);
+		}
+		catch (Throwable e) {
+			System.out.println("Error when parsing debug property");
+		}
+
+		try {
+			String encryptChars = Util.getHudupProperty("encrypt_chars");
+			if (encryptChars != null)
+				ENCRYPT_CHARS = Boolean.parseBoolean(encryptChars);
 		}
 		catch (Throwable e) {
 			System.out.println("Error when parsing debug property");
