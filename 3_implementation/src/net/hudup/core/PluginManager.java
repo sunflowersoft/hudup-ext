@@ -7,6 +7,7 @@
  */
 package net.hudup.core;
 
+import java.io.InputStream;
 import java.lang.reflect.Modifier;
 import java.util.List;
 import java.util.Set;
@@ -201,4 +202,21 @@ public interface PluginManager {
 	}
 	
 
+	/**
+	 * Loading class from specified class name.
+	 * @param name specified class name.
+	 * @return class loaded from specified class name.
+	 * @throws ClassNotFoundException if class is not found.
+	 */
+	Class<?> loadClass(String name) throws ClassNotFoundException;
+	
+	
+	/**
+	 * Getting resource as stream.
+	 * @param name resource name.
+	 * @return resource as stream.
+	 */
+	InputStream getResourceAsStream(String name);
+	
+	
 }

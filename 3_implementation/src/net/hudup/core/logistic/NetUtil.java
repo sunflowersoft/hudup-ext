@@ -342,7 +342,8 @@ public class NetUtil {
 		
 		
 		/**
-		 * Register and export remote object.
+		 * Register and export remote object. This method is deprecated because
+		 * method LocateRegistry.getRegistry(port) always returns non-null reference of a registry even though such registry is not created yet.
 		 * @param remote remote object.
 		 * @param port registered port.
 		 * @return registry and stub.

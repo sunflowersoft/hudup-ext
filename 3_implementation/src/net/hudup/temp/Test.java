@@ -124,6 +124,10 @@ public class Test {
 		for (UIManager.LookAndFeelInfo look : looks) {
 			System.out.println(look.getClassName());
 		}
+		
+		System.out.println(System.getProperties().getProperty("java.rmi.server.codebase"));
+		
+
 	}
 
 	

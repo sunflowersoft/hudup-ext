@@ -147,47 +147,52 @@ public final class Constants {
 	/**
 	 * Default port of Hudup (recommendation) server
 	 */
-	public final static int     DEFAULT_SERVER_PORT           = 10151;
+	public final static int     DEFAULT_SERVER_PORT               = 10151;
 	
 	/**
 	 * Default port of Hudup listener. Note that listener is responsible for interact between user and Hudup server.
 	 */
-	public final static int     DEFAULT_LISTENER_PORT         = DEFAULT_SERVER_PORT + 1;
+	public final static int     DEFAULT_LISTENER_PORT             = DEFAULT_SERVER_PORT + 1;
 	
 	/**
 	 * Default exported port of Hudup listener. RMI application connects with listener via this port.
 	 * Java Remote Method Invocation (RMI) is a protocol that allows an Java application to call remotely methods of Java objects inside other Java application over network.
 	 * Please see Oracle Java document for more details about RMI (<a href="https://docs.oracle.com/javase/tutorial/rmi/index.html">https://docs.oracle.com/javase/tutorial/rmi/index.html</a>).
 	 */
-	public final static int     DEFAULT_LISTENER_EXPORT_PORT  = DEFAULT_SERVER_PORT + 2;
+	public final static int     DEFAULT_LISTENER_EXPORT_PORT      = DEFAULT_SERVER_PORT + 2;
 	
 	/**
 	 * Default port of Hudup balancer. Essentialy, balancer is a particular listener that supports balancing in busy network.
 	 * For example, if there are many Hudup servers, balancer will choose a least busy server to process incoming request.
 	 */
-	public final static int     DEFAULT_BALANCER_PORT         = DEFAULT_SERVER_PORT + 3;
+	public final static int     DEFAULT_BALANCER_PORT             = DEFAULT_SERVER_PORT + 3;
 	
 	/**
 	 * Default exported port of Hudup balancer. RMI application connects with balancer via this port.
 	 * Java Remote Method Invocation (RMI) is a protocol that allows an Java application to call remotely methods of Java objects inside other Java application over network.
 	 * Please see Oracle Java document for more details about RMI (<a href="https://docs.oracle.com/javase/tutorial/rmi/index.html">https://docs.oracle.com/javase/tutorial/rmi/index.html</a>).
 	 */
-	public final static int     DEFAULT_BALANCER_EXPORT_PORT  = DEFAULT_SERVER_PORT + 4;
+	public final static int     DEFAULT_BALANCER_EXPORT_PORT      = DEFAULT_SERVER_PORT + 4;
 	
 	/**
 	 * Default port for control server or listener..
 	 */
-	public final static int     DEFAULT_SOCKET_CONTROL_PORT   = DEFAULT_SERVER_PORT + 5;
+	public final static int     DEFAULT_SOCKET_CONTROL_PORT       = DEFAULT_SERVER_PORT + 5;
 
 	/**
 	 * Default evaluator port.
 	 */
-	public final static int     DEFAULT_EVALUATOR_PORT        = DEFAULT_SERVER_PORT + 6;
+	public final static int     DEFAULT_EVALUATOR_PORT            = DEFAULT_SERVER_PORT + 6;
 
 	/**
 	 * The graphic user interface (GUI) allowing users to control Hudup server is called control panel. Control panel uses this port to connect with Hudup server instead of using {@link #DEFAULT_SERVER_PORT}.
 	 */
-	public final static int     DEFAULT_CONTROL_PANEL_PORT    = DEFAULT_SERVER_PORT + 7;
+	public final static int     DEFAULT_CONTROL_PANEL_PORT        = DEFAULT_SERVER_PORT + 7;
+
+	/**
+	 * Default network class loader port.
+	 */
+	public final static int     DEFAULT_NETWORK_CLASS_LOADER_PORT = DEFAULT_SERVER_PORT + 8;
 	
 	/**
 	 * When Hudup server, listener, or balancer starts, it uses firstly the port {@link #DEFAULT_SERVER_PORT}. If this constant is {@code true}, many random ports are tried until success.
@@ -195,40 +200,40 @@ public final class Constants {
 	 */
 	public static boolean TRY_RANDOM_PORT                     = true;
 	
+	
 	/**
 	 * This is the period in miliseconds that the Hudup server does periodically internal tasks such as data mining and learning knowledge base.
 	 */
-	public final static int     DEFAULT_SERVER_TASKS_PERIOD   = (int) (1000 * 60 * 5); // 5 minute
+	public final static int     DEFAULT_SERVER_TASKS_PERIOD  = (int) (1000 * 60 * 5); // 5 minute
 	
 	/**
 	 * The Hudup server is available to serve incoming request in a interval called a timeout in miliseconds. This constant specifies such timeout.
 	 * After timeout interval is reached, the server suspends and users must resumes it.
 	 */
-	public final static int     DEFAULT_SERVER_TIMEOUT        = (int) (1000 * 60 * 30); // 30 minutes
+	public final static int     DEFAULT_SERVER_TIMEOUT       = (int) (1000 * 60 * 30); // 30 minutes
 	
 	/**
 	 * This is the period in miliseconds that the listener does periodically internal tasks.
 	 */
-	public final static int     DEFAULT_LISTENER_TASK_PERIOD  = DEFAULT_SERVER_TIMEOUT;
+	public final static int     DEFAULT_LISTENER_TASK_PERIOD = DEFAULT_SERVER_TIMEOUT;
+	
 	
 	/**
 	 * The integer identification of every object (item, user) in data set (database) is often increased automatically.
 	 * However such auto-increment consumes much time and resources. This constant indicates whether or not the auto-increment is supported.
 	 * By default, this constant is {@code false}, which means that there is no support of auto-increment.
 	 */
-	public static final boolean SUPPORT_AUTO_INCREMENT_ID     = false;
+	public static final boolean SUPPORT_AUTO_INCREMENT_ID = false;
 
-	
 	/**
 	 * Hardware address.
 	 */
-	public static String hardwareAddress                       = null;
-	
+	public static String hardwareAddress                  = null;
 	
 	/**
 	 * Host address.
 	 */
-	public static String hostAddress                           = null;
+	public static String hostAddress                      = null;
 
 	
 	/**

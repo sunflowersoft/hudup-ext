@@ -23,7 +23,6 @@ import net.hudup.core.logistic.NetUtil;
 import net.hudup.core.logistic.NetUtil.InetHardware;
 import net.hudup.core.logistic.xURI;
 import net.hudup.core.logistic.ui.UIUtil;
-import net.hudup.evaluate.ui.BatchEvaluateGUI;
 import net.hudup.server.DefaultServer;
 import net.hudup.server.DefaultService;
 import net.hudup.server.PowerServerConfig;
@@ -89,15 +88,6 @@ public class DefaultServerExt extends DefaultServer {
 	@Override
 	protected PopupMenu createSysTrayMenuExt() {
 		// TODO Auto-generated method stub
-		
-		try {
-			BatchEvaluateGUI.class.getClass();
-		}
-		catch (Exception e) {
-			LogUtil.error("There is no evaluator package, error by " + e.getMessage());
-			return null;
-		}
-		
 		
         PopupMenu popup = new PopupMenu();
 

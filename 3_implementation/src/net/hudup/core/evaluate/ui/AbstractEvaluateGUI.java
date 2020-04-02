@@ -21,6 +21,7 @@ import net.hudup.core.PluginStorage;
 import net.hudup.core.RegisterTable;
 import net.hudup.core.Util;
 import net.hudup.core.alg.Alg;
+import net.hudup.core.alg.AlgRemote;
 import net.hudup.core.alg.SetupAlgListener;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.DatasetAbstract;
@@ -43,7 +44,7 @@ import net.hudup.core.evaluate.MetricsUtil;
 import net.hudup.core.logistic.CounterElapsedTimeListener;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.NetUtil;
-import net.hudup.core.logistic.Timestamp;
+import net.hudup.core.logistic.NetworkClassLoaderServer;
 import net.hudup.core.logistic.xURI;
 
 /**
@@ -110,15 +111,21 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 
 	
 	/**
+	 * Network class loader server.
+	 */
+	protected NetworkClassLoaderServer ncLoader = null;
+	
+	
+	/**
 	 * Evaluator GUI data.
 	 */
 	protected EvaluateGUIData guiData = null;
 	
 	
-	/**
-	 * Time stamp.
-	 */
-	protected Timestamp timestamp = null;
+//	/**
+//	 * Time stamp.
+//	 */
+//	protected Timestamp timestamp = null;
 	
 	
 //	/**
@@ -192,6 +199,9 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 				LogUtil.info("Evaluator GUI exported at port " + bindUri.getPort());
 			else
 				LogUtil.info("Evaluator GUI failed to exported");
+			
+//			ncLoader = new NetworkClassLoaderServer(Constants.DEFAULT_NETWORK_CLASS_LOADER_PORT);
+//			ncLoader.start();
 		}
 		else { //Evaluator is local
 			try {
@@ -212,11 +222,7 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 		this.evaluator = evaluator;
 		this.evProcessor = new EvaluateProcessor(evaluator);
 		
-		//Current version only update normal algorithm and metric plug-in
-		if (bindUri != null) { //Only remote
-			PluginStorage.updateFromEvaluator(evaluator, Alg.class, true);
-			PluginStorage.updateFromEvaluator(evaluator, Metric.class, true);
-		}
+		updatePluginFromEvaluator();
 
 		if (referredAlg != null) {
 			try {
@@ -260,7 +266,7 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 		if (guiData.algNames == null || guiData.algNames.size() == 0)
 			guiData.algNames = algRegTable.getAlgNames();
 		else
-			updateAlgRegFromRemoteEvaluator(guiData.algNames);
+			updateAlgRegFromEvaluator(guiData.algNames);
 		
 		DatasetPool oldPool = guiData.pool; 
 		try {
@@ -435,7 +441,10 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 		updateGUIData();
 		guiData.active = false;
 		
-//		if (waitTimer != null) waitTimer.cancel(); //Destroying waiting timer.
+		try {
+			if (ncLoader != null) ncLoader.stop();
+			ncLoader = null;
+		} catch (Exception e) {LogUtil.trace(e);}
 		
 		if (exportedStub != null) {
 			boolean ret = NetUtil.RegistryRemote.unexport(this);
@@ -638,28 +647,50 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	
 	
 	/**
+	 * Update plug-in storage from evaluator.
+	 */
+	protected void updatePluginFromEvaluator() {
+		if (bindUri == null || evaluator == null)
+			return;
+		
+		//Current version only update normal algorithm and metric plug-in
+		PluginStorage.updateFromEvaluator(evaluator, Alg.class, true);
+		PluginStorage.updateFromEvaluator(evaluator, Metric.class, true);
+	}
+	
+	
+	/**
 	 * Update algorithm register table from list of algorithm names.
 	 * @param algNames list of algorithm names.
 	 */
-	protected void updateAlgRegFromRemoteEvaluator(List<String> algNames) {
+	protected void updateAlgRegFromEvaluator(List<String> algNames) {
 		if (bindUri == null || evaluator == null || algNames == null || algNames.size() == 0)
 			return;
 		
 		List<String> regAlgNames = algRegTable.getAlgNames();
 		for (String regAlgName : regAlgNames) {
-			if (!PluginStorage.getNormalAlgReg().contains(regAlgName))
+			Alg alg = algRegTable.query(regAlgName);
+			if (!PluginStorage.contains(alg)) {
+				try {
+					if (alg instanceof AlgRemote)
+						((AlgRemote)alg).unexport();
+				} catch (Exception e) {LogUtil.trace(e);}
+				
 				algRegTable.unregister(regAlgName);
+			}
 		}
 		
 		for (String algName : algNames) {
-			if (algRegTable.contains(algName)) continue;
-			
-			try {
-				Alg alg = evaluator.getEvaluatedAlg(algName, true);
-				if (alg != null) algRegTable.register(alg);
-			}
-			catch (Exception e) {
-				LogUtil.trace(e);
+			if (algRegTable.contains(algName))
+				continue;
+			else if (PluginStorage.getNormalAlgReg().contains(algName))
+				algRegTable.register(PluginStorage.getNormalAlgReg().query(algName));
+			else {
+				try {
+					Alg alg = evaluator.getEvaluatedAlg(algName, true);
+					if (alg != null) algRegTable.register(alg);
+				}
+				catch (Exception e) {LogUtil.trace(e);}
 			}
 		}
 	}

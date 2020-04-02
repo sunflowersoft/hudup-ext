@@ -324,9 +324,7 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 		try {
 			agent = batchEvaluateGUI.getEvaluator().isAgent();
 		}
-		catch (Throwable e) {
-			LogUtil.trace(e);
-		}
+		catch (Throwable e) {LogUtil.trace(e);}
 		
 		SysConfigDlgExt cfg = new SysConfigDlgExt(this, I18nUtil.message("system_configure"), this) {
 

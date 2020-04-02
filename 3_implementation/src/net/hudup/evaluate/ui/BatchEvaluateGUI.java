@@ -41,11 +41,13 @@ import net.hudup.core.PluginChangedEvent;
 import net.hudup.core.PluginStorage;
 import net.hudup.core.RegisterTable;
 import net.hudup.core.alg.Alg;
+import net.hudup.core.alg.AlgRemote;
 import net.hudup.core.alg.DuplicatableAlg;
 import net.hudup.core.alg.SetupAlgEvent;
 import net.hudup.core.alg.ui.AlgListBox;
 import net.hudup.core.alg.ui.AlgListBox.AlgListChangedEvent;
 import net.hudup.core.alg.ui.AlgListChooser;
+import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.DatasetPair;
 import net.hudup.core.data.DatasetPool;
@@ -66,7 +68,6 @@ import net.hudup.core.logistic.CounterElapsedTimeEvent;
 import net.hudup.core.logistic.DSUtil;
 import net.hudup.core.logistic.I18nUtil;
 import net.hudup.core.logistic.LogUtil;
-import net.hudup.core.logistic.Timestamp;
 import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.xURI;
 import net.hudup.core.logistic.ui.SortableSelectableTable;
@@ -320,6 +321,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			
 			algRegTable.clear();
 			algRegTable.register(EvaluatorAbstract.extractNormalAlgFromPluginStorage(evaluator)); //Algorithms are not cloned because of saving memory when evaluator GUI keep algorithms for a long time.
+			lbAlgs.unexportNonPluginAlgs();
 			lbAlgs.update(algRegTable.getAlgList());
 			
 			updateMode();
@@ -363,26 +365,44 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 		    	final Alg selectedAlg = getSelectedAlg();
 		    	if (selectedAlg == null) return;
 				
+		    	if ((selectedAlg instanceof DuplicatableAlg) && (bindUri != null)) {
+		    		removeDuplicateMenuItem(contextMenu);
+		    	}
+		    	
 		    	if ((selectedAlg instanceof DuplicatableAlg) && 
-		    			!(PluginStorage.getNormalAlgReg().contains(selectedAlg.getName())) &&
+		    			!PluginStorage.contains(selectedAlg) &&
 		    			algRegTable.contains(selectedAlg.getName())) {
 			    	
-		    		contextMenu.addSeparator();
-					JMenuItem miDiscard = UIUtil.makeMenuItem((String)null, "Discard algorithm", 
+					JMenuItem miRegister = UIUtil.makeMenuItem((String)null, "Register", 
 						new ActionListener() {
-							
+							@Override
+							public void actionPerformed(ActionEvent e) {
+								PluginStorage.getNormalAlgReg().register(selectedAlg);
+							}
+						});
+					contextMenu.add(miRegister);
+
+					JMenuItem miDiscard = UIUtil.makeMenuItem((String)null, "Discard", 
+						new ActionListener() {
 							@Override
 							public void actionPerformed(ActionEvent e) {
 								algRegTable.unregister(selectedAlg.getName());
 								lbAlgs.remove(selectedAlg);
-								
+								if (selectedAlg instanceof AlgRemote) {
+									try {
+										((AlgRemote)selectedAlg).unexport();
+									} catch (Exception ex) {LogUtil.trace(ex);}
+								}
 								updateMode();
 							}
 						});
 					contextMenu.add(miDiscard);
 		    	}
 
-		    	contextMenu.addSeparator();
+		    	if (contextMenu.getComponentCount() > 0) {
+		    		if (contextMenu.getComponent(contextMenu.getComponentCount() - 1) instanceof JMenuItem)
+				    	contextMenu.addSeparator();
+		    	}
 				JMenuItem miTraining = UIUtil.makeMenuItem((String)null, "Add training", 
 					new ActionListener() {
 						
@@ -402,7 +422,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			@Override
 			public void algListChanged(AlgListChangedEvent evt) {
 				// TODO Auto-generated method stub
-				if (evaluator == null || algRegTable == null)
+				if (evaluator == null || algRegTable == null || bindUri != null)
 					return;
 				
 				try {
@@ -485,11 +505,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 					
 					if (bindUri == null) {
 						try {
-//							synchronized (this) {
-								evaluator.updatePool(toDatasetPoolExchangedClient(guiData.pool),
-										getThisGUI().timestamp = new Timestamp());
-//								wait();
-//							}
+							evaluator.updatePool(toDatasetPoolExchangedClient(guiData.pool), null);
 						} catch (Throwable e) {LogUtil.trace(e);}
 					}
 					else {
@@ -1077,10 +1093,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 
 			if (bindUri == null) {
 				try {
-//					synchronized (this) {
-						evaluator.updatePool(null, null);
-//						wait();
-//					}
+					evaluator.updatePool(null, null);
 				} catch (Throwable e) {LogUtil.trace(e);}
 			}
 			else {
@@ -1114,14 +1127,16 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			
 			clearResult();
 			boolean started = false;
-//			synchronized (this) {
-				if (bindUri == null)
-					started = evaluator.remoteStart0(lbAlgs.getAlgList(), toDatasetPoolExchangedClient(guiData.pool), this.timestamp = new Timestamp());
-				else
-					started = evaluator.remoteStart(lbAlgs.getAlgNameList(), toDatasetPoolExchangedClient(guiData.pool), null);
+			if (bindUri == null)
+				started = evaluator.remoteStart0(lbAlgs.getAlgList(), toDatasetPoolExchangedClient(guiData.pool), null);
+			else {
+				DataConfig config = null;
+//				config = lbAlgs.getAlgClassNameMap();
+//				config.put("$clienthost", Constants.hostAddress);
+//				config.put("$clientport", ncLoader.getServerPort());
+				started = evaluator.remoteStart(lbAlgs.getAlgNameList(), toDatasetPoolExchangedClient(guiData.pool), config);
+			}
 				
-//				try {wait();} catch (Exception e) {LogUtil.trace(e);}
-//			}
 			if (!started) updateMode();
 		}
 		catch (Throwable e) {
@@ -1134,38 +1149,32 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 	
 	@Override
 	public synchronized void receivedEvaluator(EvaluatorEvent evt) throws RemoteException {
-		// TODO Auto-generated method stub
-//		try {notifyAll();} catch (Exception e) {LogUtil.trace(e);}
-		
-		if (evt.getType() == EvaluatorEvent.Type.start || evt.getType() == EvaluatorEvent.Type.update_pool) {
-//			Timestamp timestamp = evt.getTimestamp();
+		if (evt.getType() == EvaluatorEvent.Type.start) {
+			updatePluginFromEvaluator();
 			
-			if (evt.getType() == EvaluatorEvent.Type.start) {
-//				if (timestamp == null || this.timestamp == null || bindUri != null || !this.timestamp.equals(timestamp)) {
-					List<String> algNames = evt.getOtherResult().algNames;
-					if (algNames != null && algNames.size() > 0) {
-						updateAlgRegFromRemoteEvaluator(algNames);
-						lbAlgs.update(algRegTable.getAlgList(algNames));
-					}
-					else
-						lbAlgs.update(algRegTable.getAlgList());
-//				}
+			List<String> algNames = evt.getOtherResult().algNames;
+			if (algNames != null && algNames.size() > 0) {
+				updateAlgRegFromEvaluator(algNames);
+				lbAlgs.update(algRegTable.getAlgList(algNames));
 			}
+			else
+				lbAlgs.update(algRegTable.getAlgList());
 			
-//			if (timestamp == null || this.timestamp == null || bindUri != null || !this.timestamp.equals(timestamp)) {
-				guiData.pool = evt.getPoolResult().toDatasetPoolClient();
-				guiData.pool = guiData.pool != null ? guiData.pool : new DatasetPool();
-				tblDatasetPool.update(guiData.pool);
-//			}
-			
-			updateMode();
-			this.timestamp = null;
+			guiData.pool = evt.getPoolResult().toDatasetPoolClient();
+			guiData.pool = guiData.pool != null ? guiData.pool : new DatasetPool();
+			tblDatasetPool.update(guiData.pool);
+		}
+		else if (evt.getType() == EvaluatorEvent.Type.update_pool) {
+			guiData.pool = evt.getPoolResult().toDatasetPoolClient();
+			guiData.pool = guiData.pool != null ? guiData.pool : new DatasetPool();
+			tblDatasetPool.update(guiData.pool);
 		}
 		else if (evt.getType() == EvaluatorEvent.Type.pause ||
 				evt.getType() == EvaluatorEvent.Type.resume || 
 				evt.getType() == EvaluatorEvent.Type.stop) {
-			updateMode();
 		}
+		
+		updateMode();
 	}
 
 
@@ -1475,10 +1484,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			clearResult();
 			if (bindUri == null) {
 				try {
-//					synchronized (this) {
-						evaluator.updatePool(toDatasetPoolExchangedClient(guiData.pool), null);
-//						wait();
-//					}
+					evaluator.updatePool(toDatasetPoolExchangedClient(guiData.pool), null);
 				} catch (Throwable e) {LogUtil.trace(e);}
 				
 			}
@@ -1595,10 +1601,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			
 			if (bindUri == null) {
 				try {
-//					synchronized (this) {
-						evaluator.updatePool(toDatasetPoolExchangedClient(guiData.pool), null);
-//						wait();
-//					}
+					evaluator.updatePool(toDatasetPoolExchangedClient(guiData.pool), null);
 				} catch (Throwable e) {LogUtil.trace(e);}
 			}
 			else {
@@ -1624,8 +1627,6 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			this.tblMetrics.clear();
 			this.statusBar.clearText();
 			this.statusBar.setTextPane0(DSUtil.shortenVerbalName(evaluator.getName()));
-			
-			this.timestamp = null;
 		}
 		catch (Throwable e) {
 			LogUtil.trace(e);
@@ -1644,6 +1645,15 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 	}
 
 
+	@Override
+	public void dispose() {
+		// TODO Auto-generated method stub
+		super.dispose();
+		
+		if (lbAlgs != null) lbAlgs.unexportNonPluginAlgs();
+	}
+
+
 	/**
 	 * Update (repaint) all controls.
 	 * This method can cause error ({@link MetricsTable}): The call of {@link DefaultTableModel#getValueAt(int, int)} can cause out of bound error from {@link DefaultTableColumnModel#getColumn(int)}
@@ -1655,6 +1665,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 	 * {@link SortableSelectableTable#getCellEditor(int, int)},
 	 * {@link SortableSelectableTableModel#getColumnClass(int)}
 	 */
+	@Deprecated
 	private void updateGUI() {
 		try {
 //			validate(); //This code line can be removed.

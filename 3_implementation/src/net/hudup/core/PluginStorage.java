@@ -368,6 +368,34 @@ public class PluginStorage implements Serializable {
 	
 	
 	/**
+	 * Checking whether the specified algorithm class and algorithm name stored in this plug-in storage.
+	 * @param algClass specified algorithm class.
+	 * @param algName specified algorithm name.
+	 * @return whether the specified algorithm class and algorithm name stored in this plug-in storage.
+	 */
+	public final static boolean contains(Class<? extends Alg> algClass, String algName) {
+		RegisterTable table = lookupTable(algClass);
+		if (table != null && table.contains(algName))
+			return true;
+		else
+			return lookupNextUpdateList(algClass, algName) != -1;
+	}
+	
+	
+	/**
+	 * Checking whether the specified algorithm stored in this plug-in storage.
+	 * @param algs specified algorithm.
+	 * @return whether the specified algorithm stored in this plug-in storage.
+	 */
+	public final static boolean contains(Alg alg) {
+		if (alg == null)
+			return false;
+		else
+			return contains(alg.getClass(), alg.getName());
+	}
+
+		
+	/**
 	 * Looking whether the specified algorithm class and algorithm name stored in next update list.
 	 * @param algClass specified algorithm class.
 	 * @param algName specified algorithm name.
@@ -460,7 +488,7 @@ public class PluginStorage implements Serializable {
 			algEvNames = evaluator.getPluginAlgNames(algClass);
 		} catch (Exception e) {LogUtil.trace(e);}
 		
-		RegisterTable algReg = PluginStorage.lookupTable(algClass);
+		RegisterTable algReg = lookupTable(algClass);
 		for (String algEvName : algEvNames) {
 			if (algReg.contains(algEvName)) continue;
 			

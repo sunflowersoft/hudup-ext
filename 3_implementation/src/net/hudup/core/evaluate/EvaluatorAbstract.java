@@ -49,6 +49,7 @@ import net.hudup.core.logistic.I18nUtil;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.MathUtil;
 import net.hudup.core.logistic.NetUtil;
+import net.hudup.core.logistic.NetworkClassLoaderClient;
 import net.hudup.core.logistic.SystemUtil;
 import net.hudup.core.logistic.TaskQueue;
 import net.hudup.core.logistic.Timestamp;
@@ -1531,13 +1532,47 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 	
 	@Override
 	public synchronized boolean remoteStart(List<String> algNameList, DatasetPoolExchanged pool, Serializable parameter) throws RemoteException {
+		DataConfig config = null;
+		NetworkClassLoaderClient ncl = null;
+		if ((parameter != null) && (parameter instanceof DataConfig)) {
+			config = (DataConfig)parameter;
+			String clientHost = config.getAsString("$clienthost");
+			int clientPort = config.getAsInt("$clientport");
+			if (clientHost != null && clientPort >= 0)
+				ncl = new NetworkClassLoaderClient(clientHost, clientPort);
+		}
+		
 		RegisterTable algReg = PluginStorage.getNormalAlgReg();
 		List<Alg> algList = Util.newList();
 		for (String algName : algNameList) {
-			Alg alg = algReg.query(algName);
-			if (alg != null)
-				algList.add(alg); //This code line is important to remote setting.
+			if (algReg.contains(algName))
+				algList.add(algReg.query(algName)); //This code line is important to remote setting.
+			else if (algRegResult != null && algRegResult.contains(algName))
+				algList.add(algRegResult.query(algName)); //This code line is important to remote setting.
+			else if (config != null && ncl != null && config.containsKey(algName)) {
+				String algClassName = config.getAsString(algName);
+				Alg newAlg = null;
+				
+				try {
+					Class<?> newAlgClass = ncl.loadClass(algClassName);
+					if (newAlgClass != null && Alg.class.isAssignableFrom(newAlgClass))
+						newAlg = (Alg)newAlgClass.newInstance();
+				}
+				catch (Exception e) {
+					LogUtil.trace(e);
+					LogUtil.error("Error to load class " + algClassName + " from host " + config.getAsString("$clienthost") +
+							" caused by " + e.getMessage());
+					newAlg = null;
+				}
+				
+				if (newAlg != null && PluginStorage.getNormalAlgReg().canRegister(newAlg)) {
+					PluginStorage.getNormalAlgReg().register(newAlg);
+					algList.add(newAlg);
+				}
+			}
 		}
+		
+		if (ncl != null) ncl.close();
 		
 		return remoteStart0(algList, pool, parameter);
 	}

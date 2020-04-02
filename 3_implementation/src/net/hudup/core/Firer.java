@@ -7,9 +7,12 @@
  */
 package net.hudup.core;
 
+import java.io.InputStream;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
@@ -99,6 +102,12 @@ public class Firer implements PluginManager {
 	 * Flag to indicate whether {@link #fire()} method was fired.
 	 */
 	protected boolean fired = false;
+	
+	
+	/**
+	 * List of extra class loaders.
+	 */
+	protected Map<URL, ClassLoader> extraClassLoaders = Util.newMap();
 	
 	
 	/**
@@ -377,6 +386,11 @@ public class Firer implements PluginManager {
 			classLoader.close();
 		} catch (Throwable e) {LogUtil.trace(e);}
 		
+		if (outObjList.size() > 0) { //This is work-around solution because meaning to use last used class loader.
+			extraClassLoaders.clear();
+			extraClassLoaders.put(storeUrl, classLoader);
+		}
+		
 		return outObjList;
 	}
 
@@ -617,6 +631,46 @@ public class Firer implements PluginManager {
 		}
 		else
 			return -1;
+	}
+
+
+	@Override
+	public Class<?> loadClass(String name) throws ClassNotFoundException {
+		// TODO Auto-generated method stub
+		Class<?> foundClass = null;
+		try {
+			foundClass = getClass().getClassLoader().loadClass(name);
+		}
+		catch (ClassNotFoundException e) {}
+		if (foundClass != null) return foundClass;
+		
+		Collection<ClassLoader> classLoaders = extraClassLoaders.values();
+		for (ClassLoader classLoader : classLoaders) {
+			try {
+				foundClass = classLoader.loadClass(name);
+			}
+			catch (ClassNotFoundException e) {
+				foundClass = null;
+			}
+			if (foundClass != null) return foundClass;
+		}
+		
+		throw new ClassNotFoundException("Class " + name + " not found");
+	}
+
+
+	@Override
+	public InputStream getResourceAsStream(String name) {
+		InputStream is = getClass().getClassLoader().getResourceAsStream(name);
+		if (is != null) return is;
+		
+		Collection<ClassLoader> classLoaders = extraClassLoaders.values();
+		for (ClassLoader classLoader : classLoaders) {
+			is = classLoader.getResourceAsStream(name);
+			if (is != null) return is;
+		}
+		
+		return null;
 	}
 
 

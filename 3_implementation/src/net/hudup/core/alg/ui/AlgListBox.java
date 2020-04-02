@@ -19,10 +19,10 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.EventListener;
 import java.util.EventObject;
 import java.util.List;
-import java.util.Random;
 import java.util.Set;
 import java.util.Vector;
 
@@ -40,9 +40,12 @@ import javax.swing.ListModel;
 import javax.swing.SwingUtilities;
 import javax.swing.event.EventListenerList;
 
+import net.hudup.core.PluginStorage;
 import net.hudup.core.Util;
 import net.hudup.core.alg.Alg;
+import net.hudup.core.alg.AlgRemote;
 import net.hudup.core.alg.DuplicatableAlg;
+import net.hudup.core.data.DataConfig;
 import net.hudup.core.logistic.DSUtil;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.ui.UIUtil;
@@ -135,22 +138,10 @@ public class AlgListBox extends JList<Alg> implements AlgListUI {
     	final int selectedRow = getSelectedIndex();
     	if (selectedRow == -1) return;
 		
-    	Alg selectedAlg = getSelectedAlg();
-    	if (selectedAlg instanceof DuplicatableAlg) {
-			JMenuItem miDuplicate = UIUtil.makeMenuItem((String)null, "Duplicate", 
-				new ActionListener() {
-					
-					@Override
-					public void actionPerformed(ActionEvent e) {
-						duplicateAlg(selectedAlg);
-					}
-				});
-			contextMenu.add(miDuplicate);
-    	}
-		
     	if (getModel().getSize() > 1) {
     		contextMenu.addSeparator();
-			if (selectedRow == 0) {
+
+    		if (selectedRow == 0) {
 				JMenuItem miMoveDown = UIUtil.makeMenuItem((String)null, "Move down", 
 					new ActionListener() {
 						
@@ -233,9 +224,43 @@ public class AlgListBox extends JList<Alg> implements AlgListUI {
 					});
 				contextMenu.add(miMoveLast);
 			}
+			
     	} // End if
     	
     	
+    	Alg selectedAlg = getSelectedAlg();
+    	if (selectedAlg instanceof DuplicatableAlg) {
+    		contextMenu.addSeparator();
+
+    		JMenuItem miDuplicate = UIUtil.makeMenuItem((String)null, "Duplicate", 
+				new ActionListener() {
+					
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						duplicateAlg(selectedAlg);
+					}
+				});
+    		miDuplicate.setActionCommand("duplicate");
+			contextMenu.add(miDuplicate);
+    	}
+		
+    }
+    
+    
+    /**
+     * Removing duplicate menu item.
+     * @param contextMenu context menu.
+     */
+    protected void removeDuplicateMenuItem(JPopupMenu contextMenu) {
+    	for (int i = 0; i < contextMenu.getComponentCount(); i++) {
+    		Component menuItem = contextMenu.getComponent(i);
+    		if (menuItem instanceof JMenuItem) {
+    			if (((JMenuItem)menuItem).getActionCommand().equals("duplicate")) {
+    				contextMenu.remove(i);
+    				return;
+    			}
+    		}
+    	}
     }
     
     
@@ -256,8 +281,7 @@ public class AlgListBox extends JList<Alg> implements AlgListUI {
         selectDlgNameDlg.add(header, BorderLayout.NORTH);
 		
         header.add(new JLabel("Type name"), BorderLayout.WEST);
-        Random rnd = new Random();
-        final JTextField txtAlgName = new JTextField(alg.getName() + rnd.nextInt());
+        final JTextField txtAlgName = new JTextField(alg.getName() + new Date().getTime());
         header.add(txtAlgName, BorderLayout.CENTER);
         
         final StringBuffer algNameBuffer = new StringBuffer();
@@ -295,18 +319,26 @@ public class AlgListBox extends JList<Alg> implements AlgListUI {
         String algName = algNameBuffer.toString();
         if (algName.isEmpty()) {
 			JOptionPane.showMessageDialog(
-					this, 
-					"Empty algorithm name", 
-					"Empty algorithm name", 
-					JOptionPane.ERROR_MESSAGE);
+				this, 
+				"Empty algorithm name", 
+				"Empty algorithm name", 
+				JOptionPane.ERROR_MESSAGE);
         	return;
         }
         if(lookupAlg(algName) != null) {
 			JOptionPane.showMessageDialog(
-					this, 
-					"This algorithm name was in this list", 
-					"Invalid algorithm name", 
-					JOptionPane.ERROR_MESSAGE);
+				this, 
+				"This algorithm name was in this list", 
+				"Invalid algorithm name", 
+				JOptionPane.ERROR_MESSAGE);
+			return;
+        }
+        if(PluginStorage.contains(alg.getClass(), algName)) {
+			JOptionPane.showMessageDialog(
+				this, 
+				"This algorithm name was in plugin storage", 
+				"Invalid algorithm name", 
+				JOptionPane.ERROR_MESSAGE);
 			return;
         }
         
@@ -527,6 +559,22 @@ public class AlgListBox extends JList<Alg> implements AlgListUI {
 	
 	
 	/**
+	 * Getting the map of algorithms class names.
+	 * @return the map of algorithms class names.
+	 */
+	public DataConfig getAlgClassNameMap() {
+		List<Alg> algList = getAlgList();
+		DataConfig classNames = new DataConfig();
+		
+		for (Alg alg : algList) {
+			classNames.put(alg.getName(), alg.getClass().getName());
+		}
+		
+		return classNames;
+	}
+
+	
+	/**
 	 * Getting the list of selected algorithms.
 	 * @return {@link List} of selected algorithms.
 	 */
@@ -621,16 +669,34 @@ public class AlgListBox extends JList<Alg> implements AlgListUI {
      * @param evt the specified for list changed task.
      */
     protected void fireAlgListChangedEvent(AlgListChangedEvent evt) {
-    	AlgListChangedListener[] listeners = getAlgListChangedListeners();
-		
-		for (AlgListChangedListener listener : listeners) {
-			try {
-				listener.algListChanged(evt);
-			}
-			catch (Throwable e) {
-				LogUtil.trace(e);
+		synchronized (listenerList) {
+	    	AlgListChangedListener[] listeners = getAlgListChangedListeners();
+			for (AlgListChangedListener listener : listeners) {
+				try {
+					listener.algListChanged(evt);
+				}
+				catch (Throwable e) {
+					LogUtil.trace(e);
+				}
 			}
 		}
+    }
+    
+    
+    /**
+     * Unexporting non-plugin algorihms.
+     */
+    public void unexportNonPluginAlgs() {
+    	List<Alg> algs = getAlgList();
+    	for (Alg alg : algs) {
+            if(PluginStorage.contains(alg.getClass(), alg.getName()))
+            	continue;
+            
+			try {
+				if (alg instanceof AlgRemote)
+					((AlgRemote)alg).unexport();
+			} catch (Exception ex) {LogUtil.trace(ex);}
+    	}
     }
     
     

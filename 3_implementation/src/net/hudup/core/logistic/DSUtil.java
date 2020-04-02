@@ -8,6 +8,8 @@
 package net.hudup.core.logistic;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.io.Reader;
 import java.util.Arrays;
 import java.util.BitSet;
@@ -559,6 +561,26 @@ public final class DSUtil {
 			name = name.substring(0, Constants.MAX_VERBAL_NAME_LENGTH) + "...";
 		return name;
 		
+	}
+	
+	
+	/**
+	 * Reading bytes from input stream.
+	 * @param in input stream.
+	 * @return bytes from input stream.
+	 */
+	public static byte[] readBytes(InputStream in) {
+		int nRead = -1;
+		byte[] data = new byte[1024];
+		ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+		try {
+			while ((nRead = in.read(data)) != -1) {
+				buffer.write(data, 0, nRead);
+			}
+		}
+		catch (Exception e) {LogUtil.trace(e);}
+		
+		return buffer.toByteArray();
 	}
 	
 	

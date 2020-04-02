@@ -187,7 +187,7 @@ public class RecommendEvaluator extends EvaluatorAbstract {
 					double relevantSparseRatio = 0;
 					int totalRatedCount = 0;
 					Dataset trainingData = recommender.getDataset(); //It is not pointer. Please pay attention that it is not always the same to dsPair.getTraining().
-					if (!config.isRecommendAll() && config.getMaxRecommend() <= 0) {
+					if (config.isHeuristicRecommend()) {
 						trainingData = trainingData != null ? trainingData : testing; //This is work-around solution, using testing for estimating recommendation number.
 						relevantSparseRatio = calcRelevantSparseRatio(trainingData);
 						totalRatedCount = countRatedItems(trainingData);
@@ -222,16 +222,15 @@ public class RecommendEvaluator extends EvaluatorAbstract {
 						RecommendParam param = new RecommendParam(testingUser.id());
 						//Setting up maximum recommendation number by binomial distribution. Added date: 2019.08.23 by Loc Nguyen.
 						int maxRecommend = 0;
-						if (!config.isRecommendAll()) {
-							if (config.getMaxRecommend() > 0)
-								maxRecommend = config.getMaxRecommend(); //Used for scanner which cannot calculate relevant-sparse ratio.
-							else if (trainingData != null) {
-								int ratedCount = 0;
-								RatingVector trainingUser = trainingData.getUserRating(testingUser.id());
-								if (trainingUser != null) ratedCount = trainingUser.count(true); 
-								maxRecommend = (int)(relevantSparseRatio*(totalRatedCount-ratedCount)+0.5);
-								trainingData = null;
-							}
+						if (config.isHeuristicRecommend() && trainingData != null) {
+							int ratedCount = 0;
+							RatingVector trainingUser = trainingData.getUserRating(testingUser.id());
+							if (trainingUser != null) ratedCount = trainingUser.count(true); 
+							maxRecommend = (int)(relevantSparseRatio*(totalRatedCount-ratedCount)+0.5);
+							trainingData = null;
+						}
+						else if (config.getMaxRecommend() > 0) {
+							maxRecommend = config.getMaxRecommend(); //Used for scanner which cannot calculate relevant-sparse ratio.
 						}
 						vExactCurrentTotal++; //Increase exact total vector count.
 						

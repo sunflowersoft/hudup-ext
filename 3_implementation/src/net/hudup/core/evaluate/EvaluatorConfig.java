@@ -54,15 +54,15 @@ public class EvaluatorConfig extends SysConfig {
 
 	
 	/**
-	 * Flag indicates whether to recommend all items
+	 * Flag indicates whether recommendation is heuristic.
 	 */
-	public final static String RECOMMEND_ALL_FIELD            = changeCase("recommend_all");
+	public final static String HEURISTIC_RECOMMEND_FIELD = changeCase("heuristic_recommend");
 
 	
 	/**
-	 * By default, do not recommend all items.
+	 * By default, recommendation is heuristic.
 	 */
-	public final static boolean RECOMMEND_ALL_DEFAULT = false;
+	public final static boolean HEURISTIC_RECOMMEND_DEFAULT = true;
 
 	
 	/**
@@ -75,7 +75,7 @@ public class EvaluatorConfig extends SysConfig {
 	 * Maximum recommended items. This field is effected if recommendation all field is false.
 	 * If it is 0 and recommendation all field is false, evaluator will have heuristic mechanism to calculate the real maximum recommended items.
 	 */
-	public final static String MAX_RECOMMEND_FIELD  = "max_recommend";
+	public final static String MAX_RECOMMEND_FIELD  = changeCase("max_recommend");
 	
 	
 	/**
@@ -138,7 +138,7 @@ public class EvaluatorConfig extends SysConfig {
 	public void reset() {
 		super.reset();
 		
-		setRecommendAll(RECOMMEND_ALL_DEFAULT);
+		setHeuristicRecommend(HEURISTIC_RECOMMEND_DEFAULT);
 		setMaxRecommend(MAX_RECOMMEND_DEFAULT);
 		setEvaluatorPort(Constants.DEFAULT_EVALUATOR_PORT);
 		//setAgent(EVALUATOR_AGENT_DEFAULT);
@@ -150,20 +150,20 @@ public class EvaluatorConfig extends SysConfig {
 
 	
 	/**
-	 * Checking whether to recommend all.
-	 * @return whether to recommend all.
+	 * Checking whether heuristic recommendation is.
+	 * @return whether heuristic recommendation is.
 	 */
-	public boolean isRecommendAll() {
-		return getAsBoolean(RECOMMEND_ALL_FIELD);
+	public boolean isHeuristicRecommend() {
+		return getAsBoolean(HEURISTIC_RECOMMEND_FIELD);
 	}
 	
 	
 	/**
-	 * Setting whether to recommend all.
-	 * @param all true if recommending all.
+	 * Setting whether heuristic recommendation is.
+	 * @param heuristicRecommend true if heuristic recommendation is.
 	 */
-	public void setRecommendAll(boolean all) {
-		put(RECOMMEND_ALL_FIELD, all);
+	public void setHeuristicRecommend(boolean heuristicRecommend) {
+		put(HEURISTIC_RECOMMEND_FIELD, heuristicRecommend);
 	}
 	
 	

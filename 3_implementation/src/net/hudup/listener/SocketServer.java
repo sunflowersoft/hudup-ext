@@ -180,7 +180,6 @@ public abstract class SocketServer extends AbstractRunner implements Server, Acc
 					socket.close();
 				} 
 				catch (Throwable e) {
-					// TODO Auto-generated catch block
 					LogUtil.trace(e);
 					LogUtil.error("Socket server failed to close socket, caused by " + e.getMessage());
 				}
@@ -196,7 +195,7 @@ public abstract class SocketServer extends AbstractRunner implements Server, Acc
 			} 
 			catch (Throwable e1) {
 				// TODO Auto-generated catch block
-				e1.printStackTrace();
+				LogUtil.trace(e1);
 				LogUtil.error("Socket server failed to close socket, caused by " + e.getMessage());
 			}
 			LogUtil.error("Socket server failed to connect to client, caused by " + e.getMessage());
@@ -383,7 +382,7 @@ public abstract class SocketServer extends AbstractRunner implements Server, Acc
 
 		destroyTimer();
 		if (!paused)
-			new SocketWrapper("localhost", config.getServerPort()).sendQuitRequest();
+			new SocketWrapper("localhost", config.getServerPort()).sendQuitRequest(); //This code line is redundant.
 		super.stop();
 		
 		fireStatusEvent(new ServerStatusEvent(this, Status.stopped));

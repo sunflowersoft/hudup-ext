@@ -127,13 +127,12 @@ public abstract class AbstractDelegator extends ProtocolImpl implements Runner, 
 			}
 			catch (Throwable e) {
 				LogUtil.trace(e);
-				LogUtil.info("Error by writing data to client.");
+				LogUtil.error("Error by writing data to client.");
 				
 				try {
 					socket.close();
 				}
 				catch (Throwable e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
 				socket = null;
@@ -146,7 +145,6 @@ public abstract class AbstractDelegator extends ProtocolImpl implements Runner, 
 						wait();
 					}
 					catch (Throwable e) {
-						// TODO Auto-generated catch block
 						LogUtil.trace(e);
 					}
 				}

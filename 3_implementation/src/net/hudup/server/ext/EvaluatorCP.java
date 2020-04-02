@@ -169,13 +169,6 @@ public class EvaluatorCP extends JFrame implements EvaluatorListener {
 		this.password = new HiddenText2(password);
 		this.bindUri = bindUri;
 		
-//		try {
-//			EvalCompoundGUI.class.getClass();
-//		}
-//		catch (Exception e) {
-//			LogUtil.trace(e);
-//		}
-		
 		if (bindUri != null) { //Evaluator is remote
 			this.exportedStub = NetUtil.RegistryRemote.export(this, bindUri.getPort());
 			if (this.exportedStub != null)
@@ -259,6 +252,18 @@ public class EvaluatorCP extends JFrame implements EvaluatorListener {
 						return;
 					}
 					
+					try {
+						EvalCompoundGUI.class.getClass();
+					}
+					catch (Exception ex) {
+						JOptionPane.showMessageDialog(
+								getThisEvaluatorCP(), 
+								"Cannot open evaluator control panel due to lack of evaluate package", 
+								"lack of evaluate package", 
+								JOptionPane.ERROR_MESSAGE);
+						return;
+					}
+
 					EvalCompoundGUI.run(evaluatorItem.evaluator, bindUri, evaluatorItem.guiData, null);
 				}
 			});

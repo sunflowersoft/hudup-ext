@@ -12,6 +12,7 @@ import java.util.Collection;
 import java.util.List;
 
 import net.hudup.core.Util;
+import net.hudup.core.data.DataConfig;
 import net.hudup.core.parser.TextParserUtil;
 
 /**
@@ -185,7 +186,7 @@ public class AlgList implements Serializable, net.hudup.core.Cloneable {
 
 	/**
 	 * Extracting names of all algorithms in this list. 
-	 * @return {@link List} of names of all algorithms in this list.
+	 * @return list of names of all algorithms in this list.
 	 */
 	public List<String> getAlgNameList() {
 		return getAlgNameList(list);
@@ -194,12 +195,12 @@ public class AlgList implements Serializable, net.hudup.core.Cloneable {
 	
 	/**
 	 * Getting list of algorithm names.
-	 * @param algList list of algorithms.
+	 * @param algs collection of algorithms.
 	 * @return list of algorithm names.
 	 */
-	public static List<String> getAlgNameList(List<Alg> algList) {
-		List<String> algNameList = Util.newList(algList.size());
-		for (Alg alg : algList) {
+	public static List<String> getAlgNameList(Collection<Alg> algs) {
+		List<String> algNameList = Util.newList(algs.size());
+		for (Alg alg : algs) {
 			algNameList.add(alg.getName());
 		}
 		
@@ -209,15 +210,53 @@ public class AlgList implements Serializable, net.hudup.core.Cloneable {
 	
 	/**
 	 * Extracting class names of all algorithms in this list.
-	 * @return {@link List} of class names of all algorithms in this list.
+	 * @return list of class names of all algorithms in this list.
 	 */
 	public List<String> getAlgClassNameList() {
+		return getAlgClassNameList(list);
+	}
+
+	
+	/**
+	 * Extracting class names of all algorithms in this list.
+	 * @param algs collection of algorithms.
+	 * @return list of class names of all algorithms in this list.
+	 */
+	public static List<String> getAlgClassNameList(Collection<Alg> algs) {
 		List<String> algClassNameList = Util.newList();
-		for (Alg alg : list) {
+		if (algs == null) return algClassNameList;
+
+		for (Alg alg : algs) {
 			algClassNameList.add(alg.getClass().getName());
 		}
 		
 		return algClassNameList;
+	}
+
+	
+	/**
+	 * Getting the map of algorithms class names.
+	 * @return the map of algorithms class names.
+	 */
+	public DataConfig getAlgClassNameMap() {
+		return getAlgClassNameMap(list);
+	}
+	
+	
+	/**
+	 * Getting the map of algorithms class names.
+	 * @param algs collection of algorithms.
+	 * @return the map of algorithms class names.
+	 */
+	public static DataConfig getAlgClassNameMap(Collection<Alg> algs) {
+		DataConfig classNames = new DataConfig();
+		if (algs == null) return classNames;
+		
+		for (Alg alg : algs) {
+			classNames.put(alg.getName(), alg.getClass().getName());
+		}
+		
+		return classNames;
 	}
 
 	

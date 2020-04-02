@@ -73,7 +73,6 @@ import net.hudup.core.logistic.DSUtil;
 import net.hudup.core.logistic.I18nUtil;
 import net.hudup.core.logistic.Inspector;
 import net.hudup.core.logistic.LogUtil;
-import net.hudup.core.logistic.Timestamp;
 import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.xURI;
 import net.hudup.core.logistic.ui.TextField;
@@ -1325,14 +1324,15 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			
 			clearResult();
 			boolean started = false;
-//			synchronized (this) {
-				if (bindUri == null)
-					started = evaluator.remoteStart0(algList, toDatasetPoolExchangedClient(guiData.pool), this.timestamp = new Timestamp());
-				else
-					started = evaluator.remoteStart(AlgList.getAlgNameList(algList), toDatasetPoolExchangedClient(guiData.pool), null);
-				
-//				try {wait();} catch (Exception e) {LogUtil.trace(e);}
-//			}
+			if (bindUri == null)
+				started = evaluator.remoteStart0(algList, toDatasetPoolExchangedClient(guiData.pool), null);
+			else {
+				DataConfig config = null;
+//				config = AlgList.getAlgClassNameMap(algList);
+//				config.put("$clienthost", Constants.hostAddress);
+//				config.put("$clientport", ncLoader.getServerPort());
+				started = evaluator.remoteStart(AlgList.getAlgNameList(algList), toDatasetPoolExchangedClient(guiData.pool), config);
+			}
 			if (!started) updateMode();
 		}
 		catch (Throwable e) {
@@ -1347,42 +1347,44 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 	@Override
 	public synchronized void receivedEvaluator(EvaluatorEvent evt) throws RemoteException {
 		// TODO Auto-generated method stub
-		try {notifyAll();} catch (Exception e) {LogUtil.trace(e);}
+		if (evt.getType() == EvaluatorEvent.Type.start) {
+			updatePluginFromEvaluator();
 
-		if (evt.getType() == EvaluatorEvent.Type.start || evt.getType() == EvaluatorEvent.Type.update_pool) {
-//			Timestamp timestamp = evt.getTimestamp();
-
-			if (evt.getType() == EvaluatorEvent.Type.start) {
-//				if (timestamp == null || this.timestamp == null || bindUri != null || !this.timestamp.equals(timestamp)) {
-					String algName = evt.getOtherResult().algName;
-					if (algName != null) {
-						updateAlgRegFromRemoteEvaluator(Arrays.asList(algName));
-						cmbAlgs.setDefaultSelected(algName);
-					}
-//				}
+			String algName = evt.getOtherResult().algName;
+			if (algName != null) {
+				updateAlgRegFromEvaluator(Arrays.asList(algName));
+				cmbAlgs.setDefaultSelected(algName);
 			}
 
-//			if (timestamp == null || this.timestamp == null || bindUri != null || !this.timestamp.equals(timestamp)) {
-				guiData.pool = evt.getPoolResult().toDatasetPoolClient();
-				guiData.pool = guiData.pool != null ? guiData.pool : new DatasetPool();
-				if (guiData.pool.size() > 0) {
-					txtTrainingBrowse.setDataset(guiData.pool.get(0).getTraining(), false);
-					txtTestingBrowse.setDataset(guiData.pool.get(0).getTesting(), false);
-				}
-				else {
-					txtTrainingBrowse.setDataset(null, false);
-					txtTestingBrowse.setDataset(null, false);
-				}
-//			}
-			
-			updateMode();
-			this.timestamp = null;
+			guiData.pool = evt.getPoolResult().toDatasetPoolClient();
+			guiData.pool = guiData.pool != null ? guiData.pool : new DatasetPool();
+			if (guiData.pool.size() > 0) {
+				txtTrainingBrowse.setDataset(guiData.pool.get(0).getTraining(), false);
+				txtTestingBrowse.setDataset(guiData.pool.get(0).getTesting(), false);
+			}
+			else {
+				txtTrainingBrowse.setDataset(null, false);
+				txtTestingBrowse.setDataset(null, false);
+			}
+		}
+		else if (evt.getType() == EvaluatorEvent.Type.update_pool) {
+			guiData.pool = evt.getPoolResult().toDatasetPoolClient();
+			guiData.pool = guiData.pool != null ? guiData.pool : new DatasetPool();
+			if (guiData.pool.size() > 0) {
+				txtTrainingBrowse.setDataset(guiData.pool.get(0).getTraining(), false);
+				txtTestingBrowse.setDataset(guiData.pool.get(0).getTesting(), false);
+			}
+			else {
+				txtTrainingBrowse.setDataset(null, false);
+				txtTestingBrowse.setDataset(null, false);
+			}
 		}
 		else if (evt.getType() == EvaluatorEvent.Type.pause ||
 				evt.getType() == EvaluatorEvent.Type.resume || 
 				evt.getType() == EvaluatorEvent.Type.stop) {
-			updateMode();
 		}
+		
+		updateMode();
 	}
 
 
@@ -1651,8 +1653,6 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			this.tblMetrics.clear();
 			this.statusBar.clearText();
 			this.statusBar.setTextPane0(DSUtil.shortenVerbalName(evaluator.getName()));
-			
-			this.timestamp = null;
 		}
 		catch (Throwable e) {
 			LogUtil.trace(e);

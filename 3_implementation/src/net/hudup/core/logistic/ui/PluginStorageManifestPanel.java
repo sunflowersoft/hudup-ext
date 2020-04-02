@@ -830,11 +830,6 @@ class ImportAlgDlg extends JDialog {
 				}
 				if (alg == null) continue;
 				
-				/////////////////////////////////////////////////
-				if (alg instanceof AlgRemoteWrapper) //Fix later
-					((AlgRemoteWrapper)alg).setExclusive(true);
-				/////////////////////////////////////////////////
-				
 				RegisterTable table = PluginStorage.lookupTable(alg.getClass());
 				if (table == null || table.contains(algDesc.algName)) {
 					unexportRemoteWrapperAlg(alg);
