@@ -42,7 +42,6 @@ import net.hudup.core.PluginStorage;
 import net.hudup.core.RegisterTable;
 import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.AlgRemote;
-import net.hudup.core.alg.DuplicatableAlg;
 import net.hudup.core.alg.SetupAlgEvent;
 import net.hudup.core.alg.ui.AlgListBox;
 import net.hudup.core.alg.ui.AlgListBox.AlgListChangedEvent;
@@ -320,7 +319,10 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			evaluator.clearDelayUnsetupAlgs();
 			
 			algRegTable.clear();
-			algRegTable.register(EvaluatorAbstract.extractNormalAlgFromPluginStorage(evaluator)); //Algorithms are not cloned because of saving memory when evaluator GUI keep algorithms for a long time.
+			if (bindUri == null)
+				algRegTable.register(EvaluatorAbstract.extractNormalAlgFromPluginStorage(evaluator)); //Algorithms are not cloned because of saving memory when evaluator GUI keep algorithms for a long time.
+			else
+				algRegTable.register(PluginStorage.getNormalAlgReg());
 			lbAlgs.unexportNonPluginAlgs();
 			lbAlgs.update(algRegTable.getAlgList());
 			
@@ -365,12 +367,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 		    	final Alg selectedAlg = getSelectedAlg();
 		    	if (selectedAlg == null) return;
 				
-		    	if ((selectedAlg instanceof DuplicatableAlg) && (bindUri != null)) {
-		    		removeDuplicateMenuItem(contextMenu);
-		    	}
-		    	
-		    	if ((selectedAlg instanceof DuplicatableAlg) && 
-		    			!PluginStorage.contains(selectedAlg) &&
+		    	if (!PluginStorage.contains(selectedAlg) &&
 		    			algRegTable.contains(selectedAlg.getName())) {
 			    	
 					JMenuItem miRegister = UIUtil.makeMenuItem((String)null, "Register", 
@@ -399,10 +396,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 					contextMenu.add(miDiscard);
 		    	}
 
-		    	if (contextMenu.getComponentCount() > 0) {
-		    		if (contextMenu.getComponent(contextMenu.getComponentCount() - 1) instanceof JMenuItem)
-				    	contextMenu.addSeparator();
-		    	}
+		    	contextMenu.addSeparator();
 				JMenuItem miTraining = UIUtil.makeMenuItem((String)null, "Add training", 
 					new ActionListener() {
 						
@@ -415,7 +409,10 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			}
 			
 		};
-		this.lbAlgs.update(algRegTable.getAlgList(guiData.algNames));
+		if (guiData.algNames != null && guiData.algNames.size() > 0)
+			this.lbAlgs.update(algRegTable.getAlgList(guiData.algNames));
+		else
+			this.lbAlgs.update(algRegTable.getAlgList());
 		this.lbAlgs.setVisibleRowCount(4);
 		this.lbAlgs.addAlgListChangedListener(new AlgListBox.AlgListChangedListener() {
 			
@@ -608,10 +605,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 					
 					boolean ret = true;
 					try {
-//						synchronized (this) {
-							ret = evaluator.updatePool(toDatasetPoolExchangedClient(guiData.pool), null);
-//							wait();
-//						}
+						ret = evaluator.updatePool(toDatasetPoolExchangedClient(guiData.pool), null);
 					} catch (Exception ex) {ex.printStackTrace();}
 					
 					if (ret) {
@@ -1130,10 +1124,8 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			if (bindUri == null)
 				started = evaluator.remoteStart0(lbAlgs.getAlgList(), toDatasetPoolExchangedClient(guiData.pool), null);
 			else {
-				DataConfig config = null;
-//				config = lbAlgs.getAlgClassNameMap();
-//				config.put("$clienthost", Constants.hostAddress);
-//				config.put("$clientport", ncLoader.getServerPort());
+				DataConfig config = lbAlgs.getAlgDescMap();
+				config.put("$cp", this);
 				started = evaluator.remoteStart(lbAlgs.getAlgNameList(), toDatasetPoolExchangedClient(guiData.pool), config);
 			}
 				

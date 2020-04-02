@@ -11,8 +11,10 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 
+import net.hudup.core.PluginStorage;
 import net.hudup.core.Util;
 import net.hudup.core.data.DataConfig;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.parser.TextParserUtil;
 
 /**
@@ -260,6 +262,32 @@ public class AlgList implements Serializable, net.hudup.core.Cloneable {
 	}
 
 	
+	/**
+	 * Getting the map of algorithm descriptions.
+	 * @return the map of algorithm descriptions.
+	 */
+	public DataConfig getAlgDescMap() {
+		return getAlgDescMap(list);
+	}
+	
+	
+	/**
+	 * Getting the map of algorithm descriptions.
+	 * @param algs collection of algorithms.
+	 * @return the map of algorithm descriptions.
+	 */
+	public static DataConfig getAlgDescMap(Collection<Alg> algs) {
+		DataConfig classNames = new DataConfig();
+		if (algs == null) return classNames;
+		
+		for (Alg alg : algs) {
+			classNames.put(alg.getName(), new AlgDesc(alg));
+		}
+		
+		return classNames;
+	}
+
+	
 	@Override
 	public String toString() {
 		// TODO Auto-generated method stub
@@ -267,7 +295,32 @@ public class AlgList implements Serializable, net.hudup.core.Cloneable {
 	}
 
 
-	@Override
+    /**
+     * Unexporting non-plugin algorihms.
+     */
+    public void unexportNonPluginAlgs() {
+    	unexportNonPluginAlgs(list);
+    }
+    
+    
+    /**
+     * Unexporting non-plugin algorihms.
+     * @param algs collection of algorithms.
+     */
+    public static void unexportNonPluginAlgs(Collection<Alg> algs) {
+    	for (Alg alg : algs) {
+            if(PluginStorage.contains(alg.getClass(), alg.getName()))
+            	continue;
+            
+			try {
+				if (alg instanceof AlgRemote)
+					((AlgRemote)alg).unexport();
+			} catch (Exception ex) {LogUtil.trace(ex);}
+    	}
+    }
+
+    
+    @Override
 	public Object clone() {
 		// TODO Auto-generated method stub
 		AlgList newAlgList = new AlgList();

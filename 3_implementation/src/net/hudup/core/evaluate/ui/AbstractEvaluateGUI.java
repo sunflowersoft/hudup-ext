@@ -7,6 +7,7 @@
  */
 package net.hudup.core.evaluate.ui;
 
+import java.io.Serializable;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.Arrays;
@@ -41,10 +42,10 @@ import net.hudup.core.evaluate.EvaluatorListener;
 import net.hudup.core.evaluate.Metric;
 import net.hudup.core.evaluate.Metrics;
 import net.hudup.core.evaluate.MetricsUtil;
+import net.hudup.core.logistic.ClassProcessor;
 import net.hudup.core.logistic.CounterElapsedTimeListener;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.NetUtil;
-import net.hudup.core.logistic.NetworkClassLoaderServer;
 import net.hudup.core.logistic.xURI;
 
 /**
@@ -53,7 +54,7 @@ import net.hudup.core.logistic.xURI;
  * @author Loc Nguyen
  * @version 10.0
  */
-public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorListener, EvaluateListener, EvaluateProgressListener, SetupAlgListener, PluginChangedListener, CounterElapsedTimeListener {
+public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorListener, EvaluateListener, EvaluateProgressListener, SetupAlgListener, PluginChangedListener, CounterElapsedTimeListener, ClassProcessor, Serializable {
 
 	
 	/**
@@ -111,15 +112,15 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 
 	
 	/**
-	 * Network class loader server.
-	 */
-	protected NetworkClassLoaderServer ncLoader = null;
-	
-	
-	/**
 	 * Evaluator GUI data.
 	 */
 	protected EvaluateGUIData guiData = null;
+	
+	
+//	/**
+//	 * Network class loader server.
+//	 */
+//	protected SocketClassLoaderServer cl = null;
 	
 	
 //	/**
@@ -193,15 +194,13 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	 */
 	public AbstractEvaluateGUI(Evaluator evaluator, xURI bindUri, EvaluateGUIData referredGUIData, Alg referredAlg) {
 		this.bindUri = bindUri;
+		
 		if (bindUri != null) { //Evaluator is remote
 			this.exportedStub = NetUtil.RegistryRemote.export(this, bindUri.getPort());
 			if (this.exportedStub != null)
 				LogUtil.info("Evaluator GUI exported at port " + bindUri.getPort());
 			else
 				LogUtil.info("Evaluator GUI failed to exported");
-			
-//			ncLoader = new NetworkClassLoaderServer(Constants.DEFAULT_NETWORK_CLASS_LOADER_PORT);
-//			ncLoader.start();
 		}
 		else { //Evaluator is local
 			try {
@@ -256,13 +255,10 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 		} catch (RemoteException e) {LogUtil.trace(e);}
 		if (otherResult == null) otherResult = new EvaluateInfo();
 
-		try {
-			if (evaluator.remoteIsStarted()) {
-				guiData.algName = otherResult.algName;
-				guiData.algNames = otherResult.algNames;
-			}
-		}
-		catch (RemoteException e) {LogUtil.trace(e);}
+		if (otherResult.algName != null)
+			guiData.algName = otherResult.algName;
+		if (otherResult.algNames != null && otherResult.algNames.size() > 0)
+			guiData.algNames = otherResult.algNames;
 		if (guiData.algNames == null || guiData.algNames.size() == 0)
 			guiData.algNames = algRegTable.getAlgNames();
 		else
@@ -291,9 +287,7 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 			else if (evStorePath != null && !evStorePath.equals(guiData.txtRunSaveBrowse))
 				guiData.txtRunSaveBrowse = evStorePath;
 		}
-		
-		
-//		waitTimer = new WaitTimer(); //Setting waiting timer.
+
 	}
 	
 	
@@ -441,11 +435,6 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 		updateGUIData();
 		guiData.active = false;
 		
-		try {
-			if (ncLoader != null) ncLoader.stop();
-			ncLoader = null;
-		} catch (Exception e) {LogUtil.trace(e);}
-		
 		if (exportedStub != null) {
 			boolean ret = NetUtil.RegistryRemote.unexport(this);
 			if (ret)
@@ -554,6 +543,13 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	}
 	
 	
+	@Override
+	public byte[] getByteCode(String className) throws RemoteException {
+		// TODO Auto-generated method stub
+		return ClassProcessor.getByteCode0(className);
+	}
+
+
 	/**
 	 * Add this GUI as listeners to specified evaluator.
 	 * @param evaluator specified evaluator.
@@ -664,7 +660,7 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	 * @param algNames list of algorithm names.
 	 */
 	protected void updateAlgRegFromEvaluator(List<String> algNames) {
-		if (bindUri == null || evaluator == null || algNames == null || algNames.size() == 0)
+		if (evaluator == null || algNames == null || algNames.size() == 0)
 			return;
 		
 		List<String> regAlgNames = algRegTable.getAlgNames();
@@ -687,7 +683,7 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 				algRegTable.register(PluginStorage.getNormalAlgReg().query(algName));
 			else {
 				try {
-					Alg alg = evaluator.getEvaluatedAlg(algName, true);
+					Alg alg = evaluator.getEvaluatedAlg(algName, bindUri != null);
 					if (alg != null) algRegTable.register(alg);
 				}
 				catch (Exception e) {LogUtil.trace(e);}

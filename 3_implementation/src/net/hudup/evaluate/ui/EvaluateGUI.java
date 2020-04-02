@@ -39,6 +39,7 @@ import javax.swing.JScrollPane;
 import javax.swing.SwingWorker;
 
 import net.hudup.core.PluginChangedEvent;
+import net.hudup.core.PluginStorage;
 import net.hudup.core.RegisterTable;
 import net.hudup.core.Util;
 import net.hudup.core.alg.Alg;
@@ -336,7 +337,12 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			evaluator.clearDelayUnsetupAlgs();
 
 			algRegTable.clear();
-			algRegTable.register(EvaluatorAbstract.extractNormalAlgFromPluginStorage(evaluator)); //Algorithms are not cloned because of saving memory when evaluator GUI keep algorithms for a long time.
+			
+			if (bindUri == null)
+				algRegTable.register(EvaluatorAbstract.extractNormalAlgFromPluginStorage(evaluator)); //Algorithms are not cloned because of saving memory when evaluator GUI keep algorithms for a long time.
+			else
+				algRegTable.register(PluginStorage.getNormalAlgReg());
+			cmbAlgs.unexportNonPluginAlgs();
 			cmbAlgs.update(algRegTable.getAlgList());
 			updateMode();
 		}
@@ -1327,10 +1333,8 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			if (bindUri == null)
 				started = evaluator.remoteStart0(algList, toDatasetPoolExchangedClient(guiData.pool), null);
 			else {
-				DataConfig config = null;
-//				config = AlgList.getAlgClassNameMap(algList);
-//				config.put("$clienthost", Constants.hostAddress);
-//				config.put("$clientport", ncLoader.getServerPort());
+				DataConfig config = AlgList.getAlgDescMap(algList);
+				config.put("$cp", this);
 				started = evaluator.remoteStart(AlgList.getAlgNameList(algList), toDatasetPoolExchangedClient(guiData.pool), config);
 			}
 			if (!started) updateMode();

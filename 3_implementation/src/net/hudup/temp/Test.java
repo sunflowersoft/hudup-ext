@@ -20,7 +20,6 @@ import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.rmi.RemoteException;
-import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.Vector;
@@ -37,7 +36,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 import javax.swing.event.EventListenerList;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -85,6 +83,7 @@ import net.hudup.core.evaluate.MetricsUtil;
 import net.hudup.core.logistic.BaseClass;
 import net.hudup.core.logistic.ClipboardUtil;
 import net.hudup.core.logistic.LogUtil;
+import net.hudup.core.logistic.SocketClassLoader;
 import net.hudup.core.logistic.xURI;
 import net.hudup.core.logistic.ui.DescriptionDlg;
 import net.hudup.core.logistic.ui.TagTextField;
@@ -111,7 +110,7 @@ public class Test {
 	 * Main method.
 	 * @param args argument.
 	 */
-	public static void main(String[] args) {
+	public static void main(String[] args) throws Exception {
 		// TODO Auto-generated method stub
 		//getInstances(NeighborCF.class, xURI.create("/E:/sim.jar"));
 		//System.out.println(System.getProperty("java.rmi.server.useCodebaseOnly"));
@@ -119,15 +118,17 @@ public class Test {
 //		AlgDesc2List list = new AlgDesc2List();
 //		list.addAll2(PluginStorage.getNormalAlgReg().getAlgList());
 		//AlgDesc2Table.showDlg(null, list);
-		System.out.println(new Date(1));
-		UIManager.LookAndFeelInfo[] looks = UIManager.getInstalledLookAndFeels();
-		for (UIManager.LookAndFeelInfo look : looks) {
-			System.out.println(look.getClassName());
-		}
+//		System.out.println(new Date(1));
+//		UIManager.LookAndFeelInfo[] looks = UIManager.getInstalledLookAndFeels();
+//		for (UIManager.LookAndFeelInfo look : looks) {
+//			System.out.println(look.getClassName());
+//		}
+//		
+//		System.out.println(System.getProperties().getProperty("java.rmi.server.codebase"));
 		
-		System.out.println(System.getProperties().getProperty("java.rmi.server.codebase"));
-		
-
+		SocketClassLoader nlc = new SocketClassLoader();
+		Class<?> cls = nlc.loadClass("net.hudup.SimFirer");
+		System.out.println(cls);
 	}
 
 	

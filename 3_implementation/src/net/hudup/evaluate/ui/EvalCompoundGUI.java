@@ -320,11 +320,11 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 			return;
 		}
 		
-		boolean agent = false;
-		try {
-			agent = batchEvaluateGUI.getEvaluator().isAgent();
-		}
-		catch (Throwable e) {LogUtil.trace(e);}
+//		boolean agent = false;
+//		try {
+//			agent = batchEvaluateGUI.getEvaluator().isAgent();
+//		}
+//		catch (Throwable e) {LogUtil.trace(e);}
 		
 		SysConfigDlgExt cfg = new SysConfigDlgExt(this, I18nUtil.message("system_configure"), this) {
 
@@ -355,8 +355,8 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 		};
 		
 		cfg.update(thisConfig);
-		if ((batchEvaluateGUI.getBindUri() != null) || (agent))
-			cfg.getPluginStorageManifest().setEnabled(false);
+//		if ((batchEvaluateGUI.getBindUri() != null) || (agent))
+//			cfg.getPluginStorageManifest().setEnabled(false);
 		
 		cfg.setVisible(true);
 	}

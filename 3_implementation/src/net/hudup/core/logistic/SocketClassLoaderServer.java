@@ -10,12 +10,10 @@ package net.hudup.core.logistic;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.InputStreamReader;
-import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 
 import net.hudup.core.Constants;
-import net.hudup.core.Util;
 
 /**
  * This class implements server network class loader.
@@ -27,7 +25,7 @@ import net.hudup.core.Util;
  *
  */
 @NextUpdate
-public class NetworkClassLoaderServer extends AbstractRunner {
+public class SocketClassLoaderServer extends AbstractRunner {
 
 	
 	/**
@@ -46,7 +44,7 @@ public class NetworkClassLoaderServer extends AbstractRunner {
 	 * Constructor with server port.
 	 * 
 	 */
-	public NetworkClassLoaderServer(int serverPort) {
+	public SocketClassLoaderServer(int serverPort) {
 		this.serverPort = serverPort;
 	}
 
@@ -92,15 +90,16 @@ public class NetworkClassLoaderServer extends AbstractRunner {
 					if (requestText == null)
 						break;
 					else {
-						Class<?> cls = null;
+						byte[] bytes = new byte[] {};
 						try {
-							cls = Util.getPluginManager().loadClass(requestText);
+							bytes = ClassProcessor.getByteCode0(requestText);
 						}
 						catch (Exception e) {LogUtil.trace(e);}
 						
-						ObjectOutputStream objectOut = new ObjectOutputStream(out);
-						objectOut.writeObject(cls);
+						out.write(bytes);
 					}
+					
+					break; //Work-around solution.
 				} 
 				catch (Throwable e) {
 					LogUtil.trace(e);

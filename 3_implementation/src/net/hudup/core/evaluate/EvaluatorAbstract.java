@@ -24,6 +24,7 @@ import net.hudup.core.RegisterTable;
 import net.hudup.core.RegisterTable.AlgFilter;
 import net.hudup.core.Util;
 import net.hudup.core.alg.Alg;
+import net.hudup.core.alg.AlgDesc;
 import net.hudup.core.alg.AlgDesc2;
 import net.hudup.core.alg.AlgDesc2List;
 import net.hudup.core.alg.AlgList;
@@ -42,6 +43,7 @@ import net.hudup.core.data.Profile;
 import net.hudup.core.evaluate.EvaluateEvent.Type;
 import net.hudup.core.evaluate.ui.AbstractEvaluateGUI;
 import net.hudup.core.logistic.AbstractRunner;
+import net.hudup.core.logistic.ClassProcessor;
 import net.hudup.core.logistic.Counter;
 import net.hudup.core.logistic.CounterElapsedTimeListener;
 import net.hudup.core.logistic.DSUtil;
@@ -49,7 +51,7 @@ import net.hudup.core.logistic.I18nUtil;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.MathUtil;
 import net.hudup.core.logistic.NetUtil;
-import net.hudup.core.logistic.NetworkClassLoaderClient;
+import net.hudup.core.logistic.RMIClassLoader;
 import net.hudup.core.logistic.SystemUtil;
 import net.hudup.core.logistic.TaskQueue;
 import net.hudup.core.logistic.Timestamp;
@@ -1533,46 +1535,47 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 	@Override
 	public synchronized boolean remoteStart(List<String> algNameList, DatasetPoolExchanged pool, Serializable parameter) throws RemoteException {
 		DataConfig config = null;
-		NetworkClassLoaderClient ncl = null;
+		RMIClassLoader cl = null;
 		if ((parameter != null) && (parameter instanceof DataConfig)) {
 			config = (DataConfig)parameter;
-			String clientHost = config.getAsString("$clienthost");
-			int clientPort = config.getAsInt("$clientport");
-			if (clientHost != null && clientPort >= 0)
-				ncl = new NetworkClassLoaderClient(clientHost, clientPort);
+			Object cp = config.get("$cp");
+			if ((cp != null) && (cp instanceof ClassProcessor))
+				cl = new RMIClassLoader((ClassProcessor)cp);
 		}
 		
 		RegisterTable algReg = PluginStorage.getNormalAlgReg();
 		List<Alg> algList = Util.newList();
 		for (String algName : algNameList) {
-			if (algReg.contains(algName))
-				algList.add(algReg.query(algName)); //This code line is important to remote setting.
+			AlgDesc algDesc = config != null ? config.getAsAlgDesc(algName) : null;
+			Alg evAlg = null;
+			
+			if (PluginStorage.lookupNextUpdateList(Alg.class, algName) != -1)
+				continue;
+			else if (algReg.contains(algName))
+				evAlg = algReg.query(algName);
 			else if (algRegResult != null && algRegResult.contains(algName))
-				algList.add(algRegResult.query(algName)); //This code line is important to remote setting.
-			else if (config != null && ncl != null && config.containsKey(algName)) {
-				String algClassName = config.getAsString(algName);
-				Alg newAlg = null;
-				
+				evAlg = algRegResult.query(algName);
+			else if (cl != null && config.containsKey(algName)) {
 				try {
-					Class<?> newAlgClass = ncl.loadClass(algClassName);
-					if (newAlgClass != null && Alg.class.isAssignableFrom(newAlgClass))
-						newAlg = (Alg)newAlgClass.newInstance();
+					Class<?> newAlgClass = cl.loadClass(algDesc.getAlgClassName());
+					if (newAlgClass != null && Alg.class.isAssignableFrom(newAlgClass)) {
+						evAlg = (Alg)newAlgClass.newInstance();
+					}
 				}
 				catch (Exception e) {
-					LogUtil.trace(e);
-					LogUtil.error("Error to load class " + algClassName + " from host " + config.getAsString("$clienthost") +
+					LogUtil.error("Error to load class " + algDesc.getAlgClassName() + " from host " + config.getAsString("$clienthost") +
 							" caused by " + e.getMessage());
-					newAlg = null;
+					evAlg = null;
 				}
 				
-				if (newAlg != null && PluginStorage.getNormalAlgReg().canRegister(newAlg)) {
-					PluginStorage.getNormalAlgReg().register(newAlg);
-					algList.add(newAlg);
-				}
+			}
+			
+			if (evAlg != null && acceptAlg(evAlg)) {
+				if (algDesc != null)
+					evAlg.getConfig().putAll(algDesc.getConfig());
+				algList.add(evAlg); //This code line is important to remote setting.
 			}
 		}
-		
-		if (ncl != null) ncl.close();
 		
 		return remoteStart0(algList, pool, parameter);
 	}

@@ -24,6 +24,7 @@ import net.hudup.core.PluginStorage;
 import net.hudup.core.RegisterTable;
 import net.hudup.core.Util;
 import net.hudup.core.alg.Alg;
+import net.hudup.core.alg.AlgList;
 
 
 /**
@@ -277,6 +278,14 @@ public class AlgComboBox extends JComboBox<Alg> implements AlgListUI {
 	}
 	
 	
+    /**
+     * Unexporting non-plugin algorihms.
+     */
+    public void unexportNonPluginAlgs() {
+    	AlgList.unexportNonPluginAlgs(getAlgList());
+    }
+
+    
     /**
      * Adding the context menu to this list.
      * @param contextMenu specified context menu.

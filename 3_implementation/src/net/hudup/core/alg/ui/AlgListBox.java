@@ -43,7 +43,8 @@ import javax.swing.event.EventListenerList;
 import net.hudup.core.PluginStorage;
 import net.hudup.core.Util;
 import net.hudup.core.alg.Alg;
-import net.hudup.core.alg.AlgRemote;
+import net.hudup.core.alg.AlgDesc;
+import net.hudup.core.alg.AlgList;
 import net.hudup.core.alg.DuplicatableAlg;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.logistic.DSUtil;
@@ -575,6 +576,22 @@ public class AlgListBox extends JList<Alg> implements AlgListUI {
 
 	
 	/**
+	 * Getting the map of algorithm descriptions.
+	 * @return the map of algorithm descriptions.
+	 */
+	public DataConfig getAlgDescMap() {
+		List<Alg> algList = getAlgList();
+		DataConfig classNames = new DataConfig();
+		
+		for (Alg alg : algList) {
+			classNames.put(alg.getName(), new AlgDesc(alg));
+		}
+		
+		return classNames;
+	}
+
+	
+	/**
 	 * Getting the list of selected algorithms.
 	 * @return {@link List} of selected algorithms.
 	 */
@@ -687,16 +704,7 @@ public class AlgListBox extends JList<Alg> implements AlgListUI {
      * Unexporting non-plugin algorihms.
      */
     public void unexportNonPluginAlgs() {
-    	List<Alg> algs = getAlgList();
-    	for (Alg alg : algs) {
-            if(PluginStorage.contains(alg.getClass(), alg.getName()))
-            	continue;
-            
-			try {
-				if (alg instanceof AlgRemote)
-					((AlgRemote)alg).unexport();
-			} catch (Exception ex) {LogUtil.trace(ex);}
-    	}
+    	AlgList.unexportNonPluginAlgs(getAlgList());
     }
     
     
