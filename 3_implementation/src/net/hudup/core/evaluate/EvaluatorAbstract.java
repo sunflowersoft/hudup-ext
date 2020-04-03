@@ -1575,7 +1575,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 	@Override
 	public synchronized boolean remoteStart(List<String> algNameList, DatasetPoolExchanged pool, ClassProcessor cp, DataConfig config, Serializable parameter) throws RemoteException {
 		HudupRMIClassLoader cl = null;
-		if ((cp != null) && (cp instanceof ClassProcessor))
+		if (cp != null)
 			cl = new HudupRMIClassLoader(getClass().getClassLoader(), (ClassProcessor)cp);
 
 		RegisterTable algReg = PluginStorage.getNormalAlgReg();

@@ -307,7 +307,7 @@ public class AlgList implements Serializable, net.hudup.core.Cloneable {
 		if (algs == null) return classNames;
 		
 		for (Alg alg : algs) {
-			classNames.put(alg.getName(), new AlgDesc(alg.getName(), (DataConfig)alg.getConfig().clone()));
+			classNames.put(alg.getName(), new AlgDesc(alg.getClass().getName(), (DataConfig)alg.getConfig().clone()));
 		}
 		
 		return classNames;

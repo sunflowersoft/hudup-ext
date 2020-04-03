@@ -517,7 +517,8 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	public void requireCleanupSomething() {
 		// TODO Auto-generated method stub
 		try {
-			evaluator.clearDelayUnsetupAlgs();
+			if (bindUri == null)
+				evaluator.clearDelayUnsetupAlgs();
 		}
 		catch (Throwable e) {
 			LogUtil.trace(e);

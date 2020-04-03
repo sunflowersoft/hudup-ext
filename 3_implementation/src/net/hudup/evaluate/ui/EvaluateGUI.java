@@ -341,7 +341,13 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			algRegTable.register(EvaluatorAbstract.extractNormalAlgFromPluginStorage(evaluator, bindUri)); //Algorithms are not cloned because of saving memory when evaluator GUI keep algorithms for a long time.
 			
 			cmbAlgs.unexportNonPluginAlgs();
-			cmbAlgs.update(algRegTable.getAlgList());
+			List<String> algNames = evaluator.getOtherResult().algNames;
+			if (algNames != null && algNames.size() > 0) {
+				syncAlgRegWithEvaluator(algNames);
+				cmbAlgs.update(algRegTable.getAlgList(algNames));
+			}
+			else
+				cmbAlgs.update(algRegTable.getAlgList());
 			
 			updateMode();
 		}

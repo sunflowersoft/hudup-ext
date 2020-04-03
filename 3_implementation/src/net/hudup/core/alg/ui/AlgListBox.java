@@ -600,7 +600,7 @@ public class AlgListBox extends JList<Alg> implements AlgListUI {
 		DataConfig classNames = new DataConfig();
 		
 		for (Alg alg : algList) {
-			classNames.put(alg.getName(), new AlgDesc(alg.getName(), (DataConfig)alg.getConfig().clone()));
+			classNames.put(alg.getName(), new AlgDesc(alg.getClass().getName(), (DataConfig)alg.getConfig().clone()));
 		}
 		
 		return classNames;

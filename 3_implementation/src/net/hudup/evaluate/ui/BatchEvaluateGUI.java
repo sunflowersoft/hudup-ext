@@ -316,7 +316,8 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 	@Override
 	public void pluginChanged(PluginChangedEvent evt) {
 		try {
-			evaluator.clearDelayUnsetupAlgs();
+			if (bindUri == null)
+				evaluator.clearDelayUnsetupAlgs();
 			
 			updatePluginFromEvaluator();
 			
@@ -324,7 +325,13 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			algRegTable.register(EvaluatorAbstract.extractNormalAlgFromPluginStorage(evaluator, bindUri)); //Algorithms are not cloned because of saving memory when evaluator GUI keep algorithms for a long time.
 			
 			lbAlgs.unexportNonPluginAlgs();
-			lbAlgs.update(algRegTable.getAlgList());
+			List<String> algNames = evaluator.getOtherResult().algNames;
+			if (algNames != null && algNames.size() > 0) {
+				syncAlgRegWithEvaluator(algNames);
+				lbAlgs.update(algRegTable.getAlgList(algNames));
+			}
+			else
+				lbAlgs.update(algRegTable.getAlgList());
 			
 			updateMode();
 		}
@@ -419,13 +426,13 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			@Override
 			public void algListChanged(AlgListChangedEvent evt) {
 				// TODO Auto-generated method stub
-				if (evaluator == null || algRegTable == null /*|| bindUri != null*/)
+				if (evaluator == null || algRegTable == null)
 					return;
 				
 				try {
 					List<Alg> list = evt.getAlgList();
 					for (Alg alg : list) {
-						if (!EvaluatorAbstract.acceptAlg(evaluator, alg, bindUri)) continue;
+						//if (!EvaluatorAbstract.acceptAlg(evaluator, alg, bindUri)) continue; //Not necessary because checked.
 						if (!algRegTable.contains(alg.getName()))
 							algRegTable.register(alg);
 					}
@@ -1144,6 +1151,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			syncPluginWithEvaluator();
 			
 			List<String> algNames = evt.getOtherResult().algNames;
+			lbAlgs.unexportNonPluginAlgs();
 			if (algNames != null && algNames.size() > 0) {
 				syncAlgRegWithEvaluator(algNames);
 				lbAlgs.update(algRegTable.getAlgList(algNames));
