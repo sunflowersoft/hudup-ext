@@ -11,8 +11,8 @@ import java.io.Serializable;
 import java.rmi.RemoteException;
 
 import net.hudup.core.alg.Alg;
+import net.hudup.core.alg.AlgDesc2;
 import net.hudup.core.alg.ExecutableAlg;
-import net.hudup.core.alg.TestAlg;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.Fetcher;
@@ -153,7 +153,7 @@ public abstract class ExecuteEvaluator extends EvaluatorAbstract {
 //		if ((remoteAlg != null) && (remoteAlg instanceof Alg))
 //			alg = (Alg)remoteAlg;
 		
-		return (alg instanceof ExecutableAlg) && (!(alg instanceof TestAlg));
+		return (alg instanceof ExecutableAlg) && (!(AlgDesc2.isForTest(alg)));
 	}
 
 	

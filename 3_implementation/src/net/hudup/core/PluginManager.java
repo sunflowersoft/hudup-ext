@@ -90,7 +90,7 @@ public interface PluginManager {
 	 * @param referredClass referred class. If this referred class is null, all classes are retrieved. 
 	 * @return list of instances belonging referred class.
 	 */
-	<T> List<T> discover(Class<T> referredClass);
+	<T> List<T> loadInstances(Class<T> referredClass);
 
 	
 	/**
@@ -101,7 +101,7 @@ public interface PluginManager {
 	 * @param referredClass referred class. If this referred class is null, all classes are retrieved.
 	 * @return list of algorithms from store and referred class.
 	 */
-	<T> List<T> discover(xURI storeUri, Class<T> referredClass);
+	<T> List<T> loadInstances(xURI storeUri, Class<T> referredClass);
 
 	
 	/**
@@ -157,7 +157,7 @@ public interface PluginManager {
 	 * @param cls specified class.
 	 * @return whether specified class is valid.
 	 */
-	static boolean isClassValid(Class<?> cls) {
+	public static boolean isClassValid(Class<?> cls) {
 		if (cls == null || cls.isInterface() || cls.isMemberClass() || cls.isAnonymousClass())
 			return false;
 		
@@ -173,6 +173,20 @@ public interface PluginManager {
 	}
 
 
+	/**
+	 * Checking whether specified algorithm is valid.
+	 * @param alg specified algorithm.
+	 * @return whether specified algorithm is valid.
+	 */
+	public static boolean isClassValidAlg(Alg alg) {
+		if (alg == null || alg.getName() == null || alg.getName().isEmpty() ||
+				alg.newInstance() == null || !alg.newInstance().getClass().equals(alg.getClass()))
+			return false;
+		else
+			return true;
+	}
+
+	
 	/**
 	 * Getting all interfaces of given object and referred class.
 	 * This method will be revised because its deep level is only 1.

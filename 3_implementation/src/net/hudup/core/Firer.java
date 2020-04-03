@@ -19,7 +19,6 @@ import java.util.Set;
 import org.reflections.Reflections;
 
 import net.hudup.core.alg.Alg;
-import net.hudup.core.alg.AlgList;
 import net.hudup.core.alg.AlgRemote;
 import net.hudup.core.alg.AlgRemoteWrapper;
 import net.hudup.core.alg.AugRemote;
@@ -123,6 +122,14 @@ public class Firer implements PluginManager {
 		if (isFired()) return;
 		
 		try {
+			PluginStorage.clear();
+		} catch (Exception e) {LogUtil.trace(e);}
+		
+		try {
+			ExtraStorage.clear();
+		} catch (Exception e) {LogUtil.trace(e);}
+		
+		try {
 			UriAdapter adapter = new UriAdapter(Constants.WORKING_DIRECTORY);
 			
 			xURI working = xURI.create(Constants.WORKING_DIRECTORY);
@@ -190,8 +197,7 @@ public class Firer implements PluginManager {
 
 	@Override
 	public void discover() {
-		// TODO Auto-generated method stub
-		try { //Redundant try-catch because it is impossible to solve the problem of error by PluginStorage.clear(). Solving later. 
+		try { //Redundant try-catch because it is impossible to solve the problem caused by PluginStorage.clear(). Solving later. 
 			PluginStorage.clear();
 			discover(Util.getLoadablePackages());
 		}
@@ -237,30 +243,28 @@ public class Firer implements PluginManager {
 			return;
 		}
 		
-		List<Class<? extends Alg>> compositeAlgClassList = Util.newList();
 		Set<Class<? extends Alg>> algClasses = reflections.getSubTypesOf(Alg.class);
+		List<Alg> compositeAlgList = Util.newList();
 		for (Class<? extends Alg> algClass : algClasses) {
 			if (algClass == null) continue;
 			
 			try {
 				if (!PluginManager.isClassValid(algClass)) continue;
 				
+				Alg alg = Util.newInstance(algClass);
+				if (!PluginManager.isClassValidAlg(alg)) continue;
+
 				if (algClass.getAnnotation(Composite.class) != null) {
-					compositeAlgClassList.add(algClass);
+					compositeAlgList.add(alg);
 					continue;
 				}
 				
-				Alg alg = Util.newInstance(algClass);
-				if (alg == null)
-					continue;
-	
 				NextUpdate nextUpdate = algClass.getAnnotation(NextUpdate.class);
-				AlgList nextUpdateList = PluginStorage.getNextUpdateList();
 				if (nextUpdate != null) {
-					if (nextUpdateList.indexOf(alg.getName()) >= 0)
+					if (PluginStorage.lookupNextUpdateList(alg.getClass(), alg.getName()) >= 0)
 						continue;
 					
-					nextUpdateList.add(alg);
+					PluginStorage.getNextUpdateList().add(alg);
 					if (nextUpdateLog != null) {
 						nextUpdateLog.write("\n\n");
 						nextUpdateLog.write(algClass.toString() + "\n\tNote: " + nextUpdate.note());
@@ -274,23 +278,23 @@ public class Firer implements PluginManager {
 			catch (Exception e) {LogUtil.trace(e);}
 		}
 			
-		for (Class<? extends Alg> compositeAlgClass : compositeAlgClassList) {
+		for (Alg compositeAlg : compositeAlgList) {
 			try {
-				Alg compositeAlg = Util.newInstance(compositeAlgClass);
-				if (compositeAlg == null) continue;
-				
-				NextUpdate nextUpdate = compositeAlgClass.getAnnotation(NextUpdate.class);
+				NextUpdate nextUpdate = compositeAlg.getClass().getAnnotation(NextUpdate.class);
 				if (nextUpdate != null) {
+					if (PluginStorage.lookupNextUpdateList(compositeAlg.getClass(), compositeAlg.getName()) >= 0)
+						continue;
+
 					PluginStorage.getNextUpdateList().add(compositeAlg);
 					if (nextUpdateLog != null) {
 						nextUpdateLog.write("\n\n");
-						nextUpdateLog.write(compositeAlgClass.toString() + "\n\tNote: " + nextUpdate.note());
+						nextUpdateLog.write(compositeAlg.getClass().toString() + "\n\tNote: " + nextUpdate.note());
 					}
 					
 					continue;
 				}
-
-				registerAlg(compositeAlg);
+				else
+					registerAlg(compositeAlg);
 			}
 			catch (Exception e) {LogUtil.trace(e);}
 		}
@@ -307,7 +311,7 @@ public class Firer implements PluginManager {
 	
 	
 	@Override
-	public <T> List<T> discover(Class<T> referredClass) {
+	public <T> List<T> loadInstances(Class<T> referredClass) {
 		String[] prefixList = Util.getLoadablePackages();
 		if (prefixList == null || prefixList.length == 0)
 			prefixList = new String[] {""};
@@ -325,7 +329,7 @@ public class Firer implements PluginManager {
 		}
 		if (reflections == null) return Util.newList();
 		
-		return discover(referredClass, reflections);
+		return loadInstances(referredClass, reflections);
 	}
 
 	
@@ -337,7 +341,7 @@ public class Firer implements PluginManager {
 	 * @param reflections specified reflections. 
 	 * @return list of instances from reflections and referred class.
 	 */
-	private static <T> List<T> discover(Class<T> referredClass, Reflections reflections) {
+	private static <T> List<T> loadInstances(Class<T> referredClass, Reflections reflections) {
 		Set<Class<? extends T>> apClasses = reflections.getSubTypesOf(referredClass);
 		List<T> instances = Util.newList();
 		for (Class<? extends T> apClass : apClasses) {
@@ -361,7 +365,7 @@ public class Firer implements PluginManager {
 	
 	
 	@Override
-	public <T> List<T> discover(xURI storeUri, Class<T> referredClass) {
+	public <T> List<T> loadInstances(xURI storeUri, Class<T> referredClass) {
 		if (storeUri == null) storeUri = xURI.create(".");
 		
 		URL storeUrl = null;
@@ -381,7 +385,7 @@ public class Firer implements PluginManager {
 		
 		String rootPath = storeUri.getPath();
 		List<T> outObjList = Util.newList();
-		discover(storeUri, rootPath, adapter, classLoader, referredClass, outObjList);
+		loadInstances(storeUri, rootPath, adapter, classLoader, referredClass, outObjList);
 		try {
 			classLoader.close();
 		} catch (Throwable e) {LogUtil.trace(e);}
@@ -405,7 +409,7 @@ public class Firer implements PluginManager {
 	 * @param referredClass referred class. If this referred class is null, all classes are retrieved.
 	 * @param outObjList list of objects (instances) as output.
 	 */
-	private static <T> void discover(xURI storeUri, String rootPath, UriAdapter adapter, ClassLoader classLoader, Class<T> referredClass, List<T> outObjList) {
+	private static <T> void loadInstances(xURI storeUri, String rootPath, UriAdapter adapter, ClassLoader classLoader, Class<T> referredClass, List<T> outObjList) {
 		adapter.uriListProcess(storeUri,
 			new UriFilter() {
 			
@@ -442,7 +446,7 @@ public class Firer implements PluginManager {
 				public void uriProcess(xURI uri) throws Exception {
 					// TODO Auto-generated method stub
 					if (adapter.isStore(uri)) {
-						discover(uri, rootPath, adapter, classLoader, referredClass, outObjList);
+						loadInstances(uri, rootPath, adapter, classLoader, referredClass, outObjList);
 						return;
 					}
 					

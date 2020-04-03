@@ -570,8 +570,8 @@ public final class DSUtil {
 	 * @return bytes from input stream.
 	 */
 	public static byte[] readBytes(InputStream in) {
-		int nRead = -1;
 		byte[] data = new byte[1024];
+		int nRead = -1;
 		ByteArrayOutputStream buffer = new ByteArrayOutputStream();
 		try {
 			while ((nRead = in.read(data)) != -1) {

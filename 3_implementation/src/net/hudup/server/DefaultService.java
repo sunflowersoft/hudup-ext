@@ -1199,7 +1199,10 @@ public class DefaultService implements Service, AutoCloseable {
 	public boolean validateAccount(String account, String password, int privileges) 
 			throws RemoteException {
 		// TODO Auto-generated method stub
-		boolean validated = getProvider().validateAccount(account, password, privileges);
+		Provider provider = getProvider();
+		if (provider == null) return true;
+
+		boolean validated = provider.validateAccount(account, password, privileges);
 		if (validated)
 			return true;
 		else if (account.equals("admin")) {
@@ -1483,7 +1486,7 @@ public class DefaultService implements Service, AutoCloseable {
 		Evaluator evaluator = null;
 		trans.lockWrite();
 		try {
-			List<Evaluator> evList = Util.getPluginManager().discover(Evaluator.class);
+			List<Evaluator> evList = Util.getPluginManager().loadInstances(Evaluator.class);
 			for (Evaluator ev : evList) {
 				if (ev.getName().equals(evaluatorName)) {
 					evaluator = ev;
@@ -1518,7 +1521,7 @@ public class DefaultService implements Service, AutoCloseable {
 		
 		trans.lockRead();
 		try {
-			List<Evaluator> evList = Util.getPluginManager().discover(Evaluator.class);
+			List<Evaluator> evList = Util.getPluginManager().loadInstances(Evaluator.class);
 			for (Evaluator ev : evList) {
 				evaluatorNames.add(ev.getName());
 			}

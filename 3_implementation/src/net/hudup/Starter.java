@@ -43,7 +43,7 @@ public class Starter {
 	 */
 	public static void main(final String[] args) {
 		// TODO Auto-generated method stub
-		List<AccessPoint> apList = Util.getPluginManager().discover(AccessPoint.class);
+		List<AccessPoint> apList = Util.getPluginManager().loadInstances(AccessPoint.class);
 		
 		if (apList.size() == 0) {
 			JOptionPane.showMessageDialog(

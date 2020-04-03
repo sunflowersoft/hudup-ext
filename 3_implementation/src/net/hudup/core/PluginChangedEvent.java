@@ -34,17 +34,50 @@ public class PluginChangedEvent extends EventObject {
 	private static final long serialVersionUID = 1L;
 
 
+//	/**
+//	 * Type of plug-in changed event.
+//	 * @author Loc Nguyen
+//	 * @version 10.0
+//	 */
+//	public static enum Type {
+//		
+//		/**
+//		 * Plug-in storage changing.
+//		 */
+//		doing,
+//		
+//		/**
+//		 * Plug-in storage changed.
+//		 */
+//		done
+//	}
+
+	
+//	/**
+//	 * Type of setting up event. 
+//	 */
+//	protected Type type = Type.doing;
+
+	
 	/**
-	 * Constructor with specified source.
+	 * Constructor with specified source and type.
 	 * @param source the source to issue this event. As usual, it is {@link PluginStorageManifest} which is the graphic user interface (GUI) allows users to manage {@link PluginStorage}.
 	 * Note, {@link PluginStorage} manages many {@link RegisterTable} (s) and each {@link RegisterTable} stores algorithms having the same type.
 	 * For example, a register table manages recommendation algorithms (recommenders) whereas another manages metrics for evaluating recommenders.
 	 */
 	public PluginChangedEvent(Object source) {
 		super(source);
-		// TODO Auto-generated constructor stub
 	}
 
+	
+//	/**
+//	 * Getting type.
+//	 * @return type.
+//	 */
+//	public Type getType() {
+//		return type;
+//	}
+	
 	
 }
 

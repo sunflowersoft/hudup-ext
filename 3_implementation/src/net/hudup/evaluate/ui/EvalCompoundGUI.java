@@ -405,13 +405,20 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 	}
 
 
+	@Override
+	public void requireCleanupSomething() {
+		// TODO Auto-generated method stub
+		batchEvaluateGUI.requireCleanupSomething();
+	}
+
+
 	/**
 	 * Switching evaluator.
 	 * @param selectedEvName selected evaluator name.
 	 * @param oldGUI old GUI.
 	 */
 	public static void switchEvaluator(String selectedEvName, Window oldGUI) {
-		List<Evaluator> evList = Util.getPluginManager().discover(Evaluator.class);
+		List<Evaluator> evList = Util.getPluginManager().loadInstances(Evaluator.class);
 		if (evList.size() == 0) {
 			JOptionPane.showMessageDialog(
 					null, 

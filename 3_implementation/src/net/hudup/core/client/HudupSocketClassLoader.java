@@ -1,10 +1,12 @@
-package net.hudup.core.logistic;
+package net.hudup.core.client;
 
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
 
 import net.hudup.core.Constants;
+import net.hudup.core.logistic.DSUtil;
+import net.hudup.core.logistic.LogUtil;
 
 /**
  * This class implements socket class loader.
@@ -14,7 +16,7 @@ import net.hudup.core.Constants;
  * @see https://www.drdobbs.com/jvm/a-java-2-network-class-loader/184404484
  *
  */
-public class SocketClassLoader extends ClassLoader {
+public class HudupSocketClassLoader extends ClassLoader {
 	
 	
 	/**
@@ -50,7 +52,7 @@ public class SocketClassLoader extends ClassLoader {
     /**
      * Default constructor.
      */
-    public SocketClassLoader() {
+    public HudupSocketClassLoader() {
         this("localhost", Constants.DEFAULT_NETWORK_CLASS_LOADER_PORT);
     }
     
@@ -60,8 +62,21 @@ public class SocketClassLoader extends ClassLoader {
      * @param host server host.
      * @param port server port.
      */
-    public SocketClassLoader(String host, int port) {
+    public HudupSocketClassLoader(String host, int port) {
         super();
+        this.host = host;
+        this.port = port;
+    }
+
+    
+    /**
+     * Constructor with parent class loader, server host and server port.
+     * @param parent parent class loader.
+     * @param host server host.
+     * @param port server port.
+     */
+    public HudupSocketClassLoader(ClassLoader parent, String host, int port) {
+        super(parent);
         this.host = host;
         this.port = port;
     }

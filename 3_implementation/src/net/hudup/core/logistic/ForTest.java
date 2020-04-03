@@ -5,15 +5,17 @@
  * Email: ng_phloc@yahoo.com
  * Phone: +84-975250362
  */
-package net.hudup.core.alg;
+package net.hudup.core.logistic;
+
+import java.rmi.Remote;
 
 /**
- * This interface represents the algorithm only for testing.
+ * This interface indicates some object (often algorithm) only for testing.
  * 
  * @author Loc Nguyen
  * @version 1.0
  *
  */
-public interface TestAlg extends Alg {
+public interface ForTest extends Remote {
 
 }

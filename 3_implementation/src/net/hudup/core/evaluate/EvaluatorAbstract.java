@@ -31,6 +31,8 @@ import net.hudup.core.alg.AlgList;
 import net.hudup.core.alg.AlgRemote;
 import net.hudup.core.alg.SetupAlgEvent;
 import net.hudup.core.alg.SetupAlgListener;
+import net.hudup.core.client.ClassProcessor;
+import net.hudup.core.client.HudupRMIClassLoader;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.DatasetPair;
@@ -43,7 +45,6 @@ import net.hudup.core.data.Profile;
 import net.hudup.core.evaluate.EvaluateEvent.Type;
 import net.hudup.core.evaluate.ui.AbstractEvaluateGUI;
 import net.hudup.core.logistic.AbstractRunner;
-import net.hudup.core.logistic.ClassProcessor;
 import net.hudup.core.logistic.Counter;
 import net.hudup.core.logistic.CounterElapsedTimeListener;
 import net.hudup.core.logistic.DSUtil;
@@ -51,7 +52,6 @@ import net.hudup.core.logistic.I18nUtil;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.MathUtil;
 import net.hudup.core.logistic.NetUtil;
-import net.hudup.core.logistic.RMIClassLoader;
 import net.hudup.core.logistic.SystemUtil;
 import net.hudup.core.logistic.TaskQueue;
 import net.hudup.core.logistic.Timestamp;
@@ -715,9 +715,10 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 	/**
 	 * Extracting algorithms from plug-in storage so that such algorithms are accepted by the specified evaluator.
 	 * @param evaluator specified evaluator.
+	 * @param bindUri bound URI.
 	 * @return register table to store algorithms extracted from plug-in storage.
 	 */
-	public static RegisterTable extractNormalAlgFromPluginStorage(Evaluator evaluator) {
+	public static RegisterTable extractNormalAlgFromPluginStorage(Evaluator evaluator, xURI bindUri) {
 		List<Alg> algList = PluginStorage.getNormalAlgReg().getAlgList(new AlgFilter() {
 			
 			/**
@@ -727,23 +728,62 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 
 			@Override
 			public boolean accept(Alg alg) {
-				alg = AlgDesc2.wrapNewInstance(alg, false);
-				if (alg == null) return false;
-				
-				try {
-					return evaluator.acceptAlg(alg);
-				} 
-				catch (Throwable e) {
-					LogUtil.trace(e);
-					LogUtil.error("Evaluator does not accept algorithm '" + alg.getName() + "' due to " + e.getMessage());
-					return false;
-				}
+				return acceptAlg(evaluator, alg, bindUri);
 			}
-			
 			
 		});
 		
 		return new RegisterTable(algList);
+	}
+	
+	
+	/**
+	 * Checking whether the specified algorithm is accepted by specified evaluator.
+	 * @param evaluator specified evaluator.
+	 * @param alg specified algorithm
+	 * @param bindUri specified bound URI.
+	 * @return whether the specified algorithm is accepted by specified evaluator.
+	 */
+	public static boolean acceptAlg(Evaluator evaluator, Alg alg, xURI bindUri) {
+		if (evaluator == null || alg == null) return false;
+		
+		if (bindUri == null) {
+			try {
+				return evaluator.acceptAlg(alg);
+			}
+			catch (Exception e) {
+				LogUtil.trace(e);
+				return false;
+			}
+		}
+	
+		alg = AlgDesc2.wrapNewInstance(alg, false);
+		if ((alg == null) || !(alg instanceof AlgRemote)) return false;
+		
+		try {
+			((AlgRemote)alg).export(0);
+		}
+		catch (Exception e) {
+			LogUtil.trace(e); return false;
+		}
+		
+		boolean accepted = true;
+		try {
+			accepted = evaluator.acceptAlg(
+					Util.getPluginManager().wrap(((AlgRemote)alg), false));
+		} 
+		catch (Throwable e) {
+//			LogUtil.trace(e);
+			LogUtil.error("Evaluator does not accept algorithm '" + alg.getName() + "' due to " + e.getMessage());
+			accepted = false;
+		}
+		
+		try {
+			((AlgRemote)alg).unexport();
+		}
+		catch (Exception e) {LogUtil.trace(e);}
+
+		return accepted;
 	}
 	
 	
@@ -1533,16 +1573,11 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 
 	
 	@Override
-	public synchronized boolean remoteStart(List<String> algNameList, DatasetPoolExchanged pool, Serializable parameter) throws RemoteException {
-		DataConfig config = null;
-		RMIClassLoader cl = null;
-		if ((parameter != null) && (parameter instanceof DataConfig)) {
-			config = (DataConfig)parameter;
-			Object cp = config.get("$cp");
-			if ((cp != null) && (cp instanceof ClassProcessor))
-				cl = new RMIClassLoader((ClassProcessor)cp);
-		}
-		
+	public synchronized boolean remoteStart(List<String> algNameList, DatasetPoolExchanged pool, ClassProcessor cp, DataConfig config, Serializable parameter) throws RemoteException {
+		HudupRMIClassLoader cl = null;
+		if ((cp != null) && (cp instanceof ClassProcessor))
+			cl = new HudupRMIClassLoader(getClass().getClassLoader(), (ClassProcessor)cp);
+
 		RegisterTable algReg = PluginStorage.getNormalAlgReg();
 		List<Alg> algList = Util.newList();
 		for (String algName : algNameList) {
@@ -1577,7 +1612,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 			}
 		}
 		
-		return remoteStart0(algList, pool, parameter);
+		return remoteStart0(algList, pool, null);
 	}
 	
 	
@@ -1592,9 +1627,18 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 		@SuppressWarnings("unchecked")
 		List<String> algNameList = (List<String>)(parameters[0]);
 		DatasetPoolExchanged pool = (DatasetPoolExchanged)(parameters[1]);
-		Serializable parameter = parameters.length > 2? parameters[2] : null;
 		
-		return remoteStart(algNameList, pool, parameter);
+		ClassProcessor cp = null;
+		if ((parameters.length > 2) && (parameters[2] instanceof ClassProcessor))
+			cp = (ClassProcessor)parameters[2];
+		DataConfig config = null;
+		if ((parameters.length > 3) && (parameters[3] instanceof DataConfig))
+			config = (DataConfig)parameters[3];
+		Serializable additionalParameter = null;
+		if ((parameters.length > 4) && (parameters[4] instanceof Serializable))
+			additionalParameter = (Serializable)parameters[4];
+		
+		return remoteStart(algNameList, pool, cp, config, additionalParameter);
 	}
 
 

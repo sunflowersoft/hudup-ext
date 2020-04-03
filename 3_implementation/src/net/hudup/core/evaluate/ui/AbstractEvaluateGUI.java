@@ -24,6 +24,7 @@ import net.hudup.core.Util;
 import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.AlgRemote;
 import net.hudup.core.alg.SetupAlgListener;
+import net.hudup.core.client.ClassProcessor;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.DatasetAbstract;
 import net.hudup.core.data.DatasetPairExchanged;
@@ -42,7 +43,6 @@ import net.hudup.core.evaluate.EvaluatorListener;
 import net.hudup.core.evaluate.Metric;
 import net.hudup.core.evaluate.Metrics;
 import net.hudup.core.evaluate.MetricsUtil;
-import net.hudup.core.logistic.ClassProcessor;
 import net.hudup.core.logistic.CounterElapsedTimeListener;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.NetUtil;
@@ -221,7 +221,7 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 		this.evaluator = evaluator;
 		this.evProcessor = new EvaluateProcessor(evaluator);
 		
-		updatePluginFromEvaluator();
+		syncPluginWithEvaluator();
 
 		if (referredAlg != null) {
 			try {
@@ -236,7 +236,7 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 			}
 			else {
 				try {
-					algRegTable = EvaluatorAbstract.extractNormalAlgFromPluginStorage(evaluator);
+					algRegTable = EvaluatorAbstract.extractNormalAlgFromPluginStorage(evaluator, bindUri);
 				} catch (Throwable e) {LogUtil.trace(e);}
 			}
 		}
@@ -262,7 +262,7 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 		if (guiData.algNames == null || guiData.algNames.size() == 0)
 			guiData.algNames = algRegTable.getAlgNames();
 		else
-			updateAlgRegFromEvaluator(guiData.algNames);
+			syncAlgRegWithEvaluator(guiData.algNames);
 		
 		DatasetPool oldPool = guiData.pool; 
 		try {
@@ -297,7 +297,7 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	 */
 	protected abstract List<Alg> getCurrentAlgList();
 	
-	
+
 	/**
 	 * Getting current evaluator.
 	 * @return current evaluator.
@@ -447,20 +447,6 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	}
 	
 	
-//	/**
-//	 * Switching the inside evaluator by specified evaluator. This method is deprecated.
-//	 * @param newEvaluator new specified evaluator.
-//	 */
-//	@Deprecated
-//	protected void switchEvaluator(Evaluator newEvaluator) {
-//		stop();
-//		unsetupListeners(this.evaluator);
-//		setupListeners(newEvaluator);
-//		
-//		updateMode();
-//	}
-	
-	
 	/**
 	 * Change list of metrics in evaluator. Current implementation does not export metrics. Exporting normal algorithms only.
 	 */
@@ -513,13 +499,6 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	}
 
 
-//	@Override
-//	public boolean isSupportImport() {
-//		// TODO Auto-generated method stub
-//		return this.bindUri == null;
-//	}
-
-
 	@Override
 	public int getPort() {
 		if (bindUri != null) //Evaluator is remote
@@ -530,6 +509,18 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 			} catch (Throwable e) {LogUtil.trace(e);}
 			
 			return -1;
+		}
+	}
+
+
+	@Override
+	public void requireCleanupSomething() {
+		// TODO Auto-generated method stub
+		try {
+			evaluator.clearDelayUnsetupAlgs();
+		}
+		catch (Throwable e) {
+			LogUtil.trace(e);
 		}
 	}
 
@@ -643,23 +634,34 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	
 	
 	/**
-	 * Update plug-in storage from evaluator.
+	 * Synchronizing plug-in storage with evaluator.
+	 */
+	protected void syncPluginWithEvaluator() {
+		if (bindUri == null || evaluator == null) return;
+		
+		//Current version only synchronize normal algorithm and metric plug-in
+		PluginStorage.syncWithEvaluator(evaluator, Alg.class, true);
+		PluginStorage.syncWithEvaluator(evaluator, Metric.class, true);
+	}
+	
+	
+	/**
+	 * Updating plug-in storage from evaluator.
 	 */
 	protected void updatePluginFromEvaluator() {
-		if (bindUri == null || evaluator == null)
-			return;
+		if (bindUri == null || evaluator == null) return;
 		
 		//Current version only update normal algorithm and metric plug-in
 		PluginStorage.updateFromEvaluator(evaluator, Alg.class, true);
 		PluginStorage.updateFromEvaluator(evaluator, Metric.class, true);
 	}
-	
+
 	
 	/**
-	 * Update algorithm register table from list of algorithm names.
+	 * Synchronizing algorithm register table with list of algorithm names.
 	 * @param algNames list of algorithm names.
 	 */
-	protected void updateAlgRegFromEvaluator(List<String> algNames) {
+	protected void syncAlgRegWithEvaluator(List<String> algNames) {
 		if (evaluator == null || algNames == null || algNames.size() == 0)
 			return;
 		

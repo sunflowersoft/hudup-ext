@@ -56,4 +56,10 @@ public interface PluginChangedListener extends EventListener {
 	int getPort();
 	
 	
+	/**
+	 * Require to clean up something.
+	 */
+	void requireCleanupSomething();
+	
+	
 }

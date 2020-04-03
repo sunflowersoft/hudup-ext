@@ -300,20 +300,21 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 				
         	doWhenStop();
 			activeMeasure.reset();
-			ExtraStorage.clearUnmanagedExportedObjects(); //Added by Loc Nguyen: 2020.03.15
 			started = false;
     		fireStatusEvent(new ServerStatusEvent(this, Status.stopped));
     		LogUtil.info("Power server stopped");
 		} 
     	catch (Throwable e) {
-			// TODO Auto-generated catch block
-
 			LogUtil.trace(e);
 			LogUtil.error("Power server failed to stop, caused by " + e.getMessage());
 		}
     	finally {
         	trans.unlockWrite();
     	}
+    	
+    	try {
+    		ExtraStorage.clearUnmanagedExportedObjects(); //Added by Loc Nguyen: 2020.03.15
+    	} catch (Throwable e) {LogUtil.trace(e);}
     	
     	return true;
 	}

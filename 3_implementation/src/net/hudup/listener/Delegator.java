@@ -25,6 +25,7 @@ import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.AlgDesc2List;
 import net.hudup.core.alg.SetupAlgEvent;
 import net.hudup.core.alg.SetupAlgListener;
+import net.hudup.core.client.ClassProcessor;
 import net.hudup.core.client.PowerServer;
 import net.hudup.core.client.Protocol;
 import net.hudup.core.client.Request;
@@ -903,15 +904,15 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluateListen
 
 	
 	@Override
-	public boolean remoteStart(List<String> algNameList, DatasetPoolExchanged pool, Serializable parameter)
+	public boolean remoteStart(List<String> algNameList, DatasetPoolExchanged pool, ClassProcessor cp, DataConfig config, Serializable parameter)
 			throws RemoteException {
 		// TODO Auto-generated method stub
 		boolean flag = socketServer.getFlag();
 		
 		if (flag)
-			return remoteEvaluator.remoteStart(algNameList, pool, parameter);
+			return remoteEvaluator.remoteStart(algNameList, pool, cp, config, parameter);
 		else if (socketServer.isRunning())
-			return remoteEvaluator.remoteStart(algNameList, pool, parameter);
+			return remoteEvaluator.remoteStart(algNameList, pool, cp, config, parameter);
 		else
 			throw new RemoteException("Socket server is not running");
 	}

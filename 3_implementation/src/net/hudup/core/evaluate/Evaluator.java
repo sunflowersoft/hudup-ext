@@ -17,7 +17,9 @@ import net.hudup.core.RegisterTable;
 import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.AlgDesc2List;
 import net.hudup.core.alg.SetupAlgListener;
+import net.hudup.core.client.ClassProcessor;
 import net.hudup.core.data.AutoCloseable;
+import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.DatasetPoolExchanged;
 import net.hudup.core.data.Exportable;
 import net.hudup.core.logistic.AgentSupport;
@@ -108,11 +110,13 @@ public interface Evaluator extends Remote, RemoteRunner, SetupAlgListener, Expor
 	 * Starting the evaluation process on specified algorithms with specified dataset pool.
 	 * @param algNameList specified list of algorithm names.
 	 * @param pool specified dataset pool containing many training datasets and testing datasets. It must be serializable in remote call.
+	 * @param cp class processor. This parameter can be null.
+	 * @param config configuration. This parameter can be null.
 	 * @param parameter additional parameter.
 	 * @return true if successful.
 	 * @throws RemoteException if any error raises.
 	 */
-	boolean remoteStart(List<String> algNameList, DatasetPoolExchanged pool, Serializable parameter) throws RemoteException;
+	boolean remoteStart(List<String> algNameList, DatasetPoolExchanged pool, ClassProcessor cp, DataConfig config, Serializable parameter) throws RemoteException;
 
 	
 	/**

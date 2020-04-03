@@ -5,13 +5,16 @@
  * Email: ng_phloc@yahoo.com
  * Phone: +84-975250362
  */
-package net.hudup.core.logistic;
+package net.hudup.core.client;
 
 import java.io.InputStream;
+import java.io.Serializable;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
 import net.hudup.core.Util;
+import net.hudup.core.logistic.DSUtil;
+import net.hudup.core.logistic.LogUtil;
 
 /**
  * This interface defines methods to process on classes and class files.
@@ -20,7 +23,7 @@ import net.hudup.core.Util;
  * @version 1.0
  *
  */
-public interface ClassProcessor extends Remote {
+public interface ClassProcessor extends Remote, Serializable {
 
 	
 	/**

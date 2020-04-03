@@ -39,7 +39,6 @@ import javax.swing.JScrollPane;
 import javax.swing.SwingWorker;
 
 import net.hudup.core.PluginChangedEvent;
-import net.hudup.core.PluginStorage;
 import net.hudup.core.RegisterTable;
 import net.hudup.core.Util;
 import net.hudup.core.alg.Alg;
@@ -336,14 +335,14 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 		try {
 			evaluator.clearDelayUnsetupAlgs();
 
-			algRegTable.clear();
+			updatePluginFromEvaluator();
 			
-			if (bindUri == null)
-				algRegTable.register(EvaluatorAbstract.extractNormalAlgFromPluginStorage(evaluator)); //Algorithms are not cloned because of saving memory when evaluator GUI keep algorithms for a long time.
-			else
-				algRegTable.register(PluginStorage.getNormalAlgReg());
+			algRegTable.clear();
+			algRegTable.register(EvaluatorAbstract.extractNormalAlgFromPluginStorage(evaluator, bindUri)); //Algorithms are not cloned because of saving memory when evaluator GUI keep algorithms for a long time.
+			
 			cmbAlgs.unexportNonPluginAlgs();
 			cmbAlgs.update(algRegTable.getAlgList());
+			
 			updateMode();
 		}
 		catch (Throwable e) {
@@ -1333,9 +1332,8 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			if (bindUri == null)
 				started = evaluator.remoteStart0(algList, toDatasetPoolExchangedClient(guiData.pool), null);
 			else {
-				DataConfig config = AlgList.getAlgDescMap(algList);
-				config.put("$cp", this);
-				started = evaluator.remoteStart(AlgList.getAlgNameList(algList), toDatasetPoolExchangedClient(guiData.pool), config);
+				DataConfig config = AlgList.getAlgDescMapRemote(algList);
+				started = evaluator.remoteStart(AlgList.getAlgNameList(algList), toDatasetPoolExchangedClient(guiData.pool), this, config, null);
 			}
 			if (!started) updateMode();
 		}
@@ -1352,11 +1350,11 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 	public synchronized void receivedEvaluator(EvaluatorEvent evt) throws RemoteException {
 		// TODO Auto-generated method stub
 		if (evt.getType() == EvaluatorEvent.Type.start) {
-			updatePluginFromEvaluator();
+			syncPluginWithEvaluator();
 
 			String algName = evt.getOtherResult().algName;
 			if (algName != null) {
-				updateAlgRegFromEvaluator(Arrays.asList(algName));
+				syncAlgRegWithEvaluator(Arrays.asList(algName));
 				cmbAlgs.setDefaultSelected(algName);
 			}
 

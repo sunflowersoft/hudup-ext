@@ -592,6 +592,22 @@ public class AlgListBox extends JList<Alg> implements AlgListUI {
 
 	
 	/**
+	 * Getting the map of algorithm descriptions remotely.
+	 * @return the map of algorithm descriptions remotely.
+	 */
+	public DataConfig getAlgDescMapRemote() {
+		List<Alg> algList = getAlgList();
+		DataConfig classNames = new DataConfig();
+		
+		for (Alg alg : algList) {
+			classNames.put(alg.getName(), new AlgDesc(alg.getName(), (DataConfig)alg.getConfig().clone()));
+		}
+		
+		return classNames;
+	}
+
+	
+	/**
 	 * Getting the list of selected algorithms.
 	 * @return {@link List} of selected algorithms.
 	 */

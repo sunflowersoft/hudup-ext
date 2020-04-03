@@ -35,6 +35,7 @@ import javax.swing.WindowConstants;
 
 import net.hudup.core.PluginChangedEvent;
 import net.hudup.core.PluginChangedListener;
+import net.hudup.core.PluginManager;
 import net.hudup.core.PluginStorage;
 import net.hudup.core.RegisterTable;
 import net.hudup.core.Util;
@@ -355,10 +356,10 @@ public class PluginStorageManifestPanel extends JPanel {
 	 * Reloading plug-in storage.
 	 */
 	protected void reload() {
-		tblRegister.firePluginChangedEvent(new PluginChangedEvent(tblRegister)); //Force to unsetting up algorithms.
+		tblRegister.fireCleanupSomething(); //Force to unsetting up algorithms.
 		Util.getPluginManager().discover();
-		tblRegister.update();
 		tblRegister.firePluginChangedEvent(new PluginChangedEvent(tblRegister));
+		tblRegister.update();
 	}
 	
 	
@@ -748,7 +749,7 @@ class ImportAlgDlg extends JDialog {
 	private void loadClassesFromStore(xURI storeUri, List<Alg> outAlgList) {
 		if (storeUri == null) return;
 
-		List<Alg> algList = Util.getPluginManager().discover(storeUri, Alg.class);
+		List<Alg> algList = Util.getPluginManager().loadInstances(storeUri, Alg.class);
 		RegisterTable normalReg = PluginStorage.getNormalAlgReg();
 		AlgList nextUpdateList = PluginStorage.getNextUpdateList();
 		for (Alg alg : algList) {
@@ -784,12 +785,6 @@ class ImportAlgDlg extends JDialog {
 		xURI storeUri = config.getStoreUri();
 		if ((parser instanceof RmiServerIndicator) || (parser instanceof SocketServerIndicator)) {
 			List<AlgDesc2> selectedList = tblAlgDescImport.getSelectedAlgDescList();
-			if (selectedList.size() == 0) {
-				JOptionPane.showMessageDialog(this, "No algorithm selected", "No algorithm selected", JOptionPane.WARNING_MESSAGE);
-				return;
-			}
-			
-			AlgList nextUpdateList = PluginStorage.getNextUpdateList();
 			Service service = null;
 			for (AlgDesc2 algDesc : selectedList) {
 				if (parser instanceof RmiServerIndicator) {
@@ -801,6 +796,7 @@ class ImportAlgDlg extends JDialog {
 						((SocketConnection)service).close();
 					service = ClientUtil.getSocketConnection(storeUri.getHost(), storeUri.getPort(),config.getStoreAccount(), config.getStorePassword().getText());
 				}
+				if (service == null) continue;
 				
 				boolean localExist = true;
 				if (algDesc.baseRemoteInterfaceNames != null) {
@@ -809,7 +805,6 @@ class ImportAlgDlg extends JDialog {
 							Class.forName(iName);
 						}
 						catch (Throwable e) {
-							LogUtil.trace(e);
 							LogUtil.error("Interface '" + iName + "' not exists, error by " + e.getMessage());
 							localExist = localExist && false;
 						}
@@ -824,9 +819,7 @@ class ImportAlgDlg extends JDialog {
 					alg = service.getAlg(algDesc.algName);
 				}
 				catch (Throwable e) {
-					LogUtil.trace(e);
 					LogUtil.error("Retrieving remote algorithm error by: " + e.getMessage());
-					alg = null;
 				}
 				if (alg == null) continue;
 				
@@ -836,24 +829,15 @@ class ImportAlgDlg extends JDialog {
 					continue;
 				}
 				
-				int idx = nextUpdateList.indexOf(algDesc.algName);
+				int idx = PluginStorage.lookupNextUpdateList(alg.getClass(), algDesc.algName);
 				if (idx < 0) {
 					if (table.register(alg))
 						importedCount++;
 					else
 						unexportRemoteWrapperAlg(alg);
 				}
-				else {
-					Alg nextUpdateAlg = nextUpdateList.get(idx);
-					if (PluginStorage.lookupTableName(nextUpdateAlg.getClass()) != PluginStorage.lookupTableName(alg.getClass())) {
-						if (table.register(alg))
-							importedCount++;
-						else
-							unexportRemoteWrapperAlg(alg);
-					}
-					else
-						unexportRemoteWrapperAlg(alg);
-				}
+				else
+					unexportRemoteWrapperAlg(alg);
 			}
 
 			if ((service != null) && (service instanceof SocketConnection))
@@ -861,27 +845,16 @@ class ImportAlgDlg extends JDialog {
 		}
 		else {
 			List<Alg> selectedList = tblAlgDescImport.getSelectedAlgList();
-			if (selectedList.size() == 0) {
-				JOptionPane.showMessageDialog(this, "No algorithm selected", "No algorithm selected", JOptionPane.WARNING_MESSAGE);
-				return;
-			}
-			
-			AlgList nextUpdateList = PluginStorage.getNextUpdateList();
 			for (Alg alg : selectedList) {
+				if (!PluginManager.isClassValidAlg(alg)) continue;
+
 				RegisterTable table = PluginStorage.lookupTable(alg.getClass());
 				if (table == null || table.contains(alg.getName())) continue;
 				
-				int idx = nextUpdateList.indexOf(alg.getName());
+				int idx = PluginStorage.lookupNextUpdateList(alg.getClass(), alg.getName());
 				if (idx < 0) {
 					if (table.register(alg))
 						importedCount++;
-				}
-				else {
-					Alg nextUpdateAlg = nextUpdateList.get(idx);
-					if (PluginStorage.lookupTableName(nextUpdateAlg.getClass()) != PluginStorage.lookupTableName(alg.getClass())) {
-						if (table.register(alg))
-							importedCount++;
-					}
 				}
 			}
 		}

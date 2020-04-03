@@ -69,7 +69,7 @@ public class DefaultServiceExt extends DefaultService implements ServiceExt {
 		boolean opened = super.open(serverConfig, params);
 		if (!opened) return false;
 		
-		List<Evaluator> evList = Util.getPluginManager().discover(Evaluator.class);
+		List<Evaluator> evList = Util.getPluginManager().loadInstances(Evaluator.class);
 		for (int i = 0; i < evList.size(); i++) {
 			Evaluator ev = evList.get(i);
 			try {

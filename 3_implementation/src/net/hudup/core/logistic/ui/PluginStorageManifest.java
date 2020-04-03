@@ -429,19 +429,37 @@ public class PluginStorageManifest extends SortableSelectableTable {
      * @param evt {@link PluginChangedEvent} event is issued to registered {@link PluginChangedListener} (s) after {@link PluginStorageManifest} was changed.
      */
     protected void firePluginChangedEvent(PluginChangedEvent evt) {
-		PluginChangedListener[] listeners = getPluginChangedListeners();
-		
-		for (PluginChangedListener listener : listeners) {
-			try {
-				listener.pluginChanged(evt);
-			}
-			catch (Throwable e) {
-				LogUtil.trace(e);
+		synchronized (listenerList) {
+			PluginChangedListener[] listeners = getPluginChangedListeners();
+			for (PluginChangedListener listener : listeners) {
+				try {
+					listener.pluginChanged(evt);
+				}
+				catch (Throwable e) {
+					LogUtil.trace(e);
+				}
 			}
 		}
-	
     }
 
+    
+    /**
+     * Cleaning up something from listeners.
+     */
+    protected void fireCleanupSomething() {
+		synchronized (listenerList) {
+			PluginChangedListener[] listeners = getPluginChangedListeners();
+			for (PluginChangedListener listener : listeners) {
+				try {
+					listener.requireCleanupSomething();
+				}
+				catch (Throwable e) {
+					LogUtil.trace(e);
+				}
+			}
+		}
+    }
+    
     
     /**
      * Testing whether a registered {@link PluginChangedListener} is idle.

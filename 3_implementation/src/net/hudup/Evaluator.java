@@ -74,7 +74,7 @@ public class Evaluator implements AccessPoint {
 			ev = null;
 		}
 		if (ev == null) {
-			List<net.hudup.core.evaluate.Evaluator> tempEvList = Util.getPluginManager().discover(net.hudup.core.evaluate.Evaluator.class);
+			List<net.hudup.core.evaluate.Evaluator> tempEvList = Util.getPluginManager().loadInstances(net.hudup.core.evaluate.Evaluator.class);
 			for (net.hudup.core.evaluate.Evaluator tempEv : tempEvList) {
 				try {
 					if (tempEv.getName().equals(args[0])) {

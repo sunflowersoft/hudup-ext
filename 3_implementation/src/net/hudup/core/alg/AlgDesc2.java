@@ -15,6 +15,7 @@ import net.hudup.core.RegisterTable;
 import net.hudup.core.Util;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Exportable;
+import net.hudup.core.logistic.ForTest;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.parser.TextParserUtil;
 
@@ -479,7 +480,7 @@ public class AlgDesc2 extends AlgDesc {
 	 * @return whether specified algorithm is stored in next update list.
 	 */
 	public static boolean isInUpdateList(Alg alg) {
-		return PluginStorage.lookupNextUpdateListExact(alg.getClass(), alg.getName()) >= 0;
+		return PluginStorage.lookupNextUpdateList(alg) >= 0;
 	}
 
 
@@ -527,5 +528,43 @@ public class AlgDesc2 extends AlgDesc {
 			return alg;
 	}
 
+	
+	/**
+	 * Getting the most inner algorithm or remote algorithm of the specified algorithm.
+	 * @param alg specified algorithm.
+	 * @return the most inner algorithm or remote algorithm of the specified algorithm.
+	 */
+	public static Object getMostInner(Alg alg) {
+		if (alg == null)
+			return null;
+		else if (alg instanceof AlgRemoteWrapper) {
+			AlgRemote remoteAlg = ((AlgRemoteWrapper)alg).getRemoteAlg();
+			if (remoteAlg == null)
+				return null;
+			else if (remoteAlg instanceof Alg)
+				return getMostInner((Alg)remoteAlg);
+			else
+				return remoteAlg;
+		}
+		else
+			return alg;
+	}
 
+	
+	/**
+	 * Checking whether the specified algorithm is only for testing.
+	 * @param alg specified algorithm
+	 * @return whether the specified algorithm is only for testing.
+	 */
+	public static boolean isForTest(Alg alg) {
+		if (alg == null) return false;
+		
+		Object obj = getMostInner(alg);
+		if (obj == null)
+			return false;
+		else
+			return obj instanceof ForTest;
+	}
+
+	
 }

@@ -5,7 +5,7 @@
  * Email: ng_phloc@yahoo.com
  * Phone: +84-975250362
  */
-package net.hudup.core.logistic;
+package net.hudup.core.client;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -14,6 +14,10 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 import net.hudup.core.Constants;
+import net.hudup.core.logistic.AbstractRunner;
+import net.hudup.core.logistic.LogUtil;
+import net.hudup.core.logistic.NetUtil;
+import net.hudup.core.logistic.NextUpdate;
 
 /**
  * This class implements server network class loader.
@@ -25,7 +29,7 @@ import net.hudup.core.Constants;
  *
  */
 @NextUpdate
-public class SocketClassLoaderServer extends AbstractRunner {
+public class HudupSocketClassLoaderServer extends AbstractRunner {
 
 	
 	/**
@@ -44,7 +48,7 @@ public class SocketClassLoaderServer extends AbstractRunner {
 	 * Constructor with server port.
 	 * 
 	 */
-	public SocketClassLoaderServer(int serverPort) {
+	public HudupSocketClassLoaderServer(int serverPort) {
 		this.serverPort = serverPort;
 	}
 

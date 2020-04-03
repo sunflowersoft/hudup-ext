@@ -318,11 +318,11 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 		try {
 			evaluator.clearDelayUnsetupAlgs();
 			
+			updatePluginFromEvaluator();
+			
 			algRegTable.clear();
-			if (bindUri == null)
-				algRegTable.register(EvaluatorAbstract.extractNormalAlgFromPluginStorage(evaluator)); //Algorithms are not cloned because of saving memory when evaluator GUI keep algorithms for a long time.
-			else
-				algRegTable.register(PluginStorage.getNormalAlgReg());
+			algRegTable.register(EvaluatorAbstract.extractNormalAlgFromPluginStorage(evaluator, bindUri)); //Algorithms are not cloned because of saving memory when evaluator GUI keep algorithms for a long time.
+			
 			lbAlgs.unexportNonPluginAlgs();
 			lbAlgs.update(algRegTable.getAlgList());
 			
@@ -419,13 +419,13 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			@Override
 			public void algListChanged(AlgListChangedEvent evt) {
 				// TODO Auto-generated method stub
-				if (evaluator == null || algRegTable == null || bindUri != null)
+				if (evaluator == null || algRegTable == null /*|| bindUri != null*/)
 					return;
 				
 				try {
 					List<Alg> list = evt.getAlgList();
 					for (Alg alg : list) {
-						if (!evaluator.acceptAlg(alg)) continue;
+						if (!EvaluatorAbstract.acceptAlg(evaluator, alg, bindUri)) continue;
 						if (!algRegTable.contains(alg.getName()))
 							algRegTable.register(alg);
 					}
@@ -1124,9 +1124,8 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			if (bindUri == null)
 				started = evaluator.remoteStart0(lbAlgs.getAlgList(), toDatasetPoolExchangedClient(guiData.pool), null);
 			else {
-				DataConfig config = lbAlgs.getAlgDescMap();
-				config.put("$cp", this);
-				started = evaluator.remoteStart(lbAlgs.getAlgNameList(), toDatasetPoolExchangedClient(guiData.pool), config);
+				DataConfig config = lbAlgs.getAlgDescMapRemote();
+				started = evaluator.remoteStart(lbAlgs.getAlgNameList(), toDatasetPoolExchangedClient(guiData.pool), this, config, null);
 			}
 				
 			if (!started) updateMode();
@@ -1142,11 +1141,11 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 	@Override
 	public synchronized void receivedEvaluator(EvaluatorEvent evt) throws RemoteException {
 		if (evt.getType() == EvaluatorEvent.Type.start) {
-			updatePluginFromEvaluator();
+			syncPluginWithEvaluator();
 			
 			List<String> algNames = evt.getOtherResult().algNames;
 			if (algNames != null && algNames.size() > 0) {
-				updateAlgRegFromEvaluator(algNames);
+				syncAlgRegWithEvaluator(algNames);
 				lbAlgs.update(algRegTable.getAlgList(algNames));
 			}
 			else

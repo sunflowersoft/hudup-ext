@@ -12,7 +12,9 @@
  * Email: ng_phloc@yahoo.com
  * Phone: +84-975250362
  */
-package net.hudup.core.logistic;
+package net.hudup.core.client;
+
+import net.hudup.core.logistic.LogUtil;
 
 /**
  * This class implements socket class loader.
@@ -21,7 +23,7 @@ package net.hudup.core.logistic;
  * @version 1.0
  *
  */
-public class RMIClassLoader extends ClassLoader {
+public class HudupRMIClassLoader extends ClassLoader {
 
 	
 	/**
@@ -34,7 +36,7 @@ public class RMIClassLoader extends ClassLoader {
 	 * Constructor with parent class loader and class processor.
 	 * @param cp class processor.s
 	 */
-	public RMIClassLoader(ClassProcessor cp) {
+	public HudupRMIClassLoader(ClassProcessor cp) {
 		super();
 		this.cp = cp;
 	}
@@ -45,7 +47,7 @@ public class RMIClassLoader extends ClassLoader {
 	 * @param parent parent class loader.
 	 * @param cp class processor.s
 	 */
-	public RMIClassLoader(ClassLoader parent, ClassProcessor cp) {
+	public HudupRMIClassLoader(ClassLoader parent, ClassProcessor cp) {
 		super(parent);
 		this.cp = cp;
 	}
@@ -56,9 +58,13 @@ public class RMIClassLoader extends ClassLoader {
         Class<?> cls = null;
 		try {
 	    	byte[] codeBytes = cp.getByteCode(name);
-			cls = defineClass(name, codeBytes, 0, codeBytes.length);
+    		cls = defineClass(name, codeBytes, 0, codeBytes.length);
 		}
-		catch (Exception e) {LogUtil.trace(e);}
+		catch (ClassFormatError e) {
+			LogUtil.trace(e);
+			LogUtil.error("Error format of class " + name + " due to " + e.getMessage());
+		}
+		catch (Exception e) {}
 		
 		if (cls != null)
 			return cls;

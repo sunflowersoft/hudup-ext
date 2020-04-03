@@ -1157,13 +1157,6 @@ public class PowerServerCP extends JFrame implements ServerStatusListener, Plugi
 	}
 
 
-//	@Override
-//	public boolean isSupportImport() {
-//		// TODO Auto-generated method stub
-//		return true;
-//	}
-
-
 	/**
 	 * Getting this power server control panel.
 	 * @return this power server control panel.
@@ -1186,6 +1179,13 @@ public class PowerServerCP extends JFrame implements ServerStatusListener, Plugi
 			
 			return -1;
 		}
+	}
+
+
+	@Override
+	public void requireCleanupSomething() {
+		// TODO Auto-generated method stub
+		//Doing something...
 	}
 
 

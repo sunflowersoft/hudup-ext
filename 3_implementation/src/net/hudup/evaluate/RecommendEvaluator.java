@@ -12,10 +12,10 @@ import java.rmi.RemoteException;
 
 import net.hudup.core.Constants;
 import net.hudup.core.alg.Alg;
+import net.hudup.core.alg.AlgDesc2;
 import net.hudup.core.alg.RecommendParam;
 import net.hudup.core.alg.Recommender;
 import net.hudup.core.alg.SetupAlgEvent;
-import net.hudup.core.alg.TestAlg;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.DatasetPair;
 import net.hudup.core.data.Fetcher;
@@ -590,7 +590,7 @@ public class RecommendEvaluator extends EvaluatorAbstract {
 //		if ((remoteAlg != null) && (remoteAlg instanceof Alg))
 //			alg = (Alg)remoteAlg;
 		
-		return (alg instanceof Recommender) && (!(alg instanceof TestAlg));
+		return (alg instanceof Recommender) && (!(AlgDesc2.isForTest(alg)));
 	}
 
 

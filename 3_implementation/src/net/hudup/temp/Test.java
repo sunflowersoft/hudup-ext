@@ -65,6 +65,7 @@ import net.hudup.core.alg.AlgRemoteWrapper;
 import net.hudup.core.alg.ui.AlgConfigDlg;
 import net.hudup.core.alg.ui.AlgListBox;
 import net.hudup.core.client.ClientUtil;
+import net.hudup.core.client.HudupSocketClassLoader;
 import net.hudup.core.client.Service;
 import net.hudup.core.client.SocketConnection;
 import net.hudup.core.data.DataConfig;
@@ -83,7 +84,6 @@ import net.hudup.core.evaluate.MetricsUtil;
 import net.hudup.core.logistic.BaseClass;
 import net.hudup.core.logistic.ClipboardUtil;
 import net.hudup.core.logistic.LogUtil;
-import net.hudup.core.logistic.SocketClassLoader;
 import net.hudup.core.logistic.xURI;
 import net.hudup.core.logistic.ui.DescriptionDlg;
 import net.hudup.core.logistic.ui.TagTextField;
@@ -103,6 +103,7 @@ import net.hudup.parser.SnapshotParserImpl;
  * @version 12.0
  *
  */
+@Deprecated
 public class Test {
 
 	
@@ -126,7 +127,7 @@ public class Test {
 //		
 //		System.out.println(System.getProperties().getProperty("java.rmi.server.codebase"));
 		
-		SocketClassLoader nlc = new SocketClassLoader();
+		HudupSocketClassLoader nlc = new HudupSocketClassLoader();
 		Class<?> cls = nlc.loadClass("net.hudup.SimFirer");
 		System.out.println(cls);
 	}
@@ -223,9 +224,22 @@ public class Test {
 
 }
 
-
+/**
+ * This class is extended reflections.
+ * 
+ * @author Loc Nguyen
+ * @version 1.0
+ *
+ */
+@Deprecated
 class Reflections2 extends Reflections {
 
+	
+	/**
+	 * Constructor with prefix and class loaders.
+	 * @param prefix specified prefix.
+	 * @param classLoaders class loaders.
+	 */
 	public Reflections2(String prefix, ClassLoader...classLoaders) {
 		super(new ConfigurationBuilder() {
 			{
@@ -239,6 +253,7 @@ class Reflections2 extends Reflections {
             }
 		});
 	}
+	
 	
 }
 
@@ -257,6 +272,7 @@ class Reflections2 extends Reflections {
  * @version 10.0
  *
  */
+@Deprecated
 class PluginStorageManifest2 extends JTable {
 
 	
@@ -962,6 +978,7 @@ class PluginStorageManifest2 extends JTable {
  * @version 10.0
  *
  */
+@Deprecated
 class RegisterTM2 extends DefaultTableModel {
 
 	
@@ -1606,6 +1623,7 @@ class MetricsOptionTM2 extends DefaultTableModel {
  * @version 10.0
  *
  */
+@Deprecated
 class MetricsTable2 extends JTable {
 
 	
@@ -1784,6 +1802,7 @@ class MetricsTable2 extends JTable {
  * @version 10.0
  *
  */
+@Deprecated
 class MetricsTM2 extends DefaultTableModel {
 
 	
@@ -2286,6 +2305,7 @@ class JarImportAlgDlag extends JDialog {
  * @author Loc Nguyen
  * @version 12.0
  */
+@Deprecated
 class ImportAlgDlag extends JDialog {
 	
 	
@@ -2684,7 +2704,7 @@ class ImportAlgDlag extends JDialog {
 	private void loadClassesFromStore(xURI storeUri, List<Alg> outAlgList) {
 		if (storeUri == null) return;
 
-		List<Alg> algList = Util.getPluginManager().discover(storeUri, Alg.class);
+		List<Alg> algList = Util.getPluginManager().loadInstances(storeUri, Alg.class);
 		RegisterTable normalReg = PluginStorage.getNormalAlgReg();
 		AlgList nextUpdateList = PluginStorage.getNextUpdateList();
 		for (Alg alg : algList) {

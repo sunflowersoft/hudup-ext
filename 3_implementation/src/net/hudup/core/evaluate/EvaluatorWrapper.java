@@ -18,6 +18,8 @@ import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.AlgDesc2List;
 import net.hudup.core.alg.SetupAlgEvent;
 import net.hudup.core.alg.SetupAlgListener;
+import net.hudup.core.client.ClassProcessor;
+import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.DatasetPoolExchanged;
 import net.hudup.core.logistic.BaseClass;
 import net.hudup.core.logistic.CounterElapsedTimeListener;
@@ -91,9 +93,9 @@ public class EvaluatorWrapper implements Evaluator, Serializable {
 
 
 	@Override
-	public boolean remoteStart(List<String> algNameList, DatasetPoolExchanged pool, Serializable parameter) throws RemoteException {
+	public boolean remoteStart(List<String> algNameList, DatasetPoolExchanged pool, ClassProcessor cp, DataConfig config, Serializable parameter) throws RemoteException {
 		// TODO Auto-generated method stub
-		return remoteEvaluator.remoteStart(algNameList, pool, parameter);
+		return remoteEvaluator.remoteStart(algNameList, pool, cp, config, parameter);
 	}
 
 
