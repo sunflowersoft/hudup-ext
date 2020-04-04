@@ -296,6 +296,12 @@ public class PluginStorageManifestPanel extends JPanel {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				reload();
+				
+				JOptionPane.showMessageDialog(
+					null, 
+					"Reloading plug-in storage finished", 
+					"Finished reloading", 
+					JOptionPane.INFORMATION_MESSAGE);
 			}
 		});
 		reloadAlg.setToolTipText("Reload plugin storage from built packages");
@@ -356,7 +362,7 @@ public class PluginStorageManifestPanel extends JPanel {
 	 * Reloading plug-in storage.
 	 */
 	protected void reload() {
-		tblRegister.fireCleanupSomething(); //Force to unsetting up algorithms.
+//		tblRegister.fireCleanupSomething(); //Force to unsetting up algorithms.
 		Util.getPluginManager().discover();
 		tblRegister.firePluginChangedEvent(new PluginChangedEvent(tblRegister));
 		tblRegister.update();
@@ -382,8 +388,8 @@ public class PluginStorageManifestPanel extends JPanel {
 		ImportAlgDlg importAlgDlg = new ImportAlgDlg(tblRegister);
 		importAlgDlg.setVisible(true);
 		if (importAlgDlg.getImportedCount() > 0) {
-			tblRegister.update();
 			tblRegister.firePluginChangedEvent(new PluginChangedEvent(tblRegister));
+			tblRegister.update();
 		}
 	}
 	

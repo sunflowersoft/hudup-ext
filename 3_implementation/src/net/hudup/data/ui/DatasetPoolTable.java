@@ -616,7 +616,7 @@ public class DatasetPoolTable extends JTable {
 				
 			dataset = DatasetUtil.getMostInnerDataset2(dataset);
 			if (dataset != null)
-				comp.setBackground(new Color(200, 200, 200));
+				comp.setBackground(new Color(0, 255, 0));
 			return comp;
 		}
 		

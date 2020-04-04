@@ -405,11 +405,11 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 	}
 
 
-	@Override
-	public void requireCleanupSomething() {
-		// TODO Auto-generated method stub
-		batchEvaluateGUI.requireCleanupSomething();
-	}
+//	@Override
+//	public void requireCleanupSomething() {
+//		// TODO Auto-generated method stub
+//		batchEvaluateGUI.requireCleanupSomething();
+//	}
 
 
 	/**

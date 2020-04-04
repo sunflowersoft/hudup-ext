@@ -67,6 +67,7 @@ import net.hudup.core.logistic.CounterElapsedTimeEvent;
 import net.hudup.core.logistic.DSUtil;
 import net.hudup.core.logistic.I18nUtil;
 import net.hudup.core.logistic.LogUtil;
+import net.hudup.core.logistic.Timestamp;
 import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.xURI;
 import net.hudup.core.logistic.ui.SortableSelectableTable;
@@ -325,11 +326,9 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			algRegTable.register(EvaluatorAbstract.extractNormalAlgFromPluginStorage(evaluator, bindUri)); //Algorithms are not cloned because of saving memory when evaluator GUI keep algorithms for a long time.
 			
 			lbAlgs.unexportNonPluginAlgs();
-			List<String> algNames = evaluator.getOtherResult().algNames;
-			if (algNames != null && algNames.size() > 0) {
-				syncAlgRegWithEvaluator(algNames);
+			List<String> algNames = updateAlgRegFromEvaluator();
+			if (algNames != null && algNames.size() > 0)
 				lbAlgs.update(algRegTable.getAlgList(algNames));
-			}
 			else
 				lbAlgs.update(algRegTable.getAlgList());
 			
@@ -381,7 +380,12 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 						new ActionListener() {
 							@Override
 							public void actionPerformed(ActionEvent e) {
-								PluginStorage.getNormalAlgReg().register(selectedAlg);
+								boolean ret = PluginStorage.getNormalAlgReg().register(selectedAlg);
+								if (ret) JOptionPane.showMessageDialog(
+										getThisGUI(), 
+										"Algorithm '" + DSUtil.shortenVerbalName(selectedAlg.getName()) + "' is registered successfully.", 
+										"Successfully registered", 
+										JOptionPane.INFORMATION_MESSAGE);
 							}
 						});
 					contextMenu.add(miRegister);
@@ -463,20 +467,6 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					// TODO Auto-generated method stub
-					
-//					List<Alg> list = lbAlgs.getAlgList();
-//					if (list.size() == 0) {
-//						JOptionPane.showMessageDialog(
-//								getThisGUI(), 
-//								"List empty", 
-//								"List empty", 
-//								JOptionPane.ERROR_MESSAGE);
-//						
-//						return;
-//						
-//					}
-					
 					AlgListChooser dlg = new AlgListChooser(getThisGUI(), algRegTable.getAlgList(), lbAlgs.getAlgList());
 					if (!dlg.isOK())
 						return;
@@ -509,7 +499,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 					
 					if (bindUri == null) {
 						try {
-							evaluator.updatePool(toDatasetPoolExchangedClient(guiData.pool), null);
+							evaluator.updatePool(toDatasetPoolExchangedClient(guiData.pool), getThisGUI(), timestamp = new Timestamp());
 						} catch (Throwable e) {LogUtil.trace(e);}
 					}
 					else {
@@ -598,41 +588,42 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 		toolGrp2.add(this.btnClear);
 
 		this.btnUpload = UIUtil.makeIconButton(
-			"upload-16x16.png", 
-			"upload", 
-			I18nUtil.message("upload"), 
-			I18nUtil.message("upload"), 
+			bindUri == null ? "scatter-16x16.png" : "upload-16x16.png", 
+			bindUri == null ? "scatter" : "upload", 
+			bindUri == null ? I18nUtil.message("scatter") : I18nUtil.message("upload"), 
+			bindUri == null ? I18nUtil.message("scatter") : I18nUtil.message("upload"), 
 				
 			new ActionListener() {
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					// TODO Auto-generated method stub
-					if (bindUri == null) return;
-					
 					boolean ret = true;
 					try {
-						ret = evaluator.updatePool(toDatasetPoolExchangedClient(guiData.pool), null);
+						if (bindUri == null)
+							ret = evaluator.updatePool(toDatasetPoolExchangedClient(guiData.pool), null, timestamp = new Timestamp());
+						else
+							ret = evaluator.updatePool(toDatasetPoolExchangedClient(guiData.pool), null, timestamp = new Timestamp());
 					} catch (Exception ex) {ex.printStackTrace();}
 					
 					if (ret) {
 						JOptionPane.showMessageDialog(
 							getThisGUI(), 
-							"Success to upload to server", 
+							"Success to upload/scatter", 
 							"Success upload", 
 							JOptionPane.INFORMATION_MESSAGE);
 					}
 					else {
 						JOptionPane.showMessageDialog(
 							getThisGUI(), 
-							"Fail to upload to server", 
+							"Fail to upload/scatter", 
 							"Fail upload", 
 							JOptionPane.ERROR_MESSAGE);
 					}
 				}
 			});
 		this.btnUpload.setMargin(new Insets(0, 0 , 0, 0));
-		this.btnUpload.setVisible(bindUri != null);
+		this.btnUpload.setVisible(true);
 		toolGrp2.add(this.btnUpload);
 
 		this.btnDownload = UIUtil.makeIconButton(
@@ -648,30 +639,32 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 					// TODO Auto-generated method stub
 					if (bindUri == null) return;
 
-					DatasetPoolExchanged poolResult = null;
-					try {
-						poolResult = evaluator.getDatasetPool();
-					} catch (Exception ex) {ex.printStackTrace();}
-					
-					if (poolResult != null) {
-						clearResult();
-						guiData.pool = poolResult.toDatasetPoolClient();
-						tblDatasetPool.update(guiData.pool);
-						updateMode();
+					synchronized (getThisGUI()) {
+						DatasetPoolExchanged poolResult = null;
+						try {
+							poolResult = evaluator.getDatasetPool();
+						} catch (Exception ex) {ex.printStackTrace();}
 						
-						JOptionPane.showMessageDialog(
-							getThisGUI(), 
-							"Success to download from server", 
-							"Success download", 
-							JOptionPane.INFORMATION_MESSAGE);
-					}
-					else {
-						JOptionPane.showMessageDialog(
-							getThisGUI(), 
-							"Fail to download from server", 
-							"Fail download", 
-							JOptionPane.ERROR_MESSAGE);
-					}
+						if (poolResult != null) {
+							clearResult();
+							guiData.pool = poolResult.toDatasetPoolClient();
+							tblDatasetPool.update(guiData.pool);
+							updateMode();
+							
+							JOptionPane.showMessageDialog(
+								getThisGUI(), 
+								"Success to download from server", 
+								"Success download", 
+								JOptionPane.INFORMATION_MESSAGE);
+						}
+						else {
+							JOptionPane.showMessageDialog(
+								getThisGUI(), 
+								"Fail to download from server", 
+								"Fail download", 
+								JOptionPane.ERROR_MESSAGE);
+						}
+					} //End synchronize
 				}
 				
 			});
@@ -1056,7 +1049,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 	@Override
 	protected void refresh() {
 		try {
-			if (evaluator.remoteIsStarted())
+			if (evaluator.remoteIsStarted() || bindUri != null)
 				return;
 			
 			clearResult();
@@ -1065,7 +1058,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
 				@Override
 				protected Void doInBackground() throws Exception {
-					evaluator.reloadPool();
+					evaluator.reloadPool(getThisGUI(), timestamp = new Timestamp());
 					return null;
 				}
 				
@@ -1094,7 +1087,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 
 			if (bindUri == null) {
 				try {
-					evaluator.updatePool(null, null);
+					evaluator.updatePool(null, this, timestamp = new Timestamp());
 				} catch (Throwable e) {LogUtil.trace(e);}
 			}
 			else {
@@ -1129,10 +1122,10 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			clearResult();
 			boolean started = false;
 			if (bindUri == null)
-				started = evaluator.remoteStart0(lbAlgs.getAlgList(), toDatasetPoolExchangedClient(guiData.pool), null);
+				started = evaluator.remoteStart0(lbAlgs.getAlgList(), toDatasetPoolExchangedClient(guiData.pool), timestamp = new Timestamp());
 			else {
 				DataConfig config = lbAlgs.getAlgDescMapRemote();
-				started = evaluator.remoteStart(lbAlgs.getAlgNameList(), toDatasetPoolExchangedClient(guiData.pool), this, config, null);
+				started = evaluator.remoteStart(lbAlgs.getAlgNameList(), toDatasetPoolExchangedClient(guiData.pool), this, config, timestamp = new Timestamp());
 			}
 				
 			if (!started) updateMode();
@@ -1147,26 +1140,48 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 	
 	@Override
 	public synchronized void receivedEvaluator(EvaluatorEvent evt) throws RemoteException {
-		if (evt.getType() == EvaluatorEvent.Type.start) {
-			syncPluginWithEvaluator();
-			
-			List<String> algNames = evt.getOtherResult().algNames;
-			lbAlgs.unexportNonPluginAlgs();
-			if (algNames != null && algNames.size() > 0) {
-				syncAlgRegWithEvaluator(algNames);
-				lbAlgs.update(algRegTable.getAlgList(algNames));
+		if (evt.getType() == EvaluatorEvent.Type.start || evt.getType() == EvaluatorEvent.Type.update_pool) {
+			if (evt.getType() == EvaluatorEvent.Type.start) {
+				updatePluginFromEvaluator();
+				
+				List<String> algNames = evt.getOtherResult().algNames;
+				lbAlgs.unexportNonPluginAlgs();
+				if (algNames != null && algNames.size() > 0) {
+					updateAlgRegFromEvaluator(algNames);
+					lbAlgs.update(algRegTable.getAlgList(algNames));
+				}
+				else
+					lbAlgs.update(algRegTable.getAlgList());
 			}
-			else
-				lbAlgs.update(algRegTable.getAlgList());
 			
-			guiData.pool = evt.getPoolResult().toDatasetPoolClient();
-			guiData.pool = guiData.pool != null ? guiData.pool : new DatasetPool();
+			DatasetPool newPool= new DatasetPool();
+			boolean timeDiff = true;
+			if (timestamp == null) {
+				if (evt.getTimestamp() == null)
+					timeDiff = false;
+				else
+					timeDiff = true;
+			}
+			else if (evt.getTimestamp() == null)
+				timeDiff = true;
+			else
+				timeDiff = !timestamp.equals(evt.getTimestamp());
+			if (evt.getType() != EvaluatorEvent.Type.start && timeDiff) {
+				for (int i = 0; i < guiData.pool.size(); i++) {
+					DatasetPair pair = guiData.pool.get(i);
+					boolean added = true;
+					added = added && pair.getTrainingUUID() == null && pair.getTestingUUID() == null && pair.getWholeUUID() == null;
+					added = added && pair.getTraining() != null && pair.getTesting() != null;
+					
+					if (added) newPool.add(pair);
+				}
+			}
+			guiData.pool = newPool;
+			guiData.pool.add(evt.getPoolResult().toDatasetPoolClient());
+			
 			tblDatasetPool.update(guiData.pool);
-		}
-		else if (evt.getType() == EvaluatorEvent.Type.update_pool) {
-			guiData.pool = evt.getPoolResult().toDatasetPoolClient();
-			guiData.pool = guiData.pool != null ? guiData.pool : new DatasetPool();
-			tblDatasetPool.update(guiData.pool);
+			
+			timestamp = null;
 		}
 		else if (evt.getType() == EvaluatorEvent.Type.pause ||
 				evt.getType() == EvaluatorEvent.Type.resume || 
@@ -1483,7 +1498,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			clearResult();
 			if (bindUri == null) {
 				try {
-					evaluator.updatePool(toDatasetPoolExchangedClient(guiData.pool), null);
+					evaluator.updatePool(toDatasetPoolExchangedClient(guiData.pool), this, timestamp = new Timestamp());
 				} catch (Throwable e) {LogUtil.trace(e);}
 				
 			}
@@ -1493,7 +1508,6 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			}
 		}
 		catch (Throwable e) {
-			// TODO Auto-generated catch block
 			LogUtil.trace(e);
 			updateMode();
 		}
@@ -1600,7 +1614,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			
 			if (bindUri == null) {
 				try {
-					evaluator.updatePool(toDatasetPoolExchangedClient(guiData.pool), null);
+					evaluator.updatePool(toDatasetPoolExchangedClient(guiData.pool), this, timestamp = new Timestamp());
 				} catch (Throwable e) {LogUtil.trace(e);}
 			}
 			else {
@@ -1626,6 +1640,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			this.tblMetrics.clear();
 			this.statusBar.clearText();
 			this.statusBar.setTextPane0(DSUtil.shortenVerbalName(evaluator.getName()));
+			this.timestamp = null;
 		}
 		catch (Throwable e) {
 			LogUtil.trace(e);

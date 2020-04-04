@@ -10,9 +10,7 @@ package net.hudup.core;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
@@ -106,7 +104,7 @@ public class Firer implements PluginManager {
 	/**
 	 * List of extra class loaders.
 	 */
-	protected Map<URL, ClassLoader> extraClassLoaders = Util.newMap();
+	protected List<URLClassLoader> extraClassLoaders = Util.newList();
 	
 	
 	/**
@@ -390,11 +388,20 @@ public class Firer implements PluginManager {
 			classLoader.close();
 		} catch (Throwable e) {LogUtil.trace(e);}
 		
-		if (outObjList.size() > 0) { //This is work-around solution because meaning to use last used class loader.
-			extraClassLoaders.clear();
-			extraClassLoaders.put(storeUrl, classLoader);
+		if (outObjList.size() == 0) return outObjList;
+
+		int foundIdx = -1;
+		for (int i = 0; i < extraClassLoaders.size(); i++) {
+			if (extraClassLoaders.get(i).getURLs()[0].equals(classLoader.getURLs()[0])) {
+				foundIdx = i;
+				break;
+			}
 		}
-		
+		if (foundIdx >= 0) extraClassLoaders.remove(foundIdx);
+		extraClassLoaders.add(0, classLoader);
+		if (Constants.MAX_EXTRA_CLASSLOADERS >= 0 && extraClassLoaders.size() > Constants.MAX_EXTRA_CLASSLOADERS)
+			extraClassLoaders.remove(extraClassLoaders.size() - 1);
+
 		return outObjList;
 	}
 
@@ -648,8 +655,7 @@ public class Firer implements PluginManager {
 		catch (ClassNotFoundException e) {}
 		if (foundClass != null) return foundClass;
 		
-		Collection<ClassLoader> classLoaders = extraClassLoaders.values();
-		for (ClassLoader classLoader : classLoaders) {
+		for (ClassLoader classLoader : extraClassLoaders) {
 			try {
 				foundClass = classLoader.loadClass(name);
 			}
@@ -668,10 +674,23 @@ public class Firer implements PluginManager {
 		InputStream is = getClass().getClassLoader().getResourceAsStream(name);
 		if (is != null) return is;
 		
-		Collection<ClassLoader> classLoaders = extraClassLoaders.values();
-		for (ClassLoader classLoader : classLoaders) {
-			is = classLoader.getResourceAsStream(name);
-			if (is != null) return is;
+		for (URLClassLoader classLoader : extraClassLoaders) {
+			try {
+				is = classLoader.getResourceAsStream(name);
+				if (is != null) return is;
+
+				URL[] urls = classLoader.getURLs();
+				if (urls == null || urls.length == 0) continue;
+				
+				xURI classPath = xURI.create(urls[0].toURI());
+				classPath = classPath.concat(name);
+				UriAdapter adapter = new UriAdapter(classPath);
+				
+				is = adapter.getInputStream(classPath);
+				adapter.close();
+				if (is != null) return is;
+				
+			} catch (Exception e) {LogUtil.trace(e);}
 		}
 		
 		return null;

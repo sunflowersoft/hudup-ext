@@ -22,7 +22,6 @@ import net.hudup.core.PluginStorage;
 import net.hudup.core.RegisterTable;
 import net.hudup.core.Util;
 import net.hudup.core.alg.Alg;
-import net.hudup.core.alg.AlgRemote;
 import net.hudup.core.alg.SetupAlgListener;
 import net.hudup.core.client.ClassProcessor;
 import net.hudup.core.data.DataConfig;
@@ -46,6 +45,7 @@ import net.hudup.core.evaluate.MetricsUtil;
 import net.hudup.core.logistic.CounterElapsedTimeListener;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.NetUtil;
+import net.hudup.core.logistic.Timestamp;
 import net.hudup.core.logistic.xURI;
 
 /**
@@ -123,10 +123,10 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 //	protected SocketClassLoaderServer cl = null;
 	
 	
-//	/**
-//	 * Time stamp.
-//	 */
-//	protected Timestamp timestamp = null;
+	/**
+	 * Time stamp.
+	 */
+	protected Timestamp timestamp = null;
 	
 	
 //	/**
@@ -221,24 +221,18 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 		this.evaluator = evaluator;
 		this.evProcessor = new EvaluateProcessor(evaluator);
 		
-		syncPluginWithEvaluator();
+		updatePluginFromEvaluator();
 
 		if (referredAlg != null) {
 			try {
-				if (evaluator.acceptAlg(referredAlg))
+				if (evaluator.acceptAlg(referredAlg) && PluginStorage.getNormalAlgReg().contains(referredAlg.getName()))
 					algRegTable = new RegisterTable(Arrays.asList(referredAlg));
 			} catch (Throwable e) {LogUtil.trace(e);}
 		}
 		else {
-			if (bindUri != null) {
-				algRegTable = new RegisterTable();
-				algRegTable.register(PluginStorage.getNormalAlgReg());
-			}
-			else {
-				try {
-					algRegTable = EvaluatorAbstract.extractNormalAlgFromPluginStorage(evaluator, bindUri);
-				} catch (Throwable e) {LogUtil.trace(e);}
-			}
+			try {
+				algRegTable = EvaluatorAbstract.extractNormalAlgFromPluginStorage(evaluator, bindUri);
+			} catch (Throwable e) {LogUtil.trace(e);}
 		}
 		if (algRegTable == null) algRegTable = new RegisterTable();
 
@@ -262,7 +256,7 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 		if (guiData.algNames == null || guiData.algNames.size() == 0)
 			guiData.algNames = algRegTable.getAlgNames();
 		else
-			syncAlgRegWithEvaluator(guiData.algNames);
+			updateAlgRegFromEvaluator(guiData.algNames);
 		
 		DatasetPool oldPool = guiData.pool; 
 		try {
@@ -513,17 +507,17 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	}
 
 
-	@Override
-	public void requireCleanupSomething() {
-		// TODO Auto-generated method stub
-		try {
-			if (bindUri == null)
-				evaluator.clearDelayUnsetupAlgs();
-		}
-		catch (Throwable e) {
-			LogUtil.trace(e);
-		}
-	}
+//	@Override
+//	public void requireCleanupSomething() {
+//		// TODO Auto-generated method stub
+//		try {
+//			if (bindUri == null)
+//				evaluator.clearDelayUnsetupAlgs();
+//		}
+//		catch (Throwable e) {
+//			LogUtil.trace(e);
+//		}
+//	}
 
 
 	/**
@@ -634,16 +628,16 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	}
 	
 	
-	/**
-	 * Synchronizing plug-in storage with evaluator.
-	 */
-	protected void syncPluginWithEvaluator() {
-		if (bindUri == null || evaluator == null) return;
-		
-		//Current version only synchronize normal algorithm and metric plug-in
-		PluginStorage.syncWithEvaluator(evaluator, Alg.class, true);
-		PluginStorage.syncWithEvaluator(evaluator, Metric.class, true);
-	}
+//	/**
+//	 * Synchronizing plug-in storage with evaluator.
+//	 */
+//	protected void syncPluginWithEvaluator() {
+//		if (bindUri == null || evaluator == null) return;
+//		
+//		//Current version only synchronize normal algorithm and metric plug-in
+//		PluginStorage.syncWithEvaluator(evaluator, Alg.class, true);
+//		PluginStorage.syncWithEvaluator(evaluator, Metric.class, true);
+//	}
 	
 	
 	/**
@@ -659,25 +653,42 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 
 	
 	/**
-	 * Synchronizing algorithm register table with list of algorithm names.
+	 * Updating algorithm register table with evaluator.
+	 * @return list of possible algorithm names.
+	 */
+	protected List<String> updateAlgRegFromEvaluator() {
+		List<String> algNames = Util.newList();
+		if (evaluator == null) return algNames;
+		try {
+			algNames = evaluator.getOtherResult().algNames;
+		} catch (Exception e) {LogUtil.trace(e);}
+		
+		updateAlgRegFromEvaluator(algNames);
+		
+		return algNames;
+	}
+	
+	
+	/**
+	 * Updating algorithm register table from evaluator and list of algorithm names.
 	 * @param algNames list of algorithm names.
 	 */
-	protected void syncAlgRegWithEvaluator(List<String> algNames) {
+	protected void updateAlgRegFromEvaluator(List<String> algNames) {
 		if (evaluator == null || algNames == null || algNames.size() == 0)
 			return;
 		
-		List<String> regAlgNames = algRegTable.getAlgNames();
-		for (String regAlgName : regAlgNames) {
-			Alg alg = algRegTable.query(regAlgName);
-			if (!PluginStorage.contains(alg)) {
-				try {
-					if (alg instanceof AlgRemote)
-						((AlgRemote)alg).unexport();
-				} catch (Exception e) {LogUtil.trace(e);}
-				
-				algRegTable.unregister(regAlgName);
-			}
-		}
+//		List<String> regAlgNames = algRegTable.getAlgNames();
+//		for (String regAlgName : regAlgNames) {
+//			Alg alg = algRegTable.query(regAlgName);
+//			if (!PluginStorage.contains(alg)) {
+//				try {
+//					if (alg instanceof AlgRemote)
+//						((AlgRemote)alg).unexport();
+//				} catch (Exception e) {LogUtil.trace(e);}
+//				
+//				algRegTable.unregister(regAlgName);
+//			}
+//		}
 		
 		for (String algName : algNames) {
 			if (algRegTable.contains(algName))

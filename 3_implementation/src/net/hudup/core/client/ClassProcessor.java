@@ -47,6 +47,8 @@ public interface ClassProcessor extends Remote, Serializable {
 		try {
 			InputStream is = Util.getPluginManager().getResourceAsStream(classPath);
 			byteCode = DSUtil.readBytes(is);
+			
+			is.close();
 		}
 		catch (Exception e) {LogUtil.trace(e);}
 

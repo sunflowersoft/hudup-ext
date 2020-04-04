@@ -168,6 +168,26 @@ public class DatasetPool implements Serializable {
     
     
     /**
+     * Adding collection of dataset pairs to this pool.
+     * @param dsPairs collection of dataset pairs.
+     */
+    public void add(Collection<DatasetPair> dsPairs) {
+    	if (dsPairs != null)
+    		this.dspList.addAll(dsPairs);
+    }
+    
+    
+    /**
+     * Adding other pool to this pool.
+     * @param pool other pool.
+     */
+    public void add(DatasetPool pool) {
+    	if (pool != null)
+    		add(pool.dspList);
+    }
+
+    
+    /**
      * Removing the specified dataset pair from this dataset pool.
      * @param dsPair the dataset pair that will be removed.
      */

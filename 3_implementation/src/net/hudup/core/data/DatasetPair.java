@@ -100,6 +100,15 @@ public class DatasetPair implements Serializable {
 	
 
 	/**
+	 * Get training UUID.
+	 * @return training UUID.
+	 */
+	public UUID getTrainingUUID() {
+		return trainingUUID;
+	}
+	
+	
+	/**
 	 * Setting training dataset.
 	 * @param training specified training dataset.
 	 */
@@ -127,6 +136,15 @@ public class DatasetPair implements Serializable {
 
 	
 	/**
+	 * Get testing UUID.
+	 * @return testing UUID.
+	 */
+	public UUID getTestingUUID() {
+		return testingUUID;
+	}
+	
+	
+	/**
 	 * Setting testing dataset.
 	 * @param testing specified testing dataset.
 	 */
@@ -150,6 +168,15 @@ public class DatasetPair implements Serializable {
 	 */
 	public Dataset getWhole() {
 		return whole;
+	}
+	
+	
+	/**
+	 * Get whole UUID.
+	 * @return whole UUID.
+	 */
+	public UUID getWholeUUID() {
+		return wholeUUID;
 	}
 	
 	

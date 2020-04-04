@@ -316,19 +316,22 @@ public interface Evaluator extends Remote, RemoteRunner, SetupAlgListener, Expor
     /**
      * Updating resulted dataset pool.
      * @param pool specified dataset pool.
-     * @param timestamp time stamp.
+     * @param localTargetListener local target listener. It can be null.
+     * @param timestamp time stamp. It can be null.
      * @return true if successful.
      * @throws RemoteException if any error raises.
      */
-    boolean updatePool(DatasetPoolExchanged pool, Timestamp timestamp) throws RemoteException;
+    boolean updatePool(DatasetPoolExchanged pool, EvaluatorListener localTargetListener, Timestamp timestamp) throws RemoteException;
     
     
     /**
      * Reloading resulted dataset pool.
+     * @param localTargetListener local target listener. It can be null.
+     * @param timestamp time stamp. It can be null.
      * @return true if successful.
      * @throws RemoteException if any error raises.
      */
-    boolean reloadPool() throws RemoteException;
+    boolean reloadPool(EvaluatorListener localTargetListener, Timestamp timestamp) throws RemoteException;
 
     
 	/**

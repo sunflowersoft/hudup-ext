@@ -1182,11 +1182,11 @@ public class PowerServerCP extends JFrame implements ServerStatusListener, Plugi
 	}
 
 
-	@Override
-	public void requireCleanupSomething() {
-		// TODO Auto-generated method stub
-		//Doing something...
-	}
+//	@Override
+//	public void requireCleanupSomething() {
+//		// TODO Auto-generated method stub
+//		//Doing something...
+//	}
 
 
 	/**

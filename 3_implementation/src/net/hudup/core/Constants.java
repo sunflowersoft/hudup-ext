@@ -234,6 +234,11 @@ public final class Constants {
 	 * Host address.
 	 */
 	public static String hostAddress                      = null;
+	
+	/**
+	 * Setting the maximum number of extra class loaders. If it is -1, there is no limit of extra class loaders but it is not adviced.
+	 */
+	public static int MAX_EXTRA_CLASSLOADERS              = 10;
 
 	
 	/**
@@ -297,11 +302,23 @@ public final class Constants {
 			}
 		}
 		catch (Throwable e) {
-			System.out.println("Error when getting MAC and host addresses");
 			hardwareAddress = null;
 			hostAddress = null;
+			System.out.println("Error when getting MAC and host addresses");
 		}
 		
+		try {
+			String maxExtraClassLoaders = Util.getHudupProperty("max_extra_classloaders");
+			if (maxExtraClassLoaders != null)
+				MAX_EXTRA_CLASSLOADERS = Integer.parseInt(maxExtraClassLoaders);
+			MAX_EXTRA_CLASSLOADERS = MAX_EXTRA_CLASSLOADERS < 0 ? -1 : MAX_EXTRA_CLASSLOADERS;
+		}
+		catch (Throwable e) {
+			MAX_EXTRA_CLASSLOADERS = 10;
+			System.out.println("Error when parsing the maximum number of extra class loaders");
+		}
+
+	
 	}
 	
 	

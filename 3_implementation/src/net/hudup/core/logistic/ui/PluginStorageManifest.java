@@ -226,7 +226,7 @@ public class PluginStorageManifest extends SortableSelectableTable {
 		
 		if (config == null) {
 			JOptionPane.showMessageDialog(
-					UIUtil.getFrameForComponent(this), 
+					this, 
 					"No configuration", 
 					"No configuration", 
 					JOptionPane.INFORMATION_MESSAGE);
@@ -443,22 +443,22 @@ public class PluginStorageManifest extends SortableSelectableTable {
     }
 
     
-    /**
-     * Cleaning up something from listeners.
-     */
-    protected void fireCleanupSomething() {
-		synchronized (listenerList) {
-			PluginChangedListener[] listeners = getPluginChangedListeners();
-			for (PluginChangedListener listener : listeners) {
-				try {
-					listener.requireCleanupSomething();
-				}
-				catch (Throwable e) {
-					LogUtil.trace(e);
-				}
-			}
-		}
-    }
+//    /**
+//     * Cleaning up something from listeners.
+//     */
+//    protected void fireCleanupSomething() {
+//		synchronized (listenerList) {
+//			PluginChangedListener[] listeners = getPluginChangedListeners();
+//			for (PluginChangedListener listener : listeners) {
+//				try {
+//					listener.requireCleanupSomething();
+//				}
+//				catch (Throwable e) {
+//					LogUtil.trace(e);
+//				}
+//			}
+//		}
+//    }
     
     
     /**

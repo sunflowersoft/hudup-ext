@@ -477,12 +477,12 @@ public class PluginStorage implements Serializable {
 	 * @param remote true if evaluator is remote.
 	 */
 	public static void syncWithEvaluator(Evaluator evaluator, Class<? extends Alg> algClass, boolean remote) {
-		List<String> algEvNames = updateFromEvaluator(evaluator, algClass, remote);
+		List<String> pluginAlgNames = updateFromEvaluator(evaluator, algClass, remote);
 		RegisterTable algReg = lookupTable(algClass);
 		if (algReg == null) return; 
 		
 		List<String> algNames = algReg.getAlgNames();
-		algNames.removeAll(algEvNames);
+		algNames.removeAll(pluginAlgNames);
 		for (String algName : algNames) {
 			Alg alg = algReg.query(algName);
 			if (alg instanceof Exportable) {
@@ -496,7 +496,7 @@ public class PluginStorage implements Serializable {
 		
 		List<Alg> nextUpdateAlgs = lookupNextUpdateList(algClass);
 		for (Alg nextUpdateAlg : nextUpdateAlgs) {
-			if (!algEvNames.contains(nextUpdateAlg.getName())) {
+			if (!pluginAlgNames.contains(nextUpdateAlg.getName())) {
 				if (nextUpdateAlg instanceof Exportable) {
 					try {
 						((Exportable)nextUpdateAlg).unexport(); //Finalize method will call unsetup method if unsetup method exists in this algorithm.
@@ -518,17 +518,17 @@ public class PluginStorage implements Serializable {
 	 */
 	public static List<String> updateFromEvaluator(Evaluator evaluator, Class<? extends Alg> algClass, boolean remote) {
 		RegisterTable algReg = lookupTable(algClass);
-		List<String> algEvNames = Util.newList();
-		if (algReg == null) return algEvNames; 
+		List<String> pluginAlgNames = Util.newList();
+		if (algReg == null) return pluginAlgNames; 
 
 		try {
-			algEvNames = evaluator.getPluginAlgNames(algClass);
+			pluginAlgNames = evaluator.getPluginAlgNames(algClass);
 		} catch (Exception e) {LogUtil.trace(e);}
 		
-		for (String algEvName : algEvNames) {
-			if (algReg.contains(algEvName)) continue;
+		for (String pluginAlgName : pluginAlgNames) {
+			if (algReg.contains(pluginAlgName)) continue;
 			
-			int idx = lookupNextUpdateList(algClass, algEvName);
+			int idx = lookupNextUpdateList(algClass, pluginAlgName);
 			if (idx != -1) {
 				Alg alg = nextUpdateList.get(idx);
 				nextUpdateList.remove(idx);
@@ -537,7 +537,7 @@ public class PluginStorage implements Serializable {
 			else {
 				Alg alg = null;
 				try {
-					alg = evaluator.getPluginAlg(algClass, algEvName, remote);
+					alg = evaluator.getPluginAlg(algClass, pluginAlgName, remote);
 				}
 				catch (Exception e) {
 					System.out.println("Retrieving remote algorithm causes error by " + e.getMessage());
@@ -547,7 +547,7 @@ public class PluginStorage implements Serializable {
 			}
 		}
 		
-		return algEvNames;
+		return pluginAlgNames;
 	}
 
 	

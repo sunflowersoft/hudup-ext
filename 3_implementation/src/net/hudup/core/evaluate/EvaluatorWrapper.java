@@ -40,7 +40,7 @@ public class EvaluatorWrapper implements Evaluator, Serializable {
 
 	
 	/**
-	 * Defautl serial version UID.
+	 * Default serial version UID.
 	 */
 	private static final long serialVersionUID = 1L;
 
@@ -327,16 +327,16 @@ public class EvaluatorWrapper implements Evaluator, Serializable {
 
 	
 	@Override
-	public boolean updatePool(DatasetPoolExchanged pool, Timestamp timestamp) throws RemoteException {
+	public boolean updatePool(DatasetPoolExchanged pool, EvaluatorListener localTargetListener, Timestamp timestamp) throws RemoteException {
 		// TODO Auto-generated method stub
-		return remoteEvaluator.updatePool(pool, timestamp);
+		return remoteEvaluator.updatePool(pool, localTargetListener, timestamp);
 	}
 
 
 	@Override
-	public boolean reloadPool() throws RemoteException {
+	public boolean reloadPool(EvaluatorListener localTargetListener, Timestamp timestamp) throws RemoteException {
 		// TODO Auto-generated method stub
-		return remoteEvaluator.reloadPool();
+		return remoteEvaluator.reloadPool(localTargetListener, timestamp);
 	}
 
 

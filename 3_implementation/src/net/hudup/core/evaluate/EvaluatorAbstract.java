@@ -320,7 +320,8 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 				EvaluatorEvent.Type.start,
 				this.otherResult,
 				this.poolResult,
-				timestamp));
+				timestamp),
+				null);
 		
 		return true;
 	}
@@ -966,7 +967,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 	
 	
 	@Override
-	public synchronized boolean updatePool(DatasetPoolExchanged pool, Timestamp timestamp) throws RemoteException {
+	public synchronized boolean updatePool(DatasetPoolExchanged pool, EvaluatorListener localTargetListener, Timestamp timestamp) throws RemoteException {
 		// TODO Auto-generated method stub
 		if (isStarted() || this.evPool != null) {
 			LogUtil.error("Evaluator is running and so it cannot update pool");
@@ -981,7 +982,8 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 					EvaluatorEvent.Type.update_pool,
 					this.otherResult,
 					this.poolResult,
-					timestamp));
+					timestamp),
+					localTargetListener);
 			return true;
 		}
 		else
@@ -990,7 +992,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 
 
 	@Override
-	public boolean reloadPool() throws RemoteException {
+	public synchronized boolean reloadPool(EvaluatorListener localTargetListener, Timestamp timestamp) throws RemoteException {
 		// TODO Auto-generated method stub
 		if (poolResult == null) return false;
 		
@@ -1002,11 +1004,13 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 				this, 
 				EvaluatorEvent.Type.update_pool,
 				this.otherResult,
-				this.poolResult));
+				this.poolResult,
+				timestamp),
+				localTargetListener);
 		return true;
 	}
 
-
+	
 	/*
 	 * This method only clears parameters.
 	 */
@@ -1118,30 +1122,23 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
     /**
      * Firing (issuing) an event from this evaluator to all evaluator listeners. 
      * @param evt event from this evaluator.
+     * @param localTargetListener local target listener.
      */
-    protected void fireEvaluatorEvent(EvaluatorEvent evt) {
+    protected void fireEvaluatorEvent(EvaluatorEvent evt, EvaluatorListener localTargetListener) {
 		synchronized (listenerList) {
-			
 			EvaluatorListener[] listeners = getEvaluatorListeners();
 			for (EvaluatorListener listener : listeners) {
-//				if ((!config.isTiedSync()) && evTaskQueue.isRunning() && (!(listener instanceof AbstractEvaluateGUI))) {
-//					taskQueue.addTask(new TaskQueue.Task() {
-//						
-//						@Override
-//						public void doTask() throws Exception {
-//							listener.receivedEvaluator(evt);
-//						}
-//						
-//					});
-//				}
-//				else {
-					try {
+				try {
+					if (localTargetListener != null) {
+						if (listener == localTargetListener)
+							listener.receivedEvaluator(evt);
+					}
+					else
 						listener.receivedEvaluator(evt);
-					}
-					catch (Exception e) {
-						LogUtil.trace(e);
-					}
-//				}
+				}
+				catch (Exception e) {
+					LogUtil.trace(e);
+				}
 			}
 			
 		}
@@ -1612,7 +1609,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 			}
 		}
 		
-		return remoteStart0(algList, pool, null);
+		return remoteStart0(algList, pool, parameter);
 	}
 	
 	
@@ -1661,7 +1658,8 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 
 		fireEvaluatorEvent(new EvaluatorEvent(
 				this, 
-				EvaluatorEvent.Type.pause)); // firing paused event.
+				EvaluatorEvent.Type.pause),
+				null); // firing paused event.
 		
 		return true;
 	}
@@ -1687,7 +1685,8 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 
 		fireEvaluatorEvent(new EvaluatorEvent(
 				this, 
-				EvaluatorEvent.Type.resume)); // firing resume event.
+				EvaluatorEvent.Type.resume),
+				null); // firing resume event.
 		
 		return true;
 	}
@@ -1706,7 +1705,8 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 		
 		fireEvaluatorEvent(new EvaluatorEvent(
 				this, 
-				EvaluatorEvent.Type.stop)); // firing stop event.
+				EvaluatorEvent.Type.stop),
+				null); // firing stop event.
 		
 		return true;
 	}

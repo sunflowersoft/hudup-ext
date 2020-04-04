@@ -651,15 +651,18 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluateListen
     /**
      * Firing (issuing) an event from this evaluator to all evaluator listeners. 
      * @param evt event from this evaluator.
+     * @param localTargetListener local target listener.
      */
     protected void fireEvaluatorEvent(EvaluatorEvent evt) {
-		EvaluatorListener[] listeners = getEvaluatorListeners();
-		for (EvaluatorListener listener : listeners) {
-			try {
-				listener.receivedEvaluator(evt);
-			}
-			catch (Throwable e) {
-				LogUtil.trace(e);
+		synchronized (listenerList) {
+			EvaluatorListener[] listeners = getEvaluatorListeners();
+			for (EvaluatorListener listener : listeners) {
+				try {
+					listener.receivedEvaluator(evt);
+				}
+				catch (Throwable e) {
+					LogUtil.trace(e);
+				}
 			}
 		}
     }
@@ -1106,16 +1109,16 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluateListen
 
 
 	@Override
-	public boolean updatePool(DatasetPoolExchanged pool, Timestamp timestamp) throws RemoteException {
+	public boolean updatePool(DatasetPoolExchanged pool, EvaluatorListener localTargetListener, Timestamp timestamp) throws RemoteException {
 		// TODO Auto-generated method stub
-		return remoteEvaluator.updatePool(pool, timestamp);
+		return remoteEvaluator.updatePool(pool, localTargetListener, timestamp);
 	}
 
 	
 	@Override
-	public boolean reloadPool() throws RemoteException {
+	public boolean reloadPool(EvaluatorListener localTargetListener, Timestamp timestamp) throws RemoteException {
 		// TODO Auto-generated method stub
-		return remoteEvaluator.reloadPool();
+		return remoteEvaluator.reloadPool(localTargetListener, timestamp);
 	}
 
 
