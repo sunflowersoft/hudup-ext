@@ -35,7 +35,6 @@ import javax.swing.WindowConstants;
 
 import net.hudup.core.PluginChangedEvent;
 import net.hudup.core.PluginChangedListener;
-import net.hudup.core.PluginManager;
 import net.hudup.core.PluginStorage;
 import net.hudup.core.RegisterTable;
 import net.hudup.core.Util;
@@ -847,7 +846,7 @@ class ImportAlgDlg extends JDialog {
 		else {
 			List<Alg> selectedList = tblAlgDescImport.getSelectedAlgList();
 			for (Alg alg : selectedList) {
-				if (!PluginManager.isClassValidAlg(alg)) continue;
+				if (!Util.getPluginManager().isValidAlg(alg)) continue;
 
 				RegisterTable table = PluginStorage.lookupTable(alg.getClass());
 				if (table == null || table.contains(alg.getName())) continue;

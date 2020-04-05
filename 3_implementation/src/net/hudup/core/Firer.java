@@ -8,6 +8,7 @@
 package net.hudup.core;
 
 import java.io.InputStream;
+import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.List;
@@ -55,6 +56,7 @@ import net.hudup.core.evaluate.Metric;
 import net.hudup.core.evaluate.MetricRemote;
 import net.hudup.core.evaluate.MetricRemoteWrapper;
 import net.hudup.core.evaluate.MetricWrapper;
+import net.hudup.core.logistic.BaseClass;
 import net.hudup.core.logistic.Composite;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.NextUpdate;
@@ -247,10 +249,10 @@ public class Firer implements PluginManager {
 			if (algClass == null) continue;
 			
 			try {
-				if (!PluginManager.isClassValid(algClass)) continue;
+				if (!isClassValid(algClass)) continue;
 				
 				Alg alg = Util.newInstance(algClass);
-				if (!PluginManager.isClassValidAlg(alg)) continue;
+				if (!isValidAlg(alg)) continue;
 
 				if (algClass.getAnnotation(Composite.class) != null) {
 					compositeAlgList.add(alg);
@@ -339,14 +341,14 @@ public class Firer implements PluginManager {
 	 * @param reflections specified reflections. 
 	 * @return list of instances from reflections and referred class.
 	 */
-	private static <T> List<T> loadInstances(Class<T> referredClass, Reflections reflections) {
+	private <T> List<T> loadInstances(Class<T> referredClass, Reflections reflections) {
 		Set<Class<? extends T>> apClasses = reflections.getSubTypesOf(referredClass);
 		List<T> instances = Util.newList();
 		for (Class<? extends T> apClass : apClasses) {
 			if (apClass == null) continue;
 			if (referredClass != null && !referredClass.isAssignableFrom(apClass))
 				continue;
-			if (!PluginManager.isClassValid(apClass)) continue;
+			if (!isClassValid(apClass)) continue;
 
 			try {
 				T instance = Util.newInstance(apClass);
@@ -416,7 +418,7 @@ public class Firer implements PluginManager {
 	 * @param referredClass referred class. If this referred class is null, all classes are retrieved.
 	 * @param outObjList list of objects (instances) as output.
 	 */
-	private static <T> void loadInstances(xURI storeUri, String rootPath, UriAdapter adapter, ClassLoader classLoader, Class<T> referredClass, List<T> outObjList) {
+	private <T> void loadInstances(xURI storeUri, String rootPath, UriAdapter adapter, ClassLoader classLoader, Class<T> referredClass, List<T> outObjList) {
 		adapter.uriListProcess(storeUri,
 			new UriFilter() {
 			
@@ -478,7 +480,7 @@ public class Firer implements PluginManager {
 					if (cls == null) return;
 					if (referredClass != null && !referredClass.isAssignableFrom(cls))
 						return;
-					if (!PluginManager.isClassValid(cls)) return;
+					if (!isClassValid(cls)) return;
 					
 					T obj = null;
 					try {
@@ -646,6 +648,40 @@ public class Firer implements PluginManager {
 
 
 	@Override
+	public boolean isClassValid(Class<?> cls) {
+		if (cls == null || cls.isInterface() || cls.isMemberClass() || cls.isAnonymousClass())
+			return false;
+		
+		int modifiers = cls.getModifiers();
+		if ( (modifiers & Modifier.ABSTRACT) != 0 || (modifiers & Modifier.PUBLIC) == 0)
+			return false;
+		else if (cls.getAnnotation(BaseClass.class) != null || 
+				cls.getAnnotation(Deprecated.class) != null) {
+			return false;
+		}
+		else
+			return true;
+	}
+
+	
+	@Override
+	public boolean isValidAlg(Alg alg) {
+		if (alg == null)
+			return false;
+		else {
+			String name = alg.getName();
+			if (name == null || name.isEmpty()) return false;
+			
+			Alg newInstance = alg.newInstance();
+			if (newInstance == null)
+				return false;
+			else
+				return alg.newInstance().getClass().equals(alg.getClass());
+		}
+	}
+
+	
+	@Override
 	public Class<?> loadClass(String name) throws ClassNotFoundException {
 		// TODO Auto-generated method stub
 		Class<?> foundClass = null;
@@ -695,6 +731,8 @@ public class Firer implements PluginManager {
 		
 		return null;
 	}
+
+	
 
 
 }

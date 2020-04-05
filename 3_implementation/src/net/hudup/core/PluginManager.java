@@ -8,7 +8,6 @@
 package net.hudup.core;
 
 import java.io.InputStream;
-import java.lang.reflect.Modifier;
 import java.util.List;
 import java.util.Set;
 
@@ -17,7 +16,6 @@ import net.hudup.core.alg.AlgRemote;
 import net.hudup.core.alg.AlgRemoteWrapper;
 import net.hudup.core.data.DatasetRemote;
 import net.hudup.core.data.DatasetRemoteWrapper;
-import net.hudup.core.logistic.BaseClass;
 import net.hudup.core.logistic.NextUpdate;
 import net.hudup.core.logistic.xURI;
 
@@ -157,20 +155,7 @@ public interface PluginManager {
 	 * @param cls specified class.
 	 * @return whether specified class is valid.
 	 */
-	public static boolean isClassValid(Class<?> cls) {
-		if (cls == null || cls.isInterface() || cls.isMemberClass() || cls.isAnonymousClass())
-			return false;
-		
-		int modifiers = cls.getModifiers();
-		if ( (modifiers & Modifier.ABSTRACT) != 0 || (modifiers & Modifier.PUBLIC) == 0)
-			return false;
-		else if (cls.getAnnotation(BaseClass.class) != null || 
-				cls.getAnnotation(Deprecated.class) != null) {
-			return false;
-		}
-		else
-			return true;
-	}
+	public boolean isClassValid(Class<?> cls);
 
 
 	/**
@@ -178,13 +163,7 @@ public interface PluginManager {
 	 * @param alg specified algorithm.
 	 * @return whether specified algorithm is valid.
 	 */
-	public static boolean isClassValidAlg(Alg alg) {
-		if (alg == null || alg.getName() == null || alg.getName().isEmpty() ||
-				alg.newInstance() == null || !alg.newInstance().getClass().equals(alg.getClass()))
-			return false;
-		else
-			return true;
-	}
+	boolean isValidAlg(Alg alg);
 
 	
 	/**

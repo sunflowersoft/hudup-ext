@@ -11,6 +11,7 @@ import java.io.Serializable;
 import java.util.List;
 
 import net.hudup.core.alg.Alg;
+import net.hudup.core.alg.AlgDesc2;
 import net.hudup.core.alg.AlgList;
 import net.hudup.core.data.Exportable;
 import net.hudup.core.data.ExternalQuery;
@@ -511,32 +512,57 @@ public class PluginStorage implements Serializable {
 	 */
 	public static List<String> updateFromEvaluator(Evaluator evaluator, Class<? extends Alg> algClass, boolean remote) {
 		RegisterTable algReg = lookupTable(algClass);
-		List<String> pluginAlgNames = Util.newList();
-		if (algReg == null) return pluginAlgNames; 
-
+		if (algReg == null) return Util.newList();
+		
+		List<String> tempAlgNames = Util.newList();
 		try {
-			pluginAlgNames = evaluator.getPluginAlgNames(algClass);
+			tempAlgNames = evaluator.getPluginAlgNames(algClass);
 		} catch (Exception e) {LogUtil.trace(e);}
 		
-		for (String pluginAlgName : pluginAlgNames) {
-			if (algReg.contains(pluginAlgName)) continue;
-			
-			int idx = lookupNextUpdateList(algClass, pluginAlgName);
-			if (idx != -1) {
-				Alg alg = nextUpdateList.get(idx);
-				nextUpdateList.remove(idx);
-				algReg.register(alg);
+		List<String> pluginAlgNames = Util.newList();
+		for (String pluginAlgName : tempAlgNames) {
+			if (algReg.contains(pluginAlgName)) {
+				Alg alg = algReg.query(pluginAlgName);
+				if (!AlgDesc2.canCallRemoteAlg(alg)) {
+					algReg.unregister(pluginAlgName);
+					try {
+						if (alg instanceof Exportable) ((Exportable)alg).unexport();
+						alg = evaluator.getPluginAlg(algClass, pluginAlgName, remote);
+						if (alg != null && algReg.register(alg))
+							pluginAlgNames.add(pluginAlgName);
+					} catch (Exception e) {LogUtil.trace(e);}
+				}
+				else
+					pluginAlgNames.add(pluginAlgName);
 			}
 			else {
-				Alg alg = null;
-				try {
-					alg = evaluator.getPluginAlg(algClass, pluginAlgName, remote);
+				int idx = lookupNextUpdateList(algClass, pluginAlgName);
+				if (idx != -1) {
+					Alg alg = nextUpdateList.get(idx);
+					nextUpdateList.remove(idx);
+					if (!AlgDesc2.canCallRemoteAlg(alg)) {
+						try {
+							if (alg instanceof Exportable) ((Exportable)alg).unexport();
+							alg = evaluator.getPluginAlg(algClass, pluginAlgName, remote);
+							if (alg != null && algReg.register(alg))
+								pluginAlgNames.add(pluginAlgName);
+						} catch (Exception e) {LogUtil.trace(e);}
+					}
+					else if (algReg.register(alg))
+						pluginAlgNames.add(pluginAlgName);
 				}
-				catch (Exception e) {
-					System.out.println("Retrieving remote algorithm causes error by " + e.getMessage());
-					alg = null;
+				else {
+					Alg alg = null;
+					try {
+						alg = evaluator.getPluginAlg(algClass, pluginAlgName, remote);
+					}
+					catch (Exception e) {
+						LogUtil.error("Retrieving remote algorithm causes error by " + e.getMessage());
+						alg = null;
+					}
+					if (alg != null && algReg.register(alg))
+						pluginAlgNames.add(pluginAlgName);
 				}
-				if (alg != null) algReg.register(alg);
 			}
 		}
 		

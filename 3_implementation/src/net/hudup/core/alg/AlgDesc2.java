@@ -567,4 +567,14 @@ public class AlgDesc2 extends AlgDesc {
 	}
 
 	
+	/**
+	 * Check whether to call the specified algorithm remotely. There exists a reference to unexported object.
+	 * @param alg specified algorithm.
+	 * @return whether to call the specified algorithm remotely.
+	 */
+	public static boolean canCallRemoteAlg(Alg alg) {
+		return alg != null && alg.getName() != null;
+	}
+	
+	
 }

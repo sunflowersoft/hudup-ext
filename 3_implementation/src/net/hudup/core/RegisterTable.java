@@ -134,6 +134,8 @@ public final class RegisterTable implements Cloneable, Serializable {
 	 * @param from specified collection of algorithms.
 	 */
 	public void register(Collection<Alg> from) {
+		if (from == null) return;
+		
 		for (Alg alg : from) {
 			this.register(alg);
 		}
@@ -146,8 +148,9 @@ public final class RegisterTable implements Cloneable, Serializable {
 	 * Alternatively, method {@link #copy(RegisterTable)} clones algorithms.
 	 * @param from specified register table.
 	 */
-	public void register(RegisterTable from) {
+	public void registerAsTheSame(RegisterTable from) {
 		this.algMap.clear();
+		if (from == null) return;
 		
 		Set<String> keys = from.algMap.keySet();
 		for (String key : keys) {
@@ -166,7 +169,13 @@ public final class RegisterTable implements Cloneable, Serializable {
 	 * @return {@code true} if the specified algorithm can be registered in this table.
 	 */
 	public boolean canRegister(Alg alg) {
-		return !contains(alg.getName());
+		if (alg == null) return false;
+		
+		String name = alg.getName();
+		if (name == null)
+			return false;
+		else
+			return !contains(alg.getName());
 	}
 
 	
@@ -191,7 +200,10 @@ public final class RegisterTable implements Cloneable, Serializable {
 	 * @return the unregistered algorithm.
 	 */
 	public Alg unregister(String algName) {
-		return algMap.remove(algName);
+		if (algName == null)
+			return null;
+		else
+			return algMap.remove(algName);
 	}
 
 	
@@ -220,7 +232,6 @@ public final class RegisterTable implements Cloneable, Serializable {
 
 			@Override
 			public int compare(Alg alg1, Alg alg2) {
-				// TODO Auto-generated method stub
 				return alg1.getName().compareTo(alg2.getName());
 			}
 		});
@@ -236,6 +247,8 @@ public final class RegisterTable implements Cloneable, Serializable {
 	 */
 	public List<Alg> getAlgList(AlgFilter filter) {
 		List<Alg> algList = getAlgList();
+		if (filter == null) return algList;
+		
 		List<Alg> newList = Util.newList();
 		for (Alg alg : algList) {
 			if (filter.accept(alg))
@@ -271,7 +284,10 @@ public final class RegisterTable implements Cloneable, Serializable {
 	 * @return whether or not this table registers an algorithm having specified name.
 	 */
 	public boolean contains(String algName) {
-		return algMap.containsKey(algName);
+		if (algName == null)
+			return false;
+		else
+			return algMap.containsKey(algName);
 	}
 
 	
@@ -303,7 +319,6 @@ public final class RegisterTable implements Cloneable, Serializable {
 	
 	@Override
 	public Object clone() {
-		// TODO Auto-generated method stub
 		RegisterTable newReg = new RegisterTable();
 		
 		Set<String> keys = this.algMap.keySet();
@@ -321,8 +336,9 @@ public final class RegisterTable implements Cloneable, Serializable {
 	 * Instancing and registering all algorithms of the specified table into this table.
 	 * @param from specified table.
 	 */
-	public void copy(RegisterTable from) {
+	public void copyTheSame(RegisterTable from) {
 		this.algMap.clear();
+		if (from == null) return;
 		
 		Set<String> keys = from.algMap.keySet();
 		for (String key : keys) {
@@ -338,6 +354,8 @@ public final class RegisterTable implements Cloneable, Serializable {
 	 * @param from specified table.
 	 */
 	public void copyNewOnes(RegisterTable from) {
+		if (from == null) return;
+		
 		Set<String> fromKeys = from.algMap.keySet();
 		for (String fromKey : fromKeys) {
 			Alg fromAlg = from.algMap.get(fromKey);

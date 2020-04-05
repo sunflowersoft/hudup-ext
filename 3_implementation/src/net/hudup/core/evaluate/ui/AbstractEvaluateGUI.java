@@ -22,6 +22,7 @@ import net.hudup.core.PluginStorage;
 import net.hudup.core.RegisterTable;
 import net.hudup.core.Util;
 import net.hudup.core.alg.Alg;
+import net.hudup.core.alg.AlgDesc2;
 import net.hudup.core.alg.SetupAlgListener;
 import net.hudup.core.client.ClassProcessor;
 import net.hudup.core.data.DataConfig;
@@ -32,6 +33,7 @@ import net.hudup.core.data.DatasetPool;
 import net.hudup.core.data.DatasetPoolExchanged;
 import net.hudup.core.data.DatasetRemote;
 import net.hudup.core.data.DatasetUtil;
+import net.hudup.core.data.Exportable;
 import net.hudup.core.evaluate.EvaluateInfo;
 import net.hudup.core.evaluate.EvaluateListener;
 import net.hudup.core.evaluate.EvaluateProcessor;
@@ -770,11 +772,25 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 //			}
 //		}
 		
+		RegisterTable normalAlgReg = PluginStorage.getNormalAlgReg();
 		for (String algName : algNames) {
-			if (algRegTable.contains(algName))
-				continue;
-			else if (PluginStorage.getNormalAlgReg().contains(algName))
-				algRegTable.register(PluginStorage.getNormalAlgReg().query(algName));
+			if (algRegTable.contains(algName)) {
+				if (normalAlgReg.contains(algName))
+					continue;
+				else {
+					Alg alg = algRegTable.query(algName);
+					if (!AlgDesc2.canCallRemoteAlg(alg)) {
+						algRegTable.unregister(algName);
+						try {
+							if (alg instanceof Exportable) ((Exportable)alg).unexport();
+							alg = evaluator.getEvaluatedAlg(algName, bindUri != null);
+							if (alg != null) algRegTable.register(alg);
+						} catch (Exception e) {LogUtil.trace(e);}
+					}
+				}
+			}
+			else if (normalAlgReg.contains(algName))
+				algRegTable.register(normalAlgReg.query(algName));
 			else {
 				try {
 					Alg alg = evaluator.getEvaluatedAlg(algName, bindUri != null);

@@ -339,7 +339,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 
 			algRegTable.unexportNonPluginAlgs();
 			algRegTable.clear();
-			algRegTable.register(EvaluatorAbstract.extractNormalAlgFromPluginStorage(evaluator, bindUri)); //Algorithms are not cloned because of saving memory when evaluator GUI keep algorithms for a long time.
+			algRegTable.registerAsTheSame(EvaluatorAbstract.extractNormalAlgFromPluginStorage(evaluator, bindUri)); //Algorithms are not cloned because of saving memory when evaluator GUI keep algorithms for a long time.
 			
 			List<String> algNames = updateAlgRegFromEvaluator();
 			if (algNames != null && algNames.size() > 0) {

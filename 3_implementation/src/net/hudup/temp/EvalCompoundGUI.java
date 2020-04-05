@@ -55,6 +55,7 @@ import net.hudup.evaluate.ui.BatchEvaluateGUI;
  * @author Loc Nguyen
  * @version 10.0
  */
+@Deprecated
 public class EvalCompoundGUI extends JFrame {
 
 	
