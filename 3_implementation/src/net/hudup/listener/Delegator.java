@@ -18,6 +18,8 @@ import java.util.List;
 
 import javax.swing.event.EventListenerList;
 
+import net.hudup.core.PluginChangedEvent;
+import net.hudup.core.PluginChangedListener;
 import net.hudup.core.PluginStorageWrapper;
 import net.hudup.core.RegisterTable;
 import net.hudup.core.Util;
@@ -486,21 +488,18 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluateListen
 	
 	@Override
 	public String getName() throws RemoteException {
-		// TODO Auto-generated method stub
 		return remoteEvaluator.getName();
 	}
 
 
 	@Override
 	public boolean acceptAlg(Alg alg) throws RemoteException {
-		// TODO Auto-generated method stub
 		return remoteEvaluator.acceptAlg(alg);
 	}
 
 
 	@Override
 	public NoneWrapperMetricList defaultMetrics() throws RemoteException {
-		// TODO Auto-generated method stub
 		return remoteEvaluator.defaultMetrics();
 	}
 
@@ -519,7 +518,6 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluateListen
 	
 	@Override
 	public EvaluateInfo getOtherResult() throws RemoteException {
-		// TODO Auto-generated method stub
 		return remoteEvaluator.getOtherResult();
 	}
 
@@ -543,24 +541,21 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluateListen
 	}
 	
 	
-	@Override
-	public void clearDelayUnsetupAlgs() throws RemoteException {
-		// TODO Auto-generated method stub
-		remoteEvaluator.clearDelayUnsetupAlgs();
-	}
-
-
 //	@Override
-//	public List<String> getAlgNames() throws RemoteException {
-//		// TODO Auto-generated method stub
-//		return remoteEvaluator.getAlgNames();
+//	public void clearDelayUnsetupAlgs() throws RemoteException {
+//		remoteEvaluator.clearDelayUnsetupAlgs();
+//	}
+//
+//
+//	@Override
+//	public void clearResult(Timestamp timestamp) throws RemoteException {
+//		remoteEvaluator.clearResult(timestamp);
 //	}
 
 
 	@NextUpdate
 	@Override
 	public DatasetPoolExchanged getDatasetPool() throws RemoteException {
-		// TODO Auto-generated method stub
 		return remoteEvaluator.getDatasetPool();
 	}
 
@@ -568,35 +563,30 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluateListen
 	@Deprecated
 	@Override
 	public PluginStorageWrapper getPluginStorage() throws RemoteException {
-		// TODO Auto-generated method stub
 		return remoteEvaluator.getPluginStorage();
 	}
 
 
 	@Override
 	public List<String> getPluginAlgNames(Class<? extends Alg> algClass) throws RemoteException {
-		// TODO Auto-generated method stub
 		return remoteEvaluator.getPluginAlgNames(algClass);
 	}
 
 
 	@Override
 	public AlgDesc2List getPluginAlgDescs(Class<? extends Alg> algClass) throws RemoteException {
-		// TODO Auto-generated method stub
 		return remoteEvaluator.getPluginAlgDescs(algClass);
 	}
 
 
 	@Override
 	public Alg getPluginAlg(Class<? extends Alg> algClass, String algName, boolean remote) throws RemoteException {
-		// TODO Auto-generated method stub
 		return remoteEvaluator.getPluginAlg(algClass, algName, remote);
 	}
 
 
 	@Override
 	public Alg getEvaluatedAlg(String algName, boolean remote) throws RemoteException {
-		// TODO Auto-generated method stub
 		return remoteEvaluator.getEvaluatedAlg(algName, remote);
 	}
 
@@ -609,19 +599,81 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluateListen
 	
 	@Override
 	public void setConfig(EvaluatorConfig config) throws RemoteException {
-		// TODO Auto-generated method stub
 		remoteEvaluator.setConfig(config);
 	}
 
 
 	@Override
 	public boolean isWrapper() throws RemoteException {
-		// TODO Auto-generated method stub
 		return true;
 	}
 
 
 	@Override
+	public void pluginChanged(PluginChangedEvent evt) throws RemoteException {
+		firePluginChangedEvent(evt);;
+	}
+
+
+	@Override
+	public boolean isIdle() throws RemoteException {
+		return remoteEvaluator.isIdle();
+	}
+
+
+	@Override
+	public int getPort() throws RemoteException {
+		return remoteEvaluator.getPort();
+	}
+
+
+	@Override
+	public void addPluginChangedListener(PluginChangedListener listener) throws RemoteException {
+		synchronized (listenerList) {
+			listenerList.add(PluginChangedListener.class, listener);
+		}
+    }
+
+	
+	@Override
+    public void removePluginChangedListener(PluginChangedListener listener) throws RemoteException {
+		synchronized (listenerList) {
+			listenerList.remove(PluginChangedListener.class, listener);
+		}
+    }
+	
+    
+    /**
+     * Return an array of registered plug-in changed listeners.
+     * @return array of registered plug-in changed listeners.
+     */
+    protected PluginChangedListener[] getPluginChangedListeners() {
+		synchronized (listenerList) {
+			return listenerList.getListeners(PluginChangedListener.class);
+		}
+    }
+
+    
+    /**
+     * Dispatching plug-in changed event to registered plug-in changed listeners after plug-in storage was changed.
+     * @param evt plug-in changed event is issued to registered plug-in changed listeners after plug-in storage was changed.
+     */
+    protected void firePluginChangedEvent(PluginChangedEvent evt) {
+		synchronized (listenerList) {
+			PluginChangedListener[] listeners = getPluginChangedListeners();
+			for (PluginChangedListener listener : listeners) {
+				try {
+					listener.pluginChanged(evt);
+				}
+				catch (Throwable e) {
+					LogUtil.trace(e);
+				}
+			}
+		}
+    }
+
+    
+    @Override
 	public void addEvaluatorListener(EvaluatorListener listener) throws RemoteException {
 		synchronized (listenerList) {
 			listenerList.add(EvaluatorListener.class, listener);
@@ -670,7 +722,6 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluateListen
     
     @Override
 	public void receivedEvaluator(EvaluatorEvent evt) throws RemoteException {
-		// TODO Auto-generated method stub
     	fireEvaluatorEvent(evt);
 	}
 
@@ -707,22 +758,22 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluateListen
      * @param evt event from this evaluator.
      */
     protected void fireEvaluateEvent(EvaluateEvent evt) {
-		EvaluateListener[] listeners = getEvaluateListeners();
-		for (EvaluateListener listener : listeners) {
-			try {
-				listener.receivedEvaluation(evt);
-			}
-			catch (Throwable e) {
-				LogUtil.trace(e);
+		synchronized (listenerList) {
+			EvaluateListener[] listeners = getEvaluateListeners();
+			for (EvaluateListener listener : listeners) {
+				try {
+					listener.receivedEvaluation(evt);
+				}
+				catch (Throwable e) {
+					LogUtil.trace(e);
+				}
 			}
 		}
-	
     }
 
     
     @Override
 	public void receivedEvaluation(EvaluateEvent evt) throws RemoteException {
-		// TODO Auto-generated method stub
     	fireEvaluateEvent(evt);
 	}
 
@@ -759,23 +810,22 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluateListen
      * @param evt the specified for evaluation progress.
      */
     protected void fireProgressEvent(EvaluateProgressEvent evt) {
-    	EvaluateProgressListener[] listeners = getProgressListeners();
-		
-		for (EvaluateProgressListener listener : listeners) {
-			try {
-				listener.receivedProgress(evt);
-			}
-			catch (Throwable e) {
-				LogUtil.trace(e);
+		synchronized (listenerList) {
+	    	EvaluateProgressListener[] listeners = getProgressListeners();
+			for (EvaluateProgressListener listener : listeners) {
+				try {
+					listener.receivedProgress(evt);
+				}
+				catch (Throwable e) {
+					LogUtil.trace(e);
+				}
 			}
 		}
-	
     }
 
 
     @Override
 	public void receivedProgress(EvaluateProgressEvent evt) throws RemoteException {
-		// TODO Auto-generated method stub
 		fireProgressEvent(evt);
 	}
 
@@ -812,23 +862,22 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluateListen
      * @param evt the specified for setup algorithm event.
      */
     protected void fireSetupAlgEvent(SetupAlgEvent evt) {
-    	SetupAlgListener[] listeners = getSetupAlgListeners();
-		
-		for (SetupAlgListener listener : listeners) {
-			try {
-				listener.receivedSetup(evt);
-			}
-			catch (Throwable e) {
-				LogUtil.trace(e);
+		synchronized (listenerList) {
+	    	SetupAlgListener[] listeners = getSetupAlgListeners();
+			for (SetupAlgListener listener : listeners) {
+				try {
+					listener.receivedSetup(evt);
+				}
+				catch (Throwable e) {
+					LogUtil.trace(e);
+				}
 			}
 		}
-	
     }
 
     
 	@Override
 	public void receivedSetup(SetupAlgEvent evt) throws RemoteException {
-		// TODO Auto-generated method stub
 		fireSetupAlgEvent(evt);
 	}
 
@@ -873,13 +922,15 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluateListen
      * @param evt elapsed time event.
      */
     protected void fireElapsedTimeEvent(CounterElapsedTimeEvent evt) {
-    	CounterElapsedTimeListener[] listeners = getElapsedTimeListeners();
-		for (CounterElapsedTimeListener listener : listeners) {
-			try {
-				listener.receivedElapsedTime(evt);
-			}
-			catch (Throwable e) {
-				LogUtil.trace(e);
+		synchronized (listenerList) {
+	    	CounterElapsedTimeListener[] listeners = getElapsedTimeListeners();
+			for (CounterElapsedTimeListener listener : listeners) {
+				try {
+					listener.receivedElapsedTime(evt);
+				}
+				catch (Throwable e) {
+					LogUtil.trace(e);
+				}
 			}
 		}
     }
@@ -887,14 +938,12 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluateListen
     
     @Override
 	public void receivedElapsedTime(CounterElapsedTimeEvent evt) throws RemoteException {
-		// TODO Auto-generated method stub
     	fireElapsedTimeEvent(evt);
 	}
 
 
 	@Override
 	public synchronized boolean remoteStart0(List<Alg> algList, DatasetPoolExchanged pool, Serializable parameter) throws RemoteException {
-		// TODO Auto-generated method stub
 		boolean flag = socketServer.getFlag();
 		
 		if (flag)
@@ -909,7 +958,6 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluateListen
 	@Override
 	public boolean remoteStart(List<String> algNameList, DatasetPoolExchanged pool, ClassProcessor cp, DataConfig config, Serializable parameter)
 			throws RemoteException {
-		// TODO Auto-generated method stub
 		boolean flag = socketServer.getFlag();
 		
 		if (flag)
@@ -923,7 +971,6 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluateListen
 
 	@Override
 	public synchronized boolean remoteStart(Serializable... parameters) throws RemoteException {
-		// TODO Auto-generated method stub
 		boolean flag = socketServer.getFlag();
 		
 		if (flag)
@@ -937,7 +984,6 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluateListen
 
 	@Override
 	public synchronized boolean remotePause() throws RemoteException {
-		// TODO Auto-generated method stub
 		boolean flag = socketServer.getFlag();
 
 		if (flag)
@@ -951,7 +997,6 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluateListen
 	
 	@Override
 	public synchronized boolean remoteResume() throws RemoteException {
-		// TODO Auto-generated method stub
 		boolean flag = socketServer.getFlag();
 
 		if (flag)
@@ -965,7 +1010,6 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluateListen
 	
 	@Override
 	public synchronized boolean remoteStop() throws RemoteException {
-		// TODO Auto-generated method stub
 		boolean flag = socketServer.getFlag();
 
 		if (flag)
@@ -979,7 +1023,6 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluateListen
 	
 	@Override
 	public boolean remoteForceStop() throws RemoteException {
-		// TODO Auto-generated method stub
 		boolean flag = socketServer.getFlag();
 		
 		if (flag)
@@ -993,28 +1036,24 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluateListen
 	
 	@Override
 	public boolean remoteIsStarted() throws RemoteException {
-		// TODO Auto-generated method stub
 		return remoteEvaluator.remoteIsStarted();
 	}
 
 	
 	@Override
 	public boolean remoteIsPaused() throws RemoteException {
-		// TODO Auto-generated method stub
 		return remoteEvaluator.remoteIsPaused();
 	}
 
 	
 	@Override
 	public boolean remoteIsRunning() throws RemoteException {
-		// TODO Auto-generated method stub
 		return remoteEvaluator.remoteIsRunning();
 	}
 
 
 	@Override
 	public synchronized Remote export(int serverPort) throws RemoteException {
-		// TODO Auto-generated method stub
 		if (exportedStub == null) {
 			exportedStub = (Evaluator)NetUtil.RegistryRemote.export(this, serverPort);
 			if (exportedStub != null)
@@ -1023,6 +1062,7 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluateListen
 				LogUtil.info("Delegator evaluator failed to export");
 
 			try {
+				remoteEvaluator.addPluginChangedListener(this);
 				remoteEvaluator.addEvaluatorListener(this);
 				remoteEvaluator.addEvaluateListener(this);
 				remoteEvaluator.addEvaluateProgressListener(this);
@@ -1040,12 +1080,12 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluateListen
 
 	@Override
 	public synchronized void unexport() throws RemoteException {
-		// TODO Auto-generated method stub
 		if (exportedStub != null) {
 			if (!remoteEvaluator.isAgent())
 				this.remoteStop(); //It is possible to stop this evaluator because its is delegated evaluator.
 			
 			try {
+				remoteEvaluator.removePluginChangedListener(this);
 				remoteEvaluator.removeEvaluatorListener(this);
 				remoteEvaluator.removeEvaluateListener(this);
 				remoteEvaluator.removeEvaluateProgressListener(this);
@@ -1069,22 +1109,31 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluateListen
 
 	@Override
 	public synchronized void forceUnexport() throws RemoteException {
-		// TODO Auto-generated method stub
 		unexport();
 	}
 
 
 	@Override
 	public String getEvaluateStorePath() throws RemoteException {
-		// TODO Auto-generated method stub
 		return remoteEvaluator.getEvaluateStorePath();
 	}
 
 
 	@Override
 	public void setEvaluateStorePath(String evStorePath) throws RemoteException {
-		// TODO Auto-generated method stub
 		remoteEvaluator.setEvaluateStorePath(evStorePath);
+	}
+
+
+	@Override
+	public Service getReferredService() throws RemoteException {
+		return remoteEvaluator.getReferredService();
+	}
+
+
+	@Override
+	public void setReferredService(Service referredService) throws RemoteException {
+		remoteEvaluator.setReferredService(referredService);
 	}
 
 
@@ -1096,35 +1145,30 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluateListen
 	
 	@Override
 	public boolean isAgent() throws RemoteException {
-		// TODO Auto-generated method stub
 		return remoteEvaluator.isAgent();
 	}
 
 
 	@Override
 	public void setAgent(boolean agent) throws RemoteException {
-		// TODO Auto-generated method stub
 		remoteEvaluator.setAgent(agent);
 	}
 
 
 	@Override
 	public boolean updatePool(DatasetPoolExchanged pool, EvaluatorListener localTargetListener, Timestamp timestamp) throws RemoteException {
-		// TODO Auto-generated method stub
 		return remoteEvaluator.updatePool(pool, localTargetListener, timestamp);
 	}
 
 	
 	@Override
 	public boolean reloadPool(EvaluatorListener localTargetListener, Timestamp timestamp) throws RemoteException {
-		// TODO Auto-generated method stub
 		return remoteEvaluator.reloadPool(localTargetListener, timestamp);
 	}
 
 
 	@Override
 	public void close() throws Exception {
-		// TODO Auto-generated method stub
 		try {
 			unexport();
 		}
@@ -1136,13 +1180,11 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluateListen
 
 	@Override
 	public String toString() {
-		// TODO Auto-generated method stub
     	String evaluatorName = "No name";
 		try {
 			evaluatorName = getName();
 		}
 		catch (Throwable e) {
-			// TODO Auto-generated catch block
 			LogUtil.trace(e);
 		}
 		return DSUtil.shortenVerbalName(evaluatorName);
@@ -1151,7 +1193,6 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluateListen
 	
 	@Override
 	protected void finalize() throws Throwable {
-		// TODO Auto-generated method stub
 		super.finalize();
 		
 		try {
@@ -1161,13 +1202,6 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluateListen
 			LogUtil.trace(e);
 		}
 	}
-			
-
-//	@Override
-//	public Object ping(Object o) throws RemoteException {
-//		// TODO Auto-generated method stub
-//		return "Ping sucessful: " + o.toString() + " " + o.toString();
-//	}
 			
 
 }

@@ -15,6 +15,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import net.hudup.core.PluginChangedEvent;
+import net.hudup.core.PluginChangedListener;
 import net.hudup.core.PluginStorage;
 import net.hudup.core.Util;
 import net.hudup.core.alg.Alg;
@@ -58,7 +60,7 @@ import net.hudup.data.SnapshotImpl;
  * @version 10.0
  *
  */
-public class DefaultService implements Service, AutoCloseable {
+public class DefaultService implements Service, PluginChangedListener, AutoCloseable {
 
 
 	/**
@@ -286,6 +288,24 @@ public class DefaultService implements Service, AutoCloseable {
 			}
 			return provider;
 		}
+	}
+
+	
+	@Override
+	public void pluginChanged(PluginChangedEvent evt) throws RemoteException {
+
+	}
+
+
+	@Override
+	public boolean isIdle() throws RemoteException {
+		return !isOpened();
+	}
+
+
+	@Override
+	public int getPort() throws RemoteException {
+		return serverConfig.getServerPort();
 	}
 
 	

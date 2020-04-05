@@ -7,6 +7,8 @@
  */
 package net.hudup.core;
 
+import java.rmi.Remote;
+import java.rmi.RemoteException;
 import java.util.EventListener;
 
 import net.hudup.core.logistic.ui.PluginStorageManifest;
@@ -25,41 +27,43 @@ import net.hudup.core.logistic.ui.PluginStorageManifest;
  * @version 10.0
  *
  */
-public interface PluginChangedListener extends EventListener {
+public interface PluginChangedListener extends EventListener, Remote {
 
 	
 	/**
 	 * Any class that implements {@link PluginChangedListener} must define this method to specify some tasks when receiving a specified event {@link PluginChangedEvent}.
 	 * @param evt specified {@link PluginChangedEvent}.
+	 * @throws RemoteException if any error raises.
 	 */
-	void pluginChanged(PluginChangedEvent evt);
+	void pluginChanged(PluginChangedEvent evt) throws RemoteException;
 	
 	
 	/**
 	 * Testing whether listener is idle.
 	 * @return whether listener is idle.
+	 * @throws RemoteException if any error raises.
 	 */
-	boolean isIdle();
+	boolean isIdle() throws RemoteException;
 	
 	
 //	/**
 //	 * Checking whether to support importing plug-ins.
 //	 * @return whether to support importing plug-ins.
 //	 */
-//	boolean isSupportImport();
+//	boolean isSupportImport() throws RemoteException;
 	
 	
 	/**
 	 * Getting port for remote call.
 	 * @return port for remote call.
 	 */
-	int getPort();
+	int getPort() throws RemoteException;
 	
 	
 //	/**
 //	 * Require to clean up something.
 //	 */
-//	void requireCleanupSomething();
+//	void requireCleanupSomething() throws RemoteException;
 	
 	
 }

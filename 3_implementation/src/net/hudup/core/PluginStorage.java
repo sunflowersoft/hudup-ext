@@ -410,17 +410,10 @@ public class PluginStorage implements Serializable {
 	 * Return -1 if not found.
 	 */
 	public final static int lookupNextUpdateList(Alg alg) {
-		if (alg == null) return -1;
-		
-		for (int i = 0; i < nextUpdateList.size(); i++) {
-			int idx = nextUpdateList.indexOf(alg.getName());
-			if (idx == -1) continue;
-			
-			Class<? extends Alg> cls = nextUpdateList.get(idx).getClass();
-			if (alg.getClass().equals(cls)) return idx;
-		}
-		
-		return -1;
+		if (alg == null)
+			return -1;
+		else
+			return lookupNextUpdateList(alg.getClass(), alg.getName());
 	}
 	
 	

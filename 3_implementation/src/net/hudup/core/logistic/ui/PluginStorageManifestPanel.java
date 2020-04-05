@@ -143,25 +143,16 @@ public class PluginStorageManifestPanel extends JPanel {
 
 	
 	/**
-	 * Constructor with plug-in changed listener.
-	 * @param listener plug-in changed listener.
-	 */
-	public PluginStorageManifestPanel(PluginChangedListener listener) {
-		this(listener, null);
-	}
-	
-	
-	/**
 	 * Constructor with plug-in changed listener and additional parameter.
 	 * @param listener plug-in changed listener.
 	 * @param parameter additional parameter.
 	 */
-	public PluginStorageManifestPanel(PluginChangedListener listener, Object parameter) {
+	public PluginStorageManifestPanel(PluginChangedListener listener) {
 		setLayout(new BorderLayout());
 		JPanel body = new JPanel(new BorderLayout());
 		add(body, BorderLayout.CENTER);
 		
-		tblRegister = createPluginStorageManifest(listener, parameter);
+		tblRegister = createPluginStorageManifest(listener);
 		if (listener != null)
 			tblRegister.addPluginChangedListener(listener);
 		body.add(new JScrollPane(tblRegister), BorderLayout.CENTER);
@@ -350,11 +341,15 @@ public class PluginStorageManifestPanel extends JPanel {
 	/**
 	 * Create plug-in manifest with plug-in changed listener.
 	 * @param listener plug-in changed listener.
-	 * @param parameter additional parameter.
 	 * @return plug-in manifest with plug-in changed listener.
 	 */
-	protected PluginStorageManifest createPluginStorageManifest(PluginChangedListener listener, Object parameter) {
-		return new PluginStorageManifest(listener == null || listener.getPort() < 0 ? 0 : listener.getPort());
+	protected PluginStorageManifest createPluginStorageManifest(PluginChangedListener listener) {
+		int port = 0;
+		try {
+			port = listener != null ? listener.getPort() : 0;
+		} catch (Exception e) {port = 0; LogUtil.trace(e);}
+		
+		return new PluginStorageManifest(port < 0 ? 0 : port);
 	}
 
 	

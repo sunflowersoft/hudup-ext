@@ -36,13 +36,13 @@ import net.hudup.core.client.ConnectDlg;
 import net.hudup.core.client.Service;
 import net.hudup.core.client.ServiceExt;
 import net.hudup.core.data.DataConfig;
-import net.hudup.core.data.HiddenText2;
 import net.hudup.core.data.ui.SysConfigPane;
 import net.hudup.core.evaluate.Evaluator;
 import net.hudup.core.evaluate.EvaluatorConfig;
 import net.hudup.core.evaluate.EvaluatorEvent;
 import net.hudup.core.evaluate.EvaluatorListener;
 import net.hudup.core.evaluate.ui.EvaluateGUIData;
+import net.hudup.core.logistic.Account;
 import net.hudup.core.logistic.DSUtil;
 import net.hudup.core.logistic.I18nUtil;
 import net.hudup.core.logistic.LogUtil;
@@ -81,15 +81,9 @@ public class EvaluatorCP extends JFrame implements EvaluatorListener {
 	
 	
 	/**
-	 * Account name.
+	 * Account.
 	 */
-	protected String account = null;
-	
-	
-	/**
-	 * Password.
-	 */
-	protected HiddenText2 password = null;
+	protected Account account = null;
 	
 	
 	/**
@@ -165,8 +159,7 @@ public class EvaluatorCP extends JFrame implements EvaluatorListener {
 	public EvaluatorCP(Service service, String account, String password, xURI bindUri) {
 		super("Evaluator control panel");
 		this.service = service;
-		this.account = account;
-		this.password = new HiddenText2(password);
+		this.account = Account.create(account, password);
 		this.bindUri = bindUri;
 		
 		if (bindUri != null) { //Evaluator is remote
@@ -402,7 +395,7 @@ public class EvaluatorCP extends JFrame implements EvaluatorListener {
 		if (service instanceof ServiceExt) {
 			try {
 				if (account != null)
-					evaluators = ((ServiceExt)service).getEvaluators(account, password.getText());
+					evaluators = ((ServiceExt)service).getEvaluators(account.getName(), account.getPassword());
 				else if (service instanceof DefaultServiceExt)
 					evaluators = ((DefaultServiceExt)service).getEvaluators();
 				else
@@ -429,7 +422,7 @@ public class EvaluatorCP extends JFrame implements EvaluatorListener {
 			Evaluator evaluator = null;
 			try {
 				if (account != null)
-					evaluator = service.getEvaluator(evaluatorName, account, password.getText());
+					evaluator = service.getEvaluator(evaluatorName, account.getName(), account.getPassword());
 				else if (service instanceof DefaultService)
 					evaluator = ((DefaultService)service).getEvaluator(evaluatorName);
 				else
@@ -622,7 +615,7 @@ public class EvaluatorCP extends JFrame implements EvaluatorListener {
         	String evaluatorName = evaluator.getName();
         	
 			if (account != null)
-				evaluator = ((ServiceExt)service).getEvaluator(evaluatorName, account, password.getText(), versionName.toString());
+				evaluator = ((ServiceExt)service).getEvaluator(evaluatorName, account.getName(), account.getPassword(), versionName.toString());
 			else if (service instanceof DefaultServiceExt)
 				evaluator = ((DefaultServiceExt)service).getEvaluator(evaluatorName, versionName.toString());
 			else
@@ -684,7 +677,7 @@ public class EvaluatorCP extends JFrame implements EvaluatorListener {
             boolean ret = false;
             
 			if (account != null)
-				ret = ((ServiceExt)service).removeEvaluator(evaluatorName, account, password.getText(), versionName);
+				ret = ((ServiceExt)service).removeEvaluator(evaluatorName, account.getName(), account.getPassword(), versionName);
 			else if (service instanceof DefaultServiceExt)
 				ret = ((DefaultServiceExt)service).removeEvaluator(evaluatorName, versionName);
 			else

@@ -22,6 +22,7 @@ import java.util.Collection;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 
+import net.hudup.core.PluginChangedEvent;
 import net.hudup.core.Util;
 import net.hudup.core.client.ServerTrayIcon;
 import net.hudup.core.client.Service;
@@ -141,6 +142,14 @@ public class DefaultServer extends PowerServerImpl {
 	}
 	
 	
+	@Override
+	public synchronized void pluginChanged(PluginChangedEvent evt) throws RemoteException {
+		super.pluginChanged(evt);
+		
+		if (service != null) service.pluginChanged(evt);
+	}
+
+
 	@Override
 	protected void initStorageSystem() {
 		// TODO Auto-generated method stub

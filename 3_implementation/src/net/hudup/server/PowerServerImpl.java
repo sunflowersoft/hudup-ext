@@ -19,6 +19,7 @@ import javax.swing.event.EventListenerList;
 
 import net.hudup.core.Constants;
 import net.hudup.core.ExtraStorage;
+import net.hudup.core.PluginChangedEvent;
 import net.hudup.core.PluginStorage;
 import net.hudup.core.client.ActiveMeasure;
 import net.hudup.core.client.Gateway;
@@ -694,6 +695,24 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 		return activeMeasure;
 	}
 	
+	
+	@Override
+	public synchronized void pluginChanged(PluginChangedEvent evt) throws RemoteException {
+		
+	}
+
+
+	@Override
+	public boolean isIdle() throws RemoteException {
+		return isStarted();
+	}
+
+
+	@Override
+	public int getPort() throws RemoteException {
+		return config.getServerPort();
+	}
+
 	
 	/**
 	 * (1) Interface "Gateway" has no method to retrieve PowerServer instance so that the client stub can't access PowerServer instance

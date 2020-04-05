@@ -26,6 +26,7 @@ import net.hudup.core.alg.SetupAlgListener;
 import net.hudup.core.client.ClassProcessor;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.DatasetAbstract;
+import net.hudup.core.data.DatasetPair;
 import net.hudup.core.data.DatasetPairExchanged;
 import net.hudup.core.data.DatasetPool;
 import net.hudup.core.data.DatasetPoolExchanged;
@@ -88,6 +89,12 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 
 	
 	/**
+	 * Recovery of resulted metrics.
+	 */
+	protected Metrics recoveredResult = null;
+
+	
+	/**
 	 * Processor to process evaluation results.
 	 */
 	protected EvaluateProcessor evProcessor = null;
@@ -117,16 +124,22 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	protected EvaluateGUIData guiData = null;
 	
 	
-//	/**
-//	 * Network class loader server.
-//	 */
-//	protected SocketClassLoaderServer cl = null;
-	
-	
 	/**
 	 * Time stamp.
 	 */
 	protected Timestamp timestamp = null;
+	
+	
+//	/**
+//	 * Account.
+//	 */
+//	protected Account attachedAccount = null;
+	
+	
+//	/**
+//	 * Network class loader server.
+//	 */
+//	protected SocketClassLoaderServer cl = null;
 	
 	
 //	/**
@@ -241,7 +254,7 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 		guiData.active = true;
 		
 		try {
-			result = evaluator.getResult(); //From server
+			recoveredResult = result = evaluator.getResult(); //From server
 		} catch (RemoteException e) {LogUtil.trace(e);}
 
 		try {
@@ -302,6 +315,33 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	
 	
 	/**
+	 * Getting evaluated result.
+	 * @return evaluated result.
+	 */
+	public Metrics getResult() {
+		return result;
+	}
+	
+	
+	/**
+	 * Getting recovered result.
+	 * @return recovered result.
+	 */
+	public Metrics getRecoveredResult() {
+		return recoveredResult;
+	}
+
+	
+	/**
+	 * Getting registered algorithm table.
+	 * @return registered algorithm table.
+	 */
+	public RegisterTable getAlgRegTable() {
+		return algRegTable;
+	}
+	
+	
+	/**
 	 * Refreshing GUI.
 	 */
 	protected abstract void refresh();
@@ -325,13 +365,16 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	protected void pauseResume() {
 		try {
 			boolean ret = true;
-//			synchronized (this) {
-				if (evaluator.remoteIsPaused())
-					ret = evaluator.remoteResume();
-				else if (evaluator.remoteIsRunning())
-					ret = evaluator.remotePause();
-//				wait();
-//			}
+			if (evaluator.remoteIsPaused())
+				ret = evaluator.remoteResume();
+			else if (evaluator.remoteIsRunning()) {
+				ret = evaluator.remotePause();
+				
+				try {
+					this.recoveredResult = evaluator.getResult();
+				} catch (Exception e) {LogUtil.trace(e);}
+			}
+			
 			if (!ret) updateMode();
 		}
 		catch (Throwable e) {
@@ -347,14 +390,10 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	protected void stop() {
 		try {
 			boolean ret = true;
-//			synchronized (this) {
-				ret = evaluator.remoteStop();
-//				wait();
-//			}
+			ret = evaluator.remoteStop();
 			if (!ret) updateMode();
 		}
 		catch (Throwable e) {
-			// TODO Auto-generated catch block
 			LogUtil.trace(e);
 			updateMode(); //Added date: 2019.08.12 by Loc Nguyen
 		}
@@ -367,14 +406,10 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	protected void forceStop() {
 		try {
 			boolean ret = true;
-//			synchronized (this) {
-				ret = evaluator.remoteForceStop();
-//				wait();
-//			}
+			ret = evaluator.remoteForceStop();
 			if (!ret) updateMode();
 		}
 		catch (Throwable e) {
-			// TODO Auto-generated catch block
 			LogUtil.trace(e);
 			updateMode(); //Added date: 2019.08.12 by Loc Nguyen
 		}
@@ -425,9 +460,16 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 			catch (Exception e) {LogUtil.trace(e);}
 		}
 		
-		this.evProcessor.clear();
+		result = null;
+		
+		evProcessor.clear();
 		updateGUIData();
 		guiData.active = false;
+//		attachedAccount = null;
+		
+		try {
+			algRegTable.unexportNonPluginAlgs();
+		} catch (Exception e) {LogUtil.trace(e);}
 		
 		if (exportedStub != null) {
 			boolean ret = NetUtil.RegistryRemote.unexport(this);
@@ -480,13 +522,11 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	
 	
 	@Override
-	public boolean isIdle() {
-		// TODO Auto-generated method stub
+	public boolean isIdle() throws RemoteException {
 		try {
 			return !evaluator.remoteIsStarted();
 		}
 		catch (Throwable e) {
-			// TODO Auto-generated catch block
 			LogUtil.trace(e);
 			return false;
 		}
@@ -494,7 +534,7 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 
 
 	@Override
-	public int getPort() {
+	public int getPort() throws RemoteException {
 		if (bindUri != null) //Evaluator is remote
 			return bindUri.getPort();
 		else { //Evaluator is local
@@ -502,7 +542,7 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 				return evaluator.getConfig().getEvaluatorPort();
 			} catch (Throwable e) {LogUtil.trace(e);}
 			
-			return -1;
+			return 0;
 		}
 	}
 
@@ -529,6 +569,24 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	}
 	
 	
+//	/**
+//	 * Getting attached account.
+//	 * @return attached account.
+//	 */
+//	public Account getAttachedAccount() {
+//		return attachedAccount;
+//	}
+//	
+//	
+//	/**
+//	 * Setting attached account.
+//	 * @param attachedAccount attached account.
+//	 */
+//	public void setAttachedAccount(Account attachedAccount) {
+//		this.attachedAccount = attachedAccount;
+//	}
+	
+	
 	@Override
 	public byte[] getByteCode(String className) throws RemoteException {
 		// TODO Auto-generated method stub
@@ -542,6 +600,7 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	 */
 	private void setupListeners(Evaluator evaluator) {
 		try {
+			evaluator.addPluginChangedListener(this);
 			evaluator.addEvaluatorListener(this);
 			evaluator.addEvaluateListener(this);
 			evaluator.addEvaluateProgressListener(this);
@@ -560,6 +619,7 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	 */
 	private void unsetupListeners(Evaluator evaluator) {
 		try {
+			evaluator.removePluginChangedListener(this);
 			evaluator.removeEvaluatorListener(this);
 			evaluator.removeEvaluateListener(this);
 			evaluator.removeEvaluateProgressListener(this);
@@ -628,6 +688,25 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	}
 	
 	
+	/**
+	 * Getting local dataset pool which contains unuploaded datasets. 
+	 * @return local dataset pool which contains unuploaded datasets.
+	 */
+	protected DatasetPool getLocalDatasetPool() {
+		DatasetPool newPool= new DatasetPool();
+		for (int i = 0; i < guiData.pool.size(); i++) {
+			DatasetPair pair = guiData.pool.get(i);
+			boolean added = true;
+			added = added && pair.getTrainingUUID() == null && pair.getTestingUUID() == null && pair.getWholeUUID() == null;
+			added = added && pair.getTraining() != null && pair.getTesting() != null;
+			
+			if (added) newPool.add(pair);
+		}
+		
+		return newPool;
+	}
+	
+	
 //	/**
 //	 * Synchronizing plug-in storage with evaluator.
 //	 */
@@ -660,7 +739,8 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 		List<String> algNames = Util.newList();
 		if (evaluator == null) return algNames;
 		try {
-			algNames = evaluator.getOtherResult().algNames;
+			EvaluateInfo otherResult = evaluator.getOtherResult();
+			algNames = otherResult != null ? otherResult.algNames : null;
 		} catch (Exception e) {LogUtil.trace(e);}
 		
 		updateAlgRegFromEvaluator(algNames);

@@ -335,7 +335,7 @@ public class AlgList implements Serializable, net.hudup.core.Cloneable {
      */
     public static void unexportNonPluginAlgs(Collection<Alg> algs) {
     	for (Alg alg : algs) {
-            if(PluginStorage.contains(alg.getClass(), alg.getName()))
+            if(PluginStorage.contains(alg))
             	continue;
             
 			try {

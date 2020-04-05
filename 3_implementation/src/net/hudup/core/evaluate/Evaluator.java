@@ -12,12 +12,14 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.List;
 
+import net.hudup.core.PluginChangedListener;
 import net.hudup.core.PluginStorageWrapper;
 import net.hudup.core.RegisterTable;
 import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.AlgDesc2List;
 import net.hudup.core.alg.SetupAlgListener;
 import net.hudup.core.client.ClassProcessor;
+import net.hudup.core.client.Service;
 import net.hudup.core.data.AutoCloseable;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.DatasetPoolExchanged;
@@ -92,7 +94,7 @@ import net.hudup.core.logistic.Timestamp;
  * @version 10.0
  *
  */
-public interface Evaluator extends Remote, RemoteRunner, SetupAlgListener, Exportable, AgentSupport, AutoCloseable {
+public interface Evaluator extends Remote, RemoteRunner, SetupAlgListener, PluginChangedListener, Exportable, AgentSupport, AutoCloseable {
 
 	
 	/**
@@ -250,13 +252,21 @@ public interface Evaluator extends Remote, RemoteRunner, SetupAlgListener, Expor
 	RegisterTable extractNormalAlgFromPluginStorage0() throws RemoteException;
 
 	
-	/**
-	 * Clearing delay unsetting up algorithms.
-	 * @throws RemoteException if any error raises.
-	 */
-	void clearDelayUnsetupAlgs() throws RemoteException;
+//	/**
+//	 * Clearing delay unsetting up algorithms.
+//	 * @throws RemoteException if any error raises.
+//	 */
+//	void clearDelayUnsetupAlgs() throws RemoteException;
 
 	
+//	/**
+//	 * Clearing all evaluated results.
+//	 * @param timestamp time stamp.
+//	 * @throws RemoteException if any error raises.
+//	 */
+//    void clearResult(Timestamp timestamp) throws RemoteException;
+
+    
 	/**
 	 * Getting dataset pool. This method needs to be improved with large dataset pool and scanner.
 	 * @return dataset pool.
@@ -265,7 +275,7 @@ public interface Evaluator extends Remote, RemoteRunner, SetupAlgListener, Expor
 	DatasetPoolExchanged getDatasetPool() throws RemoteException;
 
 	
-	/**
+    /**
 	 * Getting system plug-in storage. This method is currently not used.
 	 * @return wrapper of system plug-in storage.
 	 * @throws RemoteException if any error raises.
@@ -335,6 +345,22 @@ public interface Evaluator extends Remote, RemoteRunner, SetupAlgListener, Expor
 
     
 	/**
+	 * Adding the specified listener to the end of list of listeners, which means that such listener is registered.
+	 * @param listener plug-in changed listener that is registered.
+     * @throws RemoteException if any error raises.
+	 */
+	void addPluginChangedListener(PluginChangedListener listener) throws RemoteException;
+
+    
+	/**
+	 * Remove the specified listener from the list of listener
+	 * @param listener plug-in changed listener that is unregistered.
+     * @throws RemoteException if any error raises.
+	 */
+    void removePluginChangedListener(PluginChangedListener listener) throws RemoteException;
+
+    	
+    /**
 	 * Add the specified evaluator listener to the end of listener list.
 	 * @param listener specified evaluator listener.
 	 * @throws RemoteException if any error raises.
@@ -428,6 +454,22 @@ public interface Evaluator extends Remote, RemoteRunner, SetupAlgListener, Expor
      * @throws RemoteException if any error raises.
      */
     void setEvaluateStorePath(String evStorePath) throws RemoteException;
+    
+    
+    /**
+     * Getting the internal referred service.
+     * @return the internal referred service.
+     * @throws RemoteException if any error raises.
+     */
+    Service getReferredService() throws RemoteException;
+    
+    
+    /**
+     * Setting the internal referred service.
+     * @param referredService the internal referred service.
+     * @throws RemoteException if any error raises.
+     */
+    void setReferredService(Service referredService) throws RemoteException;
     
     
 //    /**

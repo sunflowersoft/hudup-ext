@@ -35,8 +35,6 @@ import javax.swing.JTextField;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import net.hudup.core.PluginChangedEvent;
-import net.hudup.core.PluginChangedListener;
 import net.hudup.core.Util;
 import net.hudup.core.client.ConnectDlg;
 import net.hudup.core.client.PowerServer;
@@ -73,7 +71,7 @@ import net.hudup.server.PowerServerConfig;
  * @version 10.0
  *
  */
-public class PowerServerCP extends JFrame implements ServerStatusListener, PluginChangedListener {
+public class PowerServerCP extends JFrame implements ServerStatusListener {
 
 
 	/**
@@ -346,28 +344,19 @@ public class PowerServerCP extends JFrame implements ServerStatusListener, Plugi
 						
 						@Override
 						protected PluginStorageManifestPanel createPluginStorageManifest(Object... vars) {
-							// TODO Auto-generated method stub
-							if (bindUri != null) {
-								if (vars.length == 0)
-									return new PluginStorageManifestPanelRemote(server, null);
-								else if (vars[0] instanceof PluginChangedListener)
-									return new PluginStorageManifestPanelRemote(server, (PluginChangedListener)vars[0]);
-								else
-									return new PluginStorageManifestPanelRemote(server, null);
-							}
+							if (bindUri != null)
+								return new PluginStorageManifestPanelRemote(server);
 							else
-								return super.createPluginStorageManifest(vars);
+								return super.createPluginStorageManifest(server);
 						}
 						
 					};
 					
 					cfg.removeSysConfigPane();
-					try {
-						cfg.getPluginStorageManifest().setEnabled(!server.isStarted());
-					}
-					catch (Exception e1) {
-						e1.printStackTrace();
-					}
+//					try {
+//						cfg.getPluginStorageManifest().setEnabled(!server.isStarted());
+//					}
+//					catch (Exception e1) {LogUtil.trace(e1);}
 					
 					cfg.setVisible(true);
 				}
@@ -1139,24 +1128,6 @@ public class PowerServerCP extends JFrame implements ServerStatusListener, Plugi
 	}
 	
 	
-	@Override
-	public void pluginChanged(PluginChangedEvent evt) {
-		// TODO Auto-generated method stub
-		//Doing something...
-	}
-
-
-	@Override
-	public boolean isIdle() {
-		// TODO Auto-generated method stub
-		try {
-			return !server.isStarted();
-		} catch (Throwable e) {LogUtil.trace(e);}
-		
-		return false;
-	}
-
-
 	/**
 	 * Getting this power server control panel.
 	 * @return this power server control panel.
@@ -1166,22 +1137,6 @@ public class PowerServerCP extends JFrame implements ServerStatusListener, Plugi
 	}
 	
 	
-	@Override
-	public int getPort() {
-		// TODO Auto-generated method stub
-		if (bindUri != null) {
-			return bindUri.getPort();
-		}
-		else {
-			try {
-				return ((PowerServerConfig)server.getConfig()).getServerPort();
-			} catch (Throwable e) {LogUtil.trace(e);}
-			
-			return -1;
-		}
-	}
-
-
 //	@Override
 //	public void requireCleanupSomething() {
 //		// TODO Auto-generated method stub

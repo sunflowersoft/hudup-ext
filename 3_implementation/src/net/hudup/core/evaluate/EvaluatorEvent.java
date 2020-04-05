@@ -65,6 +65,11 @@ public class EvaluatorEvent extends EventObject {
 		 * Updating pool. 
 		 */
 		update_pool,
+		
+//		/**
+//		 * Evaluator clears all results.
+//		 */
+//		clear_result,
 	}
 	
 	

@@ -65,7 +65,6 @@ import net.hudup.core.alg.AlgRemoteWrapper;
 import net.hudup.core.alg.ui.AlgConfigDlg;
 import net.hudup.core.alg.ui.AlgListBox;
 import net.hudup.core.client.ClientUtil;
-import net.hudup.core.client.HudupSocketClassLoader;
 import net.hudup.core.client.Service;
 import net.hudup.core.client.SocketConnection;
 import net.hudup.core.data.DataConfig;
@@ -127,9 +126,12 @@ public class Test {
 //		
 //		System.out.println(System.getProperties().getProperty("java.rmi.server.codebase"));
 		
-		HudupSocketClassLoader nlc = new HudupSocketClassLoader();
-		Class<?> cls = nlc.loadClass("net.hudup.SimFirer");
-		System.out.println(cls);
+//		HudupSocketClassLoader nlc = new HudupSocketClassLoader();
+//		Class<?> cls = nlc.loadClass("net.hudup.SimFirer");
+//		System.out.println(cls);
+		
+		long a = -1;
+		System.out.println((int)a);
 	}
 
 	
@@ -720,7 +722,11 @@ class PluginStorageManifest2 extends JTable {
 			JPanel body = new JPanel(new BorderLayout());
 			add(body, BorderLayout.CENTER);
 			
-			tblRegister = new PluginStorageManifest2(listener.getPort() < 0 ? 0 : listener.getPort());
+			int port = 0;
+			try {
+				port = listener != null ? listener.getPort() : 0;
+			} catch (Exception e) {port = 0; LogUtil.trace(e);}
+			tblRegister = new PluginStorageManifest2(port < 0 ? 0 : port);
 			if (listener != null)
 				tblRegister.addPluginChangedListener(listener);
 			body.add(new JScrollPane(tblRegister), BorderLayout.CENTER);

@@ -57,7 +57,7 @@ public class DefaultServerExt extends DefaultServer {
 	@Override
 	protected DefaultService createService() {
 		// TODO Auto-generated method stub
-		return new DefaultServiceExt(trans);
+		return new DefaultServiceExt(trans, this);
 	}
 
 

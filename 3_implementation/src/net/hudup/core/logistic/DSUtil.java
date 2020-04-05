@@ -170,6 +170,64 @@ public final class DSUtil {
 	
 	
 	/**
+	 * Converting specified object into long number.
+	 * @param object specified object.
+	 * @return long number.
+	 */
+	public final static long toLong(Object object) {
+		if (object == null)
+			return -1;
+		else if (object instanceof Long)
+			return (long)object;
+		else if (object instanceof Number)
+			return ((Number)object).longValue();
+		else if (object instanceof Boolean)
+			return ((boolean)object) ? 1 : 0;
+		else if (object instanceof Character)
+			return Character.getNumericValue(((Character)object));
+		else if (object instanceof Date)
+			return ((Date)object).getTime();
+		else {
+			try {
+				return Long.parseLong(object.toString());
+			}
+			catch (Exception e) {
+				
+			}
+			return -1;
+		}
+	}
+
+	
+	/**
+	 * Converting specified object into boolean value.
+	 * @param object specified object.
+	 * @return boolean value.
+	 */
+	public final static boolean toBoolean(Object object) {
+		if (object == null)
+			return false;
+		else if (object instanceof Boolean)
+			return (boolean)object;
+		else if (object instanceof Number)
+			return ((Number)object).byteValue() == 0 ? false : true;
+		else if (object instanceof Character)
+			return Character.getNumericValue(((Character)object)) == 0 ? false : true;
+		else if (object instanceof Date)
+			return ((Date)object).getTime() == 0 ? false : true;
+		else {
+			try {
+				return Boolean.parseBoolean(object.toString());
+			}
+			catch (Exception e) {
+				
+			}
+			return false;
+		}
+	}
+
+	
+	/**
 	 * Converting any object of a list of real numbers.
 	 * @param object specified object.
 	 * @param removeUnusedValues if true, unused real numbers are removed from list;

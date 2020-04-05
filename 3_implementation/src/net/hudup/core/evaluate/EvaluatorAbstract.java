@@ -15,9 +15,12 @@ import java.util.Date;
 import java.util.EventListener;
 import java.util.List;
 
+import javax.swing.JOptionPane;
 import javax.swing.event.EventListenerList;
 
 import net.hudup.core.Constants;
+import net.hudup.core.PluginChangedEvent;
+import net.hudup.core.PluginChangedListener;
 import net.hudup.core.PluginStorage;
 import net.hudup.core.PluginStorageWrapper;
 import net.hudup.core.RegisterTable;
@@ -33,6 +36,10 @@ import net.hudup.core.alg.SetupAlgEvent;
 import net.hudup.core.alg.SetupAlgListener;
 import net.hudup.core.client.ClassProcessor;
 import net.hudup.core.client.HudupRMIClassLoader;
+import net.hudup.core.client.PowerServer;
+import net.hudup.core.client.Service;
+import net.hudup.core.client.ServiceExt;
+import net.hudup.core.client.ServiceLocal;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.DatasetPair;
@@ -57,6 +64,7 @@ import net.hudup.core.logistic.TaskQueue;
 import net.hudup.core.logistic.Timestamp;
 import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.xURI;
+import net.hudup.core.logistic.ui.LoginDlg;
 import net.hudup.core.logistic.ui.ProgressEvent;
 import net.hudup.core.logistic.ui.ProgressListener;
 
@@ -236,6 +244,12 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
      */
     protected List<Alg> delayUnsetupAlgs = Util.newList();
 
+    
+    /**
+     * Referred service.
+     */
+    protected Service referredService = null;
+    
     
 	/**
 	 * Default constructor.
@@ -563,8 +577,10 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 	}
 	
 	
-	@Override
-	public synchronized void clearDelayUnsetupAlgs() throws RemoteException {
+	/**
+	 * Clearing delay unsetting up algorithms.
+	 */
+	private void clearDelayUnsetupAlgs() {
 		synchronized (delayUnsetupAlgs) {
 			for (Alg alg : delayUnsetupAlgs) {
 				try {
@@ -578,6 +594,26 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 
 	
 	/**
+	 * Clearing all evaluated results.
+	 */
+    private synchronized void clearResult() {
+//    	if (result != null) result.clear(); //Keep for recovery locally.
+    	result = null;
+    	
+    	if (poolResult != null) poolResult.clear(true);
+    	poolResult = null;
+    	
+    	if (algRegResult != null) {
+    		algRegResult.unexportNonPluginAlgs();
+    		algRegResult.clear();
+    	}
+    	algRegResult = null;
+    	
+    	otherResult.reset();
+    }
+
+    
+    /**
 	 * Fetching profiles from the specified testing dataset.
 	 * @param testing specified training dataset.
 	 * @return fetcher for retrieving profiles from the specified testing dataset as {@link Fetcher}.
@@ -1027,7 +1063,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 	}
 
 	
-	@Override
+    @Override
 	protected void task() {
 		// TODO Auto-generated method stub
 		LogUtil.info("Evaluator#task not used because overriding Evaluator#run");
@@ -1093,6 +1129,77 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 
 
 	@Override
+	public synchronized void pluginChanged(PluginChangedEvent evt) throws RemoteException {
+		if (remoteIsStarted()) {
+			if (!stop()) return;
+		}
+
+		clearDelayUnsetupAlgs();
+		clearResult();
+		
+		firePluginChangedEvent(evt);
+	}
+
+
+	@Override
+	public boolean isIdle() throws RemoteException {
+		return !remoteIsStarted();
+	}
+
+
+	@Override
+	public int getPort() throws RemoteException {
+		return config.getEvaluatorPort();
+	}
+
+	
+	@Override
+	public void addPluginChangedListener(PluginChangedListener listener) throws RemoteException {
+		synchronized (listenerList) {
+			listenerList.add(PluginChangedListener.class, listener);
+		}
+    }
+
+	
+	@Override
+    public void removePluginChangedListener(PluginChangedListener listener) throws RemoteException {
+		synchronized (listenerList) {
+			listenerList.remove(PluginChangedListener.class, listener);
+		}
+    }
+	
+    
+    /**
+     * Return an array of registered plug-in changed listeners.
+     * @return array of registered plug-in changed listeners.
+     */
+    protected PluginChangedListener[] getPluginChangedListeners() {
+		synchronized (listenerList) {
+			return listenerList.getListeners(PluginChangedListener.class);
+		}
+    }
+
+    
+    /**
+     * Dispatching plug-in changed event to registered plug-in changed listeners after plug-in storage was changed.
+     * @param evt plug-in changed event is issued to registered plug-in changed listeners after plug-in storage was changed.
+     */
+    protected void firePluginChangedEvent(PluginChangedEvent evt) {
+		synchronized (listenerList) {
+			PluginChangedListener[] listeners = getPluginChangedListeners();
+			for (PluginChangedListener listener : listeners) {
+				try {
+					listener.pluginChanged(evt);
+				}
+				catch (Throwable e) {
+					LogUtil.trace(e);
+				}
+			}
+		}
+    }
+
+    
+    @Override
 	public void addEvaluatorListener(EvaluatorListener listener) throws RemoteException {
 		synchronized (listenerList) {
 			listenerList.add(EvaluatorListener.class, listener);
@@ -1136,9 +1243,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 					else
 						listener.receivedEvaluator(evt);
 				}
-				catch (Exception e) {
-					LogUtil.trace(e);
-				}
+				catch (Exception e) {LogUtil.trace(e);}
 			}
 			
 		}
@@ -1178,38 +1283,33 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
      */
     protected void fireEvaluateEvent(EvaluateEvent evt) {
 		synchronized (listenerList) {
-			
 			EvaluateListener[] listeners = getEvaluateListeners();
 			for (EvaluateListener listener : listeners) {
 				if ((!config.isTiedSync()) && evTaskQueue.isRunning() && (!(listener instanceof AbstractEvaluateGUI))) {
 					evTaskQueue.addTask(new TaskQueue.Task() {
-						
 						@Override
 						public void doTask() throws Exception {
 							listener.receivedEvaluation(evt);
 						}
-						
 					});
 				}
 				else {
 					try {
 						listener.receivedEvaluation(evt);
 					}
-					catch (Exception e) {
-						LogUtil.trace(e);
-					}
+					catch (Exception e) {LogUtil.trace(e);}
 				}
 			}
 		
 			String evStorePath = config.getAsString(DataConfig.STORE_URI_FIELD);
-			if (evStorePath != null && evAlgList != null) {
+			if (evStorePath != null && algRegResult != null) {
 				boolean saveResultSummary = false;
 				try {
 					saveResultSummary = config.isSaveResultSummary();
 				} catch (Throwable e) {LogUtil.trace(e);}
 				
 				evt.setMetrics(result); //Important code line, saving all metrics.
-				evProcessor.saveEvaluateResult(evStorePath, evt, evAlgList, saveResultSummary);
+				evProcessor.saveEvaluateResult(evStorePath, evt, algRegResult, saveResultSummary);
 			}
 			
 			
@@ -1219,7 +1319,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 			
 			if (evt.getType() != Type.done && evt.getType() != Type.done_one)
 				return;
-			if (this.result == null || this.evAlgList == null)
+			if (this.result == null || this.algRegResult == null)
 				return;
 			
 			try {
@@ -1228,16 +1328,13 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 				if (!backupAdapter.exists(backupDir)) backupAdapter.create(backupDir, true);
 				xURI analyzeBackupFile = backupDir.concat("evaluator-analyze-backup-" + new Date().getTime() + "." + Constants.DEFAULT_EXT);
 				
-				MetricsUtil util = new MetricsUtil(this.result, new RegisterTable(this.evAlgList), this);
+				MetricsUtil util = new MetricsUtil(this.result, algRegResult, this);
 				Writer writer = backupAdapter.getWriter(analyzeBackupFile, false);
 				writer.write(util.createPlainText());
 				writer.close();
 				backupAdapter.close();
 			}
-			catch (Throwable e) {
-				LogUtil.trace(e);
-			}
-			
+			catch (Throwable e) {LogUtil.trace(e);}
 		}
     }
 
@@ -1275,26 +1372,21 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
      */
     protected void fireEvaluateProgressEvent(EvaluateProgressEvent evt) {
 		synchronized (listenerList) {
-			
 	    	EvaluateProgressListener[] listeners = getEvaluateProgressListeners();
 			for (EvaluateProgressListener listener : listeners) {
 				if ((!config.isTiedSync()) && evTaskQueue.isRunning() && (!(listener instanceof AbstractEvaluateGUI))) {
 					evTaskQueue.addTask(new TaskQueue.Task() {
-						
 						@Override
 						public void doTask() throws Exception {
 							listener.receivedProgress(evt);
 						}
-						
 					});
 				}
 				else {
 					try {
 						listener.receivedProgress(evt);
 					}
-					catch (Exception e) {
-						LogUtil.trace(e);
-					}
+					catch (Exception e) {LogUtil.trace(e);}
 				}
 			}
 			
@@ -1335,26 +1427,21 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
      */
     protected void fireSetupAlgEvent(SetupAlgEvent evt) {
 		synchronized (listenerList) {
-			
 	    	SetupAlgListener[] listeners = getSetupAlgListeners();
 			for (SetupAlgListener listener : listeners) {
 				if ((!config.isTiedSync()) && evTaskQueue.isRunning() && (!(listener instanceof AbstractEvaluateGUI))) {
 					evTaskQueue.addTask(new TaskQueue.Task() {
-						
 						@Override
 						public void doTask() throws Exception {
 							listener.receivedSetup(evt);
 						}
-						
 					});
 				}
 				else {
 					try {
 						listener.receivedSetup(evt);
 					}
-					catch (Exception e) {
-						LogUtil.trace(e);
-					}
+					catch (Exception e) {LogUtil.trace(e);}
 				}
 			}
 		
@@ -1423,6 +1510,18 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
     		config.remove(DataConfig.STORE_URI_FIELD);
     	else
     		config.put(DataConfig.STORE_URI_FIELD, evStorePath);
+	}
+
+
+	@Override
+	public Service getReferredService() throws RemoteException {
+		return referredService;
+	}
+
+
+	@Override
+	public void setReferredService(Service referredService) throws RemoteException {
+		this.referredService = referredService; 
 	}
 
 
@@ -1540,6 +1639,15 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 		catch (Throwable e) {LogUtil.trace(e);}
 
 		try {
+	    	if (algRegResult != null) {
+	    		algRegResult.unexportNonPluginAlgs();
+	    		algRegResult.clear();
+	    	}
+	    	algRegResult = null;
+		}
+		catch (Throwable e) {LogUtil.trace(e);}
+
+    	try {
 			evProcessor.clear();
 		}
 		catch (Throwable e) {LogUtil.trace(e);}
@@ -1816,6 +1924,103 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 		}
 		
 		return new String[] {status};
+	}
+	
+	
+	/**
+	 * Getting top-most plug-in changed listener with specified evaluator.
+	 * @param evaluator specified evaluator.
+	 * @return top-most plug-in changed listener with specified evaluator.
+	 */
+	public static PluginChangedListener getTopMostPluginChangedListener(Evaluator evaluator) {
+		return getTopMostPluginChangedListener(evaluator, null, null, false);
+	}
+
+	
+	/**
+	 * Getting top-most plug-in changed listener with specified evaluator, account, and password.
+	 * @param evaluator specified evaluator.
+	 * @param account specified account.
+	 * @param password specified password.
+	 * @return top-most plug-in changed listener with specified evaluator, account, and password.
+	 */
+	public static PluginChangedListener getTopMostPluginChangedListener(Evaluator evaluator, String account, String password) {
+		return getTopMostPluginChangedListener(evaluator, account, password, false);
+	}
+	
+	
+	/**
+	 * Getting top-most plug-in changed listener with specified evaluator.
+	 * @param evaluator specified evaluator.
+	 * @param loginIfNecessary flag to indicate whether show login dialog if necessary.
+	 * @return top-most plug-in changed listener with specified evaluator.
+	 */
+	public static PluginChangedListener getTopMostPluginChangedListener(Evaluator evaluator, boolean loginIfNecessary) {
+		return getTopMostPluginChangedListener(evaluator, null, null, loginIfNecessary);
+	}
+	
+	
+	/**
+	 * Getting top-most plug-in changed listener with specified evaluator, account, and password.
+	 * @param evaluator specified evaluator.
+	 * @param account specified account.
+	 * @param password specified password.
+	 * @param loginIfNecessary flag to indicate whether show login dialog if necessary.
+	 * @return top-most plug-in changed listener with specified evaluator, account, and password.
+	 */
+	private static PluginChangedListener getTopMostPluginChangedListener(Evaluator evaluator, String account, String password, boolean loginIfNecessary) {
+		if (evaluator == null) return null;
+		
+		Service referredService = null;
+		try {
+			referredService = evaluator.getReferredService();
+		} catch (Exception e) {LogUtil.trace(e);}
+		
+		if (referredService == null)
+			return evaluator;
+		else if (referredService instanceof ServiceExt) {
+			PowerServer referredServer = null;
+			if (referredService instanceof ServiceLocal)
+				referredServer = ((ServiceLocal)referredService).getReferredServer();
+			else {
+				if (account == null || password == null) {
+					if (loginIfNecessary) {
+						LoginDlg dlgLogin = new LoginDlg(null, "Enter admin account and password \nto retrieve server");
+						if (dlgLogin.wasLogin()) {
+							account = dlgLogin.getUsername();
+							password = dlgLogin.getPassword();
+						}
+					}
+				}
+				
+				if (account != null && password != null) {
+					try {
+						referredServer = ((ServiceExt)referredService).getReferredServer(account, password);
+					} catch (Exception e) {LogUtil.trace(e);}
+				}
+				else
+					referredServer = null;
+			}
+			
+			if (referredServer == null) {
+				if (loginIfNecessary) {
+					JOptionPane.showMessageDialog(null,
+						"Cannot retrieve server but \n possible to retrieve service or evaluator", 
+						"Cannot retrieve server", JOptionPane.INFORMATION_MESSAGE);
+				}
+				
+				if (referredService instanceof PluginChangedListener)
+					return (PluginChangedListener)referredService;
+				else
+					return evaluator;
+			}
+			else
+				return referredServer;
+		}
+		else if (referredService instanceof PluginChangedListener)
+			return (PluginChangedListener)referredService;
+		else
+			return evaluator;
 	}
 	
 	

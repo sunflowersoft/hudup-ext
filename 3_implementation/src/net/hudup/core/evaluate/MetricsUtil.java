@@ -373,7 +373,7 @@ public class MetricsUtil {
 
 		row = Util.newVector();
 		row.add("Evaluation percentage");
-		row.add(MathUtil.round((double)otherResult.progressStep / otherResult.progressTotal * 100.0) + "%");
+		row.add(otherResult.progressTotal != 0 ? MathUtil.round((double)otherResult.progressStep / otherResult.progressTotal * 100.0) + "%" : "0%");
 		data.add(row);
 
 		row = Util.newVector();
@@ -783,6 +783,7 @@ public class MetricsUtil {
 		if (referredEvaluator == null) return 1;
 		
 		EvaluateInfo otherResult = referredEvaluator.getOtherResult();
+		otherResult = otherResult != null ? otherResult : new EvaluateInfo();
 		WritableCellFormat[] formats = createCellFormats();
 		int rows = 0;
 		
@@ -803,7 +804,7 @@ public class MetricsUtil {
 		Label evPercentage = new Label(0, row, "Evaluation percentage", formats[0]);
 		sheet.addCell(evPercentage);
 		Label evPercentageValue = new Label(1, row,
-				MathUtil.round((double)otherResult.progressStep / otherResult.progressTotal * 100.0) + "%",
+				otherResult.progressTotal != 0 ? MathUtil.round((double)otherResult.progressStep / otherResult.progressTotal * 100.0) + "%" : "0%",
 				formats[0]);
 		sheet.addCell(evPercentageValue);
 
@@ -1170,11 +1171,12 @@ public class MetricsUtil {
 		
 		if (referredEvaluator != null) {
 			EvaluateInfo otherResult = referredEvaluator.getOtherResult();
+			otherResult = otherResult != null ? otherResult : new EvaluateInfo();
 
 			buffer.append("\n\n\nEvaluation information");
 			buffer.append("\n  Total records: " + otherResult.progressTotal);
 			buffer.append("\n  Evaluated records: " + otherResult.progressStep);
-			buffer.append("\n  Evaluation percentage: " + MathUtil.round((double)otherResult.progressStep / otherResult.progressTotal * 100.0) + "%");
+			buffer.append("\n  Evaluation percentage: " + (otherResult.progressTotal != 0 ? MathUtil.round((double)otherResult.progressStep / otherResult.progressTotal * 100.0) + "%" : "0%"));
 			buffer.append("\n  Elapsed time: " + Counter.formatTimeInterval(otherResult.elapsedTime));
 		}
 

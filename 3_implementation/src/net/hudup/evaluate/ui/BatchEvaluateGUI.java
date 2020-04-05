@@ -54,6 +54,7 @@ import net.hudup.core.data.DatasetPoolExchanged;
 import net.hudup.core.data.NullPointer;
 import net.hudup.core.evaluate.EvaluateEvent;
 import net.hudup.core.evaluate.EvaluateEvent.Type;
+import net.hudup.core.evaluate.EvaluateInfo;
 import net.hudup.core.evaluate.EvaluateProgressEvent;
 import net.hudup.core.evaluate.Evaluator;
 import net.hudup.core.evaluate.EvaluatorAbstract;
@@ -315,24 +316,28 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 	
 	
 	@Override
-	public void pluginChanged(PluginChangedEvent evt) {
+	public void pluginChanged(PluginChangedEvent evt) throws RemoteException {
 		try {
-			if (bindUri == null)
-				evaluator.clearDelayUnsetupAlgs();
+			if (evaluator.remoteIsStarted()) return;
 			
-			updatePluginFromEvaluator();
-			
+			algRegTable.unexportNonPluginAlgs();
 			algRegTable.clear();
 			algRegTable.register(EvaluatorAbstract.extractNormalAlgFromPluginStorage(evaluator, bindUri)); //Algorithms are not cloned because of saving memory when evaluator GUI keep algorithms for a long time.
 			
-			lbAlgs.unexportNonPluginAlgs();
 			List<String> algNames = updateAlgRegFromEvaluator();
 			if (algNames != null && algNames.size() > 0)
 				lbAlgs.update(algRegTable.getAlgList(algNames));
 			else
 				lbAlgs.update(algRegTable.getAlgList());
 			
+			clearResult();
+			
+			guiData.pool = getLocalDatasetPool();
+			tblDatasetPool.update(guiData.pool);
+
 			updateMode();
+			
+			LogUtil.info("Plug-in storage is changed by you or someones else.");
 		}
 		catch (Throwable e) {
 			LogUtil.trace(e);
@@ -908,7 +913,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 							}
 							catch (Exception ex) {ex.printStackTrace();}
 							if (result != null) {
-								getThisGUI().result = result;
+								getThisGUI().recoveredResult = getThisGUI().result = result;
 								update(result);
 							}
 							else {
@@ -946,20 +951,20 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 				// TODO Auto-generated method stub
 				if (result != null) {
 					try {
-						new MetricsAnalyzeDlg(getThisGUI(), result, new RegisterTable(lbAlgs.getAlgList()), evaluator);
+						new MetricsAnalyzeDlg(getThisGUI(), result, algRegTable, evaluator);
 					}
 					catch (Exception ex) {
 						ex.printStackTrace();
+						recoveredResult = result;
 						result = null;
 					}
 				}
-				
-				if (result == null) {
+				else {
 					JOptionPane.showMessageDialog(
-							getThisGUI(), 
-							"No result", 
-							"No result", 
-							JOptionPane.WARNING_MESSAGE);
+						getThisGUI(), 
+						"No result", 
+						"No result", 
+						JOptionPane.WARNING_MESSAGE);
 				}
 			}
 			
@@ -1140,11 +1145,26 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 	
 	@Override
 	public synchronized void receivedEvaluator(EvaluatorEvent evt) throws RemoteException {
-		if (evt.getType() == EvaluatorEvent.Type.start || evt.getType() == EvaluatorEvent.Type.update_pool) {
+		EvaluatorEvent.Type type = evt.getType();
+		
+		boolean timeDiff = true;
+		if (timestamp == null) {
+			if (evt.getTimestamp() == null)
+				timeDiff = false;
+			else
+				timeDiff = true;
+		}
+		else if (evt.getTimestamp() == null)
+			timeDiff = true;
+		else
+			timeDiff = !timestamp.equals(evt.getTimestamp());
+
+		if (type == EvaluatorEvent.Type.start || type == EvaluatorEvent.Type.update_pool) {
 			if (evt.getType() == EvaluatorEvent.Type.start) {
 				updatePluginFromEvaluator();
 				
-				List<String> algNames = evt.getOtherResult().algNames;
+				EvaluateInfo otherResult = evt.getOtherResult();
+				List<String> algNames = otherResult != null ? otherResult.algNames : null;
 				lbAlgs.unexportNonPluginAlgs();
 				if (algNames != null && algNames.size() > 0) {
 					updateAlgRegFromEvaluator(algNames);
@@ -1154,39 +1174,36 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 					lbAlgs.update(algRegTable.getAlgList());
 			}
 			
-			DatasetPool newPool= new DatasetPool();
-			boolean timeDiff = true;
-			if (timestamp == null) {
-				if (evt.getTimestamp() == null)
-					timeDiff = false;
-				else
-					timeDiff = true;
-			}
-			else if (evt.getTimestamp() == null)
-				timeDiff = true;
+			if (type != EvaluatorEvent.Type.start && timeDiff)
+				guiData.pool = getLocalDatasetPool();
 			else
-				timeDiff = !timestamp.equals(evt.getTimestamp());
-			if (evt.getType() != EvaluatorEvent.Type.start && timeDiff) {
-				for (int i = 0; i < guiData.pool.size(); i++) {
-					DatasetPair pair = guiData.pool.get(i);
-					boolean added = true;
-					added = added && pair.getTrainingUUID() == null && pair.getTestingUUID() == null && pair.getWholeUUID() == null;
-					added = added && pair.getTraining() != null && pair.getTesting() != null;
-					
-					if (added) newPool.add(pair);
-				}
-			}
-			guiData.pool = newPool;
+				guiData.pool = new DatasetPool();
 			guiData.pool.add(evt.getPoolResult().toDatasetPoolClient());
 			
 			tblDatasetPool.update(guiData.pool);
 			
 			timestamp = null;
 		}
-		else if (evt.getType() == EvaluatorEvent.Type.pause ||
-				evt.getType() == EvaluatorEvent.Type.resume || 
-				evt.getType() == EvaluatorEvent.Type.stop) {
+		else if (type == EvaluatorEvent.Type.pause ||
+				type == EvaluatorEvent.Type.resume || 
+				type == EvaluatorEvent.Type.stop) {
 		}
+//		else if (type == EvaluatorEvent.Type.clear_result) {
+//			if (timeDiff) {
+//				updatePluginFromEvaluator();
+//				
+//				algRegTable.clear();
+//				algRegTable.register(EvaluatorAbstract.extractNormalAlgFromPluginStorage(evaluator, bindUri)); //Algorithms are not cloned because of saving memory when evaluator GUI keep algorithms for a long time.
+//			}
+//			
+//			lbAlgs.unexportNonPluginAlgs();
+//			lbAlgs.update(algRegTable.getAlgList());
+//			
+//			guiData.pool = new DatasetPool();
+//			tblDatasetPool.update(guiData.pool);
+//			
+//			clearResult();
+//		}
 		
 		updateMode();
 	}
@@ -1205,14 +1222,21 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 				saveResultSummary = evaluator.getConfig().isSaveResultSummary();
 			} catch (Throwable e) {LogUtil.trace(e);}
 			
-			evProcessor.saveEvaluateResult(txtRunSaveBrowse.getText(), evt, lbAlgs.getAlgList(), saveResultSummary, EV_RESULT_FILENAME_PREFIX);
+			evProcessor.saveEvaluateResult(txtRunSaveBrowse.getText(), evt, algRegTable, saveResultSummary, EV_RESULT_FILENAME_PREFIX);
 		}
 		
 		
-		//this.result = evaluator.getResult();
-		this.result = evt.getMetrics(); //Fix bug date: 2019.09.04 by Loc Nguyen.
-		if (evt.getType() == Type.done) {
-			updateMode();
+		result = evt.getMetrics();
+		if (result != null) recoveredResult = result; 
+		if (evt.getType() == Type.done || evt.getType() == Type.done_one) {
+			if (evt.getType() == Type.done)
+				updateMode();
+			else if (evt.getType() == Type.done_one) { //Limiting connect to server.
+				try {
+					Metrics tempResult = evaluator.getResult();
+					if (tempResult != null) recoveredResult = tempResult;
+				} catch (Exception e) {LogUtil.trace(e);}
+			}
 		}
 	}
 
@@ -1301,9 +1325,11 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 					setInternalEnable(false);
 					setResultVisible(false);
 					
-					result = null;
-					tblMetrics.clear();
-					txtRunInfo.setText("");
+//					recoveredResult = result;
+//					result = null;
+//					tblMetrics.clear();
+//					txtRunInfo.setText("");
+					
 					btnPauseResume.setText(I18nUtil.message("pause"));
 					btnPauseResume.setEnabled(true);
 					btnStop.setEnabled(true);
@@ -1636,6 +1662,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 	private void clearResult() {
 		try {
 			this.txtRunInfo.setText("");
+			this.recoveredResult = result;
 			this.result = null;
 			this.tblMetrics.clear();
 			this.statusBar.clearText();
@@ -1656,15 +1683,6 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 		guiData.txtRunSaveBrowse = this.chkRunSave.isSelected() ? this.txtRunSaveBrowse.getText() : null;
 		
 		guiData.chkVerbal = this.chkVerbal.isSelected();
-	}
-
-
-	@Override
-	public void dispose() {
-		// TODO Auto-generated method stub
-		super.dispose();
-		
-		if (lbAlgs != null) lbAlgs.unexportNonPluginAlgs();
 	}
 
 

@@ -58,6 +58,7 @@ import net.hudup.core.data.DatasetPoolExchanged;
 import net.hudup.core.data.DatasetUtil;
 import net.hudup.core.data.Pointer;
 import net.hudup.core.evaluate.EvaluateEvent;
+import net.hudup.core.evaluate.EvaluateInfo;
 import net.hudup.core.evaluate.EvaluateEvent.Type;
 import net.hudup.core.evaluate.EvaluateProgressEvent;
 import net.hudup.core.evaluate.Evaluator;
@@ -332,25 +333,31 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 	
 	
 	@Override
-	public void pluginChanged(PluginChangedEvent evt) {
+	public void pluginChanged(PluginChangedEvent evt) throws RemoteException {
 		try {
-			evaluator.clearDelayUnsetupAlgs();
+			if (evaluator.remoteIsStarted()) return;
 
-			updatePluginFromEvaluator();
-			
+			algRegTable.unexportNonPluginAlgs();
 			algRegTable.clear();
 			algRegTable.register(EvaluatorAbstract.extractNormalAlgFromPluginStorage(evaluator, bindUri)); //Algorithms are not cloned because of saving memory when evaluator GUI keep algorithms for a long time.
 			
-			cmbAlgs.unexportNonPluginAlgs();
-			List<String> algNames = evaluator.getOtherResult().algNames;
+			List<String> algNames = updateAlgRegFromEvaluator();
 			if (algNames != null && algNames.size() > 0) {
-				updateAlgRegFromEvaluator(algNames);
-				cmbAlgs.update(algRegTable.getAlgList(algNames));
+				cmbAlgs.update(algRegTable.getAlgList());
+				cmbAlgs.setDefaultSelected(algNames.get(0));
 			}
 			else
 				cmbAlgs.update(algRegTable.getAlgList());
 			
+			clearResult();
+			
+			guiData.pool = getLocalDatasetPool();
+			txtTrainingBrowse.setDataset(guiData.pool.get(0).getTraining(), false);
+			txtTestingBrowse.setDataset(guiData.pool.get(0).getTesting(), false);
+
 			updateMode();
+			
+			LogUtil.info("Plug-in storage is changed by you or someones else.");
 		}
 		catch (Throwable e) {
 			LogUtil.trace(e);
@@ -860,7 +867,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 							}
 							catch (Exception ex) {ex.printStackTrace();}
 							if (result != null) {
-								getThisGUI().result = result;
+								getThisGUI().recoveredResult = getThisGUI().result = result;
 								update(result);
 							}
 							else {
@@ -898,14 +905,14 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 				// TODO Auto-generated method stub
 				if (result != null) {
 					try {
-						new MetricsAnalyzeDlg(getThisGUI(), result, new RegisterTable(Arrays.asList(getAlg())), evaluator);
+						new MetricsAnalyzeDlg(getThisGUI(), result, algRegTable, evaluator);
 					} catch (Exception ex) {
 						ex.printStackTrace();
+						recoveredResult = result;
 						result = null;
 					}
 				}
-				
-				if (result == null) {
+				else {
 					JOptionPane.showMessageDialog(
 						getThisGUI(), 
 						"No result", 
@@ -1347,41 +1354,41 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 	
 	@Override
 	public synchronized void receivedEvaluator(EvaluatorEvent evt) throws RemoteException {
-		// TODO Auto-generated method stub
-		if (evt.getType() == EvaluatorEvent.Type.start || evt.getType() == EvaluatorEvent.Type.update_pool) {
+		EvaluatorEvent.Type type = evt.getType();
+
+		boolean timeDiff = true;
+		if (timestamp == null) {
+			if (evt.getTimestamp() == null)
+				timeDiff = false;
+			else
+				timeDiff = true;
+		}
+		else if (evt.getTimestamp() == null)
+			timeDiff = true;
+		else
+			timeDiff = !timestamp.equals(evt.getTimestamp());
+
+		if (type == EvaluatorEvent.Type.start || type == EvaluatorEvent.Type.update_pool) {
 			if (evt.getType() == EvaluatorEvent.Type.start) {
 				updatePluginFromEvaluator();
 	
-				String algName = evt.getOtherResult().algName;
+				cmbAlgs.unexportNonPluginAlgs();
+				EvaluateInfo otherResult = evt.getOtherResult();
+				String algName = otherResult != null ? otherResult.algName : null;
 				if (algName != null) {
 					updateAlgRegFromEvaluator(Arrays.asList(algName));
+					cmbAlgs.update(algRegTable.getAlgList());
 					cmbAlgs.setDefaultSelected(algName);
 				}
+				else
+					cmbAlgs.update(algRegTable.getAlgList());
+					
 			}
 			
-			boolean timeDiff = true;
-			if (timestamp == null) {
-				if (evt.getTimestamp() == null)
-					timeDiff = false;
-				else
-					timeDiff = true;
-			}
-			else if (evt.getTimestamp() == null)
-				timeDiff = true;
+			if (type != EvaluatorEvent.Type.start && timeDiff)
+				guiData.pool = getLocalDatasetPool();
 			else
-				timeDiff = !timestamp.equals(evt.getTimestamp());
-			DatasetPool newPool= new DatasetPool();
-			if (evt.getType() != EvaluatorEvent.Type.start && timeDiff) {
-				for (int i = 0; i < guiData.pool.size(); i++) {
-					DatasetPair pair = guiData.pool.get(i);
-					boolean added = true;
-					added = added && pair.getTrainingUUID() == null && pair.getTestingUUID() == null && pair.getWholeUUID() == null;
-					added = added && pair.getTraining() != null && pair.getTesting() != null;
-					
-					if (added) newPool.add(pair);
-				}
-			}
-			guiData.pool = newPool;
+				guiData.pool = new DatasetPool();
 			guiData.pool.add(evt.getPoolResult().toDatasetPoolClient());
 			
 			if (guiData.pool.size() > 0) {
@@ -1395,9 +1402,9 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			
 			timestamp = null;
 		}
-		else if (evt.getType() == EvaluatorEvent.Type.pause ||
-				evt.getType() == EvaluatorEvent.Type.resume || 
-				evt.getType() == EvaluatorEvent.Type.stop) {
+		else if (type == EvaluatorEvent.Type.pause ||
+				type == EvaluatorEvent.Type.resume || 
+				type == EvaluatorEvent.Type.stop) {
 		}
 		
 		updateMode();
@@ -1417,15 +1424,23 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 				saveResultSummary = evaluator.getConfig().isSaveResultSummary();
 			} catch (Throwable e) {LogUtil.trace(e);}
 
-			evProcessor.saveEvaluateResult(txtRunSaveBrowse.getText(), evt, Arrays.asList(getAlg()), saveResultSummary, EV_RESULT_FILENAME_PREFIX);
+			evProcessor.saveEvaluateResult(txtRunSaveBrowse.getText(), evt, algRegTable, saveResultSummary, EV_RESULT_FILENAME_PREFIX);
 		}
 		
 		
-		//this.result = evaluator.getResult();
-		this.result = evt.getMetrics(); //Fix bug date: 2019.09.04 by Loc Nguyen.
-		if (evt.getType() == Type.done) {
-			updateMode();
+		result = evt.getMetrics();
+		if (result != null) recoveredResult = result; 
+		if (evt.getType() == Type.done || evt.getType() == Type.done_one) {
+			if (evt.getType() == Type.done)
+				updateMode();
+			else if (evt.getType() == Type.done_one) { //Limiting connect to server.
+				try {
+					Metrics tempResult = evaluator.getResult();
+					if (tempResult != null) recoveredResult = tempResult;
+				} catch (Exception e) {LogUtil.trace(e);}
+			}
 		}
+		
 	}
 	
 	
@@ -1665,6 +1680,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 	private void clearResult() {
 		try {
 			this.txtRunInfo.setText("");
+			this.recoveredResult = this.result;
 			this.result = null;
 			this.tblMetrics.clear();
 			this.statusBar.clearText();

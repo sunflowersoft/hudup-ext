@@ -28,13 +28,12 @@ public class PluginStorageManifestPanelRemote extends PluginStorageManifestPanel
 	
 	/**
 	 * Constructor with server and plug-in changed listener.
-	 * @param server specified server.
 	 * @param listener specified listener.
 	 */
-	public PluginStorageManifestPanelRemote(PowerServer server, PluginChangedListener listener) {
+	public PluginStorageManifestPanelRemote(PluginChangedListener listener) {
 		// TODO Auto-generated constructor stub
-		super(listener, server);
-		this.server = server;
+		super(listener);
+		this.server = listener instanceof PowerServer ? (PowerServer)listener : null;
 		
 		JOptionPane.showMessageDialog(
 			this, 
@@ -44,13 +43,5 @@ public class PluginStorageManifestPanelRemote extends PluginStorageManifestPanel
 	}
 
 
-	@Override
-	protected PluginStorageManifest createPluginStorageManifest(PluginChangedListener listener, Object parameter) {
-		// TODO Auto-generated method stub
-		if ((parameter == null) || !(parameter instanceof PowerServer))
-			return super.createPluginStorageManifest(listener, parameter);
-		else
-			return new PluginStorageManifestRemote((PowerServer)parameter, listener == null || listener.getPort() < 0 ? 0 : listener.getPort());
-	}
 
 }

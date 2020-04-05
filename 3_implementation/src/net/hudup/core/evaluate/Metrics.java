@@ -30,7 +30,7 @@ import net.hudup.core.logistic.xURI;
  * @version 10.0
  *
  */
-public class Metrics implements Serializable /*, Exportable*/ {
+public class Metrics implements Serializable/*, Cloneable , Exportable*/ {
 
 	
 	/**
@@ -974,6 +974,31 @@ public class Metrics implements Serializable /*, Exportable*/ {
 		
 		return buffer.toString();
 	}
+
+
+//	@Override
+//	public Object clone() {
+//		try {
+//			ByteArrayOutputStream bOut = new ByteArrayOutputStream();
+//			ObjectOutputStream out = new ObjectOutputStream(bOut);
+//			out.writeObject(this);
+//			out.flush();
+//			
+//			ByteArrayInputStream bIn = new ByteArrayInputStream(bOut.toByteArray());
+//			ObjectInputStream in = new ObjectInputStream(bIn);
+//			Metrics metrics = (Metrics)in.readObject();
+//			
+//			out.close();
+//			in.close();
+//			
+//			return metrics;
+//		}
+//		catch (Exception e) {
+//			LogUtil.trace(e);
+//		}
+//		
+//		return null;
+//	}
 
 
 //	@Override

@@ -14,8 +14,12 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
+import net.hudup.core.PluginChangedEvent;
+import net.hudup.core.PluginChangedListener;
 import net.hudup.core.Util;
+import net.hudup.core.client.PowerServer;
 import net.hudup.core.client.ServiceExt;
+import net.hudup.core.client.ServiceLocal;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.evaluate.Evaluator;
 import net.hudup.core.evaluate.EvaluatorConfig;
@@ -32,7 +36,7 @@ import net.hudup.server.Transaction;
  * @version 1.0
  *
  */
-public class DefaultServiceExt extends DefaultService implements ServiceExt {
+public class DefaultServiceExt extends DefaultService implements ServiceExt, ServiceLocal, PluginChangedListener {
 
 	
 	/**
@@ -54,18 +58,33 @@ public class DefaultServiceExt extends DefaultService implements ServiceExt {
 	
 	
 	/**
+	 * Referred power server.
+	 */
+	protected PowerServer referredServer = null;
+	
+	
+	/**
 	 * Constructor with specified transaction.
 	 * @param trans specified transaction.
 	 */
 	public DefaultServiceExt(Transaction trans) {
+		this(trans, null);
+	}
+
+	
+	/**
+	 * Constructor with specified transaction and referred power server.
+	 * @param trans specified transaction.
+	 * @param referredServer referred power server.
+	 */
+	public DefaultServiceExt(Transaction trans, PowerServer referredServer) {
 		super(trans);
-		// TODO Auto-generated constructor stub
+		this.referredServer = referredServer;
 	}
 
 	
 	@Override
 	public boolean open(PowerServerConfig serverConfig, Object... params) {
-		// TODO Auto-generated method stub
 		boolean opened = super.open(serverConfig, params);
 		if (!opened) return false;
 		
@@ -77,6 +96,7 @@ public class DefaultServiceExt extends DefaultService implements ServiceExt {
 				
 				ev.getConfig().setEvaluatorPort(serverConfig.getServerPort());
 				ev.setAgent(true);
+				ev.setReferredService(this);
 				ev.export(serverConfig.getServerPort());
 				
 				pairMap.put(ev.getName(), ev);
@@ -91,7 +111,6 @@ public class DefaultServiceExt extends DefaultService implements ServiceExt {
 	
 	@Override
 	public void close() {
-		// TODO Auto-generated method stub
 		super.close();
 		
 		if (pairMap != null) {
@@ -118,6 +137,21 @@ public class DefaultServiceExt extends DefaultService implements ServiceExt {
 	}
 
 	
+	@Override
+	public PowerServer getReferredServer(String account, String password) throws RemoteException {
+		if (validateAccount(account, password, DataConfig.ACCOUNT_ADMIN_PRIVILEGE))
+			return referredServer;
+		else
+			return null;
+	}
+
+
+	@Override
+	public PowerServer getReferredServer() {
+		return referredServer;
+	}
+
+
 	@Override
 	public List<Evaluator> getEvaluators(String account, String password) throws RemoteException {
 		if (!validateAccount(account, password, DataConfig.ACCOUNT_EVALUATE_PRIVILEGE))
@@ -259,6 +293,7 @@ public class DefaultServiceExt extends DefaultService implements ServiceExt {
 					config.setEvaluatorPort(serverConfig.getServerPort());
 					config.setSaveAbility(false);
 					reproducedEvaluator.setAgent(true);
+					reproducedEvaluator.setReferredService(this);
 					reproducedEvaluator.export(serverConfig.getServerPort());
 					
 					pairReproducedMap.put(evaluatorReproducedName, reproducedEvaluator);
@@ -397,6 +432,19 @@ public class DefaultServiceExt extends DefaultService implements ServiceExt {
 		String evaluatorName = extractName(evaluator);
 		return guiDataMap.get(evaluatorName);
 	}
-	
-	
+
+
+	@Override
+	public void pluginChanged(PluginChangedEvent evt) throws RemoteException {
+		super.pluginChanged(evt);
+		
+		List<Evaluator> evaluators = getEvaluators();
+		for (Evaluator evaluator : evaluators) {
+			try {
+				evaluator.pluginChanged(evt);
+			} catch (Exception e) {LogUtil.trace(e);}
+		}
+	}
+
+
 }

@@ -13,6 +13,9 @@ import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
+import net.hudup.core.logistic.Account;
+import net.hudup.core.logistic.LogUtil;
+
 /**
  * This is login dialog.
  * 
@@ -127,10 +130,16 @@ public class LoginDlg extends JDialog {
 	/**
 	 * Login method can be overrided.
 	 */
-	@SuppressWarnings("deprecation")
 	protected void login() {
 		username = txtUsername.getText();
-		password= txtPassword.getText();
+		try {
+			password = new String(txtPassword.getPassword());
+			//password = txtPassword.getText();
+		}
+		catch (Exception e) {
+			LogUtil.trace(e);
+			password = null;
+		}
 	}
 	
 	
@@ -161,4 +170,13 @@ public class LoginDlg extends JDialog {
 	}
 	
 	
+	/**
+	 * Getting account.
+	 * @return account.
+	 */
+	public Account getAccount() {
+		return Account.create(username, password);
+	}
+	
+
 }

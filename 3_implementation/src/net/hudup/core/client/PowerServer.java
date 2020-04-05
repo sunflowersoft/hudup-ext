@@ -9,6 +9,8 @@ package net.hudup.core.client;
 
 import java.rmi.RemoteException;
 
+import net.hudup.core.PluginChangedListener;
+
 /**
  * {@link PowerServer} is a powerful {@link Server} with advanced functions such as supporting balancing and retrieving service.
  * For example, there is a counter inside {@link ActiveMeasure}.
@@ -25,7 +27,7 @@ import java.rmi.RemoteException;
  * @version 10.0
  *
  */
-public interface PowerServer extends Server {
+public interface PowerServer extends Server, PluginChangedListener {
 	
 	
 	/**

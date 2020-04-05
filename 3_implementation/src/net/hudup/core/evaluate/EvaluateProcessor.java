@@ -15,7 +15,6 @@ import java.util.Set;
 
 import net.hudup.core.RegisterTable;
 import net.hudup.core.Util;
-import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.SetupAlgEvent;
 import net.hudup.core.evaluate.EvaluateEvent.Type;
 import net.hudup.core.logistic.LogUtil;
@@ -98,10 +97,10 @@ public class EvaluateProcessor {
 	 * Saving bath evaluation results.
 	 * @param storePath directory path to store evaluation results.
 	 * @param evt evaluation event.
-	 * @param algs list of algorithms.
+	 * @param algTable algorithm table.
 	 */
-	public void saveEvaluateResult(String storePath, EvaluateEvent evt, List<Alg> algs) {
-		saveEvaluateResult(storePath, evt, algs, false, null);
+	public void saveEvaluateResult(String storePath, EvaluateEvent evt, RegisterTable algTable) {
+		saveEvaluateResult(storePath, evt, algTable, false, null);
 	}
 
 	
@@ -109,11 +108,11 @@ public class EvaluateProcessor {
 	 * Saving bath evaluation results.
 	 * @param storePath directory path to store evaluation results.
 	 * @param evt evaluation event.
-	 * @param algs list of algorithms.
+	 * @param algTable algorithm table.
 	 * @param saveResultSummary fast saving mode.
 	 */
-	public void saveEvaluateResult(String storePath, EvaluateEvent evt, List<Alg> algs, boolean saveResultSummary) {
-		saveEvaluateResult(storePath, evt, algs, saveResultSummary, null);
+	public void saveEvaluateResult(String storePath, EvaluateEvent evt, RegisterTable algTable, boolean saveResultSummary) {
+		saveEvaluateResult(storePath, evt, algTable, saveResultSummary, null);
 	}
 	
 	
@@ -121,11 +120,11 @@ public class EvaluateProcessor {
 	 * Saving bath evaluation results.
 	 * @param storePath directory path to store evaluation results.
 	 * @param evt evaluation event.
-	 * @param algs list of algorithms.
+	 * @param algTable algorithm table.
 	 * @param saveResultSummary fast saving mode.
 	 * @param prefix prefix of file name.
 	 */
-	public void saveEvaluateResult(String storePath, EvaluateEvent evt, List<Alg> algs, boolean saveResultSummary, String prefix) {
+	public void saveEvaluateResult(String storePath, EvaluateEvent evt, RegisterTable algTable, boolean saveResultSummary, String prefix) {
 		if (storePath == null) return;
 		storePath = storePath.trim();
 		
@@ -171,7 +170,7 @@ public class EvaluateProcessor {
 	    // Exporting excel file
 		if (evt.getType() == Type.done || evt.getType() == Type.done_one) {
 		    // Exporting excel file
-			MetricsUtil util = new MetricsUtil(evt.getMetrics(), new RegisterTable(algs), referredEvaluator);
+			MetricsUtil util = new MetricsUtil(evt.getMetrics(), algTable, referredEvaluator);
 			
 			try {
 				util.createExcel(store.concat(prefix + METRICS_ANALYZE_EXCEL_FILE_NAME));

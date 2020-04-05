@@ -20,6 +20,7 @@ import net.hudup.core.Cloneable;
 import net.hudup.core.Constants;
 import net.hudup.core.Util;
 import net.hudup.core.data.Attribute.Type;
+import net.hudup.core.logistic.DSUtil;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.MinMax;
 import net.hudup.core.parser.TextParsable;
@@ -764,7 +765,7 @@ public class Profile implements Cloneable, TextParsable, Serializable {
 			return ((Long)value).doubleValue();
 			
 		case object:
-			return Constants.UNUSED;
+			return DSUtil.toDouble(value);
 		}
 		
 		return Constants.UNUSED;
@@ -844,7 +845,7 @@ public class Profile implements Cloneable, TextParsable, Serializable {
 			return ((Long)value).intValue();
 
 		case object:
-			return 0;
+			return (int)DSUtil.toLong(value);
 		}
 		
 		return -1;
@@ -908,7 +909,7 @@ public class Profile implements Cloneable, TextParsable, Serializable {
 			return ((Long)value) == 0;
 			
 		case object:
-			return false;
+			return DSUtil.toBoolean(value);
 		}
 		
 		return false;
@@ -1026,7 +1027,7 @@ public class Profile implements Cloneable, TextParsable, Serializable {
 			return (Long)value;
 
 		case object:
-			return 0;
+			return DSUtil.toLong(value);
 		}
 		
 		return -1;

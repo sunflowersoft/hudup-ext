@@ -285,6 +285,15 @@ public final class RegisterTable implements Cloneable, Serializable {
 
 	
 	/**
+	 * Unexporting non-plugin algorithms.
+	 */
+	public void unexportNonPluginAlgs() {
+		Collection<Alg> algs = algMap.values();
+		AlgList.unexportNonPluginAlgs(algs);
+	}
+	
+	
+	/**
 	 * Clearing register table, which means that all algorithms are unregistered from this table.
 	 */
 	public void clear() {

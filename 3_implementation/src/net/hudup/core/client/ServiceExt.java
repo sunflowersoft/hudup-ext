@@ -56,4 +56,14 @@ public interface ServiceExt extends Service {
 	boolean removeEvaluator(String evaluatorName, String account, String password, String reproducedVersion) throws RemoteException;
 	
 	
+	/**
+	 * Getting referred power server.
+	 * @param account account.
+	 * @param password password.
+	 * @return referred power server.
+	 * @throws RemoteException if any error raises.
+	 */
+	PowerServer getReferredServer(String account, String password) throws RemoteException;
+	
+	
 }

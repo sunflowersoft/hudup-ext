@@ -26,7 +26,6 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 
 import net.hudup.core.Constants;
-import net.hudup.core.PluginChangedEvent;
 import net.hudup.core.PluginChangedListener;
 import net.hudup.core.PluginStorage;
 import net.hudup.core.RegisterTable;
@@ -38,6 +37,7 @@ import net.hudup.core.evaluate.EvaluatorAbstract;
 import net.hudup.core.evaluate.EvaluatorConfig;
 import net.hudup.core.evaluate.MetaMetric;
 import net.hudup.core.evaluate.Metric;
+import net.hudup.core.evaluate.Metrics;
 import net.hudup.core.evaluate.NoneWrapperMetricList;
 import net.hudup.core.evaluate.ui.EvaluateGUIData;
 import net.hudup.core.logistic.I18nUtil;
@@ -55,7 +55,7 @@ import net.hudup.data.ui.SysConfigDlgExt;
  * @author Loc Nguyen
  * @version 10.0
  */
-public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
+public class EvalCompoundGUI extends JFrame {
 
 	
 	/**
@@ -68,12 +68,6 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 	 * Evaluation configuration.
 	 */
 	private EvaluatorConfig thisConfig = null;
-	
-	
-//	/**
-//	 * Body panel.
-//	 */
-//	private JTabbedPane body = null;
 	
 	
 	/**
@@ -112,13 +106,10 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 		
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		addWindowListener(new WindowAdapter() {
-
 			@Override
 			public void windowClosed(WindowEvent e) {
 				super.windowClosed(e);
-//				batchEvaluateGUI.dispose(); //Calling in dispose() method instead.
 			}
-
 		});
 		
         Image image = UIUtil.getImage("evaluator-32x32.png");
@@ -135,29 +126,6 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 		
 		setTitle(I18nUtil.message("evaluator"));
 		
-//		Container content = getContentPane();
-//		content.setLayout(new BorderLayout(2, 2));
-//		this.body = new JTabbedPane();
-//		content.add(this.body, BorderLayout.CENTER);
-//		this.body.add(I18nUtil.message("evaluate_batch"), this.batchEvaluateGUI);
-		
-//		this.body.addMouseListener(new MouseAdapter() {
-//			@Override
-//			public void mouseClicked(MouseEvent e) {
-//				if(!SwingUtilities.isRightMouseButton(e)) return;
-//				JPopupMenu contextMenu = createContextMenu();
-//				if (contextMenu != null) contextMenu.show((Component)e.getSource(), e.getX(), e.getY());
-//			}
-//		});
-//		this.batchEvaluateGUI.addMouseListener(new MouseAdapter() {
-//			@Override
-//			public void mouseClicked(MouseEvent e) {
-//				if(!SwingUtilities.isRightMouseButton(e)) return;
-//				JPopupMenu contextMenu = createContextMenu();
-//				if (contextMenu != null) contextMenu.show((Component)e.getSource(), e.getX(), e.getY());
-//			}
-//		});
-
 		setVisible(true);
 	}
 	
@@ -183,7 +151,7 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 		
 		JMenuItem mniSysConfig = new JMenuItem(
 			new AbstractAction(I18nUtil.message("system_configure")) {
-
+				
 				/**
 				 * Serial version UID for serializable class. 
 				 */
@@ -193,9 +161,56 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 				public void actionPerformed(ActionEvent e) {
 					sysConfig();
 				}
-			
 			});
 		mnTools.add(mniSysConfig);
+
+		JMenuItem mniRecoverResult = new JMenuItem(
+			new AbstractAction(I18nUtil.message("recover_evaluate_result")) {
+				
+				/**
+				 * Serial version UID for serializable class. 
+				 */
+				private static final long serialVersionUID = 1L;
+
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					Metrics recoveredResult = batchEvaluateGUI.getRecoveredResult();
+					if (recoveredResult == null) {
+						JOptionPane.showMessageDialog(
+							getThisEvalGUI(), 
+							"Evaluated result empty", 
+							"Evaluated result empty", 
+							JOptionPane.INFORMATION_MESSAGE);
+						return;
+					}
+					
+					if (recoveredResult == batchEvaluateGUI.getResult()) {
+						JOptionPane.showMessageDialog(
+							getThisEvalGUI(), 
+							"Evaluated result is not lost and so\n it is not necessary to recover it.", 
+							"Evaluated result is not lost", 
+							JOptionPane.INFORMATION_MESSAGE);
+						return;
+					}
+
+					try {
+						new MetricsAnalyzeDlg(
+							getThisEvalGUI(),
+							recoveredResult,
+							batchEvaluateGUI.getAlgRegTable(),
+							batchEvaluateGUI.getEvaluator());
+					}
+					catch (Exception ex) {
+						LogUtil.trace(ex);
+						JOptionPane.showMessageDialog(
+							getThisEvalGUI(), 
+							"Cannot recover evaluated result", 
+							"Cannot recover evaluated result", 
+							JOptionPane.ERROR_MESSAGE);
+					}
+				}
+			});
+		mnTools.add(mniRecoverResult);
 
 		boolean agent = false;
 		try {
@@ -203,9 +218,10 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 		}
 		catch (Throwable e) {LogUtil.trace(e);}
 		if (batchEvaluateGUI.getBindUri() != null || !agent) {
+			mnTools.addSeparator();
 			JMenuItem mniSwitchEvaluator = new JMenuItem(
 				new AbstractAction(I18nUtil.message("switch_evaluator")) {
-
+					
 					/**
 					 * Serial version UID for serializable class. 
 					 */
@@ -215,7 +231,6 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 					public void actionPerformed(ActionEvent e) {
 						switchEvaluator();
 					}
-				
 				});
 			mnTools.add(mniSwitchEvaluator);
 		}
@@ -226,7 +241,7 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 		
 		JMenuItem mniHelpContent = new JMenuItem(
 			new AbstractAction(I18nUtil.message("help_content")) {
-
+				
 				/**
 				 * Serial version UID for serializable class. 
 				 */
@@ -236,7 +251,6 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 				public void actionPerformed(ActionEvent e) {
 					new HelpContent(getThisEvalGUI());
 				}
-			
 			});
 		mnHelp.add(mniHelpContent);
 
@@ -245,44 +259,16 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 	}
 
 	
-//	/**
-//	 * Create context menu.
-//	 * @return context menu.
-//	 */
-//	private JPopupMenu createContextMenu() {
-//		if (!isIdle()) return null;
-//		
-//		boolean agent = false;
-//		try {
-//			agent = batchEvaluateGUI.evaluator.isAgent();
-//		}
-//		catch (Throwable e) {
-//			LogUtil.trace(e);
-//		}
-//		if (agent && batchEvaluateGUI.bindUri == null)
-//			return null;
-//
-//		JPopupMenu contextMenu = new JPopupMenu();
-//		
-//		JMenuItem mniPluginConfig = UIUtil.makeMenuItem(null, I18nUtil.message("plugin_manager"), 
-//			new ActionListener() {
-//				
-//				@Override
-//				public void actionPerformed(ActionEvent e) {
-//					PluginStorageManifest.showDlg(getThisEvalGUI(), getThisEvalGUI());
-//				}
-//			});
-//		contextMenu.add(mniPluginConfig);
-//
-//		return contextMenu;
-//	}
-	
-	
 	/**
 	 * Switch evaluator.
 	 */
 	private void switchEvaluator() {
-		if (!isIdle()) {
+		boolean isIdle = false;
+		try {
+			isIdle = batchEvaluateGUI.isIdle();
+		} catch (Exception e) {LogUtil.trace(e);}
+
+		if (!isIdle) {
 			int confirm = JOptionPane.showConfirmDialog(
 					UIUtil.getFrameForComponent(getThisEvalGUI()), 
 					"Evaluation task will be terminated if switching evaluator.\n" +
@@ -311,7 +297,12 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 	 * Show an dialog allowing users to see and modify the configuration of system.
 	 */
 	private void sysConfig() {
-		if (!isIdle()) {
+		boolean isIdle = false;
+		try {
+			isIdle = batchEvaluateGUI.isIdle();
+		} catch (Exception e) {LogUtil.trace(e);}
+		
+		if (!isIdle) {
 			JOptionPane.showMessageDialog(
 					getThisEvalGUI(), 
 					"Evaluatior is running.\n It is impossible to configure system", 
@@ -320,13 +311,11 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 			return;
 		}
 		
-//		boolean agent = false;
-//		try {
-//			agent = batchEvaluateGUI.getEvaluator().isAgent();
-//		}
-//		catch (Throwable e) {LogUtil.trace(e);}
+		PluginChangedListener pluginChangedListener = batchEvaluateGUI.getEvaluator();
+		if (batchEvaluateGUI.getBindUri() == null)
+			pluginChangedListener = EvaluatorAbstract.getTopMostPluginChangedListener((Evaluator)pluginChangedListener, true);
 		
-		SysConfigDlgExt cfg = new SysConfigDlgExt(this, I18nUtil.message("system_configure"), this) {
+		SysConfigDlgExt cfg = new SysConfigDlgExt(this, I18nUtil.message("system_configure"), pluginChangedListener) {
 
 			/**
 			 * Serial version UID for serializable class.
@@ -335,9 +324,7 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 
 			@Override
 			protected void onApply() {
-				// TODO Auto-generated method stub
-				if (!isModified())
-					return;
+				if (!isModified()) return;
 				
 				if (paneSysConfig != null && paneSysConfig.isModified()) {
 					paneSysConfig.apply();
@@ -355,8 +342,6 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 		};
 		
 		cfg.update(thisConfig);
-//		if ((batchEvaluateGUI.getBindUri() != null) || (agent))
-//			cfg.getPluginStorageManifest().setEnabled(false);
 		
 		cfg.setVisible(true);
 	}
@@ -384,34 +369,6 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 	}
 
 
-	@Override
-	public void pluginChanged(PluginChangedEvent evt) {
-		// TODO Auto-generated method stub
-		batchEvaluateGUI.pluginChanged(evt);
-	}
-
-
-	@Override
-	public boolean isIdle() {
-		// TODO Auto-generated method stub
-		return batchEvaluateGUI.isIdle();
-	}
-	
-	
-	@Override
-	public int getPort() {
-		// TODO Auto-generated method stub
-		return batchEvaluateGUI.getPort();
-	}
-
-
-//	@Override
-//	public void requireCleanupSomething() {
-//		// TODO Auto-generated method stub
-//		batchEvaluateGUI.requireCleanupSomething();
-//	}
-
-
 	/**
 	 * Switching evaluator.
 	 * @param selectedEvName selected evaluator name.
@@ -437,7 +394,6 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 					return o1.getName().compareToIgnoreCase(o2.getName());
 				}
 				catch (Throwable e) {
-					// TODO Auto-generated catch block
 					LogUtil.trace(e);
 					return -1;
 				}
@@ -453,15 +409,11 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 						break;
 					}
 				}
-				catch (Throwable e) {
-					// TODO Auto-generated catch block
-					LogUtil.trace(e);
-				}
+				catch (Throwable e) {LogUtil.trace(e);}
 			}
 		}
 		
 		final StartDlg dlgEvStarter = new StartDlg((JFrame)null, "List of evaluators") {
-			
 			/**
 			 * Serial version UID for serializable class.
 			 */
@@ -536,7 +488,6 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 			
 			final Service finalService = service;
 			final StartDlg dlgEvStarter = new StartDlg((JFrame)null, "List of evaluators") {
-				
 				/**
 				 * Serial version UID for serializable class.
 				 */
@@ -563,25 +514,22 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 						
 						xURI bindUri = ConnectDlg.getBindUri();
 						
-						//ev.getPluginStorage().assignToSystem();
 						run(ev, bindUri, null, null);
 					}
 					catch (Exception e) {
 						LogUtil.trace(e);
 						JOptionPane.showMessageDialog(
-								this, "Can't get remote evaluator", "Connection to evaluator fail", JOptionPane.ERROR_MESSAGE);
+							this, "Can't get remote evaluator", "Connection to evaluator fail", JOptionPane.ERROR_MESSAGE);
 					}
 				}
 				
 				@Override
 				protected JComboBox<?> createItemControl() {
-					// TODO Auto-generated method stub
 					return new JComboBox<String>(evNames);
 				}
 				
 				@Override
 				protected TextArea createHelp() {
-					// TODO Auto-generated method stub
 					TextArea helper = new TextArea("Thank you for choosing evaluators");
 					helper.setEditable(false);
 					return helper;
@@ -589,7 +537,6 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 
 				@Override
 				public void dispose() {
-					// TODO Auto-generated method stub
 					super.dispose();
 					
 					if (service != null)
@@ -604,10 +551,7 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 			dlgEvStarter.setSize(400, 150);
 	        dlgEvStarter.setVisible(true);
 		}
-		catch (Exception e) {
-			// TODO Auto-generated catch block
-			LogUtil.trace(e);
-		}
+		catch (Exception e) {LogUtil.trace(e);}
 	}
 
 	
@@ -623,21 +567,9 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 			Util.getPluginManager().fire();
 			
 		try {
-//			RegisterTable algReg = EvaluatorAbstract.extractAlgFromPluginStorage(evaluator);
-//			if (algReg == null || algReg.size() == 0) {
-//				JOptionPane.showMessageDialog(null, 
-//						"WARNING: There is no registered algorithm.\n Program cannot run.", 
-//						"No registered algorithm", JOptionPane.ERROR_MESSAGE);
-//				return;
-//			}
-			
 			RegisterTable parserReg = PluginStorage.getParserReg();
 			if (parserReg.size() == 0) {
 				Util.getPluginManager().discover();
-//				JOptionPane.showMessageDialog(null,
-//						"There is no registered dataset parser.\n Program cannot run.", 
-//						"No dataset parser", JOptionPane.ERROR_MESSAGE);
-//				return;
 			}
 			
 			RegisterTable metricReg = PluginStorage.getMetricReg();
@@ -656,10 +588,7 @@ public class EvalCompoundGUI extends JFrame implements PluginChangedListener {
 			if (oldGUI != null) oldGUI.dispose();
 			new EvalCompoundGUI(evaluator, bindUri, referredData);
 		}
-		catch (Exception e) {
-			// TODO Auto-generated catch block
-			LogUtil.trace(e);
-		}
+		catch (Exception e) {LogUtil.trace(e);}
 	}
 
 
