@@ -168,28 +168,11 @@ public final class DatasetUtil {
 
 	
 	/**
-	 * Getting most inner dataset of remote dataset.
-	 * @param remoteDataset remote dataset.
-	 * @return most inner dataset of remote dataset.
-	 */
-	public static Dataset getMostInnerDataset(DatasetRemote remoteDataset) {
-		if (remoteDataset == null)
-			return null;
-		else if (remoteDataset instanceof DatasetRemoteWrapper)
-			return getMostInnerDataset(((DatasetRemoteWrapper)remoteDataset).getRemoteDataset());
-		else if (remoteDataset instanceof Dataset)
-			return (Dataset)remoteDataset;
-		else
-			return null;
-	}
-
-
-	/**
 	 * Getting the most inner dataset of the specified dataset.
 	 * @param dataset specified dataset.
 	 * @return the most inner dataset of the specified dataset.
 	 */
-	public static Dataset getMostInnerDataset2(Dataset dataset) {
+	public static Dataset getMostInnerDataset(Dataset dataset) {
 		if (dataset == null)
 			return null;
 		else if (dataset instanceof DatasetRemoteWrapper) {
@@ -197,7 +180,7 @@ public final class DatasetUtil {
 			if (remoteDataset == null)
 				return null;
 			else if (remoteDataset instanceof Dataset)
-				return getMostInnerDataset2((Dataset)remoteDataset);
+				return getMostInnerDataset((Dataset)remoteDataset);
 			else
 				return null;
 		}
@@ -206,4 +189,41 @@ public final class DatasetUtil {
 	}
 
 
+	/**
+	 * Getting most inner dataset of remote dataset.
+	 * @param remoteDataset remote dataset.
+	 * @return most inner dataset of remote dataset.
+	 */
+	public static Dataset getMostInnerDatasetRemote(DatasetRemote remoteDataset) {
+		if (remoteDataset == null)
+			return null;
+		else if (remoteDataset instanceof DatasetRemoteWrapper)
+			return getMostInnerDatasetRemote(((DatasetRemoteWrapper)remoteDataset).getRemoteDataset());
+		else if (remoteDataset instanceof Dataset)
+			return (Dataset)remoteDataset;
+		else
+			return null;
+	}
+
+
+	/**
+	 * Check whether to call the specified dataset remotely. There exists a reference to unexported object.
+	 * @param dataset specified dataset.
+	 * @return whether to call the specified dataset remotely.
+	 */
+	public static boolean canCallRemote(Dataset dataset) {
+		if (dataset == null)
+			return false;
+		else if (dataset instanceof DatasetRemote) {
+			DataConfig config = null;
+			try {
+				config = ((DatasetRemote)dataset).remoteGetConfig();
+			} catch (Throwable e) {}
+			return config != null;
+		}
+		else
+			return dataset.getConfig() != null;
+	}
+	
+	
 }

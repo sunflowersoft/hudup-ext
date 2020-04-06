@@ -249,13 +249,13 @@ public class DatasetPoolExchanged  implements Serializable {
 			Dataset training = null;
 			UUID trainingUUID = null;
 			if (pair.training != null) {
-				training = DatasetUtil.getMostInnerDataset(pair.training);
+				training = DatasetUtil.getMostInnerDatasetRemote(pair.training);
 				trainingUUID = training != null ? pair.trainingUUID : null;
 			}
 			else if (pair.trainingUUID != null) {
 				DatasetPairExchanged newPair = referredPool.findByTrainingUUID(pair.trainingUUID);
 				if (newPair != null) {
-					training = DatasetUtil.getMostInnerDataset(newPair.training);
+					training = DatasetUtil.getMostInnerDatasetRemote(newPair.training);
 					trainingUUID = training != null ? newPair.trainingUUID : null;
 				}
 			}
@@ -263,13 +263,13 @@ public class DatasetPoolExchanged  implements Serializable {
 			Dataset testing = null;
 			UUID testingUUID = null;
 			if (pair.testing != null) {
-				testing = DatasetUtil.getMostInnerDataset(pair.testing);
+				testing = DatasetUtil.getMostInnerDatasetRemote(pair.testing);
 				testingUUID = testing != null ? pair.testingUUID : null;
 			}
 			else if (pair.testingUUID != null) {
 				DatasetPairExchanged newPair = referredPool.findByTestingUUID(pair.testingUUID);
 				if (newPair != null) {
-					testing = DatasetUtil.getMostInnerDataset(newPair.testing);
+					testing = DatasetUtil.getMostInnerDatasetRemote(newPair.testing);
 					testingUUID = testing != null ? newPair.testingUUID : null;
 				}
 			}
@@ -277,13 +277,13 @@ public class DatasetPoolExchanged  implements Serializable {
 			Dataset whole = null;
 			UUID wholeUUID = null;
 			if (pair.whole != null) {
-				whole = DatasetUtil.getMostInnerDataset(pair.whole);
+				whole = DatasetUtil.getMostInnerDatasetRemote(pair.whole);
 				wholeUUID = whole != null ? pair.wholeUUID : null;
 			}
 			else if (pair.wholeUUID != null) {
 				DatasetPairExchanged newPair = referredPool.findByWholeUUID(pair.wholeUUID);
 				if (newPair != null) {
-					whole = DatasetUtil.getMostInnerDataset(newPair.whole);
+					whole = DatasetUtil.getMostInnerDatasetRemote(newPair.whole);
 					wholeUUID = whole != null ? newPair.wholeUUID : null;
 				}
 			}

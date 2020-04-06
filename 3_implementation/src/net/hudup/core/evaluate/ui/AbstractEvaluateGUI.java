@@ -132,24 +132,6 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	protected Timestamp timestamp = null;
 	
 	
-//	/**
-//	 * Account.
-//	 */
-//	protected Account attachedAccount = null;
-	
-	
-//	/**
-//	 * Network class loader server.
-//	 */
-//	protected SocketClassLoaderServer cl = null;
-	
-	
-//	/**
-//	 * Waiting timer.
-//	 */
-//	protected WaitTimer waitTimer = null;
-	
-	
 	/**
 	 * Constructor with local evaluator.
 	 * @param evaluator local evaluator.
@@ -467,7 +449,6 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 		evProcessor.clear();
 		updateGUIData();
 		guiData.active = false;
-//		attachedAccount = null;
 		
 		try {
 			algRegTable.unexportNonPluginAlgs();
@@ -516,7 +497,6 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 			evaluator.setMetricNameList(MetricsUtil.extractMetricNameList(selectedMetricList));
 		}
 		catch (Throwable e) {
-			// TODO Auto-generated catch block
 			LogUtil.trace(e);
 			LogUtil.error("Error in setting metrics");
 		}
@@ -549,19 +529,6 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	}
 
 
-//	@Override
-//	public void requireCleanupSomething() {
-//		// TODO Auto-generated method stub
-//		try {
-//			if (bindUri == null)
-//				evaluator.clearDelayUnsetupAlgs();
-//		}
-//		catch (Throwable e) {
-//			LogUtil.trace(e);
-//		}
-//	}
-
-
 	/**
 	 * Getting bound URI.
 	 * @return bound URI.
@@ -571,27 +538,8 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	}
 	
 	
-//	/**
-//	 * Getting attached account.
-//	 * @return attached account.
-//	 */
-//	public Account getAttachedAccount() {
-//		return attachedAccount;
-//	}
-//	
-//	
-//	/**
-//	 * Setting attached account.
-//	 * @param attachedAccount attached account.
-//	 */
-//	public void setAttachedAccount(Account attachedAccount) {
-//		this.attachedAccount = attachedAccount;
-//	}
-	
-	
 	@Override
 	public byte[] getByteCode(String className) throws RemoteException {
-		// TODO Auto-generated method stub
 		return ClassProcessor.getByteCode0(className);
 	}
 
@@ -667,7 +615,7 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	 */
 	private void setupDatasetExchanged(DatasetRemote remoteDataset) {
 		if (remoteDataset == null || bindUri == null) return;
-		if (DatasetUtil.getMostInnerDataset(remoteDataset) == null)
+		if (DatasetUtil.getMostInnerDatasetRemote(remoteDataset) == null)
 			return;
 		
 		try {
@@ -709,18 +657,6 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	}
 	
 	
-//	/**
-//	 * Synchronizing plug-in storage with evaluator.
-//	 */
-//	protected void syncPluginWithEvaluator() {
-//		if (bindUri == null || evaluator == null) return;
-//		
-//		//Current version only synchronize normal algorithm and metric plug-in
-//		PluginStorage.syncWithEvaluator(evaluator, Alg.class, true);
-//		PluginStorage.syncWithEvaluator(evaluator, Metric.class, true);
-//	}
-	
-	
 	/**
 	 * Updating plug-in storage from evaluator.
 	 */
@@ -759,19 +695,6 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 		if (evaluator == null || algNames == null || algNames.size() == 0)
 			return;
 		
-//		List<String> regAlgNames = algRegTable.getAlgNames();
-//		for (String regAlgName : regAlgNames) {
-//			Alg alg = algRegTable.query(regAlgName);
-//			if (!PluginStorage.contains(alg)) {
-//				try {
-//					if (alg instanceof AlgRemote)
-//						((AlgRemote)alg).unexport();
-//				} catch (Exception e) {LogUtil.trace(e);}
-//				
-//				algRegTable.unregister(regAlgName);
-//			}
-//		}
-		
 		RegisterTable normalAlgReg = PluginStorage.getNormalAlgReg();
 		for (String algName : algNames) {
 			if (algRegTable.contains(algName)) {
@@ -779,7 +702,7 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 					continue;
 				else {
 					Alg alg = algRegTable.query(algName);
-					if (!AlgDesc2.canCallRemoteAlg(alg)) {
+					if (!AlgDesc2.canCallRemote(alg)) {
 						algRegTable.unregister(algName);
 						try {
 							if (alg instanceof Exportable) ((Exportable)alg).unexport();

@@ -116,7 +116,7 @@ public final class SystemUtil {
 	 * Java 9 or higher: 9.0.1, 11.0.4, 12, 12.0.1.
 	 * @return Java version like 6, 7, 8, 9.
 	 */
-	public static int getJavaVersion2() {
+	public static int getJavaVersion() {
 		try {
 			String version = System.getProperty("java.version");
 		    if(version.startsWith("1."))
@@ -147,7 +147,7 @@ public final class SystemUtil {
 		
 		System.setProperty("java.security.policy", policyUrl.toString());
 		if (System.getSecurityManager() == null) {
-			int version = SystemUtil.getJavaVersion2();
+			int version = SystemUtil.getJavaVersion();
 			if (version <= 8)
 				System.setSecurityManager(new java.rmi.RMISecurityManager());
 			else

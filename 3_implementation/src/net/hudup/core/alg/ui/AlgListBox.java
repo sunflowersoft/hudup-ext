@@ -23,7 +23,6 @@ import java.util.Date;
 import java.util.EventListener;
 import java.util.EventObject;
 import java.util.List;
-import java.util.Set;
 import java.util.Vector;
 
 import javax.swing.JButton;
@@ -395,19 +394,34 @@ public class AlgListBox extends JList<Alg> implements AlgListUI {
 	
 	
 	/**
-	 * Adding the specified collection of algorithms into this {@link AlgListBox}.
+	 * Adding the specified collection of algorithms into this algorithm list box.
+	 * This method does not accept duplicated algorithm references.
 	 * @param algList specified collection of algorithms.
 	 */
-	public void addAll(Collection<Alg> algList) {
-		Set<Alg> algSet = Util.newSet();
-		algSet.addAll(getAlgList());
-		algSet.addAll(algList);
-		
+	public void addAllNoRefDuplicate(Collection<Alg> algList) {
 		List<Alg> wholeList = Util.newList();
-		wholeList.addAll(algSet);
+		wholeList.addAll(getAlgList());
+		for (Alg alg : algList) {
+			if (!wholeList.contains(alg))
+				wholeList.add(alg);
+		}
+		
 		update(wholeList);
 	}
 	
+	
+	/**
+	 * Adding the specified collection of algorithms into this algorithm list box.
+	 * @param algList specified collection of algorithms.
+	 */
+	public void addAll(Collection<Alg> algList) {
+		List<Alg> wholeList = Util.newList();
+		wholeList.addAll(getAlgList());
+		wholeList.addAll(algList);
+		
+		update(wholeList);
+	}
+
 	
 	/**
 	 * Removing the specified algorithm from this {@link AlgListBox}.

@@ -200,6 +200,16 @@ public class DatasetPoolTable extends JTable {
 			});
 		contextMenu.add(miSave);
 
+		JMenuItem miAdd = UIUtil.makeMenuItem((String)null, "Add script", 
+			new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					add();
+				}
+			});
+		contextMenu.add(miAdd);
+
 		final int selectedRow = getSelectedRow();
 		final int selectedColumn = getSelectedColumn();
 		if (selectedRow == -1) return contextMenu;
@@ -547,11 +557,20 @@ public class DatasetPoolTable extends JTable {
 	/**
 	 * Save data.
 	 */
-	public void save() {
+	protected void save() {
 		JOptionPane.showMessageDialog(this, 
-				"Not implement yet", "Not implement yet", JOptionPane.WARNING_MESSAGE);
+			"Saving script not implemented yet", "Not implement yet", JOptionPane.WARNING_MESSAGE);
 	}
 
+	
+	/**
+	 * Add and load script.
+	 */
+	protected void add() {
+		JOptionPane.showMessageDialog(this, 
+			"Adding and loading script not implemented yet", "Not implement yet", JOptionPane.WARNING_MESSAGE);
+	}
+	
 	
 	/**
 	 * Setting optionally enabled flag.
@@ -614,7 +633,7 @@ public class DatasetPoolTable extends JTable {
 			else if (column == 3)
 				dataset = pool.get(row).getWhole();
 				
-			dataset = DatasetUtil.getMostInnerDataset2(dataset);
+			dataset = DatasetUtil.getMostInnerDataset(dataset);
 			if (dataset != null)
 				comp.setBackground(new Color(0, 255, 0));
 			return comp;

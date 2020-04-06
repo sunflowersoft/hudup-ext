@@ -87,14 +87,14 @@ public class EvaluatorWrapper implements Evaluator, Serializable {
 
 	
 	@Override
-	public boolean remoteStart0(List<Alg> algList, DatasetPoolExchanged pool, Serializable parameter) throws RemoteException {
-		return remoteEvaluator.remoteStart0(algList, pool, parameter);
+	public boolean remoteStart0(List<Alg> algList, DatasetPoolExchanged pool, Timestamp timestamp, Serializable parameter) throws RemoteException {
+		return remoteEvaluator.remoteStart0(algList, pool, timestamp, parameter);
 	}
 
 
 	@Override
-	public boolean remoteStart(List<String> algNameList, DatasetPoolExchanged pool, ClassProcessor cp, DataConfig config, Serializable parameter) throws RemoteException {
-		return remoteEvaluator.remoteStart(algNameList, pool, cp, config, parameter);
+	public boolean remoteStart(List<String> algNameList, DatasetPoolExchanged pool, ClassProcessor cp, DataConfig config, Timestamp timestamp, Serializable parameter) throws RemoteException {
+		return remoteEvaluator.remoteStart(algNameList, pool, cp, config, timestamp, parameter);
 	}
 
 

@@ -183,6 +183,21 @@ public class BatchScript implements Serializable {
 	
 	
 	/**
+	 * Getting list of algorithm names without duplication.
+	 * @return list of algorithm names without duplication.
+	 */
+	public List<String> getAlgNameListNoDuplicate() {
+		List<String> newAlgNameList = Util.newList();
+		for (String algName : algNameList) {
+			if (!newAlgNameList.contains(algName))
+				newAlgNameList.add(algName);
+		}
+		
+		return newAlgNameList;
+	}
+
+	
+	/**
 	 * Creating a batch script by assigning specified dataset pool and list of algorithm names.
 	 * @param pool specified dataset pool.
 	 * @param algNameList specified list of algorithm names.

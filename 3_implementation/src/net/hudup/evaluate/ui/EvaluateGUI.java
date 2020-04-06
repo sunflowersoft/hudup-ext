@@ -244,7 +244,6 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 	 * Status bar.
 	 */
 	protected StatusBar statusBar = null;
-//	protected StatusBar2 statusBar = null;
 	
 	
 	/**
@@ -391,7 +390,6 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 
 			@Override
 			protected void addToContextMenu(JPopupMenu contextMenu) {
-				// TODO Auto-generated method stub
 				super.addToContextMenu(contextMenu);
 
 				contextMenu.addSeparator();
@@ -412,7 +410,6 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			
 			@Override
 			public void itemStateChanged(ItemEvent e) {
-				// TODO Auto-generated method stub
 				if (e.getStateChange() != ItemEvent.SELECTED)
 					return;
 				
@@ -436,7 +433,6 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					// TODO Auto-generated method stub
 					new AlgConfigDlg(getThisGUI(), getAlg()).
 						setVisible(true);
 				}
@@ -455,8 +451,6 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
-				
 				openTrainingSet();
 			}
 		});
@@ -467,8 +461,6 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
-				
 				openTestingSet();
 			}
 		});
@@ -500,8 +492,6 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					// TODO Auto-generated method stub
-					
 					refresh();
 				}
 			});
@@ -519,8 +509,6 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					// TODO Auto-generated method stub
-					
 					clear();
 				}
 			});
@@ -537,7 +525,6 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					// TODO Auto-generated method stub
 					boolean ret = true;
 					try {
 						if (bindUri == null)
@@ -576,7 +563,6 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					// TODO Auto-generated method stub
 					if (bindUri == null) return;
 
 					synchronized (getThisGUI()) {
@@ -628,8 +614,6 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					// TODO Auto-generated method stub
-					
 					forceStop();
 				}
 			});
@@ -687,8 +671,6 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
-				
 				run();
 			}
 		});
@@ -699,8 +681,6 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
-				
 				pauseResume();
 			}
 		});
@@ -711,8 +691,6 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
-				
 				stop();
 			}
 		});
@@ -742,7 +720,6 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				xURI store = null;
 				if(chkRunSave.isSelected()) {
 					UriAdapter adapter = new UriAdapter();
@@ -793,7 +770,6 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				boolean verbal = chkVerbal.isSelected();
 				setVerbal(verbal);
 			}
@@ -813,8 +789,6 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					// TODO Auto-generated method stub
-					
 					metricsOption();
 				}
 			});
@@ -852,7 +826,6 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 
 			@Override
 			protected void addToContextMenu(JPopupMenu contextMenu) {
-				// TODO Auto-generated method stub
 				super.addToContextMenu(contextMenu);
 				if (contextMenu == null) return;
 				
@@ -902,7 +875,6 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				if (result != null) {
 					try {
 						new MetricsAnalyzeDlg(getThisGUI(), result, algRegTable, evaluator);
@@ -1081,7 +1053,6 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			}
 		}
 		catch (Throwable e) {
-			// TODO Auto-generated catch block
 			LogUtil.trace(e);
 			updateMode();
 		}
@@ -1158,7 +1129,6 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			openTestingSet(config);
 		}
 		catch (Throwable e) {
-			// TODO Auto-generated catch block
 			LogUtil.trace(e);
 		}
 	}
@@ -1199,12 +1169,12 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			
 			if (dataset instanceof Pointer) {
 				JOptionPane.showMessageDialog(
-						this, 
-						"Testing dataset is pointer", 
-						"Invalid testing dataset", 
-						JOptionPane.ERROR_MESSAGE);
-					
-					return;
+					this, 
+					"Testing dataset is pointer", 
+					"Invalid testing dataset", 
+					JOptionPane.ERROR_MESSAGE);
+				
+				return;
 			}
 	
 			clearResult();
@@ -1220,7 +1190,6 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			}
 		}
 		catch (Throwable e) {
-			// TODO Auto-generated catch block
 			LogUtil.trace(e);
 			updateMode();
 		}
@@ -1251,7 +1220,6 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			worker.execute(); dlgWait.setVisible(true);
 		}
 		catch (Throwable e) {
-			// TODO Auto-generated catch block
 			LogUtil.trace(e);
 		}
 	}
@@ -1279,7 +1247,6 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			}
 		}
 		catch (Throwable e) {
-			// TODO Auto-generated catch block
 			LogUtil.trace(e);
 			updateMode();
 		}
@@ -1291,7 +1258,6 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 	 * @return {@link Alg} as current algorithm.
 	 */
 	private Alg getAlg() {
-		// TODO Auto-generated method stub
 		if (cmbAlgs.getItemCount() == 0)
 			return null;
 		else
@@ -1301,7 +1267,6 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 	
 	@Override
 	protected List<Alg> getCurrentAlgList() {
-		// TODO Auto-generated method stub
 		List<Alg> algList = Util.newList();
 		
 		Alg alg = getAlg();
@@ -1336,15 +1301,14 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			clearResult();
 			boolean started = false;
 			if (bindUri == null)
-				started = evaluator.remoteStart0(algList, toDatasetPoolExchangedClient(guiData.pool), timestamp = new Timestamp());
+				started = evaluator.remoteStart0(algList, toDatasetPoolExchangedClient(guiData.pool), timestamp = new Timestamp(), null);
 			else {
 				DataConfig config = AlgList.getAlgDescMapRemote(algList);
-				started = evaluator.remoteStart(AlgList.getAlgNameList(algList), toDatasetPoolExchangedClient(guiData.pool), this, config, timestamp = new Timestamp());
+				started = evaluator.remoteStart(AlgList.getAlgNameList(algList), toDatasetPoolExchangedClient(guiData.pool), this, config, timestamp = new Timestamp(), null);
 			}
 			if (!started) updateMode();
 		}
 		catch (Throwable e) {
-			// TODO Auto-generated catch block
 			LogUtil.trace(e);
 			LogUtil.error("Error in evaluation");
 			updateMode(); //Added date: 2019.08.12 by Loc Nguyen
@@ -1486,7 +1450,6 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 
 	@Override
 	public void receivedElapsedTime(CounterElapsedTimeEvent evt) throws RemoteException {
-		// TODO Auto-generated method stub
 		if (statusBar != null && statusBar.getLastPane() != null) {
 			String elapsedTimeText = Counter.formatTime(evt.getElapsedTime());
 			statusBar.getLastPane().setText(elapsedTimeText);
@@ -1695,7 +1658,6 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 	
 	@Override
 	protected void updateGUIData() {
-		// TODO Auto-generated method stub
 		if (cmbAlgs.getSelectedAlg() != null)
 			guiData.algName = cmbAlgs.getSelectedAlg().getName();
 		else
@@ -1797,7 +1759,6 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 
 				@Override
 				public void windowClosed(WindowEvent e) {
-					// TODO Auto-generated method stub
 					super.windowClosed(e);
 					
 					evaluateGUI.dispose();
@@ -1812,7 +1773,6 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 
 		@Override
 		public void inspect() {
-			// TODO Auto-generated method stub
 			setVisible(true);
 		}
 		

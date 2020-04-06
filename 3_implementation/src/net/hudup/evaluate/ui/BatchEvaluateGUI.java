@@ -243,7 +243,6 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 	 * Status bar.
 	 */
 	protected StatusBar statusBar = null;
-//	protected StatusBar2 statusBar = null;
 	
 	
 	/**
@@ -372,7 +371,6 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 
 			@Override
 			protected void addToContextMenu(JPopupMenu contextMenu) {
-				// TODO Auto-generated method stub
 				super.addToContextMenu(contextMenu);
 				
 		    	final Alg selectedAlg = getSelectedAlg();
@@ -441,7 +439,6 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 				try {
 					List<Alg> list = evt.getAlgList();
 					for (Alg alg : list) {
-						//if (!EvaluatorAbstract.acceptAlg(evaluator, alg, bindUri)) continue; //Not necessary because checked.
 						if (!algRegTable.contains(alg.getName()))
 							algRegTable.register(alg);
 					}
@@ -507,9 +504,8 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 							evaluator.updatePool(toDatasetPoolExchangedClient(guiData.pool), getThisGUI(), timestamp = new Timestamp());
 						} catch (Throwable e) {LogUtil.trace(e);}
 					}
-					else {
+					else
 						updateMode();
-					}
 				}
 				
 				return ret;
@@ -518,6 +514,11 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			@Override
 			public void save() {
 				saveBatchScript();
+			}
+
+			@Override
+			protected void add() {
+				loadBatchScript(true);
 			}
 
 		};
@@ -536,7 +537,6 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				addDataset(false);
 			}
 		});
@@ -547,8 +547,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
-				loadBatchScript();
+				loadBatchScript(false);
 			}
 		});
 		toolGrp1.add(this.btnLoadBatchScript);
@@ -566,7 +565,6 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					// TODO Auto-generated method stub
 					refresh();
 				}
 			});
@@ -602,7 +600,6 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					// TODO Auto-generated method stub
 					boolean ret = true;
 					try {
 						if (bindUri == null)
@@ -641,7 +638,6 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					// TODO Auto-generated method stub
 					if (bindUri == null) return;
 
 					synchronized (getThisGUI()) {
@@ -705,8 +701,6 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					// TODO Auto-generated method stub
-					
 					forceStop();
 				}
 				
@@ -733,7 +727,6 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				run();
 			}
 		});
@@ -744,8 +737,6 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
-				
 				pauseResume();
 			}
 		});
@@ -756,7 +747,6 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				stop();
 			}
 			
@@ -787,8 +777,6 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
-				
 				xURI store = null;
 				if(chkRunSave.isSelected()) {
 					UriAdapter adapter = new UriAdapter();
@@ -839,7 +827,6 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				boolean verbal = chkVerbal.isSelected();
 				setVerbal(verbal);
 			}
@@ -859,7 +846,6 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					// TODO Auto-generated method stub
 					metricsOption();
 				}
 				
@@ -898,7 +884,6 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 
 			@Override
 			protected void addToContextMenu(JPopupMenu contextMenu) {
-				// TODO Auto-generated method stub
 				super.addToContextMenu(contextMenu);
 				if (contextMenu == null) return;
 				
@@ -948,7 +933,6 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				if (result != null) {
 					try {
 						new MetricsAnalyzeDlg(getThisGUI(), result, algRegTable, evaluator);
@@ -1046,7 +1030,6 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 	
 	@Override
 	protected List<Alg> getCurrentAlgList() {
-		// TODO Auto-generated method stub
 		return lbAlgs.getAlgList();
 	}
 
@@ -1127,10 +1110,10 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			clearResult();
 			boolean started = false;
 			if (bindUri == null)
-				started = evaluator.remoteStart0(lbAlgs.getAlgList(), toDatasetPoolExchangedClient(guiData.pool), timestamp = new Timestamp());
+				started = evaluator.remoteStart0(lbAlgs.getAlgList(), toDatasetPoolExchangedClient(guiData.pool), timestamp = new Timestamp(), null);
 			else {
 				DataConfig config = lbAlgs.getAlgDescMapRemote();
-				started = evaluator.remoteStart(lbAlgs.getAlgNameList(), toDatasetPoolExchangedClient(guiData.pool), this, config, timestamp = new Timestamp());
+				started = evaluator.remoteStart(lbAlgs.getAlgNameList(), toDatasetPoolExchangedClient(guiData.pool), this, config, timestamp = new Timestamp(), null);
 			}
 				
 			if (!started) updateMode();
@@ -1188,22 +1171,6 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 				type == EvaluatorEvent.Type.resume || 
 				type == EvaluatorEvent.Type.stop) {
 		}
-//		else if (type == EvaluatorEvent.Type.clear_result) {
-//			if (timeDiff) {
-//				updatePluginFromEvaluator();
-//				
-//				algRegTable.clear();
-//				algRegTable.register(EvaluatorAbstract.extractNormalAlgFromPluginStorage(evaluator, bindUri)); //Algorithms are not cloned because of saving memory when evaluator GUI keep algorithms for a long time.
-//			}
-//			
-//			lbAlgs.unexportNonPluginAlgs();
-//			lbAlgs.update(algRegTable.getAlgList());
-//			
-//			guiData.pool = new DatasetPool();
-//			tblDatasetPool.update(guiData.pool);
-//			
-//			clearResult();
-//		}
 		
 		updateMode();
 	}
@@ -1282,7 +1249,6 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 	
 	@Override
 	public void receivedElapsedTime(CounterElapsedTimeEvent evt) throws RemoteException {
-		// TODO Auto-generated method stub
 		if (statusBar != null && statusBar.getLastPane() != null) {
 			String elapsedTimeText = Counter.formatTime(evt.getElapsedTime());
 			statusBar.getLastPane().setText(elapsedTimeText);
@@ -1324,11 +1290,6 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 				if (evaluator.remoteIsRunning()) {
 					setInternalEnable(false);
 					setResultVisible(false);
-					
-//					recoveredResult = result;
-//					result = null;
-//					tblMetrics.clear();
-//					txtRunInfo.setText("");
 					
 					btnPauseResume.setText(I18nUtil.message("pause"));
 					btnPauseResume.setEnabled(true);
@@ -1444,8 +1405,9 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 	
 	/**
 	 * Load batch script.
+	 * @param append Flag to indicate whether to append to current pool.
 	 */
-	protected void loadBatchScript() {
+	private void loadBatchScript(boolean append) {
 		try {
 			if (evaluator.remoteIsStarted() || this.lbAlgs.getAlgList().size() == 0)
 				return;
@@ -1497,7 +1459,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 				return;
 			}
 
-			List<Alg> batchAlgList = algRegTable.getAlgList(script.getAlgNameList());
+			List<Alg> batchAlgList = algRegTable.getAlgList(script.getAlgNameListNoDuplicate());
 			if (batchAlgList.size() == 0) {
 				JOptionPane.showMessageDialog(
 						this, 
@@ -1505,10 +1467,14 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 						"Batch script has unsuitable algorithms", 
 						JOptionPane.WARNING_MESSAGE);
 			}
-			else
-				this.lbAlgs.update(batchAlgList);
+			else {
+				if (append)
+					this.lbAlgs.addAllNoRefDuplicate(batchAlgList);
+				else
+					this.lbAlgs.update(batchAlgList);
+			}
 			
-			guiData.pool.clear();
+			if (!append) guiData.pool.removeAllNoClearDatasets();
 			DatasetPool scriptPool = script.getPool();
 			Alg[] algList = this.lbAlgs.getAlgList().toArray(new Alg[] {} );
 			for (int i = 0; i < scriptPool.size(); i++) {
@@ -1537,20 +1503,19 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			LogUtil.trace(e);
 			updateMode();
 		}
-			
 	}
 	
 	
 	/**
 	 * Saving batch script.
 	 */
-	protected void saveBatchScript() {
+	private void saveBatchScript() {
 		if (guiData.pool.size() == 0) {
 			JOptionPane.showMessageDialog(
-					this, 
-					"Pool empty",
-					"Pool empty", 
-					JOptionPane.ERROR_MESSAGE);
+				this, 
+				"Pool empty",
+				"Pool empty", 
+				JOptionPane.ERROR_MESSAGE);
 			return;
 		}
 
@@ -1566,10 +1531,10 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
         
         if (uri == null) {
 			JOptionPane.showMessageDialog(
-					this, 
-					"URI not save", 
-					"URI not save", 
-					JOptionPane.WARNING_MESSAGE);
+				this, 
+				"URI not save", 
+				"URI not save", 
+				JOptionPane.WARNING_MESSAGE);
 			return;
         }
         
@@ -1578,11 +1543,11 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 		adapter.close();
         if (existed) {
         	int ret = JOptionPane.showConfirmDialog(
-        			this, 
-        			"URI exist. Do you want to override it?", 
-        			"URI exist", 
-        			JOptionPane.YES_NO_OPTION, 
-        			JOptionPane.QUESTION_MESSAGE);
+    			this, 
+    			"URI exist. Do you want to override it?", 
+    			"URI exist", 
+    			JOptionPane.YES_NO_OPTION, 
+    			JOptionPane.QUESTION_MESSAGE);
         	if (ret == JOptionPane.NO_OPTION)
         		return;
         }
@@ -1626,7 +1591,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 	 * Adding dataset.
 	 * @param nullTesting true if add null testing dataset {@link NullPointer}.
 	 */
-	protected void addDataset(boolean nullTesting) {
+	private void addDataset(boolean nullTesting) {
 		try {
 			if (evaluator.remoteIsStarted() || this.lbAlgs.getAlgList().size() == 0)
 				return;
@@ -1677,7 +1642,6 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 	
 	@Override
 	protected void updateGUIData() {
-		// TODO Auto-generated method stub
 		guiData.algNames = lbAlgs.getAlgNameList();
 		
 		guiData.txtRunSaveBrowse = this.chkRunSave.isSelected() ? this.txtRunSaveBrowse.getText() : null;

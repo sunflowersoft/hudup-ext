@@ -282,7 +282,6 @@ class MetricsTM extends SortableTableModel {
 	 */
 	public MetricsTM() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
 

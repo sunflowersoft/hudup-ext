@@ -101,11 +101,12 @@ public interface Evaluator extends Remote, RemoteRunner, SetupAlgListener, Plugi
 	 * Starting the evaluation process on specified algorithms with specified dataset pool.
 	 * @param algList specified list of algorithms.
 	 * @param pool specified dataset pool containing many training datasets and testing datasets. It must be serializable in remote call.
-	 * @param parameter additional parameter.
+	 * @param timestamp time stamp. It can be null.
+	 * @param parameter additional parameter. It can be null.
 	 * @return true if successful.
 	 * @throws RemoteException if any error raises.
 	 */
-	boolean remoteStart0(List<Alg> algList, DatasetPoolExchanged pool, Serializable parameter) throws RemoteException;
+	boolean remoteStart0(List<Alg> algList, DatasetPoolExchanged pool, Timestamp timestamp, Serializable parameter) throws RemoteException;
 
 	
 	/**
@@ -114,11 +115,12 @@ public interface Evaluator extends Remote, RemoteRunner, SetupAlgListener, Plugi
 	 * @param pool specified dataset pool containing many training datasets and testing datasets. It must be serializable in remote call.
 	 * @param cp class processor. This parameter can be null.
 	 * @param config configuration. This parameter can be null.
+	 * @param timestamp time stamp. It can be null.
 	 * @param parameter additional parameter.
 	 * @return true if successful.
 	 * @throws RemoteException if any error raises.
 	 */
-	boolean remoteStart(List<String> algNameList, DatasetPoolExchanged pool, ClassProcessor cp, DataConfig config, Serializable parameter) throws RemoteException;
+	boolean remoteStart(List<String> algNameList, DatasetPoolExchanged pool, ClassProcessor cp, DataConfig config, Timestamp timestamp, Serializable parameter) throws RemoteException;
 
 	
 	/**
@@ -252,21 +254,6 @@ public interface Evaluator extends Remote, RemoteRunner, SetupAlgListener, Plugi
 	RegisterTable extractNormalAlgFromPluginStorage0() throws RemoteException;
 
 	
-//	/**
-//	 * Clearing delay unsetting up algorithms.
-//	 * @throws RemoteException if any error raises.
-//	 */
-//	void clearDelayUnsetupAlgs() throws RemoteException;
-
-	
-//	/**
-//	 * Clearing all evaluated results.
-//	 * @param timestamp time stamp.
-//	 * @throws RemoteException if any error raises.
-//	 */
-//    void clearResult(Timestamp timestamp) throws RemoteException;
-
-    
 	/**
 	 * Getting dataset pool. This method needs to be improved with large dataset pool and scanner.
 	 * @return dataset pool.
@@ -470,15 +457,6 @@ public interface Evaluator extends Remote, RemoteRunner, SetupAlgListener, Plugi
      * @throws RemoteException if any error raises.
      */
     void setReferredService(Service referredService) throws RemoteException;
-    
-    
-//    /**
-//     * Testing RMI call.
-//     * @param o parameter.
-//     * @return an object.
-//     * @throws RemoteException if any error raises.
-//     */
-//    Object ping(Object o) throws RemoteException;
     
     
 }

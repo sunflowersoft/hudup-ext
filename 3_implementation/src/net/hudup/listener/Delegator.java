@@ -943,27 +943,27 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluateListen
 
 
 	@Override
-	public synchronized boolean remoteStart0(List<Alg> algList, DatasetPoolExchanged pool, Serializable parameter) throws RemoteException {
+	public synchronized boolean remoteStart0(List<Alg> algList, DatasetPoolExchanged pool, Timestamp timestamp, Serializable parameter) throws RemoteException {
 		boolean flag = socketServer.getFlag();
 		
 		if (flag)
-			return remoteEvaluator.remoteStart0(algList, pool, parameter);
+			return remoteEvaluator.remoteStart0(algList, pool, timestamp, parameter);
 		else if (socketServer.isRunning())
-			return remoteEvaluator.remoteStart0(algList, pool, parameter);
+			return remoteEvaluator.remoteStart0(algList, pool, timestamp, parameter);
 		else
 			throw new RemoteException("Socket server is not running");
 	}
 
 	
 	@Override
-	public boolean remoteStart(List<String> algNameList, DatasetPoolExchanged pool, ClassProcessor cp, DataConfig config, Serializable parameter)
+	public boolean remoteStart(List<String> algNameList, DatasetPoolExchanged pool, ClassProcessor cp, DataConfig config, Timestamp timestamp, Serializable parameter)
 			throws RemoteException {
 		boolean flag = socketServer.getFlag();
 		
 		if (flag)
-			return remoteEvaluator.remoteStart(algNameList, pool, cp, config, parameter);
+			return remoteEvaluator.remoteStart(algNameList, pool, cp, config, timestamp, parameter);
 		else if (socketServer.isRunning())
-			return remoteEvaluator.remoteStart(algNameList, pool, cp, config, parameter);
+			return remoteEvaluator.remoteStart(algNameList, pool, cp, config, timestamp, parameter);
 		else
 			throw new RemoteException("Socket server is not running");
 	}

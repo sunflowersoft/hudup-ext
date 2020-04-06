@@ -281,8 +281,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 	
 	
 	@Override
-	public synchronized boolean remoteStart0(List<Alg> algList, DatasetPoolExchanged pool, Serializable parameter) throws RemoteException {
-		// TODO Auto-generated method stub
+	public synchronized boolean remoteStart0(List<Alg> algList, DatasetPoolExchanged pool, Timestamp timestamp, Serializable parameter) throws RemoteException {
 		if (isStarted() || this.evAlgList != null || this.evPool != null) {
 			LogUtil.error("Evaluator is running and so evaluation is not run");
 			return false;
@@ -326,9 +325,6 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 		this.evCounter.stop();
 		this.evCounter.start();
 
-		Timestamp timestamp = null;
-		if (parameter != null && parameter instanceof Timestamp)
-			timestamp = (Timestamp)parameter;
 		fireEvaluatorEvent(new EvaluatorEvent(
 				this, 
 				EvaluatorEvent.Type.start,
@@ -343,7 +339,6 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 	
 	@Override
 	public void run() {
-		// TODO Auto-generated method stub
 		try {
 			run0();
 		}
@@ -609,7 +604,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
     	}
     	algRegResult = null;
     	
-    	otherResult.reset();
+    	otherResult.reset(); //Wrong when recover evaluation progress.
     }
 
     
@@ -810,7 +805,6 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 					Util.getPluginManager().wrap(((AlgRemote)alg), false));
 		} 
 		catch (Throwable e) {
-//			LogUtil.trace(e);
 			LogUtil.error("Evaluator does not accept algorithm '" + alg.getName() + "' due to " + e.getMessage());
 			accepted = false;
 		}
@@ -1004,7 +998,6 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 	
 	@Override
 	public synchronized boolean updatePool(DatasetPoolExchanged pool, EvaluatorListener localTargetListener, Timestamp timestamp) throws RemoteException {
-		// TODO Auto-generated method stub
 		if (isStarted() || this.evPool != null) {
 			LogUtil.error("Evaluator is running and so it cannot update pool");
 			return false;
@@ -1029,7 +1022,6 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 
 	@Override
 	public synchronized boolean reloadPool(EvaluatorListener localTargetListener, Timestamp timestamp) throws RemoteException {
-		// TODO Auto-generated method stub
 		if (poolResult == null) return false;
 		
 		this.poolResult.reload();
@@ -1052,7 +1044,6 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 	 */
 	@Override
 	protected void clear() {
-		// TODO Auto-generated method stub
 		this.evAlgList = null;
 		this.evAlg = null;
 		this.evPool = null;
@@ -1065,7 +1056,6 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 	
     @Override
 	protected void task() {
-		// TODO Auto-generated method stub
 		LogUtil.info("Evaluator#task not used because overriding Evaluator#run");
 	}
 
@@ -1080,7 +1070,6 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 			Thread.currentThread().sleep(1000);
 		} 
 		catch (Throwable e) {
-			// TODO Auto-generated catch block
 			LogUtil.trace(e);
 		}
 		
@@ -1115,7 +1104,6 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 	
 	@Override
 	public void setConfig(EvaluatorConfig config) throws RemoteException {
-		// TODO Auto-generated method stub
 		if (config == null) return;
 		this.config.putAll(config);
 	}
@@ -1123,7 +1111,6 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 
 	@Override
 	public boolean isWrapper() throws RemoteException {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
@@ -1191,9 +1178,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 				try {
 					listener.pluginChanged(evt);
 				}
-				catch (Throwable e) {
-					LogUtil.trace(e);
-				}
+				catch (Throwable e) {LogUtil.trace(e);}
 			}
 		}
     }
@@ -1476,10 +1461,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 				writer.close();
 				backupAdapter.close();
 			}
-			catch (Throwable e) {
-				LogUtil.trace(e);
-			}
-			
+			catch (Throwable e) {LogUtil.trace(e);}
 		}
     }
 
@@ -1498,14 +1480,12 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 
     @Override
 	public String getEvaluateStorePath() throws RemoteException {
-		// TODO Auto-generated method stub
    		return config.getAsString(DataConfig.STORE_URI_FIELD);
 	}
 
 	
 	@Override
 	public void setEvaluateStorePath(String evStorePath) throws RemoteException {
-		// TODO Auto-generated method stub
     	if (evStorePath == null)
     		config.remove(DataConfig.STORE_URI_FIELD);
     	else
@@ -1546,22 +1526,18 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
     
 	@Override
 	public String toString() {
-		// TODO Auto-generated method stub
     	String evaluatorName = "No name";
 		try {
 			evaluatorName = getName();
 		}
-		catch (Throwable e) {
-			// TODO Auto-generated catch block
-			LogUtil.trace(e);
-		}
+		catch (Throwable e) {LogUtil.trace(e);}
+		
 		return DSUtil.shortenVerbalName(evaluatorName);
 	}
 
 
 	@Override
 	public synchronized Remote export(int serverPort) throws RemoteException {
-		// TODO Auto-generated method stub
 		if (exportedStub != null) return exportedStub;
 
 		exportedStub = (Evaluator) NetUtil.RegistryRemote.export(this, serverPort);
@@ -1589,7 +1565,6 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 
 	@Override
 	public synchronized void forceUnexport() throws RemoteException {
-		// TODO Auto-generated method stub
 		unexport();
 	}
 
@@ -1602,21 +1577,18 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 	
 	@Override
 	public boolean isAgent() throws RemoteException {
-		// TODO Auto-generated method stub
 		return isAgent;
 	}
 
 
 	@Override
 	public synchronized void setAgent(boolean isAgent) throws RemoteException {
-		// TODO Auto-generated method stub
 		this.isAgent = isAgent;
 	}
 
 
 	@Override
 	public synchronized void close() throws Exception {
-		// TODO Auto-generated method stub
 		try {
 			remoteStop();
 		}
@@ -1665,7 +1637,6 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 
 	@Override
 	protected void finalize() throws Throwable {
-		// TODO Auto-generated method stub
 		super.finalize();
 		
 		try {
@@ -1678,7 +1649,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 
 	
 	@Override
-	public synchronized boolean remoteStart(List<String> algNameList, DatasetPoolExchanged pool, ClassProcessor cp, DataConfig config, Serializable parameter) throws RemoteException {
+	public synchronized boolean remoteStart(List<String> algNameList, DatasetPoolExchanged pool, ClassProcessor cp, DataConfig config, Timestamp timestamp, Serializable parameter) throws RemoteException {
 		HudupRMIClassLoader cl = null;
 		if (cp != null)
 			cl = new HudupRMIClassLoader(getClass().getClassLoader(), (ClassProcessor)cp);
@@ -1713,17 +1684,19 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 			if (evAlg != null && acceptAlg(evAlg)) {
 				if (algDesc != null)
 					evAlg.getConfig().putAll(algDesc.getConfig());
-				algList.add(evAlg); //This code line is important to remote setting.
+				algList.add(evAlg);
 			}
 		}
 		
-		return remoteStart0(algList, pool, parameter);
+		if (algList.size() == 0)
+			return false;
+		else
+			return remoteStart0(algList, pool, timestamp, parameter);
 	}
 	
 	
 	@Override
 	public synchronized boolean remoteStart(Serializable... parameters) throws RemoteException {
-		// TODO Auto-generated method stub
 		if (parameters == null || parameters.length < 2
 				|| !(parameters[0] instanceof List<?>)
 				|| !(parameters[1] instanceof DatasetPoolExchanged))
@@ -1736,20 +1709,25 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 		ClassProcessor cp = null;
 		if ((parameters.length > 2) && (parameters[2] instanceof ClassProcessor))
 			cp = (ClassProcessor)parameters[2];
+		
 		DataConfig config = null;
 		if ((parameters.length > 3) && (parameters[3] instanceof DataConfig))
 			config = (DataConfig)parameters[3];
-		Serializable additionalParameter = null;
-		if ((parameters.length > 4) && (parameters[4] instanceof Serializable))
-			additionalParameter = (Serializable)parameters[4];
 		
-		return remoteStart(algNameList, pool, cp, config, additionalParameter);
+		Timestamp timestamp = null;
+		if ((parameters.length > 4) && (parameters[4] instanceof Serializable))
+			timestamp = (Timestamp)parameters[4];
+		
+		Serializable parameter = null;
+		if ((parameters.length > 5) && (parameters[5] instanceof Serializable))
+			parameter = (Serializable)parameters[5];
+		
+		return remoteStart(algNameList, pool, cp, config, timestamp, parameter);
 	}
 
 
 	@Override
 	public synchronized boolean remotePause() throws RemoteException {
-		// TODO Auto-generated method stub
 		if (otherResult.inAlgSetup && evAlg != null && evAlg instanceof AlgRemote) {
 			if (!((AlgRemote)evAlg).learnPause()) {
 				if (!pause()) return false;
@@ -1775,7 +1753,6 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 	
 	@Override
 	public synchronized boolean remoteResume() throws RemoteException {
-		// TODO Auto-generated method stub
 		if (otherResult.inAlgSetup && evAlg != null && evAlg instanceof AlgRemote) {
 			if (!((AlgRemote)evAlg).learnResume()) {
 				if (!resume()) return false;
@@ -1794,7 +1771,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 		fireEvaluatorEvent(new EvaluatorEvent(
 				this, 
 				EvaluatorEvent.Type.resume),
-				null); // firing resume event.
+				null);
 		
 		return true;
 	}
@@ -1814,7 +1791,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 		fireEvaluatorEvent(new EvaluatorEvent(
 				this, 
 				EvaluatorEvent.Type.stop),
-				null); // firing stop event.
+				null);
 		
 		return true;
 	}
@@ -1822,38 +1799,27 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 	
 	@Override
 	public boolean remoteForceStop() throws RemoteException {
-		// TODO Auto-generated method stub
 		return forceStop();
 	}
 
 	
 	@Override
 	public boolean remoteIsStarted() throws RemoteException {
-		// TODO Auto-generated method stub
 		return isStarted();
 	}
 
 	
 	@Override
 	public boolean remoteIsPaused() throws RemoteException {
-		// TODO Auto-generated method stub
 		return isPaused();
 	}
 
 	
 	@Override
 	public boolean remoteIsRunning() throws RemoteException {
-		// TODO Auto-generated method stub
 		return isRunning();
 	}
 
-
-//	@Override
-//	public Object ping(Object o) throws RemoteException {
-//		// TODO Auto-generated method stub
-//		return "Ping sucessful: " + o.toString() + " " + o.toString();
-//	}
-			
 
 	/**
 	 * Extracting information from specified evaluation progress event.

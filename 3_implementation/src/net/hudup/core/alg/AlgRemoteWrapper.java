@@ -64,6 +64,12 @@ public class AlgRemoteWrapper implements Alg, AlgRemote, Serializable {
     protected EventListenerList listenerList = new EventListenerList();
     
 
+    /**
+     * Algorithm name.
+     */
+    private String name = null;
+    
+    
 	/**
 	 * Constructor with specified remote algorithm.
 	 * @param remoteAlg remote algorithm.
@@ -83,6 +89,10 @@ public class AlgRemoteWrapper implements Alg, AlgRemote, Serializable {
 		// TODO Auto-generated constructor stub
 		this.remoteAlg = remoteAlg;
 		this.exclusive = exclusive;
+		
+		try {
+			name = this.remoteAlg.queryName();
+		} catch (Throwable e) {LogUtil.trace(e);}
 	}
 
 	
@@ -212,7 +222,10 @@ public class AlgRemoteWrapper implements Alg, AlgRemote, Serializable {
 	public String getName() {
 		// TODO Auto-generated method stub
 		try {
-			return remoteAlg.queryName();
+			if (name != null)
+				return name;
+			else
+				return name = remoteAlg.queryName();
 		} catch (Exception e) { LogUtil.trace(e); }
 		
 		return null;

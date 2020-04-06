@@ -572,8 +572,18 @@ public class AlgDesc2 extends AlgDesc {
 	 * @param alg specified algorithm.
 	 * @return whether to call the specified algorithm remotely.
 	 */
-	public static boolean canCallRemoteAlg(Alg alg) {
-		return alg != null && alg.getName() != null;
+	public static boolean canCallRemote(Alg alg) {
+		if (alg == null)
+			return false;
+		else if (alg instanceof AlgRemote) {
+			String name = null;
+			try {
+				name = ((AlgRemote)alg).queryName();
+			} catch (Throwable e) {}
+			return name != null;
+		}
+		else
+			return alg.getName() != null;
 	}
 	
 	

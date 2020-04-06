@@ -1,8 +1,0 @@
-# Sample batch script
-
-
-algorithms=gfall, neighborcf_itembased
-
-trainingsets=datasets/movielens/hdp_rating1.base#snapshot_parser#file
-
-testingsets=datasets/movielens/hdp_rating1.test#snapshot_parser#file
