@@ -200,16 +200,6 @@ public class DatasetPoolTable extends JTable {
 			});
 		contextMenu.add(miSave);
 
-		JMenuItem miAdd = UIUtil.makeMenuItem((String)null, "Add script", 
-			new ActionListener() {
-				
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					add();
-				}
-			});
-		contextMenu.add(miAdd);
-
 		final int selectedRow = getSelectedRow();
 		final int selectedColumn = getSelectedColumn();
 		if (selectedRow == -1) return contextMenu;
@@ -360,6 +350,16 @@ public class DatasetPoolTable extends JTable {
 			});
 		contextMenu.add(miRemoveRow);
 		
+		JMenuItem miAdd = UIUtil.makeMenuItem((String)null, "Add script", 
+			new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					add();
+				}
+			});
+		contextMenu.add(miAdd);
+
 		if (getRowCount() > 1) {
 			contextMenu.addSeparator();
 			
@@ -449,6 +449,7 @@ public class DatasetPoolTable extends JTable {
 			
 		}
 
+		
 		return contextMenu;
 	}
 	

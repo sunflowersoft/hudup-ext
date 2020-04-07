@@ -16,8 +16,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.rmi.RemoteException;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 
 import javax.swing.BoxLayout;
@@ -102,11 +100,6 @@ public class RemoteServerCP extends JFrame implements ServerStatusListener {
 	private Server server = null;
 	
 	/**
-	 * RMI registry for exposing this control panel as remote RMI object. Please see {@link Registry} for more details about RMI registry.
-	 */
-	private Registry registry = null;
-	
-	/**
 	 * Binded URI of this control panel as remote RMI object. It is URI pointing to where this control panel is located.
 	 */
 	private xURI bindUri = null;
@@ -128,7 +121,6 @@ public class RemoteServerCP extends JFrame implements ServerStatusListener {
 				
 				@Override
 				public void windowClosed(WindowEvent e) {
-					// TODO Auto-generated method stub
 					super.windowClosed(e);
 					close();
 				}
@@ -166,7 +158,6 @@ public class RemoteServerCP extends JFrame implements ServerStatusListener {
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					// TODO Auto-generated method stub
 					applyConfig();
 				}
 			});
@@ -177,7 +168,6 @@ public class RemoteServerCP extends JFrame implements ServerStatusListener {
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					// TODO Auto-generated method stub
 					resetConfig();
 				}
 			});
@@ -194,12 +184,10 @@ public class RemoteServerCP extends JFrame implements ServerStatusListener {
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					// TODO Auto-generated method stub
 					try {
 						updateControls();
 					} 
 					catch (RemoteException e1) {
-						// TODO Auto-generated catch block
 						e1.printStackTrace();
 					}
 				}
@@ -216,7 +204,6 @@ public class RemoteServerCP extends JFrame implements ServerStatusListener {
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					// TODO Auto-generated method stub
 					start();
 				}
 			});
@@ -227,7 +214,6 @@ public class RemoteServerCP extends JFrame implements ServerStatusListener {
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					// TODO Auto-generated method stub
 					pauseResume();
 				}
 			});
@@ -238,7 +224,6 @@ public class RemoteServerCP extends JFrame implements ServerStatusListener {
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					// TODO Auto-generated method stub
 					stop();
 				}
 			});
@@ -266,7 +251,6 @@ public class RemoteServerCP extends JFrame implements ServerStatusListener {
 		
 		if (bindUri != null) {
 			try {
-				registry = LocateRegistry.createRegistry(bindUri.getPort());
 				UnicastRemoteObject.exportObject(this, bindUri.getPort());
 				
 				result = server.addStatusListener(this);
@@ -283,14 +267,6 @@ public class RemoteServerCP extends JFrame implements ServerStatusListener {
 					e1.printStackTrace();
 				}
 				
-				try {
-		    		UnicastRemoteObject.unexportObject(registry, true);
-				}
-				catch (Throwable e1) {
-					e1.printStackTrace();
-				}
-				
-				registry = null;
 				bindUri = null;
 				result = false;
 			}
@@ -314,7 +290,6 @@ public class RemoteServerCP extends JFrame implements ServerStatusListener {
 				updateControls();
 		} 
 		catch (Exception e) {
-			// TODO Auto-generated catch block
 			LogUtil.trace(e);
 		}
 	}
@@ -350,7 +325,6 @@ public class RemoteServerCP extends JFrame implements ServerStatusListener {
 				updateControls();
 		}
 		catch (Exception e) {
-			// TODO Auto-generated catch block
 			LogUtil.trace(e);
 		}
 	}
@@ -530,7 +504,6 @@ public class RemoteServerCP extends JFrame implements ServerStatusListener {
 	
 	@Override
 	public void statusChanged(ServerStatusEvent evt) throws RemoteException {
-		// TODO Auto-generated method stub
 		updateControls(evt.getStatus());
 	}
 	
@@ -556,19 +529,8 @@ public class RemoteServerCP extends JFrame implements ServerStatusListener {
     		LogUtil.trace(e);
     	}
 
-    	try {
-    		if (registry != null)
-    			UnicastRemoteObject.unexportObject(registry, true);
-    	}
-    	catch (Throwable e) {
-    		LogUtil.trace(e);
-    	}
-    	
-    	
     	server = null;
 		bindUri = null;
-		registry = null;
-		
 	}
 
 
@@ -582,7 +544,7 @@ public class RemoteServerCP extends JFrame implements ServerStatusListener {
 		
 		Server server = dlg.getServer();
 		if (server != null)
-			new RemoteServerCP(server, ConnectDlg.getBindUri());
+			new RemoteServerCP(server, dlg.getBindNamingUri().bindUri);
 		else {
 			JOptionPane.showMessageDialog(
 					null, "Can't retrieve remote server", "Faile to retrieve server", JOptionPane.ERROR_MESSAGE);

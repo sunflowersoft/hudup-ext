@@ -114,7 +114,6 @@ public class LightRemoteServerCP extends JFrame {
 				
 				@Override
 				public void windowClosed(WindowEvent e) {
-					// TODO Auto-generated method stub
 					super.windowClosed(e);
 					close();
 				}
@@ -151,7 +150,6 @@ public class LightRemoteServerCP extends JFrame {
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					// TODO Auto-generated method stub
 					applyConfig();
 				}
 			});
@@ -162,7 +160,6 @@ public class LightRemoteServerCP extends JFrame {
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					// TODO Auto-generated method stub
 					resetConfig();
 				}
 			});
@@ -179,12 +176,10 @@ public class LightRemoteServerCP extends JFrame {
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					// TODO Auto-generated method stub
 					try {
 						updateControls();
 					} 
 					catch (RemoteException e1) {
-						// TODO Auto-generated catch block
 						e1.printStackTrace();
 					}
 				}
@@ -200,7 +195,6 @@ public class LightRemoteServerCP extends JFrame {
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					// TODO Auto-generated method stub
 					start();
 				}
 			});
@@ -211,7 +205,6 @@ public class LightRemoteServerCP extends JFrame {
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					// TODO Auto-generated method stub
 					pauseResume();
 				}
 			});
@@ -222,7 +215,6 @@ public class LightRemoteServerCP extends JFrame {
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					// TODO Auto-generated method stub
 					stop();
 				}
 			});
@@ -235,12 +227,10 @@ public class LightRemoteServerCP extends JFrame {
 				
 					@Override
 					public void run() {
-						// TODO Auto-generated method stub
 						try {
 							updateControls();
 						} 
 						catch (Throwable e) {
-							// TODO Auto-generated catch block
 							LogUtil.trace(e);
 						}
 					}
@@ -267,7 +257,6 @@ public class LightRemoteServerCP extends JFrame {
 			server.start();
 			updateControls();
 		} catch (RemoteException e) {
-			// TODO Auto-generated catch block
 			LogUtil.trace(e);
 		}
 	}
@@ -298,7 +287,6 @@ public class LightRemoteServerCP extends JFrame {
 			server.stop();
 			updateControls();
 		} catch (RemoteException e) {
-			// TODO Auto-generated catch block
 			LogUtil.trace(e);
 		}
 	}
@@ -464,148 +452,6 @@ public class LightRemoteServerCP extends JFrame {
 	}
 	
 	
-//	/**
-//	 * This graphic user interface (GUI) component shows a dialog for connecting to remote server.
-//	 * 
-//	 * @author Loc Nguyen
-//	 * @version 10.0
-//	 *
-//	 */
-//	@Deprecated
-//	@SuppressWarnings("unused")
-//	private static class ConnectServerDlg extends JDialog {
-//
-//		/**
-//		 * Serial version UID for serializable class. 
-//		 */
-//		private static final long serialVersionUID = 1L;
-//		
-//		/**
-//		 * {@link JTextField} to fill remote host.
-//		 */
-//		protected JTextField txtHost = null;
-//		
-//		/**
-//		 * {@link JTextField} to fill remote port.
-//		 */
-//		protected JTextField txtPort = null;
-//		
-//		/**
-//		 * {@link JTextField} to fill remote user name.
-//		 */
-//		protected JTextField txtUsername = null;
-//		
-//		/**
-//		 * {@link JPasswordField} to fill remote password.
-//		 */
-//		protected JPasswordField txtPassword = null;
-//		
-//		/**
-//		 * Connected result as remote server.
-//		 */
-//		protected Server connServer = null;
-//		
-//		/**
-//		 * Constructor with parent component.
-//		 * @param comp parent component.
-//		 */
-//		public ConnectServerDlg(Component comp) {
-//			super(UIUtil.getFrameForComponent(comp), "Server connection", true);
-//			
-//			setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-//			setSize(400, 200);
-//			setLocationRelativeTo(UIUtil.getFrameForComponent(comp));
-//			setLayout(new BorderLayout());
-//			
-//	        Image image = UIUtil.getImage("connect-32x32.png");
-//	        if (image != null)
-//	        	setIconImage(image);
-//
-//			JPanel header = new JPanel(new BorderLayout());
-//			add(header, BorderLayout.NORTH);
-//			
-//			JPanel left = new JPanel(new GridLayout(0, 1));
-//			header.add(left, BorderLayout.WEST);
-//			
-//			left.add(new JLabel("Host:"));
-//			left.add(new JLabel("Port:"));
-//			left.add(new JLabel("Username:"));
-//			left.add(new JLabel("password:"));
-//			
-//			JPanel right = new JPanel(new GridLayout(0, 1));
-//			header.add(right, BorderLayout.CENTER);
-//			
-//			txtHost = new JTextField("localhost");
-//			right.add(txtHost);
-//			
-//			txtPort = new JTextField("" + Constants.DEFAULT_SERVER_PORT);
-//			right.add(txtPort);
-//			
-//			txtUsername = new JTextField();
-//			right.add(txtUsername);
-//
-//			txtPassword = new JPasswordField();
-//			right.add(txtPassword);
-//
-//			
-//			JPanel footer = new JPanel();
-//			add(footer, BorderLayout.SOUTH);
-//			
-//			JButton connect = new JButton("Connect");
-//			connect.addActionListener(new ActionListener() {
-//				
-//				@Override
-//				public void actionPerformed(ActionEvent e) {
-//					// TODO Auto-generated method stub
-//					connect();
-//				}
-//			});
-//			footer.add(connect);
-//			
-//			JButton close = new JButton("Close");
-//			close.addActionListener(new ActionListener() {
-//				
-//				@Override
-//				public void actionPerformed(ActionEvent e) {
-//					// TODO Auto-generated method stub
-//					dispose();
-//				}
-//			});
-//			footer.add(close);
-//			
-//			setVisible(true);
-//		}
-//		
-//		@SuppressWarnings("deprecation")
-//		private void connect() {
-//			String host = txtHost.getText().trim();
-//			String port_s = txtPort.getText().trim();
-//			int port = -1;
-//			if (!port_s.isEmpty())
-//				port = Integer.parseInt(port_s);
-//				
-//			this.connServer = DriverManager.getRemoteServer(host, port, txtUsername.getText(), txtPassword.getText());
-//			
-//			if (this.connServer == null) {
-//				JOptionPane.showMessageDialog(
-//					this, "Can't connect to server", "Can't connect to server", JOptionPane.ERROR_MESSAGE);
-//			}
-//			else
-//				dispose();
-//		}
-//		
-//		/**
-//		 * Getting the connected server as the result of this dialog.
-//		 * @return connected {@link Server} as the result of this dialog.
-//		 */
-//		public Server getServer() {
-//			return this.connServer;
-//		}
-//		
-//	}
-	
-	
-	
 	/**
 	 * The main method shows the {@link ConnectDlg} for users to enter authenticated information to connect server.
 	 * Later on this method shows this light remote control panel for users to start, stop, pause and configure sever remotely.
@@ -760,5 +606,6 @@ public class LightRemoteServerCP extends JFrame {
 
 		System.out.println(result);
 	}
+	
 	
 }

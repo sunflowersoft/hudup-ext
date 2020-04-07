@@ -49,7 +49,6 @@ public abstract class StartDlg extends JDialog {
 	 * @param title title of dialog.
 	 */
 	public StartDlg(Component comp, String title) {
-		// TODO Auto-generated constructor stub
 		super(UIUtil.getFrameForComponent(comp), title, true);
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setLocationRelativeTo(null);
@@ -72,7 +71,6 @@ public abstract class StartDlg extends JDialog {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				start();
 			}
 		});

@@ -67,6 +67,7 @@ import net.hudup.core.evaluate.EvaluatorEvent;
 import net.hudup.core.evaluate.Metrics;
 import net.hudup.core.evaluate.ui.AbstractEvaluateGUI;
 import net.hudup.core.evaluate.ui.EvaluateGUIData;
+import net.hudup.core.logistic.BindNamingURI;
 import net.hudup.core.logistic.ClipboardUtil;
 import net.hudup.core.logistic.Counter;
 import net.hudup.core.logistic.CounterElapsedTimeEvent;
@@ -257,10 +258,10 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 	/**
 	 * Constructor with specified evaluator and bound URI.
 	 * @param evaluator specified evaluator.
-	 * @param bindUri bound URI. If this parameter is null, evaluator is local.
+	 * @param bindNamingUri bound and naming URI.
 	 */
-	public EvaluateGUI(Evaluator evaluator, xURI bindUri) {
-		this(evaluator, bindUri, null);
+	public EvaluateGUI(Evaluator evaluator, BindNamingURI bindNamingUri) {
+		this(evaluator, bindNamingUri, null);
 	}
 
 	
@@ -288,11 +289,11 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 	/**
 	 * Constructor with specified evaluator, bound URI, and GUI data.
 	 * @param evaluator specified evaluator.
-	 * @param bindUri bound URI. If this parameter is null, evaluator is local.
+	 * @param bindNamingUri bound and naming URI.
 	 * @param referredGUIData referred GUI data.
 	 */
-	public EvaluateGUI(Evaluator evaluator, xURI bindUri, EvaluateGUIData referredGUIData) {
-		super(evaluator, bindUri, referredGUIData, null);
+	public EvaluateGUI(Evaluator evaluator, BindNamingURI bindNamingUri, EvaluateGUIData referredGUIData) {
+		super(evaluator, bindNamingUri, referredGUIData, null);
 		initGUI();
 	}
 
@@ -338,7 +339,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 
 			algRegTable.unexportNonPluginAlgs();
 			algRegTable.clear();
-			algRegTable.registerAsTheSame(EvaluatorAbstract.extractNormalAlgFromPluginStorage(evaluator, bindUri)); //Algorithms are not cloned because of saving memory when evaluator GUI keep algorithms for a long time.
+			algRegTable.registerAsTheSame(EvaluatorAbstract.extractNormalAlgFromPluginStorage(evaluator, bindNamingUri.bindUri)); //Algorithms are not cloned because of saving memory when evaluator GUI keep algorithms for a long time.
 			
 			List<String> algNames = updateAlgRegFromEvaluator();
 			if (algNames != null && algNames.size() > 0) {
@@ -496,7 +497,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 				}
 			});
 		this.btnRefresh.setMargin(new Insets(0, 0 , 0, 0));
-		this.btnRefresh.setVisible(bindUri == null);
+		this.btnRefresh.setVisible(bindNamingUri.bindUri == null);
 		tool.add(this.btnRefresh);
 
 		this.btnClear = UIUtil.makeIconButton(
@@ -516,10 +517,10 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 		tool.add(this.btnClear);
 
 		this.btnUpload = UIUtil.makeIconButton(
-			bindUri == null ? "scatter-16x16.png" : "upload-16x16.png", 
-			bindUri == null ? "scatter" : "upload", 
-			bindUri == null ? I18nUtil.message("scatter") : I18nUtil.message("upload"), 
-			bindUri == null ? I18nUtil.message("scatter") : I18nUtil.message("upload"), 
+			bindNamingUri.bindUri == null ? "scatter-16x16.png" : "upload-16x16.png", 
+			bindNamingUri.bindUri == null ? "scatter" : "upload", 
+			bindNamingUri.bindUri == null ? I18nUtil.message("scatter") : I18nUtil.message("upload"), 
+			bindNamingUri.bindUri == null ? I18nUtil.message("scatter") : I18nUtil.message("upload"), 
 				
 			new ActionListener() {
 				
@@ -527,7 +528,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 				public void actionPerformed(ActionEvent e) {
 					boolean ret = true;
 					try {
-						if (bindUri == null)
+						if (bindNamingUri.bindUri == null)
 							ret = evaluator.updatePool(toDatasetPoolExchangedClient(guiData.pool), null, timestamp = new Timestamp());
 						else
 							ret = evaluator.updatePool(toDatasetPoolExchangedClient(guiData.pool), null, timestamp = new Timestamp());
@@ -563,7 +564,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					if (bindUri == null) return;
+					if (bindNamingUri.bindUri == null) return;
 
 					synchronized (getThisGUI()) {
 						DatasetPoolExchanged poolResult = null;
@@ -601,7 +602,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 				}
 			});
 		this.btnDownload.setMargin(new Insets(0, 0 , 0, 0));
-		this.btnDownload.setVisible(bindUri != null);
+		this.btnDownload.setVisible(bindNamingUri.bindUri != null);
 		tool.add(this.btnDownload);
 
 		this.btnForceStop = UIUtil.makeIconButton(
@@ -743,7 +744,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 				
 				//Setting evaluation store path to evaluator.
 				try {
-					if (bindUri == null) //Local evaluator.
+					if (bindNamingUri.bindUri == null) //Local evaluator.
 						evaluator.setEvaluateStorePath(store != null ? store.toString() : null);
 				} catch (Throwable ex) {ex.printStackTrace();}
 			}
@@ -1042,7 +1043,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			
 			clearResult();
 			addTrainingToPool(dataset);
-			if (bindUri == null) {
+			if (bindNamingUri.bindUri == null) {
 				try {
 					evaluator.updatePool(toDatasetPoolExchangedClient(guiData.pool), this, timestamp = new Timestamp());
 				} catch (Throwable e) {LogUtil.trace(e);}
@@ -1068,7 +1069,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 				return;
 			
 			DatasetPool pool = new DatasetPool();
-			new AddingTrainingDatasetNullTestingDatasetDlg(this, pool, Arrays.asList(getAlg()), evaluator.getMainUnit(), bindUri).setVisible(true);
+			new AddingTrainingDatasetNullTestingDatasetDlg(this, pool, Arrays.asList(getAlg()), evaluator.getMainUnit(), bindNamingUri.bindUri).setVisible(true);
 			if (pool.size() == 0) {
 				JOptionPane.showMessageDialog(
 						this, 
@@ -1080,7 +1081,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			
 			clearResult();
 			guiData.pool = pool;
-			if (bindUri == null) {
+			if (bindNamingUri.bindUri == null) {
 				try {
 					evaluator.updatePool(toDatasetPoolExchangedClient(guiData.pool), this, timestamp = new Timestamp());
 				} catch (Throwable e) {LogUtil.trace(e);}
@@ -1179,7 +1180,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 	
 			clearResult();
 			addTestingToPool(dataset);
-			if (bindUri == null) {
+			if (bindNamingUri.bindUri == null) {
 				try {
 					evaluator.updatePool(toDatasetPoolExchangedClient(guiData.pool), this, timestamp = new Timestamp());
 				} catch (Throwable e) {LogUtil.trace(e);}
@@ -1234,7 +1235,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			clearResult();
 			updateMode();
 			
-			if (bindUri == null) {
+			if (bindNamingUri.bindUri == null) {
 				try {
 					evaluator.updatePool(null, this, timestamp = new Timestamp());
 				} catch (Throwable e) {LogUtil.trace(e);}
@@ -1300,7 +1301,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			
 			clearResult();
 			boolean started = false;
-			if (bindUri == null)
+			if (bindNamingUri.bindUri == null)
 				started = evaluator.remoteStart0(algList, toDatasetPoolExchangedClient(guiData.pool), timestamp = new Timestamp(), null);
 			else {
 				DataConfig config = AlgList.getAlgDescMapRemote(algList);

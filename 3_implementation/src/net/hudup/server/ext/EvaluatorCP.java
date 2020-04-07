@@ -43,6 +43,7 @@ import net.hudup.core.evaluate.EvaluatorEvent;
 import net.hudup.core.evaluate.EvaluatorListener;
 import net.hudup.core.evaluate.ui.EvaluateGUIData;
 import net.hudup.core.logistic.Account;
+import net.hudup.core.logistic.BindNamingURI;
 import net.hudup.core.logistic.DSUtil;
 import net.hudup.core.logistic.I18nUtil;
 import net.hudup.core.logistic.LogUtil;
@@ -257,7 +258,7 @@ public class EvaluatorCP extends JFrame implements EvaluatorListener {
 						return;
 					}
 
-					EvalCompoundGUI.run(evaluatorItem.evaluator, bindUri, evaluatorItem.guiData, null);
+					EvalCompoundGUI.run(evaluatorItem.evaluator, BindNamingURI.createBindUri(bindUri), evaluatorItem.guiData, null);
 				}
 			});
 		btnOpenStart.setMargin(new Insets(0, 0 , 0, 0));
@@ -863,7 +864,7 @@ public class EvaluatorCP extends JFrame implements EvaluatorListener {
 
 		boolean validated = false;
 		try {
-			validated = service.validateAccount(connectDlg.getRemoteUsername(), connectDlg.getRemotePassword(), DataConfig.ACCOUNT_ADMIN_PRIVILEGE);
+			validated = service.validateAccount(connectDlg.getUsername(), connectDlg.getPassword(), DataConfig.ACCOUNT_ADMIN_PRIVILEGE);
 		} 
 		catch (Exception e) {
 			LogUtil.trace(e);
@@ -875,7 +876,7 @@ public class EvaluatorCP extends JFrame implements EvaluatorListener {
 		}
 		
 		EvaluatorCP ecp = null;
-		ecp = new EvaluatorCP(service, connectDlg.getRemoteUsername(), connectDlg.getRemotePassword(), ConnectDlg.getBindUri());
+		ecp = new EvaluatorCP(service, connectDlg.getUsername(), connectDlg.getPassword(), connectDlg.getBindNamingUri().bindUri);
 		ecp.setVisible(true);
 	}
 	

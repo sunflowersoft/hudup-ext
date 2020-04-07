@@ -494,6 +494,15 @@ public class EvaluatorWrapper implements Evaluator, Serializable {
 	}
 
 
+	/**
+	 * Getting remote evaluator.
+	 * @return remote evaluator.
+	 */
+	public Evaluator getRemoteEvaluator() {
+		return remoteEvaluator;
+	}
+	
+	
 	@Override
 	protected void finalize() throws Throwable {
 		super.finalize();

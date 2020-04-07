@@ -83,6 +83,7 @@ import net.hudup.core.evaluate.MetricsUtil;
 import net.hudup.core.logistic.BaseClass;
 import net.hudup.core.logistic.ClipboardUtil;
 import net.hudup.core.logistic.LogUtil;
+import net.hudup.core.logistic.NetUtil;
 import net.hudup.core.logistic.xURI;
 import net.hudup.core.logistic.ui.DescriptionDlg;
 import net.hudup.core.logistic.ui.TagTextField;
@@ -130,8 +131,7 @@ public class Test {
 //		Class<?> cls = nlc.loadClass("net.hudup.SimFirer");
 //		System.out.println(cls);
 		
-		long a = -1;
-		System.out.println((int)a);
+		System.out.println(NetUtil.testPort(-1));
 	}
 
 	

@@ -11,6 +11,7 @@ import java.rmi.Naming;
 
 import net.hudup.core.Constants;
 import net.hudup.core.data.DataConfig;
+import net.hudup.core.evaluate.Evaluator;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.xURI;
 
@@ -25,14 +26,14 @@ public final class ClientUtil {
 	
 	
 	/**
-	 * Creating {@link SocketConnection} with given URI of server, user name, and password.
-	 * {@link SocketConnection} is also a service that sends request to server and then receives response (result) from server, according to socket interaction.
-	 * In the same session, {@link SocketConnection} can send many requests and receive many responses (from server)
+	 * Creating socket connection with given URI of server, user name, and password.
+	 * Socket connection is also a service that sends request to server and then receives response (result) from server, according to socket interaction.
+	 * In the same session, socket connection can send many requests and receive many responses (from server)
 	 * 
 	 * @param uri URI of server
 	 * @param username authenticated user name.
 	 * @param password authenticated password.
-	 * @return {@link SocketConnection} with given URI of server, user name, and password.
+	 * @return socket connection with given URI of server, user name, and password.
 	 */
 	public final static SocketConnection getSocketConnection(
 			xURI uri, String username, String password) {
@@ -51,7 +52,7 @@ public final class ClientUtil {
 	 * @param port remote port.
 	 * @param username authenticated user name
 	 * @param password authenticated password.
-	 * @return {@link SocketConnection} according to RMI protocol.
+	 * @return socket connection according to RMI protocol.
 	 */
 	public final static SocketConnection getSocketConnection(
 			String host, int port, String username, String password) {
@@ -70,35 +71,6 @@ public final class ClientUtil {
 	}
 
 	
-//	/**
-//	 * Creating {@link SocketWrapper} with given URI of server, user name, and password.
-//	 * {@link SocketWrapper} is also a service that sends only one request to server and then receives only one response (result) from server at one time, according to socket interaction.
-//	 * So every time users want to send/receive request/response to/from server, they must re-create a new instance of {@link SocketWrapper}.
-//	 * 
-//	 * @param uri URI of server
-//	 * @param username authenticated user name.
-//	 * @param password authenticated password.
-//	 * @return {@link SocketWrapper} with given URI of server, user name, and password.
-//	 */
-//	@SuppressWarnings("unused")
-//	@Deprecated
-//	private final static SocketWrapper getSocketWrapper(xURI uri, String username, String password) {
-//		String schema = uri.getScheme();
-//		if (schema == null || !schema.equals(Protocol.HDP_PROTOCOL))
-//			return null;
-//		
-//		String host = uri.getHost();
-//		if (host == null)
-//			return null;
-//		
-//		int port = uri.getPort();
-//		if (port < 0)
-//			port = Constants.DEFAULT_SERVER_PORT;
-//		
-//		return new SocketWrapper(host, port);
-//	}
-
-
 	/**
 	 * Getting a remote service with given remote host, remote port, authenticated user name, and authenticated password.
 	 * Service specifies methods to serve user requests according to RMI ((abbreviation of Java Remote Method Invocation)) protocol. These methods focus on providing recommendation, inserting, updating and getting information such as user ratings, user profiles, and item profiles stored in database.
@@ -156,6 +128,30 @@ public final class ClientUtil {
 		catch (Exception e) {
 			LogUtil.trace(e);
 		}
+		
+		return null;
+	}
+	
+	
+	/**
+	 * Getting remote evaluator with specified host, port, and bound name.
+	 * @param host specified host.
+	 * @param port specified port.
+	 * @param bindName specified bound name.
+	 * @return remote evaluator with specified host, port, and bound name.
+	 */
+	public final static Evaluator getRemoteEvaluator(String host, int port, String bindName) {
+		if (bindName == null) bindName = "";
+		bindName = bindName.trim();
+		bindName = bindName.replace('\\', '/');
+		if (bindName.startsWith("/")) bindName = bindName.substring(1);
+		
+		String uri = "rmi://" + host + ":" + port + "/" + bindName;
+			
+		try {
+			return (Evaluator)Naming.lookup(uri);
+		}
+		catch (Exception e) {LogUtil.trace(e);}
 		
 		return null;
 	}

@@ -16,8 +16,10 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
+import java.util.Date;
 
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFormattedTextField;
@@ -32,6 +34,8 @@ import javax.swing.text.NumberFormatter;
 
 import net.hudup.core.Constants;
 import net.hudup.core.Util;
+import net.hudup.core.evaluate.Evaluator;
+import net.hudup.core.logistic.BindNamingURI;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.NetUtil;
 import net.hudup.core.logistic.xURI;
@@ -73,6 +77,12 @@ public abstract class ConnectDlg extends JDialog {
 
 	
 	/**
+	 * Evaluator connection.
+	 */
+	public final static String EVALUATOR_CONNECT = "Evaluator";
+
+	
+	/**
 	 * This type represents connection type
 	 * @author Loc Nguyen
 	 * @version 1.0
@@ -80,7 +90,8 @@ public abstract class ConnectDlg extends JDialog {
 	public enum ConnectType {
 		server,
 		service,
-		socket_service
+		socket_service,
+		evaluator
 	}
 	
 	
@@ -125,6 +136,10 @@ public abstract class ConnectDlg extends JDialog {
 				this.desc = SOCKET_SERVICE_CONNECT;
 				this.defaultPort = Constants.DEFAULT_LISTENER_PORT;
 			}
+			else if (type == ConnectType.evaluator) {
+				this.desc = EVALUATOR_CONNECT;
+				this.defaultPort = Constants.DEFAULT_EVALUATOR_PORT;
+			}
 		}
 	
 		/**
@@ -159,19 +174,18 @@ public abstract class ConnectDlg extends JDialog {
 			return new ConnectTypeDesc[] {
 				new ConnectTypeDesc(ConnectType.server),
 				new ConnectTypeDesc(ConnectType.service),
-				new ConnectTypeDesc(ConnectType.socket_service)
+				new ConnectTypeDesc(ConnectType.socket_service),
+				new ConnectTypeDesc(ConnectType.evaluator)
 			};
 		}
 
 		@Override
 		public String toString() {
-			// TODO Auto-generated method stub
 			return desc;
 		}
 
 		@Override
 		public boolean equals(Object obj) {
-			// TODO Auto-generated method stub
 			if (obj == null)
 				return false;
 			else if (obj instanceof ConnectType)
@@ -192,28 +206,58 @@ public abstract class ConnectDlg extends JDialog {
 	
 	
 	/**
-	 * {@link JTextField} to fill remote host.
+	 * Text field to fill host.
 	 */
-	protected JTextField txtRemoteHost = null;
+	protected JTextField txtHost = null;
 	
 	
 	/**
-	 * {@link JFormattedTextField} to fill remote port.
+	 * Text field to fill port.
 	 */
-	protected JFormattedTextField txtRemotePort = null;
+	protected JFormattedTextField txtPort = null;
 	
 	
 	/**
-	 * {@link JTextField} to fill remote user name.
+	 * Text field to fill naming name.
 	 */
-	protected JTextField txtRemoteUsername = null;
+	protected JTextField txtNamingName = null;
 	
 	
 	/**
-	 * {@link JPasswordField} to fill remote password.
+	 * Text field to fill user name.
 	 */
-	protected JPasswordField txtRemotePassword = null;
+	protected JTextField txtUsername = null;
 	
+	
+	/**
+	 * Password field to fill password.
+	 */
+	protected JPasswordField txtPassword = null;
+	
+	
+	/**
+	 * Check box as flag to indicate whether exporting again.
+	 */
+	protected JCheckBox chkExport = null;
+	
+	
+	/**
+	 * Text field to fill naming name.
+	 */
+	protected JTextField txtBindName = null;
+
+	
+	/**
+	 * Text field to generate bind name.
+	 */
+	protected JButton btnGenBindName = null; 
+			
+	
+	/**
+	 * Text field to fill naming port.
+	 */
+	protected JFormattedTextField txtBindPort = null;
+
 	
 	/**
 	 * Remote connector.
@@ -222,15 +266,45 @@ public abstract class ConnectDlg extends JDialog {
 	
 	
 	/**
+	 * Remote host.
+	 */
+	protected String host = null;
+	
+	
+	/**
+	 * Remote port.
+	 */
+	protected int port = 0;
+
+	
+	/**
+	 * Naming name.
+	 */
+	protected String namingName = null;
+	
+	
+	/**
 	 * Remote user name.
 	 */
-	protected String remoteUsername = null;
+	protected String username = null;
 	
 	
 	/**
 	 * Remote password.
 	 */
-	protected String remotePassword = null;
+	protected String password = null;
+	
+	
+	/**
+	 * Bound name.
+	 */
+	protected String bindName = null;
+	
+	
+	/**
+	 * Bound port.
+	 */
+	protected int bindPort = 0;
 	
 	
 	/**
@@ -240,7 +314,7 @@ public abstract class ConnectDlg extends JDialog {
 		super((JFrame)null, "Remote connection", true);
 		
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-		setSize(400, 300);
+		setSize(400, 400);
 		setLocationRelativeTo(null);
 		setLayout(new BorderLayout());
 		
@@ -255,10 +329,14 @@ public abstract class ConnectDlg extends JDialog {
 		header.add(left, BorderLayout.WEST);
 		
 		left.add(new JLabel("Connection type:"));
-		left.add(new JLabel("Remote host:"));
-		left.add(new JLabel("Remote port:"));
-		left.add(new JLabel("Remote username:"));
-		left.add(new JLabel("Remote password:"));
+		left.add(new JLabel("Host:"));
+		left.add(new JLabel("Port:"));
+		left.add(new JLabel("Naming:"));
+		left.add(new JLabel("User name:"));
+		left.add(new JLabel("Password:"));
+		left.add(new JLabel("Export:"));
+		left.add(new JLabel("Bound port:"));
+		left.add(new JLabel("Bound name:"));
 		
 		JPanel right = new JPanel(new GridLayout(0, 1));
 		header.add(right, BorderLayout.CENTER);
@@ -269,32 +347,89 @@ public abstract class ConnectDlg extends JDialog {
 			
 			@Override
 			public void itemStateChanged(ItemEvent e) {
-				// TODO Auto-generated method stub
 				if (e.getStateChange() == ItemEvent.SELECTED) {
 					ConnectTypeDesc connectType = (ConnectTypeDesc)cmbConnectType.getSelectedItem();
-					txtRemotePort.setValue(connectType.getDefaultPort());
+					txtPort.setValue(connectType.getDefaultPort());
+					
+					if (connectType.type == ConnectType.evaluator) {
+						txtUsername.setEditable(false);
+						txtPassword.setEditable(false);
+						txtBindPort.setValue(Constants.DEFAULT_EVALUATOR_PORT);
+					}
+					else {
+						txtUsername.setEditable(true);
+						txtPassword.setEditable(true);
+						txtBindPort.setValue(Constants.DEFAULT_CONTROL_PANEL_PORT);
+					}
 				}
 			}
 		});
 		right.add(cmbConnectType);
 		
-		txtRemoteHost = new JTextField("localhost");
-		right.add(txtRemoteHost);
+		txtHost = new JTextField("localhost");
+		right.add(txtHost);
 		
-		txtRemotePort = new JFormattedTextField(new NumberFormatter());
+		txtPort = new JFormattedTextField(new NumberFormatter());
 		if (connectTypes.length > 0) {
 			cmbConnectType.setSelectedItem(connectTypes[0]);
-			txtRemotePort.setValue(connectTypes[0].getDefaultPort());
+			txtPort.setValue(connectTypes[0].getDefaultPort());
 		}
-		right.add(txtRemotePort);
+		right.add(txtPort);
 		
-		txtRemoteUsername = new JTextField("admin");
-		right.add(txtRemoteUsername);
+		txtNamingName = new JTextField("connect1");
+		right.add(txtNamingName);
 
-		txtRemotePassword = new JPasswordField("admin");
-		right.add(txtRemotePassword);
+		txtUsername = new JTextField("admin");
+		right.add(txtUsername);
+
+		txtPassword = new JPasswordField("admin");
+		right.add(txtPassword);
 		String pwd = Util.getHudupProperty("admin");
-		if (pwd == null) txtRemotePassword.setText(pwd);
+		if (pwd == null) txtPassword.setText(pwd);
+
+		chkExport = new JCheckBox("", false);
+		right.add(chkExport);
+		chkExport.addItemListener(new ItemListener() {
+			
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				txtBindName.setVisible(chkExport.isSelected());
+				btnGenBindName.setVisible(chkExport.isSelected());
+				
+				ConnectTypeDesc connectType = (ConnectTypeDesc)cmbConnectType.getSelectedItem();
+				if (connectType.type == ConnectType.evaluator)
+					txtBindPort.setValue(Constants.DEFAULT_EVALUATOR_PORT);
+				else
+					txtBindPort.setValue(Constants.DEFAULT_CONTROL_PANEL_PORT);
+			}
+		});
+		chkExport.setEnabled(false);
+
+		txtBindPort = new JFormattedTextField(new NumberFormatter());
+		txtBindPort.setValue(Constants.DEFAULT_CONTROL_PANEL_PORT);
+		right.add(txtBindPort);
+
+		JPanel paneBindName = new JPanel(new BorderLayout());
+		right.add(paneBindName);
+		
+		txtBindName = new JTextField("connect1");
+		paneBindName.add(txtBindName, BorderLayout.CENTER);
+		txtBindName.setVisible(chkExport.isSelected());
+		btnGenBindName = UIUtil.makeIconButton(
+			"generate-16x16.png",
+			"generate", 
+			"Generate - http://www.iconarchive.com/show/flatastic-9-icons-by-custom-icon-design/Generate-keys-icon.html", 
+			"Generate", 
+			
+			new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					txtBindName.setText("connect" + new Date().getTime());
+				}
+			});
+		paneBindName.add(btnGenBindName, BorderLayout.EAST);
+		btnGenBindName.setVisible(chkExport.isSelected());
 
 		
 		JPanel body = new JPanel(new BorderLayout());
@@ -322,7 +457,6 @@ public abstract class ConnectDlg extends JDialog {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				connect0();
 			}
 		});
@@ -333,7 +467,6 @@ public abstract class ConnectDlg extends JDialog {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				dispose();
 			}
 		});
@@ -392,7 +525,6 @@ public abstract class ConnectDlg extends JDialog {
 					return ((PowerServer)server).getService();
 				}
 				catch (RemoteException e) {
-					// TODO Auto-generated catch block
 					LogUtil.trace(e);
 				}
 				
@@ -407,26 +539,50 @@ public abstract class ConnectDlg extends JDialog {
 
 	
 	/**
+	 * Testing whether connecting to evaluator.
+	 * @return true if connecting to evaluator.
+	 */
+	public boolean isEvaluator() {
+		if (connector == null)
+			return false;
+		else
+			return (connector instanceof Evaluator);
+	}
+
+	
+	/**
+	 * Getting evaluator.
+	 * @return evaluator.
+	 */
+	public Evaluator getEvaluator() {
+		if (isEvaluator())
+			return (Evaluator)connector;
+		else
+			return null;
+	}
+
+	
+	/**
 	 * Connect to remote server / service.
 	 */
 	protected abstract void connect0();
 	
 	
 	/**
-	 * Getting remote user name.
-	 * @return remote user name.
+	 * Getting user name.
+	 * @return user name.
 	 */
-	public String getRemoteUsername() {
-		return remoteUsername;
+	public String getUsername() {
+		return username;
 	}
 	
 	
 	/**
-	 * Getting remote password.
-	 * @return remote password.
+	 * Getting password.
+	 * @return password.
 	 */
-	public String getRemotePassword() {
-		return remotePassword;
+	public String getPassword() {
+		return password;
 	}
 
 	
@@ -441,15 +597,28 @@ public abstract class ConnectDlg extends JDialog {
 	
 	
 	/**
-	 * Creating the binded URI for the control panel. In current implementation, it is &quot;rmi://localhost:&lt;port&gt;/connect&quot;
-	 * @return binded URI.
+	 * Getting naming name.
+	 * @return naming name.
 	 */
-	public static xURI getBindUri() {
-		int port = NetUtil.getPort(Constants.DEFAULT_CONTROL_PANEL_PORT, true);
-		if (port < 0)
-			return null;
-		else 
-			return xURI.create( "rmi://localhost:" + port + "/connect");
+	public String getNamingName() {
+		return namingName;
+	}
+	
+	
+	/**
+	 * Creating the bound and naming URI.
+	 * @return bound and naming URI.
+	 */
+	public BindNamingURI getBindNamingUri() {
+		xURI bindUri = xURI.create("rmi://localhost:" + bindPort);
+		
+		if (chkExport.isSelected()) {
+			xURI namingUri = bindUri;
+			if (bindName != null) namingUri = namingUri.concat(bindName);
+			return new BindNamingURI(bindUri, namingUri);
+		}
+		else
+			return BindNamingURI.createBindUri(bindUri);
 	}
 	
 	
@@ -470,29 +639,33 @@ public abstract class ConnectDlg extends JDialog {
 			@SuppressWarnings("deprecation")
 			@Override
 			protected void connect0() {
-				// TODO Auto-generated method stub
-				String remoteHost = txtRemoteHost.getText().trim();
-				int remotePort = txtRemotePort.getValue() instanceof Number ? ( (Number) txtRemotePort.getValue()).intValue() : -1; 
+				host = txtHost.getText().trim();
+				port = txtPort.getValue() instanceof Number ? ( (Number) txtPort.getValue()).intValue() : 0; 
+				namingName = normalizeNamingName(txtNamingName.getText());
 				
-				String connectType = cmbConnectType.getSelectedItem().toString();
-				if (connectType.equals(SERVER_CONNECT))
-					connector = ClientUtil.getRemoteServer(remoteHost, remotePort, txtRemoteUsername.getText(), txtRemotePassword.getText());
-				else if (connectType.equals(SERVICE_CONNECT))
-					connector = ClientUtil.getRemoteService(remoteHost, remotePort, txtRemoteUsername.getText(), txtRemotePassword.getText());
-				else if (connectType.equals(SOCKET_SERVICE_CONNECT))
-					connector = ClientUtil.getSocketConnection(remoteHost, remotePort, txtRemoteUsername.getText(), txtRemotePassword.getText());
-				else
-					connector = null;
+				username = txtUsername.getText();
+				password = txtPassword.getText();
+				
+				bindName = normalizeNamingName(txtBindName.getText());
+				bindPort = txtBindPort.getValue() instanceof Number ? ( (Number) txtBindPort.getValue()).intValue() : 0;
+				bindPort = NetUtil.getPort(bindPort, chkExport.isSelected() ? Constants.TRY_RANDOM_PORT : true);
+
+				ConnectTypeDesc connectType = (ConnectTypeDesc)cmbConnectType.getSelectedItem();
+				if (connectType.equals(ConnectType.server))
+					connector = ClientUtil.getRemoteServer(host, port, username, password);
+				else if (connectType.equals(ConnectType.service))
+					connector = ClientUtil.getRemoteService(host, port, username, password);
+				else if (connectType.equals(ConnectType.socket_service))
+					connector = ClientUtil.getSocketConnection(host, port, username, password);
+				else  if (connectType.equals(ConnectType.evaluator))
+					connector = ClientUtil.getRemoteEvaluator(host, port, namingName);
 				
 				if (connector == null) {
 					JOptionPane.showMessageDialog(
 						this, "Can't connect to server", "Can't connect to server", JOptionPane.ERROR_MESSAGE);
 				}
-				else {
-					remoteUsername = txtRemoteUsername.getText();
-					remotePassword = txtRemotePassword.getText();
+				else
 					dispose();
-				}
 			}
 		};
 		
@@ -500,7 +673,7 @@ public abstract class ConnectDlg extends JDialog {
 			connectDlg.cmbConnectType.setSelectedItem(new ConnectTypeDesc(hintConnectType));
 		
 		if (hintPort > 0)
-			connectDlg.txtRemotePort.setValue(hintPort);
+			connectDlg.txtPort.setValue(hintPort);
 		
 		connectDlg.setVisible(true);
 		
@@ -538,4 +711,18 @@ public abstract class ConnectDlg extends JDialog {
 	}
 
 
+	/**
+	 * Normalizing naming name.
+	 * @param namingName naming name.
+	 * @return normalized naming name.
+	 */
+	public static String normalizeNamingName(String namingName) {
+		namingName = namingName != null ? namingName.trim() : "";
+		namingName = namingName.replace('\\', '/');
+		if (namingName.startsWith("/")) namingName = namingName.substring(1);
+		
+		return namingName;
+	}
+	
+	
 }

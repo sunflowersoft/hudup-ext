@@ -18,6 +18,8 @@ import java.rmi.RemoteException;
 
 import javax.swing.GrayFilter;
 
+import net.hudup.core.Constants;
+import net.hudup.core.data.DataConfig;
 import net.hudup.core.logistic.I18nUtil;
 import net.hudup.core.logistic.LogUtil;
 
@@ -116,18 +118,29 @@ public class ServerTrayIcon extends TrayIcon implements ServerStatusListener {
 	 * For instance, {@link ServerTrayIcon} changes different icons according to different statuses such as running status, paused status, and stopped status.
 	 */
 	protected void updateStatus() {
+		int serverPort = Constants.DEFAULT_SERVER_PORT;
+		try {
+			DataConfig config = server.getConfig();
+			if (config instanceof ServerConfig)
+				serverPort = ((ServerConfig)config).getServerPort();
+		}
+		catch (Throwable e) {
+			LogUtil.trace(e);
+		}
+		
+		
 		try {
 			if (server.isRunning()) {
 				setImage(runningImage);
-				setToolTip(tooltip + " (" + I18nUtil.message("run") + ")");
+				setToolTip(tooltip + " (" + I18nUtil.message("running") + " at port " + serverPort + ")");
 			}
 			else if (server.isPaused()) {
 				setImage(pausedImage);
-				setToolTip(tooltip + " (" + I18nUtil.message("pause") + ")");
+				setToolTip(tooltip + " (" + I18nUtil.message("paused") + ")");
 			}
 			else {
 				setImage(stoppedImage);
-				setToolTip(tooltip + " (" + I18nUtil.message("stop") + ")");
+				setToolTip(tooltip + " (" + I18nUtil.message("stopped") + ")");
 			}
 		}
 		catch (Throwable e) {

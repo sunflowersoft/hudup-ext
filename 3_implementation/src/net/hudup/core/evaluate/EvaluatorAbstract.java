@@ -1990,4 +1990,46 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 	}
 	
 	
+	/**
+	 * Checking whether the specified evaluator is remote object.
+	 * @param evaluator specified evaluator.
+	 * @return whether the specified evaluator is remote object.
+	 */
+	public static boolean isRemote(Evaluator evaluator) {
+		if (evaluator == null)
+			return false;
+		else if (evaluator instanceof EvaluatorWrapper) {
+			Evaluator remoteEvaluator = ((EvaluatorWrapper)evaluator).getRemoteEvaluator();
+			if (remoteEvaluator == null)
+				return false;
+			else 
+				return isRemote(remoteEvaluator);
+		}
+		else if (evaluator instanceof EvaluatorAbstract)
+			return false;
+		else
+			return true;
+	}
+
+	
+	/**
+	 * Getting the most inner evaluator of the specified evaluator.
+	 * @param evaluator specified evaluator.
+	 * @return the most inner evaluator of the specified evaluator.
+	 */
+	public static Evaluator getMostInner(Evaluator evaluator) {
+		if (evaluator == null)
+			return null;
+		else if (evaluator instanceof EvaluatorWrapper) {
+			Evaluator remoteEvaluator = ((EvaluatorWrapper)evaluator).getRemoteEvaluator();
+			if (remoteEvaluator == null)
+				return null;
+			else 
+				return getMostInner(remoteEvaluator);
+		}
+		else
+			return evaluator;
+	}
+
+
 }

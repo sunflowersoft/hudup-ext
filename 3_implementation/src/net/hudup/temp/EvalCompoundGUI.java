@@ -39,9 +39,9 @@ import net.hudup.core.evaluate.MetaMetric;
 import net.hudup.core.evaluate.Metric;
 import net.hudup.core.evaluate.NoneWrapperMetricList;
 import net.hudup.core.evaluate.ui.EvaluateGUIData;
+import net.hudup.core.logistic.BindNamingURI;
 import net.hudup.core.logistic.I18nUtil;
 import net.hudup.core.logistic.LogUtil;
-import net.hudup.core.logistic.xURI;
 import net.hudup.core.logistic.ui.HelpContent;
 import net.hudup.core.logistic.ui.StartDlg;
 import net.hudup.core.logistic.ui.TextArea;
@@ -86,10 +86,10 @@ public class EvalCompoundGUI extends JFrame {
 	/**
 	 * Constructor with specified evaluator.
 	 * @param evaluator specified {@link EvaluatorAbstract}.
-	 * @param bindUri bound URI. If this parameter is null, evaluator is local.
+	 * @param bindNamingUri bound and naming URI.
 	 */
-	public EvalCompoundGUI(Evaluator evaluator, xURI bindUri) {
-		this(evaluator, bindUri, null);
+	public EvalCompoundGUI(Evaluator evaluator, BindNamingURI bindNamingUri) {
+		this(evaluator, bindNamingUri, null);
 	}
 	
 	
@@ -99,17 +99,17 @@ public class EvalCompoundGUI extends JFrame {
 	 * @param bindUri bound URI. If this parameter is null, evaluator is local.
 	 * @param referredData evaluator GUI data.
 	 */
-	public EvalCompoundGUI(Evaluator evaluator, xURI bindUri, final EvaluateGUIData referredData) {
+	public EvalCompoundGUI(Evaluator evaluator, BindNamingURI bindNamingUri, final EvaluateGUIData referredData) {
 		super("Evaluator GUI");
 		try {
 			this.thisConfig = evaluator.getConfig();
-			this.thisConfig.setSaveAbility(bindUri == null); //Save only local configuration.
+			this.thisConfig.setSaveAbility(bindNamingUri.bindUri == null); //Save only local configuration.
 		}
 		catch (Throwable e) {
 			LogUtil.trace(e);
 			LogUtil.error("Error in getting evaluator configuration");
 		}
-		this.batchEvaluateGUI = new BatchEvaluateGUI(evaluator, bindUri, referredData);
+		this.batchEvaluateGUI = new BatchEvaluateGUI(evaluator, bindNamingUri, referredData);
 		
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		addWindowListener(new WindowAdapter() {
@@ -563,7 +563,7 @@ public class EvalCompoundGUI extends JFrame {
 					// TODO Auto-generated method stub
 					String evName = (String) getItemControl().getSelectedItem();
 					try {
-						final Evaluator ev = service.getEvaluator(evName, connectDlg.getRemoteUsername(), connectDlg.getRemotePassword());
+						final Evaluator ev = service.getEvaluator(evName, connectDlg.getUsername(), connectDlg.getPassword());
 						if (ev == null) {
 							JOptionPane.showMessageDialog(
 									this, "Can't get remote evaluator", "Connection to evaluator fail", JOptionPane.ERROR_MESSAGE);
@@ -572,10 +572,8 @@ public class EvalCompoundGUI extends JFrame {
 						dispose();
 						if (oldGUI != null) oldGUI.dispose();
 						
-						xURI bindUri = ConnectDlg.getBindUri();
-						
 						//ev.getPluginStorage().assignToSystem();
-						run(ev, bindUri, null, null);
+						run(ev, connectDlg.getBindNamingUri(), null, null);
 					}
 					catch (Exception e) {
 						LogUtil.trace(e);
@@ -586,13 +584,11 @@ public class EvalCompoundGUI extends JFrame {
 				
 				@Override
 				protected JComboBox<?> createItemControl() {
-					// TODO Auto-generated method stub
 					return new JComboBox<String>(evNames);
 				}
 				
 				@Override
 				protected TextArea createHelp() {
-					// TODO Auto-generated method stub
 					TextArea helper = new TextArea("Thank you for choosing evaluators");
 					helper.setEditable(false);
 					return helper;
@@ -600,7 +596,6 @@ public class EvalCompoundGUI extends JFrame {
 
 				@Override
 				public void dispose() {
-					// TODO Auto-generated method stub
 					super.dispose();
 					
 					if (service != null)
@@ -616,7 +611,6 @@ public class EvalCompoundGUI extends JFrame {
 	        dlgEvStarter.setVisible(true);
 		}
 		catch (Exception e) {
-			// TODO Auto-generated catch block
 			LogUtil.trace(e);
 		}
 	}
@@ -629,7 +623,7 @@ public class EvalCompoundGUI extends JFrame {
 	 * @param referredData evaluator GUI data.
 	 * @param oldGUI old GUI.
 	 */
-	public static void run(Evaluator evaluator, xURI bindUri, EvaluateGUIData referredData, Window oldGUI) {
+	public static void run(Evaluator evaluator, BindNamingURI bindNamingUri, EvaluateGUIData referredData, Window oldGUI) {
 		if (!Util.getPluginManager().isFired())
 			Util.getPluginManager().fire();
 			
@@ -665,7 +659,7 @@ public class EvalCompoundGUI extends JFrame {
 			}
 
 			if (oldGUI != null) oldGUI.dispose();
-			new EvalCompoundGUI(evaluator, bindUri, referredData);
+			new EvalCompoundGUI(evaluator, bindNamingUri, referredData);
 		}
 		catch (Exception e) {
 			// TODO Auto-generated catch block

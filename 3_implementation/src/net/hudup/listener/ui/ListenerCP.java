@@ -16,8 +16,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.rmi.RemoteException;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 
 import javax.swing.BoxLayout;
@@ -112,11 +110,6 @@ public class ListenerCP extends JFrame implements ServerStatusListener {
 	protected Server listener = null;
 	
 	/**
-	 * RMI registry for exposing this control panel as remote RMI object. Please see {@link Registry} for more details about RMI registry.
-	 */
-	private Registry registry = null;
-
-	/**
 	 * Binded URI of this control panel as remote RMI object. It is URI pointing to where this control panel is located.
 	 * If it is not null, this control panel associates with remote listener on remote host.
 	 */
@@ -140,7 +133,6 @@ public class ListenerCP extends JFrame implements ServerStatusListener {
 	
 				@Override
 				public void windowClosed(WindowEvent e) {
-					// TODO Auto-generated method stub
 					super.windowClosed(e);
 					close();
 				}
@@ -175,12 +167,10 @@ public class ListenerCP extends JFrame implements ServerStatusListener {
 	
 				@Override
 				public void run() {
-					// TODO Auto-generated method stub
 					try {
 						close();
 					} 
 					catch (Throwable e) {
-						// TODO Auto-generated catch block
 						LogUtil.trace(e);
 					}
 				}
@@ -208,14 +198,12 @@ public class ListenerCP extends JFrame implements ServerStatusListener {
 		boolean result = false;
 		
 		if (bindUri == null) {
-			registry = null;
 			result = listener.addStatusListener(this);
 		}
 		else {
 			btnExitListener.setVisible(false);
 			
 			try {
-				registry = LocateRegistry.createRegistry(bindUri.getPort());
 				UnicastRemoteObject.exportObject(this, bindUri.getPort());
 				
 				result = listener.addStatusListener(this);
@@ -232,14 +220,6 @@ public class ListenerCP extends JFrame implements ServerStatusListener {
 					e1.printStackTrace();
 				}
 				
-				try {
-		    		UnicastRemoteObject.unexportObject(registry, true);
-				}
-				catch (Throwable e1) {
-					e1.printStackTrace();
-				}
-				
-				registry = null;
 				bindUri = null;
 				result = false;
 			}
@@ -283,7 +263,6 @@ public class ListenerCP extends JFrame implements ServerStatusListener {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				applyConfig();
 			}
 		});
@@ -294,7 +273,6 @@ public class ListenerCP extends JFrame implements ServerStatusListener {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				resetConfig();
 			}
 		});
@@ -312,12 +290,10 @@ public class ListenerCP extends JFrame implements ServerStatusListener {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				try {
 					updateControls();
 				} 
 				catch (RemoteException e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
 			}
@@ -330,7 +306,6 @@ public class ListenerCP extends JFrame implements ServerStatusListener {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				exit();
 			}
 		});
@@ -345,7 +320,6 @@ public class ListenerCP extends JFrame implements ServerStatusListener {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				start();
 			}
 		});
@@ -356,7 +330,6 @@ public class ListenerCP extends JFrame implements ServerStatusListener {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				pauseResume();
 			}
 		});
@@ -367,7 +340,6 @@ public class ListenerCP extends JFrame implements ServerStatusListener {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				stop();
 			}
 		});
@@ -439,7 +411,6 @@ public class ListenerCP extends JFrame implements ServerStatusListener {
 			listener.exit();
 		} 
 		catch (Exception e) {
-			// TODO Auto-generated catch block
 			LogUtil.trace(e);
 		}
 	}
@@ -500,21 +471,21 @@ public class ListenerCP extends JFrame implements ServerStatusListener {
 			
 			paneConfig.reset();
 			int confirm = JOptionPane.showConfirmDialog(
-					this, 
-					"Reset configuration successfully. \n" + 
-					"Do you want to apply configuration into being effective?", 
-					"Reset configuration successfully", 
-					JOptionPane.YES_NO_OPTION,
-					JOptionPane.QUESTION_MESSAGE);
+				this, 
+				"Reset configuration successfully. \n" + 
+				"Do you want to apply configuration into being effective?", 
+				"Reset configuration successfully", 
+				JOptionPane.YES_NO_OPTION,
+				JOptionPane.QUESTION_MESSAGE);
 			
 			if (confirm == JOptionPane.YES_OPTION)
 				applyConfig();
 			else {
 				JOptionPane.showMessageDialog(
-						this, 
-						"Please press button 'Apply Config' to make store configuration effect later", 
-						"Please press button 'Apply Config' to make store configuration effect later", 
-						JOptionPane.INFORMATION_MESSAGE);
+					this, 
+					"Please press button 'Apply Config' to make store configuration effect later", 
+					"Please press button 'Apply Config' to make store configuration effect later", 
+					JOptionPane.INFORMATION_MESSAGE);
 			}
 			
 		}
@@ -634,7 +605,6 @@ public class ListenerCP extends JFrame implements ServerStatusListener {
 	@Override
 	public void statusChanged(ServerStatusEvent evt) 
 			throws RemoteException {
-		// TODO Auto-generated method stub
 		if (bindUri != null)
 			updateControls(evt.getStatus());
 		else if (!evt.getShutdownHookStatus())
@@ -652,7 +622,6 @@ public class ListenerCP extends JFrame implements ServerStatusListener {
 				listener.removeStatusListener(this);
 		} 
 		catch (Throwable e) {
-			// TODO Auto-generated catch block
 			LogUtil.trace(e);
 		}
 		
@@ -661,24 +630,13 @@ public class ListenerCP extends JFrame implements ServerStatusListener {
 				UnicastRemoteObject.unexportObject(this, true);
 			}
 			catch (Throwable e) {
-				// TODO Auto-generated catch block
 				LogUtil.trace(e);
 			}
 			
-			try {
-				if (registry != null)
-					UnicastRemoteObject.unexportObject(registry, true);
-			}
-			catch (Throwable e) {
-				// TODO Auto-generated catch block
-				LogUtil.trace(e);
-			}
 		}
 		
 		listener = null;
 		bindUri = null;
-		registry = null;
-		
 	}
 
 	
@@ -695,7 +653,7 @@ public class ListenerCP extends JFrame implements ServerStatusListener {
 		
 		Server server = dlg.getServer();
 		if (server != null)
-			new ListenerCP(server, ConnectDlg.getBindUri());
+			new ListenerCP(server, dlg.getBindNamingUri().bindUri);
 		else {
 			JOptionPane.showMessageDialog(
 					null, "Can't retrieve listener", "Can't retrieve listener", JOptionPane.ERROR_MESSAGE);
