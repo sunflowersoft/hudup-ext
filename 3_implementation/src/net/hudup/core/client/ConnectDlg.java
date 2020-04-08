@@ -354,12 +354,10 @@ public abstract class ConnectDlg extends JDialog {
 					if (connectType.type == ConnectType.evaluator) {
 						txtUsername.setEditable(false);
 						txtPassword.setEditable(false);
-						txtBindPort.setValue(Constants.DEFAULT_EVALUATOR_PORT);
 					}
 					else {
 						txtUsername.setEditable(true);
 						txtPassword.setEditable(true);
-						txtBindPort.setValue(Constants.DEFAULT_CONTROL_PANEL_PORT);
 					}
 				}
 			}
@@ -395,12 +393,6 @@ public abstract class ConnectDlg extends JDialog {
 			public void itemStateChanged(ItemEvent e) {
 				txtBindName.setVisible(chkExport.isSelected());
 				btnGenBindName.setVisible(chkExport.isSelected());
-				
-				ConnectTypeDesc connectType = (ConnectTypeDesc)cmbConnectType.getSelectedItem();
-				if (connectType.type == ConnectType.evaluator)
-					txtBindPort.setValue(Constants.DEFAULT_EVALUATOR_PORT);
-				else
-					txtBindPort.setValue(Constants.DEFAULT_CONTROL_PANEL_PORT);
 			}
 		});
 		chkExport.setEnabled(false);

@@ -5,7 +5,7 @@
  * Email: ng_phloc@yahoo.com
  * Phone: +84-975250362
  */
-package net.hudup.core.evaluate.ui;
+package net.hudup.temp;
 
 import java.io.Serializable;
 import java.rmi.Naming;
@@ -47,6 +47,8 @@ import net.hudup.core.evaluate.EvaluatorListener;
 import net.hudup.core.evaluate.Metric;
 import net.hudup.core.evaluate.Metrics;
 import net.hudup.core.evaluate.MetricsUtil;
+import net.hudup.core.evaluate.ui.EvaluateGUIData;
+import net.hudup.core.evaluate.ui.MetricsOptionDlg;
 import net.hudup.core.logistic.BindNamingURI;
 import net.hudup.core.logistic.CounterElapsedTimeListener;
 import net.hudup.core.logistic.LogUtil;
@@ -206,12 +208,32 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 		
 		try {
 			if (bindNamingUri.bindUri != null) { //Evaluator is remote
-				bindNamingUri.namingUri = null;
-				this.exportedStub = NetUtil.RegistryRemote.export(this, bindNamingUri.bindUri.getPort()); //Exporting this GUI
-				if (this.exportedStub != null)
-					LogUtil.info("Evaluator GUI exported at port " + bindNamingUri.bindUri.getPort());
-				else
-					LogUtil.info("Evaluator GUI failed to export");
+//				if (bindNamingUri.namingUri != null) { //Exporting the evaluator again.
+//					RegistryRemote rr = NetUtil.RegistryRemote.registerExport(this, bindNamingUri.namingUri);
+//					if (rr != null) {
+//						exportedStub = rr.getStub();
+//						registry = rr.getRegistry();
+//						
+//						evaluator.export(bindNamingUri.namingUri.getPort());
+//						evaluator.getConfig().setEvaluatorPort(bindNamingUri.namingUri.getPort());
+//						evaluator.setAgent(true);
+//						Naming.rebind(bindNamingUri.namingUri.toString(), evaluator);
+//						
+//						LogUtil.info("EVALUATOR AND EVALUATOR GUI EXPORTED AND NAMED AT PORT " + bindNamingUri.namingUri.getPort());
+//					}
+//					else {
+//						bindNamingUri.namingUri = null;
+//						LogUtil.info("Evaluator and evaluator GUI failed to exported");
+//					}
+//				}
+//				else {
+					bindNamingUri.namingUri = null;
+					this.exportedStub = NetUtil.RegistryRemote.export(this, bindNamingUri.bindUri.getPort()); //Exporting this GUI
+					if (this.exportedStub != null)
+						LogUtil.info("Evaluator GUI exported at port " + bindNamingUri.bindUri.getPort());
+					else
+						LogUtil.info("Evaluator GUI failed to exported");
+//				}
 			}
 			else { //Evaluator is local
 				if (evaluator.isAgent()) { //Evaluator is agent.
@@ -232,9 +254,20 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 					}
 					else {
 						bindNamingUri.namingUri = null;
-						LogUtil.info("Evaluator and evaluator GUI failed to export");
+						LogUtil.info("Evaluator and evaluator GUI failed to exported");
 					}
 				}
+//				else {
+//					bindNamingUri.namingUri = null;
+//					
+//					EvaluatorConfig config = evaluator.getConfig();
+//					int evaluatorPort = config.getEvaluatorPort();
+//					evaluatorPort = NetUtil.getPort(evaluatorPort, true);
+//					
+//					evaluator.export(evaluatorPort);
+//					
+//					config.setEvaluatorPort(evaluatorPort);
+//				}
 			}
 		}
 		catch (Throwable e) {
