@@ -23,6 +23,7 @@ import net.hudup.core.PluginChangedListener;
 import net.hudup.core.data.DataDriverList;
 import net.hudup.core.data.ui.DataDriverListTable;
 import net.hudup.core.data.ui.SysConfigPane;
+import net.hudup.core.logistic.xURI;
 import net.hudup.core.logistic.ui.PluginStorageManifestPanel;
 import net.hudup.logistic.SystemPropertiesPane;
 
@@ -129,7 +130,6 @@ public class SysConfigDlgExt extends SysConfigDlg {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				dispose();
 			}
 		});
@@ -143,12 +143,20 @@ public class SysConfigDlgExt extends SysConfigDlg {
 	 * @return plug-in storage manifest.
 	 */
 	protected PluginStorageManifestPanel createPluginStorageManifest(Object...vars) {
-		if (vars.length == 0)
-			return new PluginStorageManifestPanel(null);
-		else if (vars[0] instanceof PluginChangedListener)
-			return new PluginStorageManifestPanel((PluginChangedListener)vars[0]);
-		else
-			return new PluginStorageManifestPanel(null);
+		if (vars == null || vars.length == 0)
+			return new PluginStorageManifestPanel(null, null);
+			
+		PluginChangedListener listener = null;
+		xURI bindUri = null;
+		if (vars.length > 0) {
+			if (vars[0] instanceof PluginChangedListener)
+				listener = (PluginChangedListener)vars[0];
+		}
+		if (vars.length > 1) {
+			if (vars[1] instanceof xURI) bindUri = (xURI)vars[1];
+		}
+		
+		return new PluginStorageManifestPanel(listener, bindUri);
 	}
 	
 	

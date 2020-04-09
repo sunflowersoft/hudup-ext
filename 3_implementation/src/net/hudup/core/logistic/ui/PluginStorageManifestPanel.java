@@ -144,14 +144,14 @@ public class PluginStorageManifestPanel extends JPanel {
 	/**
 	 * Constructor with plug-in changed listener and additional parameter.
 	 * @param listener plug-in changed listener.
-	 * @param parameter additional parameter.
+	 * @param bindUri bound URI.
 	 */
-	public PluginStorageManifestPanel(PluginChangedListener listener) {
+	public PluginStorageManifestPanel(PluginChangedListener listener, xURI bindUri) {
 		setLayout(new BorderLayout());
 		JPanel body = new JPanel(new BorderLayout());
 		add(body, BorderLayout.CENTER);
 		
-		tblRegister = createPluginStorageManifest(listener);
+		tblRegister = createPluginStorageManifest(listener, bindUri);
 		if (listener != null)
 			tblRegister.addPluginChangedListener(listener);
 		body.add(new JScrollPane(tblRegister), BorderLayout.CENTER);
@@ -340,12 +340,18 @@ public class PluginStorageManifestPanel extends JPanel {
 	/**
 	 * Create plug-in manifest with plug-in changed listener.
 	 * @param listener plug-in changed listener.
+	 * @param bindUri bound URI.
 	 * @return plug-in manifest with plug-in changed listener.
 	 */
-	protected PluginStorageManifest createPluginStorageManifest(PluginChangedListener listener) {
+	protected PluginStorageManifest createPluginStorageManifest(PluginChangedListener listener, xURI bindUri) {
 		int port = 0;
 		try {
-			port = listener != null ? listener.getPort() : 0;
+			if (bindUri != null)
+				port = bindUri.getPort();
+			else if (listener != null)
+				port = listener.getPort();
+			else
+				port = 0;
 		} catch (Exception e) {port = 0; LogUtil.trace(e);}
 		
 		return new PluginStorageManifest(port < 0 ? 0 : port);
@@ -443,9 +449,10 @@ public class PluginStorageManifestPanel extends JPanel {
 	/**
 	 * Showing a dialog containing {@link PluginStorageManifest}.
 	 * @param comp parent component.
-	 * @param listener {@link PluginChangedListener} to receive {@link PluginChangedEvent} if {@link PluginStorageManifest} is changed. 
+	 * @param listener plug-in changed listener to receive {@link PluginChangedEvent} if {@link PluginStorageManifest} is changed.
+	 * @param bindUri bound URI. 
 	 */
-	public static void showDlg(Component comp, PluginChangedListener listener) {
+	public static void showDlg(Component comp, PluginChangedListener listener, xURI bindUri) {
 		JDialog dlg = new JDialog(UIUtil.getFrameForComponent(comp), I18nUtil.message("plugin_manager"), true);
 		dlg.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		dlg.setSize(600, 400);
@@ -456,7 +463,7 @@ public class PluginStorageManifestPanel extends JPanel {
 		JPanel body = new JPanel(new BorderLayout());
 		dlg.add(body, BorderLayout.CENTER);
 		
-		final PluginStorageManifestPanel paneManifest= new PluginStorageManifestPanel(listener);
+		final PluginStorageManifestPanel paneManifest= new PluginStorageManifestPanel(listener, bindUri);
 		body.add(paneManifest, BorderLayout.CENTER);
 		
 		

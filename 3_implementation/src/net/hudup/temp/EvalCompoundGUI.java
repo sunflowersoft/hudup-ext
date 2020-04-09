@@ -339,7 +339,7 @@ public class EvalCompoundGUI extends JFrame {
 				pluginChangedListener = (PluginChangedListener)referredService; 
 		} catch (Exception e) {LogUtil.trace(e);}
 		
-		SysConfigDlgExt cfg = new SysConfigDlgExt(this, I18nUtil.message("system_configure"), pluginChangedListener) {
+		SysConfigDlgExt cfg = new SysConfigDlgExt(this, I18nUtil.message("system_configure"), pluginChangedListener, batchEvaluateGUI.getBindUri()) {
 
 			/**
 			 * Serial version UID for serializable class.

@@ -360,7 +360,7 @@ public class EvalCompoundGUI extends JFrame {
 		if (batchEvaluateGUI.getBindUri() == null)
 			pluginChangedListener = EvaluatorAbstract.getTopMostPluginChangedListener((Evaluator)pluginChangedListener, true);
 		
-		SysConfigDlgExt cfg = new SysConfigDlgExt(this, I18nUtil.message("system_configure"), pluginChangedListener) {
+		SysConfigDlgExt cfg = new SysConfigDlgExt(this, I18nUtil.message("system_configure"), pluginChangedListener, batchEvaluateGUI.getBindUri()) {
 
 			/**
 			 * Serial version UID for serializable class.

@@ -4,6 +4,7 @@ import javax.swing.JOptionPane;
 
 import net.hudup.core.PluginChangedListener;
 import net.hudup.core.client.PowerServer;
+import net.hudup.core.logistic.xURI;
 
 /**
  * Panel for plug-in storage manifest from remote connection.
@@ -29,10 +30,11 @@ public class PluginStorageManifestPanelRemote extends PluginStorageManifestPanel
 	/**
 	 * Constructor with server and plug-in changed listener.
 	 * @param listener specified listener.
+	 * @param bindUri bound URI.
 	 */
-	public PluginStorageManifestPanelRemote(PluginChangedListener listener) {
+	public PluginStorageManifestPanelRemote(PluginChangedListener listener, xURI bindUri) {
 		// TODO Auto-generated constructor stub
-		super(listener);
+		super(listener, bindUri);
 		this.server = listener instanceof PowerServer ? (PowerServer)listener : null;
 		
 		JOptionPane.showMessageDialog(

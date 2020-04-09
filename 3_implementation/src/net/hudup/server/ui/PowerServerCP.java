@@ -335,7 +335,7 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					SysConfigDlgExt cfg = new SysConfigDlgExt(general, I18nUtil.message("system_configure"), getThisPowerServerCP()) {
+					SysConfigDlgExt cfg = new SysConfigDlgExt(general, I18nUtil.message("system_configure")) {
 
 						/**
 						 * Serial version UID for serializable class. 
@@ -344,10 +344,7 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 						
 						@Override
 						protected PluginStorageManifestPanel createPluginStorageManifest(Object... vars) {
-							if (bindUri != null)
-								return new PluginStorageManifestPanelRemote(server);
-							else
-								return super.createPluginStorageManifest(server);
+							return new PluginStorageManifestPanelRemote(server, bindUri);
 						}
 						
 					};
@@ -1128,22 +1125,6 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 	}
 	
 	
-	/**
-	 * Getting this power server control panel.
-	 * @return this power server control panel.
-	 */
-	private PowerServerCP getThisPowerServerCP() {
-		return this;
-	}
-	
-	
-//	@Override
-//	public void requireCleanupSomething() {
-//		// TODO Auto-generated method stub
-//		//Doing something...
-//	}
-
-
 	/**
 	 * Main method.
 	 * @param args specified arguments.

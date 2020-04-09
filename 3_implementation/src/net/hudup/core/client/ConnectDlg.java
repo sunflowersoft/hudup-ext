@@ -640,7 +640,10 @@ public abstract class ConnectDlg extends JDialog {
 				
 				bindName = normalizeNamingName(txtBindName.getText());
 				bindPort = txtBindPort.getValue() instanceof Number ? ( (Number) txtBindPort.getValue()).intValue() : 0;
-				bindPort = NetUtil.getPort(bindPort, chkExport.isSelected() ? Constants.TRY_RANDOM_PORT : true);
+				if (bindPort <= 0)
+					bindPort = 0;
+				else
+					bindPort = NetUtil.getPort(bindPort, chkExport.isSelected() ? Constants.TRY_RANDOM_PORT : true);
 
 				ConnectTypeDesc connectType = (ConnectTypeDesc)cmbConnectType.getSelectedItem();
 				if (connectType.equals(ConnectType.server))
