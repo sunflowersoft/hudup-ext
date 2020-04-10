@@ -318,6 +318,20 @@
 
 
 	<!--
+	Function: converting byte array (byte[]) to string and vice versa, which is used for internal ciphering.
+	Affected packages, classes: net.hudup.core.security.CipherImpl
+	Referred jars:
+	Source: package sun.misc in rt.jar of JRE8
+	Vendor: Sun Microsystem
+	Archive: rt.jar, sun.misc.jar
+	Version: JRE8
+	Status: using
+	Note:
+	-->
+	<property name="sun.misc.jar" value="${lib.home}/sun.misc.jar"/>
+	
+
+	<!--
 	Function: storaging via many protocol such as file, compressed file (zip, jar), http
 	Affected packages, classes: net.hudup.core.factory.FactoryImpl (UriAssocTrueZip)
 	Referred jars:

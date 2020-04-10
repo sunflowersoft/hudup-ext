@@ -72,7 +72,7 @@ public class SortableTableModel extends DefaultTableModel {
 	 * @param data data vector.
 	 * @param columnNames column names.
 	 */
-	public SortableTableModel(@SuppressWarnings("rawtypes") Vector data, @SuppressWarnings("rawtypes") Vector columnNames) {
+	public SortableTableModel(Vector<? extends Vector<?>> data, Vector<?> columnNames) {
 		super(data, columnNames);
 	}
 

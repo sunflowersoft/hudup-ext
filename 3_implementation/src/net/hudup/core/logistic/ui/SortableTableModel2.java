@@ -86,7 +86,7 @@ public class SortableTableModel2 extends DefaultTableModel {
      * @param data specified data vector.
      * @param columnNames specified column names as a vector.
      */
-	public SortableTableModel2(Vector<?> data, Vector<?> columnNames) {
+	public SortableTableModel2(Vector<? extends Vector<?>> data, Vector<?> columnNames) {
 		super(data, columnNames);
 	}
 

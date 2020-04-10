@@ -78,7 +78,7 @@ public class SortableTable extends JTable {
 	 * @param rowData row data vector.
 	 * @param columnNames column names vector.
 	 */
-	public SortableTable(@SuppressWarnings("rawtypes") Vector rowData, @SuppressWarnings("rawtypes") Vector columnNames) {
+	public SortableTable(Vector<? extends Vector<?>> rowData, Vector<?> columnNames) {
 		super(new SortableTableModel(rowData, columnNames));
 		init();
 	}
