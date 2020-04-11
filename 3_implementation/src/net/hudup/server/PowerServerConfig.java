@@ -58,6 +58,12 @@ public class PowerServerConfig extends ServerConfig {
 
 	
 	/**
+	 * Default store path.
+	 */
+	public final static String  STORE_PATH_DEFAULT2 = Constants.DATABASE_DIRECTORY + "/file";
+
+	
+	/**
 	 * Server recommender field.
 	 */
 	public final static String SERVER_RECOMMENDER_FIELD = changeCase("server_recommender");

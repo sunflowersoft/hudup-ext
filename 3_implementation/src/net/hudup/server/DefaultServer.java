@@ -7,6 +7,7 @@
  */
 package net.hudup.server;
 
+import java.awt.GraphicsEnvironment;
 import java.awt.Image;
 import java.awt.MenuItem;
 import java.awt.PopupMenu;
@@ -18,6 +19,7 @@ import java.rmi.RemoteException;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Collection;
+import java.util.Scanner;
 
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
@@ -42,6 +44,7 @@ import net.hudup.core.logistic.ui.UIUtil;
 import net.hudup.data.ProviderImpl;
 import net.hudup.server.ui.PowerServerCP;
 import net.hudup.server.ui.SetupServerWizard;
+import net.hudup.server.ui.SetupServerWizardConsole;
 
 /**
  * {@link DefaultServer} class is default and complete implementation of {@link net.hudup.core.client.Server} interface.
@@ -77,7 +80,6 @@ public class DefaultServer extends PowerServerImpl {
 	 */
 	protected DefaultServer(PowerServerConfig config) {
 		super(config);
-		// TODO Auto-generated constructor stub
 		
 		service = createService();
 		
@@ -88,7 +90,6 @@ public class DefaultServer extends PowerServerImpl {
 
 	@Override
 	protected Transaction createTransaction() {
-		// TODO Auto-generated method stub
 		return new TransactionImpl();
 	}
 
@@ -129,7 +130,6 @@ public class DefaultServer extends PowerServerImpl {
 	
 	@Override
 	protected void serverTasks() {
-		// TODO Auto-generated method stub
 		
 		// Task 1
 		if (config.isPeriodLearn()) { //This method is used to prevent time consuming to learn internal recommender.
@@ -152,7 +152,6 @@ public class DefaultServer extends PowerServerImpl {
 
 	@Override
 	protected void initStorageSystem() {
-		// TODO Auto-generated method stub
 		
 		try {
 			DataDriver driver = DataDriver.create(config.getStoreUri());
@@ -160,7 +159,6 @@ public class DefaultServer extends PowerServerImpl {
 				driver.loadDriver();
 		} 
 		catch (Throwable e) {
-			// TODO Auto-generated catch block
 			LogUtil.trace(e);
 			LogUtil.error("Server fail to initialize storage system, error is " + e.getMessage());
 		}
@@ -169,7 +167,6 @@ public class DefaultServer extends PowerServerImpl {
 
 	@Override
 	protected void destroyStorageSystem() {
-		// TODO Auto-generated method stub
 		
 		DataDriver driver = DataDriver.create(config.getStoreUri());
 		
@@ -178,7 +175,6 @@ public class DefaultServer extends PowerServerImpl {
 				DriverManager.getConnection("jdbc:derby:;shutdown=true");
 			} 
 			catch (Throwable e) {
-				// TODO Auto-generated catch block
 				if (e instanceof SQLException) {
 					if (! ((SQLException)e).getSQLState().equals("XJ015") ) {
 						LogUtil.trace(e);
@@ -230,7 +226,6 @@ public class DefaultServer extends PowerServerImpl {
 	
 	@Override
 	public Service getService() throws RemoteException {
-		// TODO Auto-generated method stub
 		return service;
 	}
 
@@ -274,12 +269,10 @@ public class DefaultServer extends PowerServerImpl {
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					// TODO Auto-generated method stub
 					try {
 						new HelpContent(null);
 					} 
 					catch (Throwable ex) {
-						// TODO Auto-generated catch block
 						ex.printStackTrace();
 					}
 				}
@@ -291,12 +284,10 @@ public class DefaultServer extends PowerServerImpl {
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					// TODO Auto-generated method stub
 					try {
 						exit();
 					} 
 					catch (Throwable ex) {
-						// TODO Auto-generated catch block
 						ex.printStackTrace();
 					}
 				}
@@ -370,7 +361,7 @@ public class DefaultServer extends PowerServerImpl {
 			/*
 			 * It is possible that current Java environment does not support GUI.
 			 * Use of GraphicsEnvironment.isHeadless() tests Java GUI.
-			 * Hence, create control panel with console here.
+			 * Hence, create control panel with console here or improve PowerServerCP to support console.
 			 */
 		}
 	}
@@ -397,25 +388,47 @@ public class DefaultServer extends PowerServerImpl {
 			return new DefaultServer(new PowerServerConfig(srvConfigUri));
 		else {
 			
-	        Image image = UIUtil.getImage("server-32x32.png");
-			int confirm = JOptionPane.showConfirmDialog(
-					null, 
-					"Server not set up yet.\n Do you want to setup server?", 
-					"Setup server", 
-					JOptionPane.OK_CANCEL_OPTION, 
-					JOptionPane.INFORMATION_MESSAGE, 
-					image == null ? null : new ImageIcon(image));
-			
-			if (confirm != JOptionPane.OK_OPTION) {
-				LogUtil.info("Server not created");
-				return null;
+			boolean isHeadLess = GraphicsEnvironment.isHeadless();
+			if (isHeadLess) {
+				Scanner scanner = new Scanner(System.in);
+				System.out.print("\nServer not set up yet.\nDo you want to setup server? (y|n): ");
+				String confirm = scanner.next().trim();
+				scanner.close();
+				
+				if (confirm.compareToIgnoreCase("y") != 0) {
+					LogUtil.info("Server not created due to not confirm");
+					return null;
+				}
+			}
+			else {
+		        Image image = UIUtil.getImage("server-32x32.png");
+				int confirm = JOptionPane.showConfirmDialog(
+						null, 
+						"Server not set up yet.\nDo you want to setup server?", 
+						"Setup server", 
+						JOptionPane.OK_CANCEL_OPTION, 
+						JOptionPane.INFORMATION_MESSAGE, 
+						image == null ? null : new ImageIcon(image));
+				
+				if (confirm != JOptionPane.OK_OPTION) {
+					LogUtil.info("Server not created");
+					return null;
+				}
 			}
 			
-			
 			PowerServerConfig config = new PowerServerConfig(srvConfigUri);
-			SetupServerWizard dlg = new SetupServerWizard(null, config);
 			
-			if (!dlg.isFinished()) {
+			boolean finished = true;
+			if (isHeadLess) {
+				SetupServerWizardConsole wizard = new SetupServerWizardConsole(config);
+				finished = wizard.isFinished(); 
+			}
+			else {
+				SetupServerWizard wizard = new SetupServerWizard(null, config);
+				finished = wizard.isFinished(); 
+			}
+			
+			if (!finished) {
 				LogUtil.info("Server not created");
 				return null;
 			}
@@ -437,7 +450,7 @@ public class DefaultServer extends PowerServerImpl {
 	 * @param srvConfigUri given configuration URI.
 	 * @return whether requiring set up.
 	 */
-	protected static boolean requireSetup(xURI srvConfigUri) {
+	public static boolean requireSetup(xURI srvConfigUri) {
 		
 		try {
 			UriAdapter adapter = new UriAdapter(srvConfigUri);
