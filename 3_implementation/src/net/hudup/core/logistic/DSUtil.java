@@ -126,6 +126,21 @@ public final class DSUtil {
 	
 	
 	/**
+	 * Converting a specified array of arrays of real numbers into list of arrays of real numbers.
+	 * @param array array of arrays of real numbers.
+	 * @return list of arrays of real numbers.
+	 */
+	public static List<double[]> toDoubleList(double[][] array) {
+		List<double[]> list = Util.newList(array.length);
+		for (double[] e : array) {
+			list.add(e);
+		}
+		
+		return list;
+	}
+
+	
+	/**
 	 * Cloning a specified collection of real numbers.
 	 * @param collection the specified collection of real numbers.
 	 * @return the cloned list of real numbers.
