@@ -352,6 +352,28 @@ public final class TextParserUtil {
 
 	
 	/**
+	 * Converting a specified array of double numbers into a string with formating number.
+	 * Words in such returned string are connected by the character specified by the parameter {@code sep}. 
+	 * @param array Specified array of objects.
+	 * @param sep The character that is used to connect words in the returned string. As usual, it is a comma &quot;,&quot;.
+	 * @return Text form (string) of the specified array of double numbers. 
+	 */
+	public static String toTextFormatted(double[] array, String sep) {
+		StringBuffer buffer = new StringBuffer();
+		
+		for (int i = 0; i < array.length; i++) {
+			if ( i > 0)
+				buffer.append(sep + " ");
+
+			buffer.append(MathUtil.format(array[i]));
+		}
+		
+		return buffer.toString();
+		
+	}
+
+	
+	/**
 	 * Converting a specified array of double numbers into a column list of strings.
 	 * Words in such returned string are connected by the character specified by the parameter {@code sep}. 
 	 * @param array Specified array of objects.
@@ -422,6 +444,30 @@ public final class TextParserUtil {
 		return buffer.toString();
 	}
 	
+	
+	/**
+	 * Converting a specified collection of real numbers into a string in which real number is converted as a word in such string.
+	 * Words in such returned string are connected by the character specified by the parameter {@code sep}. 
+	 * @param list Specified collection of real numbers.
+	 * @param sep The character that is used to connect words in the returned string. As usual, it is a comma &quot;,&quot;.
+	 * @return Text form (string) of the specified collection of real numbers, in which each real number is converted as a word in such text form.
+	 */
+	public static String toTextFormatted(Collection<Double> list, String sep) {
+		StringBuffer buffer = new StringBuffer();
+		
+		int i = 0;
+		for (double value : list) {
+			if (i > 0)
+				buffer.append(sep + " ");
+			
+			buffer.append(MathUtil.format(value));
+			
+			i++;
+		}
+			
+		return buffer.toString();
+	}
+
 	
 	/**
 	 * Converting a specified collection of objects (any type) into a column string list in which each object is converted as a word in such string.
