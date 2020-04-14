@@ -190,16 +190,38 @@ public class DatasetPoolTable extends JTable {
 	private JPopupMenu createContextMenu() {
 		JPopupMenu contextMenu = new JPopupMenu();
 		
-		JMenuItem miSave = UIUtil.makeMenuItem((String)null, "Save script", 
+		JMenuItem miSaveScript = UIUtil.makeMenuItem((String)null, "Save script", 
 			new ActionListener() {
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					save();
+					saveScript();
 				}
 			});
-		contextMenu.add(miSave);
+		contextMenu.add(miSaveScript);
 
+		if (isEnabled2()) {
+			JMenuItem miAddScript = UIUtil.makeMenuItem((String)null, "Add script", 
+				new ActionListener() {
+					
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						addScript();
+					}
+				});
+			contextMenu.add(miAddScript);
+			
+			JMenuItem miAddTraining = UIUtil.makeMenuItem((String)null, "Add training", 
+				new ActionListener() {
+					
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						addTraining();
+					}
+				});
+			contextMenu.add(miAddTraining);
+		}
+		
 		final int selectedRow = getSelectedRow();
 		final int selectedColumn = getSelectedColumn();
 		if (selectedRow == -1) return contextMenu;
@@ -350,16 +372,6 @@ public class DatasetPoolTable extends JTable {
 			});
 		contextMenu.add(miRemoveRow);
 		
-		JMenuItem miAdd = UIUtil.makeMenuItem((String)null, "Add script", 
-			new ActionListener() {
-				
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					add();
-				}
-			});
-		contextMenu.add(miAdd);
-
 		if (getRowCount() > 1) {
 			contextMenu.addSeparator();
 			
@@ -556,9 +568,9 @@ public class DatasetPoolTable extends JTable {
 	
 	
 	/**
-	 * Save data.
+	 * Save script.
 	 */
-	protected void save() {
+	protected void saveScript() {
 		JOptionPane.showMessageDialog(this, 
 			"Saving script not implemented yet", "Not implement yet", JOptionPane.WARNING_MESSAGE);
 	}
@@ -567,11 +579,20 @@ public class DatasetPoolTable extends JTable {
 	/**
 	 * Add and load script.
 	 */
-	protected void add() {
+	protected void addScript() {
 		JOptionPane.showMessageDialog(this, 
 			"Adding and loading script not implemented yet", "Not implement yet", JOptionPane.WARNING_MESSAGE);
 	}
 	
+	
+	/**
+	 * Add training dataset.
+	 */
+	protected void addTraining() {
+		JOptionPane.showMessageDialog(this, 
+			"Adding training set not implemented yet", "Not implement yet", JOptionPane.WARNING_MESSAGE);
+	}
+
 	
 	/**
 	 * Setting optionally enabled flag.

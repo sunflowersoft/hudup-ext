@@ -523,13 +523,18 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			}
 			
 			@Override
-			public void save() {
+			public void saveScript() {
 				saveBatchScript();
 			}
 
 			@Override
-			protected void add() {
+			protected void addScript() {
 				loadBatchScript(true);
+			}
+
+			@Override
+			protected void addTraining() {
+				addDataset(true);
 			}
 
 		};
@@ -636,7 +641,9 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 				}
 			});
 		this.btnUpload.setMargin(new Insets(0, 0 , 0, 0));
-		this.btnUpload.setVisible(true);
+		try {
+			this.btnUpload.setVisible(bindNamingUri.bindUri != null || evaluator.isAgent());
+		} catch (Exception e) {LogUtil.trace(e);}
 		toolGrp2.add(this.btnUpload);
 
 		this.btnDownload = UIUtil.makeIconButton(

@@ -207,7 +207,7 @@ public class DatasetPoolDlg extends JDialog {
 			}
 			
 			@Override
-			public void save() {
+			public void saveScript() {
 		        saveBatchScript();
 			}
 			
