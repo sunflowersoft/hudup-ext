@@ -9,7 +9,7 @@ package net.hudup.logistic.math.ui;
 
 import javax.swing.JTable;
 
-import net.hudup.data.bit.BitData;
+import net.hudup.core.data.bit.BitData;
 import net.hudup.logistic.math.BitProbItemMatrix;
 
 /**

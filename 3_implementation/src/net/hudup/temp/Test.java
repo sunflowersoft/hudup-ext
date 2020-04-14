@@ -73,6 +73,7 @@ import net.hudup.core.data.DataDriver.DataType;
 import net.hudup.core.data.DataDriverList;
 import net.hudup.core.data.Exportable;
 import net.hudup.core.data.HiddenText;
+import net.hudup.core.data.ui.DatasetConfigurator;
 import net.hudup.core.evaluate.Evaluator;
 import net.hudup.core.evaluate.MetaMetric;
 import net.hudup.core.evaluate.Metric;
@@ -90,11 +91,10 @@ import net.hudup.core.logistic.ui.TagTextField;
 import net.hudup.core.logistic.ui.UIUtil;
 import net.hudup.core.parser.DatasetParser;
 import net.hudup.core.parser.RmiServerIndicator;
+import net.hudup.core.parser.SnapshotParserImpl;
 import net.hudup.core.parser.SocketServerIndicator;
-import net.hudup.data.ui.DatasetConfigurator;
 import net.hudup.listener.RemoteInfo;
 import net.hudup.listener.RemoteInfoList;
-import net.hudup.parser.SnapshotParserImpl;
 
 /**
  * This is temporal testing class.

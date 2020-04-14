@@ -32,6 +32,7 @@ import net.hudup.core.RegisterTable;
 import net.hudup.core.Util;
 import net.hudup.core.client.ConnectDlg;
 import net.hudup.core.client.Service;
+import net.hudup.core.data.ui.SysConfigDlgExt;
 import net.hudup.core.evaluate.Evaluator;
 import net.hudup.core.evaluate.EvaluatorAbstract;
 import net.hudup.core.evaluate.EvaluatorConfig;
@@ -46,7 +47,6 @@ import net.hudup.core.logistic.ui.HelpContent;
 import net.hudup.core.logistic.ui.StartDlg;
 import net.hudup.core.logistic.ui.TextArea;
 import net.hudup.core.logistic.ui.UIUtil;
-import net.hudup.data.ui.SysConfigDlgExt;
 import net.hudup.evaluate.ui.BatchEvaluateGUI;
 
 /**

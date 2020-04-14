@@ -63,6 +63,7 @@ import net.hudup.core.logistic.xURI;
  * @author Loc Nguyen
  * @version 10.0
  */
+@Deprecated
 public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorListener, EvaluateListener, EvaluateProgressListener, SetupAlgListener, PluginChangedListener, CounterElapsedTimeListener, ClassProcessor, Serializable {
 
 	

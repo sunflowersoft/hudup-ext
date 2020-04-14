@@ -12,7 +12,7 @@ import java.rmi.RemoteException;
 import net.hudup.core.alg.Alg;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Dataset;
-import net.hudup.parser.SemiScannerParser;
+import net.hudup.core.parser.SemiScannerParser;
 
 /**
  * This class is parser to parse extended semi-scanner.

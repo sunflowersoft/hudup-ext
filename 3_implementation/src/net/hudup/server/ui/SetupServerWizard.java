@@ -32,19 +32,19 @@ import net.hudup.core.data.Attribute;
 import net.hudup.core.data.AttributeList;
 import net.hudup.core.data.BooleanWrapper;
 import net.hudup.core.data.DataConfig;
+import net.hudup.core.data.DatasetUtil2;
 import net.hudup.core.data.Provider;
+import net.hudup.core.data.ProviderImpl;
 import net.hudup.core.data.Unit;
 import net.hudup.core.data.UnitList;
+import net.hudup.core.data.ui.AttributeListTable;
 import net.hudup.core.data.ui.DataConfigTextField;
 import net.hudup.core.data.ui.SysConfigPane;
+import net.hudup.core.data.ui.UnitListBoxExt;
 import net.hudup.core.data.ui.UnitTable;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.ui.UIUtil;
 import net.hudup.core.logistic.ui.WaitDialog;
-import net.hudup.data.DatasetUtil2;
-import net.hudup.data.ProviderImpl;
-import net.hudup.data.ui.AttributeListTable;
-import net.hudup.data.ui.UnitListBoxExt;
 import net.hudup.server.PowerServerConfig;
 
 /**
@@ -910,7 +910,7 @@ public class SetupServerWizard extends JDialog {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
-				DataConfig srcConfig = net.hudup.data.DatasetUtil2.chooseConfig(getWizard(), null);
+				DataConfig srcConfig = DatasetUtil2.chooseConfig(getWizard(), null);
 				
 				if (srcConfig == null) {
 					JOptionPane.showMessageDialog(

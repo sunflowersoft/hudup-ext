@@ -206,7 +206,7 @@
 
 	<!--
 	Function: Processing Excel files.
-	Affected packages, classes: net.hudup.core.evaluate.MetricsUtil
+	Affected packages, classes: net.hudup.core.evaluate.MetricsUtil, net.hudup.core.factory.FlatProviderAssoc (ExcelReader, ExcelWriter)
 	Referred jars:
 	Source: http://jexcelapi.sourceforge.net, https://sourceforge.net/projects/jexcelapi
 	Vendor: Andy Khan 
@@ -220,7 +220,7 @@
 
 	<!--
 	Function: Apache Logging Services (log4j)
-	Affected packages, classes: Classes that support logging.
+	Affected packages, classes: net.hudup.core.logistic.LogUtil
 	Referred jars: commons-logging.jar
 	Source: https://logging.apache.org/log4j
 	Vendor: Apache Software Foundation 
@@ -290,7 +290,7 @@
 
 	<!--
 	Function: SwingX is a library of components and utilities extending the Java Swing library
-	Affected packages, classes: net.hudup.data.ctx.ui.CTStable, net.hudup.data.ctx.ui.CTSviewer
+	Affected packages, classes: net.hudup.core.data.ctx.ui.CTStable, net.hudup.core.data.ctx.ui.CTSviewer
 	Referred jars:
 	Source: https://github.com/tmyroadctfig/swingx
 	Vendor: swingLabs
@@ -304,17 +304,17 @@
 
 	<!--
 	Function: creating a table whose rows can be sorted according to columns
-	Affected packages, classes: net.hudup.core.logistic.ui.SortableTable, net.hudup.core.logistic.ui.SortableTableModel
+	Affected packages, classes: net.hudup.core.logistic.ui.SortableTable2, net.hudup.core.logistic.ui.SortableTableModel2
 	Referred jars:
 	Source: http://www.java2s.com/Code/Java/Swing-JFC/AsimpleextensionofJTablethatsupportstheuseofaSortableTableModel.htm
 	Vendor: David Gilbert and Nobuo Tamemasa - Object Refinery Limited
 	Archive: newtech-research/ui/java/SORTABLETABLE, newtech-research/prog-language/java/ui/SORTABLETABLE
 	Version: 1.5 build 2005.11.16
-	Status: using
+	Status: not using
 	Note:
 	-->
-	<property name="SortableTable.class" value="${bin.home}/net/hudup/core/logistic/ui/SortableTable.class"/>
-	<property name="SortableTableModel.class" value="${bin.home}/net/hudup/core/logistic/ui/SortableTableModel.class"/>
+	<property name="SortableTable2.class" value="${bin.home}/net/hudup/core/logistic/ui/SortableTable2.class"/>
+	<property name="SortableTableModel2.class" value="${bin.home}/net/hudup/core/logistic/ui/SortableTableModel2.class"/>
 
 
 	<!--
@@ -323,7 +323,7 @@
 	Referred jars:
 	Source: package sun.misc in rt.jar of JRE8
 	Vendor: Sun Microsystem
-	Archive: rt.jar, sun.misc.jar
+	Archive: rt.jar
 	Version: JRE8
 	Status: using
 	Note:
@@ -368,27 +368,28 @@
 	Version: 2011.08.26
 	Status: not using
 	Note:
-	<property name="zql.jar" value="${lib.home}/zql-20110826.jar"/>
+	<property name="zql.jar" value="${lib.home}/ext/zql-20110826.jar"/>
 	-->
 
 
 	<!--
 	List of classes and packages which use libraries:
 	
-	net.hudup.data.ctx.ui.CTStable: swingx-all.jar
-	net.hudup.data.ctx.ui.CTSviewer: swingx-all.jar
+	net.hudup.core.data.ctx.ui.CTStable: swingx-all.jar
+	net.hudup.core.data.ctx.ui.CTSviewer: swingx-all.jar
 	net.hudup.core.data.DataDriver: derby.jar, derbyclient.jar, mysql-connector-java.jar
 	net.hudup.core.data.PropList: xml-apis.jar
 	net.hudup.core.evaluate.MetricsUtil: flanagan.jar, jxl.jar
 	net.hudup.core.factory.FactoryImpl: quicktable.jar
 	net.hudup.core.factory.FactoryImpl (UriAssocTrueZip): truezip.jar
 	net.hudup.core.factory.FlatProviderAssoc: javacsv.jar
+	net.hudup.core.factory.FlatProviderAssoc (ExcelReader, ExcelWriter): jxl.jar
 	net.hudup.core.Firer: reflections.jar
 	net.hudup.core.logistic.LogUtil: log4j.jar
-	net.hudup.core.logistic.ui.SortableTable: SortableTable.class
-	net.hudup.core.logistic.ui.SortableTableModel: SortableTableModel.class
+	net.hudup.core.logistic.ui.SortableTable2: SortableTable2.class
+	net.hudup.core.logistic.ui.SortableTableModel2: SortableTableModel2.class
 	net.hudup.core.parser.JsonParserImpl: common-io.jar, json-io.jar
-	net.hudup.core.logistic.ui.SortableTable: SortableTable.class
+	net.hudup.core.security.CipherImpl: sun.misc.jar
 	net.hudup.phoebe.math.FlanaganStat: flanagan.jar
 	net.hudup.phoebe.math.ui.StatDlg: flanagan.jar
 	

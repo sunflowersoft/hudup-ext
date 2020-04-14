@@ -45,6 +45,7 @@ import net.hudup.core.RegisterTable;
 import net.hudup.core.Util;
 import net.hudup.core.client.ConnectDlg;
 import net.hudup.core.client.Service;
+import net.hudup.core.data.ui.SysConfigDlgExt;
 import net.hudup.core.evaluate.Evaluator;
 import net.hudup.core.evaluate.EvaluatorAbstract;
 import net.hudup.core.evaluate.EvaluatorConfig;
@@ -53,6 +54,7 @@ import net.hudup.core.evaluate.Metric;
 import net.hudup.core.evaluate.Metrics;
 import net.hudup.core.evaluate.NoneWrapperMetricList;
 import net.hudup.core.evaluate.ui.EvaluateGUIData;
+import net.hudup.core.evaluate.ui.MetricsAnalyzeDlg;
 import net.hudup.core.logistic.BindNamingURI;
 import net.hudup.core.logistic.I18nUtil;
 import net.hudup.core.logistic.LogUtil;
@@ -62,7 +64,6 @@ import net.hudup.core.logistic.ui.HelpContent;
 import net.hudup.core.logistic.ui.StartDlg;
 import net.hudup.core.logistic.ui.TextArea;
 import net.hudup.core.logistic.ui.UIUtil;
-import net.hudup.data.ui.SysConfigDlgExt;
 
 /**
  * This class represents the entire frame allowing users to interact fully with evaluator.

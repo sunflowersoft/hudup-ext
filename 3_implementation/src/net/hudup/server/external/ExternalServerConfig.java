@@ -20,10 +20,10 @@ import net.hudup.core.data.CData;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.DataDriverList;
 import net.hudup.core.data.ExternalConfig;
+import net.hudup.core.data.ui.ExternalConfigurator;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.xURI;
 import net.hudup.core.parser.DatasetParser;
-import net.hudup.data.ui.ExternalConfigurator;
 import net.hudup.server.PowerServerConfig;
 
 /**

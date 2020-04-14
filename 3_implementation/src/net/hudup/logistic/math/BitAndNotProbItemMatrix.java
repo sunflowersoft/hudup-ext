@@ -15,9 +15,9 @@ import java.util.Set;
 
 import net.hudup.core.Util;
 import net.hudup.core.data.Pair;
+import net.hudup.core.data.bit.BitData;
+import net.hudup.core.data.bit.BitItem;
 import net.hudup.core.logistic.DSUtil;
-import net.hudup.data.bit.BitData;
-import net.hudup.data.bit.BitItem;
 
 /**
  * This class is matrix of AND and AND-NOT probabilities of binary items,

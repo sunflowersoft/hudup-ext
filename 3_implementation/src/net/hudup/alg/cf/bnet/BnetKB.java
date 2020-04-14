@@ -37,6 +37,7 @@ import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.KBaseAbstract;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Dataset;
+import net.hudup.core.data.DatasetUtil2;
 import net.hudup.core.data.Fetcher;
 import net.hudup.core.data.RatingVector;
 import net.hudup.core.logistic.Inspector;
@@ -46,7 +47,6 @@ import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.xURI;
 import net.hudup.core.logistic.ui.TextArea;
 import net.hudup.core.parser.TextParserUtil;
-import net.hudup.data.DatasetUtil2;
 
 
 /**

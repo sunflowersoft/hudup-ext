@@ -12,12 +12,12 @@ import java.awt.Image;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 
+import net.hudup.core.data.DefaultExternalQuery;
 import net.hudup.core.data.ExternalConfig;
 import net.hudup.core.data.ExternalQuery;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.xURI;
 import net.hudup.core.logistic.ui.UIUtil;
-import net.hudup.data.DefaultExternalQuery;
 import net.hudup.server.DefaultServer;
 import net.hudup.server.external.ui.ExternalServerCP;
 import net.hudup.server.external.ui.SetupExternalServerWizard;

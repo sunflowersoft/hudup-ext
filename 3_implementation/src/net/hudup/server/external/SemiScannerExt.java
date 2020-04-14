@@ -17,7 +17,7 @@ import net.hudup.core.data.ExternalRecord;
 import net.hudup.core.data.Fetcher;
 import net.hudup.core.data.MemProfiles;
 import net.hudup.core.data.Profile;
-import net.hudup.data.SemiScanner;
+import net.hudup.core.data.SemiScanner;
 
 /**
  * This class is an extension of semi-scanner ({@link SemiScanner}) which supports external mapping.

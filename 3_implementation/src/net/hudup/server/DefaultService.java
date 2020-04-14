@@ -41,16 +41,16 @@ import net.hudup.core.data.Nominal;
 import net.hudup.core.data.NominalList;
 import net.hudup.core.data.Profile;
 import net.hudup.core.data.Provider;
+import net.hudup.core.data.ProviderImpl;
 import net.hudup.core.data.Rating;
 import net.hudup.core.data.RatingVector;
 import net.hudup.core.data.Scanner;
 import net.hudup.core.data.Snapshot;
+import net.hudup.core.data.SnapshotImpl;
 import net.hudup.core.evaluate.Evaluator;
 import net.hudup.core.evaluate.EvaluatorConfig;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.NextUpdate;
-import net.hudup.data.ProviderImpl;
-import net.hudup.data.SnapshotImpl;
 
 /**
  * {@link DefaultService} class is default implementation of {@link Service} interface. {@link DefaultService} uses {@link Recommender} and {@link Provider} for processing recommendation request and update request, respectively.

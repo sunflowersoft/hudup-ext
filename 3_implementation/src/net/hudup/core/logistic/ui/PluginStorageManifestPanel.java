@@ -51,15 +51,15 @@ import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.DataDriver;
 import net.hudup.core.data.DataDriver.DataType;
 import net.hudup.core.data.DataDriverList;
+import net.hudup.core.data.ui.DatasetConfigurator;
 import net.hudup.core.logistic.I18nUtil;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.NextUpdate;
 import net.hudup.core.logistic.xURI;
 import net.hudup.core.parser.DatasetParser;
 import net.hudup.core.parser.RmiServerIndicator;
+import net.hudup.core.parser.SnapshotParserImpl;
 import net.hudup.core.parser.SocketServerIndicator;
-import net.hudup.data.ui.DatasetConfigurator;
-import net.hudup.parser.SnapshotParserImpl;
 
 /**
  * Panel for plug-in storage manifest.

@@ -14,8 +14,8 @@ import java.util.Map;
 import net.hudup.core.Util;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.DatasetUtil;
+import net.hudup.core.data.DatasetUtil2;
 import net.hudup.core.data.Pair;
-import net.hudup.data.DatasetUtil2;
 
 /**
  * This class is matrix of probabilities of users, in which each cell is probability array of a user with many items.

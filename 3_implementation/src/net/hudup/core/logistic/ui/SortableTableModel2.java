@@ -43,6 +43,7 @@ import javax.swing.table.DefaultTableModel;
  * @author David Gilbert (for Object Refinery Limited), Nobuo Tamemasa
  * @version 2.1
  */
+@Deprecated
 public class SortableTableModel2 extends DefaultTableModel {
 
 	/**
@@ -159,6 +160,7 @@ public class SortableTableModel2 extends DefaultTableModel {
  *
  */
 @SuppressWarnings({ "unchecked", "rawtypes" })
+@Deprecated
 class ColumnSorter implements Comparator<Vector> { 
 	protected int colIndex = 0; 
 	protected boolean ascending = true;

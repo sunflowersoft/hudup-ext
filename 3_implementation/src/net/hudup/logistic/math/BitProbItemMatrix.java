@@ -14,8 +14,8 @@ import java.util.Set;
 
 import net.hudup.core.Util;
 import net.hudup.core.data.Pair;
-import net.hudup.data.bit.BitData;
-import net.hudup.data.bit.BitDataUtil;
+import net.hudup.core.data.bit.BitData;
+import net.hudup.core.data.bit.BitDataUtil;
 import net.hudup.logistic.math.BitAndNotProbItemMatrix.Prob;
 
 /**

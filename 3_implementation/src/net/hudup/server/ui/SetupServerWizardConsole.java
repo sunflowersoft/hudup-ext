@@ -14,10 +14,10 @@ import net.hudup.core.data.Attribute;
 import net.hudup.core.data.AttributeList;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Provider;
+import net.hudup.core.data.ProviderImpl;
 import net.hudup.core.logistic.NextUpdate;
 import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.xURI;
-import net.hudup.data.ProviderImpl;
 import net.hudup.server.PowerServerConfig;
 
 /**

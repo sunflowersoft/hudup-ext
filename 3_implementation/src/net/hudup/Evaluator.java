@@ -19,6 +19,7 @@ import net.hudup.core.PluginStorage;
 import net.hudup.core.RegisterTable;
 import net.hudup.core.Util;
 import net.hudup.core.alg.Alg;
+import net.hudup.core.data.BatchScript;
 import net.hudup.core.data.DatasetPool;
 import net.hudup.core.evaluate.EvaluateEvent;
 import net.hudup.core.evaluate.EvaluateEvent.Type;
@@ -29,7 +30,6 @@ import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.MathUtil;
 import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.xURI;
-import net.hudup.data.BatchScript;
 import net.hudup.evaluate.ui.EvalCompoundGUI;
 
 /**

@@ -26,6 +26,7 @@ import net.hudup.core.logistic.xURI;
  * @version 10.0
  *
  */
+@Deprecated
 public final class ClientUtil {
 	
 	

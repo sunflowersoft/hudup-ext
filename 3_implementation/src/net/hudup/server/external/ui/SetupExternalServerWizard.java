@@ -25,16 +25,16 @@ import javax.swing.event.ListSelectionListener;
 import net.hudup.core.Util;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.DataDriverList;
+import net.hudup.core.data.DatasetUtil2;
+import net.hudup.core.data.DefaultExternalQuery;
 import net.hudup.core.data.ExternalConfig;
 import net.hudup.core.data.ExternalQuery;
 import net.hudup.core.data.Unit;
 import net.hudup.core.data.ui.DataConfigTextField;
+import net.hudup.core.data.ui.ExternalConfigurator;
 import net.hudup.core.data.ui.SysConfigPane;
+import net.hudup.core.data.ui.UnitListBoxExt;
 import net.hudup.core.data.ui.UnitTable;
-import net.hudup.data.DatasetUtil2;
-import net.hudup.data.DefaultExternalQuery;
-import net.hudup.data.ui.ExternalConfigurator;
-import net.hudup.data.ui.UnitListBoxExt;
 import net.hudup.server.external.ExternalServerConfig;
 import net.hudup.server.ui.SetupServerWizard;
 
@@ -300,7 +300,7 @@ public class SetupExternalServerWizard extends SetupServerWizard {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
-				DataConfig srcConfig = net.hudup.data.DatasetUtil2.chooseConfig(getWizard(), null);
+				DataConfig srcConfig = DatasetUtil2.chooseConfig(getWizard(), null);
 				
 				if (srcConfig == null) {
 					JOptionPane.showMessageDialog(

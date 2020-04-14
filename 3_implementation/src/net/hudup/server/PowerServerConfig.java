@@ -7,16 +7,16 @@
  */
 package net.hudup.server;
 
-import net.hudup.alg.cf.gfall.GreenFallCF;
 import net.hudup.core.Constants;
 import net.hudup.core.Util;
 import net.hudup.core.alg.Recommender;
+import net.hudup.core.alg.cf.gfall.GreenFallCF;
 import net.hudup.core.client.ServerConfig;
 import net.hudup.core.data.HiddenText;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.xURI;
-import net.hudup.parser.SemiScannerParser;
-import net.hudup.parser.SnapshotParserImpl;
+import net.hudup.core.parser.SemiScannerParser;
+import net.hudup.core.parser.SnapshotParserImpl;
 
 /**
  * This class represents configuration for power server.

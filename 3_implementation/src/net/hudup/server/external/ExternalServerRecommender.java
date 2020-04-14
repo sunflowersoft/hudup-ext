@@ -10,7 +10,6 @@ package net.hudup.server.external;
 import java.rmi.RemoteException;
 import java.util.Set;
 
-import net.hudup.alg.cf.gfall.GreenFallCF;
 import net.hudup.core.Constants;
 import net.hudup.core.Util;
 import net.hudup.core.alg.Alg;
@@ -20,6 +19,7 @@ import net.hudup.core.alg.RecommendFilter;
 import net.hudup.core.alg.RecommendFilterParam;
 import net.hudup.core.alg.RecommendParam;
 import net.hudup.core.alg.Recommender;
+import net.hudup.core.alg.cf.gfall.GreenFallCF;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.Profile;

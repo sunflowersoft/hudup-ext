@@ -28,6 +28,7 @@ import elvira.inference.elimination.VariableElimination;
 import elvira.potential.PotentialTable;
 import net.hudup.core.Util;
 import net.hudup.core.data.DataConfig;
+import net.hudup.core.data.DatasetUtil2;
 import net.hudup.core.data.Pair;
 import net.hudup.core.data.RatingTriple;
 import net.hudup.core.data.RatingVector;
@@ -39,7 +40,6 @@ import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.ValueTriple;
 import net.hudup.core.logistic.xURI;
 import net.hudup.core.parser.TextParserUtil;
-import net.hudup.data.DatasetUtil2;
 
 
 /**

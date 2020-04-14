@@ -10,6 +10,7 @@ package net.hudup.parser;
 import java.rmi.RemoteException;
 
 import net.hudup.core.data.DataDriver;
+import net.hudup.core.parser.Mapper;
 import net.hudup.core.parser.SnapshotParser;
 
 /**

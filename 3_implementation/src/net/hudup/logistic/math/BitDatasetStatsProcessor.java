@@ -14,9 +14,9 @@ import java.util.List;
 
 import net.hudup.core.data.Attribute;
 import net.hudup.core.data.Profile;
+import net.hudup.core.data.bit.BitData;
+import net.hudup.core.data.bit.BitItem;
 import net.hudup.core.logistic.DSUtil;
-import net.hudup.data.bit.BitData;
-import net.hudup.data.bit.BitItem;
 
 /**
  * This is utility class which calculates probabilities on bit data (binary data).

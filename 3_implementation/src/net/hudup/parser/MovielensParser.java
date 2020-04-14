@@ -29,12 +29,14 @@ import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.DataDriver;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.DatasetMetadata;
+import net.hudup.core.data.DatasetUtil2;
 import net.hudup.core.data.ExternalRecord;
 import net.hudup.core.data.ItemRating;
 import net.hudup.core.data.MemProfiles;
 import net.hudup.core.data.Profile;
 import net.hudup.core.data.Rating;
 import net.hudup.core.data.RatingVector;
+import net.hudup.core.data.SnapshotImpl;
 import net.hudup.core.data.UserRating;
 import net.hudup.core.data.ctx.CTSMemMultiProfiles;
 import net.hudup.core.data.ctx.ContextTemplateSchemaImpl;
@@ -45,8 +47,6 @@ import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.xURI;
 import net.hudup.core.parser.SnapshotParser;
 import net.hudup.core.parser.TextParserUtil;
-import net.hudup.data.DatasetUtil2;
-import net.hudup.data.SnapshotImpl;
 
 /**
  * This parser is used to parse original Movielens database into snapshot.
