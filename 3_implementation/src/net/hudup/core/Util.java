@@ -14,6 +14,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -321,6 +322,34 @@ public final class Util {
 	 */
 	public static boolean isUsed(double value) {
 		return (!(Double.isNaN(value))) && (value != Constants.UNUSED);
+	}
+
+	
+	/**
+	 * Checking whether all values in specified array are used.
+	 * @param values specified array.
+	 * @return whether all values in specified array are used.
+	 */
+	public static boolean isUsedAll(double[] values) {
+		if (values == null || values.length == 0) return false;
+		for (double value : values) {
+			if (!isUsed(value)) return false;
+		}
+		return true;
+	}
+	
+	
+	/**
+	 * Checking whether all values in specified collection are used.
+	 * @param values specified collection.
+	 * @return whether all values in specified collection are used.
+	 */
+	public static boolean isUsedAll(Collection<Double> values) {
+		if (values == null || values.size() == 0) return false;
+		for (double value : values) {
+			if (!isUsed(value)) return false;
+		}
+		return true;
 	}
 
 	
