@@ -1,7 +1,7 @@
 /**
  * HUDUP: A FRAMEWORK OF E-COMMERCIAL RECOMMENDATION ALGORITHMS
  * (C) Copyright by Loc Nguyen's Academic Network
- * Project homepage: http://www.locnguyen.net/st/products/hudup
+ * Project homepage: hudup.locnguyen.net
  * Email: ng_phloc@yahoo.com
  * Phone: +84-975250362
  */
@@ -413,7 +413,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 					otherResult.inAlgSetup = true;
 					if (evAlg instanceof AlgRemote) {
 						((AlgRemote)evAlg).addSetupListener(this);
-						SetupAlgEvent setupEvt = new SetupAlgEvent(evAlg, SetupAlgEvent.Type.doing, evAlg.getName(), null, "fired");
+						SetupAlgEvent setupEvt = new SetupAlgEvent(evAlg, SetupAlgEvent.Type.doing, evAlg.getName(), datasetId, "fired");
 						otherResult.statuses = extractSetupInfo(setupEvt);
 						fireSetupAlgEvent(setupEvt);
 					}
@@ -433,7 +433,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 					fireEvaluateEvent(new EvaluateEvent(this, Type.doing, setupMetrics)); // firing setup time metric
 					
 					if (evAlg instanceof AlgRemote) {
-						SetupAlgEvent setupEvt = new SetupAlgEvent(evAlg, SetupAlgEvent.Type.done, evAlg.getName(), null, "fired");
+						SetupAlgEvent setupEvt = new SetupAlgEvent(evAlg, SetupAlgEvent.Type.done, evAlg.getName(), datasetId, "fired");
 						otherResult.statuses = extractSetupInfo(setupEvt);
 						fireSetupAlgEvent(setupEvt);
 						((AlgRemote)evAlg).removeSetupListener(this);

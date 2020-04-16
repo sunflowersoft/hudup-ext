@@ -1,7 +1,7 @@
 /**
  * HUDUP: A FRAMEWORK OF E-COMMERCIAL RECOMMENDATION ALGORITHMS
  * (C) Copyright by Loc Nguyen's Academic Network
- * Project homepage: http://www.locnguyen.net/st/products/hudup
+ * Project homepage: hudup.locnguyen.net
  * Email: ng_phloc@yahoo.com
  * Phone: +84-975250362
  */
@@ -15,6 +15,7 @@ import net.hudup.core.alg.Recommender;
 import net.hudup.core.alg.SetupAlgEvent;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.DatasetPair;
+import net.hudup.core.data.DatasetUtil;
 import net.hudup.core.data.Fetcher;
 import net.hudup.core.data.RatingVector;
 import net.hudup.core.evaluate.EvaluateEvent;
@@ -59,8 +60,6 @@ public class EstimateEvaluator extends RecommendEvaluator {
 	
 	@Override
 	protected void run0() {
-		// TODO Auto-generated method stub
-		//int unratedCount = config.getAsInt(DataConfig.MAX_RECOMMEND_FIELD);
 		otherResult.progressStep = 0;
 		otherResult.progressTotal = evPool.getTotalTestingUserNumber() * evAlgList.size();
 		result = new Metrics();
@@ -86,14 +85,17 @@ public class EstimateEvaluator extends RecommendEvaluator {
 					Dataset     testing = dsPair.getTesting();
 					int         datasetId = j + 1;
 					xURI        datasetUri = testing.getConfig() != null ? testing.getConfig().getUriId() : null;
+					
 					otherResult.datasetId = datasetId;
+					DatasetUtil.setDatasetId(training, datasetId);
+					DatasetUtil.setDatasetId(testing, datasetId);
 					
 					// Adding default metrics to metric result
 					result.add( recommender.getName(), datasetId, datasetUri, ((NoneWrapperMetricList)evMetricList.clone()).sort().list() );
 					
 					otherResult.inAlgSetup = true;
 					recommender.addSetupListener(this);
-					SetupAlgEvent setupEvt = new SetupAlgEvent(recommender, SetupAlgEvent.Type.doing, recommender.getName(), null, "not supported yet");
+					SetupAlgEvent setupEvt = new SetupAlgEvent(recommender, SetupAlgEvent.Type.doing, recommender.getName(), datasetId, "fired");
 					otherResult.statuses = extractSetupInfo(setupEvt);
 					fireSetupAlgEvent(setupEvt);
 					
@@ -112,7 +114,7 @@ public class EstimateEvaluator extends RecommendEvaluator {
 					//Fire doing event with setup time metric.
 					fireEvaluateEvent(new EvaluateEvent(this, Type.doing, setupMetrics)); // firing setup time metric
 
-					setupEvt = new SetupAlgEvent(recommender, SetupAlgEvent.Type.done, recommender.getName(), null, "not supported yet");
+					setupEvt = new SetupAlgEvent(recommender, SetupAlgEvent.Type.done, recommender.getName(), datasetId, "fired");
 					otherResult.statuses = extractSetupInfo(setupEvt);
 					fireSetupAlgEvent(setupEvt);
 					recommender.removeSetupListener(this);

@@ -1,7 +1,7 @@
 /**
  * HUDUP: A FRAMEWORK OF E-COMMERCIAL RECOMMENDATION ALGORITHMS
  * (C) Copyright by Loc Nguyen's Academic Network
- * Project homepage: http://www.locnguyen.net/st/products/hudup
+ * Project homepage: hudup.locnguyen.net
  * Email: ng_phloc@yahoo.com
  * Phone: +84-975250362
  */
@@ -47,6 +47,7 @@ import net.hudup.core.data.DatasetPairExchanged;
 import net.hudup.core.data.DatasetPool;
 import net.hudup.core.data.DatasetPoolExchanged;
 import net.hudup.core.data.DatasetRemoteWrapper;
+import net.hudup.core.data.DatasetUtil;
 import net.hudup.core.data.Fetcher;
 import net.hudup.core.data.Profile;
 import net.hudup.core.evaluate.EvaluateEvent.Type;
@@ -384,7 +385,10 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 					Dataset     testing = dsPair.getTesting();
 					int         datasetId = j + 1;
 					xURI        datasetUri = testing.getConfig() != null ? testing.getConfig().getUriId() : null;
+					
 					otherResult.datasetId = datasetId;
+					DatasetUtil.setDatasetId(training, datasetId);
+					DatasetUtil.setDatasetId(testing, datasetId);
 					
 					// Adding default metrics to metric result. Pay attention to cloning metrics list.
 					result.add( evAlg.getName(), datasetId, datasetUri, ((NoneWrapperMetricList)evMetricList.clone()).sort().list() );
@@ -392,7 +396,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 					otherResult.inAlgSetup = true;
 					if (evAlg instanceof AlgRemote) {
 						((AlgRemote)evAlg).addSetupListener(this);
-						SetupAlgEvent setupEvt = new SetupAlgEvent(evAlg, SetupAlgEvent.Type.doing, evAlg.getName(), null, "fired");
+						SetupAlgEvent setupEvt = new SetupAlgEvent(evAlg, SetupAlgEvent.Type.doing, evAlg.getName(), datasetId, "fired");
 						otherResult.statuses = extractSetupInfo(setupEvt);
 						fireSetupAlgEvent(setupEvt);
 					}
@@ -412,7 +416,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 					fireEvaluateEvent(new EvaluateEvent(this, Type.doing, setupMetrics)); // firing setup time metric
 					
 					if (evAlg instanceof AlgRemote) {
-						SetupAlgEvent setupEvt = new SetupAlgEvent(evAlg, SetupAlgEvent.Type.done, evAlg.getName(), null, "fired");
+						SetupAlgEvent setupEvt = new SetupAlgEvent(evAlg, SetupAlgEvent.Type.done, evAlg.getName(), datasetId, "fired");
 						otherResult.statuses = extractSetupInfo(setupEvt);
 						fireSetupAlgEvent(setupEvt);
 						((AlgRemote)evAlg).removeSetupListener(this);
@@ -656,8 +660,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 	 */
 	@Override
 	public void receivedSetup(SetupAlgEvent evt) throws RemoteException {
-		// TODO Auto-generated method stub
-		fireSetupAlgEvent(evt);
+		fireSetupAlgEvent(evt.transferForRemote());
 		otherResult.statuses = extractSetupInfo(evt);
 	}
 	
@@ -1855,24 +1858,12 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 		String algName = evt.getAlgName();
 		if (algName == null) return new String[] {""};
 
-		String datasetName = null;
-		try {
-			if (evt.getTrainingDataset() != null) {
-				xURI storeUri = evt.getTrainingDataset().getConfig().getStoreUri();
-				if (storeUri != null) datasetName = storeUri.getLastName();
-				datasetName = datasetName == null || datasetName.isEmpty() ? null : datasetName;
-			}
-		}
-		catch (Exception e) {
-			LogUtil.trace(e);
-			datasetName = null;
-		}
-		
+		String datasetIdOrName = evt.extractTrainingDatasetIdOrName();
 		String status = "";
 		if (evt.getType() == SetupAlgEvent.Type.doing) {
 			status = I18nUtil.message("setting_up_algorithm") + " '" + DSUtil.shortenVerbalName(algName) + "'";
-			if (datasetName != null)
-				status += " on training set '" + DSUtil.shortenVerbalName(datasetName) + "'";
+			if (datasetIdOrName != null)
+				status += " " + I18nUtil.message("dataset") + " '" + DSUtil.shortenVerbalName(datasetIdOrName) + "'";
 			
 			if (evt.getProgressTotalEstimated() > 0)
 				status += ": " + MathUtil.format((double)evt.getProgressStep() / evt.getProgressTotalEstimated() * 100.0) + "%";
@@ -1882,8 +1873,8 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 		else if (evt.getType() == SetupAlgEvent.Type.done) {
 			if (evt.getProgressTotalEstimated() > 0) {
 				status = I18nUtil.message("setting_up_algorithm") + " '" + DSUtil.shortenVerbalName(algName) + "'";
-				if (datasetName != null)
-					status += " on training set '" + DSUtil.shortenVerbalName(datasetName) + "'";
+				if (datasetIdOrName != null)
+					status += " " + I18nUtil.message("dataset") + " '" + DSUtil.shortenVerbalName(datasetIdOrName) + "'";
 
 				status += " done " + MathUtil.format((double)evt.getProgressStep() / evt.getProgressTotalEstimated() * 100.0) + "%";
 			}

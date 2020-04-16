@@ -1,7 +1,7 @@
 /**
  * HUDUP: A FRAMEWORK OF E-COMMERCIAL RECOMMENDATION ALGORITHMS
  * (C) Copyright by Loc Nguyen's Academic Network
- * Project homepage: http://www.locnguyen.net/st/products/hudup
+ * Project homepage: hudup.locnguyen.net
  * Email: ng_phloc@yahoo.com
  * Phone: +84-975250362
  */
@@ -56,6 +56,12 @@ public abstract class DatasetAbstract implements Dataset, DatasetRemote {
 	 * Host address field field.
 	 */
 	public static final String HOST_ADDR_FIELD = "host_addr";
+
+	
+	/**
+	 * Dataset identifier. This identifier is not the URI identifier. It is a number which is often assigned in evaluation process.
+	 */
+	public static final String DATASETID_FIELD = "$datasetid";
 
 	
 	/**

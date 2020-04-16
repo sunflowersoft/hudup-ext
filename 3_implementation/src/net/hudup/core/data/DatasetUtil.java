@@ -1,7 +1,7 @@
 /**
  * HUDUP: A FRAMEWORK OF E-COMMERCIAL RECOMMENDATION ALGORITHMS
  * (C) Copyright by Loc Nguyen's Academic Network
- * Project homepage: http://www.locnguyen.net/st/products/hudup
+ * Project homepage: hudup.locnguyen.net
  * Email: ng_phloc@yahoo.com
  * Phone: +84-975250362
  */
@@ -151,6 +151,69 @@ public final class DatasetUtil {
 	
 	
 	/**
+	 * Extracting name of specified dataset.
+	 * @param dataset specified dataset.
+	 * @return name of specified dataset.
+	 */
+	public static String extractDatasetName(Dataset dataset) {
+		DataConfig config = dataset != null ? dataset.getConfig() : null;
+		if (config != null && config.getMainUnit() != null) {
+			String mainUnit = config.getMainUnit();
+			return config.getAsString(mainUnit);
+		}
+		else
+			return null;
+	}
+	
+	
+	/**
+	 * Getting dataset identifier. Note that this identifier is often number, not URI identifier.
+	 * This identifier is often assigned in evaluation process.
+	 * @param dataset specified dataset.
+	 * @return identifier of specified dataset.
+	 */
+	public static int getDatasetId(Dataset dataset) {
+		if (dataset == null) return -1;
+		
+		DataConfig config = dataset.getConfig();
+		if (config != null && config.containsKey(DatasetAbstract.DATASETID_FIELD))
+			return config.getAsInt(DatasetAbstract.DATASETID_FIELD);
+		else
+			return -1;
+	}
+	
+	
+	/**
+	 * Setting dataset identifier. Note that this identifier is often number, not URI identifier.
+	 * This identifier is often assigned in evaluation process.
+	 * @param dataset specified dataset.
+	 * @param id identifier of specified dataset.
+	 */
+	public static void setDatasetId(Dataset dataset, int id) {
+		if (dataset == null || id < 0) return;
+		
+		DataConfig config = dataset.getConfig();
+		if (config != null)
+			config.put(DatasetAbstract.DATASETID_FIELD, id);
+	}
+	
+	
+	/**
+	 * Extracting identifier or name of specified dataset. If the identifier exists, it is returned. Otherwise, the name is returned.
+	 * Note that the identifier is often number, not URI identifier. The identifier is often assigned in evaluation process.
+	 * @param dataset specified dataset.
+	 * @return identifier or name of specified dataset. Return null if there is nor identifier neither name.
+	 */
+	public static String extractDatasetIdOrName(Dataset dataset) {
+		int id = getDatasetId(dataset);
+		if (id >= 0)
+			return "" + id;
+		else
+			return extractDatasetName(dataset);
+	}
+
+	
+	/**
 	 * Checking whether the specified dataset is remote object.
 	 * @param dataset specified dataset.
 	 * @return whether the specified dataset is remote object.
@@ -194,11 +257,11 @@ public final class DatasetUtil {
 	 * @param remoteDataset remote dataset.
 	 * @return most inner dataset of remote dataset.
 	 */
-	public static Dataset getMostInnerDatasetRemote(DatasetRemote remoteDataset) {
+	public static Dataset getMostInnerDataset2(DatasetRemote remoteDataset) {
 		if (remoteDataset == null)
 			return null;
 		else if (remoteDataset instanceof DatasetRemoteWrapper)
-			return getMostInnerDatasetRemote(((DatasetRemoteWrapper)remoteDataset).getRemoteDataset());
+			return getMostInnerDataset2(((DatasetRemoteWrapper)remoteDataset).getRemoteDataset());
 		else if (remoteDataset instanceof Dataset)
 			return (Dataset)remoteDataset;
 		else

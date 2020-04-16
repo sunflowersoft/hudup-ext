@@ -1,7 +1,7 @@
 /**
  * HUDUP: A FRAMEWORK OF E-COMMERCIAL RECOMMENDATION ALGORITHMS
  * (C) Copyright by Loc Nguyen's Academic Network
- * Project homepage: http://www.locnguyen.net/st/products/hudup
+ * Project homepage: hudup.locnguyen.net
  * Email: ng_phloc@yahoo.com
  * Phone: +84-975250362
  */
@@ -460,7 +460,7 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 			LogUtil.trace(e);
 		}
 		
-		if (agent && bindNamingUri.bindUri != null) {
+		if (agent && bindNamingUri.namingUri == null) {
 			if (wrapper) {
 				unsetupListeners(evaluator);
 				
@@ -671,7 +671,7 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	 */
 	private void setupDatasetExchanged(DatasetRemote remoteDataset) {
 		if (remoteDataset == null || bindNamingUri.bindUri == null) return;
-		if (DatasetUtil.getMostInnerDatasetRemote(remoteDataset) == null)
+		if (DatasetUtil.getMostInnerDataset2(remoteDataset) == null)
 			return;
 		
 		try {

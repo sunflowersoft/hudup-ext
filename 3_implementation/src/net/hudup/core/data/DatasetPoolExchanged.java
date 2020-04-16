@@ -1,7 +1,7 @@
 /**
  * HUDUP: A FRAMEWORK OF E-COMMERCIAL RECOMMENDATION ALGORITHMS
  * (C) Copyright by Loc Nguyen's Academic Network
- * Project homepage: http://www.locnguyen.net/st/products/hudup
+ * Project homepage: hudup.locnguyen.net
  * Email: ng_phloc@yahoo.com
  * Phone: +84-975250362
  */
@@ -249,13 +249,13 @@ public class DatasetPoolExchanged  implements Serializable {
 			Dataset training = null;
 			UUID trainingUUID = null;
 			if (pair.training != null) {
-				training = DatasetUtil.getMostInnerDatasetRemote(pair.training);
+				training = DatasetUtil.getMostInnerDataset2(pair.training);
 				trainingUUID = training != null ? pair.trainingUUID : null;
 			}
 			else if (pair.trainingUUID != null) {
 				DatasetPairExchanged newPair = referredPool.findByTrainingUUID(pair.trainingUUID);
 				if (newPair != null) {
-					training = DatasetUtil.getMostInnerDatasetRemote(newPair.training);
+					training = DatasetUtil.getMostInnerDataset2(newPair.training);
 					trainingUUID = training != null ? newPair.trainingUUID : null;
 				}
 			}
@@ -263,13 +263,13 @@ public class DatasetPoolExchanged  implements Serializable {
 			Dataset testing = null;
 			UUID testingUUID = null;
 			if (pair.testing != null) {
-				testing = DatasetUtil.getMostInnerDatasetRemote(pair.testing);
+				testing = DatasetUtil.getMostInnerDataset2(pair.testing);
 				testingUUID = testing != null ? pair.testingUUID : null;
 			}
 			else if (pair.testingUUID != null) {
 				DatasetPairExchanged newPair = referredPool.findByTestingUUID(pair.testingUUID);
 				if (newPair != null) {
-					testing = DatasetUtil.getMostInnerDatasetRemote(newPair.testing);
+					testing = DatasetUtil.getMostInnerDataset2(newPair.testing);
 					testingUUID = testing != null ? newPair.testingUUID : null;
 				}
 			}
@@ -277,13 +277,13 @@ public class DatasetPoolExchanged  implements Serializable {
 			Dataset whole = null;
 			UUID wholeUUID = null;
 			if (pair.whole != null) {
-				whole = DatasetUtil.getMostInnerDatasetRemote(pair.whole);
+				whole = DatasetUtil.getMostInnerDataset2(pair.whole);
 				wholeUUID = whole != null ? pair.wholeUUID : null;
 			}
 			else if (pair.wholeUUID != null) {
 				DatasetPairExchanged newPair = referredPool.findByWholeUUID(pair.wholeUUID);
 				if (newPair != null) {
-					whole = DatasetUtil.getMostInnerDatasetRemote(newPair.whole);
+					whole = DatasetUtil.getMostInnerDataset2(newPair.whole);
 					wholeUUID = whole != null ? newPair.wholeUUID : null;
 				}
 			}
