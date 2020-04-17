@@ -1194,7 +1194,6 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 
 			@Override
 			public Serializable userEdit(Component comp, String key, Serializable defaultValue) {
-				// TODO Auto-generated method stub
 				if (key.equals(MEASURE)) {
 					String measure = getAsString(MEASURE);
 					measure = measure == null ? getDefaultMeasure() : measure;
