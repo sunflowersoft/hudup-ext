@@ -10,11 +10,10 @@ package net.hudup.core.alg;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
-import javax.swing.event.EventListenerList;
-
 import net.hudup.core.ExtraStorage;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.logistic.DSUtil;
+import net.hudup.core.logistic.EventListenerList2;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.NetUtil;
 
@@ -54,7 +53,7 @@ public abstract class AlgAbstract implements Alg, AlgRemote {
 	 * Holding a list of listeners.
 	 * 
 	 */
-    protected EventListenerList listenerList = new EventListenerList();
+    protected EventListenerList2 listenerList = new EventListenerList2();
     
 
     /**

@@ -1,11 +1,11 @@
 cd ../..
-./env.sh
+. env.sh
 
 if [ "$1" == "console" ]
 then
-	$JAVA_CMD net.hudup.core.client.LightRemoteServerCP console
+	eval $JAVA_CMD net.hudup.core.client.LightRemoteServerCP console
 else
-	$JAVA_CMD net.hudup.core.client.LightRemoteServerCP
+	eval $JAVA_CMD net.hudup.core.client.LightRemoteServerCP
 fi
 
 cd tools/cp

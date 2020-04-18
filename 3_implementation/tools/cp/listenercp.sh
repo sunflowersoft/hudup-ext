@@ -1,7 +1,7 @@
 cd ../..
-./env.sh
+. env.sh
 
-$JAVA_CMD net.hudup.listener.ui.ListenerCP
+eval $JAVA_CMD net.hudup.listener.ui.ListenerCP
 
 cd tools/cp
 

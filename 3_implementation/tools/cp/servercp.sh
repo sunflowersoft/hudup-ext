@@ -1,4 +1,4 @@
 cd ../..
-./env.sh
-$JAVA_CMD net.hudup.server.ui.PowerServerCP
+. env.sh
+eval $JAVA_CMD net.hudup.server.ui.PowerServerCP
 cd tools/cp
