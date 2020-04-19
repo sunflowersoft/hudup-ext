@@ -97,7 +97,7 @@ public class NetUtil {
 	 * Getting the internet address of current terminator.
 	 * @return internet address as {@link InetAddress} of current terminator.
 	 */
-	public static InetAddress getLocalInetAddress() {
+	public static InetAddress getInetAddress() {
 		Enumeration<NetworkInterface> nis = null;
 		
         try {

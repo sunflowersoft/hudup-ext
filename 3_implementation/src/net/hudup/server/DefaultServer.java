@@ -246,7 +246,6 @@ public class DefaultServer extends PowerServerImpl {
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					// TODO Auto-generated method stub
 					showCP();
 				}
 			});
@@ -307,7 +306,6 @@ public class DefaultServer extends PowerServerImpl {
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					// TODO Auto-generated method stub
 					showCP();
 				}
 			});
@@ -355,7 +353,7 @@ public class DefaultServer extends PowerServerImpl {
 			new PowerServerCP(this);
 		}
 		catch (Throwable e) {
-			LogUtil.trace(e);
+			//LogUtil.trace(e);
 			LogUtil.error("Server fail to show control panel, caused by " + e.getMessage());
 			
 			/*

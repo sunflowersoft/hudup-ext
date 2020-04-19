@@ -7,6 +7,7 @@
  */
 package net.hudup.server;
 
+import java.net.InetAddress;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -21,6 +22,7 @@ import net.hudup.core.Constants;
 import net.hudup.core.ExtraStorage;
 import net.hudup.core.PluginChangedEvent;
 import net.hudup.core.PluginStorage;
+import net.hudup.core.Util;
 import net.hudup.core.client.ActiveMeasure;
 import net.hudup.core.client.Gateway;
 import net.hudup.core.client.PowerServer;
@@ -130,6 +132,24 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 		super();
 		
 		try {
+			String hudupHost = Util.getHudupProperty("host_address");
+			InetAddress inetAddress = NetUtil.getInetAddress();
+			String host = null;
+			if (inetAddress == null)
+				host = hudupHost;
+			else if (hudupHost != null && !hudupHost.isEmpty())
+				host = hudupHost;
+			else
+				host = inetAddress.getHostAddress();
+			
+			if (host != null && !host.isEmpty() && !host.equals("localhost") && !host.equals("127.0.0.1")) {
+				System.setProperty("java.rmi.server.hostname", host);
+				LogUtil.info("java.rmi.server.hostname=" + host);
+			}
+		}
+		catch (Throwable e) {LogUtil.trace(e);}
+		
+		try {
 			this.config = config;
 			this.config.addReadOnly(DataConfig.MAX_RATING_FIELD);
 			this.config.addReadOnly(DataConfig.MIN_RATING_FIELD);
@@ -153,7 +173,6 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 			
 		} 
 		catch (Throwable e) {
-			// TODO Auto-generated catch block
 			LogUtil.trace(e);
 			LogUtil.error("Power server constructor caused error " + e.getMessage());
 			System.exit(0);
@@ -164,7 +183,6 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 
 			@Override
 			public void run() {
-				// TODO Auto-generated method stub
 				try {
 					shutdownHookStatus = true;
 					
@@ -173,7 +191,6 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 					shutdownHookStatus = false;
 				} 
 				catch (Throwable e) {
-					// TODO Auto-generated catch block
 					LogUtil.trace(e);
 				}
 			}
@@ -192,7 +209,6 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 	
 	@Override
 	public synchronized boolean start() throws RemoteException {
-		// TODO Auto-generated method stub
 		if (isStarted()) return false;
     	
     	trans.lockWrite();
@@ -210,7 +226,6 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 			LogUtil.info("POWER SERVER IS SERVING AT PORT " + config.getServerPort());
 		} 
     	catch (Throwable e) {
-			// TODO Auto-generated catch block
 			LogUtil.trace(e);
 			
 			try {
@@ -240,7 +255,6 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
     
 	@Override
 	public synchronized boolean pause() throws RemoteException {
-		// TODO Auto-generated method stub
 		if (!isRunning()) return false;
 
     	trans.lockWrite();
@@ -257,7 +271,6 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 	
 	@Override
 	public synchronized boolean resume() throws RemoteException {
-		// TODO Auto-generated method stub
 		//Which thread locked server can unlock server. This feature is used for security of service.
 		//However, this feature causes trouble in remote control.
 		if (!trans.isWriteLockedByCurrentThread())
@@ -279,7 +292,6 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 	
 	@Override
 	public synchronized boolean stop()  throws RemoteException {
-		// TODO Auto-generated method stub
 		if (!isStarted()) return false;
 		
 		if (isPaused()) {
@@ -329,7 +341,6 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 	
 	@Override
 	public void exit() throws RemoteException {
-		// TODO Auto-generated method stub
 		shutdown();
 		System.exit(0);
 	}
@@ -340,7 +351,6 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 	 * @throws RemoteException if any error raises.
 	 */
 	protected synchronized void shutdown() throws RemoteException {
-		// TODO Auto-generated method stub
 		if (config == null) return;
 		
 		stop();
@@ -364,7 +374,6 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
     		config.save();
 		} 
     	catch (Throwable e) {
-			// TODO Auto-generated catch block
 			LogUtil.trace(e);
 			LogUtil.error("Power server got error when shutdowning, error is " + e.getMessage());
 		} 
@@ -397,12 +406,10 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 			
 				@Override
 				public void run() {
-					// TODO Auto-generated method stub
 					try {
 						callServerTasks();
 					} 
 					catch (Throwable e) {
-						// TODO Auto-generated catch block
 						LogUtil.trace(e);
 						LogUtil.error("Calling power server tasks causes error " + e.getMessage());
 					}
@@ -467,21 +474,18 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 	
 	@Override
 	public boolean isStarted()  throws RemoteException {
-		// TODO Auto-generated method stub
 		return started;
 	}
 
 	
 	@Override
 	public boolean isPaused()  throws RemoteException {
-		// TODO Auto-generated method stub
 		return started && paused;
 	}
 
 	
 	@Override
 	public boolean isRunning()  throws RemoteException {
-		// TODO Auto-generated method stub
 		return started && !paused;
 	}
 
@@ -521,9 +525,7 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 	
 
 	@Override
-	public boolean ping()
-			throws RemoteException {
-		// TODO Auto-generated method stub
+	public boolean ping() throws RemoteException {
 		
 		return config != null;
 	}
@@ -616,7 +618,6 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 					
 				}
 				catch (Throwable e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
 				
@@ -745,7 +746,6 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 		@Override
 		public Server getRemoteServer(String account, String password)
 				throws RemoteException {
-			// TODO Auto-generated method stub
 			
 			return gateway.getRemoteServer(account, password);
 		}
@@ -753,7 +753,6 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 		@Override
 		public Service getRemoteService(String account, String password)
 				throws RemoteException {
-			// TODO Auto-generated method stub
 			
 			return gateway.getRemoteService(account, password);
 		}
@@ -763,7 +762,6 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 
 	@Override
 	protected void finalize() throws Throwable {
-		// TODO Auto-generated method stub
 		super.finalize();
 		
 		try {

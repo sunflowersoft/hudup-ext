@@ -58,7 +58,6 @@ public class DefaultServerExt extends DefaultServer {
 	
 	@Override
 	protected DefaultService createService() {
-		// TODO Auto-generated method stub
 		return new DefaultServiceExt(trans, this);
 	}
 
@@ -100,8 +99,8 @@ public class DefaultServerExt extends DefaultServer {
 					showEvaluatorCP();
 				}
 				catch (Throwable ex) {
-					ex.printStackTrace();
-					LogUtil.error("Server fail to show evaluator, caused by " + ex.getMessage());
+					//LogUtil.trace(ex);
+					LogUtil.error("Server fail to show GUI evaluator, caused by " + ex.getMessage());
 					
 					/*
 					 * It is possible that current Java environment does not support GUI.
