@@ -16,7 +16,7 @@ import net.hudup.core.alg.AlgRemote;
  * @version 12.0
  *
  */
-public interface DatasetParserRemote extends DatasetParserRemoteTask, AlgRemote {
+public interface DatasetParserRemote extends DatasetParserRemoteTask2, AlgRemote {
 
 
 }

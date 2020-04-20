@@ -24,7 +24,7 @@ import net.hudup.core.logistic.Inspectable;
  * @version 1.0
  *
  */
-public interface Aug extends AugRemoteTask, ExecutableAlg, SupportCacheAlg, NoteAlg, Inspectable, Serializable {
+public interface Aug extends AugRemoteTask, ExecutableAlg, ModelBasedAlg, SupportCacheAlg, NoteAlg, Inspectable, Serializable {
 
 	
 	/**

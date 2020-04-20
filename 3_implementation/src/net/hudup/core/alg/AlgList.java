@@ -288,32 +288,6 @@ public class AlgList implements Serializable, net.hudup.core.Cloneable {
 	}
 
 	
-	/**
-	 * Getting the map of algorithm descriptions remotely.
-	 * @return the map of algorithm descriptions remotely.
-	 */
-	public DataConfig getAlgDescMapRemote() {
-		return getAlgDescMapRemote(list);
-	}
-
-	
-	/**
-	 * Getting the map of algorithm descriptions remotely.
-	 * @param algs collection of algorithms.
-	 * @return the map of algorithm descriptions remotely.
-	 */
-	public static DataConfig getAlgDescMapRemote(Collection<Alg> algs) {
-		DataConfig classNames = new DataConfig();
-		if (algs == null) return classNames;
-		
-		for (Alg alg : algs) {
-			classNames.put(alg.getName(), new AlgDesc(alg.getClass().getName(), (DataConfig)alg.getConfig().clone()));
-		}
-		
-		return classNames;
-	}
-
-	
 	@Override
 	public String toString() {
 		// TODO Auto-generated method stub

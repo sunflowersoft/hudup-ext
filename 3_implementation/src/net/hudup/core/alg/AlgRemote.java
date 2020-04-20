@@ -18,7 +18,7 @@ import java.rmi.RemoteException;
  * @version 12.0
  *
  */
-public interface AlgRemote extends AlgRemoteTask, SetupAlgListener, Remote, Serializable {
+public interface AlgRemote extends AlgRemoteTask2, SetupAlgListener, Remote, Serializable {
 
 
 	/**

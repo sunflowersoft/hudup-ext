@@ -102,11 +102,22 @@ public class PowerServerConfig extends ServerConfig {
 
 	
 	/**
+	 * Flag field to indicate whether to deploy Hudup framework over internet.
+	 */
+	public final static String DEPLOY_INTERNET_FIELD = "deploy_internet";
+
+	
+	/**
+	 * By default, Hudup framework is not deployed over internet.
+	 */
+	public final static boolean DEPLOY_INTERNET_DEFAULT = false;
+
+	
+	/**
 	 * Default constructor.
 	 */
 	public PowerServerConfig() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
 
@@ -116,13 +127,11 @@ public class PowerServerConfig extends ServerConfig {
 	 */
 	public PowerServerConfig(xURI uri) {
 		super(uri);
-		// TODO Auto-generated constructor stub
 	}
 
 	
 	@Override
 	public void reset() {
-		// TODO Auto-generated method stub
 		super.reset();
 		try {
 			xURI storeUri = xURI.create(STORE_PATH_DEFAULT);
@@ -179,6 +188,28 @@ public class PowerServerConfig extends ServerConfig {
 
 	
 	/**
+	 * Setting flag to indicate whether to deploy Hudup framework over internet.
+	 * @param flag flag to indicate whether to deploy Hudup framework over internet.
+	 */
+	@SuppressWarnings("unused")
+	@Deprecated
+	private void setDeployInternet(boolean flag) {
+		put(DEPLOY_INTERNET_FIELD, flag);
+	}
+	
+	
+	/**
+	 * Getting flag to indicate whether to deploy Hudup framework over internet.
+	 * @return flag to indicate whether to deploy Hudup framework over internet.
+	 */
+	@SuppressWarnings("unused")
+	@Deprecated
+	private boolean isDeployInternet() {
+		return getAsBoolean(DEPLOY_INTERNET_FIELD);
+	}
+
+	
+	/**
 	 * Setting flag to indicate empty dataset.
 	 * @param flag flag to indicate empty dataset.
 	 */
@@ -198,14 +229,12 @@ public class PowerServerConfig extends ServerConfig {
 	
 	@Override
 	protected String encrypt(HiddenText hidden) {
-		// TODO Auto-generated method stub
 		return Util.getCipher().encrypt(hidden.getText());
 	}
 
 
 	@Override
 	protected HiddenText decrypt(String text) {
-		// TODO Auto-generated method stub
 		return new HiddenText(Util.getCipher().decrypt(text));
 	}
 	

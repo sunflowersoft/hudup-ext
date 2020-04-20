@@ -22,6 +22,7 @@ import net.hudup.core.data.Profile;
  */
 public interface ExecutableAlgRemoteTask extends AlgRemoteTask {
 
+
 	/**
 	 * Setting up this testing algorithm based on specified dataset.
 	 * In this current version, this method initializes the data sample for learning parameter and then calls learning method.

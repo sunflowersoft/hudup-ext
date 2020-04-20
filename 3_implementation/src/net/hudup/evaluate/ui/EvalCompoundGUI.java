@@ -664,7 +664,7 @@ public class EvalCompoundGUI extends JFrame {
 					
 					xURI namingUri = xURI.create("rmi://localhost:" + namingPort);
 					if (namingName != null) namingUri = namingUri.concat(namingName);
-					bindNamingUri = new BindNamingURI(null, namingUri);
+					bindNamingUri = new BindNamingURI(null, namingUri, null);
 				}
 				
 				Evaluator ev = (Evaluator) cmbEvs.getSelectedItem();

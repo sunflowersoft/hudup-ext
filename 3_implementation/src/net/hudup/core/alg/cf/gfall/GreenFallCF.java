@@ -34,20 +34,17 @@ public class GreenFallCF extends FreqItemsetBasedCF {
 	 */
 	public GreenFallCF() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
 
 	@Override
 	public String getName() {
-//		return "gfall vsaaadfaTEYYYYYYYYYYYYYYYYYYYYYYYYYYY fsgs hhdshs hdsghdsh hh gfall vsaaadfaTEYYYYYYYYYYYYYYYYYYYYYYYYYYY fsgs hhdshs hdsghdsh hh";
 		return "gfall";
 	}
 
 	
 	@Override
 	public String getDescription() throws RemoteException {
-		// TODO Auto-generated method stub
 		return "Green Fall algorithm";
 	}
 
@@ -62,7 +59,6 @@ public class GreenFallCF extends FreqItemsetBasedCF {
 
 	@Override
 	public Alg newInstance() {
-		// TODO Auto-generated method stub
 		return new GreenFallCF();
 	}
 

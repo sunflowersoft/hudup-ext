@@ -16,7 +16,7 @@ import net.hudup.core.alg.AlgRemote;
  * @version 12.0
  *
  */
-public interface CTSManagerRemote extends CTSManagerRemoteTask, AlgRemote {
+public interface CTSManagerRemote extends CTSManagerRemoteTask2, AlgRemote {
 
 
 }

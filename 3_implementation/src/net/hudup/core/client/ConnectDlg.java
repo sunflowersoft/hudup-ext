@@ -278,6 +278,12 @@ public abstract class ConnectDlg extends JDialog {
 
 	
 	/**
+	 * Connection URI to remote host.
+	 */
+	protected xURI connectUri = null;
+	
+	
+	/**
 	 * Naming name.
 	 */
 	protected String namingName = null;
@@ -607,10 +613,10 @@ public abstract class ConnectDlg extends JDialog {
 		if (chkExport.isSelected()) {
 			xURI namingUri = bindUri;
 			if (bindName != null) namingUri = namingUri.concat(bindName);
-			return new BindNamingURI(bindUri, namingUri);
+			return new BindNamingURI(bindUri, namingUri, connectUri);
 		}
 		else
-			return BindNamingURI.createBindUri(bindUri);
+			return new BindNamingURI(bindUri, null, connectUri);
 	}
 	
 	
@@ -646,15 +652,22 @@ public abstract class ConnectDlg extends JDialog {
 					bindPort = NetUtil.getPort(bindPort, chkExport.isSelected() ? Constants.TRY_RANDOM_PORT : true);
 
 				ConnectTypeDesc connectType = (ConnectTypeDesc)cmbConnectType.getSelectedItem();
-				if (connectType.equals(ConnectType.server))
+				if (connectType.equals(ConnectType.server)) {
 					connector = ClientUtil.getRemoteServer(host, port, username, password);
-				else if (connectType.equals(ConnectType.service))
+					connectUri = xURI.create("rmi://" + host + ":" + port);
+				}
+				else if (connectType.equals(ConnectType.service)) {
 					connector = ClientUtil.getRemoteService(host, port, username, password);
-				else if (connectType.equals(ConnectType.socket_service))
+					connectUri = xURI.create("rmi://" + host + ":" + port);
+				}
+				else if (connectType.equals(ConnectType.socket_service)) {
 					connector = ClientUtil.getSocketConnection(host, port, username, password);
-				else  if (connectType.equals(ConnectType.evaluator))
+					connectUri = xURI.create("hdp://" + host + ":" + port);
+				}
+				else  if (connectType.equals(ConnectType.evaluator)) {
 					connector = ClientUtil.getRemoteEvaluator(host, port, namingName);
-				
+					connectUri = xURI.create("rmi://" + host + ":" + port + "/" + namingName);
+				}
 				if (connector == null) {
 					JOptionPane.showMessageDialog(
 						this, "Can't connect to server", "Can't connect to server", JOptionPane.ERROR_MESSAGE);

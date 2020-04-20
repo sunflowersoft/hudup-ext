@@ -854,7 +854,6 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 
 	@Override
 	public AlgDesc2List getPluginAlgDescs(Class<? extends Alg> algClass) throws RemoteException {
-		// TODO Auto-generated method stub
     	RegisterTable algReg = PluginStorage.lookupTable(algClass);
 		AlgDesc2List algDescs = new AlgDesc2List();
     	if (algReg == null) return algDescs;
@@ -873,6 +872,17 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
     	}
     	
 		return algDescs;
+	}
+
+
+	@Override
+	public AlgDesc getPluginAlgDesc(Class<? extends Alg> algClass, String algName) throws RemoteException {
+    	RegisterTable algReg = PluginStorage.lookupTable(algClass);
+    	if (algReg == null) return null;
+		Alg alg = algReg.query(algName);
+		if (alg == null) return null;
+		
+		return new AlgDesc(alg);
 	}
 
 

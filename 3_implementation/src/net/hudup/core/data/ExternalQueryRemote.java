@@ -16,6 +16,6 @@ import net.hudup.core.alg.AlgRemote;
  * @version 12.0
  *
  */
-public interface ExternalQueryRemote extends ExternalQueryRemoteTask, AlgRemote {
+public interface ExternalQueryRemote extends ExternalQueryRemoteTask2, AlgRemote {
 
 }

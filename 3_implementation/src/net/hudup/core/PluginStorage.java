@@ -11,6 +11,7 @@ import java.io.Serializable;
 import java.util.List;
 
 import net.hudup.core.alg.Alg;
+import net.hudup.core.alg.AlgDesc;
 import net.hudup.core.alg.AlgDesc2;
 import net.hudup.core.alg.AlgList;
 import net.hudup.core.data.Exportable;
@@ -564,6 +565,18 @@ public class PluginStorage implements Serializable {
 						pluginAlgNames.add(pluginAlgName);
 				}
 			}
+		}
+		
+		if (!remote) return pluginAlgNames;
+		
+		//Updating configuration of each algorithm in remote case.
+		for (String pluginAlgName : pluginAlgNames) {
+			try {
+				Alg alg = algReg.query(pluginAlgName);
+				if (alg == null) continue;
+				AlgDesc algDesc = evaluator.getPluginAlgDesc(alg.getClass(), alg.getName());
+				if (algDesc != null) alg.getConfig().putAll(algDesc.getConfig());
+			} catch (Exception e) {LogUtil.trace(e);}
 		}
 		
 		return pluginAlgNames;

@@ -236,6 +236,11 @@ public final class Constants {
 	public static String hostAddress                      = null;
 	
 	/**
+	 * Host address.
+	 */
+	public static boolean deployInternet                  = false;
+	
+	/**
 	 * Setting the maximum number of extra class loaders. If it is -1, there is no limit of extra class loaders but it is not adviced.
 	 */
 	public static int MAX_EXTRA_CLASSLOADERS              = 10;
@@ -307,6 +312,12 @@ public final class Constants {
 			System.out.println("Error when getting MAC and host addresses");
 		}
 		
+		try {
+			String deployInternetText = Util.getHudupProperty("deploy_internet");
+			if (deployInternetText != null)
+				deployInternet = Boolean.parseBoolean(deployInternetText);
+		} catch (Exception e) {}
+
 		try {
 			String maxExtraClassLoaders = Util.getHudupProperty("max_extra_classloaders");
 			if (maxExtraClassLoaders != null)

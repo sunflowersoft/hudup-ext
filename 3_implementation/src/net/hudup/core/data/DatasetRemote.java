@@ -17,7 +17,7 @@ import java.rmi.RemoteException;
  * @version 12.0
  *
  */
-public interface DatasetRemote extends DatasetRemoteTask, Remote {
+public interface DatasetRemote extends DatasetRemoteTask2, Remote {
 
 
 	/**

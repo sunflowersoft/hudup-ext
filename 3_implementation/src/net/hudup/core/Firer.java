@@ -20,8 +20,6 @@ import org.reflections.Reflections;
 import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.AlgRemote;
 import net.hudup.core.alg.AlgRemoteWrapper;
-import net.hudup.core.alg.AugRemote;
-import net.hudup.core.alg.AugRemoteWrapper;
 import net.hudup.core.alg.CompositeAlg;
 import net.hudup.core.alg.CompositeAlgRemote;
 import net.hudup.core.alg.ExecutableAlg;
@@ -574,8 +572,8 @@ public class Firer implements PluginManager {
 			return new RecommenderRemoteWrapper((RecommenderRemote)remoteAlg, exclusive);
 		else if (remoteAlg instanceof ExecutableAlgRemote)
 			return new ExecutableAlgRemoteWrapper((ExecutableAlgRemote)remoteAlg, exclusive);
-		else if (remoteAlg instanceof AugRemote)
-			return new AugRemoteWrapper((AugRemote)remoteAlg, exclusive);
+//		else if (remoteAlg instanceof AugRemote)
+//			return new AugRemoteWrapper((AugRemote)remoteAlg, exclusive);
 		else
 			return new AlgRemoteWrapper(remoteAlg, exclusive);
 	}

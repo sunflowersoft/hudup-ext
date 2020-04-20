@@ -182,7 +182,6 @@ public class EvaluatorCP extends JFrame implements EvaluatorListener {
 			
 			@Override
 			public void windowClosed(WindowEvent e) {
-				// TODO Auto-generated method stub
 				super.windowClosed(e);
 			}
 			
@@ -203,7 +202,6 @@ public class EvaluatorCP extends JFrame implements EvaluatorListener {
 			
 			@Override
 			public void itemStateChanged(ItemEvent e) {
-				// TODO Auto-generated method stub
 				if (e.getStateChange() == ItemEvent.DESELECTED) {
 				}
 				else if (e.getStateChange() == ItemEvent.SELECTED) {
@@ -223,7 +221,6 @@ public class EvaluatorCP extends JFrame implements EvaluatorListener {
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					// TODO Auto-generated method stub
 					EvaluatorItem evaluatorItem = (EvaluatorItem)cmbEvaluators.getSelectedItem();
 					if (evaluatorItem == null || evaluatorItem.evaluator == null) {
 						JOptionPane.showMessageDialog(
@@ -258,7 +255,7 @@ public class EvaluatorCP extends JFrame implements EvaluatorListener {
 						return;
 					}
 
-					EvalCompoundGUI.run(evaluatorItem.evaluator, BindNamingURI.createBindUri(bindUri), evaluatorItem.guiData, null);
+					EvalCompoundGUI.run(evaluatorItem.evaluator, new BindNamingURI(bindUri, null, null), evaluatorItem.guiData, null);
 				}
 			});
 		btnOpenStart.setMargin(new Insets(0, 0 , 0, 0));
@@ -293,7 +290,6 @@ public class EvaluatorCP extends JFrame implements EvaluatorListener {
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					// TODO Auto-generated method stub
 					reproduceEvaluator();
 				}
 			});
@@ -310,7 +306,6 @@ public class EvaluatorCP extends JFrame implements EvaluatorListener {
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					// TODO Auto-generated method stub
 					removeEvaluator();
 				}
 			});
@@ -330,7 +325,6 @@ public class EvaluatorCP extends JFrame implements EvaluatorListener {
 
 			@Override
 			public boolean apply() {
-				// TODO Auto-generated method stub
 				boolean ret = super.apply();
 				if (!ret) return false;
 				if (service == null) return ret;
@@ -366,7 +360,6 @@ public class EvaluatorCP extends JFrame implements EvaluatorListener {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				dispose();
 			}
 		});
@@ -580,7 +573,6 @@ public class EvaluatorCP extends JFrame implements EvaluatorListener {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				String text = txtVersionName.getText();
 				if (text != null && !text.trim().isEmpty())
 					versionName.append(text.trim());
@@ -594,7 +586,6 @@ public class EvaluatorCP extends JFrame implements EvaluatorListener {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				selectDlgNameDlg.dispose();
 			}
 		});
@@ -709,14 +700,12 @@ public class EvaluatorCP extends JFrame implements EvaluatorListener {
 	
 	@Override
 	public synchronized void receivedEvaluator(EvaluatorEvent evt) throws RemoteException {
-		// TODO Auto-generated method stub
 		updateMode();
 	}
 
 
 	@Override
 	public void dispose() {
-		// TODO Auto-generated method stub
 		checkConfigModified();
 		
 		unsetupListeners();
@@ -842,7 +831,6 @@ public class EvaluatorCP extends JFrame implements EvaluatorListener {
 		
 		@Override
 		public String toString() {
-			// TODO Auto-generated method stub
 			return DSUtil.shortenVerbalName(getName());
 		}
 		

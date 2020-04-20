@@ -7,10 +7,13 @@
  */
 package net.hudup.core.logistic;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.ServerSocket;
+import java.net.URL;
 import java.rmi.Naming;
 import java.rmi.NoSuchObjectException;
 import java.rmi.NotBoundException;
@@ -20,6 +23,9 @@ import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.Enumeration;
 import java.util.Random;
+
+import net.hudup.core.Constants;
+import net.hudup.core.Util;
 
 /**
  * This final class provides utility static methods for network programming. Some methods in this class are available on internet.
@@ -125,6 +131,54 @@ public class NetUtil {
         catch (Exception e) {
             return null;
         }
+	}
+	
+	
+	/**
+	 * Getting public internet address. This method is work-around because it request the service <a href="http://bot.whatismyipaddress.com">http://bot.whatismyipaddress.com</a>.
+	 * Source code is available at <a href="https://www.geeksforgeeks.org/java-program-find-ip-address-computer">https://www.geeksforgeeks.org/java-program-find-ip-address-computer</a>. 
+	 * @return public internet address. Return null if unable to retrieve the public internet address.
+	 */
+	public static String getPublicInetAddress() {
+		BufferedReader reader = null;
+		String publicAddr = null;
+		try {
+			URL url = new URL("http://bot.whatismyipaddress.com"); 
+			reader = new BufferedReader(new InputStreamReader(url.openStream()));
+			publicAddr = reader.readLine().trim();
+		}
+		catch (Exception e) {
+			publicAddr = null;
+		}
+		finally {
+			try {
+				if (reader != null) reader.close();
+			} catch (Exception e) {}
+		}
+		
+		return publicAddr != null && !publicAddr.isEmpty() ? publicAddr : null;
+	}
+
+	
+	/**
+	 * Getting host address.
+	 * @return host address. Return null if unable to find host address.
+	 */
+	public static String getHostAddress() {
+		String host = null;
+		if (Constants.deployInternet)
+			host = NetUtil.getPublicInetAddress();
+		if (host == null) {
+			String hudupHost = Util.getHudupProperty("host_address");
+			if (hudupHost != null && !hudupHost.isEmpty())
+				host = hudupHost;
+		}
+		if (host == null) {
+			InetAddress inetAddress = NetUtil.getInetAddress();
+			if (inetAddress != null)
+				host = inetAddress.getHostAddress();
+		}
+		return host != null ? host : "localhost";
 	}
 	
 	

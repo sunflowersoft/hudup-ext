@@ -26,4 +26,6 @@ public interface AutoCloseable {
 	 * @throws Exception if any error raises.
 	 */
     void close() throws Exception;
+    
+    
 }

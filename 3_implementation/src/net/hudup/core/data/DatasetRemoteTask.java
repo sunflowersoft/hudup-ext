@@ -25,7 +25,6 @@ import net.hudup.core.data.ctx.ContextTemplateSchema;
 public interface DatasetRemoteTask extends Exportable {
 
 
-	
 	/**
 	 * Getting configuration of rating data remotely.
 	 * @return Configuration of rating data {@link DataConfig}

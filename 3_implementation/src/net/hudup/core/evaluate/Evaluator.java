@@ -16,6 +16,7 @@ import net.hudup.core.PluginChangedListener;
 import net.hudup.core.PluginStorageWrapper;
 import net.hudup.core.RegisterTable;
 import net.hudup.core.alg.Alg;
+import net.hudup.core.alg.AlgDesc;
 import net.hudup.core.alg.AlgDesc2List;
 import net.hudup.core.alg.SetupAlgListener;
 import net.hudup.core.client.ClassProcessor;
@@ -290,6 +291,16 @@ public interface Evaluator extends Remote, RemoteRunner, SetupAlgListener, Plugi
     
     
     /**
+     * Getting description of a plug-in algorithm.
+     * @param algClass specified algorithm class.
+     * @param algName algorithm name.
+     * @return description of a plug-in algorithm.
+     * @throws RemoteException if any error raises.
+     */
+    AlgDesc getPluginAlgDesc(Class<? extends Alg> algClass, String algName) throws RemoteException;
+    
+    
+    /**
      * Getting registered cloned plug-in algorithm.
      * @param algClass specified algorithm class.
      * @param algName algorithm name.
@@ -459,4 +470,28 @@ public interface Evaluator extends Remote, RemoteRunner, SetupAlgListener, Plugi
     void setReferredService(Service referredService) throws RemoteException;
     
     
+    @Override
+	boolean isAgent() throws RemoteException;
+
+
+    @Override
+    Remote export(int serverPort) throws RemoteException;
+    
+    
+    @Override
+    void unexport() throws RemoteException;
+
+
+    @Override
+    void forceUnexport() throws RemoteException;
+
+    
+    @Override
+	Remote getExportedStub() throws RemoteException;
+
+
+    @Override
+    void close() throws Exception;
+
+
 }

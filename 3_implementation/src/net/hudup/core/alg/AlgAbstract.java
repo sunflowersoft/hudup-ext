@@ -53,7 +53,7 @@ public abstract class AlgAbstract implements Alg, AlgRemote {
 	 * Holding a list of listeners.
 	 * 
 	 */
-    protected EventListenerList2 listenerList = new EventListenerList2();
+    protected transient EventListenerList2 listenerList = new EventListenerList2();
     
 
     /**
@@ -185,7 +185,6 @@ public abstract class AlgAbstract implements Alg, AlgRemote {
 
 	@Override
 	public DataConfig getConfig() {
-		// TODO Auto-generated method stub
 		return config;
 	}
 
@@ -201,7 +200,6 @@ public abstract class AlgAbstract implements Alg, AlgRemote {
 	
 	@Override
 	public synchronized void resetConfig() {
-		// TODO Auto-generated method stub
 		config.clear();
 		config.putAll(createDefaultConfig());
 	}
@@ -209,10 +207,8 @@ public abstract class AlgAbstract implements Alg, AlgRemote {
 	
 	@Override
 	public DataConfig createDefaultConfig() {
-		// TODO Auto-generated method stub
 		DataConfig config = new DataConfig();
 		config.put(DataConfig.DELAY_UNSETUP, false); //Please pay attention to this code line.
-//		config.addUnsaved(DataConfig.DELAY_UNSETUP);
 		return config;
 	}
 
@@ -225,32 +221,27 @@ public abstract class AlgAbstract implements Alg, AlgRemote {
 
 	@Override
 	public String queryName() throws RemoteException {
-		// TODO Auto-generated method stub
 		return getName();
 	}
 
 
 	@Override
 	public String[] getBaseRemoteInterfaceNames() throws RemoteException {
-		// TODO Auto-generated method stub
 		return new String[] {AlgRemote.class.getName()};
 	}
 
 
 	@Override
 	public DataConfig queryConfig() throws RemoteException {
-		// TODO Auto-generated method stub
 		DataConfig config = new DataConfig();
 		config.putAll(getConfig());
 		return config;
-		
-//		return getConfig();
 	}
 
 
 	@Override
 	public void addSetupListener(SetupAlgListener listener) throws RemoteException {
-		// TODO Auto-generated method stub
+		if (listenerList == null) listenerList = new EventListenerList2();
 		synchronized (listenerList) {
 			listenerList.add(SetupAlgListener.class, listener);
 		}
@@ -259,7 +250,7 @@ public abstract class AlgAbstract implements Alg, AlgRemote {
 
 	@Override
 	public void removeSetupListener(SetupAlgListener listener) throws RemoteException {
-		// TODO Auto-generated method stub
+		if (listenerList == null) return;
 		synchronized (listenerList) {
 			listenerList.remove(SetupAlgListener.class, listener);
 		}
@@ -271,7 +262,7 @@ public abstract class AlgAbstract implements Alg, AlgRemote {
 	 * @return array of listeners for this EM.
 	 */
 	protected SetupAlgListener[] getSetupListeners() {
-		// TODO Auto-generated method stub
+		if (listenerList == null) return new SetupAlgListener[] {};
 		synchronized (listenerList) {
 			return listenerList.getListeners(SetupAlgListener.class);
 		}
@@ -280,7 +271,7 @@ public abstract class AlgAbstract implements Alg, AlgRemote {
 
 	@Override
 	public void fireSetupEvent(SetupAlgEvent evt) throws RemoteException {
-		// TODO Auto-generated method stub
+		if (listenerList == null) return;
 		synchronized (listenerList) {
 			SetupAlgListener[] listeners = getSetupListeners();
 			for (SetupAlgListener listener : listeners) {
@@ -297,14 +288,12 @@ public abstract class AlgAbstract implements Alg, AlgRemote {
 
 	@Override
 	public void receivedSetup(SetupAlgEvent evt) throws RemoteException {
-		// TODO Auto-generated method stub
 		fireSetupEvent(evt);
 	}
 
 
 	@Override
 	public synchronized Remote export(int serverPort) throws RemoteException {
-		// TODO Auto-generated method stub
 		if (exportedStub == null)
 			exportedStub = (AlgRemote) NetUtil.RegistryRemote.export(this, serverPort);
 	
@@ -314,7 +303,6 @@ public abstract class AlgAbstract implements Alg, AlgRemote {
 
 	@Override
 	public synchronized void unexport() throws RemoteException {
-		// TODO Auto-generated method stub
 		if (exportedStub != null) {
 			NetUtil.RegistryRemote.unexport(this);
 			exportedStub = null;
@@ -326,7 +314,6 @@ public abstract class AlgAbstract implements Alg, AlgRemote {
 	
 	@Override
 	public synchronized void forceUnexport() throws RemoteException {
-		// TODO Auto-generated method stub
 		unexport();
 	}
 
@@ -353,7 +340,6 @@ public abstract class AlgAbstract implements Alg, AlgRemote {
 
 	@Override
 	protected void finalize() throws Throwable {
-		// TODO Auto-generated method stub
 		super.finalize();
 		
 		try {

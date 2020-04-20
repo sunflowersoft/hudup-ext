@@ -18,7 +18,7 @@ import java.rmi.RemoteException;
  * @version 12.0
  *
  */
-public interface KBaseRemote extends KBaseRemoteTask, AlgRemoteTask, SetupAlgListener, Remote, Serializable {
+public interface KBaseRemote extends KBaseRemoteTask2, AlgRemoteTask2, SetupAlgListener, Remote, Serializable {
 
 	
 	/**

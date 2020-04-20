@@ -14,7 +14,7 @@ package net.hudup.core.alg;
  * @version 1.0
  *
  */
-public interface RecommenderRemote extends RecommenderRemoteTask, AlgRemote {
+public interface RecommenderRemote extends RecommenderRemoteTask2, AlgRemote {
 
 	
 }

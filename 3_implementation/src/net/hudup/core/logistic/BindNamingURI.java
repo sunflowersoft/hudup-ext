@@ -38,10 +38,29 @@ public final class BindNamingURI implements Serializable {
 	
 	
 	/**
+	 * Connection URI to remote host.
+	 */
+	public xURI connectUri = null;
+
+	
+	/**
 	 * Default constructor.
 	 */
 	public BindNamingURI() {
 		
+	}
+
+	
+	/**
+	 * Constructor with bound URI, naming URI, and connection URI.
+	 * @param bindUri bound URI.
+	 * @param namingUri naming URI.
+	 * @param connectUri connection URI to connect remote host.
+	 */
+	public BindNamingURI(xURI bindUri, xURI namingUri, xURI connectUri) {
+		this.bindUri = bindUri;
+		this.namingUri = namingUri;
+		this.connectUri = connectUri;
 	}
 
 	
@@ -51,28 +70,7 @@ public final class BindNamingURI implements Serializable {
 	 * @param namingUri naming URI.
 	 */
 	public BindNamingURI(xURI bindUri, xURI namingUri) {
-		this.bindUri = bindUri;
-		this.namingUri = namingUri;
-	}
-
-	
-	/**
-	 * Creating bound and naming URI with bound URI.
-	 * @param bindUri bound URI.
-	 * @return bound and naming URI with bound URI.
-	 */
-	public static BindNamingURI createBindUri(xURI bindUri) {
-		return new BindNamingURI(bindUri, null);
-	}
-
-	
-	/**
-	 * Creating bound and naming URI with naming URI.
-	 * @param namingUri naming URI.
-	 * @return bound and naming URI with naming URI.
-	 */
-	public static BindNamingURI createNamingUri(xURI namingUri) {
-		return new BindNamingURI(null, namingUri);
+		this(bindUri, namingUri, null);
 	}
 	
 	

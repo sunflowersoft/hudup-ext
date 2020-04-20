@@ -14,6 +14,6 @@ package net.hudup.core.alg;
  * @version 12.0
  *
  */
-public interface AugRemoteTask extends ExecutableAlgRemoteTask, ModelBasedAlg {
+public interface AugRemoteTask extends ExecutableAlgRemoteTask {
 
 }

@@ -7,7 +7,6 @@
  */
 package net.hudup.server;
 
-import java.net.InetAddress;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -22,7 +21,6 @@ import net.hudup.core.Constants;
 import net.hudup.core.ExtraStorage;
 import net.hudup.core.PluginChangedEvent;
 import net.hudup.core.PluginStorage;
-import net.hudup.core.Util;
 import net.hudup.core.client.ActiveMeasure;
 import net.hudup.core.client.Gateway;
 import net.hudup.core.client.PowerServer;
@@ -132,17 +130,8 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 		super();
 		
 		try {
-			String hudupHost = Util.getHudupProperty("host_address");
-			InetAddress inetAddress = NetUtil.getInetAddress();
-			String host = null;
-			if (inetAddress == null)
-				host = hudupHost;
-			else if (hudupHost != null && !hudupHost.isEmpty())
-				host = hudupHost;
-			else
-				host = inetAddress.getHostAddress();
-			
-			if (host != null && !host.isEmpty() && !host.equals("localhost") && !host.equals("127.0.0.1")) {
+			String host = Constants.deployInternet ? NetUtil.getHostAddress() : null;
+			if (host != null && !host.equals("localhost") && !host.equals("127.0.0.1")) {
 				System.setProperty("java.rmi.server.hostname", host);
 				LogUtil.info("java.rmi.server.hostname=" + host);
 			}

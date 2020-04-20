@@ -25,6 +25,7 @@ import net.hudup.core.PluginStorage;
 import net.hudup.core.RegisterTable;
 import net.hudup.core.Util;
 import net.hudup.core.alg.Alg;
+import net.hudup.core.alg.AlgDesc;
 import net.hudup.core.alg.AlgDesc2;
 import net.hudup.core.alg.SetupAlgListener;
 import net.hudup.core.client.ClassProcessor;
@@ -205,17 +206,19 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 		this.bindNamingUri = bindNamingUri;
 		
 		try {
+			String host = Constants.deployInternet ? NetUtil.getHostAddress() : null;
+			if (host != null && !host.equals("localhost") && !host.equals("127.0.0.1")) {
+				System.setProperty("java.rmi.server.hostname", host);
+				LogUtil.info("java.rmi.server.hostname=" + host);
+			}
+		}
+		catch (Throwable e) {LogUtil.trace(e);}
+		
+		try {
 			if (bindNamingUri.bindUri != null) { //Evaluator is remote
 				bindNamingUri.namingUri = null;
 				this.exportedStub = NetUtil.RegistryRemote.export(this, bindNamingUri.bindUri.getPort()); //Exporting this GUI
 				if (this.exportedStub != null) {
-					try {
-						String host = bindNamingUri.bindUri.getHost();
-						if (host != null && !host.equals("localhost") && !host.equals("127.0.0.1")) {
-							System.setProperty("java.rmi.server.hostname", host);
-							LogUtil.info("java.rmi.server.hostname=" + host);
-						}
-					} catch (Exception e) {LogUtil.trace(e);}
 					LogUtil.info("EVALUATOR GUI EXPORTED AT PORT " + bindNamingUri.bindUri.getPort());
 				}
 				else
@@ -798,6 +801,17 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 				}
 				catch (Exception e) {LogUtil.trace(e);}
 			}
+		}
+		
+		if (bindNamingUri.bindUri == null) return;
+		
+		algNames = algRegTable.getAlgNames();
+		for (String algName : algNames) {
+			try {
+				Alg alg = algRegTable.query(algName);
+				AlgDesc algDesc = evaluator.getPluginAlgDesc(alg.getClass(), alg.getName());
+				if (algDesc != null) alg.getConfig().putAll(algDesc.getConfig());
+			} catch (Exception e) {LogUtil.trace(e);}
 		}
 	}
 	

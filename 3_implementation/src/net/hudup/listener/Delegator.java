@@ -24,6 +24,7 @@ import net.hudup.core.PluginStorageWrapper;
 import net.hudup.core.RegisterTable;
 import net.hudup.core.Util;
 import net.hudup.core.alg.Alg;
+import net.hudup.core.alg.AlgDesc;
 import net.hudup.core.alg.AlgDesc2List;
 import net.hudup.core.alg.SetupAlgEvent;
 import net.hudup.core.alg.SetupAlgListener;
@@ -576,6 +577,12 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluateListen
 	@Override
 	public AlgDesc2List getPluginAlgDescs(Class<? extends Alg> algClass) throws RemoteException {
 		return remoteEvaluator.getPluginAlgDescs(algClass);
+	}
+
+
+	@Override
+	public AlgDesc getPluginAlgDesc(Class<? extends Alg> algClass, String algName) throws RemoteException {
+		return remoteEvaluator.getPluginAlgDesc(algClass, algName);
 	}
 
 
