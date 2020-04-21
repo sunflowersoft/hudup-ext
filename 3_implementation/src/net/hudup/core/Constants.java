@@ -202,20 +202,26 @@ public final class Constants {
 	
 	
 	/**
-	 * This is the period in miliseconds that the Hudup server does periodically internal tasks such as data mining and learning knowledge base.
-	 */
-	public final static int     DEFAULT_SERVER_TASKS_PERIOD  = (int) (1000 * 60 * 5); // 5 minute
-	
-	/**
 	 * The Hudup server is available to serve incoming request in a interval called a timeout in miliseconds. This constant specifies such timeout.
 	 * After timeout interval is reached, the server suspends and users must resumes it.
 	 */
 	public final static int     DEFAULT_SERVER_TIMEOUT       = (int) (1000 * 60 * 30); // 30 minutes
 	
 	/**
+	 * This is the period in miliseconds that the Hudup server does periodically internal tasks such as data mining and learning knowledge base.
+	 */
+	public final static int     DEFAULT_SERVER_TASKS_PERIOD  = (int) (1000 * 60 * 5); // 5 minute
+	
+	/**
 	 * This is the period in miliseconds that the listener does periodically internal tasks.
 	 */
 	public final static int     DEFAULT_LISTENER_TASK_PERIOD = DEFAULT_SERVER_TIMEOUT;
+	
+	/**
+	 * The short time out for any tasks.
+	 */
+	public final static int     DEFAULT_SHORT_TIMEOUT        = (int) (1000 * 60 * 5); // 5 minutes
+	
 	
 	
 	/**
@@ -234,11 +240,6 @@ public final class Constants {
 	 * Host address.
 	 */
 	public static String hostAddress                      = null;
-	
-	/**
-	 * Host address.
-	 */
-	public static boolean deployInternet                  = false;
 	
 	/**
 	 * Setting the maximum number of extra class loaders. If it is -1, there is no limit of extra class loaders but it is not adviced.
@@ -312,12 +313,6 @@ public final class Constants {
 			System.out.println("Error when getting MAC and host addresses");
 		}
 		
-		try {
-			String deployInternetText = Util.getHudupProperty("deploy_internet");
-			if (deployInternetText != null)
-				deployInternet = Boolean.parseBoolean(deployInternetText);
-		} catch (Exception e) {}
-
 		try {
 			String maxExtraClassLoaders = Util.getHudupProperty("max_extra_classloaders");
 			if (maxExtraClassLoaders != null)

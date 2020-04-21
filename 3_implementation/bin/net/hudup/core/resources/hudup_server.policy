@@ -5,7 +5,7 @@
 //Phone: +84-975250362
 
 grant {
-    permission java.net.SocketPermission "*:1024-65535", "connect,accept,listen";
+    permission java.net.SocketPermission "*:0-65535", "connect,resolve,accept,listen";
     permission java.lang.RuntimePermission "accessClassInPackage.sun.misc";
     permission java.lang.RuntimePermission "accessDeclaredMembers";
     permission java.lang.RuntimePermission "createClassLoader";

@@ -7,8 +7,13 @@
  */
 package net.hudup.core.logistic;
 
+import java.util.Collection;
+import java.util.EventObject;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
+import net.hudup.core.Constants;
 import net.hudup.core.Util;
 
 /**
@@ -44,16 +49,21 @@ public class TaskQueue extends AbstractRunner {
 	
 	
 	/**
+	 * Internal map of task lists. Each list is list of events of a listener ID.
+	 */
+	private Map<UUID, List<EventObject>> taskMap = Util.newMap();
+
+	
+	/**
 	 * Default constructor.
 	 */
 	public TaskQueue() {
-		// TODO Auto-generated constructor stub
+
 	}
 
 	
 	@Override
 	protected void task() {
-		// TODO Auto-generated method stub
 		while (true) {
 			Task task = null;
 			
@@ -65,22 +75,58 @@ public class TaskQueue extends AbstractRunner {
 			try {
 				if (task != null) task.doTask();
 			}
-			catch (Exception e) {
-				LogUtil.trace(e);
+			catch (Exception e) {LogUtil.trace(e);}
+		}
+		
+		
+		long startTime = System.currentTimeMillis();
+		while (true) {
+			synchronized (taskMap) {
+				Collection<List<EventObject>> evtLists = taskMap.values();
+				boolean empty = true;
+				for (List<EventObject> evtList : evtLists) {
+					if (evtList.size() > 0) {
+						empty = false;
+						break;
+					}
+				}
+				if (empty) break;
+			}
+			
+			long currentTime = System.currentTimeMillis();
+			long interval = currentTime - startTime;
+			if (interval > Constants.DEFAULT_SHORT_TIMEOUT) {
+				synchronized (taskMap) {
+					clearTaskMap();
+				}
+				break;
 			}
 		}
-
 	}
 
 	
 	@Override
 	protected void clear() {
-		// TODO Auto-generated method stub
 		synchronized (taskList) {
 			taskList.clear();
 		}
+		
+		synchronized (taskMap) {
+			clearTaskMap();
+		}
 	}
 
+	
+	/**
+	 * Clearing task map.
+	 */
+	private void clearTaskMap() {
+		Collection<List<EventObject>> evtLists = taskMap.values();
+		for (List<EventObject> evtList : evtLists) {
+			evtList.clear();
+		}
+	}
+	
 	
 	/**
 	 * Adding a task to this queue.
@@ -92,6 +138,123 @@ public class TaskQueue extends AbstractRunner {
 		
 		synchronized (taskList) {
 			return taskList.add(task);
+		}
+	}
+	
+	
+	/**
+	 * Adding task to this queue by listener ID and event object.
+	 * @param listenerID listener ID.
+	 * @param evt event object.
+	 * @return true if adding successfully.
+	 */
+	public synchronized boolean addTask(UUID listenerID, EventObject evt) {
+		if (listenerID == null || evt == null) return false;
+		
+		synchronized (taskMap) {
+			List<EventObject> evtList = null;
+			if (taskMap.containsKey(listenerID))
+				evtList = taskMap.get(listenerID);
+			else {
+				evtList = Util.newList();
+				taskMap.put(listenerID, evtList);
+			}
+			return evtList.add(evt);
+		}
+	}
+	
+	
+	/**
+	 * Adding task to this queue by event object.
+	 * @param evt event object.
+	 * @return true if adding successfully.
+	 */
+	public synchronized boolean addTask(EventObject evt) {
+		if (evt == null) return false;
+		
+		synchronized (taskMap) {
+			Collection<List<EventObject>> evtLists = taskMap.values();
+			for (List<EventObject> evtList : evtLists) {
+				evtList.add(evt);
+			}
+			
+			return true;
+		}
+	}
+	
+	
+	/**
+	 * Performing as task of specified listener ID, which simply getting and removing an event from event list of such listener.
+	 * @param listenerID specified listener ID.
+	 * @return true if successful.
+	 */
+	public EventObject doTask(UUID listenerID) {
+		if (listenerID == null) return null;
+		
+		synchronized (taskMap) {
+			List<EventObject> evtList = null;
+			if (!taskMap.containsKey(listenerID)) return null;
+			
+			evtList = taskMap.get(listenerID);
+			if (evtList.size() == 0)
+				return null;
+			else
+				return evtList.remove(0);
+		}
+		
+	}
+	
+	
+	/**
+	 * Performing a task list of specified listener.
+	 * @param listenerID specified listener ID.
+	 * @return list of events as the task list.
+	 */
+	public List<EventObject> doTaskList(UUID listenerID) {
+		if (listenerID == null) return Util.newList();
+		
+		synchronized (taskMap) {
+			List<EventObject> evtList = null;
+			if (!taskMap.containsKey(listenerID)) return Util.newList();
+			
+			evtList = taskMap.get(listenerID);
+			List<EventObject> returnedEvtList = Util.newList(evtList.size());
+			returnedEvtList.addAll(evtList);
+			evtList.clear();
+			return returnedEvtList;
+		}
+	}
+	
+	
+	/**
+	 * Adding listener via listener ID.
+	 * @param listenerID listener ID.
+	 * @return true if adding successful.
+	 */
+	public boolean addListener(UUID listenerID) {
+		if (listenerID == null) return false;
+		
+		synchronized (taskMap) {
+			if (taskMap.containsKey(listenerID)) 
+				return true;
+			else {
+				List<EventObject> evtList = Util.newList();
+				return taskMap.put(listenerID, evtList) != null;
+			}
+		}
+	}
+	
+	
+	/**
+	 * Removing listener via listener ID. 
+	 * @param listenerID listener ID. 
+	 * @return true if removing is successful.
+	 */
+	public boolean removeListener(UUID listenerID) {
+		if (listenerID == null) return false;
+		
+		synchronized (taskMap) {
+			return taskMap.remove(listenerID) != null;
 		}
 	}
 	

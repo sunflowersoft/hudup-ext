@@ -14,7 +14,9 @@ import java.net.Socket;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.EventListener;
+import java.util.EventObject;
 import java.util.List;
+import java.util.UUID;
 
 import javax.swing.event.EventListenerList;
 
@@ -494,8 +496,8 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluateListen
 
 
 	@Override
-	public boolean acceptAlg(Alg alg) throws RemoteException {
-		return remoteEvaluator.acceptAlg(alg);
+	public boolean acceptAlg(Class<? extends Alg> algClass) throws RemoteException {
+		return remoteEvaluator.acceptAlg(algClass);
 	}
 
 
@@ -635,6 +637,13 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluateListen
 
 
 	@Override
+	public List<EventObject> doTaskList(UUID listenerID) throws RemoteException {
+		LogUtil.error("Not implement yet");
+		return Util.newList();
+	}
+
+
+	@Override
 	public void addPluginChangedListener(PluginChangedListener listener) throws RemoteException {
 		synchronized (listenerList) {
 			listenerList.add(PluginChangedListener.class, listener);
@@ -643,6 +652,12 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluateListen
 
 	
 	@Override
+	public void addPluginChangedListener(UUID listenerID) throws RemoteException {
+		LogUtil.error("Not implement yet");
+	}
+
+
+	@Override
     public void removePluginChangedListener(PluginChangedListener listener) throws RemoteException {
 		synchronized (listenerList) {
 			listenerList.remove(PluginChangedListener.class, listener);
@@ -650,7 +665,13 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluateListen
     }
 	
     
-    /**
+    @Override
+	public void removePluginChangedListener(UUID listenerID) throws RemoteException {
+		LogUtil.error("Not implement yet");
+	}
+
+
+	/**
      * Return an array of registered plug-in changed listeners.
      * @return array of registered plug-in changed listeners.
      */
@@ -689,6 +710,12 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluateListen
 
     
 	@Override
+	public void addEvaluatorListener(UUID listenerID) throws RemoteException {
+		LogUtil.error("Not implement yet");
+	}
+
+
+	@Override
     public void removeEvaluatorListener(EvaluatorListener listener) throws RemoteException {
 		synchronized (listenerList) {
 			listenerList.remove(EvaluatorListener.class, listener);
@@ -696,6 +723,12 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluateListen
     }
 
 	
+    @Override
+	public void removeEvaluatorListener(UUID listenerID) throws RemoteException {
+		LogUtil.error("Not implement yet");
+	}
+
+
 	/**
      * Return array of evaluator listeners for this evaluator.
      * @return array of evaluator listeners for this evaluator.
@@ -742,6 +775,12 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluateListen
 
     
 	@Override
+	public void addEvaluateListener(UUID listenerID) throws RemoteException {
+		LogUtil.error("Not implement yet");
+	}
+
+
+	@Override
     public void removeEvaluateListener(EvaluateListener listener) throws RemoteException {
 		synchronized (listenerList) {
 			listenerList.remove(EvaluateListener.class, listener);
@@ -749,6 +788,12 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluateListen
     }
 	
     
+    @Override
+	public void removeEvaluateListener(UUID listenerID) throws RemoteException {
+		LogUtil.error("Not implement yet");
+	}
+
+
     /**
      * Return array of evaluation listeners for this evaluator.
      * @return array of evaluation listeners.
@@ -793,6 +838,12 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluateListen
     }
 
     
+	@Override
+	public void addEvaluateProgressListener(UUID listenerID) throws RemoteException {
+		LogUtil.error("Not implement yet");
+	}
+
+
     @Override
     public void removeEvaluateProgressListener(EvaluateProgressListener listener) throws RemoteException {
 		synchronized (listenerList) {
@@ -801,6 +852,12 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluateListen
     }
 	
     
+    @Override
+	public void removeEvaluateProgressListener(UUID listenerID) throws RemoteException {
+		LogUtil.error("Not implement yet");
+	}
+
+
     /**
      * Getting an array of evaluation progress listener.
      * @return array of {@link ProgressListener} (s).
@@ -845,6 +902,12 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluateListen
     }
 
     
+	@Override
+	public void addSetupAlgListener(UUID listenerID) throws RemoteException {
+		LogUtil.error("Not implement yet");
+	}
+
+
     @Override
     public void removeSetupAlgListener(SetupAlgListener listener) throws RemoteException {
 		synchronized (listenerList) {
@@ -853,6 +916,12 @@ class DelegatorEvaluator implements Evaluator, EvaluatorListener, EvaluateListen
     }
 	
     
+    @Override
+	public void removeSetupAlgListener(UUID listenerID) throws RemoteException {
+		LogUtil.error("Not implement yet");
+	}
+
+
     /**
      * Getting an array of setup algorithm listeners.
      * @return array of setup algorithm listeners.

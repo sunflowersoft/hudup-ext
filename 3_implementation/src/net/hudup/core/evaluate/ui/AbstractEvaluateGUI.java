@@ -13,7 +13,11 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.rmi.registry.Registry;
 import java.util.Arrays;
+import java.util.EventObject;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.UUID;
 
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -27,6 +31,7 @@ import net.hudup.core.Util;
 import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.AlgDesc;
 import net.hudup.core.alg.AlgDesc2;
+import net.hudup.core.alg.SetupAlgEvent;
 import net.hudup.core.alg.SetupAlgListener;
 import net.hudup.core.client.ClassProcessor;
 import net.hudup.core.data.DataConfig;
@@ -38,23 +43,27 @@ import net.hudup.core.data.DatasetPoolExchanged;
 import net.hudup.core.data.DatasetRemote;
 import net.hudup.core.data.DatasetUtil;
 import net.hudup.core.data.Exportable;
+import net.hudup.core.evaluate.EvaluateEvent;
 import net.hudup.core.evaluate.EvaluateInfo;
 import net.hudup.core.evaluate.EvaluateListener;
 import net.hudup.core.evaluate.EvaluateProcessor;
+import net.hudup.core.evaluate.EvaluateProgressEvent;
 import net.hudup.core.evaluate.EvaluateProgressListener;
 import net.hudup.core.evaluate.Evaluator;
 import net.hudup.core.evaluate.EvaluatorAbstract;
+import net.hudup.core.evaluate.EvaluatorEvent;
 import net.hudup.core.evaluate.EvaluatorListener;
 import net.hudup.core.evaluate.Metric;
 import net.hudup.core.evaluate.Metrics;
 import net.hudup.core.evaluate.MetricsUtil;
-import net.hudup.core.logistic.BindNamingURI;
+import net.hudup.core.logistic.ConnectInfo;
+import net.hudup.core.logistic.Counter;
+import net.hudup.core.logistic.CounterElapsedTimeEvent;
 import net.hudup.core.logistic.CounterElapsedTimeListener;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.NetUtil;
 import net.hudup.core.logistic.NetUtil.RegistryRemote;
 import net.hudup.core.logistic.Timestamp;
-import net.hudup.core.logistic.xURI;
 
 /**
  * This abstract class represents an abstract GUI to allow users to interact with {@link EvaluatorAbstract}.
@@ -75,6 +84,12 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	 * Prefix of evaluated file name.
 	 */
 	public static final String EV_RESULT_FILENAME_PREFIX = "gui";
+	
+	
+	/**
+	 * Identifier of this GUI.
+	 */
+	protected UUID id = null;
 	
 	
 	/**
@@ -108,9 +123,9 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	
 	
 	/**
-	 * Bind and naming URI.
+	 * Connection information.
 	 */
-	protected BindNamingURI bindNamingUri = new BindNamingURI();
+	protected ConnectInfo connectInfo = new ConnectInfo();
 	
 	
 	/**
@@ -144,6 +159,12 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	
 	
 	/**
+	 * Internal timer.
+	 */
+	protected Timer timer = null;
+
+	
+	/**
 	 * Constructor with local evaluator.
 	 * @param evaluator local evaluator.
 	 */
@@ -155,10 +176,10 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	/**
 	 * Constructor with specified evaluator and bound URI.
 	 * @param evaluator specified evaluator.
-	 * @param bindNamingUri bound and naming URI.
+	 * @param connectInfo connection information.
 	 */
-	public AbstractEvaluateGUI(Evaluator evaluator, BindNamingURI bindNamingUri) {
-		this(evaluator, bindNamingUri, null, null);
+	public AbstractEvaluateGUI(Evaluator evaluator, ConnectInfo connectInfo) {
+		this(evaluator, connectInfo, null, null);
 	}
 	
 	
@@ -185,64 +206,67 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	/**
 	 * Constructor with specified evaluator, bound URI, and referred GUI data.
 	 * @param evaluator specified evaluator.
-	 * @param bindNamingUri bound and naming URI.
+	 * @param connectInfo connection information.
 	 * @param referredGUIData referred GUI data.
 	 */
-	public AbstractEvaluateGUI(Evaluator evaluator, BindNamingURI bindNamingUri, EvaluateGUIData referredGUIData) {
-		this(evaluator, bindNamingUri, referredGUIData, null);
+	public AbstractEvaluateGUI(Evaluator evaluator, ConnectInfo connectInfo, EvaluateGUIData referredGUIData) {
+		this(evaluator, connectInfo, referredGUIData, null);
 	}
 	
 	
 	/**
 	 * Constructor with specified evaluator, bound URI, referred GUI data, and referred algorithm.
 	 * @param evaluator specified evaluator.
-	 * @param bindNamingUri bound and naming URI.
+	 * @param connectInfo connection information.
 	 * @param referredGUIData referred GUI data.
 	 * @param referredAlg referred algorithm.
 	 */
-	public AbstractEvaluateGUI(Evaluator evaluator, BindNamingURI bindNamingUri, EvaluateGUIData referredGUIData, Alg referredAlg) {
+	public AbstractEvaluateGUI(Evaluator evaluator, ConnectInfo connectInfo, EvaluateGUIData referredGUIData, Alg referredAlg) {
+		this.id = UUID.randomUUID();
 		this.evaluator = evaluator;
-		bindNamingUri = bindNamingUri != null ? bindNamingUri : new BindNamingURI();
-		this.bindNamingUri = bindNamingUri;
+		connectInfo = connectInfo != null ? connectInfo : new ConnectInfo();
+		this.connectInfo = connectInfo;
 		
 		try {
-			String host = Constants.deployInternet ? NetUtil.getHostAddress() : null;
-			if (host != null && !host.equals("localhost") && !host.equals("127.0.0.1")) {
-				System.setProperty("java.rmi.server.hostname", host);
-				LogUtil.info("java.rmi.server.hostname=" + host);
+			if (connectInfo.deployGlobal) {
+				String globalHost = connectInfo.getDeployGlobalHost();
+				if (globalHost != null) {
+					System.setProperty("java.rmi.server.hostname", globalHost);
+					LogUtil.info("java.rmi.server.hostname=" + globalHost);
+				}
 			}
 		}
 		catch (Throwable e) {LogUtil.trace(e);}
 		
 		try {
-			if (bindNamingUri.bindUri != null) { //Evaluator is remote
-				bindNamingUri.namingUri = null;
-				this.exportedStub = NetUtil.RegistryRemote.export(this, bindNamingUri.bindUri.getPort()); //Exporting this GUI
+			if (connectInfo.bindUri != null) { //Evaluator is remote
+				connectInfo.namingUri = null;
+				this.exportedStub = NetUtil.RegistryRemote.export(this, connectInfo.bindUri.getPort()); //Exporting this GUI
 				if (this.exportedStub != null) {
-					LogUtil.info("EVALUATOR GUI EXPORTED AT PORT " + bindNamingUri.bindUri.getPort());
+					LogUtil.info("EVALUATOR GUI EXPORTED AT PORT " + connectInfo.bindUri.getPort());
 				}
 				else
 					LogUtil.info("Evaluator GUI failed to export");
 			}
 			else { //Evaluator is local
 				if (evaluator.isAgent()) { //Evaluator is agent.
-					bindNamingUri.namingUri = null;
+					connectInfo.namingUri = null;
 				}
-				else if (bindNamingUri.namingUri != null) { //Exporting the evaluator.
-					RegistryRemote rr = NetUtil.RegistryRemote.registerExport(this, bindNamingUri.namingUri);
+				else if (connectInfo.namingUri != null) { //Exporting the evaluator.
+					RegistryRemote rr = NetUtil.RegistryRemote.registerExport(this, connectInfo.namingUri);
 					if (rr != null) {
 						exportedStub = rr.getStub();
 						registry = rr.getRegistry();
 						
-						evaluator.export(bindNamingUri.namingUri.getPort());
-						evaluator.getConfig().setEvaluatorPort(bindNamingUri.namingUri.getPort());
+						evaluator.export(connectInfo.namingUri.getPort());
+						evaluator.getConfig().setEvaluatorPort(connectInfo.namingUri.getPort());
 						evaluator.setAgent(true); //It is OK to set this local evaluator to be agent here.
-						Naming.rebind(bindNamingUri.namingUri.toString(), evaluator);
+						Naming.rebind(connectInfo.namingUri.toString(), evaluator);
 						
-						LogUtil.info("EVALUATOR AND EVALUATOR GUI EXPORTED AND NAMED AT PORT " + bindNamingUri.namingUri.getPort());
+						LogUtil.info("EVALUATOR AND EVALUATOR GUI EXPORTED AND NAMED AT PORT " + connectInfo.namingUri.getPort());
 					}
 					else {
-						bindNamingUri.namingUri = null;
+						connectInfo.namingUri = null;
 						LogUtil.info("Evaluator and evaluator GUI failed to export");
 					}
 				}
@@ -261,13 +285,13 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 
 		if (referredAlg != null) {
 			try {
-				if (evaluator.acceptAlg(referredAlg) && PluginStorage.getNormalAlgReg().contains(referredAlg.getName()))
+				if (EvaluatorAbstract.acceptAlg(evaluator, referredAlg, connectInfo.bindUri) && PluginStorage.getNormalAlgReg().contains(referredAlg.getName()))
 					algRegTable = new RegisterTable(Arrays.asList(referredAlg));
 			} catch (Throwable e) {LogUtil.trace(e);}
 		}
 		else {
 			try {
-				algRegTable = EvaluatorAbstract.extractNormalAlgFromPluginStorage(evaluator, bindNamingUri.bindUri);
+				algRegTable = EvaluatorAbstract.extractNormalAlgFromPluginStorage(evaluator, connectInfo.bindUri);
 			} catch (Throwable e) {LogUtil.trace(e);}
 		}
 		if (algRegTable == null) algRegTable = new RegisterTable();
@@ -306,7 +330,7 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 				guiData.pool = new DatasetPool();
 		}
 		
-		if (bindNamingUri.bindUri == null) {
+		if (connectInfo.bindUri == null) {
 			String evStorePath = null;
 			try {
 				evStorePath = evaluator.getEvaluateStorePath();
@@ -318,6 +342,62 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 				guiData.txtRunSaveBrowse = evStorePath;
 		}
 
+		if (connectInfo.deployGlobal) {
+			timer = new Timer();
+			timer.schedule(new TimerTask() {
+				
+					@Override
+					public void run() {
+						try {
+							timerTask();
+						} 
+						catch (Throwable e) {LogUtil.trace(e);}
+					}
+				}, 
+				Counter.PERIOD, 
+				Counter.PERIOD);
+		}
+	}
+	
+	
+	/**
+	 * Timer task.
+	 */
+	protected void timerTask() {
+		List<EventObject> evtList = Util.newList();
+		try {
+			evtList = evaluator.doTaskList(id);
+		}
+		catch (Throwable e) {LogUtil.trace(e);}
+		
+		for (EventObject evt : evtList) {
+			try {
+				if (evt instanceof PluginChangedEvent) {
+					pluginChanged((PluginChangedEvent)evt);
+				}
+				else if (evt instanceof EvaluatorEvent) {
+					receivedEvaluator((EvaluatorEvent)evt);
+				}
+				else if (evt instanceof EvaluateEvent) {
+					receivedEvaluation((EvaluateEvent)evt);
+				}
+				else if (evt instanceof EvaluateProgressEvent) {
+					receivedProgress((EvaluateProgressEvent)evt);
+				}
+				else if (evt instanceof SetupAlgEvent) {
+					receivedSetup((SetupAlgEvent)evt);
+				}
+			}
+			catch (Throwable e) {LogUtil.trace(e);}
+		}
+		
+		try {
+			EvaluateInfo otherResult = evaluator.getOtherResult();
+			if (otherResult != null && otherResult.elapsedTime > 0) {
+				receivedElapsedTime(new CounterElapsedTimeEvent(new Counter(), otherResult.elapsedTime));
+			}
+		}
+		catch (Throwable e) {LogUtil.trace(e);}
 	}
 	
 	
@@ -450,8 +530,8 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	 */
 	public void dispose() {
 		try {
-			if (bindNamingUri.namingUri != null) {
-				Naming.unbind(bindNamingUri.namingUri.toString());
+			if (connectInfo.namingUri != null) {
+				Naming.unbind(connectInfo.namingUri.toString());
 				LogUtil.info("Evaluator unbound successfully");
 			}
 		}
@@ -471,7 +551,7 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 			LogUtil.trace(e);
 		}
 		
-		if (agent && bindNamingUri.namingUri == null) {
+		if (agent && connectInfo.namingUri == null) {
 			if (wrapper) {
 				unsetupListeners(evaluator);
 				
@@ -503,6 +583,11 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 		try {
 			algRegTable.unexportNonPluginAlgs();
 		} catch (Exception e) {LogUtil.trace(e);}
+		
+		if (timer != null) {
+			timer.cancel();
+			timer = null;
+		}
 		
 		if (exportedStub != null) {
 			boolean ret = NetUtil.RegistryRemote.unexport(this);
@@ -575,8 +660,8 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 
 	@Override
 	public int getPort() throws RemoteException {
-		if (bindNamingUri.bindUri != null) //Evaluator is remote
-			return bindNamingUri.bindUri.getPort();
+		if (connectInfo.bindUri != null) //Evaluator is remote
+			return connectInfo.bindUri.getPort();
 		else { //Evaluator is local
 			try {
 				return evaluator.getConfig().getEvaluatorPort();
@@ -588,22 +673,13 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 
 
 	/**
-	 * Getting bound URI.
-	 * @return bound URI.
+	 * Getting connection information.
+	 * @return connection information.
 	 */
-	public xURI getBindUri() {
-		return bindNamingUri.bindUri;
+	public ConnectInfo getConnectInfo() {
+		return connectInfo;
 	}
 	
-	
-	/**
-	 * Getting naming URI.
-	 * @return naming URI.
-	 */
-	public xURI getNamingUri() {
-		return bindNamingUri.namingUri;
-	}
-
 	
 	@Override
 	public byte[] getByteCode(String className) throws RemoteException {
@@ -617,12 +693,21 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	 */
 	private void setupListeners(Evaluator evaluator) {
 		try {
-			evaluator.addPluginChangedListener(this);
-			evaluator.addEvaluatorListener(this);
-			evaluator.addEvaluateListener(this);
-			evaluator.addEvaluateProgressListener(this);
-			evaluator.addSetupAlgListener(this);
-			evaluator.addElapsedTimeListener(this);
+			if (connectInfo.deployGlobal) {
+				evaluator.addPluginChangedListener(id);
+				evaluator.addEvaluatorListener(id);
+				evaluator.addEvaluateListener(id);
+				evaluator.addEvaluateProgressListener(id);
+				evaluator.addSetupAlgListener(id);
+			}
+			else {
+				evaluator.addPluginChangedListener(this);
+				evaluator.addEvaluatorListener(this);
+				evaluator.addEvaluateListener(this);
+				evaluator.addEvaluateProgressListener(this);
+				evaluator.addSetupAlgListener(this);
+				evaluator.addElapsedTimeListener(this);
+			}
 		}
 		catch (Throwable e) {
 			LogUtil.trace(e);
@@ -636,12 +721,21 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	 */
 	private void unsetupListeners(Evaluator evaluator) {
 		try {
-			evaluator.removePluginChangedListener(this);
-			evaluator.removeEvaluatorListener(this);
-			evaluator.removeEvaluateListener(this);
-			evaluator.removeEvaluateProgressListener(this);
-			evaluator.removeSetupAlgListener(this);
-			evaluator.removeElapsedTimeListener(this);
+			if (connectInfo.deployGlobal) {
+				evaluator.removePluginChangedListener(id);
+				evaluator.removeEvaluatorListener(id);
+				evaluator.removeEvaluateListener(id);
+				evaluator.removeEvaluateProgressListener(id);
+				evaluator.removeSetupAlgListener(id);
+			}
+			else {
+				evaluator.removePluginChangedListener(this);
+				evaluator.removeEvaluatorListener(this);
+				evaluator.removeEvaluateListener(this);
+				evaluator.removeEvaluateProgressListener(this);
+				evaluator.removeSetupAlgListener(this);
+				evaluator.removeElapsedTimeListener(this);
+			}
 		}
 		catch (Throwable e) {
 			LogUtil.trace(e);
@@ -664,7 +758,7 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 		if (pool == null) return null;
 		
 		DatasetPoolExchanged exchangedPool = pool.toDatasetPoolExchangedClient();
-		if (bindNamingUri.bindUri == null) return exchangedPool;
+		if (connectInfo.bindUri == null) return exchangedPool;
 		
 		for (DatasetPairExchanged pair : exchangedPool.dspList) {
 			setupDatasetExchanged(pair.training);
@@ -681,7 +775,7 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	 * @param remoteDataset specified remote dataset.
 	 */
 	private void setupDatasetExchanged(DatasetRemote remoteDataset) {
-		if (remoteDataset == null || bindNamingUri.bindUri == null) return;
+		if (remoteDataset == null || connectInfo.bindUri == null) return;
 		if (DatasetUtil.getMostInnerDataset2(remoteDataset) == null)
 			return;
 		
@@ -741,7 +835,7 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	 * Updating plug-in storage from evaluator.
 	 */
 	protected void updatePluginFromEvaluator() {
-		if (bindNamingUri.bindUri == null || evaluator == null) return;
+		if (connectInfo.bindUri == null || evaluator == null) return;
 		
 		//Current version only update normal algorithm and metric plug-in
 		PluginStorage.updateFromEvaluator(evaluator, Alg.class, true);
@@ -786,7 +880,7 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 						algRegTable.unregister(algName);
 						try {
 							if (alg instanceof Exportable) ((Exportable)alg).unexport();
-							alg = evaluator.getEvaluatedAlg(algName, bindNamingUri.bindUri != null);
+							alg = evaluator.getEvaluatedAlg(algName, connectInfo.bindUri != null);
 							if (alg != null) algRegTable.register(alg);
 						} catch (Exception e) {LogUtil.trace(e);}
 					}
@@ -796,14 +890,14 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 				algRegTable.register(normalAlgReg.query(algName));
 			else {
 				try {
-					Alg alg = evaluator.getEvaluatedAlg(algName, bindNamingUri.bindUri != null);
+					Alg alg = evaluator.getEvaluatedAlg(algName, connectInfo.bindUri != null);
 					if (alg != null) algRegTable.register(alg);
 				}
 				catch (Exception e) {LogUtil.trace(e);}
 			}
 		}
 		
-		if (bindNamingUri.bindUri == null) return;
+		if (connectInfo.bindUri == null) return;
 		
 		algNames = algRegTable.getAlgNames();
 		for (String algName : algNames) {

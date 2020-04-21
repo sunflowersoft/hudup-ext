@@ -10,7 +10,9 @@ package net.hudup.core.evaluate;
 import java.io.Serializable;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
+import java.util.EventObject;
 import java.util.List;
+import java.util.UUID;
 
 import net.hudup.core.PluginChangedListener;
 import net.hudup.core.PluginStorageWrapper;
@@ -189,12 +191,12 @@ public interface Evaluator extends Remote, RemoteRunner, SetupAlgListener, Plugi
 	
 	
 	/**
-	 * Checking whether the specified algorithm is accepted by this evaluator.
-	 * @param alg specified algorithm.
+	 * Checking whether the specified algorithm class is accepted by this evaluator.
+	 * @param algClass specified algorithm class.
 	 * @return whether the specified algorithm is accepted by this evaluator.
 	 * @throws RemoteException if any error raises.
 	 */
-	boolean acceptAlg(Alg alg) throws RemoteException;
+	boolean acceptAlg(Class<? extends Alg> algClass) throws RemoteException;
 
 	
 	/**
@@ -343,6 +345,15 @@ public interface Evaluator extends Remote, RemoteRunner, SetupAlgListener, Plugi
 
     
 	/**
+	 * Performing a task list of specified listener.
+	 * @param listenerID specified listener ID.
+	 * @return list of events as the task list.
+     * @throws RemoteException if any error raises.
+	 */
+	List<EventObject> doTaskList(UUID listenerID) throws RemoteException;
+
+	
+	/**
 	 * Adding the specified listener to the end of list of listeners, which means that such listener is registered.
 	 * @param listener plug-in changed listener that is registered.
      * @throws RemoteException if any error raises.
@@ -351,6 +362,14 @@ public interface Evaluator extends Remote, RemoteRunner, SetupAlgListener, Plugi
 
     
 	/**
+	 * Adding the specified listener to the end of list of listeners, which means that such listener is registered.
+	 * @param listenerID plug-in changed listener ID.
+     * @throws RemoteException if any error raises.
+	 */
+	void addPluginChangedListener(UUID listenerID) throws RemoteException;
+	
+	
+	/**
 	 * Remove the specified listener from the list of listener
 	 * @param listener plug-in changed listener that is unregistered.
      * @throws RemoteException if any error raises.
@@ -358,6 +377,14 @@ public interface Evaluator extends Remote, RemoteRunner, SetupAlgListener, Plugi
     void removePluginChangedListener(PluginChangedListener listener) throws RemoteException;
 
     	
+	/**
+	 * Remove the specified listener from the list of listener
+	 * @param listenerID plug-in changed listener ID.
+     * @throws RemoteException if any error raises.
+	 */
+    void removePluginChangedListener(UUID listenerID) throws RemoteException;
+
+    
     /**
 	 * Add the specified evaluator listener to the end of listener list.
 	 * @param listener specified evaluator listener.
@@ -366,28 +393,60 @@ public interface Evaluator extends Remote, RemoteRunner, SetupAlgListener, Plugi
 	void addEvaluatorListener(EvaluatorListener listener) throws RemoteException;
 	
 	
+    /**
+	 * Add the specified evaluator listener to the end of listener list.
+	 * @param listenerID specified evaluator listener ID.
+	 * @throws RemoteException if any error raises.
+	 */
+	void addEvaluatorListener(UUID listenerID) throws RemoteException;
+	
+	
 	/**
 	 * Remove the specified evaluator listener from the listener list.
 	 * @param listener specified evaluator listener.
 	 * @throws RemoteException if any error raises.
 	 */
     void removeEvaluatorListener(EvaluatorListener listener) throws RemoteException;
+	
+	
+	/**
+	 * Remove the specified evaluator listener from the listener list.
+	 * @param listenerID specified evaluator listener ID.
+	 * @throws RemoteException if any error raises.
+	 */
+    void removeEvaluatorListener(UUID listenerID) throws RemoteException;
 
     
     /**
 	 * Add the specified evaluation listener to the end of listener list.
-	 * @param listener specified {@link EvaluateListener}
+	 * @param listener specified evaluate listener.
 	 * @throws RemoteException if any error raises.
 	 */
 	void addEvaluateListener(EvaluateListener listener) throws RemoteException;
 	
 	
+    /**
+	 * Add the specified evaluation listener to the end of listener list.
+	 * @param listenerID specified evaluate listener ID.
+	 * @throws RemoteException if any error raises.
+	 */
+	void addEvaluateListener(UUID listenerID) throws RemoteException;
+	
+	
 	/**
 	 * Remove the specified evaluation listener from the listener list.
-	 * @param listener specified {@link EvaluateListener}.
+	 * @param listener specified evaluate listener.
 	 * @throws RemoteException if any error raises.
 	 */
     void removeEvaluateListener(EvaluateListener listener) throws RemoteException;
+	
+
+	/**
+	 * Remove the specified evaluation listener from the listener list.
+	 * @param listenerID specified evaluate listener ID.
+	 * @throws RemoteException if any error raises.
+	 */
+    void removeEvaluateListener(UUID listenerID) throws RemoteException;
 	
 
     /**
@@ -398,6 +457,14 @@ public interface Evaluator extends Remote, RemoteRunner, SetupAlgListener, Plugi
 	void addEvaluateProgressListener(EvaluateProgressListener listener) throws RemoteException;
 
     
+    /**
+     * Adding the specified progress listener.
+     * @param listenerID specified progress listener ID.
+	 * @throws RemoteException if any error raises.
+     */
+	void addEvaluateProgressListener(UUID listenerID) throws RemoteException;
+
+    
 	/**
      * Removing the specified progress listener.
 	 * @param listener specified progress listener.
@@ -406,6 +473,14 @@ public interface Evaluator extends Remote, RemoteRunner, SetupAlgListener, Plugi
     void removeEvaluateProgressListener(EvaluateProgressListener listener) throws RemoteException;
 
 
+	/**
+     * Removing the specified progress listener.
+	 * @param listenerID specified progress listener ID.
+	 * @throws RemoteException if any error raises.
+	 */
+    void removeEvaluateProgressListener(UUID listenerID) throws RemoteException;
+
+    
     /**
      * Adding the specified setup algorithm listener.
      * @param listener specified setup algorithm listener.
@@ -414,12 +489,28 @@ public interface Evaluator extends Remote, RemoteRunner, SetupAlgListener, Plugi
 	void addSetupAlgListener(SetupAlgListener listener) throws RemoteException;
 
     
+    /**
+     * Adding the specified setup algorithm listener.
+     * @param listenerID specified setup algorithm listener ID.
+	 * @throws RemoteException if any error raises.
+     */
+	void addSetupAlgListener(UUID listenerID) throws RemoteException;
+
+    
 	/**
      * Removing the specified setup algorithm listener.
 	 * @param listener specified progress algorithm listener.
 	 * @throws RemoteException if any error raises.
 	 */
     void removeSetupAlgListener(SetupAlgListener listener) throws RemoteException;
+
+    
+	/**
+     * Removing the specified setup algorithm listener.
+	 * @param listenerID specified progress algorithm listener.
+	 * @throws RemoteException if any error raises.
+	 */
+    void removeSetupAlgListener(UUID listenerID) throws RemoteException;
 
     
 	/**

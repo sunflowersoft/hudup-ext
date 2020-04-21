@@ -10,7 +10,9 @@ package net.hudup.core.evaluate;
 import java.io.Serializable;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
+import java.util.EventObject;
 import java.util.List;
+import java.util.UUID;
 
 import net.hudup.core.PluginChangedEvent;
 import net.hudup.core.PluginChangedListener;
@@ -192,11 +194,11 @@ public class EvaluatorWrapper implements Evaluator, Serializable {
 
 
 	@Override
-	public boolean acceptAlg(Alg alg) throws RemoteException {
-		return remoteEvaluator.acceptAlg(alg);
+	public boolean acceptAlg(Class<? extends Alg> algClass) throws RemoteException {
+		return remoteEvaluator.acceptAlg(algClass);
 	}
 
-	
+
 	@Override
 	public NoneWrapperMetricList defaultMetrics() throws RemoteException {
 		return remoteEvaluator.defaultMetrics();
@@ -326,8 +328,20 @@ public class EvaluatorWrapper implements Evaluator, Serializable {
 
 
 	@Override
+	public List<EventObject> doTaskList(UUID listenerID) throws RemoteException {
+		return remoteEvaluator.doTaskList(listenerID);
+	}
+
+
+	@Override
 	public void addPluginChangedListener(PluginChangedListener listener) throws RemoteException {
 		remoteEvaluator.addPluginChangedListener(listener);
+	}
+
+
+	@Override
+	public void addPluginChangedListener(UUID listenerID) throws RemoteException {
+		remoteEvaluator.addPluginChangedListener(listenerID);
 	}
 
 
@@ -338,11 +352,23 @@ public class EvaluatorWrapper implements Evaluator, Serializable {
 
 
 	@Override
+	public void removePluginChangedListener(UUID listenerID) throws RemoteException {
+		remoteEvaluator.removePluginChangedListener(listenerID);
+	}
+
+
+	@Override
 	public void addEvaluatorListener(EvaluatorListener listener) throws RemoteException {
 		remoteEvaluator.addEvaluatorListener(listener);
 	}
 
 	
+	@Override
+	public void addEvaluatorListener(UUID listenerID) throws RemoteException {
+		remoteEvaluator.addEvaluatorListener(listenerID);
+	}
+
+
 	@Override
 	public void removeEvaluatorListener(EvaluatorListener listener) throws RemoteException {
 		remoteEvaluator.removeEvaluatorListener(listener);
@@ -350,11 +376,23 @@ public class EvaluatorWrapper implements Evaluator, Serializable {
 
 	
 	@Override
+	public void removeEvaluatorListener(UUID listenerID) throws RemoteException {
+		remoteEvaluator.removeEvaluatorListener(listenerID);
+	}
+
+
+	@Override
 	public void addEvaluateListener(EvaluateListener listener) throws RemoteException {
 		remoteEvaluator.addEvaluateListener(listener);
 	}
 
 	
+	@Override
+	public void addEvaluateListener(UUID listenerID) throws RemoteException {
+		remoteEvaluator.addEvaluatorListener(listenerID);
+	}
+
+
 	@Override
 	public void removeEvaluateListener(EvaluateListener listener) throws RemoteException {
 		remoteEvaluator.removeEvaluateListener(listener);
@@ -362,11 +400,23 @@ public class EvaluatorWrapper implements Evaluator, Serializable {
 
 	
 	@Override
+	public void removeEvaluateListener(UUID listenerID) throws RemoteException {
+		remoteEvaluator.removeEvaluateListener(listenerID);
+	}
+
+
+	@Override
 	public void addEvaluateProgressListener(EvaluateProgressListener listener) throws RemoteException {
 		remoteEvaluator.addEvaluateProgressListener(listener);
 	}
 
 	
+	@Override
+	public void addEvaluateProgressListener(UUID listenerID) throws RemoteException {
+		remoteEvaluator.addEvaluatorListener(listenerID);
+	}
+
+
 	@Override
 	public void removeEvaluateProgressListener(EvaluateProgressListener listener) throws RemoteException {
 		remoteEvaluator.removeEvaluateProgressListener(listener);
@@ -374,17 +424,35 @@ public class EvaluatorWrapper implements Evaluator, Serializable {
 
 	
 	@Override
+	public void removeEvaluateProgressListener(UUID listenerID) throws RemoteException {
+		remoteEvaluator.removeEvaluateProgressListener(listenerID);
+	}
+
+
+	@Override
 	public void addSetupAlgListener(SetupAlgListener listener) throws RemoteException {
 		remoteEvaluator.addSetupAlgListener(listener);
 	}
 
 	
 	@Override
+	public void addSetupAlgListener(UUID listenerID) throws RemoteException {
+		remoteEvaluator.addSetupAlgListener(listenerID);
+	}
+
+
+	@Override
 	public void removeSetupAlgListener(SetupAlgListener listener) throws RemoteException {
 		remoteEvaluator.removeSetupAlgListener(listener);
 	}
 
 	
+	@Override
+	public void removeSetupAlgListener(UUID listenerID) throws RemoteException {
+		remoteEvaluator.removeSetupAlgListener(listenerID);
+	}
+
+
 	@Override
 	public void addElapsedTimeListener(CounterElapsedTimeListener listener) throws RemoteException {
 		remoteEvaluator.addElapsedTimeListener(listener);

@@ -544,7 +544,7 @@ public class RemoteServerCP extends JFrame implements ServerStatusListener {
 		
 		Server server = dlg.getServer();
 		if (server != null)
-			new RemoteServerCP(server, dlg.getBindNamingUri().bindUri);
+			new RemoteServerCP(server, dlg.getConnectInfo().bindUri);
 		else {
 			JOptionPane.showMessageDialog(
 					null, "Can't retrieve remote server", "Faile to retrieve server", JOptionPane.ERROR_MESSAGE);

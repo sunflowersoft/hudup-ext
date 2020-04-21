@@ -55,7 +55,8 @@ import net.hudup.core.evaluate.Metrics;
 import net.hudup.core.evaluate.NoneWrapperMetricList;
 import net.hudup.core.evaluate.ui.EvaluateGUIData;
 import net.hudup.core.evaluate.ui.MetricsAnalyzeDlg;
-import net.hudup.core.logistic.BindNamingURI;
+import net.hudup.core.logistic.Account;
+import net.hudup.core.logistic.ConnectInfo;
 import net.hudup.core.logistic.I18nUtil;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.NetUtil;
@@ -95,32 +96,32 @@ public class EvalCompoundGUI extends JFrame {
 	/**
 	 * Constructor with specified evaluator.
 	 * @param evaluator specified {@link EvaluatorAbstract}.
-	 * @param bindNamingUri bound and naming URI.
+	 * @param ConnectInfo connection information.
 	 */
-	public EvalCompoundGUI(Evaluator evaluator, BindNamingURI bindNamingUri) {
-		this(evaluator, bindNamingUri, null);
+	public EvalCompoundGUI(Evaluator evaluator, ConnectInfo connectInfo) {
+		this(evaluator, connectInfo, null);
 	}
 	
 	
 	/**
 	 * Constructor with specified evaluator.
 	 * @param evaluator specified {@link EvaluatorAbstract}.
-	 * @param bindNamingUri bound and naming URI.
+	 * @param connectInfo connection information.
 	 * @param referredData evaluator GUI data.
 	 */
-	public EvalCompoundGUI(Evaluator evaluator, BindNamingURI bindNamingUri, final EvaluateGUIData referredData) {
+	public EvalCompoundGUI(Evaluator evaluator, ConnectInfo connectInfo, final EvaluateGUIData referredData) {
 		super("Evaluator GUI");
-		bindNamingUri = bindNamingUri != null ? bindNamingUri : new BindNamingURI();
+		connectInfo = connectInfo != null ? connectInfo : new ConnectInfo();
 
 		try {
 			thisConfig = evaluator.getConfig();
-			thisConfig.setSaveAbility(bindNamingUri.bindUri == null); //Save only local configuration.
+			thisConfig.setSaveAbility(connectInfo.bindUri == null); //Save only local configuration.
 		}
 		catch (Throwable e) {
 			LogUtil.trace(e);
 			LogUtil.error("Error in getting evaluator configuration");
 		}
-		batchEvaluateGUI = new BatchEvaluateGUI(evaluator, bindNamingUri, referredData);
+		batchEvaluateGUI = new BatchEvaluateGUI(evaluator, connectInfo, referredData);
 		
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		addWindowListener(new WindowAdapter() {
@@ -142,7 +143,7 @@ public class EvalCompoundGUI extends JFrame {
 		add(batchEvaluateGUI, BorderLayout.CENTER);
 		
 		try {
-			if (batchEvaluateGUI.getNamingUri() != null) {
+			if (batchEvaluateGUI.getConnectInfo().namingUri != null) {
 				int port = batchEvaluateGUI.getPort();
 				setTitle(I18nUtil.message("evaluator") + " (" + port + ")");
 			}
@@ -192,7 +193,7 @@ public class EvalCompoundGUI extends JFrame {
 			});
 		mnTools.add(mniSysConfig);
 
-		if (batchEvaluateGUI.getBindUri() != null) {
+		if (batchEvaluateGUI.getConnectInfo().bindUri != null) {
 			JMenuItem mniUpdateFromServer = new JMenuItem(
 				new AbstractAction(I18nUtil.message("update_from_server")) {
 					
@@ -263,7 +264,7 @@ public class EvalCompoundGUI extends JFrame {
 		}
 		catch (Throwable e) {LogUtil.trace(e);}
 		
-		if (batchEvaluateGUI.getBindUri() != null || !agent) {
+		if (batchEvaluateGUI.getConnectInfo().bindUri != null || !agent) {
 			mnTools.addSeparator();
 			JMenuItem mniSwitchEvaluator = new JMenuItem(
 				new AbstractAction(I18nUtil.message("switch_evaluator")) {
@@ -328,7 +329,7 @@ public class EvalCompoundGUI extends JFrame {
 		}
 	
 		try {
-			if (batchEvaluateGUI.getBindUri() == null)
+			if (batchEvaluateGUI.getConnectInfo().bindUri == null)
 				switchEvaluator(batchEvaluateGUI.getEvaluator().getName(), this);
 			else
 				switchRemoteEvaluator(batchEvaluateGUI.getEvaluator().getName(), this);
@@ -358,10 +359,10 @@ public class EvalCompoundGUI extends JFrame {
 		}
 		
 		PluginChangedListener pluginChangedListener = batchEvaluateGUI.getEvaluator();
-		if (batchEvaluateGUI.getBindUri() == null)
+		if (batchEvaluateGUI.getConnectInfo().bindUri == null)
 			pluginChangedListener = EvaluatorAbstract.getTopMostPluginChangedListener((Evaluator)pluginChangedListener, true);
 		
-		SysConfigDlgExt cfg = new SysConfigDlgExt(this, I18nUtil.message("system_configure"), pluginChangedListener, batchEvaluateGUI.getBindUri()) {
+		SysConfigDlgExt cfg = new SysConfigDlgExt(this, I18nUtil.message("system_configure"), pluginChangedListener, batchEvaluateGUI.getConnectInfo().bindUri) {
 
 			/**
 			 * Serial version UID for serializable class.
@@ -376,7 +377,7 @@ public class EvalCompoundGUI extends JFrame {
 					paneSysConfig.apply();
 					
 					try {
-						if (batchEvaluateGUI.getBindUri() != null)
+						if (batchEvaluateGUI.getConnectInfo().bindUri != null)
 							batchEvaluateGUI.getEvaluator().setConfig(thisConfig);
 					} catch (Throwable e) {LogUtil.trace(e);}
 				}
@@ -411,7 +412,7 @@ public class EvalCompoundGUI extends JFrame {
 			return;
 		}
 		
-		if (batchEvaluateGUI.getBindUri() == null) {
+		if (batchEvaluateGUI.getConnectInfo().bindUri == null) {
 			JOptionPane.showMessageDialog(
 				this, 
 				"Evaluator is local.\n It is impossible to update from server", 
@@ -439,13 +440,13 @@ public class EvalCompoundGUI extends JFrame {
 			catch (Exception e) {LogUtil.trace(e);}
 	
 			batchEvaluateGUI.dispose();
-			if (!agent || batchEvaluateGUI.getBindUri() != null)
+			if (!agent || batchEvaluateGUI.getConnectInfo().bindUri != null)
 				PluginStorage.clear();
 			
 			super.dispose();
 		}
 		catch (Throwable e) {
-			if (batchEvaluateGUI.getBindUri() != null)
+			if (batchEvaluateGUI.getConnectInfo().bindUri != null)
 				System.exit(0);
 		}
 	}
@@ -576,9 +577,9 @@ public class EvalCompoundGUI extends JFrame {
 		}
 		
 		
-		JDialog dlgEvStarter = new JDialog((JFrame)null, "Start evaluator", true); 
+		final JDialog dlgEvStarter = new JDialog((JFrame)null, "Start evaluator", true); 
 		dlgEvStarter.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		dlgEvStarter.setSize(400, 250);
+		dlgEvStarter.setSize(400, 300);
 		dlgEvStarter.setLocationRelativeTo(null);
 		dlgEvStarter.setLayout(new BorderLayout());
 		
@@ -594,8 +595,10 @@ public class EvalCompoundGUI extends JFrame {
 		
 		left.add(new JLabel("Evaluator:"));
 		left.add(new JLabel("Export:"));
-		left.add(new JLabel("Naming port"));
-		left.add(new JLabel("Naming name"));
+		left.add(new JLabel("Naming port:"));
+		left.add(new JLabel("Naming path:"));
+		left.add(new JLabel("Deploy global:"));
+		left.add(new JLabel("Global address:"));
 		
 		JPanel right = new JPanel(new GridLayout(0, 1));
 		header.add(right, BorderLayout.CENTER);
@@ -608,17 +611,47 @@ public class EvalCompoundGUI extends JFrame {
 		final JCheckBox chkExport = new JCheckBox("", false);
 		right.add(chkExport);
 		
-		final JFormattedTextField txtNamingPort = new JFormattedTextField(new NumberFormatter());
-		right.add(txtNamingPort);
-		txtNamingPort.setValue(Constants.DEFAULT_EVALUATOR_PORT);
-		txtNamingPort.setVisible(chkExport.isSelected());
+		JPanel paneNamingPort = new JPanel(new BorderLayout());
+		right.add(paneNamingPort);
+		paneNamingPort.setVisible(false);
 
-		JPanel paneNamingName = new JPanel(new BorderLayout());
-		right.add(paneNamingName);
+		final JFormattedTextField txtNamingPort = new JFormattedTextField(new NumberFormatter());
+		paneNamingPort.add(txtNamingPort, BorderLayout.CENTER);
+		txtNamingPort.setValue(Constants.DEFAULT_EVALUATOR_PORT);
+
+		JButton btnCheckNamingPort = UIUtil.makeIconButton(
+			"checking-16x16.png",
+			"checking", 
+			"Checking - http://www.iconarchive.com/show/outline-icons-by-iconsmind/Check-2-icon.html", 
+			"Checking", 
+			
+			new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					int port = txtNamingPort.getValue() instanceof Number ? ( (Number) txtNamingPort.getValue()).intValue() : 0;
+					boolean ret = NetUtil.testPort(port);
+					if (ret) {
+						JOptionPane.showMessageDialog(dlgEvStarter,
+								"The port " + port + " is valid",
+								"Valid port", JOptionPane.INFORMATION_MESSAGE);
+						return;
+					}
+					
+					int suggestedPort = NetUtil.getPort(-1, true);
+					JOptionPane.showMessageDialog(dlgEvStarter,
+							"The port " + port + " is invalid (used).\n The suggested port is " + suggestedPort,
+							"Invalid port", JOptionPane.ERROR_MESSAGE);
+				}
+			});
+		paneNamingPort.add(btnCheckNamingPort, BorderLayout.EAST);
+
+		JPanel paneNamingPath = new JPanel(new BorderLayout());
+		right.add(paneNamingPath);
+		paneNamingPath.setVisible(chkExport.isSelected());
 		
-		final JTextField txtNamingName = new JTextField("connect1");
-		paneNamingName.add(txtNamingName, BorderLayout.CENTER);
-		txtNamingName.setVisible(chkExport.isSelected());
+		final JTextField txtNamingPath = new JTextField("connect1");
+		paneNamingPath.add(txtNamingPath, BorderLayout.CENTER);
 		
 		JButton btnGenNamingName = UIUtil.makeIconButton(
 			"generate-16x16.png",
@@ -630,22 +663,53 @@ public class EvalCompoundGUI extends JFrame {
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					txtNamingName.setText("connect" + new Date().getTime());
+					txtNamingPath.setText("connect" + new Date().getTime());
 				}
 			});
-		paneNamingName.add(btnGenNamingName, BorderLayout.EAST);
-		btnGenNamingName.setVisible(chkExport.isSelected());
+		paneNamingPath.add(btnGenNamingName, BorderLayout.EAST);
+
+		JCheckBox chkDeployGlobal = new JCheckBox("", false);
+		right.add(chkDeployGlobal);
+
+		JPanel paneDeployGlobalAddress = new JPanel(new BorderLayout());
+		right.add(paneDeployGlobalAddress);
+		paneDeployGlobalAddress.setVisible(chkDeployGlobal.isSelected());
+
+		JTextField txtDeployGlobalAddress = new JTextField("");
+		paneDeployGlobalAddress.add(txtDeployGlobalAddress, BorderLayout.CENTER);
+
+		JButton btnGenDeployGlobalAddress = UIUtil.makeIconButton(
+			"generate-16x16.png",
+			"generate", 
+			"Generate - http://www.iconarchive.com/show/flatastic-9-icons-by-custom-icon-design/Generate-keys-icon.html", 
+			"Generate", 
+			
+			new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					String publicIP = NetUtil.getPublicInetAddress();
+					txtDeployGlobalAddress.setText(publicIP != null ? publicIP : "");
+				}
+			});
+		paneDeployGlobalAddress.add(btnGenDeployGlobalAddress, BorderLayout.EAST);
 
 		chkExport.addItemListener(new ItemListener() {
 			
 			@Override
 			public void itemStateChanged(ItemEvent e) {
-				txtNamingPort.setVisible(chkExport.isSelected());
-				txtNamingName.setVisible(chkExport.isSelected());
-				btnGenNamingName.setVisible(chkExport.isSelected());
+				paneNamingPort.setVisible(chkExport.isSelected());
+				paneNamingPath.setVisible(chkExport.isSelected());
 			}
 		});
 
+		chkDeployGlobal.addItemListener(new ItemListener() {
+			
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				paneDeployGlobalAddress.setVisible(chkDeployGlobal.isSelected());
+			}
+		});
 		
 		JPanel footer = new JPanel();
 		dlgEvStarter.add(footer, BorderLayout.SOUTH);
@@ -655,23 +719,37 @@ public class EvalCompoundGUI extends JFrame {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				BindNamingURI bindNamingUri = null;
+				ConnectInfo connectInfo = new ConnectInfo();
 				
+				connectInfo.deployGlobal = chkDeployGlobal.isSelected();
+				connectInfo.deployGlobalAddress = txtDeployGlobalAddress.getText();
+				if (connectInfo.deployGlobalAddress != null) {
+					connectInfo.deployGlobalAddress = connectInfo.deployGlobalAddress.trim();
+					if (connectInfo.deployGlobalAddress.isEmpty())
+						connectInfo.deployGlobalAddress = null;
+				}
+
 				if (chkExport.isSelected()) {
-					String namingName = ConnectDlg.normalizeNamingName(txtNamingName.getText());
+					String namingPath = ConnectDlg.normalizeNamingPath(txtNamingPath.getText());
 					int namingPort = txtNamingPort.getValue() instanceof Number ? ( (Number) txtNamingPort.getValue()).intValue() : 0;
 					namingPort = NetUtil.getPort(namingPort, Constants.TRY_RANDOM_PORT);
 					
-					xURI namingUri = xURI.create("rmi://localhost:" + namingPort);
-					if (namingName != null) namingUri = namingUri.concat(namingName);
-					bindNamingUri = new BindNamingURI(null, namingUri, null);
+					String host = null;
+					if (connectInfo.deployGlobal)
+						host = connectInfo.getDeployGlobalHost();
+					host = host != null ? host : "localhost";
+					connectInfo.namingUri = xURI.create("rmi://" + host + ":" + namingPort);
+						
+					if (namingPath != null && !namingPath.isEmpty())
+						connectInfo.namingUri = connectInfo.namingUri.concat(namingPath);
 				}
 				
+
 				Evaluator ev = (Evaluator) cmbEvs.getSelectedItem();
 				dlgEvStarter.dispose();
 				if (oldGUI != null) oldGUI.dispose();
 
-				run(ev, bindNamingUri, null, null);
+				run(ev, connectInfo, null, null);
 			}
 		});
 		footer.add(start);
@@ -708,7 +786,7 @@ public class EvalCompoundGUI extends JFrame {
 			}
 			else {
 				if (oldGUI != null) oldGUI.dispose();
-				run(ev, connectDlg.getBindNamingUri(), null, null);
+				run(ev, connectDlg.getConnectInfo(), null, null);
 			}
 			
 			return;
@@ -750,7 +828,8 @@ public class EvalCompoundGUI extends JFrame {
 				protected void start() {
 					String evName = (String) getItemControl().getSelectedItem();
 					try {
-						final Evaluator ev = service.getEvaluator(evName, connectDlg.getUsername(), connectDlg.getPassword());
+						Account account = connectDlg.getConnectInfo().account;
+						final Evaluator ev = service.getEvaluator(evName, account.getName(), account.getPassword());
 						if (ev == null) {
 							JOptionPane.showMessageDialog(
 									this, "Can't get remote evaluator", "Connection to evaluator fail", JOptionPane.ERROR_MESSAGE);
@@ -759,7 +838,7 @@ public class EvalCompoundGUI extends JFrame {
 						dispose();
 						if (oldGUI != null) oldGUI.dispose();
 						
-						run(ev, connectDlg.getBindNamingUri(), null, null);
+						run(ev, connectDlg.getConnectInfo(), null, null);
 					}
 					catch (Exception e) {
 						LogUtil.trace(e);
@@ -803,11 +882,11 @@ public class EvalCompoundGUI extends JFrame {
 	/**
 	 * Staring the particular evaluator selected by user.
 	 * @param evaluator particular evaluator selected by user.
-	 * @param bindNamingUri bound and naming URI.
+	 * @param connectInfo connection information.
 	 * @param referredData evaluator GUI data.
 	 * @param oldGUI old GUI.
 	 */
-	public static void run(Evaluator evaluator, BindNamingURI bindNamingUri, EvaluateGUIData referredData, Window oldGUI) {
+	public static void run(Evaluator evaluator, ConnectInfo connectInfo, EvaluateGUIData referredData, Window oldGUI) {
 		if (!Util.getPluginManager().isFired())
 			Util.getPluginManager().fire();
 			
@@ -831,7 +910,7 @@ public class EvalCompoundGUI extends JFrame {
 			}
 
 			if (oldGUI != null) oldGUI.dispose();
-			new EvalCompoundGUI(evaluator, bindNamingUri, referredData);
+			new EvalCompoundGUI(evaluator, connectInfo, referredData);
 		}
 		catch (Exception e) {LogUtil.trace(e);}
 	}

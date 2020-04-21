@@ -10,6 +10,7 @@ package net.hudup.core.security;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
 import java.util.List;
 
 import javax.crypto.KeyGenerator;
@@ -19,8 +20,6 @@ import javax.crypto.spec.SecretKeySpec;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.xURI;
-import sun.misc.BASE64Decoder;
-import sun.misc.BASE64Encoder;
 
 /**
  * This utility class provides methods of encryption and decryption. Methods here are available on internet.
@@ -55,30 +54,55 @@ public class CipherImpl implements Cipher {
 	
 	@Override
 	public String encrypt(String data) {
+//		try {
+//			javax.crypto.Cipher cipher = javax.crypto.Cipher.getInstance(CALG);
+//	        cipher.init(javax.crypto.Cipher.ENCRYPT_MODE, secretKey);
+//	        
+//	        byte[] encode = cipher.doFinal(data.getBytes());
+//	        String code = new BASE64Encoder().encode(encode);
+//	        return toHex(code);
+//		}
+//		catch (Exception e) {
+//			LogUtil.trace(e);
+//			return data;
+//		}
+		
 		try {
 			javax.crypto.Cipher cipher = javax.crypto.Cipher.getInstance(CALG);
 	        cipher.init(javax.crypto.Cipher.ENCRYPT_MODE, secretKey);
 	        
 	        byte[] encode = cipher.doFinal(data.getBytes());
-	        String code = new BASE64Encoder().encode(encode);
-	        return toHex(code);
+	        return Base64.getEncoder().encodeToString(encode);
 		}
 		catch (Exception e) {
 			LogUtil.trace(e);
 			return data;
 		}
-		
     }
 
 	
 	@Override
 	public String decrypt(String encrypted) {
+//		try {
+//			javax.crypto.Cipher cipher = javax.crypto.Cipher.getInstance(CALG);
+//	        cipher.init(javax.crypto.Cipher.DECRYPT_MODE, secretKey);
+//	        
+//	        String code = fromHex(encrypted);
+//	        byte[] decode = new BASE64Decoder().decodeBuffer(code);
+//	        String text = new String(cipher.doFinal(decode));
+//	        
+//	        return text;
+//		}
+//		catch (Exception e) {
+//			LogUtil.trace(e);
+//			return encrypted;
+//		}
+		
 		try {
 			javax.crypto.Cipher cipher = javax.crypto.Cipher.getInstance(CALG);
 	        cipher.init(javax.crypto.Cipher.DECRYPT_MODE, secretKey);
 	        
-	        String code = fromHex(encrypted);
-	        byte[] decode = new BASE64Decoder().decodeBuffer(code);
+	        byte[] decode = Base64.getDecoder().decode(encrypted);
 	        String text = new String(cipher.doFinal(decode));
 	        
 	        return text;
@@ -87,7 +111,6 @@ public class CipherImpl implements Cipher {
 			LogUtil.trace(e);
 			return encrypted;
 		}
-		
     }
 	
 	
@@ -96,6 +119,7 @@ public class CipherImpl implements Cipher {
 	 * @param text specified plain text.
 	 * @return string of hex numbers converted from specified plain text. 
 	 */
+	@SuppressWarnings("unused")
 	private static String toHex(String text) {
 		byte[] bytes = text.getBytes();
 		
@@ -112,6 +136,7 @@ public class CipherImpl implements Cipher {
 	 * @param hexText string of hex numbers.
 	 * @return plain text converted from the string of hex numbers.
 	 */
+	@SuppressWarnings("unused")
 	private static String fromHex(String hexText) { 
 		StringBuilder buffer = new StringBuilder();
 	    

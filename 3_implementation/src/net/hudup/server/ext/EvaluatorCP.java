@@ -42,13 +42,11 @@ import net.hudup.core.evaluate.EvaluatorConfig;
 import net.hudup.core.evaluate.EvaluatorEvent;
 import net.hudup.core.evaluate.EvaluatorListener;
 import net.hudup.core.evaluate.ui.EvaluateGUIData;
-import net.hudup.core.logistic.Account;
-import net.hudup.core.logistic.BindNamingURI;
+import net.hudup.core.logistic.ConnectInfo;
 import net.hudup.core.logistic.DSUtil;
 import net.hudup.core.logistic.I18nUtil;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.NetUtil;
-import net.hudup.core.logistic.xURI;
 import net.hudup.core.logistic.ui.UIUtil;
 import net.hudup.evaluate.ui.EvalCompoundGUI;
 import net.hudup.server.DefaultService;
@@ -76,19 +74,13 @@ public class EvaluatorCP extends JFrame implements EvaluatorListener {
 	
 	
 	/**
-	 * Bound URI.
+	 * Connection information.
 	 */
-	protected xURI bindUri = null;
+	protected ConnectInfo connectInfo = null;
 	
 	
 	/**
-	 * Account.
-	 */
-	protected Account account = null;
-	
-	
-	/**
-	 * Exported stub (EvaluatorListener,).
+	 * Exported stub (EvaluatorListener).
 	 */
 	protected Remote exportedStub = null;
 
@@ -146,27 +138,24 @@ public class EvaluatorCP extends JFrame implements EvaluatorListener {
 	 * @param service specified service.
 	 */
 	public EvaluatorCP(Service service) {
-		this(service, null, null, null);
+		this(service, null);
 	}
 	
 	
     /**
 	 * Constructor with specified service, account, password, and bound URI.
 	 * @param service specified service.
-	 * @param account account.
-	 * @param password password.
-	 * @param bindUri bound URI.
+	 * @param connectInfo connection information.
 	 */
-	public EvaluatorCP(Service service, String account, String password, xURI bindUri) {
+	public EvaluatorCP(Service service, ConnectInfo connectInfo) {
 		super("Evaluator control panel");
 		this.service = service;
-		this.account = Account.create(account, password);
-		this.bindUri = bindUri;
+		this.connectInfo = connectInfo != null ? connectInfo : (connectInfo = new ConnectInfo());
 		
-		if (bindUri != null) { //Evaluator is remote
-			this.exportedStub = NetUtil.RegistryRemote.export(this, bindUri.getPort());
+		if (connectInfo.bindUri != null) { //Evaluator is remote
+			this.exportedStub = NetUtil.RegistryRemote.export(this, connectInfo.bindUri.getPort());
 			if (this.exportedStub != null)
-				LogUtil.info("Evaluator control panel exported at port " + bindUri.getPort());
+				LogUtil.info("Evaluator control panel exported at port " + connectInfo.bindUri.getPort());
 			else
 				LogUtil.info("Evaluator control panel failed to exported");
 		}
@@ -255,7 +244,7 @@ public class EvaluatorCP extends JFrame implements EvaluatorListener {
 						return;
 					}
 
-					EvalCompoundGUI.run(evaluatorItem.evaluator, new BindNamingURI(bindUri, null, null), evaluatorItem.guiData, null);
+					EvalCompoundGUI.run(evaluatorItem.evaluator, getThisEvaluatorCP().connectInfo, evaluatorItem.guiData, null);
 				}
 			});
 		btnOpenStart.setMargin(new Insets(0, 0 , 0, 0));
@@ -336,7 +325,7 @@ public class EvaluatorCP extends JFrame implements EvaluatorListener {
 				if (evaluatorItem == null || evaluatorItem.evaluator == null) return ret;
 				
 				try {
-					if (bindUri != null)
+					if (getThisEvaluatorCP().connectInfo.bindUri != null)
 						evaluatorItem.evaluator.setConfig(config);
 				}
 				catch (Exception e) {
@@ -388,8 +377,8 @@ public class EvaluatorCP extends JFrame implements EvaluatorListener {
 		
 		if (service instanceof ServiceExt) {
 			try {
-				if (account != null)
-					evaluators = ((ServiceExt)service).getEvaluators(account.getName(), account.getPassword());
+				if (connectInfo.account != null)
+					evaluators = ((ServiceExt)service).getEvaluators(connectInfo.account.getName(), connectInfo.account.getPassword());
 				else if (service instanceof DefaultServiceExt)
 					evaluators = ((DefaultServiceExt)service).getEvaluators();
 				else
@@ -415,8 +404,8 @@ public class EvaluatorCP extends JFrame implements EvaluatorListener {
 		for (String evaluatorName : evaluatorNames) {
 			Evaluator evaluator = null;
 			try {
-				if (account != null)
-					evaluator = service.getEvaluator(evaluatorName, account.getName(), account.getPassword());
+				if (connectInfo.account != null)
+					evaluator = service.getEvaluator(evaluatorName, connectInfo.account.getName(), connectInfo.account.getPassword());
 				else if (service instanceof DefaultService)
 					evaluator = ((DefaultService)service).getEvaluator(evaluatorName);
 				else
@@ -476,7 +465,7 @@ public class EvaluatorCP extends JFrame implements EvaluatorListener {
 			}
 			
 			if (config != null) {
-				if (bindUri != null)
+				if (connectInfo.bindUri != null)
 					config.setSaveAbility(false);
 				paneConfig.update(evaluator.getConfig());
 			}
@@ -606,8 +595,8 @@ public class EvaluatorCP extends JFrame implements EvaluatorListener {
         try {
         	String evaluatorName = evaluator.getName();
         	
-			if (account != null)
-				evaluator = ((ServiceExt)service).getEvaluator(evaluatorName, account.getName(), account.getPassword(), versionName.toString());
+			if (connectInfo.account != null)
+				evaluator = ((ServiceExt)service).getEvaluator(evaluatorName, connectInfo.account.getName(), connectInfo.account.getPassword(), versionName.toString());
 			else if (service instanceof DefaultServiceExt)
 				evaluator = ((DefaultServiceExt)service).getEvaluator(evaluatorName, versionName.toString());
 			else
@@ -668,8 +657,8 @@ public class EvaluatorCP extends JFrame implements EvaluatorListener {
         	String versionName = config.getReproducedVersion();
             boolean ret = false;
             
-			if (account != null)
-				ret = ((ServiceExt)service).removeEvaluator(evaluatorName, account.getName(), account.getPassword(), versionName);
+			if (connectInfo.account != null)
+				ret = ((ServiceExt)service).removeEvaluator(evaluatorName, connectInfo.account.getName(), connectInfo.account.getPassword(), versionName);
 			else if (service instanceof DefaultServiceExt)
 				ret = ((DefaultServiceExt)service).removeEvaluator(evaluatorName, versionName);
 			else
@@ -852,7 +841,7 @@ public class EvaluatorCP extends JFrame implements EvaluatorListener {
 
 		boolean validated = false;
 		try {
-			validated = service.validateAccount(connectDlg.getUsername(), connectDlg.getPassword(), DataConfig.ACCOUNT_ADMIN_PRIVILEGE);
+			validated = service.validateAccount(connectDlg.getConnectInfo().account.getName(), connectDlg.getConnectInfo().account.getPassword(), DataConfig.ACCOUNT_ADMIN_PRIVILEGE);
 		} 
 		catch (Exception e) {
 			LogUtil.trace(e);
@@ -864,7 +853,7 @@ public class EvaluatorCP extends JFrame implements EvaluatorListener {
 		}
 		
 		EvaluatorCP ecp = null;
-		ecp = new EvaluatorCP(service, connectDlg.getUsername(), connectDlg.getPassword(), connectDlg.getBindNamingUri().bindUri);
+		ecp = new EvaluatorCP(service, connectDlg.getConnectInfo());
 		ecp.setVisible(true);
 	}
 	

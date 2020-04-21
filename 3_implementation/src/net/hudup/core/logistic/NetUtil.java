@@ -24,9 +24,6 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.Enumeration;
 import java.util.Random;
 
-import net.hudup.core.Constants;
-import net.hudup.core.Util;
-
 /**
  * This final class provides utility static methods for network programming. Some methods in this class are available on internet.
  * 
@@ -160,26 +157,26 @@ public class NetUtil {
 	}
 
 	
-	/**
-	 * Getting host address.
-	 * @return host address. Return null if unable to find host address.
-	 */
-	public static String getHostAddress() {
-		String host = null;
-		if (Constants.deployInternet)
-			host = NetUtil.getPublicInetAddress();
-		if (host == null) {
-			String hudupHost = Util.getHudupProperty("host_address");
-			if (hudupHost != null && !hudupHost.isEmpty())
-				host = hudupHost;
-		}
-		if (host == null) {
-			InetAddress inetAddress = NetUtil.getInetAddress();
-			if (inetAddress != null)
-				host = inetAddress.getHostAddress();
-		}
-		return host != null ? host : "localhost";
-	}
+//	/**
+//	 * Getting host address.
+//	 * @return host address. Return null if unable to find host address.
+//	 */
+//	public static String getHostAddress() {
+//		String host = null;
+//		if (Constants.deployInternet)
+//			host = NetUtil.getPublicInetAddress();
+//		if (host == null) {
+//			String hudupHost = Util.getHudupProperty("host_address");
+//			if (hudupHost != null && !hudupHost.isEmpty())
+//				host = hudupHost;
+//		}
+//		if (host == null) {
+//			InetAddress inetAddress = NetUtil.getInetAddress();
+//			if (inetAddress != null)
+//				host = inetAddress.getHostAddress();
+//		}
+//		return host != null ? host : "localhost";
+//	}
 	
 	
 	/**

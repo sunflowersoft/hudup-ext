@@ -88,8 +88,6 @@ public abstract class KBaseAbstract implements KBase, KBaseRemote {
 	
 	@Override
 	public synchronized void load() throws RemoteException {
-		// TODO Auto-generated method stub
-		
 		xURI store = config.getStoreUri();
 		xURI cfgUri = store.concat(KBASE_CONFIG);
 		config.load(cfgUri);
@@ -107,7 +105,6 @@ public abstract class KBaseAbstract implements KBase, KBaseRemote {
 
 	@Override
 	public synchronized void learn(Dataset dataset, Alg alg) throws RemoteException {
-		// TODO Auto-generated method stub
 		config.setMetadata(dataset.getConfig().getMetadata());
 		config.put(KBASE_NAME, getName());
 		
@@ -136,8 +133,6 @@ public abstract class KBaseAbstract implements KBase, KBaseRemote {
 	
 	@Override
 	public synchronized void save(DataConfig storeConfig) throws RemoteException {
-		// TODO Auto-generated method stub
-
 		UriAdapter adapter = new UriAdapter(storeConfig);
 
 		xURI store = storeConfig.getStoreUri();
@@ -145,13 +140,11 @@ public abstract class KBaseAbstract implements KBase, KBaseRemote {
 			
 			@Override
 			public boolean accept(xURI uri) {
-				// TODO Auto-generated method stub
 				return uri.getLastName().startsWith(getName());
 			}
 
 			@Override
 			public String getDescription() {
-				// TODO Auto-generated method stub
 				return "No description";
 			}
 			
@@ -168,8 +161,6 @@ public abstract class KBaseAbstract implements KBase, KBaseRemote {
 
 	@Override
 	public synchronized void clear() throws RemoteException {
-		// TODO Auto-generated method stub
-		
 		xURI store = config.getStoreUri();
 		if (store != null) {
 			UriAdapter adapter = new UriAdapter(config);
@@ -177,13 +168,11 @@ public abstract class KBaseAbstract implements KBase, KBaseRemote {
 				
 				@Override
 				public boolean accept(xURI uri) {
-					// TODO Auto-generated method stub
 					return uri.getLastName().startsWith(getName());
 				}
 				
 				@Override
 				public String getDescription() {
-					// TODO Auto-generated method stub
 					return "No description";
 				}
 				
@@ -203,7 +192,6 @@ public abstract class KBaseAbstract implements KBase, KBaseRemote {
 	 */
 	@Override
 	public synchronized void close() throws Exception {
-		// TODO Auto-generated method stub
 		datasource.close();
 		
 		config.setMetadata(null);
@@ -218,21 +206,18 @@ public abstract class KBaseAbstract implements KBase, KBaseRemote {
 
 	@Override
 	public String queryName() throws RemoteException {
-		// TODO Auto-generated method stub
 		return getName();
 	}
 
 
 	@Override
 	public String getDescription() throws RemoteException {
-		// TODO Auto-generated method stub
 		return getName();
 	}
 
 
 	@Override
 	public String[] getBaseRemoteInterfaceNames() throws RemoteException {
-		// TODO Auto-generated method stub
 		return new String[] {KBase.class.getName()};
 	}
 
@@ -246,7 +231,6 @@ public abstract class KBaseAbstract implements KBase, KBaseRemote {
 	
 	@Override
 	public DataConfig queryConfig() throws RemoteException {
-		// TODO Auto-generated method stub
 		return getConfig();
 	}
 
@@ -259,21 +243,18 @@ public abstract class KBaseAbstract implements KBase, KBaseRemote {
 
 	@Override
 	public Datasource getDatasource() {
-		// TODO Auto-generated method stub
 		return datasource;
 	}
 
 
 	@Override
 	public Inspector getInspector() {
-		// TODO Auto-generated method stub
 		return new Inspector.NullInspector();
 	}
 
 	
 	@Override
 	public void addSetupListener(SetupAlgListener listener) throws RemoteException {
-		// TODO Auto-generated method stub
 		synchronized (listenerList) {
 			listenerList.add(SetupAlgListener.class, listener);
 		}
@@ -282,7 +263,6 @@ public abstract class KBaseAbstract implements KBase, KBaseRemote {
 
 	@Override
 	public void removeSetupListener(SetupAlgListener listener) throws RemoteException {
-		// TODO Auto-generated method stub
 		synchronized (listenerList) {
 			listenerList.remove(SetupAlgListener.class, listener);
 		}
@@ -294,7 +274,6 @@ public abstract class KBaseAbstract implements KBase, KBaseRemote {
 	 * @return array of listeners for this EM.
 	 */
 	protected SetupAlgListener[] getSetupListeners() {
-		// TODO Auto-generated method stub
 		synchronized (listenerList) {
 			return listenerList.getListeners(SetupAlgListener.class);
 		}
@@ -303,7 +282,6 @@ public abstract class KBaseAbstract implements KBase, KBaseRemote {
 
 	@Override
 	public void fireSetupEvent(SetupAlgEvent evt) throws RemoteException {
-		// TODO Auto-generated method stub
 		synchronized (listenerList) {
 			SetupAlgListener[] listeners = getSetupListeners();
 			for (SetupAlgListener listener : listeners) {
@@ -320,14 +298,12 @@ public abstract class KBaseAbstract implements KBase, KBaseRemote {
 
 	@Override
 	public void receivedSetup(SetupAlgEvent evt) throws RemoteException {
-		// TODO Auto-generated method stub
 		fireSetupEvent(evt);
 	}
 
 	
 	@Override
 	public synchronized Remote export(int serverPort) throws RemoteException {
-		// TODO Auto-generated method stub
 		if (exportedStub == null)
 			exportedStub = (KBaseRemote) NetUtil.RegistryRemote.export(this, serverPort);
 	
@@ -341,7 +317,6 @@ public abstract class KBaseAbstract implements KBase, KBaseRemote {
 	 */
 	@Override
 	public synchronized void unexport() throws RemoteException {
-		// TODO Auto-generated method stub
 		if (exportedStub != null) {
 			NetUtil.RegistryRemote.unexport(this);
 			exportedStub = null;
@@ -351,7 +326,6 @@ public abstract class KBaseAbstract implements KBase, KBaseRemote {
 	
 	@Override
 	public synchronized void forceUnexport() throws RemoteException {
-		// TODO Auto-generated method stub
 		unexport();
 	}
 
@@ -378,7 +352,6 @@ public abstract class KBaseAbstract implements KBase, KBaseRemote {
 
 	@Override
 	protected void finalize() throws Throwable {
-		// TODO Auto-generated method stub
 		super.finalize();
 		
 		try {
@@ -513,13 +486,11 @@ public abstract class KBaseAbstract implements KBase, KBaseRemote {
 
 			@Override
 			public boolean isEmpty() throws RemoteException {
-				// TODO Auto-generated method stub
 				return true;
 			}
 			
 			@Override
 			public String getName() {
-				// TODO Auto-generated method stub
 				return (kbaseName != null && !kbaseName.isEmpty()) ? kbaseName : "empty_kbase";
 			}
 			

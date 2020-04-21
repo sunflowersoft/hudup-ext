@@ -717,7 +717,7 @@ public class BalancerCP extends JFrame implements ServerStatusListener {
 		
 		Server server = dlg.getServer();
 		if (server != null)
-			new BalancerCP(server, dlg.getBindNamingUri().bindUri);
+			new BalancerCP(server, dlg.getConnectInfo().bindUri);
 		else {
 			JOptionPane.showMessageDialog(
 					null, "Can't retrieve balancer", "Can't retrieve balancer", JOptionPane.ERROR_MESSAGE);

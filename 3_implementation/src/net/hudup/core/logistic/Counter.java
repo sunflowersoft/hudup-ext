@@ -128,7 +128,6 @@ public class Counter extends AbstractRunner implements Serializable {
 	
 	@Override
 	protected void task() {
-		// TODO Auto-generated method stub
 		if (startedTime == 0)
 			return;
 		
@@ -144,23 +143,18 @@ public class Counter extends AbstractRunner implements Serializable {
 		
 //		try {
 //			if (PERIOD <= 1000) Thread.sleep(PERIOD);
-//		}
-//		catch (Exception e) {
-//			LogUtil.trace(e);
-//		}
+//		} catch (Exception e) {LogUtil.trace(e);}
 	}
 
 	
 	@Override
 	protected void clear() {
-		// TODO Auto-generated method stub
 		
 	}
 
 
 	@Override
 	public synchronized boolean start() {
-		// TODO Auto-generated method stub
 		return start(0);
 	}
 
@@ -171,7 +165,6 @@ public class Counter extends AbstractRunner implements Serializable {
 	 * @return true if successful.
 	 */
 	public synchronized boolean start(long elapsedTime) {
-		// TODO Auto-generated method stub
 		if (!super.start()) return false;
 
 		this.elapsedTime = 0;
@@ -183,7 +176,6 @@ public class Counter extends AbstractRunner implements Serializable {
 	
 	@Override
 	public synchronized boolean stop() {
-		// TODO Auto-generated method stub
 		if (!super.stop()) return false;
 
 		elapsedTime = 0;
@@ -195,7 +187,6 @@ public class Counter extends AbstractRunner implements Serializable {
 	
 	@Override
 	public synchronized boolean pause() {
-		// TODO Auto-generated method stub
 		if (!super.pause()) return false;
 
 		long currentTime = System.currentTimeMillis();
@@ -208,7 +199,6 @@ public class Counter extends AbstractRunner implements Serializable {
 	
 	@Override
 	public synchronized boolean resume() {
-		// TODO Auto-generated method stub
 		if (!super.resume()) return false;
 
 		startedTime = System.currentTimeMillis();

@@ -41,7 +41,7 @@ public class RecommendContextPrefilterImpl extends CompositeRecommenderAbstract 
 	/**
 	 * This constant specifies the default internal recommendation algorithm.
 	 */
-	public static final String INNER_RECOMMENDER = "net.hudup.alg.cf.gfall.GreenFallCF";
+	public static final String INNER_RECOMMENDER = "net.hudup.core.alg.cf.gfall.GreenFallCF";
 			
 
 	/**

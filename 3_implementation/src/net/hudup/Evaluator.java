@@ -48,14 +48,12 @@ public class Evaluator implements AccessPoint {
 	 * @throws Exception if there is any error.
 	 */
 	public static void main(String[] args) throws Exception {
-		// TODO Auto-generated method stub
 		new Evaluator().run(args);
 	}
 
 
 	@Override
 	public void run(String[] args) {
-		// TODO Auto-generated method stub
 		LogUtil.info("Sytax: java net.hudup.Evaluator \"EvaluatorName\" \"batch.script\"");
 		Util.getPluginManager().fire();
 		
@@ -70,7 +68,6 @@ public class Evaluator implements AccessPoint {
 			ev = (net.hudup.core.evaluate.Evaluator)Class.forName(evClassName).newInstance();
 		}
 		catch (Throwable e) {
-			// TODO Auto-generated catch block
 			ev = null;
 		}
 		if (ev == null) {
@@ -168,14 +165,12 @@ public class Evaluator implements AccessPoint {
 
 	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
 		return "Evaluator";
 	}
 
 
 	@Override
 	public String toString() {
-		// TODO Auto-generated method stub
 		return getName();
 	}
 

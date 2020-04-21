@@ -13,7 +13,9 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.Date;
 import java.util.EventListener;
+import java.util.EventObject;
 import java.util.List;
+import java.util.UUID;
 
 import javax.swing.JOptionPane;
 import javax.swing.event.EventListenerList;
@@ -28,7 +30,6 @@ import net.hudup.core.RegisterTable.AlgFilter;
 import net.hudup.core.Util;
 import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.AlgDesc;
-import net.hudup.core.alg.AlgDesc2;
 import net.hudup.core.alg.AlgDesc2List;
 import net.hudup.core.alg.AlgList;
 import net.hudup.core.alg.AlgRemote;
@@ -736,7 +737,6 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 					return acceptAlg(alg);
 				} 
 				catch (Throwable e) {
-					// TODO Auto-generated catch block
 					LogUtil.trace(e);
 					return false;
 				}
@@ -773,6 +773,21 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 	
 	
 	/**
+	 * Checking whether the specified algorithm is accepted by this evaluator.
+	 * @param alg specified algorithm.
+	 * @return whether the specified algorithm is accepted by this evaluator.
+	 */
+	public boolean acceptAlg(Alg alg) {
+		if (alg == null) return false;
+		
+		try {
+			return acceptAlg(alg.getClass());
+		} catch (Exception e) {LogUtil.trace(e);}
+		return false;
+	}
+
+	
+	/**
 	 * Checking whether the specified algorithm is accepted by specified evaluator.
 	 * @param evaluator specified evaluator.
 	 * @param alg specified algorithm
@@ -783,41 +798,41 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 		if (evaluator == null || alg == null) return false;
 		
 		if (bindUri == null) {
-			try {
-				return evaluator.acceptAlg(alg);
-			}
-			catch (Exception e) {
-				LogUtil.trace(e);
-				return false;
-			}
-		}
-	
-		alg = AlgDesc2.wrapNewInstance(alg, false);
-		if ((alg == null) || !(alg instanceof AlgRemote)) return false;
-		
-		try {
-			((AlgRemote)alg).export(0);
-		}
-		catch (Exception e) {
-			LogUtil.trace(e); return false;
-		}
-		
-		boolean accepted = true;
-		try {
-			accepted = evaluator.acceptAlg(
-					Util.getPluginManager().wrap(((AlgRemote)alg), false));
-		} 
-		catch (Throwable e) {
-			LogUtil.error("Evaluator does not accept algorithm '" + alg.getName() + "' due to " + e.getMessage());
-			accepted = false;
+			if (evaluator instanceof EvaluatorAbstract)
+				return ((EvaluatorAbstract)evaluator).acceptAlg(alg);
 		}
 		
 		try {
-			((AlgRemote)alg).unexport();
+			return evaluator.acceptAlg(alg.getClass());
 		}
-		catch (Exception e) {LogUtil.trace(e);}
-
-		return accepted;
+		catch (Exception e) {LogUtil.trace(e); return false;}
+		
+//		alg = AlgDesc2.wrapNewInstance(alg, false);
+//		if ((alg == null) || !(alg instanceof AlgRemote)) return false;
+//		
+//		try {
+//			((AlgRemote)alg).export(0);
+//		}
+//		catch (Exception e) {
+//			LogUtil.trace(e); return false;
+//		}
+//		
+//		boolean accepted = true;
+//		try {
+//			accepted = evaluator.acceptAlg(
+//					Util.getPluginManager().wrap(((AlgRemote)alg), false));
+//		} 
+//		catch (Throwable e) {
+//			LogUtil.error("Evaluator does not accept algorithm '" + alg.getName() + "' due to " + e.getMessage());
+//			accepted = false;
+//		}
+//		
+//		try {
+//			((AlgRemote)alg).unexport();
+//		}
+//		catch (Exception e) {LogUtil.trace(e);}
+//
+//		return accepted;
 	}
 	
 	
@@ -1154,6 +1169,12 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 
 	
 	@Override
+	public List<EventObject> doTaskList(UUID listenerID) throws RemoteException {
+		return evTaskQueue.doTaskList(listenerID);
+	}
+
+
+	@Override
 	public void addPluginChangedListener(PluginChangedListener listener) throws RemoteException {
 		synchronized (listenerList) {
 			listenerList.add(PluginChangedListener.class, listener);
@@ -1162,6 +1183,12 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 
 	
 	@Override
+	public void addPluginChangedListener(UUID listenerID) throws RemoteException {
+		evTaskQueue.addListener(listenerID);
+	}
+
+
+	@Override
     public void removePluginChangedListener(PluginChangedListener listener) throws RemoteException {
 		synchronized (listenerList) {
 			listenerList.remove(PluginChangedListener.class, listener);
@@ -1169,7 +1196,13 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
     }
 	
     
-    /**
+    @Override
+	public void removePluginChangedListener(UUID listenerID) throws RemoteException {
+    	evTaskQueue.removeListener(listenerID);
+	}
+
+
+	/**
      * Return an array of registered plug-in changed listeners.
      * @return array of registered plug-in changed listeners.
      */
@@ -1194,6 +1227,8 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 				catch (Throwable e) {LogUtil.trace(e);}
 			}
 		}
+		
+		evTaskQueue.addTask(evt);
     }
 
     
@@ -1206,6 +1241,12 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 
     
 	@Override
+	public void addEvaluatorListener(UUID listenerID) throws RemoteException {
+		evTaskQueue.addListener(listenerID);
+	}
+
+	
+	@Override
     public void removeEvaluatorListener(EvaluatorListener listener) throws RemoteException {
 		synchronized (listenerList) {
 			listenerList.remove(EvaluatorListener.class, listener);
@@ -1213,6 +1254,12 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
     }
 	
     
+    @Override
+	public void removeEvaluatorListener(UUID listenerID) throws RemoteException {
+    	evTaskQueue.removeListener(listenerID);
+	}
+
+
     /**
      * Return array of evaluator listeners for this evaluator.
      * @return array of evaluator listeners for this evaluator.
@@ -1245,6 +1292,8 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 			}
 			
 		}
+		
+		evTaskQueue.addTask(evt);
     }
 
     
@@ -1257,6 +1306,12 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 
     
 	@Override
+	public void addEvaluateListener(UUID listenerID) throws RemoteException {
+		evTaskQueue.addListener(listenerID);
+	}
+
+	
+	@Override
     public void removeEvaluateListener(EvaluateListener listener) throws RemoteException {
 		synchronized (listenerList) {
 			listenerList.remove(EvaluateListener.class, listener);
@@ -1264,6 +1319,12 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
     }
 	
     
+    @Override
+	public void removeEvaluateListener(UUID listenerID) throws RemoteException {
+    	evTaskQueue.removeListener(listenerID);
+	}
+
+
     /**
      * Return array of evaluation listeners for this evaluator.
      * @return array of evaluation listeners.
@@ -1334,6 +1395,8 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 			}
 			catch (Throwable e) {LogUtil.trace(e);}
 		}
+		
+		evTaskQueue.addTask(evt);
     }
 
     
@@ -1345,6 +1408,12 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
     }
 
     
+	@Override
+	public void addEvaluateProgressListener(UUID listenerID) throws RemoteException {
+		evTaskQueue.addListener(listenerID);
+	}
+
+	
     @Override
     public void removeEvaluateProgressListener(EvaluateProgressListener listener) throws RemoteException {
 		synchronized (listenerList) {
@@ -1353,6 +1422,12 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
     }
 	
     
+    @Override
+	public void removeEvaluateProgressListener(UUID listenerID) throws RemoteException {
+    	evTaskQueue.removeListener(listenerID);
+	}
+
+
     /**
      * Getting an array of evaluation progress listeners.
      * @return array of {@link ProgressListener} (s).
@@ -1389,6 +1464,8 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 			}
 			
 		}
+		
+		evTaskQueue.addTask(evt);
     }
 
 
@@ -1400,6 +1477,12 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
     }
 
     
+	@Override
+	public void addSetupAlgListener(UUID listenerID) throws RemoteException {
+		evTaskQueue.addListener(listenerID);
+	}
+
+	
     @Override
     public void removeSetupAlgListener(SetupAlgListener listener) throws RemoteException {
 		synchronized (listenerList) {
@@ -1408,6 +1491,12 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
     }
 	
     
+    @Override
+	public void removeSetupAlgListener(UUID listenerID) throws RemoteException {
+    	evTaskQueue.removeListener(listenerID);
+	}
+
+
     /**
      * Getting an array of setup algorithm listeners.
      * @return array of setup algorithm listeners.
@@ -1476,6 +1565,8 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 			}
 			catch (Throwable e) {LogUtil.trace(e);}
 		}
+		
+		evTaskQueue.addTask(evt);
     }
 
     

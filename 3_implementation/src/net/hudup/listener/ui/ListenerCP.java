@@ -653,7 +653,7 @@ public class ListenerCP extends JFrame implements ServerStatusListener {
 		
 		Server server = dlg.getServer();
 		if (server != null)
-			new ListenerCP(server, dlg.getBindNamingUri().bindUri);
+			new ListenerCP(server, dlg.getConnectInfo().bindUri);
 		else {
 			JOptionPane.showMessageDialog(
 					null, "Can't retrieve listener", "Can't retrieve listener", JOptionPane.ERROR_MESSAGE);

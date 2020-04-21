@@ -568,6 +568,16 @@ public class AlgDesc2 extends AlgDesc {
 
 	
 	/**
+	 * Checking whether the specified algorithm class is only for testing.
+	 * @param algClass specified algorithm class.
+	 * @return whether the specified algorithm class is only for testing.
+	 */
+	public static boolean isForTest(Class<? extends Alg> algClass) {
+		return ForTest.class.isAssignableFrom(algClass);
+	}
+	
+	
+	/**
 	 * Check whether to call the specified algorithm remotely. There exists a reference to unexported object.
 	 * @param alg specified algorithm.
 	 * @return whether to call the specified algorithm remotely.

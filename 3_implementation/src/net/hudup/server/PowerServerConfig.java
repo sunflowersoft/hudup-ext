@@ -14,6 +14,7 @@ import net.hudup.core.alg.cf.gfall.GreenFallCF;
 import net.hudup.core.client.ServerConfig;
 import net.hudup.core.data.HiddenText;
 import net.hudup.core.logistic.LogUtil;
+import net.hudup.core.logistic.NetUtil;
 import net.hudup.core.logistic.xURI;
 import net.hudup.core.parser.SemiScannerParser;
 import net.hudup.core.parser.SnapshotParserImpl;
@@ -102,15 +103,27 @@ public class PowerServerConfig extends ServerConfig {
 
 	
 	/**
-	 * Flag field to indicate whether to deploy Hudup framework over internet.
+	 * Flag field to indicate whether to deploy Hudup framework globally like WAN, internet.
 	 */
-	public final static String DEPLOY_INTERNET_FIELD = "deploy_internet";
+	public final static String DEPLOY_GLOBAL_FIELD = "deploy_global";
 
 	
 	/**
-	 * By default, Hudup framework is not deployed over internet.
+	 * By default, Hudup framework is not deployed globally like WAN, internet.
 	 */
-	public final static boolean DEPLOY_INTERNET_DEFAULT = false;
+	public final static boolean DEPLOY_GLOBAL_DEFAULT = false;
+
+	
+	/**
+	 * Field of default global deployed host.
+	 */
+	public final static String DEPLOY_GLOBAL_HOST_FIELD = "deploy_global_host";
+
+	
+	/**
+	 * Default value of default global deployed host.
+	 */
+	public final static String DEPLOY_GLOBAL_HOST_DEFAULT = "";
 
 	
 	/**
@@ -147,6 +160,8 @@ public class PowerServerConfig extends ServerConfig {
 		}
 		setPeriodLearn(PERIOD_LEARN_DEFAULT);
 		setDatasetEmpty(DATASET_EMPTY_DEFAULT);
+		setDeployGlobal(DEPLOY_GLOBAL_DEFAULT);
+		setDeployGlobalHostByDefault(DEPLOY_GLOBAL_HOST_DEFAULT);
 	}
 
 	
@@ -188,25 +203,67 @@ public class PowerServerConfig extends ServerConfig {
 
 	
 	/**
-	 * Setting flag to indicate whether to deploy Hudup framework over internet.
-	 * @param flag flag to indicate whether to deploy Hudup framework over internet.
+	 * Setting flag to indicate whether to deploy Hudup framework globally like WAN, internet.
+	 * @param flag flag to indicate whether to deploy Hudup framework globally like WAN, internet.
 	 */
-	@SuppressWarnings("unused")
-	@Deprecated
-	private void setDeployInternet(boolean flag) {
-		put(DEPLOY_INTERNET_FIELD, flag);
+	public void setDeployGlobal(boolean flag) {
+		put(DEPLOY_GLOBAL_FIELD, flag);
 	}
 	
 	
 	/**
-	 * Getting flag to indicate whether to deploy Hudup framework over internet.
-	 * @return flag to indicate whether to deploy Hudup framework over internet.
+	 * Getting flag to indicate whether to deploy Hudup framework globally like WAN, internet.
+	 * @return flag to indicate whether to deploy Hudup framework globally like WAN, internet.
 	 */
-	@SuppressWarnings("unused")
-	@Deprecated
-	private boolean isDeployInternet() {
-		return getAsBoolean(DEPLOY_INTERNET_FIELD);
+	public boolean isDeployGlobal() {
+		return getAsBoolean(DEPLOY_GLOBAL_FIELD);
 	}
+
+	
+	/**
+	 * Setting default global host in case of global deployment.
+	 * @param globalHost default global host in case of global deployment.
+	 */
+	public void setDeployGlobalHostByDefault(String globalHost) {
+		put(DEPLOY_GLOBAL_HOST_FIELD, globalHost);
+	}
+	
+	
+	/**
+	 * Getting default global host in case of global deployment.
+	 * @return default global host in case of global deployment.
+	 */
+	public String getDeployGlobalHostByDefault() {
+		return getAsString(DEPLOY_GLOBAL_HOST_FIELD);
+	}
+	
+	
+	/**
+	 * Getting global host in case of global deployment.
+	 * @return global host in case of global deployment. Return null if unable to retrieve global host.
+	 */
+	public String getDeployGlobalHost() {
+		if (!isDeployGlobal()) return null;
+		
+		String host = getDeployGlobalHostByDefault();
+		host = host == null ? host : host.trim();
+		if (host == null || host.isEmpty())
+			host = NetUtil.getPublicInetAddress();
+		if (host == null || host.isEmpty() || host.compareToIgnoreCase("localhost") == 0 || host.compareToIgnoreCase("127.0.0.1") == 0)
+			return null;
+		else
+			return host;
+	}
+
+	
+//	/**
+//	 * Checking whether to deploy globally.
+//	 * @return whether to deploy globally.
+//	 */
+//	public boolean checkDeployGlobal() {
+//		String globalHost = getDeployGlobalHost();
+//		return globalHost != null && globalHost.compareToIgnoreCase("localhost") != 0 && globalHost.compareToIgnoreCase("127.0.0.1") != 0;
+//	}
 
 	
 	/**

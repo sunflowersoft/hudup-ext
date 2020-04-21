@@ -130,10 +130,12 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 		super();
 		
 		try {
-			String host = Constants.deployInternet ? NetUtil.getHostAddress() : null;
-			if (host != null && !host.equals("localhost") && !host.equals("127.0.0.1")) {
-				System.setProperty("java.rmi.server.hostname", host);
-				LogUtil.info("java.rmi.server.hostname=" + host);
+			if (config.isDeployGlobal()) {
+				String globalHost = config.getDeployGlobalHost();
+				if (globalHost != null) {
+					System.setProperty("java.rmi.server.hostname", globalHost);
+					LogUtil.info("java.rmi.server.hostname=" + globalHost);
+				}
 			}
 		}
 		catch (Throwable e) {LogUtil.trace(e);}
@@ -483,7 +485,7 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 	 * Getting bind name.
 	 * @return gateway bind name.
 	 */
-	private String getGatewayBindName() {
+	protected String getGatewayBindName() {
 		xURI uri = xURI.create( "rmi://localhost:" + config.getServerPort() + "/" + Protocol.GATEWAY);
 		return uri.toString(); 
 	}
