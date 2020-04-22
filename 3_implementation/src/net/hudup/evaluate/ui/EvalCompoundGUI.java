@@ -209,7 +209,79 @@ public class EvalCompoundGUI extends JFrame {
 				});
 			mnTools.add(mniUpdateFromServer);
 		}
+
 		
+		mnTools.addSeparator();
+		JMenuItem mniRefreshGUI = new JMenuItem(
+			new AbstractAction(I18nUtil.message("refresh_gui")) {
+				
+				/**
+				 * Serial version UID for serializable class. 
+				 */
+				private static final long serialVersionUID = 1L;
+
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					batchEvaluateGUI.updateMode();
+				}
+			});
+		mnTools.add(mniRefreshGUI);
+
+		JMenuItem mniRefreshResult = new JMenuItem(
+			new AbstractAction(I18nUtil.message("refresh_evaluate_result")) {
+				
+				/**
+				 * Serial version UID for serializable class. 
+				 */
+				private static final long serialVersionUID = 1L;
+
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					boolean idle = false;
+					try {
+						idle = batchEvaluateGUI.isIdle();
+					} catch (Exception ex) {LogUtil.trace(ex);}
+					
+					if (!idle) {
+						int confirm = JOptionPane.showConfirmDialog(
+							getThisEvalGUI(), 
+							"System is not idle or corrupted.\nDo you want to continue to get refreshing?", 
+							"Refreshing confirmation",
+							JOptionPane.YES_NO_OPTION,
+							JOptionPane.QUESTION_MESSAGE);
+						if (confirm != JOptionPane.YES_OPTION)
+							return;
+					}
+					
+					Metrics result = null;
+					boolean success = true;
+					try {
+						result = batchEvaluateGUI.getEvaluator().getResult();
+					} catch (Exception ex) {LogUtil.trace(ex); success = false;}
+					
+					if (result != null) {
+						batchEvaluateGUI.setResult(result);
+						batchEvaluateGUI.updateMode();
+					}
+					
+					if (success) {
+						JOptionPane.showMessageDialog(
+							getThisEvalGUI(), 
+							"Result refreshing successful", 
+							"Result refreshing successful", 
+							JOptionPane.INFORMATION_MESSAGE);
+					}
+					else {
+						JOptionPane.showMessageDialog(
+							getThisEvalGUI(), 
+							"Result refreshing failed", 
+							"Result refreshing failed", 
+							JOptionPane.ERROR_MESSAGE);
+					}
+				}
+			});
+		mnTools.add(mniRefreshResult);
+
 		JMenuItem mniRecoverResult = new JMenuItem(
 			new AbstractAction(I18nUtil.message("recover_evaluate_result")) {
 				
@@ -257,6 +329,8 @@ public class EvalCompoundGUI extends JFrame {
 				}
 			});
 		mnTools.add(mniRecoverResult);
+
+		
 
 		boolean agent = false;
 		try {
@@ -426,7 +500,7 @@ public class EvalCompoundGUI extends JFrame {
 				this, 
 				"Update from server successfully", 
 				"Update from server successfully", 
-				JOptionPane.WARNING_MESSAGE);
+				JOptionPane.INFORMATION_MESSAGE);
 	}
 	
 	
@@ -595,10 +669,10 @@ public class EvalCompoundGUI extends JFrame {
 		
 		left.add(new JLabel("Evaluator:"));
 		left.add(new JLabel("Export:"));
-		left.add(new JLabel("Naming port:"));
-		left.add(new JLabel("Naming path:"));
+		left.add(new JLabel("My naming port:"));
+		left.add(new JLabel("My naming path:"));
 		left.add(new JLabel("Deploy global:"));
-		left.add(new JLabel("Global address:"));
+		left.add(new JLabel("My global address:"));
 		
 		JPanel right = new JPanel(new GridLayout(0, 1));
 		header.add(right, BorderLayout.CENTER);

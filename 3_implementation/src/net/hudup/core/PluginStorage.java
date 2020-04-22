@@ -558,7 +558,8 @@ public class PluginStorage implements Serializable {
 						alg = evaluator.getPluginAlg(algClass, pluginAlgName, remote);
 					}
 					catch (Exception e) {
-						LogUtil.error("Retrieving remote algorithm causes error by " + e.getMessage());
+						LogUtil.trace(e);
+						LogUtil.error("PluginStorage#updateFromEvaluator: Retrieving remote algorithm causes error by " + e.getMessage());
 						alg = null;
 					}
 					if (alg != null && algReg.register(alg))

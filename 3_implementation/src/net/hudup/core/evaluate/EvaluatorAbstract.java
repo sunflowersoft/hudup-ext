@@ -529,10 +529,10 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 			thread = null;
 			paused = false;
 			
-			clear();
-
 			fireEvaluateEvent(new EvaluateEvent(this, Type.done, result));
 			
+			clear();
+
 			notifyAll();
 		}
 		
@@ -1117,9 +1117,11 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 		
 		thread = null;
 		paused = false;
-		clear();
+
 		fireEvaluateEvent(new EvaluateEvent(this, Type.done, result));
 		
+		clear();
+
 		return true;
 	}
 	
@@ -1218,6 +1220,8 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
      * @param evt plug-in changed event is issued to registered plug-in changed listeners after plug-in storage was changed.
      */
     protected void firePluginChangedEvent(PluginChangedEvent evt) {
+		evTaskQueue.addTask(evt);
+
 		synchronized (listenerList) {
 			PluginChangedListener[] listeners = getPluginChangedListeners();
 			for (PluginChangedListener listener : listeners) {
@@ -1227,8 +1231,6 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 				catch (Throwable e) {LogUtil.trace(e);}
 			}
 		}
-		
-		evTaskQueue.addTask(evt);
     }
 
     
@@ -1277,6 +1279,8 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
      * @param localTargetListener local target listener.
      */
     protected void fireEvaluatorEvent(EvaluatorEvent evt, EvaluatorListener localTargetListener) {
+		evTaskQueue.addTask(evt);
+
 		synchronized (listenerList) {
 			EvaluatorListener[] listeners = getEvaluatorListeners();
 			for (EvaluatorListener listener : listeners) {
@@ -1292,8 +1296,6 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 			}
 			
 		}
-		
-		evTaskQueue.addTask(evt);
     }
 
     
@@ -1341,6 +1343,8 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
      * @param evt event from this evaluator.
      */
     protected void fireEvaluateEvent(EvaluateEvent evt) {
+		evTaskQueue.addTask(evt);
+    	
 		synchronized (listenerList) {
 			EvaluateListener[] listeners = getEvaluateListeners();
 			for (EvaluateListener listener : listeners) {
@@ -1395,8 +1399,6 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 			}
 			catch (Throwable e) {LogUtil.trace(e);}
 		}
-		
-		evTaskQueue.addTask(evt);
     }
 
     
@@ -1444,6 +1446,8 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
      * @param evt the specified for evaluation progress.
      */
     protected void fireEvaluateProgressEvent(EvaluateProgressEvent evt) {
+		evTaskQueue.addTask(evt);
+
 		synchronized (listenerList) {
 	    	EvaluateProgressListener[] listeners = getEvaluateProgressListeners();
 			for (EvaluateProgressListener listener : listeners) {
@@ -1464,8 +1468,6 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 			}
 			
 		}
-		
-		evTaskQueue.addTask(evt);
     }
 
 
@@ -1513,6 +1515,8 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
      * @param evt the specified for setup algorithm event.
      */
     protected void fireSetupAlgEvent(SetupAlgEvent evt) {
+		evTaskQueue.addTask(evt);
+
 		synchronized (listenerList) {
 	    	SetupAlgListener[] listeners = getSetupAlgListeners();
 			for (SetupAlgListener listener : listeners) {
@@ -1565,8 +1569,6 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 			}
 			catch (Throwable e) {LogUtil.trace(e);}
 		}
-		
-		evTaskQueue.addTask(evt);
     }
 
     
@@ -1843,14 +1845,14 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 			if (!pause()) return false;
 		}
 
-		evCounter.pause();
-		evTaskQueue.pause();
-
 		fireEvaluatorEvent(new EvaluatorEvent(
 				this, 
 				EvaluatorEvent.Type.pause),
 				null); // firing paused event.
 		
+		evCounter.pause();
+		evTaskQueue.pause();
+
 		return true;
 	}
 
@@ -1868,7 +1870,6 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 			if (!resume()) return false;
 		}
 
-		
 		evTaskQueue.resume();
 		evCounter.resume();
 
@@ -1889,13 +1890,13 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 		
 		if (!stop()) return false;
 
-		this.evCounter.stop();
-		this.evTaskQueue.stop();
-		
 		fireEvaluatorEvent(new EvaluatorEvent(
 				this, 
 				EvaluatorEvent.Type.stop),
 				null);
+		
+		this.evCounter.stop();
+		this.evTaskQueue.stop();
 		
 		return true;
 	}

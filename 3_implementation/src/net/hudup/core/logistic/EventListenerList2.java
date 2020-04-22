@@ -7,8 +7,14 @@
  */
 package net.hudup.core.logistic;
 
+import java.io.Serializable;
+import java.lang.reflect.Array;
+import java.util.EventListener;
+import java.util.List;
+
 import javax.swing.event.EventListenerList;
 
+import net.hudup.core.Util;
 import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.AlgAbstract;
 import net.hudup.core.alg.AlgRemoteWrapper;
@@ -25,7 +31,7 @@ import net.hudup.core.evaluate.Metric;
  * @version 1.0
  *
  */
-public class EventListenerList2 extends EventListenerList {
+public class EventListenerList2 implements Serializable {
 
 	
 	/**
@@ -35,6 +41,12 @@ public class EventListenerList2 extends EventListenerList {
 
 	
 	/**
+	 * Internal list of listeners.
+	 */
+	protected List<EventListener> listeners = Util.newList();
+	
+	
+	/**
 	 * Default constructor.
 	 */
 	public EventListenerList2() {
@@ -42,4 +54,45 @@ public class EventListenerList2 extends EventListenerList {
 	}
 
 	
+	/**
+	 * Adding listener with specified class.
+	 * @param t specified class.
+	 * @param l specified listener.
+	 */
+    public synchronized <T extends EventListener> void add(Class<T> t, T l) {
+    	if ((l == null) || !(t.isInstance(l))) return;
+    	listeners.add(l);
+    }
+
+
+    /**
+	 * Removing listener with specified class.
+	 * @param t specified class.
+	 * @param l specified listener.
+     */
+    public synchronized <T extends EventListener> void remove(Class<T> t, T l) {
+    	if ((l == null) || !(t.isInstance(l))) return;
+    	listeners.remove(l);
+    }
+    
+    
+    /**
+     * Getting array of listeners with specified class.
+     * @param t specified class.
+     * @return array of listeners with specified class.
+     */
+    @SuppressWarnings("unchecked")
+	public <T extends EventListener> T[] getListeners(Class<T> t) {
+    	List<T> list = Util.newList();
+    	for (EventListener l : listeners) {
+    		if (t.isInstance(l)) list.add((T)l);
+    	}
+    	
+    	T[] array = (T[])Array.newInstance(t, list.size());
+    	for (int i = 0; i < list.size(); i++) array[i] = list.get(i);
+    	
+    	return array;
+    }
+    
+    
 }

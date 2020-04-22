@@ -37,6 +37,7 @@ import net.hudup.core.Util;
 import net.hudup.core.evaluate.Evaluator;
 import net.hudup.core.logistic.Account;
 import net.hudup.core.logistic.ConnectInfo;
+import net.hudup.core.logistic.Counter;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.NetUtil;
 import net.hudup.core.logistic.xURI;
@@ -285,6 +286,12 @@ public abstract class ConnectDlg extends JDialog {
 			
 	
 	/**
+	 * Text field to fill server access period.
+	 */
+	protected JFormattedTextField txtServerAccessPeriod = null;
+
+	
+	/**
 	 * Remote connector.
 	 */
 	protected Remote connector = null;
@@ -324,10 +331,11 @@ public abstract class ConnectDlg extends JDialog {
 		left.add(new JLabel("User name:"));
 		left.add(new JLabel("Password:"));
 		left.add(new JLabel("Export:"));
-		left.add(new JLabel("Bound port:"));
-		left.add(new JLabel("Bound path:"));
+		left.add(new JLabel("My bound port:"));
+		left.add(new JLabel("My bound path:"));
 		left.add(new JLabel("Deploy global:"));
-		left.add(new JLabel("Global address:"));
+		left.add(new JLabel("My global address:"));
+		left.add(new JLabel("Access period (s):"));
 		
 		JPanel right = new JPanel(new GridLayout(0, 1));
 		header.add(right, BorderLayout.CENTER);
@@ -464,6 +472,11 @@ public abstract class ConnectDlg extends JDialog {
 			});
 		paneDeployGlobalAddress.add(btnGenDeployGlobalAddress, BorderLayout.EAST);
 
+		txtServerAccessPeriod = new JFormattedTextField(new NumberFormatter());
+		right.add(txtServerAccessPeriod);
+		txtServerAccessPeriod.setValue(1);
+		txtServerAccessPeriod.setVisible(chkDeployGlobal.isSelected());
+
 		chkExport.addItemListener(new ItemListener() {
 			
 			@Override
@@ -478,6 +491,7 @@ public abstract class ConnectDlg extends JDialog {
 			@Override
 			public void itemStateChanged(ItemEvent e) {
 				paneDeployGlobalAddress.setVisible(chkDeployGlobal.isSelected());
+				txtServerAccessPeriod.setVisible(chkDeployGlobal.isSelected());
 			}
 		});
 		
@@ -717,7 +731,13 @@ public abstract class ConnectDlg extends JDialog {
 					if (connectInfo.deployGlobalAddress.isEmpty())
 						connectInfo.deployGlobalAddress = null;
 				}
+				if (connectInfo.deployGlobal && connectInfo.deployGlobalAddress == null)
+					connectInfo.internetAddress = NetUtil.getPublicInetAddress();
 				
+				int serverAccessPeriod = txtServerAccessPeriod.getValue() instanceof Number ? ( (Number) txtServerAccessPeriod.getValue()).intValue() : 1;
+				serverAccessPeriod = 1000 * serverAccessPeriod;
+				connectInfo.serverAccessPeriod = serverAccessPeriod < Counter.PERIOD ? Counter.PERIOD : serverAccessPeriod;   
+
 				dispose();
 			}
 		};

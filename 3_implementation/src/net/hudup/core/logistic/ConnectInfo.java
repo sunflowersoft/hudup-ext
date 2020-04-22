@@ -60,6 +60,18 @@ public class ConnectInfo implements Serializable {
 	
 	
 	/**
+	 * Extra internet address.
+	 */
+	public String internetAddress = null;
+	
+	
+	/**
+	 * Server access period constant in milisecond.
+	 */
+	public long serverAccessPeriod = Counter.PERIOD;
+	
+	
+	/**
 	 * Default constructor.
 	 */
 	public ConnectInfo() {
@@ -74,8 +86,8 @@ public class ConnectInfo implements Serializable {
 		if (!deployGlobal) return null;
 		
 		String host = deployGlobalAddress == null ? deployGlobalAddress : deployGlobalAddress.trim();
-		if (host == null || host.isEmpty())
-			host = NetUtil.getPublicInetAddress();
+//		if (host == null || host.isEmpty())
+//			host = NetUtil.getPublicInetAddress();
 		if (host == null || host.isEmpty() || host.compareToIgnoreCase("localhost") == 0 || host.compareToIgnoreCase("127.0.0.1") == 0)
 			return null;
 		else

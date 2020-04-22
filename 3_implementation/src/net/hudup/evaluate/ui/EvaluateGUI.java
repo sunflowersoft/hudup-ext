@@ -1712,6 +1712,20 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 
 	
 	/**
+	 * Setting and backing up result.
+	 * @param newResult new result.
+	 */
+	protected synchronized void setResult(Metrics newResult) {
+		if (newResult == null) {
+			this.recoveredResult = this.result;
+			this.result = newResult;
+		}
+		else
+			this.recoveredResult = this.result = newResult;
+	}
+
+	
+	/**
 	 * Creating inspector for recommendation algorithm.
 	 * @param recommender specified recommendation algorithm.
 	 * @return inspector for recommendation algorithm.

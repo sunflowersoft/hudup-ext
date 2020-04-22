@@ -258,11 +258,11 @@ public class EstimateEvaluator extends RecommendEvaluator {
 			thread = null;
 			paused = false;
 			
-			clear();
-
 			//Fire evaluation finished event (done event).
 			fireEvaluateEvent(new EvaluateEvent(this, Type.done, result));
 			
+			clear();
+
 			notifyAll();
 		}
 	}

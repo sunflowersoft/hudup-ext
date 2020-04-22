@@ -341,11 +341,11 @@ public class RecommendEvaluator extends EvaluatorAbstract {
 			thread = null;
 			paused = false;
 			
-			clear();
-
 			//Fire evaluation finished event (done event).
 			fireEvaluateEvent(new EvaluateEvent(this, Type.done, result));
 			
+			clear();
+
 			notifyAll();
 		}
 		

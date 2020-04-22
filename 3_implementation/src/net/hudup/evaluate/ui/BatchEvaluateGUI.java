@@ -1689,4 +1689,18 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 	}
 	
 	
+	/**
+	 * Setting and backing up result.
+	 * @param result new result.
+	 */
+	protected synchronized void setResult(Metrics result) {
+		if (result == null) {
+			this.recoveredResult = this.result;
+			this.result = result;
+		}
+		else
+			this.recoveredResult = this.result = result;
+	}
+	
+	
 }

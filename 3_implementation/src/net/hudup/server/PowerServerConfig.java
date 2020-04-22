@@ -14,7 +14,6 @@ import net.hudup.core.alg.cf.gfall.GreenFallCF;
 import net.hudup.core.client.ServerConfig;
 import net.hudup.core.data.HiddenText;
 import net.hudup.core.logistic.LogUtil;
-import net.hudup.core.logistic.NetUtil;
 import net.hudup.core.logistic.xURI;
 import net.hudup.core.parser.SemiScannerParser;
 import net.hudup.core.parser.SnapshotParserImpl;
@@ -247,8 +246,8 @@ public class PowerServerConfig extends ServerConfig {
 		
 		String host = getDeployGlobalHostByDefault();
 		host = host == null ? host : host.trim();
-		if (host == null || host.isEmpty())
-			host = NetUtil.getPublicInetAddress();
+//		if (host == null || host.isEmpty())
+//			host = NetUtil.getPublicInetAddress();
 		if (host == null || host.isEmpty() || host.compareToIgnoreCase("localhost") == 0 || host.compareToIgnoreCase("127.0.0.1") == 0)
 			return null;
 		else

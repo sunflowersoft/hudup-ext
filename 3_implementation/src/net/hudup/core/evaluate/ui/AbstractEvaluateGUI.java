@@ -15,8 +15,6 @@ import java.rmi.registry.Registry;
 import java.util.Arrays;
 import java.util.EventObject;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.UUID;
 
 import javax.swing.JOptionPane;
@@ -56,6 +54,7 @@ import net.hudup.core.evaluate.EvaluatorListener;
 import net.hudup.core.evaluate.Metric;
 import net.hudup.core.evaluate.Metrics;
 import net.hudup.core.evaluate.MetricsUtil;
+import net.hudup.core.logistic.AbstractRunner;
 import net.hudup.core.logistic.ConnectInfo;
 import net.hudup.core.logistic.Counter;
 import net.hudup.core.logistic.CounterElapsedTimeEvent;
@@ -159,10 +158,10 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	
 	
 	/**
-	 * Internal timer.
+	 * Feeding task queue from server.
 	 */
-	protected Timer timer = null;
-
+	protected AbstractRunner taskQueueFeeder = null;
+	
 	
 	/**
 	 * Constructor with local evaluator.
@@ -342,28 +341,30 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 				guiData.txtRunSaveBrowse = evStorePath;
 		}
 
-		if (connectInfo.deployGlobal) {
-			timer = new Timer();
-			timer.schedule(new TimerTask() {
+		if (connectInfo.deployGlobal && connectInfo.bindUri != null) {
+			final long serverAccessPeriod = connectInfo.serverAccessPeriod;
+			taskQueueFeeder = new AbstractRunner() {
 				
-					@Override
-					public void run() {
-						try {
-							timerTask();
-						} 
-						catch (Throwable e) {LogUtil.trace(e);}
-					}
-				}, 
-				Counter.PERIOD, 
-				Counter.PERIOD);
+				@Override
+				protected void task() {
+					long startedTime = System.currentTimeMillis();
+					taskQueueFeed();
+					
+					while (System.currentTimeMillis() - startedTime < serverAccessPeriod) { }
+				}
+				
+				@Override
+				protected void clear() { }
+			};
+			taskQueueFeeder.start();
 		}
 	}
 	
 	
 	/**
-	 * Timer task.
+	 * Feeding tasks from server.
 	 */
-	protected void timerTask() {
+	protected void taskQueueFeed() {
 		List<EventObject> evtList = Util.newList();
 		try {
 			evtList = evaluator.doTaskList(id);
@@ -584,11 +585,11 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 			algRegTable.unexportNonPluginAlgs();
 		} catch (Exception e) {LogUtil.trace(e);}
 		
-		if (timer != null) {
-			timer.cancel();
-			timer = null;
+		if (taskQueueFeeder != null) {
+			taskQueueFeeder.stop();
+			taskQueueFeeder = null;
 		}
-		
+
 		if (exportedStub != null) {
 			boolean ret = NetUtil.RegistryRemote.unexport(this);
 			if (ret)
@@ -693,7 +694,7 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	 */
 	private void setupListeners(Evaluator evaluator) {
 		try {
-			if (connectInfo.deployGlobal) {
+			if (connectInfo.deployGlobal && connectInfo.bindUri != null) {
 				evaluator.addPluginChangedListener(id);
 				evaluator.addEvaluatorListener(id);
 				evaluator.addEvaluateListener(id);
@@ -721,7 +722,7 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	 */
 	private void unsetupListeners(Evaluator evaluator) {
 		try {
-			if (connectInfo.deployGlobal) {
+			if (connectInfo.deployGlobal && connectInfo.bindUri != null) {
 				evaluator.removePluginChangedListener(id);
 				evaluator.removeEvaluatorListener(id);
 				evaluator.removeEvaluateListener(id);
@@ -790,7 +791,12 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 					!config.containsKey(DatasetAbstract.HARDWARE_ADDR_FIELD) &&
 					!config.containsKey(DatasetAbstract.HOST_ADDR_FIELD)) {
 				config.put(DatasetAbstract.HARDWARE_ADDR_FIELD, Constants.hardwareAddress);
-				config.put(DatasetAbstract.HOST_ADDR_FIELD, Constants.hostAddress);
+				
+				String hostAddr = connectInfo.getDeployGlobalHost();
+				if (hostAddr == null && connectInfo.deployGlobal)
+					hostAddr = connectInfo.internetAddress;
+				hostAddr = hostAddr != null ? hostAddr : Constants.hostAddress;
+				config.put(DatasetAbstract.HOST_ADDR_FIELD, hostAddr);
 			}
 		}
 		catch (Exception e) {
