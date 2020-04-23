@@ -69,12 +69,17 @@ public class AlgRemoteWrapper implements Alg, AlgRemote, Serializable {
     private String name = null;
     
     
+    /**
+     * Configuration.
+     */
+    private DataConfig config = new DataConfig();
+    
+    
 	/**
 	 * Constructor with specified remote algorithm.
 	 * @param remoteAlg remote algorithm.
 	 */
 	public AlgRemoteWrapper(AlgRemote remoteAlg) {
-		// TODO Auto-generated constructor stub
 		this(remoteAlg, true);
 	}
 
@@ -85,12 +90,15 @@ public class AlgRemoteWrapper implements Alg, AlgRemote, Serializable {
 	 * @param exclusive exclusive mode.
 	 */
 	public AlgRemoteWrapper(AlgRemote remoteAlg, boolean exclusive) {
-		// TODO Auto-generated constructor stub
 		this.remoteAlg = remoteAlg;
 		this.exclusive = exclusive;
 		
 		try {
-			name = this.remoteAlg.queryName();
+			this.name = queryName();
+		} catch (Throwable e) {LogUtil.trace(e);}
+		
+		try {
+			this.config = queryConfig();
 		} catch (Throwable e) {LogUtil.trace(e);}
 	}
 
@@ -133,14 +141,12 @@ public class AlgRemoteWrapper implements Alg, AlgRemote, Serializable {
 
 	@Override
 	public boolean isLearnPaused() throws RemoteException {
-		// TODO Auto-generated method stub
 		return remoteAlg.isLearnPaused();
 	}
 
 
 	@Override
 	public boolean isLearnRunning() throws RemoteException {
-		// TODO Auto-generated method stub
 		return remoteAlg.isLearnRunning();
 	}
 
@@ -165,39 +171,38 @@ public class AlgRemoteWrapper implements Alg, AlgRemote, Serializable {
 	
 	@Override
 	public String queryName() throws RemoteException {
-		// TODO Auto-generated method stub
-		return remoteAlg.queryName();
+		return name = remoteAlg.queryName();
 	}
 
 	
 	@Override
 	public String[] getBaseRemoteInterfaceNames() throws RemoteException {
-		// TODO Auto-generated method stub
 		return new String[] {AlgRemote.class.getName()};
 	}
 	
 	
 	@Override
 	public DataConfig queryConfig() throws RemoteException {
-		// TODO Auto-generated method stub
-		return remoteAlg.queryConfig();
+		try {
+			if (remoteAlg instanceof Alg)
+				config = ((Alg)remoteAlg).getConfig();
+			else {
+				config = remoteAlg.queryConfig();
+			}
+		} catch (Throwable e) {LogUtil.trace(e);}
+		
+		return this.config;
 	}
 
 	
 	@Override
 	public DataConfig getConfig() {
-		// TODO Auto-generated method stub
-		try {
-			return remoteAlg.queryConfig();
-		} catch (Exception e) { LogUtil.trace(e); }
-		
-		return null;
+		return config;
 	}
 
 	
 	@Override
 	public void resetConfig() {
-		// TODO Auto-generated method stub
 		if (remoteAlg instanceof Alg)
 			((Alg)remoteAlg).resetConfig();
 		else
@@ -207,7 +212,6 @@ public class AlgRemoteWrapper implements Alg, AlgRemote, Serializable {
 	
 	@Override
 	public DataConfig createDefaultConfig() {
-		// TODO Auto-generated method stub
 		if (remoteAlg instanceof Alg)
 			return ((Alg)remoteAlg).createDefaultConfig();
 		else {
@@ -219,28 +223,18 @@ public class AlgRemoteWrapper implements Alg, AlgRemote, Serializable {
 	
 	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
-		try {
-			if (name != null)
-				return name;
-			else
-				return name = remoteAlg.queryName();
-		} catch (Exception e) { LogUtil.trace(e); }
-		
-		return null;
+		return name;
 	}
 
 	
 	@Override
 	public String getDescription() throws RemoteException {
-		// TODO Auto-generated method stub
 		return remoteAlg.getDescription();
 	}
 
 	
 	@Override
 	public Alg newInstance() {
-		// TODO Auto-generated method stub
 		if (remoteAlg instanceof AlgAbstract) {
 			AlgAbstract newAlg = (AlgAbstract) ((AlgAbstract)remoteAlg).newInstance();
 			return new AlgRemoteWrapper(newAlg, exclusive);
@@ -254,28 +248,24 @@ public class AlgRemoteWrapper implements Alg, AlgRemote, Serializable {
 	
 	@Override
 	public void addSetupListener(SetupAlgListener listener) throws RemoteException {
-		// TODO Auto-generated method stub
 		remoteAlg.addSetupListener(listener);
 	}
 
 
 	@Override
 	public void removeSetupListener(SetupAlgListener listener) throws RemoteException {
-		// TODO Auto-generated method stub
 		remoteAlg.removeSetupListener(listener);
 	}
 
 
 	@Override
 	public void fireSetupEvent(SetupAlgEvent evt) throws RemoteException {
-		// TODO Auto-generated method stub
 		remoteAlg.fireSetupEvent(evt);
 	}
 
 
 	@Override
 	public void receivedSetup(SetupAlgEvent evt) throws RemoteException {
-		// TODO Auto-generated method stub
 		remoteAlg.receivedSetup(evt);
 	}
 
@@ -292,7 +282,6 @@ public class AlgRemoteWrapper implements Alg, AlgRemote, Serializable {
 
 	@Override
 	public synchronized void unexport() throws RemoteException {
-		// TODO Auto-generated method stub
 		if (exclusive && remoteAlg != null) {
 			try {
 				//if (!remoteAlg.isAgent())
@@ -310,7 +299,6 @@ public class AlgRemoteWrapper implements Alg, AlgRemote, Serializable {
 	
 	@Override
 	public synchronized void forceUnexport() throws RemoteException {
-		// TODO Auto-generated method stub
 		if (remoteAlg != null) {
 			try {
 				//if (!remoteAlg.isAgent())
@@ -340,28 +328,24 @@ public class AlgRemoteWrapper implements Alg, AlgRemote, Serializable {
 	
 //	@Override
 //	public boolean isAgent() throws RemoteException {
-//		// TODO Auto-generated method stub
 //		return remoteAlg.isAgent();
 //	}
 //
 //
 //	@Override
 //	public void setAgent(boolean isAgent) throws RemoteException {
-//		// TODO Auto-generated method stub
 //		remoteAlg.setAgent(isAgent);
 //	}
 
 
 	@Override
 	public String toString() {
-		// TODO Auto-generated method stub
 		return DSUtil.shortenVerbalName(getName());
 	}
 
 
 	@Override
 	protected void finalize() throws Throwable {
-		// TODO Auto-generated method stub
 		super.finalize();
 		
 		try {

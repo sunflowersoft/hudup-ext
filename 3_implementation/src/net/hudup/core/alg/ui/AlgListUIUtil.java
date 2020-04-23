@@ -36,9 +36,9 @@ public final class AlgListUIUtil {
 
 	
 	/**
-	 * Creating the context menu for {@link AlgListUI}.
-	 * @param ui specified {@link AlgListUI}.
-	 * @return context menu {@link JPopupMenu} for {@link AlgListUI}.
+	 * Creating the context menu for algorithm list UI.
+	 * @param ui specified algorithm list UI.
+	 * @return context pop-up menu for algorithm list UI.
 	 */
 	public final static JPopupMenu createContextMenu(AlgListUI ui) {
 		return createContextMenu0(ui);
@@ -46,12 +46,11 @@ public final class AlgListUIUtil {
 	
 	
 	/**
-	 * Creating the context menu for {@link AlgListUI}. This method is deprecated with remote imported algorithms. It will be updated.
-	 * @param ui specified {@link AlgListUI}.
-	 * @return context menu {@link JPopupMenu} for {@link AlgListUI}.
+	 * Creating the context menu for algorithm list UI. This method needs to be updated with knowledge base inspector.
+	 * @param ui specified algorithm list UI.
+	 * @return context pop-up menu for algorithm list UI.
 	 */
 	@NextUpdate
-	@Deprecated
 	private final static JPopupMenu createContextMenu0(final AlgListUI ui) {
 		Alg alg = ui.getSelectedAlg();
 		if (alg == null)
@@ -164,9 +163,9 @@ public final class AlgListUIUtil {
 
 
 	/**
-	 * Getting the {@link Frame} of specified {@link AlgListUI}.
-	 * @param ui specified {@link AlgListUI}.
-	 * @return {@link Frame} of specified {@link AlgListUI}.
+	 * Getting the windows frame of specified algorithm list UI.
+	 * @param ui specified algorithm list UI.
+	 * @return windows frame of specified algorithm list UI.
 	 */
 	private static Frame getFrame(AlgListUI ui) {
 		if (ui instanceof Frame)
@@ -179,8 +178,8 @@ public final class AlgListUIUtil {
 	
 	
 	/**
-	 * Showing the {@link AlgConfigDlg} dialog to assist users to configure the algorithm selected from the specified {@link AlgListUI}.
-	 * @param ui specified {@link AlgListUI}.
+	 * Showing the configuration dialog to assist users to configure the algorithm selected from the specified {@link AlgListUI}.
+	 * @param ui specified algorithm list UI.
 	 */
 	public static void config(AlgListUI ui) {
 		Alg alg = ui.getSelectedAlg();

@@ -138,17 +138,17 @@ public final class DataDriverList {
 		clear();
 		
 		try {
-			add(new DataDriver(DataType.derby));
+//			add(new DataDriver(DataType.derby));
 			add(new DataDriver(DataType.derby_engine));
 			add(new DataDriver(DataType.file));
-			add(new DataDriver(DataType.ftp));
-			add(new DataDriver(DataType.http));
+//			add(new DataDriver(DataType.ftp));
+//			add(new DataDriver(DataType.http));
 			add(new DataDriver(DataType.hudup_rmi));
 			add(new DataDriver(DataType.hudup_socket));
-			add(new DataDriver(DataType.mssql));
-			add(new DataDriver(DataType.mysql));
-			add(new DataDriver(DataType.oracle));
-			add(new DataDriver(DataType.postgresql));
+//			add(new DataDriver(DataType.mssql));
+//			add(new DataDriver(DataType.mysql));
+//			add(new DataDriver(DataType.oracle));
+//			add(new DataDriver(DataType.postgresql));
 		}
 		catch (Throwable e) {
 			LogUtil.trace(e);

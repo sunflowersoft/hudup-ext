@@ -83,6 +83,10 @@ JPF Team provided Java Plug-in Framework (JPF) Project available at http://jpf.s
 
 Kent Beck, Erich Gamma, David Saff, and Mike Clark are developers of JUnit - A unit testing framework for the Java programming language.
 
+Machine Learning Group - The University of Waikato (https://www.cs.waikato.ac.nz/~ml/people.html) provided Weka software (https://www.cs.waikato.ac.nz/~ml/weka) is a collection of machine learning algorithms for data mining tasks.
+
+Michael Kutschke provided Jayes (https://github.com/kutschkem/Jayes) is a Bayesian Network Library for Java.
+
 Michael Thomas Flanagan - University College London provided statistic software package "Java Scientific Library" available at https://goo.gl/oX5mvU.
 
 MySQL Team provided MySQL JDBC driver available at https://goo.gl/LpDX5V.

@@ -327,8 +327,8 @@
 	Version: JRE8
 	Status: using
 	Note:
-	-->
 	<property name="sun.misc.jar" value="${lib.home}/sun.misc.jar"/>
+	-->
 	
 
 	<!--
@@ -389,7 +389,7 @@
 	net.hudup.core.logistic.ui.SortableTable2: SortableTable2.class
 	net.hudup.core.logistic.ui.SortableTableModel2: SortableTableModel2.class
 	net.hudup.core.parser.JsonParserImpl: common-io.jar, json-io.jar
-	net.hudup.core.security.CipherImpl: sun.misc.jar
+	//net.hudup.core.security.CipherImpl: sun.misc.jar
 	net.hudup.phoebe.math.FlanaganStat: flanagan.jar
 	net.hudup.phoebe.math.ui.StatDlg: flanagan.jar
 	
