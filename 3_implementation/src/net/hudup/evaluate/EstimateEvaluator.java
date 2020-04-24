@@ -54,7 +54,6 @@ public class EstimateEvaluator extends RecommendEvaluator {
 	 */
 	public EstimateEvaluator() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
 	
@@ -66,12 +65,6 @@ public class EstimateEvaluator extends RecommendEvaluator {
 		
 		Thread current = Thread.currentThread();
 		for (int i = 0; current == thread && evAlgList != null && i < evAlgList.size(); i++) {
-//			try {
-//				if (!acceptAlg(evAlgList.get(i))) continue;
-//			} catch (Throwable e) {
-//				LogUtil.trace(e);
-//				continue;
-//			}
 			Recommender recommender = (Recommender)evAlgList.get(i);
 			evAlg = recommender;
 			otherResult.algName = recommender.getName();
@@ -299,7 +292,6 @@ public class EstimateEvaluator extends RecommendEvaluator {
 
 	@Override
 	public NoneWrapperMetricList defaultMetrics() throws RemoteException {
-		// TODO Auto-generated method stub
 		NoneWrapperMetricList metricList = new NoneWrapperMetricList();
 		
 		SetupTimeMetric setupTime = new SetupTimeMetric();
@@ -337,7 +329,6 @@ public class EstimateEvaluator extends RecommendEvaluator {
 	
 	@Override
 	public String getName() throws RemoteException {
-		// TODO Auto-generated method stub
 		return "Estimation Evaluator";
 	}
 

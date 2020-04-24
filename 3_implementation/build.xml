@@ -522,6 +522,22 @@
 	</target>
 
 
+	<target name="deploy-in-one" depends="compile" description="Create framework deployment">
+		<mkdir dir="${archive.home}"/>
+		<antcall target="clean-archive" />
+
+		<!--Deployment needs source to rebuild immediately-->
+		<zip destfile="${archive.home}/${product}-${version}-deploy-in-one.zip" basedir="." 
+			includes="${bin.home}/**, 
+				${lib.home}/**, 
+				${plugins.home}/**, 
+				${src.home}/**, 
+				${tools.home}/**, *" 
+			excludes="${working.home}, ${datasets.home}, ${docs.home}">
+		</zip>
+	</target>
+
+
 	<target name="jar-core" depends="compile" description="Create core package">
 		<mkdir dir="${archive.home}"/>
 		<antcall target="clean-archive" />

@@ -390,7 +390,7 @@ public class PluginStorage implements Serializable {
 	
 	/**
 	 * Checking whether the specified algorithm stored in this plug-in storage.
-	 * @param algs specified algorithm.
+	 * @param alg specified algorithm.
 	 * @return whether the specified algorithm stored in this plug-in storage.
 	 */
 	public final static boolean contains(Alg alg) {
@@ -405,10 +405,9 @@ public class PluginStorage implements Serializable {
 
 		
 	/**
-	 * Looking whether the specified algorithm class and algorithm name stored in next update list.
-	 * @param algClass specified algorithm class.
-	 * @param algName specified algorithm name.
-	 * @return the index of the specified algorithm class and algorithm name stored in next update list.
+	 * Looking whether the specified algorithm stored in next update list.
+	 * @param alg specified algorithm class.
+	 * @return the index of the specified algorithm stored in next update list.
 	 * Return -1 if not found.
 	 */
 	public final static int lookupNextUpdateList(Alg alg) {

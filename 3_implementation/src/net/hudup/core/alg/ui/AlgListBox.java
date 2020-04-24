@@ -46,6 +46,7 @@ import net.hudup.core.alg.AlgDesc;
 import net.hudup.core.alg.AlgList;
 import net.hudup.core.alg.DuplicatableAlg;
 import net.hudup.core.data.DataConfig;
+import net.hudup.core.evaluate.Evaluator;
 import net.hudup.core.logistic.DSUtil;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.ui.UIUtil;
@@ -88,8 +89,9 @@ public class AlgListBox extends JList<Alg> implements AlgListUI {
     /**
      * Constructor with flag of sorting.
      * @param sorting if {@code true}, this list is sorted.
+     * @param evaluator referred evaluator.
      */
-    public AlgListBox(boolean sorting) {
+    public AlgListBox(boolean sorting, Evaluator evaluator) {
 		super();
 		this.sorting = sorting;
 		
@@ -102,7 +104,7 @@ public class AlgListBox extends JList<Alg> implements AlgListUI {
 					return;
 				
 				if(SwingUtilities.isRightMouseButton(e) ) {
-					JPopupMenu contextMenu = AlgListUIUtil.createContextMenu(getThis());
+					JPopupMenu contextMenu = AlgListUIUtil.createContextMenu(getThis(), evaluator);
 					if(contextMenu == null)
 						return;
 					

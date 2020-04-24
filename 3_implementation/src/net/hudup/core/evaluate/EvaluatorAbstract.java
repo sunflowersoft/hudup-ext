@@ -294,6 +294,9 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 			return false;
 		}
 
+		this.evTaskQueue.stop();
+		this.evCounter.stop();
+
 		this.evPool = updatePoolResult(pool);
 		if (this.evPool == null) {
 			LogUtil.error("Cannot create pool");
@@ -322,9 +325,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 			return false;
 		}
 		
-		this.evTaskQueue.stop();
 		this.evTaskQueue.start();
-		this.evCounter.stop();
 		this.evCounter.start();
 
 		fireEvaluatorEvent(new EvaluatorEvent(
@@ -364,7 +365,6 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 				fetcher.close();
 			}
 			catch (Exception e) {
-				// TODO Auto-generated catch block
 				LogUtil.trace(e);
 			}
 		}
@@ -623,7 +623,6 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 	
 	@Override
 	public DatasetPoolExchanged getDatasetPool() throws RemoteException {
-		// TODO Auto-generated method stub
 		return poolResult;
 	}
 
@@ -680,7 +679,6 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 	
 	@Override
 	public EvaluateInfo getOtherResult() throws RemoteException {
-		// TODO Auto-generated method stub
 		return otherResult;
 	}
 
@@ -839,14 +837,12 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 	@Deprecated
 	@Override
 	public PluginStorageWrapper getPluginStorage() throws RemoteException {
-		// TODO Auto-generated method stub
 		return new PluginStorageWrapper();
 	}
 
 
     @Override
 	public List<String> getPluginAlgNames(Class<? extends Alg> algClass) throws RemoteException {
-		// TODO Auto-generated method stub
     	RegisterTable algReg = PluginStorage.lookupTable(algClass);
     	if (algReg == null) return Util.newList();
     	
@@ -903,14 +899,12 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 
 	@Override
 	public Alg getPluginAlg(Class<? extends Alg> algClass, String algName, boolean remote) throws RemoteException {
-		// TODO Auto-generated method stub
 		return getAlg(PluginStorage.lookupTable(algClass), algName, remote);
 	}
 
 
 	@Override
 	public Alg getEvaluatedAlg(String algName, boolean remote) throws RemoteException {
-		// TODO Auto-generated method stub
 		return getAlg(algRegResult, algName, remote);
 	}
 
@@ -1140,7 +1134,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 
 
 	@Override
-	public boolean isWrapper() throws RemoteException {
+	public boolean isDelegate() throws RemoteException {
 		return false;
 	}
 
@@ -1171,8 +1165,8 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 
 	
 	@Override
-	public List<EventObject> doTaskList(UUID listenerID) throws RemoteException {
-		return evTaskQueue.doTaskList(listenerID);
+	public List<EventObject> doTask(UUID listenerID) throws RemoteException {
+		return evTaskQueue.doTaskGreedy(listenerID);
 	}
 
 
@@ -1780,7 +1774,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 					}
 				}
 				catch (Exception e) {
-					LogUtil.error("Error to load class " + algDesc.getAlgClassName() + " from host " + config.getAsString("$clienthost") +
+					LogUtil.error("remoteStart: Error to load class " + algDesc.getAlgClassName() + " from remote host/client" +
 							" caused by " + e.getMessage());
 					evAlg = null;
 				}

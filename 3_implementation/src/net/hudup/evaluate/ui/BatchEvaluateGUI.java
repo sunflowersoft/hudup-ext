@@ -367,7 +367,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 		
 		paneAlg.add(new JLabel(I18nUtil.message("algorithms") + ":"));
 		
-		this.lbAlgs = new AlgListBox(false) {
+		this.lbAlgs = new AlgListBox(false, evaluator) {
 
 			/**
 			 * Default serial version UID.
@@ -474,7 +474,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					AlgListChooser dlg = new AlgListChooser(getThisGUI(), algRegTable.getAlgList(), lbAlgs.getAlgList());
+					AlgListChooser dlg = new AlgListChooser(getThisGUI(), algRegTable.getAlgList(), lbAlgs.getAlgList(), evaluator);
 					if (!dlg.isOK())
 						return;
 					
@@ -1129,7 +1129,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 				started = evaluator.remoteStart0(lbAlgs.getAlgList(), toDatasetPoolExchangedClient(guiData.pool), timestamp = new Timestamp(), null);
 			else {
 				DataConfig config = lbAlgs.getAlgDescMapRemote();
-				started = evaluator.remoteStart(lbAlgs.getAlgNameList(), toDatasetPoolExchangedClient(guiData.pool), this, config, timestamp = new Timestamp(), null);
+				started = evaluator.remoteStart(lbAlgs.getAlgNameList(), toDatasetPoolExchangedClient(guiData.pool), connectInfo.deployGlobal ? null : this, config, timestamp = new Timestamp(), null);
 			}
 				
 			if (!started) updateMode();
@@ -1686,20 +1686,6 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 		catch (Throwable e) {
 			LogUtil.trace(e);
 		}
-	}
-	
-	
-	/**
-	 * Setting and backing up result.
-	 * @param result new result.
-	 */
-	protected synchronized void setResult(Metrics result) {
-		if (result == null) {
-			this.recoveredResult = this.result;
-			this.result = result;
-		}
-		else
-			this.recoveredResult = this.result = result;
 	}
 	
 	

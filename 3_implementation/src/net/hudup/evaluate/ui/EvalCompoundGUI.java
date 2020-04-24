@@ -8,6 +8,7 @@
 package net.hudup.evaluate.ui;
 
 import java.awt.BorderLayout;
+import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.Window;
@@ -95,8 +96,17 @@ public class EvalCompoundGUI extends JFrame {
 	
 	/**
 	 * Constructor with specified evaluator.
-	 * @param evaluator specified {@link EvaluatorAbstract}.
-	 * @param ConnectInfo connection information.
+	 * @param evaluator specified evaluator.
+	 */
+	public EvalCompoundGUI(Evaluator evaluator) {
+		this(evaluator, null, null);
+	}
+
+	
+	/**
+	 * Constructor with specified evaluator and connection information.
+	 * @param evaluator specified evaluator.
+	 * @param connectInfo connection information.
 	 */
 	public EvalCompoundGUI(Evaluator evaluator, ConnectInfo connectInfo) {
 		this(evaluator, connectInfo, null);
@@ -105,7 +115,7 @@ public class EvalCompoundGUI extends JFrame {
 	
 	/**
 	 * Constructor with specified evaluator.
-	 * @param evaluator specified {@link EvaluatorAbstract}.
+	 * @param evaluator specified evaluator.
 	 * @param connectInfo connection information.
 	 * @param referredData evaluator GUI data.
 	 */
@@ -195,7 +205,7 @@ public class EvalCompoundGUI extends JFrame {
 
 		if (batchEvaluateGUI.getConnectInfo().bindUri != null) {
 			JMenuItem mniUpdateFromServer = new JMenuItem(
-				new AbstractAction(I18nUtil.message("update_from_server")) {
+				new AbstractAction(I18nUtil.message("update_system_from_server")) {
 					
 					/**
 					 * Serial version UID for serializable class. 
@@ -212,23 +222,8 @@ public class EvalCompoundGUI extends JFrame {
 
 		
 		mnTools.addSeparator();
-		JMenuItem mniRefreshGUI = new JMenuItem(
-			new AbstractAction(I18nUtil.message("refresh_gui")) {
-				
-				/**
-				 * Serial version UID for serializable class. 
-				 */
-				private static final long serialVersionUID = 1L;
-
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					batchEvaluateGUI.updateMode();
-				}
-			});
-		mnTools.add(mniRefreshGUI);
-
 		JMenuItem mniRefreshResult = new JMenuItem(
-			new AbstractAction(I18nUtil.message("refresh_evaluate_result")) {
+			new AbstractAction(I18nUtil.message("refresh_evaluate_process")) {
 				
 				/**
 				 * Serial version UID for serializable class. 
@@ -237,48 +232,9 @@ public class EvalCompoundGUI extends JFrame {
 
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					boolean idle = false;
-					try {
-						idle = batchEvaluateGUI.isIdle();
-					} catch (Exception ex) {LogUtil.trace(ex);}
-					
-					if (!idle) {
-						int confirm = JOptionPane.showConfirmDialog(
-							getThisEvalGUI(), 
-							"System is not idle or corrupted.\nDo you want to continue to get refreshing?", 
-							"Refreshing confirmation",
-							JOptionPane.YES_NO_OPTION,
-							JOptionPane.QUESTION_MESSAGE);
-						if (confirm != JOptionPane.YES_OPTION)
-							return;
-					}
-					
-					Metrics result = null;
-					boolean success = true;
-					try {
-						result = batchEvaluateGUI.getEvaluator().getResult();
-					} catch (Exception ex) {LogUtil.trace(ex); success = false;}
-					
-					if (result != null) {
-						batchEvaluateGUI.setResult(result);
-						batchEvaluateGUI.updateMode();
-					}
-					
-					if (success) {
-						JOptionPane.showMessageDialog(
-							getThisEvalGUI(), 
-							"Result refreshing successful", 
-							"Result refreshing successful", 
-							JOptionPane.INFORMATION_MESSAGE);
-					}
-					else {
-						JOptionPane.showMessageDialog(
-							getThisEvalGUI(), 
-							"Result refreshing failed", 
-							"Result refreshing failed", 
-							JOptionPane.ERROR_MESSAGE);
-					}
+					batchEvaluateGUI.refreshEvaluateProcess();
 				}
+				
 			});
 		mnTools.add(mniRefreshResult);
 
@@ -480,7 +436,7 @@ public class EvalCompoundGUI extends JFrame {
 		if (!isIdle) {
 			JOptionPane.showMessageDialog(
 				this, 
-				"Evaluator is running.\n It is impossible to update from server", 
+				"Evaluator is running.\n It is impossible to update system from server", 
 				"Evaluator is running", 
 				JOptionPane.WARNING_MESSAGE);
 			return;
@@ -653,7 +609,7 @@ public class EvalCompoundGUI extends JFrame {
 		
 		final JDialog dlgEvStarter = new JDialog((JFrame)null, "Start evaluator", true); 
 		dlgEvStarter.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		dlgEvStarter.setSize(400, 300);
+		dlgEvStarter.setSize(400, 320);
 		dlgEvStarter.setLocationRelativeTo(null);
 		dlgEvStarter.setLayout(new BorderLayout());
 		
@@ -668,11 +624,11 @@ public class EvalCompoundGUI extends JFrame {
 		header.add(left, BorderLayout.WEST);
 		
 		left.add(new JLabel("Evaluator:"));
-		left.add(new JLabel("Export:"));
-		left.add(new JLabel("My naming port:"));
-		left.add(new JLabel("My naming path:"));
+		left.add(new JLabel("Hosting:"));
+		left.add(new JLabel("    Naming port:"));
+		left.add(new JLabel("    Naming path:"));
 		left.add(new JLabel("Deploy global:"));
-		left.add(new JLabel("My global address:"));
+		left.add(new JLabel("    Global address:"));
 		
 		JPanel right = new JPanel(new GridLayout(0, 1));
 		header.add(right, BorderLayout.CENTER);
@@ -682,8 +638,8 @@ public class EvalCompoundGUI extends JFrame {
 			cmbEvs.setSelectedItem(initialEv);
 		right.add(cmbEvs);
 		
-		final JCheckBox chkExport = new JCheckBox("", false);
-		right.add(chkExport);
+		final JCheckBox chkHosting = new JCheckBox("", false);
+		right.add(chkHosting);
 		
 		JPanel paneNamingPort = new JPanel(new BorderLayout());
 		right.add(paneNamingPort);
@@ -722,12 +678,12 @@ public class EvalCompoundGUI extends JFrame {
 
 		JPanel paneNamingPath = new JPanel(new BorderLayout());
 		right.add(paneNamingPath);
-		paneNamingPath.setVisible(chkExport.isSelected());
+		paneNamingPath.setVisible(chkHosting.isSelected());
 		
 		final JTextField txtNamingPath = new JTextField("connect1");
 		paneNamingPath.add(txtNamingPath, BorderLayout.CENTER);
 		
-		JButton btnGenNamingName = UIUtil.makeIconButton(
+		JButton btnGenNamingPath = UIUtil.makeIconButton(
 			"generate-16x16.png",
 			"generate", 
 			"Generate - http://www.iconarchive.com/show/flatastic-9-icons-by-custom-icon-design/Generate-keys-icon.html", 
@@ -740,7 +696,7 @@ public class EvalCompoundGUI extends JFrame {
 					txtNamingPath.setText("connect" + new Date().getTime());
 				}
 			});
-		paneNamingPath.add(btnGenNamingName, BorderLayout.EAST);
+		paneNamingPath.add(btnGenNamingPath, BorderLayout.EAST);
 
 		JCheckBox chkDeployGlobal = new JCheckBox("", false);
 		right.add(chkDeployGlobal);
@@ -768,12 +724,12 @@ public class EvalCompoundGUI extends JFrame {
 			});
 		paneDeployGlobalAddress.add(btnGenDeployGlobalAddress, BorderLayout.EAST);
 
-		chkExport.addItemListener(new ItemListener() {
+		chkHosting.addItemListener(new ItemListener() {
 			
 			@Override
 			public void itemStateChanged(ItemEvent e) {
-				paneNamingPort.setVisible(chkExport.isSelected());
-				paneNamingPath.setVisible(chkExport.isSelected());
+				paneNamingPort.setVisible(chkHosting.isSelected());
+				paneNamingPath.setVisible(chkHosting.isSelected());
 			}
 		});
 
@@ -785,9 +741,12 @@ public class EvalCompoundGUI extends JFrame {
 			}
 		});
 		
-		JPanel footer = new JPanel();
+		JPanel footer = new JPanel(new BorderLayout());
 		dlgEvStarter.add(footer, BorderLayout.SOUTH);
 		
+		JPanel buttons = new JPanel();
+		footer.add(buttons, BorderLayout.NORTH);
+
 		JButton start = new JButton("Start");
 		start.addActionListener(new ActionListener() {
 			
@@ -803,7 +762,7 @@ public class EvalCompoundGUI extends JFrame {
 						connectInfo.deployGlobalAddress = null;
 				}
 
-				if (chkExport.isSelected()) {
+				if (chkHosting.isSelected()) {
 					String namingPath = ConnectDlg.normalizeNamingPath(txtNamingPath.getText());
 					int namingPort = txtNamingPort.getValue() instanceof Number ? ( (Number) txtNamingPort.getValue()).intValue() : 0;
 					namingPort = NetUtil.getPort(namingPort, Constants.TRY_RANDOM_PORT);
@@ -826,7 +785,7 @@ public class EvalCompoundGUI extends JFrame {
 				run(ev, connectInfo, null, null);
 			}
 		});
-		footer.add(start);
+		buttons.add(start);
 		
 		JButton cancel = new JButton("Cancel");
 		cancel.addActionListener(new ActionListener() {
@@ -836,7 +795,13 @@ public class EvalCompoundGUI extends JFrame {
 				dlgEvStarter.dispose();
 			}
 		});
-		footer.add(cancel);
+		buttons.add(cancel);
+
+		JPanel status = new JPanel(new FlowLayout(FlowLayout.LEFT));
+		footer.add(status, BorderLayout.SOUTH);
+		
+		status.add(new JLabel("Local address: " + Constants.hostAddress + "  "));
+		status.add(new JLabel("Internet address: " + NetUtil.getPublicInetAddress()));
 
 		
 		dlgEvStarter.setVisible(true);

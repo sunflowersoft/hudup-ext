@@ -46,24 +46,12 @@ public interface PluginChangedListener extends EventListener, Remote {
 	boolean isIdle() throws RemoteException;
 	
 	
-//	/**
-//	 * Checking whether to support importing plug-ins.
-//	 * @return whether to support importing plug-ins.
-//	 */
-//	boolean isSupportImport() throws RemoteException;
-	
-	
 	/**
 	 * Getting port for remote call.
 	 * @return port for remote call.
+	 * @throws RemoteException if any error raises.
 	 */
 	int getPort() throws RemoteException;
-	
-	
-//	/**
-//	 * Require to clean up something.
-//	 */
-//	void requireCleanupSomething() throws RemoteException;
 	
 	
 }

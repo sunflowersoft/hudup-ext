@@ -11,6 +11,7 @@ import java.util.Collection;
 import java.util.EventObject;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import net.hudup.core.Constants;
@@ -43,6 +44,115 @@ public class TaskQueue extends AbstractRunner {
 	
 	
 	/**
+	 * This class represents a tasks driven events.
+	 * @author Loc Nguyen
+	 * @version 1.0
+	 */
+	public static class EventTask {
+		
+		/**
+		 * List of events.
+		 */
+		protected List<EventObject> evtList = Util.newList();
+		
+		/**
+		 * Last access.
+		 */
+		protected long lastDone = 0;
+		
+		/**
+		 * Default constructor.
+		 */
+		public EventTask() {
+			this(null, 0);
+		}
+
+		/**
+		 * Constructor with event list and last access.
+		 * @param evtList event list.
+		 */
+		public EventTask(List<EventObject> evtList) {
+			this(evtList, 0);
+		}
+
+		/**
+		 * Constructor with event list and last access.
+		 * @param evtList event list.
+		 * @param lastAccess last access.
+		 */
+		public EventTask(List<EventObject> evtList, long lastAccess) {
+			this.evtList = evtList != null ? evtList : Util.newList();
+			this.lastDone = lastAccess;
+		}
+		
+		/**
+		 * Getting event at specified index.
+		 * @param index specified index.
+		 * @return event at specified index.
+		 */
+		public EventObject get(int index) {
+			return evtList.get(index);
+		}
+		
+		/**
+		 * Adding event object.
+		 * @param evt specified event object.
+		 * @return true if adding is successful.
+		 */
+		public boolean add(EventObject evt) {
+			return evtList.add(evt);
+		}
+		
+		/**
+		 * Removing event at specified index.
+		 * @param index specified index.
+		 * @return removed event.
+		 */
+		public EventObject remove(int index) {
+			return evtList.remove(index);
+		}
+		
+		/**
+		 * Getting number of events.
+		 * @return number of events.
+		 */
+		public int size() {
+			return evtList.size();
+		}
+		
+		/**
+		 * Clearing all events.
+		 */
+		public void clear() {
+			evtList.clear();
+		}
+		
+		/**
+		 * Getting last time to do task.
+		 * @return last time to do task.
+		 */
+		public long getLastDone() {
+			return lastDone;
+		}
+		
+		/**
+		 * Updating last time to do task.
+		 */
+		public void updateLastDone() {
+			lastDone = System.currentTimeMillis();
+		}
+		
+		/**
+		 * Getting list of events.
+		 */
+		public List<EventObject> getEventList() {
+			return evtList;
+		}
+		
+	}
+	
+	
+	/**
 	 * Maximum number of event objects.
 	 */
 	public static int MAX_NUMBER_EVENT_OBJECTS = 1000;
@@ -51,13 +161,13 @@ public class TaskQueue extends AbstractRunner {
 	/**
 	 * Internal list of tasks.
 	 */
-	private List<Task> taskList = Util.newList();
+	protected List<Task> taskList = Util.newList();
 	
 	
 	/**
-	 * Internal map of task lists. Each list is list of events of a listener ID.
+	 * Internal map of event tasks. Each entry is an event-driven task of a listener ID.
 	 */
-	private Map<UUID, List<EventObject>> taskMap = Util.newMap();
+	protected Map<UUID, EventTask> taskMap = Util.newMap();
 
 	
 	/**
@@ -88,20 +198,24 @@ public class TaskQueue extends AbstractRunner {
 		long startTime = System.currentTimeMillis();
 		while (true) {
 			synchronized (taskMap) {
-				Collection<List<EventObject>> evtLists = taskMap.values();
+				Set<UUID> listenerUUIDs = Util.newSet();
+				listenerUUIDs.addAll(taskMap.keySet());
 				boolean empty = true;
-				for (List<EventObject> evtList : evtLists) {
-					if (evtList.size() > 0) {
-						empty = false;
-						break;
+				for (UUID listenerUUID : listenerUUIDs) {
+					EventTask task = taskMap.get(listenerUUID);
+					if (task == null) continue;
+					
+					if (System.currentTimeMillis() - task.getLastDone() > 10 * Constants.DEFAULT_SHORT_TIMEOUT) {
+						task.clear();
+						taskMap.remove(listenerUUID);
 					}
+					
+					empty = empty && (task.size() == 0);
 				}
 				if (empty) break;
 			}
 			
-			long currentTime = System.currentTimeMillis();
-			long interval = currentTime - startTime;
-			if (interval > Constants.DEFAULT_SHORT_TIMEOUT) {
+			if (System.currentTimeMillis() - startTime > Constants.DEFAULT_SHORT_TIMEOUT) {
 				synchronized (taskMap) {
 					clearTaskMap();
 				}
@@ -127,9 +241,9 @@ public class TaskQueue extends AbstractRunner {
 	 * Clearing task map.
 	 */
 	private void clearTaskMap() {
-		Collection<List<EventObject>> evtLists = taskMap.values();
-		for (List<EventObject> evtList : evtLists) {
-			evtList.clear();
+		Collection<EventTask> tasks = taskMap.values();
+		for (EventTask task : tasks) {
+			task.clear();
 		}
 	}
 	
@@ -158,14 +272,15 @@ public class TaskQueue extends AbstractRunner {
 		if (listenerID == null || evt == null) return false;
 		
 		synchronized (taskMap) {
-			List<EventObject> evtList = null;
+			EventTask task = null;
 			if (taskMap.containsKey(listenerID))
-				evtList = taskMap.get(listenerID);
+				task = taskMap.get(listenerID);
 			else {
-				evtList = Util.newList();
-				taskMap.put(listenerID, evtList);
+				task = new EventTask();
+				taskMap.put(listenerID, task);
 			}
-			return evtList.add(evt);
+			
+			return task.add(evt);
 		}
 	}
 	
@@ -179,11 +294,11 @@ public class TaskQueue extends AbstractRunner {
 		if (evt == null) return false;
 		
 		synchronized (taskMap) {
-			Collection<List<EventObject>> evtLists = taskMap.values();
-			for (List<EventObject> evtList : evtLists) {
-				evtList.add(evt);
-				if (evtList.size() > MAX_NUMBER_EVENT_OBJECTS)
-					evtList.remove(0);
+			Collection<EventTask> tasks = taskMap.values();
+			for (EventTask task : tasks) {
+				task.add(evt);
+				if (task.size() > MAX_NUMBER_EVENT_OBJECTS)
+					task.remove(0);
 			}
 			
 			return true;
@@ -200,14 +315,15 @@ public class TaskQueue extends AbstractRunner {
 		if (listenerID == null) return null;
 		
 		synchronized (taskMap) {
-			List<EventObject> evtList = null;
+			EventTask task = null;
 			if (!taskMap.containsKey(listenerID)) return null;
 			
-			evtList = taskMap.get(listenerID);
-			if (evtList.size() == 0)
+			task = taskMap.get(listenerID);
+			task.updateLastDone();
+			if (task.size() == 0)
 				return null;
 			else
-				return evtList.remove(0);
+				return task.remove(0);
 		}
 		
 	}
@@ -218,17 +334,18 @@ public class TaskQueue extends AbstractRunner {
 	 * @param listenerID specified listener ID.
 	 * @return list of events as the task list.
 	 */
-	public List<EventObject> doTaskList(UUID listenerID) {
+	public List<EventObject> doTaskGreedy(UUID listenerID) {
 		if (listenerID == null) return Util.newList();
 		
 		synchronized (taskMap) {
-			List<EventObject> evtList = null;
+			EventTask task = null;
 			if (!taskMap.containsKey(listenerID)) return Util.newList();
 			
-			evtList = taskMap.get(listenerID);
-			List<EventObject> returnedEvtList = Util.newList(evtList.size());
-			returnedEvtList.addAll(evtList);
-			evtList.clear();
+			task = taskMap.get(listenerID);
+			List<EventObject> returnedEvtList = Util.newList(task.size());
+			returnedEvtList.addAll(task.getEventList());
+			task.clear();
+			task.updateLastDone();
 			return returnedEvtList;
 		}
 	}
@@ -246,8 +363,9 @@ public class TaskQueue extends AbstractRunner {
 			if (taskMap.containsKey(listenerID)) 
 				return true;
 			else {
-				List<EventObject> evtList = Util.newList();
-				return taskMap.put(listenerID, evtList) != null;
+				EventTask task = new EventTask();
+				taskMap.put(listenerID, task);
+				return true;
 			}
 		}
 	}

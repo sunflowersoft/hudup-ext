@@ -428,7 +428,7 @@ class AlgConfigDlg extends JDialog {
 		}
 		
 		
-		AlgChooser chooser = new AlgChooser(this, defaultAlg, null, removedAlgList);
+		AlgChooser chooser = new AlgChooser(this, defaultAlg, null, removedAlgList, null);
 		Alg alg = chooser.getResult();
 		if (alg == null)
 			return false;

@@ -8,6 +8,7 @@
 package net.hudup.core.client;
 
 import java.awt.BorderLayout;
+import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
@@ -18,6 +19,7 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.Date;
 
+import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -25,6 +27,9 @@ import javax.swing.JDialog;
 import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
@@ -38,6 +43,7 @@ import net.hudup.core.evaluate.Evaluator;
 import net.hudup.core.logistic.Account;
 import net.hudup.core.logistic.ConnectInfo;
 import net.hudup.core.logistic.Counter;
+import net.hudup.core.logistic.I18nUtil;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.NetUtil;
 import net.hudup.core.logistic.xURI;
@@ -240,13 +246,13 @@ public abstract class ConnectDlg extends JDialog {
 	/**
 	 * Check box as flag to indicate whether exporting again.
 	 */
-	protected JCheckBox chkExport = null;
+	protected JCheckBox chkHostingAgain = null;
 	
 	
 	/**
 	 * Text field to fill naming path.
 	 */
-	protected JTextField txtBindPath = null;
+	protected JTextField txtMyNamingPath = null;
 
 	
 	/**
@@ -258,37 +264,37 @@ public abstract class ConnectDlg extends JDialog {
 	/**
 	 * Text field to fill naming port.
 	 */
-	protected JFormattedTextField txtBindPort = null;
+	protected JFormattedTextField txtMyBindPort = null;
 
 	
 	/**
 	 * Button to check port.
 	 */
-	protected JButton btnCheckBindPort = null;
+	protected JButton btnCheckMyBindPort = null;
 	
 	
 	/**
 	 * Check box as flag to indicate whether to deploy server / service globally.
 	 */
-	protected JCheckBox chkDeployGlobal = null;
+	protected JCheckBox chkServerDeployGlobal = null;
 
 	
 	/**
 	 * Text field to fill global deployed host.
 	 */
-	protected JTextField txtDeployGlobalAddress = null;
+	protected JTextField txtMyGlobalAddress = null;
 
 	
 	/**
 	 * Text field to generate bind path.
 	 */
-	protected JButton btnGenDeployGlobalAddress = null; 
+	protected JButton btnGenMyGlobalAddress = null; 
 			
 	
 	/**
 	 * Text field to fill server access period.
 	 */
-	protected JFormattedTextField txtServerAccessPeriod = null;
+	protected JFormattedTextField txtMyAccessPeriod = null;
 
 	
 	/**
@@ -318,7 +324,63 @@ public abstract class ConnectDlg extends JDialog {
         if (image != null)
         	setIconImage(image);
 
-        JPanel header = new JPanel(new BorderLayout());
+		JMenuBar mnBar = new JMenuBar();
+		setJMenuBar(mnBar);
+		
+		JMenu mnHelp = new JMenu(I18nUtil.message("Help"));
+		mnBar.add(mnHelp);
+		
+		JMenuItem mniGuideline = new JMenuItem(
+			new AbstractAction(I18nUtil.message("guidance")) {
+				
+				/**
+				 * Serial version UID for serializable class. 
+				 */
+				private static final long serialVersionUID = 1L;
+
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					JDialog dlgGuide = new JDialog(getThisConnectDlg(), I18nUtil.message("guidance"), true);
+					dlgGuide.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+					dlgGuide.setSize(300, 200);
+					dlgGuide.setLocationRelativeTo(getThisConnectDlg());
+					dlgGuide.setLayout(new BorderLayout());
+					
+					JPanel body = new JPanel(new BorderLayout());
+					dlgGuide.add(body, BorderLayout.CENTER);
+					
+					TextArea txtInfo = new TextArea();
+					body.add(new JScrollPane(txtInfo), BorderLayout.CENTER);
+					txtInfo.setEditable(false);
+					txtInfo.setText(
+						  "Server serves at default port (RMI) " + Constants.DEFAULT_SERVER_PORT + ".\n\n"
+						+ "Listener serves at default port (Socket) " + Constants.DEFAULT_LISTENER_PORT + ".\n"
+						+ "Listener exports at default port (RMI) " + Constants.DEFAULT_LISTENER_EXPORT_PORT + " for control connection.\n\n"
+						+ "Balancer serves at default port (Socket) " + Constants.DEFAULT_BALANCER_PORT + ".\n"
+						+ "Balancer exports at default port (RMI) " + Constants.DEFAULT_BALANCER_EXPORT_PORT + " for control connection.\n\n"
+						+ "Default socket control port is (Socket) " + Constants.DEFAULT_SOCKET_CONTROL_PORT + ".\n\n"
+						+ "Evaluator serves at default port (RMI) " + Constants.DEFAULT_EVALUATOR_PORT + ".\n\n"
+						+ "Default control panel port is (RMI) " + Constants.DEFAULT_CONTROL_PANEL_PORT + ".\n\n");
+					
+					JPanel footer = new JPanel();
+					dlgGuide.add(footer, BorderLayout.SOUTH);
+					
+					JButton ok = new JButton("OK");
+					ok.addActionListener(new ActionListener() {
+						
+						@Override
+						public void actionPerformed(ActionEvent e) {
+							dlgGuide.dispose();
+						}
+					});
+					footer.add(ok);
+					
+					dlgGuide.setVisible(true);
+				}
+			});
+		mnHelp.add(mniGuideline);
+		
+		JPanel header = new JPanel(new BorderLayout());
 		add(header, BorderLayout.NORTH);
 		
 		JPanel left = new JPanel(new GridLayout(0, 1));
@@ -330,12 +392,12 @@ public abstract class ConnectDlg extends JDialog {
 		left.add(new JLabel("Connect path:"));
 		left.add(new JLabel("User name:"));
 		left.add(new JLabel("Password:"));
-		left.add(new JLabel("Export:"));
+		left.add(new JLabel("Server deploy global:"));
+		left.add(new JLabel("    My global address:"));
+		left.add(new JLabel("    My access period (s):"));
 		left.add(new JLabel("My bound port:"));
-		left.add(new JLabel("My bound path:"));
-		left.add(new JLabel("Deploy global:"));
-		left.add(new JLabel("My global address:"));
-		left.add(new JLabel("Access period (s):"));
+		left.add(new JLabel("Hosting again:"));
+		left.add(new JLabel("    My hosting naming path:"));
 		
 		JPanel right = new JPanel(new GridLayout(0, 1));
 		header.add(right, BorderLayout.CENTER);
@@ -387,18 +449,47 @@ public abstract class ConnectDlg extends JDialog {
 		String pwd = Util.getHudupProperty("admin");
 		if (pwd == null) txtPassword.setText(pwd);
 
-		chkExport = new JCheckBox("", false);
-		right.add(chkExport);
-		chkExport.setEnabled(false);
+		chkServerDeployGlobal = new JCheckBox("", false);
+		right.add(chkServerDeployGlobal);
+
+		JPanel paneDeployGlobalAddress = new JPanel(new BorderLayout());
+		right.add(paneDeployGlobalAddress);
+		paneDeployGlobalAddress.setVisible(chkServerDeployGlobal.isSelected());
+
+		txtMyGlobalAddress = new JTextField("");
+		paneDeployGlobalAddress.add(txtMyGlobalAddress, BorderLayout.CENTER);
+		txtMyGlobalAddress.setToolTipText("It is possible to leave my global address empty so that system will assign default address");
+		
+		btnGenMyGlobalAddress = UIUtil.makeIconButton(
+			"generate-16x16.png",
+			"generate", 
+			"Generate - http://www.iconarchive.com/show/flatastic-9-icons-by-custom-icon-design/Generate-keys-icon.html", 
+			"Generate", 
+			
+			new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					String publicIP = NetUtil.getPublicInetAddress();
+					txtMyGlobalAddress.setText(publicIP != null ? publicIP : "");
+				}
+			});
+		paneDeployGlobalAddress.add(btnGenMyGlobalAddress, BorderLayout.EAST);
+
+		txtMyAccessPeriod = new JFormattedTextField(new NumberFormatter());
+		right.add(txtMyAccessPeriod);
+		txtMyAccessPeriod.setValue((int)(5*Counter.PERIOD/1000));
+		txtMyAccessPeriod.setVisible(chkServerDeployGlobal.isSelected());
 
 		JPanel paneBindPort = new JPanel(new BorderLayout());
 		right.add(paneBindPort);
 		
-		txtBindPort = new JFormattedTextField(new NumberFormatter());
-		paneBindPort.add(txtBindPort, BorderLayout.CENTER);
-		txtBindPort.setValue(Constants.DEFAULT_CONTROL_PANEL_PORT);
+		txtMyBindPort = new JFormattedTextField(new NumberFormatter());
+		paneBindPort.add(txtMyBindPort, BorderLayout.CENTER);
+		txtMyBindPort.setValue(Constants.DEFAULT_CONTROL_PANEL_PORT);
+		txtMyBindPort.setToolTipText("It is possible to set my bound port 0 if not hosting again");
 
-		btnCheckBindPort = UIUtil.makeIconButton(
+		btnCheckMyBindPort = UIUtil.makeIconButton(
 			"checking-16x16.png",
 			"checking", 
 			"Checking - http://www.iconarchive.com/show/outline-icons-by-iconsmind/Check-2-icon.html", 
@@ -408,7 +499,7 @@ public abstract class ConnectDlg extends JDialog {
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					int port = txtBindPort.getValue() instanceof Number ? ( (Number) txtBindPort.getValue()).intValue() : 0;
+					int port = txtMyBindPort.getValue() instanceof Number ? ( (Number) txtMyBindPort.getValue()).intValue() : 0;
 					boolean ret = NetUtil.testPort(port);
 					if (ret) {
 						JOptionPane.showMessageDialog(getThisConnectDlg(),
@@ -423,14 +514,18 @@ public abstract class ConnectDlg extends JDialog {
 							"Invalid port", JOptionPane.ERROR_MESSAGE);
 				}
 			});
-		paneBindPort.add(btnCheckBindPort, BorderLayout.EAST);
+		paneBindPort.add(btnCheckMyBindPort, BorderLayout.EAST);
 
-		JPanel paneBindPath = new JPanel(new BorderLayout());
-		right.add(paneBindPath);
-		paneBindPath.setVisible(chkExport.isSelected());
+		chkHostingAgain = new JCheckBox("", false);
+		right.add(chkHostingAgain);
+		//chkHostingAgain.setEnabled(false);
+
+		JPanel paneMyNamingPath = new JPanel(new BorderLayout());
+		right.add(paneMyNamingPath);
+		paneMyNamingPath.setVisible(chkHostingAgain.isSelected());
 		
-		txtBindPath = new JTextField("connect1");
-		paneBindPath.add(txtBindPath, BorderLayout.CENTER);
+		txtMyNamingPath = new JTextField("connect1");
+		paneMyNamingPath.add(txtMyNamingPath, BorderLayout.CENTER);
 		btnGenBindPath = UIUtil.makeIconButton(
 			"generate-16x16.png",
 			"generate", 
@@ -441,80 +536,35 @@ public abstract class ConnectDlg extends JDialog {
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					txtBindPath.setText("connect" + new Date().getTime());
+					txtMyNamingPath.setText("connect" + new Date().getTime());
 				}
 			});
-		paneBindPath.add(btnGenBindPath, BorderLayout.EAST);
+		paneMyNamingPath.add(btnGenBindPath, BorderLayout.EAST);
 
-		chkDeployGlobal = new JCheckBox("", false);
-		right.add(chkDeployGlobal);
-
-		JPanel paneDeployGlobalAddress = new JPanel(new BorderLayout());
-		right.add(paneDeployGlobalAddress);
-		paneDeployGlobalAddress.setVisible(chkDeployGlobal.isSelected());
-
-		txtDeployGlobalAddress = new JTextField("");
-		paneDeployGlobalAddress.add(txtDeployGlobalAddress, BorderLayout.CENTER);
-
-		btnGenDeployGlobalAddress = UIUtil.makeIconButton(
-			"generate-16x16.png",
-			"generate", 
-			"Generate - http://www.iconarchive.com/show/flatastic-9-icons-by-custom-icon-design/Generate-keys-icon.html", 
-			"Generate", 
-			
-			new ActionListener() {
-				
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					String publicIP = NetUtil.getPublicInetAddress();
-					txtDeployGlobalAddress.setText(publicIP != null ? publicIP : "");
-				}
-			});
-		paneDeployGlobalAddress.add(btnGenDeployGlobalAddress, BorderLayout.EAST);
-
-		txtServerAccessPeriod = new JFormattedTextField(new NumberFormatter());
-		right.add(txtServerAccessPeriod);
-		txtServerAccessPeriod.setValue(1);
-		txtServerAccessPeriod.setVisible(chkDeployGlobal.isSelected());
-
-		chkExport.addItemListener(new ItemListener() {
+		
+		chkServerDeployGlobal.addItemListener(new ItemListener() {
 			
 			@Override
 			public void itemStateChanged(ItemEvent e) {
-				paneBindPort.setVisible(chkExport.isSelected());
-				paneBindPath.setVisible(chkExport.isSelected());
+				paneDeployGlobalAddress.setVisible(chkServerDeployGlobal.isSelected());
+				txtMyAccessPeriod.setVisible(chkServerDeployGlobal.isSelected());
 			}
 		});
 
-		chkDeployGlobal.addItemListener(new ItemListener() {
+		chkHostingAgain.addItemListener(new ItemListener() {
 			
 			@Override
 			public void itemStateChanged(ItemEvent e) {
-				paneDeployGlobalAddress.setVisible(chkDeployGlobal.isSelected());
-				txtServerAccessPeriod.setVisible(chkDeployGlobal.isSelected());
+				paneMyNamingPath.setVisible(chkHostingAgain.isSelected());
 			}
 		});
-		
-		
-		JPanel body = new JPanel(new BorderLayout());
-		add(body, BorderLayout.CENTER);
-		
-		TextArea txtInfo = new TextArea();
-		body.add(new JScrollPane(txtInfo), BorderLayout.CENTER);
-		txtInfo.setEditable(false);
-		txtInfo.setText(
-			  "Server serves at default port (RMI) " + Constants.DEFAULT_SERVER_PORT + ".\n\n"
-			+ "Listener serves at default port (Socket) " + Constants.DEFAULT_LISTENER_PORT + ".\n"
-			+ "Listener exports at default port (RMI) " + Constants.DEFAULT_LISTENER_EXPORT_PORT + " for control connection.\n\n"
-			+ "Balancer serves at default port (Socket) " + Constants.DEFAULT_BALANCER_PORT + ".\n"
-			+ "Balancer exports at default port (RMI) " + Constants.DEFAULT_BALANCER_EXPORT_PORT + " for control connection.\n\n"
-			+ "Default socket control port is (Socket) " + Constants.DEFAULT_SOCKET_CONTROL_PORT + ".\n\n"
-			+ "Evaluator serves at default port (RMI) " + Constants.DEFAULT_EVALUATOR_PORT + ".\n\n"
-			+ "Default control panel port is (RMI) " + Constants.DEFAULT_CONTROL_PANEL_PORT + ".\n\n");
 
 		
-		JPanel footer = new JPanel();
+		JPanel footer = new JPanel(new BorderLayout());
 		add(footer, BorderLayout.SOUTH);
+		
+		JPanel buttons = new JPanel();
+		footer.add(buttons, BorderLayout.NORTH);
 		
 		JButton connect = new JButton("Connect");
 		connect.addActionListener(new ActionListener() {
@@ -524,7 +574,7 @@ public abstract class ConnectDlg extends JDialog {
 				connect0();
 			}
 		});
-		footer.add(connect);
+		buttons.add(connect);
 		
 		JButton close = new JButton("Close");
 		close.addActionListener(new ActionListener() {
@@ -534,7 +584,13 @@ public abstract class ConnectDlg extends JDialog {
 				dispose();
 			}
 		});
-		footer.add(close);
+		buttons.add(close);
+		
+		JPanel status = new JPanel(new FlowLayout(FlowLayout.LEFT));
+		footer.add(status, BorderLayout.SOUTH);
+		
+		status.add(new JLabel("Local address: " + Constants.hostAddress + "  "));
+		status.add(new JLabel("Internet address: " + NetUtil.getPublicInetAddress()));
 	}
 	
 	
@@ -683,12 +739,12 @@ public abstract class ConnectDlg extends JDialog {
 				String username = txtUsername.getText();
 				String password = txtPassword.getText();
 				
-				String bindPath = normalizeNamingPath(txtBindPath.getText());
-				int bindPort = txtBindPort.getValue() instanceof Number ? ( (Number) txtBindPort.getValue()).intValue() : 0;
+				String myNamingPath = normalizeNamingPath(txtMyNamingPath.getText());
+				int bindPort = txtMyBindPort.getValue() instanceof Number ? ( (Number) txtMyBindPort.getValue()).intValue() : 0;
 				if (bindPort <= 0)
 					bindPort = 0;
 				else
-					bindPort = NetUtil.getPort(bindPort, chkExport.isSelected() ? Constants.TRY_RANDOM_PORT : true);
+					bindPort = NetUtil.getPort(bindPort, chkHostingAgain.isSelected() ? Constants.TRY_RANDOM_PORT : true);
 
 				ConnectTypeDesc connectType = (ConnectTypeDesc)cmbConnectType.getSelectedItem();
 				xURI connectUri = null;
@@ -718,14 +774,14 @@ public abstract class ConnectDlg extends JDialog {
 				connectInfo.account = Account.create(username, password);
 				connectInfo.connectUri = connectUri; 
 				connectInfo.bindUri = xURI.create("rmi://localhost:" + bindPort);
-				if (chkExport.isSelected()) {
+				if (chkHostingAgain.isSelected()) {
 					connectInfo.namingUri = connectInfo.bindUri;
-					if (bindPath != null && !bindPath.isEmpty())
-						connectInfo.namingUri = connectInfo.namingUri.concat(bindPath);
+					if (myNamingPath != null && !myNamingPath.isEmpty())
+						connectInfo.namingUri = connectInfo.namingUri.concat(myNamingPath);
 				}
 				
-				connectInfo.deployGlobal = chkDeployGlobal.isSelected();
-				connectInfo.deployGlobalAddress = txtDeployGlobalAddress.getText();
+				connectInfo.deployGlobal = chkServerDeployGlobal.isSelected();
+				connectInfo.deployGlobalAddress = txtMyGlobalAddress.getText();
 				if (connectInfo.deployGlobalAddress != null) {
 					connectInfo.deployGlobalAddress = connectInfo.deployGlobalAddress.trim();
 					if (connectInfo.deployGlobalAddress.isEmpty())
@@ -734,9 +790,9 @@ public abstract class ConnectDlg extends JDialog {
 				if (connectInfo.deployGlobal && connectInfo.deployGlobalAddress == null)
 					connectInfo.internetAddress = NetUtil.getPublicInetAddress();
 				
-				int serverAccessPeriod = txtServerAccessPeriod.getValue() instanceof Number ? ( (Number) txtServerAccessPeriod.getValue()).intValue() : 1;
-				serverAccessPeriod = 1000 * serverAccessPeriod;
-				connectInfo.serverAccessPeriod = serverAccessPeriod < Counter.PERIOD ? Counter.PERIOD : serverAccessPeriod;   
+				int myAccessPeriod = txtMyAccessPeriod.getValue() instanceof Number ? ( (Number) txtMyAccessPeriod.getValue()).intValue() : 1;
+				myAccessPeriod = 1000 * myAccessPeriod;
+				connectInfo.accessPeriod = myAccessPeriod < Counter.PERIOD ? Counter.PERIOD : myAccessPeriod;   
 
 				dispose();
 			}

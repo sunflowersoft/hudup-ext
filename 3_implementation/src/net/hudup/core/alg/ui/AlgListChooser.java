@@ -25,6 +25,7 @@ import javax.swing.JScrollPane;
 
 import net.hudup.core.Util;
 import net.hudup.core.alg.Alg;
+import net.hudup.core.evaluate.Evaluator;
 import net.hudup.core.logistic.ui.UIUtil;
 
 /**
@@ -69,12 +70,24 @@ public class AlgListChooser extends JDialog {
 	
 	
 	/**
-	 * Constructor with parent component, the whole list of algorithms, the list of firstly selected algorithms.
+	 * Constructor with parent component, the whole list of algorithms, and the list of firstly selected algorithms.
 	 * @param comp parent component.
 	 * @param wholeList whole list of algorithms.
 	 * @param selectedList list of firstly selected algorithms.
 	 */
 	public AlgListChooser(Component comp, List<Alg> wholeList, List<Alg> selectedList) {
+		this(comp, wholeList, selectedList, null);
+	}
+	
+	
+	/**
+	 * Constructor with parent component, the whole list of algorithms, the list of firstly selected algorithms, and referred evaluator.
+	 * @param comp parent component.
+	 * @param wholeList whole list of algorithms.
+	 * @param selectedList list of firstly selected algorithms.
+	 * @param referredEvaluator referred evaluator.
+	 */
+	public AlgListChooser(Component comp, List<Alg> wholeList, List<Alg> selectedList, Evaluator referredEvaluator) {
 		super(UIUtil.getFrameForComponent(comp), "Choosing algorithms", true);
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		setSize(600, 400);
@@ -85,7 +98,6 @@ public class AlgListChooser extends JDialog {
 			
 			@Override
 			public int compare(Alg alg1, Alg alg2) {
-				// TODO Auto-generated method stub
 				return alg1.getName().compareTo(alg2.getName());
 			}
 		});
@@ -93,7 +105,6 @@ public class AlgListChooser extends JDialog {
 			
 			@Override
 			public int compare(Alg alg1, Alg alg2) {
-				// TODO Auto-generated method stub
 				return alg1.getName().compareTo(alg2.getName());
 			}
 		});
@@ -113,7 +124,7 @@ public class AlgListChooser extends JDialog {
 		body.add(left);
 		
 		left.add(new JLabel("Available algorithm list"), BorderLayout.NORTH);
-		leftList = new AlgListBox(true);
+		leftList = new AlgListBox(true, referredEvaluator);
 		leftList.update(remainList);
 		leftList.setEnableDoubleClick(false);
 		left.add(new JScrollPane(leftList), BorderLayout.CENTER);
@@ -127,7 +138,6 @@ public class AlgListChooser extends JDialog {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				leftToRight();
 			}
 		});
@@ -140,7 +150,6 @@ public class AlgListChooser extends JDialog {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				leftToRightAll();
 			}
 		});
@@ -153,7 +162,6 @@ public class AlgListChooser extends JDialog {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				rightToLeft();
 			}
 		});
@@ -166,7 +174,6 @@ public class AlgListChooser extends JDialog {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				rightToLeftAll();
 			}
 		});
@@ -180,7 +187,7 @@ public class AlgListChooser extends JDialog {
 		
 		right.add(new JLabel("Selected algorithm list"), BorderLayout.NORTH);
 		
-		rightList = new AlgListBox(true);
+		rightList = new AlgListBox(true, referredEvaluator);
 		rightList.setEnableDoubleClick(false);
 		rightList.update(selectedList);
 		right.add(new JScrollPane(rightList), BorderLayout.CENTER);
@@ -194,7 +201,6 @@ public class AlgListChooser extends JDialog {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				ok();
 			}
 		});
@@ -205,7 +211,6 @@ public class AlgListChooser extends JDialog {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				dispose();
 			}
 		});

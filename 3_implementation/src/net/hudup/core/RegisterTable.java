@@ -145,7 +145,7 @@ public final class RegisterTable implements Cloneable, Serializable {
 	/**
 	 * Registering all algorithms of the specified register table. This method is only called by evaluator GUI.
 	 * By default all algorithms are not cloned due to saving memory and supporting well remote (imported) algorithms but you can clone algorithms (by overriding) for safety.
-	 * Alternatively, method {@link #copy(RegisterTable)} clones algorithms.
+	 * Alternatively, method {@link #copyTheSame(RegisterTable)} clones algorithms.
 	 * @param from specified register table.
 	 */
 	public void registerAsTheSame(RegisterTable from) {

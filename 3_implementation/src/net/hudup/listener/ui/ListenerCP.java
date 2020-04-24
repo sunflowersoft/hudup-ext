@@ -120,8 +120,6 @@ public class ListenerCP extends JFrame implements ServerStatusListener {
 	 * Constructor with reference to specified listener and binded URI of this control panel as remote RMI object.
 	 * @param listener specified listener.
 	 * @param bindUri binded URI of this control panel as remote RMI object. If it is not null, this control panel associates with remote listener on remote host.
-	 * @param bRemote if this flag is true, this control panel associates with remote listener on remote host.
-	 * If this flag is false, this control panel associates with local listener on the same host.
 	 */
 	public ListenerCP(Server listener, xURI bindUri) {
 		super("Listener control panel");

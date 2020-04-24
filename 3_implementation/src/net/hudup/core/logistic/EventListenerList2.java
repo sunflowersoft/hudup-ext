@@ -56,6 +56,7 @@ public class EventListenerList2 implements Serializable {
 	
 	/**
 	 * Adding listener with specified class.
+	 * @param <T> specified type of event listener.
 	 * @param t specified class.
 	 * @param l specified listener.
 	 */
@@ -67,6 +68,7 @@ public class EventListenerList2 implements Serializable {
 
     /**
 	 * Removing listener with specified class.
+	 * @param <T> specified type of event listener.
 	 * @param t specified class.
 	 * @param l specified listener.
      */
@@ -78,6 +80,7 @@ public class EventListenerList2 implements Serializable {
     
     /**
      * Getting array of listeners with specified class.
+	 * @param <T> specified type of event listener.
      * @param t specified class.
      * @return array of listeners with specified class.
      */

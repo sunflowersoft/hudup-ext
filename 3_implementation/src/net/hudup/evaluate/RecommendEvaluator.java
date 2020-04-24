@@ -130,12 +130,6 @@ public class RecommendEvaluator extends EvaluatorAbstract {
 		Thread current = Thread.currentThread();
 		
 		for (int i = 0; current == thread && evAlgList != null && i < evAlgList.size(); i++) {
-//			try {
-//				if (!acceptAlg(evAlgList.get(i))) continue;
-//			} catch (Throwable e) {
-//				LogUtil.trace(e);
-//				continue;
-//			}
 			Recommender recommender = (Recommender)evAlgList.get(i);
 			evAlg = recommender;
 			otherResult.algName = recommender.getName();
@@ -388,7 +382,6 @@ public class RecommendEvaluator extends EvaluatorAbstract {
 					users.close();
 			} 
 			catch (Throwable e) {
-				// TODO Auto-generated catch block
 				LogUtil.trace(e);
 			}
 		}
@@ -426,7 +419,6 @@ public class RecommendEvaluator extends EvaluatorAbstract {
 					items.close();
 			} 
 			catch (Throwable e) {
-				// TODO Auto-generated catch block
 				LogUtil.trace(e);
 			}
 		}
@@ -467,14 +459,12 @@ public class RecommendEvaluator extends EvaluatorAbstract {
 	
 	@Override
 	public String getName() throws RemoteException {
-		// TODO Auto-generated method stub
 		return Constants.DEFAULT_EVALUATOR_NAME;
 	}
 
 
 	@Override
 	public NoneWrapperMetricList defaultMetrics() throws RemoteException {
-		// TODO Auto-generated method stub
 		NoneWrapperMetricList metricList = new NoneWrapperMetricList();
 		
 		SetupTimeMetric setupTime = new SetupTimeMetric();
@@ -540,7 +530,6 @@ public class RecommendEvaluator extends EvaluatorAbstract {
 
 	@Override
 	protected void setupAlg(Alg alg, Dataset training) {
-		// TODO Auto-generated method stub
 		try {
 			((Recommender)alg).setup(training);
 		}
@@ -550,7 +539,6 @@ public class RecommendEvaluator extends EvaluatorAbstract {
 
 	@Override
 	protected void unsetupAlg(Alg alg) {
-		// TODO Auto-generated method stub
 		try {
 			((Recommender)alg).unsetup();
 		}
@@ -560,28 +548,24 @@ public class RecommendEvaluator extends EvaluatorAbstract {
 
 	@Override
 	protected Fetcher<Profile> fetchTesting(Dataset testing) {
-		// TODO Auto-generated method stub
 		throw new RuntimeException("Do not support this method");
 	}
 
 
 	@Override
 	protected Profile prepareExecuteAlg(Alg alg, Profile testingProfile) {
-		// TODO Auto-generated method stub
 		throw new RuntimeException("Do not support this method");
 	}
 
 
 	@Override
 	protected Serializable executeAlg(Alg alg, Profile param) {
-		// TODO Auto-generated method stub
 		throw new RuntimeException("Do not support this method");
 	}
 
 
 	@Override
 	protected Serializable extractTestValue(Alg alg, Profile testingProfile) {
-		// TODO Auto-generated method stub
 		throw new RuntimeException("Do not support this method");
 	}
 

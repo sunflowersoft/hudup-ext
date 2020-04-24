@@ -25,6 +25,7 @@ import net.hudup.core.RegisterTable;
 import net.hudup.core.Util;
 import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.AlgList;
+import net.hudup.core.evaluate.Evaluator;
 
 
 /**
@@ -42,10 +43,11 @@ public class AlgComboBox extends JComboBox<Alg> implements AlgListUI {
 	private static final long serialVersionUID = 1L;
 
 	
-    /**
-     * Default constructor.
+	/**
+     * Constructor with evaluator.
+     * @param evaluator referred evaluator.
      */
-	public AlgComboBox() {
+	public AlgComboBox(Evaluator evaluator) {
 		super();
 		
 		addMouseListener(new MouseAdapter() {
@@ -57,7 +59,7 @@ public class AlgComboBox extends JComboBox<Alg> implements AlgListUI {
 					return;
 				
 				if(SwingUtilities.isRightMouseButton(e) ) {
-					JPopupMenu contextMenu = AlgListUIUtil.createContextMenu(getThis());
+					JPopupMenu contextMenu = AlgListUIUtil.createContextMenu(getThis(), evaluator);
 					if(contextMenu == null) return;
 					
 					addToContextMenu(contextMenu);
@@ -74,13 +76,31 @@ public class AlgComboBox extends JComboBox<Alg> implements AlgListUI {
 	
 	
     /**
-     * Constructor with array of algorithms.
-     * @param algList array of algorithms.
+     * Default constructor.
      */
-    public AlgComboBox(Alg[] algList) {
-    	this();
+	public AlgComboBox() {
+		this((Evaluator)null);
+	}
+
+		
+    /**
+     * Constructor with array of algorithms.
+     * @param algArray array of algorithms.
+     */
+    public AlgComboBox(Alg[] algArray) {
+    	this(algArray, null);
+    }
+
+    
+    /**
+     * Constructor with array of algorithms and evaluator.
+     * @param algArray array of algorithms.
+     * @param evaluator referred evaluator.
+     */
+    public AlgComboBox(Alg[] algArray, Evaluator evaluator) {
+    	this(evaluator);
     	
-    	update(algList);
+    	update(algArray);
     }
     
 
@@ -89,7 +109,17 @@ public class AlgComboBox extends JComboBox<Alg> implements AlgListUI {
      * @param algList list of algorithms.
      */
     public AlgComboBox(List<Alg> algList) {
-    	this();
+    	this(algList, null);
+    }
+    
+    
+    /**
+     * Constructor with list of algorithms and evaluator.
+     * @param algList list of algorithms.
+     * @param evaluator referred evaluator.
+     */
+    public AlgComboBox(List<Alg> algList, Evaluator evaluator) {
+    	this(evaluator);
     	
     	update(algList);
     }
@@ -176,14 +206,14 @@ public class AlgComboBox extends JComboBox<Alg> implements AlgListUI {
 	
 	/**
      * Update this {@link AlgComboBox} by specified array of algorithms.
-	 * @param algList specified array of algorithms.
+	 * @param algArray specified array of algorithms.
 	 */
-	public void update(Alg[] algList) {
+	public void update(Alg[] algArray) {
 		removeAllItems();
-		if (algList == null)
+		if (algArray == null)
 			return;
 		
-		update(Arrays.asList(algList));
+		update(Arrays.asList(algArray));
 	}
 	
 	

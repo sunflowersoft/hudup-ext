@@ -275,7 +275,6 @@ public final class UIUtil {
 
 		Random rnd = new Random();
 		int index = rnd.nextInt(looks.length);
-		if (index == 0) return;
 		
 		try {
 			UIManager.setLookAndFeel(looks[index].getClassName());

@@ -2415,7 +2415,7 @@ class ImportAlgDlag extends JDialog {
 		body.add(left);
 		
 		left.add(new JLabel("Available algorithm list"), BorderLayout.NORTH);
-		leftList = new AlgListBox(true);
+		leftList = new AlgListBox(true, null);
 		//leftList.update(remainList);
 		leftList.setEnableDoubleClick(false);
 		left.add(new JScrollPane(leftList), BorderLayout.CENTER);
@@ -2481,7 +2481,7 @@ class ImportAlgDlag extends JDialog {
 		
 		right.add(new JLabel("Selected algorithm list"), BorderLayout.NORTH);
 		
-		rightList = new AlgListBox(true);
+		rightList = new AlgListBox(true, null);
 		rightList.setEnableDoubleClick(false);
 		//rightList.update(selectedList);
 		right.add(new JScrollPane(rightList), BorderLayout.CENTER);

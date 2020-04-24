@@ -13,7 +13,7 @@ import net.hudup.core.logistic.LogUtil;
  * 
  * @author Lorenzo, Donato
  * @version 1.0
- * @see https://www.drdobbs.com/jvm/a-java-2-network-class-loader/184404484
+ * @see <a href="https://www.drdobbs.com/jvm/a-java-2-network-class-loader/184404484">https://www.drdobbs.com/jvm/a-java-2-network-class-loader/184404484</a>
  *
  */
 public class HudupSocketClassLoader extends ClassLoader {

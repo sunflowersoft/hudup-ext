@@ -610,6 +610,7 @@ class PropTableModel extends DefaultTableModel {
 					comp, 
 					value, 
 					((RegisterTable) PluginStorage.getCTSManagerReg().clone()).getAlgList(), 
+					null,
 					null);
 			
 			CTSManager ctsm = (CTSManager) chooser.getResult();

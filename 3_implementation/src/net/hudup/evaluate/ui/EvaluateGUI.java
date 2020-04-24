@@ -385,7 +385,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 		JPanel paneAlg = new JPanel();
 		up.add(paneAlg);
 		paneAlg.add(new JLabel(I18nUtil.message("algorithm") + ":"));
-		this.cmbAlgs = new AlgComboBox(algRegTable.getAlgList()) {
+		this.cmbAlgs = new AlgComboBox(algRegTable.getAlgList(), evaluator) {
 
 			/**
 			 * Default serial version UID.
@@ -1308,7 +1308,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 				started = evaluator.remoteStart0(algList, toDatasetPoolExchangedClient(guiData.pool), timestamp = new Timestamp(), null);
 			else {
 				DataConfig config = AlgList.getAlgDescMap(algList);
-				started = evaluator.remoteStart(AlgList.getAlgNameList(algList), toDatasetPoolExchangedClient(guiData.pool), this, config, timestamp = new Timestamp(), null);
+				started = evaluator.remoteStart(AlgList.getAlgNameList(algList), toDatasetPoolExchangedClient(guiData.pool), connectInfo.deployGlobal ? null : this, config, timestamp = new Timestamp(), null);
 			}
 			if (!started) updateMode();
 		}
@@ -1708,20 +1708,6 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			pair.setTesting(testing);
 			pair.setTestingUUID(null);
 		}
-	}
-
-	
-	/**
-	 * Setting and backing up result.
-	 * @param newResult new result.
-	 */
-	protected synchronized void setResult(Metrics newResult) {
-		if (newResult == null) {
-			this.recoveredResult = this.result;
-			this.result = newResult;
-		}
-		else
-			this.recoveredResult = this.result = newResult;
 	}
 
 	

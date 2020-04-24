@@ -183,11 +183,11 @@ public interface Evaluator extends Remote, RemoteRunner, SetupAlgListener, Plugi
 
 	
 	/**
-	 * Checking whether this object is a wrapper of an evaluator.
-	 * @return whether this object is a wrapper of an evaluator.
+	 * Checking whether this object is a delegate of an evaluator.
+	 * @return whether this object is a delegate of an evaluator.
 	 * @throws RemoteException if any error raises.
 	 */
-	boolean isWrapper() throws RemoteException;
+	boolean isDelegate() throws RemoteException;
 	
 	
 	/**
@@ -345,12 +345,12 @@ public interface Evaluator extends Remote, RemoteRunner, SetupAlgListener, Plugi
 
     
 	/**
-	 * Performing a task list of specified listener.
+	 * Performing event task of specified listener.
 	 * @param listenerID specified listener ID.
-	 * @return list of events as the task list.
+	 * @return list of events as the event task.
      * @throws RemoteException if any error raises.
 	 */
-	List<EventObject> doTaskList(UUID listenerID) throws RemoteException;
+	List<EventObject> doTask(UUID listenerID) throws RemoteException;
 
 	
 	/**

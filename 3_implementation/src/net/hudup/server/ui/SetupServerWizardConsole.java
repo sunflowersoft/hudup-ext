@@ -79,7 +79,8 @@ public class SetupServerWizardConsole {
 
 	
 	/**
-	 * Default constructor.
+	 * Constructor with configuration.
+	 * @param srvConfig power server configuration.
 	 */
 	public SetupServerWizardConsole(PowerServerConfig srvConfig) {
 		this.config = srvConfig;

@@ -38,7 +38,7 @@ import net.hudup.core.logistic.Timestamp;
  * This class is wrapper of remote evaluator.
  * 
  * @author Loc Nguyen
- * @version 1.0s
+ * @version 1.0
  *
  */
 @BaseClass //This is not base class but the base class annotation is used to prevent reflection of evaluators.
@@ -188,8 +188,8 @@ public class EvaluatorWrapper implements Evaluator, Serializable {
 
 
 	@Override
-	public boolean isWrapper() throws RemoteException {
-		return true;
+	public boolean isDelegate() throws RemoteException {
+		return false;
 	}
 
 
@@ -328,8 +328,8 @@ public class EvaluatorWrapper implements Evaluator, Serializable {
 
 
 	@Override
-	public List<EventObject> doTaskList(UUID listenerID) throws RemoteException {
-		return remoteEvaluator.doTaskList(listenerID);
+	public List<EventObject> doTask(UUID listenerID) throws RemoteException {
+		return remoteEvaluator.doTask(listenerID);
 	}
 
 

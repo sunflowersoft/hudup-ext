@@ -27,6 +27,7 @@ import net.hudup.core.PluginStorage;
 import net.hudup.core.RegisterTable;
 import net.hudup.core.RegisterTableList.RegisterTableItem;
 import net.hudup.core.alg.Alg;
+import net.hudup.core.evaluate.Evaluator;
 import net.hudup.core.logistic.ui.UIUtil;
 
 
@@ -79,13 +80,27 @@ public class AlgChooser extends JDialog {
 	
 	
 	/**
-	 * Constructor with parent component, algorithm selected by default, initial list of algorithms, list of removed algorithms.
+	 * Constructor with parent component, algorithm selected by default, and initial list of algorithms, list of removed algorithms.
 	 * @param comp parent component.
 	 * @param defaultAlg algorithm selected by default.
 	 * @param initAlgList initial list of algorithms.
 	 * @param removedAlgList list of removed algorithms.
 	 */
 	public AlgChooser(Component comp, Object defaultAlg, List<Alg> initAlgList, List<Alg> removedAlgList) {
+		this(comp, defaultAlg, initAlgList, removedAlgList, null);
+		
+	}
+
+	
+	/**
+	 * Constructor with parent component, algorithm selected by default, initial list of algorithms, list of removed algorithms, and referred evaluator.
+	 * @param comp parent component.
+	 * @param defaultAlg algorithm selected by default.
+	 * @param initAlgList initial list of algorithms.
+	 * @param removedAlgList list of removed algorithms.
+	 * @param referredEvaluator referred evaluator.
+	 */
+	public AlgChooser(Component comp, Object defaultAlg, List<Alg> initAlgList, List<Alg> removedAlgList, Evaluator referredEvaluator) {
 		super(UIUtil.getFrameForComponent(comp), "Choosing algorithms", true);
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		setSize(400, 200);
@@ -116,7 +131,6 @@ public class AlgChooser extends JDialog {
 				
 				@Override
 				public void itemStateChanged(ItemEvent e) {
-					// TODO Auto-generated method stub
 					if (e.getStateChange() != ItemEvent.SELECTED)
 						return;
 					
@@ -129,7 +143,7 @@ public class AlgChooser extends JDialog {
 		JPanel algPane = new JPanel(new BorderLayout());
 		center.add(algPane);
 
-		cmbAlgs = new AlgComboBox(initAlgList);
+		cmbAlgs = new AlgComboBox(initAlgList, referredEvaluator);
 		cmbAlgs.setDefaultSelected(defaultAlg);
 		algPane.add(cmbAlgs, BorderLayout.CENTER);
 		
@@ -141,7 +155,6 @@ public class AlgChooser extends JDialog {
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					// TODO Auto-generated method stub
 					Alg alg = getAlg();
 					if (alg.getConfig() == null)
 						JOptionPane.showMessageDialog(getThis(), "Algorithm has no configuration", "Algorithm has no configuration", JOptionPane.INFORMATION_MESSAGE);
@@ -161,7 +174,6 @@ public class AlgChooser extends JDialog {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				result = getAlg();
 				
 				dispose();
@@ -174,7 +186,6 @@ public class AlgChooser extends JDialog {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				result = null;
 				dispose();
 			}
@@ -216,7 +227,6 @@ public class AlgChooser extends JDialog {
 	 * @return currently selected algorithm.
 	 */
 	private Alg getAlg() {
-		// TODO Auto-generated method stub
 		if (cmbAlgs.getItemCount() == 0)
 			return null;
 		else

@@ -17,12 +17,14 @@ import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 
 import net.hudup.core.alg.Alg;
+import net.hudup.core.alg.AlgDesc2;
 import net.hudup.core.alg.KBase;
 import net.hudup.core.alg.ModelBasedAlg;
+import net.hudup.core.evaluate.Evaluator;
+import net.hudup.core.evaluate.EvaluatorAbstract;
 import net.hudup.core.logistic.Inspectable;
 import net.hudup.core.logistic.Inspector;
 import net.hudup.core.logistic.LogUtil;
-import net.hudup.core.logistic.NextUpdate;
 import net.hudup.core.logistic.ui.UIUtil;
 
 /**
@@ -41,17 +43,28 @@ public final class AlgListUIUtil {
 	 * @return context pop-up menu for algorithm list UI.
 	 */
 	public final static JPopupMenu createContextMenu(AlgListUI ui) {
-		return createContextMenu0(ui);
+		return createContextMenu0(ui, null);
+	}
+
+	
+	/**
+	 * Creating the context menu for algorithm list UI.
+	 * @param ui specified algorithm list UI.
+	 * @param evaluator referred evaluator. It can be null.
+	 * @return context pop-up menu for algorithm list UI.
+	 */
+	public final static JPopupMenu createContextMenu(AlgListUI ui, Evaluator evaluator) {
+		return createContextMenu0(ui, evaluator);
 	}
 	
 	
 	/**
-	 * Creating the context menu for algorithm list UI. This method needs to be updated with knowledge base inspector.
+	 * Creating the context menu for algorithm list UI. This method needs to be updated with remote knowledge base inspector.
 	 * @param ui specified algorithm list UI.
+	 * @param evaluator referred evaluator.
 	 * @return context pop-up menu for algorithm list UI.
 	 */
-	@NextUpdate
-	private final static JPopupMenu createContextMenu0(final AlgListUI ui) {
+	private final static JPopupMenu createContextMenu0(AlgListUI ui, Evaluator evaluator) {
 		Alg alg = ui.getSelectedAlg();
 		if (alg == null)
 			return null;
@@ -80,15 +93,10 @@ public final class AlgListUIUtil {
 					
 					@Override
 					public void actionPerformed(ActionEvent e) {
-						Inspector inspector = null;
-						try {
-							inspector = ((Inspectable)alg).getInspector();
-							if (inspector != null) inspector.inspect();
-						} catch (Exception ex) {
-							ex.printStackTrace();
-							inspector = null;
-						}
-						if (inspector == null)
+						Inspector inspector = getInspector(alg, evaluator);
+						if (inspector != null)
+							inspector.inspect();
+						else
 							JOptionPane.showMessageDialog(UIUtil.getFrameForComponent((Component)ui), "Cannot retrieve inspector", "Cannot retrieve inspector", JOptionPane.ERROR_MESSAGE);
 					}
 				});
@@ -129,15 +137,10 @@ public final class AlgListUIUtil {
 							if (confirm != JOptionPane.OK_OPTION)
 								return;
 
-							Inspector inspector = null;
-							try {
-								inspector = kbase.getInspector();
-								if (inspector != null) inspector.inspect();
-							} catch (Exception ex) {
-								ex.printStackTrace();
-								inspector = null;
-							}
-							if (inspector == null)
+							Inspector inspector = kbase.getInspector();
+							if (inspector != null)
+								inspector.inspect();
+							else
 								JOptionPane.showMessageDialog(UIUtil.getFrameForComponent((Component)ui), "Cannot view knowledge base", "Cannot view knowledge base", JOptionPane.ERROR_MESSAGE);
 						}
 					});
@@ -162,6 +165,35 @@ public final class AlgListUIUtil {
 	}
 
 
+	/**
+	 * Getting inspector of the algorithm with evaluator.
+	 * @param alg specified algorithm.
+	 * @param evaluator specified evaluator.
+	 * @return inspector of the algorithm with evaluator.
+	 */
+	private static Inspector getInspector(Alg alg, Evaluator evaluator) {
+		if (alg == null) return null;
+		if ((evaluator == null) || !(EvaluatorAbstract.isRemote(evaluator)) || (AlgDesc2.isRemote(alg))) {
+			if (alg instanceof Inspectable)
+				return ((Inspectable)alg).getInspector();
+			else
+				return null;
+		}
+		else {
+			Alg remoteAlg = null;
+			try {
+				remoteAlg = evaluator.getEvaluatedAlg(alg.getName(), true);
+			} catch (Exception e) {LogUtil.trace(e);}
+			
+			if (remoteAlg == null)
+				return getInspector(remoteAlg, null);
+			else
+				return getInspector(alg, null);
+		}
+		
+	}
+	
+	
 	/**
 	 * Getting the windows frame of specified algorithm list UI.
 	 * @param ui specified algorithm list UI.

@@ -25,7 +25,7 @@ import net.hudup.core.logistic.NextUpdate;
  * 
  * @author Lorenzo, Donato, Loc Nguyen
  * @version 1.0
- * @see https://www.drdobbs.com/jvm/a-java-2-network-class-loader/184404484
+ * @see <a href="https://www.drdobbs.com/jvm/a-java-2-network-class-loader/184404484">https://www.drdobbs.com/jvm/a-java-2-network-class-loader/184404484</a>
  *
  */
 @NextUpdate
@@ -46,7 +46,7 @@ public class HudupSocketClassLoaderServer extends AbstractRunner {
 	
 	/**
 	 * Constructor with server port.
-	 * 
+	 * @param serverPort server port.
 	 */
 	public HudupSocketClassLoaderServer(int serverPort) {
 		this.serverPort = serverPort;
