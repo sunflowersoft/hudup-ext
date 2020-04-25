@@ -12,8 +12,6 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import javax.swing.event.EventListenerList;
 
@@ -34,6 +32,7 @@ import net.hudup.core.data.DataConfig;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.NetUtil;
 import net.hudup.core.logistic.SystemUtil;
+import net.hudup.core.logistic.Timer;
 import net.hudup.core.logistic.xURI;
 
 /**
@@ -130,12 +129,10 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 		super();
 		
 		try {
-			if (config.isDeployGlobal()) {
-				String globalHost = config.getDeployGlobalHost();
-				if (globalHost != null) {
-					System.setProperty("java.rmi.server.hostname", globalHost);
-					LogUtil.info("java.rmi.server.hostname=" + globalHost);
-				}
+			String globalAddress = config.getGlobalAddress();
+			if (globalAddress != null) {
+				System.setProperty("java.rmi.server.hostname", globalAddress);
+				LogUtil.info("java.rmi.server.hostname=" + globalAddress);
 			}
 		}
 		catch (Throwable e) {LogUtil.trace(e);}
@@ -391,23 +388,24 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 		if (milisec == 0)
 			return;
 		
-		timer = new Timer();
-		timer.schedule(
-			new TimerTask() {
-			
-				@Override
-				public void run() {
-					try {
-						callServerTasks();
-					} 
-					catch (Throwable e) {
-						LogUtil.trace(e);
-						LogUtil.error("Calling power server tasks causes error " + e.getMessage());
-					}
+		timer = new Timer(milisec, milisec) { //Need delaying so that server runs stably.
+
+			@Override
+			protected void task() {
+				try {
+					callServerTasks();
+				} 
+				catch (Throwable e) {
+					LogUtil.trace(e);
+					LogUtil.error("Calling power server tasks causes error " + e.getMessage());
 				}
-			}, 
-			milisec, 
-			milisec);
+			}
+
+			@Override
+			protected void clear() { }
+			
+		};
+		timer.start();
 		
 		LogUtil.info("Power server created internal timer, executing periodly " + milisec + " miliseconds");
 	}
@@ -418,7 +416,7 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 	 */
 	private void destroyTimer() {
 		if (timer != null) {
-			timer.cancel();
+			timer.stop();
 			timer = null;
 			
 			LogUtil.info("Power server destroyed internal timer");

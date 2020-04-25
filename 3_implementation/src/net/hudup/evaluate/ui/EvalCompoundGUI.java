@@ -11,6 +11,7 @@ import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.Image;
+import java.awt.Insets;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -37,7 +38,11 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.JToolBar;
+import javax.swing.KeyStroke;
 import javax.swing.text.NumberFormatter;
+
+import com.sun.glass.events.KeyEvent;
 
 import net.hudup.core.Constants;
 import net.hudup.core.PluginChangedListener;
@@ -45,6 +50,7 @@ import net.hudup.core.PluginStorage;
 import net.hudup.core.RegisterTable;
 import net.hudup.core.Util;
 import net.hudup.core.client.ConnectDlg;
+import net.hudup.core.client.ConnectInfo;
 import net.hudup.core.client.Service;
 import net.hudup.core.data.ui.SysConfigDlgExt;
 import net.hudup.core.evaluate.Evaluator;
@@ -57,7 +63,6 @@ import net.hudup.core.evaluate.NoneWrapperMetricList;
 import net.hudup.core.evaluate.ui.EvaluateGUIData;
 import net.hudup.core.evaluate.ui.MetricsAnalyzeDlg;
 import net.hudup.core.logistic.Account;
-import net.hudup.core.logistic.ConnectInfo;
 import net.hudup.core.logistic.I18nUtil;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.NetUtil;
@@ -150,6 +155,8 @@ public class EvalCompoundGUI extends JFrame {
 	    
 		setLayout(new BorderLayout());
 		
+//		add(createToolbar(), BorderLayout.NORTH);
+		
 		add(batchEvaluateGUI, BorderLayout.CENTER);
 		
 		try {
@@ -201,6 +208,7 @@ public class EvalCompoundGUI extends JFrame {
 					sysConfig();
 				}
 			});
+		mniSysConfig.setMnemonic(KeyEvent.VK_C);
 		mnTools.add(mniSysConfig);
 
 		if (batchEvaluateGUI.getConnectInfo().bindUri != null) {
@@ -217,13 +225,14 @@ public class EvalCompoundGUI extends JFrame {
 						updateFromServer();
 					}
 				});
+			mniUpdateFromServer.setMnemonic(KeyEvent.VK_U);
 			mnTools.add(mniUpdateFromServer);
 		}
 
 		
 		mnTools.addSeparator();
 		JMenuItem mniRefreshResult = new JMenuItem(
-			new AbstractAction(I18nUtil.message("refresh_evaluate_process")) {
+			new AbstractAction(I18nUtil.message("refresh_evaluate_result")) {
 				
 				/**
 				 * Serial version UID for serializable class. 
@@ -232,11 +241,13 @@ public class EvalCompoundGUI extends JFrame {
 
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					batchEvaluateGUI.refreshEvaluateProcess();
+					batchEvaluateGUI.refreshResult();
 				}
 				
 			});
 		mnTools.add(mniRefreshResult);
+		mniRefreshResult.setMnemonic(KeyEvent.VK_F);
+		mniRefreshResult.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F5, 0));
 
 		JMenuItem mniRecoverResult = new JMenuItem(
 			new AbstractAction(I18nUtil.message("recover_evaluate_result")) {
@@ -284,9 +295,8 @@ public class EvalCompoundGUI extends JFrame {
 					}
 				}
 			});
+		mniRecoverResult.setMnemonic(KeyEvent.VK_R);
 		mnTools.add(mniRecoverResult);
-
-		
 
 		boolean agent = false;
 		try {
@@ -309,6 +319,7 @@ public class EvalCompoundGUI extends JFrame {
 						switchEvaluator();
 					}
 				});
+			mniSwitchEvaluator.setMnemonic(KeyEvent.VK_S);
 			mnTools.add(mniSwitchEvaluator);
 		}
 			
@@ -329,12 +340,41 @@ public class EvalCompoundGUI extends JFrame {
 					new HelpContent(getThisEvalGUI());
 				}
 			});
+		mniHelpContent.setMnemonic(KeyEvent.VK_H);
+		mniHelpContent.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F1, 0));
 		mnHelp.add(mniHelpContent);
 
-		
 		return mnBar;
 	}
 
+	
+	/**
+	 * Creating tool bar.
+	 * @return tool bar.
+	 */
+	@SuppressWarnings("unused")
+	private JToolBar createToolbar() {
+		JToolBar toolbar = new JToolBar();
+
+		JButton btnRefreshResult = UIUtil.makeIconButton(
+			"refresh2-16x16.png", 
+			"refresh_result", 
+			I18nUtil.message("refresh"), 
+			I18nUtil.message("refresh"), 
+			
+			new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					batchEvaluateGUI.refreshResult();
+				}
+			});
+		btnRefreshResult.setMargin(new Insets(0, 0 , 0, 0));
+		toolbar.add(btnRefreshResult);
+
+		return toolbar;
+	}
+	
 	
 	/**
 	 * Switch evaluator.
@@ -607,7 +647,7 @@ public class EvalCompoundGUI extends JFrame {
 		}
 		
 		
-		final JDialog dlgEvStarter = new JDialog((JFrame)null, "Start evaluator", true); 
+		JDialog dlgEvStarter = new JDialog((JFrame)null, "Start evaluator", true); 
 		dlgEvStarter.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		dlgEvStarter.setSize(400, 320);
 		dlgEvStarter.setLocationRelativeTo(null);
@@ -627,8 +667,7 @@ public class EvalCompoundGUI extends JFrame {
 		left.add(new JLabel("Hosting:"));
 		left.add(new JLabel("    Naming port:"));
 		left.add(new JLabel("    Naming path:"));
-		left.add(new JLabel("Deploy global:"));
-		left.add(new JLabel("    Global address:"));
+		left.add(new JLabel("Global address:"));
 		
 		JPanel right = new JPanel(new GridLayout(0, 1));
 		header.add(right, BorderLayout.CENTER);
@@ -652,7 +691,7 @@ public class EvalCompoundGUI extends JFrame {
 		JButton btnCheckNamingPort = UIUtil.makeIconButton(
 			"checking-16x16.png",
 			"checking", 
-			"Checking - http://www.iconarchive.com/show/outline-icons-by-iconsmind/Check-2-icon.html", 
+			"Checking whether naming port is available - http://www.iconarchive.com/show/outline-icons-by-iconsmind/Check-2-icon.html", 
 			"Checking", 
 			
 			new ActionListener() {
@@ -686,7 +725,7 @@ public class EvalCompoundGUI extends JFrame {
 		JButton btnGenNamingPath = UIUtil.makeIconButton(
 			"generate-16x16.png",
 			"generate", 
-			"Generate - http://www.iconarchive.com/show/flatastic-9-icons-by-custom-icon-design/Generate-keys-icon.html", 
+			"Generate naming path - http://www.iconarchive.com/show/flatastic-9-icons-by-custom-icon-design/Generate-keys-icon.html", 
 			"Generate", 
 			
 			new ActionListener() {
@@ -698,20 +737,16 @@ public class EvalCompoundGUI extends JFrame {
 			});
 		paneNamingPath.add(btnGenNamingPath, BorderLayout.EAST);
 
-		JCheckBox chkDeployGlobal = new JCheckBox("", false);
-		right.add(chkDeployGlobal);
+		JPanel paneGlobalAddress = new JPanel(new BorderLayout());
+		right.add(paneGlobalAddress);
 
-		JPanel paneDeployGlobalAddress = new JPanel(new BorderLayout());
-		right.add(paneDeployGlobalAddress);
-		paneDeployGlobalAddress.setVisible(chkDeployGlobal.isSelected());
+		JTextField txtGlobalAddress = new JTextField("");
+		paneGlobalAddress.add(txtGlobalAddress, BorderLayout.CENTER);
 
-		JTextField txtDeployGlobalAddress = new JTextField("");
-		paneDeployGlobalAddress.add(txtDeployGlobalAddress, BorderLayout.CENTER);
-
-		JButton btnGenDeployGlobalAddress = UIUtil.makeIconButton(
+		JButton btnGenGlobalAddress = UIUtil.makeIconButton(
 			"generate-16x16.png",
 			"generate", 
-			"Generate - http://www.iconarchive.com/show/flatastic-9-icons-by-custom-icon-design/Generate-keys-icon.html", 
+			"Retrieve internet address as global address - http://www.iconarchive.com/show/flatastic-9-icons-by-custom-icon-design/Generate-keys-icon.html", 
 			"Generate", 
 			
 			new ActionListener() {
@@ -719,10 +754,10 @@ public class EvalCompoundGUI extends JFrame {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					String publicIP = NetUtil.getPublicInetAddress();
-					txtDeployGlobalAddress.setText(publicIP != null ? publicIP : "");
+					txtGlobalAddress.setText(publicIP != null ? publicIP : "");
 				}
 			});
-		paneDeployGlobalAddress.add(btnGenDeployGlobalAddress, BorderLayout.EAST);
+		paneGlobalAddress.add(btnGenGlobalAddress, BorderLayout.EAST);
 
 		chkHosting.addItemListener(new ItemListener() {
 			
@@ -733,14 +768,6 @@ public class EvalCompoundGUI extends JFrame {
 			}
 		});
 
-		chkDeployGlobal.addItemListener(new ItemListener() {
-			
-			@Override
-			public void itemStateChanged(ItemEvent e) {
-				paneDeployGlobalAddress.setVisible(chkDeployGlobal.isSelected());
-			}
-		});
-		
 		JPanel footer = new JPanel(new BorderLayout());
 		dlgEvStarter.add(footer, BorderLayout.SOUTH);
 		
@@ -754,12 +781,11 @@ public class EvalCompoundGUI extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				ConnectInfo connectInfo = new ConnectInfo();
 				
-				connectInfo.deployGlobal = chkDeployGlobal.isSelected();
-				connectInfo.deployGlobalAddress = txtDeployGlobalAddress.getText();
-				if (connectInfo.deployGlobalAddress != null) {
-					connectInfo.deployGlobalAddress = connectInfo.deployGlobalAddress.trim();
-					if (connectInfo.deployGlobalAddress.isEmpty())
-						connectInfo.deployGlobalAddress = null;
+				connectInfo.globalAddress = txtGlobalAddress.getText();
+				if (connectInfo.globalAddress != null) {
+					connectInfo.globalAddress = connectInfo.globalAddress.trim();
+					if (connectInfo.globalAddress.isEmpty())
+						connectInfo.globalAddress = null;
 				}
 
 				if (chkHosting.isSelected()) {
@@ -767,9 +793,7 @@ public class EvalCompoundGUI extends JFrame {
 					int namingPort = txtNamingPort.getValue() instanceof Number ? ( (Number) txtNamingPort.getValue()).intValue() : 0;
 					namingPort = NetUtil.getPort(namingPort, Constants.TRY_RANDOM_PORT);
 					
-					String host = null;
-					if (connectInfo.deployGlobal)
-						host = connectInfo.getDeployGlobalHost();
+					String host = connectInfo.globalAddress;
 					host = host != null ? host : "localhost";
 					connectInfo.namingUri = xURI.create("rmi://" + host + ":" + namingPort);
 						
@@ -801,7 +825,9 @@ public class EvalCompoundGUI extends JFrame {
 		footer.add(status, BorderLayout.SOUTH);
 		
 		status.add(new JLabel("Local address: " + Constants.hostAddress + "  "));
-		status.add(new JLabel("Internet address: " + NetUtil.getPublicInetAddress()));
+		String publicIP = NetUtil.getPublicInetAddress();
+		if (publicIP != null)
+			status.add(new JLabel("Internet address: " + publicIP));
 
 		
 		dlgEvStarter.setVisible(true);

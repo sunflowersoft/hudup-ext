@@ -45,6 +45,7 @@ import net.hudup.core.alg.AlgRemote;
 import net.hudup.core.alg.SetupAlgEvent;
 import net.hudup.core.alg.ui.AlgListBox;
 import net.hudup.core.alg.ui.AlgListBox.AlgListChangedEvent;
+import net.hudup.core.client.ConnectInfo;
 import net.hudup.core.alg.ui.AlgListChooser;
 import net.hudup.core.data.BatchScript;
 import net.hudup.core.data.DataConfig;
@@ -70,7 +71,6 @@ import net.hudup.core.evaluate.ui.EvaluateGUIData;
 import net.hudup.core.evaluate.ui.MetricsAnalyzeDlg;
 import net.hudup.core.evaluate.ui.MetricsTable;
 import net.hudup.core.logistic.ClipboardUtil;
-import net.hudup.core.logistic.ConnectInfo;
 import net.hudup.core.logistic.Counter;
 import net.hudup.core.logistic.CounterElapsedTimeEvent;
 import net.hudup.core.logistic.DSUtil;
@@ -909,21 +909,34 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 						@Override
 						public void actionPerformed(ActionEvent e) {
 							Metrics result = null;
+							boolean success = true;
 							try {
 								result = getThisGUI().evaluator.getResult();
 							}
-							catch (Exception ex) {ex.printStackTrace();}
-							if (result != null) {
-								getThisGUI().recoveredResult = getThisGUI().result = result;
-								update(result);
-							}
-							else {
+							catch (Exception ex) {success = false; ex.printStackTrace();}
+							if (!success) {
 								JOptionPane.showMessageDialog(
 									getThisGUI(), 
-									"Empty resulted metrics", 
-									"Empty resulted metrics", 
-									JOptionPane.WARNING_MESSAGE);
+									"Unable to connect server", 
+									"Unable to connect server", 
+									JOptionPane.ERROR_MESSAGE);
+								return;
 							}
+							
+							if (result == null) {
+								getThisGUI().recoveredResult = getThisGUI().result;
+								getThisGUI().result = result;
+								
+								JOptionPane.showMessageDialog(
+										getThisGUI(), 
+										"Empty resulted metrics", 
+										"Empty resulted metrics", 
+										JOptionPane.WARNING_MESSAGE);
+							}
+							else
+								getThisGUI().recoveredResult = getThisGUI().result = result;
+							
+							update(result);
 						}
 					});
 				
@@ -1129,7 +1142,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 				started = evaluator.remoteStart0(lbAlgs.getAlgList(), toDatasetPoolExchangedClient(guiData.pool), timestamp = new Timestamp(), null);
 			else {
 				DataConfig config = lbAlgs.getAlgDescMapRemote();
-				started = evaluator.remoteStart(lbAlgs.getAlgNameList(), toDatasetPoolExchangedClient(guiData.pool), connectInfo.deployGlobal ? null : this, config, timestamp = new Timestamp(), null);
+				started = evaluator.remoteStart(lbAlgs.getAlgNameList(), toDatasetPoolExchangedClient(guiData.pool), connectInfo.pullMode ? null : this, config, timestamp = new Timestamp(), null);
 			}
 				
 			if (!started) updateMode();

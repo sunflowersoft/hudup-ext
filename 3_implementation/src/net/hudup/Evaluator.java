@@ -150,6 +150,12 @@ public class Evaluator implements AccessPoint {
 						LogUtil.trace(e);
 					}
 				}
+				
+				@Override
+				public boolean ping() throws RemoteException {
+					return true;
+				}
+
 			});
 			
 			DatasetPool pool = script.getPool();

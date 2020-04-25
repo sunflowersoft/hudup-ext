@@ -153,9 +153,12 @@ public class TaskQueue extends AbstractRunner {
 	
 	
 	/**
-	 * Maximum number of event objects.
+	 * Default maximum number of event objects. Suppose a task needs at least 5 miliseconds. There are 1000 tasks in 5 seconds at most
+	 * and so the default access period from client is 5 seconds. Suppose the networking cost is as same as a task cost.
+	 * So the default maximum number of event objects is 2000. Suppose the length of array is 200,000 in average, there can be 100 clients in average without concerning other resources and costs.
+	 * If resources are limited 10 times in decrease, there can be 10 client in average.
 	 */
-	public static int MAX_NUMBER_EVENT_OBJECTS = 1000;
+	public static int MAX_NUMBER_EVENT_OBJECTS = 2000;
 	
 	
 	/**
@@ -205,7 +208,7 @@ public class TaskQueue extends AbstractRunner {
 					EventTask task = taskMap.get(listenerUUID);
 					if (task == null) continue;
 					
-					if (System.currentTimeMillis() - task.getLastDone() > 10 * Constants.DEFAULT_SHORT_TIMEOUT) {
+					if (System.currentTimeMillis() - task.getLastDone() > Constants.DEFAULT_LONG_TIMEOUT) {
 						task.clear();
 						taskMap.remove(listenerUUID);
 					}
@@ -213,14 +216,17 @@ public class TaskQueue extends AbstractRunner {
 					empty = empty && (task.size() == 0);
 				}
 				if (empty) break;
+				
+				if (System.currentTimeMillis() - startTime > Constants.DEFAULT_SHORT_TIMEOUT) {
+					clearTaskMap();
+					break;
+				}
 			}
 			
-			if (System.currentTimeMillis() - startTime > Constants.DEFAULT_SHORT_TIMEOUT) {
-				synchronized (taskMap) {
-					clearTaskMap();
-				}
-				break;
-			}
+			try {
+				Thread.sleep(5000); //5 seconds for listeners to occupy doing tasks (taskMap).
+			} catch (Exception e) {LogUtil.trace(e);}
+			
 		}
 	}
 

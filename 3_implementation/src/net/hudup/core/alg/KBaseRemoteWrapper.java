@@ -372,4 +372,10 @@ public class KBaseRemoteWrapper implements KBase, KBaseRemote {
 	}
 
 
+	@Override
+	public boolean ping() throws RemoteException {
+		return true;
+	}
+
+
 }

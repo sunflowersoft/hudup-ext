@@ -32,6 +32,7 @@ import net.hudup.core.alg.AlgDesc2;
 import net.hudup.core.alg.SetupAlgEvent;
 import net.hudup.core.alg.SetupAlgListener;
 import net.hudup.core.client.ClassProcessor;
+import net.hudup.core.client.ConnectInfo;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.DatasetAbstract;
 import net.hudup.core.data.DatasetPair;
@@ -56,12 +57,12 @@ import net.hudup.core.evaluate.Metric;
 import net.hudup.core.evaluate.Metrics;
 import net.hudup.core.evaluate.MetricsUtil;
 import net.hudup.core.logistic.AbstractRunner;
-import net.hudup.core.logistic.ConnectInfo;
 import net.hudup.core.logistic.Counter;
 import net.hudup.core.logistic.CounterElapsedTimeEvent;
 import net.hudup.core.logistic.CounterElapsedTimeListener;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.NetUtil;
+import net.hudup.core.logistic.Timer;
 import net.hudup.core.logistic.NetUtil.RegistryRemote;
 import net.hudup.core.logistic.Timestamp;
 
@@ -161,7 +162,7 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	/**
 	 * Feeding task queue from server.
 	 */
-	protected AbstractRunner taskQueueFeeder = null;
+	protected AbstractRunner taskQueueFeedee = null;
 	
 	
 	/**
@@ -228,12 +229,9 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 		this.connectInfo = connectInfo;
 		
 		try {
-			if (connectInfo.deployGlobal) {
-				String globalHost = connectInfo.getDeployGlobalHost();
-				if (globalHost != null) {
-					System.setProperty("java.rmi.server.hostname", globalHost);
-					LogUtil.info("java.rmi.server.hostname=" + globalHost);
-				}
+			if (connectInfo.globalAddress != null) {
+				System.setProperty("java.rmi.server.hostname", connectInfo.globalAddress);
+				LogUtil.info("java.rmi.server.hostname=" + connectInfo.globalAddress);
 			}
 		}
 		catch (Throwable e) {LogUtil.trace(e);}
@@ -363,52 +361,21 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 				guiData.txtRunSaveBrowse = evStorePath;
 		}
 
-		if (connectInfo.deployGlobal && connectInfo.bindUri != null) {
-			final long serverAccessPeriod = connectInfo.accessPeriod;
-			taskQueueFeeder = new AbstractRunner() {
-				
-				/**
-				 * Waiting flag for forcing to stop.
-				 */
-				private volatile boolean wait = true;
+		if (connectInfo.pullMode && connectInfo.bindUri != null) {
+			taskQueueFeedee = new Timer(0, connectInfo.accessPeriod) {
 				
 				@Override
 				protected void task() {
-					long startedTime = System.currentTimeMillis();
 					taskQueueFeed();
-					
-					while (wait && (System.currentTimeMillis() - startedTime < serverAccessPeriod)) { }
 				}
 				
 				@Override
-				protected void clear() {wait = true;}
-
-				@Override
-				public synchronized boolean stop() {
-					if (!isStarted()) return false;
-					
-					thread = null;
-					wait = false;
-					
-					if (paused) {
-						paused = false;
-						notifyAll();
-					}
-					
-					try {
-						wait();
-					} 
-					catch (Throwable e) {
-						LogUtil.trace(e);
-					}
-					
-					return true;
-				}
-				
-				
+				protected void clear() {}
 			};
-			taskQueueFeeder.start();
+			
+			taskQueueFeedee.start();
 		}
+				
 	}
 	
 	
@@ -497,26 +464,29 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	
 	
 	/**
-	 * Refreshing the entire evaluation process. Please distinguish this method from method {@link #refresh()}
-	 * when method {@link #refresh()} only refreshes local GUI.
-	 * This method will connect to server in case of remote evaluator.
+	 * Refreshing evaluated result. Please distinguish this method from method {@link #refresh()}
+	 * when method {@link #refresh()} refreshes data pool and local GUI.
+	 * This method will connect to server in pull mode.
 	 */
-	public void refreshEvaluateProcess() {
-		if (connectInfo.deployGlobal && connectInfo.bindUri != null) {
+	public synchronized void refreshResult() {
+		if (connectInfo.pullMode && connectInfo.bindUri != null) {
 			taskQueueFeed();
 		}
 		else {
 			Metrics result = null;
+			boolean success = true;
 			try {
 				result = evaluator.getResult();
-			} catch (Exception ex) {LogUtil.trace(ex);}
+			} catch (Exception ex) {success = false; LogUtil.trace(ex);}
 	
-			if (result == null) {
-				this.recoveredResult = this.result;
-				this.result = result;
+			if (success) {
+				if (result == null) {
+					this.recoveredResult = this.result;
+					this.result = result;
+				}
+				else
+					this.recoveredResult = this.result = result;
 			}
-			else
-				this.recoveredResult = this.result = result;
 			
 			updateMode();
 		}
@@ -663,9 +633,9 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 			algRegTable.unexportNonPluginAlgs();
 		} catch (Exception e) {LogUtil.trace(e);}
 		
-		if (taskQueueFeeder != null) {
-			taskQueueFeeder.stop();
-			taskQueueFeeder = null;
+		if (taskQueueFeedee != null) {
+			taskQueueFeedee.stop();
+			taskQueueFeedee = null;
 		}
 
 		if (exportedStub != null) {
@@ -766,13 +736,19 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	}
 
 
+	@Override
+	public boolean ping() throws RemoteException {
+		return true;
+	}
+
+
 	/**
 	 * Add this GUI as listeners to specified evaluator.
 	 * @param evaluator specified evaluator.
 	 */
 	private void setupListeners(Evaluator evaluator) {
 		try {
-			if (connectInfo.deployGlobal && connectInfo.bindUri != null) {
+			if (connectInfo.pullMode && connectInfo.bindUri != null) {
 				evaluator.addPluginChangedListener(id);
 				evaluator.addEvaluatorListener(id);
 				evaluator.addEvaluateListener(id);
@@ -800,7 +776,7 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	 */
 	private void unsetupListeners(Evaluator evaluator) {
 		try {
-			if (connectInfo.deployGlobal && connectInfo.bindUri != null) {
+			if (connectInfo.pullMode && connectInfo.bindUri != null) {
 				evaluator.removePluginChangedListener(id);
 				evaluator.removeEvaluatorListener(id);
 				evaluator.removeEvaluateListener(id);
@@ -870,10 +846,7 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 					!config.containsKey(DatasetAbstract.HOST_ADDR_FIELD)) {
 				config.put(DatasetAbstract.HARDWARE_ADDR_FIELD, Constants.hardwareAddress);
 				
-				String hostAddr = connectInfo.getDeployGlobalHost();
-				if (hostAddr == null && connectInfo.deployGlobal)
-					hostAddr = connectInfo.internetAddress;
-				hostAddr = hostAddr != null ? hostAddr : Constants.hostAddress;
+				String hostAddr = connectInfo.globalAddress != null ? connectInfo.globalAddress : Constants.hostAddress;
 				config.put(DatasetAbstract.HOST_ADDR_FIELD, hostAddr);
 			}
 		}
@@ -905,7 +878,7 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	/**
 	 * Updating both plug-in storage, evaluated algorithms, and dataset pool from server.
 	 */
-	public void updateFromServer() {
+	public synchronized void updateFromServer() {
 		updatePluginFromEvaluator();
 		updateAlgRegFromEvaluator();
 		

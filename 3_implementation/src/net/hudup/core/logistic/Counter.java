@@ -11,7 +11,6 @@ import java.io.Serializable;
 import java.rmi.RemoteException;
 
 import javax.swing.JLabel;
-import javax.swing.event.EventListenerList;
 
 import net.hudup.core.evaluate.EvaluateInfo;
 
@@ -61,7 +60,7 @@ public class Counter extends AbstractRunner implements Serializable {
 	 * Holding a list of event listener.
 	 * 
 	 */
-    protected EventListenerList listenerList = new EventListenerList();
+    protected EventListenerList2 listenerList = new EventListenerList2();
 
     
     /**
@@ -81,6 +80,17 @@ public class Counter extends AbstractRunner implements Serializable {
 	 */
 	public Counter() {
 		
+	}
+	
+	
+	/**
+	 * Setting listener list. Using this method is careful.
+	 * @param listenerList listener list.
+	 */
+	public synchronized void setListenerList(EventListenerList2 listenerList) {
+		synchronized (this.listenerList) {
+			if (listenerList != null) this.listenerList = listenerList;
+		}
 	}
 	
 	

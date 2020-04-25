@@ -202,15 +202,17 @@ public final class Constants {
 	
 	
 	/**
-	 * The Hudup server is available to serve incoming request in a interval called a timeout in miliseconds. This constant specifies such timeout.
+	 * The Hudup server (only listener and balancer) is available to serve incoming request in a interval called a timeout in miliseconds. This constant specifies such timeout.
 	 * After timeout interval is reached, the server suspends and users must resumes it.
+	 * However, in current implementation, time out is only effective to listener and balancer. Hudup server is not affected.
 	 */
-	public final static int     DEFAULT_SERVER_TIMEOUT       = (int) (1000 * 60 * 30); // 30 minutes
+	public final static int     DEFAULT_SERVER_TIMEOUT       = (int) (1000 * 60 * 60); // 1 hour
 	
 	/**
 	 * This is the period in miliseconds that the Hudup server does periodically internal tasks such as data mining and learning knowledge base.
 	 */
-	public final static int     DEFAULT_SERVER_TASKS_PERIOD  = (int) (1000 * 60 * 5); // 5 minute
+	//public final static int     DEFAULT_SERVER_TASKS_PERIOD  = (int) (1000 * 60 * 5); // 5 minute for testing learning algorithm.
+	public final static int     DEFAULT_SERVER_TASKS_PERIOD  = (int) (1000 * 60 * 30); // 30-minute interval is relatively enough to learn algorithm normally with small enough dataset.
 	
 	/**
 	 * This is the period in miliseconds that the listener does periodically internal tasks.
@@ -218,9 +220,14 @@ public final class Constants {
 	public final static int     DEFAULT_LISTENER_TASK_PERIOD = DEFAULT_SERVER_TIMEOUT;
 	
 	/**
+	 * The long time out for any tasks.
+	 */
+	public static int     DEFAULT_LONG_TIMEOUT               = (int) (1000 * 60 * 30); // 30 minutes
+	
+	/**
 	 * The short time out for any tasks.
 	 */
-	public final static int     DEFAULT_SHORT_TIMEOUT        = (int) (1000 * 60 * 5); // 5 minutes
+	public static int     DEFAULT_SHORT_TIMEOUT              = (int) (1000 * 60 * 5); // 5 minutes
 	
 	
 	
@@ -287,6 +294,25 @@ public final class Constants {
 			System.out.println("Error when parsing try random port");
 		}
 		
+		try {
+			String long_timeout_text = Util.getHudupProperty("timeout_long");
+			if (long_timeout_text != null) {
+				int long_timeout = Integer.parseInt(long_timeout_text);
+				long_timeout = long_timeout <= 0 ? DEFAULT_LONG_TIMEOUT : long_timeout;
+				DEFAULT_LONG_TIMEOUT = long_timeout;
+			}
+			
+			String short_timeout_text = Util.getHudupProperty("timeout_short");
+			if (short_timeout_text != null) {
+				int short_timeout = Integer.parseInt(short_timeout_text);
+				short_timeout = short_timeout <= 0 ? DEFAULT_SHORT_TIMEOUT : short_timeout;
+				DEFAULT_SHORT_TIMEOUT = short_timeout;
+			}
+		}
+		catch (Throwable e) {
+			System.out.println("Error when parsing the long and short time out");
+		}
+
 		try {
 			String log4j = Util.getHudupProperty("log4j");
 			if (log4j != null)

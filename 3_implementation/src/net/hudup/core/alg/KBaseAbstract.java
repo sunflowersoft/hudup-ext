@@ -471,6 +471,12 @@ public abstract class KBaseAbstract implements KBase, KBaseRemote {
 	}
 
 
+	@Override
+	public boolean ping() throws RemoteException {
+		return true;
+	}
+
+
 	/**
 	 * Create empty knowledge base.
 	 * @param kbaseName knowledge base name.

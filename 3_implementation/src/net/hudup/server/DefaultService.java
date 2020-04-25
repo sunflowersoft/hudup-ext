@@ -1667,8 +1667,13 @@ public class DefaultService implements Service, PluginChangedListener, AutoClose
 
 
 	@Override
+	public boolean ping() throws RemoteException {
+		return true;
+	}
+
+
+	@Override
 	protected void finalize() throws Throwable {
-		// TODO Auto-generated method stub
 		super.finalize();
 		
 		try {

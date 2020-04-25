@@ -11,6 +11,8 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.EventListener;
 
+import net.hudup.core.logistic.Pingable;
+
 /**
  * This interface represents a listener that monitors the evaluation progress.
  * 
@@ -18,7 +20,7 @@ import java.util.EventListener;
  * @version 10.0
  *
  */
-public interface EvaluateProgressListener extends EventListener, Remote {
+public interface EvaluateProgressListener extends EventListener, Pingable, Remote {
 	
 	
 	/**

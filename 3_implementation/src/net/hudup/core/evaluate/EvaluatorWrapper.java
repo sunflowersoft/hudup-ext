@@ -132,6 +132,12 @@ public class EvaluatorWrapper implements Evaluator, Serializable {
 
 	
 	@Override
+	public boolean ping() throws RemoteException {
+		return true;
+	}
+
+
+	@Override
 	public void close() throws Exception {
 		if (exclusive && remoteEvaluator != null) {
 			try {

@@ -102,27 +102,15 @@ public class PowerServerConfig extends ServerConfig {
 
 	
 	/**
-	 * Flag field to indicate whether to deploy Hudup framework globally like WAN, internet.
+	 * Field of global address.
 	 */
-	public final static String DEPLOY_GLOBAL_FIELD = "deploy_global";
+	public final static String GLOBAL_ADDRESS_FIELD = "global_address";
 
 	
 	/**
-	 * By default, Hudup framework is not deployed globally like WAN, internet.
+	 * Default value of global address.
 	 */
-	public final static boolean DEPLOY_GLOBAL_DEFAULT = false;
-
-	
-	/**
-	 * Field of default global deployed host.
-	 */
-	public final static String DEPLOY_GLOBAL_HOST_FIELD = "deploy_global_host";
-
-	
-	/**
-	 * Default value of default global deployed host.
-	 */
-	public final static String DEPLOY_GLOBAL_HOST_DEFAULT = "";
+	public final static String GLOBAL_ADDRESS_DEFAULT = "";
 
 	
 	/**
@@ -159,8 +147,7 @@ public class PowerServerConfig extends ServerConfig {
 		}
 		setPeriodLearn(PERIOD_LEARN_DEFAULT);
 		setDatasetEmpty(DATASET_EMPTY_DEFAULT);
-		setDeployGlobal(DEPLOY_GLOBAL_DEFAULT);
-		setDeployGlobalHostByDefault(DEPLOY_GLOBAL_HOST_DEFAULT);
+		setGlobalAddress(GLOBAL_ADDRESS_DEFAULT);
 	}
 
 	
@@ -202,57 +189,44 @@ public class PowerServerConfig extends ServerConfig {
 
 	
 	/**
-	 * Setting flag to indicate whether to deploy Hudup framework globally like WAN, internet.
-	 * @param flag flag to indicate whether to deploy Hudup framework globally like WAN, internet.
+	 * Setting global address.
+	 * @param globalAddress global address.
 	 */
-	public void setDeployGlobal(boolean flag) {
-		put(DEPLOY_GLOBAL_FIELD, flag);
+	public void setGlobalAddress(String globalAddress) {
+		put(GLOBAL_ADDRESS_FIELD, globalAddress);
 	}
 	
 	
 	/**
-	 * Getting flag to indicate whether to deploy Hudup framework globally like WAN, internet.
-	 * @return flag to indicate whether to deploy Hudup framework globally like WAN, internet.
+	 * Getting global address.
+	 * @return global address.
 	 */
-	public boolean isDeployGlobal() {
-		return getAsBoolean(DEPLOY_GLOBAL_FIELD);
-	}
-
-	
-	/**
-	 * Setting default global host in case of global deployment.
-	 * @param globalHost default global host in case of global deployment.
-	 */
-	public void setDeployGlobalHostByDefault(String globalHost) {
-		put(DEPLOY_GLOBAL_HOST_FIELD, globalHost);
-	}
-	
-	
-	/**
-	 * Getting default global host in case of global deployment.
-	 * @return default global host in case of global deployment.
-	 */
-	public String getDeployGlobalHostByDefault() {
-		return getAsString(DEPLOY_GLOBAL_HOST_FIELD);
-	}
-	
-	
-	/**
-	 * Getting global host in case of global deployment.
-	 * @return global host in case of global deployment. Return null if unable to retrieve global host.
-	 */
-	public String getDeployGlobalHost() {
-		if (!isDeployGlobal()) return null;
-		
-		String host = getDeployGlobalHostByDefault();
-		host = host == null ? host : host.trim();
-//		if (host == null || host.isEmpty())
-//			host = NetUtil.getPublicInetAddress();
-		if (host == null || host.isEmpty() || host.compareToIgnoreCase("localhost") == 0 || host.compareToIgnoreCase("127.0.0.1") == 0)
+	public String getGlobalAddress() {
+		String globalAddress = getAsString(GLOBAL_ADDRESS_FIELD);
+		globalAddress = globalAddress == null ? globalAddress : globalAddress.trim();
+		if (globalAddress == null || globalAddress.isEmpty())
 			return null;
 		else
-			return host;
+			return globalAddress;
 	}
+	
+	
+//	/**
+//	 * Getting global host in case of global deployment.
+//	 * @return global host in case of global deployment. Return null if unable to retrieve global host.
+//	 */
+//	public String getDeployGlobalHost() {
+//		if (!isDeployGlobal()) return null;
+//		
+//		String host = getDeployGlobalHostByDefault();
+//		host = host == null ? host : host.trim();
+////		if (host == null || host.isEmpty())
+////			host = NetUtil.getPublicInetAddress();
+//		if (host == null || host.isEmpty() || host.compareToIgnoreCase("localhost") == 0 || host.compareToIgnoreCase("127.0.0.1") == 0)
+//			return null;
+//		else
+//			return host;
+//	}
 
 	
 //	/**

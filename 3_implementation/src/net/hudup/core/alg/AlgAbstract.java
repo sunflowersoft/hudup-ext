@@ -339,6 +339,12 @@ public abstract class AlgAbstract implements Alg, AlgRemote {
 
 
 	@Override
+	public boolean ping() throws RemoteException {
+		return true;
+	}
+
+
+	@Override
 	protected void finalize() throws Throwable {
 		super.finalize();
 		

@@ -11,13 +11,15 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.EventListener;
 
+import net.hudup.core.logistic.Pingable;
+
 /**
  * This interface represents a listener for successful setting up process.
  * @author Loc Nguyen
  * @version 1.0
  *
  */
-public interface SetupAlgListener extends EventListener, Remote {
+public interface SetupAlgListener extends EventListener, Pingable, Remote {
 
 	
 	/**

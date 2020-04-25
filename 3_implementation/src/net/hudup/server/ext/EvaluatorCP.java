@@ -33,6 +33,7 @@ import javax.swing.JTextField;
 
 import net.hudup.core.Util;
 import net.hudup.core.client.ConnectDlg;
+import net.hudup.core.client.ConnectInfo;
 import net.hudup.core.client.Service;
 import net.hudup.core.client.ServiceExt;
 import net.hudup.core.data.DataConfig;
@@ -42,7 +43,6 @@ import net.hudup.core.evaluate.EvaluatorConfig;
 import net.hudup.core.evaluate.EvaluatorEvent;
 import net.hudup.core.evaluate.EvaluatorListener;
 import net.hudup.core.evaluate.ui.EvaluateGUIData;
-import net.hudup.core.logistic.ConnectInfo;
 import net.hudup.core.logistic.DSUtil;
 import net.hudup.core.logistic.I18nUtil;
 import net.hudup.core.logistic.LogUtil;
@@ -690,6 +690,12 @@ public class EvaluatorCP extends JFrame implements EvaluatorListener {
 	@Override
 	public synchronized void receivedEvaluator(EvaluatorEvent evt) throws RemoteException {
 		updateMode();
+	}
+
+
+	@Override
+	public boolean ping() throws RemoteException {
+		return true;
 	}
 
 

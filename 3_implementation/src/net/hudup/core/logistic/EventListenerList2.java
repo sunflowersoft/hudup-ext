@@ -11,6 +11,7 @@ import java.io.Serializable;
 import java.lang.reflect.Array;
 import java.util.EventListener;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.event.EventListenerList;
 
@@ -41,12 +42,38 @@ public class EventListenerList2 implements Serializable {
 
 	
 	/**
+	 * This class represents listener information.
+	 * @author Loc Nguyen
+	 * @version 1.0
+	 */
+	public static class ListenerInfo implements Serializable {
+		
+		/**
+		 * Serial version UID for serializable class.
+		 */
+		private static final long serialVersionUID = 1L;
+
+		/**
+		 * Count of failed ping.
+		 */
+		public int failedPingCount = 0;
+		
+	}
+
+	
+	/**
 	 * Internal list of listeners.
 	 */
 	protected List<EventListener> listeners = Util.newList();
 	
 	
-	/**
+    /**
+     * Map of listener information.
+     */
+    protected Map<EventListener, ListenerInfo> listenerInfoMap = Util.newMap();
+
+    
+    /**
 	 * Default constructor.
 	 */
 	public EventListenerList2() {
@@ -61,8 +88,10 @@ public class EventListenerList2 implements Serializable {
 	 * @param l specified listener.
 	 */
     public synchronized <T extends EventListener> void add(Class<T> t, T l) {
-    	if ((l == null) || !(t.isInstance(l))) return;
+    	if ((l == null) || !(t.isInstance(l)) || (listenerInfoMap.containsKey(l))) return;
+    	
     	listeners.add(l);
+   		listenerInfoMap.put(l, new ListenerInfo());
     }
 
 
@@ -74,9 +103,23 @@ public class EventListenerList2 implements Serializable {
      */
     public synchronized <T extends EventListener> void remove(Class<T> t, T l) {
     	if ((l == null) || !(t.isInstance(l))) return;
-    	listeners.remove(l);
+    	
+    	while (listeners.remove(l)) {};
+		listenerInfoMap.remove(l);
     }
     
+    
+    /**
+	 * Removing listener.
+	 * @param l specified listener.
+     */
+    public synchronized void remove(EventListener l) {
+    	if (l == null) return;
+    	
+    	while (listeners.remove(l)) {};
+		listenerInfoMap.remove(l);
+    }
+
     
     /**
      * Getting array of listeners with specified class.
@@ -85,7 +128,7 @@ public class EventListenerList2 implements Serializable {
      * @return array of listeners with specified class.
      */
     @SuppressWarnings("unchecked")
-	public <T extends EventListener> T[] getListeners(Class<T> t) {
+	public synchronized <T extends EventListener> T[] getListeners(Class<T> t) {
     	List<T> list = Util.newList();
     	for (EventListener l : listeners) {
     		if (t.isInstance(l)) list.add((T)l);
@@ -95,6 +138,51 @@ public class EventListenerList2 implements Serializable {
     	for (int i = 0; i < list.size(); i++) array[i] = list.get(i);
     	
     	return array;
+    }
+    
+    
+    /**
+     * Getting entire listeners. Using this method is careful.
+     * @return entire listeners.
+     */
+    public synchronized List<EventListener> getListeners() {
+    	return listeners;
+    }
+    
+    
+    /**
+     * Getting information of specified listener.
+     * @param l specified listener.
+     * @return information of specified listener.
+     */
+    public synchronized ListenerInfo getInfo(EventListener l) {
+		return listenerInfoMap.get(l);
+    }
+    
+    
+    /**
+     * Updating listener information.
+     */
+    public synchronized void updateInfo() {
+    	for (EventListener l : listeners) {
+    		ListenerInfo info = listenerInfoMap.get(l);
+    		if (info == null) continue;
+    		
+    		if (l instanceof Pingable) {
+    			boolean success = true;
+    			try {
+    				((Pingable)l).ping();
+    			}
+    			catch (Exception e) {success = false;}
+    			
+        		if (success)
+        			info.failedPingCount = 0;
+        		else
+        			info.failedPingCount = info.failedPingCount + 1;
+    		}
+    		
+    	}
+    	
     }
     
     

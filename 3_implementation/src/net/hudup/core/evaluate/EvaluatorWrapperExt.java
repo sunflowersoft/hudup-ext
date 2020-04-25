@@ -918,6 +918,12 @@ public class EvaluatorWrapperExt implements Evaluator, EvaluatorListener, Evalua
 
 
 	@Override
+	public boolean ping() throws RemoteException {
+		return true;
+	}
+
+
+	@Override
 	public void close() throws Exception {
 		try {
 			unexport();

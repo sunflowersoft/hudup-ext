@@ -36,8 +36,6 @@ public abstract class AbstractRunner implements Runner {
 	
 	@Override
 	public void run() {
-		// TODO Auto-generated method stub
-		
 		Thread current = Thread.currentThread();
 		
 		while (current == thread) {
@@ -105,7 +103,6 @@ public abstract class AbstractRunner implements Runner {
 			wait();
 		} 
 		catch (Throwable e) {
-			// TODO Auto-generated catch block
 			LogUtil.trace(e);
 		}
 		
@@ -145,7 +142,6 @@ public abstract class AbstractRunner implements Runner {
 			wait();
 		} 
 		catch (Throwable e) {
-			// TODO Auto-generated catch block
 			LogUtil.trace(e);
 		}
 		
@@ -179,7 +175,7 @@ public abstract class AbstractRunner implements Runner {
 			notifyAll();
 		}
 		catch (Throwable e) {
-			LogUtil.error("Calling notifyAll() in Evaluator#forceStop causes error " + e.getMessage());
+			LogUtil.error("Calling notifyAll() in AbstractRunner#forceStop causes error " + e.getMessage());
 		}
 		
 		return true;

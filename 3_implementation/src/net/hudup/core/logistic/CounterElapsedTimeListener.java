@@ -18,7 +18,7 @@ import java.util.EventListener;
  * @version 1.0
  *
  */
-public interface CounterElapsedTimeListener extends EventListener, Remote {
+public interface CounterElapsedTimeListener extends EventListener, Pingable, Remote {
 
 	
 	/**

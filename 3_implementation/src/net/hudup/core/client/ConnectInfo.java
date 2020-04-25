@@ -5,9 +5,13 @@
  * Email: ng_phloc@yahoo.com
  * Phone: +84-975250362
  */
-package net.hudup.core.logistic;
+package net.hudup.core.client;
 
 import java.io.Serializable;
+
+import net.hudup.core.logistic.Account;
+import net.hudup.core.logistic.Counter;
+import net.hudup.core.logistic.xURI;
 
 /**
  * This class represents connection information.
@@ -48,27 +52,27 @@ public class ConnectInfo implements Serializable {
 	
 	
 	/**
-	 * Flag to indicate whether to deploy server / service globally.
+	 * Flag to indicate whether pull mode is set. In pull mode, client is active to retrieve (pull) events from server.
 	 */
-	public boolean deployGlobal = false;
+	public boolean pullMode = false;
 	
 	
 	/**
-	 * Deploy global host.
+	 * Global address like internet address, WAN address.
 	 */
-	public String deployGlobalAddress= null;
-	
-	
-	/**
-	 * Extra internet address.
-	 */
-	public String internetAddress = null;
+	public String globalAddress= null;
 	
 	
 	/**
 	 * Server access period constant in milisecond.
 	 */
 	public long accessPeriod = Counter.PERIOD;
+	
+	
+//	/**
+//	 * Extra internet address.
+//	 */
+//	public String internetAddress = null;
 	
 	
 	/**
@@ -78,21 +82,22 @@ public class ConnectInfo implements Serializable {
 		
 	}
 	
-	/**
-	 * Getting global host in case of global deployment.
-	 * @return global host in case of global deployment. Return null if unable to retrieve global host.
-	 */
-	public String getDeployGlobalHost() {
-		if (!deployGlobal) return null;
-		
-		String host = deployGlobalAddress == null ? deployGlobalAddress : deployGlobalAddress.trim();
-//		if (host == null || host.isEmpty())
-//			host = NetUtil.getPublicInetAddress();
-		if (host == null || host.isEmpty() || host.compareToIgnoreCase("localhost") == 0 || host.compareToIgnoreCase("127.0.0.1") == 0)
-			return null;
-		else
-			return host;
-	}
+	
+//	/**
+//	 * Getting global host in case of global deployment.
+//	 * @return global host in case of global deployment. Return null if unable to retrieve global host.
+//	 */
+//	public String getDeployGlobalHost() {
+//		if (!deployGlobal) return null;
+//		
+//		String host = deployGlobalAddress == null ? deployGlobalAddress : deployGlobalAddress.trim();
+////		if (host == null || host.isEmpty())
+////			host = NetUtil.getPublicInetAddress();
+//		if (host == null || host.isEmpty() || host.compareToIgnoreCase("localhost") == 0 || host.compareToIgnoreCase("127.0.0.1") == 0)
+//			return null;
+//		else
+//			return host;
+//	}
 	
 	
 //	/**

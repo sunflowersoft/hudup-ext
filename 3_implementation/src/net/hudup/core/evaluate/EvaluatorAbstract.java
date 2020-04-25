@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.UUID;
 
 import javax.swing.JOptionPane;
-import javax.swing.event.EventListenerList;
 
 import net.hudup.core.Constants;
 import net.hudup.core.PluginChangedEvent;
@@ -57,12 +56,15 @@ import net.hudup.core.logistic.AbstractRunner;
 import net.hudup.core.logistic.Counter;
 import net.hudup.core.logistic.CounterElapsedTimeListener;
 import net.hudup.core.logistic.DSUtil;
+import net.hudup.core.logistic.EventListenerList2;
+import net.hudup.core.logistic.EventListenerList2.ListenerInfo;
 import net.hudup.core.logistic.I18nUtil;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.MathUtil;
 import net.hudup.core.logistic.NetUtil;
 import net.hudup.core.logistic.SystemUtil;
 import net.hudup.core.logistic.TaskQueue;
+import net.hudup.core.logistic.Timer;
 import net.hudup.core.logistic.Timestamp;
 import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.xURI;
@@ -160,7 +162,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 	 * Holding a list of {@link EventListener} (s)
 	 * 
 	 */
-    protected EventListenerList listenerList = new EventListenerList();
+    protected EventListenerList2 listenerList = new EventListenerList2();
 
     
     /**
@@ -253,6 +255,12 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
     protected Service referredService = null;
     
     
+    /**
+     * Internal timer.
+     */
+    protected Timer timer = null;
+    
+    
 	/**
 	 * Default constructor.
 	 */
@@ -279,6 +287,36 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 		
 		this.evProcessor = new EvaluateProcessor(this);
 		this.evCounter = new Counter(otherResult);
+		this.evCounter.setListenerList(listenerList); //Counter uses the same listener list.
+		
+		this.timer = new Timer(0, Constants.DEFAULT_LONG_TIMEOUT) {
+			
+			@Override
+			protected void task() {
+				synchronized (listenerList) {
+					listenerList.updateInfo();
+					
+					List<EventListener> listeners = listenerList.getListeners();
+					List<EventListener> tempListeners = Util.newList(listeners.size());
+					tempListeners.addAll(listeners);
+					for (EventListener listener : tempListeners) {
+						if (!listeners.contains(listener))
+							continue;
+						
+						ListenerInfo info = listenerList.getInfo(listener);
+						if (info != null && info.failedPingCount > 2) { //Removing clients that are unable to connect more than 2 times (more than 1 hour in average).
+							listenerList.remove(listener);
+							if (listeners.size() == 0) break;
+						}
+					}
+				}
+			}
+			
+			@Override
+			protected void clear() {}
+		};
+		this.timer.start();
+		
 	}
 	
 	
@@ -1568,13 +1606,17 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
     
     @Override
 	public void addElapsedTimeListener(CounterElapsedTimeListener listener) throws RemoteException {
-		evCounter.addElapsedTimeListener(listener);
+    	synchronized (listenerList) {
+    		listenerList.add(CounterElapsedTimeListener.class, listener);
+    	}
     }
 
     
     @Override
     public void removeElapsedTimeListener(CounterElapsedTimeListener listener) throws RemoteException {
-		evCounter.removeElapsedTimeListener(listener);
+    	synchronized (listenerList) {
+    		listenerList.remove(CounterElapsedTimeListener.class, listener);
+    	}
     }
 
 
@@ -1688,6 +1730,12 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 
 
 	@Override
+	public boolean ping() throws RemoteException {
+		return true;
+	}
+
+
+	@Override
 	public synchronized void close() throws Exception {
 		try {
 			remoteStop();
@@ -1724,6 +1772,14 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 		}
 		catch (Throwable e) {LogUtil.trace(e);}
 
+    	try {
+    		if (timer != null) {
+    			timer.stop();
+    			timer = null;
+    		}
+    	}
+		catch (Throwable e) {LogUtil.trace(e);}
+    	
 		try {
 			config.save();
 		} catch (Throwable e) {LogUtil.trace(e);}

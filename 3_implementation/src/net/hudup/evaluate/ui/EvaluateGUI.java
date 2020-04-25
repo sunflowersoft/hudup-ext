@@ -50,6 +50,7 @@ import net.hudup.core.alg.ServiceAlg;
 import net.hudup.core.alg.SetupAlgEvent;
 import net.hudup.core.alg.ui.AlgComboBox;
 import net.hudup.core.alg.ui.AlgConfigDlg;
+import net.hudup.core.client.ConnectInfo;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.DatasetPair;
@@ -73,7 +74,6 @@ import net.hudup.core.evaluate.ui.EvaluateGUIData;
 import net.hudup.core.evaluate.ui.MetricsAnalyzeDlg;
 import net.hudup.core.evaluate.ui.MetricsTable;
 import net.hudup.core.logistic.ClipboardUtil;
-import net.hudup.core.logistic.ConnectInfo;
 import net.hudup.core.logistic.Counter;
 import net.hudup.core.logistic.CounterElapsedTimeEvent;
 import net.hudup.core.logistic.DSUtil;
@@ -1308,7 +1308,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 				started = evaluator.remoteStart0(algList, toDatasetPoolExchangedClient(guiData.pool), timestamp = new Timestamp(), null);
 			else {
 				DataConfig config = AlgList.getAlgDescMap(algList);
-				started = evaluator.remoteStart(AlgList.getAlgNameList(algList), toDatasetPoolExchangedClient(guiData.pool), connectInfo.deployGlobal ? null : this, config, timestamp = new Timestamp(), null);
+				started = evaluator.remoteStart(AlgList.getAlgNameList(algList), toDatasetPoolExchangedClient(guiData.pool), connectInfo.pullMode ? null : this, config, timestamp = new Timestamp(), null);
 			}
 			if (!started) updateMode();
 		}

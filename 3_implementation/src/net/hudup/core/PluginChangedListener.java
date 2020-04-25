@@ -11,6 +11,7 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.EventListener;
 
+import net.hudup.core.logistic.Pingable;
 import net.hudup.core.logistic.ui.PluginStorageManifest;
 
 /**
@@ -27,7 +28,7 @@ import net.hudup.core.logistic.ui.PluginStorageManifest;
  * @version 10.0
  *
  */
-public interface PluginChangedListener extends EventListener, Remote {
+public interface PluginChangedListener extends EventListener, Pingable, Remote {
 
 	
 	/**

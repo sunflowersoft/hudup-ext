@@ -41,7 +41,6 @@ import net.hudup.core.Constants;
 import net.hudup.core.Util;
 import net.hudup.core.evaluate.Evaluator;
 import net.hudup.core.logistic.Account;
-import net.hudup.core.logistic.ConnectInfo;
 import net.hudup.core.logistic.Counter;
 import net.hudup.core.logistic.I18nUtil;
 import net.hudup.core.logistic.LogUtil;
@@ -244,6 +243,18 @@ public abstract class ConnectDlg extends JDialog {
 	
 	
 	/**
+	 * Check box as flag to indicate whether pull mode is set. In pull mode, client is active to retrieve (pull) events from server.
+	 */
+	protected JCheckBox chkPullMode = null;
+
+	
+	/**
+	 * Text field to fill server access period.
+	 */
+	protected JFormattedTextField txtMyAccessPeriod = null;
+
+	
+	/**
 	 * Check box as flag to indicate whether exporting again.
 	 */
 	protected JCheckBox chkHostingAgain = null;
@@ -274,12 +285,6 @@ public abstract class ConnectDlg extends JDialog {
 	
 	
 	/**
-	 * Check box as flag to indicate whether to deploy server / service globally.
-	 */
-	protected JCheckBox chkServerDeployGlobal = null;
-
-	
-	/**
 	 * Text field to fill global deployed host.
 	 */
 	protected JTextField txtMyGlobalAddress = null;
@@ -290,12 +295,6 @@ public abstract class ConnectDlg extends JDialog {
 	 */
 	protected JButton btnGenMyGlobalAddress = null; 
 			
-	
-	/**
-	 * Text field to fill server access period.
-	 */
-	protected JFormattedTextField txtMyAccessPeriod = null;
-
 	
 	/**
 	 * Remote connector.
@@ -392,12 +391,12 @@ public abstract class ConnectDlg extends JDialog {
 		left.add(new JLabel("Connect path:"));
 		left.add(new JLabel("User name:"));
 		left.add(new JLabel("Password:"));
-		left.add(new JLabel("Server deploy global:"));
-		left.add(new JLabel("    My global address:"));
+		left.add(new JLabel("Pull mode:"));
 		left.add(new JLabel("    My access period (s):"));
 		left.add(new JLabel("My bound port:"));
 		left.add(new JLabel("Hosting again:"));
 		left.add(new JLabel("    My hosting naming path:"));
+		left.add(new JLabel("My global address:"));
 		
 		JPanel right = new JPanel(new GridLayout(0, 1));
 		header.add(right, BorderLayout.CENTER);
@@ -449,50 +448,26 @@ public abstract class ConnectDlg extends JDialog {
 		String pwd = Util.getHudupProperty("admin");
 		if (pwd == null) txtPassword.setText(pwd);
 
-		chkServerDeployGlobal = new JCheckBox("", false);
-		right.add(chkServerDeployGlobal);
-
-		JPanel paneDeployGlobalAddress = new JPanel(new BorderLayout());
-		right.add(paneDeployGlobalAddress);
-		paneDeployGlobalAddress.setVisible(chkServerDeployGlobal.isSelected());
-
-		txtMyGlobalAddress = new JTextField("");
-		paneDeployGlobalAddress.add(txtMyGlobalAddress, BorderLayout.CENTER);
-		txtMyGlobalAddress.setToolTipText("It is possible to leave my global address empty so that system will assign default address");
-		
-		btnGenMyGlobalAddress = UIUtil.makeIconButton(
-			"generate-16x16.png",
-			"generate", 
-			"Generate - http://www.iconarchive.com/show/flatastic-9-icons-by-custom-icon-design/Generate-keys-icon.html", 
-			"Generate", 
-			
-			new ActionListener() {
-				
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					String publicIP = NetUtil.getPublicInetAddress();
-					txtMyGlobalAddress.setText(publicIP != null ? publicIP : "");
-				}
-			});
-		paneDeployGlobalAddress.add(btnGenMyGlobalAddress, BorderLayout.EAST);
+		chkPullMode = new JCheckBox("", false);
+		right.add(chkPullMode);
 
 		txtMyAccessPeriod = new JFormattedTextField(new NumberFormatter());
 		right.add(txtMyAccessPeriod);
 		txtMyAccessPeriod.setValue((int)(5*Counter.PERIOD/1000));
-		txtMyAccessPeriod.setVisible(chkServerDeployGlobal.isSelected());
+		txtMyAccessPeriod.setVisible(chkPullMode.isSelected());
 
 		JPanel paneBindPort = new JPanel(new BorderLayout());
 		right.add(paneBindPort);
 		
 		txtMyBindPort = new JFormattedTextField(new NumberFormatter());
 		paneBindPort.add(txtMyBindPort, BorderLayout.CENTER);
-		txtMyBindPort.setValue(Constants.DEFAULT_CONTROL_PANEL_PORT);
+		txtMyBindPort.setValue(0);
 		txtMyBindPort.setToolTipText("It is possible to set my bound port 0 if not hosting again");
 
 		btnCheckMyBindPort = UIUtil.makeIconButton(
 			"checking-16x16.png",
 			"checking", 
-			"Checking - http://www.iconarchive.com/show/outline-icons-by-iconsmind/Check-2-icon.html", 
+			"Checking whether bound port to client is available - http://www.iconarchive.com/show/outline-icons-by-iconsmind/Check-2-icon.html", 
 			"Checking", 
 			
 			new ActionListener() {
@@ -518,7 +493,6 @@ public abstract class ConnectDlg extends JDialog {
 
 		chkHostingAgain = new JCheckBox("", false);
 		right.add(chkHostingAgain);
-		//chkHostingAgain.setEnabled(false);
 
 		JPanel paneMyNamingPath = new JPanel(new BorderLayout());
 		right.add(paneMyNamingPath);
@@ -529,7 +503,7 @@ public abstract class ConnectDlg extends JDialog {
 		btnGenBindPath = UIUtil.makeIconButton(
 			"generate-16x16.png",
 			"generate", 
-			"Generate - http://www.iconarchive.com/show/flatastic-9-icons-by-custom-icon-design/Generate-keys-icon.html", 
+			"Generate naming path - http://www.iconarchive.com/show/flatastic-9-icons-by-custom-icon-design/Generate-keys-icon.html", 
 			"Generate", 
 			
 			new ActionListener() {
@@ -541,13 +515,34 @@ public abstract class ConnectDlg extends JDialog {
 			});
 		paneMyNamingPath.add(btnGenBindPath, BorderLayout.EAST);
 
+		JPanel paneMyGlobalAddress = new JPanel(new BorderLayout());
+		right.add(paneMyGlobalAddress);
+
+		txtMyGlobalAddress = new JTextField("");
+		paneMyGlobalAddress.add(txtMyGlobalAddress, BorderLayout.CENTER);
+		txtMyGlobalAddress.setToolTipText("It is possible to leave my global address (WAN address, internet address) empty");
 		
-		chkServerDeployGlobal.addItemListener(new ItemListener() {
+		btnGenMyGlobalAddress = UIUtil.makeIconButton(
+			"generate-16x16.png",
+			"generate", 
+			"Retrieve internet address as global address - http://www.iconarchive.com/show/flatastic-9-icons-by-custom-icon-design/Generate-keys-icon.html", 
+			"Generate", 
+			
+			new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					String publicIP = NetUtil.getPublicInetAddress();
+					txtMyGlobalAddress.setText(publicIP != null ? publicIP : "");
+				}
+			});
+		paneMyGlobalAddress.add(btnGenMyGlobalAddress, BorderLayout.EAST);
+		
+		chkPullMode.addItemListener(new ItemListener() {
 			
 			@Override
 			public void itemStateChanged(ItemEvent e) {
-				paneDeployGlobalAddress.setVisible(chkServerDeployGlobal.isSelected());
-				txtMyAccessPeriod.setVisible(chkServerDeployGlobal.isSelected());
+				txtMyAccessPeriod.setVisible(chkPullMode.isSelected());
 			}
 		});
 
@@ -556,6 +551,15 @@ public abstract class ConnectDlg extends JDialog {
 			@Override
 			public void itemStateChanged(ItemEvent e) {
 				paneMyNamingPath.setVisible(chkHostingAgain.isSelected());
+				int port = txtMyBindPort.getValue() instanceof Number ? ( (Number) txtMyBindPort.getValue()).intValue() : 0;
+				if (chkHostingAgain.isSelected()) {
+					if (port == 0) {
+						port = NetUtil.getPort(Constants.DEFAULT_CONTROL_PANEL_PORT, true);
+						txtMyBindPort.setValue(port >= 0 ? port : port);
+					}
+				}
+				else if (port != 0)
+					txtMyBindPort.setValue(0);
 			}
 		});
 
@@ -590,7 +594,9 @@ public abstract class ConnectDlg extends JDialog {
 		footer.add(status, BorderLayout.SOUTH);
 		
 		status.add(new JLabel("Local address: " + Constants.hostAddress + "  "));
-		status.add(new JLabel("Internet address: " + NetUtil.getPublicInetAddress()));
+		String publicIP = NetUtil.getPublicInetAddress();
+		if (publicIP != null)
+			status.add(new JLabel("Internet address: " + publicIP));
 	}
 	
 	
@@ -772,7 +778,13 @@ public abstract class ConnectDlg extends JDialog {
 
 				connectInfo = new ConnectInfo();
 				connectInfo.account = Account.create(username, password);
-				connectInfo.connectUri = connectUri; 
+				connectInfo.connectUri = connectUri;
+				
+				connectInfo.pullMode = chkPullMode.isSelected();
+				int myAccessPeriod = txtMyAccessPeriod.getValue() instanceof Number ? ( (Number) txtMyAccessPeriod.getValue()).intValue() : 1;
+				myAccessPeriod = 1000 * myAccessPeriod;
+				connectInfo.accessPeriod = myAccessPeriod < Counter.PERIOD ? Counter.PERIOD : myAccessPeriod;   
+
 				connectInfo.bindUri = xURI.create("rmi://localhost:" + bindPort);
 				if (chkHostingAgain.isSelected()) {
 					connectInfo.namingUri = connectInfo.bindUri;
@@ -780,20 +792,13 @@ public abstract class ConnectDlg extends JDialog {
 						connectInfo.namingUri = connectInfo.namingUri.concat(myNamingPath);
 				}
 				
-				connectInfo.deployGlobal = chkServerDeployGlobal.isSelected();
-				connectInfo.deployGlobalAddress = txtMyGlobalAddress.getText();
-				if (connectInfo.deployGlobalAddress != null) {
-					connectInfo.deployGlobalAddress = connectInfo.deployGlobalAddress.trim();
-					if (connectInfo.deployGlobalAddress.isEmpty())
-						connectInfo.deployGlobalAddress = null;
+				connectInfo.globalAddress = txtMyGlobalAddress.getText();
+				if (connectInfo.globalAddress != null) {
+					connectInfo.globalAddress = connectInfo.globalAddress.trim();
+					if (connectInfo.globalAddress.isEmpty())
+						connectInfo.globalAddress = null;
 				}
-				if (connectInfo.deployGlobal && connectInfo.deployGlobalAddress == null)
-					connectInfo.internetAddress = NetUtil.getPublicInetAddress();
 				
-				int myAccessPeriod = txtMyAccessPeriod.getValue() instanceof Number ? ( (Number) txtMyAccessPeriod.getValue()).intValue() : 1;
-				myAccessPeriod = 1000 * myAccessPeriod;
-				connectInfo.accessPeriod = myAccessPeriod < Counter.PERIOD ? Counter.PERIOD : myAccessPeriod;   
-
 				dispose();
 			}
 		};
