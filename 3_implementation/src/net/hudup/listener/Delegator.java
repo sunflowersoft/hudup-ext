@@ -438,6 +438,38 @@ class DelegatorEvaluator extends EvaluatorWrapperExt {
 		catch (Exception e) {
 			LogUtil.trace(e);
 		}
+		
+		//Delegated evaluator does not use timer because of suppose that there are limited clients connecting to listeners
+		//when there can be many different listeners. It is complicated with timer.
+//		this.timer = new Timer(0, Constants.DEFAULT_LONG_TIMEOUT) {
+//			
+//			@Override
+//			protected void task() {
+//				synchronized (listenerList) {
+//					listenerList.updateInfo();
+//					
+//					List<EventListener> listeners = listenerList.getListeners();
+//					List<EventListener> tempListeners = Util.newList(listeners.size());
+//					tempListeners.addAll(listeners);
+//					for (EventListener listener : tempListeners) {
+//						if (!listeners.contains(listener))
+//							continue;
+//						
+//						ListenerInfo info = listenerList.getInfo(listener);
+//						if (info != null && info.failedPingCount > 2) { //Removing clients that are unable to connect more than 2 times (more than 1 hour in average).
+//							listenerList.remove(listener);
+//							if (listeners.size() == 0) break;
+//						}
+//					}
+//				}
+//			}
+//			
+//			@Override
+//			protected void clear() {}
+//			
+//		};
+//		this.timer.setPriority(Priority.min);
+//		this.timer.start();
 	}
 	
 	

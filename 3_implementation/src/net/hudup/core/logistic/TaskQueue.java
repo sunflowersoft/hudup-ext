@@ -144,6 +144,7 @@ public class TaskQueue extends AbstractRunner {
 		
 		/**
 		 * Getting list of events.
+		 * @return list of events.
 		 */
 		public List<EventObject> getEventList() {
 			return evtList;

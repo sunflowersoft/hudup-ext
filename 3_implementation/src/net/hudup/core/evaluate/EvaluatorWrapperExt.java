@@ -10,8 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import javax.swing.event.EventListenerList;
-
 import net.hudup.core.Constants;
 import net.hudup.core.PluginChangedEvent;
 import net.hudup.core.PluginChangedListener;
@@ -31,11 +29,15 @@ import net.hudup.core.logistic.BaseClass;
 import net.hudup.core.logistic.CounterElapsedTimeEvent;
 import net.hudup.core.logistic.CounterElapsedTimeListener;
 import net.hudup.core.logistic.DSUtil;
+import net.hudup.core.logistic.EventListenerList2;
+import net.hudup.core.logistic.EventListenerList2.ListenerInfo;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.NetUtil;
 import net.hudup.core.logistic.NextUpdate;
 import net.hudup.core.logistic.TaskQueue;
+import net.hudup.core.logistic.Timer;
 import net.hudup.core.logistic.Timestamp;
+import net.hudup.core.logistic.AbstractRunner.Priority;
 import net.hudup.core.logistic.ui.ProgressEvent;
 import net.hudup.core.logistic.ui.ProgressListener;
 
@@ -60,7 +62,7 @@ public class EvaluatorWrapperExt implements Evaluator, EvaluatorListener, Evalua
 	 * Holding a list of {@link EventListener} (s)
 	 * 
 	 */
-    protected EventListenerList listenerList = new EventListenerList();
+    protected EventListenerList2 listenerList = new EventListenerList2();
 
     
 	/**
@@ -82,28 +84,63 @@ public class EvaluatorWrapperExt implements Evaluator, EvaluatorListener, Evalua
 	protected Evaluator exportedStub = null;
 	
 	
+    /**
+     * Internal timer.
+     */
+    protected Timer timer = null;
+    
+    
 	/**
 	 * Default constructor.
 	 */
 	protected EvaluatorWrapperExt() {
 		
 	}
-	
+
 	
 	/**
 	 * Constructor with remote evaluator and socket server.
-	 * @param remoteEvaluator remote evaluator.
+	 * @param remoteEvaluator remote evaluator, always in non-exclusive mode.
 	 * @param exportedPort port to export the wrapper.
 	 */
 	public EvaluatorWrapperExt(Evaluator remoteEvaluator, int exportedPort) {
 		try {
 			this.remoteEvaluator = remoteEvaluator;
-			
 			export(exportedPort);
 		}
 		catch (Exception e) {
 			LogUtil.trace(e);
 		}
+		
+		this.timer = new Timer(0, Constants.DEFAULT_LONG_TIMEOUT) {
+			
+			@Override
+			protected void task() {
+				synchronized (listenerList) {
+					listenerList.updateInfo();
+					
+					List<EventListener> listeners = listenerList.getListeners();
+					List<EventListener> tempListeners = Util.newList(listeners.size());
+					tempListeners.addAll(listeners);
+					for (EventListener listener : tempListeners) {
+						if (!listeners.contains(listener))
+							continue;
+						
+						ListenerInfo info = listenerList.getInfo(listener);
+						if (info != null && info.failedPingCount > 2) { //Removing clients that are unable to connect more than 2 times (more than 1 hour in average).
+							listenerList.remove(listener);
+							if (listeners.size() == 0) break;
+						}
+					}
+				}
+			}
+			
+			@Override
+			protected void clear() {}
+			
+		};
+		this.timer.setPriority(Priority.min);
+		this.timer.start();
 	}
 	
 	
@@ -449,7 +486,6 @@ public class EvaluatorWrapperExt implements Evaluator, EvaluatorListener, Evalua
     /**
      * Firing (issuing) an event from this evaluator to all evaluator listeners. 
      * @param evt event from this evaluator.
-     * @param localTargetListener local target listener.
      */
     protected void fireEvaluatorEvent(EvaluatorEvent evt) {
     	addTask(evt);
@@ -925,7 +961,15 @@ public class EvaluatorWrapperExt implements Evaluator, EvaluatorListener, Evalua
 
 	@Override
 	public void close() throws Exception {
-		try {
+    	try {
+    		if (timer != null) {
+    			timer.stop();
+    			timer = null;
+    		}
+    	}
+		catch (Throwable e) {LogUtil.trace(e);}
+
+    	try {
 			unexport();
 		}
 		catch (Throwable e) {

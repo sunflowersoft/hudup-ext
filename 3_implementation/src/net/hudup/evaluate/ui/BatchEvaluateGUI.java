@@ -307,6 +307,8 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 		add(footer, BorderLayout.SOUTH);
 		
 		setVerbal(guiData != null ? guiData.chkVerbal : false);
+		
+		setupListeners(this.evaluator);
 	}
 
 	

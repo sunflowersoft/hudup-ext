@@ -131,6 +131,15 @@ public class Test {
 //		System.out.println(cls);
 		
 //		System.out.println(InetAddress.getLocalHost());
+//		RecommendEvaluator ev = new RecommendEvaluator();
+//		ev = null;
+//		System.runFinalization();
+//		
+//		while (true) {
+//			int a = 0;
+//			a = 1;
+//			if (a < 0) break;
+//		};
 	}
 
 	

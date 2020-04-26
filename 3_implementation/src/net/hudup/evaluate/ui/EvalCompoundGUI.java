@@ -17,6 +17,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.Collections;
@@ -42,8 +43,6 @@ import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 import javax.swing.text.NumberFormatter;
 
-import com.sun.glass.events.KeyEvent;
-
 import net.hudup.core.Constants;
 import net.hudup.core.PluginChangedListener;
 import net.hudup.core.PluginStorage;
@@ -52,6 +51,7 @@ import net.hudup.core.Util;
 import net.hudup.core.client.ConnectDlg;
 import net.hudup.core.client.ConnectInfo;
 import net.hudup.core.client.Service;
+import net.hudup.core.data.BooleanWrapper;
 import net.hudup.core.data.ui.SysConfigDlgExt;
 import net.hudup.core.evaluate.Evaluator;
 import net.hudup.core.evaluate.EvaluatorAbstract;
@@ -208,7 +208,7 @@ public class EvalCompoundGUI extends JFrame {
 					sysConfig();
 				}
 			});
-		mniSysConfig.setMnemonic(KeyEvent.VK_C);
+		mniSysConfig.setMnemonic('c');
 		mnTools.add(mniSysConfig);
 
 		if (batchEvaluateGUI.getConnectInfo().bindUri != null) {
@@ -225,7 +225,7 @@ public class EvalCompoundGUI extends JFrame {
 						updateFromServer();
 					}
 				});
-			mniUpdateFromServer.setMnemonic(KeyEvent.VK_U);
+			mniUpdateFromServer.setMnemonic('u');
 			mnTools.add(mniUpdateFromServer);
 		}
 
@@ -246,7 +246,7 @@ public class EvalCompoundGUI extends JFrame {
 				
 			});
 		mnTools.add(mniRefreshResult);
-		mniRefreshResult.setMnemonic(KeyEvent.VK_F);
+		mniRefreshResult.setMnemonic('f');
 		mniRefreshResult.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F5, 0));
 
 		JMenuItem mniRecoverResult = new JMenuItem(
@@ -567,20 +567,34 @@ public class EvalCompoundGUI extends JFrame {
 			}
 		}
 		
-		final StartDlg dlgEvStarter = new StartDlg((JFrame)null, "List of evaluators") {
+		StartDlg dlgEvStarter = new StartDlg((JFrame)null, "List of evaluators") {
+			
 			/**
 			 * Serial version UID for serializable class.
 			 */
 			private static final long serialVersionUID = 1L;
 
+			/**
+			 * Flag to indicate whether evaluator is started.
+			 */
+			private boolean started = false;
+			
 			@Override
 			protected void start() {
-				final Evaluator ev = (Evaluator) getItemControl().getSelectedItem();
+				final Evaluator evaluator = (Evaluator) getItemControl().getSelectedItem();
 				dispose();
 				if (oldGUI != null)
 					oldGUI.dispose();
 
-				run(ev, null, null, null);
+				for (Evaluator ev : evList) {
+					if (ev != evaluator) {
+						try {
+							ev.close();
+						} catch (Exception e1) {LogUtil.trace(e1);}
+					}
+				}
+				started = true;
+				run(evaluator, null, null, null);
 			}
 			
 			@Override
@@ -594,6 +608,20 @@ public class EvalCompoundGUI extends JFrame {
 				toolkit.setEditable(false);
 				return toolkit;
 			}
+
+			@Override
+			public void dispose() {
+				super.dispose();
+				
+				if (started) return;
+				
+				for (Evaluator ev : evList) {
+					try {
+						ev.close();
+					} catch (Exception e1) {LogUtil.trace(e1);}
+				}
+			}
+			
 		};
 		
 		if (initialEv != null)
@@ -646,8 +674,27 @@ public class EvalCompoundGUI extends JFrame {
 			}
 		}
 		
+		final BooleanWrapper started = new BooleanWrapper(false);
+		JDialog dlgEvStarter = new JDialog((JFrame)null, "Start evaluator", true) {
+			
+			/**
+			 * Serial version UID for serializable class.
+			 */
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void dispose() {
+				super.dispose();
+				if (started.get()) return;
+				
+				for (Evaluator ev : evList) {
+					try {
+						ev.close();
+					} catch (Exception e1) {LogUtil.trace(e1);}
+				}
+			}
+		}; 
 		
-		JDialog dlgEvStarter = new JDialog((JFrame)null, "Start evaluator", true); 
 		dlgEvStarter.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		dlgEvStarter.setSize(400, 320);
 		dlgEvStarter.setLocationRelativeTo(null);
@@ -802,11 +849,19 @@ public class EvalCompoundGUI extends JFrame {
 				}
 				
 
-				Evaluator ev = (Evaluator) cmbEvs.getSelectedItem();
+				Evaluator evaluator = (Evaluator) cmbEvs.getSelectedItem();
 				dlgEvStarter.dispose();
 				if (oldGUI != null) oldGUI.dispose();
 
-				run(ev, connectInfo, null, null);
+				for (Evaluator ev : evList) {
+					if (ev != evaluator) {
+						try {
+							ev.close();
+						} catch (Exception e1) {LogUtil.trace(e1);}
+					}
+				}
+				started.set(true);
+				run(evaluator, connectInfo, null, null);
 			}
 		});
 		buttons.add(start);

@@ -21,6 +21,36 @@ public abstract class AbstractRunner implements Runner {
 	
 	
 	/**
+	 * This enum specifies priority of thread.
+	 * @author Loc Nguyen
+	 * @version 1.0
+	 */
+	public enum Priority {
+		
+		/**
+		 * Default priority.
+		 */
+		default_value,
+		
+		/**
+		 * Minimum priority.
+		 */
+		min,
+		
+		/**
+		 * Normal priority.
+		 */
+		normal,
+		
+		/**
+		 * Maximum priority.
+		 */
+		max,
+		
+	};
+	
+	
+	/**
 	 * Built-in thread which is the base of this runner to run.
 	 * This is also so a flag of whether this runner is starting.
 	 */
@@ -33,6 +63,48 @@ public abstract class AbstractRunner implements Runner {
 	 */
 	protected volatile boolean paused = false;
 
+	
+	/**
+	 * Thread priority.
+	 */
+	protected Priority priority = Priority.default_value;
+	
+	
+	/**
+	 * Default constructor.
+	 */
+	public AbstractRunner() {
+		this(Priority.default_value);
+	}
+	
+	
+	/**
+	 * Constructor with specified priority.
+	 * @param priority specified priority.
+	 */
+	public AbstractRunner(Priority priority) {
+		super();
+		this.priority = priority;
+	}
+
+
+	/**
+	 * Setting thread priority.
+	 * @param priority thread priority.
+	 */
+	public void setPriority(Priority priority) {
+		this.priority = priority;
+	}
+	
+	
+	/**
+	 * Getting thread priority.
+	 * @return thread priority.
+	 */
+	public Priority getPriority() {
+		return priority;
+	}
+	
 	
 	@Override
 	public void run() {
@@ -87,6 +159,13 @@ public abstract class AbstractRunner implements Runner {
 		if (isStarted()) return false;
 		
 		thread = new RunnerThread(this);
+		if (priority == Priority.min)
+			thread.setPriority(Thread.MIN_PRIORITY);
+		else if (priority == Priority.normal)
+			thread.setPriority(Thread.NORM_PRIORITY);
+		else if (priority == Priority.max)
+			thread.setPriority(Thread.MAX_PRIORITY);
+		
 		thread.start();
 		
 		return true;

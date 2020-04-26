@@ -35,6 +35,15 @@ public abstract class Timer extends AbstractRunner {
 
 	
 	/**
+	 * Constructor with period.
+	 * @param period period time in miliseconds.
+	 */
+	public Timer(long period) {
+		this(0, period);
+	}
+
+	
+	/**
 	 * Constructor with delay and period.
 	 * @param delay delay time in miliseconds.
 	 * @param period period time in miliseconds.

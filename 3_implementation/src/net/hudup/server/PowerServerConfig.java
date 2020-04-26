@@ -203,41 +203,15 @@ public class PowerServerConfig extends ServerConfig {
 	 */
 	public String getGlobalAddress() {
 		String globalAddress = getAsString(GLOBAL_ADDRESS_FIELD);
-		globalAddress = globalAddress == null ? globalAddress : globalAddress.trim();
-		if (globalAddress == null || globalAddress.isEmpty())
+		if (globalAddress == null) return null;
+		
+		globalAddress = globalAddress.trim();
+		if (globalAddress.isEmpty() || globalAddress.compareToIgnoreCase("localhost") == 0 || globalAddress.compareToIgnoreCase("127.0.0.1") == 0)
 			return null;
 		else
 			return globalAddress;
 	}
 	
-	
-//	/**
-//	 * Getting global host in case of global deployment.
-//	 * @return global host in case of global deployment. Return null if unable to retrieve global host.
-//	 */
-//	public String getDeployGlobalHost() {
-//		if (!isDeployGlobal()) return null;
-//		
-//		String host = getDeployGlobalHostByDefault();
-//		host = host == null ? host : host.trim();
-////		if (host == null || host.isEmpty())
-////			host = NetUtil.getPublicInetAddress();
-//		if (host == null || host.isEmpty() || host.compareToIgnoreCase("localhost") == 0 || host.compareToIgnoreCase("127.0.0.1") == 0)
-//			return null;
-//		else
-//			return host;
-//	}
-
-	
-//	/**
-//	 * Checking whether to deploy globally.
-//	 * @return whether to deploy globally.
-//	 */
-//	public boolean checkDeployGlobal() {
-//		String globalHost = getDeployGlobalHost();
-//		return globalHost != null && globalHost.compareToIgnoreCase("localhost") != 0 && globalHost.compareToIgnoreCase("127.0.0.1") != 0;
-//	}
-
 	
 	/**
 	 * Setting flag to indicate empty dataset.

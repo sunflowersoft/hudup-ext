@@ -269,27 +269,27 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 			String evalconfigPath = Constants.WORKING_DIRECTORY + "/" +
 					(EvaluatorConfig.EVALCONFIG_FILENAME_PREFIX + getName()).replaceAll("\\s", "") + "." +
 					EvaluatorConfig.EVALCONFIG_FILEEXT;
-			this.config = new EvaluatorConfig(xURI.create(evalconfigPath));
+			config = new EvaluatorConfig(xURI.create(evalconfigPath));
 		}
 		catch (Exception e) {
 			LogUtil.trace(e);
-			this.config = new EvaluatorConfig(xURI.create(EvaluatorConfig.EVALCONFIG_FILEPATH_DEFAULT));
+			config = new EvaluatorConfig(xURI.create(EvaluatorConfig.EVALCONFIG_FILEPATH_DEFAULT));
 		}
 		
 		try {
-			this.evMetricList = defaultMetrics();
-			this.evMetricList.syncWithPlugin();
-			this.evMetricList.sort();
+			evMetricList = defaultMetrics();
+			evMetricList.syncWithPlugin();
+			evMetricList.sort();
 		}
 		catch (Exception e) {
 			LogUtil.trace(e);
 		}
 		
-		this.evProcessor = new EvaluateProcessor(this);
-		this.evCounter = new Counter(otherResult);
-		this.evCounter.setListenerList(listenerList); //Counter uses the same listener list.
+		evProcessor = new EvaluateProcessor(this);
+		evCounter = new Counter(otherResult);
+		evCounter.setListenerList(listenerList); //Counter uses the same listener list.
 		
-		this.timer = new Timer(0, Constants.DEFAULT_LONG_TIMEOUT) {
+		timer = new Timer(0, Constants.DEFAULT_LONG_TIMEOUT) {
 			
 			@Override
 			protected void task() {
@@ -314,9 +314,10 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 			
 			@Override
 			protected void clear() {}
+			
 		};
-		this.timer.start();
-		
+		timer.setPriority(Priority.min);
+		timer.start();
 	}
 	
 	

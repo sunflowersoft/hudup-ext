@@ -323,6 +323,8 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			this.txtTrainingBrowse.setDataset(guiData.pool.get(0).getTraining(), false);
 			this.txtTestingBrowse.setDataset(guiData.pool.get(0).getTesting(), false);
 		}
+		
+		setupListeners(this.evaluator);
 	}
 
 	

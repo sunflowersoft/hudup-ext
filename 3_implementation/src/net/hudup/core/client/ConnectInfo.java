@@ -69,12 +69,6 @@ public class ConnectInfo implements Serializable {
 	public long accessPeriod = Counter.PERIOD;
 	
 	
-//	/**
-//	 * Extra internet address.
-//	 */
-//	public String internetAddress = null;
-	
-	
 	/**
 	 * Default constructor.
 	 */
@@ -83,31 +77,19 @@ public class ConnectInfo implements Serializable {
 	}
 	
 	
-//	/**
-//	 * Getting global host in case of global deployment.
-//	 * @return global host in case of global deployment. Return null if unable to retrieve global host.
-//	 */
-//	public String getDeployGlobalHost() {
-//		if (!deployGlobal) return null;
-//		
-//		String host = deployGlobalAddress == null ? deployGlobalAddress : deployGlobalAddress.trim();
-////		if (host == null || host.isEmpty())
-////			host = NetUtil.getPublicInetAddress();
-//		if (host == null || host.isEmpty() || host.compareToIgnoreCase("localhost") == 0 || host.compareToIgnoreCase("127.0.0.1") == 0)
-//			return null;
-//		else
-//			return host;
-//	}
-	
-	
-//	/**
-//	 * Checking whether to deploy globally.
-//	 * @return whether to deploy globally.
-//	 */
-//	public boolean checkDeployGlobal() {
-//		String globalHost = getDeployGlobalHost();
-//		return globalHost != null && globalHost.compareToIgnoreCase("localhost") != 0 && globalHost.compareToIgnoreCase("127.0.0.1") != 0;
-//	}
+	/**
+	 * Getting global address.
+	 * @return global address.
+	 */
+	public String extractGlobalAddress() {
+		if (globalAddress == null) return null;
+		
+		String addr = globalAddress.trim();
+		if (addr.isEmpty() || addr.compareToIgnoreCase("localhost") == 0 || addr.compareToIgnoreCase("127.0.0.1") == 0)
+			return null;
+		else
+			return addr;
+	}
 	
 	
 }

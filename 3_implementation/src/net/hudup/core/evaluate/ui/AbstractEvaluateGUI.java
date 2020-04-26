@@ -229,9 +229,10 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 		this.connectInfo = connectInfo;
 		
 		try {
-			if (connectInfo.globalAddress != null) {
-				System.setProperty("java.rmi.server.hostname", connectInfo.globalAddress);
-				LogUtil.info("java.rmi.server.hostname=" + connectInfo.globalAddress);
+			String globalAddress = connectInfo.extractGlobalAddress();
+			if (globalAddress != null) {
+				System.setProperty("java.rmi.server.hostname", globalAddress);
+				LogUtil.info("java.rmi.server.hostname=" + globalAddress);
 			}
 		}
 		catch (Throwable e) {LogUtil.trace(e);}
@@ -295,8 +296,6 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 		}
 		catch (Throwable e) {LogUtil.trace(e);}
 		
-		
-		setupListeners(this.evaluator);
 		
 		evProcessor = new EvaluateProcessor(this.evaluator);
 		
@@ -746,7 +745,7 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	 * Add this GUI as listeners to specified evaluator.
 	 * @param evaluator specified evaluator.
 	 */
-	private void setupListeners(Evaluator evaluator) {
+	protected synchronized void setupListeners(Evaluator evaluator) {
 		try {
 			if (connectInfo.pullMode && connectInfo.bindUri != null) {
 				evaluator.addPluginChangedListener(id);
@@ -774,7 +773,7 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	 * Remove this GUI as listeners from specified evaluator.
 	 * @param evaluator specified evaluator.
 	 */
-	private void unsetupListeners(Evaluator evaluator) {
+	protected synchronized void unsetupListeners(Evaluator evaluator) {
 		try {
 			if (connectInfo.pullMode && connectInfo.bindUri != null) {
 				evaluator.removePluginChangedListener(id);
@@ -846,7 +845,8 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 					!config.containsKey(DatasetAbstract.HOST_ADDR_FIELD)) {
 				config.put(DatasetAbstract.HARDWARE_ADDR_FIELD, Constants.hardwareAddress);
 				
-				String hostAddr = connectInfo.globalAddress != null ? connectInfo.globalAddress : Constants.hostAddress;
+				String globalAddress = connectInfo.extractGlobalAddress();
+				String hostAddr = globalAddress != null ? globalAddress : Constants.hostAddress;
 				config.put(DatasetAbstract.HOST_ADDR_FIELD, hostAddr);
 			}
 		}
