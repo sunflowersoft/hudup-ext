@@ -21,6 +21,7 @@ import javax.swing.WindowConstants;
 
 import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.AlgDesc2;
+import net.hudup.core.alg.AlgRemoteWrapper;
 import net.hudup.core.alg.NoteAlg;
 import net.hudup.core.data.ui.PropPane;
 import net.hudup.core.logistic.LogUtil;
@@ -144,7 +145,14 @@ public class AlgConfigDlg extends JDialog {
 			@Override
 			public void reset() {
 				// TODO Auto-generated method stub
-				thisAlg.resetConfig();
+				if (AlgDesc2.isRemote(thisAlg) && (thisAlg instanceof AlgRemoteWrapper)) {
+					try {
+						((AlgRemoteWrapper)thisAlg).queryConfig();
+					} catch (Exception e) {LogUtil.trace(e);}
+				}
+				else
+					thisAlg.resetConfig();
+				
 				update(thisAlg.getConfig());
 				JOptionPane.showMessageDialog(
 						comp, 
@@ -190,8 +198,8 @@ public class AlgConfigDlg extends JDialog {
 			txtInfo.setText(algDesc.toString());
 			if (algDesc.isRemote) {
 				paneCfg.setToolbarVisible(false);
-				paneCfg.setControlVisible(false);
-				paneCfg.setEnabled(false);
+//				paneCfg.setControlVisible(false);
+//				paneCfg.setEnabled(false);
 			}
 		}
 		catch (Throwable e) {

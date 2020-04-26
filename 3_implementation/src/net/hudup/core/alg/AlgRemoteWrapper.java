@@ -72,7 +72,7 @@ public class AlgRemoteWrapper implements Alg, AlgRemote, Serializable {
     /**
      * Configuration.
      */
-    private DataConfig config = new DataConfig();
+    private transient DataConfig config = null;
     
     
 	/**
@@ -97,9 +97,9 @@ public class AlgRemoteWrapper implements Alg, AlgRemote, Serializable {
 			this.name = queryName();
 		} catch (Throwable e) {LogUtil.trace(e);}
 		
-		try {
-			this.config = queryConfig();
-		} catch (Throwable e) {LogUtil.trace(e);}
+//		try {
+//			this.config = queryConfig();
+//		} catch (Throwable e) {LogUtil.trace(e);}
 	}
 
 	
@@ -184,19 +184,22 @@ public class AlgRemoteWrapper implements Alg, AlgRemote, Serializable {
 	@Override
 	public DataConfig queryConfig() throws RemoteException {
 		try {
-			if (remoteAlg instanceof Alg)
-				config = ((Alg)remoteAlg).getConfig();
-			else {
-				config = remoteAlg.queryConfig();
-			}
+			config = remoteAlg.queryConfig();
 		} catch (Throwable e) {LogUtil.trace(e);}
 		
-		return this.config;
+		return config;
 	}
 
 	
 	@Override
 	public DataConfig getConfig() {
+		try {
+			if (remoteAlg instanceof Alg)
+				config = ((Alg)remoteAlg).getConfig();
+			else if (config == null)
+				config = remoteAlg.queryConfig();
+		} catch (Throwable e) {LogUtil.trace(e);}
+		
 		return config;
 	}
 

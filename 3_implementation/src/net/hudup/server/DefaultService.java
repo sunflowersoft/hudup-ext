@@ -1589,6 +1589,7 @@ public class DefaultService implements Service, PluginChangedListener, AutoClose
 				
 				remoteAlg.export(serverConfig.getServerPort());
 				alg = Util.getPluginManager().wrap(remoteAlg, false);
+				
 //				if (!singleton)
 //					ExtraStorage.addUnmanagedExportedObject(remoteAlg);
 			}
