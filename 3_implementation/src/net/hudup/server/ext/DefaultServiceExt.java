@@ -188,12 +188,10 @@ public class DefaultServiceExt extends DefaultService implements ServiceExt, Ser
 				
 				@Override
 				public int compare(Evaluator o1, Evaluator o2) {
-					// TODO Auto-generated method stub
 					try {
 						return extractName(o1).compareToIgnoreCase(extractName(o2));
 					}
 					catch (Throwable e) {
-						// TODO Auto-generated catch block
 						LogUtil.trace(e);
 						return -1;
 					}
@@ -216,7 +214,6 @@ public class DefaultServiceExt extends DefaultService implements ServiceExt, Ser
 	
 	@Override
 	public Evaluator getEvaluator(String evaluatorName, String account, String password) throws RemoteException {
-		// TODO Auto-generated method stub
 		if (!validateAccount(account, password, DataConfig.ACCOUNT_EVALUATE_PRIVILEGE))
 			return null;
 		else
@@ -226,7 +223,6 @@ public class DefaultServiceExt extends DefaultService implements ServiceExt, Ser
 
 	@Override
 	public Evaluator getEvaluator(String evaluatorName) throws RemoteException {
-		// TODO Auto-generated method stub
 		Evaluator evaluator = null;
 		trans.lockWrite();
 		try {
@@ -250,7 +246,6 @@ public class DefaultServiceExt extends DefaultService implements ServiceExt, Ser
 	@Override
 	public Evaluator getEvaluator(String evaluatorName, String account, String password, String reproducedVersion)
 			throws RemoteException {
-		// TODO Auto-generated method stub
 		if (!validateAccount(account, password, DataConfig.ACCOUNT_EVALUATE_PRIVILEGE))
 			return null;
 		
@@ -318,7 +313,6 @@ public class DefaultServiceExt extends DefaultService implements ServiceExt, Ser
 	@Override
 	public boolean removeEvaluator(String evaluatorName, String account, String password, String reproducedVersion)
 			throws RemoteException {
-		// TODO Auto-generated method stub
 		if (!validateAccount(account, password, DataConfig.ACCOUNT_EVALUATE_PRIVILEGE))
 			return false;
 		else
@@ -367,7 +361,6 @@ public class DefaultServiceExt extends DefaultService implements ServiceExt, Ser
 	
 	@Override
 	public String[] getEvaluatorNames() throws RemoteException {
-		// TODO Auto-generated method stub
 		List<String> evaluatorNames = Util.newList();
 		
 		trans.lockRead();
@@ -389,7 +382,6 @@ public class DefaultServiceExt extends DefaultService implements ServiceExt, Ser
 
 			@Override
 			public int compare(String o1, String o2) {
-				// TODO Auto-generated method stub
 				return o1.compareToIgnoreCase(o2);
 			}
 			

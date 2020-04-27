@@ -33,7 +33,6 @@ import net.hudup.core.alg.AlgDesc2;
 import net.hudup.core.alg.AlgDesc2List;
 import net.hudup.core.alg.AlgList;
 import net.hudup.core.alg.AlgRemote;
-import net.hudup.core.alg.AlgRemoteWrapper;
 import net.hudup.core.alg.SetupAlgEvent;
 import net.hudup.core.alg.SetupAlgListener;
 import net.hudup.core.client.ClassProcessor;
@@ -812,6 +811,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 	}
 	
 
+	@Deprecated
 	@Override
 	public boolean acceptAlg(Class<? extends Alg> algClass) throws RemoteException {
 		try {
@@ -845,8 +845,11 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 		
 		if ((connectInfo.pullMode) || !(alg instanceof AlgRemote)) {
 			try {
-				return evaluator.acceptAlg(alg.getClass());
-			} catch (Exception e) {LogUtil.trace(e);}
+				alg = alg.getClass().newInstance();
+				return evaluator.acceptAlg(alg);
+			} catch (Exception e) {
+				LogUtil.error("Evaluator does not accept algorithm '" + (alg != null ? alg.getName() : "noname") + "' due to " + e.getMessage());
+			}
 			return false;
 		}
 		
@@ -859,11 +862,8 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 		
 		boolean accepted = true;
 		try {
-			if (alg instanceof AlgRemoteWrapper)
-				accepted = evaluator.acceptAlg(alg);
-			else
-				accepted = evaluator.acceptAlg(
-						Util.getPluginManager().wrap(((AlgRemote)alg), false));
+			accepted = evaluator.acceptAlg(
+				Util.getPluginManager().wrap((AlgRemote)alg, false));
 		} 
 		catch (Throwable e) {
 			LogUtil.error("Evaluator does not accept algorithm '" + alg.getName() + "' due to " + e.getMessage());

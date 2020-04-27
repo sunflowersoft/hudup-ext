@@ -156,6 +156,7 @@ public class EvaluatorWrapperExt implements Evaluator, EvaluatorListener, Evalua
 	}
 
 
+	@Deprecated
 	@Override
 	public boolean acceptAlg(Class<? extends Alg> algClass) throws RemoteException {
 		return remoteEvaluator.acceptAlg(algClass);

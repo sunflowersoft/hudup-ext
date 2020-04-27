@@ -213,6 +213,7 @@ public class EvaluatorWrapper implements Evaluator, Serializable {
 	}
 
 
+	@Deprecated
 	@Override
 	public boolean acceptAlg(Class<? extends Alg> algClass) throws RemoteException {
 		return remoteEvaluator.acceptAlg(algClass);

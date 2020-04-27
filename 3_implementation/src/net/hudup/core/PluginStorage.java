@@ -576,7 +576,7 @@ public class PluginStorage implements Serializable {
 				if (alg == null) continue;
 				AlgDesc algDesc = evaluator.getPluginAlgDesc(alg.getClass(), alg.getName());
 				if (algDesc != null) alg.getConfig().putAll(algDesc.getConfig());
-			} catch (Exception e) {LogUtil.trace(e);}
+			} catch (Exception e) {LogUtil.error("Error when evaluator gets plug-in algorithm, caused by " + e.getMessage());}
 		}
 		
 		return pluginAlgNames;

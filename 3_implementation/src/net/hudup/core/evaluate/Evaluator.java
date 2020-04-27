@@ -204,6 +204,7 @@ public interface Evaluator extends Remote, RemoteRunner, SetupAlgListener, Plugi
 	 * @param algClass specified algorithm class.
 	 * @return whether the specified algorithm class is accepted by this evaluator.
 	 */
+	@Deprecated
 	boolean acceptAlg(Class<? extends Alg> algClass) throws RemoteException;
 
 		
