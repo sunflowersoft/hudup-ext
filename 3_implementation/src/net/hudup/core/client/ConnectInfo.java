@@ -92,6 +92,15 @@ public class ConnectInfo implements Serializable {
 	}
 	
 	
+	/**
+	 * Checking whether pull mode is set.
+	 * @return whether pull mode is set.
+	 */
+	public boolean checkPullMode() {
+		return pullMode && bindUri != null;
+	}
+	
+	
 }
 
 

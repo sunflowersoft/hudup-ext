@@ -843,7 +843,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 		alg = AlgDesc2.wrapNewInstance(alg, false);
 		if (alg == null) return false;
 		
-		if ((connectInfo.pullMode) || !(alg instanceof AlgRemote)) {
+		if ((connectInfo.checkPullMode()) || !(alg instanceof AlgRemote)) {
 			try {
 				alg = alg.getClass().newInstance();
 				return evaluator.acceptAlg(alg);

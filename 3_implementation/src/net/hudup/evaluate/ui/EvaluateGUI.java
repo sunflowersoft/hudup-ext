@@ -83,6 +83,7 @@ import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.Timestamp;
 import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.xURI;
+import net.hudup.core.logistic.ui.Light;
 import net.hudup.core.logistic.ui.StatusBar;
 import net.hudup.core.logistic.ui.TextField;
 import net.hudup.core.logistic.ui.TxtOutput;
@@ -251,6 +252,12 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 	
 	
 	/**
+	 * Signal light.
+	 */
+	protected Light signalLight = null;
+	
+	
+	/**
 	 * Constructor with local evaluator.
 	 * @param evaluator local evaluator.
 	 */
@@ -336,6 +343,16 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 		return this;	
 	}
 	
+	
+	@Override
+	protected synchronized boolean taskQueueFeed() {
+		boolean connected = super.taskQueueFeed();
+		if (signalLight != null && connectInfo.checkPullMode())
+			signalLight.turn(connected);
+		
+		return connected;
+	}
+
 	
 	@Override
 	public void pluginChanged(PluginChangedEvent evt) throws RemoteException {
@@ -943,6 +960,10 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 		}
 		statusPane.add(this.statusBar, BorderLayout.CENTER);
 
+		this.signalLight = new Light();
+		this.signalLight.turn(false);
+		statusPane.add(this.signalLight, BorderLayout.EAST);
+
 		return footer;
 	}
 
@@ -1310,7 +1331,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 				started = evaluator.remoteStart0(algList, toDatasetPoolExchangedClient(guiData.pool), timestamp = new Timestamp(), null);
 			else {
 				DataConfig config = AlgList.getAlgDescMap(algList);
-				started = evaluator.remoteStart(AlgList.getAlgNameList(algList), toDatasetPoolExchangedClient(guiData.pool), connectInfo.pullMode ? null : this, config, timestamp = new Timestamp(), null);
+				started = evaluator.remoteStart(AlgList.getAlgNameList(algList), toDatasetPoolExchangedClient(guiData.pool), connectInfo.checkPullMode() ? null : this, config, timestamp = new Timestamp(), null);
 			}
 			if (!started) updateMode();
 		}

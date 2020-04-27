@@ -828,12 +828,10 @@ public class EvalCompoundGUI extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				ConnectInfo connectInfo = new ConnectInfo();
 				
-				connectInfo.globalAddress = txtGlobalAddress.getText();
-				if (connectInfo.globalAddress != null) {
-					connectInfo.globalAddress = connectInfo.globalAddress.trim();
-					if (connectInfo.globalAddress.isEmpty())
-						connectInfo.globalAddress = null;
-				}
+				String globalAddress = txtGlobalAddress.getText() != null ? txtGlobalAddress.getText().trim() : ""; 
+				if (globalAddress.isEmpty() || globalAddress.compareToIgnoreCase("localhost") == 0 || globalAddress.compareToIgnoreCase("127.0.0.1") == 0)
+					globalAddress = null;
+				connectInfo.globalAddress = globalAddress;
 
 				if (chkHosting.isSelected()) {
 					String namingPath = ConnectDlg.normalizeNamingPath(txtNamingPath.getText());

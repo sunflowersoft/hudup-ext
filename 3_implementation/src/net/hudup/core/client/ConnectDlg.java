@@ -780,11 +780,6 @@ public abstract class ConnectDlg extends JDialog {
 				connectInfo.account = Account.create(username, password);
 				connectInfo.connectUri = connectUri;
 				
-				connectInfo.pullMode = chkPullMode.isSelected();
-				int myAccessPeriod = txtMyAccessPeriod.getValue() instanceof Number ? ( (Number) txtMyAccessPeriod.getValue()).intValue() : 1;
-				myAccessPeriod = 1000 * myAccessPeriod;
-				connectInfo.accessPeriod = myAccessPeriod < Counter.PERIOD ? Counter.PERIOD : myAccessPeriod;   
-
 				connectInfo.bindUri = xURI.create("rmi://localhost:" + bindPort);
 				if (chkHostingAgain.isSelected()) {
 					connectInfo.namingUri = connectInfo.bindUri;
@@ -792,12 +787,15 @@ public abstract class ConnectDlg extends JDialog {
 						connectInfo.namingUri = connectInfo.namingUri.concat(myNamingPath);
 				}
 				
-				connectInfo.globalAddress = txtMyGlobalAddress.getText();
-				if (connectInfo.globalAddress != null) {
-					connectInfo.globalAddress = connectInfo.globalAddress.trim();
-					if (connectInfo.globalAddress.isEmpty())
-						connectInfo.globalAddress = null;
-				}
+				connectInfo.pullMode = chkPullMode.isSelected() && connectInfo.bindUri != null;
+				int myAccessPeriod = txtMyAccessPeriod.getValue() instanceof Number ? ( (Number) txtMyAccessPeriod.getValue()).intValue() : 1;
+				myAccessPeriod = 1000 * myAccessPeriod;
+				connectInfo.accessPeriod = myAccessPeriod < Counter.PERIOD ? Counter.PERIOD : myAccessPeriod;   
+
+				String globalAddress = txtMyGlobalAddress.getText() != null ? txtMyGlobalAddress.getText().trim() : ""; 
+				if (globalAddress.isEmpty() || globalAddress.compareToIgnoreCase("localhost") == 0 || globalAddress.compareToIgnoreCase("127.0.0.1") == 0)
+					globalAddress = null;
+				connectInfo.globalAddress = globalAddress;
 				
 				dispose();
 			}

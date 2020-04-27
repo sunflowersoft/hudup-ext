@@ -356,7 +356,7 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 				guiData.txtRunSaveBrowse = evStorePath;
 		}
 
-		if (connectInfo.pullMode && connectInfo.bindUri != null) {
+		if (connectInfo.checkPullMode()) {
 			taskQueueFeedee = new Timer(0, connectInfo.accessPeriod) {
 				
 				@Override
@@ -376,13 +376,15 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	
 	/**
 	 * Feeding tasks from server.
+	 * @return true if connecting to server is successful.
 	 */
-	protected synchronized void taskQueueFeed() {
+	protected synchronized boolean taskQueueFeed() {
+		boolean connected = true;
 		List<EventObject> evtList = Util.newList();
 		try {
 			evtList = evaluator.doTask(id);
 		}
-		catch (Throwable e) {LogUtil.trace(e);}
+		catch (Throwable e) {connected = false; LogUtil.trace(e);}
 		
 		for (EventObject evt : evtList) {
 			try {
@@ -412,6 +414,8 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 			}
 		}
 		catch (Throwable e) {LogUtil.trace(e);}
+		
+		return connected;
 	}
 	
 	
@@ -464,7 +468,7 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	 * This method will connect to server in pull mode.
 	 */
 	public synchronized void refreshResult() {
-		if (connectInfo.pullMode && connectInfo.bindUri != null) {
+		if (connectInfo.checkPullMode()) {
 			taskQueueFeed();
 		}
 		else {
@@ -737,13 +741,26 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	}
 
 
+//	/**
+//	 * Reconnecting to server. This method is only effective in pull mode.
+//	 * @return true if reconnecting to server is success.
+//	 */
+//	public synchronized boolean reconnectServer() {
+//		if (!connectInfo.isPullMode()) return false;
+//		
+//		unsetupListeners(evaluator);
+//		return setupListeners(evaluator);
+//	}
+	
+	
 	/**
 	 * Add this GUI as listeners to specified evaluator.
 	 * @param evaluator specified evaluator.
+	 * @return true if unsetting up listeners successfully.
 	 */
-	protected synchronized void setupListeners(Evaluator evaluator) {
+	protected synchronized boolean setupListeners(Evaluator evaluator) {
 		try {
-			if (connectInfo.pullMode && connectInfo.bindUri != null) {
+			if (connectInfo.checkPullMode()) {
 				evaluator.addPluginChangedListener(id);
 				evaluator.addEvaluatorListener(id);
 				evaluator.addEvaluateListener(id);
@@ -758,20 +775,25 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 				evaluator.addSetupAlgListener(this);
 				evaluator.addElapsedTimeListener(this);
 			}
+			
+			return true;
 		}
 		catch (Throwable e) {
 			LogUtil.trace(e);
 		}
+		
+		return false;
 	}
 	
 	
 	/**
 	 * Remove this GUI as listeners from specified evaluator.
 	 * @param evaluator specified evaluator.
+	 * @return true if unsetting up listeners successfully.
 	 */
-	protected synchronized void unsetupListeners(Evaluator evaluator) {
+	protected synchronized boolean unsetupListeners(Evaluator evaluator) {
 		try {
-			if (connectInfo.pullMode && connectInfo.bindUri != null) {
+			if (connectInfo.checkPullMode()) {
 				evaluator.removePluginChangedListener(id);
 				evaluator.removeEvaluatorListener(id);
 				evaluator.removeEvaluateListener(id);
@@ -786,10 +808,14 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 				evaluator.removeSetupAlgListener(this);
 				evaluator.removeElapsedTimeListener(this);
 			}
+			
+			return true;
 		}
 		catch (Throwable e) {
 			LogUtil.trace(e);
 		}
+		
+		return false;
 	}
 
 	
