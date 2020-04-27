@@ -39,12 +39,19 @@ public class RecommenderRemoteWrapper extends AlgRemoteWrapper implements Recomm
 	private static final long serialVersionUID = 1L;
 
 
+    /**
+     * Default constructor.
+     */
+    public RecommenderRemoteWrapper() {
+
+    }
+
+    
 	/**
 	 * Constructor with remote recommender.
 	 * @param remoteRecommender remote recommender.
 	 */
 	public RecommenderRemoteWrapper(RecommenderRemote remoteRecommender) {
-		// TODO Auto-generated constructor stub
 		super(remoteRecommender);
 	}
 

@@ -32,13 +32,20 @@ public class MetricRemoteWrapper extends AlgRemoteWrapper implements Metric, Met
 	private static final long serialVersionUID = 1L;
 
 	
-	/**
+    /**
+     * Default constructor.
+     */
+    public MetricRemoteWrapper() {
+
+    }
+
+    
+    /**
 	 * Constructor with remote metric.
 	 * @param remoteMetric remote metric.
 	 */
 	public MetricRemoteWrapper(MetricRemote remoteMetric) {
 		super(remoteMetric);
-		// TODO Auto-generated constructor stub
 	}
 
 	
@@ -49,62 +56,53 @@ public class MetricRemoteWrapper extends AlgRemoteWrapper implements Metric, Met
 	 */
 	public MetricRemoteWrapper(MetricRemote remoteMetric, boolean exclusive) {
 		super(remoteMetric, exclusive);
-		// TODO Auto-generated constructor stub
 	}
 
 	
 	@Override
 	public String getTypeName() throws RemoteException {
-		// TODO Auto-generated method stub
 		return ((MetricRemote)remoteAlg).getTypeName();
 	}
 
 	
 	@Override
 	public void setup(Object... params) throws RemoteException {
-		// TODO Auto-generated method stub
 		((MetricRemote)remoteAlg).setup(params);
 	}
 
 	
 	@Override
 	public MetricValue getCurrentValue() throws RemoteException {
-		// TODO Auto-generated method stub
 		return ((MetricRemote)remoteAlg).getCurrentValue();
 	}
 
 	
 	@Override
 	public MetricValue getAccumValue() throws RemoteException {
-		// TODO Auto-generated method stub
 		return ((MetricRemote)remoteAlg).getAccumValue();
 	}
 
 	
 	@Override
 	public boolean recalc(Object... params) throws RemoteException {
-		// TODO Auto-generated method stub
 		return ((MetricRemote)remoteAlg).recalc(params);
 	}
 
 	
 	@Override
 	public void reset() throws RemoteException {
-		// TODO Auto-generated method stub
 		((MetricRemote)remoteAlg).reset();
 	}
 
 	
 	@Override
 	public boolean isValid() throws RemoteException {
-		// TODO Auto-generated method stub
 		return ((MetricRemote)remoteAlg).isValid();
 	}
 
 
 	@Override
 	public Alg newInstance() {
-		// TODO Auto-generated method stub
 		if (remoteAlg instanceof MetricAbstract) {
 			MetricAbstract newMetric = (MetricAbstract) ((MetricAbstract)remoteAlg).newInstance();
 			return new MetricRemoteWrapper(newMetric, exclusive);
@@ -118,14 +116,12 @@ public class MetricRemoteWrapper extends AlgRemoteWrapper implements Metric, Met
 
 	@Override
 	public String[] getBaseRemoteInterfaceNames() throws RemoteException {
-		// TODO Auto-generated method stub
 		return new String[] {MetricRemote.class.getName()};
 	}
 
 	
 	@Override
 	public DataConfig createDefaultConfig() {
-		// TODO Auto-generated method stub
 		if (remoteAlg instanceof Metric)
 			return ((Metric)remoteAlg).createDefaultConfig();
 		else {

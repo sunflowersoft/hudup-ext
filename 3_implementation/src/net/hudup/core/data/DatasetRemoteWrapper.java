@@ -51,12 +51,19 @@ public class DatasetRemoteWrapper implements Dataset, DatasetRemote {
 	protected DatasetRemote remoteDataset = null;
 	
 	
+    /**
+     * Default constructor.
+     */
+    public DatasetRemoteWrapper() {
+
+    }
+
+    
 	/**
 	 * Constructor with specified remote dataset.
 	 * @param remoteDataset remote dataset.
 	 */
 	public DatasetRemoteWrapper(DatasetRemote remoteDataset) {
-		// TODO Auto-generated constructor stub
 		this(remoteDataset, true);
 	}
 

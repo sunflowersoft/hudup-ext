@@ -46,18 +46,16 @@ public abstract class ExecuteEvaluator extends EvaluatorAbstract {
 	 * Default constructor.
 	 */
 	public ExecuteEvaluator() {
-		// TODO Auto-generated constructor stub
+
 	}
 
 	
 	@Override
 	protected void setupAlg(Alg alg, Dataset training) {
-		// TODO Auto-generated method stub
 		try {
 			((ExecutableAlg)alg).setup(training);
 		}
 		catch (Throwable e) {
-			// TODO Auto-generated catch block
 			LogUtil.trace(e);
 		}
 	}
@@ -65,7 +63,6 @@ public abstract class ExecuteEvaluator extends EvaluatorAbstract {
 	
 	@Override
 	protected void unsetupAlg(Alg alg) {
-		// TODO Auto-generated method stub
 		try {
 			((ExecutableAlg)alg).unsetup();
 		}
@@ -75,21 +72,18 @@ public abstract class ExecuteEvaluator extends EvaluatorAbstract {
 	
 	@Override
 	protected Fetcher<Profile> fetchTesting(Dataset testing) {
-		// TODO Auto-generated method stub
 		return testing.fetchSample();
 	}
 
 	
 	@Override
 	protected Profile prepareExecuteAlg(Alg alg, Profile testingProfile) {
-		// TODO Auto-generated method stub
 		return testingProfile;
 	}
 
 	
 	@Override
 	protected Serializable executeAlg(Alg alg, Profile param) {
-		// TODO Auto-generated method stub
 		try {
 			Object result = ((ExecutableAlg)alg).execute(param);
 			if (result instanceof Serializable)
@@ -97,7 +91,6 @@ public abstract class ExecuteEvaluator extends EvaluatorAbstract {
 			else
 				return null;
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			LogUtil.trace(e);
 		}
 		
@@ -107,7 +100,6 @@ public abstract class ExecuteEvaluator extends EvaluatorAbstract {
 	
 	@Override
 	public NoneWrapperMetricList defaultMetrics() throws RemoteException {
-		// TODO Auto-generated method stub
 		NoneWrapperMetricList metricList = new NoneWrapperMetricList();
 		
 		SetupTimeMetric setupTime = new SetupTimeMetric();
@@ -147,25 +139,13 @@ public abstract class ExecuteEvaluator extends EvaluatorAbstract {
 
 	
 	@Override
-	public boolean acceptAlg(Alg alg) {
-		if (alg == null) return false;
-		
-		try {
-			return acceptAlg(alg.getClass()) && (!(AlgDesc2.isForTest(alg)));
-		} catch (Exception e) {LogUtil.trace(e);}
-		return false;
-	}
-
-	
-	@Override
-	public boolean acceptAlg(Class<? extends Alg> algClass) throws RemoteException {
-		return ExecutableAlg.class.isAssignableFrom(algClass);
+	public boolean acceptAlg(Alg alg) throws RemoteException {
+		return (alg != null) && (alg instanceof ExecutableAlg) && !(AlgDesc2.isForTest(alg));
 	}
 
 
 	@Override
 	public String getMainUnit() {
-		// TODO Auto-generated method stub
 		return DataConfig.SAMPLE_UNIT;
 	}
 

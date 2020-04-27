@@ -75,6 +75,14 @@ public class AlgRemoteWrapper implements Alg, AlgRemote, Serializable {
     private transient DataConfig config = null;
     
     
+    /**
+     * Default constructor.
+     */
+    public AlgRemoteWrapper() {
+
+    }
+    
+    
 	/**
 	 * Constructor with specified remote algorithm.
 	 * @param remoteAlg remote algorithm.

@@ -44,12 +44,19 @@ public class KBaseRemoteWrapper implements KBase, KBaseRemote {
     protected KBaseRemote exportedStub = null;
 
     
-	/**
+    /**
+     * Default constructor.
+     */
+    public KBaseRemoteWrapper() {
+
+    }
+
+    
+    /**
 	 * Constructor with specified remote knowledge base.
 	 * @param remoteKBase remote knowledge base.
 	 */
 	public KBaseRemoteWrapper(KBaseRemote remoteKBase) {
-		// TODO Auto-generated constructor stub
 		this(remoteKBase, true);
 	}
 

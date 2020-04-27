@@ -191,14 +191,22 @@ public interface Evaluator extends Remote, RemoteRunner, SetupAlgListener, Plugi
 	
 	
 	/**
-	 * Checking whether the specified algorithm class is accepted by this evaluator.
-	 * @param algClass specified algorithm class.
+	 * Checking whether the specified algorithm is accepted by this evaluator.
+	 * @param alg specified algorithm.
 	 * @return whether the specified algorithm is accepted by this evaluator.
 	 * @throws RemoteException if any error raises.
 	 */
-	boolean acceptAlg(Class<? extends Alg> algClass) throws RemoteException;
+	boolean acceptAlg(Alg alg) throws RemoteException;
 
 	
+	/**
+	 * Checking whether the specified algorithm class is accepted by this evaluator.
+	 * @param algClass specified algorithm class.
+	 * @return whether the specified algorithm class is accepted by this evaluator.
+	 */
+	boolean acceptAlg(Class<? extends Alg> algClass) throws RemoteException;
+
+		
 	/**
 	 * Defining the list of default metrics. This method is used only locally.
 	 * @return the list of default metrics as {@link NoneWrapperMetricList}.

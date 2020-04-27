@@ -23,13 +23,20 @@ public class ServerPointerRemoteWrapper extends PointerRemoteWrapper implements 
 	private static final long serialVersionUID = 1L;
 
 	
+    /**
+     * Default constructor.
+     */
+    public ServerPointerRemoteWrapper() {
+
+    }
+
+    
 	/**
 	 * Constructor with remote server pointer.
 	 * @param remoteServerPointer remote server pointer.
 	 */
 	public ServerPointerRemoteWrapper(ServerPointerRemote remoteServerPointer) {
 		super(remoteServerPointer);
-		// TODO Auto-generated constructor stub
 	}
 
 	
@@ -40,7 +47,6 @@ public class ServerPointerRemoteWrapper extends PointerRemoteWrapper implements 
 	 */
 	public ServerPointerRemoteWrapper(ServerPointerRemote remoteServerPointer, boolean exclusive) {
 		super(remoteServerPointer, exclusive);
-		// TODO Auto-generated constructor stub
 	}
 
 	

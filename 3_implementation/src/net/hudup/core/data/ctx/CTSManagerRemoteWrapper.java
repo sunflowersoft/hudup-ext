@@ -38,13 +38,20 @@ public class CTSManagerRemoteWrapper extends AlgRemoteWrapper implements CTSMana
 	private static final long serialVersionUID = 1L;
 
 	
+    /**
+     * Default constructor.
+     */
+    public CTSManagerRemoteWrapper() {
+
+    }
+
+    
 	/**
 	 * Constructor with specified remote context template manager.
 	 * @param remoteCTSManager specified remote context template manager.
 	 */
 	public CTSManagerRemoteWrapper(CTSManagerRemote remoteCTSManager) {
 		super(remoteCTSManager);
-		// TODO Auto-generated constructor stub
 	}
 
 	
@@ -55,13 +62,11 @@ public class CTSManagerRemoteWrapper extends AlgRemoteWrapper implements CTSMana
 	 */
 	public CTSManagerRemoteWrapper(CTSManagerRemote remoteCTSManager, boolean exclusive) {
 		super(remoteCTSManager, exclusive);
-		// TODO Auto-generated constructor stub
 	}
 
 	
 	@Override
 	public void setup(DataConfig config) {
-		// TODO Auto-generated method stub
 		try {
 			((CTSManagerRemote)remoteAlg).remoteSetup(config);
 		} catch (Exception e) {LogUtil.trace(e);}
@@ -70,7 +75,6 @@ public class CTSManagerRemoteWrapper extends AlgRemoteWrapper implements CTSMana
 	
 	@Override
 	public ContextTemplateSchema getCTSchema() {
-		// TODO Auto-generated method stub
 		try {
 			return ((CTSManagerRemote)remoteAlg).remoteGetCTSchema();
 		} catch (Exception e) {LogUtil.trace(e);}
@@ -81,7 +85,6 @@ public class CTSManagerRemoteWrapper extends AlgRemoteWrapper implements CTSMana
 	
 	@Override
 	public boolean createContextTemplateUnit() {
-		// TODO Auto-generated method stub
 		try {
 			return ((CTSManagerRemote)remoteAlg).remoteCreateContextTemplateUnit();
 		} catch (Exception e) {LogUtil.trace(e);}
@@ -92,7 +95,6 @@ public class CTSManagerRemoteWrapper extends AlgRemoteWrapper implements CTSMana
 	
 	@Override
 	public void reload() {
-		// TODO Auto-generated method stub
 		try {
 			((CTSManagerRemote)remoteAlg).remoteReload();
 		} catch (Exception e) {LogUtil.trace(e);}
@@ -101,7 +103,6 @@ public class CTSManagerRemoteWrapper extends AlgRemoteWrapper implements CTSMana
 	
 	@Override
 	public Context createContext(int ctxTemplateId, Serializable assignedValue) {
-		// TODO Auto-generated method stub
 		try {
 			return ((CTSManagerRemote)remoteAlg).remoteCreateContext(ctxTemplateId, assignedValue);
 		} catch (Exception e) {LogUtil.trace(e);}
@@ -112,7 +113,6 @@ public class CTSManagerRemoteWrapper extends AlgRemoteWrapper implements CTSMana
 	
 	@Override
 	public ContextList getContexts(int userId, int itemId) {
-		// TODO Auto-generated method stub
 		try {
 			return ((CTSManagerRemote)remoteAlg).remoteGetContexts(userId, itemId);
 		} catch (Exception e) {LogUtil.trace(e);}
@@ -123,7 +123,6 @@ public class CTSManagerRemoteWrapper extends AlgRemoteWrapper implements CTSMana
 	
 	@Override
 	public ContextList getContexts(int userId, int itemId, long ratedDate) {
-		// TODO Auto-generated method stub
 		try {
 			return ((CTSManagerRemote)remoteAlg).remoteGetContexts(userId, itemId, ratedDate);
 		} catch (Exception e) {LogUtil.trace(e);}
@@ -134,7 +133,6 @@ public class CTSManagerRemoteWrapper extends AlgRemoteWrapper implements CTSMana
 	
 	@Override
 	public Profile profileOf(Context context) {
-		// TODO Auto-generated method stub
 		try {
 			return ((CTSManagerRemote)remoteAlg).remoteProfileOf(context);
 		} catch (Exception e) {LogUtil.trace(e);}
@@ -145,7 +143,6 @@ public class CTSManagerRemoteWrapper extends AlgRemoteWrapper implements CTSMana
 	
 	@Override
 	public Profile profileOf(int ctxTemplateId, ContextValue ctxValue) {
-		// TODO Auto-generated method stub
 		try {
 			return ((CTSManagerRemote)remoteAlg).remoteProfileOf(ctxTemplateId, ctxValue);
 		} catch (Exception e) {LogUtil.trace(e);}
@@ -156,7 +153,6 @@ public class CTSManagerRemoteWrapper extends AlgRemoteWrapper implements CTSMana
 	
 	@Override
 	public Profiles profilesOf(int ctxTemplateId) {
-		// TODO Auto-generated method stub
 		try {
 			return ((CTSManagerRemote)remoteAlg).remoteProfilesOf(ctxTemplateId);
 		} catch (Exception e) {LogUtil.trace(e);}
@@ -167,7 +163,6 @@ public class CTSManagerRemoteWrapper extends AlgRemoteWrapper implements CTSMana
 	
 	@Override
 	public CTSMultiProfiles createCTSProfiles() {
-		// TODO Auto-generated method stub
 		try {
 			return ((CTSManagerRemote)remoteAlg).remoteCreateCTSProfiles();
 		} catch (Exception e) {LogUtil.trace(e);}
@@ -178,7 +173,6 @@ public class CTSManagerRemoteWrapper extends AlgRemoteWrapper implements CTSMana
 	
 	@Override
 	public boolean commitCTSchema() {
-		// TODO Auto-generated method stub
 		try {
 			return ((CTSManagerRemote)remoteAlg).remoteCommitCTSchema();
 		} catch (Exception e) {LogUtil.trace(e);}
@@ -189,7 +183,6 @@ public class CTSManagerRemoteWrapper extends AlgRemoteWrapper implements CTSMana
 	
 	@Override
 	public boolean importCTSchema(CTSManager ctsm) {
-		// TODO Auto-generated method stub
 		try {
 			return ((CTSManagerRemote)remoteAlg).remoteImportCTSchema(ctsm);
 		} catch (Exception e) {LogUtil.trace(e);}
@@ -200,7 +193,6 @@ public class CTSManagerRemoteWrapper extends AlgRemoteWrapper implements CTSMana
 	
 	@Override
 	public boolean importCTSchema(Dataset dataset) {
-		// TODO Auto-generated method stub
 		try {
 			return ((CTSManagerRemote)remoteAlg).remoteImportCTSchema(dataset);
 		} catch (Exception e) {LogUtil.trace(e);}
@@ -211,7 +203,6 @@ public class CTSManagerRemoteWrapper extends AlgRemoteWrapper implements CTSMana
 	
 	@Override
 	public void defaultCTSchema() {
-		// TODO Auto-generated method stub
 		try {
 			((CTSManagerRemote)remoteAlg).remoteDefaultCTSchema();
 		} catch (Exception e) {LogUtil.trace(e);}
@@ -220,14 +211,12 @@ public class CTSManagerRemoteWrapper extends AlgRemoteWrapper implements CTSMana
 	
 	@Override
 	public Inspector getInspector() {
-		// TODO Auto-generated method stub
 		return new Inspector.NullInspector();
 	}
 
 	
 	@Override
 	public Alg newInstance() {
-		// TODO Auto-generated method stub
 		if (remoteAlg instanceof CTSManagerAbstract) {
 			CTSManagerAbstract newCTSManager = (CTSManagerAbstract) ((CTSManagerAbstract)remoteAlg).newInstance();
 			return new CTSManagerRemoteWrapper(newCTSManager, exclusive);
@@ -241,7 +230,6 @@ public class CTSManagerRemoteWrapper extends AlgRemoteWrapper implements CTSMana
 	
 	@Override
 	public DataConfig createDefaultConfig() {
-		// TODO Auto-generated method stub
 		if (remoteAlg instanceof CTSManagerAbstract)
 			return ((CTSManagerAbstract)remoteAlg).createDefaultConfig();
 		else {
@@ -253,7 +241,6 @@ public class CTSManagerRemoteWrapper extends AlgRemoteWrapper implements CTSMana
 	
 	@Override
 	public void close() throws Exception {
-		// TODO Auto-generated method stub
 		if (exclusive && (remoteAlg != null)) {
 			try {
 				((CTSManagerRemote)remoteAlg).close();
@@ -270,14 +257,12 @@ public class CTSManagerRemoteWrapper extends AlgRemoteWrapper implements CTSMana
 	
 	@Override
 	public String[] getBaseRemoteInterfaceNames() throws RemoteException {
-		// TODO Auto-generated method stub
 		return new String[] {CTSManagerRemote.class.getName()};
 	}
 
 	
 	@Override
 	protected void finalize() throws Throwable {
-		// TODO Auto-generated method stub
 		try {
 			close();
 		}
@@ -296,105 +281,90 @@ public class CTSManagerRemoteWrapper extends AlgRemoteWrapper implements CTSMana
 	
 	@Override
 	public void remoteSetup(DataConfig config) throws RemoteException {
-		// TODO Auto-generated method stub
 		((CTSManagerRemote)remoteAlg).remoteSetup(config);
 	}
 
 
 	@Override
 	public ContextTemplateSchema remoteGetCTSchema() throws RemoteException {
-		// TODO Auto-generated method stub
 		return ((CTSManagerRemote)remoteAlg).remoteGetCTSchema();
 	}
 
 	
 	@Override
 	public boolean remoteCreateContextTemplateUnit() throws RemoteException {
-		// TODO Auto-generated method stub
 		return ((CTSManagerRemote)remoteAlg).remoteCreateContextTemplateUnit();
 	}
 
 
 	@Override
 	public void remoteReload() throws RemoteException {
-		// TODO Auto-generated method stub
 		((CTSManagerRemote)remoteAlg).remoteReload();
 	}
 
 	
 	@Override
 	public Context remoteCreateContext(int ctxTemplateId, Serializable assignedValue) throws RemoteException {
-		// TODO Auto-generated method stub
 		return ((CTSManagerRemote)remoteAlg).remoteCreateContext(ctxTemplateId, assignedValue);
 	}
 
 	
 	@Override
 	public ContextList remoteGetContexts(int userId, int itemId) throws RemoteException {
-		// TODO Auto-generated method stub
 		return ((CTSManagerRemote)remoteAlg).remoteGetContexts(userId, itemId);
 	}
 
 	
 	@Override
 	public ContextList remoteGetContexts(int userId, int itemId, long ratedDate) throws RemoteException {
-		// TODO Auto-generated method stub
 		return ((CTSManagerRemote)remoteAlg).remoteGetContexts(userId, itemId, ratedDate);
 	}
 
 	
 	@Override
 	public Profile remoteProfileOf(Context context) throws RemoteException {
-		// TODO Auto-generated method stub
 		return ((CTSManagerRemote)remoteAlg).remoteProfileOf(context);
 	}
 
 	
 	@Override
 	public Profile remoteProfileOf(int ctxTemplateId, ContextValue ctxValue) throws RemoteException {
-		// TODO Auto-generated method stub
 		return ((CTSManagerRemote)remoteAlg).remoteProfileOf(ctxTemplateId, ctxValue);
 	}
 
 	
 	@Override
 	public Profiles remoteProfilesOf(int ctxTemplateId) throws RemoteException {
-		// TODO Auto-generated method stub
 		return ((CTSManagerRemote)remoteAlg).remoteProfilesOf(ctxTemplateId);
 	}
 
 	
 	@Override
 	public CTSMultiProfiles remoteCreateCTSProfiles() throws RemoteException {
-		// TODO Auto-generated method stub
 		return ((CTSManagerRemote)remoteAlg).remoteCreateCTSProfiles();
 	}
 
 
 	@Override
 	public boolean remoteCommitCTSchema() throws RemoteException {
-		// TODO Auto-generated method stub
 		return ((CTSManagerRemote)remoteAlg).remoteCommitCTSchema();
 	}
 
 
 	@Override
 	public boolean remoteImportCTSchema(CTSManager ctsm) throws RemoteException {
-		// TODO Auto-generated method stub
 		return ((CTSManagerRemote)remoteAlg).remoteImportCTSchema(ctsm);
 	}
 
 
 	@Override
 	public boolean remoteImportCTSchema(Dataset dataset) throws RemoteException {
-		// TODO Auto-generated method stub
 		return ((CTSManagerRemote)remoteAlg).remoteImportCTSchema(dataset);
 	}
 
 
 	@Override
 	public void remoteDefaultCTSchema() throws RemoteException {
-		// TODO Auto-generated method stub
 		((CTSManagerRemote)remoteAlg).remoteDefaultCTSchema();
 	}
 

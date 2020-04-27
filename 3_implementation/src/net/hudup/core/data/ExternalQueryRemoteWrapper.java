@@ -32,13 +32,20 @@ public class ExternalQueryRemoteWrapper extends AlgRemoteWrapper implements Exte
 	private static final long serialVersionUID = 1L;
 
 	
+    /**
+     * Default constructor.
+     */
+    public ExternalQueryRemoteWrapper() {
+
+    }
+
+    
 	/**
 	 * Constructor with remote external query.
 	 * @param remoteExternalQuery remote external query.
 	 */
 	public ExternalQueryRemoteWrapper(ExternalQueryRemote remoteExternalQuery) {
 		super(remoteExternalQuery);
-		// TODO Auto-generated constructor stub
 	}
 
 	
@@ -49,41 +56,35 @@ public class ExternalQueryRemoteWrapper extends AlgRemoteWrapper implements Exte
 	 */
 	public ExternalQueryRemoteWrapper(ExternalQueryRemote remoteExternalQuery, boolean exclusive) {
 		super(remoteExternalQuery, exclusive);
-		// TODO Auto-generated constructor stub
 	}
 
 	
 	@Override
 	public boolean setup(DataConfig internalConfig, ExternalConfig externalConfig) throws RemoteException {
-		// TODO Auto-generated method stub
 		return ((ExternalQueryRemote)remoteAlg).setup(internalConfig, externalConfig);
 	}
 
 	
 	@Override
 	public ExternalItemInfo getItemInfo(int itemId) throws RemoteException {
-		// TODO Auto-generated method stub
 		return ((ExternalQueryRemote)remoteAlg).getItemInfo(itemId);
 	}
 
 	
 	@Override
 	public ExternalUserInfo getUserInfo(int userId) throws RemoteException {
-		// TODO Auto-generated method stub
 		return ((ExternalQueryRemote)remoteAlg).getUserInfo(userId);
 	}
 
 	
 	@Override
 	public void importData(ProgressListener registeredListener) throws RemoteException {
-		// TODO Auto-generated method stub
 		((ExternalQueryRemote)remoteAlg).importData(registeredListener);
 	}
 
 	
 	@Override
 	public synchronized void resetConfig() {
-		// TODO Auto-generated method stub
 		if (remoteAlg instanceof ExternalQuery)
 			((ExternalQuery)remoteAlg).resetConfig();
 		else
@@ -93,7 +94,6 @@ public class ExternalQueryRemoteWrapper extends AlgRemoteWrapper implements Exte
 	
 	@Override
 	public DataConfig createDefaultConfig() {
-		// TODO Auto-generated method stub
 		if (remoteAlg instanceof ExternalQuery)
 			return ((ExternalQuery)remoteAlg).createDefaultConfig();
 		else {
@@ -105,7 +105,6 @@ public class ExternalQueryRemoteWrapper extends AlgRemoteWrapper implements Exte
 	
 	@Override
 	public synchronized void unexport() throws RemoteException {
-		// TODO Auto-generated method stub
 		if (exclusive && remoteAlg != null) {
 			try {
 				((ExternalQueryRemote)remoteAlg).close();
@@ -118,7 +117,6 @@ public class ExternalQueryRemoteWrapper extends AlgRemoteWrapper implements Exte
 
 	@Override
 	public Alg newInstance() {
-		// TODO Auto-generated method stub
 		if (remoteAlg instanceof ExternalQueryAbstract) {
 			ExternalQueryAbstract newExternalQuery = (ExternalQueryAbstract) ((ExternalQueryAbstract)remoteAlg).newInstance();
 			return new ExternalQueryRemoteWrapper(newExternalQuery, exclusive);
@@ -132,7 +130,6 @@ public class ExternalQueryRemoteWrapper extends AlgRemoteWrapper implements Exte
 	
 	@Override
 	public void close() throws Exception {
-		// TODO Auto-generated method stub
 		try {
 			unexport();
 		} catch (Throwable e) {LogUtil.trace(e);}
@@ -141,14 +138,12 @@ public class ExternalQueryRemoteWrapper extends AlgRemoteWrapper implements Exte
 
 	@Override
 	public String[] getBaseRemoteInterfaceNames() throws RemoteException {
-		// TODO Auto-generated method stub
 		return new String[] {ExternalQueryRemote.class.getName()};
 	}
 
 	
 	@Override
 	protected void finalize() throws Throwable {
-		// TODO Auto-generated method stub
 		super.finalize();
 		
 		try {

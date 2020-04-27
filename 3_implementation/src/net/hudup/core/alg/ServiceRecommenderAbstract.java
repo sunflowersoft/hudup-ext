@@ -29,13 +29,12 @@ public abstract class ServiceRecommenderAbstract extends RecommenderAbstract imp
 	 * Default constructor
 	 */
 	public ServiceRecommenderAbstract() {
-		// TODO Auto-generated constructor stub
+
 	}
 
 	
 	@Override
 	public String[] getBaseRemoteInterfaceNames() throws RemoteException {
-		// TODO Auto-generated method stub
 		return new String[] {RecommenderRemote.class.getName(), ServiceAlgRemote.class.getName()};
 	}
 

@@ -23,13 +23,20 @@ public class PointerRemoteWrapper extends DatasetRemoteWrapper implements Pointe
 	private static final long serialVersionUID = 1L;
 
 	
+    /**
+     * Default constructor.
+     */
+    public PointerRemoteWrapper() {
+
+    }
+
+    
 	/**
 	 * Constructor with remote pointer.
 	 * @param remotePointer remote pointer.
 	 */
 	public PointerRemoteWrapper(PointerRemote remotePointer) {
 		super(remotePointer);
-		// TODO Auto-generated constructor stub
 	}
 
 	

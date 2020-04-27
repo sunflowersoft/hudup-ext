@@ -29,12 +29,15 @@ import net.hudup.core.RegisterTable.AlgFilter;
 import net.hudup.core.Util;
 import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.AlgDesc;
+import net.hudup.core.alg.AlgDesc2;
 import net.hudup.core.alg.AlgDesc2List;
 import net.hudup.core.alg.AlgList;
 import net.hudup.core.alg.AlgRemote;
+import net.hudup.core.alg.AlgRemoteWrapper;
 import net.hudup.core.alg.SetupAlgEvent;
 import net.hudup.core.alg.SetupAlgListener;
 import net.hudup.core.client.ClassProcessor;
+import net.hudup.core.client.ConnectInfo;
 import net.hudup.core.client.HudupRMIClassLoader;
 import net.hudup.core.client.PowerServer;
 import net.hudup.core.client.Service;
@@ -787,10 +790,10 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 	/**
 	 * Extracting algorithms from plug-in storage so that such algorithms are accepted by the specified evaluator.
 	 * @param evaluator specified evaluator.
-	 * @param bindUri bound URI.
+	 * @param connectInfo connection information.
 	 * @return register table to store algorithms extracted from plug-in storage.
 	 */
-	public static RegisterTable extractNormalAlgFromPluginStorage(Evaluator evaluator, xURI bindUri) {
+	public static RegisterTable extractNormalAlgFromPluginStorage(Evaluator evaluator, ConnectInfo connectInfo) {
 		List<Alg> algList = PluginStorage.getNormalAlgReg().getAlgList(new AlgFilter() {
 			
 			/**
@@ -800,7 +803,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 
 			@Override
 			public boolean accept(Alg alg) {
-				return acceptAlg(evaluator, alg, bindUri);
+				return acceptAlg(evaluator, alg, connectInfo);
 			}
 			
 		});
@@ -808,18 +811,13 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 		return new RegisterTable(algList);
 	}
 	
-	
-	/**
-	 * Checking whether the specified algorithm is accepted by this evaluator.
-	 * @param alg specified algorithm.
-	 * @return whether the specified algorithm is accepted by this evaluator.
-	 */
-	public boolean acceptAlg(Alg alg) {
-		if (alg == null) return false;
-		
+
+	@Override
+	public boolean acceptAlg(Class<? extends Alg> algClass) throws RemoteException {
 		try {
-			return acceptAlg(alg.getClass());
+			return acceptAlg(algClass.newInstance());
 		} catch (Exception e) {LogUtil.trace(e);}
+		
 		return false;
 	}
 
@@ -828,48 +826,56 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 	 * Checking whether the specified algorithm is accepted by specified evaluator.
 	 * @param evaluator specified evaluator.
 	 * @param alg specified algorithm
-	 * @param bindUri specified bound URI.
+	 * @param connectInfo connection information.
 	 * @return whether the specified algorithm is accepted by specified evaluator.
 	 */
-	public static boolean acceptAlg(Evaluator evaluator, Alg alg, xURI bindUri) {
+	public static boolean acceptAlg(Evaluator evaluator, Alg alg, ConnectInfo connectInfo) {
 		if (evaluator == null || alg == null) return false;
 		
-		if (bindUri == null) {
-			if (evaluator instanceof EvaluatorAbstract)
-				return ((EvaluatorAbstract)evaluator).acceptAlg(alg);
+		if (connectInfo == null || connectInfo.bindUri == null) {
+			try {
+				return evaluator.acceptAlg(alg);
+			} catch (Exception e) {LogUtil.trace(e);}
+			return false;
+		}
+
+		
+		alg = AlgDesc2.wrapNewInstance(alg, false);
+		if (alg == null) return false;
+		
+		if ((connectInfo.pullMode) || !(alg instanceof AlgRemote)) {
+			try {
+				return evaluator.acceptAlg(alg.getClass());
+			} catch (Exception e) {LogUtil.trace(e);}
+			return false;
 		}
 		
 		try {
-			return evaluator.acceptAlg(alg.getClass());
+			((AlgRemote)alg).export(0);
 		}
-		catch (Exception e) {LogUtil.trace(e); return false;}
+		catch (Exception e) {
+			LogUtil.trace(e); return false;
+		}
 		
-//		alg = AlgDesc2.wrapNewInstance(alg, false);
-//		if ((alg == null) || !(alg instanceof AlgRemote)) return false;
-//		
-//		try {
-//			((AlgRemote)alg).export(0);
-//		}
-//		catch (Exception e) {
-//			LogUtil.trace(e); return false;
-//		}
-//		
-//		boolean accepted = true;
-//		try {
-//			accepted = evaluator.acceptAlg(
-//					Util.getPluginManager().wrap(((AlgRemote)alg), false));
-//		} 
-//		catch (Throwable e) {
-//			LogUtil.error("Evaluator does not accept algorithm '" + alg.getName() + "' due to " + e.getMessage());
-//			accepted = false;
-//		}
-//		
-//		try {
-//			((AlgRemote)alg).unexport();
-//		}
-//		catch (Exception e) {LogUtil.trace(e);}
-//
-//		return accepted;
+		boolean accepted = true;
+		try {
+			if (alg instanceof AlgRemoteWrapper)
+				accepted = evaluator.acceptAlg(alg);
+			else
+				accepted = evaluator.acceptAlg(
+						Util.getPluginManager().wrap(((AlgRemote)alg), false));
+		} 
+		catch (Throwable e) {
+			LogUtil.error("Evaluator does not accept algorithm '" + alg.getName() + "' due to " + e.getMessage());
+			accepted = false;
+		}
+		
+		try {
+			((AlgRemote)alg).unexport();
+		}
+		catch (Exception e) {LogUtil.trace(e);}
+
+		return accepted;
 	}
 	
 	

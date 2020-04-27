@@ -69,6 +69,14 @@ public class EvaluatorWrapper implements Evaluator, Serializable {
 	protected Evaluator remoteEvaluator = null;
 	
 	
+    /**
+     * Default constructor.
+     */
+    protected EvaluatorWrapper() {
+
+    }
+
+    
 	/**
 	 * Constructor with specified remote evaluator.
 	 * @param remoteEvaluator remote evaluator.
@@ -196,6 +204,12 @@ public class EvaluatorWrapper implements Evaluator, Serializable {
 	@Override
 	public boolean isDelegate() throws RemoteException {
 		return false;
+	}
+
+
+	@Override
+	public boolean acceptAlg(Alg alg) throws RemoteException {
+		return remoteEvaluator.acceptAlg(alg);
 	}
 
 

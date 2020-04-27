@@ -302,15 +302,11 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 		updatePluginFromEvaluator();
 
 		if (referredAlg != null) {
-			try {
-				if (EvaluatorAbstract.acceptAlg(this.evaluator, referredAlg, connectInfo.bindUri) && PluginStorage.getNormalAlgReg().contains(referredAlg.getName()))
-					algRegTable = new RegisterTable(Arrays.asList(referredAlg));
-			} catch (Throwable e) {LogUtil.trace(e);}
+			if (EvaluatorAbstract.acceptAlg(this.evaluator, referredAlg, connectInfo) && PluginStorage.getNormalAlgReg().contains(referredAlg.getName()))
+				algRegTable = new RegisterTable(Arrays.asList(referredAlg));
 		}
 		else {
-			try {
-				algRegTable = EvaluatorAbstract.extractNormalAlgFromPluginStorage(this.evaluator, connectInfo.bindUri);
-			} catch (Throwable e) {LogUtil.trace(e);}
+			algRegTable = EvaluatorAbstract.extractNormalAlgFromPluginStorage(this.evaluator, connectInfo);
 		}
 		if (algRegTable == null) algRegTable = new RegisterTable();
 

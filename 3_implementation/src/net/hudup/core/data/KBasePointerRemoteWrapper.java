@@ -23,13 +23,20 @@ public class KBasePointerRemoteWrapper extends PointerRemoteWrapper implements K
 	private static final long serialVersionUID = 1L;
 
 	
+    /**
+     * Default constructor.
+     */
+    public KBasePointerRemoteWrapper() {
+
+    }
+
+    
 	/**
 	 * Constructor with remote KBase pointer.
 	 * @param remoteKBasePointer remote KBase pointer.
 	 */
 	public KBasePointerRemoteWrapper(KBasePointerRemote remoteKBasePointer) {
 		super(remoteKBasePointer);
-		// TODO Auto-generated constructor stub
 	}
 
 	
@@ -40,7 +47,6 @@ public class KBasePointerRemoteWrapper extends PointerRemoteWrapper implements K
 	 */
 	public KBasePointerRemoteWrapper(KBasePointerRemote remoteKBasePointer, boolean exclusive) {
 		super(remoteKBasePointer, exclusive);
-		// TODO Auto-generated constructor stub
 	}
 
 	

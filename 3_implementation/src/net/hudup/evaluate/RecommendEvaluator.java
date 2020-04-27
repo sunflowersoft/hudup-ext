@@ -571,19 +571,8 @@ public class RecommendEvaluator extends EvaluatorAbstract {
 
 	
 	@Override
-	public boolean acceptAlg(Alg alg) {
-		if (alg == null) return false;
-		
-		try {
-			return acceptAlg(alg.getClass()) && (!(AlgDesc2.isForTest(alg)));
-		} catch (Exception e) {LogUtil.trace(e);}
-		return false;
-	}
-
-
-	@Override
-	public boolean acceptAlg(Class<? extends Alg> algClass) throws RemoteException {
-		return Recommender.class.isAssignableFrom(algClass);
+	public boolean acceptAlg(Alg alg) throws RemoteException {
+		return (alg != null) && (alg instanceof Recommender) && !(AlgDesc2.isForTest(alg));
 	}
 
 

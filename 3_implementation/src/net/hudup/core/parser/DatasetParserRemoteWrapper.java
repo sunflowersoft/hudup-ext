@@ -34,13 +34,20 @@ public class DatasetParserRemoteWrapper extends AlgRemoteWrapper implements Data
 	private static final long serialVersionUID = 1L;
 
 	
+    /**
+     * Default constructor.
+     */
+    public DatasetParserRemoteWrapper() {
+
+    }
+
+    
 	/**
 	 * Constructor with specified remote dataset parser.
 	 * @param remoteDatasetParser remote dataset parser.
 	 */
 	public DatasetParserRemoteWrapper(DatasetParserRemote remoteDatasetParser) {
 		super(remoteDatasetParser);
-		// TODO Auto-generated constructor stub
 	}
 
 	
@@ -51,27 +58,23 @@ public class DatasetParserRemoteWrapper extends AlgRemoteWrapper implements Data
 	 */
 	public DatasetParserRemoteWrapper(DatasetParserRemote remoteDatasetParser, boolean exclusive) {
 		super(remoteDatasetParser, exclusive);
-		// TODO Auto-generated constructor stub
 	}
 
 	
 	@Override
 	public Dataset parse(DataConfig config) throws RemoteException {
-		// TODO Auto-generated method stub
 		return ((DatasetParserRemote)remoteAlg).parse(config);
 	}
 
 	
 	@Override
 	public boolean support(DataDriver driver) throws RemoteException {
-		// TODO Auto-generated method stub
 		return ((DatasetParserRemote)remoteAlg).support(driver);
 	}
 
 	
 	@Override
 	public Alg newInstance() {
-		// TODO Auto-generated method stub
 		if (remoteAlg instanceof DatasetParserAbstract) {
 			DatasetParserAbstract newDatasetParser = (DatasetParserAbstract) ((DatasetParserAbstract)remoteAlg).newInstance();
 			return new DatasetParserRemoteWrapper(newDatasetParser, exclusive);
@@ -85,14 +88,12 @@ public class DatasetParserRemoteWrapper extends AlgRemoteWrapper implements Data
 
 	@Override
 	public String[] getBaseRemoteInterfaceNames() throws RemoteException {
-		// TODO Auto-generated method stub
 		return new String[] {DatasetParserRemote.class.getName()};
 	}
 
 	
 	@Override
 	public DataConfig createDefaultConfig() {
-		// TODO Auto-generated method stub
 		if (remoteAlg instanceof DatasetParser)
 			return ((DatasetParser)remoteAlg).createDefaultConfig();
 		else {
