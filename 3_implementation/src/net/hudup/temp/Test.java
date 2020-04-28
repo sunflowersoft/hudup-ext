@@ -84,6 +84,7 @@ import net.hudup.core.evaluate.MetricsUtil;
 import net.hudup.core.logistic.BaseClass;
 import net.hudup.core.logistic.ClipboardUtil;
 import net.hudup.core.logistic.LogUtil;
+import net.hudup.core.logistic.NetUtil;
 import net.hudup.core.logistic.xURI;
 import net.hudup.core.logistic.ui.DescriptionDlg;
 import net.hudup.core.logistic.ui.TagTextField;
@@ -140,6 +141,8 @@ public class Test {
 //			a = 1;
 //			if (a < 0) break;
 //		};
+		
+		System.out.println(NetUtil.testPort(80));
 	}
 
 	
