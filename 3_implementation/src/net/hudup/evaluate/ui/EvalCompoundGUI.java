@@ -594,6 +594,10 @@ public class EvalCompoundGUI extends JFrame {
 					}
 				}
 				started = true;
+				
+				try {
+					evaluator.stimulate();
+				} catch (Exception e) {LogUtil.trace(e);}
 				run(evaluator, null, null, null);
 			}
 			
@@ -859,6 +863,10 @@ public class EvalCompoundGUI extends JFrame {
 					}
 				}
 				started.set(true);
+				
+				try {
+					evaluator.stimulate();
+				} catch (Exception ex) {LogUtil.trace(ex);}
 				run(evaluator, connectInfo, null, null);
 			}
 		});

@@ -98,6 +98,7 @@ public class DefaultServiceExt extends DefaultService implements ServiceExt, Ser
 				ev.setAgent(true);
 				ev.setReferredService(this);
 				ev.export(serverConfig.getServerPort());
+				ev.stimulate();
 				
 				pairMap.put(ev.getName(), ev);
 				guiDataMap.put(ev.getName(), new EvaluateGUIData());
@@ -290,6 +291,7 @@ public class DefaultServiceExt extends DefaultService implements ServiceExt, Ser
 					reproducedEvaluator.setAgent(true);
 					reproducedEvaluator.setReferredService(this);
 					reproducedEvaluator.export(serverConfig.getServerPort());
+					reproducedEvaluator.stimulate();
 					
 					pairReproducedMap.put(evaluatorReproducedName, reproducedEvaluator);
 					guiDataMap.put(evaluatorReproducedName, new EvaluateGUIData());

@@ -101,6 +101,13 @@ public interface Evaluator extends Remote, RemoteRunner, SetupAlgListener, Plugi
 
 	
 	/**
+	 * Stimulating the evaluator with internal tasks.
+	 * @throws RemoteException if any error raises.
+	 */
+	void stimulate() throws RemoteException;
+	 
+	 
+	/**
 	 * Starting the evaluation process on specified algorithms with specified dataset pool.
 	 * @param algList specified list of algorithms.
 	 * @param pool specified dataset pool containing many training datasets and testing datasets. It must be serializable in remote call.

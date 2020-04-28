@@ -328,6 +328,7 @@ public class Delegator extends AbstractDelegator {
 				if (remoteEvaluator == null)
 					return null;
 				DelegatorEvaluator evaluator = new DelegatorEvaluator(this, remoteEvaluator);
+				evaluator.stimulate();
 				return Response.create((Evaluator)evaluator.getExportedStub());
 			}
 			

@@ -259,6 +259,7 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 							private static final long serialVersionUID = 1L;
 							
 						};
+						this.evaluator.stimulate();
 						
 						Naming.rebind(connectInfo.namingUri.toString(), this.evaluator);
 						

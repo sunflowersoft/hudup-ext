@@ -319,10 +319,16 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 			
 		};
 		timer.setPriority(Priority.min);
-		timer.start();
 	}
 	
 	
+	@Override
+	public void stimulate() throws RemoteException {
+		if (timer != null && !timer.isStarted())
+			timer.start();
+	}
+
+
 	@Override
 	public synchronized boolean remoteStart0(List<Alg> algList, DatasetPoolExchanged pool, Timestamp timestamp, Serializable parameter) throws RemoteException {
 		if (isStarted() || this.evAlgList != null || this.evPool != null) {
@@ -368,6 +374,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 		
 		this.evTaskQueue.start();
 		this.evCounter.start();
+		this.stimulate();
 
 		fireEvaluatorEvent(new EvaluatorEvent(
 				this, 

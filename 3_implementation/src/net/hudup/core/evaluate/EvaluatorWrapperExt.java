@@ -140,10 +140,17 @@ public class EvaluatorWrapperExt implements Evaluator, EvaluatorListener, Evalua
 			
 		};
 		this.timer.setPriority(Priority.min);
-		this.timer.start();
 	}
 	
 	
+	@Override
+	public void stimulate() throws RemoteException {
+		remoteEvaluator.stimulate();
+		if (timer != null && !timer.isStarted())
+			timer.start();
+	}
+
+
 	@Override
 	public String getName() throws RemoteException {
 		return remoteEvaluator.getName();

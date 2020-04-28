@@ -1514,8 +1514,17 @@ public class DefaultService implements Service, PluginChangedListener, AutoClose
 				}
 			}
 			
+			for (Evaluator ev : evList) {
+				if (ev != evaluator) {
+					try {
+						ev.close();
+					} catch (Exception e) {LogUtil.trace(e);}
+				}
+			}
+			
 			if (evaluator != null) {
 				evaluator.export(serverConfig.getServerPort());
+				evaluator.stimulate();
 				
 				this.evaluatorConfigMap.put(evaluator.getName(), evaluator.getConfig());
 			}
