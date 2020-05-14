@@ -32,13 +32,12 @@ public class CounterElapsedTimeEvent extends EventObject {
 	
 	
 	/**
-	 * Constructor with counter.
-	 * @param counter counter.
+	 * Constructor with source.
+	 * @param source source.
 	 * @param elapsedTime elapsed time.
 	 */
-	public CounterElapsedTimeEvent(Counter counter, long elapsedTime) {
-		super(counter);
-		
+	public CounterElapsedTimeEvent(Object source, long elapsedTime) {
+		super(source);
 		this.elapsedTime = elapsedTime;
 	}
 
@@ -65,8 +64,16 @@ public class CounterElapsedTimeEvent extends EventObject {
 	 * Getting counter.
 	 * @return counter.
 	 */
-	public Counter getCounter() {
-		return (Counter)getSource();
+	@SuppressWarnings("unused")
+	@Deprecated
+	private Counter getCounter() {
+		Object source = getSource();
+		if (source == null)
+			return null;
+		else if (source instanceof Counter)
+			return (Counter)source;
+		else
+			return null;
 	}
 	
 	

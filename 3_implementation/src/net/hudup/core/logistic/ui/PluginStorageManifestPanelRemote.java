@@ -1,3 +1,10 @@
+/**
+ * HUDUP: A FRAMEWORK OF E-COMMERCIAL RECOMMENDATION ALGORITHMS
+ * (C) Copyright by Loc Nguyen's Academic Network
+ * Project homepage: hudup.locnguyen.net
+ * Email: ng_phloc@yahoo.com
+ * Phone: +84-975250362
+ */
 package net.hudup.core.logistic.ui;
 
 import javax.swing.JOptionPane;
@@ -33,15 +40,14 @@ public class PluginStorageManifestPanelRemote extends PluginStorageManifestPanel
 	 * @param bindUri bound URI.
 	 */
 	public PluginStorageManifestPanelRemote(PluginChangedListener listener, xURI bindUri) {
-		// TODO Auto-generated constructor stub
 		super(listener, bindUri);
 		this.server = listener instanceof PowerServer ? (PowerServer)listener : null;
 		
 		JOptionPane.showMessageDialog(
 			this, 
-			"Remote plugin storage manifest not implemented yet", 
-			"Not implemented yet", 
-			JOptionPane.ERROR_MESSAGE);
+			"Remote plugin storage manifest not stable yet", 
+			"Not stable yet", 
+			JOptionPane.INFORMATION_MESSAGE);
 	}
 
 

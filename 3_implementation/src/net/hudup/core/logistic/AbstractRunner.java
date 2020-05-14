@@ -159,12 +159,15 @@ public abstract class AbstractRunner implements Runner {
 		if (isStarted()) return false;
 		
 		thread = new RunnerThread(this);
-		if (priority == Priority.min)
-			thread.setPriority(Thread.MIN_PRIORITY);
-		else if (priority == Priority.normal)
-			thread.setPriority(Thread.NORM_PRIORITY);
-		else if (priority == Priority.max)
-			thread.setPriority(Thread.MAX_PRIORITY);
+		try {
+			if (priority == Priority.min)
+				thread.setPriority(Thread.MIN_PRIORITY);
+			else if (priority == Priority.normal)
+				thread.setPriority(Thread.NORM_PRIORITY);
+			else if (priority == Priority.max)
+				thread.setPriority(Thread.MAX_PRIORITY);
+		}
+		catch (Exception e) {LogUtil.trace(e);}
 		
 		thread.start();
 		

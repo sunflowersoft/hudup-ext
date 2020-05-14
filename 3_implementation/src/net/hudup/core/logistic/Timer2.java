@@ -8,19 +8,13 @@
 package net.hudup.core.logistic;
 
 /**
- * This class is timer.
+ * This class is extended version of timer.
  * @author Loc Nguyen
  * @version 1.0
  *
  */
-public abstract class Timer extends AbstractRunner {
+public abstract class Timer2 extends AbstractRunner {
 
-	
-	/**
-	 * Waiting flag for forcing to stop.
-	 */
-	protected volatile boolean wait = false;
-	
 	
 	/**
 	 * Delay at starting time.
@@ -38,7 +32,7 @@ public abstract class Timer extends AbstractRunner {
 	 * Constructor with period.
 	 * @param period period time in miliseconds.
 	 */
-	public Timer(long period) {
+	public Timer2(long period) {
 		this(0, period);
 	}
 
@@ -48,7 +42,7 @@ public abstract class Timer extends AbstractRunner {
 	 * @param delay delay time in miliseconds.
 	 * @param period period time in miliseconds.
 	 */
-	public Timer(long delay, long period) {
+	public Timer2(long delay, long period) {
 		super();
 		this.delay = delay >= 0 ? delay : 0;
 		this.period = period >= 0 ? period : 0;
@@ -57,39 +51,34 @@ public abstract class Timer extends AbstractRunner {
 	
 	@Override
 	public void run() {
-		long startedTime = System.currentTimeMillis();
-		while (wait && (System.currentTimeMillis() - startedTime < delay)) { }
+		if (delay > 0) {
+			synchronized (this) {
+				try {
+					wait(delay);
+				}
+				catch (Throwable e) {LogUtil.trace(e);}
+			}
+		}
 
 		Thread current = Thread.currentThread();
 		while (current == thread) {
 			
 			try {
-				startedTime = System.currentTimeMillis();
 				task();
-				
-				while (wait && (System.currentTimeMillis() - startedTime < period)) { }
 			}
-			catch (Throwable e) {
-				LogUtil.trace(e);
-			}
+			catch (Throwable e) {LogUtil.trace(e);}
 
 			synchronized (this) {
-				while (paused) {
-					notifyAll();
-					try {
-						wait();
-					}
-					catch (Throwable e) {
-						LogUtil.trace(e);
-					}
+				try {
+					if (thread != null && period > 0)
+						wait(period);
 				}
+				catch (Throwable e) {LogUtil.trace(e);}
 			}
 		}
 		
 		synchronized (this) {
 			thread = null;
-			wait = false;
-			paused = false;
 			clear();
 			
 			notifyAll();
@@ -111,41 +100,24 @@ public abstract class Timer extends AbstractRunner {
 				thread.setPriority(Thread.MAX_PRIORITY);
 		}
 		catch (Exception e) {LogUtil.trace(e);}
-		
-		wait = true;
+
 		thread.start();
 		
 		return true;
 	}
 
-	
+
 	@Override
 	public synchronized boolean pause() {
-		if (!isRunning()) return false;
-		
-		wait = false;
-		paused  = true;
-		
-		try {
-			wait();
-		} 
-		catch (Throwable e) {
-			LogUtil.trace(e);
-		}
-		
-		return true;
+		LogUtil.error("Timer2 does not support method pause()");
+		return false;
 	}
 	
 	
 	@Override
 	public synchronized boolean resume() {
-		if (!isPaused()) return false;
-		
-		paused = false;
-		wait = true;
-		notifyAll();
-		
-		return true;
+		LogUtil.error("Timer2 does not support method resume()");
+		return false;
 	}
 	
 	
@@ -154,19 +126,13 @@ public abstract class Timer extends AbstractRunner {
 		if (!isStarted()) return false;
 		
 		thread = null;
-		wait = false;
 		
-		if (paused) {
-			paused = false;
-			notifyAll();
-		}
+		notifyAll();
 		
 		try {
 			wait();
 		} 
-		catch (Throwable e) {
-			LogUtil.trace(e);
-		}
+		catch (Throwable e) {LogUtil.trace(e);}
 		
 		return true;
 	}
@@ -178,23 +144,20 @@ public abstract class Timer extends AbstractRunner {
 		if (!isStarted()) return false;
 
 		try {
-			if (thread != null)
-				thread.stop();
+			if (thread != null) thread.stop();
 		}
 		catch (Throwable e) {
-			LogUtil.error("Calling thread destroy() in Timer#forceStop causes error " + e.getMessage());
+			LogUtil.error("Calling thread destroy() in Timer2#forceStop causes error " + e.getMessage());
 		}
 		
-		wait = false;
 		thread = null;
-		paused = false;
 		clear();
 		
 		try {
 			notifyAll();
 		}
 		catch (Throwable e) {
-			LogUtil.error("Calling notifyAll() in Timer#forceStop causes error " + e.getMessage());
+			LogUtil.error("Calling notifyAll() in Timer2#forceStop causes error " + e.getMessage());
 		}
 		
 		return true;

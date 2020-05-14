@@ -25,6 +25,7 @@ import net.hudup.core.client.ClassProcessor;
 import net.hudup.core.client.Service;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.DatasetPoolExchanged;
+import net.hudup.core.logistic.AbstractRunner.Priority;
 import net.hudup.core.logistic.BaseClass;
 import net.hudup.core.logistic.CounterElapsedTimeEvent;
 import net.hudup.core.logistic.CounterElapsedTimeListener;
@@ -35,9 +36,8 @@ import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.NetUtil;
 import net.hudup.core.logistic.NextUpdate;
 import net.hudup.core.logistic.TaskQueue;
-import net.hudup.core.logistic.Timer;
+import net.hudup.core.logistic.Timer2;
 import net.hudup.core.logistic.Timestamp;
-import net.hudup.core.logistic.AbstractRunner.Priority;
 import net.hudup.core.logistic.ui.ProgressEvent;
 import net.hudup.core.logistic.ui.ProgressListener;
 
@@ -87,7 +87,7 @@ public class EvaluatorWrapperExt implements Evaluator, EvaluatorListener, Evalua
     /**
      * Internal timer.
      */
-    protected Timer timer = null;
+    protected Timer2 timer = null;
     
     
 	/**
@@ -112,7 +112,7 @@ public class EvaluatorWrapperExt implements Evaluator, EvaluatorListener, Evalua
 			LogUtil.trace(e);
 		}
 		
-		this.timer = new Timer(0, Constants.DEFAULT_LONG_TIMEOUT) {
+		this.timer = new Timer2(Constants.DEFAULT_LONG_TIMEOUT) {
 			
 			@Override
 			protected void task() {

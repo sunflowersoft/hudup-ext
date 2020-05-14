@@ -216,7 +216,6 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 	
 				@Override
 				public void windowClosed(WindowEvent e) {
-					// TODO Auto-generated method stub
 					super.windowClosed(e);
 					close();
 				}
@@ -230,7 +229,7 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 			this.server = server;
 			this.bindUri = bindUri;
 			
-			Container container = getContentPane();
+		    Container container = getContentPane();
 			JTabbedPane main = new JTabbedPane();
 			container.add(main);
 			
@@ -382,7 +381,6 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				applyConfig();
 			}
 		});
@@ -393,7 +391,6 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				resetConfig();
 			}
 		});
@@ -405,7 +402,6 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				loadStore();
 			}
 		});
@@ -423,13 +419,11 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				try {
 					updateControls();
 				} 
 				catch (RemoteException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
+					LogUtil.trace(e1);
 				}
 			}
 		});
@@ -440,7 +434,6 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				setupServer();
 			}
 		});
@@ -451,7 +444,6 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				exit();
 			}
 		});
@@ -466,7 +458,6 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				start();
 			}
 		});
@@ -477,7 +468,6 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				pauseResume();
 			}
 		});
@@ -488,7 +478,6 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				stop();
 			}
 		});
@@ -518,7 +507,6 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 			
 			@Override
 			public void valueChanged(ListSelectionEvent e) {
-				// TODO Auto-generated method stub
 			
 				Unit unit = unitList.getSelectedValue();
 				if (unit == null) {
@@ -547,7 +535,6 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 			
 			@Override
 			public void respond(SelectionChangedEvent evt) {
-				// TODO Auto-generated method stub
 				updateAccData();
 			}
 		});
@@ -589,7 +576,6 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 			@SuppressWarnings("deprecation")
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				try {
 					Profile accProfile = new Profile(
 							provider.getProfileAttributes(
@@ -627,7 +613,6 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				try {
 					String accName = txtAccName.getText().trim();
 					if (accName.isEmpty() || accName.isEmpty()) {
@@ -689,7 +674,6 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 			
 		} 
 		catch (Exception e) {
-			// TODO Auto-generated catch block
 			LogUtil.trace(e);
 		}
 	}
@@ -725,7 +709,6 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 				updateControls();
 		}
 		catch (Exception e) {
-			// TODO Auto-generated catch block
 			LogUtil.trace(e);
 		}
 		
@@ -754,7 +737,6 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 			
 		} 
 		catch (RemoteException e) {
-			// TODO Auto-generated catch block
 			LogUtil.trace(e);
 		}
 		
@@ -772,7 +754,6 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 			server.exit();
 		} 
 		catch (Exception e) {
-			// TODO Auto-generated catch block
 			LogUtil.trace(e);
 		}
 	}
@@ -1075,7 +1056,6 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 	
 	@Override
 	public void statusChanged(ServerStatusEvent evt) throws RemoteException {
-		// TODO Auto-generated method stub
 		if (bindUri != null)
 			updateControls(evt.getStatus());
 		else if (!evt.getShutdownHookStatus())
@@ -1093,7 +1073,6 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 				server.removeStatusListener(this);
 		}
 		catch (Throwable e) {
-			// TODO Auto-generated catch block
 			LogUtil.trace(e);
 		}
 		
@@ -1110,7 +1089,6 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 					UnicastRemoteObject.unexportObject(registry, true);
 			}
 			catch (Throwable e) {
-				// TODO Auto-generated catch block
 				LogUtil.trace(e);
 			}
 		}

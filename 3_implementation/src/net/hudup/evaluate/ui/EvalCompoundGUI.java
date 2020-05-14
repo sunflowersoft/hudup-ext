@@ -742,7 +742,7 @@ public class EvalCompoundGUI extends JFrame {
 		JButton btnCheckNamingPort = UIUtil.makeIconButton(
 			"checking-16x16.png",
 			"checking", 
-			"Checking whether naming port is available - http://www.iconarchive.com/show/outline-icons-by-iconsmind/Check-2-icon.html", 
+			"Checking whether naming port is available - http://www.iconarchive.com", 
 			"Checking", 
 			
 			new ActionListener() {
@@ -776,7 +776,7 @@ public class EvalCompoundGUI extends JFrame {
 		JButton btnGenNamingPath = UIUtil.makeIconButton(
 			"generate-16x16.png",
 			"generate", 
-			"Generate naming path - http://www.iconarchive.com/show/flatastic-9-icons-by-custom-icon-design/Generate-keys-icon.html", 
+			"Generate naming path - http://www.iconarchive.com", 
 			"Generate", 
 			
 			new ActionListener() {
@@ -797,7 +797,7 @@ public class EvalCompoundGUI extends JFrame {
 		JButton btnGenGlobalAddress = UIUtil.makeIconButton(
 			"generate-16x16.png",
 			"generate", 
-			"Retrieve internet address as global address - http://www.iconarchive.com/show/flatastic-9-icons-by-custom-icon-design/Generate-keys-icon.html", 
+			"Retrieve internet address as global address - http://www.iconarchive.com", 
 			"Generate", 
 			
 			new ActionListener() {

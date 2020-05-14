@@ -32,8 +32,9 @@ import net.hudup.core.data.DataConfig;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.NetUtil;
 import net.hudup.core.logistic.SystemUtil;
-import net.hudup.core.logistic.Timer;
+import net.hudup.core.logistic.Timer2;
 import net.hudup.core.logistic.xURI;
+import net.hudup.core.logistic.AbstractRunner.Priority;
 
 /**
  * This is abstract class for power sever which is the base of recommendation server.
@@ -100,7 +101,7 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 	/**
 	 * Internal timer.
 	 */
-	protected Timer timer = null;
+	protected Timer2 timer = null;
 
 	
 	/**
@@ -388,7 +389,7 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 		if (milisec == 0)
 			return;
 		
-		timer = new Timer(milisec, milisec) { //Need delaying so that server runs stably.
+		timer = new Timer2(milisec, milisec) {
 
 			@Override
 			protected void task() {
@@ -405,6 +406,7 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 			protected void clear() { }
 			
 		};
+		timer.setPriority(Priority.min);
 		timer.start();
 		
 		LogUtil.info("Power server created internal timer, executing periodly " + milisec + " miliseconds");

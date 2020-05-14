@@ -442,7 +442,7 @@ class DelegatorEvaluator extends EvaluatorWrapperExt {
 		
 		//Delegated evaluator does not use timer because of suppose that there are limited clients connecting to listeners
 		//when there can be many different listeners. It is complicated with timer.
-//		this.timer = new Timer(0, Constants.DEFAULT_LONG_TIMEOUT) {
+//		this.timer = new Timer2(Constants.DEFAULT_LONG_TIMEOUT) {
 //			
 //			@Override
 //			protected void task() {

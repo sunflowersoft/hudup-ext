@@ -175,6 +175,13 @@ public class TaskQueue extends AbstractRunner {
 
 	
 	/**
+	 * Holding an extra list of event listeners.
+	 * 
+	 */
+    protected EventListenerList2 listenerList = new EventListenerList2();
+
+    
+	/**
 	 * Default constructor.
 	 */
 	public TaskQueue() {
@@ -182,6 +189,17 @@ public class TaskQueue extends AbstractRunner {
 	}
 
 	
+	/**
+	 * Setting listener list. Using this method is careful.
+	 * @param listenerList listener list.
+	 */
+	public synchronized void setListenerList(EventListenerList2 listenerList) {
+		synchronized (this.listenerList) {
+			if (listenerList != null) this.listenerList = listenerList;
+		}
+	}
+
+
 	@Override
 	protected void task() {
 		while (true) {
@@ -225,7 +243,7 @@ public class TaskQueue extends AbstractRunner {
 			}
 			
 			try {
-				Thread.sleep(5000); //5 seconds for listeners to occupy doing tasks (taskMap).
+				Thread.sleep(Counter.PERIOD); //1 second for listeners to occupy doing tasks (taskMap).
 			} catch (Exception e) {LogUtil.trace(e);}
 			
 		}

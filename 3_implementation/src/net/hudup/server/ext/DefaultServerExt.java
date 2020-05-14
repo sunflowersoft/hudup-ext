@@ -124,6 +124,26 @@ public class DefaultServerExt extends DefaultServer {
 	}
 
 
+	/**
+	 * Show control panel.
+	 */
+	protected void showCP() {
+		try {
+			new DefaultServerExtCP(this);
+		}
+		catch (Throwable e) {
+			//LogUtil.trace(e);
+			LogUtil.error("Extended server fail to show control panel, caused by " + e.getMessage());
+			
+			/*
+			 * It is possible that current Java environment does not support GUI.
+			 * Use of GraphicsEnvironment.isHeadless() tests Java GUI.
+			 * Hence, create control panel with console here or improve PowerServerCP to support console.
+			 */
+		}
+	}
+
+	
 	@Override
 	protected PopupMenu createSysTrayMenuExt() {
 		

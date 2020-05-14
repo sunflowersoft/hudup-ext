@@ -138,11 +138,9 @@ public class Counter extends AbstractRunner implements Serializable {
 	
 	@Override
 	protected void task() {
-		if (startedTime == 0)
-			return;
+		if (startedTime == 0) return;
 		
-		long currentTime = System.currentTimeMillis();
-		long interval = currentTime - startedTime;
+		long interval = System.currentTimeMillis() - startedTime;
 		if (interval < PERIOD) return;
 		
 		long newElapsedTime = elapsedTime + interval;
@@ -152,7 +150,7 @@ public class Counter extends AbstractRunner implements Serializable {
 		fireElapsedTimeEvent(new CounterElapsedTimeEvent(this, newElapsedTime));
 		
 //		try {
-//			if (PERIOD <= 1000) Thread.sleep(PERIOD);
+//			Thread.sleep(Math.min(PERIOD, 5000));
 //		} catch (Exception e) {LogUtil.trace(e);}
 	}
 
@@ -177,7 +175,7 @@ public class Counter extends AbstractRunner implements Serializable {
 	public synchronized boolean start(long elapsedTime) {
 		if (!super.start()) return false;
 
-		this.elapsedTime = 0;
+		this.elapsedTime = elapsedTime;
 		this.startedTime = System.currentTimeMillis();
 
 		return true;
@@ -231,6 +229,7 @@ public class Counter extends AbstractRunner implements Serializable {
 	/**
 	 * Clearing associated information.
 	 */
+	@Deprecated
 	private synchronized void clearAssoc() {
 		if (assocTxtTime != null) assocTxtTime.setText("");
 		if (assocEvaluateInfo != null) assocEvaluateInfo.elapsedTime = 0;

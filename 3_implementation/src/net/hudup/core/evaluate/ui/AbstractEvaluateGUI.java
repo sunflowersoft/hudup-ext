@@ -56,14 +56,12 @@ import net.hudup.core.evaluate.EvaluatorWrapperExt;
 import net.hudup.core.evaluate.Metric;
 import net.hudup.core.evaluate.Metrics;
 import net.hudup.core.evaluate.MetricsUtil;
-import net.hudup.core.logistic.AbstractRunner;
-import net.hudup.core.logistic.Counter;
 import net.hudup.core.logistic.CounterElapsedTimeEvent;
 import net.hudup.core.logistic.CounterElapsedTimeListener;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.NetUtil;
-import net.hudup.core.logistic.Timer;
 import net.hudup.core.logistic.NetUtil.RegistryRemote;
+import net.hudup.core.logistic.Timer2;
 import net.hudup.core.logistic.Timestamp;
 
 /**
@@ -162,7 +160,7 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	/**
 	 * Feeding task queue from server.
 	 */
-	protected AbstractRunner taskQueueFeedee = null;
+	protected Timer2 taskQueueFeedee = null;
 	
 	
 	/**
@@ -358,7 +356,7 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 		}
 
 		if (connectInfo.checkPullMode()) {
-			taskQueueFeedee = new Timer(0, connectInfo.accessPeriod) {
+			taskQueueFeedee = new Timer2(connectInfo.accessPeriod) {
 				
 				@Override
 				protected void task() {
@@ -386,6 +384,7 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 			evtList = evaluator.doTask(id);
 		}
 		catch (Throwable e) {connected = false; LogUtil.trace(e);}
+		if (evtList.size() == 0) return connected;
 		
 		for (EventObject evt : evtList) {
 			try {
@@ -411,7 +410,7 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 		try {
 			EvaluateInfo otherResult = evaluator.getOtherResult();
 			if (otherResult != null) {
-				receivedElapsedTime(new CounterElapsedTimeEvent(new Counter(), otherResult.elapsedTime));
+				receivedElapsedTime(new CounterElapsedTimeEvent(this, otherResult.elapsedTime));
 			}
 		}
 		catch (Throwable e) {LogUtil.trace(e);}

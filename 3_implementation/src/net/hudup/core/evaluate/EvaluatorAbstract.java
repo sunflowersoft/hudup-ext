@@ -55,8 +55,8 @@ import net.hudup.core.data.Profile;
 import net.hudup.core.evaluate.EvaluateEvent.Type;
 import net.hudup.core.evaluate.ui.AbstractEvaluateGUI;
 import net.hudup.core.logistic.AbstractRunner;
-import net.hudup.core.logistic.Counter;
 import net.hudup.core.logistic.CounterElapsedTimeListener;
+import net.hudup.core.logistic.CounterTaskQueue;
 import net.hudup.core.logistic.DSUtil;
 import net.hudup.core.logistic.EventListenerList2;
 import net.hudup.core.logistic.EventListenerList2.ListenerInfo;
@@ -66,13 +66,11 @@ import net.hudup.core.logistic.MathUtil;
 import net.hudup.core.logistic.NetUtil;
 import net.hudup.core.logistic.SystemUtil;
 import net.hudup.core.logistic.TaskQueue;
-import net.hudup.core.logistic.Timer;
+import net.hudup.core.logistic.Timer2;
 import net.hudup.core.logistic.Timestamp;
 import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.xURI;
 import net.hudup.core.logistic.ui.LoginDlg;
-import net.hudup.core.logistic.ui.ProgressEvent;
-import net.hudup.core.logistic.ui.ProgressListener;
 
 /**
  * {@code Evaluator} is one of main objects of Hudup framework, which is responsible for executing and evaluation algorithms according to built-in and user-defined metrics.
@@ -206,15 +204,9 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
     /**
      * Internal task queue.
      */
-    protected TaskQueue evTaskQueue = new TaskQueue();
+    protected CounterTaskQueue evTaskQueue = null;
     
     
-	/**
-	 * Internal counter.
-	 */
-	protected Counter evCounter = null;
-
-	
     /**
      * Evaluation processor.
      */
@@ -260,7 +252,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
     /**
      * Internal timer.
      */
-    protected Timer timer = null;
+    protected Timer2 timer = null;
     
     
 	/**
@@ -288,10 +280,10 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 		}
 		
 		evProcessor = new EvaluateProcessor(this);
-		evCounter = new Counter(otherResult);
-		evCounter.setListenerList(listenerList); //Counter uses the same listener list.
+		evTaskQueue = new CounterTaskQueue(otherResult);
+		evTaskQueue.setListenerList(listenerList); //Task queue uses the same listener list.
 		
-		timer = new Timer(0, Constants.DEFAULT_LONG_TIMEOUT) {
+		timer = new Timer2(Constants.DEFAULT_LONG_TIMEOUT) {
 			
 			@Override
 			protected void task() {
@@ -342,7 +334,6 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 		}
 
 		this.evTaskQueue.stop();
-		this.evCounter.stop();
 
 		this.evPool = updatePoolResult(pool);
 		if (this.evPool == null) {
@@ -373,7 +364,6 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 		}
 		
 		this.evTaskQueue.start();
-		this.evCounter.start();
 		this.stimulate();
 
 		fireEvaluatorEvent(new EvaluatorEvent(
@@ -1123,7 +1113,6 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 		this.evPool = null;
 		this.evParameter = null;
 		
-		this.evCounter.stop();
 		this.evTaskQueue.stop();
 	}
 
@@ -1478,7 +1467,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 
     /**
      * Getting an array of evaluation progress listeners.
-     * @return array of {@link ProgressListener} (s).
+     * @return array of evaluation progress listeners.
      */
     protected EvaluateProgressListener[] getEvaluateProgressListeners() {
 		synchronized (listenerList) {
@@ -1488,7 +1477,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
     
     
     /**
-     * Firing {@link ProgressEvent}.
+     * Firing evaluation progress event.
      * @param evt the specified for evaluation progress.
      */
     protected void fireEvaluateProgressEvent(EvaluateProgressEvent evt) {
@@ -1914,7 +1903,6 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 				EvaluatorEvent.Type.pause),
 				null); // firing paused event.
 		
-		evCounter.pause();
 		evTaskQueue.pause();
 
 		return true;
@@ -1935,7 +1923,6 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 		}
 
 		evTaskQueue.resume();
-		evCounter.resume();
 
 		fireEvaluatorEvent(new EvaluatorEvent(
 				this, 
@@ -1959,7 +1946,6 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 				EvaluatorEvent.Type.stop),
 				null);
 		
-		this.evCounter.stop();
 		this.evTaskQueue.stop();
 		
 		return true;
