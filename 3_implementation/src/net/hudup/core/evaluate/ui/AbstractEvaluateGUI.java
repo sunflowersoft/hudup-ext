@@ -375,16 +375,19 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	
 	/**
 	 * Feeding tasks from server.
-	 * @return true if connecting to server is successful.
+	 * @return the number of events. If connection to server fails, return -1;
 	 */
-	protected synchronized boolean taskQueueFeed() {
+	protected synchronized int taskQueueFeed() {
 		boolean connected = true;
 		List<EventObject> evtList = Util.newList();
 		try {
 			evtList = evaluator.doTask(id);
 		}
 		catch (Throwable e) {connected = false; LogUtil.trace(e);}
-		if (evtList.size() == 0) return connected;
+		if (!connected)
+			return -1;
+		else if (evtList.size() == 0)
+			return 0;
 		
 		for (EventObject evt : evtList) {
 			try {
@@ -409,13 +412,12 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 		
 		try {
 			EvaluateInfo otherResult = evaluator.getOtherResult();
-			if (otherResult != null) {
+			if (otherResult != null)
 				receivedElapsedTime(new CounterElapsedTimeEvent(this, otherResult.elapsedTime));
-			}
 		}
 		catch (Throwable e) {LogUtil.trace(e);}
 		
-		return connected;
+		return evtList.size();
 	}
 	
 	
@@ -469,26 +471,38 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	 */
 	public synchronized void refreshResult() {
 		if (connectInfo.checkPullMode()) {
-			taskQueueFeed();
+			int numTask = taskQueueFeed();
+			if (numTask > 0) return;
 		}
-		else {
-			Metrics result = null;
-			boolean success = true;
-			try {
-				result = evaluator.getResult();
-			} catch (Exception ex) {success = false; LogUtil.trace(ex);}
-	
-			if (success) {
-				if (result == null) {
-					this.recoveredResult = this.result;
-					this.result = result;
-				}
-				else
-					this.recoveredResult = this.result = result;
-			}
-			
+		
+		Metrics result = null;
+		EvaluateInfo otherResult = null;
+		boolean success = true;
+		try {
+			result = evaluator.getResult();
+			otherResult = evaluator.getOtherResult();
+		} catch (Exception ex) {success = false; LogUtil.trace(ex);}
+		
+		if (!success) {
 			updateMode();
+			return;
 		}
+
+		if (result == null) {
+			this.recoveredResult = this.result;
+			this.result = result;
+		}
+		else
+			this.recoveredResult = this.result = result;
+		
+		if (otherResult != null) {
+			try {
+				receivedElapsedTime(new CounterElapsedTimeEvent(this, otherResult.elapsedTime));
+			}
+			catch (Throwable e) {LogUtil.trace(e);}
+		}
+	
+		updateMode();
 	}
 
 	

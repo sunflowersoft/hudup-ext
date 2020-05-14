@@ -79,6 +79,9 @@ public class EvaluateInfo implements Serializable {
 	public long elapsedTime = 0;
 	
 	
+	/**
+	 * Array of statuses.
+	 */
 	public String[] statuses = null;
 	
 			
@@ -96,6 +99,21 @@ public class EvaluateInfo implements Serializable {
 		inAlgSetup = false;
 		elapsedTime = 0;
 		statuses = null;
+	}
+	
+	
+	/**
+	 * Converting this evaluation information into evaluation progress event.
+	 * @return evaluation progress event.
+	 */
+	public EvaluateProgressEvent toEvaluateProgressEvent() {
+		EvaluateProgressEvent evt = new EvaluateProgressEvent(null, progressTotal, progressStep);
+		evt.setCurrentTotal(vCurrentTotal);
+		evt.setCurrentCount(vCurrentCount);
+		evt.setDatasetId(datasetId);
+		evt.setAlgName(algName);
+		
+		return evt;
 	}
 	
 	

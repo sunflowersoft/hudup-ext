@@ -77,7 +77,7 @@ public class EvaluateProgressEvent extends EventObject {
 	 */
 	@NextUpdate
 	public EvaluateProgressEvent(Evaluator evaluator, int progressTotal, int progressStep) {
-		super(evaluator);
+		super(evaluator != null ? evaluator : new Integer(0));
 		
 //		this.evaluator = evaluator;
 		this.progressTotal = progressTotal;

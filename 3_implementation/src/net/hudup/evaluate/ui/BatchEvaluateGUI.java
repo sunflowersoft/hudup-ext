@@ -329,12 +329,12 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 	
 	
 	@Override
-	protected synchronized boolean taskQueueFeed() {
-		boolean connected = super.taskQueueFeed();
+	protected synchronized int taskQueueFeed() {
+		int numTask = super.taskQueueFeed();
 		if (signalLight != null && connectInfo.checkPullMode())
-			signalLight.turn(connected);
+			signalLight.turn(numTask >= 0);
 		
-		return connected;
+		return numTask;
 	}
 
 
