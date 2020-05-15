@@ -282,15 +282,13 @@ public abstract class KBaseAbstract implements KBase, KBaseRemote {
 
 	@Override
 	public void fireSetupEvent(SetupAlgEvent evt) throws RemoteException {
-		synchronized (listenerList) {
-			SetupAlgListener[] listeners = getSetupListeners();
-			for (SetupAlgListener listener : listeners) {
-				try {
-					listener.receivedSetup(evt);
-				}
-				catch (Throwable e) {
-					LogUtil.trace(e);
-				}
+		SetupAlgListener[] listeners = getSetupListeners();
+		for (SetupAlgListener listener : listeners) {
+			try {
+				listener.receivedSetup(evt);
+			}
+			catch (Throwable e) {
+				LogUtil.trace(e);
 			}
 		}
 	}

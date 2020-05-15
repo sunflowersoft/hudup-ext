@@ -596,6 +596,12 @@ public class EvaluatorWrapper implements Evaluator, Serializable {
 	}
 
 
+	@Override
+	public boolean containsAgent() throws RemoteException {
+		return remoteEvaluator.containsAgent();
+	}
+
+
 	/**
 	 * Getting remote evaluator.
 	 * @return remote evaluator.

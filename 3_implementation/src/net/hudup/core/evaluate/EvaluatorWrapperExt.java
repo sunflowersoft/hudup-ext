@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import net.hudup.core.Constants;
 import net.hudup.core.PluginChangedEvent;
 import net.hudup.core.PluginChangedListener;
 import net.hudup.core.PluginStorageWrapper;
@@ -25,17 +24,16 @@ import net.hudup.core.client.ClassProcessor;
 import net.hudup.core.client.Service;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.DatasetPoolExchanged;
-import net.hudup.core.logistic.AbstractRunner.Priority;
 import net.hudup.core.logistic.BaseClass;
 import net.hudup.core.logistic.CounterElapsedTimeEvent;
 import net.hudup.core.logistic.CounterElapsedTimeListener;
 import net.hudup.core.logistic.DSUtil;
 import net.hudup.core.logistic.EventListenerList2;
-import net.hudup.core.logistic.EventListenerList2.ListenerInfo;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.NetUtil;
 import net.hudup.core.logistic.NextUpdate;
 import net.hudup.core.logistic.TaskQueue;
+import net.hudup.core.logistic.TaskQueue.EventTask;
 import net.hudup.core.logistic.Timer2;
 import net.hudup.core.logistic.Timestamp;
 import net.hudup.core.logistic.ui.ProgressEvent;
@@ -68,7 +66,7 @@ public class EvaluatorWrapperExt implements Evaluator, EvaluatorListener, Evalua
 	/**
 	 * Internal map of task lists. Each list is list of events of a listener ID.
 	 */
-	protected Map<UUID, List<EventObject>> taskMap = Util.newMap();
+	protected Map<UUID, EventTask> taskMap = Util.newMap();
 
 	
     /**
@@ -91,6 +89,12 @@ public class EvaluatorWrapperExt implements Evaluator, EvaluatorListener, Evalua
     
     
 	/**
+	 * Flag to indicate whether the evaluator is agent.
+	 */
+	protected boolean isAgent = false;
+
+	
+	/**
 	 * Default constructor.
 	 */
 	protected EvaluatorWrapperExt() {
@@ -112,40 +116,12 @@ public class EvaluatorWrapperExt implements Evaluator, EvaluatorListener, Evalua
 			LogUtil.trace(e);
 		}
 		
-		this.timer = new Timer2(Constants.DEFAULT_LONG_TIMEOUT) {
-			
-			@Override
-			protected void task() {
-				synchronized (listenerList) {
-					listenerList.updateInfo();
-					
-					List<EventListener> listeners = listenerList.getListeners();
-					List<EventListener> tempListeners = Util.newList(listeners.size());
-					tempListeners.addAll(listeners);
-					for (EventListener listener : tempListeners) {
-						if (!listeners.contains(listener))
-							continue;
-						
-						ListenerInfo info = listenerList.getInfo(listener);
-						if (info != null && info.failedPingCount > 2) { //Removing clients that are unable to connect more than 2 times (more than 1 hour in average).
-							listenerList.remove(listener);
-							if (listeners.size() == 0) break;
-						}
-					}
-				}
-			}
-			
-			@Override
-			protected void clear() {}
-			
-		};
-		this.timer.setPriority(Priority.min);
+		this.timer = EvaluatorAbstract.createPurgeListenersTimer(listenerList);
 	}
 	
 	
 	@Override
 	public void stimulate() throws RemoteException {
-		remoteEvaluator.stimulate();
 		if (timer != null && !timer.isStarted())
 			timer.start();
 	}
@@ -305,8 +281,9 @@ public class EvaluatorWrapperExt implements Evaluator, EvaluatorListener, Evalua
 			if (taskMap.containsKey(listenerID)) 
 				return true;
 			else {
-				List<EventObject> evtList = Util.newList();
-				return taskMap.put(listenerID, evtList) != null;
+				EventTask task = new EventTask();
+				taskMap.put(listenerID, task);
+				return true;
 			}
 		}
 	}
@@ -335,11 +312,11 @@ public class EvaluatorWrapperExt implements Evaluator, EvaluatorListener, Evalua
 		if (evt == null) return false;
 		
 		synchronized (taskMap) {
-			Collection<List<EventObject>> evtLists = taskMap.values();
-			for (List<EventObject> evtList : evtLists) {
-				evtList.add(evt);
-				if (evtList.size() > TaskQueue.MAX_NUMBER_EVENT_OBJECTS)
-					evtList.remove(0);
+			Collection<EventTask> tasks = taskMap.values();
+			for (EventTask task : tasks) {
+				task.add(evt);
+				if (task.size() > TaskQueue.MAX_NUMBER_EVENT_OBJECTS)
+					task.remove(0);
 			}
 			
 			return true;
@@ -347,57 +324,43 @@ public class EvaluatorWrapperExt implements Evaluator, EvaluatorListener, Evalua
 	}
 
 	
-	/**
-	 * Waiting for task queue.
-	 */
-	protected void waitForTaskQueue() {
-		long startTime = System.currentTimeMillis();
-		while (true) {
-			synchronized (taskMap) {
-				Collection<List<EventObject>> evtLists = taskMap.values();
-				boolean empty = true;
-				for (List<EventObject> evtList : evtLists) {
-					if (evtList.size() > 0) {
-						empty = false;
-						break;
-					}
-				}
-				if (empty) break;
-			}
-			
-			long currentTime = System.currentTimeMillis();
-			long interval = currentTime - startTime;
-			if (interval > Constants.DEFAULT_SHORT_TIMEOUT) {
-				synchronized (taskMap) {
-					Collection<List<EventObject>> evtLists = taskMap.values();
-					for (List<EventObject> evtList : evtLists) {
-						evtList.clear();
-					}
-				}
-				break;
-			}
-		}
-	}
-	
-	
-	
 	@Override
 	public List<EventObject> doTask(UUID listenerID) throws RemoteException {
+		List<EventObject> evtList = doTask0(listenerID);
+		
+		try {
+			if (evtList.size() == 0 && !remoteIsRunning()) return evtList;
+			EvaluateInfo otherResult = getOtherResult();
+			if (otherResult != null)
+				evtList.add(new CounterElapsedTimeEvent(this, otherResult.elapsedTime));
+		} catch (Exception ex) {LogUtil.trace(ex);}
+
+		return evtList;
+	}
+
+
+	/**
+	 * Performing event task of specified listener.
+	 * @param listenerID ID of specified listener.
+	 * @return list of events as the event task.
+	 */
+	private List<EventObject> doTask0(UUID listenerID) {
 		if (listenerID == null) return Util.newList();
 		
 		synchronized (taskMap) {
-			List<EventObject> evtList = null;
+			EventTask task = null;
 			if (!taskMap.containsKey(listenerID)) return Util.newList();
 			
-			evtList = taskMap.get(listenerID);
-			List<EventObject> returnedEvtList = Util.newList(evtList.size());
-			returnedEvtList.addAll(evtList);
-			evtList.clear();
+			task = taskMap.get(listenerID);
+			List<EventObject> returnedEvtList = Util.newList(task.size());
+			returnedEvtList.addAll(task.getEventList());
+			task.clear();
+			task.updateLastDone();
 			return returnedEvtList;
 		}
 	}
-
-
+	
+	
 	@Override
 	public void addPluginChangedListener(PluginChangedListener listener) throws RemoteException {
 		synchronized (listenerList) {
@@ -444,15 +407,13 @@ public class EvaluatorWrapperExt implements Evaluator, EvaluatorListener, Evalua
     protected void firePluginChangedEvent(PluginChangedEvent evt) {
     	addTask(evt);
     	
-		synchronized (listenerList) {
-			PluginChangedListener[] listeners = getPluginChangedListeners();
-			for (PluginChangedListener listener : listeners) {
-				try {
-					listener.pluginChanged(evt);
-				}
-				catch (Throwable e) {
-					LogUtil.trace(e);
-				}
+		PluginChangedListener[] listeners = getPluginChangedListeners();
+		for (PluginChangedListener listener : listeners) {
+			try {
+				listener.pluginChanged(evt);
+			}
+			catch (Throwable e) {
+				LogUtil.trace(e);
 			}
 		}
     }
@@ -504,15 +465,13 @@ public class EvaluatorWrapperExt implements Evaluator, EvaluatorListener, Evalua
     protected void fireEvaluatorEvent(EvaluatorEvent evt) {
     	addTask(evt);
 
-    	synchronized (listenerList) {
-			EvaluatorListener[] listeners = getEvaluatorListeners();
-			for (EvaluatorListener listener : listeners) {
-				try {
-					listener.receivedEvaluator(evt);
-				}
-				catch (Throwable e) {
-					LogUtil.trace(e);
-				}
+		EvaluatorListener[] listeners = getEvaluatorListeners();
+		for (EvaluatorListener listener : listeners) {
+			try {
+				listener.receivedEvaluator(evt);
+			}
+			catch (Throwable e) {
+				LogUtil.trace(e);
 			}
 		}
     }
@@ -570,15 +529,13 @@ public class EvaluatorWrapperExt implements Evaluator, EvaluatorListener, Evalua
     protected void fireEvaluateEvent(EvaluateEvent evt) {
     	addTask(evt);
 
-    	synchronized (listenerList) {
-			EvaluateListener[] listeners = getEvaluateListeners();
-			for (EvaluateListener listener : listeners) {
-				try {
-					listener.receivedEvaluation(evt);
-				}
-				catch (Throwable e) {
-					LogUtil.trace(e);
-				}
+		EvaluateListener[] listeners = getEvaluateListeners();
+		for (EvaluateListener listener : listeners) {
+			try {
+				listener.receivedEvaluation(evt);
+			}
+			catch (Throwable e) {
+				LogUtil.trace(e);
 			}
 		}
     }
@@ -636,15 +593,13 @@ public class EvaluatorWrapperExt implements Evaluator, EvaluatorListener, Evalua
     protected void fireProgressEvent(EvaluateProgressEvent evt) {
     	addTask(evt);
 
-    	synchronized (listenerList) {
-	    	EvaluateProgressListener[] listeners = getProgressListeners();
-			for (EvaluateProgressListener listener : listeners) {
-				try {
-					listener.receivedProgress(evt);
-				}
-				catch (Throwable e) {
-					LogUtil.trace(e);
-				}
+    	EvaluateProgressListener[] listeners = getProgressListeners();
+		for (EvaluateProgressListener listener : listeners) {
+			try {
+				listener.receivedProgress(evt);
+			}
+			catch (Throwable e) {
+				LogUtil.trace(e);
 			}
 		}
     }
@@ -702,15 +657,13 @@ public class EvaluatorWrapperExt implements Evaluator, EvaluatorListener, Evalua
     protected void fireSetupAlgEvent(SetupAlgEvent evt) {
     	addTask(evt);
 
-    	synchronized (listenerList) {
-	    	SetupAlgListener[] listeners = getSetupAlgListeners();
-			for (SetupAlgListener listener : listeners) {
-				try {
-					listener.receivedSetup(evt);
-				}
-				catch (Throwable e) {
-					LogUtil.trace(e);
-				}
+    	SetupAlgListener[] listeners = getSetupAlgListeners();
+		for (SetupAlgListener listener : listeners) {
+			try {
+				listener.receivedSetup(evt);
+			}
+			catch (Throwable e) {
+				LogUtil.trace(e);
 			}
 		}
     }
@@ -762,15 +715,13 @@ public class EvaluatorWrapperExt implements Evaluator, EvaluatorListener, Evalua
      * @param evt elapsed time event.
      */
     protected void fireElapsedTimeEvent(CounterElapsedTimeEvent evt) {
-		synchronized (listenerList) {
-	    	CounterElapsedTimeListener[] listeners = getElapsedTimeListeners();
-			for (CounterElapsedTimeListener listener : listeners) {
-				try {
-					listener.receivedElapsedTime(evt);
-				}
-				catch (Throwable e) {
-					LogUtil.trace(e);
-				}
+    	CounterElapsedTimeListener[] listeners = getElapsedTimeListeners();
+		for (CounterElapsedTimeListener listener : listeners) {
+			try {
+				listener.receivedElapsedTime(evt);
+			}
+			catch (Throwable e) {
+				LogUtil.trace(e);
 			}
 		}
     }
@@ -784,16 +735,18 @@ public class EvaluatorWrapperExt implements Evaluator, EvaluatorListener, Evalua
 
 	@Override
 	public synchronized boolean remoteStart0(List<Alg> algList, DatasetPoolExchanged pool, Timestamp timestamp, Serializable parameter) throws RemoteException {
-		waitForTaskQueue();
+		TaskQueue.waitForTaskQueue(taskMap);
+		stimulate();
 		
 		return remoteEvaluator.remoteStart0(algList, pool, timestamp, parameter);
 	}
 
 	
 	@Override
-	public boolean remoteStart(List<String> algNameList, DatasetPoolExchanged pool, ClassProcessor cp, DataConfig config, Timestamp timestamp, Serializable parameter)
+	public synchronized boolean remoteStart(List<String> algNameList, DatasetPoolExchanged pool, ClassProcessor cp, DataConfig config, Timestamp timestamp, Serializable parameter)
 			throws RemoteException {
-		waitForTaskQueue();
+		TaskQueue.waitForTaskQueue(taskMap);
+		stimulate();
 		
 		return remoteEvaluator.remoteStart(algNameList, pool, cp, config, timestamp, parameter);
 	}
@@ -801,7 +754,8 @@ public class EvaluatorWrapperExt implements Evaluator, EvaluatorListener, Evalua
 
 	@Override
 	public synchronized boolean remoteStart(Serializable... parameters) throws RemoteException {
-		waitForTaskQueue();
+		TaskQueue.waitForTaskQueue(taskMap);
+		stimulate();
 		
 		return remoteEvaluator.remoteStart(parameters);
 	}
@@ -809,7 +763,7 @@ public class EvaluatorWrapperExt implements Evaluator, EvaluatorListener, Evalua
 
 	@Override
 	public synchronized boolean remotePause() throws RemoteException {
-		waitForTaskQueue();
+		TaskQueue.waitForTaskQueue(taskMap);
 		
 		return remoteEvaluator.remotePause();
 	}
@@ -817,7 +771,7 @@ public class EvaluatorWrapperExt implements Evaluator, EvaluatorListener, Evalua
 	
 	@Override
 	public synchronized boolean remoteResume() throws RemoteException {
-		waitForTaskQueue();
+		TaskQueue.waitForTaskQueue(taskMap);
 		
 		return remoteEvaluator.remoteResume();
 	}
@@ -825,15 +779,15 @@ public class EvaluatorWrapperExt implements Evaluator, EvaluatorListener, Evalua
 	
 	@Override
 	public synchronized boolean remoteStop() throws RemoteException {
-		waitForTaskQueue();
+		TaskQueue.waitForTaskQueue(taskMap);
 		
 		return remoteEvaluator.remoteStop();
 	}
 
 	
 	@Override
-	public boolean remoteForceStop() throws RemoteException {
-		waitForTaskQueue();
+	public synchronized boolean remoteForceStop() throws RemoteException {
+		TaskQueue.waitForTaskQueue(taskMap);
 		
 		return remoteEvaluator.remoteForceStop();
 	}
@@ -883,8 +837,8 @@ public class EvaluatorWrapperExt implements Evaluator, EvaluatorListener, Evalua
 	@Override
 	public synchronized void unexport() throws RemoteException {
 		if (exportedStub != null) {
-			if (!remoteEvaluator.isAgent())
-				this.remoteStop(); //It is possible to stop this evaluator because its is delegated evaluator.
+			if (!remoteEvaluator.containsAgent())
+				this.remoteStop();
 			
 			try {
 				remoteEvaluator.removePluginChangedListener(this);
@@ -893,6 +847,7 @@ public class EvaluatorWrapperExt implements Evaluator, EvaluatorListener, Evalua
 				remoteEvaluator.removeEvaluateProgressListener(this);
 				remoteEvaluator.removeSetupAlgListener(this);
 				remoteEvaluator.removeElapsedTimeListener(this);
+				
 				if (!remoteEvaluator.isAgent())
 					remoteEvaluator.unexport();
 			} catch (Exception e) {LogUtil.trace(e);}
@@ -945,13 +900,19 @@ public class EvaluatorWrapperExt implements Evaluator, EvaluatorListener, Evalua
 	
 	@Override
 	public boolean isAgent() throws RemoteException {
-		return remoteEvaluator.isAgent();
+		return isAgent;
 	}
 
 
 	@Override
 	public void setAgent(boolean agent) throws RemoteException {
-		remoteEvaluator.setAgent(agent);
+		this.isAgent = agent;
+	}
+
+
+	@Override
+	public boolean containsAgent() throws RemoteException {
+		return remoteEvaluator.containsAgent();
 	}
 
 

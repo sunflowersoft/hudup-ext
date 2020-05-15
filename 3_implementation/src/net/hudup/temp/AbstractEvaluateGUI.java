@@ -5,7 +5,7 @@
  * Email: ng_phloc@yahoo.com
  * Phone: +84-975250362
  */
-package net.hudup.core.evaluate.ui;
+package net.hudup.temp;
 
 import java.io.Serializable;
 import java.rmi.Naming;
@@ -56,6 +56,8 @@ import net.hudup.core.evaluate.EvaluatorWrapperExt;
 import net.hudup.core.evaluate.Metric;
 import net.hudup.core.evaluate.Metrics;
 import net.hudup.core.evaluate.MetricsUtil;
+import net.hudup.core.evaluate.ui.EvaluateGUIData;
+import net.hudup.core.evaluate.ui.MetricsOptionDlg;
 import net.hudup.core.logistic.CounterElapsedTimeEvent;
 import net.hudup.core.logistic.CounterElapsedTimeListener;
 import net.hudup.core.logistic.LogUtil;
@@ -70,6 +72,7 @@ import net.hudup.core.logistic.Timestamp;
  * @author Loc Nguyen
  * @version 10.0
  */
+@Deprecated
 public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorListener, EvaluateListener, EvaluateProgressListener, SetupAlgListener, PluginChangedListener, CounterElapsedTimeListener, ClassProcessor, Serializable {
 
 	
@@ -621,6 +624,38 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 			}
 		}
 		
+//		boolean agent = false;
+//		boolean delegate = false;
+//		try {
+//			agent = evaluator.isAgent();
+//			delegate = evaluator.isDelegate();
+//		}
+//		catch (Throwable e) {
+//			LogUtil.trace(e);
+//		}
+//		
+//		if (agent && connectInfo.namingUri == null) {
+//			if (delegate) {
+//				unsetupListeners(evaluator);
+//				
+//				try {
+//					evaluator.close(); //The close() method also unexports evaluator wrapper.
+//				}
+//				catch (Exception e) {LogUtil.trace(e);}
+//			}
+//			else
+//				unsetupListeners(evaluator);
+//		}
+//		else {
+//			stop();
+//
+//			unsetupListeners(evaluator);
+//			
+//			try {
+//				evaluator.close(); //The close() method also unexports evaluator.
+//			}
+//			catch (Exception e) {LogUtil.trace(e);}
+//		}
 		
 		result = null;
 		

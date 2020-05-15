@@ -272,15 +272,14 @@ public abstract class AlgAbstract implements Alg, AlgRemote {
 	@Override
 	public void fireSetupEvent(SetupAlgEvent evt) throws RemoteException {
 		if (listenerList == null) return;
-		synchronized (listenerList) {
-			SetupAlgListener[] listeners = getSetupListeners();
-			for (SetupAlgListener listener : listeners) {
-				try {
-					listener.receivedSetup(evt);
-				}
-				catch (Throwable e) {
-					LogUtil.trace(e);
-				}
+		
+		SetupAlgListener[] listeners = getSetupListeners();
+		for (SetupAlgListener listener : listeners) {
+			try {
+				listener.receivedSetup(evt);
+			}
+			catch (Throwable e) {
+				LogUtil.trace(e);
 			}
 		}
 	}

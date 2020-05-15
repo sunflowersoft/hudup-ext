@@ -27,9 +27,11 @@ import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.DatasetPoolExchanged;
 import net.hudup.core.data.MemFetcher;
 import net.hudup.core.evaluate.Evaluator;
+import net.hudup.core.evaluate.EvaluatorAbstract;
 import net.hudup.core.evaluate.EvaluatorWrapperExt;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.NetUtil;
+import net.hudup.core.logistic.TaskQueue;
 import net.hudup.core.logistic.Timestamp;
 import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.xURI;
@@ -81,7 +83,6 @@ public class Delegator extends AbstractDelegator {
 			this.remoteService = remoteServer.getService();
 		} 
 		catch (Throwable e) {
-			// TODO Auto-generated catch block
 			LogUtil.trace(e);
 			this.remoteService = null;
 			
@@ -92,12 +93,10 @@ public class Delegator extends AbstractDelegator {
 	
 	@Override
 	public void run() {
-		// TODO Auto-generated method stub
 		try {
 			remoteServer.incRequest();
 		} 
 		catch (Throwable e) {
-			// TODO Auto-generated catch block
 			LogUtil.trace(e);
 			LogUtil.error("Delegator fail to increase server request, causes error " + e.getMessage());
 		}
@@ -108,7 +107,6 @@ public class Delegator extends AbstractDelegator {
 			remoteServer.decRequest();
 		} 
 		catch (Throwable e) {
-			// TODO Auto-generated catch block
 			LogUtil.trace(e);
 			LogUtil.error("Delegator fail to decrease server request, causes error " + e.getMessage());
 		}
@@ -202,7 +200,6 @@ public class Delegator extends AbstractDelegator {
 	 */
 	@SuppressWarnings("deprecation")
 	private Response processRequest(Request request) {
-		// TODO Auto-generated method stub
 		
 		try {
 			String action = request.action;
@@ -374,7 +371,6 @@ public class Delegator extends AbstractDelegator {
 
 	@Override
 	public boolean validateAdminAccount(String account, String password) {
-		// TODO Auto-generated method stub
 		boolean validated = validateAccount(account, password, DataConfig.ACCOUNT_ADMIN_PRIVILEGE);
 		if (validated)
 			return true;
@@ -440,49 +436,16 @@ class DelegatorEvaluator extends EvaluatorWrapperExt {
 			LogUtil.trace(e);
 		}
 		
-		//Delegated evaluator does not use timer because of suppose that there are limited clients connecting to listeners
+		//Delegated evaluator may not use timer because of suppose that there are limited clients connecting to listeners
 		//when there can be many different listeners. It is complicated with timer.
-//		this.timer = new Timer2(Constants.DEFAULT_LONG_TIMEOUT) {
-//			
-//			@Override
-//			protected void task() {
-//				synchronized (listenerList) {
-//					listenerList.updateInfo();
-//					
-//					List<EventListener> listeners = listenerList.getListeners();
-//					List<EventListener> tempListeners = Util.newList(listeners.size());
-//					tempListeners.addAll(listeners);
-//					for (EventListener listener : tempListeners) {
-//						if (!listeners.contains(listener))
-//							continue;
-//						
-//						ListenerInfo info = listenerList.getInfo(listener);
-//						if (info != null && info.failedPingCount > 2) { //Removing clients that are unable to connect more than 2 times (more than 1 hour in average).
-//							listenerList.remove(listener);
-//							if (listeners.size() == 0) break;
-//						}
-//					}
-//				}
-//			}
-//			
-//			@Override
-//			protected void clear() {}
-//			
-//		};
-//		this.timer.setPriority(Priority.min);
-//		this.timer.start();
+		this.timer = EvaluatorAbstract.createPurgeListenersTimer(listenerList);
 	}
 	
 	
-	@Override
-	public boolean isDelegate() throws RemoteException {
-		return true;
-	}
-
-
 	@Override
 	public synchronized boolean remoteStart0(List<Alg> algList, DatasetPoolExchanged pool, Timestamp timestamp, Serializable parameter) throws RemoteException {
-		waitForTaskQueue();
+		TaskQueue.waitForTaskQueue(taskMap);
+		stimulate();
 		
 		boolean flag = socketServer.getFlag();
 		
@@ -498,7 +461,8 @@ class DelegatorEvaluator extends EvaluatorWrapperExt {
 	@Override
 	public boolean remoteStart(List<String> algNameList, DatasetPoolExchanged pool, ClassProcessor cp, DataConfig config, Timestamp timestamp, Serializable parameter)
 			throws RemoteException {
-		waitForTaskQueue();
+		TaskQueue.waitForTaskQueue(taskMap);
+		stimulate();
 		
 		boolean flag = socketServer.getFlag();
 		
@@ -513,7 +477,8 @@ class DelegatorEvaluator extends EvaluatorWrapperExt {
 
 	@Override
 	public synchronized boolean remoteStart(Serializable... parameters) throws RemoteException {
-		waitForTaskQueue();
+		TaskQueue.waitForTaskQueue(taskMap);
+		stimulate();
 		
 		boolean flag = socketServer.getFlag();
 		
@@ -528,7 +493,7 @@ class DelegatorEvaluator extends EvaluatorWrapperExt {
 
 	@Override
 	public synchronized boolean remotePause() throws RemoteException {
-		waitForTaskQueue();
+		TaskQueue.waitForTaskQueue(taskMap);
 		
 		boolean flag = socketServer.getFlag();
 
@@ -543,7 +508,7 @@ class DelegatorEvaluator extends EvaluatorWrapperExt {
 	
 	@Override
 	public synchronized boolean remoteResume() throws RemoteException {
-		waitForTaskQueue();
+		TaskQueue.waitForTaskQueue(taskMap);
 		
 		boolean flag = socketServer.getFlag();
 
@@ -558,7 +523,7 @@ class DelegatorEvaluator extends EvaluatorWrapperExt {
 	
 	@Override
 	public synchronized boolean remoteStop() throws RemoteException {
-		waitForTaskQueue();
+		TaskQueue.waitForTaskQueue(taskMap);
 		
 		boolean flag = socketServer.getFlag();
 
@@ -573,7 +538,7 @@ class DelegatorEvaluator extends EvaluatorWrapperExt {
 	
 	@Override
 	public boolean remoteForceStop() throws RemoteException {
-		waitForTaskQueue();
+		TaskQueue.waitForTaskQueue(taskMap);
 		
 		boolean flag = socketServer.getFlag();
 		
@@ -615,9 +580,9 @@ class DelegatorEvaluator extends EvaluatorWrapperExt {
 	@Override
 	public synchronized void unexport() throws RemoteException {
 		if (exportedStub != null) {
-			if (!remoteEvaluator.isAgent())
-				this.remoteStop(); //It is possible to stop this evaluator because its is delegated evaluator.
-			
+			if (!remoteEvaluator.containsAgent())
+				this.remoteStop();
+
 			try {
 				remoteEvaluator.removePluginChangedListener(this);
 				remoteEvaluator.removeEvaluatorListener(this);

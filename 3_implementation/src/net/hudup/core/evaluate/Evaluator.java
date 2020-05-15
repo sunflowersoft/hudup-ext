@@ -190,7 +190,8 @@ public interface Evaluator extends Remote, RemoteRunner, SetupAlgListener, Plugi
 
 	
 	/**
-	 * Checking whether this object is a delegate of an evaluator.
+	 * Checking whether this object is a delegate of an evaluator. Delegate is also wrapper of a evaluator but it is more independent than wrapper.
+	 * For instance, delegate has own list of listeners. 
 	 * @return whether this object is a delegate of an evaluator.
 	 * @throws RemoteException if any error raises.
 	 */
@@ -577,11 +578,23 @@ public interface Evaluator extends Remote, RemoteRunner, SetupAlgListener, Plugi
     void setReferredService(Service referredService) throws RemoteException;
     
     
-    @Override
+	@Override
 	boolean isAgent() throws RemoteException;
 
 
     @Override
+	void setAgent(boolean isAgent) throws RemoteException;
+
+	
+	/**
+	 * Checking whether the implemented object contains agent.
+	 * @return whether the implemented contains is agent.
+	 * @throws RemoteException if any error raises.
+	 */
+	boolean containsAgent() throws RemoteException;
+
+	
+	@Override
     Remote export(int serverPort) throws RemoteException;
     
     

@@ -429,15 +429,13 @@ public class PluginStorageManifest extends SortableSelectableTable {
      * @param evt {@link PluginChangedEvent} event is issued to registered {@link PluginChangedListener} (s) after {@link PluginStorageManifest} was changed.
      */
     protected void firePluginChangedEvent(PluginChangedEvent evt) {
-		synchronized (listenerList) {
-			PluginChangedListener[] listeners = getPluginChangedListeners();
-			for (PluginChangedListener listener : listeners) {
-				try {
-					listener.pluginChanged(evt);
-				}
-				catch (Throwable e) {
-					LogUtil.trace(e);
-				}
+		PluginChangedListener[] listeners = getPluginChangedListeners();
+		for (PluginChangedListener listener : listeners) {
+			try {
+				listener.pluginChanged(evt);
+			}
+			catch (Throwable e) {
+				LogUtil.trace(e);
 			}
 		}
     }
@@ -447,7 +445,6 @@ public class PluginStorageManifest extends SortableSelectableTable {
 //     * Cleaning up something from listeners.
 //     */
 //    protected void fireCleanupSomething() {
-//		synchronized (listenerList) {
 //			PluginChangedListener[] listeners = getPluginChangedListeners();
 //			for (PluginChangedListener listener : listeners) {
 //				try {
@@ -457,7 +454,6 @@ public class PluginStorageManifest extends SortableSelectableTable {
 //					LogUtil.trace(e);
 //				}
 //			}
-//		}
 //    }
     
     

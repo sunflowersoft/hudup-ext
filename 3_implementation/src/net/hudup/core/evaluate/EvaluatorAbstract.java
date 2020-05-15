@@ -283,34 +283,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 		evTaskQueue = new CounterTaskQueue(otherResult);
 		evTaskQueue.setListenerList(listenerList); //Task queue uses the same listener list.
 		
-		timer = new Timer2(Constants.DEFAULT_LONG_TIMEOUT) {
-			
-			@Override
-			protected void task() {
-				synchronized (listenerList) {
-					listenerList.updateInfo();
-					
-					List<EventListener> listeners = listenerList.getListeners();
-					List<EventListener> tempListeners = Util.newList(listeners.size());
-					tempListeners.addAll(listeners);
-					for (EventListener listener : tempListeners) {
-						if (!listeners.contains(listener))
-							continue;
-						
-						ListenerInfo info = listenerList.getInfo(listener);
-						if (info != null && info.failedPingCount > 2) { //Removing clients that are unable to connect more than 2 times (more than 1 hour in average).
-							listenerList.remove(listener);
-							if (listeners.size() == 0) break;
-						}
-					}
-				}
-			}
-			
-			@Override
-			protected void clear() {}
-			
-		};
-		timer.setPriority(Priority.min);
+		timer = createPurgeListenersTimer(listenerList);
 	}
 	
 	
@@ -1207,7 +1180,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 	
 	@Override
 	public List<EventObject> doTask(UUID listenerID) throws RemoteException {
-		return evTaskQueue.doTaskGreedy(listenerID);
+		return evTaskQueue.doTask(listenerID);
 	}
 
 
@@ -1257,14 +1230,12 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
     protected void firePluginChangedEvent(PluginChangedEvent evt) {
 		evTaskQueue.addTask(evt);
 
-		synchronized (listenerList) {
-			PluginChangedListener[] listeners = getPluginChangedListeners();
-			for (PluginChangedListener listener : listeners) {
-				try {
-					listener.pluginChanged(evt);
-				}
-				catch (Throwable e) {LogUtil.trace(e);}
+		PluginChangedListener[] listeners = getPluginChangedListeners();
+		for (PluginChangedListener listener : listeners) {
+			try {
+				listener.pluginChanged(evt);
 			}
+			catch (Throwable e) {LogUtil.trace(e);}
 		}
     }
 
@@ -1316,20 +1287,17 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
     protected void fireEvaluatorEvent(EvaluatorEvent evt, EvaluatorListener localTargetListener) {
 		evTaskQueue.addTask(evt);
 
-		synchronized (listenerList) {
-			EvaluatorListener[] listeners = getEvaluatorListeners();
-			for (EvaluatorListener listener : listeners) {
-				try {
-					if (localTargetListener != null) {
-						if (listener == localTargetListener)
-							listener.receivedEvaluator(evt);
-					}
-					else
+		EvaluatorListener[] listeners = getEvaluatorListeners();
+		for (EvaluatorListener listener : listeners) {
+			try {
+				if (localTargetListener != null) {
+					if (listener == localTargetListener)
 						listener.receivedEvaluator(evt);
 				}
-				catch (Exception e) {LogUtil.trace(e);}
+				else
+					listener.receivedEvaluator(evt);
 			}
-			
+			catch (Exception e) {LogUtil.trace(e);}
 		}
     }
 
@@ -1380,60 +1348,58 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
     protected void fireEvaluateEvent(EvaluateEvent evt) {
 		evTaskQueue.addTask(evt);
     	
-		synchronized (listenerList) {
-			EvaluateListener[] listeners = getEvaluateListeners();
-			for (EvaluateListener listener : listeners) {
-				if ((!config.isTiedSync()) && evTaskQueue.isRunning() && (!(listener instanceof AbstractEvaluateGUI))) {
-					evTaskQueue.addTask(new TaskQueue.Task() {
-						@Override
-						public void doTask() throws Exception {
-							listener.receivedEvaluation(evt);
-						}
-					});
-				}
-				else {
-					try {
+		EvaluateListener[] listeners = getEvaluateListeners();
+		for (EvaluateListener listener : listeners) {
+			if ((!config.isTiedSync()) && evTaskQueue.isRunning() && (!(listener instanceof AbstractEvaluateGUI))) {
+				evTaskQueue.addTask(new TaskQueue.Task() {
+					@Override
+					public void doTask() throws Exception {
 						listener.receivedEvaluation(evt);
 					}
-					catch (Exception e) {LogUtil.trace(e);}
-				}
+				});
 			}
-		
-			String evStorePath = config.getAsString(DataConfig.STORE_URI_FIELD);
-			if (evStorePath != null && algRegResult != null) {
-				boolean saveResultSummary = false;
+			else {
 				try {
-					saveResultSummary = config.isSaveResultSummary();
-				} catch (Throwable e) {LogUtil.trace(e);}
-				
-				evt.setMetrics(result); //Important code line, saving all metrics.
-				evProcessor.saveEvaluateResult(evStorePath, evt, algRegResult, saveResultSummary);
+					listener.receivedEvaluation(evt);
+				}
+				catch (Exception e) {LogUtil.trace(e);}
 			}
-			
-			
-			//Backing up evaluation results.
-			boolean backup = isBackup() || (evStorePath == null && listeners.length == 0);
-			if (!backup) return;
-			
-			if (evt.getType() != Type.done && evt.getType() != Type.done_one)
-				return;
-			if (this.result == null || this.algRegResult == null)
-				return;
-			
-			try {
-				xURI backupDir = xURI.create(Constants.BACKUP_DIRECTORY);
-				UriAdapter backupAdapter = new UriAdapter(backupDir);
-				if (!backupAdapter.exists(backupDir)) backupAdapter.create(backupDir, true);
-				xURI analyzeBackupFile = backupDir.concat("evaluator-analyze-backup-" + new Date().getTime() + "." + Constants.DEFAULT_EXT);
-				
-				MetricsUtil util = new MetricsUtil(this.result, algRegResult, this);
-				Writer writer = backupAdapter.getWriter(analyzeBackupFile, false);
-				writer.write(util.createPlainText());
-				writer.close();
-				backupAdapter.close();
-			}
-			catch (Throwable e) {LogUtil.trace(e);}
 		}
+	
+		String evStorePath = config.getAsString(DataConfig.STORE_URI_FIELD);
+		if (evStorePath != null && algRegResult != null) {
+			boolean saveResultSummary = false;
+			try {
+				saveResultSummary = config.isSaveResultSummary();
+			} catch (Throwable e) {LogUtil.trace(e);}
+			
+			evt.setMetrics(result); //Important code line, saving all metrics.
+			evProcessor.saveEvaluateResult(evStorePath, evt, algRegResult, saveResultSummary);
+		}
+		
+		
+		//Backing up evaluation results.
+		boolean backup = isBackup() || (evStorePath == null && listeners.length == 0);
+		if (!backup) return;
+		
+		if (evt.getType() != Type.done && evt.getType() != Type.done_one)
+			return;
+		if (this.result == null || this.algRegResult == null)
+			return;
+		
+		try {
+			xURI backupDir = xURI.create(Constants.BACKUP_DIRECTORY);
+			UriAdapter backupAdapter = new UriAdapter(backupDir);
+			if (!backupAdapter.exists(backupDir)) backupAdapter.create(backupDir, true);
+			xURI analyzeBackupFile = backupDir.concat("evaluator-analyze-backup-" + new Date().getTime() + "." + Constants.DEFAULT_EXT);
+			
+			MetricsUtil util = new MetricsUtil(this.result, algRegResult, this);
+			Writer writer = backupAdapter.getWriter(analyzeBackupFile, false);
+			writer.write(util.createPlainText());
+			writer.close();
+			backupAdapter.close();
+		}
+		catch (Throwable e) {LogUtil.trace(e);}
     }
 
     
@@ -1483,25 +1449,22 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
     protected void fireEvaluateProgressEvent(EvaluateProgressEvent evt) {
 		evTaskQueue.addTask(evt);
 
-		synchronized (listenerList) {
-	    	EvaluateProgressListener[] listeners = getEvaluateProgressListeners();
-			for (EvaluateProgressListener listener : listeners) {
-				if ((!config.isTiedSync()) && evTaskQueue.isRunning() && (!(listener instanceof AbstractEvaluateGUI))) {
-					evTaskQueue.addTask(new TaskQueue.Task() {
-						@Override
-						public void doTask() throws Exception {
-							listener.receivedProgress(evt);
-						}
-					});
-				}
-				else {
-					try {
+    	EvaluateProgressListener[] listeners = getEvaluateProgressListeners();
+		for (EvaluateProgressListener listener : listeners) {
+			if ((!config.isTiedSync()) && evTaskQueue.isRunning() && (!(listener instanceof AbstractEvaluateGUI))) {
+				evTaskQueue.addTask(new TaskQueue.Task() {
+					@Override
+					public void doTask() throws Exception {
 						listener.receivedProgress(evt);
 					}
-					catch (Exception e) {LogUtil.trace(e);}
-				}
+				});
 			}
-			
+			else {
+				try {
+					listener.receivedProgress(evt);
+				}
+				catch (Exception e) {LogUtil.trace(e);}
+			}
 		}
     }
 
@@ -1552,58 +1515,56 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
     protected void fireSetupAlgEvent(SetupAlgEvent evt) {
 		evTaskQueue.addTask(evt);
 
-		synchronized (listenerList) {
-	    	SetupAlgListener[] listeners = getSetupAlgListeners();
-			for (SetupAlgListener listener : listeners) {
-				if ((!config.isTiedSync()) && evTaskQueue.isRunning() && (!(listener instanceof AbstractEvaluateGUI))) {
-					evTaskQueue.addTask(new TaskQueue.Task() {
-						@Override
-						public void doTask() throws Exception {
-							listener.receivedSetup(evt);
-						}
-					});
-				}
-				else {
-					try {
+    	SetupAlgListener[] listeners = getSetupAlgListeners();
+		for (SetupAlgListener listener : listeners) {
+			if ((!config.isTiedSync()) && evTaskQueue.isRunning() && (!(listener instanceof AbstractEvaluateGUI))) {
+				evTaskQueue.addTask(new TaskQueue.Task() {
+					@Override
+					public void doTask() throws Exception {
 						listener.receivedSetup(evt);
 					}
-					catch (Exception e) {LogUtil.trace(e);}
-				}
+				});
 			}
-		
-			String evStorePath = config.getAsString(DataConfig.STORE_URI_FIELD);
-			if (evStorePath != null) {
-				boolean saveResultSummary = false;
+			else {
 				try {
-					saveResultSummary = config.isSaveResultSummary();
-				} catch (Throwable e) {LogUtil.trace(e);}
-	
-				evProcessor.saveSetupResult(evStorePath, evt, saveResultSummary);
+					listener.receivedSetup(evt);
+				}
+				catch (Exception e) {LogUtil.trace(e);}
 			}
-			
-			
-			//Backing up evaluation results.
-			boolean backup = isBackup() || (evStorePath == null && listeners.length == 0);
-			if (!backup || evt.getType() != SetupAlgEvent.Type.done)
-				return;
-			try {
-				String info = "========== Algorithm \"" + evt.getAlgName() + "\" ==========\n";
-				info = info + evt.translate() + "\n\n\n\n";
-	
-				xURI backupDir = xURI.create(Constants.BACKUP_DIRECTORY);
-				UriAdapter backupAdapter = new UriAdapter(backupDir);
-				if (!backupAdapter.exists(backupDir)) backupAdapter.create(backupDir, true);
-				xURI analyzeBackupFile = backupDir.concat(
-						"evaluator-" + evt.getAlgName() + "-backup-" + new Date().getTime() +
-						EvaluateProcessor.SETUP_DONE_FILE_EXTENSION);
-				
-				Writer writer = backupAdapter.getWriter(analyzeBackupFile, false);
-				writer.write(info.toCharArray());
-				writer.close();
-				backupAdapter.close();
-			}
-			catch (Throwable e) {LogUtil.trace(e);}
 		}
+	
+		String evStorePath = config.getAsString(DataConfig.STORE_URI_FIELD);
+		if (evStorePath != null) {
+			boolean saveResultSummary = false;
+			try {
+				saveResultSummary = config.isSaveResultSummary();
+			} catch (Throwable e) {LogUtil.trace(e);}
+
+			evProcessor.saveSetupResult(evStorePath, evt, saveResultSummary);
+		}
+		
+		
+		//Backing up evaluation results.
+		boolean backup = isBackup() || (evStorePath == null && listeners.length == 0);
+		if (!backup || evt.getType() != SetupAlgEvent.Type.done)
+			return;
+		try {
+			String info = "========== Algorithm \"" + evt.getAlgName() + "\" ==========\n";
+			info = info + evt.translate() + "\n\n\n\n";
+
+			xURI backupDir = xURI.create(Constants.BACKUP_DIRECTORY);
+			UriAdapter backupAdapter = new UriAdapter(backupDir);
+			if (!backupAdapter.exists(backupDir)) backupAdapter.create(backupDir, true);
+			xURI analyzeBackupFile = backupDir.concat(
+					"evaluator-" + evt.getAlgName() + "-backup-" + new Date().getTime() +
+					EvaluateProcessor.SETUP_DONE_FILE_EXTENSION);
+			
+			Writer writer = backupAdapter.getWriter(analyzeBackupFile, false);
+			writer.write(info.toCharArray());
+			writer.close();
+			backupAdapter.close();
+		}
+		catch (Throwable e) {LogUtil.trace(e);}
     }
 
     
@@ -1729,6 +1690,12 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 	@Override
 	public synchronized void setAgent(boolean isAgent) throws RemoteException {
 		this.isAgent = isAgent;
+	}
+
+
+	@Override
+	public boolean containsAgent() throws RemoteException {
+		return isAgent();
 	}
 
 
@@ -2134,6 +2101,16 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 	
 	
 	/**
+	 * Checking whether the specified evaluator is wrapped evaluator.
+	 * @param evaluator specified evaluator.
+	 * @return whether the specified evaluator is wrapped evaluator.
+	 */
+	public static boolean isWrapper(Evaluator evaluator) {
+		return (evaluator instanceof EvaluatorWrapperExt) || (evaluator instanceof EvaluatorWrapper);
+	}
+	
+	
+	/**
 	 * Checking whether the specified evaluator is remote object.
 	 * @param evaluator specified evaluator.
 	 * @return whether the specified evaluator is remote object.
@@ -2141,12 +2118,14 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 	public static boolean isRemote(Evaluator evaluator) {
 		if (evaluator == null)
 			return false;
-		else if (evaluator instanceof EvaluatorWrapper) {
-			Evaluator remoteEvaluator = ((EvaluatorWrapper)evaluator).getRemoteEvaluator();
-			if (remoteEvaluator == null)
-				return false;
-			else 
-				return isRemote(remoteEvaluator);
+		else if ((evaluator instanceof EvaluatorWrapper) || (evaluator instanceof EvaluatorWrapperExt)) {
+			Evaluator remoteEvaluator = null;
+			if (evaluator instanceof EvaluatorWrapper)
+				remoteEvaluator = ((EvaluatorWrapper)evaluator).remoteEvaluator;
+			else if (evaluator instanceof EvaluatorWrapperExt)
+				remoteEvaluator = ((EvaluatorWrapperExt)evaluator).remoteEvaluator;
+
+			return isRemote(remoteEvaluator);
 		}
 		else if (evaluator instanceof EvaluatorAbstract)
 			return false;
@@ -2163,16 +2142,59 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 	public static Evaluator getMostInner(Evaluator evaluator) {
 		if (evaluator == null)
 			return null;
-		else if (evaluator instanceof EvaluatorWrapper) {
-			Evaluator remoteEvaluator = ((EvaluatorWrapper)evaluator).getRemoteEvaluator();
-			if (remoteEvaluator == null)
-				return null;
-			else 
-				return getMostInner(remoteEvaluator);
+		else if ((evaluator instanceof EvaluatorWrapper) || (evaluator instanceof EvaluatorWrapperExt)) {
+			Evaluator remoteEvaluator = null;
+			if (evaluator instanceof EvaluatorWrapper)
+				remoteEvaluator = ((EvaluatorWrapper)evaluator).remoteEvaluator;
+			else if (evaluator instanceof EvaluatorWrapperExt)
+				remoteEvaluator = ((EvaluatorWrapperExt)evaluator).remoteEvaluator;
+			
+			return getMostInner(remoteEvaluator);
 		}
 		else
 			return evaluator;
 	}
 
 
+	/**
+	 * Creating timer to purge listeners list.
+	 * @param listenerList purge listeners list.
+	 * @return timer to purge listeners list.
+	 */
+	public static Timer2 createPurgeListenersTimer(EventListenerList2 listenerList) {
+		if (listenerList == null) return null;
+		
+		Timer2 timer = new Timer2(Constants.DEFAULT_LONG_TIMEOUT) {
+			
+			@Override
+			protected void task() {
+				synchronized (listenerList) {
+					listenerList.updateInfo();
+					
+					List<EventListener> listeners = listenerList.getListeners();
+					List<EventListener> tempListeners = Util.newList(listeners.size());
+					tempListeners.addAll(listeners);
+					for (EventListener listener : tempListeners) {
+						if (!listeners.contains(listener))
+							continue;
+						
+						ListenerInfo info = listenerList.getInfo(listener);
+						if (info != null && info.failedPingCount > 2) { //Removing clients that are unable to connect more than 2 times (more than 1 hour in average).
+							listenerList.remove(listener);
+							if (listeners.size() == 0) break;
+						}
+					}
+				}
+			}
+			
+			@Override
+			protected void clear() {}
+			
+		};
+		timer.setPriority(Priority.min);
+		
+		return timer;
+	}
+	
+	
 }

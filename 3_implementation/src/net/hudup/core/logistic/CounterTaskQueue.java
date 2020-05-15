@@ -8,6 +8,9 @@
 package net.hudup.core.logistic;
 
 import java.rmi.RemoteException;
+import java.util.EventObject;
+import java.util.List;
+import java.util.UUID;
 
 import net.hudup.core.evaluate.EvaluateInfo;
 
@@ -124,6 +127,17 @@ public class CounterTaskQueue extends TaskQueue {
 	}
 
 
+	@Override
+	public List<EventObject> doTask(UUID listenerID) {
+		List<EventObject> evtList = super.doTask(listenerID);
+		
+		if ((assocEvaluateInfo != null) && (evtList.size() > 0 || isRunning()))
+			evtList.add(new CounterElapsedTimeEvent(this, assocEvaluateInfo.elapsedTime));
+		
+		return evtList;
+	}
+
+
 	/**
 	 * Adding elapsed time listener.
 	 * @param listener elapsed time listener.
@@ -164,17 +178,22 @@ public class CounterTaskQueue extends TaskQueue {
      * @param evt elapsed time event.
      */
     protected void fireElapsedTimeEvent(CounterElapsedTimeEvent evt) {
-//		synchronized (listenerList) {
-	    	CounterElapsedTimeListener[] listeners = getElapsedTimeListeners();
-			for (CounterElapsedTimeListener listener : listeners) {
-				try {
-					listener.receivedElapsedTime(evt);
-				}
-				catch (Throwable e) {
-					LogUtil.trace(e);
-				}
+    	CounterElapsedTimeListener[] listeners = getElapsedTimeListeners();
+		for (CounterElapsedTimeListener listener : listeners) {
+//			addTask(new Task() {
+//				@Override
+//				public void doTask() throws Exception {
+//					listener.receivedElapsedTime(evt);
+//				}
+//			});
+
+			try {
+				listener.receivedElapsedTime(evt);
 			}
-//		}
+			catch (Throwable e) {
+				LogUtil.trace(e);
+			}
+		}
     }
 
     

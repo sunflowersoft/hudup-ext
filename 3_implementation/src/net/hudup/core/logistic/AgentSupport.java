@@ -10,7 +10,7 @@ package net.hudup.core.logistic;
 import java.rmi.RemoteException;
 
 /**
- * This interface supports whether the implemented object is agent.
+ * This interface supports whether the implemented object is agent. Agent is a service / program is managed by server.
  * 
  * @author Loc Nguyen
  * @version 1.0

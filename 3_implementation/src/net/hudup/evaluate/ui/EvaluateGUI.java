@@ -345,12 +345,12 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 	
 	
 	@Override
-	protected synchronized int taskQueueFeed() {
-		int numTask = super.taskQueueFeed();
+	protected synchronized boolean taskQueueFeed() {
+		boolean connected = super.taskQueueFeed();
 		if (signalLight != null && connectInfo.checkPullMode())
-			signalLight.turn(numTask >= 0);
+			signalLight.turn(connected);
 		
-		return numTask;
+		return connected;
 	}
 
 	

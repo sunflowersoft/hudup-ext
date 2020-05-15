@@ -718,15 +718,13 @@ public class AlgListBox extends JList<Alg> implements AlgListUI {
      * @param evt the specified for list changed task.
      */
     protected void fireAlgListChangedEvent(AlgListChangedEvent evt) {
-		synchronized (listenerList) {
-	    	AlgListChangedListener[] listeners = getAlgListChangedListeners();
-			for (AlgListChangedListener listener : listeners) {
-				try {
-					listener.algListChanged(evt);
-				}
-				catch (Throwable e) {
-					LogUtil.trace(e);
-				}
+    	AlgListChangedListener[] listeners = getAlgListChangedListeners();
+		for (AlgListChangedListener listener : listeners) {
+			try {
+				listener.algListChanged(evt);
+			}
+			catch (Throwable e) {
+				LogUtil.trace(e);
 			}
 		}
     }
