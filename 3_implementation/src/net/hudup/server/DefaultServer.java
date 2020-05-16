@@ -133,27 +133,26 @@ public class DefaultServer extends PowerServerImpl {
 	protected void serverTasks() {
 		
 		// Task 1: Period learning.
-		if (config.isPeriodLearn()) { //This method is used to prevent time consuming to learn internal recommender.
-			if (!config.isDatasetEmpty()) {
-//				DefaultService newService = createService();
-//				newService.open(config); //This statement is important, which takes much time.
-//				newService.transferTo(service);
-				
-				Recommender recommender = null;
+		if (config.isPeriodLearn() && !config.isDatasetEmpty()) { //These methods are used to prevent time consuming from learning internal recommender.
+//			DefaultService newService = createService();
+//			newService.open(config); //This statement is important, which takes much time.
+//			newService.transferTo(service);
+			
+			Recommender recommender = null;
+			try {
+				if (service.isOpened())
+					recommender = service.createRecommender();
+			} catch (Exception e) {LogUtil.trace(e);}
+			
+			if (recommender != null) {
+				trans.lockWrite();
 				try {
-					recommender = service.createRecommender(config);
-				} catch (Exception e) {LogUtil.trace(e);}
+					if (service.recommender != null) service.recommender.unsetup();
+				} catch (Throwable e) {LogUtil.trace(e);}
+				service.recommender = recommender;
+				trans.unlockWrite();
 				
-				if (recommender != null) {
-					trans.lockWrite();
-					try {
-						if (service.recommender != null) service.recommender.unsetup();
-					} catch (Throwable e) {LogUtil.trace(e);}
-					service.recommender = recommender;
-					trans.unlockWrite();
-					
-					LogUtil.info("Server timer internal tasks: Learning recommendation algorithm is successful");
-				}
+				LogUtil.info("Server timer internal tasks: Learning recommendation algorithm is successful");
 			}
 		}
 	}

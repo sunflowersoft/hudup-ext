@@ -35,13 +35,11 @@ public class SemiScannerParser extends ScannerParserImpl {
 	 */
 	public SemiScannerParser() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
 
 	@Override
 	public Dataset parse(DataConfig config) throws RemoteException {
-		// TODO Auto-generated method stub
 		
 		config.setParser(this);
 		return new SemiScanner(config);
@@ -50,21 +48,18 @@ public class SemiScannerParser extends ScannerParserImpl {
 	
 	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
 		return "semi_scanner_parser";
 	}
 
 	
 	@Override
 	public DataConfig createDefaultConfig() {
-		// TODO Auto-generated method stub
 		return new DataConfig();
 	}
 
 	
 	@Override
 	public Alg newInstance() {
-		// TODO Auto-generated method stub
 		return new SemiScannerParser();
 	}
 	

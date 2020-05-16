@@ -111,7 +111,6 @@ public class DefaultService implements Service, PluginChangedListener, AutoClose
 	 */
 	public DefaultService(Transaction trans) {
 		super();
-		// TODO Auto-generated constructor stub
 		
 		this.trans = trans;
 	}
@@ -120,7 +119,7 @@ public class DefaultService implements Service, PluginChangedListener, AutoClose
 	/**
 	 * Open service with specified configuration and parameters.
 	 * @param serverConfig specified configuration.
-	 * @param params specified parameters.
+	 * @param params additional parameters so that recommender algorithm sets up.
 	 * @return whether open service successfully.
 	 */
 	public boolean open(PowerServerConfig serverConfig, Object... params) {
@@ -134,7 +133,7 @@ public class DefaultService implements Service, PluginChangedListener, AutoClose
 		boolean opened = true;
 		this.serverConfig = serverConfig;
 		try {
-			recommender = createRecommender(serverConfig, params);
+			recommender = createRecommender(params);
 		}
 		catch (Throwable e) {
 			LogUtil.trace(e);
@@ -150,22 +149,13 @@ public class DefaultService implements Service, PluginChangedListener, AutoClose
 	
 	/**
 	 * Creating recommender.
-	 * @param config specified configuration.
-	 * @param params specified parameters.
-	 * @return created recommender.
+	 * @param params additional parameters so that recommender algorithm sets up.
+	 * @return recommender created from server configuration.
 	 * @throws Exception if any error raises.
 	 */
-	protected Recommender createRecommender(DataConfig config, Object... params) throws Exception {
-		if (config == null) return null;
-		PowerServerConfig serverConfig = config instanceof PowerServerConfig ? (PowerServerConfig)config : null;
+	protected Recommender createRecommender(Object...params) throws Exception {
 		Dataset dataset = null;
-		
-		Recommender recommender = null;
-		if (serverConfig == null) {
-			dataset = new SnapshotImpl();
-			dataset.setConfig((DataConfig)config.clone());
-		}
-		else if (serverConfig.isDatasetEmpty()) {
+		if (serverConfig.isDatasetEmpty()) {
 			dataset = new SnapshotImpl();
 			dataset.setConfig((DataConfig)serverConfig.clone());
 		}
@@ -173,8 +163,8 @@ public class DefaultService implements Service, PluginChangedListener, AutoClose
 			dataset = serverConfig.getParser().parse((DataConfig)serverConfig.clone());
 		}
 		dataset.setExclusive(true);
-		
-		recommender = (Recommender) serverConfig.getRecommender().newInstance();
+
+		Recommender recommender = (Recommender) serverConfig.getRecommender().newInstance();
 		recommender.getConfig().putAll(serverConfig.getRecommender().getConfig());
 		recommender.setup(dataset, params);
 		
@@ -331,7 +321,6 @@ public class DefaultService implements Service, PluginChangedListener, AutoClose
 	
 	@Override
 	public RatingVector estimate(RecommendParam param, Set<Integer> queryIds) throws RemoteException {
-		// TODO Auto-generated method stub
 		
 		RatingVector result = null;
 		
@@ -355,7 +344,6 @@ public class DefaultService implements Service, PluginChangedListener, AutoClose
 	
 	@Override
 	public RatingVector recommend(RecommendParam param, int maxRecommend) throws RemoteException {
-		// TODO Auto-generated method stub
 		
 		RatingVector result = null;
 		
@@ -380,7 +368,6 @@ public class DefaultService implements Service, PluginChangedListener, AutoClose
 	@Override
 	public RatingVector recommend(int userId, int maxRecommend)
 			throws RemoteException {
-		// TODO Auto-generated method stub
 		RatingVector result = null;
 		
 		trans.lockRead();
@@ -434,7 +421,6 @@ public class DefaultService implements Service, PluginChangedListener, AutoClose
 			Serializable externalItemId,
 			int maxRecommend, 
 			Rating rating) throws RemoteException {
-		// TODO Auto-generated method stub
 		
 		if (externalItemId != null && rating != null && rating.isRated()) {
 			trans.lockWrite();
@@ -501,7 +487,6 @@ public class DefaultService implements Service, PluginChangedListener, AutoClose
 
 	@Override
 	public boolean updateRating(RatingVector vRating) throws RemoteException {
-		// TODO Auto-generated method stub
 		boolean result = false;
 		
 		trans.lockWrite();
@@ -569,7 +554,6 @@ public class DefaultService implements Service, PluginChangedListener, AutoClose
 	
 	@Override
 	public Fetcher<Integer> getUserIds() throws RemoteException {
-		// TODO Auto-generated method stub
 		Fetcher<Integer> fetcher = MemFetcher.createEmpty();
 		
 		trans.lockRead();
@@ -660,7 +644,6 @@ public class DefaultService implements Service, PluginChangedListener, AutoClose
 	
 	@Override
 	public Profile getUserProfile(int userId) throws RemoteException {
-		// TODO Auto-generated method stub
 		
 		Profile user = null;
 		
@@ -685,7 +668,6 @@ public class DefaultService implements Service, PluginChangedListener, AutoClose
 	@Override
 	public Profile getUserProfileByExternal(Serializable externalUserId)
 			throws RemoteException {
-		// TODO Auto-generated method stub
 
 		Profile user = null;
 		
@@ -733,7 +715,6 @@ public class DefaultService implements Service, PluginChangedListener, AutoClose
 		
 	@Override
 	public boolean updateUserProfile(Profile user) throws RemoteException {
-		// TODO Auto-generated method stub
 		
 		boolean result = false;
 		
@@ -781,7 +762,6 @@ public class DefaultService implements Service, PluginChangedListener, AutoClose
 	@Override
 	public AttributeList getUserAttributeList()
 			throws RemoteException {
-		// TODO Auto-generated method stub
 		
 		AttributeList attributeList = null;
 		
@@ -806,7 +786,6 @@ public class DefaultService implements Service, PluginChangedListener, AutoClose
 	@Override
 	public ExternalRecord getUserExternalRecord(int userId)
 			throws RemoteException {
-		// TODO Auto-generated method stub
 		
 		ExternalRecord externalRecord = null;
 		
@@ -830,7 +809,6 @@ public class DefaultService implements Service, PluginChangedListener, AutoClose
 
 	@Override
 	public Fetcher<Integer> getItemIds() throws RemoteException {
-		// TODO Auto-generated method stub
 		Fetcher<Integer> fetcher = MemFetcher.createEmpty();
 		
 		trans.lockRead();
@@ -922,7 +900,6 @@ public class DefaultService implements Service, PluginChangedListener, AutoClose
 	
 	@Override
 	public Profile getItemProfile(int itemId) throws RemoteException {
-		// TODO Auto-generated method stub
 		
 		Profile item = null;
 		
@@ -947,7 +924,6 @@ public class DefaultService implements Service, PluginChangedListener, AutoClose
 	@Override
 	public Profile getItemProfileByExternal(Serializable externalItemId)
 			throws RemoteException {
-		// TODO Auto-generated method stub
 
 		Profile item = null;
 		
@@ -995,7 +971,6 @@ public class DefaultService implements Service, PluginChangedListener, AutoClose
 	
 	@Override
 	public boolean updateItemProfile(Profile item) throws RemoteException {
-		// TODO Auto-generated method stub
 		
 		boolean result = false;
 		
@@ -1044,7 +1019,6 @@ public class DefaultService implements Service, PluginChangedListener, AutoClose
 	@Override
 	public AttributeList getItemAttributeList()
 			throws RemoteException {
-		// TODO Auto-generated method stub
 		
 		AttributeList attributeList = null;
 		
@@ -1069,7 +1043,6 @@ public class DefaultService implements Service, PluginChangedListener, AutoClose
 	@Override
 	public ExternalRecord getItemExternalRecord(int itemId)
 			throws RemoteException {
-		// TODO Auto-generated method stub
 		
 		ExternalRecord externalRecord = null;
 		
@@ -1093,7 +1066,6 @@ public class DefaultService implements Service, PluginChangedListener, AutoClose
 	
 	@Override
 	public NominalList getNominal(String unitName, String attribute) {
-		// TODO Auto-generated method stub
 		NominalList nominalList = null;
 		
 		trans.lockRead();
@@ -1117,7 +1089,6 @@ public class DefaultService implements Service, PluginChangedListener, AutoClose
 	@Override
 	public boolean updateNominal(String unitName, String attribute, Nominal nominal)
 			throws RemoteException {
-		// TODO Auto-generated method stub
 		
 		boolean result = false;
 		
@@ -1163,7 +1134,6 @@ public class DefaultService implements Service, PluginChangedListener, AutoClose
 	
 	@Override
 	public ExternalRecord getExternalRecord(InternalRecord internalRecord) throws RemoteException {
-		// TODO Auto-generated method stub
 		
 		ExternalRecord externalRecord = null;
 		
@@ -1190,7 +1160,6 @@ public class DefaultService implements Service, PluginChangedListener, AutoClose
 	@Override
 	public boolean updateExternalRecord(InternalRecord internalRecord,
 			ExternalRecord externalRecord) throws RemoteException {
-		// TODO Auto-generated method stub
 		boolean result = false;
 		
 		trans.lockWrite();
@@ -1214,7 +1183,6 @@ public class DefaultService implements Service, PluginChangedListener, AutoClose
 
 	@Override
 	public boolean deleteExternalRecord(InternalRecord internalRecord) throws RemoteException {
-		// TODO Auto-generated method stub
 		boolean result = false;
 		
 		trans.lockWrite();
@@ -1238,7 +1206,6 @@ public class DefaultService implements Service, PluginChangedListener, AutoClose
 	@Override
 	public boolean validateAccount(String account, String password, int privileges) 
 			throws RemoteException {
-		// TODO Auto-generated method stub
 		Provider provider = getProvider();
 		if (provider == null) return true;
 
@@ -1455,7 +1422,6 @@ public class DefaultService implements Service, PluginChangedListener, AutoClose
 	
 	@Override
 	public DataConfig getServerConfig() throws RemoteException {
-		// TODO Auto-generated method stub
 		
 		DataConfig serverConfig = null;
 		
@@ -1508,7 +1474,6 @@ public class DefaultService implements Service, PluginChangedListener, AutoClose
 
 	@Override
 	public Evaluator getEvaluator(String evaluatorName, String account, String password) throws RemoteException {
-		// TODO Auto-generated method stub
 		if (!validateAccount(account, password, DataConfig.ACCOUNT_EVALUATE_PRIVILEGE))
 			return null;
 		else
@@ -1565,7 +1530,6 @@ public class DefaultService implements Service, PluginChangedListener, AutoClose
 	
 	@Override
 	public String[] getEvaluatorNames() throws RemoteException {
-		// TODO Auto-generated method stub
 		List<String> evaluatorNames = Util.newList();
 		
 		trans.lockRead();
@@ -1587,7 +1551,6 @@ public class DefaultService implements Service, PluginChangedListener, AutoClose
 
 			@Override
 			public int compare(String o1, String o2) {
-				// TODO Auto-generated method stub
 				return o1.compareToIgnoreCase(o2);
 			}
 			
@@ -1603,7 +1566,6 @@ public class DefaultService implements Service, PluginChangedListener, AutoClose
 	@NextUpdate
 	@Override
 	public Alg getAlg(String algName) throws RemoteException {
-		// TODO Auto-generated method stub
 		Alg alg = null;
 		
 		trans.lockWrite();
@@ -1668,7 +1630,6 @@ public class DefaultService implements Service, PluginChangedListener, AutoClose
 	 */
 	@Override
 	public AlgDesc2List getAlgDescs() throws RemoteException {
-		// TODO Auto-generated method stub
 		AlgDesc2List algDescs = new AlgDesc2List();
 		
 		trans.lockRead();
@@ -1687,7 +1648,6 @@ public class DefaultService implements Service, PluginChangedListener, AutoClose
 
 			@Override
 			public int compare(AlgDesc2 o1, AlgDesc2 o2) {
-				// TODO Auto-generated method stub
 				return o1.algName.compareTo(o2.algName);
 			}
 			

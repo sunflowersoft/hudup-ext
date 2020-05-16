@@ -52,7 +52,6 @@ public class SemiScanner extends ScannerImpl {
 	 */
 	public SemiScanner(DataConfig config) {
 		super(config);
-		// TODO Auto-generated constructor stub
 		
 		loadRatingData();
 	}
@@ -188,7 +187,6 @@ public class SemiScanner extends ScannerImpl {
 	
 	@Override
 	public Object clone() {
-		// TODO Auto-generated method stub
 		SemiScanner scanner = new SemiScanner(config);
 		scanner.enhance();
 		
