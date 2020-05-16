@@ -253,6 +253,11 @@ public final class Constants {
 	 */
 	public static int MAX_EXTRA_CLASSLOADERS              = 10;
 
+	/**
+	 * If flag is true, server is responsible for purging disconnected listeners. Otherwise, each evaluator is responsible for purging disconnected listeners.
+	 */
+	public static boolean SERVER_PURGE_LISTENERS          = true;
+	
 	
 	/**
 	 * Static code to load dynamic constant.
@@ -350,6 +355,14 @@ public final class Constants {
 			System.out.println("Error when parsing the maximum number of extra class loaders");
 		}
 
+		try {
+			String serverPurgeListeners = Util.getHudupProperty("server_purge_listeners");
+			if (serverPurgeListeners != null)
+				SERVER_PURGE_LISTENERS = Boolean.parseBoolean(serverPurgeListeners);
+		}
+		catch (Throwable e) {
+			System.out.println("Error when parsing server purging listeners");
+		}
 	
 	}
 	

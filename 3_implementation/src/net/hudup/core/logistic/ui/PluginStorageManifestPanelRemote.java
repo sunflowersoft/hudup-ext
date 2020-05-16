@@ -43,11 +43,13 @@ public class PluginStorageManifestPanelRemote extends PluginStorageManifestPanel
 		super(listener, bindUri);
 		this.server = listener instanceof PowerServer ? (PowerServer)listener : null;
 		
-		JOptionPane.showMessageDialog(
-			this, 
-			"Remote plugin storage manifest not stable yet", 
-			"Not stable yet", 
-			JOptionPane.INFORMATION_MESSAGE);
+		if (bindUri != null) {
+			JOptionPane.showMessageDialog(
+				this, 
+				"Remote plugin storage manifest not stable yet", 
+				"Not stable yet", 
+				JOptionPane.INFORMATION_MESSAGE);
+		}
 	}
 
 

@@ -59,8 +59,6 @@ public class SemiScannerExt extends SemiScanner {
 	 */
 	public SemiScannerExt(DataConfig config) {
 		super(config);
-		// TODO Auto-generated constructor stub
-		
 	}
 
 	
@@ -107,7 +105,6 @@ public class SemiScannerExt extends SemiScanner {
 	
 	@Override
 	public ExternalRecord getUserExternalRecord(int userId) {
-		// TODO Auto-generated method stub
 		if (!loaded)
 			return super.getUserExternalRecord(userId);
 		else
@@ -117,7 +114,6 @@ public class SemiScannerExt extends SemiScanner {
 	
 	@Override
 	public ExternalRecord getItemExternalRecord(int itemId) {
-		// TODO Auto-generated method stub
 		if (!loaded)
 			return super.getItemExternalRecord(itemId);
 		else

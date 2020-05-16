@@ -36,7 +36,6 @@ public class PluginStorageManifestRemote extends PluginStorageManifest {
 	 * @param server power server.
 	 */
 	public PluginStorageManifestRemote(PowerServer server) {
-		// TODO Auto-generated constructor stub
 		this(server, new RegisterRemoteTM(server), 0);
 	}
 

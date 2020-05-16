@@ -85,7 +85,7 @@ public class EvaluatorWrapperExt implements Evaluator, EvaluatorListener, Evalua
     /**
      * Internal timer.
      */
-    protected Timer2 timer = null;
+    protected Timer2 purgeTimer = null;
     
     
 	/**
@@ -116,14 +116,14 @@ public class EvaluatorWrapperExt implements Evaluator, EvaluatorListener, Evalua
 			LogUtil.trace(e);
 		}
 		
-		this.timer = EvaluatorAbstract.createPurgeListenersTimer(listenerList);
+		this.purgeTimer = EvaluatorAbstract.createPurgeListenersTimer(listenerList);
 	}
 	
 	
 	@Override
 	public void stimulate() throws RemoteException {
-		if (timer != null && !timer.isStarted())
-			timer.start();
+		if (purgeTimer != null && !purgeTimer.isStarted())
+			purgeTimer.start();
 	}
 
 
@@ -937,9 +937,9 @@ public class EvaluatorWrapperExt implements Evaluator, EvaluatorListener, Evalua
 	@Override
 	public void close() throws Exception {
     	try {
-    		if (timer != null) {
-    			timer.stop();
-    			timer = null;
+    		if (purgeTimer != null) {
+    			purgeTimer.stop();
+    			purgeTimer = null;
     		}
     	}
 		catch (Throwable e) {LogUtil.trace(e);}

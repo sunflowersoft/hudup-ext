@@ -14,6 +14,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
+import net.hudup.core.Constants;
 import net.hudup.core.PluginChangedEvent;
 import net.hudup.core.PluginChangedListener;
 import net.hudup.core.Util;
@@ -22,8 +23,10 @@ import net.hudup.core.client.ServiceExt;
 import net.hudup.core.client.ServiceLocal;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.evaluate.Evaluator;
+import net.hudup.core.evaluate.EvaluatorAbstract;
 import net.hudup.core.evaluate.EvaluatorConfig;
 import net.hudup.core.evaluate.ui.EvaluateGUIData;
+import net.hudup.core.logistic.EventListenerList2;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.server.DefaultService;
 import net.hudup.server.PowerServerConfig;
@@ -36,7 +39,7 @@ import net.hudup.server.Transaction;
  * @version 1.0
  *
  */
-public class DefaultServiceExt extends DefaultService implements ServiceExt, ServiceLocal, PluginChangedListener {
+public class ExtendedService extends DefaultService implements ServiceExt, ServiceLocal, PluginChangedListener {
 
 	
 	/**
@@ -67,7 +70,7 @@ public class DefaultServiceExt extends DefaultService implements ServiceExt, Ser
 	 * Constructor with specified transaction.
 	 * @param trans specified transaction.
 	 */
-	public DefaultServiceExt(Transaction trans) {
+	public ExtendedService(Transaction trans) {
 		this(trans, null);
 	}
 
@@ -77,7 +80,7 @@ public class DefaultServiceExt extends DefaultService implements ServiceExt, Ser
 	 * @param trans specified transaction.
 	 * @param referredServer referred power server.
 	 */
-	public DefaultServiceExt(Transaction trans, PowerServer referredServer) {
+	public ExtendedService(Transaction trans, PowerServer referredServer) {
 		super(trans);
 		this.referredServer = referredServer;
 	}
@@ -98,6 +101,8 @@ public class DefaultServiceExt extends DefaultService implements ServiceExt, Ser
 				ev.setAgent(true);
 				ev.setReferredService(this);
 				ev.export(serverConfig.getServerPort());
+				if (Constants.SERVER_PURGE_LISTENERS && (ev instanceof EvaluatorAbstract))
+					((EvaluatorAbstract)ev).removePurgeTimer();
 				ev.stimulate();
 				
 				pairMap.put(ev.getName(), ev);
@@ -137,6 +142,34 @@ public class DefaultServiceExt extends DefaultService implements ServiceExt, Ser
 		if (guiDataMap != null) guiDataMap.clear(); 
 	}
 
+	
+	/**
+	 * Purging disconnected listeners.
+	 */
+	protected void purgeListeners() {
+		List<EventListenerList2> evtLists = Util.newList();
+		
+		trans.lockRead();
+		Collection<Evaluator> evs = Util.newList();
+		evs.addAll(pairMap.values());
+		evs.addAll(pairReproducedMap.values());
+		trans.unlockRead();
+		
+		for (Evaluator ev : evs) {
+			if (!(ev instanceof EvaluatorAbstract)) continue;
+			EvaluatorAbstract evaluator = (EvaluatorAbstract)ev;
+			if (evaluator.getPurgeTimer() != null) continue;
+			
+			EventListenerList2 evtList = evaluator.getListenerList();
+			if (evtList != null && evtList.getListeners().size() > 0)
+				evtLists.add(evtList);
+		}
+		
+		for (EventListenerList2 evtList : evtLists) {
+			EvaluatorAbstract.purgeListeners(evtList);
+		}
+	}
+	
 	
 	@Override
 	public PowerServer getReferredServer(String account, String password) throws RemoteException {
@@ -291,6 +324,8 @@ public class DefaultServiceExt extends DefaultService implements ServiceExt, Ser
 					reproducedEvaluator.setAgent(true);
 					reproducedEvaluator.setReferredService(this);
 					reproducedEvaluator.export(serverConfig.getServerPort());
+					if (Constants.SERVER_PURGE_LISTENERS && (reproducedEvaluator instanceof EvaluatorAbstract))
+						((EvaluatorAbstract)reproducedEvaluator).removePurgeTimer();
 					reproducedEvaluator.stimulate();
 					
 					pairReproducedMap.put(evaluatorReproducedName, reproducedEvaluator);

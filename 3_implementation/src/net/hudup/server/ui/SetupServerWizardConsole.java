@@ -21,7 +21,7 @@ import net.hudup.core.logistic.xURI;
 import net.hudup.server.PowerServerConfig;
 
 /**
- * This class provides a wizard to set up server.
+ * This class provides a console wizard to set up server.
  * 
  * @author Loc Nguyen
  * @version 1.0

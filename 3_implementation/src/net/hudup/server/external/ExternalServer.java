@@ -45,14 +45,11 @@ public class ExternalServer extends DefaultServer {
 	 */
 	public ExternalServer(ExternalServerConfig config) {
 		super(config);
-		// TODO Auto-generated constructor stub
-		
 	}
 
 
 	@Override
 	protected void serverTasks() {
-		// TODO Auto-generated method stub
 		
 		ExternalConfig externalConfig = ((ExternalServerConfig) config).getExternalConfig();
 		if (externalConfig == null || externalConfig.size() == 0) {

@@ -38,7 +38,7 @@ import net.hudup.server.ui.SetupServerWizardConsole;
  * @version 1.0
  *
  */
-public class DefaultServerExt extends DefaultServer {
+public class ExtendedServer extends DefaultServer {
 
 	
 	/**
@@ -57,7 +57,7 @@ public class DefaultServerExt extends DefaultServer {
 	 * Constructor with configuration.
 	 * @param config power server configuration.
 	 */
-	public DefaultServerExt(PowerServerConfig config) {
+	public ExtendedServer(PowerServerConfig config) {
 		super(config);
 //		serverStub = this;
 	}
@@ -65,7 +65,7 @@ public class DefaultServerExt extends DefaultServer {
 	
 	@Override
 	protected DefaultService createService() {
-		return new DefaultServiceExt(trans, this);
+		return new ExtendedService(trans, this);
 	}
 
 
@@ -124,12 +124,24 @@ public class DefaultServerExt extends DefaultServer {
 	}
 
 
+	@Override
+	protected void serverTasks() {
+		super.serverTasks();
+		
+		//Task 1: Purging disconnected listeners.
+		if ((service != null) && (service instanceof ExtendedService)) {
+			((ExtendedService)service).purgeListeners();
+			LogUtil.info("Server timer internal tasks: Purging disconnected listeners is successful");
+		}
+	}
+
+
 	/**
 	 * Show control panel.
 	 */
 	protected void showCP() {
 		try {
-			new DefaultServerExtCP(this);
+			new ExtendedServerCP(this);
 		}
 		catch (Throwable e) {
 			//LogUtil.trace(e);
@@ -179,7 +191,7 @@ public class DefaultServerExt extends DefaultServer {
 	 * Showing evaluator control panel.
 	 */
 	protected void showEvaluatorCP() {
-		if ((service == null) || !(service instanceof DefaultServiceExt)) {
+		if ((service == null) || !(service instanceof ExtendedService)) {
 			LogUtil.error("Service is not initialized yet or not extended service");
 			JOptionPane.showMessageDialog(
 					null, 
@@ -200,7 +212,7 @@ public class DefaultServerExt extends DefaultServer {
 				return;
 			}
 			
-			EvaluatorCP ecp = new EvaluatorCP((DefaultServiceExt)service);
+			EvaluatorCP ecp = new EvaluatorCP((ExtendedService)service);
 			ecp.setVisible(true);
 		}
 		catch (Exception e) {
@@ -213,7 +225,7 @@ public class DefaultServerExt extends DefaultServer {
 	 * Static method to create default server.
 	 * @return extended default server.
 	 */
-	public static DefaultServerExt create() {
+	public static ExtendedServer create() {
 		return create(xURI.create(PowerServerConfig.serverConfig));
 	}
 	
@@ -223,11 +235,11 @@ public class DefaultServerExt extends DefaultServer {
 	 * @param srvConfigUri specified configuration URI.
 	 * @return extended default server.
 	 */
-	public static DefaultServerExt create(xURI srvConfigUri) {
+	public static ExtendedServer create(xURI srvConfigUri) {
 		boolean require = requireSetup(srvConfigUri);
 		
 		if (!require)
-			return new DefaultServerExt(new PowerServerConfig(srvConfigUri));
+			return new ExtendedServer(new PowerServerConfig(srvConfigUri));
 		else {
 			boolean isHeadLess = GraphicsEnvironment.isHeadless(); 
 			if (isHeadLess) {
@@ -279,7 +291,7 @@ public class DefaultServerExt extends DefaultServer {
 				return null;
 			}
 			
-			return new DefaultServerExt(new PowerServerConfig(srvConfigUri));
+			return new ExtendedServer(new PowerServerConfig(srvConfigUri));
 		}
 		
 	}

@@ -64,7 +64,6 @@ public class ExternalServerConfig extends PowerServerConfig {
 	 * Default constructor.
 	 */
 	public ExternalServerConfig() {
-		// TODO Auto-generated constructor stub
 		super();
 	}
 
@@ -75,7 +74,6 @@ public class ExternalServerConfig extends PowerServerConfig {
 	 */
 	public ExternalServerConfig(xURI uri) {
 		super(uri);
-		// TODO Auto-generated constructor stub
 	}
 
 	
@@ -135,7 +133,6 @@ public class ExternalServerConfig extends PowerServerConfig {
 
 	@Override
 	public Serializable userEdit(Component comp, String key, Serializable defaultValue) {
-		// TODO Auto-generated method stub
 		if (key.equals(EXTERNAL_QUERY_CONFIG)) {
 			
 			ExternalConfig defaultExternalConfig = getExternalConfig(); 
@@ -163,7 +160,6 @@ public class ExternalServerConfig extends PowerServerConfig {
 
 	@Override
 	public Object clone() {
-		// TODO Auto-generated method stub
 		ExternalServerConfig cfg = new ExternalServerConfig();
 		cfg.putAll(this);
 		

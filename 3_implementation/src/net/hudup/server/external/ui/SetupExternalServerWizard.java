@@ -61,7 +61,6 @@ public class SetupExternalServerWizard extends SetupServerWizard {
 	 */
 	public SetupExternalServerWizard(Component comp, ExternalServerConfig srvConfig) {
 		super(comp, srvConfig);
-		// TODO Auto-generated constructor stub
 	}
 
 	
@@ -89,7 +88,6 @@ public class SetupExternalServerWizard extends SetupServerWizard {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				boolean apply = paneConfig.apply();
 				if (!apply) {
 					JOptionPane.showMessageDialog(
@@ -115,7 +113,6 @@ public class SetupExternalServerWizard extends SetupServerWizard {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				
 				paneConfig.reset();
 				int confirm = JOptionPane.showConfirmDialog(
@@ -146,7 +143,6 @@ public class SetupExternalServerWizard extends SetupServerWizard {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				
 				DataConfig configExt = DatasetUtil2.chooseServerConfig(getWizard(), config);
 				
@@ -179,7 +175,6 @@ public class SetupExternalServerWizard extends SetupServerWizard {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				ExternalConfig defaultExternalConfig = ((ExternalServerConfig)config).getExternalConfig();
 				
 				ExternalConfigurator configurator = new ExternalConfigurator(
@@ -236,14 +231,12 @@ public class SetupExternalServerWizard extends SetupServerWizard {
 
 			@Override
 			public void clearData() {
-				// TODO Auto-generated method stub
 				super.clearData();
 				unitTable.clear();
 			}
 
 			@Override
 			public void modify() {
-				// TODO Auto-generated method stub
 				JOptionPane.showMessageDialog(
 						getWizard(), 
 						"Not support this method", 
@@ -253,7 +246,6 @@ public class SetupExternalServerWizard extends SetupServerWizard {
 
 			@Override
 			public void drop() {
-				// TODO Auto-generated method stub
 				JOptionPane.showMessageDialog(
 						getWizard(), 
 						"Not support this method", 
@@ -268,7 +260,6 @@ public class SetupExternalServerWizard extends SetupServerWizard {
 			
 			@Override
 			public void valueChanged(ListSelectionEvent e) {
-				// TODO Auto-generated method stub
 			
 				Unit unit = unitList.getSelectedValue();
 				if (unit == null) {
@@ -299,7 +290,6 @@ public class SetupExternalServerWizard extends SetupServerWizard {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				DataConfig srcConfig = DatasetUtil2.chooseConfig(getWizard(), null);
 				
 				if (srcConfig == null) {
@@ -340,7 +330,6 @@ public class SetupExternalServerWizard extends SetupServerWizard {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				ExternalConfig externalConfig = ((ExternalServerConfig) config).getExternalConfig();
 				
 				if (externalConfig == null || externalConfig.size() == 0) {

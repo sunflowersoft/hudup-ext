@@ -31,7 +31,7 @@ import net.hudup.server.ui.PowerServerCP;
  * @version 1.0
  *
  */
-public class DefaultServerExtCP extends PowerServerCP {
+public class ExtendedServerCP extends PowerServerCP {
 
 
 	/**
@@ -44,7 +44,7 @@ public class DefaultServerExtCP extends PowerServerCP {
 	 * Constructor with specified server.
 	 * @param server specified server.
 	 */
-	public DefaultServerExtCP(PowerServer server) {
+	public ExtendedServerCP(PowerServer server) {
 		this(server, null);
 	}
 
@@ -54,7 +54,7 @@ public class DefaultServerExtCP extends PowerServerCP {
 	 * @param server specified server
 	 * @param bindUri bound URI.
 	 */
-	public DefaultServerExtCP(PowerServer server, xURI bindUri) {
+	public ExtendedServerCP(PowerServer server, xURI bindUri) {
 		super(server, bindUri);
 	    setJMenuBar(createMenuBar());
 	}
@@ -84,7 +84,7 @@ public class DefaultServerExtCP extends PowerServerCP {
 				}
 			});
 		mniInstallService.setMnemonic('i');
-		mnTool.add(mniInstallService);
+//		mnTool.add(mniInstallService);
 
 		JMenuItem mniUninstallService = new JMenuItem(
 			new AbstractAction(I18nUtil.message("uninstall_service")) {
@@ -100,9 +100,9 @@ public class DefaultServerExtCP extends PowerServerCP {
 				}
 			});
 		mniUninstallService.setMnemonic('u');
-		mnTool.add(mniUninstallService);
+//		mnTool.add(mniUninstallService);
 
-		mnTool.addSeparator();
+//		mnTool.addSeparator();
 		JMenuItem mniEvaluatorCP = new JMenuItem(
 			new AbstractAction(I18nUtil.message("evaluator")) {
 				
@@ -113,8 +113,8 @@ public class DefaultServerExtCP extends PowerServerCP {
 
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					if (server instanceof DefaultServerExt)
-						((DefaultServerExt)server).showEvaluatorCP();
+					if (server instanceof ExtendedServer)
+						((ExtendedServer)server).showEvaluatorCP();
 					else
 						JOptionPane.showMessageDialog(
 							null, 

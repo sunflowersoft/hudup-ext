@@ -18,7 +18,7 @@ import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.xURI;
 import net.hudup.server.PowerServerConfig;
-import net.hudup.server.ext.DefaultServerExt;
+import net.hudup.server.ext.ExtendedServer;
 import net.hudup.server.external.ExternalServer;
 
 /**
@@ -73,7 +73,7 @@ public final class Server implements AccessPoint {
 
 		PowerServer server = null;
 		if (args.length == 0) {
-			server = DefaultServerExt.create();
+			server = ExtendedServer.create();
 		}
 		else {
 			String serverKind = args[0].trim().toLowerCase();
@@ -81,7 +81,7 @@ public final class Server implements AccessPoint {
 			if (serverKind.equals("-external"))
 				server = ExternalServer.create();
 			else
-				server = DefaultServerExt.create();
+				server = ExtendedServer.create();
 		}
 		
 		if (server == null)

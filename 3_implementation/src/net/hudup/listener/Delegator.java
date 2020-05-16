@@ -438,7 +438,7 @@ class DelegatorEvaluator extends EvaluatorWrapperExt {
 		
 		//Delegated evaluator may not use timer because of suppose that there are limited clients connecting to listeners
 		//when there can be many different listeners. It is complicated with timer.
-		this.timer = EvaluatorAbstract.createPurgeListenersTimer(listenerList);
+		this.purgeTimer = EvaluatorAbstract.createPurgeListenersTimer(listenerList);
 	}
 	
 	

@@ -186,7 +186,6 @@ public class SetupServerWizard extends JDialog {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				back();
 			}
 		});
@@ -197,7 +196,6 @@ public class SetupServerWizard extends JDialog {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				next();
 			}
 		});
@@ -209,7 +207,6 @@ public class SetupServerWizard extends JDialog {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				finished();
 			}
 		});
@@ -221,7 +218,6 @@ public class SetupServerWizard extends JDialog {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				cancel();
 			}
 		});
@@ -273,7 +269,6 @@ public class SetupServerWizard extends JDialog {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				boolean apply = paneConfig.apply();
 				if (!apply) {
 					JOptionPane.showMessageDialog(
@@ -299,7 +294,6 @@ public class SetupServerWizard extends JDialog {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 			
 				paneConfig.reset();
 				int confirm = JOptionPane.showConfirmDialog(
@@ -331,7 +325,6 @@ public class SetupServerWizard extends JDialog {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				
 				DataConfig configExt = DatasetUtil2.chooseServerConfig(getWizard(), config);
 				
@@ -391,7 +384,6 @@ public class SetupServerWizard extends JDialog {
 
 			@Override
 			public void clearData() {
-				// TODO Auto-generated method stub
 				JOptionPane.showMessageDialog(
 						getWizard(), 
 						"Not support this method", 
@@ -401,7 +393,6 @@ public class SetupServerWizard extends JDialog {
 
 			@Override
 			public void modify() {
-				// TODO Auto-generated method stub
 				Unit selected = getSelectedValue();
 				if (selected == null)
 					return;
@@ -436,7 +427,6 @@ public class SetupServerWizard extends JDialog {
 
 			@Override
 			public void drop() {
-				// TODO Auto-generated method stub
 				super.drop();
 				clearSelection();
 				attTable.clear();
@@ -450,7 +440,6 @@ public class SetupServerWizard extends JDialog {
 			
 			@Override
 			public void valueChanged(ListSelectionEvent e) {
-				// TODO Auto-generated method stub
 			
 				Unit unit = unitList.getSelectedValue();
 				if (unit == null) {
@@ -472,7 +461,6 @@ public class SetupServerWizard extends JDialog {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				
 				if (unitList.getUnitList().getMainList().size() > 0) {
 					int confirm = JOptionPane.showConfirmDialog(
@@ -526,7 +514,6 @@ public class SetupServerWizard extends JDialog {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				
 				if (unitList.getUnitList().size() == 0) {
 					JOptionPane.showMessageDialog(
@@ -559,7 +546,6 @@ public class SetupServerWizard extends JDialog {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				
 				boolean result = createModifyUnit(null);
 				unitList.connectUpdate(config);
@@ -653,7 +639,6 @@ public class SetupServerWizard extends JDialog {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				userTable.apply();
 				itemTable.apply();
 				flag.set(true);
@@ -667,7 +652,6 @@ public class SetupServerWizard extends JDialog {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				createAttDlg.dispose();
 			}
 		});
@@ -753,7 +737,6 @@ public class SetupServerWizard extends JDialog {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				String unitName = txtUnitName.getText().trim();
 				if (unitName.isEmpty()) {
 					JOptionPane.showMessageDialog(
@@ -796,7 +779,6 @@ public class SetupServerWizard extends JDialog {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				createDlg.dispose();
 			}
 		});
@@ -848,14 +830,12 @@ public class SetupServerWizard extends JDialog {
 
 			@Override
 			public void clearData() {
-				// TODO Auto-generated method stub
 				super.clearData();
 				unitTable.clear();
 			}
 
 			@Override
 			public void modify() {
-				// TODO Auto-generated method stub
 				JOptionPane.showMessageDialog(
 						getWizard(), 
 						"Not support this method", 
@@ -865,7 +845,6 @@ public class SetupServerWizard extends JDialog {
 
 			@Override
 			public void drop() {
-				// TODO Auto-generated method stub
 				JOptionPane.showMessageDialog(
 						getWizard(), 
 						"Not support this method", 
@@ -880,7 +859,6 @@ public class SetupServerWizard extends JDialog {
 			
 			@Override
 			public void valueChanged(ListSelectionEvent e) {
-				// TODO Auto-generated method stub
 			
 				Unit unit = unitList.getSelectedValue();
 				if (unit == null) {
@@ -909,7 +887,6 @@ public class SetupServerWizard extends JDialog {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				DataConfig srcConfig = DatasetUtil2.chooseConfig(getWizard(), null);
 				
 				if (srcConfig == null) {

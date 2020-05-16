@@ -379,8 +379,8 @@ public class EvaluatorCP extends JFrame implements EvaluatorListener {
 			try {
 				if (connectInfo.account != null)
 					evaluators = ((ServiceExt)service).getEvaluators(connectInfo.account.getName(), connectInfo.account.getPassword());
-				else if (service instanceof DefaultServiceExt)
-					evaluators = ((DefaultServiceExt)service).getEvaluators();
+				else if (service instanceof ExtendedService)
+					evaluators = ((ExtendedService)service).getEvaluators();
 				else
 					evaluators = Util.newList();
 			}
@@ -509,8 +509,8 @@ public class EvaluatorCP extends JFrame implements EvaluatorListener {
         	EvaluatorItem item = new EvaluatorItem(evaluator);
         	cmbEvaluators.addItem(item);
         	
-        	if (service != null && service instanceof DefaultServiceExt)
-        		item.guiData = ((DefaultServiceExt)service).getEvaluateGUIData(evaluator);
+        	if (service != null && service instanceof ExtendedService)
+        		item.guiData = ((ExtendedService)service).getEvaluateGUIData(evaluator);
         	
         	if (item.getName().equals(evaluatorName + "-" + reproducedVersion))
         		selectedItem = item;
@@ -597,8 +597,8 @@ public class EvaluatorCP extends JFrame implements EvaluatorListener {
         	
 			if (connectInfo.account != null)
 				evaluator = ((ServiceExt)service).getEvaluator(evaluatorName, connectInfo.account.getName(), connectInfo.account.getPassword(), versionName.toString());
-			else if (service instanceof DefaultServiceExt)
-				evaluator = ((DefaultServiceExt)service).getEvaluator(evaluatorName, versionName.toString());
+			else if (service instanceof ExtendedService)
+				evaluator = ((ExtendedService)service).getEvaluator(evaluatorName, versionName.toString());
 			else
 				evaluator = null;
         	
@@ -659,8 +659,8 @@ public class EvaluatorCP extends JFrame implements EvaluatorListener {
             
 			if (connectInfo.account != null)
 				ret = ((ServiceExt)service).removeEvaluator(evaluatorName, connectInfo.account.getName(), connectInfo.account.getPassword(), versionName);
-			else if (service instanceof DefaultServiceExt)
-				ret = ((DefaultServiceExt)service).removeEvaluator(evaluatorName, versionName);
+			else if (service instanceof ExtendedService)
+				ret = ((ExtendedService)service).removeEvaluator(evaluatorName, versionName);
 			else
 				ret = false;
 			

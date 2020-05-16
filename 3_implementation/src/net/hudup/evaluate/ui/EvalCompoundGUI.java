@@ -589,6 +589,7 @@ public class EvalCompoundGUI extends JFrame {
 				for (Evaluator ev : evList) {
 					if (ev != evaluator) {
 						try {
+							ev.getConfig().setSaveAbility(false);
 							ev.close();
 						} catch (Exception e1) {LogUtil.trace(e1);}
 					}
@@ -621,6 +622,7 @@ public class EvalCompoundGUI extends JFrame {
 				
 				for (Evaluator ev : evList) {
 					try {
+						ev.getConfig().setSaveAbility(false);
 						ev.close();
 					} catch (Exception e1) {LogUtil.trace(e1);}
 				}
@@ -693,6 +695,7 @@ public class EvalCompoundGUI extends JFrame {
 				
 				for (Evaluator ev : evList) {
 					try {
+						ev.getConfig().setSaveAbility(false);
 						ev.close();
 					} catch (Exception e1) {LogUtil.trace(e1);}
 				}
@@ -858,6 +861,7 @@ public class EvalCompoundGUI extends JFrame {
 				for (Evaluator ev : evList) {
 					if (ev != evaluator) {
 						try {
+							ev.getConfig().setSaveAbility(false);
 							ev.close();
 						} catch (Exception e1) {LogUtil.trace(e1);}
 					}

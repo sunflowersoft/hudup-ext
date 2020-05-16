@@ -61,7 +61,6 @@ public class ExternalServerCP extends PowerServerCP {
 	 */
 	public ExternalServerCP(PowerServer server, xURI bindUri) {
 		super(server, bindUri);
-		// TODO Auto-generated constructor stub
 	}
 
 	
@@ -71,7 +70,6 @@ public class ExternalServerCP extends PowerServerCP {
 	 */
 	public ExternalServerCP(PowerServer server) {
 		super(server);
-		// TODO Auto-generated constructor stub
 	}
 
 	
@@ -101,7 +99,6 @@ public class ExternalServerCP extends PowerServerCP {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				applyConfig();
 			}
 		});
@@ -112,7 +109,6 @@ public class ExternalServerCP extends PowerServerCP {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				resetConfig();
 			}
 		});
@@ -124,7 +120,6 @@ public class ExternalServerCP extends PowerServerCP {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				loadStore();
 			}
 		});
@@ -136,7 +131,6 @@ public class ExternalServerCP extends PowerServerCP {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				externalConfig();
 			}
 		});
@@ -154,13 +148,11 @@ public class ExternalServerCP extends PowerServerCP {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				try {
 					updateControls();
 				} 
-				catch (RemoteException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
+				catch (RemoteException ex) {
+					LogUtil.trace(ex);
 				}
 			}
 		});
@@ -171,7 +163,6 @@ public class ExternalServerCP extends PowerServerCP {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				setupServer();
 			}
 		});
@@ -182,7 +173,6 @@ public class ExternalServerCP extends PowerServerCP {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				exit();
 			}
 		});
@@ -197,7 +187,6 @@ public class ExternalServerCP extends PowerServerCP {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				start();
 			}
 		});
@@ -208,7 +197,6 @@ public class ExternalServerCP extends PowerServerCP {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				pauseResume();
 			}
 		});
@@ -219,7 +207,6 @@ public class ExternalServerCP extends PowerServerCP {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				stop();
 			}
 		});
@@ -320,7 +307,6 @@ public class ExternalServerCP extends PowerServerCP {
 			
 		} 
 		catch (RemoteException e) {
-			// TODO Auto-generated catch block
 			LogUtil.trace(e);
 		}
 		

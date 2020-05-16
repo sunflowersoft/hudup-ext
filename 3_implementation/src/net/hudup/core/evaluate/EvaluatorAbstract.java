@@ -250,9 +250,9 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
     
     
     /**
-     * Internal timer.
+     * Timer to purging.
      */
-    protected Timer2 timer = null;
+    protected Timer2 purgeTimer = null;
     
     
 	/**
@@ -283,14 +283,14 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 		evTaskQueue = new CounterTaskQueue(otherResult);
 		evTaskQueue.setListenerList(listenerList); //Task queue uses the same listener list.
 		
-		timer = createPurgeListenersTimer(listenerList);
+		purgeTimer = createPurgeListenersTimer(listenerList);
 	}
 	
 	
 	@Override
 	public void stimulate() throws RemoteException {
-		if (timer != null && !timer.isStarted())
-			timer.start();
+		if (purgeTimer != null && !purgeTimer.isStarted())
+			purgeTimer.start();
 	}
 
 
@@ -1698,7 +1698,51 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 		return isAgent();
 	}
 
-
+	
+	/**
+	 * Getting purging timer.
+	 * @return purging timer.
+	 */
+	public Timer2 getPurgeTimer() {
+		return purgeTimer;
+	}
+	
+	
+	/**
+	 * Setting purging timer.
+	 * @param purgeTimer purging timer.
+	 */
+	public void setPurgeTimer(Timer2 purgeTimer) {
+		removePurgeTimer();
+		if (purgeTimer != null) {
+			this.purgeTimer = purgeTimer;
+			try {
+				stimulate();
+			} catch (Exception e) {LogUtil.trace(e);}
+		}
+	}
+	
+	
+	/**
+	 * Removing purging timer.
+	 */
+	public void removePurgeTimer() {
+		if (purgeTimer == null) return;
+		
+		purgeTimer.stop();
+		purgeTimer = null;
+	}
+	
+	
+	/**
+	 * Getting listener list.
+	 * @return listener list.
+	 */
+	public EventListenerList2 getListenerList() {
+		return listenerList;
+	}
+	
+	
 	@Override
 	public boolean ping() throws RemoteException {
 		return true;
@@ -1743,9 +1787,9 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 		catch (Throwable e) {LogUtil.trace(e);}
 
     	try {
-    		if (timer != null) {
-    			timer.stop();
-    			timer = null;
+    		if (purgeTimer != null) {
+    			purgeTimer.stop();
+    			purgeTimer = null;
     		}
     	}
 		catch (Throwable e) {LogUtil.trace(e);}
@@ -2158,7 +2202,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 
 	/**
 	 * Creating timer to purge listeners list.
-	 * @param listenerList purge listeners list.
+	 * @param listenerList purged listeners list.
 	 * @return timer to purge listeners list.
 	 */
 	public static Timer2 createPurgeListenersTimer(EventListenerList2 listenerList) {
@@ -2168,23 +2212,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 			
 			@Override
 			protected void task() {
-				synchronized (listenerList) {
-					listenerList.updateInfo();
-					
-					List<EventListener> listeners = listenerList.getListeners();
-					List<EventListener> tempListeners = Util.newList(listeners.size());
-					tempListeners.addAll(listeners);
-					for (EventListener listener : tempListeners) {
-						if (!listeners.contains(listener))
-							continue;
-						
-						ListenerInfo info = listenerList.getInfo(listener);
-						if (info != null && info.failedPingCount > 2) { //Removing clients that are unable to connect more than 2 times (more than 1 hour in average).
-							listenerList.remove(listener);
-							if (listeners.size() == 0) break;
-						}
-					}
-				}
+				purgeListeners(listenerList);
 			}
 			
 			@Override
@@ -2194,6 +2222,33 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 		timer.setPriority(Priority.min);
 		
 		return timer;
+	}
+	
+	
+	/**
+	 * Purging listeners list.
+	 * @param listenerList purged listeners list.
+	 */
+	public static void purgeListeners(EventListenerList2 listenerList) {
+		if (listenerList == null) return;
+		synchronized (listenerList) {
+			listenerList.updateInfo();
+			
+			List<EventListener> listeners = listenerList.getListeners();
+			List<EventListener> tempListeners = Util.newList(listeners.size());
+			tempListeners.addAll(listeners);
+			for (EventListener listener : tempListeners) {
+				if (!listeners.contains(listener))
+					continue;
+				
+				ListenerInfo info = listenerList.getInfo(listener);
+				if (info != null && info.failedPingCount > 2) { //Removing clients that are unable to connect more than 2 times (more than 1 hour in average).
+					listenerList.remove(listener);
+					if (listeners.size() == 0) break;
+				}
+			}
+		}
+		
 	}
 	
 	

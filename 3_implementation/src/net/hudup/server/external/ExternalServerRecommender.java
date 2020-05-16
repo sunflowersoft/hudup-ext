@@ -48,7 +48,6 @@ public class ExternalServerRecommender extends CompositeRecommenderAbstract {
 	 */
 	public ExternalServerRecommender() {
 		super();
-		// TODO Auto-generated constructor stub
 		
 		Recommender recommender = new GreenFallCF();
 		setInnerRecommenders(new AlgList(recommender));
@@ -57,7 +56,6 @@ public class ExternalServerRecommender extends CompositeRecommenderAbstract {
 	
 	@Override
 	public void setup(Dataset dataset, Object...params) throws RemoteException {
-		// TODO Auto-generated method stub
 		super.setup(dataset, params);
 		
 		initFilters();
@@ -66,7 +64,6 @@ public class ExternalServerRecommender extends CompositeRecommenderAbstract {
 
 	@Override
 	public void unsetup() throws RemoteException {
-		// TODO Auto-generated method stub
 		super.unsetup();
 		filterList.clear();
 	}
@@ -92,7 +89,6 @@ public class ExternalServerRecommender extends CompositeRecommenderAbstract {
 			
 			@Override
 			public void prepare(RecommendParam param) {
-				// TODO Auto-generated method stub
 				if (param.extra == null || !(param.extra instanceof Number)) {
 					itemType = ((Number) param.extra).doubleValue();
 				}
@@ -104,7 +100,6 @@ public class ExternalServerRecommender extends CompositeRecommenderAbstract {
 			
 			@Override
 			public boolean filter(Dataset dataset, RecommendFilterParam param) {
-				// TODO Auto-generated method stub
 				if (!Util.isUsed(itemType) || itemType < 0)
 					return true;
 				
@@ -126,21 +121,18 @@ public class ExternalServerRecommender extends CompositeRecommenderAbstract {
 	
 	@Override
 	public RatingVector estimate(RecommendParam param, Set<Integer> queryIds) throws RemoteException {
-		// TODO Auto-generated method stub
 		return ((Recommender)getInnerRecommenders().get(0)).estimate(param, queryIds);
 	}
 
 	
 	@Override
 	public RatingVector recommend(RecommendParam param, int maxRecommend) throws RemoteException {
-		// TODO Auto-generated method stub
 		return ((Recommender)getInnerRecommenders().get(0)).recommend(param, maxRecommend);
 	}
 
 	
 	@Override
 	public Dataset getDataset() throws RemoteException {
-		// TODO Auto-generated method stub
 		AlgList innerRecommenders = getInnerRecommenders();
 		if (innerRecommenders.size() > 0)
 			return ((Recommender)getInnerRecommenders().get(0)).getDataset();
@@ -151,21 +143,18 @@ public class ExternalServerRecommender extends CompositeRecommenderAbstract {
 
 	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
 		return "external_recommender";
 	}
 
 	
 	@Override
 	public String getDescription() throws RemoteException {
-		// TODO Auto-generated method stub
 		return "Recommendation algorithm by calling other external algorithm";
 	}
 
 
 	@Override
 	public Alg newInstance() {
-		// TODO Auto-generated method stub
 		return new ExternalServerRecommender();
 	}
 

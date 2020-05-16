@@ -134,19 +134,7 @@ public class DefaultService implements Service, PluginChangedListener, AutoClose
 		boolean opened = true;
 		this.serverConfig = serverConfig;
 		try {
-			Dataset dataset = null;
-			if (!serverConfig.isDatasetEmpty()) {
-				dataset = serverConfig.getParser().parse((DataConfig)serverConfig.clone());
-			}
-			else {
-				dataset = new SnapshotImpl();
-				dataset.setConfig((DataConfig)serverConfig.clone());
-			}
-			dataset.setExclusive(true);
-			
-			recommender = (Recommender) serverConfig.getRecommender().newInstance();
-			recommender.getConfig().putAll(serverConfig.getRecommender().getConfig());
-			recommender.setup(dataset, params);
+			recommender = createRecommender(serverConfig, params);
 		}
 		catch (Throwable e) {
 			LogUtil.trace(e);
@@ -161,6 +149,40 @@ public class DefaultService implements Service, PluginChangedListener, AutoClose
 	
 	
 	/**
+	 * Creating recommender.
+	 * @param config specified configuration.
+	 * @param params specified parameters.
+	 * @return created recommender.
+	 * @throws Exception if any error raises.
+	 */
+	protected Recommender createRecommender(DataConfig config, Object... params) throws Exception {
+		if (config == null) return null;
+		PowerServerConfig serverConfig = config instanceof PowerServerConfig ? (PowerServerConfig)config : null;
+		Dataset dataset = null;
+		
+		Recommender recommender = null;
+		if (serverConfig == null) {
+			dataset = new SnapshotImpl();
+			dataset.setConfig((DataConfig)config.clone());
+		}
+		else if (serverConfig.isDatasetEmpty()) {
+			dataset = new SnapshotImpl();
+			dataset.setConfig((DataConfig)serverConfig.clone());
+		}
+		else {
+			dataset = serverConfig.getParser().parse((DataConfig)serverConfig.clone());
+		}
+		dataset.setExclusive(true);
+		
+		recommender = (Recommender) serverConfig.getRecommender().newInstance();
+		recommender.getConfig().putAll(serverConfig.getRecommender().getConfig());
+		recommender.setup(dataset, params);
+		
+		return recommender;
+	}
+	
+	
+	/**
 	 * Testing whether service is opened.
 	 * @return whether service is opened.
 	 */
@@ -171,13 +193,11 @@ public class DefaultService implements Service, PluginChangedListener, AutoClose
 	
 	@Override
 	public void close() {
-		// TODO Auto-generated method stub
 		if (recommender != null) {
 			try {
 				recommender.unsetup();
 			}
 			catch (Throwable e) {
-				// TODO Auto-generated catch block
 				LogUtil.trace(e);
 			}
 		}

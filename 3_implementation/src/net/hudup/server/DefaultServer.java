@@ -26,6 +26,7 @@ import javax.swing.JOptionPane;
 
 import net.hudup.core.PluginChangedEvent;
 import net.hudup.core.Util;
+import net.hudup.core.alg.Recommender;
 import net.hudup.core.client.ServerTrayIcon;
 import net.hudup.core.client.Service;
 import net.hudup.core.data.DataConfig;
@@ -131,12 +132,28 @@ public class DefaultServer extends PowerServerImpl {
 	@Override
 	protected void serverTasks() {
 		
-		// Task 1
+		// Task 1: Period learning.
 		if (config.isPeriodLearn()) { //This method is used to prevent time consuming to learn internal recommender.
 			if (!config.isDatasetEmpty()) {
-				DefaultService newService = createService();
-				newService.open(config); //This statement is important, which takes much time.
-				newService.transferTo(service);
+//				DefaultService newService = createService();
+//				newService.open(config); //This statement is important, which takes much time.
+//				newService.transferTo(service);
+				
+				Recommender recommender = null;
+				try {
+					recommender = service.createRecommender(config);
+				} catch (Exception e) {LogUtil.trace(e);}
+				
+				if (recommender != null) {
+					trans.lockWrite();
+					try {
+						if (service.recommender != null) service.recommender.unsetup();
+					} catch (Throwable e) {LogUtil.trace(e);}
+					service.recommender = recommender;
+					trans.unlockWrite();
+					
+					LogUtil.info("Server timer internal tasks: Learning recommendation algorithm is successful");
+				}
 			}
 		}
 	}
