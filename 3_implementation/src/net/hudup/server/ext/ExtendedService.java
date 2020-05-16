@@ -28,6 +28,7 @@ import net.hudup.core.evaluate.EvaluatorConfig;
 import net.hudup.core.evaluate.ui.EvaluateGUIData;
 import net.hudup.core.logistic.EventListenerList2;
 import net.hudup.core.logistic.LogUtil;
+import net.hudup.core.logistic.Timer2;
 import net.hudup.server.DefaultService;
 import net.hudup.server.PowerServerConfig;
 import net.hudup.server.Transaction;
@@ -67,6 +68,12 @@ public class ExtendedService extends DefaultService implements ServiceExt, Servi
 	
 	
 	/**
+	 * Internal timer.
+	 */
+	protected Timer2 timer = null;
+	
+	
+	/**
 	 * Constructor with specified transaction.
 	 * @param trans specified transaction.
 	 */
@@ -101,7 +108,7 @@ public class ExtendedService extends DefaultService implements ServiceExt, Servi
 				ev.setAgent(true);
 				ev.setReferredService(this);
 				ev.export(serverConfig.getServerPort());
-				if (Constants.SERVER_PURGE_LISTENERS && (ev instanceof EvaluatorAbstract))
+				if (ev instanceof EvaluatorAbstract)
 					((EvaluatorAbstract)ev).removePurgeTimer();
 				ev.stimulate();
 				
@@ -111,6 +118,24 @@ public class ExtendedService extends DefaultService implements ServiceExt, Servi
 			catch (Throwable e) {LogUtil.trace(e);}
 		}
 
+		if (timer != null) timer.stop();
+		timer = null;
+		if (!Constants.SERVER_PURGE_LISTENERS) {
+			timer = new Timer2(Constants.DEFAULT_SHORT_TIMEOUT, Constants.DEFAULT_LONG_TIMEOUT) {
+				
+				@Override
+				protected void task() {
+					purgeListeners();
+					LogUtil.info("Service timer internal tasks: Purging disconnected listeners is successful");
+				}
+				
+				@Override
+				protected void clear() {}
+			};
+			
+			timer.start();
+		}
+		
 		return opened;
 	}
 
@@ -139,7 +164,12 @@ public class ExtendedService extends DefaultService implements ServiceExt, Servi
 			pairReproducedMap.clear();
 		}
 		
-		if (guiDataMap != null) guiDataMap.clear(); 
+		if (guiDataMap != null) guiDataMap.clear();
+		
+		if (timer != null) {
+			timer.stop();
+			timer = null;
+		}
 	}
 
 	
@@ -324,7 +354,7 @@ public class ExtendedService extends DefaultService implements ServiceExt, Servi
 					reproducedEvaluator.setAgent(true);
 					reproducedEvaluator.setReferredService(this);
 					reproducedEvaluator.export(serverConfig.getServerPort());
-					if (Constants.SERVER_PURGE_LISTENERS && (reproducedEvaluator instanceof EvaluatorAbstract))
+					if (reproducedEvaluator instanceof EvaluatorAbstract)
 						((EvaluatorAbstract)reproducedEvaluator).removePurgeTimer();
 					reproducedEvaluator.stimulate();
 					

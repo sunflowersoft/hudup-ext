@@ -51,7 +51,7 @@ public abstract class Timer2 extends AbstractRunner {
 	
 	@Override
 	public void run() {
-		if (delay > 0) {
+		if (thread != null && delay > 0) {
 			synchronized (this) {
 				try {
 					wait(delay);

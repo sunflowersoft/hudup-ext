@@ -129,7 +129,7 @@ public class ExtendedServer extends DefaultServer {
 		super.serverTasks();
 		
 		//Task 1: Purging disconnected listeners.
-		if ((service != null) && (service instanceof ExtendedService)) {
+		if (Constants.SERVER_PURGE_LISTENERS && (service != null) && (service instanceof ExtendedService)) {
 			((ExtendedService)service).purgeListeners();
 			LogUtil.info("Server timer internal tasks: Purging disconnected listeners is successful");
 		}
