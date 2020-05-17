@@ -5,36 +5,19 @@
  * Email: ng_phloc@yahoo.com
  * Phone: +84-975250362
  */
-package net.hudup.core.data.ext;
+package net.hudup.core.data;
 
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import net.hudup.core.Util;
-import net.hudup.core.data.Attribute;
-import net.hudup.core.data.AttributeList;
-import net.hudup.core.data.DataConfig;
-import net.hudup.core.data.DataDriver;
+import net.hudup.core.data.Attribute.Type;
 import net.hudup.core.data.DataDriver.DataType;
-import net.hudup.core.data.ExternalRecord;
-import net.hudup.core.data.Fetcher;
-import net.hudup.core.data.FetcherUtil;
-import net.hudup.core.data.InterchangeAttributeMap;
-import net.hudup.core.data.InternalRecord;
-import net.hudup.core.data.ItemRating;
-import net.hudup.core.data.MemProfiles;
-import net.hudup.core.data.Profile;
-import net.hudup.core.data.ProviderAssoc;
 import net.hudup.core.data.ProviderAssoc.CsvReader;
-import net.hudup.core.data.ProviderImpl;
-import net.hudup.core.data.Rating;
-import net.hudup.core.data.RatingMulti;
-import net.hudup.core.data.RatingVector;
-import net.hudup.core.data.SnapshotImpl;
-import net.hudup.core.data.UserRating;
 import net.hudup.core.data.ctx.Context;
 import net.hudup.core.data.ctx.ContextTemplate;
 import net.hudup.core.data.ctx.ContextTemplateSchema;
@@ -62,8 +45,128 @@ public class SnapshotImplExt extends SnapshotImpl {
 	 * Default constructor.
 	 */
 	public SnapshotImplExt() {
-		// TODO Auto-generated constructor stub
 		super();
+	}
+
+	
+	/**
+	 * Creating snapshot by triples of ratings.
+	 * @param tripleList specified triples of ratings.
+	 * @param datasetMetadata dataset meta-data.
+	 * @return snapshot created from triples of ratings.
+	 */
+	public static SnapshotImplExt create(Collection<RatingTriple> tripleList, DatasetMetadata datasetMetadata) {
+		
+		SnapshotImplExt snapshot = new SnapshotImplExt();
+		DataConfig config = new DataConfig();
+		config.setMetadata(datasetMetadata);
+		snapshot.setConfig(config);
+		
+		for (RatingTriple triple : tripleList) {
+			int userId = triple.userId();
+			int itemId = triple.itemId();
+			Rating rating = triple.getRating();
+			if (rating == null) continue;
+
+			RatingVector userRating = null;
+			if (snapshot.userRatingMap.containsKey(userId))
+				userRating = snapshot.userRatingMap.get(userId);
+			else {
+				userRating = new UserRating(userId);
+				snapshot.userRatingMap.put(userId, userRating);
+			}
+			
+			RatingMulti mrating = null;
+			if (rating instanceof RatingMulti)
+				mrating = (RatingMulti)rating;
+			else if (userRating.contains(itemId)) {
+				mrating = (RatingMulti)userRating.get(itemId);
+				mrating.addRating(rating);
+			}
+			else
+				mrating = new RatingMulti(rating);
+
+			userRating.put(itemId, mrating);
+
+			RatingVector itemRating = null;
+			if (snapshot.itemRatingMap.containsKey(itemId))
+				itemRating = snapshot.itemRatingMap.get(itemId);
+			else {
+				itemRating = new ItemRating(itemId);
+				snapshot.itemRatingMap.put(itemId, itemRating);
+			}
+			itemRating.put(userId, mrating);
+		}
+		
+		snapshot.userProfiles = MemProfiles.createEmpty(DataConfig.USERID_FIELD, Type.integer);
+		((MemProfiles)snapshot.userProfiles).fillUnion(snapshot.userRatingMap.keySet(), DataConfig.USERID_FIELD);
+		
+		snapshot.itemProfiles = MemProfiles.createEmpty(DataConfig.ITEMID_FIELD, Type.integer);
+		((MemProfiles)snapshot.itemProfiles).fillUnion(snapshot.itemRatingMap.keySet(), DataConfig.ITEMID_FIELD);
+
+		snapshot.enhance();
+		return snapshot;
+	}
+
+	
+	/**
+	 * Creating snapshot by specified rating matrix.
+	 * @param matrix specified rating matrix.
+	 * @param userMatrix if true the, the specified rating matrix is user rating matrix.
+	 * @return snapshot created from rating matrix.
+	 */
+	public static SnapshotImplExt create(RatingMatrix matrix, boolean userMatrix) {
+		SnapshotImplExt snapshot = new SnapshotImplExt();
+		DataConfig config = new DataConfig();
+		config.setMetadata(matrix.metadata.to());
+		snapshot.setConfig(config);
+
+		List<Integer> userIdList = userMatrix ?  matrix.rowIdList : matrix.columnIdList;
+		List<Integer> itemIdList = userMatrix ?  matrix.columnIdList : matrix.rowIdList;
+		
+		int m = userIdList.size();
+		int n = itemIdList.size();
+		for (int i = 0; i < m; i++) {
+			for (int j = 0; j < n; j++) {
+				double ratingValue = userMatrix ? matrix.matrix[i][j] : matrix.matrix[j][i];
+				if (!Util.isUsed(ratingValue))
+					continue;
+				
+				int userId = userIdList.get(i);
+				int itemId = itemIdList.get(j);
+				RatingMulti mrating = new RatingMulti(ratingValue);
+				
+				RatingVector userRating = null;
+				if (snapshot.userRatingMap.containsKey(userId))
+					userRating = snapshot.userRatingMap.get(userId);
+				else {
+					userRating = new UserRating(userId);
+					snapshot.userRatingMap.put(userId, userRating);
+				}
+				userRating.put(itemId, mrating);
+
+				RatingVector itemRating = null;
+				if (snapshot.itemRatingMap.containsKey(itemId))
+					itemRating = snapshot.itemRatingMap.get(itemId);
+				else {
+					itemRating = new ItemRating(itemId);
+					snapshot.itemRatingMap.put(itemId, itemRating);
+				}
+				itemRating.put(userId, mrating);
+				
+			} // end for column
+			
+		} // end for row
+		
+		
+		snapshot.userProfiles = MemProfiles.createEmpty(DataConfig.USERID_FIELD, Type.integer);
+		((MemProfiles)snapshot.userProfiles).fillUnion(snapshot.userRatingMap.keySet(), DataConfig.USERID_FIELD);
+		
+		snapshot.itemProfiles = MemProfiles.createEmpty(DataConfig.ITEMID_FIELD, Type.integer);
+		((MemProfiles)snapshot.itemProfiles).fillUnion(snapshot.itemRatingMap.keySet(), DataConfig.ITEMID_FIELD);
+		
+		snapshot.enhance();
+		return snapshot;
 	}
 
 	
@@ -218,7 +321,6 @@ public class SnapshotImplExt extends SnapshotImpl {
 	 * @return dyadic snapshot from file.
 	 */
 	private static SnapshotImplExt fileCreate(DataConfig config) {
-		// TODO Auto-generated method stub
 		
 		ProviderImpl provider = new ProviderImpl(config);
 		ProviderAssoc assoc = Util.getFactory().createProviderAssoc(config);

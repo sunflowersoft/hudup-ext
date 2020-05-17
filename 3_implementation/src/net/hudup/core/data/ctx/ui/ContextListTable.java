@@ -88,7 +88,6 @@ public class ContextListTable extends JTable {
 
 			@Override
 			public void keyPressed(KeyEvent e) {
-				// TODO Auto-generated method stub
 				if (!getContextListTM().enabled)
 					return;
 				
@@ -122,7 +121,6 @@ public class ContextListTable extends JTable {
 	
 	@Override
 	public void setEnabled(boolean enabled) {
-		// TODO Auto-generated method stub
 		super.setEnabled(enabled);
 		
 		getContextListTM().setEnabled(enabled);
@@ -351,7 +349,6 @@ public class ContextListTable extends JTable {
 
 				@Override
 				public int compare(ContextTemplate template1, ContextTemplate template2) {
-					// TODO Auto-generated method stub
 					return template1.getName().compareTo(template2.getName());
 				}
 				
@@ -558,7 +555,6 @@ class ContextListTM extends DefaultTableModel {
 	
 	@Override
 	public boolean isCellEditable(int row, int column) {
-		// TODO Auto-generated method stub
 		return (enabled);
 	}
 

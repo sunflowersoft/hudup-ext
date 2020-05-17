@@ -119,21 +119,18 @@ public class ProviderImpl implements Provider {
 	
 	@Override
 	public CTSManager getCTSManager() {
-		// TODO Auto-generated method stub
 		return ctsManager;
 	}
 
 	
 	@Override
 	public DataConfig getConfig() {
-		// TODO Auto-generated method stub
 		return assoc.getConfig();
 	}
 
 	
 	@Override
 	public ProviderAssoc getAssoc() {
-		// TODO Auto-generated method stub
 		return assoc;
 	}
 
@@ -184,7 +181,6 @@ public class ProviderImpl implements Provider {
 	 * @return whether contains rating of user id and item id
 	 */
 	protected boolean containsRating(int userId, int itemId) {
-		// TODO Auto-generated method stub
 		
 		Profile profile = new Profile(assoc.getAttributes(getConfig().getRatingUnit()));
 		profile.setValue(DataConfig.USERID_FIELD, userId);
@@ -276,7 +272,6 @@ public class ProviderImpl implements Provider {
 	
 	@Override
 	public Profile getConfigProfile(String cfgAttribute) {
-		// TODO Auto-generated method stub
 		Profile profile = new Profile(assoc.getAttributes(getConfig().getConfigUnit()));
 		profile.setValue(DataConfig.ATTRIBUTE_FIELD, cfgAttribute);
 		
@@ -286,14 +281,12 @@ public class ProviderImpl implements Provider {
 	
 	@Override
 	public boolean insertConfigProfile(Profile cfgProfile) {
-		// TODO Auto-generated method stub
 		return assoc.insertProfile(getConfig().getConfigUnit(), cfgProfile);
 	}
 
 	
 	@Override
 	public boolean updateConfigProfile(Profile cfgProfile) {
-		// TODO Auto-generated method stub
 		Object idValue = cfgProfile.getIdValue();
 		String att = (idValue == null ? null : idValue.toString());
 		
@@ -306,7 +299,6 @@ public class ProviderImpl implements Provider {
 	
 	@Override
 	public boolean deleteConfigProfile(String cfgAttribute) {
-		// TODO Auto-generated method stub
 		Profile profile = new Profile(assoc.getAttributes(getConfig().getConfigUnit()));
 		profile.setValue(DataConfig.ATTRIBUTE_FIELD, cfgAttribute);
 		
@@ -328,7 +320,6 @@ public class ProviderImpl implements Provider {
 
 			@Override
 			public RatingTriple create(Profile u) {
-				// TODO Auto-generated method stub
 				if (u == null)
 					return null;
 				
@@ -446,7 +437,6 @@ public class ProviderImpl implements Provider {
 	
 	@Override
 	public boolean insertRating(int userId, int itemId, Rating rating) {
-		// TODO Auto-generated method stub
 		if (rating instanceof RatingMulti) {
 			boolean result = true;
 			RatingMulti mrating = (RatingMulti)rating;
@@ -482,7 +472,6 @@ public class ProviderImpl implements Provider {
 
 	@Override
 	public boolean insertRating(RatingVector vRating) {
-		// TODO Auto-generated method stub
 		boolean result = true;
 
 		Set<Integer> fieldIds = vRating.fieldIds(true);
@@ -500,7 +489,6 @@ public class ProviderImpl implements Provider {
 
 	@Override
 	public boolean updateRating(int userId, int itemId, Rating rating) {
-		// TODO Auto-generated method stub
 		if (rating instanceof RatingMulti) {
 			boolean result = true;
 			RatingMulti mrating = (RatingMulti)rating;
@@ -549,7 +537,6 @@ public class ProviderImpl implements Provider {
 	
 	@Override
 	public boolean updateRating(RatingVector vRating) {
-		// TODO Auto-generated method stub
 		Set<Integer> fieldIds = vRating.fieldIds(true);
 		boolean result = true;
 		
@@ -582,7 +569,6 @@ public class ProviderImpl implements Provider {
 	
 	@Override
 	public boolean deleteRating(RatingVector vRating) {
-		// TODO Auto-generated method stub
 		int id = vRating.id();
 		
 		Set<Integer> fieldIds = vRating.fieldIds();
@@ -601,7 +587,6 @@ public class ProviderImpl implements Provider {
 	
 	@Override
 	public RatingVector getUserRatingVector(int userId) {
-		// TODO Auto-generated method stub
 		
 		RatingVector user = new UserRating(userId);
 		
@@ -653,7 +638,6 @@ public class ProviderImpl implements Provider {
 	
 	@Override
 	public boolean deleteUserRating(int userId) {
-		// TODO Auto-generated method stub
 		Profile profile = new Profile(assoc.getAttributes(getConfig().getRatingUnit()));
 		profile.setValue(DataConfig.USERID_FIELD, userId);
 		
@@ -663,7 +647,6 @@ public class ProviderImpl implements Provider {
 	
 	@Override
 	public Profile getUserProfile(int userId) {
-		// TODO Auto-generated method stub
 		Profile profile = new Profile(assoc.getAttributes(getConfig().getUserUnit()));
 		profile.setValue(DataConfig.USERID_FIELD, userId);
 		
@@ -673,7 +656,6 @@ public class ProviderImpl implements Provider {
 	
 	@Override
 	public AttributeList getUserAttributes() {
-		// TODO Auto-generated method stub
 		return assoc.getAttributes(getConfig().getUserUnit());
 	}
 
@@ -688,7 +670,6 @@ public class ProviderImpl implements Provider {
 	
 	@Override
 	public boolean insertUserProfile(Profile user, ExternalRecord externalRecord) {
-		// TODO Auto-generated method stub
 		int userId = user.getIdValueAsInt();
 		Attribute userIdAtt = user.getIdAtt();
 		
@@ -727,7 +708,6 @@ public class ProviderImpl implements Provider {
 	
 	@Override
 	public boolean updateUserProfile(Profile user) {
-		// TODO Auto-generated method stub
 		if (containsUserProfile(user.getIdValueAsInt()))
 			return assoc.updateProfile(getConfig().getUserUnit(), user);
 		else
@@ -737,7 +717,6 @@ public class ProviderImpl implements Provider {
 
 	@Override
 	public boolean deleteUserProfile(int userId) {
-		// TODO Auto-generated method stub
 		Profile profile = new Profile(assoc.getAttributes(getConfig().getUserUnit()));
 		profile.setValue(DataConfig.USERID_FIELD, userId);
 		
@@ -747,7 +726,6 @@ public class ProviderImpl implements Provider {
 	
 	@Override
 	public RecommendParam getRecommendParam(int userId) {
-		// TODO Auto-generated method stub
 		RatingVector vRating = getUserRatingVector(userId);
 		Profile profile = getUserProfile(userId);
 		
@@ -757,7 +735,6 @@ public class ProviderImpl implements Provider {
 	
 	@Override
 	public RatingVector getItemRatingVector(int itemId) {
-		// TODO Auto-generated method stub
 		RatingVector item = new ItemRating(itemId);
 		
 		Profile select = new Profile(assoc.getAttributes(getConfig().getRatingUnit()));
@@ -808,7 +785,6 @@ public class ProviderImpl implements Provider {
 	
 	@Override
 	public boolean deleteItemRating(int itemId) {
-		// TODO Auto-generated method stub
 		Profile profile = new Profile(assoc.getAttributes(getConfig().getRatingUnit()));
 		profile.setValue(DataConfig.ITEMID_FIELD, itemId);
 		
@@ -818,7 +794,6 @@ public class ProviderImpl implements Provider {
 	
 	@Override
 	public Profile getItemProfile(int itemId) {
-		// TODO Auto-generated method stub
 		Profile profile = new Profile(assoc.getAttributes(getConfig().getItemUnit()));
 		profile.setValue(DataConfig.ITEMID_FIELD, itemId);
 		
@@ -828,7 +803,6 @@ public class ProviderImpl implements Provider {
 	
 	@Override
 	public AttributeList getItemAttributes() {
-		// TODO Auto-generated method stub
 		return assoc.getAttributes(getConfig().getItemUnit());
 	}
 
@@ -843,7 +817,6 @@ public class ProviderImpl implements Provider {
 	
 	@Override
 	public boolean insertItemProfile(Profile item, ExternalRecord externalRecord) {
-		// TODO Auto-generated method stub
 		int itemId = item.getIdValueAsInt();
 		Attribute itemIdAtt = item.getIdAtt();
 
@@ -882,7 +855,6 @@ public class ProviderImpl implements Provider {
 	
 	@Override
 	public boolean updateItemProfile(Profile item) {
-		// TODO Auto-generated method stub
 		if (containsItemProfile(item.getIdValueAsInt()))
 			return assoc.updateProfile(getConfig().getItemUnit(), item);
 		else
@@ -892,7 +864,6 @@ public class ProviderImpl implements Provider {
 	
 	@Override
 	public boolean deleteItemProfile(int itemId) {
-		// TODO Auto-generated method stub
 		Profile profile = new Profile(assoc.getAttributes(getConfig().getItemUnit()));
 		profile.setValue(DataConfig.ITEMID_FIELD, itemId);
 		
@@ -902,7 +873,6 @@ public class ProviderImpl implements Provider {
 	
 	@Override
 	public NominalList getNominalList(String unitName, String attribute) {
-		// TODO Auto-generated method stub
 		return assoc.getNominalList(unitName, attribute);
 	}
 
@@ -910,7 +880,6 @@ public class ProviderImpl implements Provider {
 	@Override
 	public boolean insertNominal(String unitName, String attName,
 			Nominal nominal) {
-		// TODO Auto-generated method stub
 		Profile profile = new Profile(assoc.getAttributes(getConfig().getNominalUnit()));
 		profile.setValue(DataConfig.NOMINAL_REF_UNIT_FIELD, unitName);
 		profile.setValue(DataConfig.ATTRIBUTE_FIELD, attName);
@@ -925,7 +894,6 @@ public class ProviderImpl implements Provider {
 	@Override
 	public boolean updateNominal(String unitName, String attName,
 			Nominal nominal) {
-		// TODO Auto-generated method stub
 		Profile profile = new Profile(assoc.getAttributes(getConfig().getNominalUnit()));
 		profile.setValue(DataConfig.NOMINAL_REF_UNIT_FIELD, unitName);
 		profile.setValue(DataConfig.ATTRIBUTE_FIELD, attName);
@@ -942,7 +910,6 @@ public class ProviderImpl implements Provider {
 	
 	@Override
 	public boolean deleteNominal(String unitName, String attName) {
-		// TODO Auto-generated method stub
 		Profile profile = new Profile(assoc.getAttributes(getConfig().getNominalUnit()));
 		profile.setValue(DataConfig.NOMINAL_REF_UNIT_FIELD, unitName);
 		profile.setValue(DataConfig.ATTRIBUTE_FIELD, attName);
@@ -953,7 +920,6 @@ public class ProviderImpl implements Provider {
 	
 	@Override
 	public boolean deleteNominal(String unitName) {
-		// TODO Auto-generated method stub
 		Profile profile = new Profile(assoc.getAttributes(getConfig().getNominalUnit()));
 		profile.setValue(DataConfig.NOMINAL_REF_UNIT_FIELD, unitName);
 		
@@ -963,7 +929,6 @@ public class ProviderImpl implements Provider {
 	
 	@Override
 	public InterchangeAttributeMap getAttributeMap(InternalRecord internalRecord) {
-		// TODO Auto-generated method stub
 		if (!internalRecord.isValid())
 			return null;
 		
@@ -998,7 +963,6 @@ public class ProviderImpl implements Provider {
 	@Override
 	public InterchangeAttributeMap getAttributeMapByExternal(
 			ExternalRecord externalRecord) {
-		// TODO Auto-generated method stub
 		if (!externalRecord.isValid())
 			return null;
 		
@@ -1074,7 +1038,6 @@ public class ProviderImpl implements Provider {
 	
 	@Override
 	public boolean updateAttributeMap(InterchangeAttributeMap attributeMap) {
-		// TODO Auto-generated method stub
 		if (!attributeMap.isValid())
 			return false;
 		
@@ -1099,7 +1062,6 @@ public class ProviderImpl implements Provider {
 	
 	@Override
 	public boolean deleteAttributeMap(InternalRecord internalRecord) {
-		// TODO Auto-generated method stub
 		if (!internalRecord.isValid())
 			return false;
 		
@@ -1116,7 +1078,6 @@ public class ProviderImpl implements Provider {
 	
 	@Override
 	public boolean deleteAttributeMap(String internalUnit) {
-		// TODO Auto-generated method stub
 		if (internalUnit == null || internalUnit.isEmpty())
 			return false;
 		
@@ -1130,7 +1091,6 @@ public class ProviderImpl implements Provider {
 	
 	@Override
 	public Profile getAccount(String accName) {
-		// TODO Auto-generated method stub
 		Profile profile = new Profile(assoc.getAttributes(getConfig().getAccountUnit()));
 		profile.setValue(DataConfig.ACCOUNT_NAME_FIELD, accName);
 		
@@ -1141,7 +1101,6 @@ public class ProviderImpl implements Provider {
 	@Override
 	public boolean validateAccount(String account, String password,
 			int privileges) {
-		// TODO Auto-generated method stub
 		
 		Profile profile = getAccount(account);
 		if (profile == null)
@@ -1171,7 +1130,6 @@ public class ProviderImpl implements Provider {
 	
 	@Override
 	public boolean updateAccount(Profile acc) {
-		// TODO Auto-generated method stub
 		if (containsAccount(acc.getValueAsString(DataConfig.ACCOUNT_NAME_FIELD)))
 			return assoc.updateProfile(getConfig().getAccountUnit(), acc);
 		else
@@ -1181,7 +1139,6 @@ public class ProviderImpl implements Provider {
 	
 	@Override
 	public boolean deleteAccount(String accName) {
-		// TODO Auto-generated method stub
 		Profile profile = new Profile(assoc.getAttributes(getConfig().getAccountUnit()));
 		profile.setValue(DataConfig.ACCOUNT_NAME_FIELD, accName);
 		
@@ -1191,98 +1148,84 @@ public class ProviderImpl implements Provider {
 	
 	@Override
 	public Profile getProfile(String profileUnit, Profile condition) {
-		// TODO Auto-generated method stub
 		return assoc.getProfile(profileUnit, condition);
 	}
 
 	
 	@Override
 	public Fetcher<Profile> getProfiles(String profileUnit, Profile condition) {
-		// TODO Auto-generated method stub
 		return assoc.getProfiles(profileUnit, condition);
 	}
 
 
 	@Override
 	public Fetcher<Profile> getProfiles(ParamSql selectSql, Profile condition) {
-		// TODO Auto-generated method stub
 		return assoc.getProfiles(selectSql, condition);
 	}
 
 
 	@Override
 	public Fetcher<Integer> getProfileIds(String profileUnit) {
-		// TODO Auto-generated method stub
 		return assoc.getProfileIds(profileUnit);
 	}
 
 
 	@Override
 	public int getProfileMaxId(String profileUnit) {
-		// TODO Auto-generated method stub
 		return assoc.getProfileMaxId(profileUnit);
 	}
 
 	
 	@Override
 	public AttributeList getProfileAttributes(String profileUnit) {
-		// TODO Auto-generated method stub
 		return assoc.getAttributes(profileUnit);
 	}
 
 	
 	@Override
 	public AttributeList getProfileAttributes(ParamSql selectSql, Profile condition) {
-		// TODO Auto-generated method stub
 		return assoc.getAttributes(selectSql, condition);
 	}
 
 
 	@Override
 	public boolean insertProfile(String profileUnit, Profile profile) {
-		// TODO Auto-generated method stub
 		return assoc.insertProfile(profileUnit, profile);
 	}
 
 	
 	@Override
 	public boolean updateProfile(String profileUnit, Profile profile) {
-		// TODO Auto-generated method stub
 		return assoc.updateProfile(profileUnit, profile);
 	}
 
 	
 	@Override
 	public boolean deleteProfile(String profileUnit, Profile condition) {
-		// TODO Auto-generated method stub
 		return assoc.deleteProfile(profileUnit, condition);
 	}
 
 	
 	@Override
 	public UnitList getUnitList() {
-		// TODO Auto-generated method stub
 		return assoc.getUnitList();
 	}
 
 	
 	@Override
 	public boolean createUnit(String unitName, AttributeList attList) {
-		// TODO Auto-generated method stub
 		return assoc.createUnit(unitName, attList);
 	}
 
 	
 	@Override
 	public boolean deleteUnitData(String unitName) {
-		// TODO Auto-generated method stub
 		return assoc.deleteUnitData(unitName);
 	}
 
 	
 	@Override
 	public boolean dropUnit(String unitName) {
-		// TODO Auto-generated method stub
 		return assoc.dropUnit(unitName);
 	}
 
@@ -1290,7 +1233,6 @@ public class ProviderImpl implements Provider {
 	@Override
 	public boolean createSchema(AttributeList userAttList,
 			AttributeList itemAttList) {
-		// TODO Auto-generated method stub
 		dropSchema();
 		boolean result = true;
 		
@@ -1397,7 +1339,6 @@ public class ProviderImpl implements Provider {
 	
 	@Override
 	public boolean dropSchema() {
-		// TODO Auto-generated method stub
 		boolean result = true;
 		UnitList tblList = getUnitList();
 		
@@ -1450,7 +1391,6 @@ public class ProviderImpl implements Provider {
 	@Override
 	public boolean importData(Provider src, boolean create,
 			ProgressListener registeredListener) {
-		// TODO Auto-generated method stub
 		
 		int progressTotal = 7;
 		int progressStep = 0;
@@ -1532,7 +1472,6 @@ public class ProviderImpl implements Provider {
 				configs.close();
 			} 
 			catch (Throwable e) {
-				// TODO Auto-generated catch block
 				LogUtil.trace(e);
 			}
 		}
@@ -1573,7 +1512,6 @@ public class ProviderImpl implements Provider {
 				users.close();
 			} 
 			catch (Throwable e) {
-				// TODO Auto-generated catch block
 				LogUtil.trace(e);
 			}
 		}
@@ -1643,7 +1581,6 @@ public class ProviderImpl implements Provider {
 				items.close();
 			} 
 			catch (Throwable e) {
-				// TODO Auto-generated catch block
 				LogUtil.trace(e);
 			}
 		}
@@ -1709,7 +1646,6 @@ public class ProviderImpl implements Provider {
 				triples.close();
 			} 
 			catch (Throwable e) {
-				// TODO Auto-generated catch block
 				LogUtil.trace(e);
 			}
 		}
@@ -1761,7 +1697,6 @@ public class ProviderImpl implements Provider {
 				sampleProfiles.close();
 			} 
 			catch (Throwable e) {
-				// TODO Auto-generated catch block
 				LogUtil.trace(e);
 			}
 		}
@@ -1780,7 +1715,6 @@ public class ProviderImpl implements Provider {
 	@Override
 	public boolean importData(Dataset src, boolean create,
 			ProgressListener registeredListener) {
-		// TODO Auto-generated method stub
 		
 		if (src instanceof Pointer)
 			return importData(new ProviderImpl(src.getConfig()), create, registeredListener);
@@ -1907,7 +1841,6 @@ public class ProviderImpl implements Provider {
 				users.close();
 			} 
 			catch (Throwable e) {
-				// TODO Auto-generated catch block
 				LogUtil.trace(e);
 			}
 		}
@@ -1983,7 +1916,6 @@ public class ProviderImpl implements Provider {
 				items.close();
 			} 
 			catch (Throwable e) {
-				// TODO Auto-generated catch block
 				LogUtil.trace(e);
 			}
 		}
@@ -2053,7 +1985,6 @@ public class ProviderImpl implements Provider {
 				ratings.close();
 			} 
 			catch (Throwable e) {
-				// TODO Auto-generated catch block
 				LogUtil.trace(e);
 			}
 		}
@@ -2105,7 +2036,6 @@ public class ProviderImpl implements Provider {
 				sampleProfiles.close();
 			} 
 			catch (Throwable e) {
-				// TODO Auto-generated catch block
 				LogUtil.trace(e);
 			}
 		}
@@ -2124,7 +2054,6 @@ public class ProviderImpl implements Provider {
 	@Override
 	public boolean importData(DataConfig src, boolean create,
 			ProgressListener registeredListener) {
-		// TODO Auto-generated method stub
 		
 		DatasetParser parser = src.getParser();
 		if ( (parser == null) || 
@@ -2149,7 +2078,6 @@ public class ProviderImpl implements Provider {
 
 	@Override
 	public void close() {
-		// TODO Auto-generated method stub
 		
 		try {
 			if (ctsManager != null)
@@ -2158,7 +2086,6 @@ public class ProviderImpl implements Provider {
 			ctsManager = null;
 		} 
 		catch (Throwable e) {
-			// TODO Auto-generated catch block
 			LogUtil.trace(e);
 		}
 		
@@ -2169,7 +2096,6 @@ public class ProviderImpl implements Provider {
 			assoc = null;
 		} 
 		catch (Throwable e) {
-			// TODO Auto-generated catch block
 			LogUtil.trace(e);
 		}
 
@@ -2178,7 +2104,6 @@ public class ProviderImpl implements Provider {
 
 	@Override
 	public Object clone() {
-		// TODO Auto-generated method stub
 		DataConfig config = (DataConfig)getConfig().clone();
 		
 		return new ProviderImpl(config);
@@ -2187,7 +2112,6 @@ public class ProviderImpl implements Provider {
 
 	@Override
 	protected void finalize() throws Throwable {
-		// TODO Auto-generated method stub
 		super.finalize();
 		
 		try {

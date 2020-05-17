@@ -5,18 +5,9 @@
  * Email: ng_phloc@yahoo.com
  * Phone: +84-975250362
  */
-package net.hudup.core.data.ext;
+package net.hudup.core.data;
 
 import net.hudup.core.Util;
-import net.hudup.core.data.DataConfig;
-import net.hudup.core.data.Fetcher;
-import net.hudup.core.data.ItemRating;
-import net.hudup.core.data.Profile;
-import net.hudup.core.data.ProviderImpl;
-import net.hudup.core.data.Rating;
-import net.hudup.core.data.RatingMulti;
-import net.hudup.core.data.RatingVector;
-import net.hudup.core.data.UserRating;
 import net.hudup.core.data.ctx.ContextList;
 import net.hudup.core.logistic.LogUtil;
 
@@ -42,13 +33,11 @@ public class ProviderImplExt extends ProviderImpl {
 	 */
 	public ProviderImplExt(DataConfig config) {
 		super(config);
-		// TODO Auto-generated constructor stub
 	}
 
 
 	@Override
 	public RatingVector getUserRatingVector(int userId) {
-		// TODO Auto-generated method stub
 		
 		RatingVector user = new UserRating(userId);
 		
@@ -109,7 +98,6 @@ public class ProviderImplExt extends ProviderImpl {
 
 	@Override
 	public RatingVector getItemRatingVector(int itemId) {
-		// TODO Auto-generated method stub
 		RatingVector item = new ItemRating(itemId);
 		
 		Profile select = new Profile(assoc.getAttributes(getConfig().getRatingUnit()));

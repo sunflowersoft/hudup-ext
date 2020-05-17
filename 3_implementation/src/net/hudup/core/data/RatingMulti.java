@@ -53,7 +53,6 @@ public class RatingMulti extends Rating {
 	 */
 	public RatingMulti(double ratingValue) {
 		this(new Rating(ratingValue));
-		// TODO Auto-generated constructor stub
 	}
 	
 	
@@ -62,9 +61,6 @@ public class RatingMulti extends Rating {
 	 * @param rating specified rating.
 	 */
 	public RatingMulti(Rating rating) {
-//		if (!(history instanceof Serializable))
-//			throw new RuntimeException("List is not serializable");
-		
 		addRating(rating);
 	}
 	
@@ -145,7 +141,6 @@ public class RatingMulti extends Rating {
 	
 	@Override
 	public List<Rating> getRatingList() {
-		// TODO Auto-generated method stub
 		if (history.size() > 0)
 			return history;
 		else
@@ -180,7 +175,6 @@ public class RatingMulti extends Rating {
 
 	@Override
 	public void assign(Rating that) {
-		// TODO Auto-generated method stub
 		if (that instanceof RatingMulti) {
 			this.history = ((RatingMulti)that).history;
 		}

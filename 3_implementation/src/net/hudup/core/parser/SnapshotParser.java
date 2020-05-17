@@ -42,20 +42,17 @@ public abstract class SnapshotParser extends DatasetParserAbstract {
 	 */
 	public SnapshotParser() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
 
 	@Override
 	public DataConfig createDefaultConfig() {
-		// TODO Auto-generated method stub
 		return new DataConfig();
 	}
 
 	
 	@Override
 	public boolean support(DataDriver driver) throws RemoteException {
-		// TODO Auto-generated method stub
 		return !driver.isHudupServer();
 	}
 

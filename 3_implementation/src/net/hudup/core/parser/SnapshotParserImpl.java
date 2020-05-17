@@ -35,13 +35,11 @@ public class SnapshotParserImpl extends SnapshotParser {
 	 */
 	public SnapshotParserImpl() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
 
 	@Override
 	public Dataset parse(DataConfig config) throws RemoteException {
-		// TODO Auto-generated method stub
 		
 		config.setParser(this);
 		return SnapshotImpl.create(config);
@@ -50,21 +48,18 @@ public class SnapshotParserImpl extends SnapshotParser {
 	
 	@Override
 	public Alg newInstance() {
-		// TODO Auto-generated method stub
 		return new SnapshotParserImpl();
 	}
 	
 	
 	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
 		return "snapshot_parser";
 	}
 
 	
 	@Override
 	public String getDescription() throws RemoteException {
-		// TODO Auto-generated method stub
 		return "Snapshot parser";
 	}
 

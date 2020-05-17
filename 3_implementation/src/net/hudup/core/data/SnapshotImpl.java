@@ -126,7 +126,6 @@ public class SnapshotImpl extends Snapshot {
 	
 	@Override
 	public int getUserId(Serializable externalUserId) {
-		// TODO Auto-generated method stub
 		Set<Integer> userIds = externalUserRecordMap.keySet();
 		for (int userId : userIds) {
 			ExternalRecord record = getUserExternalRecord(userId);
@@ -140,7 +139,6 @@ public class SnapshotImpl extends Snapshot {
 
 	@Override
 	public ExternalRecord getUserExternalRecord(int userId) {
-		// TODO Auto-generated method stub
 		return externalUserRecordMap.get(userId);
 	}
 
@@ -153,7 +151,6 @@ public class SnapshotImpl extends Snapshot {
 	
 	@Override
 	public int getItemId(Serializable externalItemId) {
-		// TODO Auto-generated method stub
 		Set<Integer> itemIds = externalItemRecordMap.keySet();
 		for (int itemId : itemIds) {
 			ExternalRecord record = getItemExternalRecord(itemId);
@@ -167,7 +164,6 @@ public class SnapshotImpl extends Snapshot {
 	
 	@Override
 	public ExternalRecord getItemExternalRecord(int itemId) {
-		// TODO Auto-generated method stub
 		return externalItemRecordMap.get(itemId);
 	}
 
@@ -286,35 +282,30 @@ public class SnapshotImpl extends Snapshot {
 	
 	@Override
 	public Profile profileOf(Context context) {
-		// TODO Auto-generated method stub
 		return ctsProfiles.profileOf(context);
 	}
 
 
 	@Override
 	public Profiles profilesOf(int ctxTemplateId) {
-		// TODO Auto-generated method stub
 		return ctsProfiles.get(ctxTemplateId);
 	}
 
 
 	@Override
 	public ContextTemplateSchema getCTSchema() {
-		// TODO Auto-generated method stub
 		return ctSchema;
 	}
 
 
 	@Override
 	public Fetcher<Profile> fetchSample() {
-		// TODO Auto-generated method stub
 		return new MemFetcher<Profile>(sampleProfiles);
 	}
 
 
 	@Override
 	public Object clone() {
-		// TODO Auto-generated method stub
 		
 		SnapshotImpl snapshot = new SnapshotImpl();
 		
@@ -437,7 +428,6 @@ public class SnapshotImpl extends Snapshot {
 	
 	@Override
 	public Dataset selectByContexts(ContextList contexts) {
-		// TODO Auto-generated method stub
 		
 		Map<Integer, RatingVector> newUserRatingMap = RatingVector.select(userRatingMap, contexts);
 		Set<Integer> newUserIds = newUserRatingMap.keySet();
@@ -483,7 +473,6 @@ public class SnapshotImpl extends Snapshot {
 
 	@Override
 	public CTSMultiProfiles getCTSMultiProfiles() {
-		// TODO Auto-generated method stub
 		return ctsProfiles;
 	}
 
@@ -510,7 +499,7 @@ public class SnapshotImpl extends Snapshot {
 	 * Creating snapshot by triples of ratings.
 	 * @param tripleList specified triples of ratings.
 	 * @param datasetMetadata dataset meta-data.
-	 * @return {@link SnapshotImpl} created from triples of ratings.
+	 * @return snapshot created from triples of ratings.
 	 */
 	public static SnapshotImpl create(Collection<RatingTriple> tripleList, DatasetMetadata datasetMetadata) {
 		
@@ -557,7 +546,7 @@ public class SnapshotImpl extends Snapshot {
 	 * Creating snapshot by specified rating matrix.
 	 * @param matrix specified rating matrix.
 	 * @param userMatrix if true the, the specified rating matrix is user rating matrix.
-	 * @return {@link SnapshotImpl} created from rating matrix.
+	 * @return snapshot created from rating matrix.
 	 */
 	public static SnapshotImpl create(RatingMatrix matrix, boolean userMatrix) {
 		SnapshotImpl snapshot = new SnapshotImpl();
@@ -765,7 +754,6 @@ public class SnapshotImpl extends Snapshot {
 	 * @return {@link SnapshotImpl} from file.
 	 */
 	private static SnapshotImpl fileCreate(DataConfig config) {
-		// TODO Auto-generated method stub
 		
 		ProviderImpl provider = new ProviderImpl(config);
 		ProviderAssoc assoc = Util.getFactory().createProviderAssoc(config);

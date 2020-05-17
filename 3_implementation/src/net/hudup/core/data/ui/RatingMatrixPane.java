@@ -30,8 +30,10 @@ import javax.swing.text.NumberFormatter;
 import net.hudup.core.Constants;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.Rating;
+import net.hudup.core.data.RatingMulti;
 import net.hudup.core.data.ctx.ContextTemplateSchema;
 import net.hudup.core.data.ctx.ui.ContextListTable;
+import net.hudup.core.logistic.ui.MovingToolbar;
 
 /**
  * This is the panel to show rating matrix.
@@ -50,9 +52,65 @@ public class RatingMatrixPane extends JPanel {
 
 	
 	/**
+	 * This class represents a selected rating on rating matrix.
+	 * @author Loc Nguyen
+	 * @version 1.0
+	 */
+	protected class SelectedRating {
+		
+		/**
+		 * Selected rating.
+		 */
+		public Rating rating = null;
+		
+		/**
+		 * Selected rating index.
+		 */
+		public int index = -1;
+		
+		/**
+		 * Default constructor.
+		 */
+		public SelectedRating() {
+			
+		}
+		
+		/**
+		 * Constructor with selected rating and index.
+		 * @param rating selected rating.
+		 * @param index selected index.
+		 */
+		public SelectedRating(Rating rating, int index) {
+			this.rating = rating;
+			this.index = index;
+		}
+		
+		/**
+		 * Checking whether this selected rating is valid.
+		 * @return whether this selected rating is valid.
+		 */
+		public boolean isValid() {
+			if (rating == null || index < 0)
+				return false;
+			else if (rating instanceof RatingMulti)
+				return index < ((RatingMulti)rating).size();
+			else
+				return index == 0;
+		}
+		
+	}
+	
+	
+	/**
 	 * Internal dataset.
 	 */
 	protected Dataset dataset = null;
+	
+	
+	/**
+	 * Selected rating.
+	 */
+	protected SelectedRating selectedRating = null;
 	
 	
 	/**
@@ -65,6 +123,12 @@ public class RatingMatrixPane extends JPanel {
 	 * Rating panel.
 	 */
 	protected RatingPane paneRating = null;
+	
+	
+	/**
+	 * Moving tool bar.
+	 */
+	protected MovingToolbar tbMove = null;
 	
 	
 	/**
@@ -84,7 +148,6 @@ public class RatingMatrixPane extends JPanel {
 
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				// TODO Auto-generated method stub
 				viewCell();
 			}
 			
@@ -97,6 +160,104 @@ public class RatingMatrixPane extends JPanel {
 		add(footer, BorderLayout.SOUTH);
 		paneRating = new RatingPane(dataset.getCTSchema());
 		footer.add(paneRating, BorderLayout.CENTER);
+		
+		tbMove = new MovingToolbar() {
+			
+			/**
+			 * Serial version UID for serializable class. 
+			 */
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void update() {
+				if (selectedRating == null || !selectedRating.isValid() || !(selectedRating.rating instanceof RatingMulti) ) {
+					setVisible(false);
+					return;
+				}
+				
+				RatingMulti mrating = (RatingMulti)selectedRating.rating;
+				if (mrating.size() <= 1) {
+					setVisible(false);
+					return;
+				}
+				
+				setVisible(true);
+				enableButtons(false);
+				info.setText("" + (selectedRating.index+1) + "/" + mrating.size());
+				paneRating.set(mrating.get(selectedRating.index));
+				
+				if (selectedRating.index == 0) {
+					next.setEnabled(true);
+					last.setEnabled(true);
+				}
+				else if (selectedRating.index == mrating.size() - 1) {
+					first.setEnabled(true);
+					previous.setEnabled(true);
+				}
+				else {
+					first.setEnabled(true);
+					previous.setEnabled(true);
+					next.setEnabled(true);
+					last.setEnabled(true);
+				}
+			}
+
+			@Override
+			public void moveFirst() {
+				if (selectedRating == null || !selectedRating.isValid() || !(selectedRating.rating instanceof RatingMulti) )
+					return;
+				RatingMulti mrating = (RatingMulti)selectedRating.rating;
+				if (mrating.size() <= 1) return;
+
+				if (selectedRating.index > 0) {
+					selectedRating.index = 0;
+					update();
+				}
+			}
+
+			@Override
+			public void movePrevious() {
+				if (selectedRating == null || !selectedRating.isValid() || !(selectedRating.rating instanceof RatingMulti) )
+					return;
+				RatingMulti mrating = (RatingMulti)selectedRating.rating;
+				if (mrating.size() <= 1) return;
+
+				if (selectedRating.index > 0) {
+					selectedRating.index --;
+					update();
+				}
+			}
+
+			@Override
+			public void moveNext() {
+				if (selectedRating == null || !selectedRating.isValid() || !(selectedRating.rating instanceof RatingMulti) )
+					return;
+				RatingMulti mrating = (RatingMulti)selectedRating.rating;
+				if (mrating.size() <= 1) return;
+
+				if (selectedRating.index < mrating.size() - 1) {
+					selectedRating.index ++;
+					update();
+				}
+			}
+
+			@Override
+			public void moveLast() {
+				if (selectedRating == null || !selectedRating.isValid() || !(selectedRating.rating instanceof RatingMulti) )
+					return;
+				RatingMulti mrating = (RatingMulti)selectedRating.rating;
+				if (mrating.size() <= 1) return;
+
+				if (selectedRating.index < mrating.size() - 1) {
+					selectedRating.index = mrating.size() - 1;
+					update();
+				}
+			}
+
+		};
+		footer.add(tbMove, BorderLayout.SOUTH);
+		tbMove.setFloatable(false);
+		tbMove.update();
 	}
 	
 	
@@ -104,7 +265,9 @@ public class RatingMatrixPane extends JPanel {
 	 * Viewing cell.
 	 */
 	protected void viewCell() {
+		selectedRating = null;
 		paneRating.clear();
+		tbMove.update();
 		
 		int rowIndex = tblRatingValue.getSelectedRow();
 		int colIndex = tblRatingValue.getSelectedColumn();
@@ -138,8 +301,20 @@ public class RatingMatrixPane extends JPanel {
 			return;
 
 		Rating rating = dataset.getRating(rowIdFound, colIdFound);
-		if (rating != null)
-			paneRating.set(rating);
+		if (rating == null)
+			return;
+		else if (rating instanceof RatingMulti) {
+			RatingMulti mrating = (RatingMulti)rating;
+			if (mrating.size() == 0)
+				selectedRating = null;
+			else
+				selectedRating = new SelectedRating(mrating, mrating.size() -  1);
+		}
+		else
+			selectedRating = new SelectedRating(rating, 0);
+		
+		paneRating.set(rating);
+		tbMove.update();
 	}
 	
 	
@@ -244,7 +419,6 @@ class RatingPane extends JPanel {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				boolean apply = apply();
 				if (apply) {
 					JOptionPane.showMessageDialog(
@@ -266,7 +440,6 @@ class RatingPane extends JPanel {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				set(rating);
 			}
 		});

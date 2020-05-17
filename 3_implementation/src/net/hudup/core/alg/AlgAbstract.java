@@ -99,7 +99,7 @@ public abstract class AlgAbstract implements Alg, AlgRemote {
 		}
 		
 		synchronized (this) {
-			learnStarted = true;
+			learnStarted = false;
 			learnPaused = false;
 			
 			notifyAll();
@@ -340,6 +340,15 @@ public abstract class AlgAbstract implements Alg, AlgRemote {
 	@Override
 	public boolean ping() throws RemoteException {
 		return true;
+	}
+
+
+	@Override
+	public Alg newInstance() {
+		try {
+			return getClass().getDeclaredConstructor().newInstance();
+		} catch (Exception e) {LogUtil.trace(e);}
+		return null;
 	}
 
 
