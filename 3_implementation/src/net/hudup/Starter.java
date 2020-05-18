@@ -42,7 +42,6 @@ public class Starter {
 	 * @param args The argument parameter of main method. It contains command line arguments.
 	 */
 	public static void main(final String[] args) {
-		// TODO Auto-generated method stub
 		List<AccessPoint> apList = Util.getPluginManager().loadInstances(AccessPoint.class);
 		
 		if (apList.size() == 0) {
@@ -58,7 +57,6 @@ public class Starter {
 
 			@Override
 			public int compare(AccessPoint o1, AccessPoint o2) {
-				// TODO Auto-generated method stub
 				return o1.getName().compareTo(o2.getName());
 			}
 		});
@@ -80,7 +78,6 @@ public class Starter {
 
 			@Override
 			protected void start() {
-				// TODO Auto-generated method stub
 				AccessPoint ap = (AccessPoint) getItemControl().getSelectedItem();
 				dispose();
 				ap.run(args);
@@ -88,13 +85,11 @@ public class Starter {
 			
 			@Override
 			protected JComboBox<?> createItemControl() {
-				// TODO Auto-generated method stub
 				return new JComboBox<AccessPoint>(apList.toArray(new AccessPoint[0]));
 			}
 			
 			@Override
 			protected TextArea createHelp() {
-				// TODO Auto-generated method stub
 				TooltipTextArea tooltip = new TooltipTextArea();
 				tooltip.setEditable(false);
 				return tooltip;

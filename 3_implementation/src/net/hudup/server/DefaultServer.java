@@ -84,8 +84,10 @@ public class DefaultServer extends PowerServerImpl {
 		
 		service = createService();
 		
-		if (!createSysTray())
-			showCP();
+		if (!config.isNonUI()) {
+			if (!createSysTray())
+				showCP();
+		}
 	}
 
 

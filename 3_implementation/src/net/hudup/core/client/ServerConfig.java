@@ -57,11 +57,22 @@ public class ServerConfig extends SysConfig {
 
 	
 	/**
+	 * Field of no-UI.
+	 */
+	public final static String NON_UI_FIELD = "non_ui";
+
+	
+	/**
+	 * Default value of no-UI field.
+	 */
+	public final static boolean NON_UI_DEFAULT = false;
+
+	
+	/**
 	 * Default constructor.
 	 */
 	public ServerConfig() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
 
@@ -71,13 +82,11 @@ public class ServerConfig extends SysConfig {
 	 */
 	public ServerConfig(xURI uri) {
 		super(uri);
-		// TODO Auto-generated constructor stub
 	}
 
 	
 	@Override
 	public void reset() {
-		// TODO Auto-generated method stub
 		super.reset();
 		
 		setServerPort(Constants.DEFAULT_SERVER_PORT);
@@ -85,6 +94,9 @@ public class ServerConfig extends SysConfig {
 		setServerTasksPeriod(Constants.DEFAULT_SERVER_TASKS_PERIOD);
 		
 		setSocketControlPort(Constants.DEFAULT_SOCKET_CONTROL_PORT);
+		
+		setNonUI(NON_UI_DEFAULT);
+		
 		addReadOnly(SOCKET_CONTROL_PORT_FIELD);
 	}
 
@@ -165,6 +177,24 @@ public class ServerConfig extends SysConfig {
 	}
 
 
+	/**
+	 * Setting flag to indicate non-UI mode.
+	 * @param flag flag to indicate non-UI mode.
+	 */
+	public void setNonUI(boolean flag) {
+		put(NON_UI_FIELD, flag);
+	}
+	
+	
+	/**
+	 * Getting flag to indicate non-UI mode.
+	 * @return flag to indicate non-UI mode.
+	 */
+	public boolean isNonUI() {
+		return getAsBoolean(NON_UI_FIELD);
+	}
+
+	
 	@Override
 	public Object clone() {
 		ServerConfig cfg = new ServerConfig();

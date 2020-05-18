@@ -95,7 +95,6 @@ public class Listener extends SocketServer implements ServerStatusListener, Gate
 	 */
 	public Listener(ListenerConfig config) {
 		super(config);
-		// TODO Auto-generated constructor stub
 		
 		try {
 			int port = NetUtil.getPort(config.getExportPort(), Constants.TRY_RANDOM_PORT);
@@ -108,11 +107,12 @@ public class Listener extends SocketServer implements ServerStatusListener, Gate
 			
 			Naming.rebind(getGatewayBindUri().toString(), this);
 			
-			if (!createSysTray())
-				showCP();
+			if (!config.isNonUI()) {
+				if (!createSysTray())
+					showCP();
+			}
 		}
 		catch (Throwable e) {
-			// TODO Auto-generated catch block
 			LogUtil.trace(e);
 			LogUtil.error("Listener/Balancer (socket server) failed to be constructed in constructor method, caused by " + e.getMessage());
 			System.exit(0);
@@ -141,7 +141,6 @@ public class Listener extends SocketServer implements ServerStatusListener, Gate
 					LogUtil.error("Listener/Balancer (socket server) failed to bind remote server");
 			} 
 			catch (Throwable e) {
-				// TODO Auto-generated catch block
 				LogUtil.trace(e);
 				LogUtil.error("Listener/Balancer (socket server) failed to bind remote server, caused by " + e.getMessage());
 			}
@@ -153,7 +152,6 @@ public class Listener extends SocketServer implements ServerStatusListener, Gate
 	
 	@Override
 	public synchronized boolean start() {
-		// TODO Auto-generated method stub
 		if (isStarted()) return false;
 		
 		super.start();
@@ -167,7 +165,6 @@ public class Listener extends SocketServer implements ServerStatusListener, Gate
 	
 	@Override
 	public synchronized boolean stop() {
-		// TODO Auto-generated method stub
 		if (!isStarted()) return false;
 		
 		super.stop();
@@ -182,7 +179,6 @@ public class Listener extends SocketServer implements ServerStatusListener, Gate
 	
 	@Override
 	protected synchronized void shutdown() throws RemoteException {
-		// TODO Auto-generated method stub
 		if (config == null)
 			return;
 
@@ -222,7 +218,6 @@ public class Listener extends SocketServer implements ServerStatusListener, Gate
 	
 	@Override
 	protected AbstractDelegator delegate(Socket socket) {
-		// TODO Auto-generated method stub
 		return new Delegator(getBindServer(), socket, this);
 	}
 
@@ -250,7 +245,6 @@ public class Listener extends SocketServer implements ServerStatusListener, Gate
 	
 	@Override
 	public synchronized void statusChanged(ServerStatusEvent evt) throws RemoteException {
-		// TODO Auto-generated method stub
 		switch(evt.getStatus()) {
 		case started:
 			break;
@@ -277,7 +271,6 @@ public class Listener extends SocketServer implements ServerStatusListener, Gate
 
 	@Override
 	public boolean validateAccount(String account, String password, int privileges) {
-		// TODO Auto-generated method stub
 		boolean validated = true;
 		
 		PowerServer bindServer = getBindServer();
@@ -317,7 +310,6 @@ public class Listener extends SocketServer implements ServerStatusListener, Gate
 
 	@Override
 	public boolean validateAdminAccount(String account, String password) {
-		// TODO Auto-generated method stub
 		boolean validated = true;
 		
 		PowerServer bindServer = getBindServer();
@@ -372,7 +364,6 @@ public class Listener extends SocketServer implements ServerStatusListener, Gate
 	@Override
 	public Server getRemoteServer(String account, String password)
 			throws RemoteException {
-		// TODO Auto-generated method stub
 		if (config == null)
 			return null;
 		else
@@ -383,7 +374,6 @@ public class Listener extends SocketServer implements ServerStatusListener, Gate
 	@Override
 	public Service getRemoteService(String account, String password)
 			throws RemoteException {
-		// TODO Auto-generated method stub
 		return null;
 	}
 	
@@ -405,7 +395,6 @@ public class Listener extends SocketServer implements ServerStatusListener, Gate
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					// TODO Auto-generated method stub
 					showCP();
 				}
 			});
@@ -418,12 +407,10 @@ public class Listener extends SocketServer implements ServerStatusListener, Gate
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					// TODO Auto-generated method stub
 					try {
 						new HelpContent(null);
 					} 
 					catch (Throwable ex) {
-						// TODO Auto-generated catch block
 						ex.printStackTrace();
 					}
 				}
@@ -436,12 +423,10 @@ public class Listener extends SocketServer implements ServerStatusListener, Gate
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					// TODO Auto-generated method stub
 					try {
 						exit();
 					} 
 					catch (RemoteException re) {
-						// TODO Auto-generated catch block
 						LogUtil.trace(re);
 					}
 				}
@@ -460,7 +445,6 @@ public class Listener extends SocketServer implements ServerStatusListener, Gate
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					// TODO Auto-generated method stub
 					showCP();
 				}
 			});

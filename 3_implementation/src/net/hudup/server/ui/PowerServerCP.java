@@ -15,8 +15,6 @@ import java.awt.Image;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -212,15 +210,6 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 			setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 			setSize(600, 400);
 			setLocationRelativeTo(null);
-			addWindowListener(new WindowAdapter() {
-	
-				@Override
-				public void windowClosed(WindowEvent e) {
-					super.windowClosed(e);
-					close();
-				}
-				
-			});
 			
 	        Image image = UIUtil.getImage("server-32x32.png");
 	        if (image != null)
@@ -271,7 +260,7 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 			result = server.addStatusListener(this);
 		}
 		else {
-			btnExitServer.setVisible(false);
+			//btnExitServer.setVisible(false);
 			
 			try {
 				registry = LocateRegistry.createRegistry(bindUri.getPort());
@@ -747,11 +736,19 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 	 * Exiting remote server.
 	 */
 	protected void exit() {
-		if (bindUri != null)
-			return;
 		
 		try {
-			server.exit();
+			if (bindUri != null) {
+				server.removeStatusListener(this);
+				try {
+					server.exit();
+				} catch (Exception e) {}
+				
+				server = null;
+				dispose();
+			}
+			else
+				server.exit();
 		} 
 		catch (Exception e) {
 			LogUtil.trace(e);
@@ -1022,10 +1019,8 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 			paneConfig.update(server.getConfig());
 		}
 		else if (state == Status.exit) {
-			if (bindUri != null) {
-				server = null;
-				dispose();
-			}
+			server = null;
+			dispose();
 		}
 	}
 	
@@ -1066,7 +1061,7 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 	/**
 	 * Close this control panel.
 	 */
-	private void close() {
+	public void dispose() {
 		
 		try {
 			if (server != null)
@@ -1100,6 +1095,8 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 		bindUri = null;
 		registry = null;
 		provider = null;
+		
+		super.dispose();
 	}
 	
 	

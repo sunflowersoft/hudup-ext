@@ -61,7 +61,6 @@ public class Balancer extends Listener {
 	 */
 	public Balancer(BalancerConfig config) {
 		super(config);
-		// TODO Auto-generated constructor stub
 	}
 
 	
@@ -80,7 +79,6 @@ public class Balancer extends Listener {
 					LogUtil.error("Listener/Balancer (socket server) failed to bind list of remote servers");
 			} 
 			catch (Throwable e) {
-				// TODO Auto-generated catch block
 				LogUtil.trace(e);
 				LogUtil.error("Listener/Balancer (socket server) failed to bind list of remote servers, caused by " + e.getMessage());
 			}
@@ -91,7 +89,6 @@ public class Balancer extends Listener {
 	
 	@Override
 	protected PowerServer getBindServer() {
-		// TODO Auto-generated method stub
 		synchronized (bindServerList) {
 			BindServer bindServer = bindServerList.getIdleServer();
 			if (bindServer != null)
@@ -104,7 +101,6 @@ public class Balancer extends Listener {
 
 	@Override
 	protected void showCP() {
-		// TODO Auto-generated method stub
 		try {
 			new BalancerCP(this);
 		}
@@ -122,7 +118,6 @@ public class Balancer extends Listener {
 
 	@Override
 	protected boolean createSysTray() {
-		// TODO Auto-generated method stub
 		if (!SystemTray.isSupported())
 			return false;
 		
@@ -134,7 +129,6 @@ public class Balancer extends Listener {
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					// TODO Auto-generated method stub
 					showCP();
 				}
 			});
@@ -147,12 +141,10 @@ public class Balancer extends Listener {
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					// TODO Auto-generated method stub
 					try {
 						new HelpContent(null);
 					} 
 					catch (Throwable ex) {
-						// TODO Auto-generated catch block
 						ex.printStackTrace();
 					}
 				}
@@ -164,12 +156,10 @@ public class Balancer extends Listener {
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					// TODO Auto-generated method stub
 					try {
 						exit();
 					} 
 					catch (RemoteException re) {
-						// TODO Auto-generated catch block
 						LogUtil.trace(re);
 					}
 				}
@@ -188,7 +178,6 @@ public class Balancer extends Listener {
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					// TODO Auto-generated method stub
 					showCP();
 				}
 			});

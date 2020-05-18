@@ -46,7 +46,6 @@ public final class Server implements AccessPoint {
 	 * @param args The argument parameter of main method. It contains command line arguments.
 	 */
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
 		
 		new Server().run(args);
 	}
@@ -54,7 +53,6 @@ public final class Server implements AccessPoint {
 	
 	@Override
 	public void run(String[] args) {
-		// TODO Auto-generated method stub
 		Util.getPluginManager().fire();
 		
 		//Not important.
@@ -91,7 +89,6 @@ public final class Server implements AccessPoint {
 			server.start();
 		} 
 		catch (RemoteException e) {
-			// TODO Auto-generated catch block
 			LogUtil.trace(e);
 		}
 		
@@ -101,17 +98,14 @@ public final class Server implements AccessPoint {
 
 	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
 		return "Server";
 	}
 
 
 	@Override
 	public String toString() {
-		// TODO Auto-generated method stub
 		return getName();
 	}
 
-	
 	
 }

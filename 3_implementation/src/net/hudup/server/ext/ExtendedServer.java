@@ -159,31 +159,39 @@ public class ExtendedServer extends DefaultServer {
 	@Override
 	protected PopupMenu createSysTrayMenuExt() {
 		
-        PopupMenu popup = new PopupMenu();
-
-        MenuItem evItem = new MenuItem(I18nUtil.message("evaluator"));
-        evItem.addActionListener(new ActionListener() {
+		try {
 			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				try {
-					showEvaluatorCP();
+	        PopupMenu popup = new PopupMenu();
+	
+	        MenuItem evItem = new MenuItem(I18nUtil.message("evaluator"));
+	        evItem.addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					try {
+						showEvaluatorCP();
+					}
+					catch (Throwable ex) {
+						//LogUtil.trace(ex);
+						LogUtil.error("Server fail to show GUI evaluator, caused by " + ex.getMessage());
+						
+						/*
+						 * It is possible that current Java environment does not support GUI.
+						 * Use of GraphicsEnvironment.isHeadless() tests Java GUI.
+						 * Hence, create control panel with console here.
+						 */
+					}
 				}
-				catch (Throwable ex) {
-					//LogUtil.trace(ex);
-					LogUtil.error("Server fail to show GUI evaluator, caused by " + ex.getMessage());
-					
-					/*
-					 * It is possible that current Java environment does not support GUI.
-					 * Use of GraphicsEnvironment.isHeadless() tests Java GUI.
-					 * Hence, create control panel with console here.
-					 */
-				}
-			}
-		});
-        popup.add(evItem);
-
-        return popup;
+			});
+	        popup.add(evItem);
+	
+	        return popup;
+		}
+		catch (Exception e) {
+			LogUtil.trace(e);
+		}
+		
+		return null;
 	}
 
 

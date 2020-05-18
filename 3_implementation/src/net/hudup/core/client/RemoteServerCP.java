@@ -60,7 +60,7 @@ public class RemoteServerCP extends JFrame implements ServerStatusListener {
 	
 	
 	/**
-	 * Pane of server configuration as {@link PropPane}.
+	 * Pane of server configuration.
 	 */
 	private PropPane paneConfig = null;
 	
