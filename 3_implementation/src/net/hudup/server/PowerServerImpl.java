@@ -29,12 +29,12 @@ import net.hudup.core.client.ServerStatusEvent.Status;
 import net.hudup.core.client.ServerStatusListener;
 import net.hudup.core.client.Service;
 import net.hudup.core.data.DataConfig;
+import net.hudup.core.logistic.AbstractRunner.Priority;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.NetUtil;
 import net.hudup.core.logistic.SystemUtil;
 import net.hudup.core.logistic.Timer2;
 import net.hudup.core.logistic.xURI;
-import net.hudup.core.logistic.AbstractRunner.Priority;
 
 /**
  * This is abstract class for power sever which is the base of recommendation server.
