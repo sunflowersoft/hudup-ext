@@ -576,8 +576,11 @@ public class LightRemoteServerCP extends JFrame {
 					server.pause();
 				else if (command.equals(Request.RESUME_CONTROL_COMMAND))
 					server.resume();
-				else if (command.equals(Request.EXIT_CONTROL_COMMAND))
-					server.exit();
+				else if (command.equals(Request.EXIT_CONTROL_COMMAND)) {
+					try {
+						server.exit();
+					} catch (RemoteException e) {}
+				}
 				else
 					connected = false;
 			}
