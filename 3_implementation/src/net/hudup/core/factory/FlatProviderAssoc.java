@@ -106,7 +106,6 @@ class FlatProviderAssoc extends ProviderAssocAbstract {
 					writer.close();
 			} 
 			catch (Throwable e) {
-				// TODO Auto-generated catch block
 				LogUtil.trace(e);
 			}
 		}
@@ -252,7 +251,6 @@ class FlatProviderAssoc extends ProviderAssocAbstract {
 			
 		} 
 		catch (Throwable e) {
-			// TODO Auto-generated catch block
 			LogUtil.trace(e);
 		}
 		finally {
@@ -271,14 +269,12 @@ class FlatProviderAssoc extends ProviderAssocAbstract {
 	
 	@Override
 	public AttributeList getAttributes(ParamSql selectSql, Profile condition) {
-		// TODO Auto-generated method stub
 		throw new RuntimeException("Not implement yet");
 	}
 
 
 	@Override
 	public boolean containsProfile(String profileUnit, Profile profile) {
-		// TODO Auto-generated method stub
 		
 		CsvReader reader = getReader(profileUnit);
 		boolean found = false;
@@ -358,7 +354,6 @@ class FlatProviderAssoc extends ProviderAssocAbstract {
 	@Override
 	public Fetcher<Profile> getProfiles(String profileUnit,
 			Profile condition) {
-		// TODO Auto-generated method stub
 
 		List<Profile> list = Util.newList();
 		
@@ -404,14 +399,12 @@ class FlatProviderAssoc extends ProviderAssocAbstract {
 
 	@Override
 	public Fetcher<Profile> getProfiles(ParamSql selectSql, Profile condition) {
-		// TODO Auto-generated method stub
 		throw new RuntimeException("Not implement yet");
 	}
 
 
 	@Override
 	public Fetcher<Integer> getProfileIds(String profileUnit) {
-		// TODO Auto-generated method stub
 		AttributeList attributes = getAttributes(profileUnit);
 		final Attribute idAtt = attributes.getId();
 		if (idAtt == null || idAtt.getType() != Type.integer)
@@ -449,7 +442,6 @@ class FlatProviderAssoc extends ProviderAssocAbstract {
 
 	@Override
 	public int getProfileMaxId(String profileUnit) {
-		// TODO Auto-generated method stub
 		
 		AttributeList attributes = getAttributes(profileUnit);
 		CsvReader reader = null;
@@ -705,7 +697,6 @@ class FlatProviderAssoc extends ProviderAssocAbstract {
 				}
 			} 
 			catch (Throwable e) {
-				// TODO Auto-generated catch block
 				LogUtil.trace(e);
 				equal = false;
 				break;
@@ -742,7 +733,6 @@ class FlatProviderAssoc extends ProviderAssocAbstract {
 				}
 			} 
 			catch (Throwable e) {
-				// TODO Auto-generated catch block
 				LogUtil.trace(e);
 				equal = false;
 				break;
@@ -781,7 +771,6 @@ class FlatProviderAssoc extends ProviderAssocAbstract {
 			writer.writeRecord(header);
 		} 
 		catch (IOException e) {
-			// TODO Auto-generated catch block
 			LogUtil.trace(e);
 		}
 	}
@@ -814,7 +803,6 @@ class FlatProviderAssoc extends ProviderAssocAbstract {
 				return null;
 		} 
 		catch (Throwable e) {
-			// TODO Auto-generated catch block
 			LogUtil.trace(e);
 		}
 		
@@ -840,7 +828,6 @@ class FlatProviderAssoc extends ProviderAssocAbstract {
 					value = Profile.createValue(attributes.get(i), record[i]);
 				} 
 				catch (Exception e) {
-					// TODO Auto-generated catch block
 					LogUtil.trace(e);
 				}
 				profile.setValue(i, value);
@@ -848,7 +835,6 @@ class FlatProviderAssoc extends ProviderAssocAbstract {
 			return profile;
 		}
 		catch (Throwable e) {
-			// TODO Auto-generated catch block
 			LogUtil.trace(e);
 		}
 		return null;
@@ -857,7 +843,6 @@ class FlatProviderAssoc extends ProviderAssocAbstract {
 	
 	@Override
 	public void close() throws Exception {
-		// TODO Auto-generated method stub
 		if (adapter != null)
 			adapter.close();
 		adapter = null;
@@ -960,35 +945,30 @@ class DefaultCsvReader implements CsvReader {
 	
 	@Override
 	public boolean readHeader() throws IOException {
-		// TODO Auto-generated method stub
 		return csvReader.readHeaders();
 	}
 	
 	
 	@Override
 	public String[] getHeader() throws IOException {
-		// TODO Auto-generated method stub
 		return csvReader.getHeaders();
 	}
 
 	
 	@Override
 	public boolean readRecord() throws IOException {
-		// TODO Auto-generated method stub
 		return csvReader.readRecord();
 	}
 	
 	
 	@Override
 	public String[] getRecord() throws IOException {
-		// TODO Auto-generated method stub
 		return csvReader.getValues();
 	}
 	
 	
 	@Override
 	public void close() {
-		// TODO Auto-generated method stub
 		if (csvReader == null) return;
 		
 		try {
@@ -1000,7 +980,6 @@ class DefaultCsvReader implements CsvReader {
 
 	@Override
 	protected void finalize() throws Throwable {
-		// TODO Auto-generated method stub
 		super.finalize();
 		
 		try {
@@ -1040,14 +1019,12 @@ class DefaultCsvWriter implements CsvWriter {
 	
 //	@Override
 //	public void write(String column) throws IOException {
-//		// TODO Auto-generated method stub
 //		csvWriter.write(column);
 //	}
 	
 	
 	@Override
 	public boolean writeRecord(String[] record) throws IOException {
-		// TODO Auto-generated method stub
 		csvWriter.writeRecord(record);
 		return true;
 	}
@@ -1055,7 +1032,6 @@ class DefaultCsvWriter implements CsvWriter {
 	
 	@Override
 	public void close() {
-		// TODO Auto-generated method stub
 		if (csvWriter == null) return;
 		
 		try {
@@ -1067,7 +1043,6 @@ class DefaultCsvWriter implements CsvWriter {
 	
 	@Override
 	protected void finalize() throws Throwable {
-		// TODO Auto-generated method stub
 		super.finalize();
 		
 		try {
@@ -1130,7 +1105,6 @@ class ExcelReader implements CsvReader {
 	
 	@Override
 	public boolean readHeader() throws IOException {
-		// TODO Auto-generated method stub
 		reset();
 		
 		if (workbook == null) return false;
@@ -1153,7 +1127,6 @@ class ExcelReader implements CsvReader {
 	
 	@Override
 	public String[] getHeader() throws IOException {
-		// TODO Auto-generated method stub
 		if (attList == null) return null;
 		
 		String[] headers = new String[attList.size()];
@@ -1167,7 +1140,6 @@ class ExcelReader implements CsvReader {
 	
 	@Override
 	public boolean readRecord() throws IOException {
-		// TODO Auto-generated method stub
 		currentProfile = null;
 		if (attList == null) return false;
 		if (currentRow >= sheet.getRows() - 1) return false;
@@ -1185,14 +1157,12 @@ class ExcelReader implements CsvReader {
 	
 	@Override
 	public String[] getRecord() throws IOException {
-		// TODO Auto-generated method stub
 		return currentProfile;
 	}
 
 	
 	@Override
 	public void close() {
-		// TODO Auto-generated method stub
 		if (workbook == null) return;
 		
 		reset();
@@ -1215,7 +1185,6 @@ class ExcelReader implements CsvReader {
 	
 	@Override
 	protected void finalize() throws Throwable {
-		// TODO Auto-generated method stub
 		super.finalize();
 		
 		try {
@@ -1353,7 +1322,6 @@ class ExcelWriter implements CsvWriter {
 	
 	@Override
 	public boolean writeRecord(String[] record) throws IOException {
-		// TODO Auto-generated method stub
 		if (this.sheet == null || record == null || record.length == 0)
 			return false;
 		
@@ -1411,7 +1379,6 @@ class ExcelWriter implements CsvWriter {
 	
 	@Override
 	public void close() {
-		// TODO Auto-generated method stub
 		if (workbook != null) {
 			try {
 				workbook.close();
@@ -1426,7 +1393,6 @@ class ExcelWriter implements CsvWriter {
 	
 	@Override
 	protected void finalize() throws Throwable {
-		// TODO Auto-generated method stub
 		super.finalize();
 		
 		try {

@@ -339,7 +339,7 @@
 	Vendor: TrueZip - Schlichtherle IT Services
 	Archive: newtech-research/database-storagesystem/io-programming/TrueZip
 	Version: 7.7.4 build 2013.09.28
-	Status: using, very important
+	Status: not using, currently net.hudup.core.factory.FactoryImpl uses UriAssocAbstract.creatUriAssoc() instead UriAssocTrueZip.
 	-->
 	<property name="truezip.jar" value="${lib.home}/truezip-samples-7.7.4-jar-with-dependencies.jar"/>
 
@@ -381,7 +381,7 @@
 	net.hudup.core.data.PropList: xml-apis.jar
 	net.hudup.core.evaluate.MetricsUtil: flanagan.jar, jxl.jar
 	net.hudup.core.factory.FactoryImpl: quicktable.jar
-	net.hudup.core.factory.FactoryImpl (UriAssocTrueZip): truezip.jar
+	//net.hudup.core.factory.FactoryImpl (UriAssocTrueZip): truezip.jar
 	net.hudup.core.factory.FlatProviderAssoc: javacsv.jar
 	net.hudup.core.factory.FlatProviderAssoc (ExcelReader, ExcelWriter): jxl.jar
 	net.hudup.core.Firer: reflections.jar

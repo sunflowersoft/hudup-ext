@@ -19,9 +19,13 @@ import java.nio.charset.Charset;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
 import java.util.List;
+
+import javax.swing.JFileChooser;
+import javax.swing.filechooser.FileFilter;
 
 import net.hudup.core.Constants;
 import net.hudup.core.Util;
@@ -84,7 +88,6 @@ public abstract class UriAssocAbstract implements UriAssoc {
 	
 	@Override
 	public boolean connect(DataConfig config) {
-		// TODO Auto-generated method stub
 		close();
 		
 		xURI uri = normalize(config.getStoreUri());
@@ -100,7 +103,6 @@ public abstract class UriAssocAbstract implements UriAssoc {
 					Files.createDirectories(store);
 				} 
 				catch (IOException e) {
-					// TODO Auto-generated catch block
 					LogUtil.trace(e);
 					return false;
 				}
@@ -113,7 +115,6 @@ public abstract class UriAssocAbstract implements UriAssoc {
 	
 	@Override
 	public boolean exists(xURI uri) {
-		// TODO Auto-generated method stub
 		uri = normalize(uri);
 		Path path = newPath(uri);
 		return Files.exists(path);
@@ -122,7 +123,6 @@ public abstract class UriAssocAbstract implements UriAssoc {
 	
 	@Override
 	public boolean isStore(xURI uri) {
-		// TODO Auto-generated method stub
 		uri = normalize(uri);
 		Path path = newPath(uri);
 		if (store != null && path.equals(store))
@@ -134,7 +134,6 @@ public abstract class UriAssocAbstract implements UriAssoc {
 	
 	@Override
 	public boolean create(xURI uri, boolean isStore) {
-		// TODO Auto-generated method stub
 		uri = normalize(uri);
 		if (exists(uri))
 			return false;
@@ -158,7 +157,6 @@ public abstract class UriAssocAbstract implements UriAssoc {
 			}
 		}
 		catch (Throwable e) {
-			// TODO Auto-generated catch block
 			LogUtil.trace(e);
 		}
 		
@@ -168,7 +166,6 @@ public abstract class UriAssocAbstract implements UriAssoc {
 	
 	@Override
 	public boolean clearContent(xURI uri, UriFilter filter) {
-		// TODO Auto-generated method stub
 		uri = normalize(uri);
 		if (!exists(uri))
 			return false;
@@ -183,7 +180,6 @@ public abstract class UriAssocAbstract implements UriAssoc {
 					Files.deleteIfExists(path);
 				} 
 				catch (Throwable e) {
-					// TODO Auto-generated catch block
 					LogUtil.trace(e);
 				}
 			}
@@ -196,7 +192,6 @@ public abstract class UriAssocAbstract implements UriAssoc {
 				Files.deleteIfExists(path);
 			} 
 			catch (Throwable e) {
-				// TODO Auto-generated catch block
 				LogUtil.trace(e);
 			}
 
@@ -207,7 +202,6 @@ public abstract class UriAssocAbstract implements UriAssoc {
 	
 	@Override
 	public boolean delete(xURI uri, UriFilter filter) {
-		// TODO Auto-generated method stub
 		uri = normalize(uri);
 		if (!exists(uri))
 			return false;
@@ -220,7 +214,6 @@ public abstract class UriAssocAbstract implements UriAssoc {
 			return true;
 		} 
 		catch (Throwable e) {
-			// TODO Auto-generated catch block
 			LogUtil.trace(e);
 		}
 		
@@ -230,7 +223,6 @@ public abstract class UriAssocAbstract implements UriAssoc {
 	
 	@Override
 	public boolean copy(xURI src, xURI dst, final boolean moved, final UriFilter filter) {
-		// TODO Auto-generated method stub
 		src = normalize(src);
 		dst = normalize(dst);
 		if (isStore(src)) {
@@ -248,7 +240,6 @@ public abstract class UriAssocAbstract implements UriAssoc {
 						
 						@Override
 						public void uriProcess(xURI uri) throws Exception {
-							// TODO Auto-generated method stub
 							xURI dstItem = finalDst.concat(uri.getLastName()); 
 							copy(uri, dstItem, moved, filter);
 						}
@@ -281,7 +272,6 @@ public abstract class UriAssocAbstract implements UriAssoc {
 				}
 			} 
 			catch (Throwable e) {
-				// TODO Auto-generated catch block
 				LogUtil.trace(e);
 			}
 			
@@ -294,7 +284,6 @@ public abstract class UriAssocAbstract implements UriAssoc {
 
 	@Override
 	public boolean rename(xURI src, xURI dst) {
-		// TODO Auto-generated method stub
 		src = normalize(src);
 		dst = normalize(dst);
 		Path srcPath = newPath(src);
@@ -304,7 +293,6 @@ public abstract class UriAssocAbstract implements UriAssoc {
 			return Files.move(srcPath, dstPath, StandardCopyOption.REPLACE_EXISTING) != null;
 		} 
 		catch (Throwable e) {
-			// TODO Auto-generated catch block
 			LogUtil.trace(e);
 		}
 		
@@ -314,7 +302,6 @@ public abstract class UriAssocAbstract implements UriAssoc {
 	
 	@Override
 	public List<xURI> getUriList(xURI store, final UriFilter filter) {
-		// TODO Auto-generated method stub
 		store = normalize(store);
 		if (!exists(store))
 			return Util.newList();
@@ -328,7 +315,6 @@ public abstract class UriAssocAbstract implements UriAssoc {
 				
 				@Override
 				public boolean accept(Path entry) throws IOException {
-					// TODO Auto-generated method stub
 					if (filter == null)
 						return true;
 					else
@@ -340,7 +326,6 @@ public abstract class UriAssocAbstract implements UriAssoc {
 				
 				@Override
 				public void pathProcess(Path path) throws Exception {
-					// TODO Auto-generated method stub
 					pathList.add(path);
 				}
 			});
@@ -356,14 +341,12 @@ public abstract class UriAssocAbstract implements UriAssoc {
 	
 	@Override
 	public InputStream getInputStream(xURI uri) {
-		// TODO Auto-generated method stub
 		uri = normalize(uri);
 		Path path = newPath(uri);
 		try {
 			return Files.newInputStream(path);
 		} 
 		catch (Throwable e) {
-			// TODO Auto-generated catch block
 			LogUtil.trace(e);
 		}
 		
@@ -373,7 +356,6 @@ public abstract class UriAssocAbstract implements UriAssoc {
 	
 	@Override
 	public OutputStream getOutputStream(xURI uri, boolean append) {
-		// TODO Auto-generated method stub
 		uri = normalize(uri);
 		Path path = newPath(uri);
 		try {
@@ -387,7 +369,6 @@ public abstract class UriAssocAbstract implements UriAssoc {
 						StandardOpenOption.TRUNCATE_EXISTING);
 		} 
 		catch (Throwable e) {
-			// TODO Auto-generated catch block
 			LogUtil.trace(e);
 		}
 		
@@ -397,14 +378,12 @@ public abstract class UriAssocAbstract implements UriAssoc {
 	
 	@Override
 	public Reader getReader(xURI uri) {
-		// TODO Auto-generated method stub
 		uri = normalize(uri);
 		Path path = newPath(uri);
 		try {
 			return Files.newBufferedReader(path, Charset.defaultCharset());
 		} 
 		catch (Throwable e) {
-			// TODO Auto-generated catch block
 			LogUtil.trace(e);
 		}
 		
@@ -414,7 +393,6 @@ public abstract class UriAssocAbstract implements UriAssoc {
 	
 	@Override
 	public Writer getWriter(xURI uri, boolean append) {
-		// TODO Auto-generated method stub
 		uri = normalize(uri);
 		Path path = newPath(uri);
 		try {
@@ -428,7 +406,6 @@ public abstract class UriAssocAbstract implements UriAssoc {
 						StandardOpenOption.TRUNCATE_EXISTING);
 		} 
 		catch (Throwable e) {
-			// TODO Auto-generated catch block
 			LogUtil.trace(e);
 		}
 		
@@ -438,14 +415,12 @@ public abstract class UriAssocAbstract implements UriAssoc {
 	
 	@Override
 	public ByteChannel getReadChannel(xURI uri) {
-		// TODO Auto-generated method stub
 		uri = normalize(uri);
 		Path path = newPath(uri);
 		try {
 			return Files.newByteChannel(path, StandardOpenOption.READ);
 		} 
 		catch (Throwable e) {
-			// TODO Auto-generated catch block
 			LogUtil.trace(e);
 		}
 		
@@ -455,7 +430,6 @@ public abstract class UriAssocAbstract implements UriAssoc {
 
 	@Override
 	public ByteChannel getWriteChannel(xURI uri, boolean append) {
-		// TODO Auto-generated method stub
 		uri = normalize(uri);
 		Path path = newPath(uri);
 		try {
@@ -471,7 +445,6 @@ public abstract class UriAssocAbstract implements UriAssoc {
 						StandardOpenOption.TRUNCATE_EXISTING);
 		} 
 		catch (Throwable e) {
-			// TODO Auto-generated catch block
 			LogUtil.trace(e);
 		}
 		
@@ -526,7 +499,6 @@ public abstract class UriAssocAbstract implements UriAssoc {
 				
 			}
 			catch (Throwable e) {
-				// TODO Auto-generated catch block
 				LogUtil.trace(e);
 			} 
 			
@@ -575,7 +547,6 @@ public abstract class UriAssocAbstract implements UriAssoc {
 				return;
 		} 
 		catch (Exception e) {
-			// TODO Auto-generated catch block
 			LogUtil.trace(e);
 		}
 		
@@ -585,7 +556,6 @@ public abstract class UriAssocAbstract implements UriAssoc {
 					Files.newDirectoryStream(store, filter) : Files.newDirectoryStream(store);
 		} 
 		catch (Exception e) {
-			// TODO Auto-generated catch block
 			LogUtil.trace(e);
 			return;
 		}
@@ -598,7 +568,6 @@ public abstract class UriAssocAbstract implements UriAssoc {
 				
 			}
 			catch (Exception e) {
-				// TODO Auto-generated catch block
 				LogUtil.trace(e);
 			} 
 		}
@@ -607,7 +576,6 @@ public abstract class UriAssocAbstract implements UriAssoc {
 			ds.close();
 		} 
 		catch (IOException e) {
-			// TODO Auto-generated catch block
 			LogUtil.trace(e);
 		}
 		
@@ -635,15 +603,170 @@ public abstract class UriAssocAbstract implements UriAssoc {
 	
 	
 	@Override
+	public xURI chooseUri(Component comp, boolean open, 
+			String[] exts, String[] descs, xURI curStore, String defaultExt) {
+		
+		ChosenUriResult result = chooseUriResult(
+				comp, 
+				open, 
+				exts, 
+				descs,
+				curStore);
+		
+        if (result == null)
+			return null;
+        
+        xURI uri = result.getChosenUri();
+        String ext = uri.getLastNameExtension();
+        if (open == false && ext == null) {
+        	ext = result.getChosenExt();
+        	if (ext == null) {
+        		if (defaultExt == null)
+        			ext = Constants.DEFAULT_EXT;
+        		else
+        			ext = defaultExt;
+        	}
+        	uri = xURI.create(uri.toString() + "." + ext);
+        }
+        
+        return uri;
+	}
+
+	
+	/**
+	 * This method shows a graphic user interface (GUI) allowing users to select files they want. Such GUI is called <i>choice dialog</i>.
+	 * Such chosen files are returned as the class {@link ChosenUriResult}.
+	 * @param comp The graphic user interface (GUI) component works as a parent component of choice dialog. 
+	 * @param open If true then, choice dialog is <i>open</i> dialog allowing users to choose and open files. Otherwise, choice dialog is <i>save</i> dialog allowing users to choose and save files. 
+	 * @param exts The specified array of archive (file) extensions which are used to filter objects that users select, for example, &quot;*.hdp&quot;, &quot;*.xls&quot;. Each extension has a description. The respective array of extension descriptions is specified by the parameter {@code descs}.  
+	 * @param descs The specified array of descriptions, for example, &quot;Hudup file&quot;, &quot;Excel 97-2003&quot;. Note that each extension has a description and the respective array of file extensions is represented by the parameter {@code exts}. The combination of parameter {@code exts} and parameter {@code descs} forms filters for selection such as &quot;Hudup file (*.hdp)&quot; and &quot;Excel 97-2003 (*.xls)&quot;.
+	 * @param mode The specified mode sets the <i>choice dialog</i> to show only archives (files) or only store (directories) or both archives (files) and store (directories). 
+	 * @param curDir Current store (directory) to open <i>choice dialog</i>. Current store can be null.
+	 * @return Chosen files are returned as the class {@link ChosenUriResult}
+	 */
+	protected abstract ChosenUriResult chooseUriResult(
+			Component comp, 
+			boolean open, 
+			final String[] exts, 
+			final String[] descs,
+			xURI curStore);
+
+		
+	/**
+	 * This class represents result of choosing file.
+	 * It contains the URI and extension of chosen archive (file).
+	 * @author Loc Nguyen
+	 * @version 10.0
+	 *
+	 */
+	protected static class ChosenUriResult {
+		
+		/**
+		 * The URI of chosen archive (file).
+		 */
+		private xURI chosenUri = null;
+		
+		/**
+		 * The extension of chosen archive (file).
+		 */
+		private String chosenExt = null;
+		
+		/**
+		 * Constructor with URI and extension of chosen archive (file).
+		 * @param chosenFile
+		 * @param chosenExt
+		 */
+		public ChosenUriResult(xURI chosenUri, String chosenExt) {
+			this.chosenUri = chosenUri;
+			this.chosenExt = chosenExt;
+		}
+		
+		/**
+		 * Getting the URI of chosen archive (file).
+		 * @return chosen {@link File}
+		 */
+		public xURI getChosenUri() {
+			return chosenUri;
+		}
+		
+		/**
+		 * Getting the extension of chosen archive (file).
+		 * @return file extension
+		 */
+		public String getChosenExt() {
+			return chosenExt;
+		}
+		
+	}
+	
+	
+	/**
+	 * This class is used for filtering file or directories shown in choice dialog allowing users to choose objects.
+	 * This class implements the interface {@link FileFilter} in which the most important method {@link ChosenFileFilter#accept(File)} must be defined for filtering.
+	 * If this method returns true, the file will be accepted to be shown in choice dialog. Otherwise, the file is rejected to be shown in choice dialog.
+	 * @author Loc Nguyen
+	 * @version 10.0
+	 *
+	 */
+	protected static class ChosenFileFilter extends FileFilter {
+
+		/**
+		 * The extension of files will be accepted for filtering, for example, &quot;*.hdp&quot;, &quot;*.xls&quot;.
+		 */
+		private String ext = null;
+		
+		/**
+		 * The description of files will be accepted for filtering. Each extension is attached to a particular description, for example, &quot;Hudup file&quot;, &quot;Excel 97-2003&quot;.
+		 */
+		private String desc = null;
+		
+		/**
+		 * Constructor with extension and description of files which will be accepted to be shown in choice dialog. In other words, such files will be filtered.
+		 * @param ext Extension of files which will be accepted for filtering
+		 * @param desc Description of files which will be accepted for filtering
+		 */
+		public ChosenFileFilter(String ext, String desc) {
+			this.ext = ext;
+			this.desc = desc;
+		}
+
+		@Override
+		public boolean accept(File f) {
+			if (f.isDirectory())
+				return true;
+			
+			String ext = xURI.create(f).getLastNameExtension();
+			if (ext != null && 
+					ext.toLowerCase().equals(this.ext.toLowerCase()))
+				return true;
+			
+			return false;
+		}
+
+		@Override
+		public String getDescription() {
+			return desc;
+		}
+	
+		/**
+		 * Getting description of files which will be accepted for filtering.
+		 * @return file extension
+		 */
+		public String getExt() {
+			return ext;
+		}
+		
+	}
+
+	
+	@Override
 	public void close() {
-		// TODO Auto-generated method stub
 		this.store = null;
 	}
 
 	
 	@Override
 	protected void finalize() throws Throwable {
-		// TODO Auto-generated method stub
 		super.finalize();
 		
 		try {
@@ -652,6 +775,117 @@ public abstract class UriAssocAbstract implements UriAssoc {
 		catch (Exception e) {
 			LogUtil.trace(e);
 		}
+	}
+
+
+	/**
+	 * Creating default URI associator.
+	 * @return default URI associator.
+	 */
+	public static UriAssoc createUriAssoc() {
+		return new UriAssocAbstract() {
+
+			@Override
+			public Path newPath(xURI uri) {
+				return Paths.get(uri.getURI());
+			}
+
+			@Override
+			public Path newPath(String path) {
+				return Paths.get(path);
+			}
+
+			@Override
+			public boolean isArchive(xURI uri) {
+				return DataDriver.isCompressed(uri);
+			}
+
+			@Override
+			public xURI chooseStore(Component comp) {
+				
+				JFileChooser uc = newUriChooser();
+				
+				xURI curStore = getCurrentStore();
+				File curDir = null;
+				if (curStore == null)
+					curDir = null;
+				else if (curStore.getScheme() == null)
+					curDir = new File(curStore.getURI().toString());
+				else
+					curDir = new File(curStore.getURI());
+				
+				if (curDir != null)
+					uc.setCurrentDirectory(curDir);
+				uc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+				
+				int ret = uc.showOpenDialog(comp);
+		        if (ret != JFileChooser.APPROVE_OPTION)
+		        	return null;
+				
+		        return xURI.create(uc.getSelectedFile());
+			}
+			
+			@Override
+			protected ChosenUriResult chooseUriResult(Component comp,
+					boolean open, String[] exts, String[] descs, xURI curStore) {
+				
+				JFileChooser uc = newUriChooser(); //This is so-called choice dialog
+				if (curStore == null || !exists(curStore))
+					curStore = getCurrentStore();
+				
+				File curDir = null;
+				if (curStore == null)
+					curDir = null;
+				else if (curStore.getScheme() == null)
+					curDir = new File(curStore.getURI().toString());
+				else
+					curDir = new File(curStore.getURI());
+				
+				if (curDir != null)
+					uc.setCurrentDirectory(curDir);
+				
+				if (exts != null && descs != null) {
+					for (int i = 0; i < exts.length; i++) {
+						uc.addChoosableFileFilter(new ChosenFileFilter(exts[i], descs[i]));
+					}
+				}
+				
+				uc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+				
+				int ret = open ? 
+						uc.showOpenDialog(comp) : uc.showSaveDialog(comp);
+		        if (ret != JFileChooser.APPROVE_OPTION)
+		        	return null;
+		        
+		        File file = uc.getSelectedFile();
+		        FileFilter filter = uc.getFileFilter();
+		        if (file == null)
+		        	return null;
+		        
+		        xURI uri = null;
+		        if (file.isFile()) {
+		        	File parent = file.getParentFile();
+		        	uri = xURI.create(parent).concat(file.getName());
+		        }
+		        else
+		        	uri = xURI.create(file.toURI());
+		        
+		        if ( (filter != null) && (filter instanceof ChosenFileFilter) )
+		        	return new ChosenUriResult(uri, ((ChosenFileFilter)filter).getExt());
+		        else
+		        	return new ChosenUriResult(uri, null);
+			}
+
+			/**
+			 * Creating the file chooser.The most important function of such chooser is to show a graphic user interface (GUI) allowing users to select files they want.
+			 * @return file chooser.
+			 */
+			private JFileChooser newUriChooser() {
+				return new JFileChooser();
+			}
+
+		};
+		
 	}
 
 

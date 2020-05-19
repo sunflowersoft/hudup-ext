@@ -78,6 +78,11 @@ public class Request extends ProtocolParam {
 	 * Resume control command. 
 	 */
 	public final static String RESUME_CONTROL_COMMAND                     = "resume";
+	
+	/**
+	 * Resume control command. 
+	 */
+	public final static String EXIT_CONTROL_COMMAND                       = "exit";
 
 	
 	/**

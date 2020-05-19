@@ -13,8 +13,6 @@ import java.awt.FlowLayout;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 
@@ -26,7 +24,9 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
+import net.hudup.core.Constants;
 import net.hudup.core.client.ConnectDlg;
+import net.hudup.core.client.ConnectDlg.ConnectType;
 import net.hudup.core.client.Server;
 import net.hudup.core.client.ServerStatusEvent;
 import net.hudup.core.client.ServerStatusEvent.Status;
@@ -133,15 +133,6 @@ public class BalancerCP extends JFrame implements ServerStatusListener {
 			setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 			setSize(600, 400);
 			setLocationRelativeTo(null);
-			addWindowListener(new WindowAdapter() {
-	
-				@Override
-				public void windowClosed(WindowEvent e) {
-					super.windowClosed(e);
-					close();
-				}
-				
-			});
 	        
 			Image image = UIUtil.getImage("balancer-32x32.png");
 	        if (image != null)
@@ -163,22 +154,6 @@ public class BalancerCP extends JFrame implements ServerStatusListener {
 		}
 		catch (RemoteException e) {
 			LogUtil.trace(e);
-		}
-		
-		if(bindUri == null) {
-			Runtime.getRuntime().addShutdownHook(new Thread() {
-	
-				@Override
-				public void run() {
-					try {
-						close();
-					} 
-					catch (Throwable e) {
-						LogUtil.trace(e);
-					}
-				}
-				
-			});
 		}
 		
 	}
@@ -204,8 +179,6 @@ public class BalancerCP extends JFrame implements ServerStatusListener {
 			result = listener.addStatusListener(this);
 		}
 		else {
-			btnExitListener.setVisible(false);
-			
 			try {
 				UnicastRemoteObject.exportObject(this, bindUri.getPort());
 				
@@ -419,11 +392,19 @@ public class BalancerCP extends JFrame implements ServerStatusListener {
 	 * Exit balancer remotely. After exiting, balancer is destroyed and cannot be re-started.
 	 */
 	private void exit() {
-		if (bindUri != null)
-			return;
-
+		
 		try {
-			listener.exit();
+			if (bindUri != null) {
+				listener.removeStatusListener(this);
+				try {
+					listener.exit();
+				} catch (Exception e) {}
+				
+				listener = null;
+				dispose();
+			}
+			else
+				listener.exit();
 		} 
 		catch (Exception e) {
 			LogUtil.trace(e);
@@ -576,26 +557,6 @@ public class BalancerCP extends JFrame implements ServerStatusListener {
 	/**
 	 * Update all controls (components) in this control panel according to current balancer status.
 	 * Please see {@link ServerStatusEvent#status} for more details about balancer statuses.
-	 * @throws RemoteException if any error raises.
-	 */
-	private void updateControls() 
-			throws RemoteException {
-		if (listener == null)
-			return;
-		
-		if (listener.isRunning())
-			updateControls(Status.started);
-		else if (listener.isPaused())
-			updateControls(Status.paused);
-		else
-			updateControls(Status.stopped);
-			
-	}
-	
-	
-	/**
-	 * Update all controls (components) in this control panel according to current balancer status.
-	 * Please see {@link ServerStatusEvent#status} for more details about balancer statuses.
 	 * @param status balancer current status.
 	 * @throws RemoteException if any error raises.
 	 */
@@ -655,15 +616,32 @@ public class BalancerCP extends JFrame implements ServerStatusListener {
 		}
 		else if (status == Status.setconfig) {
 			paneConfig.update(listener.getConfig());
-			
 		}
 		else if (status == Status.exit) {
-			if (bindUri != null) {
-				listener = null;
-				dispose();
-			}
+			listener = null;
+			dispose();
 		}
 		
+	}
+	
+	
+	/**
+	 * Update all controls (components) in this control panel according to current balancer status.
+	 * Please see {@link ServerStatusEvent#status} for more details about balancer statuses.
+	 * @throws RemoteException if any error raises.
+	 */
+	private void updateControls() 
+			throws RemoteException {
+		if (listener == null)
+			return;
+		
+		if (listener.isRunning())
+			updateControls(Status.started);
+		else if (listener.isPaused())
+			updateControls(Status.paused);
+		else
+			updateControls(Status.stopped);
+			
 	}
 	
 	
@@ -676,11 +654,9 @@ public class BalancerCP extends JFrame implements ServerStatusListener {
 			updateControls(evt.getStatus());
 	}
 	
-	
-	/**
-	 * Closing this control panel. All resources such as reference to balancer and time counter are released.
-	 */
-	private void close() {
+
+	@Override
+	public void dispose() {
 		
 		try {
 			if (listener != null)
@@ -702,6 +678,8 @@ public class BalancerCP extends JFrame implements ServerStatusListener {
 		
 		listener = null;
 		bindUri = null;
+		
+		super.dispose();
 	}
 
 	
@@ -710,7 +688,7 @@ public class BalancerCP extends JFrame implements ServerStatusListener {
 	 * @param args The argument parameter of main method. It contains command line arguments.
 	 */
 	public static void main(String[] args) {
-		ConnectDlg dlg = ConnectDlg.connect();
+		ConnectDlg dlg = ConnectDlg.connect(ConnectType.server, Constants.DEFAULT_BALANCER_EXPORT_PORT);
 		Image image = UIUtil.getImage("balancer-32x32.png");
         if (image != null)
         	dlg.setIconImage(image);

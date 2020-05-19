@@ -116,7 +116,6 @@ public class ServerStatusEvent extends EventObject {
 	 */
 	public ServerStatusEvent(Server server, Status status) {
 		super(server);
-		// TODO Auto-generated constructor stub
 		
 		this.status = status;
 	}
@@ -130,7 +129,6 @@ public class ServerStatusEvent extends EventObject {
 	 */
 	public ServerStatusEvent(Server server, Status status, String msg) {
 		this(server, status);
-		// TODO Auto-generated constructor stub
 		
 		this.msg = msg;
 	}

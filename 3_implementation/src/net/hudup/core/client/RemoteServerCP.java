@@ -13,8 +13,6 @@ import java.awt.FlowLayout;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 
@@ -64,6 +62,11 @@ public class RemoteServerCP extends JFrame implements ServerStatusListener {
 	 */
 	private PropPane paneConfig = null;
 	
+	/**
+	 * Exiting server button.
+	 */
+	protected JButton btnExitServer = null;
+
 	/**
 	 * Button to start server.
 	 */
@@ -117,15 +120,6 @@ public class RemoteServerCP extends JFrame implements ServerStatusListener {
 			setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 			setSize(600, 400);
 			setLocationRelativeTo(null);
-			addWindowListener(new WindowAdapter() {
-				
-				@Override
-				public void windowClosed(WindowEvent e) {
-					super.windowClosed(e);
-					close();
-				}
-				
-			});
 	        Image image = UIUtil.getImage("remotecp-32x32.png");
 	        if (image != null)
 	        	setIconImage(image);
@@ -195,6 +189,16 @@ public class RemoteServerCP extends JFrame implements ServerStatusListener {
 			btnRefresh.setAlignmentX(LEFT_ALIGNMENT);
 			leftToolbar.add(btnRefresh);
 
+			btnExitServer = new JButton("Exit server");
+			btnExitServer.addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					exit();
+				}
+			});
+			leftToolbar.add(btnExitServer);
+
 			
 			JPanel centerToolbar = new JPanel(new FlowLayout());
 			mainToolbar.add(centerToolbar, BorderLayout.CENTER);
@@ -245,11 +249,15 @@ public class RemoteServerCP extends JFrame implements ServerStatusListener {
 	/**
 	 * Binding (exposing) this control panel as remote RMI object so that server or other applications can interact with it via RMI protocol.
 	 * The internal variable {@link #bindUri} pointing to where to locate this control panel.
+	 * @throws RemoteException if any error raises.
 	 */
-	private void bindServer() {
+	private void bindServer() throws RemoteException {
 		boolean result = false;
 		
-		if (bindUri != null) {
+		if (bindUri == null) {
+			result = server.addStatusListener(this);
+		}
+		else {
 			try {
 				UnicastRemoteObject.exportObject(this, bindUri.getPort());
 				
@@ -331,6 +339,30 @@ public class RemoteServerCP extends JFrame implements ServerStatusListener {
 	
 	
 	/**
+	 * Exiting remote server.
+	 */
+	private void exit() {
+		
+		try {
+			if (bindUri != null) {
+				server.removeStatusListener(this);
+				try {
+					server.exit();
+				} catch (Exception e) {}
+				
+				server = null;
+				dispose();
+			}
+			else
+				server.exit();
+		} 
+		catch (Exception e) {
+			LogUtil.trace(e);
+		}
+	}
+
+	
+	/**
 	 * Apply changes into server configuration remotely.
 	 */
 	private void applyConfig() {
@@ -400,6 +432,7 @@ public class RemoteServerCP extends JFrame implements ServerStatusListener {
 	 * @param enabled if {@code true}, all controls are enabled. Otherwise, all controls are disabled.
 	 */
 	private void enableControls(boolean enabled) {
+		btnExitServer.setEnabled(enabled);
 		btnStart.setEnabled(enabled);
 		btnPauseResume.setEnabled(enabled);
 		btnStop.setEnabled(enabled);
@@ -407,28 +440,6 @@ public class RemoteServerCP extends JFrame implements ServerStatusListener {
 		btnResetConfig.setEnabled(enabled);
 		btnRefresh.setEnabled(enabled);
 		paneConfig.setEnabled(enabled);
-	}
-	
-	
-	/**
-	 * Update all controls (components) in this control panel according to current server status.
-	 * Please see {@link ServerStatusEvent#status} for more details about server statuses.
-	 * @throws RemoteException if any error raises.
-	 */
-	private void updateControls() throws RemoteException {
-		if (server.isRunning()) {
-			updateControls(Status.started);
-			btnRefresh.setEnabled(true);
-		}
-		else if (server.isPaused()) {
-			updateControls(Status.paused);
-			btnRefresh.setEnabled(true);
-		}
-		else {
-			updateControls(Status.stopped);
-			btnRefresh.setEnabled(true);
-		}
-		
 	}
 	
 	
@@ -445,6 +456,7 @@ public class RemoteServerCP extends JFrame implements ServerStatusListener {
 		if (status == Status.started || status == Status.resumed) {
 			enableControls(false);
 
+			btnExitServer.setEnabled(true);
 			btnStart.setEnabled(false);
 			btnPauseResume.setEnabled(true);
 			btnPauseResume.setText("Pause");
@@ -464,6 +476,7 @@ public class RemoteServerCP extends JFrame implements ServerStatusListener {
 		else if (status == Status.paused) {
 			enableControls(false);
 
+			btnExitServer.setEnabled(true);
 			btnStart.setEnabled(false);
 			btnPauseResume.setEnabled(true);
 			btnPauseResume.setText("Resume");
@@ -476,6 +489,7 @@ public class RemoteServerCP extends JFrame implements ServerStatusListener {
 		else if (status == Status.stopped) {
 			enableControls(false);
 
+			btnExitServer.setEnabled(true);
 			btnStart.setEnabled(true);
 			btnPauseResume.setEnabled(false);
 			btnPauseResume.setText("Pause");
@@ -502,16 +516,36 @@ public class RemoteServerCP extends JFrame implements ServerStatusListener {
 	}
 
 	
+	/**
+	 * Update all controls (components) in this control panel according to current server status.
+	 * Please see {@link ServerStatusEvent#status} for more details about server statuses.
+	 * @throws RemoteException if any error raises.
+	 */
+	private void updateControls() throws RemoteException {
+		if (server.isRunning()) {
+			updateControls(Status.started);
+			btnRefresh.setEnabled(true);
+		}
+		else if (server.isPaused()) {
+			updateControls(Status.paused);
+			btnRefresh.setEnabled(true);
+		}
+		else {
+			updateControls(Status.stopped);
+			btnRefresh.setEnabled(true);
+		}
+		
+	}
+	
+	
 	@Override
 	public void statusChanged(ServerStatusEvent evt) throws RemoteException {
 		updateControls(evt.getStatus());
 	}
 	
 	
-	/**
-	 * Closing this control panel. All resources such as reference to server and time counter are released.
-	 */
-	private void close() {
+	@Override
+	public void dispose() {
 		
     	try {
     		if (server != null)
@@ -531,6 +565,8 @@ public class RemoteServerCP extends JFrame implements ServerStatusListener {
 
     	server = null;
 		bindUri = null;
+		
+		super.dispose();
 	}
 
 

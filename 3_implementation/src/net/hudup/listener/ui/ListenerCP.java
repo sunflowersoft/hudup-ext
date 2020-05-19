@@ -13,8 +13,6 @@ import java.awt.FlowLayout;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 
@@ -127,15 +125,6 @@ public class ListenerCP extends JFrame implements ServerStatusListener {
 			setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 			setSize(600, 400);
 			setLocationRelativeTo(null);
-			addWindowListener(new WindowAdapter() {
-	
-				@Override
-				public void windowClosed(WindowEvent e) {
-					super.windowClosed(e);
-					close();
-				}
-				
-			});
 	        Image image = UIUtil.getImage("listener-32x32.png");
 	        if (image != null)
 	        	setIconImage(image);
@@ -156,24 +145,6 @@ public class ListenerCP extends JFrame implements ServerStatusListener {
 		}
 		catch (RemoteException e) {
 			LogUtil.trace(e);
-		}
-		
-		
-		if(bindUri == null) {
-			
-			Runtime.getRuntime().addShutdownHook(new Thread() {
-	
-				@Override
-				public void run() {
-					try {
-						close();
-					} 
-					catch (Throwable e) {
-						LogUtil.trace(e);
-					}
-				}
-				
-			});
 		}
 		
 	}
@@ -199,8 +170,6 @@ public class ListenerCP extends JFrame implements ServerStatusListener {
 			result = listener.addStatusListener(this);
 		}
 		else {
-			btnExitListener.setVisible(false);
-			
 			try {
 				UnicastRemoteObject.exportObject(this, bindUri.getPort());
 				
@@ -402,11 +371,19 @@ public class ListenerCP extends JFrame implements ServerStatusListener {
 	 * Exit listener remotely. After exiting, listener is destroyed and cannot be re-started.
 	 */
 	private void exit() {
-		if (bindUri != null)
-			return;
-
+		
 		try {
-			listener.exit();
+			if (bindUri != null) {
+				listener.removeStatusListener(this);
+				try {
+					listener.exit();
+				} catch (Exception e) {}
+				
+				listener = null;
+				dispose();
+			}
+			else
+				listener.exit();
 		} 
 		catch (Exception e) {
 			LogUtil.trace(e);
@@ -512,26 +489,6 @@ public class ListenerCP extends JFrame implements ServerStatusListener {
 	/**
 	 * Update all controls (components) in this control panel according to current listener status.
 	 * Please see {@link ServerStatusEvent#status} for more details about listener statuses.
-	 * @throws RemoteException if any error raises.
-	 */
-	private void updateControls() 
-			throws RemoteException {
-		if (listener == null)
-			return;
-		
-		if (listener.isRunning())
-			updateControls(Status.started);
-		else if (listener.isPaused())
-			updateControls(Status.paused);
-		else
-			updateControls(Status.stopped);
-			
-	}
-	
-	
-	/**
-	 * Update all controls (components) in this control panel according to current listener status.
-	 * Please see {@link ServerStatusEvent#status} for more details about listener statuses.
 	 * @param status listener current status.
 	 * @throws RemoteException if any error raises.
 	 */
@@ -590,13 +547,30 @@ public class ListenerCP extends JFrame implements ServerStatusListener {
 			paneConfig.update(listener.getConfig());
 		}
 		else if (status == Status.exit) {
-			if (bindUri != null) {
-				listener = null;
-				dispose();
-			}
+			listener = null;
+			dispose();
 		}
 		
+	}
+	
+	
+	/**
+	 * Update all controls (components) in this control panel according to current listener status.
+	 * Please see {@link ServerStatusEvent#status} for more details about listener statuses.
+	 * @throws RemoteException if any error raises.
+	 */
+	private void updateControls() 
+			throws RemoteException {
+		if (listener == null)
+			return;
 		
+		if (listener.isRunning())
+			updateControls(Status.started);
+		else if (listener.isPaused())
+			updateControls(Status.paused);
+		else
+			updateControls(Status.stopped);
+			
 	}
 	
 	
@@ -609,11 +583,9 @@ public class ListenerCP extends JFrame implements ServerStatusListener {
 			updateControls(evt.getStatus());
 	}
 	
-	
-	/**
-	 * Closing this control panel. All resources such as reference to listener and time counter are released.
-	 */
-	private void close() {
+
+	@Override
+	public void dispose() {
 		
 		try {
 			if (listener != null)
@@ -635,6 +607,8 @@ public class ListenerCP extends JFrame implements ServerStatusListener {
 		
 		listener = null;
 		bindUri = null;
+		
+		super.dispose();
 	}
 
 	

@@ -13,8 +13,6 @@ import java.awt.FlowLayout;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.io.Console;
 import java.rmi.RemoteException;
 import java.util.Timer;
@@ -57,6 +55,11 @@ public class LightRemoteServerCP extends JFrame {
 	 */
 	private PropPane paneConfig = null;
 	
+	/**
+	 * Exiting server button.
+	 */
+	protected JButton btnExitServer = null;
+
 	/**
 	 * Button to start server.
 	 */
@@ -110,15 +113,6 @@ public class LightRemoteServerCP extends JFrame {
 			setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 			setSize(600, 400);
 			setLocationRelativeTo(null);
-			addWindowListener(new WindowAdapter() {
-				
-				@Override
-				public void windowClosed(WindowEvent e) {
-					super.windowClosed(e);
-					close();
-				}
-				
-			});
 	        Image image = UIUtil.getImage("remotecp-32x32.png");
 	        if (image != null)
 	        	setIconImage(image);
@@ -186,6 +180,16 @@ public class LightRemoteServerCP extends JFrame {
 			});
 			leftToolbar.add(btnRefresh);
 	
+			btnExitServer = new JButton("Exit server");
+			btnExitServer.addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					exit();
+				}
+			});
+			leftToolbar.add(btnExitServer);
+
 			
 			JPanel centerToolbar = new JPanel(new FlowLayout());
 			mainToolbar.add(centerToolbar, BorderLayout.CENTER);
@@ -252,7 +256,7 @@ public class LightRemoteServerCP extends JFrame {
 	/**
 	 * Start server remotely.
 	 */
-	private void start() {
+	private synchronized void start() {
 		try {
 			server.start();
 			updateControls();
@@ -265,7 +269,7 @@ public class LightRemoteServerCP extends JFrame {
 	/**
 	 * Pause/resume server remotely.
 	 */
-	private void pauseResume() {
+	private synchronized void pauseResume() {
 		try {
 			if (server.isPaused())
 				server.resume();
@@ -282,7 +286,7 @@ public class LightRemoteServerCP extends JFrame {
 	/**
 	 * Stop server remotely.
 	 */
-	private void stop() {
+	private synchronized void stop() {
 		try {
 			server.stop();
 			updateControls();
@@ -293,9 +297,22 @@ public class LightRemoteServerCP extends JFrame {
 	
 	
 	/**
+	 * Exiting remote server.
+	 */
+	private synchronized void exit() {
+		try {
+			server.exit();
+		} 
+		catch (Exception e) {}
+		
+		server = null;
+		dispose();
+	}
+
+	/**
 	 * Apply changes into server configuration remotely.
 	 */
-	private void applyConfig() {
+	private synchronized void applyConfig() {
 		try {
 			if (server.isRunning()) {
 				JOptionPane.showMessageDialog(
@@ -332,7 +349,7 @@ public class LightRemoteServerCP extends JFrame {
 	/**
 	 * Reset server configuration.
 	 */
-	private void resetConfig() {
+	private synchronized void resetConfig() {
 		try {
 			if (server.isRunning()) {
 				JOptionPane.showMessageDialog(
@@ -363,6 +380,7 @@ public class LightRemoteServerCP extends JFrame {
 	 * @param enabled if {@code true}, all controls are enabled. Otherwise, all controls are disabled.
 	 */
 	private void enableControls(boolean enabled) {
+		btnExitServer.setEnabled(enabled);
 		btnStart.setEnabled(enabled);
 		btnPauseResume.setEnabled(enabled);
 		btnStop.setEnabled(enabled);
@@ -375,7 +393,6 @@ public class LightRemoteServerCP extends JFrame {
 	
 	/**
 	 * Update all controls (components) in this control panel according to current server status.
-	 * Please see {@link ServerStatusEvent#status} for more details about server statuses.
 	 * This method currently hide pause/resume button because of error remote lock. The next version will be improve this method.
 	 * @throws RemoteException if any error raises.
 	 */
@@ -387,6 +404,7 @@ public class LightRemoteServerCP extends JFrame {
 		if (server.isRunning()) {
 			enableControls(false);
 
+			btnExitServer.setEnabled(true);
 			btnStart.setEnabled(false);
 			btnPauseResume.setEnabled(true);
 			btnPauseResume.setText("Pause");
@@ -400,6 +418,7 @@ public class LightRemoteServerCP extends JFrame {
 		else if (server.isPaused()) {
 			enableControls(false);
 
+			btnExitServer.setEnabled(true);
 			btnStart.setEnabled(false);
 			btnPauseResume.setEnabled(true);
 			btnPauseResume.setText("Resume");
@@ -413,6 +432,7 @@ public class LightRemoteServerCP extends JFrame {
 		else {
 			enableControls(false);
 
+			btnExitServer.setEnabled(true);
 			btnStart.setEnabled(true);
 			btnPauseResume.setEnabled(false);
 			btnPauseResume.setText("Pause");
@@ -439,16 +459,16 @@ public class LightRemoteServerCP extends JFrame {
 		btnPauseResume.setVisible(false);
 	}
 	
-	
-	/**
-	 * Closing this control panel. All resources such as reference to server and time counter are released.
-	 */
-	private synchronized void close() {
+
+	@Override
+	public synchronized void dispose() {
 		if (timer != null)
 			timer.cancel();
 		
 		server = null;
 		timer = null;
+		
+		super.dispose();
 	}
 	
 	
@@ -528,7 +548,7 @@ public class LightRemoteServerCP extends JFrame {
 //		System.out.print("Enter command (start|stop|pause|resume|exit): ");
 		if (connectType.equals("rmi"))
 			System.out.print("Enter command (" + Request.START_CONTROL_COMMAND
-				+ "|" + Request.STOP_CONTROL_COMMAND + "): ");
+				+ "|" + Request.STOP_CONTROL_COMMAND + "|" + Request.EXIT_CONTROL_COMMAND + "): ");
 		else
 			System.out.print("Enter command (" + Request.START_CONTROL_COMMAND 
 				+ "|" + Request.STOP_CONTROL_COMMAND
@@ -552,10 +572,12 @@ public class LightRemoteServerCP extends JFrame {
 					server.start();
 				else if (command.equals(Request.STOP_CONTROL_COMMAND))
 					server.stop();
-//				else if (command.equals(Request.PAUSE_CONTROL_COMMAND))
-//					server.pause();
-//				else if (command.equals(Request.RESUME_CONTROL_COMMAND))
-//					server.resume();
+				else if (command.equals(Request.PAUSE_CONTROL_COMMAND))
+					server.pause();
+				else if (command.equals(Request.RESUME_CONTROL_COMMAND))
+					server.resume();
+				else if (command.equals(Request.EXIT_CONTROL_COMMAND))
+					server.exit();
 				else
 					connected = false;
 			}
@@ -580,6 +602,8 @@ public class LightRemoteServerCP extends JFrame {
 					connected = connector.control(Request.PAUSE_CONTROL_COMMAND);
 				else if (command.equals(Request.RESUME_CONTROL_COMMAND))
 					connected = connector.control(Request.RESUME_CONTROL_COMMAND);
+				else if (command.equals(Request.EXIT_CONTROL_COMMAND))
+					connected = connector.control(Request.EXIT_CONTROL_COMMAND);
 				else
 					connected = false;
 			}

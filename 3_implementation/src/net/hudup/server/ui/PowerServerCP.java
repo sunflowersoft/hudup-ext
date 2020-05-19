@@ -16,8 +16,6 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.rmi.RemoteException;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 
 import javax.swing.BoxLayout;
@@ -189,11 +187,6 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 	protected Provider provider = null;
 	
 	/**
-	 * RMI registry.
-	 */
-	protected Registry registry = null;
-
-	/**
 	 * Binded URI of this control panel.
 	 */
 	protected xURI bindUri = null;
@@ -256,14 +249,10 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 		boolean result = false;
 		
 		if (bindUri == null) {
-			registry = null;
 			result = server.addStatusListener(this);
 		}
 		else {
-			//btnExitServer.setVisible(false);
-			
 			try {
-				registry = LocateRegistry.createRegistry(bindUri.getPort());
 				UnicastRemoteObject.exportObject(this, bindUri.getPort());
 				
 				result = server.addStatusListener(this);
@@ -280,14 +269,6 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 					e1.printStackTrace();
 				}
 				
-				try {
-		    		UnicastRemoteObject.unexportObject(registry, true);
-				}
-				catch (Throwable e1) {
-					e1.printStackTrace();
-				}
-				
-				registry = null;
 				bindUri = null;
 				result = false;
 			}
@@ -347,7 +328,6 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 				}
 			});
 		this.btnSystem.setMargin(new Insets(0, 0 , 0, 0));
-//		if (bRemote) this.btnSystem.setVisible(false);
 		configGrp1.add(this.btnSystem, BorderLayout.EAST);
 		
 		JPanel configGrp2 = new JPanel(new BorderLayout());
@@ -1057,10 +1037,8 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 			updateControls(evt.getStatus());
 	}
 	
-	
-	/**
-	 * Close this control panel.
-	 */
+
+	@Override
 	public void dispose() {
 		
 		try {
@@ -1079,13 +1057,6 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 				LogUtil.trace(e);
 			}
 			
-			try {
-				if (registry != null)
-					UnicastRemoteObject.unexportObject(registry, true);
-			}
-			catch (Throwable e) {
-				LogUtil.trace(e);
-			}
 		}
 		
 		if (provider != null)
@@ -1093,7 +1064,6 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 		
 		server = null;
 		bindUri = null;
-		registry = null;
 		provider = null;
 		
 		super.dispose();

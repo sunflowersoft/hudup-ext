@@ -44,7 +44,6 @@ public abstract class ProviderAssocAbstract implements ProviderAssoc {
 
 	@Override
 	protected void finalize() throws Throwable {
-		// TODO Auto-generated method stub
 		
 		try {
 			close();

@@ -68,6 +68,7 @@ public interface UriAssoc extends AutoCloseable {
 	
 	/**
 	 * Checking whether the specified URI is &quot;store&quot;. The concept &quot;store&quot; is similar to the concept &quot;directory&quot; in file system.
+	 * However, a compressed file is considered as store.
 	 * @param uri Specified URI
 	 * @return Whether the specified URI is &quot;store&quot;
 	 */
@@ -75,7 +76,7 @@ public interface UriAssoc extends AutoCloseable {
 	
 	
 	/**
-	 * Checking whether the specified URI is &quot;archive&quot;. The concept &quot;archive&quot; is similar to the concept &quot;file&quot; in file system.
+	 * Checking whether the specified URI is &quot;archive&quot;. The concept &quot;archive&quot; is similar to the concept &quot;compressed file&quot; in file system.
 	 * @param uri Specified URI
 	 * @return whether specified URI is archive
 	 */
