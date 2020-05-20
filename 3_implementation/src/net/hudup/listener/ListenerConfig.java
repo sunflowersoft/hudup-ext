@@ -70,7 +70,6 @@ public class ListenerConfig extends ServerConfig {
 	 */
 	public ListenerConfig() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
 
@@ -80,13 +79,11 @@ public class ListenerConfig extends ServerConfig {
 	 */
 	public ListenerConfig(xURI uri) {
 		super(uri);
-		// TODO Auto-generated constructor stub
 	}
 
 	
 	@Override
 	public void reset() {
-		// TODO Auto-generated method stub
 		super.reset();
 		
 		setServerPort(Constants.DEFAULT_LISTENER_PORT);
@@ -225,21 +222,18 @@ public class ListenerConfig extends ServerConfig {
 	
 	@Override
 	protected String encrypt(HiddenText hidden) {
-		// TODO Auto-generated method stub
 		return Util.getCipher().encrypt(hidden.getText());
 	}
 
 
 	@Override
 	protected HiddenText decrypt(String text) {
-		// TODO Auto-generated method stub
 		return new HiddenText(Util.getCipher().decrypt(text));
 	}
 
 
 	@Override
 	public Object clone() {
-		// TODO Auto-generated method stub
 		ListenerConfig cfg = new ListenerConfig();
 		cfg.putAll(this);
 		

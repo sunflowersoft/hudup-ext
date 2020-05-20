@@ -121,7 +121,7 @@ public class ExtendedService extends DefaultService implements ServiceExt, Servi
 		if (timer != null) timer.stop();
 		timer = null;
 		if (!Constants.SERVER_PURGE_LISTENERS) {
-			timer = new Timer2(Constants.DEFAULT_SHORT_TIMEOUT, Constants.DEFAULT_LONG_TIMEOUT) {
+			timer = new Timer2(Constants.DEFAULT_SHORT_TIMEOUT*1000, Constants.DEFAULT_LONG_TIMEOUT*1000) {
 				
 				@Override
 				protected void task() {
@@ -232,7 +232,7 @@ public class ExtendedService extends DefaultService implements ServiceExt, Servi
 	 */
 	public List<Evaluator> getEvaluators() throws RemoteException {
 		List<Evaluator> evList = Util.newList();
-		trans.lockWrite();
+		trans.lockRead();
 		try {
 			if (pairMap != null) {
 				Collection<Evaluator> evs = pairMap.values();
@@ -269,7 +269,7 @@ public class ExtendedService extends DefaultService implements ServiceExt, Servi
 			LogUtil.error("Service fail to get evaluator list, caused by " + e.getMessage());
 		}
 		finally {
-			trans.unlockWrite();
+			trans.unlockRead();
 		}
 		
 		return evList;
@@ -288,7 +288,7 @@ public class ExtendedService extends DefaultService implements ServiceExt, Servi
 	@Override
 	public Evaluator getEvaluator(String evaluatorName) throws RemoteException {
 		Evaluator evaluator = null;
-		trans.lockWrite();
+		trans.lockRead();
 		try {
 			if (pairMap.containsKey(evaluatorName))
 				evaluator = pairMap.get(evaluatorName);
@@ -300,7 +300,7 @@ public class ExtendedService extends DefaultService implements ServiceExt, Servi
 			LogUtil.error("Service fail to get evaluator, caused by " + e.getMessage());
 		}
 		finally {
-			trans.unlockWrite();
+			trans.unlockRead();
 		}
 		
 		return evaluator;

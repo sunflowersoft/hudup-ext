@@ -298,8 +298,10 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
     		LogUtil.info("Power server is initializing to stop, please waiting...");
 			destroyTimer();
 			
-			UnicastRemoteObject.unexportObject(getService(), true);
-				
+			try {
+				UnicastRemoteObject.unexportObject(getService(), true);
+			} catch (Exception e) {LogUtil.trace(e);}
+			
         	doWhenStop();
 			activeMeasure.reset();
 			started = false;
@@ -337,12 +339,47 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 	
 	/**
 	 * Shutdown server, after server shutdown, program exits. Called by {@link #exit()}.
-	 * @throws RemoteException if any error raises.
 	 */
-	protected synchronized void shutdown() throws RemoteException {
+	protected void shutdown() {
+		shutdown0();
+		
+//		if (config == null) return;
+//
+//		Object sync = new Object();
+//		
+//		SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
+//			@Override
+//			protected Void doInBackground() throws Exception {
+//				try {
+//					shutdown0();
+//				} catch (Exception e) {LogUtil.trace(e);}
+//				
+//				sync.notifyAll();
+//				return null;
+//			}
+//			
+//		};
+//		worker.execute();
+//		
+//		synchronized(sync) {
+//			try {
+//				sync.wait(Constants.DEFAULT_SHORT_TIMEOUT*1000);
+//			} catch (Exception e) {LogUtil.trace(e);}
+//		}
+//
+//		config = null;
+	}
+	
+	
+	/**
+	 * Shutdown server.
+	 */
+	private synchronized void shutdown0() {
 		if (config == null) return;
 		
-		stop();
+		try {
+			stop();
+		} catch (Exception e) {LogUtil.trace(e);}
 		
     	trans.lockWrite();
     	try {
@@ -385,9 +422,8 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 	private void createTimer() {
 		destroyTimer();
 		
-		int milisec = config.getServerTasksPeriod();
-		if (milisec == 0)
-			return;
+		int milisec = config.getServerTasksPeriod()*1000;
+		if (milisec == 0) return;
 		
 		timer = new Timer2(milisec, milisec) {
 
@@ -409,7 +445,7 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 		timer.setPriority(Priority.min);
 		timer.start();
 		
-		LogUtil.info("Power server created internal timer, executing periodly " + milisec + " miliseconds");
+		LogUtil.info("Power server created internal timer, executing periodly " + (milisec/1000) + " seconds");
 	}
 	
 	

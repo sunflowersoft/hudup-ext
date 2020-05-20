@@ -57,18 +57,6 @@ public class ServerConfig extends SysConfig {
 
 	
 	/**
-	 * Field of no-UI.
-	 */
-	public final static String NON_UI_FIELD = "non_ui";
-
-	
-	/**
-	 * Default value of no-UI field.
-	 */
-	public final static boolean NON_UI_DEFAULT = false;
-
-	
-	/**
 	 * Default constructor.
 	 */
 	public ServerConfig() {
@@ -94,8 +82,6 @@ public class ServerConfig extends SysConfig {
 		setServerTasksPeriod(Constants.DEFAULT_SERVER_TASKS_PERIOD);
 		
 		setSocketControlPort(Constants.DEFAULT_SOCKET_CONTROL_PORT);
-		
-		setNonUI(NON_UI_DEFAULT);
 		
 		addReadOnly(SOCKET_CONTROL_PORT_FIELD);
 	}
@@ -138,19 +124,19 @@ public class ServerConfig extends SysConfig {
 
 	
 	/**
-	 * Setting server task period in miliseconds.
-	 * Note, the period in miliseconds that the Hudup server does periodically internal tasks such as data mining and learning knowledge base.
-	 * @param milisec task period in miliseconds.
+	 * Setting server task period in seconds.
+	 * Note, the period in seconds that the Hudup server does periodically internal tasks such as data mining and learning knowledge base.
+	 * @param sec task period in seconds.
 	 */
-	public void setServerTasksPeriod(int milisec) {
-		put(SERVER_TASKS_PERIOD_FIELD, milisec);
+	public void setServerTasksPeriod(int sec) {
+		put(SERVER_TASKS_PERIOD_FIELD, sec);
 	}
 	
 	
 	/**
-	 * Getting server task period in miliseconds.
-	 * Note, the period in miliseconds that the Hudup server does periodically internal tasks such as data mining and learning knowledge base.
-	 * @return task period in mili seconds.
+	 * Getting server task period in seconds.
+	 * Note, the period in seconds that the Hudup server does periodically internal tasks such as data mining and learning knowledge base.
+	 * @return task period in seconds.
 	 */
 	public int getServerTasksPeriod() {
 		return getAsInt(SERVER_TASKS_PERIOD_FIELD);
@@ -158,9 +144,9 @@ public class ServerConfig extends SysConfig {
 	
 	
 	/**
-	 * Setting server timeout in miliseconds.
+	 * Setting server timeout in seconds.
 	 * Note, server is available to serve incoming request in a interval called a timeout in miliseconds.
-	 * @param timeout timeout in miliseconds.
+	 * @param timeout timeout in seconds.
 	 */
 	public void setServerTimeout(int timeout) {
 		put(SERVER_TIMEOUT_FIELD, timeout);
@@ -168,33 +154,15 @@ public class ServerConfig extends SysConfig {
 	
 	
 	/**
-	 * Getting server timeout in miliseconds.
+	 * Getting server timeout in seconds.
 	 * Note, server is available to serve incoming request in a interval called a timeout in miliseconds.
-	 * @return server timeout in miliseconds.
+	 * @return server timeout in seconds.
 	 */
 	public int getServerTimeout() {
 		return getAsInt(SERVER_TIMEOUT_FIELD);
 	}
 
 
-	/**
-	 * Setting flag to indicate non-UI mode.
-	 * @param flag flag to indicate non-UI mode.
-	 */
-	public void setNonUI(boolean flag) {
-		put(NON_UI_FIELD, flag);
-	}
-	
-	
-	/**
-	 * Getting flag to indicate non-UI mode.
-	 * @return flag to indicate non-UI mode.
-	 */
-	public boolean isNonUI() {
-		return getAsBoolean(NON_UI_FIELD);
-	}
-
-	
 	@Override
 	public Object clone() {
 		ServerConfig cfg = new ServerConfig();

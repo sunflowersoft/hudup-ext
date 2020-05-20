@@ -127,7 +127,6 @@ public abstract class SocketServer extends AbstractRunner implements Server, Acc
 
 			@Override
 			public void run() {
-				// TODO Auto-generated method stub
 				try {
 					shutdownHookStatus = true;
 
@@ -136,7 +135,6 @@ public abstract class SocketServer extends AbstractRunner implements Server, Acc
 					shutdownHookStatus = false;
 				} 
 				catch (Throwable e) {
-					// TODO Auto-generated catch block
 					LogUtil.trace(e);
 					LogUtil.error("Socket server failed to shutdown, caused by " + e.getMessage());
 				}
@@ -148,7 +146,6 @@ public abstract class SocketServer extends AbstractRunner implements Server, Acc
 	
 	@Override
 	protected void task() {
-		// TODO Auto-generated method stub
 		if (serverSocket == null || paused)
 			return;
 		
@@ -169,7 +166,7 @@ public abstract class SocketServer extends AbstractRunner implements Server, Acc
 		if (socket == null) return;
 
 		try {
-			socket.setSoTimeout(config.getServerTimeout());
+			socket.setSoTimeout(config.getServerTimeout()*1000);
 			
 			AbstractDelegator delegator = delegate(socket);
 			if (delegator != null) {
@@ -187,14 +184,12 @@ public abstract class SocketServer extends AbstractRunner implements Server, Acc
 			}
 		} 
 		catch (Throwable e) {
-			// TODO Auto-generated catch block
 			LogUtil.trace(e);
 			
 			try {
 				socket.close();
 			} 
 			catch (Throwable e1) {
-				// TODO Auto-generated catch block
 				LogUtil.trace(e1);
 				LogUtil.error("Socket server failed to close socket, caused by " + e.getMessage());
 			}
@@ -215,7 +210,7 @@ public abstract class SocketServer extends AbstractRunner implements Server, Acc
 		BufferedReader in = null;
 		UserSession userSession = new UserSession();
 		try {
-			socket.setSoTimeout(config.getServerTimeout());
+			socket.setSoTimeout(config.getServerTimeout()*1000);
 			
 			out = new DataOutputStream(socket.getOutputStream());
 			in = new BufferedReader(
@@ -277,7 +272,6 @@ public abstract class SocketServer extends AbstractRunner implements Server, Acc
 			
 		} 
 		catch (Throwable e) {
-			// TODO Auto-generated catch block
 			LogUtil.trace(e);
 		}
 		finally {
@@ -312,7 +306,6 @@ public abstract class SocketServer extends AbstractRunner implements Server, Acc
 	
 	@Override
 	public synchronized boolean start() {
-		// TODO Auto-generated method stub
 		if (isStarted()) return false;
 		
 		LogUtil.info("Socket server is initializing to start, please wait...");
@@ -336,7 +329,6 @@ public abstract class SocketServer extends AbstractRunner implements Server, Acc
 	
 	@Override
 	public synchronized boolean pause() {
-		// TODO Auto-generated method stub
 		if (!isRunning()) return false;
 		
 		pauseInternalRunners(); //Added date: 2019.08.11 by Loc Nguyen.
@@ -356,7 +348,6 @@ public abstract class SocketServer extends AbstractRunner implements Server, Acc
 
 	@Override
 	public synchronized boolean resume() {
-		// TODO Auto-generated method stub
 		if (!isPaused()) return false;
 		
 		resumeInternalRunners(); //Added date: 2019.08.11 by Loc Nguyen.
@@ -374,7 +365,6 @@ public abstract class SocketServer extends AbstractRunner implements Server, Acc
 
 	@Override
 	public synchronized boolean stop() {
-		// TODO Auto-generated method stub
 		if (!isStarted()) return false;
 		
 		LogUtil.info("Socket server prepares to stop, please waiting...");
@@ -426,7 +416,6 @@ public abstract class SocketServer extends AbstractRunner implements Server, Acc
 	
 	@Override
 	protected void clear() {
-		// TODO Auto-generated method stub
 		destroyServerSocket();
 		
 		synchronized(internalRunners) {
@@ -454,9 +443,8 @@ public abstract class SocketServer extends AbstractRunner implements Server, Acc
 		destroyTimer();
 		
 		try {
-			int milisec = config.getServerTasksPeriod();
-			if (milisec == 0)
-				return;
+			int milisec = config.getServerTasksPeriod()*1000;
+			if (milisec == 0) return;
 			
 			timer = new Timer();
 			timer.schedule(
@@ -464,14 +452,13 @@ public abstract class SocketServer extends AbstractRunner implements Server, Acc
 				
 					@Override
 					public void run() {
-						// TODO Auto-generated method stub
 						callServerTasks();
 					}
 				}, 
 				milisec, 
 				milisec);
 			
-			LogUtil.info("Socket server created internal timer, executing periodly " + milisec + " miliseconds");
+			LogUtil.info("Socket server created internal timer, executing periodly " + (milisec/1000) + " seconds");
 		}
 		catch (Throwable e) {
 			LogUtil.trace(e);
@@ -539,7 +526,6 @@ public abstract class SocketServer extends AbstractRunner implements Server, Acc
 				serverSocket.close();
 			} 
 			catch (Throwable e) {
-				// TODO Auto-generated catch block
 				LogUtil.trace(e);
 				LogUtil.error("Socket server failed to close server socket, caused by " + e.getMessage());
 			}
@@ -561,7 +547,6 @@ public abstract class SocketServer extends AbstractRunner implements Server, Acc
 				controlSocket.close();
 			} 
 			catch (Throwable e) {
-				// TODO Auto-generated catch block
 				LogUtil.trace(e);
 			}
 			
@@ -583,10 +568,9 @@ public abstract class SocketServer extends AbstractRunner implements Server, Acc
 				config.setServerPort(port);
 
 				serverSocket = new ServerSocket(port);
-				serverSocket.setSoTimeout(config.getServerTimeout());
+				serverSocket.setSoTimeout(config.getServerTimeout()*1000);
 			}
 			catch (Throwable e) {
-				// TODO Auto-generated catch block
 				LogUtil.trace(e);
 				LogUtil.error("Socket server failed to create server socket, caused by " + e.getMessage());
 				destroyServerSocket();
@@ -609,10 +593,9 @@ public abstract class SocketServer extends AbstractRunner implements Server, Acc
 			config.setSocketControlPort(port);
 
 			controlSocket = new ServerSocket(port);
-			controlSocket.setSoTimeout(config.getServerTimeout());
+			controlSocket.setSoTimeout(config.getServerTimeout()*1000);
 		}
 		catch (Throwable e) {
-			// TODO Auto-generated catch block
 			LogUtil.trace(e);
 			LogUtil.error("Socket server failed to create server socket, caused by " + e.getMessage());
 			destroyControlSocket();
@@ -624,7 +607,6 @@ public abstract class SocketServer extends AbstractRunner implements Server, Acc
 
 			@Override
 			public void run() {
-				// TODO Auto-generated method stub
 				super.run();
 				
 				while (controlSocket != null && !controlSocket.isClosed()) {
@@ -680,8 +662,6 @@ public abstract class SocketServer extends AbstractRunner implements Server, Acc
 	@Override
 	public boolean ping()
 			throws RemoteException {
-		
-		// TODO Auto-generated method stub
 		
 		return config != null;
 	}
@@ -765,7 +745,6 @@ public abstract class SocketServer extends AbstractRunner implements Server, Acc
 	
 	@Override
 	public boolean validateAdminAccount(String account, String password) {
-		// TODO Auto-generated method stub
 		if (!account.equals("admin"))
 			return false;
 		
@@ -836,7 +815,6 @@ public abstract class SocketServer extends AbstractRunner implements Server, Acc
 
 			@Override
 			public void run() {
-				// TODO Auto-generated method stub
 				super.run();
 				
 				List<AbstractDelegator> delegators = getDelegators();
@@ -989,7 +967,6 @@ public abstract class SocketServer extends AbstractRunner implements Server, Acc
 
 	@Override
 	protected void finalize() throws Throwable {
-		// TODO Auto-generated method stub
 		super.finalize();
 		
 		try {

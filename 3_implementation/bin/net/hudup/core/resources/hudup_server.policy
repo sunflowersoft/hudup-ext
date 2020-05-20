@@ -8,6 +8,7 @@ grant {
     permission java.net.SocketPermission "*:0-65535", "connect,resolve,accept,listen";
     permission java.lang.RuntimePermission "accessClassInPackage.sun.misc";
     permission java.lang.RuntimePermission "accessDeclaredMembers";
+    permission java.lang.RuntimePermission "closeClassLoader";
     permission java.lang.RuntimePermission "createClassLoader";
     permission java.lang.RuntimePermission "exitVM.0";
     permission java.lang.RuntimePermission "getenv.*";

@@ -56,7 +56,6 @@ public abstract class SysConfig extends DataConfig {
 	 */
 	public SysConfig(xURI uri) {
 		super(uri);
-		// TODO Auto-generated constructor stub
 		this.uri = uri.toString();
 	}
 
@@ -93,7 +92,6 @@ public abstract class SysConfig extends DataConfig {
 	
 	@Override
 	public boolean load(xURI uri) {
-		// TODO Auto-generated method stub
 		reset();
 		
 		this.uri = uri.toString();

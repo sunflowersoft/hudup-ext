@@ -35,7 +35,6 @@
 			<attribute name="javadoc_location" value="jar:platform:/resource/hudup3/lib/doc/swingx-all-1.6.4-doc.jar!/"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="lib/truezip-samples-7.7.4-jar-with-dependencies.jar" sourcepath="lib/src/truezip-samples-7.7.4-jar-with-dependencies-src.zip"/>
 	<classpathentry kind="lib" path="lib/mysql-connector-java-5.1.46-bin.jar" sourcepath="lib/src/mysql-connector-java-5.1.46-src.zip"/>
 	<classpathentry kind="lib" path="lib/guava-11.0.2.jar" sourcepath="lib/src/guava-28.1-src.zip"/>
 	<classpathentry kind="lib" path="lib/javassist-3.12.1.GA.jar"/>
@@ -58,5 +57,6 @@
 	<classpathentry kind="lib" path="lib/xml-apis-2.0.2.jar" sourcepath="lib/src/xml-apis-2.0.2-sources.jar"/>
 	<classpathentry kind="lib" path="lib/elvira2-2005.jar" sourcepath="lib/src/elvira2-2005-src.zip"/>
 	<classpathentry kind="lib" path="lib/sun.misc.jar"/>
+	<classpathentry kind="lib" path="lib/truezip-samples-7.7.4-jar-with-dependencies.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

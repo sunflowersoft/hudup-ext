@@ -77,7 +77,7 @@ public class SocketClassLoaderServer0 extends AbstractRunner {
 			DataOutputStream out = null;
 			BufferedReader in = null;
 			try {
-				socket.setSoTimeout(Constants.DEFAULT_SERVER_TIMEOUT);
+				socket.setSoTimeout(Constants.DEFAULT_SERVER_TIMEOUT*1000);
 
 				out = new DataOutputStream(socket.getOutputStream());
 				in = new BufferedReader(
@@ -201,7 +201,7 @@ public class SocketClassLoaderServer0 extends AbstractRunner {
 			try {
 				serverPort = NetUtil.getPort(serverPort, Constants.TRY_RANDOM_PORT);
 				serverSocket = new ServerSocket(serverPort);
-				serverSocket.setSoTimeout(Constants.DEFAULT_SERVER_TIMEOUT);
+				serverSocket.setSoTimeout(Constants.DEFAULT_SERVER_TIMEOUT*1000);
 			}
 			catch (Throwable e) {
 				LogUtil.trace(e);

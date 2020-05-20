@@ -82,14 +82,12 @@ public class ClientStubImpl implements ClientStub {
 	
 	@Override
 	public String toText() {
-		// TODO Auto-generated method stub
 		return TextParserUtil.encryptReservedChars(regName) + TextParserUtil.MAIN_SEP + TextParserUtil.toText(itemInfo, ",");
 	}
 
 	
 	@Override
 	public void parseText(String spec) {
-		// TODO Auto-generated method stub
 		clear();
 		
 		List<String> textList = TextParserUtil.split(spec, TextParserUtil.MAIN_SEP, null);
@@ -145,14 +143,12 @@ public class ClientStubImpl implements ClientStub {
 
 	@Override
 	public String getRegName() {
-		// TODO Auto-generated method stub
 		return regName;
 	}
 
 
 	@Override
 	public ExternalItemInfo getExternalItemInfo(int itemId) {
-		// TODO Auto-generated method stub
 		return itemInfo.get(itemId);
 	}
 

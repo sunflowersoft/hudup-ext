@@ -2208,7 +2208,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 	public static Timer2 createPurgeListenersTimer(EventListenerList2 listenerList) {
 		if (listenerList == null) return null;
 		
-		Timer2 timer = new Timer2(Constants.DEFAULT_LONG_TIMEOUT) {
+		Timer2 timer = new Timer2(Constants.DEFAULT_LONG_TIMEOUT*1000) {
 			
 			@Override
 			protected void task() {

@@ -29,7 +29,6 @@ public class TransactionImpl implements Transaction {
 	 * Default constructor.
 	 */
 	public TransactionImpl() {
-		// TODO Auto-generated constructor stub
 		lock = new ReentrantReadWriteLock();
 	}
 
@@ -39,7 +38,6 @@ public class TransactionImpl implements Transaction {
 	 * @param fair true if using the fair ordering policy. Please see {@link ReentrantReadWriteLock}.
 	 */
 	public TransactionImpl(boolean fair) {
-		// TODO Auto-generated constructor stub
 		
 		lock = new ReentrantReadWriteLock(fair);
 	}
@@ -71,7 +69,6 @@ public class TransactionImpl implements Transaction {
 
 	@Override
 	public boolean isWriteLockedByCurrentThread() {
-		// TODO Auto-generated method stub
 		
 		return lock.isWriteLockedByCurrentThread();
 	}

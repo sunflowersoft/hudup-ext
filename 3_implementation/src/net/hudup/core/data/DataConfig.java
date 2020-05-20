@@ -374,7 +374,6 @@ public class DataConfig extends PropList {
 	 */
 	public DataConfig() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
 	
@@ -385,7 +384,6 @@ public class DataConfig extends PropList {
 	 */
 	public DataConfig(xURI uri) {
 		super(uri);
-		// TODO Auto-generated constructor stub
 	}
 
 
@@ -1203,7 +1201,6 @@ public class DataConfig extends PropList {
 	 * @return The number of rating values per item
 	 */
 	public int getNumberRatingsPerItem() {
-		// TODO Auto-generated method stub
 		return (int) (getMaxRating() - getMinRating() + 1);
 	}
 	
@@ -1254,7 +1251,6 @@ public class DataConfig extends PropList {
 
 	@Override
 	protected Serializable preprocessValue(String key, Serializable value) {
-		// TODO Auto-generated method stub
 		if (key == null || value == null)
 			return null;
 		else if (key.equals(STORE_URI_FIELD) && value instanceof String) {

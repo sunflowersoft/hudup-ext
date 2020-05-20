@@ -72,7 +72,6 @@ public class BalancerConfig extends ListenerConfig {
 	 */
 	public BalancerConfig() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
 	
@@ -82,13 +81,11 @@ public class BalancerConfig extends ListenerConfig {
 	 */
 	public BalancerConfig(xURI uri) {
 		super(uri);
-		// TODO Auto-generated constructor stub
 	}
 
 	
 	@Override
 	public void reset() {
-		// TODO Auto-generated method stub
 		super.reset();
 
 		remove(REMOTE_HOST_FIELD);
@@ -221,7 +218,6 @@ public class BalancerConfig extends ListenerConfig {
 
 	@Override
 	public Serializable userEdit(Component comp, String key, Serializable defaultValue) {
-		// TODO Auto-generated method stub
 		if (!key.equals(REMOTE_INFO_LIST))
 			return super.userEdit(comp, key, defaultValue);
 		
@@ -243,7 +239,6 @@ public class BalancerConfig extends ListenerConfig {
 
 	@Override
 	public Object clone() {
-		// TODO Auto-generated method stub
 		BalancerConfig cfg = new BalancerConfig();
 		cfg.putAll(this);
 		

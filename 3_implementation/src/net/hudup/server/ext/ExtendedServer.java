@@ -249,57 +249,57 @@ public class ExtendedServer extends DefaultServer {
 		if (!require)
 			return new ExtendedServer(new PowerServerConfig(srvConfigUri));
 		else {
-			boolean isHeadLess = GraphicsEnvironment.isHeadless(); 
-			if (isHeadLess) {
-				@SuppressWarnings("resource")
-				Scanner scanner = new Scanner(System.in);
-				System.out.print("\nServer not set up yet.\nDo you want to setup server? (y|n): ");
-				String confirm = scanner.next().trim();
-				if (confirm.compareToIgnoreCase("n") == 0) {
-					LogUtil.info("Server not created due to not confirm");
-					return null;
+			boolean finished = true;
+			if (Constants.SERVER_UI) {
+				boolean isHeadLess = GraphicsEnvironment.isHeadless();
+				if (isHeadLess) {
+					@SuppressWarnings("resource")
+					Scanner scanner = new Scanner(System.in);
+					System.out.print("\nServer not set up yet.\nDo you want to setup server? (y|n): ");
+					String confirm = scanner.next().trim();
+					if (confirm.compareToIgnoreCase("n") == 0) {
+						LogUtil.error("Server not created due to not confirm");
+						return null;
+					}
+				}
+				else {
+			        Image image = UIUtil.getImage("server-32x32.png");
+					int confirm = JOptionPane.showConfirmDialog(
+							null, 
+							"Server not set up yet.\nDo you want to setup server?", 
+							"Setup server", 
+							JOptionPane.OK_CANCEL_OPTION, 
+							JOptionPane.INFORMATION_MESSAGE, 
+							image == null ? null : new ImageIcon(image));
+					
+					if (confirm != JOptionPane.OK_OPTION) {
+						LogUtil.error("Server not created");
+						return null;
+					}
+				}
+				
+				PowerServerConfig config = new PowerServerConfig(srvConfigUri);
+				if (isHeadLess) {
+					SetupServerWizardConsole wizard = new SetupServerWizardConsole(config);
+					finished = wizard.isFinished(); 
+				}
+				else {
+					SetupServerWizard wizard = new SetupServerWizard(null, config);
+					finished = wizard.isFinished(); 
 				}
 			}
 			else {
-		        Image image = UIUtil.getImage("server-32x32.png");
-				int confirm = JOptionPane.showConfirmDialog(
-						null, 
-						"Server not set up yet.\nDo you want to setup server?", 
-						"Setup server", 
-						JOptionPane.OK_CANCEL_OPTION, 
-						JOptionPane.INFORMATION_MESSAGE, 
-						image == null ? null : new ImageIcon(image));
-				
-				if (confirm != JOptionPane.OK_OPTION) {
-					LogUtil.info("Server not created");
-					return null;
-				}
-			}
-			
-			PowerServerConfig config = new PowerServerConfig(srvConfigUri);
-			
-			boolean finished = true;
-			if (isHeadLess) {
+				PowerServerConfig config = new PowerServerConfig(srvConfigUri);
 				SetupServerWizardConsole wizard = new SetupServerWizardConsole(config);
 				finished = wizard.isFinished(); 
 			}
+			
+			if (finished && !requireSetup(srvConfigUri))
+				return new ExtendedServer(new PowerServerConfig(srvConfigUri));
 			else {
-				SetupServerWizard wizard = new SetupServerWizard(null, config);
-				finished = wizard.isFinished(); 
-			}
-			
-			if (!finished) {
-				LogUtil.info("Server not created due to not finish setting up");
+				LogUtil.error("Server not created");
 				return null;
 			}
-			
-			require = requireSetup(srvConfigUri);
-			if (require) {
-				LogUtil.info("Server not created");
-				return null;
-			}
-			
-			return new ExtendedServer(new PowerServerConfig(srvConfigUri));
 		}
 		
 	}

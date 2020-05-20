@@ -15,6 +15,8 @@ import java.awt.SystemTray;
 import java.awt.TrayIcon;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.PrintWriter;
 import java.rmi.RemoteException;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -24,9 +26,9 @@ import java.util.Scanner;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 
+import net.hudup.core.Constants;
 import net.hudup.core.PluginChangedEvent;
 import net.hudup.core.Util;
-import net.hudup.core.alg.Recommender;
 import net.hudup.core.client.ServerTrayIcon;
 import net.hudup.core.client.Service;
 import net.hudup.core.data.DataConfig;
@@ -84,7 +86,7 @@ public class DefaultServer extends PowerServerImpl {
 		
 		service = createService();
 		
-		if (!config.isNonUI()) {
+		if (Constants.SERVER_UI) {
 			if (!createSysTray())
 				showCP();
 		}
@@ -136,26 +138,39 @@ public class DefaultServer extends PowerServerImpl {
 		
 		// Task 1: Period learning.
 		if (config.isPeriodLearn() && !config.isDatasetEmpty()) { //These methods are used to prevent time consuming from learning internal recommender.
-//			DefaultService newService = createService();
-//			newService.open(config); //This statement is important, which takes much time.
-//			newService.transferTo(service);
-			
-			Recommender recommender = null;
 			try {
-				if (service.isOpened())
-					recommender = service.createRecommender();
-			} catch (Exception e) {LogUtil.trace(e);}
-			
-			if (recommender != null) {
-				trans.lockWrite();
-				try {
-					if (service.recommender != null) service.recommender.unsetup();
-				} catch (Throwable e) {LogUtil.trace(e);}
-				service.recommender = recommender;
-				trans.unlockWrite();
+//				DefaultService newService = createService();
+//				newService.open(config); //This statement is important, which takes much time.
+//				newService.transferTo(service);
 				
-				LogUtil.info("Server timer internal tasks: Learning recommendation algorithm is successful");
+				service.updateRecommender();
+				if (service.recommender != null)
+					LogUtil.info("Server timer internal tasks: Learning recommendation algorithm is successful");
+			} catch (Exception e) {LogUtil.trace(e);}
+		}
+		
+		
+		//Task 2: clearing log files
+		try {
+			long m10 = 1024*1024*10;
+			File log = new File(Constants.LOGS_DIRECTORY + "/hudup.log");
+			if (log.exists() && log.length() > m10) {
+				try {
+					new PrintWriter(log).close();
+				}
+				catch (Exception e) {LogUtil.trace(e);}
 			}
+			
+			File nextupdate = new File(Constants.LOGS_DIRECTORY + "/nextupdate.log");
+			if (nextupdate.exists() && nextupdate.length() > m10) {
+				try {
+					new PrintWriter(nextupdate).close();
+				}
+				catch (Exception e) {LogUtil.trace(e);}
+			}
+		}
+		catch (Exception e) {
+			LogUtil.trace(e);
 		}
 	}
 	
@@ -332,7 +347,6 @@ public class DefaultServer extends PowerServerImpl {
 //
 //				@Override
 //				public void mouseClicked(MouseEvent e) {
-//					// TODO Auto-generated method stub
 //					super.mouseClicked(e);
 //					if(!SwingUtilities.isLeftMouseButton(e) || e.getClickCount() >= 2)
 //						return;
@@ -403,59 +417,58 @@ public class DefaultServer extends PowerServerImpl {
 		if (!require)
 			return new DefaultServer(new PowerServerConfig(srvConfigUri));
 		else {
-			
-			boolean isHeadLess = GraphicsEnvironment.isHeadless();
-			if (isHeadLess) {
-				Scanner scanner = new Scanner(System.in);
-				System.out.print("\nServer not set up yet.\nDo you want to setup server? (y|n): ");
-				String confirm = scanner.next().trim();
-				scanner.close();
-				
-				if (confirm.compareToIgnoreCase("y") != 0) {
-					LogUtil.info("Server not created due to not confirm");
-					return null;
-				}
-			}
-			else {
-		        Image image = UIUtil.getImage("server-32x32.png");
-				int confirm = JOptionPane.showConfirmDialog(
-						null, 
-						"Server not set up yet.\nDo you want to setup server?", 
-						"Setup server", 
-						JOptionPane.OK_CANCEL_OPTION, 
-						JOptionPane.INFORMATION_MESSAGE, 
-						image == null ? null : new ImageIcon(image));
-				
-				if (confirm != JOptionPane.OK_OPTION) {
-					LogUtil.info("Server not created");
-					return null;
-				}
-			}
-			
-			PowerServerConfig config = new PowerServerConfig(srvConfigUri);
-			
 			boolean finished = true;
-			if (isHeadLess) {
-				SetupServerWizardConsole wizard = new SetupServerWizardConsole(config);
-				finished = wizard.isFinished(); 
+			if (Constants.SERVER_UI) {
+				boolean isHeadLess = GraphicsEnvironment.isHeadless();
+				if (isHeadLess) {
+					Scanner scanner = new Scanner(System.in);
+					System.out.print("\nServer not set up yet.\nDo you want to setup server? (y|n): ");
+					String confirm = scanner.next().trim();
+					scanner.close();
+					
+					if (confirm.compareToIgnoreCase("y") != 0) {
+						LogUtil.error("Server not created due to not confirm");
+						return null;
+					}
+				}
+				else {
+			        Image image = UIUtil.getImage("server-32x32.png");
+					int confirm = JOptionPane.showConfirmDialog(
+							null, 
+							"Server not set up yet.\nDo you want to setup server?", 
+							"Setup server", 
+							JOptionPane.OK_CANCEL_OPTION, 
+							JOptionPane.INFORMATION_MESSAGE, 
+							image == null ? null : new ImageIcon(image));
+					
+					if (confirm != JOptionPane.OK_OPTION) {
+						LogUtil.error("Server not created");
+						return null;
+					}
+				}
+				
+				PowerServerConfig config = new PowerServerConfig(srvConfigUri);
+				if (isHeadLess) {
+					SetupServerWizardConsole wizard = new SetupServerWizardConsole(config);
+					finished = wizard.isFinished(); 
+				}
+				else {
+					SetupServerWizard wizard = new SetupServerWizard(null, config);
+					finished = wizard.isFinished(); 
+				}
 			}
 			else {
-				SetupServerWizard wizard = new SetupServerWizard(null, config);
-				finished = wizard.isFinished(); 
+				PowerServerConfig config = new PowerServerConfig(srvConfigUri);
+				SetupServerWizardConsole wizard = new SetupServerWizardConsole(config);
+				finished = wizard.isFinished();
 			}
 			
-			if (!finished) {
-				LogUtil.info("Server not created");
+			if (finished && !requireSetup(srvConfigUri))
+				return new DefaultServer(new PowerServerConfig(srvConfigUri));
+			else {
+				LogUtil.error("Server not created");
 				return null;
 			}
-			
-			require = requireSetup(srvConfigUri);
-			if (require) {
-				LogUtil.info("Server not created");
-				return null;
-			}
-			
-			return new DefaultServer(new PowerServerConfig(srvConfigUri));
 		}
 		
 	}

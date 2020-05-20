@@ -237,7 +237,7 @@ public class TaskQueue extends AbstractRunner {
 					EventTask task = taskMap.get(listenerUUID);
 					if (task == null) continue;
 					
-					if (System.currentTimeMillis() - task.getLastDone() > Constants.DEFAULT_LONG_TIMEOUT) {
+					if (System.currentTimeMillis() - task.getLastDone() > Constants.DEFAULT_LONG_TIMEOUT*1000) {
 						task.clear();
 						taskMap.remove(listenerUUID);
 					}
@@ -246,7 +246,7 @@ public class TaskQueue extends AbstractRunner {
 				}
 				if (empty) break;
 				
-				if (System.currentTimeMillis() - startTime > Constants.DEFAULT_SHORT_TIMEOUT) {
+				if (System.currentTimeMillis() - startTime > Constants.DEFAULT_SHORT_TIMEOUT*1000) {
 					Collection<EventTask> tasks = taskMap.values();
 					for (EventTask task : tasks) {
 						task.clear();
@@ -256,7 +256,7 @@ public class TaskQueue extends AbstractRunner {
 			}
 			
 			try {
-				Thread.sleep(Counter.PERIOD); //1 second for listeners to occupy doing tasks (taskMap).
+				Thread.sleep(Counter.PERIOD*1000); //1 second for listeners to occupy doing tasks (taskMap).
 			} catch (Exception e) {LogUtil.trace(e);}
 			
 		}

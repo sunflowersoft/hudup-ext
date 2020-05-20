@@ -92,54 +92,79 @@ public class SetupServerWizardConsole {
 	/**
 	 * Main method to start the setting up process.
 	 */
-	private void start() {
+	@NextUpdate
+	protected void start() {
 		if (provider == null) provider = new ProviderImpl(config);
 		
-		@SuppressWarnings("resource")
-		Scanner scanner = new Scanner(System.in);
-
 		xURI storeUri = config.getStoreUri();
 		UriAdapter adapter = new UriAdapter(storeUri);
-		if (storeUri != null && adapter.exists(storeUri)) {
-			System.out.print("\nStore URI exists: " + storeUri.toString());
-			System.out.print("\nDo you want to clear it? (y|n): ");
-			String clearStore = scanner.next().trim();
-			if (clearStore.compareToIgnoreCase("y") == 0)
-				adapter.clearContent(storeUri, null);
+
+		boolean needInit = true;
+		if (Constants.SERVER_UI) {
+			@SuppressWarnings("resource")
+			Scanner scanner = new Scanner(System.in);
+			if (storeUri != null && adapter.exists(storeUri)) {
+				System.out.print("\nStore URI exists: " + storeUri.toString());
+				System.out.print("\nDo you want to clear it? (y|n): ");
+				String clearStore = scanner.next().trim();
+				if (clearStore.compareToIgnoreCase("y") == 0)
+					adapter.clearContent(storeUri, null);
+				else {
+					try {
+						if (storeUri.getLastName().equals(PowerServerConfig.TEMPLATES_SAMPLE_DATA_NAME))
+							needInit = false;
+					}
+					catch (Exception e) { }
+				}
+			}
+			else {
+				if (storeUri == null) storeUri = xURI.create(PowerServerConfig.STORE_PATH_DEFAULT2);
+				
+				System.out.print("\nEnter store URI (default <" + storeUri.toString() + ">: ");
+				String storeUriText = scanner.next().trim();
+				if (!storeUriText.isEmpty())
+					storeUri = xURI.create(storeUriText);
+				if (!adapter.exists(storeUri))
+					adapter.create(storeUri, true);
+				else
+					adapter.clearContent(storeUri, null);
+			}
 		}
 		else {
-			if (storeUri == null) storeUri = xURI.create(PowerServerConfig.STORE_PATH_DEFAULT2);
-			
-			System.out.print("\nEnter store URI (default <" + storeUri.toString() + ">: ");
-			String storeUriText = scanner.next().trim();
-			if (!storeUriText.isEmpty())
-				storeUri = xURI.create(storeUriText);
-			if (!adapter.exists(storeUri))
+			if (storeUri == null || !adapter.exists(storeUri)) {
+				if (storeUri == null) storeUri = xURI.create(PowerServerConfig.STORE_PATH_DEFAULT2);
 				adapter.create(storeUri, true);
-			else
-				adapter.clearContent(storeUri, null);
+			}
+			else {
+				try {
+					if (storeUri.getLastName().equals(PowerServerConfig.TEMPLATES_SAMPLE_DATA_NAME))
+						needInit = false;
+				}
+				catch (Exception e) { }
+			}
 		}
 		adapter.close();
-		
 		config.setStoreUri(storeUri);
 		
-		AttributeList userAtt = new AttributeList();
-		userAtt = AttributeList.defaultUserAttributeList();
-		userAtt = userAtt.nomalizeId(
-				DataConfig.USERID_FIELD, Attribute.Type.integer, Constants.SUPPORT_AUTO_INCREMENT_ID);
-		
-		AttributeList itemAtt = AttributeList.defaultItemAttributeList();
-		itemAtt = itemAtt.nomalizeId(
-				DataConfig.ITEMID_FIELD, Attribute.Type.integer, Constants.SUPPORT_AUTO_INCREMENT_ID);
-		
-		provider.createSchema(userAtt, itemAtt);
-		config.removeUnitList(DataConfig.getDefaultUnitList());
-		config.putUnitList(provider.getUnitList().getMainList());
-
-		provider.getCTSManager().defaultCTSchema();
-		provider.getCTSManager().reload();
-		
-		//Importing data. Improving later.
+		if (needInit) {
+			AttributeList userAtt = new AttributeList();
+			userAtt = AttributeList.defaultUserAttributeList();
+			userAtt = userAtt.nomalizeId(
+					DataConfig.USERID_FIELD, Attribute.Type.integer, Constants.SUPPORT_AUTO_INCREMENT_ID);
+			
+			AttributeList itemAtt = AttributeList.defaultItemAttributeList();
+			itemAtt = itemAtt.nomalizeId(
+					DataConfig.ITEMID_FIELD, Attribute.Type.integer, Constants.SUPPORT_AUTO_INCREMENT_ID);
+			
+			provider.createSchema(userAtt, itemAtt);
+			config.removeUnitList(DataConfig.getDefaultUnitList());
+			config.putUnitList(provider.getUnitList().getMainList());
+	
+			provider.getCTSManager().defaultCTSchema();
+			provider.getCTSManager().reload();
+			
+			//Importing data. Improving later.
+		}
 		
 		config.save();
 		provider.close();

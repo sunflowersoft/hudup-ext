@@ -339,7 +339,7 @@
 	Vendor: TrueZip - Schlichtherle IT Services
 	Archive: newtech-research/database-storagesystem/io-programming/TrueZip
 	Version: 7.7.4 build 2013.09.28
-	Status: not using, currently net.hudup.core.factory.FactoryImpl uses UriAssocAbstract.creatUriAssoc() instead UriAssocTrueZip.
+	Status: using
 	-->
 	<property name="truezip.jar" value="${lib.home}/truezip-samples-7.7.4-jar-with-dependencies.jar"/>
 

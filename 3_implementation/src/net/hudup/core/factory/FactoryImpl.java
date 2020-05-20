@@ -23,6 +23,7 @@ import javax.swing.filechooser.FileFilter;
 import de.schlichtherle.truezip.file.TFile;
 import de.schlichtherle.truezip.file.swing.TFileChooser;
 import de.schlichtherle.truezip.nio.file.TPath;
+import net.hudup.core.Constants;
 import net.hudup.core.client.Service;
 import net.hudup.core.client.SocketConnection;
 import net.hudup.core.data.AttributeList;
@@ -130,15 +131,22 @@ public class FactoryImpl implements Factory {
 		
 		UriAssoc assoc = null;
 		String schema = uri.getScheme();
-		if (schema == null)
-//			assoc = new UriAssocTrueZip();
-			assoc = UriAssocAbstract.createUriAssoc();
+		if (schema == null) {
+			if (Constants.COMPRESSED_FILE_SUPPORT)
+				assoc = new UriAssocTrueZip();
+			else
+				assoc = UriAssocAbstract.createUriAssoc();
+		}
 		else if (schema.equals("ftp")) {
 			//Current implementation does not support FTP file system yet.
 			throw new RuntimeException("Current implementation does not support FTP file system yet.");
 		}
-		else
-			assoc = new UriAssocTrueZip();
+		else {
+			if (Constants.COMPRESSED_FILE_SUPPORT)
+				assoc = new UriAssocTrueZip();
+			else
+				assoc = UriAssocAbstract.createUriAssoc();
+		}
 		
 		return assoc;
 	}
@@ -684,7 +692,6 @@ class DBUnitTable extends DBTable implements UnitTable {
  * @version 11.0
  *
  */
-@Deprecated
 class UriAssocTrueZip extends UriAssocAbstract {
 
 	

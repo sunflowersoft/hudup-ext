@@ -11,6 +11,7 @@ import java.net.URL;
 import java.rmi.RemoteException;
 
 import net.hudup.core.AccessPoint;
+import net.hudup.core.Constants;
 import net.hudup.core.Util;
 import net.hudup.core.client.PowerServer;
 import net.hudup.core.data.ui.toolkit.DatasetToolkit;
@@ -57,13 +58,15 @@ public final class Server implements AccessPoint {
 		
 		//Not important.
 		try {
-			URL sampleDataUrl = getClass().getResource(PowerServerConfig.TEMPLATES_SAMPLE_DATA_PATH);
-			xURI sampleDataUri = xURI.create(sampleDataUrl.toURI());
-			xURI storeUri = xURI.create(PowerServerConfig.STORE_PATH_DEFAULT);
-			UriAdapter adapter = new UriAdapter(sampleDataUri);
-			if (!adapter.exists(storeUri))
-				adapter.copy(sampleDataUri, storeUri, false, null);
-			adapter.close();
+			if (Constants.COMPRESSED_FILE_SUPPORT) {
+				URL sampleDataUrl = getClass().getResource(PowerServerConfig.TEMPLATES_SAMPLE_DATA_PATH);
+				xURI sampleDataUri = xURI.create(sampleDataUrl.toURI());
+				xURI storeUri = xURI.create(PowerServerConfig.STORE_PATH_DEFAULT);
+				UriAdapter adapter = new UriAdapter(sampleDataUri);
+				if (!adapter.exists(storeUri))
+					adapter.copy(sampleDataUri, storeUri, false, null);
+				adapter.close();
+			}
 		}
 		catch (Throwable e) {
 			LogUtil.trace(e);

@@ -7,11 +7,14 @@
  */
 package net.hudup.server.external;
 
+import java.awt.GraphicsEnvironment;
 import java.awt.Image;
+import java.util.Scanner;
 
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 
+import net.hudup.core.Constants;
 import net.hudup.core.data.DefaultExternalQuery;
 import net.hudup.core.data.ExternalConfig;
 import net.hudup.core.data.ExternalQuery;
@@ -21,6 +24,7 @@ import net.hudup.core.logistic.ui.UIUtil;
 import net.hudup.server.DefaultServer;
 import net.hudup.server.external.ui.ExternalServerCP;
 import net.hudup.server.external.ui.SetupExternalServerWizard;
+import net.hudup.server.external.ui.SetupExternalServerWizardConsole;
 
 /**
  * This class is  a powerful server that supports external mapping.
@@ -117,35 +121,57 @@ public class ExternalServer extends DefaultServer {
 		if (!require)
 			return new ExternalServer(new ExternalServerConfig(srvConfigUri));
 		else {
-	        Image image = UIUtil.getImage("server-32x32.png");
-			int confirm = JOptionPane.showConfirmDialog(
-					null, 
-					"External server not set up yet.\n Do you want to setup server?", 
-					"Setup external server", 
-					JOptionPane.OK_CANCEL_OPTION, 
-					JOptionPane.INFORMATION_MESSAGE, 
-					image == null ? null : new ImageIcon(image));
-			
-			if (confirm != JOptionPane.OK_OPTION) {
-				LogUtil.info("External server not created");
-				return null;
+			boolean finished = true;
+			if (Constants.SERVER_UI) {
+				boolean isHeadLess = GraphicsEnvironment.isHeadless();
+				if (isHeadLess) {
+					@SuppressWarnings("resource")
+					Scanner scanner = new Scanner(System.in);
+					System.out.print("\nServer not set up yet.\nDo you want to setup server? (y|n): ");
+					String confirm = scanner.next().trim();
+					if (confirm.compareToIgnoreCase("n") == 0) {
+						LogUtil.error("Server not created due to not confirm");
+						return null;
+					}
+				}
+				else {
+			        Image image = UIUtil.getImage("server-32x32.png");
+					int confirm = JOptionPane.showConfirmDialog(
+							null, 
+							"External server not set up yet.\n Do you want to setup server?", 
+							"Setup external server", 
+							JOptionPane.OK_CANCEL_OPTION, 
+							JOptionPane.INFORMATION_MESSAGE, 
+							image == null ? null : new ImageIcon(image));
+					
+					if (confirm != JOptionPane.OK_OPTION) {
+						LogUtil.error("External server not created");
+						return null;
+					}
+				}
+				
+				ExternalServerConfig config = new ExternalServerConfig(srvConfigUri);
+				if (isHeadLess) {
+					SetupExternalServerWizardConsole wizard = new SetupExternalServerWizardConsole(config);
+					finished = wizard.isFinished();
+				}
+				else {
+					SetupExternalServerWizard wizard = new SetupExternalServerWizard(null, config);
+					finished = wizard.isFinished();
+				}
+			}
+			else {
+				ExternalServerConfig config = new ExternalServerConfig(srvConfigUri);
+				SetupExternalServerWizardConsole wizard = new SetupExternalServerWizardConsole(config);
+				finished = wizard.isFinished();
 			}
 			
-			ExternalServerConfig config = new ExternalServerConfig(srvConfigUri);
-			SetupExternalServerWizard dlg = new SetupExternalServerWizard(null, config);
-			
-			if (!dlg.isFinished()) {
-				LogUtil.info("External server not created");
+			if (finished && !requireSetup(srvConfigUri))
+				return new ExternalServer(new ExternalServerConfig(srvConfigUri));
+			else {
+				LogUtil.error("Server not created");
 				return null;
 			}
-			
-			require = requireSetup(srvConfigUri);
-			if (require) {
-				LogUtil.info("External server not created");
-				return null;
-			}
-			
-			return new ExternalServer(new ExternalServerConfig(srvConfigUri));
 		}
 		
 	}

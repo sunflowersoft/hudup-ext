@@ -38,9 +38,9 @@ public class Counter extends AbstractRunner implements Serializable {
 	
 	
 	/**
-	 * Time period in milisecond to update the counter.
+	 * Time period in seconds to update the counter.
 	 */
-	public static final long PERIOD = 1000; // 1 s
+	public static final long PERIOD = 1; // 1 s
 	
 	
 	/**
@@ -141,7 +141,7 @@ public class Counter extends AbstractRunner implements Serializable {
 		if (startedTime == 0) return;
 		
 		long interval = System.currentTimeMillis() - startedTime;
-		if (interval < PERIOD) return;
+		if (interval < PERIOD*1000) return;
 		
 		long newElapsedTime = elapsedTime + interval;
 		if (assocEvaluateInfo != null) assocEvaluateInfo.elapsedTime = newElapsedTime;
@@ -150,7 +150,7 @@ public class Counter extends AbstractRunner implements Serializable {
 		fireElapsedTimeEvent(new CounterElapsedTimeEvent(this, newElapsedTime));
 		
 //		try {
-//			Thread.sleep(Math.min(PERIOD, 5000));
+//			Thread.sleep(Math.min(PERIOD*1000, 5000));
 //		} catch (Exception e) {LogUtil.trace(e);}
 	}
 

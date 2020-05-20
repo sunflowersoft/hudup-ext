@@ -246,7 +246,7 @@ public abstract class AbstractRunner implements Runner {
 				thread.stop();
 		}
 		catch (Throwable e) {
-			LogUtil.error("Calling thread destroy() in AbstractRunner#forceStop causes error " + e.getMessage());
+			LogUtil.error("Calling thread stop() in AbstractRunner#forceStop causes error " + e.getMessage());
 		}
 		
 		thread = null;

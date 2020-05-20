@@ -202,32 +202,32 @@ public final class Constants {
 	
 	
 	/**
-	 * The Hudup server (only listener and balancer) is available to serve incoming request in a interval called a timeout in miliseconds. This constant specifies such timeout.
+	 * The Hudup server (only listener and balancer) is available to serve incoming request in a interval called a timeout in seconds. This constant specifies such timeout.
 	 * After timeout interval is reached, the server suspends and users must resumes it.
 	 * However, in current implementation, time out is only effective to listener and balancer. Hudup server is not affected.
 	 */
-	public final static int     DEFAULT_SERVER_TIMEOUT       = (int) (1000 * 60 * 60); // 1 hour
+	public final static int     DEFAULT_SERVER_TIMEOUT       = (int) (60 * 60); // 1 hour
 	
 	/**
-	 * This is the period in miliseconds that the Hudup server does periodically internal tasks such as data mining and learning knowledge base.
+	 * This is the period in seconds that the Hudup server does periodically internal tasks such as data mining and learning knowledge base.
 	 */
-	//public final static int     DEFAULT_SERVER_TASKS_PERIOD  = (int) (1000 * 60 * 5); // 5 minute for testing learning algorithm.
-	public final static int     DEFAULT_SERVER_TASKS_PERIOD  = (int) (1000 * 60 * 30); // 30-minute interval is relatively enough to learn algorithm normally with small enough dataset.
+	//public final static int     DEFAULT_SERVER_TASKS_PERIOD  = (int) (60 * 5); // 5 minute for testing learning algorithm.
+	public final static int     DEFAULT_SERVER_TASKS_PERIOD  = (int) (60 * 30); // 30-minute interval is relatively enough to learn algorithm normally with small enough dataset.
 	
 	/**
-	 * This is the period in miliseconds that the listener does periodically internal tasks.
+	 * This is the period in seconds that the listener does periodically internal tasks.
 	 */
 	public final static int     DEFAULT_LISTENER_TASK_PERIOD = DEFAULT_SERVER_TIMEOUT;
 	
 	/**
-	 * The long time out for any tasks.
+	 * The long time out in seconds for any tasks.
 	 */
-	public static int     DEFAULT_LONG_TIMEOUT               = (int) (1000 * 60 * 30); // 30 minutes
+	public static int     DEFAULT_LONG_TIMEOUT               = (int) (60 * 30); // 30 minutes
 	
 	/**
-	 * The short time out for any tasks.
+	 * The short time out in seconds for any tasks.
 	 */
-	public static int     DEFAULT_SHORT_TIMEOUT              = (int) (1000 * 60 * 5); // 5 minutes
+	public static int     DEFAULT_SHORT_TIMEOUT              = (int) (60 * 5); // 5 minutes
 	
 	
 	
@@ -257,7 +257,17 @@ public final class Constants {
 	 * If flag is true, server is responsible for purging disconnected listeners. Otherwise, each evaluator is responsible for purging disconnected listeners.
 	 */
 	public static boolean SERVER_PURGE_LISTENERS          = true;
+
+	/**
+	 * If flag is true, server has UI. Otherwise, server has no UI.
+	 */
+	public static boolean SERVER_UI                       = false;
 	
+	/**
+	 * If flag is true, the framework supports compressed file (zip, jar) as storage.
+	 */
+	public static boolean COMPRESSED_FILE_SUPPORT         = false;
+
 	
 	/**
 	 * Static code to load dynamic constant.
@@ -364,6 +374,24 @@ public final class Constants {
 			System.out.println("Error when parsing server purging listeners");
 		}
 	
+		try {
+			String serverUI = Util.getHudupProperty("server_ui");
+			if (serverUI != null)
+				SERVER_UI = Boolean.parseBoolean(serverUI);
+		}
+		catch (Throwable e) {
+			System.out.println("Error when parsing server ui");
+		}
+
+		try {
+			String compressedFileSupport = Util.getHudupProperty("compressed_file_support");
+			if (compressedFileSupport != null)
+				COMPRESSED_FILE_SUPPORT = Boolean.parseBoolean(compressedFileSupport);
+		}
+		catch (Throwable e) {
+			System.out.println("Error when parsing compressed file support");
+		}
+
 	}
 	
 	

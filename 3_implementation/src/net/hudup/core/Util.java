@@ -227,7 +227,6 @@ public final class Util {
 			instance = tClass.newInstance();
 		} 
 		catch (Exception e) {
-			// TODO Auto-generated catch block
 			LogUtil.trace(e);
 		}
 		
@@ -257,7 +256,6 @@ public final class Util {
 				instance = Class.forName(className).newInstance();
 		} 
 		catch (Throwable e) {
-			// TODO Auto-generated catch block
 			LogUtil.trace(e);
 			instance = null;
 		}

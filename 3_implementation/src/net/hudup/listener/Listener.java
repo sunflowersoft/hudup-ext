@@ -107,7 +107,7 @@ public class Listener extends SocketServer implements ServerStatusListener, Gate
 			
 			Naming.rebind(getGatewayBindUri().toString(), this);
 			
-			if (!config.isNonUI()) {
+			if (Constants.SERVER_UI) {
 				if (!createSysTray())
 					showCP();
 			}

@@ -134,7 +134,7 @@ public class PowerServerConfig extends ServerConfig {
 	public void reset() {
 		super.reset();
 		try {
-			xURI storeUri = xURI.create(STORE_PATH_DEFAULT);
+			xURI storeUri = Constants.COMPRESSED_FILE_SUPPORT ? xURI.create(STORE_PATH_DEFAULT) : xURI.create(STORE_PATH_DEFAULT2);
 			putDefaultUnitList(storeUri);
 			setRecommender(new GreenFallCF());
 			setParser(new SnapshotParserImpl());

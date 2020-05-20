@@ -49,6 +49,7 @@ import net.hudup.core.data.Snapshot;
 import net.hudup.core.data.SnapshotImpl;
 import net.hudup.core.evaluate.Evaluator;
 import net.hudup.core.evaluate.EvaluatorConfig;
+import net.hudup.core.logistic.AbstractRunner;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.NextUpdate;
 
@@ -88,6 +89,12 @@ public class DefaultService implements Service, PluginChangedListener, AutoClose
 	
 	
 	/**
+	 * Creating recommender algorithm.
+	 */
+	protected AbstractRunner recommenderCreator = null;
+	
+	
+	/**
 	 * Provider. Do not retrieve directly this variable. Using method {@link #getProvider()} instead.
 	 */
 	private Provider provider = null;
@@ -111,8 +118,52 @@ public class DefaultService implements Service, PluginChangedListener, AutoClose
 	 */
 	public DefaultService(Transaction trans) {
 		super();
-		
 		this.trans = trans;
+		
+		this.recommenderCreator = new AbstractRunner() {
+			
+			@Override
+			protected void task() {
+				if (serverConfig == null) {
+					thread = null;
+					paused = false;
+					return;
+				}
+				
+				Recommender recommender0 = null;
+				try {
+					recommender0 = createRecommender(serverConfig);
+				} catch (Exception e) {LogUtil.trace(e);}
+				
+				if (recommender0 != null) {
+					synchronized (this) {
+						trans.lockWrite();
+						
+						try {
+							if (recommender != null) recommender.unsetup();
+						} catch (Throwable e) {LogUtil.trace(e);}
+						
+						recommender = recommender0;
+						
+						trans.unlockWrite();
+						
+						LogUtil.info("Service creates recommender successful");
+					}
+				}
+				
+				thread = null;
+				paused = false;
+			}
+			
+			@Override
+			protected void clear() {}
+
+			@Override
+			public synchronized boolean stop() {
+				return super.forceStop();
+			}
+			
+		};
 	}
 
 	
@@ -133,7 +184,7 @@ public class DefaultService implements Service, PluginChangedListener, AutoClose
 		boolean opened = true;
 		this.serverConfig = serverConfig;
 		try {
-			recommender = createRecommender(params);
+			updateRecommender(params);
 		}
 		catch (Throwable e) {
 			LogUtil.trace(e);
@@ -148,27 +199,46 @@ public class DefaultService implements Service, PluginChangedListener, AutoClose
 	
 	
 	/**
+	 * Updating internal recommender.
+	 * @param params additional parameters so that recommender algorithm sets up.
+	 */
+	protected void updateRecommender(Object...params) {
+		try {
+			recommenderCreator.stop();
+			recommenderCreator.start();
+		}
+		catch (Throwable e) {LogUtil.trace(e);}
+	}
+	
+	
+	/**
 	 * Creating recommender.
+	 * @param serverConfig server configuration.
 	 * @param params additional parameters so that recommender algorithm sets up.
 	 * @return recommender created from server configuration.
-	 * @throws Exception if any error raises.
 	 */
-	protected Recommender createRecommender(Object...params) throws Exception {
-		Dataset dataset = null;
-		if (serverConfig.isDatasetEmpty()) {
-			dataset = new SnapshotImpl();
-			dataset.setConfig((DataConfig)serverConfig.clone());
+	protected static Recommender createRecommender(PowerServerConfig serverConfig, Object...params) {
+		try {
+			Dataset dataset = null;
+			if (serverConfig.isDatasetEmpty()) {
+				dataset = new SnapshotImpl();
+				dataset.setConfig((DataConfig)serverConfig.clone());
+			}
+			else {
+				dataset = serverConfig.getParser().parse((DataConfig)serverConfig.clone());
+			}
+			dataset.setExclusive(true);
+	
+			Recommender recommender = (Recommender) serverConfig.getRecommender().newInstance();
+			recommender.getConfig().putAll(serverConfig.getRecommender().getConfig());
+			recommender.setup(dataset, params);
+			
+			return recommender;
 		}
-		else {
-			dataset = serverConfig.getParser().parse((DataConfig)serverConfig.clone());
+		catch (Exception e) {
+			LogUtil.trace(e);
+			return null;
 		}
-		dataset.setExclusive(true);
-
-		Recommender recommender = (Recommender) serverConfig.getRecommender().newInstance();
-		recommender.getConfig().putAll(serverConfig.getRecommender().getConfig());
-		recommender.setup(dataset, params);
-		
-		return recommender;
 	}
 	
 	
@@ -183,13 +253,16 @@ public class DefaultService implements Service, PluginChangedListener, AutoClose
 	
 	@Override
 	public void close() {
+		try {
+			recommenderCreator.stop();
+		}
+		catch (Throwable e) {LogUtil.trace(e);}
+		
 		if (recommender != null) {
 			try {
 				recommender.unsetup();
 			}
-			catch (Throwable e) {
-				LogUtil.trace(e);
-			}
+			catch (Throwable e) {LogUtil.trace(e);}
 		}
 		recommender = null;
 		
@@ -197,9 +270,7 @@ public class DefaultService implements Service, PluginChangedListener, AutoClose
 			try {
 				provider.close();
 			}
-			catch (Throwable e) {
-				LogUtil.trace(e);
-			}
+			catch (Throwable e) {LogUtil.trace(e);}
 		}
 		provider = null;
 	}
@@ -1489,7 +1560,7 @@ public class DefaultService implements Service, PluginChangedListener, AutoClose
 	 */
 	public Evaluator getEvaluator(String evaluatorName) throws RemoteException {
 		Evaluator evaluator = null;
-		trans.lockWrite();
+		trans.lockRead();
 		try {
 			List<Evaluator> evList = Util.getPluginManager().loadInstances(Evaluator.class);
 			for (Evaluator ev : evList) {
@@ -1511,7 +1582,9 @@ public class DefaultService implements Service, PluginChangedListener, AutoClose
 				evaluator.export(serverConfig.getServerPort());
 				evaluator.stimulate();
 				
-				this.evaluatorConfigMap.put(evaluator.getName(), evaluator.getConfig());
+				synchronized (evaluatorConfigMap) {
+					evaluatorConfigMap.put(evaluator.getName(), evaluator.getConfig());
+				}
 			}
 		}
 		catch (Throwable e) {
@@ -1521,7 +1594,7 @@ public class DefaultService implements Service, PluginChangedListener, AutoClose
 			LogUtil.error("Service fail to get evaluator, caused by " + e.getMessage());
 		}
 		finally {
-			trans.unlockWrite();
+			trans.unlockRead();
 		}
 		
 		return evaluator;
@@ -1568,7 +1641,7 @@ public class DefaultService implements Service, PluginChangedListener, AutoClose
 	public Alg getAlg(String algName) throws RemoteException {
 		Alg alg = null;
 		
-		trans.lockWrite();
+		trans.lockRead();
 		try {
 			alg = PluginStorage.getNormalAlgReg().query(algName);
 			if (alg instanceof AlgRemote) {
@@ -1578,7 +1651,9 @@ public class DefaultService implements Service, PluginChangedListener, AutoClose
 //				if (!singleton)
 //					remoteAlg = (AlgRemote) alg.newInstance();
 				
-				remoteAlg.export(serverConfig.getServerPort());
+				synchronized (remoteAlg) {
+					remoteAlg.export(serverConfig.getServerPort());
+				}
 				alg = Util.getPluginManager().wrap(remoteAlg, false);
 				
 //				if (!singleton)
@@ -1592,7 +1667,7 @@ public class DefaultService implements Service, PluginChangedListener, AutoClose
 			LogUtil.error("Service fails to get algorithm, caused by " + e.getMessage());
 		}
 		finally {
-			trans.unlockWrite();
+			trans.unlockRead();
 		}
 		
 		return alg;
