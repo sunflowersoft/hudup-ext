@@ -102,18 +102,6 @@ public class PowerServerConfig extends ServerConfig {
 
 	
 	/**
-	 * Field of global address.
-	 */
-	public final static String GLOBAL_ADDRESS_FIELD = "global_address";
-
-	
-	/**
-	 * Default value of global address.
-	 */
-	public final static String GLOBAL_ADDRESS_DEFAULT = "";
-
-	
-	/**
 	 * Default constructor.
 	 */
 	public PowerServerConfig() {
@@ -147,7 +135,6 @@ public class PowerServerConfig extends ServerConfig {
 		}
 		setPeriodLearn(PERIOD_LEARN_DEFAULT);
 		setDatasetEmpty(DATASET_EMPTY_DEFAULT);
-		setGlobalAddress(GLOBAL_ADDRESS_DEFAULT);
 	}
 
 	
@@ -187,31 +174,6 @@ public class PowerServerConfig extends ServerConfig {
 		return getAsBoolean(PERIOD_LEARN_FIELD);
 	}
 
-	
-	/**
-	 * Setting global address.
-	 * @param globalAddress global address.
-	 */
-	public void setGlobalAddress(String globalAddress) {
-		put(GLOBAL_ADDRESS_FIELD, globalAddress);
-	}
-	
-	
-	/**
-	 * Getting global address.
-	 * @return global address.
-	 */
-	public String getGlobalAddress() {
-		String globalAddress = getAsString(GLOBAL_ADDRESS_FIELD);
-		if (globalAddress == null) return null;
-		
-		globalAddress = globalAddress.trim();
-		if (globalAddress.isEmpty() || globalAddress.compareToIgnoreCase("localhost") == 0 || globalAddress.compareToIgnoreCase("127.0.0.1") == 0)
-			return null;
-		else
-			return globalAddress;
-	}
-	
 	
 	/**
 	 * Setting flag to indicate empty dataset.

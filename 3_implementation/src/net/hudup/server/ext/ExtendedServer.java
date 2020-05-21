@@ -21,8 +21,6 @@ import javax.swing.JOptionPane;
 import net.hudup.core.Constants;
 import net.hudup.core.logistic.I18nUtil;
 import net.hudup.core.logistic.LogUtil;
-import net.hudup.core.logistic.NetUtil;
-import net.hudup.core.logistic.NetUtil.InetHardware;
 import net.hudup.core.logistic.xURI;
 import net.hudup.core.logistic.ui.UIUtil;
 import net.hudup.server.DefaultServer;
@@ -47,80 +45,18 @@ public class ExtendedServer extends DefaultServer {
 	private static final long serialVersionUID = 1L;
 
 	
-//	/**
-//	 * Server stub.
-//	 */
-//	protected Remote serverStub = null;
-	
-	
 	/**
 	 * Constructor with configuration.
 	 * @param config power server configuration.
 	 */
 	public ExtendedServer(PowerServerConfig config) {
 		super(config);
-//		serverStub = this;
 	}
 
 	
 	@Override
 	protected DefaultService createService() {
 		return new ExtendedService(trans, this);
-	}
-
-
-	@Override
-	protected void doWhenStart() {
-		super.doWhenStart();
-		
-//		try {
-//			String globalHost = config.getDeployGlobalHost();
-//			if (globalHost != null && globalHost.compareToIgnoreCase("localhost") != 0 && globalHost.compareToIgnoreCase("127.0.0.1") != 0) {
-//				System.setProperty("java.rmi.server.hostname", globalHost);
-//				LogUtil.info("java.rmi.server.hostname=" + globalHost);
-//			}
-//			else
-//				System.setProperty("java.rmi.server.hostname", "");
-//		}
-//		catch (Throwable e) {LogUtil.trace(e);}
-//
-//		if (serverStub == null) {
-//			try {
-//				int port = config.getServerPort();
-//				UnicastRemoteObject.exportObject(this, port);
-//				serverStub = this;
-//			} 
-//			catch (Throwable e) {LogUtil.trace(e);}
-//		}
-		
-		try {
-			InetHardware ih = NetUtil.getInetHardware();
-			if (ih != null && ih.ni != null && ih.inetAddr != null) {
-				Constants.hardwareAddress = ih.getMACAddress();
-				Constants.hostAddress = ih.inetAddr.getHostAddress();
-			}
-			if (Constants.hardwareAddress == null || Constants.hostAddress == null) {
-				Constants.hardwareAddress = null;
-				Constants.hostAddress = null;
-			}
-		}
-		catch (Throwable e) {
-			LogUtil.error("Error when getting MAC and host addresses");
-			Constants.hardwareAddress = null;
-			Constants.hostAddress = null;
-		}
-	}
-
-
-	@Override
-	protected void doWhenStop() {
-		super.doWhenStop();
-		
-//		try {
-//			UnicastRemoteObject.unexportObject(this, true);
-//			serverStub = null;
-//		} 
-//		catch (Throwable e) {LogUtil.trace(e);}
 	}
 
 

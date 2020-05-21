@@ -29,6 +29,7 @@ import net.hudup.core.client.ServerStatusEvent.Status;
 import net.hudup.core.client.ServerStatusListener;
 import net.hudup.core.client.Service;
 import net.hudup.core.data.DataConfig;
+import net.hudup.core.logistic.AbstractRunner;
 import net.hudup.core.logistic.AbstractRunner.Priority;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.NetUtil;
@@ -130,10 +131,9 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 		super();
 		
 		try {
-			String globalAddress = config.getGlobalAddress();
-			if (globalAddress != null) {
-				System.setProperty("java.rmi.server.hostname", globalAddress);
-				LogUtil.info("java.rmi.server.hostname=" + globalAddress);
+			if (Constants.globalAddress != null) {
+				System.setProperty("java.rmi.server.hostname", Constants.globalAddress);
+				LogUtil.info("java.rmi.server.hostname=" + Constants.globalAddress);
 			}
 		}
 		catch (Throwable e) {LogUtil.trace(e);}
@@ -341,33 +341,43 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 	 * Shutdown server, after server shutdown, program exits. Called by {@link #exit()}.
 	 */
 	protected void shutdown() {
-		shutdown0();
+//		shutdown0();
 		
-//		if (config == null) return;
-//
-//		Object sync = new Object();
-//		
-//		SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
-//			@Override
-//			protected Void doInBackground() throws Exception {
-//				try {
-//					shutdown0();
-//				} catch (Exception e) {LogUtil.trace(e);}
-//				
-//				sync.notifyAll();
-//				return null;
-//			}
-//			
-//		};
-//		worker.execute();
-//		
-//		synchronized(sync) {
-//			try {
-//				sync.wait(Constants.DEFAULT_SHORT_TIMEOUT*1000);
-//			} catch (Exception e) {LogUtil.trace(e);}
-//		}
-//
-//		config = null;
+		if (config == null) return;
+
+		Object sync = new Object();
+		
+		AbstractRunner worker = new AbstractRunner() {
+			
+			@Override
+			protected void task() {
+				try {
+					shutdown0();
+				} catch (Exception e) {LogUtil.trace(e);}
+
+				thread = null;
+				paused = false;
+				
+				synchronized(sync) {
+					sync.notifyAll();
+				}
+			}
+			
+			@Override
+			protected void clear() { }
+			
+		};
+	
+		synchronized(sync) {
+			worker.start();
+			
+			try {
+				sync.wait(Constants.DEFAULT_SHORT_TIMEOUT*1000);
+			} catch (Exception e) {LogUtil.trace(e);}
+		}
+		worker.forceStop();
+		
+		config = null;
 	}
 	
 	

@@ -249,6 +249,11 @@ public final class Constants {
 	public static String hostAddress                      = null;
 	
 	/**
+	 * Global address.
+	 */
+	public static String globalAddress                      = null;
+
+	/**
 	 * Setting the maximum number of extra class loaders. If it is -1, there is no limit of extra class loaders but it is not adviced.
 	 */
 	public static int MAX_EXTRA_CLASSLOADERS              = 10;
@@ -343,9 +348,9 @@ public final class Constants {
 				hardwareAddress = ih.getMACAddress();
 				hostAddress = ih.inetAddr.getHostAddress();
 			}
-			if (Constants.hardwareAddress == null || Constants.hostAddress == null) {
-				Constants.hardwareAddress = null;
-				Constants.hostAddress = null;
+			if (hardwareAddress == null || hostAddress == null) {
+				hardwareAddress = null;
+				hostAddress = null;
 			}
 		}
 		catch (Throwable e) {
@@ -354,6 +359,23 @@ public final class Constants {
 			System.out.println("Error when getting MAC and host addresses");
 		}
 		
+		try {
+			String globalAddress0 = Util.getHudupProperty("global_address");
+			if (globalAddress0 != null) globalAddress0 = globalAddress0.trim();
+			if (globalAddress0 == null || globalAddress0.isEmpty())
+				globalAddress = null;
+			else if (globalAddress0.compareToIgnoreCase("localhost") == 0 || globalAddress0.compareToIgnoreCase("127.0.0.1") == 0)
+				globalAddress = null;
+			else
+				globalAddress = globalAddress0;
+			
+			if (hardwareAddress != null && globalAddress != null)
+				hostAddress = globalAddress;
+		}
+		catch (Throwable e) {
+			System.out.println("Error when parsing log4j property");
+		}
+
 		try {
 			String maxExtraClassLoaders = Util.getHudupProperty("max_extra_classloaders");
 			if (maxExtraClassLoaders != null)

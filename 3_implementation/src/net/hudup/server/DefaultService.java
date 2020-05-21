@@ -205,6 +205,10 @@ public class DefaultService implements Service, PluginChangedListener, AutoClose
 	protected void updateRecommender(Object...params) {
 		try {
 			recommenderCreator.stop();
+		}
+		catch (Throwable e) {LogUtil.trace(e);}
+		
+		try {
 			recommenderCreator.start();
 		}
 		catch (Throwable e) {LogUtil.trace(e);}
