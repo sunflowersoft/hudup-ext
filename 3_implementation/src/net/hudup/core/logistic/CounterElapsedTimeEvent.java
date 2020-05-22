@@ -37,7 +37,7 @@ public class CounterElapsedTimeEvent extends EventObject {
 	 * @param elapsedTime elapsed time.
 	 */
 	public CounterElapsedTimeEvent(Object source, long elapsedTime) {
-		super(source != null ? source : new Integer(0));
+		super(source != null ? source : Integer.valueOf(0));
 		this.elapsedTime = elapsedTime;
 	}
 

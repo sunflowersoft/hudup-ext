@@ -168,7 +168,7 @@ public class ExternalRecord implements Serializable, Cloneable, TextParsable {
 		Set<Integer> keys = map.keySet();
 		for (int key : keys) {
 			ExternalRecord value = map.get(key);
-			newMap.put(new Integer(key), (ExternalRecord)value.clone());
+			newMap.put(Integer.valueOf(key), (ExternalRecord)value.clone());
 		}
 		
 		return newMap;

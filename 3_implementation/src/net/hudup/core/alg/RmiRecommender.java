@@ -45,34 +45,29 @@ public class RmiRecommender extends ServiceRecommenderAbstract implements RmiAlg
 	 */
 	public RmiRecommender() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
 
 	@Override
 	public DataConfig createDefaultConfig() {
-		// TODO Auto-generated method stub
 		return new DataConfig();
 	}
 
 	
 	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
 		return "rmi_server_query";
 	}
 
 	
 	@Override
 	public String getDescription() throws RemoteException {
-		// TODO Auto-generated method stub
 		return "Recommendation algorithm by calling RMI service";
 	}
 
 
 	@Override
 	public Dataset getDataset() throws RemoteException {
-		// TODO Auto-generated method stub
 		if (service == null)
 			return null;
 		else
@@ -82,7 +77,6 @@ public class RmiRecommender extends ServiceRecommenderAbstract implements RmiAlg
 
 	@Override
 	public synchronized void setup(Dataset dataset, Object...params) throws RemoteException {
-		// TODO Auto-generated method stub
 		unsetup();
 		
 		xURI uri = dataset.getConfig().getStoreUri(); 
@@ -96,7 +90,6 @@ public class RmiRecommender extends ServiceRecommenderAbstract implements RmiAlg
 	
 	@Override
 	public synchronized void unsetup() throws RemoteException {
-		// TODO Auto-generated method stub
 		service = null;
 
 		super.unsetup();
@@ -105,13 +98,11 @@ public class RmiRecommender extends ServiceRecommenderAbstract implements RmiAlg
 
 	@Override
 	public synchronized RatingVector estimate(RecommendParam param, Set<Integer> queryIds) throws RemoteException {
-		// TODO Auto-generated method stub
 		
 		try {
 			return service.estimate(param, queryIds);
 		} 
 		catch (Throwable e) {
-			// TODO Auto-generated catch block
 			LogUtil.trace(e);
 			return null;
 		}
@@ -120,25 +111,17 @@ public class RmiRecommender extends ServiceRecommenderAbstract implements RmiAlg
 	
 	@Override
 	public synchronized RatingVector recommend(RecommendParam param, int maxRecommend) throws RemoteException {
-		// TODO Auto-generated method stub
 
 		try {
 			return service.recommend(param, maxRecommend);
 		} 
 		catch (Throwable e) {
-			// TODO Auto-generated catch block
 			LogUtil.trace(e);
 			return null;
 		}
 		
 	}
 
-
-	@Override
-	public Alg newInstance() {
-		// TODO Auto-generated method stub
-		return new RmiRecommender();
-	}
 
 	
 }

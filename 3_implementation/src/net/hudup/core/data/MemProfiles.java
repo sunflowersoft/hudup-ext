@@ -139,7 +139,7 @@ public class MemProfiles implements Profiles {
 			
 			try {
 				Profile profile = new Profile(attList);
-				profile.setIdValue(new Integer(profileId));
+				profile.setIdValue(Integer.valueOf(profileId));
 				profileMap.put(profileId, profile);
 			}
 			catch (Throwable e) {
@@ -329,18 +329,4 @@ public class MemProfiles implements Profiles {
 	}
 
 
-	@Override
-	protected void finalize() throws Throwable {
-		// TODO Auto-generated method stub
-		super.finalize();
-		
-		try {
-			clear();
-		}
-		catch (Throwable e) {
-			LogUtil.trace(e);
-		}
-	}
-
-	
 }

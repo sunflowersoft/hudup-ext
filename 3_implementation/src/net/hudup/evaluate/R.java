@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Set;
 
 import net.hudup.core.Util;
-import net.hudup.core.alg.Alg;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.RatingVector;
 import net.hudup.core.evaluate.MetricValue;
@@ -41,34 +40,29 @@ public class R extends CorrelationAccuracy {
 	 */
 	public R() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
 
 	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
 		return "R.recommend";
 	}
 
 	
 	@Override
 	public String getTypeName() throws RemoteException {
-		// TODO Auto-generated method stub
 		return "Correlation accuracy";
 	}
 
 
 	@Override
 	public String getDescription() throws RemoteException {
-		// TODO Auto-generated method stub
 		return "Pearson correlation for recommendation algorithm";
 	}
 
 	
 	@Override
 	protected MetricValue calc(RatingVector recommended, RatingVector vTesting, Dataset testing) {
-		// TODO Auto-generated method stub
 		
 		if (vTesting == null)
 			return null;
@@ -97,13 +91,6 @@ public class R extends CorrelationAccuracy {
 		else
 			return null;
 		
-	}
-
-
-	@Override
-	public Alg newInstance() {
-		// TODO Auto-generated method stub
-		return new R();
 	}
 
 

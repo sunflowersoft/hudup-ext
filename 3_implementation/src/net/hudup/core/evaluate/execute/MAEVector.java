@@ -11,7 +11,6 @@ import java.rmi.RemoteException;
 import java.util.List;
 
 import net.hudup.core.Util;
-import net.hudup.core.alg.Alg;
 import net.hudup.core.evaluate.FractionMetricValue;
 import net.hudup.core.evaluate.MetricValue;
 import net.hudup.core.evaluate.VectorMetric;
@@ -38,41 +37,30 @@ public class MAEVector extends VectorMetric {
 	 * Default constructor.
 	 */
 	public MAEVector() {
-		// TODO Auto-generated constructor stub
+
 	}
 
 	
 	@Override
 	public String getDescription() throws RemoteException {
-		// TODO Auto-generated method stub
 		return "Vector of Mean Absolute Errors for executable algorithms";
 	}
 
 	
 	@Override
 	public String getTypeName() throws RemoteException {
-		// TODO Auto-generated method stub
 		return "Accuracy";
 	}
 
 	
 	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
 		return "MAEVector.exe";
 	}
 
 	
 	@Override
-	public Alg newInstance() {
-		// TODO Auto-generated method stub
-		return new MAEVector();
-	}
-
-	
-	@Override
 	protected MetricValue parseParams(Object... params) {
-		// TODO Auto-generated method stub
 		if (params == null || params.length < 2)
 			return null;
 		

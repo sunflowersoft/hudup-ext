@@ -9,8 +9,6 @@ package net.hudup.core.evaluate;
 
 import java.rmi.RemoteException;
 
-import net.hudup.core.alg.Alg;
-
 /**
  * This class implements recall metric for estimation on query ID.
  * 
@@ -65,15 +63,7 @@ public class ExactRecallMetric extends DefaultMetric {
 	
 	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
 		return "Exact recall";
-	}
-
-
-	@Override
-	public Alg newInstance() {
-		// TODO Auto-generated method stub
-		return new ExactRecallMetric();
 	}
 
 

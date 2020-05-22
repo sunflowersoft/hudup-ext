@@ -36,24 +36,14 @@ public class PluginDemoCF extends MemoryBasedCF {
 
 	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
 		return "plugin_demo_cf";
 	}
 
 	
 	@Override
-	public Alg newInstance() {
-		// TODO Auto-generated method stub
-		return new PluginDemoCF();
-	}
-
-
-	@Override
 	public RatingVector estimate(RecommendParam param, Set<Integer> queryIds) throws RemoteException {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
-	
 	
 }

@@ -126,14 +126,12 @@ public abstract class FreqItemsetFinder implements Alg {
 
 	@Override
 	public DataConfig getConfig() {
-		// TODO Auto-generated method stub
 		return config;
 	}
 
 
 	@Override
 	public void resetConfig() {
-		// TODO Auto-generated method stub
 		config.clear();
 		config.putAll(createDefaultConfig());
 	}
@@ -141,7 +139,6 @@ public abstract class FreqItemsetFinder implements Alg {
 
 	@Override
 	public DataConfig createDefaultConfig() {
-		// TODO Auto-generated method stub
 		DataConfig config = new DataConfig();
 		
 		config.put(MIN_SUP, DEFAULT_MIN_SUP);

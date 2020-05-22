@@ -12,7 +12,6 @@ import java.rmi.RemoteException;
 import java.util.Map;
 
 import net.hudup.core.Util;
-import net.hudup.core.alg.Alg;
 import net.hudup.core.data.Attribute;
 import net.hudup.core.data.Attribute.Type;
 import net.hudup.core.data.AttributeList;
@@ -63,19 +62,16 @@ public class DefaultCTSManager extends CTSManagerAbstract {
 	 */
 	public DefaultCTSManager() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
 	
 	@Override
 	public void setup(DataConfig config) {
-		// TODO Auto-generated method stub
 
 		try {
 			close();
 		} 
 		catch (Throwable e) {
-			// TODO Auto-generated catch block
 			LogUtil.trace(e);
 		}
 		
@@ -88,7 +84,6 @@ public class DefaultCTSManager extends CTSManagerAbstract {
 
 	@Override
 	public DataConfig getConfig() {
-		// TODO Auto-generated method stub
 		
 		return assoc == null ? null : assoc.getConfig();
 	}
@@ -96,7 +91,6 @@ public class DefaultCTSManager extends CTSManagerAbstract {
 
 	@Override
 	public ContextTemplateSchema getCTSchema() {
-		// TODO Auto-generated method stub
 		
 		return ctSchema;
 	}
@@ -110,7 +104,6 @@ public class DefaultCTSManager extends CTSManagerAbstract {
 	
 	@Override
 	public void reload() {
-		// TODO Auto-generated method stub
 		ctSchema.clear();
 		
 		DataConfig config = getConfig();
@@ -145,7 +138,6 @@ public class DefaultCTSManager extends CTSManagerAbstract {
 					fetcher.close();
 			} 
 			catch (Throwable e) {
-				// TODO Auto-generated catch block
 				LogUtil.trace(e);
 			}
 			
@@ -224,7 +216,6 @@ public class DefaultCTSManager extends CTSManagerAbstract {
 	
 	@Override
 	public ContextList getContexts(int userId, int itemId) {
-		// TODO Auto-generated method stub
 		ContextList contexts = new ContextList();
 		
 		AttributeList attributes = new AttributeList();
@@ -280,7 +271,6 @@ public class DefaultCTSManager extends CTSManagerAbstract {
 	
 	@Override
 	public ContextList getContexts(int userId, int itemId, long ratedDate) {
-		// TODO Auto-generated method stub
 		if (ratedDate <= 0) return getContexts(userId, itemId);
 		
 		ContextList contexts = new ContextList();
@@ -329,7 +319,6 @@ public class DefaultCTSManager extends CTSManagerAbstract {
 	
 	@Override
 	public Profile profileOf(int ctxTemplateId, ContextValue ctxValue) {
-		// TODO Auto-generated method stub
 		if (ctxTemplateId < 0 || ctxValue == null || !ctxValue.isQuantized())
 			return null;
 		String profileUnit = getConfig().getContextTemplateProfileUnit(ctxTemplateId);
@@ -356,7 +345,6 @@ public class DefaultCTSManager extends CTSManagerAbstract {
 	
 	@Override
 	public Profiles profilesOf(int ctxTemplateId) {
-		// TODO Auto-generated method stub
 		String profileUnit = getConfig().getContextTemplateProfileUnit(ctxTemplateId);
 		if (profileUnit == null)
 			return MemProfiles.createEmpty();
@@ -410,7 +398,6 @@ public class DefaultCTSManager extends CTSManagerAbstract {
 	
 	@Override
 	public boolean commitCTSchema() {
-		// TODO Auto-generated method stub
 		final String templateUnit = getConfig().getContextTemplateUnit();
 		if (templateUnit == null)
 			return false;
@@ -428,7 +415,6 @@ public class DefaultCTSManager extends CTSManagerAbstract {
 			
 			@Override
 			public void process(ContextTemplate template) {
-				// TODO Auto-generated method stub
 				UnitList unitList = assoc.getUnitList();
 				
 				Profile templateRecord = new Profile(templateAttRef);
@@ -495,7 +481,6 @@ public class DefaultCTSManager extends CTSManagerAbstract {
 	
 	@Override
 	public boolean importCTSchema(CTSManager ctsm) {
-		// TODO Auto-generated method stub
 		
 		// Creating schema
 		ContextTemplateSchema schema = ctsm.getCTSchema();
@@ -514,7 +499,6 @@ public class DefaultCTSManager extends CTSManagerAbstract {
 				
 				@Override
 				public void process(ContextTemplate template) {
-					// TODO Auto-generated method stub
 					if (!template.hasProfile())
 						return;
 					
@@ -542,7 +526,6 @@ public class DefaultCTSManager extends CTSManagerAbstract {
 							fetcher.close();
 						} 
 						catch (Throwable e) {
-							// TODO Auto-generated catch block
 							LogUtil.trace(e);
 						}
 					}
@@ -560,7 +543,6 @@ public class DefaultCTSManager extends CTSManagerAbstract {
 	
 	@Override
 	public boolean importCTSchema(Dataset dataset) {
-		// TODO Auto-generated method stub
 		
 		// Creating schema
 		ContextTemplateSchema schema = dataset.getCTSchema();
@@ -579,7 +561,6 @@ public class DefaultCTSManager extends CTSManagerAbstract {
 				
 				@Override
 				public void process(ContextTemplate template) {
-					// TODO Auto-generated method stub
 					if (!template.hasProfile())
 						return;
 					
@@ -607,7 +588,6 @@ public class DefaultCTSManager extends CTSManagerAbstract {
 							fetcher.close();
 						} 
 						catch (Throwable e) {
-							// TODO Auto-generated catch block
 							LogUtil.trace(e);
 						}
 					}
@@ -625,32 +605,22 @@ public class DefaultCTSManager extends CTSManagerAbstract {
 	
 	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
 		return "default_cts_manager";
 	}
 
 	
 	@Override
 	public String getDescription() throws RemoteException {
-		// TODO Auto-generated method stub
 		return "Default context template manager";
 	}
 
 
 	@Override
 	public Inspector getInspector() {
-		// TODO Auto-generated method stub
 		return new CTScreator(null, this);
 	}
 
 
-	@Override
-	public Alg newInstance() {
-		// TODO Auto-generated method stub
-		return new DefaultCTSManager();
-	}
-
-	
 	@Override
 	public void close() throws Exception {
 		try {

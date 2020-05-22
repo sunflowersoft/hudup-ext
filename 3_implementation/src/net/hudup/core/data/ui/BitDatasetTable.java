@@ -145,7 +145,7 @@ class BitDatasetTableModel extends RatingValueTM {
 			
 			Vector<Object> row = Util.newVector();
 			row.setSize(this.columnIds.size());
-			int sessionIdx = realSessionIds.indexOf(new Integer(rowId));
+			int sessionIdx = realSessionIds.indexOf(Integer.valueOf(rowId));
 			for (int j = 0; j < this.columnIds.size(); j++) {
 				int bitItemId = this.columnIds.get(j);
 				BitItem item = this.bitData.get(bitItemId);

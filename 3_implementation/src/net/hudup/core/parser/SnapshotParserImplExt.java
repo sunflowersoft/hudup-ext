@@ -9,7 +9,6 @@ package net.hudup.core.parser;
 
 import java.rmi.RemoteException;
 
-import net.hudup.core.alg.Alg;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.SnapshotImplExt;
@@ -45,12 +44,6 @@ public class SnapshotParserImplExt extends SnapshotParserImpl {
 		return SnapshotImplExt.create(config);
 	}
 
-	
-	@Override
-	public Alg newInstance() {
-		return new SnapshotParserImplExt();
-	}
-	
 	
 	@Override
 	public String getName() {

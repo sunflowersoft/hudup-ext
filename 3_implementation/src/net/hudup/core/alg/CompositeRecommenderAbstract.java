@@ -73,7 +73,7 @@ public abstract class CompositeRecommenderAbstract extends RecommenderAbstract i
 		config.setStoreUri(store);
 		
 		try {
-			Recommender defaultRecommender = DEFAULT_RECOMMENDER_CLASS.newInstance();
+			Recommender defaultRecommender = DEFAULT_RECOMMENDER_CLASS.getDeclaredConstructor().newInstance();
 			defaultRecommender.getConfig().setStoreUri(config.getStoreUri().concat(defaultRecommender.getName()));
 			
 			config.put(INNER_RECOMMENDER, new AlgList(defaultRecommender));

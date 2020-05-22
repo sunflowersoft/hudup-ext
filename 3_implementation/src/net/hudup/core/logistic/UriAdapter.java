@@ -453,8 +453,7 @@ public class UriAdapter implements UriAssoc, AutoCloseable {
 	
 	@Override
 	protected void finalize() throws Throwable {
-		// TODO Auto-generated method stub
-		super.finalize();
+//		super.finalize();
 		
 		try {
 			close();
@@ -560,8 +559,7 @@ public class UriAdapter implements UriAssoc, AutoCloseable {
 
 		@Override
 		protected void finalize() throws Throwable {
-			// TODO Auto-generated method stub
-			super.finalize();
+//			super.finalize();
 			
 			try {
 				close();
@@ -638,8 +636,7 @@ public class UriAdapter implements UriAssoc, AutoCloseable {
 
 		@Override
 		protected void finalize() throws Throwable {
-			// TODO Auto-generated method stub
-			super.finalize();
+//			super.finalize();
 			
 			try {
 				close();
@@ -736,8 +733,7 @@ public class UriAdapter implements UriAssoc, AutoCloseable {
 
 		@Override
 		protected void finalize() throws Throwable {
-			// TODO Auto-generated method stub
-			super.finalize();
+//			super.finalize();
 			
 			try {
 				close();

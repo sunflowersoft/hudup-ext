@@ -9,7 +9,6 @@ package net.hudup.core.evaluate.execute;
 
 import java.rmi.RemoteException;
 
-import net.hudup.core.alg.Alg;
 import net.hudup.core.evaluate.FractionMetricValue;
 import net.hudup.core.evaluate.MetaMetric;
 import net.hudup.core.evaluate.MetricValue;
@@ -83,13 +82,6 @@ public class RMSE extends MSE {
 				}
 				
 			};
-	}
-
-	
-	@Override
-	public Alg newInstance() {
-		// TODO Auto-generated method stub
-		return new RMSE();
 	}
 
 	
@@ -176,11 +168,4 @@ class RMSEDeprecated extends MetaMetric {
 	}
 
 
-	@Override
-	public Alg newInstance() {
-		// TODO Auto-generated method stub
-		return new RMSEDeprecated();
-	}
-
-	
 }

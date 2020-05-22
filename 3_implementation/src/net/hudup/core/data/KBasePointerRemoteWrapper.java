@@ -26,7 +26,7 @@ public class KBasePointerRemoteWrapper extends PointerRemoteWrapper implements K
     /**
      * Default constructor.
      */
-    public KBasePointerRemoteWrapper() {
+    protected KBasePointerRemoteWrapper() {
 
     }
 

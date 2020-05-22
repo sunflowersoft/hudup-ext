@@ -9,8 +9,6 @@ package net.hudup.core.alg.cf.gfall;
 
 import java.rmi.RemoteException;
 
-import net.hudup.core.alg.Alg;
-
 
 
 /**
@@ -57,14 +55,6 @@ public class GreenFallCF extends FreqItemsetBasedCF {
 	}
 
 
-	@Override
-	public Alg newInstance() {
-		return new GreenFallCF();
-	}
-
-
 }
-
-
 
 

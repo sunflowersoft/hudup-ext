@@ -632,7 +632,7 @@ public final class TextParserUtil {
 					continue;
 				
 				K key = (K) parseObjectByClass(list.get(0), k);
-				V value = v.newInstance();
+				V value = v.getDeclaredConstructor().newInstance();
 				value.parseText(list.get(1));
 				
 				map.put(key, value);
@@ -665,7 +665,7 @@ public final class TextParserUtil {
 		for (String el : array) {
 			
 			try {
-				T t = classType.newInstance();
+				T t = classType.getDeclaredConstructor().newInstance();
 				t.parseText(el);
 				
 				list.add(t);
@@ -746,7 +746,7 @@ public final class TextParserUtil {
 				adapter.close();
 			}
 			else if (TextParsable.class.isAssignableFrom(type)){
-				TextParsable obj = (TextParsable) type.newInstance();
+				TextParsable obj = (TextParsable) type.getDeclaredConstructor().newInstance();
 				obj.parseText(string);
 				v = obj;
 			}
@@ -754,7 +754,6 @@ public final class TextParserUtil {
 				v = null;
 		}
 		catch (Throwable e) {
-			// TODO Auto-generated catch block
 			LogUtil.trace(e);
 			v = null;
 		} 

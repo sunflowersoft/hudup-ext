@@ -64,7 +64,7 @@ public class RecommendContextPrefilterImpl extends CompositeRecommenderAbstract 
 		
 		Recommender recommender = null;
 		try {
-			recommender = (Recommender) Class.forName(INNER_RECOMMENDER).newInstance();
+			recommender = (Recommender) Class.forName(INNER_RECOMMENDER).getDeclaredConstructor().newInstance();
 		}
 		catch (Throwable e) {
 			LogUtil.info("Inner recommender " + INNER_RECOMMENDER + " initiated " + this.getClass() + " not exist");
@@ -78,7 +78,6 @@ public class RecommendContextPrefilterImpl extends CompositeRecommenderAbstract 
 	
 	@Override
 	public synchronized void setup(Dataset dataset, Object...params) throws RemoteException {
-		// TODO Auto-generated method stub
 		unsetup();
 		
 		this.dataset = dataset;
@@ -109,7 +108,6 @@ public class RecommendContextPrefilterImpl extends CompositeRecommenderAbstract 
 	
 	@Override
 	public synchronized void unsetup() throws RemoteException {
-		// TODO Auto-generated method stub
 		super.unsetup();
 		
 		if (filteredDataset != null) {
@@ -123,7 +121,6 @@ public class RecommendContextPrefilterImpl extends CompositeRecommenderAbstract 
 
 	@Override
 	public Dataset getDataset() throws RemoteException {
-		// TODO Auto-generated method stub
 		return dataset == null ? filteredDataset : dataset;
 	}
 
@@ -157,13 +154,11 @@ public class RecommendContextPrefilterImpl extends CompositeRecommenderAbstract 
 	
 	@Override
 	public synchronized RatingVector estimate(RecommendParam param, Set<Integer> queryIds) throws RemoteException {
-		// TODO Auto-generated method stub
 		
 		try {
 			prepareInnerRecommender(param);
 		} 
 		catch (Throwable e) {
-			// TODO Auto-generated catch block
 			LogUtil.trace(e);
 			return null;
 		}
@@ -175,13 +170,11 @@ public class RecommendContextPrefilterImpl extends CompositeRecommenderAbstract 
 	
 	@Override
 	public synchronized RatingVector recommend(RecommendParam param, int maxRecommend) throws RemoteException {
-		// TODO Auto-generated method stub
 
 		try {
 			prepareInnerRecommender(param);
 		} 
 		catch (Throwable e) {
-			// TODO Auto-generated catch block
 			LogUtil.trace(e);
 			return null;
 		}
@@ -215,23 +208,14 @@ public class RecommendContextPrefilterImpl extends CompositeRecommenderAbstract 
 	
 	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
 		return "context_prefilter";
 	}
 
 	
 	@Override
 	public String getDescription() throws RemoteException {
-		// TODO Auto-generated method stub
 		return "Recommendation algorithm based on context prefilter";
 	}
 
 
-	@Override
-	public Alg newInstance() {
-		// TODO Auto-generated method stub
-		return new RecommendContextPrefilterImpl();
-	}
-
-	
 }

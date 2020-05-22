@@ -2166,11 +2166,11 @@ class DbProviderAssoc extends ProviderAssocAbstract {
 			
 			try {
 				if (type == Type.bit)
-					value = new Byte(rs.getByte(name));
+					value = Byte.valueOf(rs.getByte(name));
 				else if (type == Type.integer)
-					value = new Integer(rs.getInt(name));
+					value = Integer.valueOf(rs.getInt(name));
 				else if (type == Type.real)
-					value = new Double(rs.getDouble(name));
+					value = Double.valueOf(rs.getDouble(name));
 				else if (type == Type.string)
 					value = rs.getString(name);
 				else if (type == Type.date)
@@ -2746,8 +2746,7 @@ class DbProviderAssoc extends ProviderAssocAbstract {
 
 		@Override
 		protected void finalize() throws Throwable {
-			// TODO Auto-generated method stub
-			super.finalize();
+//			super.finalize();
 			
 			try {
 				close();

@@ -785,7 +785,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 	@Override
 	public boolean acceptAlg(Class<? extends Alg> algClass) throws RemoteException {
 		try {
-			return acceptAlg(algClass.newInstance());
+			return acceptAlg(algClass.getDeclaredConstructor().newInstance());
 		} catch (Exception e) {LogUtil.trace(e);}
 		
 		return false;
@@ -815,7 +815,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 		
 		if ((connectInfo.checkPullMode()) || !(alg instanceof AlgRemote)) {
 			try {
-				alg = alg.getClass().newInstance();
+				alg = alg.getClass().getDeclaredConstructor().newInstance();
 				return evaluator.acceptAlg(alg);
 			} catch (Exception e) {
 				LogUtil.error("Evaluator does not accept algorithm '" + (alg != null ? alg.getName() : "noname") + "' due to " + e.getMessage());
@@ -1782,7 +1782,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 		catch (Throwable e) {LogUtil.trace(e);}
 
     	try {
-			evProcessor.clear();
+			evProcessor.close();
 		}
 		catch (Throwable e) {LogUtil.trace(e);}
 
@@ -1807,7 +1807,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 
 	@Override
 	protected void finalize() throws Throwable {
-		super.finalize();
+//		super.finalize();
 		
 		try {
 			close();
@@ -1840,7 +1840,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 				try {
 					Class<?> newAlgClass = cl.loadClass(algDesc.getAlgClassName());
 					if (newAlgClass != null && Alg.class.isAssignableFrom(newAlgClass)) {
-						evAlg = (Alg)newAlgClass.newInstance();
+						evAlg = (Alg)newAlgClass.getDeclaredConstructor().newInstance();
 					}
 				}
 				catch (Exception e) {

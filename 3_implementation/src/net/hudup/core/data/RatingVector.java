@@ -748,7 +748,7 @@ public class RatingVector implements Cloneable, TextParsable, Serializable {
 	public RatingVector newInstance(boolean sequence) {
 		RatingVector result = null;
 		try {
-			result = this.getClass().newInstance();
+			result = this.getClass().getDeclaredConstructor().newInstance();
 			if (sequence)
 				result.ratedMap = new ListMap<Integer, Rating>();
 		} 
@@ -961,7 +961,7 @@ public class RatingVector implements Cloneable, TextParsable, Serializable {
 		
 		Set<Integer> keys = map.keySet();
 		for (Integer key : keys) {
-			Integer newKey = new Integer(key);
+			Integer newKey = Integer.valueOf(key);
 			RatingVector newvRating = (RatingVector) map.get(key).clone();
 			newMap.put(newKey, newvRating);
 		}
@@ -994,7 +994,7 @@ public class RatingVector implements Cloneable, TextParsable, Serializable {
 		
 		Set<Integer> keys = map.keySet();
 		for (Integer key : keys) {
-			Integer newKey = new Integer(key);
+			Integer newKey = Integer.valueOf(key);
 			RatingVector newvRating = (RatingVector) map.get(key).select(contexts);
 			if (newvRating != null)
 				newMap.put(newKey, newvRating);

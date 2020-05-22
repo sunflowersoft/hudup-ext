@@ -42,7 +42,7 @@ public class ExecutableAlgRemoteWrapper extends AlgRemoteWrapper implements Exec
     /**
      * Default constructor.
      */
-    public ExecutableAlgRemoteWrapper() {
+    protected ExecutableAlgRemoteWrapper() {
 
     }
 
@@ -52,7 +52,6 @@ public class ExecutableAlgRemoteWrapper extends AlgRemoteWrapper implements Exec
 	 * @param remoteExecutableAlg remote executable algorithm.
 	 */
 	public ExecutableAlgRemoteWrapper(ExecutableAlgRemote remoteExecutableAlg) {
-		// TODO Auto-generated constructor stub
 		super(remoteExecutableAlg);
 	}
 
@@ -63,14 +62,12 @@ public class ExecutableAlgRemoteWrapper extends AlgRemoteWrapper implements Exec
 	 * @param exclusive exclusive mode.
 	 */
 	public ExecutableAlgRemoteWrapper(ExecutableAlgRemote remoteExecutableAlg, boolean exclusive) {
-		// TODO Auto-generated constructor stub
 		super(remoteExecutableAlg, exclusive);
 	}
 
 
 	@Override
 	public Inspector getInspector() {
-		// TODO Auto-generated method stub
 		String desc = "";
 		try {
 			desc = getDescription();
@@ -82,62 +79,41 @@ public class ExecutableAlgRemoteWrapper extends AlgRemoteWrapper implements Exec
 	
 	@Override
 	public void setup(Dataset dataset, Object... info) throws RemoteException {
-		// TODO Auto-generated method stub
 		((ExecutableAlgRemote)remoteAlg).setup(dataset, info);
 	}
 
 	
 	@Override
 	public void setup(Fetcher<Profile> sample, Object... info) throws RemoteException {
-		// TODO Auto-generated method stub
 		((ExecutableAlgRemote)remoteAlg).setup(sample, info);
 	}
 
 	
 	@Override
 	public void unsetup() throws RemoteException {
-		// TODO Auto-generated method stub
 		((ExecutableAlgRemote)remoteAlg).unsetup();
 	}
 
 	
 	@Override
 	public Object execute(Object input) throws RemoteException {
-		// TODO Auto-generated method stub
 		return ((ExecutableAlgRemote)remoteAlg).execute(input);
 	}
 
 	
 	@Override
 	public Object getParameter() throws RemoteException {
-		// TODO Auto-generated method stub
 		return ((ExecutableAlgRemote)remoteAlg).getParameter();
 	}
 
 	@Override
 	public String parameterToShownText(Object parameter, Object... info) throws RemoteException {
-		// TODO Auto-generated method stub
 		return ((ExecutableAlgRemote)remoteAlg).parameterToShownText(parameter, info);
 	}
 
 	
 	@Override
-	public Alg newInstance() {
-		// TODO Auto-generated method stub
-		if (remoteAlg instanceof ExecutableAlgAbstract) {
-			ExecutableAlgAbstract newAlg = (ExecutableAlgAbstract) ((ExecutableAlgAbstract)remoteAlg).newInstance();
-			return new ExecutableAlgRemoteWrapper(newAlg, exclusive);
-		}
-		else {
-			LogUtil.warn("Wrapper of remote executable algorithm: newInstance() returns itselfs and so does not return new object");
-			return this;
-		}
-	}
-
-
-	@Override
 	public synchronized void unexport() throws RemoteException {
-		// TODO Auto-generated method stub
 		if (exclusive && remoteAlg != null) {
 			((ExecutableAlgRemote)remoteAlg).unsetup();
 		}
@@ -148,14 +124,12 @@ public class ExecutableAlgRemoteWrapper extends AlgRemoteWrapper implements Exec
 
 	@Override
 	public String[] getBaseRemoteInterfaceNames() throws RemoteException {
-		// TODO Auto-generated method stub
 		return new String[] {ExecutableAlgRemote.class.getName()};
 	}
 
 	
 	@Override
 	public DataConfig createDefaultConfig() {
-		// TODO Auto-generated method stub
 		if (remoteAlg instanceof ExecutableAlg)
 			return ((ExecutableAlg)remoteAlg).createDefaultConfig();
 		else {

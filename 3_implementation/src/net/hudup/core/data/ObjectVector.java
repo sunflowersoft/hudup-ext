@@ -222,7 +222,7 @@ public abstract class ObjectVector<E extends Serializable> implements Cloneable,
 		ObjectVector<E> result = null;
 		
 		try {
-			result = this.getClass().newInstance();
+			result = this.getClass().getDeclaredConstructor().newInstance();
 			result.setId(this.id);
 		} 
 		catch (Exception e) {

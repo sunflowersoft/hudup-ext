@@ -26,7 +26,7 @@ public class PointerRemoteWrapper extends DatasetRemoteWrapper implements Pointe
     /**
      * Default constructor.
      */
-    public PointerRemoteWrapper() {
+    protected PointerRemoteWrapper() {
 
     }
 

@@ -10,27 +10,8 @@ package net.hudup.core.data;
 import java.rmi.RemoteException;
 
 import net.hudup.core.Util;
-import net.hudup.core.alg.Alg;
-import net.hudup.core.data.AttributeList;
-import net.hudup.core.data.DataConfig;
-import net.hudup.core.data.DataDriver;
 import net.hudup.core.data.DataDriver.DataType;
-import net.hudup.core.data.ExternalConfig;
-import net.hudup.core.data.ExternalItemInfo;
-import net.hudup.core.data.ExternalQuery;
-import net.hudup.core.data.ExternalQueryAbstract;
-import net.hudup.core.data.ExternalRecord;
-import net.hudup.core.data.ExternalUserInfo;
-import net.hudup.core.data.Fetcher;
-import net.hudup.core.data.InterchangeAttributeMap;
-import net.hudup.core.data.InternalRecord;
-import net.hudup.core.data.ParamSql;
-import net.hudup.core.data.Profile;
-import net.hudup.core.data.Provider;
-import net.hudup.core.data.ProviderAssoc;
 import net.hudup.core.data.ProviderAssoc.CsvWriter;
-import net.hudup.core.data.Rating;
-import net.hudup.core.data.UnitList;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.ui.ProgressEvent;
 import net.hudup.core.logistic.ui.ProgressListener;
@@ -81,7 +62,6 @@ public class DefaultExternalQuery extends ExternalQueryAbstract {
 			close();
 		} 
 		catch (Throwable e) {
-			// TODO Auto-generated catch block
 			LogUtil.trace(e);
 		}
 		
@@ -100,7 +80,6 @@ public class DefaultExternalQuery extends ExternalQueryAbstract {
 				close();
 			} 
 			catch (Throwable e2) {
-				// TODO Auto-generated catch block
 				e2.printStackTrace();
 			}
 
@@ -165,7 +144,6 @@ public class DefaultExternalQuery extends ExternalQueryAbstract {
 	
 	@Override
 	public void importData(ProgressListener registeredListener) throws RemoteException {
-		// TODO Auto-generated method stub
 		DataConfig internalConfig = internalProvider.getConfig();
 		ExternalConfig externalConfig = (ExternalConfig) externalProvider.getConfig();
 
@@ -373,7 +351,6 @@ public class DefaultExternalQuery extends ExternalQueryAbstract {
 	 * @throws RemoteException if any error raises.
 	 */
 	private void fileImportData(ProgressListener registeredListener) throws RemoteException {
-		// TODO Auto-generated method stub
 		preImportData();
 		
 		DataConfig internalConfig = internalProvider.getConfig();
@@ -587,28 +564,18 @@ public class DefaultExternalQuery extends ExternalQueryAbstract {
 	
 	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
 		return "default_external_query";
 	}
 
 	
 	@Override
 	public String getDescription() throws RemoteException {
-		// TODO Auto-generated method stub
 		return "Default external query";
 	}
 
 
 	@Override
-	public Alg newInstance() {
-		// TODO Auto-generated method stub
-		return new DefaultExternalQuery();
-	}
-
-
-	@Override
 	public ExternalUserInfo getUserInfo(int userId) throws RemoteException {
-		// TODO Auto-generated method stub
 		DataConfig internalConfig = internalProvider.getConfig();
 		
 		InterchangeAttributeMap inter = internalProvider.getAttributeMap(
@@ -637,7 +604,6 @@ public class DefaultExternalQuery extends ExternalQueryAbstract {
 	
 	@Override
 	public ExternalItemInfo getItemInfo(int itemId) throws RemoteException {
-		// TODO Auto-generated method stub
 		DataConfig internalConfig = internalProvider.getConfig();
 		
 		InterchangeAttributeMap inter = internalProvider.getAttributeMap(
@@ -666,7 +632,6 @@ public class DefaultExternalQuery extends ExternalQueryAbstract {
 
 	@Override
 	public DataConfig getConfig() {
-		// TODO Auto-generated method stub
 		if (externalProvider == null)
 			return null;
 		else
@@ -676,7 +641,6 @@ public class DefaultExternalQuery extends ExternalQueryAbstract {
 	
 	@Override
 	public void close() throws Exception {
-		// TODO Auto-generated method stub
 		super.close();
 		
 		try {
@@ -707,7 +671,6 @@ public class DefaultExternalQuery extends ExternalQueryAbstract {
 	 * @return whether insert profile successfully
 	 */
 	private static boolean insertUserProfile(DataConfig internalConfig, CsvWriter userWriter, CsvWriter csvAttMapWriter, AttributeList attMapAttributes, Profile user, ExternalRecord externalRecord) {
-		// TODO Auto-generated method stub
 		
 		boolean result = insertProfile(userWriter, user);
 		
@@ -737,7 +700,6 @@ public class DefaultExternalQuery extends ExternalQueryAbstract {
 	 * @return whether insert profile successfully
 	 */
 	private static boolean insertItemProfile(DataConfig internalConfig, CsvWriter itemWriter, CsvWriter csvAttMapWriter, AttributeList attMapAttributes, Profile item, ExternalRecord externalRecord) {
-		// TODO Auto-generated method stub
 		
 		boolean result = insertProfile(itemWriter, item);
 		

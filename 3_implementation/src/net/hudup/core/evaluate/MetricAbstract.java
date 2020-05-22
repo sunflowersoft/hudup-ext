@@ -32,20 +32,18 @@ public abstract class MetricAbstract extends AlgAbstract implements Metric, Metr
 	 * Default constructor.
 	 */
 	public MetricAbstract() {
-		// TODO Auto-generated constructor stub
 		super();
 	}
 
 	
 	@Override
 	public void setup(Object... params) throws RemoteException {
-		// TODO Auto-generated method stub
+
 	}
 
 	
 	@Override
 	public String[] getBaseRemoteInterfaceNames() throws RemoteException {
-		// TODO Auto-generated method stub
 		return new String[] {MetricRemote.class.getName()};
 	}
 

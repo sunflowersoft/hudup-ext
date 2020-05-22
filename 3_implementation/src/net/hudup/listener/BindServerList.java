@@ -338,7 +338,6 @@ public class BindServerList {
 	
 	@Override
 	protected void finalize() throws Throwable {
-		// TODO Auto-generated method stub
 		try {
 			unbindAll();
 		}
@@ -346,7 +345,7 @@ public class BindServerList {
 			LogUtil.trace(e);
 		}
 		
-		super.finalize();
+//		super.finalize();
 	}
 	
 	

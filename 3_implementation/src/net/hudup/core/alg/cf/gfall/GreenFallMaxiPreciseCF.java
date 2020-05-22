@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Set;
 
 import net.hudup.core.Util;
-import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.RecommendParam;
 import net.hudup.core.data.Pair;
 import net.hudup.core.data.RatingVector;
@@ -44,7 +43,6 @@ public class GreenFallMaxiPreciseCF extends GreenFallMaxiCF {
 	 */
 	public GreenFallMaxiPreciseCF() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
 
@@ -56,7 +54,6 @@ public class GreenFallMaxiPreciseCF extends GreenFallMaxiCF {
 
 	@Override
 	public String getDescription() throws RemoteException {
-		// TODO Auto-generated method stub
 		return "Precise maximal Green Fall algorithm";
 	}
 
@@ -105,11 +102,4 @@ public class GreenFallMaxiPreciseCF extends GreenFallMaxiCF {
 	}
 
 
-	@Override
-	public Alg newInstance() {
-		// TODO Auto-generated method stub
-		return new GreenFallMaxiPreciseCF();
-	}
-
-	
 }

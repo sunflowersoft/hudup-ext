@@ -9,7 +9,6 @@ package net.hudup.core.alg.cf.mf;
 
 import java.rmi.RemoteException;
 
-import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.KBase;
 import net.hudup.core.logistic.NextUpdate;
 
@@ -36,34 +35,23 @@ public class SvdGradientPlusCF extends SvdGradientCF {
 	 */
 	public SvdGradientPlusCF() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
 	
 	@Override
 	public KBase newKB() throws RemoteException {
-		// TODO Auto-generated method stub
 		return SvdGradientPlusKB.create(this);
 	}
 
 	
 	@Override
-	public Alg newInstance() {
-		// TODO Auto-generated method stub
-		return new SvdGradientPlusCF();
-	}
-
-	
-	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
 		return "svd_gradient_plus";
 	}
 	
 	
 	@Override
 	public String getDescription() throws RemoteException {
-		// TODO Auto-generated method stub
 		return "SVD++ algorithm";
 	}
 

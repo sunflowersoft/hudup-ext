@@ -9,7 +9,6 @@ package net.hudup.core.parser;
 
 import java.rmi.RemoteException;
 
-import net.hudup.core.alg.Alg;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.DataDriver;
 import net.hudup.core.data.Dataset;
@@ -82,7 +81,6 @@ public class KBaseIndicator extends Indicator {
 
 	@Override
 	public DataConfig createDefaultConfig() {
-		// TODO Auto-generated method stub
 		return new DataConfig();
 	}
 
@@ -90,17 +88,9 @@ public class KBaseIndicator extends Indicator {
 	
 	@Override
 	public boolean support(DataDriver driver) throws RemoteException {
-		// TODO Auto-generated method stub
 		
 		return driver.isFlatServer();
 	}
 
-	
-	@Override
-	public Alg newInstance() {
-		// TODO Auto-generated method stub
-		return new KBaseIndicator();
-	}
-	
 	
 }

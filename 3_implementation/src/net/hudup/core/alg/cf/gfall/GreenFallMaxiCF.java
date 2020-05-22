@@ -9,7 +9,6 @@ package net.hudup.core.alg.cf.gfall;
 
 import java.rmi.RemoteException;
 
-import net.hudup.core.alg.Alg;
 import net.hudup.core.logistic.NextUpdate;
 
 
@@ -36,7 +35,6 @@ public class GreenFallMaxiCF extends GreenFallCF {
 	 */
 	public GreenFallMaxiCF() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
 
@@ -48,7 +46,6 @@ public class GreenFallMaxiCF extends GreenFallCF {
 	
 	@Override
 	public String getDescription() throws RemoteException {
-		// TODO Auto-generated method stub
 		return "Maximal Green Fall algorithm";
 	}
 
@@ -61,11 +58,4 @@ public class GreenFallMaxiCF extends GreenFallCF {
 	}
 
 
-	@Override
-	public Alg newInstance() {
-		// TODO Auto-generated method stub
-		return new GreenFallMaxiCF();
-	}
-	
-	
 }

@@ -10,7 +10,6 @@ package net.hudup.evaluate;
 import java.rmi.RemoteException;
 import java.util.Set;
 
-import net.hudup.core.alg.Alg;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.RatingVector;
 import net.hudup.core.evaluate.FractionMetricValue;
@@ -94,13 +93,6 @@ public class MAERatio extends PredictiveAccuracy {
 			return new FractionMetricValue(mae, n);
 		else
 			return null;
-	}
-
-
-	@Override
-	public Alg newInstance() {
-		// TODO Auto-generated method stub
-		return new MAERatio();
 	}
 
 

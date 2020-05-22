@@ -10,7 +10,6 @@ package net.hudup.evaluate;
 import java.rmi.RemoteException;
 import java.util.Set;
 
-import net.hudup.core.alg.Alg;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.RatingVector;
@@ -39,27 +38,23 @@ public class NMSE extends PredictiveAccuracy {
 	 */
 	public NMSE() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
 
 	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
 		return "NMSE.recommend";
 	}
 
 	
 	@Override
 	public String getTypeName() throws RemoteException {
-		// TODO Auto-generated method stub
 		return "Predictive accuracy";
 	}
 
 
 	@Override
 	public String getDescription() throws RemoteException {
-		// TODO Auto-generated method stub
 		return "Normalized Mean Squared Error for recommendation algorithm";
 	}
 
@@ -67,7 +62,6 @@ public class NMSE extends PredictiveAccuracy {
 	@Override
 	protected MetricValue calc(RatingVector recommended, RatingVector vTesting,
 			Dataset testing) {
-		// TODO Auto-generated method stub
 		
 		if (vTesting == null)
 			return null;
@@ -93,13 +87,6 @@ public class NMSE extends PredictiveAccuracy {
 			return new FractionMetricValue(mse, n);
 		else
 			return null;
-	}
-
-
-	@Override
-	public Alg newInstance() {
-		// TODO Auto-generated method stub
-		return new NMSE();
 	}
 
 

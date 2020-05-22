@@ -409,9 +409,9 @@ public abstract class SvdGradientPlusKB extends SvdGradientKB {
 		DataConfig parameters = new DataConfig();
 		parameters.putAll(superParameters);
 		
-		parameters.put(GAMMA, new Double(DEFAULT_GAMMA));
-		parameters.put(LAMDA, new Double(DEFAULT_LAMDA));
-		parameters.put(LAMDA2, new Double(DEFAULT_LAMDA2));
+		parameters.put(GAMMA, DEFAULT_GAMMA);
+		parameters.put(LAMDA, DEFAULT_LAMDA);
+		parameters.put(LAMDA2, DEFAULT_LAMDA2);
 		
 		return parameters;
 	}

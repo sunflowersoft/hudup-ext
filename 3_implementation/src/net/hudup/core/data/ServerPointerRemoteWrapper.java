@@ -26,7 +26,7 @@ public class ServerPointerRemoteWrapper extends PointerRemoteWrapper implements 
     /**
      * Default constructor.
      */
-    public ServerPointerRemoteWrapper() {
+    protected ServerPointerRemoteWrapper() {
 
     }
 

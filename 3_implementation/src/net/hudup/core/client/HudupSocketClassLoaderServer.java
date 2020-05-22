@@ -241,8 +241,7 @@ public class HudupSocketClassLoaderServer extends AbstractRunner {
 
 	@Override
 	protected void finalize() throws Throwable {
-		// TODO Auto-generated method stub
-		super.finalize();
+//		super.finalize();
 		
 		try {
 			stop();

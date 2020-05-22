@@ -11,7 +11,6 @@ import java.util.BitSet;
 import java.util.List;
 
 import net.hudup.core.Util;
-import net.hudup.core.alg.Alg;
 import net.hudup.core.data.bit.BitData;
 import net.hudup.core.data.bit.BitItem;
 import net.hudup.core.data.bit.BitItemset;
@@ -69,13 +68,6 @@ public class YRollerMaxi extends YRoller {
 	}
 
 
-	@Override
-	public Alg newInstance() {
-		// TODO Auto-generated method stub
-		return new YRollerMaxi();
-	}
-	
-	
 }
 
 
@@ -147,7 +139,7 @@ class RollingStepMaxi extends RollingStep {
 			freqItemset.setSupport(max.getSupport());
 			accumBitItem = max;
 
-			itemIds.remove(new Integer(max.getBitItemId()));
+			itemIds.remove(Integer.valueOf(max.getBitItemId()));
 		}
 		
 		return freqItemset;

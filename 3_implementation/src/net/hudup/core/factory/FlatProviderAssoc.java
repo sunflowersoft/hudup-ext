@@ -980,7 +980,7 @@ class DefaultCsvReader implements CsvReader {
 
 	@Override
 	protected void finalize() throws Throwable {
-		super.finalize();
+//		super.finalize();
 		
 		try {
 			close();
@@ -1043,7 +1043,7 @@ class DefaultCsvWriter implements CsvWriter {
 	
 	@Override
 	protected void finalize() throws Throwable {
-		super.finalize();
+//		super.finalize();
 		
 		try {
 			close();
@@ -1185,7 +1185,7 @@ class ExcelReader implements CsvReader {
 	
 	@Override
 	protected void finalize() throws Throwable {
-		super.finalize();
+//		super.finalize();
 		
 		try {
 			close();
@@ -1393,7 +1393,7 @@ class ExcelWriter implements CsvWriter {
 	
 	@Override
 	protected void finalize() throws Throwable {
-		super.finalize();
+//		super.finalize();
 		
 		try {
 			close();

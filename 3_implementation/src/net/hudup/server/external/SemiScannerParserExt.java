@@ -9,7 +9,6 @@ package net.hudup.server.external;
 
 import java.rmi.RemoteException;
 
-import net.hudup.core.alg.Alg;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.parser.SemiScannerParser;
@@ -51,11 +50,5 @@ public class SemiScannerParserExt extends SemiScannerParser {
 		return "semi_scanner_ext_parser";
 	}
 
-	
-	@Override
-	public Alg newInstance() {
-		return new SemiScannerParserExt();
-	}
-	
 	
 }

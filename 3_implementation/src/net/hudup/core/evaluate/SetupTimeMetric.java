@@ -9,8 +9,6 @@ package net.hudup.core.evaluate;
 
 import java.rmi.RemoteException;
 
-import net.hudup.core.alg.Alg;
-
 /**
  * 
  * @author Loc Nguyen
@@ -30,36 +28,25 @@ public class SetupTimeMetric extends TimeMetric {
 	 * 
 	 */
 	public SetupTimeMetric() {
-		// TODO Auto-generated constructor stub
 		super();
 	}
 
 	
 	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
 		return "Setup time";
 	}
 
 	
 	@Override
 	public String getDescription() throws RemoteException {
-		// TODO Auto-generated method stub
 		return "Setup time (in seconds)";
 	}
 
 
 	@Override
 	public String getTypeName() throws RemoteException {
-		// TODO Auto-generated method stub
 		return "Time";
-	}
-
-
-	@Override
-	public Alg newInstance() {
-		// TODO Auto-generated method stub
-		return new SetupTimeMetric();
 	}
 
 

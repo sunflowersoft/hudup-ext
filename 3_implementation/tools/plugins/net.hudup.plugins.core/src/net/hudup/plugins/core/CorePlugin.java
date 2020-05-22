@@ -90,8 +90,7 @@ public final class CorePlugin extends ApplicationPlugin implements Application {
 	        for (String classPath : classPathList) {
 	        	try {
 	        		
-	        		Alg alg = (Alg)classLoader.loadClass(classPath).
-	        				newInstance();
+	        		Alg alg = (Alg)classLoader.loadClass(classPath).getDeclaredConstructor().newInstance();
 	        		
 	        		if (alg instanceof Recommender) {
 	        			PluginStorage.getRecommenderReg().register(alg);

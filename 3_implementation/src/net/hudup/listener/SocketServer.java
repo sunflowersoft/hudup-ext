@@ -967,7 +967,7 @@ public abstract class SocketServer extends AbstractRunner implements Server, Acc
 
 	@Override
 	protected void finalize() throws Throwable {
-		super.finalize();
+//		super.finalize();
 		
 		try {
 			shutdown();

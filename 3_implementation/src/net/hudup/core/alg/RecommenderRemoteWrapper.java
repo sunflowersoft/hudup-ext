@@ -42,7 +42,7 @@ public class RecommenderRemoteWrapper extends AlgRemoteWrapper implements Recomm
     /**
      * Default constructor.
      */
-    public RecommenderRemoteWrapper() {
+    protected RecommenderRemoteWrapper() {
 
     }
 
@@ -62,14 +62,12 @@ public class RecommenderRemoteWrapper extends AlgRemoteWrapper implements Recomm
 	 * @param exclusive exclusive mode.
 	 */
 	public RecommenderRemoteWrapper(RecommenderRemote remoteRecommender, boolean exclusive) {
-		// TODO Auto-generated constructor stub
 		super(remoteRecommender, exclusive);
 	}
 
 	
 	@Override
 	public Inspector getInspector() {
-		// TODO Auto-generated method stub
 		String desc = "";
 		try {
 			desc = getDescription();
@@ -81,28 +79,24 @@ public class RecommenderRemoteWrapper extends AlgRemoteWrapper implements Recomm
 	
 	@Override
 	public void setup(Dataset dataset, Object... params) throws RemoteException {
-		// TODO Auto-generated method stub
 		((RecommenderRemote)remoteAlg).setup(dataset, params);
 	}
 
 	
 	@Override
 	public void unsetup() throws RemoteException {
-		// TODO Auto-generated method stub
 		((RecommenderRemote)remoteAlg).unsetup();
 	}
 
 	
 	@Override
 	public RecommendFilterList getFilterList() throws RemoteException {
-		// TODO Auto-generated method stub
 		return ((RecommenderRemote)remoteAlg).getFilterList();
 	}
 
 	
 	@Override
 	public Dataset getDataset() throws RemoteException {
-		// TODO Auto-generated method stub
 		if (remoteAlg instanceof Recommender)
 			return ((Recommender)remoteAlg).getDataset();
 		else {
@@ -114,35 +108,18 @@ public class RecommenderRemoteWrapper extends AlgRemoteWrapper implements Recomm
 	
 	@Override
 	public RatingVector estimate(RecommendParam param, Set<Integer> queryIds) throws RemoteException {
-		// TODO Auto-generated method stub
 		return ((RecommenderRemote)remoteAlg).estimate(param, queryIds);
 	}
 
 	
 	@Override
 	public RatingVector recommend(RecommendParam param, int maxRecommend) throws RemoteException {
-		// TODO Auto-generated method stub
 		return ((RecommenderRemote)remoteAlg).recommend(param, maxRecommend);
 	}
 
 
 	@Override
-	public Alg newInstance() {
-		// TODO Auto-generated method stub
-		if (remoteAlg instanceof RecommenderAbstract) {
-			RecommenderAbstract newRecommender = (RecommenderAbstract) ((RecommenderAbstract)remoteAlg).newInstance();
-			return new RecommenderRemoteWrapper(newRecommender, exclusive);
-		}
-		else {
-			LogUtil.warn("newInstance() returns itselfs and so does not return new object");
-			return this;
-		}
-	}
-
-	
-	@Override
 	public synchronized void unexport() throws RemoteException {
-		// TODO Auto-generated method stub
 		if (exclusive && remoteAlg != null) {
 			((RecommenderRemote)remoteAlg).unsetup();
 		}
@@ -153,14 +130,12 @@ public class RecommenderRemoteWrapper extends AlgRemoteWrapper implements Recomm
 	
 	@Override
 	public String[] getBaseRemoteInterfaceNames() throws RemoteException {
-		// TODO Auto-generated method stub
 		return new String[] {RecommenderRemote.class.getName()};
 	}
 
 	
 	@Override
 	public DataConfig createDefaultConfig() {
-		// TODO Auto-generated method stub
 		if (remoteAlg instanceof Recommender)
 			return ((Recommender)remoteAlg).createDefaultConfig();
 		else {

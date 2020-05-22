@@ -125,8 +125,7 @@ public class DefaultService implements Service, PluginChangedListener, AutoClose
 			@Override
 			protected void task() {
 				if (serverConfig == null) {
-					thread = null;
-					paused = false;
+					thread = null; paused = false;
 					return;
 				}
 				
@@ -151,24 +150,19 @@ public class DefaultService implements Service, PluginChangedListener, AutoClose
 					}
 				}
 				
-				thread = null;
-				paused = false;
+				thread = null; paused = false;
 			}
 			
 			@Override
 			protected void clear() {}
 
-			@Override
-			public synchronized boolean stop() {
-				return super.forceStop();
-			}
-			
 		};
 	}
 
 	
 	/**
 	 * Open service with specified configuration and parameters.
+	 * There is no clock on this method because serve will make write-lock when calling this method.
 	 * @param serverConfig specified configuration.
 	 * @param params additional parameters so that recommender algorithm sets up.
 	 * @return whether open service successfully.
@@ -203,11 +197,6 @@ public class DefaultService implements Service, PluginChangedListener, AutoClose
 	 * @param params additional parameters so that recommender algorithm sets up.
 	 */
 	protected void updateRecommender(Object...params) {
-		try {
-			recommenderCreator.stop();
-		}
-		catch (Throwable e) {LogUtil.trace(e);}
-		
 		try {
 			recommenderCreator.start();
 		}
@@ -254,11 +243,14 @@ public class DefaultService implements Service, PluginChangedListener, AutoClose
 		return recommender != null;
 	}
 	
-	
+	/**
+	 * Closing the service.
+	 * There is no clock on this method because serve will make write-lock when calling this method.
+	 */
 	@Override
 	public void close() {
 		try {
-			recommenderCreator.stop();
+			recommenderCreator.forceStop();
 		}
 		catch (Throwable e) {LogUtil.trace(e);}
 		
@@ -1743,7 +1735,7 @@ public class DefaultService implements Service, PluginChangedListener, AutoClose
 
 	@Override
 	protected void finalize() throws Throwable {
-		super.finalize();
+//		super.finalize();
 		
 		try {
 			close();

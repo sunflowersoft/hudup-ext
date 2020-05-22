@@ -276,14 +276,12 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 	 * Default constructor.
 	 */
 	public NeighborCF() {
-		// TODO Auto-generated constructor stub
 		
 	}
 
 
 	@Override
 	public synchronized void setup(Dataset dataset, Object...params) throws RemoteException {
-		// TODO Auto-generated method stub
 		super.setup(dataset, params);
 		
 		this.ratingMedian = (this.config.getMinRating() + this.config.getMaxRating()) / 2.0;
@@ -295,7 +293,6 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 
 	@Override
 	public synchronized void unsetup() throws RemoteException {
-		// TODO Auto-generated method stub
 		super.unsetup();
 		
 		this.ratingMedian = Constants.UNUSED;
@@ -432,7 +429,6 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 	 * @return supported similar measures.
 	 */
 	public List<String> getSupportedMeasures() {
-		// TODO Auto-generated method stub
 		Set<String> mSet = Util.newSet();
 		mSet.add(COSINE);
 //		mSet.add(COSINEJ);
@@ -502,7 +498,6 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 	
 //	@Override
 //	public synchronized RatingVector estimate(RecommendParam param, Set<Integer> queryIds) throws RemoteException {
-//		// TODO Auto-generated method stub
 //		if (param.ratingVector == null) //Consider not estimating yet.
 //			return null;
 //		if (!isCached())
@@ -1124,14 +1119,12 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 	
 	@Override
 	public Object cacheTask(int id1, int id2, Map<Integer, Map<Integer, Object>> cache, Task task, Object...params) {
-		// TODO Auto-generated method stub
 		return SupportCacheAlg.cacheTask(this, id1, id2, cache, task, params);
 	}
 
 	
 	@Override
 	public Object cacheTask(int id, Map<Integer, Object> cache, Task task, Object... params) {
-		// TODO Auto-generated method stub
 		return SupportCacheAlg.cacheTask(this, id, cache, task, params);
 	}
 

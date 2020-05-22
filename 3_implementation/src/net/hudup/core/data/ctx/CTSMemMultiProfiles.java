@@ -128,14 +128,6 @@ public class CTSMemMultiProfiles implements CTSMultiProfiles {
 	}
 	
 	
-	@Override
-	protected void finalize() throws Throwable {
-		// TODO Auto-generated method stub
-		super.finalize();
-		clear();
-	}
-
-
 	/**
 	 * Create the empty memory profiles of context templates.
 	 * @return empty memory profiles of context templates.

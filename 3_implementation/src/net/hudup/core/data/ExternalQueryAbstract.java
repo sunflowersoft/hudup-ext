@@ -9,7 +9,6 @@ package net.hudup.core.data;
 
 import java.rmi.RemoteException;
 
-import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.AlgAbstract;
 import net.hudup.core.logistic.LogUtil;
 
@@ -33,7 +32,7 @@ public abstract class ExternalQueryAbstract extends AlgAbstract implements Exter
 	 * Default constructor.
 	 */
 	public ExternalQueryAbstract() {
-		// TODO Auto-generated constructor stub
+
 	}
 
 	
@@ -45,42 +44,12 @@ public abstract class ExternalQueryAbstract extends AlgAbstract implements Exter
 	
 	@Override
 	public synchronized void resetConfig() {
-		// TODO Auto-generated method stub
 		LogUtil.info("External query does not support method resetConfig()");
 	}
 
 	
 	@Override
-	public DataConfig createDefaultConfig() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	
-	@Override
-	public String getName() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-
-	@Override
-	public Alg newInstance() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-
-	@Override
-	public String getDescription() throws RemoteException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-
-	@Override
 	public void close() throws Exception {
-		// TODO Auto-generated method stub
 		try {
 			unexport();
 		} catch (Throwable e) {LogUtil.trace(e);}
@@ -89,14 +58,12 @@ public abstract class ExternalQueryAbstract extends AlgAbstract implements Exter
 
 	@Override
 	public String[] getBaseRemoteInterfaceNames() throws RemoteException {
-		// TODO Auto-generated method stub
 		return new String[] {ExternalQueryRemote.class.getName()};
 	}
 
 	
 	@Override
 	protected void finalize() throws Throwable {
-		// TODO Auto-generated method stub
 		super.finalize();
 		
 		try {

@@ -19,7 +19,6 @@ import javax.swing.JOptionPane;
 import elvira.Bnet;
 import elvira.Evidence;
 import net.hudup.core.Util;
-import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.KBase;
 import net.hudup.core.alg.RecommendParam;
 import net.hudup.core.data.DataConfig;
@@ -52,27 +51,24 @@ public class BnetCF extends BnetCFAbstract {
 	 */
 	public BnetCF() {
 		super();
-		// TODO Auto-generated constructor stub
+
 	}
 
 
 	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
 		return "bayesnet";
 	}
 
 	
 	@Override
 	public String getDescription() throws RemoteException {
-		// TODO Auto-generated method stub
 		return "Bayesian network collaborative filtering algorithm";
 	}
 
 
 	@Override
 	public KBase newKB() throws RemoteException {
-		// TODO Auto-generated method stub
 		return BnetKB.create(this);
 	}
 
@@ -93,7 +89,6 @@ public class BnetCF extends BnetCFAbstract {
 	
 	@Override
 	protected List<ValueTriple> bnetEstimate(RecommendParam param, Set<Integer> queryIds, double referredRatingValue, RatingFilter ratingFilter) {
-		// TODO Auto-generated method stub
 		Set<Integer> itemIdSet = Util.newSet();
 		itemIdSet.addAll(param.ratingVector.fieldIds());
 		itemIdSet.addAll(queryIds);
@@ -133,7 +128,6 @@ public class BnetCF extends BnetCFAbstract {
 
 	@Override
 	protected Set<Integer> getItemIds() {
-		// TODO Auto-generated method stub
 		return ((BnetKB)kb).itemIds;
 	}
 
@@ -141,7 +135,7 @@ public class BnetCF extends BnetCFAbstract {
 	@Override
 	public DataConfig createDefaultConfig() {
 		DataConfig superConfig = super.createDefaultConfig();
-		superConfig.put(BnetKB.K2_MAX_PARENTS, new Integer(BnetKB.K2_MAX_PARENTS_DEFAULT));
+		superConfig.put(BnetKB.K2_MAX_PARENTS, BnetKB.K2_MAX_PARENTS_DEFAULT);
 		superConfig.addInvisible(BnetKB.K2_MAX_PARENTS);
 		
 		superConfig.put(BnetKB.LEARNING_METHOD_FIELD, BnetKB.K2);
@@ -182,13 +176,6 @@ public class BnetCF extends BnetCFAbstract {
 	}
 
 
-	@Override
-	public Alg newInstance() {
-		// TODO Auto-generated method stub
-		return new BnetCF();
-	}
-
-	
 }
 
 

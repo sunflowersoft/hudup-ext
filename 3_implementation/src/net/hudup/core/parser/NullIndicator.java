@@ -9,7 +9,6 @@ package net.hudup.core.parser;
 
 import java.rmi.RemoteException;
 
-import net.hudup.core.alg.Alg;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.DataDriver;
 import net.hudup.core.data.Dataset;
@@ -59,22 +58,13 @@ public class NullIndicator extends Indicator {
 	
 	@Override
 	public String getDescription() throws RemoteException {
-		// TODO Auto-generated method stub
 		return "Null indicator";
 	}
 
 
 	@Override
 	public boolean support(DataDriver driver) throws RemoteException {
-		// TODO Auto-generated method stub
 		return true;
-	}
-
-	
-	@Override
-	public Alg newInstance() {
-		// TODO Auto-generated method stub
-		return new NullIndicator();
 	}
 
 	

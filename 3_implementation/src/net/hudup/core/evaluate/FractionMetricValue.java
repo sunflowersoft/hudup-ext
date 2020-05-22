@@ -128,7 +128,7 @@ public class FractionMetricValue implements MetricValue /*, Comparable<FractionM
 //	@Override
 //	public int compareTo(FractionMetricValue o) {
 //		// TODO Auto-generated method stub
-//		return new Double((Double)this.value()).compareTo((Double)o.value());
+//		return ((Double)this.value()).compareTo((Double)o.value());
 //	}
 	
 	

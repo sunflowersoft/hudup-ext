@@ -799,7 +799,7 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 
 	@Override
 	protected void finalize() throws Throwable {
-		super.finalize();
+//		super.finalize();
 		
 		try {
 			shutdown();

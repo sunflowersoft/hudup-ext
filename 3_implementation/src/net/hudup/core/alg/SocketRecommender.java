@@ -48,34 +48,29 @@ public class SocketRecommender extends ServiceRecommenderAbstract implements Soc
 	 */
 	public SocketRecommender() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
 
 	@Override
 	public DataConfig createDefaultConfig() {
-		// TODO Auto-generated method stub
 		return new DataConfig();
 	}
 
 	
 	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
 		return "socket_server_query";
 	}
 
 	
 	@Override
 	public String getDescription() throws RemoteException {
-		// TODO Auto-generated method stub
 		return "Recommendation algorithm by calling socket service";
 	}
 
 
 	@Override
 	public Dataset getDataset() throws RemoteException {
-		// TODO Auto-generated method stub
 		if (connection == null)
 			return null;
 		else
@@ -85,7 +80,6 @@ public class SocketRecommender extends ServiceRecommenderAbstract implements Soc
 
 	@Override
 	public synchronized void setup(Dataset dataset, Object...params) throws RemoteException {
-		// TODO Auto-generated method stub
 		unsetup();
 		
 		if (!(dataset instanceof ServerPointer))
@@ -117,7 +111,6 @@ public class SocketRecommender extends ServiceRecommenderAbstract implements Soc
 	
 	@Override
 	public synchronized RatingVector estimate(RecommendParam param, Set<Integer> queryIds) throws RemoteException {
-		// TODO Auto-generated method stub
 		
 		if (connection == null)
 			return null;
@@ -126,7 +119,6 @@ public class SocketRecommender extends ServiceRecommenderAbstract implements Soc
 				return connection.estimate(param, queryIds);
 			} 
 			catch (Throwable e) {
-				// TODO Auto-generated catch block
 				LogUtil.trace(e);
 				return null;
 			}
@@ -136,7 +128,6 @@ public class SocketRecommender extends ServiceRecommenderAbstract implements Soc
 	
 	@Override
 	public synchronized RatingVector recommend(RecommendParam param, int maxRecommend) throws RemoteException {
-		// TODO Auto-generated method stub
 		
 		if (connection == null)
 			return null;
@@ -145,7 +136,6 @@ public class SocketRecommender extends ServiceRecommenderAbstract implements Soc
 				return connection.recommend(param, maxRecommend);
 			} 
 			catch (Throwable e) {
-				// TODO Auto-generated catch block
 				LogUtil.trace(e);
 				return null;
 			}
@@ -153,11 +143,4 @@ public class SocketRecommender extends ServiceRecommenderAbstract implements Soc
 	}
 
 	
-	@Override
-	public Alg newInstance() {
-		// TODO Auto-generated method stub
-		return new SocketRecommender();
-	}
-
-
 }

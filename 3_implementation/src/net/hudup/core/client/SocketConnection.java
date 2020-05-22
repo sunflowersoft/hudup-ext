@@ -170,8 +170,7 @@ public class SocketConnection extends SocketWrapper implements AutoCloseable {
 
 	@Override
 	protected void finalize() throws Throwable {
-		// TODO Auto-generated method stub
-		super.finalize();
+//		super.finalize();
 		
 		try {
 			close();

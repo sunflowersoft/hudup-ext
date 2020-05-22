@@ -445,7 +445,7 @@ abstract class FreqItemsetKB extends KBaseAbstract {
 				minsup = minmax.min();
 			}
 		}
-		finder.getConfig().put(FreqItemsetFinder.MIN_SUP, new Double(minsup));
+		finder.getConfig().put(FreqItemsetFinder.MIN_SUP, minsup);
 
 		freqResults.clear();
 		List<BitItemset> freqItemsets = finder.findFreqItemset();

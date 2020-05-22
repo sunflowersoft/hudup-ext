@@ -104,19 +104,6 @@ public class AugRemoteWrapper extends ExecutableAlgRemoteWrapper implements Aug,
 
 
 	@Override
-	public Alg newInstance() {
-		if (remoteAlg instanceof AugAbstract) {
-			AugAbstract newAlg = (AugAbstract) ((AugAbstract)remoteAlg).newInstance();
-			return new AugRemoteWrapper(newAlg, exclusive);
-		}
-		else {
-			LogUtil.warn("Wrapper of remote executable algorithm: newInstance() returns itselfs and so does not return new object");
-			return this;
-		}
-	}
-
-	
-	@Override
 	public String note() {
 		if (remoteAlg instanceof Aug)
 			return ((Aug)remoteAlg).note();

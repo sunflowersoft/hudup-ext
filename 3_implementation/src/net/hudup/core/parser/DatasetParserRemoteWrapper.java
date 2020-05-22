@@ -9,7 +9,6 @@ package net.hudup.core.parser;
 
 import java.rmi.RemoteException;
 
-import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.AlgRemoteWrapper;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.DataDriver;
@@ -37,7 +36,7 @@ public class DatasetParserRemoteWrapper extends AlgRemoteWrapper implements Data
     /**
      * Default constructor.
      */
-    public DatasetParserRemoteWrapper() {
+    protected DatasetParserRemoteWrapper() {
 
     }
 
@@ -73,19 +72,6 @@ public class DatasetParserRemoteWrapper extends AlgRemoteWrapper implements Data
 	}
 
 	
-	@Override
-	public Alg newInstance() {
-		if (remoteAlg instanceof DatasetParserAbstract) {
-			DatasetParserAbstract newDatasetParser = (DatasetParserAbstract) ((DatasetParserAbstract)remoteAlg).newInstance();
-			return new DatasetParserRemoteWrapper(newDatasetParser, exclusive);
-		}
-		else {
-			LogUtil.warn("newInstance() returns itselfs and so does not return new object");
-			return this;
-		}
-	}
-
-
 	@Override
 	public String[] getBaseRemoteInterfaceNames() throws RemoteException {
 		return new String[] {DatasetParserRemote.class.getName()};

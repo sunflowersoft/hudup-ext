@@ -110,7 +110,7 @@ public final class Util {
 		
 		try {
 			String pluginManagerText = getHudupProperty("plugin_manager");
-			pluginManager = (PluginManager) Class.forName(pluginManagerText).newInstance();
+			pluginManager = (PluginManager) Class.forName(pluginManagerText).getDeclaredConstructor().newInstance();
 		}
 		catch (Throwable e) {
 			LogUtil.trace(e);
@@ -224,7 +224,7 @@ public final class Util {
 	public static <T> T newInstance(Class<T> tClass) {
 		T instance = null;
 		try {
-			instance = tClass.newInstance();
+			instance = tClass.getDeclaredConstructor().newInstance();
 		} 
 		catch (Exception e) {
 			LogUtil.trace(e);
@@ -245,7 +245,7 @@ public final class Util {
 		try {
 			if (className.contains("$")) {
 				try {
-					instance = Class.forName(className).newInstance();
+					instance = Class.forName(className).getDeclaredConstructor().newInstance();
 				}
 				catch (Throwable e) {
 					System.out.println("Cannot instantiate inner class " + className);
@@ -253,7 +253,7 @@ public final class Util {
 				}
 			}
 			else
-				instance = Class.forName(className).newInstance();
+				instance = Class.forName(className).getDeclaredConstructor().newInstance();
 		} 
 		catch (Throwable e) {
 			LogUtil.trace(e);
@@ -371,7 +371,7 @@ public final class Util {
 			if (factoryClassName == null)
 				return new FactoryImpl();
 			else
-				return (Factory)Class.forName(factoryClassName).newInstance();
+				return (Factory)Class.forName(factoryClassName).getDeclaredConstructor().newInstance();
 		}
 		catch (Throwable e) {
 			LogUtil.trace(e);
@@ -391,7 +391,7 @@ public final class Util {
 			if (cipherClassName == null)
 				return new CipherImpl();
 			else
-				return (Cipher)Class.forName(cipherClassName).newInstance();
+				return (Cipher)Class.forName(cipherClassName).getDeclaredConstructor().newInstance();
 		}
 		catch (Throwable e) {
 			LogUtil.trace(e);
@@ -411,7 +411,7 @@ public final class Util {
 			if (jsonParserClassName == null)
 				return new JsonParserImpl();
 			else
-				return (JsonParser)Class.forName(jsonParserClassName).newInstance();
+				return (JsonParser)Class.forName(jsonParserClassName).getDeclaredConstructor().newInstance();
 		}
 		catch (Throwable e) {
 			LogUtil.trace(e);

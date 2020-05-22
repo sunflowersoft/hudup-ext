@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Set;
 
 import net.hudup.core.Util;
-import net.hudup.core.alg.Alg;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.Pair;
 import net.hudup.core.data.RatingVector;
@@ -42,34 +41,29 @@ public class Spearman extends CorrelationAccuracy {
 	 */
 	public Spearman() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
 
 	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
 		return "Spearman.recommend";
 	}
 
 	
 	@Override
 	public String getTypeName() throws RemoteException {
-		// TODO Auto-generated method stub
 		return "Correlation accuracy";
 	}
 
 
 	@Override
 	public String getDescription() throws RemoteException {
-		// TODO Auto-generated method stub
 		return "Spearman correlation for recommendation algorithm";
 	}
 
 	
 	@Override
 	protected MetricValue calc(RatingVector recommended, RatingVector vTesting, Dataset testing) {
-		// TODO Auto-generated method stub
 
 		if (vTesting == null)
 			return null;
@@ -109,13 +103,6 @@ public class Spearman extends CorrelationAccuracy {
 			return new RealMeanMetricValue(corr);
 		else
 			return null;
-	}
-
-
-	@Override
-	public Alg newInstance() {
-		// TODO Auto-generated method stub
-		return new Spearman();
 	}
 
 

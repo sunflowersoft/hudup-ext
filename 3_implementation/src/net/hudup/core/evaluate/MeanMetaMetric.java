@@ -10,7 +10,6 @@ package net.hudup.core.evaluate;
 import java.rmi.RemoteException;
 import java.util.List;
 
-import net.hudup.core.alg.Alg;
 import net.hudup.core.logistic.BaseClass;
 import net.hudup.core.logistic.DSUtil;
 
@@ -116,11 +115,4 @@ public class MeanMetaMetric extends MetaMetric {
 	}
 
 
-	@Override
-	public Alg newInstance() {
-		// TODO Auto-generated method stub
-		return new MeanMetaMetric();
-	}
-
-	
 }

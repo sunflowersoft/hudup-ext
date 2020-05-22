@@ -9,7 +9,6 @@ package net.hudup.core.parser;
 
 import java.rmi.RemoteException;
 
-import net.hudup.core.alg.Alg;
 import net.hudup.core.client.ClientUtil;
 import net.hudup.core.client.Service;
 import net.hudup.core.data.DataConfig;
@@ -111,7 +110,6 @@ public class RmiServerIndicator extends Indicator {
 
 	@Override
 	public boolean support(DataDriver driver) throws RemoteException {
-		// TODO Auto-generated method stub
 		return driver.getType() == DataType.hudup_rmi;
 	}
 
@@ -119,16 +117,8 @@ public class RmiServerIndicator extends Indicator {
 	
 	@Override
 	public DataConfig createDefaultConfig() {
-		// TODO Auto-generated method stub
 		return new DataConfig();
 	}
 
-	
-	@Override
-	public Alg newInstance() {
-		// TODO Auto-generated method stub
-		return new RmiServerIndicator();
-	}
-	
 	
 }

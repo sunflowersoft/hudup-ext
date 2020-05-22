@@ -9,7 +9,6 @@ package net.hudup.evaluate;
 
 import java.rmi.RemoteException;
 
-import net.hudup.core.alg.Alg;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.RatingVector;
 import net.hudup.core.evaluate.FractionMetricValue;
@@ -39,13 +38,12 @@ public class RNMSE extends NMSE {
 	 * Default constructor.
 	 */
 	public RNMSE() {
-		// TODO Auto-generated constructor stub
+
 	}
 
 	
 	@Override
 	protected MetricValue calc(RatingVector recommended, RatingVector vTesting, Dataset testing) {
-		// TODO Auto-generated method stub
 		FractionMetricValue fraction = (FractionMetricValue)super.calc(recommended, vTesting, testing);
 		
 		if (fraction == null)
@@ -60,7 +58,6 @@ public class RNMSE extends NMSE {
 
 				@Override
 				protected double operator(double value) {
-					// TODO Auto-generated method stub
 					return Math.sqrt(value);
 				}
 			};
@@ -69,32 +66,22 @@ public class RNMSE extends NMSE {
 	
 	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
 		return "RNMSE.recommend";
 	}
 
 	
 	@Override
 	public String getDescription() throws RemoteException {
-		// TODO Auto-generated method stub
 		return "Root Normalized Mean Squared Error for recommendation algorithm";
 	}
 
 	
 	@Override
 	public String getTypeName() throws RemoteException {
-		// TODO Auto-generated method stub
 		return "Predictive accuracy";
 	}
 
 	
-	@Override
-	public Alg newInstance() {
-		// TODO Auto-generated method stub
-		return new RNMSE();
-	}
-
-
 }
 
 
@@ -122,7 +109,6 @@ class NRMSEDeprecated extends MetaMetric {
 	 */
 	public NRMSEDeprecated() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
 	
@@ -138,28 +124,24 @@ class NRMSEDeprecated extends MetaMetric {
 	
 	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
 		return "RNMSE.recommend.deprecated";
 	}
 
 	
 	@Override
 	public String getDescription() throws RemoteException {
-		// TODO Auto-generated method stub
 		return "Root Normalized Mean Squared Error (deprecated) for recommendation algorithm";
 	}
 
 	
 	@Override
 	public String getTypeName() throws RemoteException {
-		// TODO Auto-generated method stub
 		return "Predictive accuracy";
 	}
 
 	
 	@Override
 	public boolean recalc(Object... params) throws RemoteException {
-		// TODO Auto-generated method stub
 		if ( meta == null || meta.length < 1 || meta[0] == null || 
 				(!(meta[0] instanceof NMSE)) )
 			return false;
@@ -175,13 +157,6 @@ class NRMSEDeprecated extends MetaMetric {
 		this.accumValue = new RealMetricValue(Math.sqrt(accumValue));
 		
 		return true;
-	}
-
-
-	@Override
-	public Alg newInstance() {
-		// TODO Auto-generated method stub
-		return new NRMSEDeprecated();
 	}
 
 

@@ -9,7 +9,6 @@ package net.hudup.core.evaluate.execute;
 
 import java.rmi.RemoteException;
 
-import net.hudup.core.alg.Alg;
 import net.hudup.core.evaluate.MetricValue;
 import net.hudup.core.evaluate.RealMetricValue;
 import net.hudup.core.evaluate.RealTwoArrayMetricValue;
@@ -79,13 +78,6 @@ public class R extends TwoArrayMetric {
 	public String getDescription() throws RemoteException {
 		// TODO Auto-generated method stub
 		return "Pearson correlation (R) for executable algorithms";
-	}
-
-
-	@Override
-	public Alg newInstance() {
-		// TODO Auto-generated method stub
-		return new R();
 	}
 
 

@@ -9,7 +9,6 @@ package net.hudup.core.evaluate.execute;
 
 import java.rmi.RemoteException;
 
-import net.hudup.core.alg.Alg;
 import net.hudup.core.evaluate.FractionMetricValue;
 import net.hudup.core.evaluate.MetricValue;
 
@@ -59,15 +58,7 @@ public class MSE extends Accuracy {
 
 	
 	@Override
-	public Alg newInstance() {
-		// TODO Auto-generated method stub
-		return new MSE();
-	}
-
-	
-	@Override
 	protected MetricValue calc(double resultedValue, double testingValue) {
-		// TODO Auto-generated method stub
 		double d = resultedValue - testingValue;
 		return new FractionMetricValue(d * d, 1);		
 	}

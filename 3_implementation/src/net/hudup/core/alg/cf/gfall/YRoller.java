@@ -13,12 +13,15 @@ import java.util.List;
 
 import net.hudup.core.Util;
 import net.hudup.core.alg.Alg;
+import net.hudup.core.alg.DuplicatableAlg;
+import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.bit.BitData;
 import net.hudup.core.data.bit.BitItem;
 import net.hudup.core.data.bit.BitItemset;
 import net.hudup.core.data.bit.BitsetItem;
 import net.hudup.core.logistic.BaseClass;
 import net.hudup.core.logistic.DSUtil;
+import net.hudup.core.logistic.LogUtil;
 
 /**
  * Roller algorithm.<br>
@@ -144,10 +147,18 @@ public class YRoller extends FreqItemsetFinder {
 
 	@Override
 	public Alg newInstance() {
-		// TODO Auto-generated method stub
-		return new YRoller();
+		try {
+			Alg alg = getClass().getDeclaredConstructor().newInstance();
+			if (this instanceof DuplicatableAlg)
+				alg.getConfig().putAll((DataConfig)this.getConfig().clone());
+			
+			return alg;
+		}
+		catch (Exception e) {LogUtil.trace(e);}
+		
+		return null;
 	}
-	
+
 
 }
 

@@ -9,7 +9,6 @@ package net.hudup.core.data;
 
 import java.rmi.RemoteException;
 
-import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.AlgRemoteWrapper;
 import net.hudup.core.logistic.BaseClass;
 import net.hudup.core.logistic.LogUtil;
@@ -35,7 +34,7 @@ public class ExternalQueryRemoteWrapper extends AlgRemoteWrapper implements Exte
     /**
      * Default constructor.
      */
-    public ExternalQueryRemoteWrapper() {
+    protected ExternalQueryRemoteWrapper() {
 
     }
 
@@ -115,19 +114,6 @@ public class ExternalQueryRemoteWrapper extends AlgRemoteWrapper implements Exte
 	}
 
 
-	@Override
-	public Alg newInstance() {
-		if (remoteAlg instanceof ExternalQueryAbstract) {
-			ExternalQueryAbstract newExternalQuery = (ExternalQueryAbstract) ((ExternalQueryAbstract)remoteAlg).newInstance();
-			return new ExternalQueryRemoteWrapper(newExternalQuery, exclusive);
-		}
-		else {
-			LogUtil.warn("newInstance() returns itselfs and so does not return new object");
-			return this;
-		}
-	}
-
-	
 	@Override
 	public void close() throws Exception {
 		try {

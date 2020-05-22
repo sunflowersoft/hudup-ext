@@ -112,14 +112,12 @@ public abstract class DatasetAbstract implements Dataset, DatasetRemote {
 
 	@Override
 	public boolean isExclusive() {
-		// TODO Auto-generated method stub
 		return exclusive;
 	}
 
 
 	@Override
 	public void setExclusive(boolean exclusive) {
-		// TODO Auto-generated method stub
 		this.exclusive = exclusive;
 	}
 
@@ -135,7 +133,6 @@ public abstract class DatasetAbstract implements Dataset, DatasetRemote {
 
 	@Override
 	public synchronized void unexport() throws RemoteException {
-		// TODO Auto-generated method stub
 		if (exportedStub != null) {
 			NetUtil.RegistryRemote.unexport(this);
 			exportedStub = null;
@@ -145,7 +142,6 @@ public abstract class DatasetAbstract implements Dataset, DatasetRemote {
 	
 	@Override
 	public synchronized void forceUnexport() throws RemoteException {
-		// TODO Auto-generated method stub
 		unexport();
 	}
 
@@ -158,15 +154,13 @@ public abstract class DatasetAbstract implements Dataset, DatasetRemote {
 	
 	@Override
 	public String[] getBaseRemoteInterfaceNames() throws RemoteException {
-		// TODO Auto-generated method stub
 		return new String[] {DatasetRemote.class.getName()};
 	}
 
 	
 	@Override
 	protected void finalize() throws Throwable {
-		// TODO Auto-generated method stub
-		super.finalize();
+//		super.finalize();
 		
 		try {
 //			clear(); //Clear method can close provider with scanner.
@@ -180,196 +174,168 @@ public abstract class DatasetAbstract implements Dataset, DatasetRemote {
 
 	@Override
 	public DataConfig remoteGetConfig() throws RemoteException {
-		// TODO Auto-generated method stub
 		return getConfig();
 	}
 
 
 	@Override
 	public Fetcher<Integer> remoteFetchUserIds() throws RemoteException {
-		// TODO Auto-generated method stub
 		return FetcherUtil.fixFetcherSerialized(fetchUserIds());
 	}
 
 
 	@Override
 	public int remoteGetUserId(Serializable externalUserId) throws RemoteException {
-		// TODO Auto-generated method stub
 		return getUserId(externalUserId);
 	}
 
 
 	@Override
 	public ExternalRecord remoteGetUserExternalRecord(int userId) throws RemoteException {
-		// TODO Auto-generated method stub
 		return getUserExternalRecord(userId);
 	}
 
 
 	@Override
 	public Fetcher<Integer> remoteFetchItemIds() throws RemoteException {
-		// TODO Auto-generated method stub
 		return FetcherUtil.fixFetcherSerialized(fetchItemIds());
 	}
 
 
 	@Override
 	public int remoteGetItemId(Serializable externalItemId) throws RemoteException {
-		// TODO Auto-generated method stub
 		return getItemId(externalItemId);
 	}
 
 
 	@Override
 	public ExternalRecord remoteGetItemExternalRecord(int itemId) throws RemoteException {
-		// TODO Auto-generated method stub
 		return getItemExternalRecord(itemId);
 	}
 
 
 	@Override
 	public Rating remoteGetRating(int userId, int itemId) throws RemoteException {
-		// TODO Auto-generated method stub
 		return getRating(userId, itemId);
 	}
 
 
 	@Override
 	public RatingVector remoteGetUserRating(int userId) throws RemoteException {
-		// TODO Auto-generated method stub
 		return getUserRating(userId);
 	}
 
 
 	@Override
 	public Fetcher<RatingVector> remoteFetchUserRatings() throws RemoteException {
-		// TODO Auto-generated method stub
 		return FetcherUtil.fixFetcherSerialized(fetchUserRatings());
 	}
 
 
 	@Override
 	public RatingVector remoteGetItemRating(int itemId) throws RemoteException {
-		// TODO Auto-generated method stub
 		return getItemRating(itemId);
 	}
 
 
 	@Override
 	public Fetcher<RatingVector> remoteFetchItemRatings() throws RemoteException {
-		// TODO Auto-generated method stub
 		return FetcherUtil.fixFetcherSerialized(fetchItemRatings());
 	}
 
 
 	@Override
 	public RatingMatrix remoteCreateUserMatrix() throws RemoteException {
-		// TODO Auto-generated method stub
 		return createUserMatrix();
 	}
 
 
 	@Override
 	public RatingMatrix remoteCreateItemMatrix() throws RemoteException {
-		// TODO Auto-generated method stub
 		return createItemMatrix();
 	}
 
 
 	@Override
 	public Profile remoteGetUserProfile(int userId) throws RemoteException {
-		// TODO Auto-generated method stub
 		return getUserProfile(userId);
 	}
 
 
 	@Override
 	public Fetcher<Profile> remoteFetchUserProfiles() throws RemoteException {
-		// TODO Auto-generated method stub
 		return FetcherUtil.fixFetcherSerialized(fetchUserProfiles());
 	}
 
 
 	@Override
 	public AttributeList remoteGetUserAttributes() throws RemoteException {
-		// TODO Auto-generated method stub
 		return getUserAttributes();
 	}
 
 
 	@Override
 	public Profile remoteGetItemProfile(int itemId) throws RemoteException {
-		// TODO Auto-generated method stub
 		return getItemProfile(itemId);
 	}
 
 
 	@Override
 	public Fetcher<Profile> remoteFetchItemProfiles() throws RemoteException {
-		// TODO Auto-generated method stub
 		return FetcherUtil.fixFetcherSerialized(fetchItemProfiles());
 	}
 
 
 	@Override
 	public AttributeList remoteGetItemAttributes() throws RemoteException {
-		// TODO Auto-generated method stub
 		return getItemAttributes();
 	}
 
 
 	@Override
 	public Profile remoteProfileOf(Context context) throws RemoteException {
-		// TODO Auto-generated method stub
 		return profileOf(context);
 	}
 
 
 	@Override
 	public Profiles remoteProfilesOf(int ctxTemplateId) throws RemoteException {
-		// TODO Auto-generated method stub
 		return profilesOf(ctxTemplateId);
 	}
 
 
 	@Override
 	public Fetcher<Profile> remoteFetchSample() throws RemoteException {
-		// TODO Auto-generated method stub
 		return FetcherUtil.fixFetcherSerialized(fetchSample());
 	}
 
 
 	@Override
 	public Dataset remoteCatchup() throws RemoteException {
-		// TODO Auto-generated method stub
 		return catchup();
 	}
 
 
 	@Override
 	public Dataset remoteSelectByContexts(ContextList contexts) throws RemoteException {
-		// TODO Auto-generated method stub
 		return selectByContexts(contexts);
 	}
 
 
 	@Override
 	public boolean remoteIsExclusive() throws RemoteException {
-		// TODO Auto-generated method stub
 		return isExclusive();
 	}
 
 
 	@Override
 	public ContextTemplateSchema remoteGetCTSchema() throws RemoteException {
-		// TODO Auto-generated method stub
 		return getCTSchema();
 	}
 
 
 	@Override
 	public void remoteClear() throws RemoteException {
-		// TODO Auto-generated method stub
 		clear();
 	}
 

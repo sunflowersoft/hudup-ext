@@ -263,7 +263,6 @@ public class MetricsAnalyzeDlg extends JDialog {
 		export.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				export();
 			}
 		});
@@ -284,7 +283,6 @@ public class MetricsAnalyzeDlg extends JDialog {
 		close.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				dispose();
 			}
 		});
@@ -318,7 +316,6 @@ public class MetricsAnalyzeDlg extends JDialog {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				zoomDlg.dispose();
 			}
 		});

@@ -11,7 +11,6 @@ import java.rmi.RemoteException;
 import java.util.List;
 
 import net.hudup.core.Util;
-import net.hudup.core.alg.Alg;
 import net.hudup.core.evaluate.ArrayMeanMetricValue;
 import net.hudup.core.evaluate.ArrayMetric;
 import net.hudup.core.evaluate.ArrayMetricValue;
@@ -66,22 +65,13 @@ public class ErrorRange extends ArrayMetric {
 	
 
 	@Override
-	public Alg newInstance() {
-		// TODO Auto-generated method stub
-		return new ErrorRange();
-	}
-
-	
-	@Override
 	protected ArrayMetricValue createMetricValue() {
-		// TODO Auto-generated method stub
 		return new ErrorRangeMetricValue();
 	}
 
 	
 	@Override
 	protected MetricValue parseParams(Object... params) {
-		// TODO Auto-generated method stub
 		if (params == null || params.length < 2 || !(params[0] instanceof Number) || !(params[1] instanceof Number))
 			return null;
 		

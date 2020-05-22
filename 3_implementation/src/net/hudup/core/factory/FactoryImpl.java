@@ -462,7 +462,7 @@ class FlatUnitTable extends ProfileTable implements UnitTable, AutoCloseable {
 
 	@Override
 	protected void finalize() throws Throwable {
-		super.finalize();
+//		super.finalize();
 		
 		try {
 			close();

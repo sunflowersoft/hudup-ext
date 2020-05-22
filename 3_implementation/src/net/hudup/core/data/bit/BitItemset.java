@@ -212,7 +212,7 @@ public class BitItemset implements Cloneable, TextParsable, Serializable {
 	 * @return index of bit item id
 	 */
 	public int indexOf(int bitItemId) {
-		return bitItemIdList.indexOf(new Integer(bitItemId));
+		return bitItemIdList.indexOf(Integer.valueOf(bitItemId));
 	}
 	
 	

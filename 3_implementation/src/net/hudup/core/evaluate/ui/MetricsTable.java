@@ -74,14 +74,12 @@ public class MetricsTable extends SortableTable {
 	 * @param referredEvaluator referred evaluator.
 	 */
 	public MetricsTable(final RegisterTable algTable, final Evaluator referredEvaluator) {
-		// TODO Auto-generated constructor stub
 		super (new MetricsTM());
 		
 		this.addMouseListener(new MouseAdapter() {
 
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				// TODO Auto-generated method stub
 				if (SwingUtilities.isRightMouseButton(e)) {
 					final Metrics metrics = getMetricsTM().getMetrics();
 					if (metrics == null || metrics.size() == 0)
@@ -375,14 +373,13 @@ class MetricsTM extends SortableTableModel {
 	
 	@Override
 	public boolean isCellEditable(int row, int column) {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
 
 	/**
 	 * Getting metrics.
-	 * @return {@link Metrics}.
+	 * @return metrics.
 	 */
 	public Metrics getMetrics() {
 		return metrics;

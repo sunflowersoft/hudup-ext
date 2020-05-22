@@ -2112,7 +2112,7 @@ public class ProviderImpl implements Provider {
 
 	@Override
 	protected void finalize() throws Throwable {
-		super.finalize();
+//		super.finalize();
 		
 		try {
 			close();

@@ -78,7 +78,7 @@ public class AlgRemoteWrapper implements Alg, AlgRemote, Serializable {
     /**
      * Default constructor.
      */
-    public AlgRemoteWrapper() {
+    protected AlgRemoteWrapper() {
 
     }
     
@@ -98,18 +98,24 @@ public class AlgRemoteWrapper implements Alg, AlgRemote, Serializable {
 	 * @param exclusive exclusive mode.
 	 */
 	public AlgRemoteWrapper(AlgRemote remoteAlg, boolean exclusive) {
+		set(remoteAlg, exclusive);
+	}
+
+	
+	/**
+	 * Setting with specified remote algorithm and exclusive mode.
+	 * @param remoteAlg remote algorithm.
+	 * @param exclusive exclusive mode.
+	 */
+	protected void set(AlgRemote remoteAlg, boolean exclusive) {
 		this.remoteAlg = remoteAlg;
 		this.exclusive = exclusive;
 		
 		try {
 			this.name = queryName();
 		} catch (Throwable e) {LogUtil.trace(e);}
-		
-//		try {
-//			this.config = queryConfig();
-//		} catch (Throwable e) {LogUtil.trace(e);}
 	}
-
+	
 	
 	@Override
 	public Object learnStart(Object... info) throws RemoteException {
@@ -247,8 +253,14 @@ public class AlgRemoteWrapper implements Alg, AlgRemote, Serializable {
 	@Override
 	public Alg newInstance() {
 		if (remoteAlg instanceof AlgAbstract) {
-			AlgAbstract newAlg = (AlgAbstract) ((AlgAbstract)remoteAlg).newInstance();
-			return new AlgRemoteWrapper(newAlg, exclusive);
+			try {
+				AlgAbstract newAlg = (AlgAbstract) ((AlgAbstract)remoteAlg).newInstance();
+				AlgRemoteWrapper wrapper = this.getClass().getDeclaredConstructor().newInstance();
+				wrapper.set(newAlg, exclusive);
+				return wrapper;
+			} catch (Exception e) {LogUtil.trace(e);}
+			
+			return null;
 		}
 		else {
 			LogUtil.warn("newInstance() returns itselfs and so does not return new object");
@@ -363,7 +375,7 @@ public class AlgRemoteWrapper implements Alg, AlgRemote, Serializable {
 
 	@Override
 	protected void finalize() throws Throwable {
-		super.finalize();
+//		super.finalize();
 		
 		try {
 			unexport();

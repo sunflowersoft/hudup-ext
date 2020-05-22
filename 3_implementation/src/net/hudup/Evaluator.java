@@ -65,7 +65,7 @@ public class Evaluator implements AccessPoint {
 		String evClassName = args[0];
 		net.hudup.core.evaluate.Evaluator ev = null;
 		try {
-			ev = (net.hudup.core.evaluate.Evaluator)Class.forName(evClassName).newInstance();
+			ev = (net.hudup.core.evaluate.Evaluator)Class.forName(evClassName).getDeclaredConstructor().newInstance();
 		}
 		catch (Throwable e) {
 			ev = null;

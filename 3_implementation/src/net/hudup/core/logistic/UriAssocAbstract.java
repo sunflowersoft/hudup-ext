@@ -767,7 +767,7 @@ public abstract class UriAssocAbstract implements UriAssoc {
 	
 	@Override
 	protected void finalize() throws Throwable {
-		super.finalize();
+//		super.finalize();
 		
 		try {
 			close();

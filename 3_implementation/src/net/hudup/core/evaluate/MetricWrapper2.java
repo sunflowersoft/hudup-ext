@@ -48,7 +48,6 @@ public class MetricWrapper2 extends MetricWrapper {
 	
 	@Override
 	public void setup(Object... params) throws RemoteException {
-		// TODO Auto-generated method stub
 		super.setup(params);
 		if (params != null && params.length >= 4) 
 			this.algDesc = (params[3] != null) ? params[3].toString() : "";
@@ -64,7 +63,7 @@ public class MetricWrapper2 extends MetricWrapper {
 	 * @throws RemoteException if any error raises.
 	 */
 	public void setup(Metric metric, String algName, int datasetId, String algDesc) throws RemoteException {
-		setup( new Object[] { metric, algName, new Integer(datasetId), algDesc } );
+		setup( new Object[] { metric, algName, Integer.valueOf(datasetId), algDesc } );
 	}
 
 
@@ -84,13 +83,6 @@ public class MetricWrapper2 extends MetricWrapper {
 	 */
 	public void setAlgDesc(String algDesc) {
 		this.algDesc = algDesc;
-	}
-	
-	
-	@Override
-	public Alg newInstance() {
-		// TODO Auto-generated method stub
-		return new MetricWrapper2();
 	}
 	
 	

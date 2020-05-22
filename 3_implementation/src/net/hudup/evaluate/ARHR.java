@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Set;
 
 import net.hudup.core.Util;
-import net.hudup.core.alg.Alg;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.RatingVector;
 import net.hudup.core.evaluate.MetricValue;
@@ -46,7 +45,6 @@ public class ARHR extends CorrelationAccuracy {
 	@Override
 	protected MetricValue calc(RatingVector recommended, RatingVector vTesting,
 			Dataset testing) {
-		// TODO Auto-generated method stub
 		
 		if (vTesting == null)
 			return null;
@@ -82,29 +80,19 @@ public class ARHR extends CorrelationAccuracy {
 	
 	@Override
 	public String getDescription() throws RemoteException {
-		// TODO Auto-generated method stub
 		return "ARHR for recommendation algorithm";
 	}
 
 	
 	@Override
 	public String getTypeName() throws RemoteException {
-		// TODO Auto-generated method stub
 		return "Correlation accuracy";
 	}
 
 	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
 		return "ARHR.recommend";
 	}
 
 	
-	@Override
-	public Alg newInstance() {
-		// TODO Auto-generated method stub
-		return new ARHR();
-	}
-
-
 }

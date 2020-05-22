@@ -339,7 +339,7 @@ public class Firer extends PluginManagerAbstract {
 					
 					T obj = null;
 					try {
-						obj = (T) cls.newInstance();
+						obj = (T) cls.getDeclaredConstructor().newInstance();
 					}
 					catch (Throwable e) {
 						System.out.println("Instantiate class \"" + classPath + "\" error");

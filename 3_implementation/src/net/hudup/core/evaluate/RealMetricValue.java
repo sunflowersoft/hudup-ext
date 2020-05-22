@@ -93,15 +93,13 @@ public class RealMetricValue implements MetricValue /*, Comparable<RealMetricVal
 
 	@Override
 	public String toString() {
-		// TODO Auto-generated method stub
 		return MathUtil.format(value);
 	}
 
 
 //	@Override
 //	public int compareTo(RealMetricValue o) {
-//		// TODO Auto-generated method stub
-//		return new Double(this.value).compareTo(o.value);
+//		return Double.valueOf(this.value).compareTo(o.value);
 //	}
 
 	

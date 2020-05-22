@@ -441,18 +441,16 @@ public class BitData implements Cloneable, net.hudup.core.data.AutoCloseable, Se
 
 	@Override
 	public void close() throws Exception {
-		// TODO Auto-generated method stub
 		clear();
 	}
 
 
 	@Override
 	protected void finalize() throws Throwable {
-		// TODO Auto-generated method stub
-		super.finalize();
+//		super.finalize();
 		
 		try {
-			clear();
+			close();
 		}
 		catch (Throwable e) {
 			LogUtil.trace(e);

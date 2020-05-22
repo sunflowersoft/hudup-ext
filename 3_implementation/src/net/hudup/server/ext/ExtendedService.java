@@ -118,8 +118,7 @@ public class ExtendedService extends DefaultService implements ServiceExt, Servi
 			catch (Throwable e) {LogUtil.trace(e);}
 		}
 
-		if (timer != null) timer.stop();
-		timer = null;
+		if (timer != null) timer.stop(); timer = null;
 		if (!Constants.SERVER_PURGE_LISTENERS) {
 			timer = new Timer2(Constants.DEFAULT_SHORT_TIMEOUT*1000, Constants.DEFAULT_LONG_TIMEOUT*1000) {
 				
@@ -166,10 +165,7 @@ public class ExtendedService extends DefaultService implements ServiceExt, Servi
 		
 		if (guiDataMap != null) guiDataMap.clear();
 		
-		if (timer != null) {
-			timer.stop();
-			timer = null;
-		}
+		if (timer != null) timer.stop(); timer = null;
 	}
 
 	
@@ -177,14 +173,15 @@ public class ExtendedService extends DefaultService implements ServiceExt, Servi
 	 * Purging disconnected listeners.
 	 */
 	protected void purgeListeners() {
-		List<EventListenerList2> evtLists = Util.newList();
-		
 		trans.lockRead();
+
 		Collection<Evaluator> evs = Util.newList();
 		evs.addAll(pairMap.values());
-		evs.addAll(pairReproducedMap.values());
-		trans.unlockRead();
+		synchronized (pairReproducedMap) {
+			evs.addAll(pairReproducedMap.values());
+		}
 		
+		List<EventListenerList2> evtLists = Util.newList();
 		for (Evaluator ev : evs) {
 			if (!(ev instanceof EvaluatorAbstract)) continue;
 			EvaluatorAbstract evaluator = (EvaluatorAbstract)ev;
@@ -198,6 +195,8 @@ public class ExtendedService extends DefaultService implements ServiceExt, Servi
 		for (EventListenerList2 evtList : evtLists) {
 			EvaluatorAbstract.purgeListeners(evtList);
 		}
+		
+		trans.unlockRead();
 	}
 	
 	
@@ -242,9 +241,11 @@ public class ExtendedService extends DefaultService implements ServiceExt, Servi
 			}
 			
 			if (pairReproducedMap != null) {
-				Collection<Evaluator> evs = pairReproducedMap.values();
-				for (Evaluator ev : evs) {
-					evList.add(ev);
+				synchronized (pairReproducedMap) {
+					Collection<Evaluator> evs = pairReproducedMap.values();
+					for (Evaluator ev : evs) {
+						evList.add(ev);
+					}
 				}
 			}
 
@@ -315,9 +316,11 @@ public class ExtendedService extends DefaultService implements ServiceExt, Servi
 		
 		if (reproducedVersion != null && !reproducedVersion.isEmpty()) {
 			String evaluatorReproducedName = evaluatorName + "-" + reproducedVersion;
-			if (!pairReproducedMap.containsKey(evaluatorReproducedName)) {
-				if (!validateAccount(account, password, DataConfig.ACCOUNT_ADMIN_PRIVILEGE))
-					return null;
+			synchronized (pairReproducedMap) {
+				if (!pairReproducedMap.containsKey(evaluatorReproducedName)) {
+					if (!validateAccount(account, password, DataConfig.ACCOUNT_ADMIN_PRIVILEGE))
+						return null;
+				}
 			}
 		}
 
@@ -334,32 +337,34 @@ public class ExtendedService extends DefaultService implements ServiceExt, Servi
 	 */
 	public Evaluator getEvaluator(String evaluatorName, String reproducedVersion) throws RemoteException {
 		Evaluator reproducedEvaluator = null;
-		trans.lockWrite();
+		trans.lockRead();
 		try {
 			if (reproducedVersion == null || reproducedVersion.isEmpty())
 				reproducedEvaluator = getEvaluator(evaluatorName);
 			else {
 				String evaluatorReproducedName = evaluatorName + "-" + reproducedVersion;
 				
-				if (pairReproducedMap.containsKey(evaluatorReproducedName))
-					reproducedEvaluator = pairReproducedMap.get(evaluatorReproducedName);
-				else if (pairMap.containsKey(evaluatorName)) {
-					reproducedEvaluator = pairMap.get(evaluatorName).getClass().newInstance();
-					
-					EvaluatorConfig config = reproducedEvaluator.getConfig();
-					config.setReproducedVersion(null);
-					config.setReproducedVersion(reproducedVersion);
-					config.setEvaluatorPort(serverConfig.getServerPort());
-					config.setSaveAbility(false);
-					reproducedEvaluator.setAgent(true);
-					reproducedEvaluator.setReferredService(this);
-					reproducedEvaluator.export(serverConfig.getServerPort());
-					if (reproducedEvaluator instanceof EvaluatorAbstract)
-						((EvaluatorAbstract)reproducedEvaluator).removePurgeTimer();
-					reproducedEvaluator.stimulate();
-					
-					pairReproducedMap.put(evaluatorReproducedName, reproducedEvaluator);
-					guiDataMap.put(evaluatorReproducedName, new EvaluateGUIData());
+				synchronized (pairReproducedMap) {
+					if (pairReproducedMap.containsKey(evaluatorReproducedName))
+						reproducedEvaluator = pairReproducedMap.get(evaluatorReproducedName);
+					else if (pairMap.containsKey(evaluatorName)) {
+						reproducedEvaluator = pairMap.get(evaluatorName).getClass().getDeclaredConstructor().newInstance();
+						
+						EvaluatorConfig config = reproducedEvaluator.getConfig();
+						config.setReproducedVersion(null);
+						config.setReproducedVersion(reproducedVersion);
+						config.setEvaluatorPort(serverConfig.getServerPort());
+						config.setSaveAbility(false);
+						reproducedEvaluator.setAgent(true);
+						reproducedEvaluator.setReferredService(this);
+						reproducedEvaluator.export(serverConfig.getServerPort());
+						if (reproducedEvaluator instanceof EvaluatorAbstract)
+							((EvaluatorAbstract)reproducedEvaluator).removePurgeTimer();
+						reproducedEvaluator.stimulate();
+						
+						pairReproducedMap.put(evaluatorReproducedName, reproducedEvaluator);
+						guiDataMap.put(evaluatorReproducedName, new EvaluateGUIData());
+					}
 				}
 			}
 		}
@@ -370,7 +375,7 @@ public class ExtendedService extends DefaultService implements ServiceExt, Servi
 			LogUtil.error("Service fail to get evaluator, caused by " + e.getMessage());
 		}
 		finally {
-			trans.unlockWrite();
+			trans.unlockRead();
 		}
 		
 		return reproducedEvaluator;
@@ -399,17 +404,19 @@ public class ExtendedService extends DefaultService implements ServiceExt, Servi
 			return false;
 
 		boolean ret = true;
-		trans.lockWrite();
+		trans.lockRead();
 		try {
 			String evaluatorReproducedName = evaluatorName + "-" + reproducedVersion;
 			
-			if (pairReproducedMap.containsKey(evaluatorReproducedName)) {
-				Evaluator reproducedEvaluator = pairReproducedMap.get(evaluatorReproducedName);
-				try {
-					reproducedEvaluator.close();
-				} catch (Throwable e) {LogUtil.trace(e);}
-				
-				pairReproducedMap.remove(evaluatorReproducedName);
+			synchronized (pairReproducedMap) {
+				if (pairReproducedMap.containsKey(evaluatorReproducedName)) {
+					Evaluator reproducedEvaluator = pairReproducedMap.get(evaluatorReproducedName);
+					try {
+						reproducedEvaluator.close();
+					} catch (Throwable e) {LogUtil.trace(e);}
+					
+					pairReproducedMap.remove(evaluatorReproducedName);
+				}
 			}
 		}
 		catch (Throwable e) {
@@ -419,7 +426,7 @@ public class ExtendedService extends DefaultService implements ServiceExt, Servi
 			LogUtil.error("Service fail to get evaluator, caused by " + e.getMessage());
 		}
 		finally {
-			trans.unlockWrite();
+			trans.unlockRead();
 		}
 		
 		return ret;

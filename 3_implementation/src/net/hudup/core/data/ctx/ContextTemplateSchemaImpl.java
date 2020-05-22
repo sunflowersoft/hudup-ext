@@ -16,7 +16,6 @@ import net.hudup.core.data.Attribute;
 import net.hudup.core.data.Attribute.Type;
 import net.hudup.core.data.AttributeList;
 import net.hudup.core.data.DataConfig;
-import net.hudup.core.logistic.LogUtil;
 
 /**
  * This class is default implementation of context template schema (CTS).
@@ -172,7 +171,6 @@ public class ContextTemplateSchemaImpl implements ContextTemplateSchema {
 
 	@Override
 	public void clear() {
-		// TODO Auto-generated method stub
 		if (roots != null)
 			roots.clear();
 	}
@@ -298,19 +296,4 @@ public class ContextTemplateSchemaImpl implements ContextTemplateSchema {
 	}
 
 
-	@Override
-	protected void finalize() throws Throwable {
-		// TODO Auto-generated method stub
-		super.finalize();
-		
-		try {
-			clear();
-		}
-		catch (Throwable e) {
-			LogUtil.trace(e);
-		}
-		
-	}
-	
-	
 }

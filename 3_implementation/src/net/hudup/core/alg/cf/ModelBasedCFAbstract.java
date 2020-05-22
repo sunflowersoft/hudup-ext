@@ -31,7 +31,6 @@ public abstract class ModelBasedCFAbstract extends ModelBasedRecommenderAbstract
 	 */
 	public ModelBasedCFAbstract() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
 

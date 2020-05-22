@@ -659,7 +659,7 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 		
 		result = null;
 		
-		evProcessor.clear();
+		evProcessor.close();
 		updateGUIData();
 		guiData.active = false;
 		

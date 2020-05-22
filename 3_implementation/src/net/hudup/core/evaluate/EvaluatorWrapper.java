@@ -523,7 +523,6 @@ public class EvaluatorWrapper implements Evaluator, Serializable {
 			evaluatorName = getName();
 		}
 		catch (Throwable e) {
-			// TODO Auto-generated catch block
 			LogUtil.trace(e);
 		}
 		return DSUtil.shortenVerbalName(evaluatorName);
@@ -613,7 +612,7 @@ public class EvaluatorWrapper implements Evaluator, Serializable {
 	
 	@Override
 	protected void finalize() throws Throwable {
-		super.finalize();
+//		super.finalize();
 		
 		try {
 			close();

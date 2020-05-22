@@ -12,7 +12,6 @@ import java.util.Set;
 
 import net.hudup.core.Constants;
 import net.hudup.core.Util;
-import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.AlgList;
 import net.hudup.core.alg.CompositeRecommenderAbstract;
 import net.hudup.core.alg.RecommendFilter;
@@ -153,10 +152,4 @@ public class ExternalServerRecommender extends CompositeRecommenderAbstract {
 	}
 
 
-	@Override
-	public Alg newInstance() {
-		return new ExternalServerRecommender();
-	}
-
-	
 }

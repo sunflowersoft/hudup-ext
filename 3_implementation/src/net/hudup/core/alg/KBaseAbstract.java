@@ -350,7 +350,7 @@ public abstract class KBaseAbstract implements KBase, KBaseRemote {
 
 	@Override
 	protected void finalize() throws Throwable {
-		super.finalize();
+//		super.finalize();
 		
 		try {
 			if (!isEmpty()) close();

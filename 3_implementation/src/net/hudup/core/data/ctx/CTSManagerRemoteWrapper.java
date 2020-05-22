@@ -10,7 +10,6 @@ package net.hudup.core.data.ctx;
 import java.io.Serializable;
 import java.rmi.RemoteException;
 
-import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.AlgRemoteWrapper;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Dataset;
@@ -41,7 +40,7 @@ public class CTSManagerRemoteWrapper extends AlgRemoteWrapper implements CTSMana
     /**
      * Default constructor.
      */
-    public CTSManagerRemoteWrapper() {
+    protected CTSManagerRemoteWrapper() {
 
     }
 
@@ -212,19 +211,6 @@ public class CTSManagerRemoteWrapper extends AlgRemoteWrapper implements CTSMana
 	@Override
 	public Inspector getInspector() {
 		return new Inspector.NullInspector();
-	}
-
-	
-	@Override
-	public Alg newInstance() {
-		if (remoteAlg instanceof CTSManagerAbstract) {
-			CTSManagerAbstract newCTSManager = (CTSManagerAbstract) ((CTSManagerAbstract)remoteAlg).newInstance();
-			return new CTSManagerRemoteWrapper(newCTSManager, exclusive);
-		}
-		else {
-			LogUtil.warn("newInstance() returns itselfs and so does not return new object");
-			return this;
-		}
 	}
 
 	

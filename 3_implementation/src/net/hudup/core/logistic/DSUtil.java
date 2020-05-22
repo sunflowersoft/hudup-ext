@@ -428,7 +428,7 @@ public final class DSUtil {
 		Map<Integer, RatingTriple> newMap = Util.newMap();
 		Set<Integer> keys = map.keySet();
 		for (Integer key : keys) {
-			Integer newKey = new Integer(key);
+			Integer newKey = Integer.valueOf(key);
 			RatingTriple newRat = (RatingTriple) map.get(key).clone();
 			newMap.put(newKey, newRat);
 		}

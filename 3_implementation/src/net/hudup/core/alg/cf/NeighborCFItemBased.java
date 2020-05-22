@@ -11,7 +11,6 @@ import java.rmi.RemoteException;
 import java.util.Set;
 
 import net.hudup.core.Util;
-import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.DuplicatableAlg;
 import net.hudup.core.alg.RecommendParam;
 import net.hudup.core.data.DataConfig;
@@ -47,13 +46,12 @@ public class NeighborCFItemBased extends NeighborCF implements DuplicatableAlg {
 	 * Default constructor.
 	 */
 	public NeighborCFItemBased() {
-		// TODO Auto-generated constructor stub
+
 	}
 
 	
 	@Override
 	public RatingVector estimate(RecommendParam param, Set<Integer> queryIds) throws RemoteException {
-		// TODO Auto-generated method stub
 		return estimate(this, param, queryIds);
 	}
 
@@ -70,7 +68,6 @@ public class NeighborCFItemBased extends NeighborCF implements DuplicatableAlg {
 	 * @throws RemoteException if any error raises.
 	 */
 	public static RatingVector estimate(NeighborCF cf, RecommendParam param, Set<Integer> queryIds) throws RemoteException {
-		// TODO Auto-generated method stub
 		/*
 		 * There are three cases of param.ratingVector:
 		 * 1. Its id is < 0, which indicates it is not stored in training dataset then, caching does not work even though this is cached algorithm.
@@ -147,7 +144,6 @@ public class NeighborCFItemBased extends NeighborCF implements DuplicatableAlg {
 			itemRatings.close();
 		} 
 		catch (Throwable e) {
-			// TODO Auto-generated catch block
 			LogUtil.trace(e);
 		}
 		
@@ -165,7 +161,6 @@ public class NeighborCFItemBased extends NeighborCF implements DuplicatableAlg {
 	
 	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
 		String name = getConfig().getAsString(DUPLICATED_ALG_NAME_FIELD);
 		if (name != null && !name.isEmpty())
 			return name;
@@ -176,31 +171,18 @@ public class NeighborCFItemBased extends NeighborCF implements DuplicatableAlg {
 
 	@Override
 	public String getDescription() throws RemoteException {
-		// TODO Auto-generated method stub
 		return "Item-based nearest neighbors collaborative filtering algorithm";
 	}
 
 
 	@Override
 	public void setName(String name) {
-		// TODO Auto-generated method stub
 		getConfig().put(DUPLICATED_ALG_NAME_FIELD, name);
 	}
 
 
 	@Override
-	public Alg newInstance() {
-		// TODO Auto-generated method stub
-		NeighborCFItemBased cf = new NeighborCFItemBased();
-		cf.getConfig().putAll((DataConfig)this.getConfig().clone());
-		
-		return cf;
-	}
-
-
-	@Override
 	public DataConfig createDefaultConfig() {
-		// TODO Auto-generated method stub
 		DataConfig config = super.createDefaultConfig();
 		config.addReadOnly(DUPLICATED_ALG_NAME_FIELD);
 		return config;

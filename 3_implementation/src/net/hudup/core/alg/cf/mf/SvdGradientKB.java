@@ -697,9 +697,9 @@ public abstract class SvdGradientKB extends KBaseRecommendIntegrated {
 	@Override
 	public PropList getDefaultParameters() {
 		DataConfig config = new DataConfig();
-		config.put(PRECISION, new Double(DEFAULT_PRECISION));
-		config.put(GAMMA, new Double(DEFAULT_GAMMA));
-		config.put(LAMDA, new Double(DEFAULT_LAMDA));
+		config.put(PRECISION, DEFAULT_PRECISION);
+		config.put(GAMMA, DEFAULT_GAMMA);
+		config.put(LAMDA, DEFAULT_LAMDA);
 		config.put(MAX_ITERATION, DEFAULT_MAX_ITERATION);
 		config.put(MAX_FACTOR, DEFAULT_MAX_FACTOR);
 		

@@ -65,7 +65,7 @@ public interface Alg extends Serializable {
 	
 	/**
 	 * Create the new instance of algorithm, concrete algorithm is determined run-time.
-	 * @return New {@link Alg} instance
+	 * @return New algorithm instance
 	 */
 	Alg newInstance();
 	

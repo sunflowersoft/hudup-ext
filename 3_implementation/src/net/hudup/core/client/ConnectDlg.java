@@ -752,21 +752,21 @@ public abstract class ConnectDlg extends JDialog {
 				else
 					bindPort = NetUtil.getPort(bindPort, chkHostingAgain.isSelected() ? Constants.TRY_RANDOM_PORT : true);
 
-				ConnectTypeDesc connectType = (ConnectTypeDesc)cmbConnectType.getSelectedItem();
+				ConnectType connectType = ((ConnectTypeDesc)cmbConnectType.getSelectedItem()).getType();
 				xURI connectUri = null;
-				if (connectType.equals(ConnectType.server)) {
+				if (connectType == ConnectType.server) {
 					connector = ClientUtil.getRemoteServer(host, port, username, password);
 					connectUri = xURI.create("rmi://" + host + ":" + port);
 				}
-				else if (connectType.equals(ConnectType.service)) {
+				else if (connectType == ConnectType.service) {
 					connector = ClientUtil.getRemoteService(host, port, username, password);
 					connectUri = xURI.create("rmi://" + host + ":" + port);
 				}
-				else if (connectType.equals(ConnectType.socket_service)) {
+				else if (connectType == ConnectType.socket_service) {
 					connector = ClientUtil.getSocketConnection(host, port, username, password);
 					connectUri = xURI.create("hdp://" + host + ":" + port);
 				}
-				else  if (connectType.equals(ConnectType.evaluator)) {
+				else  if (connectType == ConnectType.evaluator) {
 					connector = ClientUtil.getRemoteEvaluator(host, port, connectPath);
 					connectUri = xURI.create("rmi://" + host + ":" + port + "/" + connectPath);
 				}

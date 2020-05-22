@@ -325,14 +325,12 @@ public abstract class AlgAbstract implements Alg, AlgRemote {
 
 //	@Override
 //	public boolean isAgent() throws RemoteException {
-//		// TODO Auto-generated method stub
 //		return config.getAsBoolean(DataConfig.AGENT_FIELD);
 //	}
 //
 //
 //	@Override
 //	public void setAgent(boolean isAgent) throws RemoteException {
-//		// TODO Auto-generated method stub
 //		config.put(DataConfig.AGENT_FIELD, isAgent); //Should use variable instead.
 //	}
 
@@ -346,15 +344,21 @@ public abstract class AlgAbstract implements Alg, AlgRemote {
 	@Override
 	public Alg newInstance() {
 		try {
-			return getClass().getDeclaredConstructor().newInstance();
-		} catch (Exception e) {LogUtil.trace(e);}
+			Alg alg = getClass().getDeclaredConstructor().newInstance();
+			if (this instanceof DuplicatableAlg)
+				alg.getConfig().putAll((DataConfig)this.getConfig().clone());
+			
+			return alg;
+		}
+		catch (Exception e) {LogUtil.trace(e);}
+		
 		return null;
 	}
 
 
 	@Override
 	protected void finalize() throws Throwable {
-		super.finalize();
+//		super.finalize();
 		
 		try {
 			unexport();

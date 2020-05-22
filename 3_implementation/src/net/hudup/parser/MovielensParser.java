@@ -21,7 +21,6 @@ import javax.swing.JOptionPane;
 
 import net.hudup.core.Constants;
 import net.hudup.core.Util;
-import net.hudup.core.alg.Alg;
 import net.hudup.core.data.Attribute;
 import net.hudup.core.data.Attribute.Type;
 import net.hudup.core.data.AttributeList;
@@ -174,7 +173,6 @@ public class MovielensParser extends SnapshotParser {
 	
 	@Override
 	public boolean support(DataDriver driver) throws RemoteException {
-		// TODO Auto-generated method stub
 		
 		return driver.isFlatServer();
 	}
@@ -207,7 +205,6 @@ public class MovielensParser extends SnapshotParser {
 				
 				@Override
 				public void process(String line) {
-					// TODO Auto-generated method stub
 					int rowId = -1;
 					int colId = -1;
 					double value = Constants.UNUSED;
@@ -258,7 +255,6 @@ public class MovielensParser extends SnapshotParser {
 			
 		} 
 		catch (Exception e) {
-			// TODO Auto-generated catch block
 			LogUtil.trace(e);
 		}
 		finally {
@@ -753,21 +749,12 @@ public class MovielensParser extends SnapshotParser {
 
 	@Override
 	public String getDescription() throws RemoteException {
-		// TODO Auto-generated method stub
 		return "Movielens parser";
 	}
 
 
 	@Override
-	public Alg newInstance() {
-		// TODO Auto-generated method stub
-		return new MovielensParser();
-	}
-
-
-	@Override
 	public DataConfig createDefaultConfig() {
-		// TODO Auto-generated method stub
 		DataConfig tempConfig = super.createDefaultConfig();
 		tempConfig.put(MOVIELENS_TYPE_FIELD, MOVIELENS_TYPE_100K);
 
@@ -780,7 +767,6 @@ public class MovielensParser extends SnapshotParser {
 
 			@Override
 			public Serializable userEdit(Component comp, String key, Serializable defaultValue) {
-				// TODO Auto-generated method stub
 				if (key.equals(MOVIELENS_TYPE_FIELD)) {
 					String type = getAsString(MOVIELENS_TYPE_FIELD);
 					type = type == null ? MOVIELENS_TYPE_100K : type;

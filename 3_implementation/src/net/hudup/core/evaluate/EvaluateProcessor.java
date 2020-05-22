@@ -78,7 +78,6 @@ public class EvaluateProcessor {
 	 * Default constructor.
 	 */
 	public EvaluateProcessor() {
-		// TODO Auto-generated constructor stub
 		this(null);
 	}
 
@@ -88,7 +87,6 @@ public class EvaluateProcessor {
 	 * @param referredEvaluator referred evaluator.
 	 */
 	public EvaluateProcessor(Evaluator referredEvaluator) {
-		// TODO Auto-generated constructor stub
 		this.referredEvaluator = referredEvaluator;
 	}
 
@@ -284,7 +282,6 @@ public class EvaluateProcessor {
 				ioChannels.get(key).close();
 			} 
 			catch (Throwable e) {
-				// TODO Auto-generated catch block
 				LogUtil.trace(e);
 			}
 		}
@@ -322,8 +319,7 @@ public class EvaluateProcessor {
 	/**
 	 * Clearing internal data.
 	 */
-	public void clear() {
-		// TODO Auto-generated method stub
+	public void close() {
 		closeIOChannels();
 		referredEvaluator = null;
 	}
@@ -331,11 +327,10 @@ public class EvaluateProcessor {
 
 	@Override
 	protected void finalize() throws Throwable {
-		// TODO Auto-generated method stub
-		super.finalize();
+//		super.finalize();
 		
 		try {
-			clear();
+			close();
 		}
 		catch (Throwable e) {
 			LogUtil.trace(e);

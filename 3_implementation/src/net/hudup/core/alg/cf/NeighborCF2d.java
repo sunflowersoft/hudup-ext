@@ -11,9 +11,7 @@ import java.rmi.RemoteException;
 import java.util.Set;
 
 import net.hudup.core.Util;
-import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.RecommendParam;
-import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.Fetcher;
 import net.hudup.core.data.RatingVector;
@@ -45,14 +43,12 @@ public class NeighborCF2d extends NeighborCFUserBased {
 	 * Default constructor.
 	 */
 	public NeighborCF2d() {
-		// TODO Auto-generated constructor stub
 		this.itemBasedCF.setConfig(this.getConfig());
 	}
 
 	
 	@Override
 	public synchronized void setup(Dataset dataset, Object...params) throws RemoteException {
-		// TODO Auto-generated method stub
 		super.setup(dataset, params);
 		this.itemBasedCF.setup(dataset, params);
 	}
@@ -60,7 +56,6 @@ public class NeighborCF2d extends NeighborCFUserBased {
 
 	@Override
 	public synchronized void unsetup() throws RemoteException {
-		// TODO Auto-generated method stub
 		super.unsetup();
 		this.itemBasedCF.unsetup();
 	}
@@ -68,7 +63,6 @@ public class NeighborCF2d extends NeighborCFUserBased {
 
 	@Override
 	public synchronized RatingVector estimate(RecommendParam param, Set<Integer> queryIds) throws RemoteException {
-		// TODO Auto-generated method stub
 		if (param.ratingVector == null) return null;
 		RatingVector thisUser = param.ratingVector;
 		RatingVector innerUser = dataset.getUserRating(thisUser.id());
@@ -171,7 +165,6 @@ public class NeighborCF2d extends NeighborCFUserBased {
 			itemRatings.close();
 		} 
 		catch (Throwable e) {
-			// TODO Auto-generated catch block
 			LogUtil.trace(e);
 		}
 		
@@ -181,7 +174,6 @@ public class NeighborCF2d extends NeighborCFUserBased {
 	
 	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
 		String name = getConfig().getAsString(DUPLICATED_ALG_NAME_FIELD);
 		if (name != null && !name.isEmpty())
 			return name;
@@ -192,18 +184,7 @@ public class NeighborCF2d extends NeighborCFUserBased {
 
 	@Override
 	public String getDescription() throws RemoteException {
-		// TODO Auto-generated method stub
 		return "Two-dimension collaborative filtering algorithm";
-	}
-
-
-	@Override
-	public Alg newInstance() {
-		// TODO Auto-generated method stub
-		NeighborCF2d cf = new NeighborCF2d();
-		cf.getConfig().putAll((DataConfig)this.getConfig().clone());
-		
-		return cf;
 	}
 
 
@@ -238,13 +219,11 @@ class NeighborCF2dDeprecated extends NeighborCFUserBased {
 	 */
 	public NeighborCF2dDeprecated() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
 	
 	@Override
 	public synchronized RatingVector estimate(RecommendParam param, Set<Integer> queryIds) throws RemoteException {
-		// TODO Auto-generated method stub
 		
 		Fetcher<RatingVector> vUserRatings = null;
 		Fetcher<RatingVector> vItemRatings = null;
@@ -325,7 +304,6 @@ class NeighborCF2dDeprecated extends NeighborCFUserBased {
 			vItemRatings.close();
 		} 
 		catch (RemoteException e) {
-			// TODO Auto-generated catch block
 			LogUtil.trace(e);
 		}
 		
@@ -340,16 +318,8 @@ class NeighborCF2dDeprecated extends NeighborCFUserBased {
 	
 	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
 		return "neighborcf_2d_deprecated";
 	}
 
 
-	@Override
-	public Alg newInstance() {
-		// TODO Auto-generated method stub
-		return new NeighborCF2dDeprecated();
-	}
-	
-	
 }

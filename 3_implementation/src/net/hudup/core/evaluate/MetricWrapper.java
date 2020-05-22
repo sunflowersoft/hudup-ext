@@ -9,7 +9,6 @@ package net.hudup.core.evaluate;
 
 import java.rmi.RemoteException;
 
-import net.hudup.core.alg.Alg;
 import net.hudup.core.logistic.BaseClass;
 import net.hudup.core.logistic.xURI;
 
@@ -78,7 +77,6 @@ public class MetricWrapper extends MetricAbstract {
 	
 	@Override
 	public void setup(Object... params) throws RemoteException {
-		// TODO Auto-generated method stub
 		
 		if (params != null && params.length >= 3 && 
 				params[0] instanceof Metric && 
@@ -101,20 +99,18 @@ public class MetricWrapper extends MetricAbstract {
 	 * @throws RemoteException if any error raises.
 	 */
 	public void setup(Metric metric, String algName, int datasetId) throws RemoteException {
-		setup( new Object[] { metric, algName, new Integer(datasetId) } );
+		setup( new Object[] { metric, algName, Integer.valueOf(datasetId) } );
 	}
 	
 	
 	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
 		return metric.getName();
 	}
 
 
 	@Override
 	public String getDescription() throws RemoteException {
-		// TODO Auto-generated method stub
 		return metric.getDescription();
 	}
 
@@ -122,7 +118,6 @@ public class MetricWrapper extends MetricAbstract {
 
 	@Override
 	public String getTypeName() throws RemoteException {
-		// TODO Auto-generated method stub
 		return metric.getTypeName();
 	}
 
@@ -130,7 +125,6 @@ public class MetricWrapper extends MetricAbstract {
 
 	@Override
 	public MetricValue getCurrentValue() throws RemoteException {
-		// TODO Auto-generated method stub
 		return metric.getCurrentValue();
 	}
 
@@ -138,28 +132,24 @@ public class MetricWrapper extends MetricAbstract {
 
 	@Override
 	public MetricValue getAccumValue() throws RemoteException {
-		// TODO Auto-generated method stub
 		return metric.getAccumValue();
 	}
 
 
 	@Override
 	public boolean recalc(Object... params) throws RemoteException {
-		// TODO Auto-generated method stub
 		return metric.recalc(params);
 	}
 
 
 	@Override
 	public void reset() throws RemoteException {
-		// TODO Auto-generated method stub
 		metric.reset();
 	}
 
 	
 	@Override
 	public boolean isValid() throws RemoteException {
-		// TODO Auto-generated method stub
 		return metric.isValid();
 	}
 
@@ -209,13 +199,6 @@ public class MetricWrapper extends MetricAbstract {
 	}
 
 	
-	@Override
-	public Alg newInstance() {
-		// TODO Auto-generated method stub
-		return new MetricWrapper();
-	}
-
-
 	/**
 	 * Creating a metric wrapper with specified internal metric, algorithm name, identifier of (testing) dataset, and URI of (testing) dataset.
 	 * This method is used to construct a metric wrapper. 

@@ -456,7 +456,6 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			
 			@Override
 			public void algListChanged(AlgListChangedEvent evt) {
-				// TODO Auto-generated method stub
 				if (evaluator == null || algRegTable == null)
 					return;
 				
@@ -615,7 +614,6 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					// TODO Auto-generated method stub
 					clear();
 				}
 				

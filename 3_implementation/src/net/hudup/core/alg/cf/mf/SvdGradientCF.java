@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Set;
 
 import net.hudup.core.Util;
-import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.KBase;
 import net.hudup.core.alg.KBaseRecommendIntegrated;
 import net.hudup.core.alg.RecommendFilterParam;
@@ -47,7 +46,6 @@ public class SvdGradientCF extends ModelBasedCFAbstract {
 	 */
 	public SvdGradientCF() {
 		super();
-		// TODO Auto-generated constructor stub
 		
 		if (kb != null)
 			config.putAll( ((KBaseRecommendIntegrated) kb).getDefaultParameters() );
@@ -56,7 +54,6 @@ public class SvdGradientCF extends ModelBasedCFAbstract {
 	
 	@Override
 	public KBase newKB() throws RemoteException {
-		// TODO Auto-generated method stub
 		return SvdGradientKB.create(this);
 	}
 
@@ -67,7 +64,6 @@ public class SvdGradientCF extends ModelBasedCFAbstract {
 	 * @throws Exception if any error raises.
 	 */
 	public synchronized void setup0(RatingMatrix userMatrix) throws Exception {
-		// TODO Auto-generated method stub
 		unsetup();
 		
 		((SvdGradientKB) kb).learn0(userMatrix);
@@ -76,7 +72,6 @@ public class SvdGradientCF extends ModelBasedCFAbstract {
 	
 	@Override
 	public synchronized RatingVector estimate(RecommendParam param, Set<Integer> queryIds) throws RemoteException {
-		// TODO Auto-generated method stub
 		SvdGradientKB kb = (SvdGradientKB) getKBase();
 		if (kb.isEmpty())
 			return null;
@@ -99,7 +94,6 @@ public class SvdGradientCF extends ModelBasedCFAbstract {
 	
 	@Override
 	public synchronized RatingVector recommend(RecommendParam param, int maxRecommend) throws RemoteException {
-		// TODO Auto-generated method stub
 		
 		SvdGradientKB kb = (SvdGradientKB) getKBase();
 		if (kb.isEmpty())
@@ -174,7 +168,6 @@ public class SvdGradientCF extends ModelBasedCFAbstract {
 //	 */
 //	@SuppressWarnings("unused")
 //	private synchronized RatingVector recommend0(RecommendParam param, int maxRecommend) throws RemoteException {
-//		// TODO Auto-generated method stub
 //		
 //		SvdGradientKB kb = (SvdGradientKB) getKBase();
 //		if (kb.isEmpty())
@@ -244,25 +237,16 @@ public class SvdGradientCF extends ModelBasedCFAbstract {
 	
 	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
 		return "svd_gradient";
 	}
 
 	
 	@Override
 	public String getDescription() throws RemoteException {
-		// TODO Auto-generated method stub
 		return "SVD algorithm";
 	}
 
 
-	@Override
-	public Alg newInstance() {
-		// TODO Auto-generated method stub
-		return new SvdGradientCF();
-	}
-
-	
 	@Override
 	public DataConfig createDefaultConfig() {
 		DataConfig tempConfig = super.createDefaultConfig();

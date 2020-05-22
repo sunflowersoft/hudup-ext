@@ -9,7 +9,6 @@ package net.hudup.core.parser;
 
 import java.rmi.RemoteException;
 
-import net.hudup.core.alg.Alg;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.ScannerImpl;
@@ -50,23 +49,14 @@ public class ScannerParserImpl extends ScannerParser {
 	
 	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
 		return "scanner_parser";
 	}
 
 	
 	@Override
 	public String getDescription() throws RemoteException {
-		// TODO Auto-generated method stub
 		return "Scanner parser";
 	}
 
 
-	@Override
-	public Alg newInstance() {
-		// TODO Auto-generated method stub
-		return new ScannerParserImpl();
-	}
-
-	
 }
