@@ -69,14 +69,6 @@ public class EvaluatorWrapper implements Evaluator, Serializable {
 	protected Evaluator remoteEvaluator = null;
 	
 	
-    /**
-     * Default constructor.
-     */
-    protected EvaluatorWrapper() {
-
-    }
-
-    
 	/**
 	 * Constructor with specified remote evaluator.
 	 * @param remoteEvaluator remote evaluator.

@@ -74,16 +74,6 @@ public class DatasetRemoteWrapper implements Dataset, DatasetRemote {
 	 * @param exclusive exclusive mode.
 	 */
 	public DatasetRemoteWrapper(DatasetRemote remoteDataset, boolean exclusive) {
-		set(remoteDataset, exclusive);
-	}
-
-	
-	/**
-	 * Setting with specified remote dataset and exclusive mode.
-	 * @param remoteDataset remote dataset.
-	 * @param exclusive exclusive mode.
-	 */
-	protected void set(DatasetRemote remoteDataset, boolean exclusive) {
 		this.remoteDataset = remoteDataset;
 		this.exclusive = exclusive;
 	}

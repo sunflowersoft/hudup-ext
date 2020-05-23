@@ -32,14 +32,6 @@ public class MetricRemoteWrapper extends AlgRemoteWrapper implements Metric, Met
 
 	
     /**
-     * Default constructor.
-     */
-    protected MetricRemoteWrapper() {
-
-    }
-
-    
-    /**
 	 * Constructor with remote metric.
 	 * @param remoteMetric remote metric.
 	 */

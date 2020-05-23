@@ -8,6 +8,7 @@
 package net.hudup.core.alg;
 
 import java.io.Serializable;
+import java.lang.reflect.Constructor;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
@@ -75,14 +76,6 @@ public class AlgRemoteWrapper implements Alg, AlgRemote, Serializable {
     private transient DataConfig config = null;
     
     
-    /**
-     * Default constructor.
-     */
-    protected AlgRemoteWrapper() {
-
-    }
-    
-    
 	/**
 	 * Constructor with specified remote algorithm.
 	 * @param remoteAlg remote algorithm.
@@ -98,16 +91,6 @@ public class AlgRemoteWrapper implements Alg, AlgRemote, Serializable {
 	 * @param exclusive exclusive mode.
 	 */
 	public AlgRemoteWrapper(AlgRemote remoteAlg, boolean exclusive) {
-		set(remoteAlg, exclusive);
-	}
-
-	
-	/**
-	 * Setting with specified remote algorithm and exclusive mode.
-	 * @param remoteAlg remote algorithm.
-	 * @param exclusive exclusive mode.
-	 */
-	protected void set(AlgRemote remoteAlg, boolean exclusive) {
 		this.remoteAlg = remoteAlg;
 		this.exclusive = exclusive;
 		
@@ -115,7 +98,7 @@ public class AlgRemoteWrapper implements Alg, AlgRemote, Serializable {
 			this.name = queryName();
 		} catch (Throwable e) {LogUtil.trace(e);}
 	}
-	
+
 	
 	@Override
 	public Object learnStart(Object... info) throws RemoteException {
@@ -255,9 +238,16 @@ public class AlgRemoteWrapper implements Alg, AlgRemote, Serializable {
 		if (remoteAlg instanceof AlgAbstract) {
 			try {
 				AlgAbstract newAlg = (AlgAbstract) ((AlgAbstract)remoteAlg).newInstance();
-				AlgRemoteWrapper wrapper = this.getClass().getDeclaredConstructor().newInstance();
-				wrapper.set(newAlg, exclusive);
-				return wrapper;
+				Constructor<?>[] constructors = getClass().getDeclaredConstructors();
+				for (Constructor<?> constructor : constructors) {
+					Class<?>[] types = constructor.getParameterTypes();
+					if (types.length == 2 &&
+							AlgRemote.class.isAssignableFrom(types[0]) &&
+							(boolean.class.isAssignableFrom(types[1]) || Boolean.class.isAssignableFrom(types[1]))) {
+						return (Alg)constructor.newInstance(newAlg, exclusive);
+					}
+				}
+				
 			} catch (Exception e) {LogUtil.trace(e);}
 			
 			return null;

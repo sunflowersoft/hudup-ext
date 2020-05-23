@@ -95,19 +95,13 @@ public class EvaluatorWrapperExt implements Evaluator, EvaluatorListener, Evalua
 
 	
 	/**
-	 * Default constructor.
-	 */
-	protected EvaluatorWrapperExt() {
-		
-	}
-
-	
-	/**
 	 * Constructor with remote evaluator and socket server.
 	 * @param remoteEvaluator remote evaluator, always in non-exclusive mode.
 	 * @param exportedPort port to export the wrapper.
 	 */
 	public EvaluatorWrapperExt(Evaluator remoteEvaluator, int exportedPort) {
+		if (remoteEvaluator == null || exportedPort < 0) return;
+		
 		try {
 			this.remoteEvaluator = remoteEvaluator;
 			export(exportedPort);

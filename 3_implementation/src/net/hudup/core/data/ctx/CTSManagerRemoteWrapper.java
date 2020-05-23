@@ -37,14 +37,6 @@ public class CTSManagerRemoteWrapper extends AlgRemoteWrapper implements CTSMana
 	private static final long serialVersionUID = 1L;
 
 	
-    /**
-     * Default constructor.
-     */
-    protected CTSManagerRemoteWrapper() {
-
-    }
-
-    
 	/**
 	 * Constructor with specified remote context template manager.
 	 * @param remoteCTSManager specified remote context template manager.

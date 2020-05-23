@@ -425,6 +425,8 @@ class DelegatorEvaluator extends EvaluatorWrapperExt {
 	 * @param remoteEvaluator remote evaluator.
 	 */
 	public DelegatorEvaluator(Delegator delegator, Evaluator remoteEvaluator) {
+		super(null, -1);
+		
 		try {
 			this.remoteServer = delegator.remoteServer;
 			this.socketServer = delegator.socketServer;

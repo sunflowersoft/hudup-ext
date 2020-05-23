@@ -33,14 +33,6 @@ public class DatasetParserRemoteWrapper extends AlgRemoteWrapper implements Data
 	private static final long serialVersionUID = 1L;
 
 	
-    /**
-     * Default constructor.
-     */
-    protected DatasetParserRemoteWrapper() {
-
-    }
-
-    
 	/**
 	 * Constructor with specified remote dataset parser.
 	 * @param remoteDatasetParser remote dataset parser.

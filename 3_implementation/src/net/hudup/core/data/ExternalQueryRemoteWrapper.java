@@ -31,14 +31,6 @@ public class ExternalQueryRemoteWrapper extends AlgRemoteWrapper implements Exte
 	private static final long serialVersionUID = 1L;
 
 	
-    /**
-     * Default constructor.
-     */
-    protected ExternalQueryRemoteWrapper() {
-
-    }
-
-    
 	/**
 	 * Constructor with remote external query.
 	 * @param remoteExternalQuery remote external query.

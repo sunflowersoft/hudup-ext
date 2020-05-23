@@ -33,14 +33,6 @@ public class AugRemoteWrapper extends ExecutableAlgRemoteWrapper implements Aug,
 
 	
     /**
-     * Default constructor.
-     */
-    public AugRemoteWrapper() {
-
-    }
-
-    
-    /**
 	 * Constructor with remote AUgorithm.
 	 * @param remoteAug remote AUgorithm.
 	 */

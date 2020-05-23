@@ -39,14 +39,6 @@ public class ExecutableAlgRemoteWrapper extends AlgRemoteWrapper implements Exec
 	private static final long serialVersionUID = 1L;
 
 
-    /**
-     * Default constructor.
-     */
-    protected ExecutableAlgRemoteWrapper() {
-
-    }
-
-    
 	/**
 	 * Constructor with specified remote executable algorithm.
 	 * @param remoteExecutableAlg remote executable algorithm.
