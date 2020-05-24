@@ -601,7 +601,7 @@ public class SetupServerWizard extends JDialog {
 				preUserAtt = provider.getProfileAttributes(config.getUserUnit());
 			}
 			catch (Throwable e) {
-				LogUtil.trace(e); //Exception here is not a problem.
+				LogUtil.error("Getting user attributes error caused by " + e.getMessage()); //Exception here is not a problem.
 				preUserAtt = null;
 			}
 			
@@ -620,7 +620,7 @@ public class SetupServerWizard extends JDialog {
 				preItemAtt = provider.getProfileAttributes(config.getItemUnit());
 			}
 			catch (Throwable e) {
-				LogUtil.trace(e); //Exception here is not a problem.
+				LogUtil.error("Getting item attributes error caused by " + e.getMessage()); //Exception here is not a problem.
 				preItemAtt = null;
 			}
 			

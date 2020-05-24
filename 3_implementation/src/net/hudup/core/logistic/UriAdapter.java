@@ -21,6 +21,8 @@ import java.nio.channels.ByteChannel;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 import net.hudup.core.Util;
 import net.hudup.core.data.AutoCloseable;
@@ -140,119 +142,102 @@ public class UriAdapter implements UriAssoc, AutoCloseable {
 	
 	@Override
 	public Path newPath(xURI uri) {
-		// TODO Auto-generated method stub
 		return assoc.newPath(uri);
 	}
 
 
 	@Override
 	public Path newPath(String path) {
-		// TODO Auto-generated method stub
 		return assoc.newPath(path);
 	}
 
 
 	@Override
 	public boolean exists(xURI uri) {
-		// TODO Auto-generated method stub
 		return assoc.exists(uri);
 	}
 
 
 	@Override
 	public boolean isStore(xURI uri) {
-		// TODO Auto-generated method stub
 		return assoc.isStore(uri);
 	}
 
 	
 	@Override
 	public boolean isArchive(xURI uri) {
-		// TODO Auto-generated method stub
 		return assoc.isArchive(uri);
 	}
 
 
 	@Override
 	public boolean create(xURI uri, boolean isStore) {
-		// TODO Auto-generated method stub
 		return assoc.create(uri, isStore);
 	}
 
 
 	@Override
 	public boolean clearContent(xURI uri, UriFilter filter) {
-		// TODO Auto-generated method stub
 		return assoc.clearContent(uri, filter);
 	}
 
 
 	@Override
 	public boolean delete(xURI uri, UriFilter filter) {
-		// TODO Auto-generated method stub
 		return assoc.delete(uri, filter);
 	}
 
 
 	@Override
 	public boolean copy(xURI src, xURI dst, boolean moved, UriFilter filter) {
-		// TODO Auto-generated method stub
 		return assoc.copy(src, dst, moved, filter);
 	}
 
 
 	@Override
 	public boolean rename(xURI src, xURI dst) {
-		// TODO Auto-generated method stub
 		return assoc.rename(src, dst);
 	}
 
 
 	@Override
 	public List<xURI> getUriList(xURI store, UriFilter filter) {
-		// TODO Auto-generated method stub
 		return assoc.getUriList(store, filter);
 	}
 
 
 	@Override
 	public InputStream getInputStream(xURI uri) {
-		// TODO Auto-generated method stub
 		return assoc.getInputStream(uri);
 	}
 
 
 	@Override
 	public OutputStream getOutputStream(xURI uri, boolean append) {
-		// TODO Auto-generated method stub
 		return assoc.getOutputStream(uri, append);
 	}
 
 
 	@Override
 	public Reader getReader(xURI uri) {
-		// TODO Auto-generated method stub
 		return assoc.getReader(uri);
 	}
 
 
 	@Override
 	public Writer getWriter(xURI uri, boolean append) {
-		// TODO Auto-generated method stub
 		return assoc.getWriter(uri, append);
 	}
 
 	
 	@Override
 	public ByteChannel getReadChannel(xURI uri) {
-		// TODO Auto-generated method stub
 		return assoc.getReadChannel(uri);
 	}
 
 
 	@Override
 	public ByteChannel getWriteChannel(xURI uri, boolean append) {
-		// TODO Auto-generated method stub
 		return assoc.getWriteChannel(uri, append);
 	}
 
@@ -266,21 +251,18 @@ public class UriAdapter implements UriAssoc, AutoCloseable {
 	@Override
 	public xURI chooseUri(Component comp, boolean open, String[] exts,
 			String[] descs, xURI curStore, String defaultExt) {
-		// TODO Auto-generated method stub
 		return assoc.chooseUri(comp, open, exts, descs, curStore, defaultExt);
 	}
 
 
 	@Override
 	public xURI chooseDefaultUri(Component comp, boolean open, xURI curStore) {
-		// TODO Auto-generated method stub
 		return assoc.chooseDefaultUri(comp, open, curStore);
 	}
 
 
 	@Override
 	public xURI chooseStore(Component comp) {
-		// TODO Auto-generated method stub
 		return assoc.chooseStore(comp);
 	}
 
@@ -381,7 +363,6 @@ public class UriAdapter implements UriAssoc, AutoCloseable {
 				
 				@Override
 				public void process(String line) {
-					// TODO Auto-generated method stub
 					content.add(new StringBuffer(line));
 				}
 			});
@@ -419,7 +400,6 @@ public class UriAdapter implements UriAssoc, AutoCloseable {
 			writer.flush();
 		} 
 		catch (Exception e) {
-			// TODO Auto-generated catch block
 			LogUtil.trace(e);
 			result = false;
 		}
@@ -439,7 +419,6 @@ public class UriAdapter implements UriAssoc, AutoCloseable {
 	
 	@Override
 	public void close() {
-		// TODO Auto-generated method stub
 		try {
 			if (assoc != null)
 				assoc.close();
@@ -448,6 +427,38 @@ public class UriAdapter implements UriAssoc, AutoCloseable {
 			LogUtil.trace(e);
 		}
 		assoc = null;
+	}
+
+	
+	/**
+	 * Unzipping the specified file to specified store.
+	 * @param zipFile specified compressed file.
+	 * @param store specified store.
+	 * @return true if unzipping is successful.
+	 */
+	public boolean unzip(xURI zipFile, xURI store) {
+		boolean ret = true;
+		
+		try (ZipInputStream zis = new ZipInputStream(getInputStream(zipFile));) {
+			ZipEntry zipEntry = null;
+			byte[] buffer = new byte[1024];
+	        while ((zipEntry = zis.getNextEntry()) != null) {
+	            xURI newUri = store.concat(zipEntry.getName());
+	            OutputStream os = getOutputStream(newUri, false);
+	            int length = 0;
+	            while ((length = zis.read(buffer)) > 0) {
+	                os.write(buffer, 0, length);
+	            }
+	            os.close();
+	        }
+			zis.closeEntry();
+		}
+		catch (Exception e) {
+			ret = false;
+			LogUtil.trace(e);
+		}
+		
+		return ret;
 	}
 
 	
@@ -532,21 +543,18 @@ public class UriAdapter implements UriAssoc, AutoCloseable {
 		
 		@Override
 		public void write(char[] cbuf, int off, int len) throws IOException {
-			// TODO Auto-generated method stub
 			writer.write(cbuf, off, len);
 		}
 
 		
 		@Override
 		public void flush() throws IOException {
-			// TODO Auto-generated method stub
 			writer.flush();
 		}
 
 		
 		@Override
 		public void close() throws IOException {
-			// TODO Auto-generated method stub
 			if (writer != null)
 				writer.close();
 			writer = null;
@@ -616,14 +624,12 @@ public class UriAdapter implements UriAssoc, AutoCloseable {
 
 		@Override
 		public int read(char[] cbuf, int off, int len) throws IOException {
-			// TODO Auto-generated method stub
 			return reader.read(cbuf, off, len);
 		}
 
 
 		@Override
 		public void close() throws IOException {
-			// TODO Auto-generated method stub
 			if (reader != null)
 				reader.close();
 			reader = null;
@@ -695,28 +701,24 @@ public class UriAdapter implements UriAssoc, AutoCloseable {
 
 		@Override
 		public int read(ByteBuffer dst) throws IOException {
-			// TODO Auto-generated method stub
 			return channel.read(dst);
 		}
 
 
 		@Override
 		public int write(ByteBuffer src) throws IOException {
-			// TODO Auto-generated method stub
 			return channel.write(src);
 		}
 
 
 		@Override
 		public boolean isOpen() {
-			// TODO Auto-generated method stub
 			return channel.isOpen();
 		}
 
 
 		@Override
 		public void close() throws IOException {
-			// TODO Auto-generated method stub
 			if (channel != null && channel.isOpen()) {
 				try {
 					channel.close();

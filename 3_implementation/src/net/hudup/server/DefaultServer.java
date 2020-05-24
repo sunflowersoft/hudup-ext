@@ -498,22 +498,16 @@ public class DefaultServer extends PowerServerImpl {
 				Provider provider = new ProviderImpl(config);
 				
 				UnitList unitList = provider.getUnitList();
-				UnitList defaultUnitList = DataConfig.getDefaultUnitList();
-				//Removing unimportant units.
-				defaultUnitList.remove(DataConfig.CONTEXT_TEMPLATE_UNIT);
-				defaultUnitList.remove(DataConfig.CONTEXT_UNIT);
-				defaultUnitList.remove(DataConfig.SAMPLE_UNIT);
-				
-				if (!unitList.contains(defaultUnitList)) {
-					provider.close();
-					return true;
-				}
+				UnitList basicUnitList = DataConfig.getBasicUnitList();
 				provider.close();
+
+				if (!unitList.contains(basicUnitList))
+					return true;
 			}
 		}
 		catch (Throwable e) {
 			LogUtil.trace(e);
-			LogUtil.error("Server require set up cause error " + e.getMessage());
+			LogUtil.error("Server requiring set up cause error " + e.getMessage());
 			return true;
 		}
 		

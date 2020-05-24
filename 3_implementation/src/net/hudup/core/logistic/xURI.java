@@ -15,6 +15,7 @@ import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -65,7 +66,6 @@ public class xURI implements Serializable, net.hudup.core.Cloneable {
 	 * @param uri Specified URI
 	 */
 	private xURI(URI uri) {
-		// TODO Auto-generated constructor stub
 		this.uri = uri;
 	}
 
@@ -187,7 +187,6 @@ public class xURI implements Serializable, net.hudup.core.Cloneable {
 			return uri.toURL();
 		} 
 		catch (Throwable e) {
-			// TODO Auto-generated catch block
 			LogUtil.trace(e);
 		}
 		
@@ -195,9 +194,26 @@ public class xURI implements Serializable, net.hudup.core.Cloneable {
 	}
 	
 	
+	/**
+	 * Convert this URI into system {@link Path}.
+	 * @return system {@link Path}.
+	 */
+	public Path toPath() {
+		return Paths.get(uri);
+	}
+	
+	
+	/**
+	 * Convert this URI into file.
+	 * @return file.
+	 */
+	public File toFile() {
+		return new File(uri);
+	}
+
+	
 	@Override
 	public String toString() {
-		// TODO Auto-generated method stub
 		return uri.toString();
 	}
 
@@ -296,7 +312,6 @@ public class xURI implements Serializable, net.hudup.core.Cloneable {
 					fragment);
 		} 
 		catch (Throwable e) {
-			// TODO Auto-generated catch block
 			LogUtil.trace(e);
 			uri = null;
 		}
@@ -342,7 +357,6 @@ public class xURI implements Serializable, net.hudup.core.Cloneable {
 					null);
 		} 
 		catch (Throwable e) {
-			// TODO Auto-generated catch block
 			LogUtil.trace(e);
 			uri = null;
 		}
@@ -366,7 +380,6 @@ public class xURI implements Serializable, net.hudup.core.Cloneable {
 			uri = new URI(urispec);
 		} 
     	catch (Throwable e) {
-			// TODO Auto-generated catch block
 			LogUtil.trace(e);
 			uri = null;
 		}
@@ -533,7 +546,6 @@ public class xURI implements Serializable, net.hudup.core.Cloneable {
 			text = URLEncoder.encode(text, "UTF-8");
 		} 
 		catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
 			LogUtil.trace(e);
 		}
 		
@@ -555,7 +567,6 @@ public class xURI implements Serializable, net.hudup.core.Cloneable {
 			text = URLDecoder.decode(text, "UTF-8");
 		} 
 		catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
 			LogUtil.trace(e);
 		}
 		
@@ -565,7 +576,6 @@ public class xURI implements Serializable, net.hudup.core.Cloneable {
 
 	@Override
 	public Object clone() {
-		// TODO Auto-generated method stub
 		if (uri == null)
 			return null;
 		else

@@ -15,6 +15,7 @@ import net.hudup.core.data.AttributeList;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Provider;
 import net.hudup.core.data.ProviderImpl;
+import net.hudup.core.data.UnitList;
 import net.hudup.core.logistic.NextUpdate;
 import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.xURI;
@@ -113,6 +114,12 @@ public class SetupServerWizardConsole {
 					try {
 						if (storeUri.getLastName().equals(PowerServerConfig.TEMPLATES_SAMPLE_DATA_NAME))
 							needInit = false;
+						else {
+							UnitList unitList = provider.getUnitList();
+							UnitList basicUnitList = DataConfig.getBasicUnitList();
+							if (unitList.contains(basicUnitList))
+								needInit = false;
+						}
 					}
 					catch (Exception e) { }
 				}
@@ -139,6 +146,12 @@ public class SetupServerWizardConsole {
 				try {
 					if (storeUri.getLastName().equals(PowerServerConfig.TEMPLATES_SAMPLE_DATA_NAME))
 						needInit = false;
+					else {
+						UnitList unitList = provider.getUnitList();
+						UnitList basicUnitList = DataConfig.getBasicUnitList();
+						if (unitList.contains(basicUnitList))
+							needInit = false;
+					}
 				}
 				catch (Exception e) { }
 			}

@@ -766,6 +766,22 @@ public class DataConfig extends PropList {
 
 	
 	/**
+	 * Getting basic unit list.
+	 * @return basic unit list.
+	 */
+	public static UnitList getBasicUnitList() {
+		UnitList basicUnitList = DataConfig.getDefaultUnitList();
+		
+		//Removing unimportant units.
+		basicUnitList.remove(DataConfig.CONTEXT_TEMPLATE_UNIT);
+		basicUnitList.remove(DataConfig.CONTEXT_UNIT);
+		basicUnitList.remove(DataConfig.SAMPLE_UNIT);
+		
+		return basicUnitList;
+	}
+	
+	
+	/**
 	 * Filling in the internal unit list by specified unit list <i>unitList</i>.
 	 * Concretely, if unit &quot;item&quot; does not exist in the internal unit list but
 	 * it exists in the specified parameter <i>unitList</i> then &quot;item&quot; is put into the internal unit list.

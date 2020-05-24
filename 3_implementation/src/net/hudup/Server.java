@@ -58,15 +58,22 @@ public final class Server implements AccessPoint {
 		
 		//Not important.
 		try {
+			URL sampleDataUrl = getClass().getResource(PowerServerConfig.TEMPLATES_SAMPLE_DATA_PATH);
+			xURI sampleDataUri = xURI.create(sampleDataUrl.toURI());
+			UriAdapter adapter = new UriAdapter(sampleDataUri);
 			if (Constants.COMPRESSED_FILE_SUPPORT) {
-				URL sampleDataUrl = getClass().getResource(PowerServerConfig.TEMPLATES_SAMPLE_DATA_PATH);
-				xURI sampleDataUri = xURI.create(sampleDataUrl.toURI());
 				xURI storeUri = xURI.create(PowerServerConfig.STORE_PATH_DEFAULT);
-				UriAdapter adapter = new UriAdapter(sampleDataUri);
 				if (!adapter.exists(storeUri))
 					adapter.copy(sampleDataUri, storeUri, false, null);
-				adapter.close();
 			}
+			else {
+				xURI storeUri = xURI.create(PowerServerConfig.STORE_PATH_DEFAULT2);
+				if (!adapter.exists(storeUri)) {
+					adapter.create(storeUri, true);
+					adapter.unzip(sampleDataUri, storeUri);
+				}
+			}
+			adapter.close();
 		}
 		catch (Throwable e) {
 			LogUtil.trace(e);
