@@ -640,8 +640,8 @@ public abstract class UriAssocAbstract implements UriAssoc {
 	 * @param open If true then, choice dialog is <i>open</i> dialog allowing users to choose and open files. Otherwise, choice dialog is <i>save</i> dialog allowing users to choose and save files. 
 	 * @param exts The specified array of archive (file) extensions which are used to filter objects that users select, for example, &quot;*.hdp&quot;, &quot;*.xls&quot;. Each extension has a description. The respective array of extension descriptions is specified by the parameter {@code descs}.  
 	 * @param descs The specified array of descriptions, for example, &quot;Hudup file&quot;, &quot;Excel 97-2003&quot;. Note that each extension has a description and the respective array of file extensions is represented by the parameter {@code exts}. The combination of parameter {@code exts} and parameter {@code descs} forms filters for selection such as &quot;Hudup file (*.hdp)&quot; and &quot;Excel 97-2003 (*.xls)&quot;.
-	 * @param mode The specified mode sets the <i>choice dialog</i> to show only archives (files) or only store (directories) or both archives (files) and store (directories). 
-	 * @param curDir Current store (directory) to open <i>choice dialog</i>. Current store can be null.
+	 * <!--@param mode The specified mode sets the <i>choice dialog</i> to show only archives (files) or only store (directories) or both archives (files) and store (directories).--> 
+	 * @param curStore Current store (directory) to open <i>choice dialog</i>. Current store can be null.
 	 * @return Chosen files are returned as the class {@link ChosenUriResult}
 	 */
 	protected abstract ChosenUriResult chooseUriResult(
@@ -673,8 +673,8 @@ public abstract class UriAssocAbstract implements UriAssoc {
 		
 		/**
 		 * Constructor with URI and extension of chosen archive (file).
-		 * @param chosenFile
-		 * @param chosenExt
+		 * @param chosenUri chosen URI
+		 * @param chosenExt chosen file extension.
 		 */
 		public ChosenUriResult(xURI chosenUri, String chosenExt) {
 			this.chosenUri = chosenUri;
