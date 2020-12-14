@@ -75,18 +75,6 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 
 	
 	/**
-	 * The similarity threshold to determine nearest neighbors.
-	 */
-	public static final String KNN_SIM_THRESHOLD = "knn_sim_threshold";
-
-	
-	/**
-	 * Default value of the similarity threshold to determine nearest neighbors.
-	 */
-	public static final double KNN_SIM_THRESHOLD_DEFAULT = 0.0;
-
-	
-	/**
 	 * In the configuration, the entry of similarity measure has the name specified by this constant.
 	 */
 	public static final String MEASURE = "measure";
@@ -518,84 +506,6 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 	protected boolean isCachedSim() {
 		return true;
 	}
-	
-	
-//	@Override
-//	public synchronized RatingVector estimate(RecommendParam param, Set<Integer> queryIds) throws RemoteException {
-//		if (param.ratingVector == null) //Consider not estimating yet.
-//			return null;
-//		if (!isCached())
-//			return estimate0(param, queryIds);
-//		
-//		int userId = param.ratingVector.id();
-//		if (userId < 0) //user is not stored in database.
-//			return estimate0(param, queryIds);
-//			
-//		if (this.userRatingCache.containsKey(userId)) { //Already estimated
-//			Map<Integer, Object> ratingMap = this.userRatingCache.get(userId);
-//			if (ratingMap == null) {
-//				ratingMap = Util.newMap();
-//				this.userRatingCache.put(userId, ratingMap);
-//			}
-//				
-//			RatingVector result = param.ratingVector.newInstance(true);
-//			Set<Integer> queryIds2 = Util.newSet();
-//			queryIds2.addAll(queryIds);
-//			if (ratingMap.size() > 0) {
-//				for (int itemId : queryIds) {
-//					if (!ratingMap.containsKey(itemId))
-//						continue;
-//					
-//					queryIds2.remove(itemId);
-//					double ratingValue = (double)ratingMap.get(itemId); //cache can store unused rating value.
-//					if (Util.isUsed(ratingValue))
-//						result.put(itemId, ratingValue);
-//				}
-//				if (queryIds2.size() == 0)
-//					return result.size() == 0 ? null : result;
-//			}
-//			
-//			RatingVector result2 = estimate0(param, queryIds2);
-//			if (result2 == null || result2.size() == 0) {
-//				for (int itemId : queryIds2) {
-//					ratingMap.put(itemId, Constants.UNUSED); //Consider estimated.
-//				}
-//				return result.size() == 0 ? null : result;
-//			}
-//			
-//			Set<Integer> itemIds = result2.fieldIds(); //Resulted items are always rated.
-//			for (int itemId : itemIds) {
-//				double value = result2.get(itemId).value;
-//				ratingMap.put(itemId, value);
-//				result.put(itemId, value);
-//			}
-//			return result.size() == 0 ? null : result;
-//		}
-//		
-//		RatingVector result = estimate0(param, queryIds);
-//		Map<Integer, Object> ratingMap = Util.newMap();
-//		userRatingCache.put(userId, ratingMap); //Consider estimated.
-//		if (result == null) return null;
-//		
-//		Set<Integer> itemIds = result.fieldIds(); //Resulted items are always rated.
-//		for (int itemId : itemIds) {
-//			double value = result.get(itemId).value;
-//			ratingMap.put(itemId, value);
-//		}
-//		return result.size() == 0 ? null : result;
-//	}
-//	
-//	
-//	/**
-//	 * This method is very important, which is used to estimate rating values of given items (users) without caching. Any class that extends this abstract class must implement this method.
-//	 * Note that the role of user and the role of item are exchangeable. Rating vector can be user rating vector or item rating vector. Please see {@link RatingVector} for more details. 
-//	 * The input parameters are a recommendation parameter and a set of item (user) identifiers.
-//	 * The output result is a set of predictive or estimated rating values of items (users) specified by the second input parameter.
-//	 * @param param recommendation parameter. Please see {@link RecommendParam} for more details of this parameter.
-//	 * @param queryIds set of identifications (IDs) of items that need to be estimated their rating values.
-//	 * @return rating vector contains estimated rating values of the specified set of IDs of items (users). Return null if cannot estimate.
-//	 */
-//	protected abstract RatingVector estimate0(RecommendParam param, Set<Integer> queryIds) throws RemoteException;
 	
 	
 	/**
@@ -1197,8 +1107,6 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 	public DataConfig createDefaultConfig() {
 		DataConfig tempConfig = super.createDefaultConfig();
 		tempConfig.put(KNN, KNN_DEFAULT);
-		tempConfig.put(KNN_SIM_THRESHOLD, KNN_SIM_THRESHOLD_DEFAULT);
-		
 		tempConfig.put(SUPPORT_CACHE_FIELD, SUPPORT_CACHE_DEFAULT);
 		tempConfig.put(MEASURE, getDefaultMeasure()); //tempConfig.addReadOnly(MEASURE);
 		tempConfig.put(HYBRID, false); tempConfig.addInvisible(HYBRID);

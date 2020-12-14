@@ -8,6 +8,7 @@
 package net.hudup.core.alg.cf;
 
 import java.rmi.RemoteException;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -17,6 +18,7 @@ import net.hudup.core.alg.DuplicatableAlg;
 import net.hudup.core.alg.RecommendParam;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Fetcher;
+import net.hudup.core.data.ObjectPair;
 import net.hudup.core.data.Profile;
 import net.hudup.core.data.RatingVector;
 import net.hudup.core.logistic.LogUtil;
@@ -52,7 +54,7 @@ public class NeighborCFUserBased extends NeighborCF implements DuplicatableAlg {
 
 
 	@Override
-	public RatingVector estimate(RecommendParam param, Set<Integer> queryIds) throws RemoteException {
+	public synchronized RatingVector estimate(RecommendParam param, Set<Integer> queryIds) throws RemoteException {
 		return estimate(this, param, queryIds);
 	}
 
@@ -77,28 +79,8 @@ public class NeighborCFUserBased extends NeighborCF implements DuplicatableAlg {
 		 */
 		
 		int knn = cf.getConfig().getAsInt(KNN);
-		if (knn <= 0)
-			return estimate1(cf, param, queryIds);
-		else
-			return estimate2(cf, param, queryIds);
-	}
-
-	
-	/**
-	 * Estimate rating values of given items (users) without caching. This method is the first version.
-	 * @param cf current neighbor algorithm.
-	 * @param param recommendation parameter. Please see {@link RecommendParam} for more details of this parameter.
-	 * @param queryIds set of identifications (IDs) of items that need to be estimated their rating values.
-	 * @return rating vector contains estimated rating values of the specified set of IDs of items (users). Return null if cannot estimate.
-	 * @throws RemoteException if any error raises.
-	 */
-	private static RatingVector estimate1(NeighborCF cf, RecommendParam param, Set<Integer> queryIds) throws RemoteException {
-		/*
-		 * There are three cases of param.ratingVector:
-		 * 1. Its id is < 0, which indicates it is not stored in training dataset then, caching does not work even though this is cached algorithm.
-		 * 2. Its id is >= 0 and, it must be empty or the same to the existing one in training dataset. If it is empty, it will be fulfilled as the same to the existing one in training dataset.
-		 * 3. Its id is >= 0 but, it is not stored in training dataset then, it must be a full rating vector of a user.
-		 */
+		if (knn > 0) return estimateKnn(cf, param, queryIds);
+		
 		if (param.ratingVector == null) return null;
 		
 		RatingVector thisUser = param.ratingVector;
@@ -116,7 +98,7 @@ public class NeighborCFUserBased extends NeighborCF implements DuplicatableAlg {
 		
 		RatingVector result = thisUser.newInstance(true);
 		boolean hybrid = cf.getConfig().getAsBoolean(HYBRID);
-		Profile userProfile1 = hybrid ? param.profile : null;
+		Profile thisProfile = hybrid ? param.profile : null;
 		double minValue = cf.getConfig().getMinRating();
 		double maxValue = cf.getConfig().getMaxRating();
 		double thisMean = thisUser.mean();
@@ -137,7 +119,7 @@ public class NeighborCFUserBased extends NeighborCF implements DuplicatableAlg {
 					if (thatUser == null || thatUser.id()== thisUser.id() || !thatUser.isRated(itemId))
 						continue;
 					
-					Profile userProfile2 = hybrid ? cf.getDataset().getUserProfile(thatUser.id()) : null;
+					Profile thatProfile = hybrid ? cf.getDataset().getUserProfile(thatUser.id()) : null;
 					
 					// computing similarity
 					double sim = Constants.UNUSED;
@@ -145,12 +127,12 @@ public class NeighborCFUserBased extends NeighborCF implements DuplicatableAlg {
 						if (localUserSimCache.containsKey(thatUser.id()))
 							sim = localUserSimCache.get(thatUser.id());
 						else {
-							sim = cf.sim(thisUser, thatUser, userProfile1, userProfile2, itemId);
+							sim = cf.sim(thisUser, thatUser, thisProfile, thatProfile, itemId);
 							localUserSimCache.put(thatUser.id(), sim);
 						}
 					}
 					else
-						sim = cf.sim(thisUser, thatUser, userProfile1, userProfile2, itemId);
+						sim = cf.sim(thisUser, thatUser, thisProfile, thatProfile, itemId);
 					if (!Util.isUsed(sim)) continue;
 					
 					double thatValue = thatUser.get(itemId).value;
@@ -194,7 +176,7 @@ public class NeighborCFUserBased extends NeighborCF implements DuplicatableAlg {
 	 * @return rating vector contains estimated rating values of the specified set of IDs of items (users). Return null if cannot estimate.
 	 * @throws RemoteException if any error raises.
 	 */
-	private static RatingVector estimate2(NeighborCF cf, RecommendParam param, Set<Integer> queryIds) throws RemoteException {
+	public static RatingVector estimateKnn(NeighborCF cf, RecommendParam param, Set<Integer> queryIds) throws RemoteException {
 		/*
 		 * There are three cases of param.ratingVector:
 		 * 1. Its id is < 0, which indicates it is not stored in training dataset then, caching does not work even though this is cached algorithm.
@@ -216,15 +198,21 @@ public class NeighborCFUserBased extends NeighborCF implements DuplicatableAlg {
 		}
 		if (thisUser.size() == 0) return null;
 		
-		RatingVector result = thisUser.newInstance(true);
-		double sh = cf.getConfig().getAsReal(KNN_SIM_THRESHOLD);
 		boolean hybrid = cf.getConfig().getAsBoolean(HYBRID);
-		Profile userProfile1 = hybrid ? param.profile : null;
+		Profile thisProfile = hybrid ? param.profile : null;
+		int knn = cf.getConfig().getAsInt(KNN);
+		Fetcher<RatingVector> userRatings = cf.getDataset().fetchUserRatings();
+		List<ObjectPair<RatingVector>> pairs = getKnnList(cf, knn, userRatings, thisUser, thisProfile);
+		try {
+			userRatings.close();
+		} 
+		catch (Throwable e) {LogUtil.trace(e);}
+		if (pairs.size() == 0) return null;
+		
+		RatingVector result = thisUser.newInstance(true);
 		double minValue = cf.getConfig().getMinRating();
 		double maxValue = cf.getConfig().getMaxRating();
 		double thisMean = thisUser.mean();
-		Map<Integer, Double> localUserSimCache = Util.newMap();
-		Fetcher<RatingVector> userRatings = cf.getDataset().fetchUserRatings();
 		for (int itemId : queryIds) {
 			if (thisUser.isRated(itemId)) {
 				result.put(itemId, thisUser.get(itemId));
@@ -234,40 +222,18 @@ public class NeighborCFUserBased extends NeighborCF implements DuplicatableAlg {
 			double accum = 0;
 			double simTotal = 0;
 			boolean calculated = false;
-			try {
-				while (userRatings.next()) {
-					RatingVector thatUser = userRatings.pick();
-					if (thatUser == null || thatUser.id()== thisUser.id() || !thatUser.isRated(itemId))
-						continue;
-					
-					Profile userProfile2 = hybrid ? cf.getDataset().getUserProfile(thatUser.id()) : null;
-					
-					// computing similarity
-					double sim = Constants.UNUSED;
-					if (cf.isCached() && cf.isCachedSim() && thisUser.id() < 0) { //Local caching
-						if (localUserSimCache.containsKey(thatUser.id()))
-							sim = localUserSimCache.get(thatUser.id());
-						else {
-							sim = cf.sim(thisUser, thatUser, userProfile1, userProfile2, itemId);
-							localUserSimCache.put(thatUser.id(), sim);
-						}
-					}
-					else
-						sim = cf.sim(thisUser, thatUser, userProfile1, userProfile2, itemId);
-					if (!Util.isUsed(sim)) continue;
-					
-					double thatValue = thatUser.get(itemId).value;
-					double thatMean = thatUser.mean();
-					double deviate = thatValue - thatMean;
-					accum += sim * deviate;
-					simTotal += Math.abs(sim);
-					
-					calculated = true;
-				}
-				userRatings.reset();
-			}
-			catch (Throwable e) {
-				LogUtil.trace(e);
+			for (ObjectPair<RatingVector> pair : pairs) {
+				RatingVector thatUser = pair.key();
+				if (!thatUser.isRated(itemId)) continue;
+				
+				double thatValue = thatUser.get(itemId).value;
+				double thatMean = thatUser.mean();
+				double deviate = thatValue - thatMean;
+				double sim = pair.value();
+				accum +=  sim * deviate;
+				simTotal += Math.abs(sim);
+				
+				calculated = true;
 			}
 			if (!calculated) continue;
 			
@@ -277,17 +243,68 @@ public class NeighborCFUserBased extends NeighborCF implements DuplicatableAlg {
 			result.put(itemId, value);
 		}
 		
+		return result.size() == 0 ? null : result;
+	}
+
+	
+	/**
+	 * Getting list of k nearest neighbors.
+	 * @param cf current neighbor algorithm.
+	 * @param k the number of nearest neighbors.
+	 * @param userRatings user rating dataset.
+	 * @param thisUser this user rating vector.
+	 * @param thisProfile this user profile.
+	 * @return list of k nearest neighbors.
+	 */
+	private static List<ObjectPair<RatingVector>> getKnnList(NeighborCF cf, int k, Fetcher<RatingVector> userRatings, RatingVector thisUser, Profile thisProfile) {
+		k = k < 0 ? 0 : k;
+		List<ObjectPair<RatingVector>> pairs = Util.newList(k);
+		boolean hybrid = cf.getConfig().getAsBoolean(HYBRID);
+		thisProfile = hybrid ? thisProfile : null;
+		Map<Integer, Double> localUserSimCache = Util.newMap();
 		try {
-			userRatings.close();
-		} 
+			while (userRatings.next()) {
+				RatingVector thatUser = userRatings.pick();
+				if (thatUser == null || thatUser.id()== thisUser.id())
+					continue;
+				
+				Profile thatProfile = hybrid ? cf.getDataset().getUserProfile(thatUser.id()) : null;
+				
+				// computing similarity
+				double sim = Constants.UNUSED;
+				if (cf.isCached() && cf.isCachedSim() && thisUser.id() < 0) { //Local caching
+					if (localUserSimCache.containsKey(thatUser.id()))
+						sim = localUserSimCache.get(thatUser.id());
+					else {
+						sim = cf.sim(thisUser, thatUser, thisProfile, thatProfile);
+						localUserSimCache.put(thatUser.id(), sim);
+					}
+				}
+				else
+					sim = cf.sim(thisUser, thatUser, thisProfile, thatProfile);
+				if (!Util.isUsed(sim)) continue;
+				
+				int found = ObjectPair.findIndexOfLessThan(sim, pairs);
+				ObjectPair<RatingVector> pair = new ObjectPair<RatingVector>(thatUser, sim);
+				if (found == -1) {
+					if (pairs.size() < k) pairs.add(pair);
+				}
+				else {
+					pairs.add(found, pair);
+					if (pairs.size() > k) pairs = pairs.subList(0, k);
+				}
+			}
+			
+			userRatings.reset();
+		}
 		catch (Throwable e) {
 			LogUtil.trace(e);
 		}
 		localUserSimCache.clear();
 		
-		return result.size() == 0 ? null : result;
+		return pairs;
 	}
-
+	
 	
 	@Override
 	protected double cod(

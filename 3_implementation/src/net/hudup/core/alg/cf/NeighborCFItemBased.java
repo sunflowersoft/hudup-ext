@@ -8,6 +8,7 @@
 package net.hudup.core.alg.cf;
 
 import java.rmi.RemoteException;
+import java.util.List;
 import java.util.Set;
 
 import net.hudup.core.Util;
@@ -15,6 +16,7 @@ import net.hudup.core.alg.DuplicatableAlg;
 import net.hudup.core.alg.RecommendParam;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Fetcher;
+import net.hudup.core.data.ObjectPair;
 import net.hudup.core.data.Profile;
 import net.hudup.core.data.RatingVector;
 import net.hudup.core.logistic.LogUtil;
@@ -51,7 +53,7 @@ public class NeighborCFItemBased extends NeighborCF implements DuplicatableAlg {
 
 	
 	@Override
-	public RatingVector estimate(RecommendParam param, Set<Integer> queryIds) throws RemoteException {
+	public synchronized RatingVector estimate(RecommendParam param, Set<Integer> queryIds) throws RemoteException {
 		return estimate(this, param, queryIds);
 	}
 
@@ -77,9 +79,9 @@ public class NeighborCFItemBased extends NeighborCF implements DuplicatableAlg {
 		
 		int knn = cf.getConfig().getAsInt(KNN);
 		if (knn <= 0)
-			return estimate1(cf, param, queryIds);
+			return estimate0(cf, param, queryIds);
 		else
-			return estimate2(cf, param, queryIds);
+			return estimateKnn(cf, param, queryIds);
 	}
 
 	
@@ -91,7 +93,7 @@ public class NeighborCFItemBased extends NeighborCF implements DuplicatableAlg {
 	 * @return rating vector contains estimated rating values of the specified set of IDs of items (users). Return null if cannot estimate.
 	 * @throws RemoteException if any error raises.
 	 */
-	private static RatingVector estimate1(NeighborCF cf, RecommendParam param, Set<Integer> queryIds) throws RemoteException {
+	private static RatingVector estimate0(NeighborCF cf, RecommendParam param, Set<Integer> queryIds) throws RemoteException {
 		/*
 		 * There are three cases of param.ratingVector:
 		 * 1. Its id is < 0, which indicates it is not stored in training dataset then, caching does not work even though this is cached algorithm.
@@ -119,8 +121,7 @@ public class NeighborCFItemBased extends NeighborCF implements DuplicatableAlg {
 				continue;
 			}
 			
-			Profile itemProfile1 = hybrid ? cf.getDataset().getItemProfile(itemId) : null;
-			double thisMean = thisItem.mean();
+			Profile thisProfile = hybrid ? cf.getDataset().getItemProfile(itemId) : null;
 			double accum = 0;
 			double simTotal = 0;
 			boolean calculated = false;
@@ -136,10 +137,10 @@ public class NeighborCFItemBased extends NeighborCF implements DuplicatableAlg {
 					if (!thatItem.isRated(thisUser.id()))
 						continue;
 					
-					Profile itemProfile2 = hybrid ? cf.getDataset().getItemProfile(thatItem.id()) : null;
+					Profile thatProfile = hybrid ? cf.getDataset().getItemProfile(thatItem.id()) : null;
 					
 					// computing similarity
-					double sim = cf.sim(thisItem, thatItem, itemProfile1, itemProfile2, thisUser.id());
+					double sim = cf.sim(thisItem, thatItem, thisProfile, thatProfile, thisUser.id());
 					if (!Util.isUsed(sim)) continue;
 					
 					double thatValue = thatItem.get(thisUser.id()).value;
@@ -157,6 +158,7 @@ public class NeighborCFItemBased extends NeighborCF implements DuplicatableAlg {
 			}
 			if (!calculated) continue;
 			
+			double thisMean = thisItem.mean();
 			double value = simTotal == 0 ? thisMean : thisMean + accum / simTotal;
 			value = (Util.isUsed(maxValue)) && (!Double.isNaN(maxValue)) ? Math.min(value, maxValue) : value;
 			value = (Util.isUsed(minValue)) && (!Double.isNaN(minValue)) ? Math.max(value, minValue) : value;
@@ -183,7 +185,7 @@ public class NeighborCFItemBased extends NeighborCF implements DuplicatableAlg {
 	 * @return rating vector contains estimated rating values of the specified set of IDs of items (users). Return null if cannot estimate.
 	 * @throws RemoteException if any error raises.
 	 */
-	private static RatingVector estimate2(NeighborCF cf, RecommendParam param, Set<Integer> queryIds) throws RemoteException {
+	private static RatingVector estimateKnn(NeighborCF cf, RecommendParam param, Set<Integer> queryIds) throws RemoteException {
 		/*
 		 * There are three cases of param.ratingVector:
 		 * 1. Its id is < 0, which indicates it is not stored in training dataset then, caching does not work even though this is cached algorithm.
@@ -193,7 +195,7 @@ public class NeighborCFItemBased extends NeighborCF implements DuplicatableAlg {
 		if (param.ratingVector == null) return null;
 		
 		RatingVector result = param.ratingVector.newInstance(true);
-		double sh = cf.getConfig().getAsReal(KNN_SIM_THRESHOLD);
+		int knn = cf.getConfig().getAsInt(KNN);
 		boolean hybrid = cf.getConfig().getAsBoolean(HYBRID);
 		RatingVector thisUser = param.ratingVector;
 		double minValue = cf.getConfig().getMinRating();
@@ -212,11 +214,8 @@ public class NeighborCFItemBased extends NeighborCF implements DuplicatableAlg {
 				continue;
 			}
 			
-			Profile itemProfile1 = hybrid ? cf.getDataset().getItemProfile(itemId) : null;
-			double thisMean = thisItem.mean();
-			double accum = 0;
-			double simTotal = 0;
-			boolean calculated = false;
+			Profile thisProfile = hybrid ? cf.getDataset().getItemProfile(itemId) : null;
+			List<ObjectPair<RatingVector>> pairs = Util.newList(knn);
 			try {
 				while (itemRatings.next()) {
 					RatingVector thatItem = itemRatings.pick();
@@ -229,27 +228,40 @@ public class NeighborCFItemBased extends NeighborCF implements DuplicatableAlg {
 					if (!thatItem.isRated(thisUser.id()))
 						continue;
 					
-					Profile itemProfile2 = hybrid ? cf.getDataset().getItemProfile(thatItem.id()) : null;
+					Profile thatProfile = hybrid ? cf.getDataset().getItemProfile(thatItem.id()) : null;
 					
 					// computing similarity
-					double sim = cf.sim(thisItem, thatItem, itemProfile1, itemProfile2, thisUser.id());
+					double sim = cf.sim(thisItem, thatItem, thisProfile, thatProfile, thisUser.id());
 					if (!Util.isUsed(sim)) continue;
 					
-					double thatValue = thatItem.get(thisUser.id()).value;
-					double thatMean = thatItem.mean();
-					double deviate = thatValue - thatMean;
-					accum += sim * deviate;
-					simTotal += Math.abs(sim);
-					
-					calculated = true;
+					int found = ObjectPair.findIndexOfLessThan(sim, pairs);
+					ObjectPair<RatingVector> pair = new ObjectPair<RatingVector>(thatItem, sim);
+					if (found == -1)
+						pairs.add(pair);
+					else
+						pairs.add(found, pair);
+					if (pairs.size() > knn) pairs = pairs.subList(0, knn);
 				}
 				itemRatings.reset();
 			}
 			catch (Throwable e) {
 				LogUtil.trace(e);
 			}
-			if (!calculated) continue;
+			if (pairs.size() == 0) continue;
 			
+			double accum = 0;
+			double simTotal = 0;
+			for (ObjectPair<RatingVector> pair : pairs) {
+				RatingVector thatItem = pair.key();
+				double thatValue = thatItem.get(thisUser.id()).value;
+				double thatMean = thatItem.mean();
+				double deviate = thatValue - thatMean;
+				double sim = pair.value();
+				accum += sim * deviate;
+				simTotal += Math.abs(sim);
+			}
+			
+			double thisMean = thisItem.mean();
 			double value = simTotal == 0 ? thisMean : thisMean + accum / simTotal;
 			value = (Util.isUsed(maxValue)) && (!Double.isNaN(maxValue)) ? Math.min(value, maxValue) : value;
 			value = (Util.isUsed(minValue)) && (!Double.isNaN(minValue)) ? Math.max(value, minValue) : value;
