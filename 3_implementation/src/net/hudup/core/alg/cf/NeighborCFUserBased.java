@@ -75,6 +75,30 @@ public class NeighborCFUserBased extends NeighborCF implements DuplicatableAlg {
 		 * 2. Its id is >= 0 and, it must be empty or the same to the existing one in training dataset. If it is empty, it will be fulfilled as the same to the existing one in training dataset.
 		 * 3. Its id is >= 0 but, it is not stored in training dataset then, it must be a full rating vector of a user.
 		 */
+		
+		int knn = cf.getConfig().getAsInt(KNN);
+		if (knn <= 0)
+			return estimate1(cf, param, queryIds);
+		else
+			return estimate2(cf, param, queryIds);
+	}
+
+	
+	/**
+	 * Estimate rating values of given items (users) without caching. This method is the first version.
+	 * @param cf current neighbor algorithm.
+	 * @param param recommendation parameter. Please see {@link RecommendParam} for more details of this parameter.
+	 * @param queryIds set of identifications (IDs) of items that need to be estimated their rating values.
+	 * @return rating vector contains estimated rating values of the specified set of IDs of items (users). Return null if cannot estimate.
+	 * @throws RemoteException if any error raises.
+	 */
+	private static RatingVector estimate1(NeighborCF cf, RecommendParam param, Set<Integer> queryIds) throws RemoteException {
+		/*
+		 * There are three cases of param.ratingVector:
+		 * 1. Its id is < 0, which indicates it is not stored in training dataset then, caching does not work even though this is cached algorithm.
+		 * 2. Its id is >= 0 and, it must be empty or the same to the existing one in training dataset. If it is empty, it will be fulfilled as the same to the existing one in training dataset.
+		 * 3. Its id is >= 0 but, it is not stored in training dataset then, it must be a full rating vector of a user.
+		 */
 		if (param.ratingVector == null) return null;
 		
 		RatingVector thisUser = param.ratingVector;
@@ -91,6 +115,109 @@ public class NeighborCFUserBased extends NeighborCF implements DuplicatableAlg {
 		if (thisUser.size() == 0) return null;
 		
 		RatingVector result = thisUser.newInstance(true);
+		boolean hybrid = cf.getConfig().getAsBoolean(HYBRID);
+		Profile userProfile1 = hybrid ? param.profile : null;
+		double minValue = cf.getConfig().getMinRating();
+		double maxValue = cf.getConfig().getMaxRating();
+		double thisMean = thisUser.mean();
+		Map<Integer, Double> localUserSimCache = Util.newMap();
+		Fetcher<RatingVector> userRatings = cf.getDataset().fetchUserRatings();
+		for (int itemId : queryIds) {
+			if (thisUser.isRated(itemId)) {
+				result.put(itemId, thisUser.get(itemId));
+				continue;
+			}
+			
+			double accum = 0;
+			double simTotal = 0;
+			boolean calculated = false;
+			try {
+				while (userRatings.next()) {
+					RatingVector thatUser = userRatings.pick();
+					if (thatUser == null || thatUser.id()== thisUser.id() || !thatUser.isRated(itemId))
+						continue;
+					
+					Profile userProfile2 = hybrid ? cf.getDataset().getUserProfile(thatUser.id()) : null;
+					
+					// computing similarity
+					double sim = Constants.UNUSED;
+					if (cf.isCached() && cf.isCachedSim() && thisUser.id() < 0) { //Local caching
+						if (localUserSimCache.containsKey(thatUser.id()))
+							sim = localUserSimCache.get(thatUser.id());
+						else {
+							sim = cf.sim(thisUser, thatUser, userProfile1, userProfile2, itemId);
+							localUserSimCache.put(thatUser.id(), sim);
+						}
+					}
+					else
+						sim = cf.sim(thisUser, thatUser, userProfile1, userProfile2, itemId);
+					if (!Util.isUsed(sim)) continue;
+					
+					double thatValue = thatUser.get(itemId).value;
+					double thatMean = thatUser.mean();
+					double deviate = thatValue - thatMean;
+					accum += sim * deviate;
+					simTotal += Math.abs(sim);
+					
+					calculated = true;
+				}
+				userRatings.reset();
+			}
+			catch (Throwable e) {
+				LogUtil.trace(e);
+			}
+			if (!calculated) continue;
+			
+			double value = simTotal == 0 ? thisMean : thisMean + accum / simTotal;
+			value = (Util.isUsed(maxValue)) && (!Double.isNaN(maxValue)) ? Math.min(value, maxValue) : value;
+			value = (Util.isUsed(minValue)) && (!Double.isNaN(minValue)) ? Math.max(value, minValue) : value;
+			result.put(itemId, value);
+		}
+		
+		try {
+			userRatings.close();
+		} 
+		catch (Throwable e) {
+			LogUtil.trace(e);
+		}
+		localUserSimCache.clear();
+		
+		return result.size() == 0 ? null : result;
+	}
+
+	
+	/**
+	 * Estimate rating values of given items (users) without caching. This method is the second version.
+	 * @param cf current neighbor algorithm.
+	 * @param param recommendation parameter. Please see {@link RecommendParam} for more details of this parameter.
+	 * @param queryIds set of identifications (IDs) of items that need to be estimated their rating values.
+	 * @return rating vector contains estimated rating values of the specified set of IDs of items (users). Return null if cannot estimate.
+	 * @throws RemoteException if any error raises.
+	 */
+	private static RatingVector estimate2(NeighborCF cf, RecommendParam param, Set<Integer> queryIds) throws RemoteException {
+		/*
+		 * There are three cases of param.ratingVector:
+		 * 1. Its id is < 0, which indicates it is not stored in training dataset then, caching does not work even though this is cached algorithm.
+		 * 2. Its id is >= 0 and, it must be empty or the same to the existing one in training dataset. If it is empty, it will be fulfilled as the same to the existing one in training dataset.
+		 * 3. Its id is >= 0 but, it is not stored in training dataset then, it must be a full rating vector of a user.
+		 */
+		if (param.ratingVector == null) return null;
+		
+		RatingVector thisUser = param.ratingVector;
+		RatingVector innerUser = cf.getDataset().getUserRating(thisUser.id());
+		if (innerUser != null) {
+			Set<Integer> itemIds = innerUser.fieldIds(true);
+			itemIds.removeAll(thisUser.fieldIds(true));
+			if (itemIds.size() > 0) thisUser = (RatingVector)thisUser.clone();
+			for (int itemId : itemIds) {
+				if (!thisUser.isRated(itemId))
+					thisUser.put(itemId, innerUser.get(itemId));
+			}
+		}
+		if (thisUser.size() == 0) return null;
+		
+		RatingVector result = thisUser.newInstance(true);
+		double sh = cf.getConfig().getAsReal(KNN_SIM_THRESHOLD);
 		boolean hybrid = cf.getConfig().getAsBoolean(HYBRID);
 		Profile userProfile1 = hybrid ? param.profile : null;
 		double minValue = cf.getConfig().getMinRating();

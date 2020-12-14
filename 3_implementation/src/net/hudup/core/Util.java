@@ -12,7 +12,9 @@ import static net.hudup.core.Constants.ROOT_PACKAGE;
 
 import java.io.File;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -87,8 +89,8 @@ public final class Util {
 			InputStream in = Util.class.getResourceAsStream(ROOT_PACKAGE + hudupPropName);
 			if (in != null) {
 				userProps.load(in);
-				in.close();
 				props.putAll(userProps);
+				in.close();
 			}
 		}
 		catch (Throwable e) {
@@ -100,14 +102,30 @@ public final class Util {
 			InputStream in = Util.class.getResourceAsStream("/" + hudupPropName);
 			if (in != null) {
 				userProps.load(in);
-				in.close();
 				props.putAll(userProps);
+				in.close();
 			}
 		}
 		catch (Throwable e) {
 			LogUtil.trace(e);
 		}
 		
+		try {
+			Path path = Paths.get(Constants.WORKING_DIRECTORY + "/" + hudupPropName);
+			if (Files.exists(path)) {
+				Properties userProps = new Properties();
+				InputStream in = Files.newInputStream(path);
+				if (in != null) {
+					userProps.load(in);
+					props.putAll(userProps);
+					in.close();
+				}
+			}
+		}
+		catch (Throwable e) {
+			LogUtil.trace(e);
+		}
+
 		try {
 			String pluginManagerText = getHudupProperty("plugin_manager");
 			pluginManager = (PluginManager) Class.forName(pluginManagerText).getDeclaredConstructor().newInstance();

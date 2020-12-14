@@ -667,8 +667,8 @@ public class EvaluatorCP extends JFrame implements EvaluatorListener {
             if (ret) {
         		JOptionPane.showMessageDialog(
     				this, 
-    				"Success to reproduce evaluator '" + evaluatorName + "'", 
-    				"Success to reproduce evaluator", 
+    				"Success to remove evaluator '" + evaluatorName + "'", 
+    				"Success to remove evaluator", 
     				JOptionPane.INFORMATION_MESSAGE);
         		
         		refresh();

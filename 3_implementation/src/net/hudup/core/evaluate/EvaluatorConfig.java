@@ -94,7 +94,7 @@ public class EvaluatorConfig extends SysConfig {
 	/**
 	 * By default, result summary saving is false. If true, only done evaluated results are saved.
 	 */
-	public final static boolean EVALUATOR_SAVE_RESULT_SUMMARY_DEFAULT = false;
+	public final static boolean EVALUATOR_SAVE_RESULT_SUMMARY_DEFAULT = true;
 
 	
 	/**

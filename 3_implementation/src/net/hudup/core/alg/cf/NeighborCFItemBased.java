@@ -74,9 +74,126 @@ public class NeighborCFItemBased extends NeighborCF implements DuplicatableAlg {
 		 * 2. Its id is >= 0 and, it must be empty or the same to the existing one in training dataset. If it is empty, it will be fulfilled as the same to the existing one in training dataset.
 		 * 3. Its id is >= 0 but, it is not stored in training dataset then, it must be a full rating vector of a user.
 		 */
+		
+		int knn = cf.getConfig().getAsInt(KNN);
+		if (knn <= 0)
+			return estimate1(cf, param, queryIds);
+		else
+			return estimate2(cf, param, queryIds);
+	}
+
+	
+	/**
+	 * Estimate rating values of given items (users). This method is the first version.
+	 * @param cf current neighbor algorithm.
+	 * @param param recommendation parameter. Please see {@link RecommendParam} for more details of this parameter.
+	 * @param queryIds set of identifications (IDs) of items that need to be estimated their rating values.
+	 * @return rating vector contains estimated rating values of the specified set of IDs of items (users). Return null if cannot estimate.
+	 * @throws RemoteException if any error raises.
+	 */
+	private static RatingVector estimate1(NeighborCF cf, RecommendParam param, Set<Integer> queryIds) throws RemoteException {
+		/*
+		 * There are three cases of param.ratingVector:
+		 * 1. Its id is < 0, which indicates it is not stored in training dataset then, caching does not work even though this is cached algorithm.
+		 * 2. Its id is >= 0 and, it must be empty or the same to the existing one in training dataset. If it is empty, it will be fulfilled as the same to the existing one in training dataset.
+		 * 3. Its id is >= 0 but, it is not stored in training dataset then, it must be a full rating vector of a user.
+		 */
 		if (param.ratingVector == null) return null;
 		
 		RatingVector result = param.ratingVector.newInstance(true);
+		boolean hybrid = cf.getConfig().getAsBoolean(HYBRID);
+		RatingVector thisUser = param.ratingVector;
+		double minValue = cf.getConfig().getMinRating();
+		double maxValue = cf.getConfig().getMaxRating();
+		Fetcher<RatingVector> itemRatings = cf.getDataset().fetchItemRatings();
+		for (int itemId : queryIds) {
+			RatingVector thisItem = cf.getDataset().getItemRating(itemId);
+			if (thisItem == null) continue; //This item is not empty and has no unrated if it is not null because it is retrieved from dataset.
+			if (thisUser.isRated(itemId) && !thisItem.isRated(thisUser.id())) {
+				thisItem = (RatingVector)thisItem.clone();
+				thisItem.put(thisUser.id(), thisUser.get(itemId));
+			}
+
+			if (thisItem.isRated(thisUser.id())) {
+				result.put(itemId, thisItem.get(thisUser.id()));
+				continue;
+			}
+			
+			Profile itemProfile1 = hybrid ? cf.getDataset().getItemProfile(itemId) : null;
+			double thisMean = thisItem.mean();
+			double accum = 0;
+			double simTotal = 0;
+			boolean calculated = false;
+			try {
+				while (itemRatings.next()) {
+					RatingVector thatItem = itemRatings.pick();
+					if (thatItem == null || thatItem.id() == itemId)
+						continue;
+					if (thisUser.isRated(thatItem.id()) && !thatItem.isRated(thisUser.id())) {
+						thatItem = (RatingVector)thatItem.clone();
+						thatItem.put(thisUser.id(), thisUser.get(thatItem.id()));
+					}
+					if (!thatItem.isRated(thisUser.id()))
+						continue;
+					
+					Profile itemProfile2 = hybrid ? cf.getDataset().getItemProfile(thatItem.id()) : null;
+					
+					// computing similarity
+					double sim = cf.sim(thisItem, thatItem, itemProfile1, itemProfile2, thisUser.id());
+					if (!Util.isUsed(sim)) continue;
+					
+					double thatValue = thatItem.get(thisUser.id()).value;
+					double thatMean = thatItem.mean();
+					double deviate = thatValue - thatMean;
+					accum += sim * deviate;
+					simTotal += Math.abs(sim);
+					
+					calculated = true;
+				}
+				itemRatings.reset();
+			}
+			catch (Throwable e) {
+				LogUtil.trace(e);
+			}
+			if (!calculated) continue;
+			
+			double value = simTotal == 0 ? thisMean : thisMean + accum / simTotal;
+			value = (Util.isUsed(maxValue)) && (!Double.isNaN(maxValue)) ? Math.min(value, maxValue) : value;
+			value = (Util.isUsed(minValue)) && (!Double.isNaN(minValue)) ? Math.max(value, minValue) : value;
+
+			result.put(itemId, value);
+		}
+		
+		try {
+			itemRatings.close();
+		} 
+		catch (Throwable e) {
+			LogUtil.trace(e);
+		}
+		
+		return result.size() == 0 ? null : result;
+	}
+
+	
+	/**
+	 * Estimate rating values of given items (users). This method is the second version.
+	 * @param cf current neighbor algorithm.
+	 * @param param recommendation parameter. Please see {@link RecommendParam} for more details of this parameter.
+	 * @param queryIds set of identifications (IDs) of items that need to be estimated their rating values.
+	 * @return rating vector contains estimated rating values of the specified set of IDs of items (users). Return null if cannot estimate.
+	 * @throws RemoteException if any error raises.
+	 */
+	private static RatingVector estimate2(NeighborCF cf, RecommendParam param, Set<Integer> queryIds) throws RemoteException {
+		/*
+		 * There are three cases of param.ratingVector:
+		 * 1. Its id is < 0, which indicates it is not stored in training dataset then, caching does not work even though this is cached algorithm.
+		 * 2. Its id is >= 0 and, it must be empty or the same to the existing one in training dataset. If it is empty, it will be fulfilled as the same to the existing one in training dataset.
+		 * 3. Its id is >= 0 but, it is not stored in training dataset then, it must be a full rating vector of a user.
+		 */
+		if (param.ratingVector == null) return null;
+		
+		RatingVector result = param.ratingVector.newInstance(true);
+		double sh = cf.getConfig().getAsReal(KNN_SIM_THRESHOLD);
 		boolean hybrid = cf.getConfig().getAsBoolean(HYBRID);
 		RatingVector thisUser = param.ratingVector;
 		double minValue = cf.getConfig().getMinRating();
