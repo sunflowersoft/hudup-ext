@@ -46,6 +46,18 @@ public class NeighborCFUserBased extends NeighborCF implements DuplicatableAlg {
 
 	
 	/**
+	 * The maximum number of nearest neighbors.
+	 */
+	public static final String KNN = "knn";
+
+	
+	/**
+	 * Default value of the maximum number of nearest neighbors.
+	 */
+	public static final int KNN_DEFAULT = 0;
+
+	
+	/**
 	 * Default constructor.
 	 */
 	public NeighborCFUserBased() {
@@ -176,7 +188,7 @@ public class NeighborCFUserBased extends NeighborCF implements DuplicatableAlg {
 	 * @return rating vector contains estimated rating values of the specified set of IDs of items (users). Return null if cannot estimate.
 	 * @throws RemoteException if any error raises.
 	 */
-	public static RatingVector estimateKnn(NeighborCF cf, RecommendParam param, Set<Integer> queryIds) throws RemoteException {
+	private static RatingVector estimateKnn(NeighborCF cf, RecommendParam param, Set<Integer> queryIds) throws RemoteException {
 		/*
 		 * There are three cases of param.ratingVector:
 		 * 1. Its id is < 0, which indicates it is not stored in training dataset then, caching does not work even though this is cached algorithm.
@@ -261,7 +273,7 @@ public class NeighborCFUserBased extends NeighborCF implements DuplicatableAlg {
 		List<ObjectPair<RatingVector>> pairs = Util.newList(k);
 		boolean hybrid = cf.getConfig().getAsBoolean(HYBRID);
 		thisProfile = hybrid ? thisProfile : null;
-		Map<Integer, Double> localUserSimCache = Util.newMap();
+		Map<Integer, Double> localUserSimCache = Util.newMap(k);
 		try {
 			while (userRatings.next()) {
 				RatingVector thatUser = userRatings.pick();
@@ -287,11 +299,11 @@ public class NeighborCFUserBased extends NeighborCF implements DuplicatableAlg {
 				int found = ObjectPair.findIndexOfLessThan(sim, pairs);
 				ObjectPair<RatingVector> pair = new ObjectPair<RatingVector>(thatUser, sim);
 				if (found == -1) {
-					if (pairs.size() < k) pairs.add(pair);
+					if (k == 0 || pairs.size() < k) pairs.add(pair);
 				}
 				else {
 					pairs.add(found, pair);
-					if (pairs.size() > k) pairs = pairs.subList(0, k);
+					if (k > 0 && pairs.size() > k) pairs.remove(pairs.size() - 1);
 				}
 			}
 			
@@ -339,6 +351,7 @@ public class NeighborCFUserBased extends NeighborCF implements DuplicatableAlg {
 	@Override
 	public DataConfig createDefaultConfig() {
 		DataConfig config = super.createDefaultConfig();
+		config.put(KNN, KNN_DEFAULT);
 		config.addReadOnly(DUPLICATED_ALG_NAME_FIELD);
 		return config;
 	}

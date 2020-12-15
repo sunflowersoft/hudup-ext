@@ -12,6 +12,7 @@ import static net.hudup.core.Constants.ROOT_PACKAGE;
 
 import java.io.File;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -72,43 +73,11 @@ public final class Util {
 	 * Loading system properties.
 	 */
 	static {
-		try {
-			InputStream in = Util.class.getResourceAsStream(RESOURCES_PACKAGE + hudupPropName);
-			if (in != null) {
-				props.load(in);
-				in.close();
-			}
-		}
-		catch (Throwable e) {
-			LogUtil.trace(e);
-		}
 
-		
 		try {
-			Properties userProps = new Properties();
-			InputStream in = Util.class.getResourceAsStream(ROOT_PACKAGE + hudupPropName);
-			if (in != null) {
-				userProps.load(in);
-				props.putAll(userProps);
-				in.close();
-			}
+			loadProperties();
 		}
-		catch (Throwable e) {
-			LogUtil.trace(e);
-		}
-		
-		try {
-			Properties userProps = new Properties();
-			InputStream in = Util.class.getResourceAsStream("/" + hudupPropName);
-			if (in != null) {
-				userProps.load(in);
-				props.putAll(userProps);
-				in.close();
-			}
-		}
-		catch (Throwable e) {
-			LogUtil.trace(e);
-		}
+		catch (Throwable e) {LogUtil.trace(e);}
 		
 		try {
 			Path path = Paths.get(Constants.WORKING_DIRECTORY + "/" + hudupPropName);
@@ -122,9 +91,7 @@ public final class Util {
 				}
 			}
 		}
-		catch (Throwable e) {
-			LogUtil.trace(e);
-		}
+		catch (Throwable e) {LogUtil.trace(e);}
 
 		try {
 			String pluginManagerText = getHudupProperty("plugin_manager");
@@ -136,6 +103,62 @@ public final class Util {
 		}
 	}
 	
+	
+	/**
+	 * Loading Hudup properties.
+	 */
+	private static void loadProperties() {
+		for (int i = 0; i <= 10; i++) {
+			String path = i == 0 ? RESOURCES_PACKAGE + hudupPropName : ROOT_PACKAGE + hudupPropName + "." + i;
+			InputStream in = null;
+			try {
+				in = Util.class.getResourceAsStream(path);
+			}
+			catch (Throwable e) {in = null;}
+			if (in == null) continue;
+			
+			try {
+				Properties userProps = new Properties();
+				userProps.load(in);
+				props.putAll(userProps);
+			}
+			catch (Throwable e) {}
+			
+			try {
+				if (in != null) in.close();
+			}
+			catch (Throwable e) {}
+		}
+		
+		xURI workingUri = xURI.create(Constants.WORKING_DIRECTORY + "/" + hudupPropName);
+		UriAdapter adapter = new UriAdapter(workingUri);
+		if (adapter.exists(workingUri)) {
+			InputStream in = null;
+			try {
+				in = adapter.getInputStream(workingUri);
+				Properties userProps = new Properties();
+				userProps.load(in);
+				props.putAll(userProps);
+			}
+			catch (Exception e) {}
+			
+			try {
+				if (in != null) in.close();
+			}
+			catch (Throwable e) {}
+		}
+		else {
+			try {
+				OutputStream out = adapter.getOutputStream(workingUri, false);
+				new Properties().store(out, "Adding your own properties");
+				out.close();
+			}
+			catch (Exception e) {}
+		}
+		
+		adapter.close();
+	}
+
 	
 	/**
 	 * Creating a new {@link Vector}.

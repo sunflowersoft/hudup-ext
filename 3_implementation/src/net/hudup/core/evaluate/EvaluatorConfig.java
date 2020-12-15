@@ -120,7 +120,6 @@ public class EvaluatorConfig extends SysConfig {
 	 */
 	public EvaluatorConfig() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
 	
@@ -130,7 +129,6 @@ public class EvaluatorConfig extends SysConfig {
 	 */
 	public EvaluatorConfig(xURI uri) {
 		super(uri);
-		// TODO Auto-generated constructor stub
 	}
 
 	
@@ -205,7 +203,6 @@ public class EvaluatorConfig extends SysConfig {
 	
 	@Override
 	public Object clone() {
-		// TODO Auto-generated method stub
 		EvaluatorConfig cfg = new EvaluatorConfig();
 		cfg.putAll(this);
 		

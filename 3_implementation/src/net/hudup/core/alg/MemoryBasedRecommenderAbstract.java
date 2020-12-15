@@ -37,6 +37,18 @@ public abstract class MemoryBasedRecommenderAbstract extends RecommenderAbstract
 
 	
 	/**
+	 * Fast recommendation mode.
+	 */
+	public static final String FAST_RECOMMEND = "fast_recommend";
+
+	
+	/**
+	 * Default value for the fast recommendation mode.
+	 */
+	public static final boolean FAST_RECOMMEND_DEFAULT = false;
+
+	
+	/**
 	 * Internal dataset.
 	 */
 	protected Dataset dataset = null;
@@ -124,26 +136,20 @@ public abstract class MemoryBasedRecommenderAbstract extends RecommenderAbstract
 					pairs.add(found, pair);
 				
 				int n = pairs.size();
-				// Having maxRecommend + 1 if all are maximum rating.
 				if (maxRecommend > 0 && n >= maxRecommend) {
-					int lastIndex = n - 1;
-					Pair last = pairs.get(lastIndex);
-					if (last.value() == maxRating)
+					Pair last = pairs.get(n - 1);
+					if (last.value() == maxRating || config.getAsBoolean(FAST_RECOMMEND)) {
+						if (n > maxRecommend) pairs.remove(n - 1);
 						break;
+					}
 					else if (n > maxRecommend)
-						pairs.remove(lastIndex);
+						pairs.remove(n - 1);
 				}
-				
 				
 			} // end while
 	
-			
-			int n = pairs.size();
-			if (maxRecommend > 0 && n > maxRecommend) {
-				if (pairs.size() == maxRecommend + 1)
-					pairs.remove(n - 1); //Remove the redundant recommended item because the pair list has almost maxRecommend + 1 pairs.
-				else
-					pairs = pairs.subList(0, maxRecommend); //The pair list has at most maxRecommend + 1 pairs and so this code line is for safe.
+			if (maxRecommend > 0 && pairs.size() > maxRecommend) {
+				pairs = pairs.subList(0, maxRecommend); //This code line is for safe in case that there are maxRecommend+1 items.
 			}
 		}
 		catch (Throwable e) {
@@ -154,15 +160,11 @@ public abstract class MemoryBasedRecommenderAbstract extends RecommenderAbstract
 				items.close();
 			} 
 			catch (Throwable e) {
-				// TODO Auto-generated catch block
 				LogUtil.trace(e);
 			}
-			
 		}
 		
-		
-		if (pairs.size() == 0)
-			return null;
+		if (pairs.size() == 0) return null;
 		
 		RatingVector rec = param.ratingVector.newInstance(true);
 		Pair.fillRatingVector(rec, pairs);
@@ -171,156 +173,18 @@ public abstract class MemoryBasedRecommenderAbstract extends RecommenderAbstract
 	}
 
 	
-//	/**
-//	 * This is backup recommendation method. It is not used in current implementation.
-//	 * @param param recommendation parameter. Please see {@link RecommendParam} for more details of this parameter.
-//	 * @param maxRecommend the maximum recommended items (users) in the returned rating vector.
-//	 * @return list of recommended items (users) which is provided to the user (item), represented by {@link RatingVector} class. The number of items (users) of such list is specified by the the maximum number. Return null if cannot estimate.
-//	 * @throws RemoteException if any error raises.
-//	 */
-//	@SuppressWarnings("unused")
-//	private synchronized RatingVector recommend1(RecommendParam param, int maxRecommend) throws RemoteException {
-//		param = recommendPreprocess(param);
-//		if (param == null)
-//			return null;
-//		
-//		filterList.prepare(param);
-//		Fetcher<Integer> fieldIds = dataset.fetchItemIds();
-//		
-//		List<Pair> pairs = Util.newList();
-//		double maxRating = getMaxRating(); //Bug fixing date: 2019.07.13 by Loc Nguyen
-//		try {
-//			//int size = fieldIds.getMetadata().getSize(); //The dataset can be dynamic and so this statement needs to be removed.
-//			
-//			//int i = 0;
-//			while (fieldIds.next()) {
-//				//i++;
-//				
-//				Integer fieldId = fieldIds.pick();
-//				if (fieldId == null || fieldId < 0 || param.ratingVector.isRated(fieldId))
-//					continue;
-//				//
-//				if(!filterList.filter(dataset, RecommendFilterParam.create(fieldId)))
-//					continue;
-//				
-//				Set<Integer> queryIds = Util.newSet();
-//				queryIds.add(fieldId);
-//				RatingVector predict = estimate(param, queryIds);
-//				if (predict == null || !predict.isRated(fieldId))
-//					continue;
-//				
-//				// Finding maximum rating
-//				double value = predict.get(fieldId).value;
-//				int found = Pair.findIndexOfLessThan(value, pairs);
-//				Pair pair = new Pair(fieldId, value);
-//				if (found == -1)
-//					pairs.add(pair);
-//				else 
-//					pairs.add(found, pair);
-//				
-//				int n = pairs.size();
-//				// Having maxRecommend + 1 if all are maximum rating.
-//				if (maxRecommend > 0 && n >= maxRecommend) {
-//					int lastIndex = pairs.size() - 1;
-//					Pair last = pairs.get(lastIndex);
-//					if (last.value() == maxRating /*|| i >= size*/) //The dataset can be dynamic and so the statement "i >= size" needs to be removed.
-//						break;
-//					else if (n > maxRecommend)
-//						pairs.remove(lastIndex);
-//				}
-//				
-//				
-//			} // end while
-//	
-//			
-//			if (maxRecommend > 0 && pairs.size() > maxRecommend) {
-//				if (pairs.size() == maxRecommend + 1)
-//					pairs.remove(pairs.size() - 1); //Remove the redundant recommended item because the pair list has almost maxRecommend + 1 pairs.
-//				else
-//					pairs = pairs.subList(0, maxRecommend); //The pair list has at most maxRecommend + 1 pairs and so this code line is for safe.
-//			}
-//		}
-//		catch (Throwable e) {
-//			LogUtil.trace(e);
-//		}
-//		finally {
-//			try {
-//				fieldIds.close();
-//			} 
-//			catch (Throwable e) {
-//				// TODO Auto-generated catch block
-//				LogUtil.trace(e);
-//			}
-//			
-//		}
-//		
-//		
-//		if (pairs.size() == 0)
-//			return null;
-//		
-//		RatingVector rec = param.ratingVector.newInstance(true);
-//		Pair.fillRatingVector(rec, pairs);
-//		return rec;
-//		
-//	}
-//
-//	
-//	/**
-//	 * This is backup recommendation method. It is not used in current implementation.
-//	 * @param param recommendation parameter. Please see {@link RecommendParam} for more details of this parameter.
-//	 * @param maxRecommend the maximum recommended items (users) in the returned rating vector.
-//	 * @return list of recommended items (users) which is provided to the user (item), represented by {@link RatingVector} class. The number of items (users) of such list is specified by the the maximum number. Return null if cannot estimate.
-//	 * @throws RemoteException if any error raises.
-//	 */
-//	@SuppressWarnings("unused")
-//	private synchronized RatingVector recommend0(RecommendParam param, int maxRecommend) throws RemoteException {
-//		param = recommendPreprocess(param);
-//		if (param == null) return null;
-//		
-//		filterList.prepare(param);
-//		
-//		Set<Integer> queryIds = Util.newSet();
-//		Fetcher<RatingVector> items = dataset.fetchItemRatings();
-//		try {
-//			while (items.next()) {
-//				RatingVector v = items.pick();
-//				if (v == null || v.size() == 0)
-//					continue;
-//				
-//				int itemId = v.id();
-//				if(filterList.filter(dataset, RecommendFilterParam.create(itemId)))
-//					queryIds.add(itemId);
-//			}
-//		}
-//		catch (Throwable e) {
-//			LogUtil.trace(e);
-//		}
-//		finally {
-//			try {
-//				if (items != null) items.close();
-//			} 
-//			catch (Throwable e) {
-//				// TODO Auto-generated catch block
-//				LogUtil.trace(e);
-//			}
-//			
-//		}
-//		
-//		RatingVector predict = estimate(param, queryIds);
-//		if (predict == null) return null;
-//		
-//		List<Pair> pairs = Pair.toPairList(predict);
-//		Pair.sort(pairs, true, maxRecommend);
-//		RatingVector rec = param.ratingVector.newInstance(true);
-//		Pair.fillRatingVector(rec, pairs);
-//		return rec.size() == 0 ? null : rec;
-//	}
-
-	
 	@Override
 	public String[] getBaseRemoteInterfaceNames() throws RemoteException {
 		// TODO Auto-generated method stub
 		return new String[] {RecommenderRemote.class.getName(), MemoryBasedAlgRemote.class.getName()};
+	}
+
+
+	@Override
+	public DataConfig createDefaultConfig() {
+		DataConfig config = super.createDefaultConfig();
+		config.put(FAST_RECOMMEND, FAST_RECOMMEND_DEFAULT);
+		return config;
 	}
 
 
