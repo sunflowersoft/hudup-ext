@@ -16,6 +16,8 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -49,13 +51,19 @@ import net.hudup.core.security.CipherImpl;
  * @author Loc Nguyen
  * @version 10.0
  */
-public final class Util {
+public class Util {
 
 	
 	/**
 	 * System properties.
 	 */
-	private final static Properties props = new Properties();
+	private final static int MAX_PROPS_FILES = 10;
+
+	
+	/**
+	 * System properties.
+	 */
+	protected final static Properties props = new Properties();
 	
 	/**
 	 * Hudup properties name.
@@ -80,20 +88,6 @@ public final class Util {
 		catch (Throwable e) {LogUtil.trace(e);}
 		
 		try {
-			Path path = Paths.get(Constants.WORKING_DIRECTORY + "/" + hudupPropName);
-			if (Files.exists(path)) {
-				Properties userProps = new Properties();
-				InputStream in = Files.newInputStream(path);
-				if (in != null) {
-					userProps.load(in);
-					props.putAll(userProps);
-					in.close();
-				}
-			}
-		}
-		catch (Throwable e) {LogUtil.trace(e);}
-
-		try {
 			String pluginManagerText = getHudupProperty("plugin_manager");
 			pluginManager = (PluginManager) Class.forName(pluginManagerText).getDeclaredConstructor().newInstance();
 		}
@@ -108,7 +102,9 @@ public final class Util {
 	 * Loading Hudup properties.
 	 */
 	private static void loadProperties() {
-		for (int i = 0; i <= 10; i++) {
+		Path lastPath = null;
+		Properties lastProps = null;
+		for (int i = 0; i <= MAX_PROPS_FILES; i++) {
 			String path = i == 0 ? RESOURCES_PACKAGE + hudupPropName : ROOT_PACKAGE + hudupPropName + "." + i;
 			InputStream in = null;
 			try {
@@ -121,21 +117,22 @@ public final class Util {
 				Properties userProps = new Properties();
 				userProps.load(in);
 				props.putAll(userProps);
+				
+				lastProps = userProps;
+				lastPath = Paths.get(Util.class.getResource(path).toURI());
 			}
 			catch (Throwable e) {}
-			
 			try {
 				if (in != null) in.close();
 			}
 			catch (Throwable e) {}
 		}
 		
-		xURI workingUri = xURI.create(Constants.WORKING_DIRECTORY + "/" + hudupPropName);
-		UriAdapter adapter = new UriAdapter(workingUri);
-		if (adapter.exists(workingUri)) {
+		Path workingPath = Paths.get(Constants.WORKING_DIRECTORY + "/" + hudupPropName);
+		if (Files.exists(workingPath)) {
 			InputStream in = null;
 			try {
-				in = adapter.getInputStream(workingUri);
+				in = Files.newInputStream(workingPath);
 				Properties userProps = new Properties();
 				userProps.load(in);
 				props.putAll(userProps);
@@ -149,14 +146,38 @@ public final class Util {
 		}
 		else {
 			try {
-				OutputStream out = adapter.getOutputStream(workingUri, false);
+				Path workingDir = Paths.get(Constants.WORKING_DIRECTORY);
+				if (!Files.exists(workingPath)) Files.createDirectory(workingDir);
+				
+				OutputStream out = Files.newOutputStream(workingPath, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
 				new Properties().store(out, "Adding your own properties");
 				out.close();
 			}
 			catch (Exception e) {}
+			
+			boolean copied = false;
+			if (lastPath != null) {
+				try {
+					Files.copy(lastPath,
+						Paths.get(Constants.WORKING_DIRECTORY + "/" + hudupPropName + ".temp"),
+						StandardCopyOption.REPLACE_EXISTING);
+					copied = true;
+				}
+				catch (Exception e) {}
+			}
+			
+			if ((!copied) && (lastProps != null)) {
+				try {
+					OutputStream out = Files.newOutputStream(
+							Paths.get(Constants.WORKING_DIRECTORY + "/" + hudupPropName + ".temp"),
+							StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+					lastProps.store(out, "Following are last properties");
+					out.close();
+				}
+				catch (Exception e) {}
+			}
 		}
 		
-		adapter.close();
 	}
 
 	

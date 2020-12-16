@@ -89,6 +89,7 @@ public class ObjectPair<T> implements Cloneable {
 	/**
 	 * This static method finds the index of the first pair (in the specified list of pairs)
 	 * whose value is less than the specified value.
+	 * @param <T> type of key.
 	 * @param value specified value.
 	 * @param pairs specified list of pairs.
 	 * @return index of the first pair (in the specified list of pairs) whose value is less than the specified value.

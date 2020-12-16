@@ -425,16 +425,33 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 	
 	
 	/**
-	 * Getting the list of supported similar measures in names.
-	 * @return supported similar measures.
+	 * Getting the list of all similar measures in names.
+	 * @return all similar measures.
 	 */
-	public List<String> getSupportedMeasures() {
+	public List<String> getAllMeasures() {
+		Set<String> mSet = Util.newSet();
+		mSet.addAll(getMainMeasures());
+		mSet.add(COSINEJ);
+		mSet.add(PEARSONJ);
+		mSet.add(MSDJ);
+		mSet.add(TJM);
+		
+		List<String> measures = Util.newList();
+		measures.addAll(mSet);
+		Collections.sort(measures);
+		return measures;
+	}
+	
+	
+	/**
+	 * Getting the list of main similar measures in names.
+	 * @return main similar measures.
+	 */
+	public List<String> getMainMeasures() {
 		Set<String> mSet = Util.newSet();
 		mSet.add(COSINE);
-//		mSet.add(COSINEJ);
 		mSet.add(COJ);
 		mSet.add(PEARSON);
-//		mSet.add(PEARSONJ);
 		mSet.add(COD);
 		mSet.add(CPC);
 		mSet.add(WPC);
@@ -442,18 +459,26 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 		mSet.add(JACCARD);
 		mSet.add(JACCARD2);
 		mSet.add(MSD);
-//		mSet.add(MSDJ);
 		mSet.add(URP);
 		mSet.add(TRIANGLE);
-//		mSet.add(TJM);
 		
 		List<String> measures = Util.newList();
-		measures.clear();
 		measures.addAll(mSet);
 		Collections.sort(measures);
 		return measures;
 	}
 
+	
+	/**
+	 * Testing whether the specified measure is supported.
+	 * @param measure specified measure.
+	 * @return whether the specified measure is supported.
+	 */
+	public boolean isSupportedMeasure(String measure) {
+		if (measure == null) return false;
+		return getAllMeasures().contains(measure);
+	}
+	
 	
 	/**
 	 * Getting the default similarity measure.
@@ -1118,7 +1143,7 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 							"Choosing similar measure", 
 							JOptionPane.INFORMATION_MESSAGE, 
 							null, 
-							getSupportedMeasures().toArray(), 
+							getMainMeasures().toArray(), 
 							measure);
 				}
 				else 
