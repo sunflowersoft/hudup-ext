@@ -63,6 +63,18 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 
 	
 	/**
+	 * The maximum number of nearest neighbors.
+	 */
+	public static final String KNN = "knn";
+
+	
+	/**
+	 * Default value of the maximum number of nearest neighbors.
+	 */
+	public static final int KNN_DEFAULT = 0;
+
+	
+	/**
 	 * In the configuration, the entry of similarity measure has the name specified by this constant.
 	 */
 	public static final String MEASURE = "measure";
@@ -1119,6 +1131,7 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 	@Override
 	public DataConfig createDefaultConfig() {
 		DataConfig tempConfig = super.createDefaultConfig();
+		tempConfig.put(KNN, KNN_DEFAULT);
 		tempConfig.put(SUPPORT_CACHE_FIELD, SUPPORT_CACHE_DEFAULT);
 		tempConfig.put(MEASURE, getDefaultMeasure()); //tempConfig.addReadOnly(MEASURE);
 		tempConfig.put(HYBRID, false); tempConfig.addInvisible(HYBRID);

@@ -46,18 +46,6 @@ public class NeighborCFUserBased extends NeighborCF implements DuplicatableAlg {
 
 	
 	/**
-	 * The maximum number of nearest neighbors.
-	 */
-	public static final String KNN = "knn";
-
-	
-	/**
-	 * Default value of the maximum number of nearest neighbors.
-	 */
-	public static final int KNN_DEFAULT = 0;
-
-	
-	/**
 	 * Default constructor.
 	 */
 	public NeighborCFUserBased() {
@@ -72,7 +60,7 @@ public class NeighborCFUserBased extends NeighborCF implements DuplicatableAlg {
 
 
 	/**
-	 * This method is very important, which is used to estimate rating values of given items (users) without caching. Any class that extends this abstract class must implement this method.
+	 * This method is very important, which is used to estimate rating values of given items (users). Any class that extends this abstract class must implement this method.
 	 * Note that the role of user and the role of item are exchangeable. Rating vector can be user rating vector or item rating vector. Please see {@link RatingVector} for more details. 
 	 * The input parameters are a recommendation parameter and a set of item (user) identifiers.
 	 * The output result is a set of predictive or estimated rating values of items (users) specified by the second input parameter.
@@ -90,8 +78,7 @@ public class NeighborCFUserBased extends NeighborCF implements DuplicatableAlg {
 		 * 3. Its id is >= 0 but, it is not stored in training dataset then, it must be a full rating vector of a user.
 		 */
 		
-		int knn = cf.getConfig().getAsInt(KNN);
-		if (knn > 0) return estimateKnn(cf, param, queryIds);
+		if (cf.getConfig().getAsBoolean(FAST_RECOMMEND)) return estimateFast(cf, param, queryIds);
 		
 		if (param.ratingVector == null) return null;
 		
@@ -116,6 +103,8 @@ public class NeighborCFUserBased extends NeighborCF implements DuplicatableAlg {
 		double thisMean = thisUser.mean();
 		Map<Integer, Double> localUserSimCache = Util.newMap();
 		Fetcher<RatingVector> userRatings = cf.getDataset().fetchUserRatings();
+		int knn = cf.getConfig().getAsInt(KNN);
+		knn = knn < 0 ? 0 : knn;
 		for (int itemId : queryIds) {
 			if (thisUser.isRated(itemId)) {
 				result.put(itemId, thisUser.get(itemId));
@@ -125,6 +114,7 @@ public class NeighborCFUserBased extends NeighborCF implements DuplicatableAlg {
 			double accum = 0;
 			double simTotal = 0;
 			boolean calculated = false;
+			List<ObjectPair<RatingVector>> pairs = Util.newList();
 			try {
 				while (userRatings.next()) {
 					RatingVector thatUser = userRatings.pick();
@@ -147,18 +137,45 @@ public class NeighborCFUserBased extends NeighborCF implements DuplicatableAlg {
 						sim = cf.sim(thisUser, thatUser, thisProfile, thatProfile, itemId);
 					if (!Util.isUsed(sim)) continue;
 					
-					double thatValue = thatUser.get(itemId).value;
-					double thatMean = thatUser.mean();
-					double deviate = thatValue - thatMean;
-					accum += sim * deviate;
-					simTotal += Math.abs(sim);
-					
-					calculated = true;
+					if (knn == 0) {
+						double deviate = thatUser.get(itemId).value - thatUser.mean();
+						accum += sim * deviate;
+						simTotal += Math.abs(sim);
+						
+						calculated = true;
+					}
+					else {
+						int found = ObjectPair.findIndexOfLessThan(sim, pairs);
+						ObjectPair<RatingVector> pair = new ObjectPair<RatingVector>(thatUser, sim);
+						if (found == -1) {
+							if (pairs.size() < knn) pairs.add(pair);
+						}
+						else {
+							pairs.add(found, pair);
+							if (pairs.size() > knn) pairs.remove(pairs.size() - 1);
+						}
+					}
 				}
 				userRatings.reset();
 			}
 			catch (Throwable e) {
 				LogUtil.trace(e);
+			}
+			
+			if (knn > 0) {
+				accum = 0;
+				simTotal = 0;
+				calculated = false;
+				for (ObjectPair<RatingVector> pair : pairs) {
+					RatingVector thatUser = pair.key();
+
+					double deviate = thatUser.get(itemId).value - thatUser.mean();
+					double sim = pair.value();
+					accum +=  sim * deviate;
+					simTotal += Math.abs(sim);
+					
+					calculated = true;
+				}
 			}
 			if (!calculated) continue;
 			
@@ -181,14 +198,14 @@ public class NeighborCFUserBased extends NeighborCF implements DuplicatableAlg {
 
 	
 	/**
-	 * Estimate rating values of given items (users) without caching. This method is the second version.
+	 * Estimate rating values of given items (users) in fast recommendation mode. This method is the second version.
 	 * @param cf current neighbor algorithm.
 	 * @param param recommendation parameter. Please see {@link RecommendParam} for more details of this parameter.
 	 * @param queryIds set of identifications (IDs) of items that need to be estimated their rating values.
 	 * @return rating vector contains estimated rating values of the specified set of IDs of items (users). Return null if cannot estimate.
 	 * @throws RemoteException if any error raises.
 	 */
-	private static RatingVector estimateKnn(NeighborCF cf, RecommendParam param, Set<Integer> queryIds) throws RemoteException {
+	private static RatingVector estimateFast(NeighborCF cf, RecommendParam param, Set<Integer> queryIds) throws RemoteException {
 		/*
 		 * There are three cases of param.ratingVector:
 		 * 1. Its id is < 0, which indicates it is not stored in training dataset then, caching does not work even though this is cached algorithm.
@@ -238,10 +255,8 @@ public class NeighborCFUserBased extends NeighborCF implements DuplicatableAlg {
 				RatingVector thatUser = pair.key();
 				if (!thatUser.isRated(itemId)) continue;
 				
-				double thatValue = thatUser.get(itemId).value;
-				double thatMean = thatUser.mean();
-				double deviate = thatValue - thatMean;
 				double sim = pair.value();
+				double deviate = thatUser.get(itemId).value - thatUser.mean();
 				accum +=  sim * deviate;
 				simTotal += Math.abs(sim);
 				
@@ -262,18 +277,18 @@ public class NeighborCFUserBased extends NeighborCF implements DuplicatableAlg {
 	/**
 	 * Getting list of k nearest neighbors.
 	 * @param cf current neighbor algorithm.
-	 * @param k the number of nearest neighbors.
+	 * @param knn the number of nearest neighbors.
 	 * @param userRatings user rating dataset.
 	 * @param thisUser this user rating vector.
 	 * @param thisProfile this user profile.
 	 * @return list of k nearest neighbors.
 	 */
-	private static List<ObjectPair<RatingVector>> getKnnList(NeighborCF cf, int k, Fetcher<RatingVector> userRatings, RatingVector thisUser, Profile thisProfile) {
-		k = k < 0 ? 0 : k;
-		List<ObjectPair<RatingVector>> pairs = Util.newList(k);
+	private static List<ObjectPair<RatingVector>> getKnnList(NeighborCF cf, int knn, Fetcher<RatingVector> userRatings, RatingVector thisUser, Profile thisProfile) {
+		knn = knn < 0 ? 0 : knn;
+		List<ObjectPair<RatingVector>> pairs = Util.newList(knn);
 		boolean hybrid = cf.getConfig().getAsBoolean(HYBRID);
 		thisProfile = hybrid ? thisProfile : null;
-		Map<Integer, Double> localUserSimCache = Util.newMap(k);
+		Map<Integer, Double> localUserSimCache = Util.newMap(knn);
 		try {
 			while (userRatings.next()) {
 				RatingVector thatUser = userRatings.pick();
@@ -299,11 +314,11 @@ public class NeighborCFUserBased extends NeighborCF implements DuplicatableAlg {
 				int found = ObjectPair.findIndexOfLessThan(sim, pairs);
 				ObjectPair<RatingVector> pair = new ObjectPair<RatingVector>(thatUser, sim);
 				if (found == -1) {
-					if (k == 0 || pairs.size() < k) pairs.add(pair);
+					if (knn == 0 || pairs.size() < knn) pairs.add(pair);
 				}
 				else {
 					pairs.add(found, pair);
-					if (k > 0 && pairs.size() > k) pairs.remove(pairs.size() - 1);
+					if (knn > 0 && pairs.size() > knn) pairs.remove(pairs.size() - 1);
 				}
 			}
 			
@@ -351,7 +366,6 @@ public class NeighborCFUserBased extends NeighborCF implements DuplicatableAlg {
 	@Override
 	public DataConfig createDefaultConfig() {
 		DataConfig config = super.createDefaultConfig();
-		config.put(KNN, KNN_DEFAULT);
 		config.addReadOnly(DUPLICATED_ALG_NAME_FIELD);
 		return config;
 	}

@@ -8,6 +8,7 @@
 package net.hudup.core.alg.cf;
 
 import java.rmi.RemoteException;
+import java.util.List;
 import java.util.Set;
 
 import net.hudup.core.Util;
@@ -15,6 +16,7 @@ import net.hudup.core.alg.DuplicatableAlg;
 import net.hudup.core.alg.RecommendParam;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Fetcher;
+import net.hudup.core.data.ObjectPair;
 import net.hudup.core.data.Profile;
 import net.hudup.core.data.RatingVector;
 import net.hudup.core.logistic.LogUtil;
@@ -80,6 +82,8 @@ public class NeighborCFItemBased extends NeighborCF implements DuplicatableAlg {
 		double minValue = cf.getConfig().getMinRating();
 		double maxValue = cf.getConfig().getMaxRating();
 		Fetcher<RatingVector> itemRatings = cf.getDataset().fetchItemRatings();
+		int knn = cf.getConfig().getAsInt(KNN);
+		knn = knn < 0 ? 0 : knn;
 		for (int itemId : queryIds) {
 			RatingVector thisItem = cf.getDataset().getItemRating(itemId);
 			if (thisItem == null) continue; //This item is not empty and has no unrated if it is not null because it is retrieved from dataset.
@@ -97,6 +101,7 @@ public class NeighborCFItemBased extends NeighborCF implements DuplicatableAlg {
 			double accum = 0;
 			double simTotal = 0;
 			boolean calculated = false;
+			List<ObjectPair<RatingVector>> pairs = Util.newList();
 			try {
 				while (itemRatings.next()) {
 					RatingVector thatItem = itemRatings.pick();
@@ -115,18 +120,45 @@ public class NeighborCFItemBased extends NeighborCF implements DuplicatableAlg {
 					double sim = cf.sim(thisItem, thatItem, thisProfile, thatProfile, thisUser.id());
 					if (!Util.isUsed(sim)) continue;
 					
-					double thatValue = thatItem.get(thisUser.id()).value;
-					double thatMean = thatItem.mean();
-					double deviate = thatValue - thatMean;
-					accum += sim * deviate;
-					simTotal += Math.abs(sim);
-					
-					calculated = true;
+					if (knn == 0) {
+						double deviate = thatItem.get(thisUser.id()).value - thatItem.mean();
+						accum += sim * deviate;
+						simTotal += Math.abs(sim);
+						
+						calculated = true;
+					}
+					else {
+						int found = ObjectPair.findIndexOfLessThan(sim, pairs);
+						ObjectPair<RatingVector> pair = new ObjectPair<RatingVector>(thatItem, sim);
+						if (found == -1) {
+							if (pairs.size() < knn) pairs.add(pair);
+						}
+						else {
+							pairs.add(found, pair);
+							if (pairs.size() > knn) pairs.remove(pairs.size() - 1);
+						}
+					}
 				}
 				itemRatings.reset();
 			}
 			catch (Throwable e) {
 				LogUtil.trace(e);
+			}
+			
+			if (knn > 0) {
+				accum = 0;
+				simTotal = 0;
+				calculated = false;
+				for (ObjectPair<RatingVector> pair : pairs) {
+					RatingVector thatItem = pair.key();
+
+					double sim = pair.value();
+					double deviate = thatItem.get(thisUser.id()).value - thatItem.mean();
+					accum += sim * deviate;
+					simTotal += Math.abs(sim);
+					
+					calculated = true;
+				}
 			}
 			if (!calculated) continue;
 			
