@@ -128,14 +128,13 @@ public class DatasetSampling extends JPanel implements ProgressListener, Dispose
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				onConfig();
 			}
 		});
 		header_left.add(btnConfig);
 		
-		header_left.add(new JLabel("Unit"));
-		header_left.add(new JLabel("Test ratios"));
+		header_left.add(new JLabel("Unit (*)"));
+		header_left.add(new JLabel("Test ratios (*)"));
 		header_left.add(new JLabel("Folder number"));
 		header_left.add(new JLabel("Sparse ratios"));
 
@@ -175,7 +174,6 @@ public class DatasetSampling extends JPanel implements ProgressListener, Dispose
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				sampling();
 			}
 		});
@@ -254,14 +252,12 @@ public class DatasetSampling extends JPanel implements ProgressListener, Dispose
 			
 			@Override
 			protected void start() {
-				// TODO Auto-generated method stub
 				txtUnit.setUnit((Unit)cmbItem.getSelectedItem());
 				dispose();
 			}
 			
 			@Override
 			protected JComboBox<?> createItemControl() {
-				// TODO Auto-generated method stub
 				UnitComboBox unitComboBox = new UnitComboBox();
 				unitComboBox.connectUpdate(config);
 				return unitComboBox;
@@ -269,13 +265,12 @@ public class DatasetSampling extends JPanel implements ProgressListener, Dispose
 			
 			@Override
 			protected TextArea createHelp() {
-				// TODO Auto-generated method stub
-				return new TextArea("Choosing an unit is optional.");
+				return new TextArea("Choosing an unit.");
 			}
 			
 			@Override
 			public String getGuidedText() {
-				return "You can choose an unit and press \"Start\" button";
+				return "You choose an unit and press \"Start\" button";
 			}
 		};
 		selectUnitDlg.setSize(400, 150);
@@ -374,14 +369,6 @@ public class DatasetSampling extends JPanel implements ProgressListener, Dispose
 			}
 			sparseRatios.add(ratio);
 		}
-		if (sparseRatios.size() == 0) {
-			JOptionPane.showMessageDialog(
-					getThis(), 
-					"Empty sparse ratios", 
-					"Empty sparse ratios", 
-					JOptionPane.ERROR_MESSAGE);
-			return;
-		}
 		
 		final List<Integer> sparseIndices = chkSparseColumns.getCheckedItemIndices();
 		
@@ -393,7 +380,6 @@ public class DatasetSampling extends JPanel implements ProgressListener, Dispose
 
 			@Override
 			public void run() {
-				// TODO Auto-generated method stub
 				try {
 					DataConfig srcConfig = txtConfig.getConfig();
 					String srcUnit = txtUnit.getUnit().getName();
@@ -404,7 +390,7 @@ public class DatasetSampling extends JPanel implements ProgressListener, Dispose
 					}
 					prgRunning.setValue(0);
 					
-					if (sparseIndices.size() > 0) {
+					if (sparseIndices.size() > 0 && sparseRatios.size() > 0) {
 						UnitList unitList = sampler.getProvider().getUnitList();
 						for (int i = 0; i < unitList.size(); i++) {
 							String unit = unitList.get(i).getName();
@@ -476,7 +462,6 @@ public class DatasetSampling extends JPanel implements ProgressListener, Dispose
 
 	@Override
 	public void receiveProgress(ProgressEvent evt) throws RemoteException {
-		// TODO Auto-generated method stub
 		int progressTotal = evt.getProgressTotal();
 		int progressStep = evt.getProgressStep();
 		
@@ -491,7 +476,6 @@ public class DatasetSampling extends JPanel implements ProgressListener, Dispose
 	@SuppressWarnings("deprecation")
 	@Override
 	public void dispose() {
-		// TODO Auto-generated method stub
 		if (runningThread == null)
 			return;
 		
@@ -506,12 +490,10 @@ public class DatasetSampling extends JPanel implements ProgressListener, Dispose
 
 	@Override
 	public boolean isRunning() {
-		// TODO Auto-generated method stub
-		
 		return runningThread != null;
 	}
 
-
+	
 }
 
 
