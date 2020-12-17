@@ -10,8 +10,6 @@ package net.hudup.core.alg.cf;
 import net.hudup.core.alg.MemoryBasedRecommender;
 import net.hudup.core.alg.Recommender;
 
-
-
 /**
  * Note, the interface {@code Recommender} represents all recommendation algorithm.
  * Two typical inherited interfaces of {@link Recommender} are {@code MemoryBasedRecomender} and {@code ModelBasedRecommender}

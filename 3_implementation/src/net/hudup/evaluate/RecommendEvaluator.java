@@ -11,10 +11,12 @@ import java.io.Serializable;
 import java.rmi.RemoteException;
 
 import net.hudup.core.Constants;
+import net.hudup.core.Util;
 import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.AlgDesc2;
 import net.hudup.core.alg.RecommendParam;
 import net.hudup.core.alg.Recommender;
+import net.hudup.core.alg.RecommenderAbstract;
 import net.hudup.core.alg.SetupAlgEvent;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.DatasetPair;
@@ -182,13 +184,23 @@ public class RecommendEvaluator extends EvaluatorAbstract {
 					SystemUtil.enhanceAuto();
 
 					//Initializing parameters for setting up maximum recommendation number by binomial distribution. Added date: 2019.08.23 by Loc Nguyen.
-					double relevantSparseRatio = 0;
-					int totalRatedCount = 0;
+					double relevantRatio = 0;
+					int totalRatedItemCount = 0;
 					Dataset trainingData = recommender.getDataset(); //It is not pointer. Please pay attention that it is not always the same to dsPair.getTraining().
+					boolean heuristicRecommend = false;
 					if (config.isHeuristicRecommend()) {
 						trainingData = trainingData != null ? trainingData : testing; //This is work-around solution, using testing for estimating recommendation number.
-						relevantSparseRatio = calcRelevantSparseRatio(trainingData);
-						totalRatedCount = countRatedItems(trainingData);
+						boolean isUsedMinMax = !recommender.getConfig().getAsBoolean(RecommenderAbstract.IGNORE_MINMAX_RATING)
+								&& Util.isUsed(trainingData.getConfig().getMinRating())
+								&& Util.isUsed(trainingData.getConfig().getMaxRating());
+						
+						if (isUsedMinMax) {
+							heuristicRecommend = true;
+							relevantRatio = calcRelevantRatio(trainingData);
+							totalRatedItemCount = countRatedItems(trainingData);
+						}
+						else
+							heuristicRecommend = false;
 					}
 					
 					
@@ -220,15 +232,15 @@ public class RecommendEvaluator extends EvaluatorAbstract {
 						RecommendParam param = new RecommendParam(testingUser.id());
 						//Setting up maximum recommendation number by binomial distribution. Added date: 2019.08.23 by Loc Nguyen.
 						int maxRecommend = 0;
-						if (config.isHeuristicRecommend() && trainingData != null) {
-							int ratedCount = 0;
+						if (heuristicRecommend && trainingData != null) {
+							int ratedItemCount = 0;
 							RatingVector trainingUser = trainingData.getUserRating(testingUser.id());
-							if (trainingUser != null) ratedCount = trainingUser.count(true); 
-							maxRecommend = (int)(relevantSparseRatio*(totalRatedCount-ratedCount)+0.5);
+							if (trainingUser != null) ratedItemCount = trainingUser.count(true); 
+							maxRecommend = (int)(relevantRatio*(totalRatedItemCount-ratedItemCount)+0.5);
 							trainingData = null;
 						}
 						else if (config.getMaxRecommend() > 0) {
-							maxRecommend = config.getMaxRecommend(); //Used for scanner which cannot calculate relevant-sparse ratio.
+							maxRecommend = config.getMaxRecommend();
 						}
 						vExactCurrentTotal++; //Increase exact total vector count.
 						
@@ -351,7 +363,7 @@ public class RecommendEvaluator extends EvaluatorAbstract {
 	 * @param dataset specified dataset.
 	 * @return relevant ratio in specified dataset.
 	 */
-	private double calcRelevantSparseRatio(Dataset dataset) {
+	private double calcRelevantRatio(Dataset dataset) {
 		int relevantRateCount = 0;
 		int nUsers = 0;
 		Fetcher<RatingVector> users = null;
@@ -409,7 +421,6 @@ public class RecommendEvaluator extends EvaluatorAbstract {
 			nRatedItems = items.getMetadata().getSize(); //For fast retrieval.
 		} 
 		catch (Throwable e) {
-			// TODO Auto-generated catch block
 			LogUtil.trace(e);
 			nRatedItems = 0;
 		}
@@ -448,7 +459,6 @@ public class RecommendEvaluator extends EvaluatorAbstract {
 //					items.close();
 //			} 
 //			catch (Throwable e) {
-//				// TODO Auto-generated catch block
 //				LogUtil.trace(e);
 //			}
 //		}

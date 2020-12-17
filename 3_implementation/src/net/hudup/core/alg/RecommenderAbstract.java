@@ -10,6 +10,8 @@ package net.hudup.core.alg;
 import java.rmi.RemoteException;
 import java.util.Set;
 
+import net.hudup.core.Util;
+import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.Profile;
 import net.hudup.core.data.RatingVector;
@@ -32,7 +34,31 @@ public abstract class RecommenderAbstract extends AlgAbstract implements Recomme
 	 * Serial version UID for serializable class. 
 	 */
 	private static final long serialVersionUID = 1L;
+
 	
+	/**
+	 * Mode of ignoring minimum rating and maximum rating.
+	 */
+	public static final String IGNORE_MINMAX_RATING = "ignore_minmax_rating";
+
+	
+	/**
+	 * Default value for mode of ignoring minimum rating and maximum rating.
+	 */
+	public static final boolean IGNORE_MINMAX_RATING_DEFAULT = false;
+
+	
+	/**
+	 * Fast recommendation mode.
+	 */
+	public static final String FAST_RECOMMEND = "fast_recommend";
+
+	
+	/**
+	 * Default value for the fast recommendation mode.
+	 */
+	public static final boolean FAST_RECOMMEND_DEFAULT = false;
+
 	
 	/**
 	 * The filter list contains of filters. Filter specifies tasks which be performed before any actual recommendation tasks.
@@ -118,28 +144,48 @@ public abstract class RecommenderAbstract extends AlgAbstract implements Recomme
 	}
 	
 	
-//	/**
-//	 * Getting minimum rating.
-//	 * @return minimum rating.
-//	 */
-//	public double getMinRating() {
-//		double minRatisng = getDataset().getConfig().getMinRating();
-//		if (!Util.isUsed(minRating))
-//			minRating = getConfig().getAsReal(DataConfig.MIN_RATING_FIELD);
-//		return minRating; 
-//	}
-//
-//	
-//	/**
-//	 * Getting maximum rating.
-//	 * @return maximum rating.
-//	 */
-//	public double getMaxRating() {
-//		double maxRating = getDataset().getConfig().getMaxRating();
-//		if (!Util.isUsed(maxRating))
-//			maxRating = getConfig().getAsReal(DataConfig.MAX_RATING_FIELD);
-//		return maxRating; 
-//	}
+	/**
+	 * Getting minimum rating.
+	 * @return minimum rating.
+	 */
+	public double getMinRating() {
+		double minRating = getConfig().getMinRating();
+		if (!Util.isUsed(minRating)) {
+			try {
+				minRating = getDataset().getConfig().getMinRating();
+			}
+			catch (Exception e) {LogUtil.trace(e);}
+		}
+		
+		return minRating; 
+	}
+
+	
+	/**
+	 * Getting maximum rating.
+	 * @return maximum rating.
+	 */
+	public double getMaxRating() {
+		double maxRating = getConfig().getMaxRating();
+		if (!Util.isUsed(maxRating)) {
+			try {
+				maxRating = getDataset().getConfig().getMaxRating();
+			}
+			catch (Exception e) {LogUtil.trace(e);}
+		}
+		
+		return maxRating; 
+	}
+	
+	
+	/**
+	 * Checking whether minimum rating and maximum are used.
+	 * @return whether minimum rating and maximum are used.
+	 */
+	public boolean isUsedMinMaxRating() {
+		return !getConfig().getAsBoolean(IGNORE_MINMAX_RATING)
+				&& Util.isUsed(getMinRating()) && Util.isUsed(getMaxRating()); 
+	}
 	
 
 	@Override
@@ -159,6 +205,15 @@ public abstract class RecommenderAbstract extends AlgAbstract implements Recomme
 	}
 
 	
+	@Override
+	public DataConfig createDefaultConfig() {
+		DataConfig config = super.createDefaultConfig();
+		config.put(IGNORE_MINMAX_RATING, IGNORE_MINMAX_RATING_DEFAULT);
+		config.put(FAST_RECOMMEND, FAST_RECOMMEND_DEFAULT);
+		return config;
+	}
+
+
 	@Override
 	protected void finalize() throws Throwable {
 		super.finalize();

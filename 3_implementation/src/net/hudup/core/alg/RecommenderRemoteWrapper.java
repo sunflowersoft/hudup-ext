@@ -10,6 +10,7 @@ package net.hudup.core.alg;
 import java.rmi.RemoteException;
 import java.util.Set;
 
+import net.hudup.core.Util;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.RatingVector;
@@ -55,17 +56,6 @@ public class RecommenderRemoteWrapper extends AlgRemoteWrapper implements Recomm
 	 */
 	public RecommenderRemoteWrapper(RecommenderRemote remoteRecommender, boolean exclusive) {
 		super(remoteRecommender, exclusive);
-	}
-
-	
-	@Override
-	public Inspector getInspector() {
-		String desc = "";
-		try {
-			desc = getDescription();
-		} catch (Exception e) {LogUtil.trace(e);}
-		
-		return new DescriptionDlg(UIUtil.getFrameForComponent(null), "Inspector", desc);
 	}
 
 	
@@ -117,6 +107,61 @@ public class RecommenderRemoteWrapper extends AlgRemoteWrapper implements Recomm
 		}
 
 		super.unexport();
+	}
+
+	
+	/**
+	 * Getting minimum rating.
+	 * @return minimum rating.
+	 */
+	public double getMinRating() {
+		double minRating = getConfig().getMinRating();
+		if (!Util.isUsed(minRating)) {
+			try {
+				minRating = getDataset().getConfig().getMinRating();
+			}
+			catch (Exception e) {LogUtil.trace(e);}
+		}
+		
+		return minRating; 
+	}
+
+	
+	/**
+	 * Getting maximum rating.
+	 * @return maximum rating.
+	 */
+	public double getMaxRating() {
+		double maxRating = getConfig().getMaxRating();
+		if (!Util.isUsed(maxRating)) {
+			try {
+				maxRating = getDataset().getConfig().getMaxRating();
+			}
+			catch (Exception e) {LogUtil.trace(e);}
+		}
+		
+		return maxRating; 
+	}
+	
+	
+	/**
+	 * Checking whether minimum rating and maximum are used.
+	 * @return whether minimum rating and maximum are used.
+	 */
+	public boolean isUsedMinMaxRating() {
+		return !getConfig().getAsBoolean(RecommenderAbstract.IGNORE_MINMAX_RATING)
+				&& Util.isUsed(getMinRating()) && Util.isUsed(getMaxRating()); 
+	}
+
+	
+	@Override
+	public Inspector getInspector() {
+		String desc = "";
+		try {
+			desc = getDescription();
+		} catch (Exception e) {LogUtil.trace(e);}
+		
+		return new DescriptionDlg(UIUtil.getFrameForComponent(null), "Inspector", desc);
 	}
 
 	

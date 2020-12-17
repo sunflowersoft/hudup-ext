@@ -32,7 +32,7 @@ import net.hudup.core.logistic.NextUpdate;
 import net.hudup.core.logistic.Vector;
 
 /**
- * This class sets up the neighbor collaborative filtering (Neighbor CF) algorithm. It is memory-based CF because it extends directly {@link MemoryBasedCF} class.
+ * This class sets up the nearest neighbors collaborative filtering algorithm. It is memory-based CF because it extends directly {@link MemoryBasedCF} class.
  * Neighbor CF algorithm finds out the nearest neighbor of active user (or active item).
  * Later on, Neighbor CF algorithm recommends items that the nearest neighbor likes (rates with high value) to the active user, with assumption that the nearest neighbor and the active user (active item) share the same interests.
  * <br>
@@ -207,7 +207,7 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 
 	
 	/**
-	 * Threshold for WPCC (weight weighted Pearson correlation coefficient).
+	 * Threshold for WPCC (weighted Pearson correlation coefficient).
 	 */
 	public static final double WPC_THRESHOLD = 50;
 
@@ -296,7 +296,7 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 	public synchronized void setup(Dataset dataset, Object...params) throws RemoteException {
 		super.setup(dataset, params);
 		
-		this.ratingMedian = (this.config.getMinRating() + this.config.getMaxRating()) / 2.0;
+		this.ratingMedian = (getMinRating() + getMaxRating()) / 2.0;
 		
 		updateUserMeanVars(dataset);
 		updateItemMeanVars(dataset);
@@ -637,18 +637,18 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 			RatingVector vRating1, RatingVector vRating2,
 			Profile profile1, Profile profile2) {
 		
-		boolean normalized = getConfig().getAsBoolean(COSINE_NORMALIZED_FIELD);
-		return normalized ? vRating1.cosine(vRating2, this.ratingMedian) : vRating1.cosine(vRating2);
+		boolean normalized = getConfig().getAsBoolean(COSINE_NORMALIZED_FIELD) && Util.isUsed(ratingMedian);
+		return normalized ? vRating1.cosine(vRating2, ratingMedian) : vRating1.cosine(vRating2);
 
 //		boolean normalized = getConfig().getAsBoolean(COSINE_NORMALIZED_FIELD);
 //		if (profile1 == null || profile2 == null)
-//			return normalized ? vRating1.cosine(vRating2, this.ratingMedian) : vRating1.cosine(vRating2);
+//			return normalized ? vRating1.cosine(vRating2, ratingMedian) : vRating1.cosine(vRating2);
 //		
 //		Vector[] vectors = toNormVector(vRating1, vRating2, profile1, profile2);
 //		Vector vector1 = vectors[0];
 //		Vector vector2 = vectors[1];
 //		
-//		return normalized ? vector1.cosine(vector2, this.ratingMedian) : vector1.cosine(vector2);
+//		return normalized ? vector1.cosine(vector2, ratingMedian) : vector1.cosine(vector2);
 	}
 
 	
@@ -711,16 +711,16 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 			Profile profile1, Profile profile2) {
 		Set<Integer> union = unionFieldIds(vRating1, vRating2);
 		
-		boolean normalized = getConfig().getAsBoolean(COSINE_NORMALIZED_FIELD);
+		boolean normalized = getConfig().getAsBoolean(COSINE_NORMALIZED_FIELD) && Util.isUsed(ratingMedian);
 		double VX = 0, VY = 0;
 		double VXY = 0;
 		for (int fieldId : union) {
 			double deviate1 = Constants.UNUSED;
 			double deviate2 = Constants.UNUSED;
 			if (vRating1.isRated(fieldId))
-				deviate1 = vRating1.get(fieldId).value - (normalized ? this.ratingMedian : 0);
+				deviate1 = vRating1.get(fieldId).value - (normalized ? ratingMedian : 0);
 			if (vRating2.isRated(fieldId))
-				deviate2 = vRating2.get(fieldId).value - (normalized ? this.ratingMedian : 0);
+				deviate2 = vRating2.get(fieldId).value - (normalized ? ratingMedian : 0);
 			
 			if (Util.isUsed(deviate1))
 				VX  += deviate1 * deviate1;
@@ -825,7 +825,7 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 		if (common.size() == 0)
 			return new Vector[0];
 		
-		double n = dataset.getConfig().getMaxRating() - dataset.getConfig().getMinRating();
+		double n = getMaxRating() - getMinRating();
 		
 		double[] data1 = new double[common.size()];
 		double[] data2 = new double[common.size()];
@@ -896,24 +896,7 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 	protected double cpc(
 			RatingVector vRating1, RatingVector vRating2,
 			Profile profile1, Profile profile2) {
-		Set<Integer> common = commonFieldIds(vRating1, vRating2);
-		if (common.size() == 0) return Constants.UNUSED;
-		
-		double VX = 0, VY = 0;
-		double VXY = 0;
-		for (int fieldId : common) {
-			double deviate1 = vRating1.get(fieldId).value - this.ratingMedian;
-			double deviate2 = vRating2.get(fieldId).value - this.ratingMedian;
-			
-			VX  += deviate1 * deviate1;
-			VY  += deviate2 * deviate2;
-			VXY += deviate1 * deviate2;
-		}
-		
-		if (VX == 0 || VY == 0)
-			return Constants.UNUSED;
-		else
-			return VXY / Math.sqrt(VX * VY);
+		return Util.isUsed(ratingMedian) ? vRating1.cosine(vRating2, ratingMedian) : vRating1.cosine(vRating2);
 	}
 	
 	
@@ -1023,7 +1006,6 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 		if (common.size() == 0) return Constants.UNUSED;
 		
 		double sum = 0;
-		double maxRating = this.config.getMaxRating();
 		for (int id : common) {
 			double d = (vRating1.get(id).value - vRating2.get(id).value);
 			sum += d*d;
@@ -1032,8 +1014,10 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 		boolean fraction = config.getAsBoolean(MSD_FRACTION_FIELD);
 		if (fraction)
 			return 1 / (1 + sum/common.size());
-		else
+		else {
+			double maxRating = getMaxRating();
 			return 1.0 - sum/(common.size()*maxRating*maxRating);
+		}
 	}
 	
 	

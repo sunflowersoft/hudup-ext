@@ -99,7 +99,7 @@ public class BnetCF extends BnetCFAbstract {
 		if (bnet == null)
 			return result;
 		
-		double minRating = config.getMinRating();
+		double minRating = getMinRating();
 		Evidence ev = BnetUtil.createItemEvidence(
 				bnet.getNodeList(), 
 				param.ratingVector, 

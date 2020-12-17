@@ -57,6 +57,12 @@ public interface RecommenderRemoteTask extends AlgRemoteTask {
 	 * The input parameters are a recommendation parameter and a set of item (user) identifiers.
 	 * The output result is a set of predictive or estimated rating values of items (users) specified by the second input parameter.
 	 * @param param recommendation parameter. Please see {@link RecommendParam} for more details of this parameter.
+	 * There are three cases of <code>param.ratingVector</code>:
+	 * <ol>
+	 * <li>Its id < 0, which indicates it is not stored in training dataset then, caching does not work even though this is cached algorithm.</li>
+	 * <li>Its id &ge; 0 and, it must be empty or the same to the existing one in training dataset. If it is empty, it will be fulfilled as the same to the existing one in training dataset.</li>
+	 * <li>Its id is &ge; 0 but, it is not stored in training dataset then, it must be a full rating vector of a user.</li>
+	 * </ol>
 	 * @param queryIds set of identifications (IDs) of items that need to be estimated their rating values.
 	 * @return rating vector contains estimated rating values of the specified set of IDs of items (users). Return null if cannot estimate.
 	 * @throws RemoteException if any error raises.
@@ -70,6 +76,12 @@ public interface RecommenderRemoteTask extends AlgRemoteTask {
 	 * The input parameters are a recommendation parameter and the maximum recommended items (users) in the returned rating vector.
 	 * The output result is a list of recommended items (users) which is provided to the user (item).
 	 * @param param recommendation parameter. Please see {@link RecommendParam} for more details of this parameter.
+	 * There are three cases of <code>param.ratingVector</code>:
+	 * <ol>
+	 * <li>Its id < 0, which indicates it is not stored in training dataset then, caching does not work even though this is cached algorithm.</li>
+	 * <li>Its id &ge; 0 and, it must be empty or the same to the existing one in training dataset. If it is empty, it will be fulfilled as the same to the existing one in training dataset.</li>
+	 * <li>Its id is &ge; 0 but, it is not stored in training dataset then, it must be a full rating vector of a user.</li>
+	 * </ol>
 	 * @param maxRecommend the maximum recommended items (users) in the returned rating vector.
 	 * @return list of recommended items (users) which is provided to the user (item), represented by {@link RatingVector} class. The number of items (users) of such list is specified by the the maximum number. Return null if cannot estimate.
 	 * @throws RemoteException if any error raises.

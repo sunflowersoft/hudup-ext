@@ -55,13 +55,11 @@ public abstract class Accuracy extends DefaultMetric {
 	 */
 	public Accuracy() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
 	
 	@Override
 	public boolean recalc(Object... params) throws RemoteException {
-		// TODO Auto-generated method stub
 		if (params == null || params.length < 2)
 			return false;
 		
@@ -86,8 +84,6 @@ public abstract class Accuracy extends DefaultMetric {
 	 * @return {@link MetricValue} at an iteration.
 	 */
 	protected MetricValue calc(RatingVector recommended, Dataset testing) {
-		// TODO Auto-generated method stub
-		
 		RatingVector vTesting = testing.getUserRating(recommended.id());
 		return calc(recommended, vTesting, testing);
 	}
@@ -168,7 +164,6 @@ public abstract class Accuracy extends DefaultMetric {
 	 * @return number of relevant (irrelevant) ratings.
 	 */
 	public static int countForRelevant(RatingVector vRating, boolean relevant, double minRating, double maxRating) {
-		
 		Set<Integer> fieldIds = vRating.fieldIds(true);
 		int count = 0;
 		for (int fieldId : fieldIds) {
@@ -238,7 +233,6 @@ public abstract class Accuracy extends DefaultMetric {
 	 * @return new rating vector whose items are rated in the specified testing dataset.
 	 */
 	protected static RatingVector pruneUnrated(RatingVector recommended, Dataset dataset) {
-		
 		RatingVector prune = recommended.newInstance();
 		Set<Integer> fieldIds = recommended.fieldIds(true);
 		for (int fieldId : fieldIds) {

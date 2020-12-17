@@ -18,7 +18,7 @@ import net.hudup.core.data.RatingVector;
 import net.hudup.core.logistic.LogUtil;
 
 /**
- * This class sets up an advanced version of 2-dimensional neighbor collaborative filtering (Neighbor CF) algorithm.
+ * This class sets up an advanced version of 2-dimensional nearest neighbors collaborative filtering algorithm.
  * 
  * @author Loc Nguyen
  * @version 1.0
@@ -80,8 +80,9 @@ public class NeighborCF2d extends NeighborCFUserBased {
 		RatingVector result = thisUser.newInstance(true);
 //		boolean hybrid = config.getAsBoolean(HYBRID);
 //		Profile userProfile1 = hybrid ? param.profile : null;
-		double minValue = config.getMinRating();
-		double maxValue = config.getMaxRating();
+		double minValue = getMinRating();
+		double maxValue = getMaxRating();
+		boolean isUsedMinMax = isUsedMinMaxRating();; 
 		Fetcher<RatingVector> userRatings = dataset.fetchUserRatings();
 		Fetcher<RatingVector> itemRatings = dataset.fetchItemRatings();
 		for (int itemId : queryIds) {
@@ -155,8 +156,8 @@ public class NeighborCF2d extends NeighborCFUserBased {
 			if (simTotal == 0) continue;
 			
 			double value = accum / simTotal;
-			value = (Util.isUsed(maxValue)) && (!Double.isNaN(maxValue)) ? Math.min(value, maxValue) : value;
-			value = (Util.isUsed(minValue)) && (!Double.isNaN(minValue)) ? Math.max(value, minValue) : value;
+			value = isUsedMinMax ? Math.min(value, maxValue) : value;
+			value = isUsedMinMax ? Math.max(value, minValue) : value;
 			result.put(itemId, value);
 		}
 		
@@ -184,7 +185,7 @@ public class NeighborCF2d extends NeighborCFUserBased {
 
 	@Override
 	public String getDescription() throws RemoteException {
-		return "Two-dimension collaborative filtering algorithm";
+		return "Two-dimension nearest neighbors collaborative filtering algorithm";
 	}
 
 

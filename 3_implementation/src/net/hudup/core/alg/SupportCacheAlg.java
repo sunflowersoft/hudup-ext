@@ -75,7 +75,6 @@ public interface SupportCacheAlg extends Alg {
 	 * @return the result which is put into the specified cache.
 	 */
 	static Object cacheTask(SupportCacheAlg alg, int id1, int id2, Map<Integer, Map<Integer, Object>> cache, Task task, Object...params) {
-		// TODO Auto-generated method stub
 		if (!alg.isCached() || id1 < 0 || id2 < 0) //Negative ID indicate unknown user/item that do not exist in dataset.
 			return task.perform(params);
 		

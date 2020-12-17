@@ -91,13 +91,11 @@ public abstract class SvdGradientPlusKB extends SvdGradientKB {
 	 */
 	public SvdGradientPlusKB() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 	
 	
 	@Override
 	protected double estimateByIndex(int userIndex, int itemIndex) {
-		// TODO Auto-generated method stub
 		Vector Pu = userFactors.get(userIndex);
 		Vector Qi = itemFactors.get(itemIndex);
 		Vector Ru = userImplicitRatedVector(userIndex);
@@ -111,7 +109,6 @@ public abstract class SvdGradientPlusKB extends SvdGradientKB {
 
 	@Override
 	protected boolean learn_initialize(RatingMatrix userMatrix) {
-		// TODO Auto-generated method stub
 		if (!super.learn_initialize(userMatrix))
 			return false;
 		
@@ -155,7 +152,6 @@ public abstract class SvdGradientPlusKB extends SvdGradientKB {
 
 	@Override
 	protected void learn_main(RatingMatrix userMatrix) {
-		// TODO Auto-generated method stub
 		double precision = getConfig().getAsReal(PRECISION);
 		if (precision == 0)
 			precision = 1;
@@ -258,7 +254,6 @@ public abstract class SvdGradientPlusKB extends SvdGradientKB {
 
 	@Override
 	protected void destroyDataStructure() {
-		// TODO Auto-generated method stub
 		super.destroyDataStructure();
 		
 		userRatedIndexes.clear();
@@ -268,7 +263,6 @@ public abstract class SvdGradientPlusKB extends SvdGradientKB {
 
 	@Override
 	public void load0() {
-		// TODO Auto-generated method stub
 		super.load0();
 		
 		UriAdapter adapter = null;
@@ -323,7 +317,6 @@ public abstract class SvdGradientPlusKB extends SvdGradientKB {
 	
 	@Override
 	public void export0(DataConfig storeConfig) {
-		// TODO Auto-generated method stub
 		super.export0(storeConfig);
 		
 		try {
@@ -432,7 +425,6 @@ public abstract class SvdGradientPlusKB extends SvdGradientKB {
 
 			@Override
 			public String getName() {
-				// TODO Auto-generated method stub
 				return cf.getName();
 			}
 		};

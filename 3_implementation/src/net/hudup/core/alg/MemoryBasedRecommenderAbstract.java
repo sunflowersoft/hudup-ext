@@ -37,18 +37,6 @@ public abstract class MemoryBasedRecommenderAbstract extends RecommenderAbstract
 
 	
 	/**
-	 * Fast recommendation mode.
-	 */
-	public static final String FAST_RECOMMEND = "fast_recommend";
-
-	
-	/**
-	 * Default value for the fast recommendation mode.
-	 */
-	public static final boolean FAST_RECOMMEND_DEFAULT = false;
-
-	
-	/**
 	 * Internal dataset.
 	 */
 	protected Dataset dataset = null;
@@ -59,13 +47,11 @@ public abstract class MemoryBasedRecommenderAbstract extends RecommenderAbstract
 	 */
 	public MemoryBasedRecommenderAbstract() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
 	
 	@Override
 	public synchronized void setup(Dataset dataset, Object...params) throws RemoteException {
-		// TODO Auto-generated method stub
 		unsetup();
 
 		this.dataset = dataset;
@@ -78,7 +64,6 @@ public abstract class MemoryBasedRecommenderAbstract extends RecommenderAbstract
 	
 	@Override
 	public synchronized void unsetup() throws RemoteException {
-		// TODO Auto-generated method stub
 		super.unsetup();
 		
 		this.config.setMetadata(null);
@@ -105,7 +90,8 @@ public abstract class MemoryBasedRecommenderAbstract extends RecommenderAbstract
 		Fetcher<RatingVector> items = dataset.fetchItemRatings();
 		
 		List<Pair> pairs = Util.newList();
-		double maxRating = config.getMaxRating(); //Bug fixing date: 2019.07.13 by Loc Nguyen
+		double maxRating = getMaxRating(); //Bug fixing date: 2019.07.13 by Loc Nguyen
+		boolean isUsedMinMax = isUsedMinMaxRating();
 		try {
 			while (items.next()) {
 				RatingVector item = items.pick();
@@ -126,7 +112,7 @@ public abstract class MemoryBasedRecommenderAbstract extends RecommenderAbstract
 				
 				// Finding maximum rating
 				double value = predict.get(itemId).value;
-				if (!Accuracy.isRelevant(value, this))
+				if (isUsedMinMax && (!Accuracy.isRelevant(value, this)))
 					continue;
 				int found = Pair.findIndexOfLessThan(value, pairs);
 				Pair pair = new Pair(itemId, value);
@@ -138,7 +124,7 @@ public abstract class MemoryBasedRecommenderAbstract extends RecommenderAbstract
 				int n = pairs.size();
 				if (maxRecommend > 0 && n >= maxRecommend) {
 					Pair last = pairs.get(n - 1);
-					if (last.value() == maxRating || config.getAsBoolean(FAST_RECOMMEND)) {
+					if (config.getAsBoolean(FAST_RECOMMEND) || (isUsedMinMax && last.value() == maxRating)) {
 						if (n > maxRecommend) pairs.remove(n - 1);
 						break;
 					}
@@ -175,16 +161,7 @@ public abstract class MemoryBasedRecommenderAbstract extends RecommenderAbstract
 	
 	@Override
 	public String[] getBaseRemoteInterfaceNames() throws RemoteException {
-		// TODO Auto-generated method stub
 		return new String[] {RecommenderRemote.class.getName(), MemoryBasedAlgRemote.class.getName()};
-	}
-
-
-	@Override
-	public DataConfig createDefaultConfig() {
-		DataConfig config = super.createDefaultConfig();
-		config.put(FAST_RECOMMEND, FAST_RECOMMEND_DEFAULT);
-		return config;
 	}
 
 

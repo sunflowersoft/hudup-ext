@@ -24,7 +24,7 @@ import net.hudup.core.data.RatingVector;
 import net.hudup.core.logistic.LogUtil;
 
 /**
- * This class sets up the neighbor collaborative filtering (Neighbor CF) algorithm for users. It extends directly {@link NeighborCF} class.
+ * This class sets up the nearest neighbors collaborative filtering algorithm for users. It extends directly {@link NeighborCF} class.
  * It is often called Neighbor User-Based CF because the similar measure is calculated between two user rating vectors (possibly, plus two user profiles).
  * Note, user rating vector contains all ratings of the same user on many items.
  * This class is completed because it defines the {@link #estimate(RecommendParam, Set)} method.<br>
@@ -66,19 +66,21 @@ public class NeighborCFUserBased extends NeighborCF implements DuplicatableAlg {
 	 * The output result is a set of predictive or estimated rating values of items (users) specified by the second input parameter.
 	 * @param cf current neighbor algorithm.
 	 * @param param recommendation parameter. Please see {@link RecommendParam} for more details of this parameter.
+	 * There are three cases of <code>param.ratingVector</code>:
+	 * <ol>
+	 * <li>Its id < 0, which indicates it is not stored in training dataset then, caching does not work even though this is cached algorithm.</li>
+	 * <li>Its id &ge; 0 and, it must be empty or the same to the existing one in training dataset. If it is empty, it will be fulfilled as the same to the existing one in training dataset.</li>
+	 * <li>Its id is &ge; 0 but, it is not stored in training dataset then, it must be a full rating vector of a user.</li>
+	 * </ol>
 	 * @param queryIds set of identifications (IDs) of items that need to be estimated their rating values.
 	 * @return rating vector contains estimated rating values of the specified set of IDs of items (users). Return null if cannot estimate.
 	 * @throws RemoteException if any error raises.
 	 */
 	public static RatingVector estimate(NeighborCF cf, RecommendParam param, Set<Integer> queryIds) throws RemoteException {
-		/*
-		 * There are three cases of param.ratingVector:
-		 * 1. Its id is < 0, which indicates it is not stored in training dataset then, caching does not work even though this is cached algorithm.
-		 * 2. Its id is >= 0 and, it must be empty or the same to the existing one in training dataset. If it is empty, it will be fulfilled as the same to the existing one in training dataset.
-		 * 3. Its id is >= 0 but, it is not stored in training dataset then, it must be a full rating vector of a user.
-		 */
-		
-		if (cf.getConfig().getAsBoolean(FAST_RECOMMEND)) return estimateFast(cf, param, queryIds);
+		int knn = cf.getConfig().getAsInt(KNN);
+		knn = knn < 0 ? 0 : knn;
+		if (cf.getConfig().getAsBoolean(FAST_RECOMMEND) && knn > 0)
+			return estimateFast(cf, param, queryIds);
 		
 		if (param.ratingVector == null) return null;
 		
@@ -98,13 +100,12 @@ public class NeighborCFUserBased extends NeighborCF implements DuplicatableAlg {
 		RatingVector result = thisUser.newInstance(true);
 		boolean hybrid = cf.getConfig().getAsBoolean(HYBRID);
 		Profile thisProfile = hybrid ? param.profile : null;
-		double minValue = cf.getConfig().getMinRating();
-		double maxValue = cf.getConfig().getMaxRating();
+		double minValue = cf.getMinRating();
+		double maxValue = cf.getMaxRating();
+		boolean isUsedMinMax = cf.isUsedMinMaxRating();
 		double thisMean = thisUser.mean();
 		Map<Integer, Double> localUserSimCache = Util.newMap();
 		Fetcher<RatingVector> userRatings = cf.getDataset().fetchUserRatings();
-		int knn = cf.getConfig().getAsInt(KNN);
-		knn = knn < 0 ? 0 : knn;
 		for (int itemId : queryIds) {
 			if (thisUser.isRated(itemId)) {
 				result.put(itemId, thisUser.get(itemId));
@@ -180,8 +181,8 @@ public class NeighborCFUserBased extends NeighborCF implements DuplicatableAlg {
 			if (!calculated) continue;
 			
 			double value = simTotal == 0 ? thisMean : thisMean + accum / simTotal;
-			value = (Util.isUsed(maxValue)) && (!Double.isNaN(maxValue)) ? Math.min(value, maxValue) : value;
-			value = (Util.isUsed(minValue)) && (!Double.isNaN(minValue)) ? Math.max(value, minValue) : value;
+			value = isUsedMinMax ? Math.min(value, maxValue) : value;
+			value = isUsedMinMax ? Math.max(value, minValue) : value;
 			result.put(itemId, value);
 		}
 		
@@ -201,17 +202,17 @@ public class NeighborCFUserBased extends NeighborCF implements DuplicatableAlg {
 	 * Estimate rating values of given items (users) in fast recommendation mode. This method is the second version.
 	 * @param cf current neighbor algorithm.
 	 * @param param recommendation parameter. Please see {@link RecommendParam} for more details of this parameter.
+	 * There are three cases of <code>param.ratingVector</code>:
+	 * <ol>
+	 * <li>Its id < 0, which indicates it is not stored in training dataset then, caching does not work even though this is cached algorithm.</li>
+	 * <li>Its id &ge; 0 and, it must be empty or the same to the existing one in training dataset. If it is empty, it will be fulfilled as the same to the existing one in training dataset.</li>
+	 * <li>Its id is &ge; 0 but, it is not stored in training dataset then, it must be a full rating vector of a user.</li>
+	 * </ol>
 	 * @param queryIds set of identifications (IDs) of items that need to be estimated their rating values.
 	 * @return rating vector contains estimated rating values of the specified set of IDs of items (users). Return null if cannot estimate.
 	 * @throws RemoteException if any error raises.
 	 */
 	private static RatingVector estimateFast(NeighborCF cf, RecommendParam param, Set<Integer> queryIds) throws RemoteException {
-		/*
-		 * There are three cases of param.ratingVector:
-		 * 1. Its id is < 0, which indicates it is not stored in training dataset then, caching does not work even though this is cached algorithm.
-		 * 2. Its id is >= 0 and, it must be empty or the same to the existing one in training dataset. If it is empty, it will be fulfilled as the same to the existing one in training dataset.
-		 * 3. Its id is >= 0 but, it is not stored in training dataset then, it must be a full rating vector of a user.
-		 */
 		if (param.ratingVector == null) return null;
 		
 		RatingVector thisUser = param.ratingVector;
@@ -239,8 +240,9 @@ public class NeighborCFUserBased extends NeighborCF implements DuplicatableAlg {
 		if (pairs.size() == 0) return null;
 		
 		RatingVector result = thisUser.newInstance(true);
-		double minValue = cf.getConfig().getMinRating();
-		double maxValue = cf.getConfig().getMaxRating();
+		double minValue = cf.getMinRating();
+		double maxValue = cf.getMaxRating();
+		boolean isUsedMinMax = cf.isUsedMinMaxRating();; 
 		double thisMean = thisUser.mean();
 		for (int itemId : queryIds) {
 			if (thisUser.isRated(itemId)) {
@@ -265,8 +267,8 @@ public class NeighborCFUserBased extends NeighborCF implements DuplicatableAlg {
 			if (!calculated) continue;
 			
 			double value = simTotal == 0 ? thisMean : thisMean + accum / simTotal;
-			value = (Util.isUsed(maxValue)) && (!Double.isNaN(maxValue)) ? Math.min(value, maxValue) : value;
-			value = (Util.isUsed(minValue)) && (!Double.isNaN(minValue)) ? Math.max(value, minValue) : value;
+			value = isUsedMinMax ? Math.min(value, maxValue) : value;
+			value = isUsedMinMax ? Math.max(value, minValue) : value;
 			result.put(itemId, value);
 		}
 		
@@ -292,7 +294,7 @@ public class NeighborCFUserBased extends NeighborCF implements DuplicatableAlg {
 		try {
 			while (userRatings.next()) {
 				RatingVector thatUser = userRatings.pick();
-				if (thatUser == null || thatUser.id()== thisUser.id())
+				if (thatUser == null || thatUser.id() == thisUser.id())
 					continue;
 				
 				Profile thatProfile = hybrid ? cf.getDataset().getUserProfile(thatUser.id()) : null;

@@ -171,8 +171,6 @@ public abstract class SvdGradientKB extends KBaseRecommendIntegrated {
 	 */
 	public SvdGradientKB() {
 		super();
-		// TODO Auto-generated constructor stub
-		
 	}
 
 	
@@ -567,8 +565,6 @@ public abstract class SvdGradientKB extends KBaseRecommendIntegrated {
 	
 	@Override
 	public boolean isEmpty() throws RemoteException {
-		// TODO Auto-generated method stub
-		
 		return !Util.isUsed(avgRating);
 	}
 
@@ -588,7 +584,6 @@ public abstract class SvdGradientKB extends KBaseRecommendIntegrated {
 	
 	@Override
 	public Inspector getInspector() {
-		// TODO Auto-generated method stub
 		return new SvdGradientInspector();
 	}
 
@@ -634,7 +629,6 @@ public abstract class SvdGradientKB extends KBaseRecommendIntegrated {
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					// TODO Auto-generated method stub
 					dispose();
 				}
 			});
@@ -644,7 +638,6 @@ public abstract class SvdGradientKB extends KBaseRecommendIntegrated {
 		
 		@Override
 		public void inspect() {
-			// TODO Auto-generated method stub
 			setVisible(true);
 		}
 		
@@ -723,7 +716,6 @@ public abstract class SvdGradientKB extends KBaseRecommendIntegrated {
 			
 			@Override
 			public String getName() {
-				// TODO Auto-generated method stub
 				return cf.getName();
 			}
 		};

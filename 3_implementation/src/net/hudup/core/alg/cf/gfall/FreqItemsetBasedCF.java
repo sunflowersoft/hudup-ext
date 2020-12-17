@@ -78,7 +78,6 @@ public abstract class FreqItemsetBasedCF extends ModelBasedCFAbstract {
 	 */
 	public FreqItemsetBasedCF() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
 
@@ -211,12 +210,12 @@ public abstract class FreqItemsetBasedCF extends ModelBasedCFAbstract {
 		if (fiKb.isEmpty())
 			return null;
 		
-		double avgRating = (config.getMaxRating() + config.getMinRating()) / 2.0; 
+		double avgRating = Constants.UNUSED;
+		if (isUsedMinMaxRating()) avgRating = (getMaxRating() + getMinRating()) / 2.0;
 		Estimate estimate = estimate(param, null, avgRating, new RatingFilter() {
 
 			@Override
 			public boolean accept(double ratingValue, double referredRatingValue) {
-				// TODO Auto-generated method stub
 				//Fixing date: 2019.08.21 by Loc Nguyen.
 				return Accuracy.isRelevant(ratingValue, referredRatingValue); /*ratingValue >= referredRatingValue;*/
 			}
@@ -355,7 +354,6 @@ abstract class FreqItemsetKB extends KBaseAbstract {
 	
 	@Override
 	public void load() throws RemoteException {
-		// TODO Auto-generated method stub
 		super.load();
 		
 		UriAdapter adapter = null;
@@ -376,7 +374,6 @@ abstract class FreqItemsetKB extends KBaseAbstract {
 						
 						@Override
 						public void process(String line) {
-							// TODO Auto-generated method stub
 							FreqResult result = new FreqResult();
 							result.parseText(line);
 							
@@ -427,7 +424,6 @@ abstract class FreqItemsetKB extends KBaseAbstract {
 	
 	@Override
 	public void learn(Dataset dataset, Alg alg) throws RemoteException {
-		// TODO Auto-generated method stub
 		super.learn(dataset, alg);
 		
 		BitData bitData = BitData.create(dataset);
@@ -468,8 +464,6 @@ abstract class FreqItemsetKB extends KBaseAbstract {
 	
 	@Override
 	public void save(DataConfig storeConfig) throws RemoteException {
-		// TODO Auto-generated method stub
-		
 		super.save(storeConfig);
 		
 		UriAdapter adapter = null;
@@ -523,14 +517,12 @@ abstract class FreqItemsetKB extends KBaseAbstract {
 	
 	@Override
 	public boolean isEmpty() throws RemoteException {
-		// TODO Auto-generated method stub
 		return freqResults.size() == 0;
 	}
 
 	
 	@Override
 	public void close() throws Exception {
-		// TODO Auto-generated method stub
 		super.close();
 		
 		freqResults.clear();
@@ -661,7 +653,6 @@ abstract class FreqItemsetKB extends KBaseAbstract {
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					// TODO Auto-generated method stub
 					dispose();
 				}
 			});
@@ -671,7 +662,6 @@ abstract class FreqItemsetKB extends KBaseAbstract {
 		
 		@Override
 		public void inspect() {
-			// TODO Auto-generated method stub
 			setVisible(true);
 		}
 		
@@ -680,7 +670,6 @@ abstract class FreqItemsetKB extends KBaseAbstract {
 	
 	@Override
 	public Inspector getInspector() {
-		// TODO Auto-generated method stub
 		return new FreqItemsetInspector();
 	}
 
@@ -700,7 +689,6 @@ abstract class FreqItemsetKB extends KBaseAbstract {
 
 			@Override
 			public String getName() {
-				// TODO Auto-generated method stub
 				return cf.getName();
 			}
 

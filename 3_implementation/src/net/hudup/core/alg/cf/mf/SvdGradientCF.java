@@ -94,7 +94,6 @@ public class SvdGradientCF extends ModelBasedCFAbstract {
 	
 	@Override
 	public synchronized RatingVector recommend(RecommendParam param, int maxRecommend) throws RemoteException {
-		
 		SvdGradientKB kb = (SvdGradientKB) getKBase();
 		if (kb.isEmpty())
 			return null;
@@ -112,14 +111,16 @@ public class SvdGradientCF extends ModelBasedCFAbstract {
 				queryIds.add(itemId);
 		}
 		
-		double maxRating = config.getMaxRating();
+		double maxRating = getMaxRating();
+		boolean isUsedMinMax = isUsedMinMaxRating();
 		int userId = param.ratingVector.id();
 		
 		List<Pair> pairs = Util.newList();
 		for (int itemId : queryIds) {
 			
 			double value = kb.estimate(userId, itemId);
-			if (!Util.isUsed(value) || !Accuracy.isRelevant(value, this))
+			if (!Util.isUsed(value)) continue;
+			if (isUsedMinMax && (!Accuracy.isRelevant(value, this)))
 				continue;
 			
 			// Finding maximum rating
@@ -131,27 +132,22 @@ public class SvdGradientCF extends ModelBasedCFAbstract {
 				pairs.add(found, pair);
 			
 			int n = pairs.size();
-			// Having maxRecommend + 1 if all are maximum rating.
 			if (maxRecommend > 0 && n >= maxRecommend) {
-				int lastIndex = n - 1;
-				Pair last = pairs.get(lastIndex);
-				if (last.value() == maxRating)
+				Pair last = pairs.get(n - 1);
+				if (config.getAsBoolean(FAST_RECOMMEND) || (isUsedMinMax && last.value() == maxRating)) {
+					if (n > maxRecommend) pairs.remove(n - 1);
 					break;
+				}
 				else if (n > maxRecommend)
-					pairs.remove(lastIndex);
+					pairs.remove(n - 1);
 			}
 			
 		}
 		
-		int n = pairs.size();
-		if (maxRecommend > 0 && n > maxRecommend) {
-			if (pairs.size() == maxRecommend + 1)
-				pairs.remove(n - 1); //Remove the redundant recommended item because the pair list has almost maxRecommend + 1 pairs.
-			else
-				pairs = pairs.subList(0, maxRecommend); //The pair list has at most maxRecommend + 1 pairs and so this code line is for safe.
+		if (maxRecommend > 0 && pairs.size() > maxRecommend) {
+			pairs = pairs.subList(0, maxRecommend); //This code line is for safe in case that there are maxRecommend+1 items.
 		}
-		if (pairs.size() == 0)
-			return null;
+		if (pairs.size() == 0) return null;
 		
 		RatingVector rec = param.ratingVector.newInstance(true);
 		Pair.fillRatingVector(rec, pairs);
@@ -186,7 +182,7 @@ public class SvdGradientCF extends ModelBasedCFAbstract {
 //				queryIds.add(itemId);
 //		}
 //		
-//		double maxRating = config.getMaxRating();
+//		double maxRating = getMaxRating();
 //		int userId = param.ratingVector.id();
 //		
 //		List<Pair> pairs = Util.newList();
