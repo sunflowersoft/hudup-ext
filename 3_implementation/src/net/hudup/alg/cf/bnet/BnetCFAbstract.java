@@ -94,8 +94,7 @@ public abstract class BnetCFAbstract extends ModelBasedCFAbstract {
 				queryIds.add(itemId);
 		}
 		
-		double avgRating = Constants.UNUSED;
-		if (isUsedMinMaxRating()) avgRating = (getMaxRating() + getMinRating()) / 2.0;
+		double avgRating = (getMaxRating() + getMinRating()) / 2.0;
 		List<ValueTriple> triples = bnetEstimate(param, queryIds, avgRating, new RatingFilter() {
 
 			@Override

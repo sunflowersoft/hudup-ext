@@ -145,11 +145,11 @@ public class RecommenderRemoteWrapper extends AlgRemoteWrapper implements Recomm
 	
 	
 	/**
-	 * Checking whether minimum rating and maximum are used.
-	 * @return whether minimum rating and maximum are used.
+	 * Checking whether minimum rating and maximum rating are bounded.
+	 * @return whether minimum rating and maximum rating are bounded.
 	 */
-	public boolean isUsedMinMaxRating() {
-		return !getConfig().getAsBoolean(RecommenderAbstract.IGNORE_MINMAX_RATING)
+	public boolean isBoundedMinMaxRating() {
+		return getConfig().getAsBoolean(RecommenderAbstract.MINMAX_RATING_BOUND)
 				&& Util.isUsed(getMinRating()) && Util.isUsed(getMaxRating()); 
 	}
 

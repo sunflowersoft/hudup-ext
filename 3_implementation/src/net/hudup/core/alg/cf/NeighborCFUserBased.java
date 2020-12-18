@@ -102,7 +102,7 @@ public class NeighborCFUserBased extends NeighborCF implements DuplicatableAlg {
 		Profile thisProfile = hybrid ? param.profile : null;
 		double minValue = cf.getMinRating();
 		double maxValue = cf.getMaxRating();
-		boolean isUsedMinMax = cf.isUsedMinMaxRating();
+		boolean isBoundedMinMax = cf.isBoundedMinMaxRating();
 		double thisMean = thisUser.mean();
 		Map<Integer, Double> localUserSimCache = Util.newMap();
 		Fetcher<RatingVector> userRatings = cf.getDataset().fetchUserRatings();
@@ -181,8 +181,8 @@ public class NeighborCFUserBased extends NeighborCF implements DuplicatableAlg {
 			if (!calculated) continue;
 			
 			double value = simTotal == 0 ? thisMean : thisMean + accum / simTotal;
-			value = isUsedMinMax ? Math.min(value, maxValue) : value;
-			value = isUsedMinMax ? Math.max(value, minValue) : value;
+			value = isBoundedMinMax ? Math.min(value, maxValue) : value;
+			value = isBoundedMinMax ? Math.max(value, minValue) : value;
 			result.put(itemId, value);
 		}
 		
@@ -242,7 +242,7 @@ public class NeighborCFUserBased extends NeighborCF implements DuplicatableAlg {
 		RatingVector result = thisUser.newInstance(true);
 		double minValue = cf.getMinRating();
 		double maxValue = cf.getMaxRating();
-		boolean isUsedMinMax = cf.isUsedMinMaxRating();; 
+		boolean isBoundedMinMax = cf.isBoundedMinMaxRating();; 
 		double thisMean = thisUser.mean();
 		for (int itemId : queryIds) {
 			if (thisUser.isRated(itemId)) {
@@ -267,8 +267,8 @@ public class NeighborCFUserBased extends NeighborCF implements DuplicatableAlg {
 			if (!calculated) continue;
 			
 			double value = simTotal == 0 ? thisMean : thisMean + accum / simTotal;
-			value = isUsedMinMax ? Math.min(value, maxValue) : value;
-			value = isUsedMinMax ? Math.max(value, minValue) : value;
+			value = isBoundedMinMax ? Math.min(value, maxValue) : value;
+			value = isBoundedMinMax ? Math.max(value, minValue) : value;
 			result.put(itemId, value);
 		}
 		

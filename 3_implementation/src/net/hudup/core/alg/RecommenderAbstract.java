@@ -41,15 +41,27 @@ public abstract class RecommenderAbstract extends AlgAbstract implements Recomme
 
 	
 	/**
-	 * Mode of ignoring minimum rating and maximum rating.
+	 * Mode of bounding minimum rating and maximum rating.
 	 */
-	public static final String IGNORE_MINMAX_RATING = "ignore_minmax_rating";
+	public static final String MINMAX_RATING_BOUND = "minmax_rating_bound";
 
 	
 	/**
-	 * Default value for mode of ignoring minimum rating and maximum rating.
+	 * Default value for mode of bound minimum rating and maximum rating.
 	 */
-	public static final boolean IGNORE_MINMAX_RATING_DEFAULT = false;
+	public static final boolean MINMAX_RATING_BOUND_DEFAULT = true;
+
+	
+	/**
+	 * Re-configuring minimum-maximum ratings mode.
+	 */
+	public static final String MINMAX_RATING_RECONFIG = "minmax_rating_reconfig";
+
+	
+	/**
+	 * Default value for re-configuring minimum-maximum ratings mode.
+	 */
+	public static final boolean MINMAX_RATING_RECONFIG_DEFAULT = false;
 
 	
 	/**
@@ -82,7 +94,7 @@ public abstract class RecommenderAbstract extends AlgAbstract implements Recomme
 	
 	@Override
 	public synchronized void unsetup() throws RemoteException {
-		filterList.clear();
+		if (filterList != null) filterList.clear();
 		Dataset dataset = getDataset();
 		if (dataset != null && dataset.isExclusive())
 			dataset.clear();
@@ -100,7 +112,6 @@ public abstract class RecommenderAbstract extends AlgAbstract implements Recomme
 		
 		List<Pair> pairs = Util.newList();
 		double maxRating = getMaxRating(); //Bug fixing date: 2019.07.13 by Loc Nguyen
-		boolean isUsedMinMax = isUsedMinMaxRating();
 		try {
 			while (items.next()) {
 				RatingVector item = items.pick();
@@ -121,7 +132,7 @@ public abstract class RecommenderAbstract extends AlgAbstract implements Recomme
 				
 				// Finding maximum rating
 				double value = predict.get(itemId).value;
-				if (isUsedMinMax && (!Accuracy.isRelevant(value, this)))
+				if (!Accuracy.isRelevant(value, this))
 					continue;
 				int found = Pair.findIndexOfLessThan(value, pairs);
 				Pair pair = new Pair(itemId, value);
@@ -133,7 +144,7 @@ public abstract class RecommenderAbstract extends AlgAbstract implements Recomme
 				int n = pairs.size();
 				if (maxRecommend > 0 && n >= maxRecommend) {
 					Pair last = pairs.get(n - 1);
-					if (config.getAsBoolean(FAST_RECOMMEND) || (isUsedMinMax && last.value() == maxRating)) {
+					if (getConfig().getAsBoolean(FAST_RECOMMEND) || last.value() >= maxRating) {
 						if (n > maxRecommend) pairs.remove(n - 1);
 						break;
 					}
@@ -259,15 +270,69 @@ public abstract class RecommenderAbstract extends AlgAbstract implements Recomme
 	
 	
 	/**
-	 * Checking whether minimum rating and maximum are used.
-	 * @return whether minimum rating and maximum are used.
+	 * Checking whether minimum rating and maximum rating are bounded.
+	 * @return whether minimum rating and maximum rating are bounded.
 	 */
-	public boolean isUsedMinMaxRating() {
-		return !getConfig().getAsBoolean(IGNORE_MINMAX_RATING)
+	public boolean isBoundedMinMaxRating() {
+		return getConfig().getAsBoolean(MINMAX_RATING_BOUND)
 				&& Util.isUsed(getMinRating()) && Util.isUsed(getMaxRating()); 
 	}
 	
 
+	/**
+	 * Re-configuring minimum rating and maximum rating.
+	 * @param config specified configuration.
+	 * @param dataset specified dataset.
+	 */
+	public static void reconfigMinMaxRating(DataConfig config, Dataset dataset) {
+		if (config == null || dataset == null) return;
+
+		double minRating = Double.MAX_VALUE;
+		double maxRating = Double.MIN_VALUE;
+		Fetcher<RatingVector> users = null;
+		boolean success = true;
+		try {
+			users = dataset.fetchUserRatings();
+			while (users.next()) {
+				RatingVector user = users.pick();
+				if (user == null) continue;
+				
+				Set<Integer> itemIds = user.fieldIds(true);
+				for (int itemId : itemIds) {
+					double value = user.get(itemId).value;
+					if (value < minRating) minRating = value;
+					if (value > maxRating) maxRating = value;
+				}
+			}
+		}
+		catch (Exception e) {
+			LogUtil.trace(e);
+			success = false;
+		}
+		finally {
+			if (users != null) {
+				try {
+					users.close();
+				} catch (Exception e) {LogUtil.trace(e);}
+			}
+		}
+		if (!success) return;
+		
+		try {
+			double cfgMinRating = config.getMinRating();
+			double cfgMaxRating = config.getMaxRating();
+			if (cfgMinRating != minRating) {
+				config.put(DataConfig.MIN_RATING_FIELD, minRating);
+				dataset.getConfig().put(DataConfig.MIN_RATING_FIELD, minRating);
+			}
+			if (cfgMaxRating != maxRating) {
+				config.put(DataConfig.MAX_RATING_FIELD, maxRating);
+				dataset.getConfig().put(DataConfig.MAX_RATING_FIELD, maxRating);
+			}
+		} catch (Exception e) {LogUtil.trace(e);}
+	}
+	
+	
 	@Override
 	public synchronized Inspector getInspector() {
 		String desc = "";
@@ -288,8 +353,9 @@ public abstract class RecommenderAbstract extends AlgAbstract implements Recomme
 	@Override
 	public DataConfig createDefaultConfig() {
 		DataConfig config = super.createDefaultConfig();
-		config.put(IGNORE_MINMAX_RATING, IGNORE_MINMAX_RATING_DEFAULT);
+		config.put(MINMAX_RATING_BOUND, MINMAX_RATING_BOUND_DEFAULT);
 		config.put(FAST_RECOMMEND, FAST_RECOMMEND_DEFAULT);
+		config.put(MINMAX_RATING_RECONFIG, MINMAX_RATING_RECONFIG_DEFAULT);
 		return config;
 	}
 

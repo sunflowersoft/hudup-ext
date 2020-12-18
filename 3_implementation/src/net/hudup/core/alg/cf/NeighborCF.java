@@ -75,6 +75,18 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 
 	
 	/**
+	 * Statistics calculation mode.
+	 */
+	public static final String CALC_STATISTICS = "calc_statistics";
+
+	
+	/**
+	 * Default value for statistics calculation mode.
+	 */
+	public static final boolean CALC_STATISTICS_DEFAULT = true;
+
+	
+	/**
 	 * In the configuration, the entry of similarity measure has the name specified by this constant.
 	 */
 	public static final String MEASURE = "measure";
@@ -185,7 +197,7 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 	/**
 	 * Cosine normalized mode.
 	 */
-	public static final String COSINE_NORMALIZED_FIELD = "cos_normalized";
+	public static final String COSINE_NORMALIZED_FIELD = "cosine_normalized";
 
 	
 	/**
@@ -213,13 +225,13 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 
 	
 	/**
-	 * Rating median.
+	 * General rating median.
 	 */
 	protected double ratingMedian = Constants.UNUSED;
 
 	
 	/**
-	 * General user mean.
+	 * General rating mean.
 	 */
 	protected double ratingMean = Constants.UNUSED;
 
@@ -296,10 +308,13 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 	public synchronized void setup(Dataset dataset, Object...params) throws RemoteException {
 		super.setup(dataset, params);
 		
-		updateUserMeanVars(dataset);
-		updateItemMeanVars(dataset);
-		
-		this.ratingMedian = isUsedMinMaxRating() ? (getMinRating() + getMaxRating()) / 2.0 : this.ratingMean;
+		if (getConfig().getAsBoolean(CALC_STATISTICS)) {
+			updateUserMeanVars(dataset);
+			updateItemMeanVars(dataset);
+		}
+
+		this.ratingMedian = getMinRating() + getMaxRating() / 2.0;
+		this.ratingMedian = Util.isUsed(this.ratingMedian) ? this.ratingMedian : this.ratingMean; 
 	}
 
 
@@ -1115,8 +1130,9 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 	@Override
 	public DataConfig createDefaultConfig() {
 		DataConfig tempConfig = super.createDefaultConfig();
-		tempConfig.put(KNN, KNN_DEFAULT);
 		tempConfig.put(SUPPORT_CACHE_FIELD, SUPPORT_CACHE_DEFAULT);
+		tempConfig.put(KNN, KNN_DEFAULT);
+		tempConfig.put(CALC_STATISTICS, CALC_STATISTICS_DEFAULT);
 		tempConfig.put(MEASURE, getDefaultMeasure()); //tempConfig.addReadOnly(MEASURE);
 		tempConfig.put(HYBRID, false); tempConfig.addInvisible(HYBRID);
 		tempConfig.put(COSINE_NORMALIZED_FIELD, COSINE_NORMALIZED_DEFAULT);

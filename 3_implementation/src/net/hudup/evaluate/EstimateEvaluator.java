@@ -10,9 +10,11 @@ package net.hudup.evaluate;
 import java.rmi.RemoteException;
 import java.util.Set;
 
+import net.hudup.core.Util;
 import net.hudup.core.alg.RecommendParam;
 import net.hudup.core.alg.Recommender;
 import net.hudup.core.alg.SetupAlgEvent;
+import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.DatasetPair;
 import net.hudup.core.data.DatasetUtil;
@@ -115,6 +117,19 @@ public class EstimateEvaluator extends RecommendEvaluator {
 
 					//Auto enhancement after setting up algorithm.
 					SystemUtil.enhanceAuto();
+
+					//Adjusting configurations.
+					double testingMinRating = testing.getConfig().getMinRating();
+					double testingMaxRating = testing.getConfig().getMaxRating();
+					double algMinRating = recommender.getConfig().getMinRating();
+					double algMaxRating = recommender.getConfig().getMaxRating();
+					if (Util.isUsed(algMinRating) && testingMinRating != algMinRating) {
+						testing.getConfig().put(DataConfig.MIN_RATING_FIELD, algMinRating);
+					}
+					if (Util.isUsed(algMaxRating) && testingMaxRating != algMaxRating) {
+						testing.getConfig().put(DataConfig.MAX_RATING_FIELD, algMaxRating);
+					}
+					
 
 					testingUsers = testing.fetchUserRatings();
 					otherResult.vCurrentTotal = testingUsers.getMetadata().getSize();

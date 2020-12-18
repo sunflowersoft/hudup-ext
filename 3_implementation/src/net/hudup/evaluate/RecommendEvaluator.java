@@ -16,8 +16,8 @@ import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.AlgDesc2;
 import net.hudup.core.alg.RecommendParam;
 import net.hudup.core.alg.Recommender;
-import net.hudup.core.alg.RecommenderAbstract;
 import net.hudup.core.alg.SetupAlgEvent;
+import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.DatasetPair;
 import net.hudup.core.data.DatasetUtil;
@@ -183,6 +183,18 @@ public class RecommendEvaluator extends EvaluatorAbstract {
 					//Auto enhancement after setting up algorithm.
 					SystemUtil.enhanceAuto();
 
+					//Adjusting configurations.
+					double testingMinRating = testing.getConfig().getMinRating();
+					double testingMaxRating = testing.getConfig().getMaxRating();
+					double algMinRating = recommender.getConfig().getMinRating();
+					double algMaxRating = recommender.getConfig().getMaxRating();
+					if (Util.isUsed(algMinRating) && testingMinRating != algMinRating) {
+						testing.getConfig().put(DataConfig.MIN_RATING_FIELD, algMinRating);
+					}
+					if (Util.isUsed(algMaxRating) && testingMaxRating != algMaxRating) {
+						testing.getConfig().put(DataConfig.MAX_RATING_FIELD, algMaxRating);
+					}
+					
 					//Initializing parameters for setting up maximum recommendation number by binomial distribution. Added date: 2019.08.23 by Loc Nguyen.
 					double relevantRatio = 0;
 					int totalRatedItemCount = 0;
@@ -190,8 +202,7 @@ public class RecommendEvaluator extends EvaluatorAbstract {
 					boolean heuristicRecommend = false;
 					if (config.isHeuristicRecommend()) {
 						trainingData = trainingData != null ? trainingData : testing; //This is work-around solution, using testing for estimating recommendation number.
-						boolean isUsedMinMax = !recommender.getConfig().getAsBoolean(RecommenderAbstract.IGNORE_MINMAX_RATING)
-								&& Util.isUsed(trainingData.getConfig().getMinRating())
+						boolean isUsedMinMax = Util.isUsed(trainingData.getConfig().getMinRating())
 								&& Util.isUsed(trainingData.getConfig().getMaxRating());
 						
 						if (isUsedMinMax) {

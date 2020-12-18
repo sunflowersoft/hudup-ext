@@ -51,6 +51,9 @@ public abstract class MemoryBasedRecommenderAbstract extends RecommenderAbstract
 		this.config.setMetadata(dataset.getConfig().getMetadata());
 		this.config.addReadOnly(DataConfig.MIN_RATING_FIELD);
 		this.config.addReadOnly(DataConfig.MAX_RATING_FIELD);
+		
+		if (this.config.getAsBoolean(MINMAX_RATING_RECONFIG))
+			reconfigMinMaxRating(this.config, dataset);
 	}
 	
 	

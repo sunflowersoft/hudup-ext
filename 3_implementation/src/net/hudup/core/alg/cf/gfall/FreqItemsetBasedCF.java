@@ -210,8 +210,7 @@ public abstract class FreqItemsetBasedCF extends ModelBasedCFAbstract {
 		if (fiKb.isEmpty())
 			return null;
 		
-		double avgRating = Constants.UNUSED;
-		if (isUsedMinMaxRating()) avgRating = (getMaxRating() + getMinRating()) / 2.0;
+		double avgRating = (getMaxRating() + getMinRating()) / 2.0;
 		Estimate estimate = estimate(param, null, avgRating, new RatingFilter() {
 
 			@Override
@@ -416,7 +415,6 @@ abstract class FreqItemsetKB extends KBaseAbstract {
 			if (adapter != null)
 				adapter.close();
 		}
-		
 		
 	}
 

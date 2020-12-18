@@ -197,11 +197,7 @@ public abstract class SvdGradientKB extends KBaseRecommendIntegrated {
 	protected double estimateByIndex(int userIndex, int itemIndex) {
 		Vector Pu = userFactors.get(userIndex);
 		Vector Qi = itemFactors.get(itemIndex);
-		double estimatedValue = avgRating + userBias.get(userIndex) + itemBias.get(itemIndex) + Pu.product(Qi);
-		estimatedValue = Math.min(estimatedValue, config.getMaxRating());
-		estimatedValue = Math.max(estimatedValue, config.getMinRating());
-		
-		return estimatedValue;
+		return avgRating + userBias.get(userIndex) + itemBias.get(itemIndex) + Pu.product(Qi);
 	}
 	
 	

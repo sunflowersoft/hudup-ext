@@ -809,21 +809,25 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 			return false;
 		}
 
+		//The evaluator is now remote.
 		
+		//This code line is not redundant because the exclusive is set to false so as to prevent the algorithm from unexporting.
 		alg = AlgDesc2.wrapNewInstance(alg, false);
 		if (alg == null) return false;
 		
-		if ((connectInfo.checkPullMode()) || !(alg instanceof AlgRemote)) {
+		if ((connectInfo.checkPullMode()) || !(alg instanceof AlgRemote)) { //Currently, there is no algorithm that does not implement remote interface.
 			try {
-				alg = alg.getClass().getDeclaredConstructor().newInstance();
 				return evaluator.acceptAlg(alg);
-			} catch (Exception e) {
+			}
+			catch (Exception e) {
 				LogUtil.error("Evaluator does not accept algorithm '" + (alg != null ? alg.getName() : "noname") + "' due to " + e.getMessage());
 			}
 			return false;
 		}
 		
 		try {
+			//This code line is not redundant because the remote evaluator can call some methods of the algorithm although such calling is invalid in pull mode.
+			//As usual, the method evaluator#acceptAlg often checks the type of algorithm and so there is now no such calling.
 			((AlgRemote)alg).export(0);
 		}
 		catch (Exception e) {

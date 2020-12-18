@@ -5,7 +5,7 @@
  * Email: ng_phloc@yahoo.com
  * Phone: +84-975250362
  */
-package net.hudup.core.alg.cf;
+package net.hudup.core.alg.cbf;
 
 import net.hudup.core.alg.MemoryBasedRecommender;
 import net.hudup.core.alg.Recommender;
@@ -25,16 +25,15 @@ import net.hudup.core.alg.Recommender;
  * </ul>
  * Both CBF and CF have their own strong and weak points.
  * <br>
- * This interface represents the memory-based recommendation algorithm with collaborative filtering (CF), called {@code memory-based CF recommender}.
- * {@code Memory-based CF recommender} uses rating matrix (as a part of the internal dataset) stored in memory for filtering task in recommendation.
+ * This interface represents the memory-based recommendation algorithm with content-based filtering (CBF), called {@code memory-based CBF recommender}.
+ * {@code Memory-based CBF recommender} uses rating matrix, user profiles, and item profiles (as parts of the internal dataset) stored in memory for filtering task in recommendation.
  * As mentioned, two main methods of any recommender are {@code estimate(...)} and {@code recommend(...)}.
  * 
  * @author Loc Nguyen
- * @version 10.0
+ * @version 1.0
  *
  */
-@CFAnnotation
-public interface MemoryBasedCF extends MemoryBasedRecommender {
+@CBFAnnotation
+public interface MemoryBasedCBF extends MemoryBasedRecommender {
 
-	
 }

@@ -5,19 +5,19 @@
  * Email: ng_phloc@yahoo.com
  * Phone: +84-975250362
  */
-package net.hudup.core.alg.cf;
+package net.hudup.core.alg.cbf;
 
-import net.hudup.core.alg.MemoryBasedRecommenderAbstract;
+import net.hudup.core.alg.ModelBasedRecommenderAbstract;
 
 /**
- * This abstract class implements basically a memory-based collaborative filtering represented by the interface {@link MemoryBasedCF}.
+ * This abstract class implements basically a model-based content-based filtering represented by the interface {@link ModelBasedCBF}.
  *  
  * @author Loc Nguyen
  * @version 10.0
  *
  */
-@CFAnnotation
-public abstract class MemoryBasedCFAbstract extends MemoryBasedRecommenderAbstract implements MemoryBasedCF {
+@CBFAnnotation
+public abstract class ModelBasedCBFAbstract extends ModelBasedRecommenderAbstract implements ModelBasedCBF {
 
 	
 	/**
@@ -29,9 +29,8 @@ public abstract class MemoryBasedCFAbstract extends MemoryBasedRecommenderAbstra
 	/**
 	 * Default constructor.
 	 */
-	public MemoryBasedCFAbstract() {
-		
+	public ModelBasedCBFAbstract() {
+
 	}
-	
-	
+
 }

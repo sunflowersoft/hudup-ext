@@ -48,7 +48,6 @@ public abstract class ModelBasedRecommenderAbstract extends RecommenderAbstract 
 	 */
 	public ModelBasedRecommenderAbstract() {
 		super();
-		// TODO Auto-generated constructor stub
 		
 		try {
 			if (kb == null)
@@ -65,7 +64,6 @@ public abstract class ModelBasedRecommenderAbstract extends RecommenderAbstract 
 
 	@Override
 	public synchronized void setup(Dataset dataset, Object...params) throws RemoteException {
-		// TODO Auto-generated method stub
 		unsetup();
 		
 		if (dataset instanceof KBasePointer) {
@@ -88,7 +86,6 @@ public abstract class ModelBasedRecommenderAbstract extends RecommenderAbstract 
 	
 	@Override
 	public synchronized void unsetup() throws RemoteException {
-		// TODO Auto-generated method stub
 		super.unsetup();
 		if (kb != null) {
 			try {
@@ -126,7 +123,6 @@ public abstract class ModelBasedRecommenderAbstract extends RecommenderAbstract 
 	
 	@Override
 	public Dataset getDataset() throws RemoteException {
-		// TODO Auto-generated method stub
 		if (kb == null) return null;
 		
 		Datasource datasource = kb.getDatasource();
@@ -139,7 +135,6 @@ public abstract class ModelBasedRecommenderAbstract extends RecommenderAbstract 
 
 	@Override
 	public String[] getBaseRemoteInterfaceNames() throws RemoteException {
-		// TODO Auto-generated method stub
 		return new String[] {RecommenderRemote.class.getName(), ModelBasedAlgRemote.class.getName()};
 	}
 
@@ -169,7 +164,6 @@ public abstract class ModelBasedRecommenderAbstract extends RecommenderAbstract 
 
 	@Override
 	public Object learnStart(Object... info) throws RemoteException {
-		// TODO Auto-generated method stub
 		if ((kb != null) && (kb instanceof KBaseRemote))
 			return ((KBaseRemote)kb).learnStart(info);
 		else
@@ -179,7 +173,6 @@ public abstract class ModelBasedRecommenderAbstract extends RecommenderAbstract 
 
 	@Override
 	public synchronized boolean learnPause() throws RemoteException {
-		// TODO Auto-generated method stub
 		if ((kb != null) && (kb instanceof KBaseRemote))
 			return ((KBaseRemote)kb).learnPause();
 		else
@@ -189,7 +182,6 @@ public abstract class ModelBasedRecommenderAbstract extends RecommenderAbstract 
 
 	@Override
 	public synchronized boolean learnResume() throws RemoteException {
-		// TODO Auto-generated method stub
 		if ((kb != null) && (kb instanceof KBaseRemote))
 			return ((KBaseRemote)kb).learnResume();
 		else
@@ -199,7 +191,6 @@ public abstract class ModelBasedRecommenderAbstract extends RecommenderAbstract 
 
 	@Override
 	public synchronized boolean learnStop() throws RemoteException {
-		// TODO Auto-generated method stub
 		if ((kb != null) && (kb instanceof KBaseRemote))
 			return ((KBaseRemote)kb).learnStop();
 		else
@@ -209,7 +200,6 @@ public abstract class ModelBasedRecommenderAbstract extends RecommenderAbstract 
 
 	@Override
 	public boolean learnForceStop() throws RemoteException {
-		// TODO Auto-generated method stub
 		if ((kb != null) && (kb instanceof KBaseRemote))
 			return ((KBaseRemote)kb).learnForceStop();
 		else
@@ -219,7 +209,6 @@ public abstract class ModelBasedRecommenderAbstract extends RecommenderAbstract 
 
 	@Override
 	public boolean isLearnStarted() throws RemoteException {
-		// TODO Auto-generated method stub
 		if ((kb != null) && (kb instanceof KBaseRemote))
 			return ((KBaseRemote)kb).isLearnStarted();
 		else
@@ -229,7 +218,6 @@ public abstract class ModelBasedRecommenderAbstract extends RecommenderAbstract 
 
 	@Override
 	public boolean isLearnPaused() throws RemoteException {
-		// TODO Auto-generated method stub
 		if ((kb != null) && (kb instanceof KBaseRemote))
 			return ((KBaseRemote)kb).isLearnPaused();
 		else
@@ -239,7 +227,6 @@ public abstract class ModelBasedRecommenderAbstract extends RecommenderAbstract 
 
 	@Override
 	public boolean isLearnRunning() throws RemoteException {
-		// TODO Auto-generated method stub
 		if ((kb != null) && (kb instanceof KBaseRemote))
 			return ((KBaseRemote)kb).isLearnRunning();
 		else

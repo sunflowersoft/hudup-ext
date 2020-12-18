@@ -82,7 +82,7 @@ public class NeighborCF2d extends NeighborCFUserBased {
 //		Profile userProfile1 = hybrid ? param.profile : null;
 		double minValue = getMinRating();
 		double maxValue = getMaxRating();
-		boolean isUsedMinMax = isUsedMinMaxRating();; 
+		boolean isBoundedMinMax = isBoundedMinMaxRating();; 
 		Fetcher<RatingVector> userRatings = dataset.fetchUserRatings();
 		Fetcher<RatingVector> itemRatings = dataset.fetchItemRatings();
 		for (int itemId : queryIds) {
@@ -156,8 +156,8 @@ public class NeighborCF2d extends NeighborCFUserBased {
 			if (simTotal == 0) continue;
 			
 			double value = accum / simTotal;
-			value = isUsedMinMax ? Math.min(value, maxValue) : value;
-			value = isUsedMinMax ? Math.max(value, minValue) : value;
+			value = isBoundedMinMax ? Math.min(value, maxValue) : value;
+			value = isBoundedMinMax ? Math.max(value, minValue) : value;
 			result.put(itemId, value);
 		}
 		
