@@ -9,14 +9,11 @@ package net.hudup.core.alg;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
-import java.util.Set;
 
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.Datasource;
-import net.hudup.core.data.Fetcher;
 import net.hudup.core.data.Pointer;
-import net.hudup.core.data.RatingVector;
 import net.hudup.core.logistic.EventListenerList2;
 import net.hudup.core.logistic.Inspector;
 import net.hudup.core.logistic.LogUtil;
@@ -130,53 +127,6 @@ public abstract class KBaseAbstract implements KBase, KBaseRemote {
 	}
 
 
-	/**
-	 * Re-configuring minimum rating and maximum rating.
-	 */
-	protected void reconfigMinMaxRating(Dataset dataset) {
-		if (dataset == null) return;
-		
-		double minRating = Double.MAX_VALUE;
-		double maxRating = Double.MIN_VALUE;
-		Fetcher<RatingVector> users = null;
-		try {
-			users = dataset.fetchUserRatings();
-			while (users.next()) {
-				RatingVector user = users.pick();
-				if (user == null) continue;
-				
-				Set<Integer> itemIds = user.fieldIds(true);
-				for (int itemId : itemIds) {
-					double value = user.get(itemId).value;
-					if (value < minRating) minRating = value;
-					if (value > maxRating) maxRating = value;
-				}
-			}
-		}
-		catch (Exception e) {
-			LogUtil.trace(e);
-		}
-		finally {
-			if (users != null) {
-				try {
-					users.close();
-				} catch (Exception e) {LogUtil.trace(e);}
-			}
-		}
-		
-		double cfgMinRating = getConfig().getMinRating();
-		double cfgMaxRating = getConfig().getMaxRating();
-		if (cfgMinRating != minRating) {
-			config.put(DataConfig.MIN_RATING_FIELD, minRating);
-			dataset.getConfig().put(DataConfig.MIN_RATING_FIELD, minRating);
-		}
-		if (cfgMaxRating != maxRating) {
-			config.put(DataConfig.MAX_RATING_FIELD, maxRating);
-			dataset.getConfig().put(DataConfig.MAX_RATING_FIELD, maxRating);
-		}
-	}
-
-	
 	@Override
 	public void save() throws RemoteException {
 		save(config);
