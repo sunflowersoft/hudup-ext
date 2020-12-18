@@ -81,7 +81,6 @@ public abstract class BnetCFAbstract extends ModelBasedCFAbstract {
 	
 	@Override
 	public synchronized RatingVector recommend(RecommendParam param, int maxRecommend) throws RemoteException {
-		// TODO Auto-generated method stub
 		param = recommendPreprocess(param);
 		if (param == null)
 			return null;
@@ -95,13 +94,13 @@ public abstract class BnetCFAbstract extends ModelBasedCFAbstract {
 				queryIds.add(itemId);
 		}
 		
-		double avgRating = (getMaxRating() + getMinRating()) / 2.0; 
+		double avgRating = Constants.UNUSED;
+		if (isUsedMinMaxRating()) avgRating = (getMaxRating() + getMinRating()) / 2.0;
 		List<ValueTriple> triples = bnetEstimate(param, queryIds, avgRating, new RatingFilter() {
 
 			@Override
 			public boolean accept(double ratingValue, double referredRatingValue) {
-				// TODO Auto-generated method stub
-				return Accuracy.isRelevant(ratingValue, referredRatingValue);
+				return Util.isUsed(referredRatingValue) ? Accuracy.isRelevant(ratingValue, referredRatingValue) : true;
 			}
 			
 		});
@@ -126,7 +125,6 @@ public abstract class BnetCFAbstract extends ModelBasedCFAbstract {
 	
 	@Override
 	public Inspector getInspector() {
-		// TODO Auto-generated method stub
 		return EvaluateGUI.createInspector(this);
 	}
 
@@ -146,7 +144,6 @@ public abstract class BnetCFAbstract extends ModelBasedCFAbstract {
 			
 			@Override
 			public boolean accept(xURI uri) {
-				// TODO Auto-generated method stub
 				if (EXT != null && !EXT.isEmpty()) {
 					String ext = uri.getLastNameExtension(); 
 					if (ext == null || ext.isEmpty())
@@ -166,7 +163,6 @@ public abstract class BnetCFAbstract extends ModelBasedCFAbstract {
 
 			@Override
 			public String getDescription() {
-				// TODO Auto-generated method stub
 				return "No description";
 			}
 			

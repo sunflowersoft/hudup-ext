@@ -296,10 +296,10 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 	public synchronized void setup(Dataset dataset, Object...params) throws RemoteException {
 		super.setup(dataset, params);
 		
-		this.ratingMedian = (getMinRating() + getMaxRating()) / 2.0;
-		
 		updateUserMeanVars(dataset);
 		updateItemMeanVars(dataset);
+		
+		this.ratingMedian = isUsedMinMaxRating() ? (getMinRating() + getMaxRating()) / 2.0 : this.ratingMean;
 	}
 
 
@@ -637,8 +637,8 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 			RatingVector vRating1, RatingVector vRating2,
 			Profile profile1, Profile profile2) {
 		
-		boolean normalized = getConfig().getAsBoolean(COSINE_NORMALIZED_FIELD) && Util.isUsed(ratingMedian);
-		return normalized ? vRating1.cosine(vRating2, ratingMedian) : vRating1.cosine(vRating2);
+		boolean normalized = getConfig().getAsBoolean(COSINE_NORMALIZED_FIELD);
+		return normalized ? vRating1.cosine(vRating2, this.ratingMedian) : vRating1.cosine(vRating2);
 
 //		boolean normalized = getConfig().getAsBoolean(COSINE_NORMALIZED_FIELD);
 //		if (profile1 == null || profile2 == null)
@@ -648,7 +648,7 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 //		Vector vector1 = vectors[0];
 //		Vector vector2 = vectors[1];
 //		
-//		return normalized ? vector1.cosine(vector2, ratingMedian) : vector1.cosine(vector2);
+//		return normalized ? vector1.cosine(vector2, this.ratingMedian) : vector1.cosine(vector2);
 	}
 
 	
@@ -711,16 +711,16 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 			Profile profile1, Profile profile2) {
 		Set<Integer> union = unionFieldIds(vRating1, vRating2);
 		
-		boolean normalized = getConfig().getAsBoolean(COSINE_NORMALIZED_FIELD) && Util.isUsed(ratingMedian);
+		boolean normalized = getConfig().getAsBoolean(COSINE_NORMALIZED_FIELD);
 		double VX = 0, VY = 0;
 		double VXY = 0;
 		for (int fieldId : union) {
 			double deviate1 = Constants.UNUSED;
 			double deviate2 = Constants.UNUSED;
 			if (vRating1.isRated(fieldId))
-				deviate1 = vRating1.get(fieldId).value - (normalized ? ratingMedian : 0);
+				deviate1 = vRating1.get(fieldId).value - (normalized ? this.ratingMedian : 0);
 			if (vRating2.isRated(fieldId))
-				deviate2 = vRating2.get(fieldId).value - (normalized ? ratingMedian : 0);
+				deviate2 = vRating2.get(fieldId).value - (normalized ? this.ratingMedian : 0);
 			
 			if (Util.isUsed(deviate1))
 				VX  += deviate1 * deviate1;
@@ -896,7 +896,7 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 	protected double cpc(
 			RatingVector vRating1, RatingVector vRating2,
 			Profile profile1, Profile profile2) {
-		return Util.isUsed(ratingMedian) ? vRating1.cosine(vRating2, ratingMedian) : vRating1.cosine(vRating2);
+		return vRating1.cosine(vRating2, this.ratingMedian);
 	}
 	
 	

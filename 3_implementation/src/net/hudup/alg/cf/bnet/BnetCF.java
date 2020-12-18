@@ -152,7 +152,6 @@ public class BnetCF extends BnetCFAbstract {
 
 			@Override
 			public Serializable userEdit(Component comp, String key, Serializable defaultValue) {
-				// TODO Auto-generated method stub
 				if (key.equals(BnetKB.LEARNING_METHOD_FIELD)) {
 					String method = getAsString(BnetKB.LEARNING_METHOD_FIELD);
 					method = method == null ? BnetKB.K2 : method;

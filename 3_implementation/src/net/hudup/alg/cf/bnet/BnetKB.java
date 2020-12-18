@@ -148,7 +148,6 @@ public abstract class BnetKB extends KBaseAbstract {
 	
 	@Override
 	public void load() throws RemoteException {
-		// TODO Auto-generated method stub
 		super.load();
 		
 		UriAdapter adapter = new UriAdapter(config);
@@ -165,7 +164,6 @@ public abstract class BnetKB extends KBaseAbstract {
 	
 	@Override
 	public void learn(Dataset dataset, Alg alg) throws RemoteException {
-		// TODO Auto-generated method stub
 		super.learn(dataset, alg);
 		
 		learnBnet(dataset);
@@ -212,8 +210,6 @@ public abstract class BnetKB extends KBaseAbstract {
 	
 	@Override
 	public void save(DataConfig storeConfig) throws RemoteException {
-		// TODO Auto-generated method stub
-		
 		super.save(storeConfig);
 		
 		UriAdapter adapter = new UriAdapter(storeConfig);
@@ -224,14 +220,12 @@ public abstract class BnetKB extends KBaseAbstract {
 	
 	@Override
 	public boolean isEmpty() throws RemoteException {
-		// TODO Auto-generated method stub
 		return bnetList.size() == 0;
 	}
 
 	
 	@Override
 	public void close() throws Exception {
-		// TODO Auto-generated method stub
 		super.close();
 		
 		bnetList.clear();
@@ -251,7 +245,6 @@ public abstract class BnetKB extends KBaseAbstract {
 	@NextUpdate
 	@Override
 	public Inspector getInspector() {
-		// TODO Auto-generated method stub
 		if (bnetList.size() == 0)
 			return new Inspector.NullInspector();
 		else
@@ -277,7 +270,6 @@ public abstract class BnetKB extends KBaseAbstract {
 		 * @param bnet specified Bayesian network.
 		 */
 		public BnetInspector(Bnet bnet) {
-			// TODO Auto-generated constructor stub
 			super((Frame)null, "Inspector for Bayesian network knowledge base", true);
 			setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 			setSize(600, 400);
@@ -324,7 +316,6 @@ public abstract class BnetKB extends KBaseAbstract {
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					// TODO Auto-generated method stub
 					dispose();
 				}
 			});
@@ -333,7 +324,6 @@ public abstract class BnetKB extends KBaseAbstract {
 
 		@Override
 		public void inspect() {
-			// TODO Auto-generated method stub
 			setVisible(true);
 		}
 
@@ -355,7 +345,6 @@ public abstract class BnetKB extends KBaseAbstract {
 
 			@Override
 			public String getName() {
-				// TODO Auto-generated method stub
 				return cf.getName();
 			}
 			

@@ -1,30 +1,30 @@
-                  HUDUP: A FRAMEWORK OF E-COMMERCIAL RECOMMENDATION ALGORITHMS
+HUDUP: A FRAMEWORK OF E-COMMERCIAL RECOMMENDATION ALGORITHMS
 
-                                     --------------------
+(http://www.locnguyen.net/st/products/hudup)
 
-Author and owner:
-       Prof. Dr. Loc Nguyen, Loc Nguyen's Academic Network, Vietnam
+Author and owner: Prof. Dr. Loc Nguyen, Loc Nguyen's Academic Network, Vietnam
+Homepage: www.locnguyen.net
+Email: ng_phloc@yahoo.com
+Tel: 84-975250362
 
-   
+
 --------------------
-Hudup product is the recommender framework dedicated to scientists and software developers who create or deploy recommendation solutions and algorithms in e-commerce and e-learning.
+Hudup product is the recommender framework dedicated to scientists and software developers who create or deploy recommendation solutions and algorithms in e-commerce and e-learning. Current version of Hudup is ${version}. The last built date is March 30, 2020. Hudup framework is composed of three modules:
+1. The infrastructure to set up recommendation algorithms.
+2. The evaluation system to measure recommendation algorithms according to metrics.
+3. The simulation environment to execute and test recommendation algorithms before deploying them in real-time applications.
 
 Hudup application has five main modules such as Evaluator, Server, Listener, Balancer and one additional module Toolkit. Note that the Server, Listener and Balancer service ports are 10151, 10152 and 10154, respectively. Toolkit module is used to configure, create and modify datasets.
 
-There are 4 Hudup installer packages bundled with Java runtime:
-- Package "Hudup-${version}-windows-jre1.7.exe" is Windows 32 bit installer. This is the most common one.
-- Package "Hudup-${version}-windows-x64-jre1.7.exe" is Windows 64 bit installer.
-- Package "Hudup-${version}-unix-jre1.7.sh" is Unix/Linux 32 bit installer.
-- Package "Hudup-${version}-macos-jre1.7.dmg" is Mac OS installer download JRE automatically.
+Hudup is available at http://www.locnguyen.net/st/products/hudup or http://www.hudup.net. Its GitHub source is available at https://github.com/sunflowersoft/hudup-ext. The tutorial is available at https://www.scitepress.org/PublicationsDetail.aspx?ID=3Tk7XB8m0LA=
 
-After installing Hudup in your computer by executing appropriate installer package, you start Hudup application and there are three experimental scripts:
+The easiest way to install Hudup is to download the all-in-one version (hudup-${version}-all-in-one.zip) available at https://drive.google.com/file/d/1XdU2I-yLzJ5uSXzrgehe2LFZMJidm9IJ or http://www.locnguyen.net/st/products/hudup and then to uncompress such version. Hudup runs on standard edition Java with version JRE 1.8.0 or JDK 1.8.0 that you have to download and install before installing Hudup. Finally, you start Hudup application and there are three experimental scripts:
 
-1. Running access point Evaluator. You press "Load script" button and open "batch-sample.script" file at current directory. All sample datasets in folder "datasets" at current directory.
+1. Running access point Evaluator (evaluator.bat, evaluator.sh, evaluator-remote.bat, evaluator-remote.sh). You press "Load script" button and open "batch-sample.script" file at current directory. All sample datasets in folder "datasets" at current directory.
 
-2. Running access point Server, which in turn, running access point Evaluator so as to deploy Hudup in client-server environment. Server automatically remind you to set up Server configuration, for default, you only press "Next" button and finish set up. Note that you must select "rmi_server_query" algorithm in Evaluator in order to evaluate Hudup in client-server environment. Administrator is "admin" with password "admin".
+2. Running access point Server (server.bat, server.sh), which in turn, running access point Evaluator so as to deploy Hudup in client-server environment. Server automatically remind you to set up server configuration, for default, you only press "Next" button and finish set up. Administrator is "admin" with password "admin". Later on, you run Evaluator to connect Server.
 
-3. Running access point Server, which in turn, running access point Listener or Balancer, which in turn, running access point Evaluator so as to deploy Hudup in client-listener-server environment. You must select "socket_server_query" algorithm in Evaluator in order to evaluate Hudup in client-listener-server environment. 
-
+3. Running access point Server, which in turn, running access point Listener (listener.bat, listener.sh) or Balancer (balancer.bat, balancer.sh), which in turn, running access point Evaluator so as to deploy Hudup in client-listener-server environment. You select "socket_server_query" algorithm in Evaluator in order to evaluate Hudup in client-listener-server environment. 
 
 Hudup software also provides 10 developing packages:
 - datasets.zip: contains movielens datasets
@@ -43,16 +43,7 @@ When you uncompress hudup-${version}-*.zip, there are a respective hudup-*.jar m
 Thank you for enjoying product.
 Best regards,
 
-Mr. Loc Nguyen,
-Independent Scholar,
-Homepage: www.locnguyen.net,
-Email: ng_phloc@yahoo.com,
-Tel: 84-975250362
 
----
-P/S: Current version of JRE and JDK is 1.8.0. Current version of Hudup is ${version}. The last built date is March 30, 2020.
-
-	   
 --------------------
 Acknowledgements:
 This product is the place to acknowledge Sir Vu, Ngoc-Dong who gave me valuable comments and advices. These comments help me to improve this product. We also thank following scientists and organizations who gave us software libraries used in Hudup. Some libraries are no longer used in current version of Hudup.
@@ -60,6 +51,10 @@ This product is the place to acknowledge Sir Vu, Ngoc-Dong who gave me valuable 
 Andy Khan provided JXL library for processing Excel file available at http://jexcelapi.sourceforge.net.
 
 Apache Software Foundation (https://apache.org) provided Apache Common Logging, Apache Commons IO, Apache Commons Math, Apache Logging Services (log4j), Derby JDBC, and XML Commons.
+
+Christian Schlichtherle provided TrueZip (https://christian-schlichtherle.bitbucket.io/truezip) which is a Java based virtual file system (VFS) which enables client applications to perform CRUD (Create, Read, Update, Delete) operations on archive files. TrueZip is very important to Hudup.
+
+CICYT (a Spanish research agency) provided Elvira (http://www.ia.uned.es/~elvira/index-en.html) which is a Bayesian expert system.
 
 ECMA International provided JSON library for Java, available at http://www.json.org.
 
@@ -71,7 +66,7 @@ Google LLC provided GSON library for processing JSON format and Google Core Libr
 
 Java Community Process (JCP) Program provided Java Specification Requests (JSRs) for Java annotation.
 
-Java CSV Team provided Java library for processing CSV files available at https://goo.gl/fXJZvH.
+Java CSV Team provided Java library for processing CSV files available at https://goo.gl/fXJZvH. Java CSV is very important to Hudup.
 
 JBoss provided Javassist (Java Programming Assistant) to make Java bytecode manipulation simple, available at https://goo.gl/ncSmbS.
 
@@ -101,9 +96,9 @@ Quality Open Software Company provided the Simple Logging Facade for Java (SLF4J
 
 QuickTable Team provided trial version of QuickTable component which is a Java database grid control, available at http://quicktablejava.appspot.com.
 
-Sam Hocevar provided Reflections package which is a Java runtime metadata analysis which allows users to scan and collection metadata about Java classes and packages in Java projects. Reflections library is available at https://goo.gl/Lf9Evr.
+Sam Hocevar provided Reflections package which is a Java runtime metadata analysis which allows users to scan and collection metadata about Java classes and packages in Java projects. Reflections library is available at https://goo.gl/Lf9Evr. Reflections package is very important to Hudup.
 
-Someones and some organizations on Internet who provide images, icons, source snippets.
+Someones and some organizations on Internet like David Gilbert (https://bit.ly/34qnaI1), Nobuo Tamemasa (https://bit.ly/34qnaI1), Icon Archive (http://www.iconarchive.com), etc who provided images, icons, source snippets.
 
 Steve Waldman provided mchange-commons-java package for JDBC connection pool available at https://goo.gl/1VAYre.
 

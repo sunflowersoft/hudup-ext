@@ -11,20 +11,20 @@
 #admin=admin
 
 #If flag is true, the framework supports compressed file (zip, jar) as storage.
+#Currently, Hudup used TrueZip (https://christian-schlichtherle.bitbucket.io/truezip) developed by Christian Schlichtherle to process compressed files.
+#When this flag is false, TrueZip is not used.
 #compressed_file_support=true
 
 #Setting debug mode. If this flag is true, Hudup framework runs in debug mode in which thrown exceptions are printed traced, for example.
 #Otherwise, only error meassages are printed in console.
 #debug=false
 
-#Global address is often static internet address or WAN address.
+#Global address is often static internet address or WAN address. When deploying Hudup on WAN or internet, global address must be set.
 #global_address=hudup.locnguyen.net
 
 #I18n meassages bundle: en_US, vi_VN, zh_CN, ar_YE
-language=en
-#language=vi
-country=US
-#country=VN
+#language=en
+#country=US
 
 #If flag is true, server is responsible for purging disconnected listeners. Otherwise, each evaluator or service is responsible for purging disconnected listeners.
 #server_purge_listeners=true

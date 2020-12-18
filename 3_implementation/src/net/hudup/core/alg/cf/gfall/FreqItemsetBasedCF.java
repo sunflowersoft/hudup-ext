@@ -185,7 +185,7 @@ public abstract class FreqItemsetBasedCF extends ModelBasedCFAbstract {
 				continue;
 			
 			double value = pair.value();
-			if (!Util.isUsed(referredRatingValue) || ratingFilter == null)
+			if (ratingFilter == null)
 				result.put(itemId, value);
 			else if (ratingFilter.accept(value, referredRatingValue))
 				result.put(itemId, value);
@@ -216,8 +216,7 @@ public abstract class FreqItemsetBasedCF extends ModelBasedCFAbstract {
 
 			@Override
 			public boolean accept(double ratingValue, double referredRatingValue) {
-				//Fixing date: 2019.08.21 by Loc Nguyen.
-				return Accuracy.isRelevant(ratingValue, referredRatingValue); /*ratingValue >= referredRatingValue;*/
+				return Util.isUsed(referredRatingValue) ? Accuracy.isRelevant(ratingValue, referredRatingValue) : true;
 			}
 			
 		});

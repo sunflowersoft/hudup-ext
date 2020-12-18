@@ -249,7 +249,7 @@ public abstract class ConnectDlg extends JDialog {
 
 	
 	/**
-	 * Text field to fill server access period.
+	 * Text field to fill server access period in seconds.
 	 */
 	protected JFormattedTextField txtMyAccessPeriod = null;
 
@@ -392,7 +392,7 @@ public abstract class ConnectDlg extends JDialog {
 		left.add(new JLabel("User name:"));
 		left.add(new JLabel("Password:"));
 		left.add(new JLabel("Pull mode:"));
-		left.add(new JLabel("    My access period (s):"));
+		left.add(new JLabel("    My access period (sec):"));
 		left.add(new JLabel("My bound port:"));
 		left.add(new JLabel("Hosting again:"));
 		left.add(new JLabel("    My hosting naming path:"));
@@ -451,9 +451,9 @@ public abstract class ConnectDlg extends JDialog {
 		chkPullMode = new JCheckBox("", false);
 		right.add(chkPullMode);
 
-		txtMyAccessPeriod = new JFormattedTextField(new NumberFormatter());
+		txtMyAccessPeriod = new JFormattedTextField(new NumberFormatter()); //Access period in seconds.
 		right.add(txtMyAccessPeriod);
-		txtMyAccessPeriod.setValue((int)(5*Counter.PERIOD/1000));
+		txtMyAccessPeriod.setValue((int)(5*Counter.PERIOD)); //5 seconds.
 		txtMyAccessPeriod.setVisible(chkPullMode.isSelected());
 
 		JPanel paneBindPort = new JPanel(new BorderLayout());
@@ -788,9 +788,9 @@ public abstract class ConnectDlg extends JDialog {
 				}
 				
 				connectInfo.pullMode = chkPullMode.isSelected() && connectInfo.bindUri != null;
-				int myAccessPeriod = txtMyAccessPeriod.getValue() instanceof Number ? ( (Number) txtMyAccessPeriod.getValue()).intValue() : 1;
-				myAccessPeriod = 1000 * myAccessPeriod;
-				connectInfo.accessPeriod = myAccessPeriod < Counter.PERIOD ? Counter.PERIOD : myAccessPeriod;   
+				long myAccessPeriod = txtMyAccessPeriod.getValue() instanceof Number ? ( (Number) txtMyAccessPeriod.getValue()).longValue() : 1;
+				myAccessPeriod = myAccessPeriod < Counter.PERIOD ? Counter.PERIOD : myAccessPeriod;
+				connectInfo.accessPeriod = 1000 * myAccessPeriod;   
 
 				String globalAddress = txtMyGlobalAddress.getText() != null ? txtMyGlobalAddress.getText().trim() : ""; 
 				if (globalAddress.isEmpty() || globalAddress.compareToIgnoreCase("localhost") == 0 || globalAddress.compareToIgnoreCase("127.0.0.1") == 0)

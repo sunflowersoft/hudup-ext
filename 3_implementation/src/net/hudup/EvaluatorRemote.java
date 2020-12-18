@@ -26,7 +26,7 @@ public class EvaluatorRemote implements AccessPoint {
 	 * Default constructor.
 	 */
 	public EvaluatorRemote() {
-		// TODO Auto-generated constructor stub
+
 	}
 
 	
@@ -36,28 +36,24 @@ public class EvaluatorRemote implements AccessPoint {
 	 * @throws Exception if there is any error.
 	 */
 	public static void main(String[] args) throws Exception {
-		// TODO Auto-generated method stub
 		new EvaluatorRemote().run(args);
 	}
 
 	
 	@Override
 	public void run(String[] args) {
-		// TODO Auto-generated method stub
 		EvalCompoundGUI.switchRemoteEvaluator(Constants.DEFAULT_EVALUATOR_NAME, null);
 	}
 
 	
 	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
 		return "Remote Evaluator";
 	}
 
 	
 	@Override
 	public String toString() {
-		// TODO Auto-generated method stub
 		return getName();
 	}
 	

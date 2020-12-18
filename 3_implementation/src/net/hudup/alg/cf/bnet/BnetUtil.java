@@ -438,7 +438,6 @@ public class BnetUtil {
 			writer.close();
 		} 
 		catch (Exception e) {
-			// TODO Auto-generated catch block
 			LogUtil.trace(e);
 		}
 	}
@@ -455,7 +454,6 @@ public class BnetUtil {
 		try {
 			return new Bnet(uri.toURL());
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			LogUtil.trace(e);
 		} 
 		
@@ -532,7 +530,6 @@ public class BnetUtil {
 			reader.close();
 		} 
 		catch (IOException e) {
-			// TODO Auto-generated catch block
 			LogUtil.trace(e);
 		}
 		
@@ -571,7 +568,6 @@ public class BnetUtil {
 			writer.flush();
 		} 
 		catch (Exception e) {
-			// TODO Auto-generated catch block
 			LogUtil.trace(e);
 		}
 		finally {
