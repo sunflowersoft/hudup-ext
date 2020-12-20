@@ -70,6 +70,24 @@ public class ExtendedServerCP extends PowerServerCP {
 		JMenu mnTool = new JMenu(I18nUtil.message("tool"));
 		mnBar.add(mnTool);
 		
+		PowerServerCP cp = this;
+		JMenuItem mniWorkingDirectoryManager = new JMenuItem(
+			new AbstractAction(I18nUtil.message("working_directory_manager")) {
+				
+				/**
+				 * Serial version UID for serializable class. 
+				 */
+				private static final long serialVersionUID = 1L;
+
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					WorkingDirectoryManager.showManager(cp, server, bindUri);
+				}
+			});
+		mniWorkingDirectoryManager.setMnemonic('w');
+//		mnTool.add(mniWorkingDirectoryManager);
+//		mnTool.addSeparator();
+
 		JMenuItem mniInstallService = new JMenuItem(
 			new AbstractAction(I18nUtil.message("install_service")) {
 				
@@ -102,7 +120,6 @@ public class ExtendedServerCP extends PowerServerCP {
 		mniUninstallService.setMnemonic('u');
 //		mnTool.add(mniUninstallService);
 
-		mnTool.addSeparator();
 		JMenuItem mniEvaluatorCP = new JMenuItem(
 			new AbstractAction(I18nUtil.message("evaluator")) {
 				

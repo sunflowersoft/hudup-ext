@@ -99,7 +99,6 @@ public class AlgListBox extends JList<Alg> implements AlgListUI {
 
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				// TODO Auto-generated method stub
 				if (!getThis().isEnabled())
 					return;
 				
@@ -295,7 +294,6 @@ public class AlgListBox extends JList<Alg> implements AlgListUI {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				String text = txtAlgName.getText();
 				if (text != null && !text.trim().isEmpty())
 					algNameBuffer.append(text.trim());
@@ -309,7 +307,6 @@ public class AlgListBox extends JList<Alg> implements AlgListUI {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				selectDlgNameDlg.dispose();
 			}
 		});
@@ -364,7 +361,6 @@ public class AlgListBox extends JList<Alg> implements AlgListUI {
 	
 				@Override
 				public int compare(Alg alg1, Alg alg2) {
-					// TODO Auto-generated method stub
 					return alg1.getName().compareTo(alg2.getName());
 				}
 			});
@@ -766,7 +762,6 @@ public class AlgListBox extends JList<Alg> implements AlgListUI {
 		 */
 		public AlgListChangedEvent(Object source, List<Alg> algList) {
 			super(source);
-			// TODO Auto-generated constructor stub
 			this.algList = algList;
 		}
 

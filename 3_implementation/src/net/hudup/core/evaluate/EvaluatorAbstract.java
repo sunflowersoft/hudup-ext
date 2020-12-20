@@ -283,6 +283,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 		evTaskQueue = new CounterTaskQueue(otherResult);
 		evTaskQueue.setListenerList(listenerList); //Task queue uses the same listener list.
 		
+		//Normal evaluators (non-reproduced evaluators) always own purging listeners timer.
 		purgeTimer = createPurgeListenersTimer(listenerList);
 	}
 	

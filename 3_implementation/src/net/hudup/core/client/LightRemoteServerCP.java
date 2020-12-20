@@ -304,8 +304,8 @@ public class LightRemoteServerCP extends JFrame {
 			server.exit();
 		} 
 		catch (Exception e) {}
-		
 		server = null;
+		
 		dispose();
 	}
 
@@ -462,8 +462,7 @@ public class LightRemoteServerCP extends JFrame {
 
 	@Override
 	public synchronized void dispose() {
-		if (timer != null)
-			timer.cancel();
+		if (timer != null) timer.cancel();
 		
 		server = null;
 		timer = null;

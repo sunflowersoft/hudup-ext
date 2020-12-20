@@ -392,23 +392,15 @@ public class BalancerCP extends JFrame implements ServerStatusListener {
 	 * Exit balancer remotely. After exiting, balancer is destroyed and cannot be re-started.
 	 */
 	private void exit() {
-		
 		try {
-			if (bindUri != null) {
-				listener.removeStatusListener(this);
-				try {
-					listener.exit();
-				} catch (Exception e) {}
-				
-				listener = null;
-				dispose();
-			}
-			else
-				listener.exit();
-		} 
-		catch (Exception e) {
-			LogUtil.trace(e);
-		}
+			listener.removeStatusListener(this);
+		} catch (Exception e) {LogUtil.trace(e);}
+		try {
+			listener.exit();
+		} catch (Exception e) {}
+		listener = null;
+		
+		dispose();
 	}
 
 	
@@ -619,7 +611,8 @@ public class BalancerCP extends JFrame implements ServerStatusListener {
 		}
 		else if (status == Status.exit) {
 			listener = null;
-			dispose();
+			if (bindUri != null) dispose();
+			bindUri = null;
 		}
 		
 	}
@@ -657,26 +650,16 @@ public class BalancerCP extends JFrame implements ServerStatusListener {
 
 	@Override
 	public void dispose() {
-		
 		try {
-			if (listener != null)
-				listener.removeStatusListener(this);
+			if (listener != null) listener.removeStatusListener(this);
 		} 
-		catch (Throwable e) {
-			LogUtil.trace(e);
-		}
-		
-		if (bindUri != null) {
-			try {
-				UnicastRemoteObject.unexportObject(this, true);
-			}
-			catch (Throwable e) {
-				LogUtil.trace(e);
-			}
-		}
-		
-		
+		catch (Throwable e) {LogUtil.trace(e);}
 		listener = null;
+
+		try {
+			if (bindUri != null) UnicastRemoteObject.unexportObject(this, true);
+		}
+		catch (Throwable e) {LogUtil.trace(e);}
 		bindUri = null;
 		
 		super.dispose();

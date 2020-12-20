@@ -47,7 +47,6 @@ public class TextArea extends JTextArea {
 	 * Default constructor.
 	 */
 	public TextArea() {
-		// TODO Auto-generated constructor stub
 		super();
 		init();
 	}
@@ -62,7 +61,6 @@ public class TextArea extends JTextArea {
 	 */
 	public TextArea(Document doc, String text, int rows, int columns) {
 		super(doc, text, rows, columns);
-		// TODO Auto-generated constructor stub
 		init();
 	}
 
@@ -73,7 +71,6 @@ public class TextArea extends JTextArea {
 	 */
 	public TextArea(Document doc) {
 		super(doc);
-		// TODO Auto-generated constructor stub
 		init();
 	}
 
@@ -85,7 +82,6 @@ public class TextArea extends JTextArea {
 	 */
 	public TextArea(int rows, int columns) {
 		super(rows, columns);
-		// TODO Auto-generated constructor stub
 		init();
 	}
 
@@ -98,7 +94,6 @@ public class TextArea extends JTextArea {
 	 */
 	public TextArea(String text, int rows, int columns) {
 		super(text, rows, columns);
-		// TODO Auto-generated constructor stub
 		init();
 	}
 
@@ -109,7 +104,6 @@ public class TextArea extends JTextArea {
 	 */
 	public TextArea(String text) {
 		super(text);
-		// TODO Auto-generated constructor stub
 		init();
 	}
 

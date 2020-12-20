@@ -156,7 +156,6 @@ public class DatasetViewer extends JDialog {
 
 			@Override
 			public void windowClosed(WindowEvent e) {
-				// TODO Auto-generated method stub
 				super.windowClosed(e);
 				clear();
 			}
@@ -197,7 +196,6 @@ public class DatasetViewer extends JDialog {
 			
 			@Override
 			public void valueChanged(ListSelectionEvent e) {
-				// TODO Auto-generated method stub
 				
 				String unit = unitList.getSelectedValue();
 				body.removeAll();
@@ -252,7 +250,6 @@ public class DatasetViewer extends JDialog {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				clear();
 				
 				paneRatingMatrix = createRatingMatrixPane();
@@ -276,7 +273,6 @@ public class DatasetViewer extends JDialog {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				JDialog exportDlg = new JDialog(UIUtil.getFrameForComponent(comp), "Export", true);
 				exportDlg.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 				exportDlg.setSize(500, 300);
@@ -287,7 +283,6 @@ public class DatasetViewer extends JDialog {
 
 					@Override
 					public void windowClosed(WindowEvent e) {
-						// TODO Auto-generated method stub
 						super.windowClosed(e);
 						
 						try {
@@ -311,7 +306,6 @@ public class DatasetViewer extends JDialog {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				dispose();
 			}
 		});
@@ -413,7 +407,6 @@ public class DatasetViewer extends JDialog {
 
 			@Override
 			protected void addToContextMenu(JPopupMenu contextMenu) {
-				// TODO Auto-generated method stub
 				super.addToContextMenu(contextMenu);
 				
 				try {
@@ -525,7 +518,6 @@ public class DatasetViewer extends JDialog {
 
 		@Override
 		protected void exportData() {
-			// TODO Auto-generated method stub
 			final DataConfig destConfig = (DataConfig) txtDestination.getConfig();
 			
 			if (destConfig == null) {
@@ -555,7 +547,6 @@ public class DatasetViewer extends JDialog {
 
 				@Override
 				public void run() {
-					// TODO Auto-generated method stub
 					super.run();
 					
 					Provider provider = new ProviderImpl(destConfig);

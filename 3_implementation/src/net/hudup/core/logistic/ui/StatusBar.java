@@ -7,11 +7,25 @@
  */
 package net.hudup.core.logistic.ui;
 
+import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
+import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
+import javax.swing.WindowConstants;
+
+import net.hudup.core.logistic.I18nUtil;
 
 /**
  * This class is the status bar.
@@ -32,7 +46,7 @@ public class StatusBar extends JPanel {
 	/**
 	 * List of labels.
 	 */
-	private JLabel[] paneList = new JLabel[5];
+	protected JLabel[] paneList = new JLabel[5];
 	
 	
 	/**
@@ -43,15 +57,69 @@ public class StatusBar extends JPanel {
 		
 		setLayout(new FlowLayout(FlowLayout.LEFT));
 		for (int i = 0; i < paneList.length; i++) {
-			if ( i > 0)
-				add(new JLabel("  "));
+			if ( i > 0) add(new JLabel("  "));
 			paneList[i] = new JLabel();
 			add(paneList[i]);
 		}
 		
+		addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if(SwingUtilities.isRightMouseButton(e) ) {
+					JPopupMenu ctxMenu = createContextMenu();
+					if(ctxMenu == null)	return;
+					ctxMenu.show((Component)e.getSource(), e.getX(), e.getY());
+				}
+			}
+		});
 	}
 	
 
+	/**
+	 * Creating context menu.
+	 * @return context menu.
+	 */
+	private final JPopupMenu createContextMenu() {
+		JPopupMenu ctxMenu = new JPopupMenu();
+		
+		Component thisBar = this;
+		JMenuItem miShow = new JMenuItem(I18nUtil.message("show_evaluation_progress"));
+		miShow.addActionListener( 
+			new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					JDialog dlgShow = new JDialog(UIUtil.getFrameForComponent(thisBar), false);
+					dlgShow.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+					dlgShow.setSize(800, 100);
+					dlgShow.setLocationRelativeTo(UIUtil.getFrameForComponent(thisBar));
+					dlgShow.setLayout(new BorderLayout());
+					
+					TextArea textArea = new TextArea();
+					textArea.setEditable(false);
+					StringBuffer buffer = new StringBuffer();
+					int i = 0;
+					for (JLabel pane : paneList) {
+						String text = pane.getText();
+						if (text == null || text.trim().isEmpty()) continue;
+						
+						if (i > 0) buffer.append("\n");
+						buffer.append(text.trim());
+						i++;
+					}
+					textArea.setText(buffer.toString());
+					textArea.setCaretPosition(0);
+					dlgShow.add(new JScrollPane(textArea), BorderLayout.CENTER);
+					
+					dlgShow.setVisible(true);
+				}
+			});
+		ctxMenu.add(miShow);
+
+		return ctxMenu;
+	}
+	
+	
 	/**
 	 * Setting text for panel 0.
 	 * @param text text for panel 0.

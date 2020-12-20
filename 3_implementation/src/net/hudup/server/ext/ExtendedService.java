@@ -175,6 +175,7 @@ public class ExtendedService extends DefaultService implements ServiceExt, Servi
 	protected void purgeListeners() {
 		trans.lockRead();
 
+		//Only purging disconnected listeners of reproduced evaluators.
 		Collection<Evaluator> evs = Util.newList();
 		evs.addAll(pairMap.values());
 		synchronized (pairReproducedMap) {
@@ -358,6 +359,7 @@ public class ExtendedService extends DefaultService implements ServiceExt, Servi
 						reproducedEvaluator.setAgent(true);
 						reproducedEvaluator.setReferredService(this);
 						reproducedEvaluator.export(serverConfig.getServerPort());
+						//Only purging disconnected listeners of reproduced evaluators.
 						if (reproducedEvaluator instanceof EvaluatorAbstract)
 							((EvaluatorAbstract)reproducedEvaluator).removePurgeTimer();
 						reproducedEvaluator.stimulate();

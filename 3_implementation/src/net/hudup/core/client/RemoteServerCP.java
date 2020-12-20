@@ -342,23 +342,15 @@ public class RemoteServerCP extends JFrame implements ServerStatusListener {
 	 * Exiting remote server.
 	 */
 	private void exit() {
-		
 		try {
-			if (bindUri != null) {
-				server.removeStatusListener(this);
-				try {
-					server.exit();
-				} catch (Exception e) {}
-				
-				server = null;
-				dispose();
-			}
-			else
-				server.exit();
-		} 
-		catch (Exception e) {
-			LogUtil.trace(e);
-		}
+			server.removeStatusListener(this);
+		} catch (Exception e) {LogUtil.trace(e);}
+		try {
+			server.exit();
+		} catch (Exception e) {}
+		server = null;
+		
+		dispose();
 	}
 
 	
@@ -504,7 +496,8 @@ public class RemoteServerCP extends JFrame implements ServerStatusListener {
 		}
 		else if (status == Status.exit) {
 			server = null;
-			dispose();
+			if (bindUri != null) dispose();
+			bindUri = null;
 		}
 		
 		
@@ -546,24 +539,16 @@ public class RemoteServerCP extends JFrame implements ServerStatusListener {
 	
 	@Override
 	public void dispose() {
-		
     	try {
-    		if (server != null)
-    			server.removeStatusListener(this);
+    		if (server != null) server.removeStatusListener(this);
     	}
-    	catch (Throwable e) {
-    		LogUtil.trace(e);
-    	}
-		
-    	try {
-    		if (bindUri != null)
-    			UnicastRemoteObject.unexportObject(this, true);
-    	}
-    	catch (Throwable e) {
-    		LogUtil.trace(e);
-    	}
-
+    	catch (Throwable e) {LogUtil.trace(e);}
     	server = null;
+		
+    	try {
+    		if (bindUri != null) UnicastRemoteObject.unexportObject(this, true);
+    	}
+    	catch (Throwable e) {LogUtil.trace(e);}
 		bindUri = null;
 		
 		super.dispose();

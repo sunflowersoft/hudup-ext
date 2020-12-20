@@ -371,23 +371,15 @@ public class ListenerCP extends JFrame implements ServerStatusListener {
 	 * Exit listener remotely. After exiting, listener is destroyed and cannot be re-started.
 	 */
 	private void exit() {
-		
 		try {
-			if (bindUri != null) {
-				listener.removeStatusListener(this);
-				try {
-					listener.exit();
-				} catch (Exception e) {}
-				
-				listener = null;
-				dispose();
-			}
-			else
-				listener.exit();
-		} 
-		catch (Exception e) {
-			LogUtil.trace(e);
-		}
+			listener.removeStatusListener(this);
+		} catch (Exception e) {LogUtil.trace(e);}
+		try {
+			listener.exit();
+		} catch (Exception e) {}
+		listener = null;
+		
+		dispose();
 	}
 
 	
@@ -548,7 +540,8 @@ public class ListenerCP extends JFrame implements ServerStatusListener {
 		}
 		else if (status == Status.exit) {
 			listener = null;
-			dispose();
+			if (bindUri != null) dispose();
+			bindUri = null;
 		}
 		
 	}
@@ -586,26 +579,16 @@ public class ListenerCP extends JFrame implements ServerStatusListener {
 
 	@Override
 	public void dispose() {
+		try {
+			if (listener != null) listener.removeStatusListener(this);
+		} 
+		catch (Throwable e) {LogUtil.trace(e);}
+		listener = null;
 		
 		try {
-			if (listener != null)
-				listener.removeStatusListener(this);
-		} 
-		catch (Throwable e) {
-			LogUtil.trace(e);
+			if (bindUri != null) UnicastRemoteObject.unexportObject(this, true);
 		}
-		
-		if (bindUri != null) {
-			try {
-				UnicastRemoteObject.unexportObject(this, true);
-			}
-			catch (Throwable e) {
-				LogUtil.trace(e);
-			}
-			
-		}
-		
-		listener = null;
+		catch (Throwable e) {LogUtil.trace(e);}
 		bindUri = null;
 		
 		super.dispose();
