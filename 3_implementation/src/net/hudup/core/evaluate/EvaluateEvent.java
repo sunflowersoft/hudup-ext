@@ -198,7 +198,6 @@ public class EvaluateEvent extends EventObject {
 	 * @throws RemoteException if any error raises.
 	 */
 	public String translate(String fAlgName, int fDatasetId) throws RemoteException {
-		// TODO Auto-generated method stub
 		StringBuffer buffer = new StringBuffer();
 		if (this.metrics == null)
 			return buffer.toString();

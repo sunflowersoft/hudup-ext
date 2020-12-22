@@ -80,11 +80,23 @@ public class EvaluateInfo implements Serializable {
 	
 	
 	/**
+	 * Started date.
+	 */
+	public long startDate = 0;
+	
+	
+	/**
+	 * Ended date.
+	 */
+	public long endDate = 0;
+	
+	
+	/**
 	 * Array of statuses.
 	 */
 	public String[] statuses = null;
 	
-			
+	
 	/**
 	 * Resetting this information.
 	 */
@@ -98,6 +110,8 @@ public class EvaluateInfo implements Serializable {
 		vCurrentCount = 0;
 		inAlgSetup = false;
 		elapsedTime = 0;
+		startDate = 0;
+		endDate = 0;
 		statuses = null;
 	}
 	

@@ -381,6 +381,21 @@ public class MetricsUtil {
 		row.add(Counter.formatTimeInterval(otherResult.elapsedTime));
 		data.add(row);
 
+		SimpleDateFormat df = new SimpleDateFormat(Constants.DATE_FORMAT);
+		if (otherResult.startDate > 0) {
+			row = Util.newVector();
+			row.add("Started date");
+			row.add(df.format(new Date(otherResult.startDate)));
+			data.add(row);
+		}
+
+		if (otherResult.endDate > 0) {
+			row = Util.newVector();
+			row.add("Ended date");
+			row.add(df.format(new Date(otherResult.endDate)));
+			data.add(row);
+		}
+
 		Vector<String> columns = Util.newVector();
 		columns.add("Variable");
 		columns.add("Value");
@@ -781,9 +796,9 @@ public class MetricsUtil {
 			int row, 
 			int col) throws Exception {
 		if (referredEvaluator == null) return 1;
-		
 		EvaluateInfo otherResult = referredEvaluator.getOtherResult();
-		otherResult = otherResult != null ? otherResult : new EvaluateInfo();
+		if (otherResult == null) return 1;
+		
 		WritableCellFormat[] formats = createCellFormats();
 		int rows = 0;
 		
@@ -814,6 +829,24 @@ public class MetricsUtil {
 		sheet.addCell(elapsedTime);
 		Label elapsedTimeValue = new Label(1, row, Counter.formatTimeInterval(otherResult.elapsedTime), formats[0]);
 		sheet.addCell(elapsedTimeValue);
+		
+		SimpleDateFormat df = new SimpleDateFormat(Constants.DATE_FORMAT);
+		if (otherResult.startDate > 0) {
+			rows++;
+			row++;
+			Label startedDate = new Label(0, row, "Started date", formats[0]);
+			sheet.addCell(startedDate);
+			Label startedDateValue = new Label(1, row, df.format(new Date(otherResult.startDate)), formats[0]);
+			sheet.addCell(startedDateValue);
+		}
+		if (otherResult.endDate > 0) {
+			rows++;
+			row++;
+			Label endedDate = new Label(0, row, "Ended date", formats[0]);
+			sheet.addCell(endedDate);
+			Label endedDateValue = new Label(1, row, df.format(new Date(otherResult.endDate)), formats[0]);
+			sheet.addCell(endedDateValue);
+		}
 		
 		return rows + 1;
 	}
@@ -1171,13 +1204,19 @@ public class MetricsUtil {
 		
 		if (referredEvaluator != null) {
 			EvaluateInfo otherResult = referredEvaluator.getOtherResult();
-			otherResult = otherResult != null ? otherResult : new EvaluateInfo();
-
-			buffer.append("\n\n\nEvaluation information");
-			buffer.append("\n  Total records: " + otherResult.progressTotal);
-			buffer.append("\n  Evaluated records: " + otherResult.progressStep);
-			buffer.append("\n  Evaluation percentage: " + (otherResult.progressTotal != 0 ? MathUtil.round((double)otherResult.progressStep / otherResult.progressTotal * 100.0) + "%" : "0%"));
-			buffer.append("\n  Elapsed time: " + Counter.formatTimeInterval(otherResult.elapsedTime));
+			if (otherResult != null) {
+				buffer.append("\n\n\nEvaluation information");
+				buffer.append("\n  Total records: " + otherResult.progressTotal);
+				buffer.append("\n  Evaluated records: " + otherResult.progressStep);
+				buffer.append("\n  Evaluation percentage: " + (otherResult.progressTotal != 0 ? MathUtil.round((double)otherResult.progressStep / otherResult.progressTotal * 100.0) + "%" : "0%"));
+				buffer.append("\n  Elapsed time: " + Counter.formatTimeInterval(otherResult.elapsedTime));
+				
+				SimpleDateFormat df = new SimpleDateFormat(Constants.DATE_FORMAT);
+				if (otherResult.startDate > 0)
+					buffer.append("\n  Started date: " + df.format(new Date(otherResult.startDate)));
+				if (otherResult.endDate > 0)
+					buffer.append("\n  Ended date: " + df.format(new Date(otherResult.endDate)));
+			}
 		}
 
 		

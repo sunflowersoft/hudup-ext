@@ -468,6 +468,7 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 		try {
 			result = evaluator.getResult();
 			otherResult = evaluator.getOtherResult();
+			if (otherResult != null) this.otherResult = otherResult;
 		} catch (Exception ex) {success = false; LogUtil.trace(ex);}
 		
 		if (!success) {

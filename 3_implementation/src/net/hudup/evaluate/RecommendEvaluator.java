@@ -127,6 +127,7 @@ public class RecommendEvaluator extends EvaluatorAbstract {
 	protected void run0() {
 		otherResult.progressStep = 0;
 		otherResult.progressTotal = evPool.getTotalTestingUserNumber() * evAlgList.size();
+		otherResult.startDate = System.currentTimeMillis();
 		result = new Metrics();
 		
 		Thread current = Thread.currentThread();
@@ -352,6 +353,8 @@ public class RecommendEvaluator extends EvaluatorAbstract {
 			} // dataset iterate
 			
 		} // algorithm iterate
+		
+		otherResult.endDate = System.currentTimeMillis();
 		
 		
 		synchronized (this) {

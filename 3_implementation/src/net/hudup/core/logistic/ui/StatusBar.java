@@ -14,6 +14,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.List;
 
 import javax.swing.JDialog;
 import javax.swing.JLabel;
@@ -25,6 +26,7 @@ import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 
+import net.hudup.core.Util;
 import net.hudup.core.logistic.I18nUtil;
 
 /**
@@ -65,10 +67,13 @@ public class StatusBar extends JPanel {
 		addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				if(SwingUtilities.isRightMouseButton(e) ) {
+				if(SwingUtilities.isRightMouseButton(e)) {
 					JPopupMenu ctxMenu = createContextMenu();
 					if(ctxMenu == null)	return;
 					ctxMenu.show((Component)e.getSource(), e.getX(), e.getY());
+				}
+				else if(e.getClickCount() >= 2) {
+					showEvaluateProgress();
 				}
 			}
 		});
@@ -82,41 +87,66 @@ public class StatusBar extends JPanel {
 	private final JPopupMenu createContextMenu() {
 		JPopupMenu ctxMenu = new JPopupMenu();
 		
-		Component thisBar = this;
-		JMenuItem miShow = new JMenuItem(I18nUtil.message("show_evaluation_progress"));
+		JMenuItem miShow = new JMenuItem(I18nUtil.message("show_evaluate_progress"));
 		miShow.addActionListener( 
 			new ActionListener() {
-				
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					JDialog dlgShow = new JDialog(UIUtil.getFrameForComponent(thisBar), false);
-					dlgShow.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-					dlgShow.setSize(800, 100);
-					dlgShow.setLocationRelativeTo(UIUtil.getFrameForComponent(thisBar));
-					dlgShow.setLayout(new BorderLayout());
-					
-					TextArea textArea = new TextArea();
-					textArea.setEditable(false);
-					StringBuffer buffer = new StringBuffer();
-					int i = 0;
-					for (JLabel pane : paneList) {
-						String text = pane.getText();
-						if (text == null || text.trim().isEmpty()) continue;
-						
-						if (i > 0) buffer.append("\n");
-						buffer.append(text.trim());
-						i++;
-					}
-					textArea.setText(buffer.toString());
-					textArea.setCaretPosition(0);
-					dlgShow.add(new JScrollPane(textArea), BorderLayout.CENTER);
-					
-					dlgShow.setVisible(true);
+					showEvaluateProgress();
 				}
 			});
 		ctxMenu.add(miShow);
 
 		return ctxMenu;
+	}
+	
+	
+	/**
+	 * Showing evaluation progress.
+	 */
+	private void showEvaluateProgress() {
+		JDialog dlgShow = new JDialog(UIUtil.getFrameForComponent(this), false);
+		dlgShow.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+		dlgShow.setSize(800, 100);
+		dlgShow.setLocationRelativeTo(UIUtil.getFrameForComponent(this));
+		dlgShow.setLayout(new BorderLayout());
+		
+		TextArea textArea = new TextArea();
+		textArea.setEditable(false);
+		StringBuffer buffer = new StringBuffer();
+		int i = 0;
+		for (JLabel pane : paneList) {
+			String text = pane.getText();
+			if (text == null || text.trim().isEmpty()) continue;
+			
+			if (i > 0) buffer.append("\n");
+			buffer.append(text.trim());
+			i++;
+		}
+		List<String> texts = getAdditionalTexts();
+		texts = texts != null ? texts : Util.newList();
+		for (String text : texts) {
+			if (text == null || text.trim().isEmpty()) continue;
+			
+			if (i > 0) buffer.append("\n");
+			buffer.append(text.trim());
+			i++;
+		}
+		
+		textArea.setText(buffer.toString());
+		textArea.setCaretPosition(0);
+		dlgShow.add(new JScrollPane(textArea), BorderLayout.CENTER);
+		
+		dlgShow.setVisible(true);
+	}
+	
+	
+	/**
+	 * Getting additional texts.
+	 * @return list of additional texts.
+	 */
+	protected List<String> getAdditionalTexts() {
+		return Util.newList();
 	}
 	
 	

@@ -52,27 +52,23 @@ public abstract class DefaultMetric extends MetricAbstract {
 	 */
 	public DefaultMetric() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
 
 	@Override
 	public MetricValue getCurrentValue() throws RemoteException {
-		// TODO Auto-generated method stub
 		return currentValue;
 	}
 
 	
 	@Override
 	public MetricValue getAccumValue() throws RemoteException {
-		// TODO Auto-generated method stub
 		return accumValue;
 	}
 
 	
 	@Override
 	public void reset() throws RemoteException {
-		// TODO Auto-generated method stub
 		currentValue = null;
 		accumValue = null;
 	}
@@ -102,7 +98,6 @@ public abstract class DefaultMetric extends MetricAbstract {
 
 	@Override
 	public boolean isValid() throws RemoteException {
-		// TODO Auto-generated method stub
 		return currentValue != null && accumValue != null;
 	}
 

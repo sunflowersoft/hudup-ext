@@ -18,6 +18,8 @@ import java.awt.event.ActionListener;
 import java.io.Reader;
 import java.io.Writer;
 import java.rmi.RemoteException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import javax.swing.AbstractAction;
@@ -40,6 +42,7 @@ import net.hudup.core.Constants;
 import net.hudup.core.PluginChangedEvent;
 import net.hudup.core.PluginStorage;
 import net.hudup.core.RegisterTable;
+import net.hudup.core.Util;
 import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.AlgRemote;
 import net.hudup.core.alg.SetupAlgEvent;
@@ -1028,7 +1031,35 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 		JPanel statusPane = new JPanel(new BorderLayout());
 		footer.add(statusPane, BorderLayout.SOUTH);
 		
-		this.statusBar = new StatusBar();
+		this.statusBar = new StatusBar() {
+
+			/**
+			 * Serial version UID for serializable class.
+			 */
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			protected List<String> getAdditionalTexts() {
+				if (result == null) return super.getAdditionalTexts();
+				
+				EvaluateInfo otherResult0 = null;
+				try {
+					otherResult0 = evaluator.getOtherResult();
+				} catch (Exception e) {otherResult0 = null; LogUtil.trace(e);}
+				if (otherResult0 == null) return super.getAdditionalTexts();
+
+				otherResult = otherResult0;
+				List<String> texts = Util.newList();
+				SimpleDateFormat df = new SimpleDateFormat(Constants.DATE_FORMAT);
+				if (otherResult.startDate > 0)
+					texts.add("Started date: " + df.format(new Date(otherResult.startDate)));
+				if (otherResult.endDate > 0)
+					texts.add("Ended date: " + df.format(new Date(otherResult.endDate)));
+				
+				return texts;
+			}
+			
+		};
 		try {
 			this.statusBar.setTextPane0(DSUtil.shortenVerbalName(evaluator.getName()));
 		} catch (Exception e) {LogUtil.trace(e);}
@@ -1221,6 +1252,11 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 				type == EvaluatorEvent.Type.resume || 
 				type == EvaluatorEvent.Type.stop) {
 		}
+		
+		try {
+			EvaluateInfo otherResult = evt.getOtherResult();
+			if (otherResult != null) this.otherResult = otherResult;
+		} catch (Exception e) {LogUtil.trace(e);}
 		
 		updateMode();
 	}

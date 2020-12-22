@@ -249,6 +249,46 @@ public class EvalCompoundGUI extends JFrame {
 		mniRefreshResult.setMnemonic('f');
 		mniRefreshResult.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F5, 0));
 
+		JMenuItem mniShowResult = new JMenuItem(
+			new AbstractAction(I18nUtil.message("show_evaluate_result")) {
+				
+				/**
+				 * Serial version UID for serializable class. 
+				 */
+				private static final long serialVersionUID = 1L;
+
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					Metrics result = batchEvaluateGUI.getResult();
+					if (result == null) {
+						JOptionPane.showMessageDialog(
+							getThisEvalGUI(), 
+							"Evaluated result empty", 
+							"Evaluated result empty", 
+							JOptionPane.INFORMATION_MESSAGE);
+						return;
+					}
+					
+					try {
+						new MetricsAnalyzeDlg(
+							getThisEvalGUI(),
+							result,
+							batchEvaluateGUI.getAlgRegTable(),
+							batchEvaluateGUI.getEvaluator());
+					}
+					catch (Exception ex) {
+						LogUtil.trace(ex);
+						JOptionPane.showMessageDialog(
+							getThisEvalGUI(), 
+							"Cannot show evaluated result", 
+							"Cannot show evaluated result", 
+							JOptionPane.ERROR_MESSAGE);
+					}
+				}
+			});
+		mniShowResult.setMnemonic(KeyEvent.VK_E);
+		mnTools.add(mniShowResult);
+
 		JMenuItem mniRecoverResult = new JMenuItem(
 			new AbstractAction(I18nUtil.message("recover_evaluate_result")) {
 				

@@ -79,7 +79,6 @@ public class FractionMetricValue implements MetricValue /*, Comparable<FractionM
 	
 	@Override
 	public void accum(MetricValue metricValue) throws RemoteException {
-		// TODO Auto-generated method stub
 		if (metricValue == null || !metricValue.isUsed() || 
 				!(metricValue instanceof FractionMetricValue))
 			return;
@@ -104,7 +103,6 @@ public class FractionMetricValue implements MetricValue /*, Comparable<FractionM
 
 	@Override
 	public void reset() {
-		// TODO Auto-generated method stub
 		a = 0;
 		b = 0;
 	}
@@ -112,14 +110,12 @@ public class FractionMetricValue implements MetricValue /*, Comparable<FractionM
 
 	@Override
 	public Object clone() {
-		// TODO Auto-generated method stub
 		return new FractionMetricValue(a, b);
 	}
 	
 	
 	@Override
 	public String toString() {
-		// TODO Auto-generated method stub
 		double value = (b == 0 ? Constants.UNUSED : ((Number)value()).doubleValue());
 		return MathUtil.format(value);
 	}
@@ -127,7 +123,6 @@ public class FractionMetricValue implements MetricValue /*, Comparable<FractionM
 
 //	@Override
 //	public int compareTo(FractionMetricValue o) {
-//		// TODO Auto-generated method stub
 //		return ((Double)this.value()).compareTo((Double)o.value());
 //	}
 	

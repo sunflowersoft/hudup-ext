@@ -381,6 +381,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 			}
 		}
 		otherResult.progressTotal *= evAlgList.size();
+		otherResult.startDate = System.currentTimeMillis();
 		
 		result = new Metrics();
 		
@@ -535,6 +536,8 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 			} // dataset iterate
 			
 		} // algorithm iterate
+		
+		otherResult.endDate = System.currentTimeMillis();
 		
 		
 		synchronized (this) {
@@ -1127,6 +1130,8 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 				}
 			}
 		}
+		
+		otherResult.endDate = System.currentTimeMillis();
 		
 		thread = null;
 		paused = false;

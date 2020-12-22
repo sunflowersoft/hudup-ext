@@ -157,7 +157,6 @@ public class Metrics implements Serializable/*, Cloneable , Exportable*/ {
 						result.add(metaWrapper);
 				} 
 				catch (Throwable e) {
-					// TODO Auto-generated catch block
 					LogUtil.trace(e);
 				}
 			}
@@ -638,7 +637,6 @@ public class Metrics implements Serializable/*, Cloneable , Exportable*/ {
 						meanWrapper.recalc(wrapper);
 					} 
 					catch (Throwable e) {
-						// TODO Auto-generated catch block
 						LogUtil.trace(e);
 					}
 				} // end for j
@@ -890,7 +888,6 @@ public class Metrics implements Serializable/*, Cloneable , Exportable*/ {
 	 * @throws RemoteException if any error raises.
 	 */
 	public String translate() throws RemoteException {
-		// TODO Auto-generated method stub
 		StringBuffer buffer = new StringBuffer();
 		
 		List<String> algNameList = getAlgNameList();
@@ -940,7 +937,6 @@ public class Metrics implements Serializable/*, Cloneable , Exportable*/ {
 	 * @return descriptions of algorithms.
 	 */
 	private String translateAlgDescs() {
-		// TODO Auto-generated method stub
 		StringBuffer buffer = new StringBuffer();
 		
 		List<String> algNameList = getAlgNameList();
@@ -1003,7 +999,6 @@ public class Metrics implements Serializable/*, Cloneable , Exportable*/ {
 
 //	@Override
 //	public Remote export(int serverPort) throws RemoteException {
-//		// TODO Auto-generated method stub
 //		List<MetricWrapper> newMetricWrapperList = Util.newList(metricWrapperList.size());
 //		for (MetricWrapper wrapper : metricWrapperList) {
 //			try {
@@ -1021,7 +1016,6 @@ public class Metrics implements Serializable/*, Cloneable , Exportable*/ {
 //
 //	@Override
 //	public void unexport() throws RemoteException {
-//		// TODO Auto-generated method stub
 //		for (MetricWrapper wrapper : metricWrapperList) {
 //			try {
 //				wrapper.unexport();
@@ -1035,14 +1029,12 @@ public class Metrics implements Serializable/*, Cloneable , Exportable*/ {
 //
 //	@Override
 //	public void forceUnexport() throws RemoteException {
-//		// TODO Auto-generated method stub
 //		
 //	}
 //
 //
 //	@Override
 //	public Remote getExportedStub() throws RemoteException {
-//		// TODO Auto-generated method stub
 //		LogUtil.warn("Metrics does not support method #getExportedStub()");
 //		
 //		return null;

@@ -29,27 +29,24 @@ public class HudupRecallMetric extends DefaultMetric {
 	 * Default constructor.
 	 */
 	public HudupRecallMetric() {
-		// TODO Auto-generated constructor stub
+
 	}
 
 	
 	@Override
 	public String getDescription() throws RemoteException {
-		// TODO Auto-generated method stub
 		return "Hudup recall";
 	}
 
 	
 	@Override
 	public String getTypeName() throws RemoteException {
-		// TODO Auto-generated method stub
 		return "Hudup";
 	}
 
 	
 	@Override
 	public boolean recalc(Object... params) throws RemoteException {
-		// TODO Auto-generated method stub
 		if (params == null || params.length != 1 || !(params[0] instanceof FractionMetricValue))
 			return false;
 
@@ -63,7 +60,6 @@ public class HudupRecallMetric extends DefaultMetric {
 	
 	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
 		return "Hudup recall";
 	}
 
