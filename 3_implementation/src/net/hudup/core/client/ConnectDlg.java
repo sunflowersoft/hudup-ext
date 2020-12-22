@@ -593,7 +593,8 @@ public abstract class ConnectDlg extends JDialog {
 		JPanel status = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		footer.add(status, BorderLayout.SOUTH);
 		
-		status.add(new JLabel("Local address: " + Constants.hostAddress + "  "));
+		if (Constants.hostAddress != null)
+			status.add(new JLabel("Local address: " + Constants.hostAddress + "  "));
 		String publicIP = NetUtil.getPublicInetAddress();
 		if (publicIP != null)
 			status.add(new JLabel("Internet address: " + publicIP));

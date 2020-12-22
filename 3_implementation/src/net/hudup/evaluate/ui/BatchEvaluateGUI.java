@@ -48,8 +48,8 @@ import net.hudup.core.alg.AlgRemote;
 import net.hudup.core.alg.SetupAlgEvent;
 import net.hudup.core.alg.ui.AlgListBox;
 import net.hudup.core.alg.ui.AlgListBox.AlgListChangedEvent;
-import net.hudup.core.client.ConnectInfo;
 import net.hudup.core.alg.ui.AlgListChooser;
+import net.hudup.core.client.ConnectInfo;
 import net.hudup.core.data.BatchScript;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Dataset;
@@ -543,7 +543,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			
 			@Override
 			public void saveScript() {
-				saveBatchScript();
+				saveBatchScript(true);
 			}
 
 			@Override
@@ -719,7 +719,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					saveBatchScript();
+					saveBatchScript(true);
 				}
 				
 			});
@@ -1040,21 +1040,24 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 
 			@Override
 			protected List<String> getAdditionalTexts() {
-				if (result == null) return super.getAdditionalTexts();
+				List<String> texts = Util.newList();
 				
 				EvaluateInfo otherResult0 = null;
 				try {
 					otherResult0 = evaluator.getOtherResult();
 				} catch (Exception e) {otherResult0 = null; LogUtil.trace(e);}
-				if (otherResult0 == null) return super.getAdditionalTexts();
-
-				otherResult = otherResult0;
-				List<String> texts = Util.newList();
-				SimpleDateFormat df = new SimpleDateFormat(Constants.DATE_FORMAT);
-				if (otherResult.startDate > 0)
-					texts.add("Started date: " + df.format(new Date(otherResult.startDate)));
-				if (otherResult.endDate > 0)
-					texts.add("Ended date: " + df.format(new Date(otherResult.endDate)));
+				
+				if (otherResult0 != null) {
+					otherResult = otherResult0;
+					SimpleDateFormat df = new SimpleDateFormat(Constants.DATE_FORMAT);
+					if (otherResult.startDate > 0)
+						texts.add("Started date: " + df.format(new Date(otherResult.startDate)));
+					if (otherResult.endDate > 0)
+						texts.add("Ended date: " + df.format(new Date(otherResult.endDate)));
+				}
+				
+				if (connectInfo != null)
+					texts.add("Connection information: " + connectInfo.toString());
 				
 				return texts;
 			}
@@ -1594,17 +1597,19 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 	
 	/**
 	 * Saving batch script.
+	 * @param strict strict mode.
 	 */
-	private void saveBatchScript() {
-		if (guiData.pool.size() == 0) {
+	protected void saveBatchScript(boolean strict) {
+		List<String> algNameList = lbAlgs.getAlgNameList();
+		if (strict && (algNameList.size() == 0 || guiData.pool.size() == 0)) {
 			JOptionPane.showMessageDialog(
 				this, 
-				"Pool empty",
-				"Pool empty", 
+				"No algorithm or empty pool",
+				"No algorithm or empty pool", 
 				JOptionPane.ERROR_MESSAGE);
 			return;
 		}
-
+		
 		UriAdapter adapter = new UriAdapter();
         xURI uri = adapter.chooseUri(
 				this, 
@@ -1645,9 +1650,12 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
     		writer = adapter.getWriter(uri, false);
     		
 			BatchScript script = BatchScript.assign(
-					guiData.pool, lbAlgs.getAlgNameList(), evaluator.getMainUnit());
+					guiData.pool, algNameList, evaluator.getMainUnit());
 			
-			script.save(writer);
+			if (strict)
+				script.save(writer);
+			else
+				script.saveEasy(writer);
     		writer.flush();
     		writer.close();
     		writer = null;

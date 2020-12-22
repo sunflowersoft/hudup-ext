@@ -177,7 +177,6 @@ public class UriChooser extends JDialog {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				onOk();
 			}
 		});
@@ -188,7 +187,6 @@ public class UriChooser extends JDialog {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				result = null;
 				internalConfig = null;
 				dispose();
@@ -217,7 +215,6 @@ public class UriChooser extends JDialog {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				select();
 			}
 		});
@@ -229,7 +226,6 @@ public class UriChooser extends JDialog {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				selectAll();
 			}
 		});
@@ -241,7 +237,6 @@ public class UriChooser extends JDialog {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				unselect();
 			}
 		});
@@ -252,7 +247,6 @@ public class UriChooser extends JDialog {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				unselectAll();
 			}
 		});
@@ -301,7 +295,6 @@ public class UriChooser extends JDialog {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				UriAdapter adapter = new UriAdapter(); 
 				xURI uri = adapter.chooseUri(getThis(), true, null, null, null, null);
 				adapter.close();
@@ -344,7 +337,6 @@ public class UriChooser extends JDialog {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				connect();
 			}
 		});
@@ -380,7 +372,6 @@ public class UriChooser extends JDialog {
 			
 			@Override
 			public void itemStateChanged(ItemEvent e) {
-				// TODO Auto-generated method stub
 				if (e.getStateChange() == ItemEvent.SELECTED)
 					dataDriverChanged();
 			}
@@ -496,6 +487,8 @@ public class UriChooser extends JDialog {
 		setConnectInfoControlVisible(true);
 		txtPort.setValue(driver.getDefaultPort());
 		txtHost.setText("localhost");
+		txtUsername.setText("admin");
+		txtPassword.setText("admin");
 		
 		if (driver.getType() == DataType.file) {
 			txtHost.setText("");
@@ -764,7 +757,6 @@ public class UriChooser extends JDialog {
 
 			@Override
 			public boolean accept(Alg alg) {
-				// TODO Auto-generated method stub
 				return alg instanceof Indicator;
 			}
 			

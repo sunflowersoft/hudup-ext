@@ -60,7 +60,7 @@ public class ConnectInfo implements Serializable {
 	/**
 	 * Global address like internet address, WAN address.
 	 */
-	public String globalAddress= null;
+	public String globalAddress = null;
 	
 	
 	/**
@@ -98,6 +98,38 @@ public class ConnectInfo implements Serializable {
 	 */
 	public boolean checkPullMode() {
 		return pullMode && bindUri != null;
+	}
+
+
+	@Override
+	public String toString() {
+		StringBuffer buffer = new StringBuffer();
+		
+		if (account != null && account.getName() != null)
+			buffer.append("Username = " + account.getName());
+		
+		if (connectUri != null)
+			buffer.append(", Connection URI = " + connectUri.toString());
+		
+		if (bindUri != null)
+			buffer.append(", Bound URI = " + bindUri.toString());
+		
+		if (namingUri != null)
+			buffer.append(", Naming URI = " + namingUri.toString());
+		
+		boolean pullMode = checkPullMode();
+		buffer.append(", Pull mode = " + pullMode);
+		
+		String globalAddress = extractGlobalAddress();
+		if (globalAddress != null)
+			buffer.append(", Global address = " + globalAddress);
+		
+		if (pullMode)
+			buffer.append(", Access period (miliseconds) = " + accessPeriod);
+
+		String text = buffer.toString();
+		if (text.startsWith(",")) text = text.substring(1);
+		return text.trim();
 	}
 	
 	

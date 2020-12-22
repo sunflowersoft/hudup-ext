@@ -231,8 +231,8 @@ public class EvalCompoundGUI extends JFrame {
 
 		
 		mnTools.addSeparator();
-		JMenuItem mniRefreshResult = new JMenuItem(
-			new AbstractAction(I18nUtil.message("refresh_evaluate_result")) {
+		JMenuItem mniRefresh = new JMenuItem(
+			new AbstractAction(I18nUtil.message("refresh_evaluate")) {
 				
 				/**
 				 * Serial version UID for serializable class. 
@@ -245,12 +245,12 @@ public class EvalCompoundGUI extends JFrame {
 				}
 				
 			});
-		mnTools.add(mniRefreshResult);
-		mniRefreshResult.setMnemonic('f');
-		mniRefreshResult.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F5, 0));
+		mniRefresh.setMnemonic('r');
+		mniRefresh.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F5, 0));
+		mnTools.add(mniRefresh);
 
-		JMenuItem mniShowResult = new JMenuItem(
-			new AbstractAction(I18nUtil.message("show_evaluate_result")) {
+		JMenuItem mniRetrieveResult = new JMenuItem(
+			new AbstractAction(I18nUtil.message("retrieve_evaluate_result")) {
 				
 				/**
 				 * Serial version UID for serializable class. 
@@ -259,12 +259,14 @@ public class EvalCompoundGUI extends JFrame {
 
 				@Override
 				public void actionPerformed(ActionEvent e) {
+					batchEvaluateGUI.refreshResult();
+
 					Metrics result = batchEvaluateGUI.getResult();
 					if (result == null) {
 						JOptionPane.showMessageDialog(
 							getThisEvalGUI(), 
-							"Evaluated result empty", 
-							"Evaluated result empty", 
+							"Evaluated result is empty", 
+							"Empty evaluated result", 
 							JOptionPane.INFORMATION_MESSAGE);
 						return;
 					}
@@ -286,8 +288,9 @@ public class EvalCompoundGUI extends JFrame {
 					}
 				}
 			});
-		mniShowResult.setMnemonic(KeyEvent.VK_E);
-		mnTools.add(mniShowResult);
+		mniRetrieveResult.setMnemonic('t');
+		mniRetrieveResult.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F6, 0));
+		mnTools.add(mniRetrieveResult);
 
 		JMenuItem mniRecoverResult = new JMenuItem(
 			new AbstractAction(I18nUtil.message("recover_evaluate_result")) {
@@ -303,8 +306,8 @@ public class EvalCompoundGUI extends JFrame {
 					if (recoveredResult == null) {
 						JOptionPane.showMessageDialog(
 							getThisEvalGUI(), 
-							"Evaluated result empty", 
-							"Evaluated result empty", 
+							"Evaluated result is empty", 
+							"Empty evaluated result", 
 							JOptionPane.INFORMATION_MESSAGE);
 						return;
 					}
@@ -335,8 +338,25 @@ public class EvalCompoundGUI extends JFrame {
 					}
 				}
 			});
-		mniRecoverResult.setMnemonic(KeyEvent.VK_R);
+		mniRecoverResult.setMnemonic('o');
 		mnTools.add(mniRecoverResult);
+
+		mnTools.addSeparator();
+		JMenuItem mniSaveScript = new JMenuItem(
+			new AbstractAction(I18nUtil.message("save_script")) {
+				
+				/**
+				 * Serial version UID for serializable class. 
+				 */
+				private static final long serialVersionUID = 1L;
+
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					batchEvaluateGUI.saveBatchScript(false);
+				}
+			});
+		mniSaveScript.setMnemonic('s');
+		mnTools.add(mniSaveScript);
 
 		boolean agent = false;
 		try {
@@ -359,11 +379,11 @@ public class EvalCompoundGUI extends JFrame {
 						switchEvaluator();
 					}
 				});
-			mniSwitchEvaluator.setMnemonic(KeyEvent.VK_S);
+			mniSwitchEvaluator.setMnemonic('w');
 			mnTools.add(mniSwitchEvaluator);
 		}
 			
-
+		
 		JMenu mnHelp = new JMenu(I18nUtil.message("help"));
 		mnBar.add(mnHelp);
 		
@@ -380,7 +400,7 @@ public class EvalCompoundGUI extends JFrame {
 					new HelpContent(getThisEvalGUI());
 				}
 			});
-		mniHelpContent.setMnemonic(KeyEvent.VK_H);
+		mniHelpContent.setMnemonic('h');
 		mniHelpContent.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F1, 0));
 		mnHelp.add(mniHelpContent);
 

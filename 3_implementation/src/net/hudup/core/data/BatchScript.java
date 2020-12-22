@@ -129,6 +129,23 @@ public class BatchScript implements Serializable {
 	
 	
 	/**
+	 * Saving this batch script.
+	 * @param writer writer to save.
+	 * @return whether save successfully.
+	 */
+	public boolean saveEasy(Writer writer) {
+		if (pool.size() > 0) return save(writer);
+		
+		PropList propList = new PropList();
+		propList.put("algorithms", TextParserUtil.toText(algNameList, ","));
+		propList.put("trainingsets", "");
+		propList.put("testingsets", "");
+		
+		return propList.saveProperties(writer);
+	}
+	
+	
+	/**
 	 * Parsing batch script to retrieve dataset pool and algorithm names. 
 	 * @param reader reader to read.
 	 * @param mainUnit main unit  which is the key of main unit in configuration. It can be null.

@@ -956,21 +956,24 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 
 			@Override
 			protected List<String> getAdditionalTexts() {
-				if (result == null) return super.getAdditionalTexts();
+				List<String> texts = Util.newList();
 				
 				EvaluateInfo otherResult0 = null;
 				try {
 					otherResult0 = evaluator.getOtherResult();
 				} catch (Exception e) {otherResult0 = null; LogUtil.trace(e);}
-				if (otherResult0 == null) return super.getAdditionalTexts();
-
-				otherResult = otherResult0;
-				List<String> texts = Util.newList();
-				SimpleDateFormat df = new SimpleDateFormat(Constants.DATE_FORMAT);
-				if (otherResult.startDate > 0)
-					texts.add("Started date: " + df.format(new Date(otherResult.startDate)));
-				if (otherResult.endDate > 0)
-					texts.add("Ended date: " + df.format(new Date(otherResult.endDate)));
+				
+				if (otherResult0 != null) {
+					otherResult = otherResult0;
+					SimpleDateFormat df = new SimpleDateFormat(Constants.DATE_FORMAT);
+					if (otherResult.startDate > 0)
+						texts.add("Started date: " + df.format(new Date(otherResult.startDate)));
+					if (otherResult.endDate > 0)
+						texts.add("Ended date: " + df.format(new Date(otherResult.endDate)));
+				}
+				
+				if (connectInfo != null)
+					texts.add("Connection information: " + connectInfo.toString());
 				
 				return texts;
 			}

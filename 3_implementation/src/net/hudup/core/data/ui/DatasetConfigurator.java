@@ -184,7 +184,6 @@ public class DatasetConfigurator extends JDialog {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				onOk();
 			}
 		});
@@ -195,7 +194,6 @@ public class DatasetConfigurator extends JDialog {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				resultedConfig = null;
 				internalConfig = null;
 				dispose();
@@ -221,7 +219,6 @@ public class DatasetConfigurator extends JDialog {
 
 			@Override
 			protected JPopupMenu createContextMenu() {
-				// TODO Auto-generated method stub
 				if (config == null || getSelectedValue() == null) return null;
 				
 				JPopupMenu ctxMenu = new JPopupMenu();
@@ -257,7 +254,6 @@ public class DatasetConfigurator extends JDialog {
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					// TODO Auto-generated method stub
 					setUnit((String)settings[index][0]);
 				}
 			});
@@ -307,8 +303,6 @@ public class DatasetConfigurator extends JDialog {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
-				
 				UriAdapter adapter = new UriAdapter();
 				xURI uri = adapter.chooseUri(getThis(), true, null, null, null, null);
 				adapter.close();
@@ -351,7 +345,6 @@ public class DatasetConfigurator extends JDialog {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				connect();
 			}
 		});
@@ -387,7 +380,6 @@ public class DatasetConfigurator extends JDialog {
 			
 			@Override
 			public void itemStateChanged(ItemEvent e) {
-				// TODO Auto-generated method stub
 				if (e.getStateChange() == ItemEvent.SELECTED)
 					dataDriverChanged();
 			}
@@ -501,6 +493,8 @@ public class DatasetConfigurator extends JDialog {
 		setConnectInfoControlVisible(true);
 		txtPort.setValue(driver.getDefaultPort());
 		txtHost.setText("localhost");
+		txtUsername.setText("admin");
+		txtPassword.setText("admin");
 		
 		if (driver.getType() == DataType.file) {
 			txtHost.setText("");
