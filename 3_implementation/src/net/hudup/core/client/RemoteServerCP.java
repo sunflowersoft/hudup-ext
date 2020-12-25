@@ -561,15 +561,25 @@ public class RemoteServerCP extends JFrame implements ServerStatusListener {
 	 * @param args argument parameter of main method. It contains command line arguments.
 	 */
 	public static void main(String[] args) {
+		boolean console = args != null && args.length >= 1 
+				&& args[0] != null && args[0].toLowerCase().equals("console");
+		if (console) {
+			LightRemoteServerCP.console();
+			return;
+		}
+		
 		ConnectDlg dlg = ConnectDlg.connect();
 		
 		Server server = dlg.getServer();
-		if (server != null)
-			new RemoteServerCP(server, dlg.getConnectInfo().bindUri);
-		else {
+		ConnectInfo connectInfo = dlg.getConnectInfo();
+		if (server == null) {
 			JOptionPane.showMessageDialog(
 					null, "Can't retrieve remote server", "Faile to retrieve server", JOptionPane.ERROR_MESSAGE);
 		}
+		else if (connectInfo.bindUri == null || connectInfo.checkPullMode())
+			new LightRemoteServerCP(server);
+		else
+			new RemoteServerCP(server, connectInfo.bindUri);
 	}
 
 
