@@ -22,6 +22,7 @@ import net.hudup.core.client.PowerServer;
 import net.hudup.core.logistic.I18nUtil;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.xURI;
+import net.hudup.core.logistic.ui.HelpContent;
 import net.hudup.server.ui.PowerServerCP;
 
 /**
@@ -59,12 +60,9 @@ public class ExtendedServerCP extends PowerServerCP {
 	    setJMenuBar(createMenuBar());
 	}
 
-	
-	/**
-	 * Creating main menu bar.
-	 * @return main menu bar.
-	 */
-	private JMenuBar createMenuBar() {
+
+	@Override
+	protected JMenuBar createMenuBar() {
 		JMenuBar mnBar = new JMenuBar();
 		
 		JMenu mnTool = new JMenu(I18nUtil.message("tool"));
@@ -144,6 +142,28 @@ public class ExtendedServerCP extends PowerServerCP {
 		mniEvaluatorCP.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, InputEvent.CTRL_DOWN_MASK));
 		mnTool.add(mniEvaluatorCP);
 
+		
+		JMenu mnHelp = new JMenu(I18nUtil.message("help"));
+		mnBar.add(mnHelp);
+		
+		PowerServerCP thisCP = this;
+		JMenuItem mniHelpContent = new JMenuItem(
+			new AbstractAction(I18nUtil.message("help_content")) {
+				
+				/**
+				 * Serial version UID for serializable class. 
+				 */
+				private static final long serialVersionUID = 1L;
+
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					new HelpContent(thisCP);
+				}
+			});
+		mniHelpContent.setMnemonic('h');
+		mniHelpContent.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F1, 0));
+		mnHelp.add(mniHelpContent);
+		
 		return mnBar;
 	}
 	

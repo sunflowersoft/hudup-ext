@@ -1063,19 +1063,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			}
 			
 		};
-		try {
-			this.statusBar.setTextPane0(DSUtil.shortenVerbalName(evaluator.getName()));
-		} catch (Exception e) {LogUtil.trace(e);}
-		if (otherResult.statuses != null && otherResult.statuses.length > 0) {
-			if (otherResult.statuses[0] != null)
-				this.statusBar.setTextPane1(otherResult.statuses[0]);
-			if (otherResult.statuses.length > 1 && otherResult.statuses[1] != null)
-				this.statusBar.setTextPane2(otherResult.statuses[1]);
-		}
-		if (otherResult.elapsedTime > 0) {
-			String elapsedTimeText = Counter.formatTime(otherResult.elapsedTime);
-			statusBar.getLastPane().setText(elapsedTimeText);
-		}
+		updateStatusBar();
 		statusPane.add(this.statusBar, BorderLayout.CENTER);
 
 		this.signalLight = new Light();
@@ -1148,6 +1136,35 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 	}
 	
 	
+	@Override
+	public synchronized void refreshEvaluate() {
+		super.refreshEvaluate();
+		
+		List<String> algNames = otherResult != null ? otherResult.algNames : null;
+		lbAlgs.unexportNonPluginAlgs();
+		if (algNames != null && algNames.size() > 0) {
+			updateAlgRegFromEvaluator(algNames);
+			lbAlgs.update(algRegTable.getAlgList(algNames));
+		}
+		else
+			lbAlgs.update(algRegTable.getAlgList());
+
+		try {
+			DatasetPoolExchanged pool = this.evaluator.getDatasetPool();
+			if (pool != null) {
+				guiData.pool = pool.toDatasetPoolClient();
+				tblDatasetPool.update(guiData.pool);
+			}
+		} catch (Throwable e) {LogUtil.trace(e);}
+
+		tblMetrics.update(result);
+
+		updateStatusBar();
+		
+		updateMode();
+	}
+
+
 	@Override
 	protected void clear() {
 		try {
@@ -1355,7 +1372,11 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 				setResultVisible(result != null && result.size() > 0);
 				
 				btnConfigAlgs.setEnabled(algRegTable.size() > 0);
+				btnClear.setEnabled(guiData.pool.size() > 0);
+				btnUpload.setEnabled(true);
+				btnDownload.setEnabled(true);
 				
+				tblMetrics.update(result);
 				prgRunning.setMaximum(0);
 				prgRunning.setValue(0);
 				prgRunning.setVisible(false);
@@ -1371,6 +1392,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 				btnUpload.setEnabled(true);
 				btnDownload.setEnabled(true);
 				
+				tblMetrics.update(result);
 				prgRunning.setMaximum(0);
 				prgRunning.setValue(0);
 				prgRunning.setVisible(false);
@@ -1733,6 +1755,30 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 		}
 	}
 
+	
+	/**
+	 * Updating status bar.
+	 */
+	private void updateStatusBar() {
+		if (statusBar == null) return;
+		
+		try {
+			statusBar.setTextPane0(DSUtil.shortenVerbalName(evaluator.getName()));
+		} catch (Exception e) {LogUtil.trace(e);}
+		
+		if (otherResult.statuses != null && otherResult.statuses.length > 0) {
+			if (otherResult.statuses[0] != null)
+				statusBar.setTextPane1(otherResult.statuses[0]);
+			if (otherResult.statuses.length > 1 && otherResult.statuses[1] != null)
+				statusBar.setTextPane2(otherResult.statuses[1]);
+		}
+		
+		if (otherResult.elapsedTime > 0) {
+			String elapsedTimeText = Counter.formatTime(otherResult.elapsedTime);
+			statusBar.getLastPane().setText(elapsedTimeText);
+		}
+	}
+	
 	
 	@Override
 	protected void updateGUIData() {

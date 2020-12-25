@@ -113,7 +113,6 @@ public class Test {
 	 * @param args argument.
 	 */
 	public static void main(String[] args) throws Exception {
-		// TODO Auto-generated method stub
 		//getInstances(NeighborCF.class, xURI.create("/E:/sim.jar"));
 		//System.out.println(System.getProperty("java.rmi.server.useCodebaseOnly"));
 //		Util.getPluginManager().fire();
@@ -155,7 +154,6 @@ public class Test {
 //	 * Default constructor.
 //	 */
 //	public Test() {
-//		// TODO Auto-generated constructor stub
 //	}
 //
 //	
@@ -323,7 +321,6 @@ class PluginStorageManifest2 extends JTable {
 
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				// TODO Auto-generated method stub
 				if(SwingUtilities.isRightMouseButton(e) ) {
 					JPopupMenu contextMenu = createContextMenu();
 					if (contextMenu != null)
@@ -768,7 +765,6 @@ class PluginStorageManifest2 extends JTable {
 					
 					@Override
 					public void actionPerformed(ActionEvent e) {
-						// TODO Auto-generated method stub
 						tblRegister.selectAll(true, 4);
 					}
 				});
@@ -782,7 +778,6 @@ class PluginStorageManifest2 extends JTable {
 					
 					@Override
 					public void actionPerformed(ActionEvent e) {
-						// TODO Auto-generated method stub
 						tblRegister.selectAll(false, 4);
 					}
 				});
@@ -804,7 +799,6 @@ class PluginStorageManifest2 extends JTable {
 					
 					@Override
 					public void actionPerformed(ActionEvent e) {
-						// TODO Auto-generated method stub
 						tblRegister.selectAll(true, 5);
 					}
 				});
@@ -819,7 +813,6 @@ class PluginStorageManifest2 extends JTable {
 					
 					@Override
 					public void actionPerformed(ActionEvent e) {
-						// TODO Auto-generated method stub
 						tblRegister.selectAll(false, 5);
 					}
 				});
@@ -841,7 +834,6 @@ class PluginStorageManifest2 extends JTable {
 					
 					@Override
 					public void actionPerformed(ActionEvent e) {
-						// TODO Auto-generated method stub
 						tblRegister.selectAll(true, 6);
 					}
 				});
@@ -855,7 +847,6 @@ class PluginStorageManifest2 extends JTable {
 					
 					@Override
 					public void actionPerformed(ActionEvent e) {
-						// TODO Auto-generated method stub
 						tblRegister.selectAll(false, 6);
 					}
 				});
@@ -917,7 +908,6 @@ class PluginStorageManifest2 extends JTable {
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					// TODO Auto-generated method stub
 					apply();
 				}
 			});
@@ -928,7 +918,6 @@ class PluginStorageManifest2 extends JTable {
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					// TODO Auto-generated method stub
 					tblRegister.update();
 				}
 			});
@@ -1069,7 +1058,7 @@ class RegisterTM2 extends DefaultTableModel {
 			
 			row.add(PluginStorage.lookupTableName(alg.getClass()));
 			row.add(alg.getName());
-			row.add(alg.getClass().toString());
+			row.add(alg.getClass().getName());
 			row.add(alg);
 			row.add(true);
 			
@@ -1107,7 +1096,7 @@ class RegisterTM2 extends DefaultTableModel {
 			
 			row.add(PluginStorage.lookupTableName(alg.getClass()));
 			row.add(alg.getName());
-			row.add(alg.getClass().toString());
+			row.add(alg.getClass().getName());
 			row.add(alg);
 			row.add(false);
 			
@@ -1159,7 +1148,6 @@ class RegisterTM2 extends DefaultTableModel {
 	
 	@Override
 	public Class<?> getColumnClass(int columnIndex) {
-		// TODO Auto-generated method stub
 		if (columnIndex == 4 || columnIndex == 5 || columnIndex == 6)
 			return Boolean.class;
 		else
@@ -1169,7 +1157,6 @@ class RegisterTM2 extends DefaultTableModel {
 	
 	@Override
 	public boolean isCellEditable(int row, int column) {
-		// TODO Auto-generated method stub
 		if (column == 4 || column == 5 || column == 6)
 			return true;
 		else
@@ -1179,7 +1166,6 @@ class RegisterTM2 extends DefaultTableModel {
 	
 	@Override
 	public void setValueAt(Object aValue, int row, int column) {
-		// TODO Auto-generated method stub
 		super.setValueAt(aValue, row, column);
 		
 		modified = true;
@@ -1310,7 +1296,6 @@ class DataDriverListTM2 extends DefaultTableModel {
 	 */
 	public DataDriverListTM2() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
 
@@ -1369,7 +1354,6 @@ class DataDriverListTM2 extends DefaultTableModel {
 	
 	@Override
 	public boolean isCellEditable(int row, int column) {
-		// TODO Auto-generated method stub
 		return false;
 	}
 	
@@ -1439,7 +1423,6 @@ class MetricsOptionTable2 extends JTable {
 
 	@Override
 	public void setValueAt(Object aValue, int row, int column) {
-		// TODO Auto-generated method stub
 		super.setValueAt(aValue, row, column);
 		
         if (column != 3)
@@ -1619,7 +1602,6 @@ class MetricsOptionTM2 extends DefaultTableModel {
 	
 	@Override
 	public Class<?> getColumnClass(int columnIndex) {
-		// TODO Auto-generated method stub
 		if (columnIndex == 3)
 			return Boolean.class;
 		else
@@ -1629,7 +1611,6 @@ class MetricsOptionTM2 extends DefaultTableModel {
 
 	@Override
 	public boolean isCellEditable(int row, int column) {
-		// TODO Auto-generated method stub
 		return column == 3;
 	}
 	
@@ -1678,14 +1659,12 @@ class MetricsTable2 extends JTable {
 	 * @param referredEvaluator referred evaluator.
 	 */
 	public MetricsTable2(final RegisterTable algTable, final Evaluator referredEvaluator) {
-		// TODO Auto-generated constructor stub
 		super (new MetricsTM2());
 		
 		this.addMouseListener(new MouseAdapter() {
 
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				// TODO Auto-generated method stub
 				if (SwingUtilities.isRightMouseButton(e)) {
 					final Metrics metrics = getMetricsTM().getMetrics();
 					if (metrics == null || metrics.size() == 0)
@@ -1845,7 +1824,6 @@ class MetricsTM2 extends DefaultTableModel {
 	 */
 	public MetricsTM2() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
 
@@ -1939,7 +1917,6 @@ class MetricsTM2 extends DefaultTableModel {
 	
 	@Override
 	public boolean isCellEditable(int row, int column) {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
@@ -2075,7 +2052,6 @@ class RemoteInfoTable2 extends JTable {
 		 */
 		public HiddenTextCellRenderer() {
 			super();
-			// TODO Auto-generated constructor stub
 		}
 		
 		
@@ -2235,7 +2211,6 @@ class RemoteInfoTM2 extends DefaultTableModel {
 	
 	@Override
 	public boolean isCellEditable(int row, int column) {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
@@ -2289,7 +2264,6 @@ class JarImportAlgDlag extends JDialog {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				onOk();
 			}
 		});
@@ -2300,7 +2274,6 @@ class JarImportAlgDlag extends JDialog {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				dispose();
 			}
 		});
@@ -2446,7 +2419,6 @@ class ImportAlgDlag extends JDialog {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				leftToRight();
 			}
 		});
@@ -2459,7 +2431,6 @@ class ImportAlgDlag extends JDialog {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				leftToRightAll();
 			}
 		});
@@ -2472,7 +2443,6 @@ class ImportAlgDlag extends JDialog {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				rightToLeft();
 			}
 		});
@@ -2485,7 +2455,6 @@ class ImportAlgDlag extends JDialog {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				rightToLeftAll();
 			}
 		});
@@ -2513,7 +2482,6 @@ class ImportAlgDlag extends JDialog {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				ok();
 			}
 		});
@@ -2524,7 +2492,6 @@ class ImportAlgDlag extends JDialog {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				dispose();
 			}
 		});
@@ -2882,7 +2849,6 @@ class ImportAlgDlag extends JDialog {
 
 	@Override
 	public void dispose() {
-		// TODO Auto-generated method stub
 		List<Alg> algList = this.leftList.getAlgList();
 		algList.addAll(this.rightList.getAlgList());
 		for (Alg alg : algList) {

@@ -9,6 +9,7 @@ package net.hudup.core.alg;
 
 import java.rmi.RemoteException;
 
+import net.hudup.core.Util;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Dataset;
 
@@ -49,8 +50,12 @@ public abstract class MemoryBasedRecommenderAbstract extends RecommenderAbstract
 		this.dataset = dataset;
 		
 		this.config.setMetadata(dataset.getConfig().getMetadata());
+		double threshold = dataset.getConfig().getAsReal(DataConfig.RELEVANT_RATING_FIELD);
+		if (Util.isUsed(threshold)) this.config.put(DataConfig.RELEVANT_RATING_FIELD, threshold);
+		
 		this.config.addReadOnly(DataConfig.MIN_RATING_FIELD);
 		this.config.addReadOnly(DataConfig.MAX_RATING_FIELD);
+		if (Util.isUsed(threshold)) this.config.addReadOnly(DataConfig.RELEVANT_RATING_FIELD);
 		
 		if (this.config.getAsBoolean(MINMAX_RATING_RECONFIG))
 			reconfigMinMaxRating(this.config, dataset);

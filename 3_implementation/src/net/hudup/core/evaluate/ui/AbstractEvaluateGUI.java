@@ -29,6 +29,7 @@ import net.hudup.core.Util;
 import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.AlgDesc;
 import net.hudup.core.alg.AlgDesc2;
+import net.hudup.core.alg.NullAlg;
 import net.hudup.core.alg.SetupAlgEvent;
 import net.hudup.core.alg.SetupAlgListener;
 import net.hudup.core.client.ClassProcessor;
@@ -332,7 +333,7 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 		else
 			updateAlgRegFromEvaluator(guiData.algNames);
 		
-		DatasetPool oldPool = guiData.pool; 
+		DatasetPool oldPool = guiData.pool;
 		try {
 			DatasetPoolExchanged pool = this.evaluator.getDatasetPool();
 			guiData.pool = pool != null ? pool.toDatasetPoolClient() : null;
@@ -382,7 +383,13 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 		boolean connected = true;
 		List<EventObject> evtList = Util.newList();
 		try {
-			evtList = evaluator.doTask(id);
+			boolean classPathContains = true;
+			try {
+				Class.forName(evaluator.getClassName());
+			}
+			catch (Throwable e) {classPathContains = false;}
+			
+			evtList = classPathContains ? evaluator.doTask(id) : evaluator.doTask2(id);
 		}
 		catch (Throwable e) {connected = false; LogUtil.trace(e);}
 		
@@ -458,24 +465,23 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	
 	
 	/**
-	 * Refreshing evaluated result. Please distinguish this method from method {@link #refresh()}
+	 * Refreshing evaluation process. Please distinguish this method from method {@link #refresh()}
 	 * when method {@link #refresh()} refreshes data pool and local GUI.
 	 */
-	public synchronized void refreshResult() {
+	public synchronized void refreshEvaluate() {
+		try {
+			if (connectInfo.checkPullMode()) taskQueueFeed();
+		}
+		catch (Throwable e) {LogUtil.trace(e);}
+		
 		Metrics result = null;
 		EvaluateInfo otherResult = null;
-		boolean success = true;
 		try {
 			result = evaluator.getResult();
 			otherResult = evaluator.getOtherResult();
 			if (otherResult != null) this.otherResult = otherResult;
-		} catch (Exception ex) {success = false; LogUtil.trace(ex);}
+		} catch (Exception ex) {LogUtil.trace(ex);}
 		
-		if (!success) {
-			updateMode();
-			return;
-		}
-
 		if (result == null) {
 			this.recoveredResult = this.result;
 			this.result = result;
@@ -820,6 +826,17 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	}
 
 	
+	@Override
+	public boolean classPathContains(String className) throws RemoteException {
+    	try {
+    		Class.forName(className);
+    		return true;
+    	} catch (Exception e) {}
+    	
+		return false;
+	}
+
+
 	/**
 	 * Updating GUI data.
 	 */
@@ -902,12 +919,19 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	 * Updating both plug-in storage, evaluated algorithms, and dataset pool from server.
 	 */
 	public synchronized void updateFromServer() {
+		try {
+			if (connectInfo.checkPullMode()) taskQueueFeed();
+		}
+		catch (Throwable e) {LogUtil.trace(e);}
+
+		// Most important.
 		updatePluginFromEvaluator();
 		updateAlgRegFromEvaluator();
-		
 		try {
 			pluginChanged(new PluginChangedEvent(this));
 		} catch (Exception e) {LogUtil.trace(e);}
+		
+		refreshEvaluate();
 	}
 	
 	
@@ -932,7 +956,12 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 		if (evaluator == null) return algNames;
 		try {
 			EvaluateInfo otherResult = evaluator.getOtherResult();
-			algNames = otherResult != null ? otherResult.algNames : null;
+			if (otherResult != null) {
+				algNames = otherResult.algNames;
+				this.otherResult = otherResult;
+			}
+			else
+				algNames = null;
 		} catch (Exception e) {LogUtil.trace(e);}
 		
 		updateAlgRegFromEvaluator(algNames);
@@ -969,11 +998,21 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 			else if (normalAlgReg.contains(algName))
 				algRegTable.register(normalAlgReg.query(algName));
 			else {
+				Alg alg = null;
 				try {
-					Alg alg = evaluator.getEvaluatedAlg(algName, connectInfo.bindUri != null);
-					if (alg != null) algRegTable.register(alg);
+					alg = evaluator.getEvaluatedAlg(algName, connectInfo.bindUri != null);
 				}
-				catch (Exception e) {LogUtil.trace(e);}
+				catch (Exception e) {
+					alg = null;
+					try {
+						AlgDesc2 algDesc = evaluator.getEvaluatedAlgDesc(algName);
+						if (algDesc != null) alg = new NullAlg(algDesc);
+					}
+					catch (Exception ex) {
+						LogUtil.error("Error when evaluator gets evaluated algorithm, caused by " + e.getMessage());
+					}
+				}
+				if (alg != null) algRegTable.register(alg);
 			}
 		}
 		
@@ -981,11 +1020,14 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 		
 		algNames = algRegTable.getAlgNames();
 		for (String algName : algNames) {
+			Alg alg = algRegTable.query(algName);
+			if (alg instanceof NullAlg) continue;
+			
+			AlgDesc algDesc = null;
 			try {
-				Alg alg = algRegTable.query(algName);
-				AlgDesc algDesc = evaluator.getPluginAlgDesc(alg.getClass(), alg.getName());
-				if (algDesc != null) alg.getConfig().putAll(algDesc.getConfig());
+				algDesc = evaluator.getPluginAlgDesc(alg.getClass(), alg.getName());
 			} catch (Exception e) {LogUtil.error("Error when evaluator gets plug-in algorithm, caused by " + e.getMessage());}
+			if (algDesc != null) alg.getConfig().putAll(algDesc.getConfig());
 		}
 	}
 	

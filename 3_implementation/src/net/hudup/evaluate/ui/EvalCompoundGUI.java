@@ -62,6 +62,7 @@ import net.hudup.core.evaluate.Metrics;
 import net.hudup.core.evaluate.NoneWrapperMetricList;
 import net.hudup.core.evaluate.ui.EvaluateGUIData;
 import net.hudup.core.evaluate.ui.MetricsAnalyzeDlg;
+import net.hudup.core.evaluate.ui.MetricsTable;
 import net.hudup.core.logistic.Account;
 import net.hudup.core.logistic.I18nUtil;
 import net.hudup.core.logistic.LogUtil;
@@ -241,7 +242,7 @@ public class EvalCompoundGUI extends JFrame {
 
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					batchEvaluateGUI.refreshResult();
+					batchEvaluateGUI.refreshEvaluate();
 				}
 				
 			});
@@ -259,37 +260,13 @@ public class EvalCompoundGUI extends JFrame {
 
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					batchEvaluateGUI.refreshResult();
-
-					Metrics result = batchEvaluateGUI.getResult();
-					if (result == null) {
-						JOptionPane.showMessageDialog(
-							getThisEvalGUI(), 
-							"Evaluated result is empty", 
-							"Empty evaluated result", 
-							JOptionPane.INFORMATION_MESSAGE);
-						return;
-					}
-					
-					try {
-						new MetricsAnalyzeDlg(
-							getThisEvalGUI(),
-							result,
-							batchEvaluateGUI.getAlgRegTable(),
-							batchEvaluateGUI.getEvaluator());
-					}
-					catch (Exception ex) {
-						LogUtil.trace(ex);
-						JOptionPane.showMessageDialog(
-							getThisEvalGUI(), 
-							"Cannot show evaluated result", 
-							"Cannot show evaluated result", 
-							JOptionPane.ERROR_MESSAGE);
-					}
+					MetricsTable.showDlg(getThisEvalGUI(),
+						batchEvaluateGUI.getResult(),
+						batchEvaluateGUI.getAlgRegTable(),
+						batchEvaluateGUI.getEvaluator());
 				}
 			});
 		mniRetrieveResult.setMnemonic('t');
-		mniRetrieveResult.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F6, 0));
 		mnTools.add(mniRetrieveResult);
 
 		JMenuItem mniRecoverResult = new JMenuItem(
@@ -306,9 +283,7 @@ public class EvalCompoundGUI extends JFrame {
 					if (recoveredResult == null) {
 						JOptionPane.showMessageDialog(
 							getThisEvalGUI(), 
-							"Evaluated result is empty", 
-							"Empty evaluated result", 
-							JOptionPane.INFORMATION_MESSAGE);
+							"Evaluated result is empty", "Empty evaluated result", JOptionPane.INFORMATION_MESSAGE);
 						return;
 					}
 					
@@ -316,25 +291,20 @@ public class EvalCompoundGUI extends JFrame {
 						JOptionPane.showMessageDialog(
 							getThisEvalGUI(), 
 							"Evaluated result is not lost and so\n it is not necessary to recover it.", 
-							"Evaluated result is not lost", 
-							JOptionPane.INFORMATION_MESSAGE);
+							"Evaluated result is not lost", JOptionPane.INFORMATION_MESSAGE);
 						return;
 					}
 
 					try {
 						new MetricsAnalyzeDlg(
-							getThisEvalGUI(),
-							recoveredResult,
-							batchEvaluateGUI.getAlgRegTable(),
-							batchEvaluateGUI.getEvaluator());
+							getThisEvalGUI(), recoveredResult,
+							batchEvaluateGUI.getAlgRegTable(), batchEvaluateGUI.getEvaluator());
 					}
 					catch (Exception ex) {
 						LogUtil.trace(ex);
 						JOptionPane.showMessageDialog(
 							getThisEvalGUI(), 
-							"Cannot recover evaluated result", 
-							"Cannot recover evaluated result", 
-							JOptionPane.ERROR_MESSAGE);
+							"Cannot recover evaluated result", "Cannot recover evaluated result", JOptionPane.ERROR_MESSAGE);
 					}
 				}
 			});
@@ -426,7 +396,7 @@ public class EvalCompoundGUI extends JFrame {
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					batchEvaluateGUI.refreshResult();
+					batchEvaluateGUI.refreshEvaluate();
 				}
 			});
 		btnRefreshResult.setMargin(new Insets(0, 0 , 0, 0));

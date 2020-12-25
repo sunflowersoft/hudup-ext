@@ -16,7 +16,6 @@ import net.hudup.core.data.RatingMatrix;
 
 /**
  * This abstract class models a so-called integrated KBase, which provides advances methods on knowledge base.
- * For example, method {@link #estimate(int, int)} estimates a rating value of specified user giving on specified item.
  * Integrated KBase is often integrated with complex recommendation algorithms.
  * Especially, any integrated KBase has internal data structure dependent on concrete application.
  * The method {@link #destroyDataStructure()} destroys such internal data structure when integrated KBase is closed. 
@@ -25,7 +24,7 @@ import net.hudup.core.data.RatingMatrix;
  * @version 10.0
  *
  */
-public abstract class KBaseRecommendIntegrated extends KBaseAbstract {
+public abstract class KBaseRecommendIntegrated extends KBaseRecommend {
 
 	
 	/**
@@ -37,25 +36,13 @@ public abstract class KBaseRecommendIntegrated extends KBaseAbstract {
 	/**
 	 * Default constructor.
 	 */
-	public KBaseRecommendIntegrated() {
+	protected KBaseRecommendIntegrated() {
 		super();
 	}
 	
 	
-	/**
-	 * This method estimates a rating value of specified user giving on specified item.
-	 * Because this method is abstract, any class extends {@link KBaseRecommendIntegrated} must complete it.
-	 * 
-	 * @param userId specified user identifier (user ID).
-	 * @param itemId specified item identifier (item ID).
-	 * @return estimated rating value.
-	 */
-	public abstract double estimate(int userId, int itemId);
-	
-	
 	@Override
 	public void learn(Dataset dataset, Alg alg) throws RemoteException {
-		// TODO Auto-generated method stub
 		super.learn(dataset, alg);
 		
 		learn0(dataset, alg);
@@ -86,7 +73,6 @@ public abstract class KBaseRecommendIntegrated extends KBaseAbstract {
 	
 	@Override
 	public void load() throws RemoteException {
-		// TODO Auto-generated method stub
 		super.load();
 		
 		load0();
@@ -102,7 +88,6 @@ public abstract class KBaseRecommendIntegrated extends KBaseAbstract {
 	
 	@Override
 	public void save(DataConfig storeConfig) throws RemoteException {
-		// TODO Auto-generated method stub
 		super.save(storeConfig);
 		
 		export0(storeConfig);
@@ -119,7 +104,6 @@ public abstract class KBaseRecommendIntegrated extends KBaseAbstract {
 	
 	@Override
 	public void close() throws Exception {
-		// TODO Auto-generated method stub
 		super.close();
 		
 		destroyDataStructure();

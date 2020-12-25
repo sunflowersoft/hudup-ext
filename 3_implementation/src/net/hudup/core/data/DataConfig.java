@@ -42,331 +42,333 @@ public class DataConfig extends PropList {
 	/**
 	 * Parser field name
 	 */
-	public final static String PARSER_FIELD                   = changeCase("parser");
+	public final static String PARSER_FIELD                    = changeCase("parser");
 	
 	/**
 	 * Data driver field name
 	 */
-	public final static String DATA_DRIVER_NAME_FIELD         = changeCase("data_driver_name");
+	public final static String DATA_DRIVER_NAME_FIELD          = changeCase("data_driver_name");
 	
 	/**
 	 * User ID field name
 	 */
-	public final static String USERID_FIELD                   = changeCase("userid");
+	public final static String USERID_FIELD                    = changeCase("userid");
 	
 	/**
 	 * External user ID field name
 	 */
-	public final static String EXTERNAL_USERID_FIELD          = changeCase("external_userid");
+	public final static String EXTERNAL_USERID_FIELD           = changeCase("external_userid");
 	
 	/**
 	 * User type field name
 	 */
-	public final static String USER_TYPE_FIELD                = changeCase("user_type");
+	public final static String USER_TYPE_FIELD                 = changeCase("user_type");
 	
 	/**
 	 * Item field name
 	 */
-	public final static String ITEM_FIELD                     = changeCase("item");
+	public final static String ITEM_FIELD                      = changeCase("item");
 	
 	/**
 	 * Item ID field name
 	 */
-	public final static String ITEMID_FIELD                   = changeCase("itemid");
+	public final static String ITEMID_FIELD                    = changeCase("itemid");
 	
 	/**
 	 * External item ID field name
 	 */
-	public final static String EXTERNAL_ITEMID_FIELD          = changeCase("external_itemid");
+	public final static String EXTERNAL_ITEMID_FIELD           = changeCase("external_itemid");
 	
 	/**
 	 * Bit item ID field name
 	 */
-	public final static String BITITEMID_FIELD                = changeCase("bititemid");
+	public final static String BITITEMID_FIELD                 = changeCase("bititemid");
 	
 	/**
 	 * Item type field name
 	 */
-	public final static String ITEM_TYPE_FIELD                = changeCase("item_type");
+	public final static String ITEM_TYPE_FIELD                 = changeCase("item_type");
 	
 	/**
 	 * Rating user ID field name
 	 */
-	public final static String RATING_USERID_FIELD            = changeCase("rating_userid");
+	public final static String RATING_USERID_FIELD             = changeCase("rating_userid");
 	
 	/**
 	 * Rating item ID field name
 	 */
-	public final static String RATING_ITEMID_FIELD            = changeCase("rating_itemid");
+	public final static String RATING_ITEMID_FIELD             = changeCase("rating_itemid");
 	
 	/**
 	 * Rating field name
 	 */
-	public final static String RATING_FIELD                   = changeCase("rating");
+	public final static String RATING_FIELD                    = changeCase("rating");
 	
 	/**
 	 * Rating date field name
 	 */
-	public final static String RATING_DATE_FIELD              = changeCase("rating_date");
+	public final static String RATING_DATE_FIELD               = changeCase("rating_date");
 	
 	/**
 	 * Attribute field name
 	 */
-	public final static String ATTRIBUTE_FIELD                = changeCase("attribute");
+	public final static String ATTRIBUTE_FIELD                 = changeCase("attribute");
 	
 	/**
 	 * Attribute value field name
 	 */
-	public final static String ATTRIBUTE_VALUE_FIELD          = changeCase("attribute_value");
+	public final static String ATTRIBUTE_VALUE_FIELD           = changeCase("attribute_value");
 	
 	/**
 	 * Nominal field name
 	 */
-	public final static String NOMINAL_FIELD                  = changeCase("nominal");
+	public final static String NOMINAL_FIELD                   = changeCase("nominal");
 	
 	/**
 	 * Nominal reference unit field name
 	 */
-	public final static String NOMINAL_REF_UNIT_FIELD         = changeCase("nominal_ref_unit");
+	public final static String NOMINAL_REF_UNIT_FIELD          = changeCase("nominal_ref_unit");
 	
 	/**
 	 * Nominal index field name
 	 */
-	public final static String NOMINAL_INDEX_FIELD            = changeCase("nominal_index");
+	public final static String NOMINAL_INDEX_FIELD             = changeCase("nominal_index");
 	
 	/**
 	 * Nominal value field name
 	 */
-	public final static String NOMINAL_VALUE_FIELD            = changeCase("nominal_value");
+	public final static String NOMINAL_VALUE_FIELD             = changeCase("nominal_value");
 	
 	/**
 	 * Nominal parent index field name
 	 */
-	public final static String NOMINAL_PARENT_INDEX_FIELD     = changeCase("nominal_parent_index");
+	public final static String NOMINAL_PARENT_INDEX_FIELD      = changeCase("nominal_parent_index");
 	
 	/**
 	 * Account field name
 	 */
-	public final static String ACCOUNT_NAME_FIELD             = changeCase("account_name");
+	public final static String ACCOUNT_NAME_FIELD              = changeCase("account_name");
 	
 	/**
 	 * Account password field name
 	 */
-	public final static String ACCOUNT_PASSWORD_FIELD         = changeCase("account_password");
+	public final static String ACCOUNT_PASSWORD_FIELD          = changeCase("account_password");
 	
 	/**
 	 * Account privileges field name
 	 */
-	public final static String ACCOUNT_PRIVILEGES_FIELD      = changeCase("account_privs");
+	public final static String ACCOUNT_PRIVILEGES_FIELD        = changeCase("account_privs");
 	
 	/**
 	 * Minimum rating field name
 	 */
-	public final static String MIN_RATING_FIELD               = changeCase("min_rating");
+	public final static String MIN_RATING_FIELD                = changeCase("min_rating");
 	
 	/**
 	 * Maximum rating field name
 	 */
-	public final static String MAX_RATING_FIELD               = changeCase("max_rating");
+	public final static String MAX_RATING_FIELD                = changeCase("max_rating");
+	
+	/**
+	 * Relevant rating threshold.
+	 */
+	public final static String RELEVANT_RATING_FIELD           = changeCase("relevant_rating");
+
 	
 	/**
 	 * Position field name
 	 */
-	public final static String POSITION_FIELD                 = changeCase("position");
+	public final static String POSITION_FIELD                  = changeCase("position");
 	
 	/**
 	 * Storage URI field name. 
 	 * Note that URI, abbreviation of Uniform Resource Identifier, is the string of characters used to identify a resource on Internet.
 	 */
-	public final static String STORE_URI_FIELD                = changeCase("store_uri");
+	public final static String STORE_URI_FIELD                 = changeCase("store_uri");
 	
 	/**
 	 * Storage account field name
 	 */
-	public final static String STORE_ACCOUNT_FIELD            = changeCase("store_account");
+	public final static String STORE_ACCOUNT_FIELD             = changeCase("store_account");
 	
 	/**
 	 * Storage password field name
 	 */
-	public final static String STORE_PASSWORD_FIELD           = changeCase("store_password");
+	public final static String STORE_PASSWORD_FIELD            = changeCase("store_password");
 	
 	/**
 	 * Session attribute field name
 	 */
-	public final static String SESSION_ATTRIBUTE_NAME_FIELD   = changeCase("session_attribute");
+	public final static String SESSION_ATTRIBUTE_NAME_FIELD    = changeCase("session_attribute");
 	
 	/**
 	 * External record field name
 	 */
-	public final static String EXTERNAL_RECORD_FIELD          = changeCase("external_record");
+	public final static String EXTERNAL_RECORD_FIELD           = changeCase("external_record");
 	
 	/**
 	 * External unit field name
 	 */
-	public final static String EXTERNAL_UNIT_FIELD            = changeCase("external_unit");
+	public final static String EXTERNAL_UNIT_FIELD             = changeCase("external_unit");
 	
 	/**
 	 * External attribute field name
 	 */
-	public final static String EXTERNAL_ATTRIBUTE_NAME_FIELD  = changeCase("external_attribute_name");
+	public final static String EXTERNAL_ATTRIBUTE_NAME_FIELD   = changeCase("external_attribute_name");
 	
 	/**
 	 * External attribute value field name
 	 */
-	public final static String EXTERNAL_ATTRIBUTE_VALUE_FIELD = changeCase("external_attribute_value");
+	public final static String EXTERNAL_ATTRIBUTE_VALUE_FIELD  = changeCase("external_attribute_value");
 	
 	/**
 	 * Internal unit field name
 	 */
-	public final static String INTERNAL_UNIT_FIELD            = changeCase("internal_unit");
+	public final static String INTERNAL_UNIT_FIELD             = changeCase("internal_unit");
 	
 	/**
 	 * Internal attribute field name
 	 */
-	public final static String INTERNAL_ATTRIBUTE_NAME_FIELD  = changeCase("internal_attribute_name");
+	public final static String INTERNAL_ATTRIBUTE_NAME_FIELD   = changeCase("internal_attribute_name");
 	
 	/**
 	 * Internal attribute value field name
 	 */
-	public final static String INTERNAL_ATTRIBUTE_VALUE_FIELD = changeCase("internal_attribute_value");
+	public final static String INTERNAL_ATTRIBUTE_VALUE_FIELD  = changeCase("internal_attribute_value");
 	
 	/**
 	 * Profile field name
 	 */
-	public final static String PROFILE_FIELD                  = changeCase("profile");
+	public final static String PROFILE_FIELD                   = changeCase("profile");
 	
 	/**
 	 * Context template ID field name
 	 */
-	public final static String CTX_TEMPLATEID_FIELD           = changeCase("ctx_templateid");
+	public final static String CTX_TEMPLATEID_FIELD            = changeCase("ctx_templateid");
 	
 	/**
 	 * Context field name
 	 */
-	public final static String CTX_NAME_FIELD                 = changeCase("ctx_name");
+	public final static String CTX_NAME_FIELD                  = changeCase("ctx_name");
 	
 	/**
 	 * Context type field name
 	 */
-	public final static String CTX_TYPE_FIELD                 = changeCase("ctx_type");
+	public final static String CTX_TYPE_FIELD                  = changeCase("ctx_type");
 	
 	/**
 	 * Context value field name
 	 */
-	public final static String CTX_VALUE_FIELD                = changeCase("ctx_value");
+	public final static String CTX_VALUE_FIELD                 = changeCase("ctx_value");
 	
 	/**
 	 * Context parent field name
 	 */
-	public final static String CTX_PARENT_FIELD               = changeCase("ctx_parent");
+	public final static String CTX_PARENT_FIELD                = changeCase("ctx_parent");
 	
 	/**
 	 * Context template schema field name
 	 */
-	public final static String CTS_MANAGER_NAME_FIELD         = changeCase("cts_manager_name");
+	public final static String CTS_MANAGER_NAME_FIELD          = changeCase("cts_manager_name");
 
 	/**
 	 * Sample field name 1
 	 */
-	public final static String SAMPLE__FIELD1                 = changeCase("sample_field1");
+	public final static String SAMPLE__FIELD1                  = changeCase("sample_field1");
 	
 	/**
 	 * Sample field name 2
 	 */
-	public final static String SAMPLE__FIELD2                 = changeCase("sample_field2");
+	public final static String SAMPLE__FIELD2                  = changeCase("sample_field2");
 	
 	
 	/**
 	 * Configuration unit name
 	 */
-	public final static String CONFIG_UNIT                    = changeCase("hdp_config");
+	public final static String CONFIG_UNIT                     = changeCase("hdp_config");
 	
 	/**
 	 * Rating unit name
 	 */
-	public final static String RATING_UNIT                    = changeCase("hdp_rating");
+	public final static String RATING_UNIT                     = changeCase("hdp_rating");
 	
 	/**
 	 * User unit name
 	 */
-	public final static String USER_UNIT                      = changeCase("hdp_user");
+	public final static String USER_UNIT                       = changeCase("hdp_user");
 	
 	/**
 	 * Item unit name
 	 */
-	public final static String ITEM_UNIT                      = changeCase("hdp_item");
+	public final static String ITEM_UNIT                       = changeCase("hdp_item");
 	
 	/**
 	 * Nominal unit name
 	 */
-	public final static String NOMINAL_UNIT                   = changeCase("hdp_nominal");
+	public final static String NOMINAL_UNIT                    = changeCase("hdp_nominal");
 	
 	/**
 	 * Attribute map unit name
 	 */
-	public final static String ATTRIBUTE_MAP_UNIT             = changeCase("hdp_attribute_map");
+	public final static String ATTRIBUTE_MAP_UNIT              = changeCase("hdp_attribute_map");
 	
 	/**
 	 * Account unit name
 	 */
-	public final static String ACCOUNT_UNIT                   = changeCase("hdp_account");
+	public final static String ACCOUNT_UNIT                    = changeCase("hdp_account");
 	
 	/**
 	 * Context template unit name
 	 */
-	public final static String CONTEXT_TEMPLATE_UNIT          = changeCase("hdp_context_template");
+	public final static String CONTEXT_TEMPLATE_UNIT           = changeCase("hdp_context_template");
 	
 	/**
 	 * Context unit name
 	 */
-	public final static String CONTEXT_UNIT                   = changeCase("hdp_context");
+	public final static String CONTEXT_UNIT                    = changeCase("hdp_context");
 
 	/**
 	 * Sample unit name
 	 */
-	public final static String SAMPLE_UNIT                   = changeCase("hdp_sample");
+	public final static String SAMPLE_UNIT                     = changeCase("hdp_sample");
 
 	/**
 	 * Main unit name, the value associated with this field refers to another unit.
 	 */
-	public final static String MAIN_UNIT                     = changeCase("hdp_main");
+	public final static String MAIN_UNIT                       = changeCase("hdp_main");
 
 	/**
 	 * When unsetup delay mode is established, evaluator will not unsetup algorithms after evaluating it.
 	 */
-	public final static String DELAY_UNSETUP                 = changeCase("delay_unsetup");
+	public final static String DELAY_UNSETUP                   = changeCase("delay_unsetup");
 
 	
 //	/**
 //	 * This constant specifies agent field. If this field is true, the object is agent.
 //	 */
-//	public final static String AGENT_FIELD                   = changeCase("agent");
+//	public final static String AGENT_FIELD                     = changeCase("agent");
 
 	
 	/**
 	 * Normal user privilege for access account
 	 */
-	public final static int ACCOUNT_ACCESS_PRIVILEGE         = 0b00000001;
+	public final static int ACCOUNT_ACCESS_PRIVILEGE           = 0b00000001;
 	
 	/**
 	 * Evaluation privilege for access account
 	 */
-	public final static int ACCOUNT_EVALUATE_PRIVILEGE       = 0b00000011;
+	public final static int ACCOUNT_EVALUATE_PRIVILEGE         = 0b00000011;
 
 	/**
 	 * Administration privilege for access account
 	 */
-	public final static int ACCOUNT_ADMIN_PRIVILEGE          = 0b11111111;
+	public final static int ACCOUNT_ADMIN_PRIVILEGE            = 0b11111111;
 	
+
 	/**
-	 * Minimum rating field name
+	 * Default value for the relevant rating threshold.
 	 */
-	public final static double MIN_RATING_DEFAULT            = 1;
-	
-	/**
-	 * Maximum rating field name
-	 */
-	public final static double MAX_RATING_DEFAULT            = 5;
+	public static final double RELEVANT_RATING_DEFAULT         = 3.0;
 
 	
 	/**

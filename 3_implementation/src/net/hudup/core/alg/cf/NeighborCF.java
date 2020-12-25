@@ -313,7 +313,7 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 			updateItemMeanVars(dataset);
 		}
 
-		this.ratingMedian = getMinRating() + getMaxRating() / 2.0;
+		this.ratingMedian = getRelevantRatingThreshold();
 		this.ratingMedian = Util.isUsed(this.ratingMedian) ? this.ratingMedian : this.ratingMean; 
 	}
 

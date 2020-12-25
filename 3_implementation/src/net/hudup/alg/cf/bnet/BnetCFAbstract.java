@@ -82,24 +82,24 @@ public abstract class BnetCFAbstract extends ModelBasedCFAbstract {
 	@Override
 	public synchronized RatingVector recommend(RecommendParam param, int maxRecommend) throws RemoteException {
 		param = recommendPreprocess(param);
-		if (param == null)
-			return null;
+		if (param == null) return null;
 		
 		filterList.prepare(param);
 		Set<Integer> totalItemIds = getItemIds();
 		Set<Integer> queryIds = Util.newSet();
 		for (int itemId : totalItemIds) {
-			
 			if ( !param.ratingVector.isRated(itemId) && filterList.filter(getDataset(), RecommendFilterParam.create(itemId)) )
 				queryIds.add(itemId);
 		}
 		
-		double avgRating = (getMaxRating() + getMinRating()) / 2.0;
-		List<ValueTriple> triples = bnetEstimate(param, queryIds, avgRating, new RatingFilter() {
+		boolean reserved = getConfig().getAsBoolean(REVERSED_RECOMMEND);
+		double relevantThreshold = getRelevantRatingThreshold();
+		List<ValueTriple> triples = bnetEstimate(param, queryIds, relevantThreshold, new RatingFilter() {
 
 			@Override
 			public boolean accept(double ratingValue, double referredRatingValue) {
-				return Util.isUsed(referredRatingValue) ? Accuracy.isRelevant(ratingValue, referredRatingValue) : true;
+				boolean relevant = Accuracy.isRelevant(ratingValue, referredRatingValue);
+				return Util.isUsed(referredRatingValue) ? relevant != reserved : true;
 			}
 			
 		});

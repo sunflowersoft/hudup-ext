@@ -210,10 +210,7 @@ public abstract class SvdGradientKB extends KBaseRecommendIntegrated {
 	}
 	
 
-	/**
-	 * Getting list of item identifiers.
-	 * @return list of item id (s)
-	 */
+	@Override
 	public List<Integer> getItemIds() {
 		return itemIds;
 	}

@@ -11,9 +11,9 @@ import java.io.Serializable;
 import java.util.List;
 
 import net.hudup.core.alg.Alg;
-import net.hudup.core.alg.AlgDesc;
 import net.hudup.core.alg.AlgDesc2;
 import net.hudup.core.alg.AlgList;
+import net.hudup.core.alg.NullAlg;
 import net.hudup.core.data.Exportable;
 import net.hudup.core.data.ExternalQuery;
 import net.hudup.core.data.ctx.CTSManager;
@@ -557,9 +557,18 @@ public class PluginStorage implements Serializable {
 						alg = evaluator.getPluginAlg(algClass, pluginAlgName, remote);
 					}
 					catch (Exception e) {
-						LogUtil.trace(e);
-						LogUtil.error("PluginStorage#updateFromEvaluator: Retrieving remote algorithm causes error by " + e.getMessage());
 						alg = null;
+						if (isNormalAlg(algClass)) {
+							try {
+								AlgDesc2 algDesc = evaluator.getPluginNormalAlgDesc(pluginAlgName);
+								if (algDesc != null) alg = new NullAlg(algDesc);
+							}
+							catch (Exception ex) {
+								LogUtil.error("PluginStorage#updateFromEvaluator: Retrieving remote algorithm causes error by " + ex.getMessage());
+							}
+						}
+						else
+							LogUtil.error("PluginStorage#updateFromEvaluator: Retrieving remote algorithm causes error by " + e.getMessage());
 					}
 					if (alg != null && algReg.register(alg))
 						pluginAlgNames.add(pluginAlgName);
@@ -571,12 +580,18 @@ public class PluginStorage implements Serializable {
 		
 		//Updating configuration of each algorithm in remote case.
 		for (String pluginAlgName : pluginAlgNames) {
+			Alg alg = algReg.query(pluginAlgName);
+			if ((alg == null) || (alg instanceof NullAlg)) continue;
+			
+			AlgDesc2 algDesc = null;
 			try {
-				Alg alg = algReg.query(pluginAlgName);
-				if (alg == null) continue;
-				AlgDesc algDesc = evaluator.getPluginAlgDesc(alg.getClass(), alg.getName());
-				if (algDesc != null) alg.getConfig().putAll(algDesc.getConfig());
-			} catch (Exception e) {LogUtil.error("Error when evaluator gets plug-in algorithm, caused by " + e.getMessage());}
+				algDesc = evaluator.getPluginAlgDesc(alg.getClass(), alg.getName());
+			}
+			catch (Exception e) {
+				algDesc = null;
+				LogUtil.error("Error when evaluator gets plug-in algorithm, caused by " + e.getMessage());
+			}
+			if (algDesc != null) alg.getConfig().putAll(algDesc.getConfig());
 		}
 		
 		return pluginAlgNames;

@@ -563,8 +563,18 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 
 	@Override
 	public boolean ping() throws RemoteException {
-		
 		return config != null;
+	}
+
+
+	@Override
+	public boolean classPathContains(String className) throws RemoteException {
+    	try {
+    		Class.forName(className);
+    		return true;
+    	} catch (Exception e) {}
+    	
+		return false;
 	}
 
 

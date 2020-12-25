@@ -34,6 +34,12 @@ public class DatasetMetadata2 extends DatasetMetadata {
 	/**
 	 * Minimum rating count of a user.
 	 */
+	public double relevantRating = DataConfig.RELEVANT_RATING_DEFAULT;
+
+	
+	/**
+	 * Minimum rating count of a user.
+	 */
 	public int userMinRatingCount = 0;
 
 	
@@ -179,14 +185,14 @@ public class DatasetMetadata2 extends DatasetMetadata {
 	 * Default constructor.
 	 */
 	protected DatasetMetadata2() {
-		// TODO Auto-generated constructor stub
+
 	}
 
 
 	@Override
 	public String toText() {
-		// TODO Auto-generated method stub
-		return MathUtil.format(minRating) + "," + 
+		return MathUtil.format(relevantRating) + "," + 
+				MathUtil.format(minRating) + ", " + 
 				MathUtil.format(maxRating) + ", " + 
 				numberOfUsers + ", " + 
 				numberOfRatingUsers +
@@ -222,46 +228,88 @@ public class DatasetMetadata2 extends DatasetMetadata {
 
 	@Override
 	public void parseText(String spec) {
-		// TODO Auto-generated method stub
 		List<String> textList = TextParserUtil.split(spec, ",", null);
-		minRating = Integer.parseInt(textList.get(0));
-		maxRating = Integer.parseInt(textList.get(1));
-		numberOfUsers = Integer.parseInt(textList.get(2));
-		numberOfRatingUsers = Integer.parseInt(textList.get(3));
-		numberOfItems = Integer.parseInt(textList.get(4));
-		numberOfRatedItems = Integer.parseInt(textList.get(5));
-		userMinRatingCount = Integer.parseInt(textList.get(6));
-		userMinRelevantRatingCount = Integer.parseInt(textList.get(7));
-		userMaxRatingCount = Integer.parseInt(textList.get(8));
-		userMaxRelevantRatingCount = Integer.parseInt(textList.get(9));
-		userAverageRatingCount = Double.parseDouble(textList.get(10));
-		userAverageRelevantRatingCount = Double.parseDouble(textList.get(11));
-		itemMinRatingCount = Integer.parseInt(textList.get(12));
-		itemMinRelevantRatingCount = Integer.parseInt(textList.get(13));
-		itemMaxRatingCount = Integer.parseInt(textList.get(14));
-		itemMaxRelevantRatingCount = Integer.parseInt(textList.get(15));
-		itemAverageRatingCount = Double.parseDouble(textList.get(16));
-		itemAverageRelevantRatingCount = Double.parseDouble(textList.get(17));
-		numberOfRatings = Integer.parseInt(textList.get(18));
-		ratingCoverRatio = Double.parseDouble(textList.get(19));
-		ratingMean = Double.parseDouble(textList.get(20));
-		ratingSd = Double.parseDouble(textList.get(21));
-		numberOfRelevantRatings = Integer.parseInt(textList.get(22));
-		ratingRelevantRatio = Integer.parseInt(textList.get(23));
-		relevantRatingMean = Double.parseDouble(textList.get(24));
-		relevantRatingSd = Double.parseDouble(textList.get(25));
-		sampleRowCount = Integer.parseInt(textList.get(26));
-		sampleColumnCount = Integer.parseInt(textList.get(27));
-		sampleCellCount = Integer.parseInt(textList.get(28));
-		sampleCoverRatio = Double.parseDouble(textList.get(29));
+		relevantRating = Integer.parseInt(textList.get(0));
+		minRating = Integer.parseInt(textList.get(1));
+		maxRating = Integer.parseInt(textList.get(2));
+		numberOfUsers = Integer.parseInt(textList.get(3));
+		numberOfRatingUsers = Integer.parseInt(textList.get(4));
+		numberOfItems = Integer.parseInt(textList.get(5));
+		numberOfRatedItems = Integer.parseInt(textList.get(6));
+		userMinRatingCount = Integer.parseInt(textList.get(7));
+		userMinRelevantRatingCount = Integer.parseInt(textList.get(8));
+		userMaxRatingCount = Integer.parseInt(textList.get(9));
+		userMaxRelevantRatingCount = Integer.parseInt(textList.get(10));
+		userAverageRatingCount = Double.parseDouble(textList.get(11));
+		userAverageRelevantRatingCount = Double.parseDouble(textList.get(12));
+		itemMinRatingCount = Integer.parseInt(textList.get(13));
+		itemMinRelevantRatingCount = Integer.parseInt(textList.get(14));
+		itemMaxRatingCount = Integer.parseInt(textList.get(15));
+		itemMaxRelevantRatingCount = Integer.parseInt(textList.get(16));
+		itemAverageRatingCount = Double.parseDouble(textList.get(17));
+		itemAverageRelevantRatingCount = Double.parseDouble(textList.get(18));
+		numberOfRatings = Integer.parseInt(textList.get(19));
+		ratingCoverRatio = Double.parseDouble(textList.get(20));
+		ratingMean = Double.parseDouble(textList.get(21));
+		ratingSd = Double.parseDouble(textList.get(22));
+		numberOfRelevantRatings = Integer.parseInt(textList.get(23));
+		ratingRelevantRatio = Integer.parseInt(textList.get(24));
+		relevantRatingMean = Double.parseDouble(textList.get(25));
+		relevantRatingSd = Double.parseDouble(textList.get(26));
+		sampleRowCount = Integer.parseInt(textList.get(27));
+		sampleColumnCount = Integer.parseInt(textList.get(28));
+		sampleCellCount = Integer.parseInt(textList.get(29));
+		sampleCoverRatio = Double.parseDouble(textList.get(30));
 	}
 	
 	
+	/**
+	 * Translating this meta-data to nice text form.
+	 * @return nice text form of this meta-data.
+	 */
+	public String toText2() {
+		StringBuffer buffer = new StringBuffer();
+		
+		buffer.append("Minimum rating = " + MathUtil.round(minRating) + "\n");
+		buffer.append("Maximum rating = " + MathUtil.round(maxRating) + "\n");
+		buffer.append("Relevant rating = " + MathUtil.round(relevantRating) + "\n");
+		buffer.append("Number of users = " + numberOfUsers + "\n");
+		buffer.append("Number of rating users = " + numberOfRatingUsers + "\n");
+		buffer.append("Number of items = " + numberOfItems + "\n");
+		buffer.append("Number of rated items = " + numberOfRatedItems + "\n");
+		buffer.append("Min rating count of a user = " + userMinRatingCount + "\n");
+		buffer.append("Min favorite rating count of a user = " + userMinRelevantRatingCount + "\n");
+		buffer.append("Max rating count of a user = " + userMaxRatingCount + "\n");
+		buffer.append("Max favorite rating count of a user = " + userMaxRelevantRatingCount + "\n");
+		buffer.append("Average rating count of a user = " + MathUtil.round(userAverageRatingCount) + "\n");
+		buffer.append("Average favorite rating count of a user = " + MathUtil.round(userAverageRelevantRatingCount) + "\n");
+		buffer.append("Min rating count of an item = " + itemMinRatingCount + "\n");
+		buffer.append("Min favorite rating count of an item = " + itemMinRelevantRatingCount + "\n");
+		buffer.append("Max rating count of an item = " + itemMaxRatingCount + "\n");
+		buffer.append("Max favorite rating count of an item = " + itemMaxRelevantRatingCount + "\n");
+		buffer.append("Average rating count of an item = " + MathUtil.round(itemAverageRatingCount) + "\n");
+		buffer.append("Average favorite rating count of an item = " + MathUtil.round(itemAverageRelevantRatingCount) + "\n");
+		buffer.append("Number of ratings = " + numberOfRatings + "\n");
+		buffer.append("Rating cover ratio = " + MathUtil.round(ratingCoverRatio*100) + "%" + "\n");
+		buffer.append("Rating mean = " + MathUtil.round(ratingMean) + "\n");
+		buffer.append("Rating standard deviation = " + MathUtil.round(ratingSd) + "\n");
+		buffer.append("Number of favorite ratings = " + numberOfRelevantRatings + "\n");
+		buffer.append("Rating favorite ratio = " + MathUtil.round(ratingRelevantRatio*100) + "%" + "\n");
+		buffer.append("Favorite rating mean = " + MathUtil.round(relevantRatingMean) + "\n");
+		buffer.append("Favorite rating standard deviation = " + MathUtil.round(relevantRatingSd) + "\n");
+		buffer.append("Sample row count = " + sampleRowCount + "\n");
+		buffer.append("Sample column count = " + sampleColumnCount + "\n");
+		buffer.append("Sample cell count = " + sampleCellCount + "\n");
+		buffer.append("Sample cover ratio = " + MathUtil.round(sampleCoverRatio*100) + "%");
+
+		return buffer.toString();
+	}
+
 	@Override
 	public Object clone() {
-		// TODO Auto-generated method stub
 		DatasetMetadata2 metadata2 = new DatasetMetadata2();
 		metadata2.assignFrom(this);
+		metadata2.relevantRating = this.relevantRating;
 		metadata2.userMinRatingCount = this.userMinRatingCount;
 		metadata2.userMinRelevantRatingCount = this.userMinRelevantRatingCount;
 		metadata2.userMaxRatingCount = this.userMaxRatingCount;
@@ -301,6 +349,7 @@ public class DatasetMetadata2 extends DatasetMetadata {
 		DatasetMetadata metadata = DatasetMetadata.create(dataset);
 		DatasetMetadata2 metadata2 = new DatasetMetadata2();
 		metadata2.assignFrom(metadata);
+		metadata2.relevantRating = Accuracy.getRelevantRatingThreshold(dataset, false);
 		
 		
 		Fetcher<RatingVector> users = null;
@@ -327,7 +376,7 @@ public class DatasetMetadata2 extends DatasetMetadata {
 				if (count > maxRateCount) maxRateCount = count;
 				rateCount += count;
 				
-				int relevantCount = Accuracy.countForRelevant(user, true, metadata2.minRating, metadata2.maxRating);
+				int relevantCount = Accuracy.countForRelevant(user, true, dataset);
 				if (relevantCount < minRelevantRateCount) minRelevantRateCount = relevantCount;
 				if (relevantCount > maxRelevantRateCount) maxRelevantRateCount = relevantCount;
 				relevantRateCount += relevantCount;
@@ -337,7 +386,7 @@ public class DatasetMetadata2 extends DatasetMetadata {
 					double value = user.get(itemId).value;
 					rateSum += value;
 					
-					if (Accuracy.isRelevant(value, metadata2.minRating, metadata2.maxRating)) {
+					if (Accuracy.isRelevant(value, dataset)) {
 						relevantRateSum += value;
 					}
 				}
@@ -396,7 +445,7 @@ public class DatasetMetadata2 extends DatasetMetadata {
 					
 					for (int itemId : itemIds) {
 						double value = user.get(itemId).value;
-						if (Accuracy.isRelevant(value, metadata2.minRating, metadata2.maxRating)) {
+						if (Accuracy.isRelevant(value, dataset)) {
 							double d = value - metadata2.relevantRatingMean;
 							relevantRatingVarSum += d*d;
 						}
@@ -416,7 +465,6 @@ public class DatasetMetadata2 extends DatasetMetadata {
 					users.close();
 			} 
 			catch (Throwable e) {
-				// TODO Auto-generated catch block
 				LogUtil.trace(e);
 			}
 		}
@@ -444,7 +492,7 @@ public class DatasetMetadata2 extends DatasetMetadata {
 				if (count > maxRateCount) maxRateCount = count;
 				rateCount += count;
 				
-				int relevantRatedCount = Accuracy.countForRelevant(item, true, metadata2.minRating, metadata2.maxRating);
+				int relevantRatedCount = Accuracy.countForRelevant(item, true, dataset);
 				if (relevantRatedCount < minRelevantRateCount) minRelevantRateCount = relevantRatedCount;
 				if (relevantRatedCount > maxRelevantRateCount) maxRelevantRateCount = relevantRatedCount;
 				relevantRateCount += relevantRatedCount;
@@ -476,7 +524,6 @@ public class DatasetMetadata2 extends DatasetMetadata {
 					items.close();
 			} 
 			catch (Throwable e) {
-				// TODO Auto-generated catch block
 				LogUtil.trace(e);
 			}
 		}
@@ -515,7 +562,6 @@ public class DatasetMetadata2 extends DatasetMetadata {
 					samples.close();
 			} 
 			catch (Throwable e) {
-				// TODO Auto-generated catch block
 				LogUtil.trace(e);
 			}
 		}

@@ -202,20 +202,21 @@ public abstract class FreqItemsetBasedCF extends ModelBasedCFAbstract {
 	public synchronized RatingVector recommend(RecommendParam param, int maxRecommend) throws RemoteException {
 		// maxRecommend = 0: get All
 		param = recommendPreprocess(param);
-		if (param == null)
-			return null;
+		if (param == null) return null;
 		
 		filterList.prepare(param);
 		FreqItemsetKB fiKb = (FreqItemsetKB)kb;
 		if (fiKb.isEmpty())
 			return null;
 		
-		double avgRating = (getMaxRating() + getMinRating()) / 2.0;
-		Estimate estimate = estimate(param, null, avgRating, new RatingFilter() {
+		boolean reserved = getConfig().getAsBoolean(REVERSED_RECOMMEND);
+		double relevantThreshold = getRelevantRatingThreshold();
+		Estimate estimate = estimate(param, null, relevantThreshold, new RatingFilter() {
 
 			@Override
 			public boolean accept(double ratingValue, double referredRatingValue) {
-				return Util.isUsed(referredRatingValue) ? Accuracy.isRelevant(ratingValue, referredRatingValue) : true;
+				boolean relevant = Accuracy.isRelevant(ratingValue, referredRatingValue);
+				return Util.isUsed(referredRatingValue) ? relevant != reserved : true;
 			}
 			
 		});
@@ -224,7 +225,6 @@ public abstract class FreqItemsetBasedCF extends ModelBasedCFAbstract {
 			return null;
 		else
 			return optimizeRecommend(estimate.freq.itemset(), estimate.result, maxRecommend);
-		
 	}
 
 	
@@ -560,13 +560,13 @@ abstract class FreqItemsetKB extends KBaseAbstract {
 	/**
 	 * Finding minimum frequent itemset and maximum frequent itemset of {@link RatingVector}
 	 * 
-	 * @param vRate {@link RatingVector}
+	 * @param vRating {@link RatingVector}
 	 * @return minimum frequent itemset and maximum frequent itemset
 	 * @see FreqResultMinMax
 	 */
-	protected FreqResultMinMax findMinMaxOf(RatingVector vRate) {
+	protected FreqResultMinMax findMinMaxOf(RatingVector vRating) {
 		// A is user rating pattern
-		BitSet A = BitDataUtil.toItemBitSet(vRate, bitItemMap);
+		BitSet A = BitDataUtil.toItemBitSet(vRating, bitItemMap);
 		return findMinMaxOf(A);
 	}
 	

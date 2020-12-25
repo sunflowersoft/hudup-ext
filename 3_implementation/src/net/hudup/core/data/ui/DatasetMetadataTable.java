@@ -9,10 +9,17 @@ package net.hudup.core.data.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 import javax.swing.JDialog;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 import javax.swing.table.DefaultTableModel;
 
@@ -20,6 +27,7 @@ import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.DatasetAbstract;
 import net.hudup.core.data.DatasetMetadata;
+import net.hudup.core.logistic.ClipboardUtil;
 import net.hudup.core.logistic.ui.TextArea;
 import net.hudup.core.logistic.ui.TextField;
 import net.hudup.core.logistic.ui.UIUtil;
@@ -44,8 +52,19 @@ public class DatasetMetadataTable extends JTable {
 	 * Default constructor.
 	 */
 	public DatasetMetadataTable() {
-		// TODO Auto-generated constructor stub
 		super(new DatasetMetadataTM());
+		
+		addMouseListener(new MouseAdapter() {
+
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if(SwingUtilities.isRightMouseButton(e)) {
+					JPopupMenu contextMenu = createContextMenu();
+					if(contextMenu != null)
+						contextMenu.show((Component)e.getSource(), e.getX(), e.getY());
+				}
+			}
+		});
 	}
 
 	
@@ -67,6 +86,30 @@ public class DatasetMetadataTable extends JTable {
 	}
 	
 	
+	/**
+	 * Creating context menu.
+	 * @return context menu.
+	 */
+	protected JPopupMenu createContextMenu() {
+		DatasetMetadata metadata = getDatasetMetadataTM().getDatasetMetadata();
+		if (metadata == null) return null;
+		
+		JPopupMenu contextMenu = new JPopupMenu();
+		
+		JMenuItem miCopy = UIUtil.makeMenuItem((String)null, "Copy", 
+			new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					ClipboardUtil.util.setText(metadata.toText2());
+				}
+			});
+		contextMenu.add(miCopy);
+		
+		return contextMenu;
+	}
+	
+		
 	/**
 	 * Showing dialog containing table of dataset meta-data.
 	 * @param comp parent component.
@@ -130,11 +173,16 @@ class DatasetMetadataTM extends DefaultTableModel {
 	
 	
 	/**
+	 * Internal dataset meta-data.
+	 */
+	protected DatasetMetadata metadata = null;
+	
+	
+	/**
 	 * Default constructor.
 	 */
 	public DatasetMetadataTM() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
 
@@ -143,6 +191,8 @@ class DatasetMetadataTM extends DefaultTableModel {
 	 * @param metadata dataset meta-data.
 	 */
 	public void update(DatasetMetadata metadata) {
+		this.metadata = metadata;
+		
 		if (metadata == null) {
 			clear();
 			return;
@@ -157,7 +207,15 @@ class DatasetMetadataTM extends DefaultTableModel {
 				{"Number of rated items", metadata.numberOfRatedItems},
 			}, 
 			createColumns());
-		
+	}
+	
+	
+	/**
+	 * Getting dataset meta-data.
+	 * @return dataset meta-data.
+	 */
+	public DatasetMetadata getDatasetMetadata() {
+		return metadata;
 	}
 	
 	
@@ -165,7 +223,6 @@ class DatasetMetadataTM extends DefaultTableModel {
 	 * Clearing table model.
 	 */
 	public void clear() {
-		
 		setDataVector(new Object[][] {}, createColumns());
 	}
 	
@@ -181,7 +238,6 @@ class DatasetMetadataTM extends DefaultTableModel {
 	
 	@Override
 	public boolean isCellEditable(int row, int column) {
-		// TODO Auto-generated method stub
 		return false;
 	}
 	

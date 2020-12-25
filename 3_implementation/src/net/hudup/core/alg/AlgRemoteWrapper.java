@@ -284,6 +284,17 @@ public class AlgRemoteWrapper implements Alg, AlgRemote, Serializable {
 
 
 	@Override
+	public boolean classPathContains(String className) throws RemoteException {
+    	try {
+    		Class.forName(className);
+    		return true;
+    	} catch (Exception e) {}
+    	
+		return false;
+	}
+
+
+	@Override
 	public synchronized Remote export(int serverPort) throws RemoteException {
 		//Remote wrapper can export itself because this function is useful when the wrapper as remote algorithm can be called remotely by remote evaluator via Evaluator.remoteStart method.
 		if (exportedStub == null)

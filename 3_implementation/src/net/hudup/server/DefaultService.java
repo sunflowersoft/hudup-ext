@@ -1728,6 +1728,17 @@ public class DefaultService implements Service, PluginChangedListener, AutoClose
 
 
 	@Override
+	public boolean classPathContains(String className) throws RemoteException {
+    	try {
+    		Class.forName(className);
+    		return true;
+    	} catch (Exception e) {}
+    	
+		return false;
+	}
+
+
+	@Override
 	public boolean ping() throws RemoteException {
 		return true;
 	}

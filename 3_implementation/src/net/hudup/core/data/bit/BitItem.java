@@ -114,17 +114,17 @@ public class BitItem implements Cloneable, Serializable {
 		Pair pair =  this.pair;
 		
 		int realItemId = pair.key();
-		RatingVector itemRat = new ItemRating(realItemId);
+		RatingVector itemRating = new ItemRating(realItemId);
 		
 		double value = pair.value();
 		BitSet bs = this.bitItem.bs;
 		List<Integer> realSessionIds = bitData.realSessionIds();
 		for (int i = bs.nextSetBit(0); i >= 0; i = bs.nextSetBit(i + 1)) {
 			int sessionId = realSessionIds.get(i);
-			itemRat.put(sessionId, value);
+			itemRating.put(sessionId, value);
 		}
 		
-		return itemRat;
+		return itemRating;
 	}
 	
 

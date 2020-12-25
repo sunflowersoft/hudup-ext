@@ -33,6 +33,7 @@ import net.hudup.core.alg.AlgDesc2;
 import net.hudup.core.alg.AlgDesc2List;
 import net.hudup.core.alg.AlgList;
 import net.hudup.core.alg.AlgRemote;
+import net.hudup.core.alg.NullAlg;
 import net.hudup.core.alg.SetupAlgEvent;
 import net.hudup.core.alg.SetupAlgListener;
 import net.hudup.core.client.ClassProcessor;
@@ -52,6 +53,7 @@ import net.hudup.core.data.DatasetRemoteWrapper;
 import net.hudup.core.data.DatasetUtil;
 import net.hudup.core.data.Fetcher;
 import net.hudup.core.data.Profile;
+import net.hudup.core.data.Simplify;
 import net.hudup.core.evaluate.EvaluateEvent.Type;
 import net.hudup.core.evaluate.ui.AbstractEvaluateGUI;
 import net.hudup.core.logistic.AbstractRunner;
@@ -681,6 +683,12 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 	
 	
 	@Override
+	public String getClassName() throws RemoteException {
+		return this.getClass().getName();
+	}
+
+
+	@Override
 	public String getMainUnit() throws RemoteException {
 		return DataConfig.RATING_UNIT;
 	}
@@ -785,7 +793,18 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 	}
 	
 
-	@Deprecated
+	@Override
+	public boolean acceptAlg(String algClassName) throws RemoteException {
+		try {
+			@SuppressWarnings("unchecked")
+			Class<? extends Alg> algClass = (Class<? extends Alg>)Class.forName(algClassName);
+			return acceptAlg(algClass);
+		} catch (Exception e) {LogUtil.trace(e);}
+		
+		return false;
+	}
+
+
 	@Override
 	public boolean acceptAlg(Class<? extends Alg> algClass) throws RemoteException {
 		try {
@@ -815,6 +834,24 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 
 		//The evaluator is now remote.
 		
+		try {
+			AlgDesc2 algDesc = evaluator.getEvaluatedAlgDesc(alg.getName());
+			if (algDesc != null) return true;
+		} catch (Exception e) {	}
+		
+		if (alg instanceof NullAlg) {
+			try {
+				String referredAlgClassName = ((NullAlg)alg).getReferredAlgClassName();
+				if (referredAlgClassName == null)
+					return false;
+				else
+					return evaluator.acceptAlg(referredAlgClassName);
+			}
+			catch (Exception e) {
+				LogUtil.error("Evaluator does not accept null algorithm '" + alg.getName() + "' due to " + e.getMessage());
+			}
+		}
+		
 		//This code line is not redundant because the exclusive is set to false so as to prevent the algorithm from unexporting.
 		alg = AlgDesc2.wrapNewInstance(alg, false);
 		if (alg == null) return false;
@@ -824,7 +861,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 				return evaluator.acceptAlg(alg);
 			}
 			catch (Exception e) {
-				LogUtil.error("Evaluator does not accept algorithm '" + (alg != null ? alg.getName() : "noname") + "' due to " + e.getMessage());
+				LogUtil.error("Evaluator does not accept algorithm '" + alg.getName() + "' due to " + e.getMessage());
 			}
 			return false;
 		}
@@ -910,13 +947,22 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 
 
 	@Override
-	public AlgDesc getPluginAlgDesc(Class<? extends Alg> algClass, String algName) throws RemoteException {
+	public AlgDesc2 getPluginAlgDesc(Class<? extends Alg> algClass, String algName) throws RemoteException {
     	RegisterTable algReg = PluginStorage.lookupTable(algClass);
     	if (algReg == null) return null;
 		Alg alg = algReg.query(algName);
 		if (alg == null) return null;
 		
-		return new AlgDesc(alg);
+		return new AlgDesc2(alg);
+	}
+
+
+	@Override
+	public AlgDesc2 getPluginNormalAlgDesc(String algName) throws RemoteException {
+		Alg alg = PluginStorage.getNormalAlgReg().query(algName);
+		if (alg == null) return null;
+		
+		return new AlgDesc2(alg);
 	}
 
 
@@ -929,6 +975,16 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 	@Override
 	public Alg getEvaluatedAlg(String algName, boolean remote) throws RemoteException {
 		return getAlg(algRegResult, algName, remote);
+	}
+
+
+	@Override
+	public AlgDesc2 getEvaluatedAlgDesc(String algName) throws RemoteException {
+		if (algRegResult == null) return null;
+		Alg alg = algRegResult.query(algName);
+		if (alg == null) return null;
+
+		return new AlgDesc2(alg);
 	}
 
 
@@ -1195,6 +1251,12 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 
 
 	@Override
+	public List<EventObject> doTask2(UUID listenerID) throws RemoteException {
+		return evTaskQueue.doTask2(listenerID);
+	}
+
+
+	@Override
 	public void addPluginChangedListener(PluginChangedListener listener) throws RemoteException {
 		synchronized (listenerList) {
 			listenerList.add(PluginChangedListener.class, listener);
@@ -1242,7 +1304,14 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 
 		PluginChangedListener[] listeners = getPluginChangedListeners();
 		for (PluginChangedListener listener : listeners) {
-			try {
+    		try {
+    	    	if ((evt instanceof Simplify) && !(listener.classPathContains(evt.getClass().getName()))) {
+	    			PluginChangedEvent simplifiedEvt = (PluginChangedEvent) ((Simplify)evt).simplify();
+	    			if (simplifiedEvt != null) evt = simplifiedEvt;
+    	    	}
+    		} catch (Exception e) {LogUtil.trace(e);}
+
+	    	try {
 				listener.pluginChanged(evt);
 			}
 			catch (Throwable e) {LogUtil.trace(e);}
@@ -1299,7 +1368,14 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 
 		EvaluatorListener[] listeners = getEvaluatorListeners();
 		for (EvaluatorListener listener : listeners) {
-			try {
+    		try {
+    	    	if ((evt instanceof Simplify) && !(listener.classPathContains(evt.getClass().getName()))) {
+	    			EvaluatorEvent simplifiedEvt = (EvaluatorEvent) ((Simplify)evt).simplify();
+	    			if (simplifiedEvt != null) evt = simplifiedEvt;
+    	    	}
+    		} catch (Exception e) {LogUtil.trace(e);}
+
+	    	try {
 				if (localTargetListener != null) {
 					if (listener == localTargetListener)
 						listener.receivedEvaluator(evt);
@@ -1360,11 +1436,19 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
     	
 		EvaluateListener[] listeners = getEvaluateListeners();
 		for (EvaluateListener listener : listeners) {
-			if ((!config.isTiedSync()) && evTaskQueue.isRunning() && (!(listener instanceof AbstractEvaluateGUI))) {
+    		try {
+    	    	if ((evt instanceof Simplify) && !(listener.classPathContains(evt.getClass().getName()))) {
+	    			EvaluateEvent simplifiedEvt = (EvaluateEvent) ((Simplify)evt).simplify();
+	    			if (simplifiedEvt != null) evt = simplifiedEvt;
+    	    	}
+    		} catch (Exception e) {LogUtil.trace(e);}
+
+	    	if ((!config.isTiedSync()) && evTaskQueue.isRunning() && (!(listener instanceof AbstractEvaluateGUI))) {
+	    		EvaluateEvent finalEvt = evt;
 				evTaskQueue.addTask(new TaskQueue.Task() {
 					@Override
 					public void doTask() throws Exception {
-						listener.receivedEvaluation(evt);
+						listener.receivedEvaluation(finalEvt);
 					}
 				});
 			}
@@ -1461,11 +1545,19 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 
     	EvaluateProgressListener[] listeners = getEvaluateProgressListeners();
 		for (EvaluateProgressListener listener : listeners) {
-			if ((!config.isTiedSync()) && evTaskQueue.isRunning() && (!(listener instanceof AbstractEvaluateGUI))) {
+    		try {
+    	    	if ((evt instanceof Simplify) && !(listener.classPathContains(evt.getClass().getName()))) {
+	    			EvaluateProgressEvent simplifiedEvt = (EvaluateProgressEvent) ((Simplify)evt).simplify();
+	    			if (simplifiedEvt != null) evt = simplifiedEvt;
+    	    	}
+    		} catch (Exception e) {LogUtil.trace(e);}
+
+	    	if ((!config.isTiedSync()) && evTaskQueue.isRunning() && (!(listener instanceof AbstractEvaluateGUI))) {
+	    		EvaluateProgressEvent finalEvt = evt;
 				evTaskQueue.addTask(new TaskQueue.Task() {
 					@Override
 					public void doTask() throws Exception {
-						listener.receivedProgress(evt);
+						listener.receivedProgress(finalEvt);
 					}
 				});
 			}
@@ -1527,11 +1619,19 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 
     	SetupAlgListener[] listeners = getSetupAlgListeners();
 		for (SetupAlgListener listener : listeners) {
+    		try {
+    	    	if ((evt instanceof Simplify) && !(listener.classPathContains(evt.getClass().getName()))) {
+	    			SetupAlgEvent simplifiedEvt = (SetupAlgEvent) ((Simplify)evt).simplify();
+	    			if (simplifiedEvt != null) evt = simplifiedEvt;
+    	    	}
+    		} catch (Exception e) {LogUtil.trace(e);}
+	    	
 			if ((!config.isTiedSync()) && evTaskQueue.isRunning() && (!(listener instanceof AbstractEvaluateGUI))) {
+				final SetupAlgEvent finalEvt = evt;
 				evTaskQueue.addTask(new TaskQueue.Task() {
 					@Override
 					public void doTask() throws Exception {
-						listener.receivedSetup(evt);
+						listener.receivedSetup(finalEvt);
 					}
 				});
 			}
@@ -1595,6 +1695,17 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 
 
     @Override
+	public boolean classPathContains(String className) throws RemoteException {
+    	try {
+    		Class.forName(className);
+    		return true;
+    	} catch (Exception e) {}
+    	
+		return false;
+	}
+
+
+	@Override
 	public String getEvaluateStorePath() throws RemoteException {
    		return config.getAsString(DataConfig.STORE_URI_FIELD);
 	}
@@ -1861,7 +1972,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 				
 			}
 			
-			if (evAlg != null && acceptAlg(evAlg)) {
+			if ((evAlg != null) && !(evAlg instanceof NullAlg) && acceptAlg(evAlg)) {
 				if (algDesc != null)
 					evAlg.getConfig().putAll(algDesc.getConfig());
 				algList.add(evAlg);

@@ -566,7 +566,7 @@ class RegisterTM extends SortableSelectableTableModel {
 			
 			row.add(PluginStorage.lookupTableName(alg.getClass()));
 			row.add(alg.getName());
-			row.add(alg.getClass().toString());
+			row.add(alg.getClass().getName());
 			row.add(alg);
 			row.add(true);
 
@@ -604,7 +604,7 @@ class RegisterTM extends SortableSelectableTableModel {
 			
 			row.add(PluginStorage.lookupTableName(alg.getClass()));
 			row.add(alg.getName());
-			row.add(alg.getClass().toString());
+			row.add(alg.getClass().getName());
 			row.add(alg);
 			row.add(false);
 			

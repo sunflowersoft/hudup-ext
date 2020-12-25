@@ -106,6 +106,25 @@ public class ObjectPair<T> implements Cloneable {
 
 	
 	/**
+	 * This static method finds the index of the first pair (in the specified list of pairs)
+	 * whose value is greater than the specified value.
+	 * @param <T> type of key.
+	 * @param value specified value.
+	 * @param pairs specified list of pairs.
+	 * @return index of the first pair (in the specified list of pairs) whose value is greater than the specified value.
+	 */
+	public static <T> int findIndexOfGreaterThan(double value, List<ObjectPair<T>> pairs) {
+		for (int j = 0; j < pairs.size(); j++) {
+			ObjectPair<T> pair = pairs.get(j);
+			if (pair.value() > value)
+				return j;
+		}
+		
+		return -1;
+	}
+
+	
+	/**
 	 * Getting keys of specified list of pairs.
 	 * @param <T> type of keys of pair list.
 	 * @param pairList specified list of pairs.

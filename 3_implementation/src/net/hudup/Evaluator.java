@@ -125,7 +125,6 @@ public class Evaluator implements AccessPoint {
 				
 				@Override
 				public void receivedEvaluation(EvaluateEvent evt) throws RemoteException {
-					// TODO Auto-generated method stub
 					if (evt.getType() != Type.done && evt.getType() != Type.done_one)
 						return;
 					
@@ -151,6 +150,16 @@ public class Evaluator implements AccessPoint {
 					}
 				}
 				
+				@Override
+				public boolean classPathContains(String className) throws RemoteException {
+					try {
+						Class.forName(className);
+						return true;
+					} catch (Exception e) {}
+					
+					return false;
+				}
+
 				@Override
 				public boolean ping() throws RemoteException {
 					return true;

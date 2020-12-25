@@ -46,6 +46,7 @@ import net.hudup.core.logistic.ClipboardUtil;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.xURI;
+import net.hudup.core.logistic.ui.TextArea;
 import net.hudup.core.logistic.ui.UIUtil;
 import net.hudup.core.logistic.ui.UriChooser;
 
@@ -76,11 +77,11 @@ public class PropTable extends JTable {
 		this.setDefaultRenderer(HiddenText.class, new HiddenTextCellRenderer());
 		this.setDefaultEditor(HiddenText.class, new HiddenTextCellEditor());
 		
+		PropTable thisTable = this;
 		this.addMouseListener(new MouseAdapter() {
 
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				// TODO Auto-generated method stub
 				if (SwingUtilities.isRightMouseButton(e)) {
 					JPopupMenu contextMenu = new JPopupMenu();
 					
@@ -94,6 +95,25 @@ public class PropTable extends JTable {
 						});
 					contextMenu.add(miConfig);
 					
+					try {
+						int row = getSelectedRow();
+						Object key = null;
+						if (row != -1 && (key = getValueAt(row, 0)) != null) {
+							String note = getPropList().userNote(key.toString());
+							if (note != null) {
+								JMenuItem miUserNote = UIUtil.makeMenuItem( (String)null, "Note", 
+									new ActionListener() {
+										
+										@Override
+										public void actionPerformed(ActionEvent e) {
+											TextArea.showDlg(thisTable, note, false);
+										}
+									});
+								contextMenu.add(miUserNote);
+							}
+						}
+					} catch (Exception ex) {}
+							
 					contextMenu.addSeparator();
 					
 					JMenuItem miCopyClipboard = UIUtil.makeMenuItem((String)null, "Copy to clipboard", 
@@ -151,9 +171,10 @@ public class PropTable extends JTable {
 		if (row == -1 || column != 0)
 			return;
 		
+		Object key = getValueAt(row, 0);
 		Object value = getValueAt(row, 1);
-		if (value != null)
-			ClipboardUtil.util.setText(value.toString());
+		if (key != null && value != null)
+			ClipboardUtil.util.setText(key + "=" +value.toString());
 		
 	}
 	
@@ -191,7 +212,6 @@ public class PropTable extends JTable {
 	
 	@Override
 	public void setEnabled(boolean enabled) {
-		// TODO Auto-generated method stub
 		super.setEnabled(enabled);
 		
 		getPropTableModel().setEnabled(enabled);
@@ -284,7 +304,6 @@ public class PropTable extends JTable {
 		 */
 		public HiddenTextCellRenderer() {
 			super();
-			// TODO Auto-generated constructor stub
 		}
 		
 		/**
@@ -443,7 +462,6 @@ class PropTableModel extends DefaultTableModel {
 	
 	@Override
 	public boolean isCellEditable(int row, int column) {
-		// TODO Auto-generated method stub
 		String key = (String) getValueAt(row, 0);
 		Object value = getValueAt(row, 1);
 		return  column == 1 && 

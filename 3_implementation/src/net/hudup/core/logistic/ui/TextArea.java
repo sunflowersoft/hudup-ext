@@ -7,6 +7,7 @@
  */
 package net.hudup.core.logistic.ui;
 
+import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -16,10 +17,16 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 
+import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
+import javax.swing.WindowConstants;
 import javax.swing.text.Document;
 
 import net.hudup.core.logistic.ClipboardUtil;
@@ -119,7 +126,6 @@ public class TextArea extends JTextArea {
 
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				// TODO Auto-generated method stub
 				if(SwingUtilities.isRightMouseButton(e) ) {
 					JPopupMenu contextMenu = createContextMenu();
 					if(contextMenu == null) return;
@@ -228,9 +234,53 @@ public class TextArea extends JTextArea {
 
 	@Override
 	public void setText(String t) {
-		// TODO Auto-generated method stub
 		super.setText(t);
 		setCaretPosition(0);
+	}
+	
+	
+	/**
+	 * Showing text area dialog.
+	 * @param comp parent component.
+	 * @param content shown content.
+	 * @param editable editable flag.
+	 */
+	public static void showDlg(Component comp, Object content, boolean editable) {
+		if (content == null) {
+			JOptionPane.showMessageDialog(comp, "Null content", "Null content", JOptionPane.INFORMATION_MESSAGE);
+			return;
+		}
+
+		JDialog dlgTextArea = new JDialog(UIUtil.getFrameForComponent(comp), true);
+		dlgTextArea.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+		dlgTextArea.setSize(400, 400);
+		dlgTextArea.setLocationRelativeTo(UIUtil.getFrameForComponent(comp));
+		dlgTextArea.setLayout(new BorderLayout());
+		
+		TextArea txtArea = null;
+		if (content instanceof String)
+			txtArea = new TextArea((String)content);
+		else if (content instanceof Document)
+			txtArea = new TextArea((Document)content);
+		else
+			txtArea = new TextArea(content.toString());
+		txtArea.setEditable(editable);
+		dlgTextArea.add(new JScrollPane(txtArea), BorderLayout.CENTER);
+		
+		JPanel footer = new JPanel();
+		dlgTextArea.add(footer, BorderLayout.SOUTH);
+
+		JButton close = new JButton("Close");
+		close.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				dlgTextArea.dispose();
+			}
+		});
+		footer.add(close);
+
+		dlgTextArea.setVisible(true);
 	}
 	
 	

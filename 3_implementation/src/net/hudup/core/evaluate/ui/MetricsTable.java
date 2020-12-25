@@ -7,6 +7,7 @@
  */
 package net.hudup.core.evaluate.ui;
 
+import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -14,9 +15,15 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Vector;
 
+import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
+import javax.swing.WindowConstants;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 
@@ -249,6 +256,73 @@ public class MetricsTable extends SortableTable {
     }
 
 
+	/**
+	 * Showing metrics dialog.
+	 * @param comp parent component.
+	 * @param metrics evaluated metrics.
+	 * @param algTable specified algorithm table.
+	 */
+	public static void showDlg(Component comp, final Metrics metrics, final RegisterTable algTable) {
+		showDlg(comp, metrics, algTable, null);
+	}
+	
+	
+	/**
+	 * Showing metrics dialog.
+	 * @param comp parent component.
+	 * @param metrics evaluated metrics.
+	 * @param algTable specified algorithm table.
+	 * @param referredEvaluator referred evaluator.
+	 */
+	public static void showDlg(Component comp, final Metrics metrics, final RegisterTable algTable, final Evaluator referredEvaluator) {
+		if (metrics == null || metrics.size() == 0) {
+			JOptionPane.showMessageDialog(comp, "Evaluated metrics list is empty", "Empty metrics", JOptionPane.INFORMATION_MESSAGE);
+			return;
+		}
+
+		JDialog dlgMetrics = new JDialog(UIUtil.getFrameForComponent(comp), true);
+		dlgMetrics.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+		dlgMetrics.setSize(600, 400);
+		dlgMetrics.setLocationRelativeTo(UIUtil.getFrameForComponent(comp));
+		dlgMetrics.setLayout(new BorderLayout());
+		
+		MetricsTable tblMetrics = referredEvaluator != null ? new MetricsTable(algTable, referredEvaluator) : new MetricsTable(algTable);
+		tblMetrics.update(metrics);
+		dlgMetrics.add(new JScrollPane(tblMetrics), BorderLayout.CENTER);
+		
+		JPanel footer = new JPanel();
+		dlgMetrics.add(footer, BorderLayout.SOUTH);
+
+		JButton btnAnalyzeResult = new JButton("Analyze result");
+		btnAnalyzeResult.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				try {
+					new MetricsAnalyzeDlg(comp, metrics, algTable, referredEvaluator);
+				}
+				catch (Exception ex) {
+					ex.printStackTrace();
+				}
+			}
+			
+		});
+		footer.add(btnAnalyzeResult);
+
+		JButton close = new JButton("Close");
+		close.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				dlgMetrics.dispose();
+			}
+		});
+		footer.add(close);
+
+		dlgMetrics.setVisible(true);
+	}
+	
+	
 }
 
 

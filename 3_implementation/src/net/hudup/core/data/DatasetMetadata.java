@@ -82,7 +82,6 @@ public class DatasetMetadata implements Serializable, TextParsable, Cloneable {
 	
 	@Override
 	public String toText() {
-		// TODO Auto-generated method stub
 		return minRating + "," + 
 				maxRating + ", " + 
 				numberOfUsers + ", " + 
@@ -94,7 +93,6 @@ public class DatasetMetadata implements Serializable, TextParsable, Cloneable {
 
 	@Override
 	public void parseText(String spec) {
-		// TODO Auto-generated method stub
 		List<String> textList = TextParserUtil.split(spec, ",", null);
 		minRating = Integer.parseInt(textList.get(0));
 		maxRating = Integer.parseInt(textList.get(1));
@@ -111,6 +109,24 @@ public class DatasetMetadata implements Serializable, TextParsable, Cloneable {
 	}
 
 
+	/**
+	 * Translating this meta-data to nice text form.
+	 * @return nice text form of this meta-data.
+	 */
+	public String toText2() {
+		StringBuffer buffer = new StringBuffer();
+		
+		buffer.append("Min rating = " + minRating + "\n");
+		buffer.append("Max rating = " + maxRating + "\n");
+		buffer.append("Number of users = " + numberOfUsers + "\n");
+		buffer.append("Number of rating users = " + numberOfRatingUsers + "\n");
+		buffer.append("Number of items = " + numberOfItems + "\n");
+		buffer.append("Number of rated items = " + numberOfRatedItems);
+		
+		return buffer.toString();
+	}
+	
+	
 	/**
 	 * Convert this meta-data to list of profiles, based on specified attribute list.
 	 * @param attributes specified attribute list.
@@ -137,7 +153,6 @@ public class DatasetMetadata implements Serializable, TextParsable, Cloneable {
 	
 	@Override
 	public Object clone() {
-		// TODO Auto-generated method stub
 		DatasetMetadata metadata = new DatasetMetadata();
 		metadata.minRating = this.minRating;
 		metadata.maxRating = this.maxRating;
@@ -188,7 +203,6 @@ public class DatasetMetadata implements Serializable, TextParsable, Cloneable {
 					userIds.close();
 			} 
 			catch (Throwable e) {
-				// TODO Auto-generated catch block
 				LogUtil.trace(e);
 			}
 		}
@@ -207,7 +221,6 @@ public class DatasetMetadata implements Serializable, TextParsable, Cloneable {
 					vUserRatings.close();
 			} 
 			catch (Throwable e) {
-				// TODO Auto-generated catch block
 				LogUtil.trace(e);
 			}
 		}
@@ -227,7 +240,6 @@ public class DatasetMetadata implements Serializable, TextParsable, Cloneable {
 					itemIds.close();
 			} 
 			catch (Throwable e) {
-				// TODO Auto-generated catch block
 				LogUtil.trace(e);
 			}
 		}
@@ -246,7 +258,6 @@ public class DatasetMetadata implements Serializable, TextParsable, Cloneable {
 					vItemRatings.close();
 			} 
 			catch (Throwable e) {
-				// TODO Auto-generated catch block
 				LogUtil.trace(e);
 			}
 		}

@@ -125,6 +125,24 @@ public class Pair implements Cloneable, Serializable {
 	
 	
 	/**
+	 * This static method finds the index of the first pair (in the specified list of pairs)
+	 * whose value is greater than the specified value.
+	 * @param value specified value.
+	 * @param pairs specified list of pairs.
+	 * @return index of the first pair (in the specified list of pairs) whose value is greater than the specified value.
+	 */
+	public static int findIndexOfGreaterThan(double value, List<Pair> pairs) {
+		for (int j = 0; j < pairs.size(); j++) {
+			Pair pair = pairs.get(j);
+			if (pair.value() > value)
+				return j;
+		}
+		
+		return -1;
+	}
+
+	
+	/**
 	 * This static method converts the specified rating vector into the list of pairs.
 	 * Each pair contains a rating value together the field ID (item ID or user ID).
 	 * @param vRating specified rating vector.

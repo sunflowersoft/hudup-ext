@@ -54,9 +54,9 @@
 			<attribute name="javadoc_location" value="jar:platform:/resource/hudup3/lib/doc/quicktable2swing11design-doc.zip!/"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="lib/xml-apis-2.0.2.jar" sourcepath="lib/src/xml-apis-2.0.2-sources.jar"/>
+	<!--<classpathentry kind="lib" path="lib/xml-apis-2.0.2.jar" sourcepath="lib/src/xml-apis-2.0.2-sources.jar"/>-->
 	<classpathentry kind="lib" path="lib/elvira2-2005.jar" sourcepath="lib/src/elvira2-2005-src.zip"/>
-	<classpathentry kind="lib" path="lib/sun.misc.jar"/>
+	<!--<classpathentry kind="lib" path="lib/sun.misc.jar"/>-->
 	<classpathentry kind="lib" path="lib/truezip-samples-7.7.4-jar-with-dependencies.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

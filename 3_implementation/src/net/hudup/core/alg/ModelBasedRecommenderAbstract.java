@@ -8,6 +8,8 @@
 package net.hudup.core.alg;
 
 import java.rmi.RemoteException;
+import java.util.List;
+import java.util.Set;
 
 import net.hudup.core.Constants;
 import net.hudup.core.Util;
@@ -15,10 +17,12 @@ import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.Datasource;
 import net.hudup.core.data.KBasePointer;
+import net.hudup.core.data.Pair;
 import net.hudup.core.data.Pointer;
+import net.hudup.core.data.RatingVector;
+import net.hudup.core.evaluate.recommend.Accuracy;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.xURI;
-
 
 /**
  * This class implements basically the model-based recommendation algorithm represented by the interface {@code ModelBasedRecomender}.
@@ -120,6 +124,68 @@ public abstract class ModelBasedRecommenderAbstract extends RecommenderAbstract 
 		return kb;
 	}
 	
+	
+	@Override
+	public synchronized RatingVector recommend(RecommendParam param, int maxRecommend) throws RemoteException {
+		KBase kb0 = getKBase();
+		if (!(kb0 instanceof KBaseRecommend)) return null;
+		KBaseRecommend kb = (KBaseRecommend)kb0;
+		if (kb.isEmpty()) return null;
+
+		param = recommendPreprocess(param);
+		if (param == null) return null;
+		
+		filterList.prepare(param);
+		List<Integer> itemIds = kb.getItemIds();
+		Set<Integer> queryIds = Util.newSet();
+		for (int itemId : itemIds) {
+			if ( !param.ratingVector.isRated(itemId) && filterList.filter(getDataset(), RecommendFilterParam.create(itemId)) )
+				queryIds.add(itemId);
+		}
+		
+		List<Pair> pairs = Util.newList();
+		double maxRating = getMaxRating();
+		double minRating = getMinRating();
+		boolean reserved = getConfig().getAsBoolean(REVERSED_RECOMMEND);
+		int userId = param.ratingVector.id();
+		for (int itemId : queryIds) {
+			double value = kb.estimate(userId, itemId);
+			if (!Util.isUsed(value)) continue;
+			if (Accuracy.isRelevant(value, this) == reserved)
+				continue;
+			
+			int found = reserved ? Pair.findIndexOfGreaterThan(value, pairs) : Pair.findIndexOfLessThan(value, pairs);
+			Pair pair = new Pair(itemId, value);
+			if (found == -1)
+				pairs.add(pair);
+			else 
+				pairs.add(found, pair);
+			
+			int n = pairs.size();
+			if (maxRecommend > 0 && n >= maxRecommend) {
+				Pair last = pairs.get(n - 1);
+				if (getConfig().getAsBoolean(FAST_RECOMMEND)
+						|| (reserved ? last.value() <= minRating : last.value() >= maxRating)) {
+					if (n > maxRecommend) pairs.remove(n - 1);
+					
+					break;
+				}
+				else if (n > maxRecommend)
+					pairs.remove(n - 1);
+			}
+		} // end for
+		
+		if (maxRecommend > 0 && pairs.size() > maxRecommend) {
+			pairs = pairs.subList(0, maxRecommend); //This code line is for safe in case that there are maxRecommend+1 items.
+		}
+		
+		if (pairs.size() == 0) return null;
+		
+		RatingVector rec = param.ratingVector.newInstance(true);
+		Pair.fillRatingVector(rec, pairs);
+		return rec;
+	}
+
 	
 	@Override
 	public Dataset getDataset() throws RemoteException {

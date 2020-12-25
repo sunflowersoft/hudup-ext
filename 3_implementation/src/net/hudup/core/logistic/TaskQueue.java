@@ -16,6 +16,7 @@ import java.util.UUID;
 
 import net.hudup.core.Constants;
 import net.hudup.core.Util;
+import net.hudup.core.data.Simplify;
 
 /**
  * This class represents a queue of tasks.
@@ -382,6 +383,30 @@ public class TaskQueue extends AbstractRunner {
 			task.updateLastDone();
 			return returnedEvtList;
 		}
+	}
+
+	
+	/**
+	 * Performing a task list of specified listener with simplified event if necessary.
+	 * The function of this method is the same to the method {@link #doTask(UUID)}.
+	 * @param listenerID specified listener ID.
+	 * @return list of events as the task list.
+	 */
+	public List<EventObject> doTask2(UUID listenerID) {
+		List<EventObject> evtList = doTask(listenerID);
+		List<EventObject> returnedEvtList = Util.newList(evtList.size());
+		for (EventObject evt : evtList) {
+			if (evt instanceof Simplify) {
+	    		try {
+	    			EventObject simplifiedEvt = (EventObject) ((Simplify)evt).simplify();
+	    			if (simplifiedEvt != null) evt = simplifiedEvt;
+	    		} catch (Exception e) {LogUtil.trace(e);}
+			}
+			
+			returnedEvtList.add(evt);
+		}
+		
+		return returnedEvtList;
 	}
 	
 	

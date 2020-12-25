@@ -382,8 +382,6 @@ public class RecommendEvaluator extends EvaluatorAbstract {
 		int nUsers = 0;
 		Fetcher<RatingVector> users = null;
 		try {
-			double minRating = dataset.getConfig().getMinRating();
-			double maxRating = dataset.getConfig().getMaxRating();
 			users = dataset.fetchUserRatings();
 			while (users.next()) {
 				RatingVector user = users.pick();
@@ -393,7 +391,7 @@ public class RecommendEvaluator extends EvaluatorAbstract {
 				
 				nUsers++;
 
-				int relevantCount = Accuracy.countForRelevant(user, true, minRating, maxRating);
+				int relevantCount = Accuracy.countForRelevant(user, true, dataset);
 				relevantRateCount += relevantCount;
 			}
 			

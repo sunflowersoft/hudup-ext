@@ -97,7 +97,6 @@ public class DatasetPoolTable extends JTable {
 	 * @param bindUri bound URI.
 	 */
 	public DatasetPoolTable(boolean clearDatasetWhenRemove, xURI bindUri) {
-		// TODO Auto-generated constructor stub
 		super(new DatasetPoolTableModel());
 		this.clearDatasetWhenRemove = clearDatasetWhenRemove;
 		this.bindUri = bindUri;
@@ -121,7 +120,6 @@ public class DatasetPoolTable extends JTable {
 
 			@Override
 			public void keyPressed(KeyEvent e) {
-				// TODO Auto-generated method stub
 				if (!isEnabled2()) return;
 				
 				if (e.getKeyCode() == KeyEvent.VK_DELETE)
@@ -599,7 +597,6 @@ public class DatasetPoolTable extends JTable {
 	 * @param enabled optionally enabled flag.
 	 */
 	public void setEnabled2(boolean enabled) {
-		// TODO Auto-generated method stub
 		this.enabled = enabled;
 	}
 
@@ -609,14 +606,12 @@ public class DatasetPoolTable extends JTable {
 	 * @return whether optionally enabled.
 	 */
 	public boolean isEnabled2() {
-		// TODO Auto-generated method stub
 		return enabled;
 	}
 
 
 	@Override
 	public TableCellRenderer getCellRenderer(int row, int column) {
-		// TODO Auto-generated method stub
 		if (column >=1 && column <= 3)
 			return new HighlightCellRenderer();
 		else
@@ -639,7 +634,6 @@ public class DatasetPoolTable extends JTable {
 		@Override
 		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus,
 				int row, int column) {
-			// TODO Auto-generated method stub
 			Component comp = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
 			
 			if (bindUri == null) return comp;
@@ -732,7 +726,6 @@ class DatasetPoolTableModel extends DefaultTableModel {
 
 	@Override
 	public boolean isCellEditable(int row, int column) {
-		// TODO Auto-generated method stub
 		return false;
 	}
 	

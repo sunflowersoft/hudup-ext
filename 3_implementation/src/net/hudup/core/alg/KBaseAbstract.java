@@ -10,6 +10,7 @@ package net.hudup.core.alg;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
+import net.hudup.core.Util;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.Datasource;
@@ -106,10 +107,13 @@ public abstract class KBaseAbstract implements KBase, KBaseRemote {
 	@Override
 	public synchronized void learn(Dataset dataset, Alg alg) throws RemoteException {
 		config.setMetadata(dataset.getConfig().getMetadata());
+		double threshold = dataset.getConfig().getAsReal(DataConfig.RELEVANT_RATING_FIELD);
+		if (Util.isUsed(threshold)) config.put(DataConfig.RELEVANT_RATING_FIELD, threshold);
 		config.put(KBASE_NAME, getName());
 		
 		config.addReadOnly(DataConfig.MIN_RATING_FIELD);
 		config.addReadOnly(DataConfig.MAX_RATING_FIELD);
+		if (Util.isUsed(threshold)) config.addReadOnly(DataConfig.RELEVANT_RATING_FIELD);
 		config.addReadOnly(KBASE_NAME);
 		
 		datasource.close();
@@ -302,6 +306,17 @@ public abstract class KBaseAbstract implements KBase, KBaseRemote {
 	}
 
 	
+	@Override
+	public boolean classPathContains(String className) throws RemoteException {
+    	try {
+    		Class.forName(className);
+    		return true;
+    	} catch (Exception e) {}
+    	
+		return false;
+	}
+
+
 	@Override
 	public synchronized Remote export(int serverPort) throws RemoteException {
 		if (exportedStub == null)

@@ -92,7 +92,6 @@ public class AlgConfigDlg extends JDialog {
 
 			@Override
 			public void windowClosing(WindowEvent e) {
-				// TODO Auto-generated method stub
 				super.windowClosing(e);
 				if (paneCfg.getPropTable().isModified()) {
 					int confirm = JOptionPane.showConfirmDialog(
@@ -127,7 +126,6 @@ public class AlgConfigDlg extends JDialog {
 
 			@Override
 			public void close() {
-				// TODO Auto-generated method stub
 				if (paneCfg.getPropTable().isModified()) {
 					int confirm = JOptionPane.showConfirmDialog(
 							comp, 
@@ -144,7 +142,6 @@ public class AlgConfigDlg extends JDialog {
 
 			@Override
 			public void reset() {
-				// TODO Auto-generated method stub
 				if (AlgDesc2.isRemote(thisAlg) && (thisAlg instanceof AlgRemoteWrapper)) {
 					try {
 						((AlgRemoteWrapper)thisAlg).queryConfig();
@@ -163,7 +160,6 @@ public class AlgConfigDlg extends JDialog {
 			
 			@Override
 			public boolean apply() {
-				// TODO Auto-generated method stub
 				return super.apply();
 			}
 
@@ -200,6 +196,9 @@ public class AlgConfigDlg extends JDialog {
 				paneCfg.setToolbarVisible(false);
 //				paneCfg.setControlVisible(false);
 //				paneCfg.setEnabled(false);
+			}
+			else {
+				paneCfg.setToolbarVisible(true);
 			}
 		}
 		catch (Throwable e) {

@@ -120,8 +120,6 @@ public class AlgDesc implements Serializable, net.hudup.core.Cloneable {
 
 	@Override
 	public Object clone() {
-		// TODO Auto-generated method stub
-		
 		return new AlgDesc(algClassName.toString(), (DataConfig) config.clone());
 	}
 	

@@ -159,7 +159,6 @@ class AlgConfigDlg extends JDialog {
 
 			@Override
 			public void windowClosing(WindowEvent e) {
-				// TODO Auto-generated method stub
 				super.windowClosing(e);
 				if (!isModified())
 					return;

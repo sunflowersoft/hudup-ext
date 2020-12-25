@@ -18,7 +18,7 @@ import net.hudup.core.PluginChangedListener;
 import net.hudup.core.PluginStorageWrapper;
 import net.hudup.core.RegisterTable;
 import net.hudup.core.alg.Alg;
-import net.hudup.core.alg.AlgDesc;
+import net.hudup.core.alg.AlgDesc2;
 import net.hudup.core.alg.AlgDesc2List;
 import net.hudup.core.alg.SetupAlgListener;
 import net.hudup.core.client.ClassProcessor;
@@ -174,6 +174,14 @@ public interface Evaluator extends Remote, RemoteRunner, SetupAlgListener, Plugi
 	
 	
 	/**
+	 * Returning class name of this evaluator.
+	 * @return class name of this evaluator.
+	 * @throws RemoteException if any error raises.
+	 */
+	String getClassName() throws RemoteException;
+
+	
+	/**
 	 * Getting configuration of this evaluator.
 	 * @return configuration of this evaluator.
 	 * @throws RemoteException if any error raises.
@@ -199,12 +207,12 @@ public interface Evaluator extends Remote, RemoteRunner, SetupAlgListener, Plugi
 	
 	
 	/**
-	 * Checking whether the specified algorithm is accepted by this evaluator.
-	 * @param alg specified algorithm.
+	 * Checking whether the specified algorithm via its class name is accepted by this evaluator.
+	 * @param algClassName specified algorithm class name.
 	 * @return whether the specified algorithm is accepted by this evaluator.
 	 * @throws RemoteException if any error raises.
 	 */
-	boolean acceptAlg(Alg alg) throws RemoteException;
+	boolean acceptAlg(String algClassName) throws RemoteException;
 
 	
 	/**
@@ -213,10 +221,18 @@ public interface Evaluator extends Remote, RemoteRunner, SetupAlgListener, Plugi
 	 * @return whether the specified algorithm class is accepted by this evaluator.
 	 * @throws RemoteException if any error raises.
 	 */
-	@Deprecated
 	boolean acceptAlg(Class<? extends Alg> algClass) throws RemoteException;
 
 		
+	/**
+	 * Checking whether the specified algorithm is accepted by this evaluator.
+	 * @param alg specified algorithm.
+	 * @return whether the specified algorithm is accepted by this evaluator.
+	 * @throws RemoteException if any error raises.
+	 */
+	boolean acceptAlg(Alg alg) throws RemoteException;
+
+	
 	/**
 	 * Defining the list of default metrics. This method is used only locally.
 	 * @return the list of default metrics as {@link NoneWrapperMetricList}.
@@ -317,8 +333,17 @@ public interface Evaluator extends Remote, RemoteRunner, SetupAlgListener, Plugi
      * @return description of a plug-in algorithm.
      * @throws RemoteException if any error raises.
      */
-    AlgDesc getPluginAlgDesc(Class<? extends Alg> algClass, String algName) throws RemoteException;
+    AlgDesc2 getPluginAlgDesc(Class<? extends Alg> algClass, String algName) throws RemoteException;
     
+    
+    /**
+     * Getting description of a plug-in normal algorithm.
+     * @param algName algorithm name.
+     * @return description of a plug-in normal algorithm.
+     * @throws RemoteException if any error raises.
+     */
+    AlgDesc2 getPluginNormalAlgDesc(String algName) throws RemoteException;
+
     
     /**
      * Getting registered cloned plug-in algorithm.
@@ -339,6 +364,15 @@ public interface Evaluator extends Remote, RemoteRunner, SetupAlgListener, Plugi
      * @throws RemoteException if any error raises.
      */
     Alg getEvaluatedAlg(String algName, boolean remote) throws RemoteException;
+
+    
+    /**
+     * Getting evaluated algorithm description.
+     * @param algName algorithm name.
+     * @return evaluated algorithm description.
+     * @throws RemoteException if any error raises.
+     */
+    AlgDesc2 getEvaluatedAlgDesc(String algName) throws RemoteException;
 
     
     /**
@@ -369,6 +403,15 @@ public interface Evaluator extends Remote, RemoteRunner, SetupAlgListener, Plugi
      * @throws RemoteException if any error raises.
 	 */
 	List<EventObject> doTask(UUID listenerID) throws RemoteException;
+
+	
+	/**
+	 * Performing event task of specified listener with simplified event if necessary.
+	 * @param listenerID specified listener ID.
+	 * @return list of events as the event task.
+     * @throws RemoteException if any error raises.
+	 */
+	List<EventObject> doTask2(UUID listenerID) throws RemoteException;
 
 	
 	/**

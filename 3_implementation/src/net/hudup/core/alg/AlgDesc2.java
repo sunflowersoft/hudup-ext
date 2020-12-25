@@ -99,6 +99,12 @@ public class AlgDesc2 extends AlgDesc {
 	public String algName = null;
 	
 	
+    /**
+     * Referred algorithm class name.
+     */
+    protected String referredAlgClassName = null;
+    
+    
 	/**
 	 * Base remote interface names.
 	 */
@@ -169,7 +175,7 @@ public class AlgDesc2 extends AlgDesc {
 	 * Default constructor.
 	 */
 	public AlgDesc2() {
-		// TODO Auto-generated constructor stub
+
 	}
 
 
@@ -179,10 +185,12 @@ public class AlgDesc2 extends AlgDesc {
 	 */
 	public AlgDesc2(Alg alg) {
 		super(alg);
-		// TODO Auto-generated constructor stub
 		
 		config = (DataConfig)config.clone();
 		algName = alg.getName();
+		
+		if (alg instanceof NullAlg)
+			referredAlgClassName = ((NullAlg)alg).getReferredAlgClassName();
 		
 		if (alg instanceof AlgRemote) {
 			try {
@@ -217,6 +225,7 @@ public class AlgDesc2 extends AlgDesc {
 		StringBuffer buffer = new StringBuffer();
 		buffer.append("Algorithm name: " + algName + "\n");
 		buffer.append("Class name: " + algClassName + "\n");
+		if (referredAlgClassName != null) buffer.append("Referred class name: " + referredAlgClassName + "\n");
 		buffer.append("Remote interfaces: " + TextParserUtil.toText(baseRemoteInterfaceNames, ",") + "\n");
 		buffer.append("Methodological type: " + toString(methodType) + "\n");
 		buffer.append("Functional type: " + toString(functionType) + "\n");

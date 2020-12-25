@@ -78,6 +78,7 @@ public class WorkingDirectoryManager extends JPanel implements Dispose {
 
 	/**
 	 * Showing working directory manager.
+	 * @param comp parent component.
 	 * @param server specified server
 	 * @param bindUri bound URI of such server. If it is not null, the server is remote.
 	 */

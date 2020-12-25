@@ -94,7 +94,6 @@ public class MemFetcher<E /*extends Serializable*/> implements Fetcher<E> {
 				fetcher.reset();
 		} 
 		catch (Throwable e) {
-			// TODO Auto-generated catch block
 			LogUtil.trace(e);
 		}
 	
@@ -125,7 +124,6 @@ public class MemFetcher<E /*extends Serializable*/> implements Fetcher<E> {
 	
 	@Override
 	public boolean next() {
-		// TODO Auto-generated method stub
 		if (iterator == null) reset(); //Solving the problem of serialization. Added by Loc Nguyen: 2020.03.29.
 		
 		if (iterator.hasNext()) {
@@ -141,14 +139,12 @@ public class MemFetcher<E /*extends Serializable*/> implements Fetcher<E> {
 
 	@Override
 	public E pick() {
-		// TODO Auto-generated method stub
 		return current;
 	}
 
 
 	@Override
 	public void reset() {
-		// TODO Auto-generated method stub
 		current = null;
 		iterator = data.iterator();
 	}
@@ -156,7 +152,6 @@ public class MemFetcher<E /*extends Serializable*/> implements Fetcher<E> {
 	
 	@Override
 	public void close() {
-		// TODO Auto-generated method stub
 		data = null;
 		current = null;
 		iterator = null;
@@ -183,7 +178,6 @@ public class MemFetcher<E /*extends Serializable*/> implements Fetcher<E> {
 
 	@Override
 	public String toText() {
-		// TODO Auto-generated method stub
 		StringBuffer buffer = new StringBuffer();
 		
 		int i = 0;
@@ -191,7 +185,7 @@ public class MemFetcher<E /*extends Serializable*/> implements Fetcher<E> {
 			if (i > 0)
 				buffer.append("\n");
 			
-			String row = el.getClass().toString() + TextParserUtil.LINK_SEP;
+			String row = el.getClass().getName() + TextParserUtil.LINK_SEP;
 			if (el instanceof TextParsable)
 				buffer.append( row + ((TextParsable)el).toText());
 			else
@@ -208,7 +202,6 @@ public class MemFetcher<E /*extends Serializable*/> implements Fetcher<E> {
 	@SuppressWarnings("unchecked")
 	@Override
 	public void parseText(String spec) {
-		// TODO Auto-generated method stub
 		try {
 			List<E> dataList = Util.newList();
 			List<String> textList = TextParserUtil.split(spec, "\n", null);

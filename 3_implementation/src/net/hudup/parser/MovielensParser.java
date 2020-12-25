@@ -129,8 +129,8 @@ public class MovielensParser extends SnapshotParser {
 			items = MemProfiles.createEmpty(DataConfig.ITEMID_FIELD, Type.integer);
 		items.fillAs(itemRatingMap.keySet());
 		
-		double minRating = DataConfig.MIN_RATING_DEFAULT;
-		double maxRating = DataConfig.MAX_RATING_DEFAULT;
+		double minRating = Constants.DEFAULT_MIN_RATING;
+		double maxRating = Constants.DEFAULT_MAX_RATING;
 		try {
 			minRating = Double.parseDouble(props.getProperty(DataConfig.MIN_RATING_FIELD));
 			maxRating = Double.parseDouble(props.getProperty(DataConfig.MAX_RATING_FIELD));
@@ -140,8 +140,8 @@ public class MovielensParser extends SnapshotParser {
 			maxRating = Constants.UNUSED;
 		}
 		DatasetMetadata metadata = this.config.getMetadata();
-		metadata.minRating = Util.isUsed(minRating) ? minRating : DataConfig.MIN_RATING_DEFAULT;
-		metadata.maxRating = Util.isUsed(maxRating) ? maxRating : DataConfig.MAX_RATING_DEFAULT;
+		metadata.minRating = Util.isUsed(minRating) ? minRating : Constants.DEFAULT_MIN_RATING;
+		metadata.maxRating = Util.isUsed(maxRating) ? maxRating : Constants.DEFAULT_MAX_RATING;
 		config.setMetadata(metadata);
 		
 		SnapshotImpl dataset = new SnapshotImpl();

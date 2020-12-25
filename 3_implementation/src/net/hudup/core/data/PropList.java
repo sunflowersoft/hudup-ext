@@ -1019,7 +1019,6 @@ public class PropList implements TextParsable, Serializable, Cloneable {
 				result = loadJson(reader);
 		} 
 		catch (Throwable e) {
-			// TODO Auto-generated catch block
 			LogUtil.trace(e);
 			result = false;
 		}
@@ -1062,7 +1061,6 @@ public class PropList implements TextParsable, Serializable, Cloneable {
 				result = saveJson(writer);
 		} 
 		catch (Throwable e) {
-			// TODO Auto-generated catch block
 			LogUtil.trace(e);
 			result = false;
 		}
@@ -1455,7 +1453,6 @@ public class PropList implements TextParsable, Serializable, Cloneable {
 			return true;
 		}
 		catch (Throwable e) {
-			// TODO Auto-generated catch block
 			LogUtil.trace(e);
 		}
 		
@@ -1498,7 +1495,6 @@ public class PropList implements TextParsable, Serializable, Cloneable {
 			return true;
 		} 
 		catch (Throwable e) {
-			// TODO Auto-generated catch block
 			LogUtil.trace(e);
 		}
 		
@@ -1726,9 +1722,19 @@ public class PropList implements TextParsable, Serializable, Cloneable {
 	}
 	
 	
+	/**
+	 * Noting on specified key.
+	 * @param key specified key.
+	 * @return Note on specified key.
+	 */
+	public String userNote(String key) {
+		
+		return null;
+	}
+	
+	
 	@Override
 	public Object clone() {
-		// TODO Auto-generated method stub
 		PropList propList = new PropList();
 		propList.putAll(this);
 		return propList;
@@ -1737,7 +1743,6 @@ public class PropList implements TextParsable, Serializable, Cloneable {
 
 	@Override
 	public void parseText(String spec) {
-		// TODO Auto-generated method stub
 		clear();
 		
 		List<String> list = TextParserUtil.parseTextList(spec, TextParserUtil.EXTRA_SEP);

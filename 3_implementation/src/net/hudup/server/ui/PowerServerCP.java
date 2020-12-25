@@ -15,19 +15,25 @@ import java.awt.Image;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 
+import javax.swing.AbstractAction;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
+import javax.swing.KeyStroke;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -54,6 +60,7 @@ import net.hudup.core.data.ui.UnitTable.SelectionChangedListener;
 import net.hudup.core.logistic.I18nUtil;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.xURI;
+import net.hudup.core.logistic.ui.HelpContent;
 import net.hudup.core.logistic.ui.PluginStorageManifestPanel;
 import net.hudup.core.logistic.ui.PluginStorageManifestPanelRemote;
 import net.hudup.core.logistic.ui.UIUtil;
@@ -238,6 +245,7 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 	 */
 	public PowerServerCP(PowerServer server) {
 		this(server, null);
+	    setJMenuBar(createMenuBar());
 	}
 	
 	
@@ -278,6 +286,38 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 			btnRefresh.setVisible(false);
 	}
 
+	
+	/**
+	 * Creating main menu bar.
+	 * @return main menu bar.
+	 */
+	protected JMenuBar createMenuBar() {
+		JMenuBar mnBar = new JMenuBar();
+		
+		JMenu mnHelp = new JMenu(I18nUtil.message("help"));
+		mnBar.add(mnHelp);
+		
+		PowerServerCP thisCP = this;
+		JMenuItem mniHelpContent = new JMenuItem(
+			new AbstractAction(I18nUtil.message("help_content")) {
+				
+				/**
+				 * Serial version UID for serializable class. 
+				 */
+				private static final long serialVersionUID = 1L;
+
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					new HelpContent(thisCP);
+				}
+			});
+		mniHelpContent.setMnemonic('h');
+		mniHelpContent.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F1, 0));
+		mnHelp.add(mniHelpContent);
+		
+		return mnBar;
+	}
+	
 	
 	/**
 	 * Create general panel.

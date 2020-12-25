@@ -16,7 +16,7 @@ import net.hudup.core.PluginStorageWrapper;
 import net.hudup.core.RegisterTable;
 import net.hudup.core.Util;
 import net.hudup.core.alg.Alg;
-import net.hudup.core.alg.AlgDesc;
+import net.hudup.core.alg.AlgDesc2;
 import net.hudup.core.alg.AlgDesc2List;
 import net.hudup.core.alg.SetupAlgEvent;
 import net.hudup.core.alg.SetupAlgListener;
@@ -24,6 +24,7 @@ import net.hudup.core.client.ClassProcessor;
 import net.hudup.core.client.Service;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.DatasetPoolExchanged;
+import net.hudup.core.data.Simplify;
 import net.hudup.core.logistic.BaseClass;
 import net.hudup.core.logistic.CounterElapsedTimeEvent;
 import net.hudup.core.logistic.CounterElapsedTimeListener;
@@ -40,7 +41,7 @@ import net.hudup.core.logistic.ui.ProgressEvent;
 import net.hudup.core.logistic.ui.ProgressListener;
 
 /**
- * This class is extended wrapper of remote evaluator.
+ * This class is extended wrapper of remote evaluator which is more independent from the internal remote evaluator than the wrapper {@link EvaluatorWrapper}.
  * 
  * @author Loc Nguyen
  * @version 1.0
@@ -128,12 +129,11 @@ public class EvaluatorWrapperExt implements Evaluator, EvaluatorListener, Evalua
 
 
 	@Override
-	public boolean acceptAlg(Alg alg) throws RemoteException {
-		return remoteEvaluator.acceptAlg(alg);
+	public boolean acceptAlg(String algClassName) throws RemoteException {
+		return remoteEvaluator.acceptAlg(algClassName);
 	}
 
 
-	@Deprecated
 	@Override
 	public boolean acceptAlg(Class<? extends Alg> algClass) throws RemoteException {
 		return remoteEvaluator.acceptAlg(algClass);
@@ -141,8 +141,20 @@ public class EvaluatorWrapperExt implements Evaluator, EvaluatorListener, Evalua
 
 
 	@Override
+	public boolean acceptAlg(Alg alg) throws RemoteException {
+		return remoteEvaluator.acceptAlg(alg);
+	}
+
+
+	@Override
 	public NoneWrapperMetricList defaultMetrics() throws RemoteException {
 		return remoteEvaluator.defaultMetrics();
+	}
+
+
+	@Override
+	public String getClassName() throws RemoteException {
+		return remoteEvaluator.getClassName();
 	}
 
 
@@ -210,8 +222,14 @@ public class EvaluatorWrapperExt implements Evaluator, EvaluatorListener, Evalua
 
 
 	@Override
-	public AlgDesc getPluginAlgDesc(Class<? extends Alg> algClass, String algName) throws RemoteException {
+	public AlgDesc2 getPluginAlgDesc(Class<? extends Alg> algClass, String algName) throws RemoteException {
 		return remoteEvaluator.getPluginAlgDesc(algClass, algName);
+	}
+
+
+	@Override
+	public AlgDesc2 getPluginNormalAlgDesc(String algName) throws RemoteException {
+		return remoteEvaluator.getPluginNormalAlgDesc(algName);
 	}
 
 
@@ -224,6 +242,12 @@ public class EvaluatorWrapperExt implements Evaluator, EvaluatorListener, Evalua
 	@Override
 	public Alg getEvaluatedAlg(String algName, boolean remote) throws RemoteException {
 		return remoteEvaluator.getEvaluatedAlg(algName, remote);
+	}
+
+
+	@Override
+	public AlgDesc2 getEvaluatedAlgDesc(String algName) throws RemoteException {
+		return remoteEvaluator.getEvaluatedAlgDesc(algName);
 	}
 
 
@@ -319,6 +343,33 @@ public class EvaluatorWrapperExt implements Evaluator, EvaluatorListener, Evalua
 
 	
 	@Override
+	public List<EventObject> doTask2(UUID listenerID) throws RemoteException {
+		boolean classPathContains = true;
+		try {
+			Class.forName(remoteEvaluator.getClassName());
+		}
+		catch (Throwable e) {classPathContains = false;}
+
+		List<EventObject> returnedEvtList = doTask(listenerID);
+		if (!classPathContains)
+			return returnedEvtList;
+		else {
+			List<EventObject> simplifiedEvtList = Util.newList(returnedEvtList.size());
+			for (EventObject evt : returnedEvtList) {
+				if (evt instanceof Simplify) {
+		    		try {
+		    			EventObject simplifiedEvt = (EventObject) ((Simplify)evt).simplify();
+		    			if (simplifiedEvt != null) evt = simplifiedEvt;
+		    		} catch (Exception e) {LogUtil.trace(e);}
+				}
+				simplifiedEvtList.add(evt);
+			}
+			return simplifiedEvtList;
+		}
+	}
+
+
+	@Override
 	public List<EventObject> doTask(UUID listenerID) throws RemoteException {
 		List<EventObject> evtList = doTask0(listenerID);
 		
@@ -341,16 +392,38 @@ public class EvaluatorWrapperExt implements Evaluator, EvaluatorListener, Evalua
 	private List<EventObject> doTask0(UUID listenerID) {
 		if (listenerID == null) return Util.newList();
 		
+		List<EventObject> returnedEvtList = Util.newList();
 		synchronized (taskMap) {
 			EventTask task = null;
 			if (!taskMap.containsKey(listenerID)) return Util.newList();
 			
 			task = taskMap.get(listenerID);
-			List<EventObject> returnedEvtList = Util.newList(task.size());
+			returnedEvtList = Util.newList(task.size());
 			returnedEvtList.addAll(task.getEventList());
 			task.clear();
 			task.updateLastDone();
+		}
+		
+		boolean classPathContains = true;
+		try {
+			Class.forName(remoteEvaluator.getClassName());
+		}
+		catch (Throwable e) {classPathContains = false;}
+		
+		if (classPathContains)
 			return returnedEvtList;
+		else {
+			List<EventObject> simplifiedEvtList = Util.newList(returnedEvtList.size());
+			for (EventObject evt : returnedEvtList) {
+				if (evt instanceof Simplify) {
+		    		try {
+		    			EventObject simplifiedEvt = (EventObject) ((Simplify)evt).simplify();
+		    			if (simplifiedEvt != null) evt = simplifiedEvt;
+		    		} catch (Exception e) {LogUtil.trace(e);}
+				}
+				simplifiedEvtList.add(evt);
+			}
+			return simplifiedEvtList;
 		}
 	}
 	
@@ -736,6 +809,12 @@ public class EvaluatorWrapperExt implements Evaluator, EvaluatorListener, Evalua
 	}
 
 	
+	@Override
+	public boolean classPathContains(String className) throws RemoteException {
+		return remoteEvaluator.classPathContains(className);
+	}
+
+
 	@Override
 	public synchronized boolean remoteStart(List<String> algNameList, DatasetPoolExchanged pool, ClassProcessor cp, DataConfig config, Timestamp timestamp, Serializable parameter)
 			throws RemoteException {

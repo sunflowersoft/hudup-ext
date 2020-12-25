@@ -25,7 +25,7 @@ import net.hudup.core.logistic.xURI;
  * @version 12.0
  *
  */
-public abstract class KBaseAbstractSerializable extends KBaseAbstract {
+public abstract class KBaseAbstractSerializable extends KBaseRecommend {
 
 	
 	/**
@@ -50,14 +50,13 @@ public abstract class KBaseAbstractSerializable extends KBaseAbstract {
 	/**
 	 * Default constructor.
 	 */
-	public KBaseAbstractSerializable() {
-		// TODO Auto-generated constructor stub
+	protected KBaseAbstractSerializable() {
+		super();
 	}
 
 	
 	@Override
 	public void load() throws RemoteException {
-		// TODO Auto-generated method stub
 		super.load();
 		deserializeNut(config.getStoreUri());
 	}
@@ -65,7 +64,6 @@ public abstract class KBaseAbstractSerializable extends KBaseAbstract {
 
 	@Override
 	public void save(DataConfig storeConfig) throws RemoteException {
-		// TODO Auto-generated method stub
 		super.save(storeConfig);
 		serializeNut(storeConfig.getStoreUri());
 	}
@@ -73,7 +71,6 @@ public abstract class KBaseAbstractSerializable extends KBaseAbstract {
 
 	@Override
 	public void close() throws Exception {
-		// TODO Auto-generated method stub
 		super.close();
 		
 		if (nut != null) {
@@ -87,7 +84,6 @@ public abstract class KBaseAbstractSerializable extends KBaseAbstract {
 
 	@Override
 	public boolean isEmpty() throws RemoteException {
-		// TODO Auto-generated method stub
 		return nut != null;
 	}
 

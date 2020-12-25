@@ -9,10 +9,17 @@ package net.hudup.core.data.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 import javax.swing.JDialog;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 import javax.swing.table.DefaultTableModel;
 
@@ -20,6 +27,7 @@ import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.DatasetAbstract;
 import net.hudup.core.data.DatasetMetadata2;
+import net.hudup.core.logistic.ClipboardUtil;
 import net.hudup.core.logistic.MathUtil;
 import net.hudup.core.logistic.ui.TextArea;
 import net.hudup.core.logistic.ui.TextField;
@@ -45,8 +53,19 @@ public class DatasetMetadata2Table extends JTable {
 	 * Default constructor.
 	 */
 	public DatasetMetadata2Table() {
-		// TODO Auto-generated constructor stub
 		super(new DatasetMetadata2TM());
+		
+		addMouseListener(new MouseAdapter() {
+
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if(SwingUtilities.isRightMouseButton(e)) {
+					JPopupMenu contextMenu = createContextMenu();
+					if(contextMenu != null)
+						contextMenu.show((Component)e.getSource(), e.getX(), e.getY());
+				}
+			}
+		});
 	}
 
 	
@@ -68,6 +87,29 @@ public class DatasetMetadata2Table extends JTable {
 	}
 	
 	
+	/**
+	 * Creating context menu.
+	 * @return context menu.
+	 */
+	protected JPopupMenu createContextMenu() {
+		DatasetMetadata2 metadata = getDatasetMetadata2TM().getDatasetMetadata();
+		if (metadata == null) return null;
+		
+		JPopupMenu contextMenu = new JPopupMenu();
+		
+		JMenuItem miCopy = UIUtil.makeMenuItem((String)null, "Copy", 
+			new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					ClipboardUtil.util.setText(metadata.toText2());
+				}
+			});
+		contextMenu.add(miCopy);
+		
+		return contextMenu;
+	}
+
 	
 	/**
 	 * Showing dialog containing table of extended dataset meta-data.
@@ -132,55 +174,63 @@ class DatasetMetadata2TM extends DefaultTableModel {
 	
 	
 	/**
+	 * Internal dataset meta-data.
+	 */
+	protected DatasetMetadata2 metadata = null;
+	
+	
+	/**
 	 * Default constructor.
 	 */
 	public DatasetMetadata2TM() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
 
 	/**
 	 * Updating table model by extended dataset meta-data.
-	 * @param metadata2 extended dataset meta-data.
+	 * @param metadata extended dataset meta-data.
 	 */
-	public void update(DatasetMetadata2 metadata2) {
-		if (metadata2 == null) {
+	public void update(DatasetMetadata2 metadata) {
+		this.metadata = metadata;
+
+		if (metadata == null) {
 			clear();
 			return;
 		}
 		
 		setDataVector(new Object[][] {
-				{"Min rating", MathUtil.round(metadata2.minRating)},
-				{"Max rating", MathUtil.round(metadata2.maxRating)},
-				{"Number of users", metadata2.numberOfUsers},
-				{"Number of rating users", metadata2.numberOfRatingUsers},
-				{"Number of items", metadata2.numberOfItems},
-				{"Number of rated items", metadata2.numberOfRatedItems},
-				{"Min rating count of a user", metadata2.userMinRatingCount},
-				{"Min favorite rating count of a user", metadata2.userMinRelevantRatingCount},
-				{"Max rating count of a user", metadata2.userMaxRatingCount},
-				{"Max favorite rating count of a user", metadata2.userMaxRelevantRatingCount},
-				{"Average rating count of a user", MathUtil.round(metadata2.userAverageRatingCount)},
-				{"Average favorite rating count of a user", MathUtil.round(metadata2.userAverageRelevantRatingCount)},
-				{"Min rating count of an item", metadata2.itemMinRatingCount},
-				{"Min favorite rating count of an item", metadata2.itemMinRelevantRatingCount},
-				{"Max rating count of an item", metadata2.itemMaxRatingCount},
-				{"Max favorite rating count of an item", metadata2.itemMaxRelevantRatingCount},
-				{"Average rating count of an item", MathUtil.round(metadata2.itemAverageRatingCount)},
-				{"Average favorite rating count of an item", MathUtil.round(metadata2.itemAverageRelevantRatingCount)},
-				{"Number of ratings", metadata2.numberOfRatings},
-				{"Rating cover ratio", MathUtil.round(metadata2.ratingCoverRatio*100) + "%"},
-				{"Rating mean", MathUtil.round(metadata2.ratingMean)},
-				{"Rating standard deviation", MathUtil.round(metadata2.ratingSd)},
-				{"Number of favorite ratings", metadata2.numberOfRelevantRatings},
-				{"Rating favorite ratio", MathUtil.round(metadata2.ratingRelevantRatio*100) + "%"},
-				{"Favorite rating mean", MathUtil.round(metadata2.relevantRatingMean)},
-				{"Favorite rating standard deviation", MathUtil.round(metadata2.relevantRatingSd)},
-				{"Sample row count", metadata2.sampleRowCount},
-				{"Sample column count", metadata2.sampleColumnCount},
-				{"Sample cell count", metadata2.sampleCellCount},
-				{"Sample cover ratio", MathUtil.round(metadata2.sampleCoverRatio*100) + "%"},
+				{"Minimum rating", MathUtil.round(metadata.minRating)},
+				{"Maximum rating", MathUtil.round(metadata.maxRating)},
+				{"Relevant rating", MathUtil.round(metadata.relevantRating)},
+				{"Number of users", metadata.numberOfUsers},
+				{"Number of rating users", metadata.numberOfRatingUsers},
+				{"Number of items", metadata.numberOfItems},
+				{"Number of rated items", metadata.numberOfRatedItems},
+				{"Min rating count of a user", metadata.userMinRatingCount},
+				{"Min favorite rating count of a user", metadata.userMinRelevantRatingCount},
+				{"Max rating count of a user", metadata.userMaxRatingCount},
+				{"Max favorite rating count of a user", metadata.userMaxRelevantRatingCount},
+				{"Average rating count of a user", MathUtil.round(metadata.userAverageRatingCount)},
+				{"Average favorite rating count of a user", MathUtil.round(metadata.userAverageRelevantRatingCount)},
+				{"Min rating count of an item", metadata.itemMinRatingCount},
+				{"Min favorite rating count of an item", metadata.itemMinRelevantRatingCount},
+				{"Max rating count of an item", metadata.itemMaxRatingCount},
+				{"Max favorite rating count of an item", metadata.itemMaxRelevantRatingCount},
+				{"Average rating count of an item", MathUtil.round(metadata.itemAverageRatingCount)},
+				{"Average favorite rating count of an item", MathUtil.round(metadata.itemAverageRelevantRatingCount)},
+				{"Number of ratings", metadata.numberOfRatings},
+				{"Rating cover ratio", MathUtil.round(metadata.ratingCoverRatio*100) + "%"},
+				{"Rating mean", MathUtil.round(metadata.ratingMean)},
+				{"Rating standard deviation", MathUtil.round(metadata.ratingSd)},
+				{"Number of favorite ratings", metadata.numberOfRelevantRatings},
+				{"Rating favorite ratio", MathUtil.round(metadata.ratingRelevantRatio*100) + "%"},
+				{"Favorite rating mean", MathUtil.round(metadata.relevantRatingMean)},
+				{"Favorite rating standard deviation", MathUtil.round(metadata.relevantRatingSd)},
+				{"Sample row count", metadata.sampleRowCount},
+				{"Sample column count", metadata.sampleColumnCount},
+				{"Sample cell count", metadata.sampleCellCount},
+				{"Sample cover ratio", MathUtil.round(metadata.sampleCoverRatio*100) + "%"},
 			}, 
 			createColumns());
 		
@@ -188,10 +238,18 @@ class DatasetMetadata2TM extends DefaultTableModel {
 	
 	
 	/**
+	 * Getting dataset meta-data.
+	 * @return dataset meta-data.
+	 */
+	public DatasetMetadata2 getDatasetMetadata() {
+		return metadata;
+	}
+
+	
+	/**
 	 * Clearing table model.
 	 */
 	public void clear() {
-		
 		setDataVector(new Object[][] {}, createColumns());
 	}
 	
@@ -207,7 +265,6 @@ class DatasetMetadata2TM extends DefaultTableModel {
 	
 	@Override
 	public boolean isCellEditable(int row, int column) {
-		// TODO Auto-generated method stub
 		return false;
 	}
 	

@@ -146,7 +146,7 @@ public class Firer extends PluginManagerAbstract {
 					PluginStorage.getNextUpdateList().add(compositeAlg);
 					if (nextUpdateLog != null) {
 						nextUpdateLog.write("\n\n");
-						nextUpdateLog.write(compositeAlg.getClass().toString() + "\n\tNote: " + nextUpdate.note());
+						nextUpdateLog.write(compositeAlg.getClass().getName() + "\n\tNote: " + nextUpdate.note());
 					}
 					
 					continue;

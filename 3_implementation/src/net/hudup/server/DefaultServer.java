@@ -332,7 +332,7 @@ public class DefaultServer extends PowerServerImpl {
             		UIUtil.getImage("server-16x16.png"), 
             		UIUtil.getImage("server-paused-16x16.png"), 
             		UIUtil.getImage("server-stopped-16x16.png"), 
-            		I18nUtil.message("hudup_server"), 
+            		I18nUtil.message("hudup_server") + " " + Constants.VERSION, 
             		popup); 
             		
             trayIcon.addActionListener(new ActionListener() {

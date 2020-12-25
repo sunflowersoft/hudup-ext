@@ -67,13 +67,25 @@ public abstract class RecommenderAbstract extends AlgAbstract implements Recomme
 	/**
 	 * Fast recommendation mode.
 	 */
-	public static final String FAST_RECOMMEND = "fast_recommend";
+	public static final String FAST_RECOMMEND = "recommend_fast";
 
 	
 	/**
 	 * Default value for the fast recommendation mode.
 	 */
 	public static final boolean FAST_RECOMMEND_DEFAULT = false;
+
+	
+	/**
+	 * Reversed recommendation mode.
+	 */
+	public static final String REVERSED_RECOMMEND = "recommend_reversed";
+
+	
+	/**
+	 * Default value for the reversed recommendation mode.
+	 */
+	public static final boolean REVERSED_RECOMMEND_DEFAULT = false;
 
 	
 	/**
@@ -111,7 +123,9 @@ public abstract class RecommenderAbstract extends AlgAbstract implements Recomme
 		Fetcher<RatingVector> items = dataset.fetchItemRatings();
 		
 		List<Pair> pairs = Util.newList();
-		double maxRating = getMaxRating(); //Bug fixing date: 2019.07.13 by Loc Nguyen
+		double maxRating = getMaxRating();
+		double minRating = getMinRating();
+		boolean reserved = getConfig().getAsBoolean(REVERSED_RECOMMEND);
 		try {
 			while (items.next()) {
 				RatingVector item = items.pick();
@@ -132,9 +146,9 @@ public abstract class RecommenderAbstract extends AlgAbstract implements Recomme
 				
 				// Finding maximum rating
 				double value = predict.get(itemId).value;
-				if (!Accuracy.isRelevant(value, this))
+				if (Accuracy.isRelevant(value, this) == reserved)
 					continue;
-				int found = Pair.findIndexOfLessThan(value, pairs);
+				int found = reserved ? Pair.findIndexOfGreaterThan(value, pairs) : Pair.findIndexOfLessThan(value, pairs);
 				Pair pair = new Pair(itemId, value);
 				if (found == -1)
 					pairs.add(pair);
@@ -144,8 +158,10 @@ public abstract class RecommenderAbstract extends AlgAbstract implements Recomme
 				int n = pairs.size();
 				if (maxRecommend > 0 && n >= maxRecommend) {
 					Pair last = pairs.get(n - 1);
-					if (getConfig().getAsBoolean(FAST_RECOMMEND) || last.value() >= maxRating) {
+					if (getConfig().getAsBoolean(FAST_RECOMMEND)
+							|| (reserved ? last.value() <= minRating : last.value() >= maxRating)) {
 						if (n > maxRecommend) pairs.remove(n - 1);
+						
 						break;
 					}
 					else if (n > maxRecommend)
@@ -270,6 +286,23 @@ public abstract class RecommenderAbstract extends AlgAbstract implements Recomme
 	
 	
 	/**
+	 * Getting relevant rating threshold.
+	 * @return relevant rating threshold.
+	 */
+	public double getRelevantRatingThreshold() {
+		double threshold = getConfig().getAsReal(DataConfig.RELEVANT_RATING_FIELD);
+		if (Util.isUsed(threshold)) return threshold;
+		
+		double minRating = getMinRating();
+		double maxRating = getMaxRating();
+		if (Util.isUsed(minRating) && Util.isUsed(maxRating))
+			return Accuracy.getRelevantRatingThreshold(minRating, maxRating);
+		else
+			return DataConfig.RELEVANT_RATING_DEFAULT;
+	}
+
+	
+	/**
 	 * Checking whether minimum rating and maximum rating are bounded.
 	 * @return whether minimum rating and maximum rating are bounded.
 	 */
@@ -321,6 +354,8 @@ public abstract class RecommenderAbstract extends AlgAbstract implements Recomme
 		try {
 			double cfgMinRating = config.getMinRating();
 			double cfgMaxRating = config.getMaxRating();
+			double cfgRelevantRating = Accuracy.getRelevantRatingThreshold(config);
+			
 			if (cfgMinRating != minRating) {
 				config.put(DataConfig.MIN_RATING_FIELD, minRating);
 				dataset.getConfig().put(DataConfig.MIN_RATING_FIELD, minRating);
@@ -328,6 +363,12 @@ public abstract class RecommenderAbstract extends AlgAbstract implements Recomme
 			if (cfgMaxRating != maxRating) {
 				config.put(DataConfig.MAX_RATING_FIELD, maxRating);
 				dataset.getConfig().put(DataConfig.MAX_RATING_FIELD, maxRating);
+			}
+			
+			double relevantRating = Accuracy.getRelevantRatingThreshold(cfgMinRating, cfgMaxRating);
+			if (cfgRelevantRating != relevantRating) {
+				config.put(DataConfig.RELEVANT_RATING_FIELD, relevantRating);
+				dataset.getConfig().put(DataConfig.RELEVANT_RATING_FIELD, relevantRating);
 			}
 		} catch (Exception e) {LogUtil.trace(e);}
 	}
@@ -355,6 +396,7 @@ public abstract class RecommenderAbstract extends AlgAbstract implements Recomme
 		DataConfig config = super.createDefaultConfig();
 		config.put(MINMAX_RATING_BOUND, MINMAX_RATING_BOUND_DEFAULT);
 		config.put(FAST_RECOMMEND, FAST_RECOMMEND_DEFAULT);
+		config.put(REVERSED_RECOMMEND, REVERSED_RECOMMEND_DEFAULT);
 		config.put(MINMAX_RATING_RECONFIG, MINMAX_RATING_RECONFIG_DEFAULT);
 		return config;
 	}

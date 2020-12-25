@@ -292,6 +292,17 @@ public abstract class AlgAbstract implements Alg, AlgRemote {
 
 
 	@Override
+	public boolean classPathContains(String className) throws RemoteException {
+    	try {
+    		Class.forName(className);
+    		return true;
+    	} catch (Exception e) {}
+    	
+		return false;
+	}
+
+
+	@Override
 	public synchronized Remote export(int serverPort) throws RemoteException {
 		if (exportedStub == null)
 			exportedStub = (AlgRemote) NetUtil.RegistryRemote.export(this, serverPort);

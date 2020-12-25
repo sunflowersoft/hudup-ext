@@ -29,6 +29,15 @@ public interface EvaluateProgressListener extends EventListener, Pingable, Remot
 	 * @throws RemoteException if any error raises.
 	 */
 	void receivedProgress(EvaluateProgressEvent evt) throws RemoteException;
+
+
+	/**
+	 * Testing whether the specified class via its name is accepted.
+	 * @param className specified class name.
+	 * @return whether the specified class via its name is accepted.
+	 * @throws RemoteException if any error raises.
+	 */
+	boolean classPathContains(String className) throws RemoteException;
 	
 	
 }

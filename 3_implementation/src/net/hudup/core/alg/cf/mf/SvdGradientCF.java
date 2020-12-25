@@ -9,20 +9,16 @@ package net.hudup.core.alg.cf.mf;
 
 import java.io.Serializable;
 import java.rmi.RemoteException;
-import java.util.List;
 import java.util.Set;
 
 import net.hudup.core.Util;
 import net.hudup.core.alg.KBase;
 import net.hudup.core.alg.KBaseRecommendIntegrated;
-import net.hudup.core.alg.RecommendFilterParam;
 import net.hudup.core.alg.RecommendParam;
 import net.hudup.core.alg.cf.ModelBasedCFAbstract;
 import net.hudup.core.data.DataConfig;
-import net.hudup.core.data.Pair;
 import net.hudup.core.data.RatingMatrix;
 import net.hudup.core.data.RatingVector;
-import net.hudup.core.evaluate.recommend.Accuracy;
 
 
 /**
@@ -71,13 +67,12 @@ public class SvdGradientCF extends ModelBasedCFAbstract {
 	@Override
 	public synchronized RatingVector estimate(RecommendParam param, Set<Integer> queryIds) throws RemoteException {
 		SvdGradientKB kb = (SvdGradientKB) getKBase();
-		if (kb.isEmpty())
-			return null;
+		if (kb.isEmpty()) return null;
 		
 		RatingVector result = param.ratingVector.newInstance(true);
 		
-		double minValue = getMinRating();
-		double maxValue = getMaxRating();
+		double minRating = getMinRating();
+		double maxRating = getMaxRating();
 		boolean isBoundedMinMax = isBoundedMinMaxRating();
 		int userId = result.id();
 		for (int queryId : queryIds) {
@@ -85,8 +80,8 @@ public class SvdGradientCF extends ModelBasedCFAbstract {
 			if (!Util.isUsed(ratingValue)) continue;
 			
 			if (isBoundedMinMax) {
-				ratingValue = isBoundedMinMax ? Math.min(ratingValue, maxValue) : ratingValue;
-				ratingValue = isBoundedMinMax ? Math.max(ratingValue, minValue) : ratingValue;
+				ratingValue = isBoundedMinMax ? Math.min(ratingValue, maxRating) : ratingValue;
+				ratingValue = isBoundedMinMax ? Math.max(ratingValue, minRating) : ratingValue;
 			}
 			result.put(queryId, ratingValue);
 		}
@@ -98,66 +93,6 @@ public class SvdGradientCF extends ModelBasedCFAbstract {
 	}
 
 	
-	@Override
-	public synchronized RatingVector recommend(RecommendParam param, int maxRecommend) throws RemoteException {
-		SvdGradientKB kb = (SvdGradientKB) getKBase();
-		if (kb.isEmpty())
-			return null;
-
-		param = recommendPreprocess(param);
-		if (param == null)
-			return null;
-		
-		filterList.prepare(param);
-		List<Integer> itemIds = kb.getItemIds();
-		Set<Integer> queryIds = Util.newSet();
-		for (int itemId : itemIds) {
-			
-			if ( !param.ratingVector.isRated(itemId) && filterList.filter(getDataset(), RecommendFilterParam.create(itemId)) )
-				queryIds.add(itemId);
-		}
-		
-		double maxRating = getMaxRating();
-		int userId = param.ratingVector.id();
-		
-		List<Pair> pairs = Util.newList();
-		for (int itemId : queryIds) {
-			
-			double value = kb.estimate(userId, itemId);
-			if (!Util.isUsed(value)) continue;
-			if (!Accuracy.isRelevant(value, this))
-				continue;
-			
-			// Finding maximum rating
-			int found = Pair.findIndexOfLessThan(value, pairs);
-			Pair pair = new Pair(itemId, value);
-			if (found == -1)
-				pairs.add(pair);
-			else 
-				pairs.add(found, pair);
-			
-			int n = pairs.size();
-			if (maxRecommend > 0 && n >= maxRecommend) {
-				Pair last = pairs.get(n - 1);
-				if (getConfig().getAsBoolean(FAST_RECOMMEND) || last.value() >= maxRating) {
-					if (n > maxRecommend) pairs.remove(n - 1);
-					break;
-				}
-				else if (n > maxRecommend)
-					pairs.remove(n - 1);
-			}
-			
-		}
-		
-		if (maxRecommend > 0 && pairs.size() > maxRecommend) {
-			pairs = pairs.subList(0, maxRecommend); //This code line is for safe in case that there are maxRecommend+1 items.
-		}
-		if (pairs.size() == 0) return null;
-		
-		RatingVector rec = param.ratingVector.newInstance(true);
-		Pair.fillRatingVector(rec, pairs);
-		return rec;
-	}
 
 	
 	@Override

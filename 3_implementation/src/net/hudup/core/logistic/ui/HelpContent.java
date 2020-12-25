@@ -41,7 +41,6 @@ public class HelpContent extends JDialog {
 	 */
 	public HelpContent(Component comp) {
 		super(UIUtil.getFrameForComponent(comp), "Help content", true);
-		// TODO Auto-generated constructor stub
 		
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		setSize(600, 400);
@@ -69,7 +68,6 @@ public class HelpContent extends JDialog {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				dispose();
 			}
 		});

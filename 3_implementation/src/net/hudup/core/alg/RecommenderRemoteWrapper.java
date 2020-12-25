@@ -145,6 +145,15 @@ public class RecommenderRemoteWrapper extends AlgRemoteWrapper implements Recomm
 	
 	
 	/**
+	 * Getting relevant rating threshold.
+	 * @return relevant rating threshold.
+	 */
+	public double getRelevantRatingThreshold() {
+		return (getMaxRating() + getMinRating()) / 2.0; 
+	}
+
+	
+	/**
 	 * Checking whether minimum rating and maximum rating are bounded.
 	 * @return whether minimum rating and maximum rating are bounded.
 	 */

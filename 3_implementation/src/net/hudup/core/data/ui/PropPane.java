@@ -117,7 +117,6 @@ public class PropPane extends JPanel {
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					// TODO Auto-generated method stub
 					onLoad();
 				}
 			});
@@ -130,7 +129,6 @@ public class PropPane extends JPanel {
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					// TODO Auto-generated method stub
 					onSave();
 				}
 			});
@@ -381,7 +379,6 @@ public class PropPane extends JPanel {
 
 	@Override
 	public void setEnabled(boolean enabled) {
-		// TODO Auto-generated method stub
 		super.setEnabled(enabled);
 		
 		tblProp.setEnabled(enabled);

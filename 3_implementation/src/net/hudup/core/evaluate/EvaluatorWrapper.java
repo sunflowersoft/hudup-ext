@@ -19,7 +19,7 @@ import net.hudup.core.PluginChangedListener;
 import net.hudup.core.PluginStorageWrapper;
 import net.hudup.core.RegisterTable;
 import net.hudup.core.alg.Alg;
-import net.hudup.core.alg.AlgDesc;
+import net.hudup.core.alg.AlgDesc2;
 import net.hudup.core.alg.AlgDesc2List;
 import net.hudup.core.alg.SetupAlgEvent;
 import net.hudup.core.alg.SetupAlgListener;
@@ -206,15 +206,20 @@ public class EvaluatorWrapper implements Evaluator, Serializable {
 
 
 	@Override
-	public boolean acceptAlg(Alg alg) throws RemoteException {
-		return remoteEvaluator.acceptAlg(alg);
+	public boolean acceptAlg(String algClassName) throws RemoteException {
+		return remoteEvaluator.acceptAlg(algClassName);
 	}
 
 
-	@Deprecated
 	@Override
 	public boolean acceptAlg(Class<? extends Alg> algClass) throws RemoteException {
 		return remoteEvaluator.acceptAlg(algClass);
+	}
+
+
+	@Override
+	public boolean acceptAlg(Alg alg) throws RemoteException {
+		return remoteEvaluator.acceptAlg(alg);
 	}
 
 
@@ -224,6 +229,12 @@ public class EvaluatorWrapper implements Evaluator, Serializable {
 	}
 
 	
+	@Override
+	public String getClassName() throws RemoteException {
+		return remoteEvaluator.getClassName();
+	}
+
+
 	@Override
 	public String getMainUnit() throws RemoteException {
 		return remoteEvaluator.getMainUnit();
@@ -311,8 +322,14 @@ public class EvaluatorWrapper implements Evaluator, Serializable {
 
 
 	@Override
-	public AlgDesc getPluginAlgDesc(Class<? extends Alg> algClass, String algName) throws RemoteException {
+	public AlgDesc2 getPluginAlgDesc(Class<? extends Alg> algClass, String algName) throws RemoteException {
 		return remoteEvaluator.getPluginAlgDesc(algClass, algName);
+	}
+
+
+	@Override
+	public AlgDesc2 getPluginNormalAlgDesc(String algName) throws RemoteException {
+		return remoteEvaluator.getPluginNormalAlgDesc(algName);
 	}
 
 
@@ -325,6 +342,12 @@ public class EvaluatorWrapper implements Evaluator, Serializable {
 	@Override
 	public Alg getEvaluatedAlg(String algName, boolean remote) throws RemoteException {
 		return remoteEvaluator.getEvaluatedAlg(algName, remote);
+	}
+
+
+	@Override
+	public AlgDesc2 getEvaluatedAlgDesc(String algName) throws RemoteException {
+		return remoteEvaluator.getEvaluatedAlgDesc(algName);
 	}
 
 
@@ -349,6 +372,12 @@ public class EvaluatorWrapper implements Evaluator, Serializable {
 	@Override
 	public List<EventObject> doTask(UUID listenerID) throws RemoteException {
 		return remoteEvaluator.doTask(listenerID);
+	}
+
+
+	@Override
+	public List<EventObject> doTask2(UUID listenerID) throws RemoteException {
+		return remoteEvaluator.doTask2(listenerID);
 	}
 
 
@@ -487,6 +516,12 @@ public class EvaluatorWrapper implements Evaluator, Serializable {
 	@Override
 	public String getEvaluateStorePath() throws RemoteException {
 		return remoteEvaluator.getEvaluateStorePath();
+	}
+
+
+	@Override
+	public boolean classPathContains(String className) throws RemoteException {
+		return remoteEvaluator.classPathContains(className);
 	}
 
 

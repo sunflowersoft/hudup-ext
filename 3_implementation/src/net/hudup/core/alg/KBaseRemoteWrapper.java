@@ -67,7 +67,6 @@ public class KBaseRemoteWrapper implements KBase, KBaseRemote {
 	 * @param exclusive exclusive mode.
 	 */
 	public KBaseRemoteWrapper(KBaseRemote remoteKBase, boolean exclusive) {
-		// TODO Auto-generated constructor stub
 		this.remoteKBase = remoteKBase;
 		this.exclusive = exclusive;
 	}
@@ -75,35 +74,30 @@ public class KBaseRemoteWrapper implements KBase, KBaseRemote {
 	
 	@Override
 	public void load() throws RemoteException {
-		// TODO Auto-generated method stub
 		remoteKBase.load();
 	}
 
 	
 	@Override
 	public void learn(Dataset dataset, Alg alg) throws RemoteException {
-		// TODO Auto-generated method stub
 		remoteKBase.learn(dataset, alg);
 	}
 
 	
 	@Override
 	public void save() throws RemoteException {
-		// TODO Auto-generated method stub
 		remoteKBase.save();
 	}
 
 	
 	@Override
 	public void save(DataConfig storeConfig) throws RemoteException {
-		// TODO Auto-generated method stub
 		remoteKBase.save(storeConfig);
 	}
 
 	
 	@Override
 	public void clear() throws RemoteException {
-		// TODO Auto-generated method stub
 		remoteKBase.clear();
 	}
 
@@ -115,21 +109,18 @@ public class KBaseRemoteWrapper implements KBase, KBaseRemote {
 	 */
 	@Override
 	public void close() throws Exception {
-		// TODO Auto-generated method stub
 		remoteKBase.close();
 	}
 
 	
 	@Override
 	public boolean isEmpty() throws RemoteException {
-		// TODO Auto-generated method stub
 		return remoteKBase.isEmpty();
 	}
 
 	
 	@Override
 	public DataConfig getConfig() {
-		// TODO Auto-generated method stub
 		try {
 			return remoteKBase.queryConfig();
 		} catch (Exception e) { LogUtil.trace(e); }
@@ -140,14 +131,12 @@ public class KBaseRemoteWrapper implements KBase, KBaseRemote {
 	
 	@Override
 	public DataConfig queryConfig() throws RemoteException {
-		// TODO Auto-generated method stub
 		return remoteKBase.queryConfig();
 	}
 
 
 	@Override
 	public void setConfig(DataConfig config) {
-		// TODO Auto-generated method stub
 		if (remoteKBase instanceof KBase)
 			((KBase)remoteKBase).setConfig(config);
 		else {
@@ -158,7 +147,6 @@ public class KBaseRemoteWrapper implements KBase, KBaseRemote {
 	
 	@Override
 	public Datasource getDatasource() {
-		// TODO Auto-generated method stub
 		if (remoteKBase instanceof KBase)
 			return ((KBase)remoteKBase).getDatasource();
 		else {
@@ -170,7 +158,6 @@ public class KBaseRemoteWrapper implements KBase, KBaseRemote {
 	
 	@Override
 	public Inspector getInspector() {
-		// TODO Auto-generated method stub
 		if (remoteKBase instanceof KBase)
 			return ((KBase)remoteKBase).getInspector();
 		else {
@@ -181,7 +168,6 @@ public class KBaseRemoteWrapper implements KBase, KBaseRemote {
 
 	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
 		try {
 			return remoteKBase.queryName();
 		} catch (Exception e) { LogUtil.trace(e); }
@@ -192,60 +178,63 @@ public class KBaseRemoteWrapper implements KBase, KBaseRemote {
 	
 	@Override
 	public String queryName() throws RemoteException {
-		// TODO Auto-generated method stub
 		return remoteKBase.queryName();
 	}
 
 
 	@Override
 	public String[] getBaseRemoteInterfaceNames() throws RemoteException {
-		// TODO Auto-generated method stub
 		return new String[] {KBase.class.getName()};
 	}
 
 	
 	@Override
 	public String getDescription() throws RemoteException {
-		// TODO Auto-generated method stub
 		return remoteKBase.getDescription();
 	}
 
 
 	@Override
 	public void addSetupListener(SetupAlgListener listener) throws RemoteException {
-		// TODO Auto-generated method stub
 		remoteKBase.addSetupListener(listener);
 	}
 
 
 	@Override
 	public void removeSetupListener(SetupAlgListener listener) throws RemoteException {
-		// TODO Auto-generated method stub
 		remoteKBase.removeSetupListener(listener);
 	}
 
 
 	@Override
 	public void fireSetupEvent(SetupAlgEvent evt) throws RemoteException {
-		// TODO Auto-generated method stub
 		remoteKBase.fireSetupEvent(evt);
 	}
 
 
 	@Override
 	public void receivedSetup(SetupAlgEvent evt) throws RemoteException {
-		// TODO Auto-generated method stub
 		remoteKBase.receivedSetup(evt);
 	}
 
 
 	@Override
 	public synchronized Remote export(int serverPort) throws RemoteException {
-		// TODO Auto-generated method stub
 		if (exportedStub == null)
 			exportedStub = (KBaseRemote) NetUtil.RegistryRemote.export(this, serverPort);
 	
 		return exportedStub;
+	}
+
+
+	@Override
+	public boolean classPathContains(String className) throws RemoteException {
+    	try {
+    		Class.forName(className);
+    		return true;
+    	} catch (Exception e) {}
+    	
+		return false;
 	}
 
 
@@ -256,7 +245,6 @@ public class KBaseRemoteWrapper implements KBase, KBaseRemote {
 	 */
 	@Override
 	public synchronized void unexport() throws RemoteException {
-		// TODO Auto-generated method stub
 		if (exclusive && remoteKBase != null) {
 			try {
 				//if (!remoteKBase.isAgent())
@@ -274,7 +262,6 @@ public class KBaseRemoteWrapper implements KBase, KBaseRemote {
 	
 	@Override
 	public synchronized void forceUnexport() throws RemoteException {
-		// TODO Auto-generated method stub
 		if (remoteKBase != null) {
 			try {
 				//if (!remoteKBase.isAgent())
@@ -304,14 +291,12 @@ public class KBaseRemoteWrapper implements KBase, KBaseRemote {
 	
 //	@Override
 //	public boolean isAgent() throws RemoteException {
-//		// TODO Auto-generated method stub
 //		return remoteKBase.isAgent();
 //	}
 //
 //
 //	@Override
 //	public void setAgent(boolean isAgent) throws RemoteException {
-//		// TODO Auto-generated method stub
 //		remoteKBase.setAgent(isAgent);
 //	}
 

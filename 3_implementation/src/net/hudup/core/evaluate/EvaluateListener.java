@@ -32,6 +32,15 @@ public interface EvaluateListener extends EventListener, Pingable, Remote {
 	 * @throws RemoteException if any error raises
 	 */
 	void receivedEvaluation(EvaluateEvent evt) throws RemoteException;
+
+
+	/**
+	 * Testing whether the specified class via its name is accepted.
+	 * @param className specified class name.
+	 * @return whether the specified class via its name is accepted.
+	 * @throws RemoteException if any error raises.
+	 */
+	boolean classPathContains(String className) throws RemoteException;
 	
 	
 }

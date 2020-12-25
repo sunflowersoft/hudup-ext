@@ -12,6 +12,7 @@ import java.util.EventObject;
 import java.util.List;
 import java.util.UUID;
 
+import net.hudup.core.data.Simplify;
 import net.hudup.core.evaluate.EvaluateInfo;
 
 /**
@@ -180,10 +181,18 @@ public class CounterTaskQueue extends TaskQueue {
     protected void fireElapsedTimeEvent(CounterElapsedTimeEvent evt) {
     	CounterElapsedTimeListener[] listeners = getElapsedTimeListeners();
 		for (CounterElapsedTimeListener listener : listeners) {
+    		try {
+    	    	if ((evt instanceof Simplify) && !(listener.classPathContains(evt.getClass().getName()))) {
+	    			CounterElapsedTimeEvent simplifiedEvt = (CounterElapsedTimeEvent) ((Simplify)evt).simplify();
+	    			if (simplifiedEvt != null) evt = simplifiedEvt;
+    	    	}
+    		} catch (Exception e) {LogUtil.trace(e);}
+	    	
+//	    	CounterElapsedTimeEvent finalEvt = evt;
 //			addTask(new Task() {
 //				@Override
 //				public void doTask() throws Exception {
-//					listener.receivedElapsedTime(evt);
+//					listener.receivedElapsedTime(finalEvt);
 //				}
 //			});
 

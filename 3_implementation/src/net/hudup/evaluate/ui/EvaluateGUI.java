@@ -979,19 +979,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			}
 			
 		};
-		try {
-			this.statusBar.setTextPane0(DSUtil.shortenVerbalName(evaluator.getName()));
-		} catch (Exception e) {LogUtil.trace(e);}
-		if (otherResult.statuses != null && otherResult.statuses.length > 0) {
-			if (otherResult.statuses[0] != null)
-				this.statusBar.setTextPane1(otherResult.statuses[0]);
-			if (otherResult.statuses.length > 1 && otherResult.statuses[1] != null)
-				this.statusBar.setTextPane2(otherResult.statuses[1]);
-		}
-		if (otherResult.elapsedTime > 0) {
-			String elapsedTimeText = Counter.formatTime(otherResult.elapsedTime);
-			statusBar.getLastPane().setText(elapsedTimeText);
-		}
+		updateStatusBar();
 		statusPane.add(this.statusBar, BorderLayout.CENTER);
 
 		this.signalLight = new Light();
@@ -1287,6 +1275,41 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 	
 	
 	@Override
+	public synchronized void refreshEvaluate() {
+		super.refreshEvaluate();
+		
+		String algName = otherResult != null ? otherResult.algName : null;
+		if (algName != null) {
+			updateAlgRegFromEvaluator(Arrays.asList(algName));
+			cmbAlgs.update(algRegTable.getAlgList());
+			cmbAlgs.setDefaultSelected(algName);
+		}
+		else
+			cmbAlgs.update(algRegTable.getAlgList());
+
+		try {
+			DatasetPoolExchanged pool = this.evaluator.getDatasetPool();
+			if (pool != null) guiData.pool = pool.toDatasetPoolClient();
+			
+			if (guiData.pool.size() > 0) {
+				txtTrainingBrowse.setDataset(guiData.pool.get(0).getTraining(), false);
+				txtTestingBrowse.setDataset(guiData.pool.get(0).getTesting(), false);
+			}
+			else {
+				txtTrainingBrowse.setDataset(null, false);
+				txtTestingBrowse.setDataset(null, false);
+			}
+		} catch (Throwable e) {LogUtil.trace(e);}
+
+		tblMetrics.update(result);
+
+		updateStatusBar();
+		
+		updateMode();
+	}
+
+	
+	@Override
 	protected void clear() {
 		try {
 			if (evaluator.remoteIsStarted())
@@ -1535,6 +1558,11 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 				setInternalEnable(false);
 				setResultVisible(result != null && result.size() > 0);
 				
+				btnClear.setEnabled(training != null || testing != null);
+				btnUpload.setEnabled((training == null && testing == null) || (training != null && testing != null));
+				btnDownload.setEnabled(true);
+
+				tblMetrics.update(result);
 				prgRunning.setMaximum(0);
 				prgRunning.setValue(0);
 				prgRunning.setVisible(false);
@@ -1552,6 +1580,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 				btnUpload.setEnabled((training == null && testing == null) || (training != null && testing != null));
 				btnDownload.setEnabled(true);
 				
+				tblMetrics.update(result);
 				prgRunning.setMaximum(0);
 				prgRunning.setValue(0);
 				prgRunning.setVisible(false);
@@ -1721,6 +1750,30 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 		}
 	}
 	
+	
+	/**
+	 * Updating status bar.
+	 */
+	private void updateStatusBar() {
+		if (statusBar == null) return;
+		
+		try {
+			this.statusBar.setTextPane0(DSUtil.shortenVerbalName(evaluator.getName()));
+		} catch (Exception e) {LogUtil.trace(e);}
+		
+		if (otherResult.statuses != null && otherResult.statuses.length > 0) {
+			if (otherResult.statuses[0] != null)
+				this.statusBar.setTextPane1(otherResult.statuses[0]);
+			if (otherResult.statuses.length > 1 && otherResult.statuses[1] != null)
+				this.statusBar.setTextPane2(otherResult.statuses[1]);
+		}
+		
+		if (otherResult.elapsedTime > 0) {
+			String elapsedTimeText = Counter.formatTime(otherResult.elapsedTime);
+			statusBar.getLastPane().setText(elapsedTimeText);
+		}
+	}
+
 	
 	@Override
 	protected void updateGUIData() {

@@ -1905,7 +1905,6 @@ class DbProviderAssoc extends ProviderAssocAbstract {
 	
 	@Override
 	public boolean createUnit(String unitName, AttributeList attList) {
-		// TODO Auto-generated method stub
 		String createSql = genProfileCreateSql(unitName, attList);
 		
 		return executeUpdate(createSql);
@@ -1914,7 +1913,6 @@ class DbProviderAssoc extends ProviderAssocAbstract {
 
 	@Override
 	public boolean deleteUnitData(String unitName) {
-		// TODO Auto-generated method stub
 		return executeUpdate("delete from " + norm(unitName));
 	}
 
@@ -2046,7 +2044,6 @@ class DbProviderAssoc extends ProviderAssocAbstract {
 			}
 		}
 		catch (Throwable e) {
-			// TODO Auto-generated catch block
 			LogUtil.trace(e);
 		}
 		
@@ -2091,8 +2088,6 @@ class DbProviderAssoc extends ProviderAssocAbstract {
 	
 	@Override
 	public AttributeList getAttributes(ParamSql selectSql, Profile condition) {
-		// TODO Auto-generated method stub
-		
 		AttributeList attributes = new AttributeList();
 		ResultSet rs = executeQuery(selectSql, condition);
 		try {
@@ -2112,7 +2107,6 @@ class DbProviderAssoc extends ProviderAssocAbstract {
 
 	@Override
 	public boolean containsProfile(String profileUnit, Profile profile) {
-		// TODO Auto-generated method stub
 		ParamSql selectSql = genProfileSelectSql2(profileUnit, profile);
 		
 		return exists(selectSql, profile);
@@ -2214,7 +2208,6 @@ class DbProviderAssoc extends ProviderAssocAbstract {
 
 			@Override
 			public Profile create(ResultSet rs) {
-				// TODO Auto-generated method stub
 				return getProfile(rs);
 			}
 			
@@ -2224,7 +2217,6 @@ class DbProviderAssoc extends ProviderAssocAbstract {
 	
 	@Override
 	public Fetcher<Profile> getProfiles(ParamSql sql, Profile condition) {
-		// TODO Auto-generated method stub
 		ResultSet rs = executeQuery(sql, condition);
 		if (rs == null)
 			return new MemFetcher<Profile>();
@@ -2238,7 +2230,6 @@ class DbProviderAssoc extends ProviderAssocAbstract {
 
 			@Override
 			public Profile create(ResultSet rs) {
-				// TODO Auto-generated method stub
 				return getProfile(rs);
 			}
 			
@@ -2248,7 +2239,6 @@ class DbProviderAssoc extends ProviderAssocAbstract {
 
 	@Override
 	public Fetcher<Integer> getProfileIds(String profileUnit) {
-		// TODO Auto-generated method stub
 		AttributeList attributes = getAttributes(profileUnit);
 		final Attribute idAtt = attributes.getId();
 		if (idAtt == null || idAtt.getType() != Type.integer)
@@ -2268,7 +2258,6 @@ class DbProviderAssoc extends ProviderAssocAbstract {
 
 			@Override
 			public Integer create(ResultSet rs) {
-				// TODO Auto-generated method stub
 				try {
 					int id = rs.getInt(idAtt.getName());
 					if (rs.wasNull() || id < 0)
@@ -2277,7 +2266,6 @@ class DbProviderAssoc extends ProviderAssocAbstract {
 						return id;
 				} 
 				catch (Throwable e) {
-					// TODO Auto-generated catch block
 					LogUtil.trace(e);
 				}
 				
@@ -2290,7 +2278,6 @@ class DbProviderAssoc extends ProviderAssocAbstract {
 
 	@Override
 	public int getProfileMaxId(String profileUnit) {
-		// TODO Auto-generated method stub
 		Attribute id = getAttributes(profileUnit).getId();
 		if (id == null)
 			return -1;
@@ -2320,9 +2307,7 @@ class DbProviderAssoc extends ProviderAssocAbstract {
 	
 	@Override
 	public boolean deleteProfile(String profileUnit, Profile condition) {
-		// TODO Auto-generated method stub
-		ParamSql deleteSql = genProfileDeleteSql2(profileUnit, 
-				condition);
+		ParamSql deleteSql = genProfileDeleteSql2(profileUnit, condition);
 		
 		return executeUpdate(deleteSql, condition);
 	}
@@ -2569,21 +2554,18 @@ class DbProviderAssoc extends ProviderAssocAbstract {
 	
 	@Override
 	public CsvReader getReader(String unit) {
-		// TODO Auto-generated method stub
 		throw new RuntimeException("Not support CSV reader");
 	}
 
 
 	@Override
 	public CsvWriter getWriter(String unit, boolean append) {
-		// TODO Auto-generated method stub
 		throw new RuntimeException("Not support CSV writer");
 	}
 	
 	
 	@Override
 	public void close() throws Exception {
-		// TODO Auto-generated method stub
 		if (conn != null) {
 			try {
 				conn.close();
@@ -2619,7 +2601,6 @@ class DbProviderAssoc extends ProviderAssocAbstract {
 			return DriverManager.getConnection(url, properties);
 		} 
 		catch (Exception e) {
-			// TODO Auto-generated catch block
 			LogUtil.trace(e);
 		}
 		
@@ -2643,7 +2624,6 @@ class DbProviderAssoc extends ProviderAssocAbstract {
 			rs.close();
 		} 
 		catch (Throwable e) {
-			// TODO Auto-generated catch block
 			LogUtil.trace(e);
 		}
 	}
@@ -2687,7 +2667,6 @@ class DbProviderAssoc extends ProviderAssocAbstract {
 				}
 			} 
 			catch (Throwable e) {
-				// TODO Auto-generated catch block
 				LogUtil.trace(e);
 				LogUtil.error("DbFetcher initialized fail, error " + e.getMessage());
 			}
@@ -2695,13 +2674,10 @@ class DbProviderAssoc extends ProviderAssocAbstract {
 		
 		@Override
 		public boolean next() throws RemoteException {
-			// TODO Auto-generated method stub
-			
 			try {
 				return (rs != null && rs.next());
 			}
 			catch (Throwable e) {
-				// TODO Auto-generated catch block
 				LogUtil.trace(e);
 				return false;
 			}
@@ -2709,32 +2685,26 @@ class DbProviderAssoc extends ProviderAssocAbstract {
 
 		@Override
 		public E pick() throws RemoteException {
-			// TODO Auto-generated method stub
 			return create(rs);
 		}
 
 		@Override
 		public void reset() throws RemoteException {
-			// TODO Auto-generated method stub
-			
 			try {
 				rs.beforeFirst();
 			} 
 			catch (Throwable e) {
-				// TODO Auto-generated catch block
 				LogUtil.trace(e);
 			}
 		}
 
 		@Override
 		public FetcherMetadata getMetadata() throws RemoteException {
-			// TODO Auto-generated method stub
 			return metadata;
 		}
 
 		@Override
 		public void close() throws RemoteException {
-			// TODO Auto-generated method stub
 			if (rs == null)
 				return;
 			
@@ -2765,7 +2735,6 @@ class DbProviderAssoc extends ProviderAssocAbstract {
 		
 		@Override
 		public String toText() {
-			// TODO Auto-generated method stub
 			StringBuffer buffer = new StringBuffer();
 			int i = 0;
 			
@@ -2778,7 +2747,7 @@ class DbProviderAssoc extends ProviderAssocAbstract {
 					if (el == null)
 						continue;
 					
-					String row = el.getClass().toString() + TextParserUtil.LINK_SEP;
+					String row = el.getClass().getName() + TextParserUtil.LINK_SEP;
 					if (el instanceof TextParsable)
 						buffer.append(row + ((TextParsable)el).toText());
 					else
@@ -2796,7 +2765,6 @@ class DbProviderAssoc extends ProviderAssocAbstract {
 					reset();
 				} 
 				catch (Throwable e) {
-					// TODO Auto-generated catch block
 					LogUtil.trace(e);
 				}
 			}
@@ -2806,7 +2774,6 @@ class DbProviderAssoc extends ProviderAssocAbstract {
 
 		@Override
 		public void parseText(String spec) {
-			// TODO Auto-generated method stub
 			throw new RuntimeException("Not support this method");
 		}
 		
@@ -2832,26 +2799,21 @@ class DbProviderAssoc extends ProviderAssocAbstract {
 		 */
 		public RmiDbFetcher(ResultSet rs) {
 			super(rs);
-			// TODO Auto-generated constructor stub
 			try {
 				UnicastRemoteObject.exportObject(this, 0);
 			} 
 			catch (RemoteException e) {
-				// TODO Auto-generated catch block
 				LogUtil.trace(e);
 			}
 		}
 
 		@Override
 		public void close() throws RemoteException {
-			// TODO Auto-generated method stub
-			
 			if (rs != null) {
 				try {
 					UnicastRemoteObject.unexportObject(this, true);
 				} 
 				catch (NoSuchObjectException e) {
-					// TODO Auto-generated catch block
 					LogUtil.trace(e);
 					LogUtil.error("No such object exported, error " + e.getMessage());
 				}
