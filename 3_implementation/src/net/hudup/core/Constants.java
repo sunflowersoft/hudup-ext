@@ -198,7 +198,7 @@ public final class Constants {
 	 * When Hudup server, listener, or balancer starts, it uses firstly the port {@link #DEFAULT_SERVER_PORT}. If this constant is {@code true}, many random ports are tried until success.
 	 * By default, this constant is {@code false}, which means that there is no such randomization. 
 	 */
-	public static boolean TRY_RANDOM_PORT                     = true;
+	public static boolean TRY_RANDOM_PORT                         = true;
 	
 	
 	/**
@@ -251,7 +251,7 @@ public final class Constants {
 	/**
 	 * Global address.
 	 */
-	public static String globalAddress                      = null;
+	public static String globalAddress                    = null;
 
 	/**
 	 * Setting the maximum number of extra class loaders. If it is -1, there is no limit of extra class loaders but it is not adviced.
@@ -273,6 +273,12 @@ public final class Constants {
 	 */
 	public static boolean COMPRESSED_FILE_SUPPORT         = false;
 
+	/**
+	 * By default, pull mode requirement is false.
+	 */
+	public static boolean REQUIRE_PULL_MODE               = false;
+
+	
 	
 	/**
 	 * Static code to load dynamic constant.
@@ -414,6 +420,14 @@ public final class Constants {
 			System.out.println("Error when parsing compressed file support");
 		}
 
+		try {
+			String requirePullMode = Util.getHudupProperty("require_pull_mode");
+			if (requirePullMode != null)
+				REQUIRE_PULL_MODE = Boolean.parseBoolean(requirePullMode);
+		}
+		catch (Throwable e) {
+			System.out.println("Error when parsing pull mode requirement");
+		}
 	}
 	
 	

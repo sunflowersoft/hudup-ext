@@ -2322,16 +2322,16 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 
 
 	/**
-	 * Checking whether the specified evaluator supports strong connection.
+	 * Checking whether the specified evaluator requires pull mode connection.
 	 * @param evaluator specified evaluator.
-	 * @return whether the specified evaluator supports strong connection.
+	 * @return whether the specified evaluator requires pull mode connection.
 	 */
-	public static boolean checkStrongConnection(Evaluator evaluator) {
+	public static boolean isRequirePullMode(Evaluator evaluator) {
 		try {
-			if (!isRemote(evaluator)) return true;
+			if (!isRemote(evaluator)) return false;
 			
 			EvaluatorConfig config = evaluator.getConfig();
-			return config.isStrongRemoteConnection();
+			return config.isRequirePullMode();
 		} catch (Throwable e) {LogUtil.trace(e);}
 		
 		return false;

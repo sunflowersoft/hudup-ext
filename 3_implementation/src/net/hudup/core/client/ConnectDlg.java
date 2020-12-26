@@ -385,9 +385,9 @@ public abstract class ConnectDlg extends JDialog {
 		JPanel left = new JPanel(new GridLayout(0, 1));
 		header.add(left, BorderLayout.WEST);
 		
-		left.add(new JLabel("Connection type:"));
-		left.add(new JLabel("Host:"));
-		left.add(new JLabel("Port:"));
+		left.add(new JLabel("Connection type (*):"));
+		left.add(new JLabel("Host (*):"));
+		left.add(new JLabel("Port (*):"));
 		left.add(new JLabel("Connect path:"));
 		left.add(new JLabel("User name:"));
 		left.add(new JLabel("Password:"));
@@ -449,6 +449,7 @@ public abstract class ConnectDlg extends JDialog {
 		if (pwd == null) txtPassword.setText(pwd);
 
 		chkPullMode = new JCheckBox("", false);
+		chkPullMode.setSelected(Constants.REQUIRE_PULL_MODE);
 		right.add(chkPullMode);
 
 		txtMyAccessPeriod = new JFormattedTextField(new NumberFormatter()); //Access period in seconds.

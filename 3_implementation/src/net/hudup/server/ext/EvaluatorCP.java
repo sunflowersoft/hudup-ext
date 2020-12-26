@@ -221,10 +221,10 @@ public class EvaluatorCP extends JFrame implements EvaluatorListener {
 						return;
 					}
 					
-					if (!EvaluatorAbstract.checkStrongConnection(evaluatorItem.evaluator) && !getThisEvaluatorCP().connectInfo.pullMode) {
+					if (EvaluatorAbstract.isRequirePullMode(evaluatorItem.evaluator) && !getThisEvaluatorCP().connectInfo.pullMode) {
 						JOptionPane.showMessageDialog(getThisEvaluatorCP(),
 							"Can't retrieve evaluator because PULL MODE is not set\n" +
-							"whereas the remote evaluator does not support strong remote connection.\n" +
+							"whereas the remote evaluator requires PULL MODE.\n" +
 							"You have to check PULL MODE in connection dialog.",
 							"Retrieval to evaluator failed", JOptionPane.ERROR_MESSAGE);
 						return;
@@ -766,7 +766,9 @@ public class EvaluatorCP extends JFrame implements EvaluatorListener {
 		for (int i = 0; i < cmbEvaluators.getItemCount(); i++) {
 			EvaluatorItem item = cmbEvaluators.getItemAt(i);
 			try {
-				if (EvaluatorAbstract.checkStrongConnection(item.evaluator) && !connectInfo.pullMode && !item.addedListener) {
+				if (item.addedListener) continue;
+				
+				if (!EvaluatorAbstract.isRequirePullMode(item.evaluator) && !connectInfo.pullMode) {
 					item.evaluator.addEvaluatorListener(this);
 					item.addedListener = true;
 				}
@@ -786,9 +788,9 @@ public class EvaluatorCP extends JFrame implements EvaluatorListener {
 		
 		for (int i = 0; i < cmbEvaluators.getItemCount(); i++) {
 			EvaluatorItem item = cmbEvaluators.getItemAt(i);
-			if (!item.addedListener) continue;
-			
 			try {
+				if (!item.addedListener) continue;
+				
 				item.evaluator.removeEvaluatorListener(this);
 				item.addedListener = false;
 			}

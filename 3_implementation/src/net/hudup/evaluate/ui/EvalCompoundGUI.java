@@ -15,6 +15,7 @@ import java.awt.Insets;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.InputEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
@@ -246,7 +247,7 @@ public class EvalCompoundGUI extends JFrame {
 				}
 				
 			});
-		mniRefresh.setMnemonic('r');
+		mniRefresh.setMnemonic('e');
 		mniRefresh.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F5, 0));
 		mnTools.add(mniRefresh);
 
@@ -266,7 +267,8 @@ public class EvalCompoundGUI extends JFrame {
 						batchEvaluateGUI.getEvaluator());
 				}
 			});
-		mniRetrieveResult.setMnemonic('t');
+		mniRetrieveResult.setMnemonic('r');
+		mniRetrieveResult.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.CTRL_DOWN_MASK));
 		mnTools.add(mniRetrieveResult);
 
 		JMenuItem mniRecoverResult = new JMenuItem(
@@ -947,12 +949,12 @@ public class EvalCompoundGUI extends JFrame {
 					null, "Can't retrieve evaluator", "Retrieval to evaluator failed", JOptionPane.ERROR_MESSAGE);
 			}
 			else {
-				if (!EvaluatorAbstract.checkStrongConnection(ev) && !pullMode) {
+				if (EvaluatorAbstract.isRequirePullMode(ev) && !pullMode) {
 					JOptionPane.showMessageDialog(null,
-							"Can't retrieve evaluator because PULL MODE is not set\n" +
-							"whereas the remote evaluator does not support strong remote connection.\n" +
-							"You have to check PULL MODE in connection dialog.",
-							"Retrieval to evaluator failed", JOptionPane.ERROR_MESSAGE);
+						"Can't retrieve evaluator because PULL MODE is not set\n" +
+						"whereas the remote evaluator requires PULL MODE.\n" +
+						"You have to check PULL MODE in connection dialog.",
+						"Retrieval to evaluator failed", JOptionPane.ERROR_MESSAGE);
 				}
 				else {
 					if (oldGUI != null) oldGUI.dispose();
@@ -1006,10 +1008,10 @@ public class EvalCompoundGUI extends JFrame {
 								this, "Can't get remote evaluator", "Connection to evaluator fail", JOptionPane.ERROR_MESSAGE);
 							return;
 						}
-						if (!EvaluatorAbstract.checkStrongConnection(ev) && !pullMode) {
+						if (EvaluatorAbstract.isRequirePullMode(ev) && !pullMode) {
 							JOptionPane.showMessageDialog(this,
 								"Can't retrieve evaluator because PULL MODE is not set\n" +
-								"whereas the remote evaluator does not support strong remote connection.\n" +
+								"whereas the remote evaluator requires PULL MODE.\n" +
 								"You have to check PULL MODE in connection dialog.",
 								"Retrieval to evaluator failed", JOptionPane.ERROR_MESSAGE);
 							return;

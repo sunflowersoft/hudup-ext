@@ -26,11 +26,14 @@
 #language=en
 #country=US
 
+#Setting pull mode requirement. If this property is true, connection to server must be in pull mode to prevent server from unexpected deadlock.
+#require_pull_mode=false
+
 #If flag is true, server is responsible for purging disconnected listeners. Otherwise, each evaluator or service is responsible for purging disconnected listeners.
 #server_purge_listeners=true
 
 #If flag is true, server has UI. Otherwise, server has no UI.
-#server_ui=false
+#server_ui=true
 
 #Try to use random port if the default port was in used. Value here is true, which means that ports are flexible.
 try_random_port=true

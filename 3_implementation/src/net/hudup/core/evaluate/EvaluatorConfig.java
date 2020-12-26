@@ -116,15 +116,9 @@ public class EvaluatorConfig extends SysConfig {
 
 	
 	/**
-	 * This constant specifies strong remote connection.
+	 * This constant specifies pull mode requirement.
 	 */
-	public final static String EVALUATOR_STRONG_REMOTE_CONNECTION_FIELD = changeCase("strong_remote_connection");
-
-	
-	/**
-	 * By default, strong remote connection is true.
-	 */
-	public final static boolean EVALUATOR_STRONG_REMOTE_CONNECTION_DEFAULT = true;
+	public final static String EVALUATOR_REQUIRE_PULL_MODE_FIELD = changeCase("require_pull_mode");
 
 	
 	/**
@@ -154,7 +148,7 @@ public class EvaluatorConfig extends SysConfig {
 		//setAgent(EVALUATOR_AGENT_DEFAULT);
 		setSaveResultSummary(EVALUATOR_SAVE_RESULT_SUMMARY_DEFAULT);
 		setTiedSync(EVALUATOR_TIED_SYNC_DEFAULT);
-		setStrongRemoteConnection(EVALUATOR_STRONG_REMOTE_CONNECTION_DEFAULT);
+		setRequirePullMode(Constants.REQUIRE_PULL_MODE);
 		
 		addReadOnly(EVALUATOR_REPRODUCED_VERSION_FIELD);
 	}
@@ -308,20 +302,20 @@ public class EvaluatorConfig extends SysConfig {
 
 
 	/**
-	 * Checking whether strong remote connection is true. 
-	 * @return whether strong remote connection is true.
+	 * Checking whether pull mode requirement is true. 
+	 * @return whether pull mode requirement is true.
 	 */
-	public boolean isStrongRemoteConnection() {
-		return getAsBoolean(EVALUATOR_STRONG_REMOTE_CONNECTION_FIELD);
+	public boolean isRequirePullMode() {
+		return getAsBoolean(EVALUATOR_REQUIRE_PULL_MODE_FIELD);
 	}
 	
 	
 	/**
-	 * Setting whether strong remote connection is true.
-	 * @param strongRemoteConnection whether strong remote connection is true.
+	 * Setting whether pull mode requirement is true.
+	 * @param requirePullMode whether pull mode requirement is true.
 	 */
-	public void setStrongRemoteConnection(boolean strongRemoteConnection) {
-		put(EVALUATOR_STRONG_REMOTE_CONNECTION_FIELD, strongRemoteConnection);
+	public void setRequirePullMode(boolean requirePullMode) {
+		put(EVALUATOR_REQUIRE_PULL_MODE_FIELD, requirePullMode);
 	}
 	
 	
