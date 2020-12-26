@@ -116,6 +116,18 @@ public class EvaluatorConfig extends SysConfig {
 
 	
 	/**
+	 * This constant specifies strong remote connection.
+	 */
+	public final static String EVALUATOR_STRONG_REMOTE_CONNECTION_FIELD = changeCase("strong_remote_connection");
+
+	
+	/**
+	 * By default, strong remote connection is true.
+	 */
+	public final static boolean EVALUATOR_STRONG_REMOTE_CONNECTION_DEFAULT = true;
+
+	
+	/**
 	 * Default constructor.
 	 */
 	public EvaluatorConfig() {
@@ -142,6 +154,7 @@ public class EvaluatorConfig extends SysConfig {
 		//setAgent(EVALUATOR_AGENT_DEFAULT);
 		setSaveResultSummary(EVALUATOR_SAVE_RESULT_SUMMARY_DEFAULT);
 		setTiedSync(EVALUATOR_TIED_SYNC_DEFAULT);
+		setStrongRemoteConnection(EVALUATOR_STRONG_REMOTE_CONNECTION_DEFAULT);
 		
 		addReadOnly(EVALUATOR_REPRODUCED_VERSION_FIELD);
 	}
@@ -294,4 +307,22 @@ public class EvaluatorConfig extends SysConfig {
 	}
 
 
+	/**
+	 * Checking whether strong remote connection is true. 
+	 * @return whether strong remote connection is true.
+	 */
+	public boolean isStrongRemoteConnection() {
+		return getAsBoolean(EVALUATOR_STRONG_REMOTE_CONNECTION_FIELD);
+	}
+	
+	
+	/**
+	 * Setting whether strong remote connection is true.
+	 * @param strongRemoteConnection whether strong remote connection is true.
+	 */
+	public void setStrongRemoteConnection(boolean strongRemoteConnection) {
+		put(EVALUATOR_STRONG_REMOTE_CONNECTION_FIELD, strongRemoteConnection);
+	}
+	
+	
 }

@@ -2322,6 +2322,23 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 
 
 	/**
+	 * Checking whether the specified evaluator supports strong connection.
+	 * @param evaluator specified evaluator.
+	 * @return whether the specified evaluator supports strong connection.
+	 */
+	public static boolean checkStrongConnection(Evaluator evaluator) {
+		try {
+			if (!isRemote(evaluator)) return true;
+			
+			EvaluatorConfig config = evaluator.getConfig();
+			return config.isStrongRemoteConnection();
+		} catch (Throwable e) {LogUtil.trace(e);}
+		
+		return false;
+	}
+
+	
+	/**
 	 * Creating timer to purge listeners list.
 	 * @param listenerList purged listeners list.
 	 * @return timer to purge listeners list.

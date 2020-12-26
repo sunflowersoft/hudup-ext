@@ -576,7 +576,7 @@ public class RemoteServerCP extends JFrame implements ServerStatusListener {
 			JOptionPane.showMessageDialog(
 					null, "Can't retrieve remote server", "Faile to retrieve server", JOptionPane.ERROR_MESSAGE);
 		}
-		else if (connectInfo.bindUri == null || connectInfo.checkPullMode())
+		else if (connectInfo.bindUri == null || connectInfo.pullMode)
 			new LightRemoteServerCP(server);
 		else
 			new RemoteServerCP(server, connectInfo.bindUri);

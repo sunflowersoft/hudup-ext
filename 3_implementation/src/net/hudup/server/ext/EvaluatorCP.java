@@ -39,6 +39,7 @@ import net.hudup.core.client.ServiceExt;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.ui.SysConfigPane;
 import net.hudup.core.evaluate.Evaluator;
+import net.hudup.core.evaluate.EvaluatorAbstract;
 import net.hudup.core.evaluate.EvaluatorConfig;
 import net.hudup.core.evaluate.EvaluatorEvent;
 import net.hudup.core.evaluate.EvaluatorListener;
@@ -220,6 +221,15 @@ public class EvaluatorCP extends JFrame implements EvaluatorListener {
 						return;
 					}
 					
+					if (!EvaluatorAbstract.checkStrongConnection(evaluatorItem.evaluator) && !getThisEvaluatorCP().connectInfo.pullMode) {
+						JOptionPane.showMessageDialog(getThisEvaluatorCP(),
+							"Can't retrieve evaluator because PULL MODE is not set\n" +
+							"whereas the remote evaluator does not support strong remote connection.\n" +
+							"You have to check PULL MODE in connection dialog.",
+							"Retrieval to evaluator failed", JOptionPane.ERROR_MESSAGE);
+						return;
+					}
+
 					if (evaluatorItem.guiData == null)
 						evaluatorItem.guiData = new EvaluateGUIData();
 					
@@ -756,7 +766,10 @@ public class EvaluatorCP extends JFrame implements EvaluatorListener {
 		for (int i = 0; i < cmbEvaluators.getItemCount(); i++) {
 			EvaluatorItem item = cmbEvaluators.getItemAt(i);
 			try {
-				item.evaluator.addEvaluatorListener(this);
+				if (EvaluatorAbstract.checkStrongConnection(item.evaluator) && !connectInfo.pullMode && !item.addedListener) {
+					item.evaluator.addEvaluatorListener(this);
+					item.addedListener = true;
+				}
 			}
 			catch (Exception e) {
 				LogUtil.trace(e);
@@ -773,12 +786,13 @@ public class EvaluatorCP extends JFrame implements EvaluatorListener {
 		
 		for (int i = 0; i < cmbEvaluators.getItemCount(); i++) {
 			EvaluatorItem item = cmbEvaluators.getItemAt(i);
+			if (!item.addedListener) continue;
+			
 			try {
 				item.evaluator.removeEvaluatorListener(this);
+				item.addedListener = false;
 			}
-			catch (Exception e) {
-				LogUtil.trace(e);
-			}
+			catch (Exception e) {LogUtil.trace(e);}
 		}
 	}
 	
@@ -804,6 +818,11 @@ public class EvaluatorCP extends JFrame implements EvaluatorListener {
 		 * Evaluation GUI data.
 		 */
 		public EvaluateGUIData guiData = null;
+		
+		/**
+		 * Flag to indicate whether listener was added.
+		 */
+		public boolean addedListener = false;
 		
 		/**
 		 * Constructor with evaluator.
