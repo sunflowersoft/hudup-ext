@@ -262,7 +262,7 @@ public class DatasetCreator extends JPanel implements Dispose {
 		JPanel footer = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 		main.add(footer, BorderLayout.SOUTH);
 		
-		JButton btnApplyConfig = new JButton("Apply config");
+		JButton btnApplyConfig = new JButton("Apply configuration");
 		btnApplyConfig.addActionListener(new ActionListener() {
 			
 			@Override
@@ -288,7 +288,7 @@ public class DatasetCreator extends JPanel implements Dispose {
 		});
 		footer.add(btnApplyConfig);
 
-		JButton btnResetConfig = new JButton("Reset config");
+		JButton btnResetConfig = new JButton("Reset configuration");
 		btnResetConfig.addActionListener(new ActionListener() {
 			
 			@Override
@@ -308,8 +308,8 @@ public class DatasetCreator extends JPanel implements Dispose {
 				else {
 					JOptionPane.showMessageDialog(
 							getCreator(), 
-							"Please press button 'Apply Config' to make store configuration effect later", 
-							"Please press button 'Apply Config' to make store configuration effect later", 
+							"Please press button 'Apply configuration' to make store configuration effect later", 
+							"Please press button 'Apply configuration'", 
 							JOptionPane.INFORMATION_MESSAGE);
 				}
 				
@@ -344,8 +344,8 @@ public class DatasetCreator extends JPanel implements Dispose {
 				JOptionPane.showMessageDialog(
 						getCreator(), 
 						"Load store configuration successfully. \n" + 
-						"Please press button 'Apply Config' to make store configuration effect", 
-						"Please press button 'Apply Config' to make store configuration effect", 
+						"Please press button 'Apply configuration' to make store configuration effect", 
+						"Please press button 'Apply configuration'", 
 						JOptionPane.INFORMATION_MESSAGE);
 			}
 		});

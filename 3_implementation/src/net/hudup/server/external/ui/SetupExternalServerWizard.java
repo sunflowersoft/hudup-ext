@@ -19,6 +19,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.SwingWorker;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -35,6 +36,7 @@ import net.hudup.core.data.ui.ExternalConfigurator;
 import net.hudup.core.data.ui.SysConfigPane;
 import net.hudup.core.data.ui.UnitListBoxExt;
 import net.hudup.core.data.ui.UnitTable;
+import net.hudup.core.logistic.ui.WaitDialog;
 import net.hudup.server.external.ExternalServerConfig;
 import net.hudup.server.ui.SetupServerWizard;
 
@@ -83,7 +85,7 @@ public class SetupExternalServerWizard extends SetupServerWizard {
 		JPanel footer = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 		main.add(footer, BorderLayout.SOUTH);
 		
-		JButton btnApplyConfig = new JButton("Apply config");
+		JButton btnApplyConfig = new JButton("Apply configuration");
 		btnApplyConfig.addActionListener(new ActionListener() {
 			
 			@Override
@@ -108,7 +110,7 @@ public class SetupExternalServerWizard extends SetupServerWizard {
 		});
 		footer.add(btnApplyConfig);
 
-		JButton btnResetConfig = new JButton("Reset config");
+		JButton btnResetConfig = new JButton("Reset configuration");
 		btnResetConfig.addActionListener(new ActionListener() {
 			
 			@Override
@@ -128,8 +130,8 @@ public class SetupExternalServerWizard extends SetupServerWizard {
 				else {
 					JOptionPane.showMessageDialog(
 							getWizard(), 
-							"Please press button 'Apply Config' to make store configuration effect later", 
-							"Please press button 'Apply Config' to make store configuration effect later", 
+							"Please press button 'Apply configuration' to make store configuration effect later", 
+							"Please press button 'Apply configuration'", 
 							JOptionPane.INFORMATION_MESSAGE);
 				}
 				
@@ -138,39 +140,7 @@ public class SetupExternalServerWizard extends SetupServerWizard {
 		footer.add(btnResetConfig);
 
 		
-		JButton btnLoadStore = new JButton("Load store");
-		btnLoadStore.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				
-				DataConfig configExt = DatasetUtil2.chooseServerConfig(getWizard(), config);
-				
-				if (configExt == null) {
-					JOptionPane.showMessageDialog(
-							getWizard(), 
-							"Not load store", 
-							"Not load store", 
-							JOptionPane.WARNING_MESSAGE);
-					return;
-				}
-				
-				DataConfig cfg = new DataConfig();
-				cfg.putAll(config);
-				cfg.putAll(configExt);
-				
-				paneConfig.getPropTable().updateNotSetup(cfg);
-				JOptionPane.showMessageDialog(
-						getWizard(), 
-						"Load store configuration successfully. \n" + 
-						"Please press button 'Apply Config' to make store configuration effect", 
-						"Please press button 'Apply Config' to make store configuration effect", 
-						JOptionPane.INFORMATION_MESSAGE);
-			}
-		});
-		footer.add(btnLoadStore);
-
-		JButton btnExternalConfig = new JButton("External configure");
+		JButton btnExternalConfig = new JButton("External configuration");
 		btnExternalConfig.addActionListener(new ActionListener() {
 			
 			@Override
@@ -199,14 +169,47 @@ public class SetupExternalServerWizard extends SetupServerWizard {
 				JOptionPane.showMessageDialog(
 						getWizard(), 
 						"Load external configuration successfully. \n" + 
-						"Please press button 'Apply Config' to make external configuration effect", 
-						"Please press button 'Apply Config'", 
+						"Please press button 'Apply configuration' to make external configuration effect", 
+						"Please press button 'Apply configuration'", 
 						JOptionPane.INFORMATION_MESSAGE);
 				
 			}
 		});
 		footer.add(btnExternalConfig);
 		
+		
+		JButton btnLoadStore = new JButton("Load store");
+		btnLoadStore.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				
+				DataConfig configExt = DatasetUtil2.chooseServerConfig(getWizard(), config);
+				
+				if (configExt == null) {
+					JOptionPane.showMessageDialog(
+							getWizard(), 
+							"Not load store", 
+							"Not load store", 
+							JOptionPane.WARNING_MESSAGE);
+					return;
+				}
+				
+				DataConfig cfg = new DataConfig();
+				cfg.putAll(config);
+				cfg.putAll(configExt);
+				
+				paneConfig.getPropTable().updateNotSetup(cfg);
+				JOptionPane.showMessageDialog(
+						getWizard(), 
+						"Load store configuration successfully. \n" + 
+						"Please press button 'Apply configuration' to make store configuration effect", 
+						"Please press button 'Apply configuration'", 
+						JOptionPane.INFORMATION_MESSAGE);
+			}
+		});
+		footer.add(btnLoadStore);
+
 		
 		return main;
 	}
@@ -301,17 +304,22 @@ public class SetupExternalServerWizard extends SetupServerWizard {
 					return;
 				}
 				
-				JDialog wait = new JDialog(getWizard(), "Please waiting...", false);
-				wait.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-				wait.setLocationRelativeTo(getWizard());
-				wait.setSize(200, 100);
-				wait.setVisible(true);
-				
-				provider.importData(srcConfig, false, null);
+				JDialog dlgWait = WaitDialog.createDialog(getWizard()); dlgWait.setUndecorated(true);
+				SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
+					@Override
+					protected Void doInBackground() throws Exception {
+						provider.importData(srcConfig, false, null);
+						return null;
+					}
+					
+					@Override
+					protected void done() {
+						super.done(); dlgWait.dispose();
+					}
+				};
+				worker.execute(); dlgWait.setVisible(true);
 				
 				unitList.connectUpdate(config);
-				
-				wait.dispose();
 				
 				JOptionPane.showMessageDialog(
 						getWizard(), 

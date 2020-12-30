@@ -66,7 +66,6 @@ public class SysConfigDlg extends JDialog {
 
 			@Override
 			public void close() {
-				// TODO Auto-generated method stub
 				dispose();
 			}
 		}; 

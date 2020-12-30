@@ -45,6 +45,7 @@ import net.hudup.core.alg.AlgList;
 import net.hudup.core.alg.AlgRemoteWrapper;
 import net.hudup.core.alg.ui.AlgDesc2ConfigDlg;
 import net.hudup.core.client.ClientUtil;
+import net.hudup.core.client.ConnectInfo;
 import net.hudup.core.client.Service;
 import net.hudup.core.client.SocketConnection;
 import net.hudup.core.data.DataConfig;
@@ -144,14 +145,14 @@ public class PluginStorageManifestPanel extends JPanel {
 	/**
 	 * Constructor with plug-in changed listener and additional parameter.
 	 * @param listener plug-in changed listener.
-	 * @param bindUri bound URI.
+	 * @param connectInfo connection information.
 	 */
-	public PluginStorageManifestPanel(PluginChangedListener listener, xURI bindUri) {
+	public PluginStorageManifestPanel(PluginChangedListener listener, ConnectInfo connectInfo) {
 		setLayout(new BorderLayout());
 		JPanel body = new JPanel(new BorderLayout());
 		add(body, BorderLayout.CENTER);
 		
-		tblRegister = createPluginStorageManifest(listener, bindUri);
+		tblRegister = createPluginStorageManifest(listener, connectInfo);
 		if (listener != null)
 			tblRegister.addPluginChangedListener(listener);
 		body.add(new JScrollPane(tblRegister), BorderLayout.CENTER);
@@ -178,7 +179,6 @@ public class PluginStorageManifestPanel extends JPanel {
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					// TODO Auto-generated method stub
 					tblRegister.selectAll(true, 4);
 				}
 			});
@@ -192,7 +192,6 @@ public class PluginStorageManifestPanel extends JPanel {
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					// TODO Auto-generated method stub
 					tblRegister.selectAll(false, 4);
 				}
 			});
@@ -214,7 +213,6 @@ public class PluginStorageManifestPanel extends JPanel {
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					// TODO Auto-generated method stub
 					tblRegister.selectAll(true, 5);
 				}
 			});
@@ -229,7 +227,6 @@ public class PluginStorageManifestPanel extends JPanel {
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					// TODO Auto-generated method stub
 					tblRegister.selectAll(false, 5);
 				}
 			});
@@ -251,7 +248,6 @@ public class PluginStorageManifestPanel extends JPanel {
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					// TODO Auto-generated method stub
 					tblRegister.selectAll(true, 6);
 				}
 			});
@@ -265,7 +261,6 @@ public class PluginStorageManifestPanel extends JPanel {
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					// TODO Auto-generated method stub
 					tblRegister.selectAll(false, 6);
 				}
 			});
@@ -317,7 +312,6 @@ public class PluginStorageManifestPanel extends JPanel {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				apply();
 			}
 		});
@@ -328,7 +322,6 @@ public class PluginStorageManifestPanel extends JPanel {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				tblRegister.update();
 			}
 		});
@@ -340,14 +333,14 @@ public class PluginStorageManifestPanel extends JPanel {
 	/**
 	 * Create plug-in manifest with plug-in changed listener.
 	 * @param listener plug-in changed listener.
-	 * @param bindUri bound URI.
+	 * @param connectInfo connection information.
 	 * @return plug-in manifest with plug-in changed listener.
 	 */
-	protected PluginStorageManifest createPluginStorageManifest(PluginChangedListener listener, xURI bindUri) {
+	protected PluginStorageManifest createPluginStorageManifest(PluginChangedListener listener, ConnectInfo connectInfo) {
 		int port = 0;
 		try {
-			if (bindUri != null)
-				port = bindUri.getPort();
+			if (connectInfo != null && connectInfo.bindUri != null)
+				port = connectInfo.bindUri.getPort();
 			else if (listener != null)
 				port = listener.getPort();
 			else
@@ -429,7 +422,6 @@ public class PluginStorageManifestPanel extends JPanel {
 	
 	@Override
 	public void setEnabled(boolean enabled) {
-		// TODO Auto-generated method stub
 		super.setEnabled(enabled);
 		
 		tblRegister.setEditable(enabled);
@@ -450,9 +442,9 @@ public class PluginStorageManifestPanel extends JPanel {
 	 * Showing a dialog containing {@link PluginStorageManifest}.
 	 * @param comp parent component.
 	 * @param listener plug-in changed listener to receive {@link PluginChangedEvent} if {@link PluginStorageManifest} is changed.
-	 * @param bindUri bound URI. 
+	 * @param connectInfo connection information.
 	 */
-	public static void showDlg(Component comp, PluginChangedListener listener, xURI bindUri) {
+	public static void showDlg(Component comp, PluginChangedListener listener, ConnectInfo connectInfo) {
 		JDialog dlg = new JDialog(UIUtil.getFrameForComponent(comp), I18nUtil.message("plugin_manager"), true);
 		dlg.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		dlg.setSize(600, 400);
@@ -463,7 +455,7 @@ public class PluginStorageManifestPanel extends JPanel {
 		JPanel body = new JPanel(new BorderLayout());
 		dlg.add(body, BorderLayout.CENTER);
 		
-		final PluginStorageManifestPanel paneManifest= new PluginStorageManifestPanel(listener, bindUri);
+		final PluginStorageManifestPanel paneManifest= new PluginStorageManifestPanel(listener, connectInfo);
 		body.add(paneManifest, BorderLayout.CENTER);
 		
 		
@@ -475,7 +467,6 @@ public class PluginStorageManifestPanel extends JPanel {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				if (paneManifest.isModified())
 					paneManifest.apply();
 				dlg.dispose();
@@ -488,7 +479,6 @@ public class PluginStorageManifestPanel extends JPanel {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				dlg.dispose();
 			}
 		});
@@ -499,7 +489,6 @@ public class PluginStorageManifestPanel extends JPanel {
 
 			@Override
 			public void windowClosed(WindowEvent e) {
-				// TODO Auto-generated method stub
 				super.windowClosed(e);
 				
 				if (!paneManifest.isModified())
@@ -643,7 +632,6 @@ class ImportAlgDlg extends JDialog {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				ok();
 			}
 		});
@@ -654,7 +642,6 @@ class ImportAlgDlg extends JDialog {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				dispose();
 			}
 		});
@@ -943,7 +930,6 @@ class AlgDescImportTable extends SortableSelectableTable {
 
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				// TODO Auto-generated method stub
 				if(SwingUtilities.isRightMouseButton(e) ) {
 					JPopupMenu contextMenu = createContextMenu();
 					if (contextMenu != null)
@@ -1103,7 +1089,6 @@ class AlgDescImportTable extends SortableSelectableTable {
 	
 	@Override
 	protected void init() {
-		// TODO Auto-generated method stub
 		super.init();
 		if (getColumnModel().getColumnCount() > 3) {
 			getColumnModel().getColumn(3).setMaxWidth(0);
@@ -1263,7 +1248,6 @@ class AlgDescImportTM extends SortableSelectableTableModel {
 	
 	@Override
 	public Class<?> getColumnClass(int columnIndex) {
-		// TODO Auto-generated method stub
 		if (columnIndex == 5)
 			return Boolean.class;
 		else
@@ -1273,7 +1257,6 @@ class AlgDescImportTM extends SortableSelectableTableModel {
 	
 	@Override
 	public boolean isCellEditable(int row, int column) {
-		// TODO Auto-generated method stub
 		if (column == 5)
 			return true;
 		else
@@ -1283,7 +1266,6 @@ class AlgDescImportTM extends SortableSelectableTableModel {
 
 	@Override
 	public void setValueAt(Object aValue, int row, int column) {
-		// TODO Auto-generated method stub
 		super.setValueAt(aValue, row, column);
 		
 		modified = true;

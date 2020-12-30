@@ -9,6 +9,9 @@ package net.hudup.server.external.ui;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
+import java.awt.GraphicsEnvironment;
+import java.awt.Image;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.rmi.RemoteException;
@@ -19,16 +22,25 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
+import net.hudup.core.client.Connector;
+import net.hudup.core.client.ConnectInfo;
+import net.hudup.core.client.LightRemoteServerCP;
 import net.hudup.core.client.PowerServer;
+import net.hudup.core.client.RemoteServerCP;
+import net.hudup.core.client.Server;
 import net.hudup.core.client.ServerStatusEvent;
 import net.hudup.core.client.ServerStatusEvent.Status;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.DataDriverList;
 import net.hudup.core.data.ExternalConfig;
 import net.hudup.core.data.ui.ExternalConfigurator;
+import net.hudup.core.data.ui.SysConfigDlgExt;
 import net.hudup.core.data.ui.SysConfigPane;
+import net.hudup.core.logistic.I18nUtil;
 import net.hudup.core.logistic.LogUtil;
-import net.hudup.core.logistic.xURI;
+import net.hudup.core.logistic.ui.PluginStorageManifestPanel;
+import net.hudup.core.logistic.ui.PluginStorageManifestPanelRemote;
+import net.hudup.core.logistic.ui.UIUtil;
 import net.hudup.server.external.ExternalServerConfig;
 import net.hudup.server.ui.PowerServerCP;
 
@@ -55,12 +67,12 @@ public class ExternalServerCP extends PowerServerCP {
 	
 	
 	/**
-	 * Constructor with specified server and binded URI of such server.
+	 * Constructor with specified server and connection information of such server.
 	 * @param server specified server
-	 * @param bindUri binded URI of such server. If it is not null, the server is remote. 
+	 * @param connectInfo connection information of the specified.
 	 */
-	public ExternalServerCP(PowerServer server, xURI bindUri) {
-		super(server, bindUri);
+	public ExternalServerCP(PowerServer server, ConnectInfo connectInfo) {
+		super(server, connectInfo);
 	}
 
 	
@@ -69,7 +81,7 @@ public class ExternalServerCP extends PowerServerCP {
 	 * @param server specified power server.
 	 */
 	public ExternalServerCP(PowerServer server) {
-		super(server);
+		this(server, null);
 	}
 
 	
@@ -80,11 +92,55 @@ public class ExternalServerCP extends PowerServerCP {
 		JPanel body = new JPanel(new BorderLayout());
 		general.add(body, BorderLayout.CENTER);
 		
-		body.add(new JLabel("Server configuration"), BorderLayout.NORTH);
+		JPanel configGrp1 = new JPanel(new BorderLayout());
+		body.add(configGrp1, BorderLayout.NORTH);
+		configGrp1.add(new JLabel("Server configuration"), BorderLayout.WEST);
+		btnSystem = UIUtil.makeIconButton(
+			"system-16x16.png", 
+			"system", 
+			I18nUtil.message("system_configure"), 
+			I18nUtil.message("system_configure"), 
+			
+			new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					SysConfigDlgExt cfg = new SysConfigDlgExt(general, I18nUtil.message("system_configure")) {
+
+						/**
+						 * Serial version UID for serializable class. 
+						 */
+						private static final long serialVersionUID = 1L;
+						
+						@Override
+						protected PluginStorageManifestPanel createPluginStorageManifest(Object... vars) {
+							return new PluginStorageManifestPanelRemote(server, connectInfo);
+						}
+						
+					};
+					
+					cfg.removeSysConfigPane();
+					if (connectInfo != null && connectInfo.bindUri != null) {
+						cfg.removeDataDriverPane();
+						cfg.removeSystemPropertiesPane();
+					}
+//					try {
+//						cfg.getPluginStorageManifest().setEnabled(!server.isStarted());
+//					}
+//					catch (Exception e1) {LogUtil.trace(e1);}
+					
+					cfg.setVisible(true);
+				}
+			});
+		btnSystem.setMargin(new Insets(0, 0 , 0, 0));
+		configGrp1.add(this.btnSystem, BorderLayout.EAST);
+		
+		JPanel configGrp2 = new JPanel(new BorderLayout());
+		body.add(configGrp2, BorderLayout.CENTER);
 		paneConfig = new SysConfigPane();
 		paneConfig.setControlVisible(false);
 		paneConfig.update(server.getConfig());
-		body.add(paneConfig, BorderLayout.CENTER);
+		configGrp2.add(paneConfig, BorderLayout.CENTER);
 		
 		
 		JPanel footer = new JPanel();
@@ -94,7 +150,7 @@ public class ExternalServerCP extends PowerServerCP {
 		JPanel configbar = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 		footer.add(configbar);
 		
-		btnApplyConfig = new JButton("Apply config");
+		btnApplyConfig = new JButton("Apply configuration");
 		btnApplyConfig.addActionListener(new ActionListener() {
 			
 			@Override
@@ -104,7 +160,7 @@ public class ExternalServerCP extends PowerServerCP {
 		});
 		configbar.add(btnApplyConfig);
 
-		btnResetConfig = new JButton("Reset config");
+		btnResetConfig = new JButton("Reset configuration");
 		btnResetConfig.addActionListener(new ActionListener() {
 			
 			@Override
@@ -113,6 +169,17 @@ public class ExternalServerCP extends PowerServerCP {
 			}
 		});
 		configbar.add(btnResetConfig);
+
+		
+		btnExternalConfig = new JButton("External configuration");
+		btnExternalConfig.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				externalConfig();
+			}
+		});
+		configbar.add(btnExternalConfig);
 
 		
 		btnLoadStore = new JButton("Load store");
@@ -126,17 +193,6 @@ public class ExternalServerCP extends PowerServerCP {
 		configbar.add(btnLoadStore);
 
 		
-		btnExternalConfig = new JButton("External configure");
-		btnExternalConfig.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				externalConfig();
-			}
-		});
-		configbar.add(btnExternalConfig);
-
-		
 		JPanel mainToolbar = new JPanel(new BorderLayout());
 		footer.add(mainToolbar);
 		
@@ -148,12 +204,7 @@ public class ExternalServerCP extends PowerServerCP {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				try {
-					updateControls();
-				} 
-				catch (RemoteException ex) {
-					LogUtil.trace(ex);
-				}
+				updateControls();
 			}
 		});
 		leftToolbar.add(btnRefresh);
@@ -217,8 +268,7 @@ public class ExternalServerCP extends PowerServerCP {
 
 	
 	@Override
-	protected void updateControls(ServerStatusEvent.Status state)
-			throws RemoteException {
+	protected void updateControls(ServerStatusEvent.Status state) {
 		
 		super.updateControls(state);
 		
@@ -280,8 +330,8 @@ public class ExternalServerCP extends PowerServerCP {
 		JOptionPane.showMessageDialog(
 				this, 
 				"Load external configuration successfully. \n" + 
-				"Please press button 'Apply Config' to make external configuration effect", 
-				"Please press button 'Apply Config'", 
+				"Please press button 'Apply configuration' to make external configuration effect", 
+				"Please press button 'Apply configuration'", 
 				JOptionPane.INFORMATION_MESSAGE);
 		
 	}
@@ -299,12 +349,28 @@ public class ExternalServerCP extends PowerServerCP {
 				return;
 			}
 			
+			if (paneConfig.isModified()) {
+				int confirm = JOptionPane.showConfirmDialog(
+					this, 
+					"Attributes are modified.\nDo you want to apply them before setting up server?", 
+					"Attributes are modified", 
+					JOptionPane.YES_NO_OPTION,
+					JOptionPane.QUESTION_MESSAGE);
+				
+				if (confirm == JOptionPane.YES_OPTION)
+					applyConfig();
+			}
+
 			SetupExternalServerWizard dlg = new SetupExternalServerWizard(this,
 					(ExternalServerConfig)server.getConfig());
-			if (bindUri != null)
-				server.setConfig(dlg.getServerConfig());
 			
-			
+			DataConfig config = dlg.getServerConfig();
+			if (connectInfo.bindUri != null) {
+				server.setConfig(config);
+				if (connectInfo.pullMode) paneConfig.update(config);
+			}
+			else
+				paneConfig.update();
 		} 
 		catch (RemoteException e) {
 			LogUtil.trace(e);
@@ -312,5 +378,41 @@ public class ExternalServerCP extends PowerServerCP {
 		
 	}
 
+	
+	/**
+	 * Main method.
+	 * @param args specified arguments.
+	 */
+	public static void main(String[] args) {
+		boolean console = args != null && args.length >= 1
+			&& args[0] != null && args[0].toLowerCase().equals("console");
+		if (console || GraphicsEnvironment.isHeadless()) {
+			LightRemoteServerCP.console();
+			return;
+		}
+
+		Connector dlg = Connector.connect();
+        Image image = UIUtil.getImage("server-32x32.png");
+        if (image != null) dlg.setIconImage(image);
+		
+		Server server = dlg.getServer();
+		ConnectInfo connectInfo = dlg.getConnectInfo();
+		if (server == null) {
+			JOptionPane.showMessageDialog(
+				null, "Fail to retrieve server", "Fail to retrieve server", JOptionPane.ERROR_MESSAGE);
+		}
+		else if (connectInfo.bindUri != null && !connectInfo.pullMode && Connector.isPullModeRequired(server)) {
+			JOptionPane.showMessageDialog(null,
+				"Can't retrieve server because PULL MODE is not set\n" +
+				"whereas the remote server requires PULL MODE.\n" +
+				"You have to check PULL MODE in connection dialog.",
+				"Retrieval to server failed", JOptionPane.ERROR_MESSAGE);
+		}
+		else if (!(server instanceof PowerServer))
+			new RemoteServerCP(server, connectInfo);
+		else
+			new ExternalServerCP((PowerServer)server, connectInfo);
+	}
+	
 	
 }

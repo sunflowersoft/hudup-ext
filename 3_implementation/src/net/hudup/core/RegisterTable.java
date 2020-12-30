@@ -76,7 +76,6 @@ public final class RegisterTable implements Cloneable, Serializable {
 	 */
 	public RegisterTable() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
 	

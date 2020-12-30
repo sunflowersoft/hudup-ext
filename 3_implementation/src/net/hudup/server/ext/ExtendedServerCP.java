@@ -7,6 +7,8 @@
  */
 package net.hudup.server.ext;
 
+import java.awt.GraphicsEnvironment;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
@@ -18,11 +20,16 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 
+import net.hudup.core.client.Connector;
+import net.hudup.core.client.ConnectInfo;
+import net.hudup.core.client.LightRemoteServerCP;
 import net.hudup.core.client.PowerServer;
+import net.hudup.core.client.RemoteServerCP;
+import net.hudup.core.client.Server;
 import net.hudup.core.logistic.I18nUtil;
 import net.hudup.core.logistic.LogUtil;
-import net.hudup.core.logistic.xURI;
 import net.hudup.core.logistic.ui.HelpContent;
+import net.hudup.core.logistic.ui.UIUtil;
 import net.hudup.server.ui.PowerServerCP;
 
 /**
@@ -42,6 +49,17 @@ public class ExtendedServerCP extends PowerServerCP {
 	
 	
 	/**
+	 * Constructor with specified server and connection information of such server.
+	 * @param server specified server
+	 * @param connectInfo connection information of the specified.
+	 */
+	public ExtendedServerCP(PowerServer server, ConnectInfo connectInfo) {
+		super(server, connectInfo);
+	    setJMenuBar(createMenuBar());
+	}
+
+
+	/**
 	 * Constructor with specified server.
 	 * @param server specified server.
 	 */
@@ -50,17 +68,6 @@ public class ExtendedServerCP extends PowerServerCP {
 	}
 
 	
-	/**
-	 * Constructor with specified server and binded URI of such server.
-	 * @param server specified server
-	 * @param bindUri bound URI.
-	 */
-	public ExtendedServerCP(PowerServer server, xURI bindUri) {
-		super(server, bindUri);
-	    setJMenuBar(createMenuBar());
-	}
-
-
 	@Override
 	protected JMenuBar createMenuBar() {
 		JMenuBar mnBar = new JMenuBar();
@@ -79,7 +86,7 @@ public class ExtendedServerCP extends PowerServerCP {
 
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					WorkingDirectoryManager.showManager(cp, server, bindUri);
+					WorkingDirectoryManager.showManager(cp, server, connectInfo.bindUri);
 				}
 			});
 		mniWorkingDirectoryManager.setMnemonic('w');
@@ -265,6 +272,42 @@ public class ExtendedServerCP extends PowerServerCP {
 //				return false;
 //			}
 //		}
+	}
+	
+	
+	/**
+	 * Main method.
+	 * @param args specified arguments.
+	 */
+	public static void main(String[] args) {
+		boolean console = args != null && args.length >= 1
+				&& args[0] != null && args[0].toLowerCase().equals("console");
+		if (console || GraphicsEnvironment.isHeadless()) {
+			LightRemoteServerCP.console();
+			return;
+		}
+
+		Connector dlg = Connector.connect();
+        Image image = UIUtil.getImage("server-32x32.png");
+        if (image != null) dlg.setIconImage(image);
+		
+		Server server = dlg.getServer();
+		ConnectInfo connectInfo = dlg.getConnectInfo();
+		if (server == null) {
+			JOptionPane.showMessageDialog(
+				null, "Fail to retrieve server", "Fail to retrieve server", JOptionPane.ERROR_MESSAGE);
+		}
+		else if (connectInfo.bindUri != null && !connectInfo.pullMode && Connector.isPullModeRequired(server)) {
+			JOptionPane.showMessageDialog(null,
+				"Can't retrieve server because PULL MODE is not set\n" +
+				"whereas the remote server requires PULL MODE.\n" +
+				"You have to check PULL MODE in connection dialog.",
+				"Retrieval to server failed", JOptionPane.ERROR_MESSAGE);
+		}
+		else if (!(server instanceof PowerServer))
+			new RemoteServerCP(server, connectInfo);
+		else
+			new ExtendedServerCP((PowerServer)server, connectInfo);
 	}
 	
 	

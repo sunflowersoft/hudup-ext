@@ -32,7 +32,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import net.hudup.core.Util;
-import net.hudup.core.client.ConnectDlg;
+import net.hudup.core.client.Connector;
 import net.hudup.core.client.ConnectInfo;
 import net.hudup.core.client.Service;
 import net.hudup.core.client.ServiceExt;
@@ -221,7 +221,7 @@ public class EvaluatorCP extends JFrame implements EvaluatorListener {
 						return;
 					}
 					
-					if (EvaluatorAbstract.isRequirePullMode(evaluatorItem.evaluator) && !getThisEvaluatorCP().connectInfo.pullMode) {
+					if (EvaluatorAbstract.isPullModeRequired(evaluatorItem.evaluator) && !getThisEvaluatorCP().connectInfo.pullMode) {
 						JOptionPane.showMessageDialog(getThisEvaluatorCP(),
 							"Can't retrieve evaluator because PULL MODE is not set\n" +
 							"whereas the remote evaluator requires PULL MODE.\n" +
@@ -768,7 +768,7 @@ public class EvaluatorCP extends JFrame implements EvaluatorListener {
 			try {
 				if (item.addedListener) continue;
 				
-				if (!EvaluatorAbstract.isRequirePullMode(item.evaluator) && !connectInfo.pullMode) {
+				if (!EvaluatorAbstract.isPullModeRequired(item.evaluator) && !connectInfo.pullMode) {
 					item.evaluator.addEvaluatorListener(this);
 					item.addedListener = true;
 				}
@@ -868,18 +868,21 @@ public class EvaluatorCP extends JFrame implements EvaluatorListener {
 	 * Starting evaluator control panel.
 	 */
 	public static void start() {
-		final ConnectDlg connectDlg = ConnectDlg.connect();
-		Service service = connectDlg.getService();
+		final Connector connector = Connector.connect();
+        Image image = UIUtil.getImage("evaluator-32x32.png");
+        if (image != null) connector.setIconImage(image);
+        
+		Service service = connector.getService();
 
 		if (service == null) {
 			JOptionPane.showMessageDialog(
-				null, "Can't retrieve service", "Retrieval to service failed", JOptionPane.ERROR_MESSAGE);
+				null, "Fail to retrieve service", "Fail to retrieve service", JOptionPane.ERROR_MESSAGE);
 			return;
 		}
 
 		boolean validated = false;
 		try {
-			validated = service.validateAccount(connectDlg.getConnectInfo().account.getName(), connectDlg.getConnectInfo().account.getPassword(), DataConfig.ACCOUNT_ADMIN_PRIVILEGE);
+			validated = service.validateAccount(connector.getConnectInfo().account.getName(), connector.getConnectInfo().account.getPassword(), DataConfig.ACCOUNT_ADMIN_PRIVILEGE);
 		} 
 		catch (Exception e) {
 			LogUtil.trace(e);
@@ -891,7 +894,7 @@ public class EvaluatorCP extends JFrame implements EvaluatorListener {
 		}
 		
 		EvaluatorCP ecp = null;
-		ecp = new EvaluatorCP(service, connectDlg.getConnectInfo());
+		ecp = new EvaluatorCP(service, connector.getConnectInfo());
 		ecp.setVisible(true);
 	}
 	

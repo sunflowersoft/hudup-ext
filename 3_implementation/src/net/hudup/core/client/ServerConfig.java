@@ -57,6 +57,12 @@ public class ServerConfig extends SysConfig {
 
 	
 	/**
+	 * This constant specifies pull mode requirement.
+	 */
+	public final static String PULL_MODE_REQUIRED_FIELD = changeCase("pull_mode_required");
+
+	
+	/**
 	 * Default constructor.
 	 */
 	public ServerConfig() {
@@ -83,6 +89,8 @@ public class ServerConfig extends SysConfig {
 		
 		setSocketControlPort(Constants.DEFAULT_SOCKET_CONTROL_PORT);
 		
+		setPullModeRequired(Constants.PULL_MODE_ADVICE);
+
 		addReadOnly(SOCKET_CONTROL_PORT_FIELD);
 	}
 
@@ -169,6 +177,24 @@ public class ServerConfig extends SysConfig {
 		cfg.putAll(this);
 		
 		return cfg;
+	}
+	
+	
+	/**
+	 * Checking whether pull mode is required. 
+	 * @return whether pull mode is required.
+	 */
+	public boolean isPullModeRequired() {
+		return getAsBoolean(PULL_MODE_REQUIRED_FIELD);
+	}
+	
+	
+	/**
+	 * Setting whether pull mode is required.
+	 * @param pullModeRequired whether pull mode is required.
+	 */
+	public void setPullModeRequired(boolean pullModeRequired) {
+		put(PULL_MODE_REQUIRED_FIELD, pullModeRequired);
 	}
 	
 	

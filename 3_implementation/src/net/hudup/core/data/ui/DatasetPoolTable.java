@@ -57,6 +57,12 @@ public class DatasetPoolTable extends JTable {
 
 	
 	/**
+	 * Highlight cell renderer.
+	 */
+	private HighlightCellRenderer highlightCellRenderer = new HighlightCellRenderer();
+	
+
+	/**
 	 * Enabled flag.
 	 */
 	protected boolean enabled = true;
@@ -613,7 +619,7 @@ public class DatasetPoolTable extends JTable {
 	@Override
 	public TableCellRenderer getCellRenderer(int row, int column) {
 		if (column >=1 && column <= 3)
-			return new HighlightCellRenderer();
+			return highlightCellRenderer;
 		else
 			return super.getCellRenderer(row, column);
 	}
@@ -631,10 +637,16 @@ public class DatasetPoolTable extends JTable {
 		 */
 		private static final long serialVersionUID = 1L;
 
+		/**
+		 * Default background color.
+		 */
+		private Color defaultBackgroundColor = null;
+		
 		@Override
 		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus,
 				int row, int column) {
 			Component comp = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+			defaultBackgroundColor = defaultBackgroundColor != null ? defaultBackgroundColor : comp.getBackground();
 			
 			if (bindUri == null) return comp;
 			
@@ -652,6 +664,8 @@ public class DatasetPoolTable extends JTable {
 			dataset = DatasetUtil.getMostInnerDataset(dataset);
 			if (dataset != null)
 				comp.setBackground(new Color(0, 255, 0));
+			else
+				comp.setBackground(defaultBackgroundColor);
 			return comp;
 		}
 		

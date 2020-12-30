@@ -10,14 +10,19 @@ package net.hudup.server.ui;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.FlowLayout;
+import java.awt.GraphicsEnvironment;
 import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.swing.AbstractAction;
 import javax.swing.BoxLayout;
@@ -38,7 +43,9 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import net.hudup.core.Util;
-import net.hudup.core.client.ConnectDlg;
+import net.hudup.core.client.Connector;
+import net.hudup.core.client.ConnectInfo;
+import net.hudup.core.client.LightRemoteServerCP;
 import net.hudup.core.client.PowerServer;
 import net.hudup.core.client.RemoteServerCP;
 import net.hudup.core.client.Server;
@@ -57,9 +64,9 @@ import net.hudup.core.data.ui.UnitListBox;
 import net.hudup.core.data.ui.UnitTable;
 import net.hudup.core.data.ui.UnitTable.SelectionChangedEvent;
 import net.hudup.core.data.ui.UnitTable.SelectionChangedListener;
+import net.hudup.core.logistic.Counter;
 import net.hudup.core.logistic.I18nUtil;
 import net.hudup.core.logistic.LogUtil;
-import net.hudup.core.logistic.xURI;
 import net.hudup.core.logistic.ui.HelpContent;
 import net.hudup.core.logistic.ui.PluginStorageManifestPanel;
 import net.hudup.core.logistic.ui.PluginStorageManifestPanelRemote;
@@ -82,6 +89,11 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 	 */
 	private static final long serialVersionUID = 1L;
 	
+	
+	/**
+	 * Current server status.
+	 */
+	protected Status currentStatus = Status.unknown;
 	
 //	/**
 //	 * External configuration button.
@@ -194,19 +206,29 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 	protected Provider provider = null;
 	
 	/**
-	 * Binded URI of this control panel.
+	 * Connection information.
 	 */
-	protected xURI bindUri = null;
+	protected ConnectInfo connectInfo = null;
+	
+	/**
+	 * Internal time counter.
+	 * Every period in seconds, this control panel updates itself by server information.
+	 */
+	protected Timer timer = null;
 	
 	
 	/**
-	 * Constructor with specified server and binded URI of such server.
+	 * Constructor with specified server and connection information of such server.
 	 * @param server specified server
-	 * @param bindUri bound URI of such server. If it is not null, the server is remote.
+	 * @param connectInfo connection information of the specified.
 	 */
-	public PowerServerCP(PowerServer server, xURI bindUri) {
+	public PowerServerCP(PowerServer server, ConnectInfo connectInfo) {
 		super("Server control panel");
+		
 		try {
+			this.connectInfo = (connectInfo != null ? connectInfo : new ConnectInfo());
+			this.server = server;
+			
 			setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 			setSize(600, 400);
 			setLocationRelativeTo(null);
@@ -215,9 +237,6 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 	        if (image != null)
 	        	setIconImage(image);
 
-			this.server = server;
-			this.bindUri = bindUri;
-			
 		    Container container = getContentPane();
 			JTabbedPane main = new JTabbedPane();
 			container.add(main);
@@ -230,6 +249,36 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 			bindServer();
 			
 			updateControls();
+			
+			ConnectInfo thisConnectInfo = this.connectInfo;
+			addWindowListener(new WindowAdapter() {
+
+				@Override
+				public void windowOpened(WindowEvent e) {
+					super.windowOpened(e);
+					
+					if (timer != null || !thisConnectInfo.pullMode) return;
+					
+					timer = new Timer();
+					long milisec = thisConnectInfo.accessPeriod < Counter.PERIOD*1000 ? Counter.PERIOD*1000 : thisConnectInfo.accessPeriod;
+					timer.schedule(
+						new TimerTask() {
+						
+							@Override
+							public void run() {
+								Status status = ServerStatusEvent.getStatus(server);
+								if (status == Status.unknown || ServerStatusEvent.isSame(status, currentStatus))
+									return;
+
+								updateControls();
+							}
+						}, 
+						milisec, 
+						milisec);
+				}
+				
+			});
+			
 			setVisible(true);
 		}
 		catch (Exception e) {
@@ -251,39 +300,35 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 	
 	/**
 	 * Binding remote server.
-	 * @throws RemoteException if any error raises.
 	 */
-	protected void bindServer() throws RemoteException {
-		boolean result = false;
-		
-		if (bindUri == null) {
-			result = server.addStatusListener(this);
-		}
-		else {
+	protected void bindServer() {
+		if (connectInfo.bindUri == null) {
 			try {
-				UnicastRemoteObject.exportObject(this, bindUri.getPort());
-				
-				result = server.addStatusListener(this);
-				if (!result)
-					throw new Exception();
+				server.addStatusListener(this);
+			}
+			catch (Throwable e) {e.printStackTrace();}
+		}
+		else if (!connectInfo.pullMode) {
+			try {
+				UnicastRemoteObject.exportObject(this, connectInfo.bindUri.getPort());
+				server.addStatusListener(this);
 			}
 			catch (Throwable e) {
 				LogUtil.trace(e);
-				
 				try {
 		        	UnicastRemoteObject.unexportObject(this, true);
 				}
-				catch (Throwable e1) {
-					e1.printStackTrace();
-				}
-				
-				bindUri = null;
-				result = false;
+				catch (Throwable e1) {e1.printStackTrace();}
 			}
 		}
 		
-		if (result)
-			btnRefresh.setVisible(false);
+		btnRefresh.setVisible(connectInfo.pullMode);
+		
+		/*
+		 * Hide pause/resume button in some cases because of error remote lock. The next version will be improve this method.
+		 * So the following code lines need to be removed.
+		 */
+		btnPauseResume.setVisible(connectInfo.bindUri == null);
 	}
 
 	
@@ -334,7 +379,7 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 		JPanel configGrp1 = new JPanel(new BorderLayout());
 		body.add(configGrp1, BorderLayout.NORTH);
 		configGrp1.add(new JLabel("Server configuration"), BorderLayout.WEST);
-		this.btnSystem = UIUtil.makeIconButton(
+		btnSystem = UIUtil.makeIconButton(
 			"system-16x16.png", 
 			"system", 
 			I18nUtil.message("system_configure"), 
@@ -353,12 +398,16 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 						
 						@Override
 						protected PluginStorageManifestPanel createPluginStorageManifest(Object... vars) {
-							return new PluginStorageManifestPanelRemote(server, bindUri);
+							return new PluginStorageManifestPanelRemote(server, connectInfo);
 						}
 						
 					};
 					
 					cfg.removeSysConfigPane();
+					if (connectInfo != null && connectInfo.bindUri != null) {
+						cfg.removeDataDriverPane();
+						cfg.removeSystemPropertiesPane();
+					}
 //					try {
 //						cfg.getPluginStorageManifest().setEnabled(!server.isStarted());
 //					}
@@ -367,8 +416,8 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 					cfg.setVisible(true);
 				}
 			});
-		this.btnSystem.setMargin(new Insets(0, 0 , 0, 0));
-		configGrp1.add(this.btnSystem, BorderLayout.EAST);
+		btnSystem.setMargin(new Insets(0, 0 , 0, 0));
+		configGrp1.add(btnSystem, BorderLayout.EAST);
 		
 		JPanel configGrp2 = new JPanel(new BorderLayout());
 		body.add(configGrp2, BorderLayout.CENTER);
@@ -385,7 +434,7 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 		JPanel configbar = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 		footer.add(configbar);
 		
-		btnApplyConfig = new JButton("Apply config");
+		btnApplyConfig = new JButton("Apply configuration");
 		btnApplyConfig.addActionListener(new ActionListener() {
 			
 			@Override
@@ -395,7 +444,7 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 		});
 		configbar.add(btnApplyConfig);
 
-		btnResetConfig = new JButton("Reset config");
+		btnResetConfig = new JButton("Reset configuration");
 		btnResetConfig.addActionListener(new ActionListener() {
 			
 			@Override
@@ -428,12 +477,7 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				try {
-					updateControls();
-				} 
-				catch (RemoteException e1) {
-					LogUtil.trace(e1);
-				}
+				updateControls();
 			}
 		});
 		leftToolbar.add(btnRefresh);
@@ -502,7 +546,7 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 	 * @return store {@link JPanel}.
 	 * @throws Exception if any error raises.
 	 */
-	private JPanel createStorePane() throws Exception {
+	protected JPanel createStorePane() throws Exception {
 		JPanel store = new JPanel(new BorderLayout());
 		
 		unitTable = Util.getFactory().createUnitTable(
@@ -535,7 +579,7 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 	 * Create account pane.
 	 * @return account {@link JPanel}.
 	 */
-	private JPanel createAccountPane() {
+	protected JPanel createAccountPane() {
 		final JPanel main = new JPanel(new BorderLayout());
 		
 		accUnitTable = Util.getFactory().createUnitTable(
@@ -652,7 +696,7 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 	/**
 	 * Update account data.
 	 */
-	private void updateAccData() {
+	protected void updateAccData() {
 		txtAccName.setText("");
 		txtAccPass.setText("");
 		txtAccPrivs.setText("");
@@ -674,11 +718,24 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 	/**
 	 * Start remote server.
 	 */
-	protected void start() {
+	protected synchronized void start() {
+		if (paneConfig.isModified()) {
+			int confirm = JOptionPane.showConfirmDialog(
+				this, 
+				"Attributes are modified.\nDo you want to apply them before starting server?", 
+				"Attributes are modified", 
+				JOptionPane.YES_NO_OPTION,
+				JOptionPane.QUESTION_MESSAGE);
+			
+			if (confirm == JOptionPane.YES_OPTION)
+				applyConfig();
+		}
+		
+		
 		try {
 			server.start();
 			
-			if (btnRefresh.isVisible())
+			if (connectInfo.pullMode)
 				updateControls();
 			
 		} 
@@ -691,14 +748,14 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 	/**
 	 * Pause and resume remote server.
 	 */
-	protected void pauseResume() {
+	protected synchronized void pauseResume() {
 		try {
 			if (server.isPaused())
 				server.resume();
 			else if (server.isRunning())
 				server.pause();
 			
-			if (btnRefresh.isVisible())
+			if (connectInfo.pullMode)
 				updateControls();
 		}
 		catch (Exception e) {
@@ -710,11 +767,11 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 	/**
 	 * Stop remote server.
 	 */
-	protected void stop() {
+	protected synchronized void stop() {
 		try {
 			server.stop();
 			
-			if (btnRefresh.isVisible())
+			if (connectInfo.pullMode)
 				updateControls();
 		}
 		catch (Exception e) {
@@ -727,7 +784,7 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 	/**
 	 * Setting up remote server.
 	 */
-	protected void setupServer() {
+	protected synchronized void setupServer() {
 		try {
 			if (server.isRunning()) {
 				JOptionPane.showMessageDialog(
@@ -738,14 +795,30 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 				return;
 			}
 			
+			if (paneConfig.isModified()) {
+				int confirm = JOptionPane.showConfirmDialog(
+					this, 
+					"Attributes are modified.\nDo you want to apply them before setting up server?", 
+					"Attributes are modified", 
+					JOptionPane.YES_NO_OPTION,
+					JOptionPane.QUESTION_MESSAGE);
+				
+				if (confirm == JOptionPane.YES_OPTION)
+					applyConfig();
+			}
+
 			SetupServerWizard dlg = new SetupServerWizard(this,
 					(PowerServerConfig)server.getConfig());
-			if (bindUri != null)
-				server.setConfig(dlg.getServerConfig());
 			
-			
+			DataConfig config = dlg.getServerConfig();
+			if (connectInfo.bindUri != null) {
+				server.setConfig(config);
+				if (connectInfo.pullMode) paneConfig.update(config);
+			}
+			else
+				paneConfig.update();
 		} 
-		catch (RemoteException e) {
+		catch (Exception e) {
 			LogUtil.trace(e);
 		}
 		
@@ -755,28 +828,45 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 	/**
 	 * Exiting remote server.
 	 */
-	protected void exit() {
-		if (bindUri != null) {
-			try {
-				server.removeStatusListener(this);
-			} catch (Exception e) {LogUtil.trace(e);}
-			try {
-				server.exit();
-			} catch (Exception e) {}
-			server = null;
-		}
-		else {
-			if (provider != null) provider.close();
-			provider = null;
+	protected synchronized void exit() {
+		if (provider != null) provider.close();
+		provider = null;
 
-			try {
+		if (timer != null) timer.cancel();
+		timer = null;
+
+		try {
+			if (server != null && (connectInfo.bindUri == null || !connectInfo.pullMode))
 				server.removeStatusListener(this);
-			} catch (Exception e) {LogUtil.trace(e);}
-			try {
-				server.exit();
-			} catch (Exception e) {}
-			server = null;
-		}
+		} catch (Exception e) {LogUtil.trace(e);}
+		
+		try {
+			if (server != null) server.exit();
+		} catch (Exception e) {}
+		server = null;
+
+//		if (connectInfo.bindUri != null) {
+//			try {
+//				if (!connectInfo.pullMode)
+//					server.removeStatusListener(this);
+//			} catch (Exception e) {LogUtil.trace(e);}
+//			try {
+//				server.exit();
+//			} catch (Exception e) {}
+//			server = null;
+//		}
+//		else {
+//			if (provider != null) provider.close();
+//			provider = null;
+//
+//			try {
+//				server.removeStatusListener(this);
+//			} catch (Exception e) {LogUtil.trace(e);}
+//			try {
+//				server.exit();
+//			} catch (Exception e) {}
+//			server = null;
+//		}
 		
 		dispose();
 	}
@@ -785,7 +875,7 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 	/**
 	 * Applying configuration to remote server.
 	 */
-	protected void applyConfig() {
+	protected synchronized boolean applyConfig() {
 		try {
 			if (server.isRunning()) {
 				JOptionPane.showMessageDialog(
@@ -793,7 +883,7 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 					"Server running. Can't save configuration", 
 					"Server running", 
 					JOptionPane.INFORMATION_MESSAGE);
-				return;
+				return false;
 			}
 			
 			boolean apply = paneConfig.apply();
@@ -814,17 +904,21 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 						"Apply configuration successfully", 
 						JOptionPane.INFORMATION_MESSAGE);
 			}
+			
+			return apply;
 		}
 		catch (Exception e) {
 			LogUtil.trace(e);
 		}
+		
+		return false;
 	}
 	
 	
 	/**
 	 * Reset configuration for remote server.
 	 */
-	protected void resetConfig() {
+	protected synchronized void resetConfig() {
 		try {
 			if (server.isRunning()) {
 				JOptionPane.showMessageDialog(
@@ -837,23 +931,22 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 			
 			paneConfig.reset();
 			int confirm = JOptionPane.showConfirmDialog(
-					this, 
-					"Reset configuration successfully. \n" + 
-					"Do you want to apply configuration into being effective?", 
-					"Reset configuration successfully", 
-					JOptionPane.YES_NO_OPTION,
-					JOptionPane.QUESTION_MESSAGE);
+				this,
+				"Reset configuration successfully. \n" +
+				"Do you want to apply configuration into being effective?",
+				"Reset configuration successfully",
+				JOptionPane.YES_NO_OPTION,
+				JOptionPane.QUESTION_MESSAGE);
 			
 			if (confirm == JOptionPane.YES_OPTION)
 				applyConfig();
 			else {
 				JOptionPane.showMessageDialog(
-						this, 
-						"Please press button 'Apply Config' to make store configuration effect later", 
-						"Please press button 'Apply Config' to make store configuration effect later", 
-						JOptionPane.INFORMATION_MESSAGE);
+					this,
+					"Please press button 'Apply configuration' to make configuration effect later", 
+					"Please press button 'Apply configuration'",
+					JOptionPane.INFORMATION_MESSAGE);
 			}
-			
 		}
 		catch (Exception e) {
 			LogUtil.trace(e);
@@ -864,7 +957,7 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 	/**
 	 * Loading store for remote server.
 	 */
-	protected void loadStore() {
+	protected synchronized void loadStore() {
 		try {
 			if (server.isRunning()) {
 				JOptionPane.showMessageDialog(
@@ -875,9 +968,10 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 				return;
 			}
 			
-			DataConfig config = DatasetUtil2.chooseServerConfig(this, server.getConfig());
+			DataConfig config = server.getConfig();
+			DataConfig storeConfig = DatasetUtil2.chooseServerConfig(this, config);
 			
-			if (config == null) {
+			if (storeConfig == null) {
 				JOptionPane.showMessageDialog(
 						this, 
 						"Not load store", 
@@ -887,15 +981,15 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 			}
 			
 			DataConfig cfg = new DataConfig();
-			cfg.putAll(server.getConfig());
 			cfg.putAll(config);
+			cfg.putAll(storeConfig);
 			
 			paneConfig.getPropTable().updateNotSetup(cfg);
 			JOptionPane.showMessageDialog(
 					this, 
 					"Load store configuration successfully. \n" + 
-					"Please press button 'Apply Config' to make store configuration effect", 
-					"Please press button 'Apply Config'", 
+					"Please press button 'Apply configuration' to make store configuration effect", 
+					"Please press button 'Apply configuration'", 
 					JOptionPane.INFORMATION_MESSAGE);
 		}
 		catch (Exception e) {
@@ -908,7 +1002,7 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 	 * Enable / disable controls.
 	 * @param enabled if true then, controls are enabled and vice versa.
 	 */
-	private void enableControls(boolean enabled) {
+	protected void enableControls(boolean enabled) {
 		btnSetupServer.setEnabled(enabled);
 		btnExitServer.setEnabled(enabled);
 		btnStart.setEnabled(enabled);
@@ -931,15 +1025,35 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 	
 	/**
 	 * Update current controls when receiving specified remote status.
-	 * @param state specified remote status.
-	 * @throws RemoteException if any error raises.
+	 * @param status specified remote status.
 	 */
-	protected void updateControls(ServerStatusEvent.Status state)
-			throws RemoteException {
-		
-		if (state == Status.started || state == Status.resumed) {
+	protected void updateControls(Status status) {
+		if (status == Status.exit) {
+			updateControls0(status);
+		}
+		else {
+			synchronized (this) {
+				updateControls0(status);
+			}
+		}
+	}
+	
+	
+	/**
+	 * Update current controls when receiving specified remote status.
+	 * @param status specified remote status.
+	 */
+	private void updateControls0(Status status) {
+		if (status == Status.unknown) return;
+		currentStatus = status;
+
+		if (status == Status.started || status == Status.resumed) {
 			enableControls(false);
-			DataConfig config = server.getConfig();
+			DataConfig config = null;
+			try {
+				config = server.getConfig();
+			}
+			catch (Throwable e) {LogUtil.trace(e);}
 
 			if (provider != null)
 				provider.close();
@@ -948,10 +1062,10 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 			btnSetupServer.setEnabled(false);
 			btnExitServer.setEnabled(true);
 			btnStart.setEnabled(false);
-			btnPauseResume.setEnabled(true && bindUri == null);
+			btnPauseResume.setEnabled(true);
 			btnPauseResume.setText("Pause");
 			btnStop.setEnabled(true);
-			btnSystem.setEnabled(true /*&& !bRemote*/);
+			btnSystem.setEnabled(true);
 			
 			btnApplyConfig.setEnabled(false);
 			btnResetConfig.setEnabled(false);
@@ -968,27 +1082,24 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 			unitList.validate();
 			unitList.updateUI();
 			
-			accUnitTable.update(provider.getAssoc(), config.getAccountUnit());
+			try {
+				accUnitTable.update(provider.getAssoc(), config.getAccountUnit());
+			}
+			catch (Throwable e) {LogUtil.trace(e);}
 			updateAccData();
 			
-			try {
-				paneConfig.update(config);
-			}
-			catch (Throwable e) {
-				LogUtil.trace(e);
-			}
-			
+			paneConfig.update(config);
 		}
-		else if (state == Status.paused) {
+		else if (status == Status.paused) {
 			enableControls(false);
 
 			btnSetupServer.setEnabled(false);
 			btnExitServer.setEnabled(true);
 			btnStart.setEnabled(false);
-			btnPauseResume.setEnabled(true && bindUri == null);
+			btnPauseResume.setEnabled(true);
 			btnPauseResume.setText("Resume");
 			btnStop.setEnabled(true);
-			btnSystem.setEnabled(true /*&& !bRemote*/);
+			btnSystem.setEnabled(true);
 			
 			btnApplyConfig.setEnabled(false);
 			btnResetConfig.setEnabled(false);
@@ -1001,7 +1112,7 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 			txtAccPass.setEnabled(true);
 			txtAccPrivs.setEnabled(true);
 		}
-		else if (state == Status.stopped) {
+		else if (status == Status.stopped) {
 			enableControls(false);
 
 			btnSetupServer.setEnabled(true);
@@ -1010,7 +1121,7 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 			btnPauseResume.setEnabled(false);
 			btnPauseResume.setText("Pause");
 			btnStop.setEnabled(false);
-			btnSystem.setEnabled(true /*&& !bRemote*/);
+			btnSystem.setEnabled(true);
 			
 			btnApplyConfig.setEnabled(true);
 			btnResetConfig.setEnabled(true);
@@ -1039,74 +1150,91 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 			if (provider != null)
 				provider.close();
 			provider = null;
-
 		}
-		else if (state == Status.setconfig) {
-			paneConfig.update(server.getConfig());
+		else if (status == Status.setconfig) {
+			try {
+				paneConfig.update(server.getConfig());
+			}
+			catch (Throwable e) {LogUtil.trace(e);}
 		}
-		else if (state == Status.exit) {
+		else if (status == Status.exit) {
 			server = null;
-			if (bindUri != null)
+			if (connectInfo.bindUri != null)
 				dispose();
-			else if (provider != null)
-				provider.close();
-			
-			bindUri = null;
-			provider = null;
+			else {
+				if (provider != null) provider.close();
+				provider = null;
+
+				if (timer != null) timer.cancel();
+				timer = null;
+			}
 		}
+		
+		btnRefresh.setEnabled(true);
 	}
 	
 	
 	/**
 	 * Update controls.
-	 * @throws RemoteException if any error raises.
 	 */
-	protected void updateControls() throws RemoteException {
-		if (server == null)
-			return;
-
-		if (server.isRunning()) {
-			updateControls(Status.started);
-			btnRefresh.setEnabled(true);
-		}
-		else if (server.isPaused()) {
-			updateControls(Status.paused);
-			btnRefresh.setEnabled(true);
+	protected void updateControls() {
+		if (server == null) return;
+		
+		Status status = ServerStatusEvent.getStatus(server);
+		
+		if (status == Status.exit) {
+			updateControls(status);
 		}
 		else {
-			updateControls(Status.stopped);
-			btnRefresh.setEnabled(true);
+			synchronized (this) {
+				updateControls(status);
+			}
 		}
-			
 	}
 	
 	
 	@Override
 	public void statusChanged(ServerStatusEvent evt) throws RemoteException {
-		if (bindUri != null)
-			updateControls(evt.getStatus());
-		else if (!evt.getShutdownHookStatus())
-			updateControls(evt.getStatus());
+		Status status = evt.getStatus();
+		
+		if (status == Status.exit) {
+			if (connectInfo.bindUri != null)
+				updateControls0(status);
+			else if (!evt.getShutdownHookStatus())
+				updateControls0(status);
+		}
+		else {
+			synchronized (this) {
+				if (connectInfo.bindUri != null)
+					updateControls0(status);
+				else if (!evt.getShutdownHookStatus())
+					updateControls0(status);
+			}
+		}
 	}
 	
 
 	@Override
 	public void dispose() {
 		try {
-			if (server != null) server.removeStatusListener(this);
+			if (server != null && (connectInfo.bindUri == null || !connectInfo.pullMode))
+				server.removeStatusListener(this);
 		}
 		catch (Throwable e) {LogUtil.trace(e);}
 		server = null;
 		
 		try {
-			if (bindUri != null) UnicastRemoteObject.unexportObject(this, true);
+			if (connectInfo.bindUri != null && !connectInfo.pullMode)
+				UnicastRemoteObject.unexportObject(this, true);
 		}
 		catch (Throwable e) {LogUtil.trace(e);}
-		bindUri = null;
 		
 		if (provider != null) provider.close();
 		provider = null;
 		
+		if (timer != null) timer.cancel();
+		timer = null;
+
 		super.dispose();
 	}
 	
@@ -1116,15 +1244,34 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 	 * @param args specified arguments.
 	 */
 	public static void main(String[] args) {
-		ConnectDlg dlg = ConnectDlg.connect();
-		
-		Server server = dlg.getServer();
-		if (server != null)
-			new PowerServerCP((PowerServer)server, dlg.getConnectInfo().bindUri);
-		else {
-			JOptionPane.showMessageDialog(
-					null, "Can't retrieve server", "Can't retrieve server", JOptionPane.ERROR_MESSAGE);
+		boolean console = args != null && args.length >= 1
+			&& args[0] != null && args[0].toLowerCase().equals("console");
+		if (console || GraphicsEnvironment.isHeadless()) {
+			LightRemoteServerCP.console();
+			return;
 		}
+
+		Connector connector = Connector.connect();
+        Image image = UIUtil.getImage("server-32x32.png");
+        if (image != null) connector.setIconImage(image);
+		
+		Server server = connector.getServer();
+		ConnectInfo connectInfo = connector.getConnectInfo();
+		if (server == null) {
+			JOptionPane.showMessageDialog(
+				null, "Fail to retrieve server", "Fail to retrieve server", JOptionPane.ERROR_MESSAGE);
+		}
+		else if (connectInfo.bindUri != null && !connectInfo.pullMode && Connector.isPullModeRequired(server)) {
+			JOptionPane.showMessageDialog(null,
+				"Can't retrieve server because PULL MODE is not set\n" +
+				"whereas the remote server requires PULL MODE.\n" +
+				"You have to check PULL MODE in connection dialog.",
+				"Retrieval to server failed", JOptionPane.ERROR_MESSAGE);
+		}
+		else if (!(server instanceof PowerServer))
+			new RemoteServerCP(server, connectInfo);
+		else
+			new PowerServerCP((PowerServer)server, connectInfo);
 	}
 	
 	

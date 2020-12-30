@@ -2326,12 +2326,12 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 	 * @param evaluator specified evaluator.
 	 * @return whether the specified evaluator requires pull mode connection.
 	 */
-	public static boolean isRequirePullMode(Evaluator evaluator) {
+	public static boolean isPullModeRequired(Evaluator evaluator) {
 		try {
 			if (!isRemote(evaluator)) return false;
 			
 			EvaluatorConfig config = evaluator.getConfig();
-			return config.isRequirePullMode();
+			return config.isPullModeRequired();
 		} catch (Throwable e) {LogUtil.trace(e);}
 		
 		return false;

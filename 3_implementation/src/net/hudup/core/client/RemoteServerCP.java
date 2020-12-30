@@ -10,11 +10,16 @@ package net.hudup.core.client;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.FlowLayout;
+import java.awt.GraphicsEnvironment;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -26,9 +31,8 @@ import javax.swing.JPanel;
 import net.hudup.core.client.ServerStatusEvent.Status;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.ui.PropPane;
+import net.hudup.core.logistic.Counter;
 import net.hudup.core.logistic.LogUtil;
-import net.hudup.core.logistic.NextUpdate;
-import net.hudup.core.logistic.xURI;
 import net.hudup.core.logistic.ui.UIUtil;
 
 /**
@@ -47,7 +51,6 @@ import net.hudup.core.logistic.ui.UIUtil;
  * @version 10.0
  *
  */
-@NextUpdate
 public class RemoteServerCP extends JFrame implements ServerStatusListener {
 
 	
@@ -58,9 +61,14 @@ public class RemoteServerCP extends JFrame implements ServerStatusListener {
 	
 	
 	/**
+	 * Current server status.
+	 */
+	protected Status currentStatus = Status.unknown;
+	
+	/**
 	 * Pane of server configuration.
 	 */
-	private PropPane paneConfig = null;
+	protected PropPane paneConfig = null;
 	
 	/**
 	 * Exiting server button.
@@ -70,62 +78,68 @@ public class RemoteServerCP extends JFrame implements ServerStatusListener {
 	/**
 	 * Button to start server.
 	 */
-	private JButton btnStart = null;
+	protected JButton btnStart = null;
 	
 	/**
 	 * Button to pause/resume server.
 	 */
-	private JButton btnPauseResume = null;
+	protected JButton btnPauseResume = null;
 	
 	/**
 	 * Button to stop server.
 	 */
-	private JButton btnStop = null;
+	protected JButton btnStop = null;
 	
 	/**
 	 * Button to apply changes of server configuration.
 	 */
-	private JButton btnApplyConfig = null;
+	protected JButton btnApplyConfig = null;
 	
 	/**
 	 * Button to reset server configuration.
 	 */
-	private JButton btnResetConfig = null;
+	protected JButton btnResetConfig = null;
 	
 	/**
 	 * Button to refresh this control panel.
 	 */
-	private JButton btnRefresh = null;
+	protected JButton btnRefresh = null;
 	
 	/**
 	 * Reference to remote server.
 	 */
-	private Server server = null;
+	protected Server server = null;
 	
 	/**
-	 * Binded URI of this control panel as remote RMI object. It is URI pointing to where this control panel is located.
+	 * Connection information.
 	 */
-	private xURI bindUri = null;
+	protected ConnectInfo connectInfo = null;
+	
+	/**
+	 * Internal time counter.
+	 * Every period in seconds, this control panel updates itself by server information.
+	 */
+	protected Timer timer = null;
 
 	
 	/**
-	 * Constructor with reference to remote server and binded URI of this control panel as remote RMI object.
-	 * @param server reference to remote server.
-	 * @param bindUri binded URI of this control panel as remote RMI object.
+	 * Constructor with specified server and connection information of such server.
+	 * @param server specified server
+	 * @param connectInfo connection information of the specified.
 	 */
-	public RemoteServerCP(Server server, xURI bindUri) {
+	public RemoteServerCP(Server server, ConnectInfo connectInfo) {
 		super("Power remote server control panel");
 		
 		try {
+			this.connectInfo = connectInfo != null ? connectInfo : new ConnectInfo();
+			this.server = server;
+
 			setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 			setSize(600, 400);
 			setLocationRelativeTo(null);
 	        Image image = UIUtil.getImage("remotecp-32x32.png");
 	        if (image != null)
 	        	setIconImage(image);
-			
-			this.server = server;
-			this.bindUri = bindUri;
 			
 			Container container = getContentPane();
 			container.setLayout(new BorderLayout());
@@ -147,7 +161,7 @@ public class RemoteServerCP extends JFrame implements ServerStatusListener {
 			JPanel configbar = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 			footer.add(configbar);
 			
-			btnApplyConfig = new JButton("Apply config");
+			btnApplyConfig = new JButton("Apply configuration");
 			btnApplyConfig.addActionListener(new ActionListener() {
 				
 				@Override
@@ -157,7 +171,7 @@ public class RemoteServerCP extends JFrame implements ServerStatusListener {
 			});
 			configbar.add(btnApplyConfig);
 	
-			btnResetConfig = new JButton("Reset config");
+			btnResetConfig = new JButton("Reset configuration");
 			btnResetConfig.addActionListener(new ActionListener() {
 				
 				@Override
@@ -178,12 +192,7 @@ public class RemoteServerCP extends JFrame implements ServerStatusListener {
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					try {
-						updateControls();
-					} 
-					catch (RemoteException e1) {
-						e1.printStackTrace();
-					}
+					updateControls();
 				}
 			});
 			btnRefresh.setAlignmentX(LEFT_ALIGNMENT);
@@ -236,6 +245,36 @@ public class RemoteServerCP extends JFrame implements ServerStatusListener {
 			bindServer();
 			
 			updateControls();
+			
+			ConnectInfo thisConnectInfo = this.connectInfo;
+			addWindowListener(new WindowAdapter() {
+
+				@Override
+				public void windowOpened(WindowEvent e) {
+					super.windowOpened(e);
+					
+					if (timer != null || !thisConnectInfo.pullMode) return;
+					
+					timer = new Timer();
+					long milisec = thisConnectInfo.accessPeriod < Counter.PERIOD*1000 ? Counter.PERIOD*1000 : thisConnectInfo.accessPeriod;
+					timer.schedule(
+						new TimerTask() {
+						
+							@Override
+							public void run() {
+								Status status = ServerStatusEvent.getStatus(server);
+								if (status == Status.unknown || ServerStatusEvent.isSame(status, currentStatus))
+									return;
+
+								updateControls();
+							}
+						}, 
+						milisec, 
+						milisec);
+				}
+				
+			});
+			
 			setVisible(true);
 		}
 		catch (Exception e) {
@@ -249,52 +288,46 @@ public class RemoteServerCP extends JFrame implements ServerStatusListener {
 	/**
 	 * Binding (exposing) this control panel as remote RMI object so that server or other applications can interact with it via RMI protocol.
 	 * The internal variable {@link #bindUri} pointing to where to locate this control panel.
-	 * @throws RemoteException if any error raises.
 	 */
-	private void bindServer() throws RemoteException {
-		boolean result = false;
-		
-		if (bindUri == null) {
-			result = server.addStatusListener(this);
-		}
-		else {
+	protected void bindServer() {
+		if (connectInfo.bindUri == null) {
 			try {
-				UnicastRemoteObject.exportObject(this, bindUri.getPort());
-				
-				result = server.addStatusListener(this);
-				if (!result)
-					throw new Exception();
+				server.addStatusListener(this);
+			}
+			catch (Throwable e1) {e1.printStackTrace();}
+		}
+		else if (!connectInfo.pullMode) {
+			try {
+				UnicastRemoteObject.exportObject(this, connectInfo.bindUri.getPort());
+				server.addStatusListener(this);
 			}
 			catch (Throwable e) {
 				LogUtil.trace(e);
-				
 				try {
 		        	UnicastRemoteObject.unexportObject(this, true);
 				}
-				catch (Throwable e1) {
-					e1.printStackTrace();
-				}
-				
-				bindUri = null;
-				result = false;
+				catch (Throwable e1) {e1.printStackTrace();}
 			}
 		}
 		
+		btnRefresh.setVisible(connectInfo.pullMode);
 		
-		if (result)
-			btnRefresh.setVisible(false);
-		
+		/*
+		 * Hide pause/resume button in some cases because of error remote lock. The next version will be improve this method.
+		 * So the following code lines need to be removed.
+		 */
+		btnPauseResume.setVisible(connectInfo.bindUri == null);
 	}
 	
 
 	/**
 	 * Start server remotely.
 	 */
-	private void start() {
+	protected synchronized void start() {
 		try {
 			server.start();
 			
-			if (btnRefresh.isVisible())
+			if (connectInfo.pullMode)
 				updateControls();
 		} 
 		catch (Exception e) {
@@ -306,14 +339,14 @@ public class RemoteServerCP extends JFrame implements ServerStatusListener {
 	/**
 	 * Pause/resume server remotely.
 	 */
-	private void pauseResume() {
+	protected synchronized void pauseResume() {
 		try {
 			if (server.isPaused())
 				server.resume();
 			else if (server.isRunning())
 				server.pause();
 			
-			if (btnRefresh.isVisible())
+			if (connectInfo.pullMode)
 				updateControls();
 		}
 		catch (Exception e) {
@@ -325,11 +358,11 @@ public class RemoteServerCP extends JFrame implements ServerStatusListener {
 	/**
 	 * Stop server remotely.
 	 */
-	private void stop() {
+	protected synchronized void stop() {
 		try {
 			server.stop();
 			
-			if (btnRefresh.isVisible())
+			if (connectInfo.pullMode)
 				updateControls();
 		}
 		catch (Exception e) {
@@ -341,12 +374,17 @@ public class RemoteServerCP extends JFrame implements ServerStatusListener {
 	/**
 	 * Exiting remote server.
 	 */
-	private void exit() {
+	protected synchronized void exit() {
+		if (timer != null) timer.cancel();
+		timer = null;
+
 		try {
-			server.removeStatusListener(this);
+			if (server != null && (connectInfo.bindUri == null || !connectInfo.pullMode))
+				server.removeStatusListener(this);
 		} catch (Exception e) {LogUtil.trace(e);}
+		
 		try {
-			server.exit();
+			if (server != null) server.exit();
 		} catch (Exception e) {}
 		server = null;
 		
@@ -357,7 +395,7 @@ public class RemoteServerCP extends JFrame implements ServerStatusListener {
 	/**
 	 * Apply changes into server configuration remotely.
 	 */
-	private void applyConfig() {
+	protected synchronized void applyConfig() {
 		try {
 			if (server.isRunning()) {
 				JOptionPane.showMessageDialog(
@@ -394,7 +432,7 @@ public class RemoteServerCP extends JFrame implements ServerStatusListener {
 	/**
 	 * Reset server configuration.
 	 */
-	private void resetConfig() {
+	protected synchronized void resetConfig() {
 		try {
 			if (server.isRunning()) {
 				JOptionPane.showMessageDialog(
@@ -406,12 +444,23 @@ public class RemoteServerCP extends JFrame implements ServerStatusListener {
 			}
 			
 			paneConfig.reset();
-			JOptionPane.showMessageDialog(
-					this, 
-					"Reset configuration successfully. \n" + 
-					"Please press button 'Apply Config' to make store configuration effect", 
-					"Please press button 'Apply Config' to make store configuration effect", 
+			int confirm = JOptionPane.showConfirmDialog(
+				this,
+				"Reset configuration successfully. \n" +
+				"Do you want to apply configuration into being effective?",
+				"Reset configuration successfully",
+				JOptionPane.YES_NO_OPTION,
+				JOptionPane.QUESTION_MESSAGE);
+			
+			if (confirm == JOptionPane.YES_OPTION)
+				applyConfig();
+			else {
+				JOptionPane.showMessageDialog(
+					this,
+					"Please press button 'Apply configuration' to make configuration effect later", 
+					"Please press button 'Apply configuration'",
 					JOptionPane.INFORMATION_MESSAGE);
+			}
 		}
 		catch (Exception e) {
 			LogUtil.trace(e);
@@ -423,7 +472,7 @@ public class RemoteServerCP extends JFrame implements ServerStatusListener {
 	 * Enable/Disable all controls (components) in this control panel.
 	 * @param enabled if {@code true}, all controls are enabled. Otherwise, all controls are disabled.
 	 */
-	private void enableControls(boolean enabled) {
+	protected void enableControls(boolean enabled) {
 		btnExitServer.setEnabled(enabled);
 		btnStart.setEnabled(enabled);
 		btnPauseResume.setEnabled(enabled);
@@ -437,13 +486,29 @@ public class RemoteServerCP extends JFrame implements ServerStatusListener {
 	
 	/**
 	 * Update all controls (components) in this control panel according to current server status.
+	 * @param status server current status.
+	 */
+	protected void updateControls(Status status) {
+		if (status == Status.exit) {
+			updateControls0(status);
+		}
+		else {
+			synchronized (this) {
+				updateControls0(status);
+			}
+		}
+	}
+	
+	
+	/**
+	 * Update all controls (components) in this control panel according to current server status.
 	 * Please see {@link ServerStatusEvent#status} for more details about server statuses.
 	 * This method currently hide pause/resume button because of error remote lock. The next version will be improve this method.
 	 * @param status server current status.
-	 * @throws RemoteException if any error raises.
 	 */
-	@NextUpdate
-	private void updateControls(ServerStatusEvent.Status status) throws RemoteException {
+	private void updateControls0(Status status) {
+		if (status == Status.unknown) return;
+		currentStatus = status;
 		
 		if (status == Status.started || status == Status.resumed) {
 			enableControls(false);
@@ -461,9 +526,7 @@ public class RemoteServerCP extends JFrame implements ServerStatusListener {
 			try {
 				paneConfig.update(server.getConfig());
 			}
-			catch (Throwable e) {
-				LogUtil.trace(e);
-			}
+			catch (Throwable e) {LogUtil.trace(e);}
 		}
 		else if (status == Status.paused) {
 			enableControls(false);
@@ -492,94 +555,112 @@ public class RemoteServerCP extends JFrame implements ServerStatusListener {
 			paneConfig.setEnabled(true);
 		}
 		else if (status == Status.setconfig) {
-			paneConfig.update(server.getConfig());
+			try {
+				paneConfig.update(server.getConfig());
+			}
+			catch (Throwable e) {LogUtil.trace(e);}
 		}
 		else if (status == Status.exit) {
 			server = null;
-			if (bindUri != null) dispose();
-			bindUri = null;
+			if (connectInfo.bindUri != null)
+				dispose();
+			else {
+				if (timer != null) timer.cancel();
+				timer = null;
+			}
 		}
 		
-		
-		/**
-		 * This method currently hide pause/resume button because of error remote lock. The next version will be improve this method.
-		 * So the following code lines need to be removed.
-		 */
-		btnPauseResume.setVisible(false);
+		btnRefresh.setEnabled(true);
 	}
 
 	
 	/**
 	 * Update all controls (components) in this control panel according to current server status.
 	 * Please see {@link ServerStatusEvent#status} for more details about server statuses.
-	 * @throws RemoteException if any error raises.
 	 */
-	private void updateControls() throws RemoteException {
-		if (server.isRunning()) {
-			updateControls(Status.started);
-			btnRefresh.setEnabled(true);
-		}
-		else if (server.isPaused()) {
-			updateControls(Status.paused);
-			btnRefresh.setEnabled(true);
+	protected void updateControls() {
+		if (server == null) return;
+		
+		Status status = ServerStatusEvent.getStatus(server);
+		
+		if (status == Status.exit) {
+			updateControls(status);
 		}
 		else {
-			updateControls(Status.stopped);
-			btnRefresh.setEnabled(true);
+			synchronized (this) {
+				updateControls(status);
+			}
 		}
-		
 	}
 	
 	
 	@Override
 	public void statusChanged(ServerStatusEvent evt) throws RemoteException {
-		updateControls(evt.getStatus());
+		Status status = evt.getStatus();
+		
+		if (status == Status.exit) {
+			updateControls0(status);
+		}
+		else {
+			synchronized (this) {
+				updateControls0(status);
+			}
+		}
 	}
 	
 	
 	@Override
 	public void dispose() {
     	try {
-    		if (server != null) server.removeStatusListener(this);
+			if (server != null && (connectInfo.bindUri == null || !connectInfo.pullMode))
+    			server.removeStatusListener(this);
     	}
     	catch (Throwable e) {LogUtil.trace(e);}
     	server = null;
 		
     	try {
-    		if (bindUri != null) UnicastRemoteObject.unexportObject(this, true);
+    		if (connectInfo.bindUri != null && !connectInfo.pullMode)
+    			UnicastRemoteObject.unexportObject(this, true);
     	}
     	catch (Throwable e) {LogUtil.trace(e);}
-		bindUri = null;
 		
+		if (timer != null) timer.cancel();
+		timer = null;
+
 		super.dispose();
 	}
 
 
 	/**
-	 * The main method shows the {@link ConnectDlg} for users to enter authenticated information to connect server.
+	 * The main method shows the {@link Connector} for users to enter authenticated information to connect server.
 	 * Later on this method shows the this control panel for users to start, stop, pause and configure sever remotely.
 	 * @param args argument parameter of main method. It contains command line arguments.
 	 */
 	public static void main(String[] args) {
 		boolean console = args != null && args.length >= 1 
 				&& args[0] != null && args[0].toLowerCase().equals("console");
-		if (console) {
+		if (console || GraphicsEnvironment.isHeadless()) {
 			LightRemoteServerCP.console();
 			return;
 		}
 		
-		ConnectDlg dlg = ConnectDlg.connect();
+		Connector connector = Connector.connect();
 		
-		Server server = dlg.getServer();
-		ConnectInfo connectInfo = dlg.getConnectInfo();
+		Server server = connector.getServer();
+		ConnectInfo connectInfo = connector.getConnectInfo();
 		if (server == null) {
 			JOptionPane.showMessageDialog(
-					null, "Can't retrieve remote server", "Faile to retrieve server", JOptionPane.ERROR_MESSAGE);
+				null, "Fail to retrieve server", "Fail to retrieve server", JOptionPane.ERROR_MESSAGE);
 		}
-		else if (connectInfo.bindUri == null || connectInfo.pullMode)
-			new LightRemoteServerCP(server);
+		else if (connectInfo.bindUri != null && !connectInfo.pullMode && Connector.isPullModeRequired(server)) {
+			JOptionPane.showMessageDialog(null,
+				"Can't retrieve server because PULL MODE is not set\n" +
+				"whereas the remote server requires PULL MODE.\n" +
+				"You have to check PULL MODE in connection dialog.",
+				"Retrieval to server failed", JOptionPane.ERROR_MESSAGE);
+		}
 		else
-			new RemoteServerCP(server, connectInfo.bindUri);
+			new RemoteServerCP(server, connectInfo);
 	}
 
 

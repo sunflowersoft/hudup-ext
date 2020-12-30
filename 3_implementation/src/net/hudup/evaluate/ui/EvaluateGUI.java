@@ -480,6 +480,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 				openTrainingSet();
 			}
 		});
+		this.btnTrainingBrowse.setMnemonic('a');
 		left.add(this.btnTrainingBrowse);
 		
 		this.btnTestingBrowse = new JButton(I18nUtil.message("testing_set"));
@@ -490,6 +491,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 				openTestingSet();
 			}
 		});
+		this.btnTestingBrowse.setMnemonic('t');
 		left.add(this.btnTestingBrowse);
 		
 		JPanel center = new JPanel();
@@ -700,6 +702,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 				run();
 			}
 		});
+		this.btnRun.setMnemonic('r');
 		paneControl.add(this.btnRun);
 		
 		this.btnPauseResume = new JButton(I18nUtil.message("pause"));
@@ -710,6 +713,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 				pauseResume();
 			}
 		});
+		this.btnPauseResume.setMnemonic('u');
 		paneControl.add(this.btnPauseResume);
 
 		this.btnStop = new JButton(I18nUtil.message("stop"));
@@ -720,6 +724,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 				stop();
 			}
 		});
+		this.btnStop.setMnemonic('s');
 		paneControl.add(this.btnStop);
 
 		JPanel main = new JPanel(new GridLayout(0, 1));
@@ -919,6 +924,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 				}
 			}
 		});
+		this.btnAnalyzeResult.setMnemonic('y');
 		toolbar.add(this.btnAnalyzeResult);
 		
 

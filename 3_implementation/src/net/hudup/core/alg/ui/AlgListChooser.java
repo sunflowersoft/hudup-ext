@@ -46,13 +46,37 @@ public class AlgListChooser extends JDialog {
 
 	
 	/**
-	 * The left {@link AlgListBox} assists users to select algorithms.
+	 * List of available algorithm.
+	 */
+	private final static String AVAILABLE = "Available algorithms";
+
+	
+	/**
+	 * List of selected algorithm.
+	 */
+	private final static String SELECTED = "Selected algorithms";
+	
+	
+	/**
+	 * The left label.
+	 */
+	private JLabel leftLabel = null;
+
+	
+	/**
+	 * The left list box assists users to select algorithms.
 	 */
 	private AlgListBox leftList = null;
 
 	
 	/**
-	 * The right {@link AlgListBox} contains chosen algorithms.
+	 * The right label.
+	 */
+	private JLabel rightLabel = null;
+
+	
+	/**
+	 * The right list box contains chosen algorithms.
 	 */
 	private AlgListBox rightList = null;
 	
@@ -123,7 +147,8 @@ public class AlgListChooser extends JDialog {
 		JPanel left = new JPanel(new BorderLayout());
 		body.add(left);
 		
-		left.add(new JLabel("Available algorithm list"), BorderLayout.NORTH);
+		leftLabel = new JLabel(AVAILABLE);
+		left.add(leftLabel, BorderLayout.NORTH);
 		leftList = new AlgListBox(true, referredEvaluator);
 		leftList.update(remainList);
 		leftList.setEnableDoubleClick(false);
@@ -185,8 +210,8 @@ public class AlgListChooser extends JDialog {
 		JPanel right = new JPanel(new BorderLayout());
 		body.add(right);
 		
-		right.add(new JLabel("Selected algorithm list"), BorderLayout.NORTH);
-		
+		rightLabel = new JLabel(SELECTED);
+		right.add(rightLabel, BorderLayout.NORTH);
 		rightList = new AlgListBox(true, referredEvaluator);
 		rightList.setEnableDoubleClick(false);
 		rightList.update(selectedList);
@@ -215,9 +240,20 @@ public class AlgListChooser extends JDialog {
 			}
 		});
 		footer.add(cancel);
-
-	
+		
+		updateAlgNumbers();
+		
+		
 		setVisible(true);
+	}
+	
+	
+	/**
+	 * Updating numbers of algorithms.
+	 */
+	private void updateAlgNumbers() {
+		leftLabel.setText(AVAILABLE + ": " + leftList.getModel().getSize());
+		rightLabel.setText(SELECTED + ": " + rightList.getModel().getSize());
 	}
 	
 	
@@ -236,6 +272,7 @@ public class AlgListChooser extends JDialog {
 		}
 		rightList.addAll(list);
 		
+		updateAlgNumbers();
 	}
 	
 
@@ -255,6 +292,8 @@ public class AlgListChooser extends JDialog {
 		
 		rightList.addAll(list);
 		leftList.clear();
+		
+		updateAlgNumbers();
 	}
 
 	
@@ -272,6 +311,8 @@ public class AlgListChooser extends JDialog {
 			return;
 		}
 		leftList.addAll(list);
+		
+		updateAlgNumbers();
 	}
 	
 
@@ -291,6 +332,8 @@ public class AlgListChooser extends JDialog {
 
 		leftList.addAll(list);
 		rightList.clear();
+		
+		updateAlgNumbers();
 	}
 
 	

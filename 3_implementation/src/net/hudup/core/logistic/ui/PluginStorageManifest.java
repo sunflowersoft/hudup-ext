@@ -103,7 +103,6 @@ public class PluginStorageManifest extends SortableSelectableTable {
 
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				// TODO Auto-generated method stub
 				if (!isEditable()) return;
 				
 				if(SwingUtilities.isRightMouseButton(e) ) {

@@ -222,7 +222,6 @@ public class AlgDescList implements Serializable, Cloneable {
 
 	@Override
 	public String toString() {
-		// TODO Auto-generated method stub
 		
 		return TextParserUtil.toText(getAlgClassNameList(), ",");
 	}
@@ -258,7 +257,6 @@ public class AlgDescList implements Serializable, Cloneable {
 	
 	@Override
 	public Object clone() {
-		// TODO Auto-generated method stub
 		AlgDescList algDescList = new AlgDescList();
 		for (AlgDesc algDesc : list) {
 			algDescList.add((AlgDesc)algDesc.clone());

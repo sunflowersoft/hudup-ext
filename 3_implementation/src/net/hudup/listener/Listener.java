@@ -265,6 +265,8 @@ public class Listener extends SocketServer implements ServerStatusListener, Gate
 				bindServerList.prune();
 			}
 			break;
+		default:
+			break;
 		}
 	}
 

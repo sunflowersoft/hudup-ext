@@ -45,13 +45,13 @@ public class ExternalServerConfig extends PowerServerConfig {
 	/**
 	 * Default server recommender.
 	 */
-	public final static Class<? extends Recommender> DEFAULT_SERVER_RECOMMENDER = ExternalServerRecommender.class;
+	public static Class<? extends Recommender> DEFAULT_SERVER_RECOMMENDER = ExternalServerRecommender.class;
 	
 	
 	/**
 	 * Default server parser.
 	 */
-	public final static Class<? extends DatasetParser> DEFAULT_SERVER_PARSER = SemiScannerParserExt.class;
+	public static Class<? extends DatasetParser> DEFAULT_SERVER_PARSER = SemiScannerParserExt.class;
 
 	
 	/**

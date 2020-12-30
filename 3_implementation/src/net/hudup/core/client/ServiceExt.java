@@ -13,7 +13,7 @@ import java.util.List;
 import net.hudup.core.evaluate.Evaluator;
 
 /**
- * This class represents extended version of service.
+ * This interface represents extended version of service.
  * 
  * @author Loc Nguyen
  * @version 13

@@ -48,7 +48,7 @@ public class EvaluatorRemote implements AccessPoint {
 	
 	@Override
 	public String getName() {
-		return "Remote Evaluator";
+		return "Evaluator Remote";
 	}
 
 	

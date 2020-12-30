@@ -85,7 +85,12 @@ public class ServerStatusEvent extends EventObject {
 		/**
 		 * &quot;exit&quot; status. Server exits and so server does not exist. Status &quot;exit&quot; is unreal.
 		 */
-		exit
+		exit,
+		
+		/**
+		 * Unknown status. This enum is only used as flag in some special cases.
+		 */
+		unknown,
 	}
 	
 	
@@ -188,6 +193,39 @@ public class ServerStatusEvent extends EventObject {
 	 */
 	public void setShutdownHookStatus(boolean shutdownHookStatus) {
 		this.shutdownHookStatus = shutdownHookStatus;
+	}
+
+	
+	/**
+	 * Getting current status of specified server.
+	 * @param server specified server.
+	 * @return current status of specified server.
+	 */
+	public static Status getStatus(Server server) {
+		try {
+			if (server.isRunning())
+				return Status.started;
+			else if (server.isPaused())
+				return Status.paused;
+			else
+				return Status.stopped;
+		}
+		catch (Exception e) {}
+		
+		return Status.unknown;
+	}
+	
+	
+	/**
+	 * Testing whether two specified statuses are same.
+	 * @param status1 first specified status.
+	 * @param status2 second specified status.
+	 * @return whether two specified statuses are same.
+	 */
+	public static boolean isSame(Status status1, Status status2) {
+		status1 = status1 == Status.resumed ? Status.started : status1;
+		status2 = status2 == Status.resumed ? Status.started : status2;
+		return status1 == status2;
 	}
 
 	

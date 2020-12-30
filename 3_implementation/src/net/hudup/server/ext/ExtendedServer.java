@@ -181,9 +181,10 @@ public class ExtendedServer extends DefaultServer {
 	 */
 	public static ExtendedServer create(xURI srvConfigUri) {
 		boolean require = requireSetup(srvConfigUri);
+		PowerServerConfig config = new PowerServerConfig(srvConfigUri);
 		
 		if (!require)
-			return new ExtendedServer(new PowerServerConfig(srvConfigUri));
+			return new ExtendedServer(config);
 		else {
 			boolean finished = true;
 			if (Constants.SERVER_UI) {
@@ -214,7 +215,6 @@ public class ExtendedServer extends DefaultServer {
 					}
 				}
 				
-				PowerServerConfig config = new PowerServerConfig(srvConfigUri);
 				if (isHeadLess) {
 					SetupServerWizardConsole wizard = new SetupServerWizardConsole(config);
 					finished = wizard.isFinished(); 
@@ -225,13 +225,12 @@ public class ExtendedServer extends DefaultServer {
 				}
 			}
 			else {
-				PowerServerConfig config = new PowerServerConfig(srvConfigUri);
 				SetupServerWizardConsole wizard = new SetupServerWizardConsole(config);
 				finished = wizard.isFinished(); 
 			}
 			
 			if (finished && !requireSetup(srvConfigUri))
-				return new ExtendedServer(new PowerServerConfig(srvConfigUri));
+				return new ExtendedServer(config);
 			else {
 				LogUtil.error("Server not created");
 				return null;

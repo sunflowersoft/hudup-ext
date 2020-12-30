@@ -12,13 +12,20 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.List;
 
 import javax.swing.event.EventListenerList;
 
 import net.hudup.core.Constants;
 import net.hudup.core.ExtraStorage;
+import net.hudup.core.PluginAlgDesc2ListMap;
 import net.hudup.core.PluginChangedEvent;
 import net.hudup.core.PluginStorage;
+import net.hudup.core.RegisterTable;
+import net.hudup.core.Util;
+import net.hudup.core.alg.Alg;
+import net.hudup.core.alg.AlgDesc2List;
+import net.hudup.core.alg.AlgList;
 import net.hudup.core.client.ActiveMeasure;
 import net.hudup.core.client.Gateway;
 import net.hudup.core.client.PowerServer;
@@ -745,11 +752,76 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 	
 	
 	@Override
+	public synchronized boolean reloadPlugin(String account, String password) throws RemoteException {
+		if (!validateAccount(account, password, DataConfig.ACCOUNT_ADMIN_PRIVILEGE))
+			return false;
+		
+		Util.getPluginManager().discover();
+		pluginChanged(new PluginChangedEvent(this));
+		return true;
+	}
+
+
+	@Override
+	public boolean applyPlugin(PluginAlgDesc2ListMap pluginDescMap, String account, String password)
+			throws RemoteException {
+		if (!validateAccount(account, password, DataConfig.ACCOUNT_ADMIN_PRIVILEGE))
+			return false;
+		
+		return true;
+	}
+
+
+	@Override
 	public synchronized void pluginChanged(PluginChangedEvent evt) throws RemoteException {
 		
 	}
 
 
+	@Override
+	public PluginAlgDesc2ListMap getPluginAlgDescs(String account, String password) throws RemoteException {
+		PluginAlgDesc2ListMap pluginMap = new PluginAlgDesc2ListMap();
+		if (!validateAccount(account, password, DataConfig.ACCOUNT_EVALUATE_PRIVILEGE))
+			return pluginMap;
+		
+		String[] regNames = PluginStorage.getRegisterTableNames();
+		for (String regName : regNames) {
+			AlgDesc2List algDescs = getPluginAlgDescs0(regName);
+			if (algDescs != null && algDescs.size() > 0)
+				pluginMap.put(regName, algDescs);
+		}
+		
+		AlgList algList = PluginStorage.getNextUpdateList();
+		AlgDesc2List algDescs = new AlgDesc2List();
+    	for (int i = 0; i < algList.size(); i++) {
+       		algDescs.add(algList.get(i));
+    	}
+		if (algDescs.size() > 0)
+			pluginMap.put(PluginStorage.NEXT_UPDATE_LIST, algDescs);
+		
+		return pluginMap;
+	}
+
+		
+	/**
+	 * Getting descriptions list of registered table specified by its name.
+	 * @param regName name of registered table.
+	 * @return descriptions list of registered table specified by its name.
+	 */
+	private AlgDesc2List getPluginAlgDescs0(String regName) {
+    	RegisterTable algReg = PluginStorage.lookupTable(regName);
+		AlgDesc2List algDescs = new AlgDesc2List();
+    	if (algReg == null) return algDescs;
+		
+    	List<Alg> algList = algReg.getAlgList();
+    	for (Alg alg : algList) {
+       		algDescs.add(alg);
+    	}
+    	
+		return algDescs;
+	}
+
+	
 	@Override
 	public boolean isIdle() throws RemoteException {
 		return isStarted();

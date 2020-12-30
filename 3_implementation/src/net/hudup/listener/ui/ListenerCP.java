@@ -10,11 +10,16 @@ package net.hudup.listener.ui;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.FlowLayout;
+import java.awt.GraphicsEnvironment;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -25,16 +30,18 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
 import net.hudup.core.Constants;
-import net.hudup.core.client.ConnectDlg;
-import net.hudup.core.client.ConnectDlg.ConnectType;
+import net.hudup.core.client.Connector;
+import net.hudup.core.client.Connector.ConnectType;
+import net.hudup.core.client.ConnectInfo;
+import net.hudup.core.client.LightRemoteServerCP;
 import net.hudup.core.client.Server;
 import net.hudup.core.client.ServerStatusEvent;
 import net.hudup.core.client.ServerStatusEvent.Status;
 import net.hudup.core.client.ServerStatusListener;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.ui.SysConfigPane;
+import net.hudup.core.logistic.Counter;
 import net.hudup.core.logistic.LogUtil;
-import net.hudup.core.logistic.xURI;
 import net.hudup.core.logistic.ui.UIUtil;
 
 /**
@@ -63,44 +70,49 @@ public class ListenerCP extends JFrame implements ServerStatusListener {
 	
 	
 	/**
+	 * Current server status.
+	 */
+	protected Status currentStatus = Status.unknown;
+	
+	/**
 	 * Pane of listener configuration as {@link SysConfigPane}.
 	 */
-	private SysConfigPane paneConfig = null;
+	protected SysConfigPane paneConfig = null;
 	
 	/**
 	 * Button to exit listener.
 	 */
-	private JButton btnExitListener = null;
+	protected JButton btnExitListener = null;
 	
 	/**
 	 * Button to start listener.
 	 */
-	private JButton btnStart = null;
+	protected JButton btnStart = null;
 	
 	/**
 	 * Button to pause/resume listener.
 	 */
-	private JButton btnPauseResume = null;
+	protected JButton btnPauseResume = null;
 
 	/**
 	 * Button to stop listener.
 	 */
-	private JButton btnStop = null;
+	protected JButton btnStop = null;
 	
 	/**
 	 * Button to apply changes of listener configuration.
 	 */
-	private JButton btnApplyConfig = null;
+	protected JButton btnApplyConfig = null;
 	
 	/**
 	 * Button to reset listener configuration.
 	 */
-	private JButton btnResetConfig = null;
+	protected JButton btnResetConfig = null;
 
 	/**
 	 * Button to refresh this control panel.
 	 */
-	private JButton btnRefresh = null;
+	protected JButton btnRefresh = null;
 
 	/**
 	 * Reference to remote listener.
@@ -108,29 +120,35 @@ public class ListenerCP extends JFrame implements ServerStatusListener {
 	protected Server listener = null;
 	
 	/**
-	 * Binded URI of this control panel as remote RMI object. It is URI pointing to where this control panel is located.
-	 * If it is not null, this control panel associates with remote listener on remote host.
+	 * Connection information.
 	 */
-	private xURI bindUri = null;
+	protected ConnectInfo connectInfo = null;
+	
+	/**
+	 * Internal time counter.
+	 * Every period in seconds, this control panel updates itself by server information.
+	 */
+	protected Timer timer = null;
 	
 	
 	/**
-	 * Constructor with reference to specified listener and binded URI of this control panel as remote RMI object.
-	 * @param listener specified listener.
-	 * @param bindUri binded URI of this control panel as remote RMI object. If it is not null, this control panel associates with remote listener on remote host.
+	 * Constructor with specified server and connection information of such server.
+	 * @param server specified server
+	 * @param connectInfo connection information of the specified.
 	 */
-	public ListenerCP(Server listener, xURI bindUri) {
+	public ListenerCP(Server listener, ConnectInfo connectInfo) {
 		super("Listener control panel");
+		
 		try {
+			this.connectInfo = connectInfo != null ? connectInfo : new ConnectInfo();
+			this.listener = listener;
+
 			setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 			setSize(600, 400);
 			setLocationRelativeTo(null);
 	        Image image = UIUtil.getImage("listener-32x32.png");
 	        if (image != null)
 	        	setIconImage(image);
-			
-			this.listener = listener;
-			this.bindUri = bindUri;
 			
 			Container container = getContentPane();
 			JTabbedPane main = new JTabbedPane();
@@ -141,6 +159,36 @@ public class ListenerCP extends JFrame implements ServerStatusListener {
 			bindServer();
 
 			updateControls();
+			
+			ConnectInfo thisConnectInfo = this.connectInfo;
+			addWindowListener(new WindowAdapter() {
+
+				@Override
+				public void windowOpened(WindowEvent e) {
+					super.windowOpened(e);
+					
+					if (timer != null || !thisConnectInfo.pullMode) return;
+					
+					timer = new Timer();
+					long milisec = thisConnectInfo.accessPeriod < Counter.PERIOD*1000 ? Counter.PERIOD*1000 : thisConnectInfo.accessPeriod;
+					timer.schedule(
+						new TimerTask() {
+						
+							@Override
+							public void run() {
+								Status status = ServerStatusEvent.getStatus(listener);
+								if (status == Status.unknown || ServerStatusEvent.isSame(status, currentStatus))
+									return;
+
+								updateControls();
+							}
+						}, 
+						milisec, 
+						milisec);
+				}
+				
+			});
+			
 			setVisible(true);
 		}
 		catch (RemoteException e) {
@@ -163,39 +211,34 @@ public class ListenerCP extends JFrame implements ServerStatusListener {
 	 * Binding (exposing) this control panel as remote RMI object so that server or other applications can interact with it via RMI protocol.
 	 * The internal variable {@link #bindUri} pointing to where to locate this control panel.
 	 */
-	private void bindServer() throws RemoteException {
-		boolean result = false;
-		
-		if (bindUri == null) {
-			result = listener.addStatusListener(this);
-		}
-		else {
+	protected void bindServer() {
+		if (connectInfo.bindUri == null) {
 			try {
-				UnicastRemoteObject.exportObject(this, bindUri.getPort());
-				
-				result = listener.addStatusListener(this);
-				if (!result)
-					throw new Exception();
+				listener.addStatusListener(this);
+			}
+			catch (Throwable e1) {e1.printStackTrace();}
+		}
+		else if (!connectInfo.pullMode) {
+			try {
+				UnicastRemoteObject.exportObject(this, connectInfo.bindUri.getPort());
+				listener.addStatusListener(this);
 			}
 			catch (Throwable e) {
 				LogUtil.trace(e);
-				
 				try {
 		        	UnicastRemoteObject.unexportObject(this, true);
 				}
-				catch (Throwable e1) {
-					e1.printStackTrace();
-				}
-				
-				bindUri = null;
-				result = false;
+				catch (Throwable e1) {e1.printStackTrace();}
 			}
-			
 		}
 			
+		btnRefresh.setVisible(connectInfo.pullMode);
 		
-		if (result)
-			btnRefresh.setVisible(false);
+		/*
+		 * Hide pause/resume button in some cases because of error remote lock. The next version will be improve this method.
+		 * So the following code lines need to be removed.
+		 */
+		btnPauseResume.setVisible(connectInfo.bindUri == null);
 	}
 
 	
@@ -204,7 +247,7 @@ public class ListenerCP extends JFrame implements ServerStatusListener {
 	 * @return {@link JPanel} containing all GUI controls (buttons).
 	 * @throws RemoteException if any error raises.
 	 */
-	private JPanel createGeneralPane() throws RemoteException {
+	protected JPanel createGeneralPane() throws RemoteException {
 		JPanel general = new JPanel(new BorderLayout());
 		
 		JPanel body = new JPanel(new BorderLayout());
@@ -225,7 +268,7 @@ public class ListenerCP extends JFrame implements ServerStatusListener {
 		JPanel configbar = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 		footer.add(configbar);
 		
-		btnApplyConfig = new JButton("Apply config");
+		btnApplyConfig = new JButton("Apply configuration");
 		btnApplyConfig.addActionListener(new ActionListener() {
 			
 			@Override
@@ -235,7 +278,7 @@ public class ListenerCP extends JFrame implements ServerStatusListener {
 		});
 		configbar.add(btnApplyConfig);
 
-		btnResetConfig = new JButton("Reset config");
+		btnResetConfig = new JButton("Reset configuration");
 		btnResetConfig.addActionListener(new ActionListener() {
 			
 			@Override
@@ -257,12 +300,7 @@ public class ListenerCP extends JFrame implements ServerStatusListener {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				try {
-					updateControls();
-				} 
-				catch (RemoteException e1) {
-					e1.printStackTrace();
-				}
+				updateControls();
 			}
 		});
 		leftToolbar.add(btnRefresh);
@@ -319,11 +357,11 @@ public class ListenerCP extends JFrame implements ServerStatusListener {
 	/**
 	 * Start listener remotely.
 	 */
-	private void start() {
+	protected synchronized void start() {
 		try {
 			listener.start();
 			
-			if (btnRefresh.isVisible())
+			if (connectInfo.pullMode)
 				updateControls();
 		}
 		catch (Exception e) {
@@ -335,14 +373,14 @@ public class ListenerCP extends JFrame implements ServerStatusListener {
 	/**
 	 * Pause/resume listener remotely.
 	 */
-	private void pauseResume() {
+	protected synchronized void pauseResume() {
 		try {
 			if (listener.isPaused())
 				listener.resume();
 			else if (listener.isRunning())
 				listener.pause();
 			
-			if (btnRefresh.isVisible())
+			if (connectInfo.pullMode)
 				updateControls();
 		}
 		catch (Exception e) {
@@ -354,11 +392,11 @@ public class ListenerCP extends JFrame implements ServerStatusListener {
 	/**
 	 * Stop listener remotely.
 	 */
-	private void stop() {
+	protected synchronized void stop() {
 		try {
 			listener.stop();
 			
-			if (btnRefresh.isVisible())
+			if (connectInfo.pullMode)
 				updateControls();
 		}
 		catch (Exception e) {
@@ -370,12 +408,17 @@ public class ListenerCP extends JFrame implements ServerStatusListener {
 	/**
 	 * Exit listener remotely. After exiting, listener is destroyed and cannot be re-started.
 	 */
-	private void exit() {
+	protected synchronized void exit() {
+		if (timer != null) timer.cancel();
+		timer = null;
+
 		try {
-			listener.removeStatusListener(this);
+			if (listener != null && (connectInfo.bindUri == null || !connectInfo.pullMode))
+				listener.removeStatusListener(this);
 		} catch (Exception e) {LogUtil.trace(e);}
+		
 		try {
-			listener.exit();
+			if (listener != null) listener.exit();
 		} catch (Exception e) {}
 		listener = null;
 		
@@ -386,7 +429,7 @@ public class ListenerCP extends JFrame implements ServerStatusListener {
 	/**
 	 * Apply changes into listener configuration remotely.
 	 */
-	private void applyConfig() {
+	protected synchronized void applyConfig() {
 		try {
 			if (listener.isRunning()) {
 				JOptionPane.showMessageDialog(
@@ -425,7 +468,7 @@ public class ListenerCP extends JFrame implements ServerStatusListener {
 	/**
 	 * Reset listener configuration.
 	 */
-	private void resetConfig() {
+	protected synchronized void resetConfig() {
 		try {
 			if (listener.isRunning()) {
 				JOptionPane.showMessageDialog(
@@ -450,8 +493,8 @@ public class ListenerCP extends JFrame implements ServerStatusListener {
 			else {
 				JOptionPane.showMessageDialog(
 					this, 
-					"Please press button 'Apply Config' to make store configuration effect later", 
-					"Please press button 'Apply Config' to make store configuration effect later", 
+					"Please press button 'Apply configuration' to make configuration effect later", 
+					"Please press button 'Apply configuration'", 
 					JOptionPane.INFORMATION_MESSAGE);
 			}
 			
@@ -466,7 +509,7 @@ public class ListenerCP extends JFrame implements ServerStatusListener {
 	 * Enable/Disable all controls (components) in this control panel.
 	 * @param enabled if {@code true}, all controls are enabled. Otherwise, all controls are disabled.
 	 */
-	private void enableControls(boolean enabled) {
+	protected void enableControls(boolean enabled) {
 		btnExitListener.setEnabled(enabled);
 		btnStart.setEnabled(enabled);
 		btnPauseResume.setEnabled(enabled);
@@ -480,19 +523,35 @@ public class ListenerCP extends JFrame implements ServerStatusListener {
 	
 	/**
 	 * Update all controls (components) in this control panel according to current listener status.
+	 * @param status listener current status.
+	 */
+	protected void updateControls(Status status) {
+		if (status == Status.exit) {
+			updateControls0(status);
+		}
+		else {
+			synchronized (this) {
+				updateControls0(status);
+			}
+		}
+	}
+	
+	
+	/**
+	 * Update all controls (components) in this control panel according to current listener status.
 	 * Please see {@link ServerStatusEvent#status} for more details about listener statuses.
 	 * @param status listener current status.
-	 * @throws RemoteException if any error raises.
 	 */
-	private void updateControls(ServerStatusEvent.Status status) 
-			throws RemoteException {
-		
+	private void updateControls0(Status status) {
+		if (status == Status.unknown) return;
+		currentStatus = status;
+
 		if (status == Status.started || status == Status.resumed) {
 			enableControls(false);
 
 			btnExitListener.setEnabled(true);
 			btnStart.setEnabled(false);
-			btnPauseResume.setEnabled(true && bindUri == null);
+			btnPauseResume.setEnabled(true);
 			btnPauseResume.setText("Pause");
 			btnStop.setEnabled(true);
 			
@@ -503,16 +562,14 @@ public class ListenerCP extends JFrame implements ServerStatusListener {
 			try {
 				paneConfig.update(listener.getConfig());
 			}
-			catch (Throwable e) {
-				LogUtil.trace(e);
-			}
+			catch (Throwable e) {LogUtil.trace(e);}
 		}
 		else if (status == Status.paused) {
 			enableControls(false);
 
 			btnExitListener.setEnabled(true);
 			btnStart.setEnabled(false);
-			btnPauseResume.setEnabled(true && bindUri == null);
+			btnPauseResume.setEnabled(true);
 			btnPauseResume.setText("Resume");
 			btnStop.setEnabled(true);
 			
@@ -536,61 +593,85 @@ public class ListenerCP extends JFrame implements ServerStatusListener {
 			
 		}
 		else if (status == Status.setconfig) {
-			paneConfig.update(listener.getConfig());
+			try {
+				paneConfig.update(listener.getConfig());
+			}
+			catch (Throwable e) {LogUtil.trace(e);}
 		}
 		else if (status == Status.exit) {
 			listener = null;
-			if (bindUri != null) dispose();
-			bindUri = null;
+			if (connectInfo.bindUri != null)
+				dispose();
+			else {
+				if (timer != null) timer.cancel();
+				timer = null;
+			}
 		}
 		
+		btnRefresh.setEnabled(true);
 	}
 	
 	
 	/**
 	 * Update all controls (components) in this control panel according to current listener status.
 	 * Please see {@link ServerStatusEvent#status} for more details about listener statuses.
-	 * @throws RemoteException if any error raises.
 	 */
-	private void updateControls() 
-			throws RemoteException {
-		if (listener == null)
-			return;
+	protected void updateControls() {
+		if (listener == null) return;
 		
-		if (listener.isRunning())
-			updateControls(Status.started);
-		else if (listener.isPaused())
-			updateControls(Status.paused);
-		else
-			updateControls(Status.stopped);
-			
+		Status status = ServerStatusEvent.getStatus(listener);
+		
+		if (status == Status.exit) {
+			updateControls(status);
+		}
+		else {
+			synchronized (this) {
+				updateControls(status);
+			}
+		}
 	}
 	
 	
 	@Override
 	public void statusChanged(ServerStatusEvent evt) 
 			throws RemoteException {
-		if (bindUri != null)
-			updateControls(evt.getStatus());
-		else if (!evt.getShutdownHookStatus())
-			updateControls(evt.getStatus());
+		Status status = evt.getStatus();
+		
+		if (status == Status.exit) {
+			if (connectInfo.bindUri != null)
+				updateControls0(status);
+			else if (!evt.getShutdownHookStatus())
+				updateControls0(status);
+		}
+		else {
+			synchronized (this) {
+				if (connectInfo.bindUri != null)
+					updateControls0(status);
+				else if (!evt.getShutdownHookStatus())
+					updateControls0(status);
+			}
+		}
 	}
 	
 
 	@Override
 	public void dispose() {
 		try {
-			if (listener != null) listener.removeStatusListener(this);
+			if (listener != null && (connectInfo.bindUri == null || !connectInfo.pullMode))
+				listener.removeStatusListener(this);
 		} 
 		catch (Throwable e) {LogUtil.trace(e);}
 		listener = null;
 		
 		try {
-			if (bindUri != null) UnicastRemoteObject.unexportObject(this, true);
+    		if (connectInfo.bindUri != null && !connectInfo.pullMode)
+				UnicastRemoteObject.unexportObject(this, true);
 		}
 		catch (Throwable e) {LogUtil.trace(e);}
-		bindUri = null;
 		
+		if (timer != null) timer.cancel();
+		timer = null;
+
 		super.dispose();
 	}
 
@@ -601,18 +682,32 @@ public class ListenerCP extends JFrame implements ServerStatusListener {
 	 * @param args The argument parameter of main method. It contains command line arguments.
 	 */
 	public static void main(String[] args) {
-		ConnectDlg dlg = ConnectDlg.connect(ConnectType.server, Constants.DEFAULT_LISTENER_EXPORT_PORT);
-		Image image = UIUtil.getImage("listener-32x32.png");
-        if (image != null)
-        	dlg.setIconImage(image);
-		
-		Server server = dlg.getServer();
-		if (server != null)
-			new ListenerCP(server, dlg.getConnectInfo().bindUri);
-		else {
-			JOptionPane.showMessageDialog(
-					null, "Can't retrieve listener", "Can't retrieve listener", JOptionPane.ERROR_MESSAGE);
+		boolean console = args != null && args.length >= 1 
+				&& args[0] != null && args[0].toLowerCase().equals("console");
+		if (console || GraphicsEnvironment.isHeadless()) {
+			LightRemoteServerCP.console();
+			return;
 		}
+
+		Connector connector = Connector.connect(ConnectType.server, Constants.DEFAULT_LISTENER_EXPORT_PORT);
+		Image image = UIUtil.getImage("listener-32x32.png");
+        if (image != null) connector.setIconImage(image);
+		
+		Server server = connector.getServer();
+		ConnectInfo connectInfo = connector.getConnectInfo();
+		if (server == null) {
+			JOptionPane.showMessageDialog(
+				null, "Fail to retrieve listener", "Fail to retrieve listener", JOptionPane.ERROR_MESSAGE);
+		}
+		else if (connectInfo.bindUri != null && !connectInfo.pullMode && Connector.isPullModeRequired(server)) {
+			JOptionPane.showMessageDialog(null,
+				"Can't retrieve listener because PULL MODE is not set\n" +
+				"whereas the remote listener requires PULL MODE.\n" +
+				"You have to check PULL MODE in connection dialog.",
+				"Retrieval to listener failed", JOptionPane.ERROR_MESSAGE);
+		}
+		else
+			new ListenerCP(server, connectInfo);
 	}
 
 

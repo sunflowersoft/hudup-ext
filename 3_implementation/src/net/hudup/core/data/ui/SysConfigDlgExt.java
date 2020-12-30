@@ -20,8 +20,8 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
 import net.hudup.core.PluginChangedListener;
+import net.hudup.core.client.ConnectInfo;
 import net.hudup.core.data.DataDriverList;
-import net.hudup.core.logistic.xURI;
 import net.hudup.core.logistic.ui.PluginStorageManifestPanel;
 import net.hudup.core.logistic.ui.SystemPropertiesPane;
 
@@ -78,7 +78,6 @@ public class SysConfigDlgExt extends SysConfigDlg {
 
 			@Override
 			public void windowClosed(WindowEvent e) {
-				// TODO Auto-generated method stub
 				super.windowClosed(e);
 				
 				if (!isModified())
@@ -145,16 +144,16 @@ public class SysConfigDlgExt extends SysConfigDlg {
 			return new PluginStorageManifestPanel(null, null);
 			
 		PluginChangedListener listener = null;
-		xURI bindUri = null;
+		ConnectInfo connectInfo = null;
 		if (vars.length > 0) {
 			if (vars[0] instanceof PluginChangedListener)
 				listener = (PluginChangedListener)vars[0];
 		}
 		if (vars.length > 1) {
-			if (vars[1] instanceof xURI) bindUri = (xURI)vars[1];
+			if (vars[1] instanceof ConnectInfo) connectInfo = (ConnectInfo)vars[1];
 		}
 		
-		return new PluginStorageManifestPanel(listener, bindUri);
+		return new PluginStorageManifestPanel(listener, connectInfo);
 	}
 	
 	
@@ -179,6 +178,28 @@ public class SysConfigDlgExt extends SysConfigDlg {
 		}
 	}
 	
+	
+	/**
+	 * Removing data driver panel.
+	 */
+	public void removeDataDriverPane() {
+		if (body != null && paneDataDriverList != null) {
+			body.remove(paneDataDriverList);
+			paneDataDriverList = null;
+		}
+	}
+
+	
+	/**
+	 * Removing system properties panel.
+	 */
+	public void removeSystemPropertiesPane() {
+		if (body != null && paneSystemProperties != null) {
+			body.remove(paneSystemProperties);
+			paneSystemProperties = null;
+		}
+	}
+
 	
 	/**
 	 * This event-driven method applies changes on system properties.

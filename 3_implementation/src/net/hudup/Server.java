@@ -47,7 +47,6 @@ public final class Server implements AccessPoint {
 	 * @param args The argument parameter of main method. It contains command line arguments.
 	 */
 	public static void main(String[] args) {
-		
 		new Server().run(args);
 	}
 

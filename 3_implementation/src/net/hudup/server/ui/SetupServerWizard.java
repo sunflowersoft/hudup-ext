@@ -98,6 +98,11 @@ public class SetupServerWizard extends JDialog {
 	protected Step currentStep = Step.config;
 	
 	/**
+	 * Configuration panel.
+	 */
+	protected SysConfigPane paneConfig = null;
+	
+	/**
 	 * Back button.
 	 */
 	protected JButton btnBack = null;
@@ -256,7 +261,7 @@ public class SetupServerWizard extends JDialog {
 		JPanel body = new JPanel(new BorderLayout());
 		main.add(body, BorderLayout.CENTER);
 		
-		final SysConfigPane paneConfig = new SysConfigPane();
+		paneConfig = new SysConfigPane();
 		paneConfig.setControlVisible(false);
 		paneConfig.update(config);
 		body.add(new JScrollPane(paneConfig), BorderLayout.CENTER);
@@ -264,7 +269,7 @@ public class SetupServerWizard extends JDialog {
 		JPanel footer = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 		main.add(footer, BorderLayout.SOUTH);
 		
-		JButton btnApplyConfig = new JButton("Apply config");
+		JButton btnApplyConfig = new JButton("Apply configuration");
 		btnApplyConfig.addActionListener(new ActionListener() {
 			
 			@Override
@@ -289,7 +294,7 @@ public class SetupServerWizard extends JDialog {
 		});
 		footer.add(btnApplyConfig);
 
-		JButton btnResetConfig = new JButton("Reset config");
+		JButton btnResetConfig = new JButton("Reset configuration");
 		btnResetConfig.addActionListener(new ActionListener() {
 			
 			@Override
@@ -309,8 +314,8 @@ public class SetupServerWizard extends JDialog {
 				else {
 					JOptionPane.showMessageDialog(
 							getWizard(), 
-							"Please press button 'Apply Config' to make store configuration effect later", 
-							"Please press button 'Apply Config' to make store configuration effect later", 
+							"Please press button 'Apply configuration' to make store configuration effect later", 
+							"Please press button 'Apply configuration'", 
 							JOptionPane.INFORMATION_MESSAGE);
 				}
 
@@ -345,8 +350,8 @@ public class SetupServerWizard extends JDialog {
 				JOptionPane.showMessageDialog(
 						getWizard(), 
 						"Load store configuration successfully. \n" + 
-						"Please press button 'Apply Config' to make store configuration effect", 
-						"Please press button 'Apply Config' to make store configuration effect", 
+						"Please press button 'Apply configuration' to make store configuration effect", 
+						"Please press button 'Apply configuration'", 
 						JOptionPane.INFORMATION_MESSAGE);
 			}
 		});
@@ -995,6 +1000,8 @@ public class SetupServerWizard extends JDialog {
 	private void next() {
 		switch (currentStep) {
 		case config:
+			if (paneConfig != null && paneConfig.isModified()) paneConfig.apply();
+			
 			createProvider();
 			if (provider == null) {
 				JOptionPane.showMessageDialog(

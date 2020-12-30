@@ -13,7 +13,6 @@ import net.hudup.core.PluginManager;
 import net.hudup.core.PluginStorage;
 import net.hudup.core.RegisterTable;
 import net.hudup.core.Util;
-import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Exportable;
 import net.hudup.core.logistic.ForTest;
 import net.hudup.core.logistic.LogUtil;
@@ -186,7 +185,6 @@ public class AlgDesc2 extends AlgDesc {
 	public AlgDesc2(Alg alg) {
 		super(alg);
 		
-		config = (DataConfig)config.clone();
 		algName = alg.getName();
 		
 		if (alg instanceof NullAlg)

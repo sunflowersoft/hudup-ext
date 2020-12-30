@@ -9,6 +9,7 @@ package net.hudup.core.client;
 
 import java.rmi.RemoteException;
 
+import net.hudup.core.PluginAlgDesc2ListMap;
 import net.hudup.core.PluginChangedListener;
 
 /**
@@ -74,5 +75,37 @@ public interface PowerServer extends Server, PluginChangedListener {
 	 * @throws RemoteException if any error raises.
 	 */
 	Service getService() throws RemoteException;
-    
+
+	
+	/**
+	 * Reloading plug-in storage.
+	 * @param account specified account.
+	 * @param password specified password.
+	 * @return true if reloading is successful.
+	 * @throws RemoteException if any error raises.
+	 */
+	boolean reloadPlugin(String account, String password) throws RemoteException;
+
+	
+	/**
+	 * Applying remotely plug-in storage.
+	 * @param pluginDescMap descriptions of algorithms in plug-in storage.
+	 * @param account specified account.
+	 * @param password specified password.
+	 * @return true if reloading is successful.
+	 * @throws RemoteException if any error raises.
+	 */
+	boolean applyPlugin(PluginAlgDesc2ListMap pluginDescMap, String account, String password) throws RemoteException;
+
+	
+	/**
+	 * Getting the map that contains descriptions of algorithms in plug-in storage.
+	 * @param account specified account.
+	 * @param password specified password.
+	 * @return the map that contains descriptions of algorithms in plug-in storage.
+	 * @throws RemoteException if any error raises.
+	 */
+	PluginAlgDesc2ListMap getPluginAlgDescs(String account, String password) throws RemoteException;
+
+	
 }

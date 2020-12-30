@@ -86,6 +86,12 @@ public class EvaluatorConfig extends SysConfig {
 
 	
 	/**
+	 * This constant specifies pull mode requirement.
+	 */
+	public final static String PULL_MODE_REQUIRED_FIELD = changeCase("pull_mode_required");
+
+	
+	/**
 	 * This constant specifies result summary saving field. If true, only done evaluated results are saved.
 	 */
 	public final static String EVALUATOR_SAVE_RESULT_SUMMARY_FIELD = changeCase("save_result_summary");
@@ -116,12 +122,6 @@ public class EvaluatorConfig extends SysConfig {
 
 	
 	/**
-	 * This constant specifies pull mode requirement.
-	 */
-	public final static String EVALUATOR_REQUIRE_PULL_MODE_FIELD = changeCase("require_pull_mode");
-
-	
-	/**
 	 * Default constructor.
 	 */
 	public EvaluatorConfig() {
@@ -148,7 +148,7 @@ public class EvaluatorConfig extends SysConfig {
 		//setAgent(EVALUATOR_AGENT_DEFAULT);
 		setSaveResultSummary(EVALUATOR_SAVE_RESULT_SUMMARY_DEFAULT);
 		setTiedSync(EVALUATOR_TIED_SYNC_DEFAULT);
-		setRequirePullMode(Constants.REQUIRE_PULL_MODE);
+		setPullModeRequired(Constants.PULL_MODE_ADVICE);
 		
 		addReadOnly(EVALUATOR_REPRODUCED_VERSION_FIELD);
 	}
@@ -302,20 +302,20 @@ public class EvaluatorConfig extends SysConfig {
 
 
 	/**
-	 * Checking whether pull mode requirement is true. 
-	 * @return whether pull mode requirement is true.
+	 * Checking whether pull mode is required. 
+	 * @return whether pull mode is required.
 	 */
-	public boolean isRequirePullMode() {
-		return getAsBoolean(EVALUATOR_REQUIRE_PULL_MODE_FIELD);
+	public boolean isPullModeRequired() {
+		return getAsBoolean(PULL_MODE_REQUIRED_FIELD);
 	}
 	
 	
 	/**
-	 * Setting whether pull mode requirement is true.
-	 * @param requirePullMode whether pull mode requirement is true.
+	 * Setting whether pull mode is required.
+	 * @param pullModeRequired whether pull mode is required.
 	 */
-	public void setRequirePullMode(boolean requirePullMode) {
-		put(EVALUATOR_REQUIRE_PULL_MODE_FIELD, requirePullMode);
+	public void setPullModeRequired(boolean pullModeRequired) {
+		put(PULL_MODE_REQUIRED_FIELD, pullModeRequired);
 	}
 	
 	

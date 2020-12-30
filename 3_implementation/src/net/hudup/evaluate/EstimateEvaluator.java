@@ -347,7 +347,7 @@ public class EstimateEvaluator extends RecommendEvaluator {
 	
 	@Override
 	public String getName() throws RemoteException {
-		return "Estimation Evaluator";
+		return "estimate";
 	}
 
 	

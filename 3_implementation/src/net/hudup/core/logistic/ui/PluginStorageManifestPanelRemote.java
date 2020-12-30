@@ -7,11 +7,10 @@
  */
 package net.hudup.core.logistic.ui;
 
-import javax.swing.JOptionPane;
-
 import net.hudup.core.PluginChangedListener;
+import net.hudup.core.client.ConnectInfo;
 import net.hudup.core.client.PowerServer;
-import net.hudup.core.logistic.xURI;
+import net.hudup.core.logistic.LogUtil;
 
 /**
  * Panel for plug-in storage manifest from remote connection.
@@ -35,23 +34,70 @@ public class PluginStorageManifestPanelRemote extends PluginStorageManifestPanel
 	
 	
 	/**
+	 * Connection information.
+	 */
+	protected ConnectInfo connectInfo = null;
+
+	
+	/**
 	 * Constructor with server and plug-in changed listener.
 	 * @param listener specified listener.
-	 * @param bindUri bound URI.
+	 * @param connectInfo connection information.
 	 */
-	public PluginStorageManifestPanelRemote(PluginChangedListener listener, xURI bindUri) {
-		super(listener, bindUri);
-		this.server = listener instanceof PowerServer ? (PowerServer)listener : null;
+	public PluginStorageManifestPanelRemote(PluginChangedListener listener, ConnectInfo connectInfo) {
+		super(listener, connectInfo = (connectInfo != null ? connectInfo : new ConnectInfo()));
 		
-		if (bindUri != null) {
-			JOptionPane.showMessageDialog(
-				this, 
-				"Remote plugin storage manifest not stable yet", 
-				"Not stable yet", 
-				JOptionPane.INFORMATION_MESSAGE);
+		this.server = (listener != null && listener instanceof PowerServer) ? (PowerServer)listener : null;
+		this.connectInfo = connectInfo;
+		
+		if (connectInfo.bindUri != null) {
+			setEnabled(false);
+			reloadAlg.setEnabled(this.server != null);
 		}
 	}
 
+
+	@Override
+	protected PluginStorageManifest createPluginStorageManifest(PluginChangedListener listener,
+			ConnectInfo connectInfo) {
+		if (listener == null)
+			return super.createPluginStorageManifest(listener, connectInfo);
+		else if (listener instanceof PowerServer) {
+			if (connectInfo.bindUri == null)
+				return super.createPluginStorageManifest(listener, connectInfo);
+			else {
+				int port = 0;
+				try {
+					if (connectInfo != null && connectInfo.bindUri != null)
+						port = connectInfo.bindUri.getPort();
+					else
+						port = listener.getPort();
+				} catch (Exception e) {port = 0; LogUtil.trace(e);}
+				
+				return new PluginStorageManifestRemote((PowerServer)listener, connectInfo, port);
+			}
+		}
+		else
+			return super.createPluginStorageManifest(listener, connectInfo);
+	}
+
+
+	@Override
+	protected void reload() {
+		if (connectInfo.bindUri == null)
+			super.reload();
+		else if (server != null) {
+			try {
+				boolean reloaded = server.reloadPlugin(connectInfo.account.getName(), connectInfo.account.getPassword());
+				if (reloaded) {
+					tblRegister.update();
+				}
+			}
+			catch (Exception e) {
+				LogUtil.trace(e);
+			}
+		}
+	}
 
 
 }

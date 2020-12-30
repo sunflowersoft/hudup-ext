@@ -575,6 +575,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 				addDataset(false);
 			}
 		});
+		this.btnAddDataset.setMnemonic('a');
 		toolGrp1.add(this.btnAddDataset);
 		
 		this.btnLoadBatchScript = new JButton(I18nUtil.message("load_script"));
@@ -585,6 +586,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 				loadBatchScript(false);
 			}
 		});
+		this.btnLoadBatchScript.setMnemonic('l');
 		toolGrp1.add(this.btnLoadBatchScript);
 
 		JPanel toolGrp2 = new JPanel(new FlowLayout(FlowLayout.RIGHT));
@@ -766,6 +768,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 				run();
 			}
 		});
+		this.btnRun.setMnemonic('r');
 		paneControl.add(this.btnRun);
 		
 		this.btnPauseResume = new JButton(I18nUtil.message("pause"));
@@ -776,6 +779,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 				pauseResume();
 			}
 		});
+		this.btnPauseResume.setMnemonic('u');
 		paneControl.add(this.btnPauseResume);
 
 		this.btnStop = new JButton(I18nUtil.message("stop"));
@@ -787,6 +791,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			}
 			
 		});
+		this.btnStop.setMnemonic('s');
 		paneControl.add(this.btnStop);
 
 		JPanel main = new JPanel(new GridLayout(0, 1));
@@ -1002,6 +1007,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			}
 			
 		});
+		this.btnAnalyzeResult.setMnemonic('y');
 		toolbar.add(this.btnAnalyzeResult);
 
 		

@@ -41,7 +41,7 @@ public class AlgDesc2List implements Serializable {
 	 * Default constructor.
 	 */
 	public AlgDesc2List() {
-		// TODO Auto-generated constructor stub
+
 	}
 
 	

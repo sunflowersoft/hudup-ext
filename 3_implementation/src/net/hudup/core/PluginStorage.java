@@ -85,6 +85,11 @@ public class PluginStorage implements Serializable {
 	public static final String EXTERNAL_QUERY = "External query";
 	
 	/**
+	 * This constant is the name of next update list.
+	 */
+	public static final String NEXT_UPDATE_LIST = "Next update";
+	
+	/**
 	 * As aforementioned, {@link PluginStorage} manages many {@link RegisterTable} (s) and each {@link RegisterTable} stores only the same type algorithms.
 	 * This constant is the name of {@link RegisterTable} of {@code CTSManager} (s).
 	 */
@@ -219,6 +224,20 @@ public class PluginStorage implements Serializable {
 		catch (Throwable e) {LogUtil.trace(e);}
 	}
 	
+	
+	/**
+	 * Getting registered table names.
+	 * @return registered table names.
+	 */
+	public final static String[] getRegisterTableNames() {
+		return new String[] {
+			NORMAL_ALG,
+			PARSER,
+			METRIC,
+			EXTERNAL_QUERY,
+			CTS_MANAGER};
+	}
+
 	
 	/**
 	 * This static method gets all register tables as a {@link RegisterTableList}.

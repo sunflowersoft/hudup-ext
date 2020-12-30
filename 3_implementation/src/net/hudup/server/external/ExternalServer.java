@@ -56,7 +56,7 @@ public class ExternalServer extends DefaultServer {
 	protected void serverTasks() {
 		
 		ExternalConfig externalConfig = ((ExternalServerConfig) config).getExternalConfig();
-		if (externalConfig == null || externalConfig.size() == 0) {
+		if (externalConfig == null || externalConfig.size() == 0 || externalConfig.getStoreUri() == null) {
 			super.serverTasks();
 			return;
 		}
@@ -117,9 +117,10 @@ public class ExternalServer extends DefaultServer {
 	 */
 	public static ExternalServer create(xURI srvConfigUri) {
 		boolean require = requireSetup(srvConfigUri);
+		ExternalServerConfig config = new ExternalServerConfig(srvConfigUri);
 		
 		if (!require)
-			return new ExternalServer(new ExternalServerConfig(srvConfigUri));
+			return new ExternalServer(config);
 		else {
 			boolean finished = true;
 			if (Constants.SERVER_UI) {
@@ -150,7 +151,6 @@ public class ExternalServer extends DefaultServer {
 					}
 				}
 				
-				ExternalServerConfig config = new ExternalServerConfig(srvConfigUri);
 				if (isHeadLess) {
 					SetupExternalServerWizardConsole wizard = new SetupExternalServerWizardConsole(config);
 					finished = wizard.isFinished();
@@ -161,13 +161,12 @@ public class ExternalServer extends DefaultServer {
 				}
 			}
 			else {
-				ExternalServerConfig config = new ExternalServerConfig(srvConfigUri);
 				SetupExternalServerWizardConsole wizard = new SetupExternalServerWizardConsole(config);
 				finished = wizard.isFinished();
 			}
 			
 			if (finished && !requireSetup(srvConfigUri))
-				return new ExternalServer(new ExternalServerConfig(srvConfigUri));
+				return new ExternalServer(config);
 			else {
 				LogUtil.error("Server not created");
 				return null;

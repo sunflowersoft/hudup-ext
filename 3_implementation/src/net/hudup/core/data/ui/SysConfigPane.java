@@ -65,7 +65,6 @@ public class SysConfigPane extends PropPane {
 
 	@Override
 	public void reset() {
-		// TODO Auto-generated method stub
 		SysConfig config = getSysConfig();
 		config.reset();
 		config.save();

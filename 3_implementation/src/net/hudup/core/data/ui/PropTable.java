@@ -7,6 +7,7 @@
  */
 package net.hudup.core.data.ui;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -64,6 +65,12 @@ public class PropTable extends JTable {
 	 * Serial version UID for serializable class. 
 	 */
 	private static final long serialVersionUID = 1L;
+
+	
+	/**
+	 * Read-only cell renderer.
+	 */
+	private ReadOnlyCellRenderer readOnlyCellRenderer = new ReadOnlyCellRenderer();
 
 	
 	/**
@@ -180,6 +187,14 @@ public class PropTable extends JTable {
 	
 	
 	/**
+	 * Update this table.
+	 */
+	public void update() {
+		getPropTableModel().update();
+	}
+
+	
+	/**
 	 * Updating this table by specified property list.
 	 * @param propList specified property list.
 	 */
@@ -259,10 +274,29 @@ public class PropTable extends JTable {
 	
 	@Override
 	public TableCellRenderer getCellRenderer(int row, int column) {
+		if (column != 0) return getCellRenderer0(row, column);
+		
+		PropList propList = getPropList();
+		if (propList == null) return getCellRenderer0(row, column);
+		Object key = getValueAt(row, column);
+		if (key != null && propList.containsReadOnly(key.toString()))
+			return readOnlyCellRenderer;
+		else
+			return getCellRenderer0(row, column);
+	}
+	
+	
+	/**
+	 * Getting cell renderer.
+	 * @param row specified row.
+	 * @param column specified column.
+	 * @return cell renderer.
+	 */
+	private TableCellRenderer getCellRenderer0(int row, int column) {
 		PropTableModel model = getPropTableModel();
 		TableCellRenderer renderer = getDefaultRenderer(
 				model.getColumnClass(row, column));
-		if(renderer == null) return super.getCellRenderer(row, column);
+		if(renderer == null) renderer = super.getCellRenderer(row, column);
 		
 		return renderer;
 	}
@@ -325,6 +359,31 @@ public class PropTable extends JTable {
 	}
 	
 	
+	/**
+	 * This class represents read-only cell renderer.
+	 * @author Loc Nguyen
+	 * @version 1.0
+	 */
+	private class ReadOnlyCellRenderer extends DefaultTableCellRenderer.UIResource {
+
+		/**
+		 * Serial version UID for serializable class.
+		 */
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus,
+				int row, int column) {
+			Component comp = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+			comp.setBackground(new Color(200, 200, 200));
+			
+			return comp;
+			
+		}
+		
+	}
+	
+
 	/**
 	 * Editor of hidden text represented by {@link HiddenText} guides how to edit a hidden text.
 	 * @author Loc Nguyen
@@ -394,13 +453,24 @@ class PropTableModel extends DefaultTableModel {
 	
 	
 	/**
+	 * Update this model.
+	 */
+	public void update() {
+		update(this.propList);
+	}
+
+	
+	/**
 	 * Update this model by specified property list.
 	 * @param propList specified property list.
 	 */
 	public void update(PropList propList) {
+		if (propList == null) return;
+		
 		this.propList = propList;
 		
 		updateNotSetup(propList);
+		
 		modified = false;
 	}
 
@@ -410,6 +480,8 @@ class PropTableModel extends DefaultTableModel {
 	 * @param propList specified property list.
 	 */
 	public void updateNotSetup(PropList propList) {
+		if (propList == null) return;
+
 		List<String> keys = propList.sortedKeyList();
 		
 		Vector<String> columns = Util.newVector();
@@ -543,7 +615,7 @@ class PropTableModel extends DefaultTableModel {
 	
 	
 	/**
-	 * Getting the internal property list.
+	 * Getting the internal property list as a new one.
 	 * @return internal property list of this model, as {@link PropList}.
 	 */
 	public PropList getModelPropList() {
@@ -637,7 +709,17 @@ class PropTableModel extends DefaultTableModel {
 		}
 		else {
 			Serializable result = propList.userEdit(comp, key, value);
-			if (result != null)
+			if (result == null)
+				return;
+			else if (result instanceof ImportantProperty) {
+				Serializable object = ((ImportantProperty)result).getObject();
+				if (object != null)
+					setValueAt(object, selectedRow, 1);
+				else
+					setValueAt(result, selectedRow, 1);
+				fireTableDataChanged();
+			}
+			else
 				setValueAt(result, selectedRow, 1);
 		}
 		

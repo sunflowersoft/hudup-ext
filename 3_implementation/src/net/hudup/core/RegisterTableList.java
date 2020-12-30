@@ -7,6 +7,7 @@
  */
 package net.hudup.core;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -24,7 +25,13 @@ import net.hudup.core.parser.TextParserUtil;
  * @version 10.0
  *
  */
-public class RegisterTableList {
+public class RegisterTableList implements Serializable {
+
+	
+	/**
+	 * Default serial version UID.
+	 */
+	private static final long serialVersionUID = 1L;
 
 	
 	/**
@@ -160,7 +167,6 @@ public class RegisterTableList {
 
 	@Override
 	public String toString() {
-		// TODO Auto-generated method stub
 		List<String> itemNameList = Util.newList();
 		for (RegisterTableItem item : list)
 			itemNameList.add(item.name);
@@ -177,7 +183,13 @@ public class RegisterTableList {
 	 * @version 10.0
 	 *
 	 */
-	public final static class RegisterTableItem implements Comparable<RegisterTableItem> {
+	public final static class RegisterTableItem implements Comparable<RegisterTableItem>, Serializable {
+
+		
+		/**
+		 * Default serial version UID.
+		 */
+		private static final long serialVersionUID = 1L;
 		
 		
 		/**
@@ -231,14 +243,12 @@ public class RegisterTableList {
 		
 		@Override
 		public String toString() {
-			// TODO Auto-generated method stub
 			return name;
 		}
 
 
 		@Override
 		public int compareTo(RegisterTableItem o) {
-			// TODO Auto-generated method stub
 			return this.name.compareTo(o.name);
 		}
 		

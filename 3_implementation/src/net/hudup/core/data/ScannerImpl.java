@@ -77,15 +77,12 @@ public class ScannerImpl extends Scanner {
 	
 	@Override
 	public Fetcher<Integer> fetchUserIds() {
-		// TODO Auto-generated method stub
-		
 		return provider.getProfileIds(config.getUserUnit());
 	}
 
 	
 	@Override
 	public int getUserId(Serializable externalUserId) {
-		// TODO Auto-generated method stub
 		Fetcher<Integer> userIds = fetchUserIds();
 		int returnUserId = -1;
 		try {
@@ -110,7 +107,6 @@ public class ScannerImpl extends Scanner {
 				userIds.close();
 			} 
 			catch (Throwable e) {
-				// TODO Auto-generated catch block
 				LogUtil.trace(e);
 			}
 		}
@@ -121,8 +117,6 @@ public class ScannerImpl extends Scanner {
 
 	@Override
 	public ExternalRecord getUserExternalRecord(int userId) {
-		// TODO Auto-generated method stub
-		
 		InterchangeAttributeMap attributeMap = provider.getUserAttributeMap(userId);
 		if (attributeMap != null)
 			return attributeMap.externalRecord;
@@ -134,7 +128,6 @@ public class ScannerImpl extends Scanner {
 
 	@Override
 	public Fetcher<Integer> fetchItemIds() {
-		// TODO Auto-generated method stub
 		
 		return provider.getProfileIds(config.getItemUnit());
 	}
@@ -142,7 +135,6 @@ public class ScannerImpl extends Scanner {
 	
 	@Override
 	public int getItemId(Serializable externalItemId) {
-		// TODO Auto-generated method stub
 		Fetcher<Integer> itemIds = fetchItemIds();
 		int returnItemId = -1;
 		try {
@@ -167,7 +159,6 @@ public class ScannerImpl extends Scanner {
 				itemIds.close();
 			} 
 			catch (Throwable e) {
-				// TODO Auto-generated catch block
 				LogUtil.trace(e);
 			}
 		}
@@ -178,7 +169,6 @@ public class ScannerImpl extends Scanner {
 	
 	@Override
 	public ExternalRecord getItemExternalRecord(int itemId) {
-		// TODO Auto-generated method stub
 		
 		InterchangeAttributeMap attributeMap = provider.getItemAttributeMap(itemId);
 		
@@ -191,7 +181,6 @@ public class ScannerImpl extends Scanner {
 
 	@Override
 	public Rating getRating(int userId, int itemId) {
-		// TODO Auto-generated method stub
 		RatingVector vRating = provider.getUserRatingVector(userId);
 		if (vRating == null)
 			return null;
@@ -202,7 +191,6 @@ public class ScannerImpl extends Scanner {
 	
 	@Override
 	public RatingVector getUserRating(int userId) {
-		// TODO Auto-generated method stub
 		
 		return provider.getUserRatingVector(userId);
 	}
@@ -210,7 +198,6 @@ public class ScannerImpl extends Scanner {
 	
 	@Override
 	public Fetcher<RatingVector> fetchUserRatings() {
-		// TODO Auto-generated method stub
 		Fetcher<Integer> userIds = fetchUserIds();
 		
 		return new MetaFetcher<Integer, RatingVector>(userIds) {
@@ -222,7 +209,6 @@ public class ScannerImpl extends Scanner {
 
 			@Override
 			public RatingVector create(Integer u) {
-				// TODO Auto-generated method stub
 				return getUserRating(u);
 			}
 			
@@ -233,7 +219,6 @@ public class ScannerImpl extends Scanner {
 	
 	@Override
 	public RatingVector getItemRating(int itemId) {
-		// TODO Auto-generated method stub
 		
 		return provider.getItemRatingVector(itemId);
 	}
@@ -241,7 +226,6 @@ public class ScannerImpl extends Scanner {
 	
 	@Override
 	public Fetcher<RatingVector> fetchItemRatings() {
-		// TODO Auto-generated method stub
 		Fetcher<Integer> itemIds = fetchItemIds();
 		
 		return new MetaFetcher<Integer, RatingVector>(itemIds) {
@@ -253,7 +237,6 @@ public class ScannerImpl extends Scanner {
 
 			@Override
 			public RatingVector create(Integer u) {
-				// TODO Auto-generated method stub
 				return getItemRating(u);
 			}
 			
@@ -276,7 +259,6 @@ public class ScannerImpl extends Scanner {
 	
 	@Override
 	public Profile getUserProfile(int userId) {
-		// TODO Auto-generated method stub
 		
 		return provider.getUserProfile(userId);
 	}
@@ -284,7 +266,6 @@ public class ScannerImpl extends Scanner {
 	
 	@Override
 	public Fetcher<Profile> fetchUserProfiles() {
-		// TODO Auto-generated method stub
 		return provider.getProfiles(config.getUserUnit(), null);
 		
 	}
@@ -292,14 +273,12 @@ public class ScannerImpl extends Scanner {
 	
 	@Override
 	public AttributeList getUserAttributes() {
-		// TODO Auto-generated method stub
 		return userAttributes;
 	}
 
 	
 	@Override
 	public Profile getItemProfile(int itemId) {
-		// TODO Auto-generated method stub
 		
 		return provider.getItemProfile(itemId);
 	}
@@ -307,14 +286,12 @@ public class ScannerImpl extends Scanner {
 	
 	@Override
 	public Fetcher<Profile> fetchItemProfiles() {
-		// TODO Auto-generated method stub
 		return provider.getProfiles(config.getItemUnit(), null);
 	}
 
 	
 	@Override
 	public AttributeList getItemAttributes() {
-		// TODO Auto-generated method stub
 		
 		return itemAttributes;
 	}
@@ -322,21 +299,18 @@ public class ScannerImpl extends Scanner {
 	
 	@Override
 	public Profile profileOf(Context context) {
-		// TODO Auto-generated method stub
 		return provider.getCTSManager().profileOf(context);
 	}
 
 
 	@Override
 	public Profiles profilesOf(int ctxTemplateId) {
-		// TODO Auto-generated method stub
 		return provider.getCTSManager().profilesOf(ctxTemplateId);
 	}
 
 
 	@Override
 	public Fetcher<Profile> fetchSample() {
-		// TODO Auto-generated method stub
 		return provider.getProfiles(config.getSampleUnit(), null);
 	}
 
@@ -350,7 +324,6 @@ public class ScannerImpl extends Scanner {
 	
 	@Override
 	public Dataset catchup() {
-		// TODO Auto-generated method stub
 		SnapshotImpl snapshot = new SnapshotImpl();
 		
 		Map<Integer, ExternalRecord> externalUserRecordMap = Util.newMap();
@@ -393,7 +366,6 @@ public class ScannerImpl extends Scanner {
 
 	@Override
 	public Dataset selectByContexts(ContextList contexts) {
-		// TODO Auto-generated method stub
 		
 		SemiScanner semiScanner = new SemiScanner(config);
 		
@@ -410,7 +382,6 @@ public class ScannerImpl extends Scanner {
 
 	@Override
 	public ContextTemplateSchema getCTSchema() {
-		// TODO Auto-generated method stub
 		return provider.getCTSManager().getCTSchema();
 	}
 

@@ -62,8 +62,8 @@ public abstract class KBaseRecommendIntegrated extends KBaseRecommend {
 	
 	/**
 	 * This method is responsible for creating KBase or learning from specified user rating matrix.
-	 * This method is called by {@link #learn(Dataset, Alg)}.
-	 * Because this method is abstract, any class extends {@link KBaseRecommendIntegrated} must complete it.
+	 * This method may be called by {@link #learn(Dataset, Alg)}.
+	 * Because this method is abstract, any class extends {@link KBaseRecommendIntegrated} may complete it or set it null.
 	 * 
 	 * @param userRatingMatrix specified user rating matrix, represented by {@link RatingMatrix}.
 	 * In user rating matrix, each row is a vector of rating values that a user gives on many items.

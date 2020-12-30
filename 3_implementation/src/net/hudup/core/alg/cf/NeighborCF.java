@@ -28,6 +28,7 @@ import net.hudup.core.data.Dataset;
 import net.hudup.core.data.Fetcher;
 import net.hudup.core.data.Profile;
 import net.hudup.core.data.RatingVector;
+import net.hudup.core.data.ui.ImportantProperty;
 import net.hudup.core.logistic.NextUpdate;
 import net.hudup.core.logistic.Vector;
 
@@ -65,163 +66,67 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 	/**
 	 * The maximum number of nearest neighbors.
 	 */
-	public static final String KNN = "knn";
+	protected static final String KNN = "knn";
 
 	
 	/**
 	 * Default value of the maximum number of nearest neighbors.
 	 */
-	public static final int KNN_DEFAULT = 0;
+	protected static final int KNN_DEFAULT = 0;
 
 	
 	/**
 	 * Statistics calculation mode.
 	 */
-	public static final String CALC_STATISTICS = "calc_statistics";
+	protected static final String CALC_STATISTICS = "calc_statistics";
 
 	
 	/**
 	 * Default value for statistics calculation mode.
 	 */
-	public static final boolean CALC_STATISTICS_DEFAULT = true;
+	protected static final boolean CALC_STATISTICS_DEFAULT = true;
 
 	
 	/**
 	 * In the configuration, the entry of similarity measure has the name specified by this constant.
 	 */
-	public static final String MEASURE = "measure";
+	protected static final String MEASURE = "measure";
 	
 	
 	/**
 	 * Name of hybrid measure.
 	 */
-	public static final String HYBRID = "hybrid";
-
-	
-	/**
-	 * Name of cosine measure.
-	 */
-	public static final String COSINE = "cosine";
-
-	
-	/**
-	 * Name of cosine + Jaccard measure.
-	 */
-	public static final String COSINEJ = "cosinej";
-
-	
-	/**
-	 * Name of pseudo Cosine + Jaccard.
-	 */
-	public static final String COJ = "coj";
-
-	
-	/**
-	 * Name of Pearson measure.
-	 */
-	public static final String PEARSON = "pearson";
-
-	
-	/**
-	 * Name of Pearson + Jaccard measure.
-	 */
-	public static final String PEARSONJ = "pearsonj";
-
-	
-	/**
-	 * Name of adjusted cosine measure.
-	 */
-	public static final String COD = "cod";
-
-	
-	/**
-	 * Name of constrained Pearson correlation coefficient measure. It is also cosine normalized (CON) measure.
-	 */
-	public static final String CPC = "cpc";
-	
-	
-	/**
-	 * Name of weighted Pearson correlation coefficient measure.
-	 */
-	public static final String WPC = "wpc";
-	
-	
-	/**
-	 * Name of sigmoid Pearson correlation coefficient measure.
-	 */
-	public static final String SPC = "spc";
-
-	
-	/**
-	 * Name of Jaccard measure.
-	 */
-	public static final String JACCARD = "jaccard";
-
-	
-	/**
-	 * Name of Jaccard2 measure.
-	 */
-	public static final String JACCARD2 = "jaccard2";
-
-	
-	/**
-	 * Name of MSD measure.
-	 */
-	public static final String MSD = "msd";
-
-	
-	/**
-	 * Name of MSD + Jaccard measure.
-	 */
-	public static final String MSDJ = "msdj";
-
-	
-	/**
-	 * Name of URP measure.
-	 */
-	public static final String URP = "urp";
-
-	
-	/**
-	 * Name of Triangle measure.
-	 */
-	public static final String TRIANGLE = "triangle";
-
-	
-	/**
-	 * Name of TJM measure.
-	 */
-	public static final String TJM = "tjm";
+	protected static final String HYBRID = "hybrid";
 
 	
 	/**
 	 * Cosine normalized mode.
 	 */
-	public static final String COSINE_NORMALIZED_FIELD = "cosine_normalized";
+	protected static final String COSINE_NORMALIZED_FIELD = "cosine_normalized";
 
 	
 	/**
 	 * Default cosine normalized mode.
 	 */
-	public static final boolean COSINE_NORMALIZED_DEFAULT = false;
+	protected static final boolean COSINE_NORMALIZED_DEFAULT = false;
 
 	
 	/**
 	 * MSD fraction mode.
 	 */
-	public static final String MSD_FRACTION_FIELD = "msd_fraction";
+	protected static final String MSD_FRACTION_FIELD = "msd_fraction";
 
 	
 	/**
 	 * Default MSD fraction mode.
 	 */
-	public static final boolean MSD_FRACTION_DEFAULT = false;
+	protected static final boolean MSD_FRACTION_DEFAULT = false;
 
 	
 	/**
 	 * Threshold for WPCC (weighted Pearson correlation coefficient).
 	 */
-	public static final double WPC_THRESHOLD = 50;
+	protected static final double WPC_THRESHOLD = 50;
 
 	
 	/**
@@ -300,7 +205,7 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 	 * Default constructor.
 	 */
 	public NeighborCF() {
-		
+		updateConfig(getMeasure());
 	}
 
 
@@ -314,7 +219,7 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 		}
 
 		this.ratingMedian = getRelevantRatingThreshold();
-		this.ratingMedian = Util.isUsed(this.ratingMedian) ? this.ratingMedian : this.ratingMean; 
+		this.ratingMedian = Util.isUsed(this.ratingMedian) ? this.ratingMedian : this.ratingMean;
 	}
 
 
@@ -458,10 +363,10 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 	public List<String> getAllMeasures() {
 		Set<String> mSet = Util.newSet();
 		mSet.addAll(getMainMeasures());
-		mSet.add(COSINEJ);
-		mSet.add(PEARSONJ);
-		mSet.add(MSDJ);
-		mSet.add(TJM);
+		mSet.add(Measure.COSINEJ);
+		mSet.add(Measure.PEARSONJ);
+		mSet.add(Measure.MSDJ);
+		mSet.add(Measure.TJM);
 		
 		List<String> measures = Util.newList();
 		measures.addAll(mSet);
@@ -476,18 +381,18 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 	 */
 	public List<String> getMainMeasures() {
 		Set<String> mSet = Util.newSet();
-		mSet.add(COSINE);
-		mSet.add(COJ);
-		mSet.add(PEARSON);
-		mSet.add(COD);
-		mSet.add(CPC);
-		mSet.add(WPC);
-		mSet.add(SPC);
-		mSet.add(JACCARD);
-		mSet.add(JACCARD2);
-		mSet.add(MSD);
-		mSet.add(URP);
-		mSet.add(TRIANGLE);
+		mSet.add(Measure.COSINE);
+		mSet.add(Measure.COJ);
+		mSet.add(Measure.PEARSON);
+		mSet.add(Measure.COD);
+		mSet.add(Measure.CPC);
+		mSet.add(Measure.WPC);
+		mSet.add(Measure.SPC);
+		mSet.add(Measure.JACCARD);
+		mSet.add(Measure.JACCARD2);
+		mSet.add(Measure.MSD);
+		mSet.add(Measure.URP);
+		mSet.add(Measure.TRIANGLE);
 		
 		List<String> measures = Util.newList();
 		measures.addAll(mSet);
@@ -512,7 +417,7 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 	 * @return default similar measure.
 	 */
 	protected String getDefaultMeasure() {
-		return COSINE;
+		return Measure.COSINE;
 	}
 
 	
@@ -535,6 +440,7 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 	 */
 	public synchronized void setMeasure(String measure) {
 		config.put(MEASURE, measure);
+		updateConfig(measure);
 	}
 	
 	
@@ -599,40 +505,115 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 //			profile2 = null;
 //		}
 		
-		if (measure.equals(COSINE))
+		if (measure.equals(Measure.COSINE))
 			return cosine(vRating1, vRating2, profile1, profile2);
-		if (measure.equals(COSINEJ))
+		else if (measure.equals(Measure.COSINEJ))
 			return cosine(vRating1, vRating2, profile1, profile2) * jaccard(vRating1, vRating2, profile1, profile2);
-		if (measure.equals(COJ))
+		else if (measure.equals(Measure.COJ))
 			return coj(vRating1, vRating2, profile1, profile2);
-		else if (measure.equals(PEARSON))
+		else if (measure.equals(Measure.PEARSON))
 			return corr(vRating1, vRating2, profile1, profile2);
-		else if (measure.equals(PEARSONJ))
+		else if (measure.equals(Measure.PEARSONJ))
 			return corr(vRating1, vRating2, profile1, profile2) * jaccard(vRating1, vRating2, profile1, profile2);
-		else if (measure.equals(COD))
+		else if (measure.equals(Measure.COD))
 			return cod(vRating1, vRating2, profile1, profile2);
-		else if (measure.equals(CPC))
+		else if (measure.equals(Measure.CPC))
 			return cpc(vRating1, vRating2, profile1, profile2);
-		else if (measure.equals(WPC))
+		else if (measure.equals(Measure.WPC))
 			return wpc(vRating1, vRating2, profile1, profile2);
-		else if (measure.equals(SPC))
+		else if (measure.equals(Measure.SPC))
 			return spc(vRating1, vRating2, profile1, profile2);
-		else if (measure.equals(JACCARD))
+		else if (measure.equals(Measure.JACCARD))
 			return jaccard(vRating1, vRating2, profile1, profile2);
-		else if (measure.equals(JACCARD2))
+		else if (measure.equals(Measure.JACCARD2))
 			return jaccard2(vRating1, vRating2, profile1, profile2);
-		else if (measure.equals(MSD))
+		else if (measure.equals(Measure.MSD))
 			return msd(vRating1, vRating2, profile1, profile2);
-		else if (measure.equals(MSDJ))
+		else if (measure.equals(Measure.MSDJ))
 			return msd(vRating1, vRating2, profile1, profile2) * jaccard(vRating1, vRating2, profile1, profile2);
-		else if (measure.equals(URP))
+		else if (measure.equals(Measure.URP))
 			return urp(vRating1, vRating2, profile1, profile2);
-		else if (measure.equals(TRIANGLE))
+		else if (measure.equals(Measure.TRIANGLE))
 			return triangle(vRating1, vRating2, profile1, profile2);
-		else if (measure.equals(TJM))
+		else if (measure.equals(Measure.TJM))
 			return triangle(vRating1, vRating2, profile1, profile2) * jaccard(vRating1, vRating2, profile1, profile2);
 		else
 			return Constants.UNUSED;
+	}
+	
+	
+	/**
+	 * Updating configuration according to specified measure.
+	 * @param measure specified measure.
+	 */
+	protected void updateConfig(String measure) {
+		if (config == null || measure == null) return;
+		
+		config.removeReadOnly(COSINE_NORMALIZED_FIELD);
+		config.removeReadOnly(MSD_FRACTION_FIELD);
+		if (measure.equals(Measure.COSINE)) {
+			config.addReadOnly(MSD_FRACTION_FIELD);
+		}
+		else if (measure.equals(Measure.COSINEJ)) {
+			config.addReadOnly(MSD_FRACTION_FIELD);
+		}
+		else if (measure.equals(Measure.COJ)) {
+			config.addReadOnly(MSD_FRACTION_FIELD);
+		}
+		else if (measure.equals(Measure.PEARSON)) {
+			config.addReadOnly(COSINE_NORMALIZED_FIELD);
+			config.addReadOnly(MSD_FRACTION_FIELD);
+		}
+		else if (measure.equals(Measure.PEARSONJ)) {
+			config.addReadOnly(COSINE_NORMALIZED_FIELD);
+			config.addReadOnly(MSD_FRACTION_FIELD);
+		}
+		else if (measure.equals(Measure.COD)) {
+			config.addReadOnly(COSINE_NORMALIZED_FIELD);
+			config.addReadOnly(MSD_FRACTION_FIELD);
+		}
+		else if (measure.equals(Measure.CPC)) {
+			config.addReadOnly(COSINE_NORMALIZED_FIELD);
+			config.addReadOnly(MSD_FRACTION_FIELD);
+		}
+		else if (measure.equals(Measure.WPC)) {
+			config.addReadOnly(COSINE_NORMALIZED_FIELD);
+			config.addReadOnly(MSD_FRACTION_FIELD);
+		}
+		else if (measure.equals(Measure.SPC)) {
+			config.addReadOnly(COSINE_NORMALIZED_FIELD);
+			config.addReadOnly(MSD_FRACTION_FIELD);
+		}
+		else if (measure.equals(Measure.JACCARD)) {
+			config.addReadOnly(COSINE_NORMALIZED_FIELD);
+			config.addReadOnly(MSD_FRACTION_FIELD);
+		}
+		else if (measure.equals(Measure.JACCARD2)) {
+			config.addReadOnly(COSINE_NORMALIZED_FIELD);
+			config.addReadOnly(MSD_FRACTION_FIELD);
+		}
+		else if (measure.equals(Measure.MSD)) {
+			config.addReadOnly(COSINE_NORMALIZED_FIELD);
+		}
+		else if (measure.equals(Measure.MSDJ)) {
+			config.addReadOnly(COSINE_NORMALIZED_FIELD);
+		}
+		else if (measure.equals(Measure.URP)) {
+			config.addReadOnly(COSINE_NORMALIZED_FIELD);
+			config.addReadOnly(MSD_FRACTION_FIELD);
+		}
+		else if (measure.equals(Measure.TRIANGLE)) {
+			config.addReadOnly(COSINE_NORMALIZED_FIELD);
+			config.addReadOnly(MSD_FRACTION_FIELD);
+		}
+		else if (measure.equals(Measure.TJM)) {
+			config.addReadOnly(COSINE_NORMALIZED_FIELD);
+			config.addReadOnly(MSD_FRACTION_FIELD);
+		}
+		else {
+			config.addReadOnly(COSINE_NORMALIZED_FIELD);
+			config.addReadOnly(MSD_FRACTION_FIELD);
+		}
 	}
 	
 	
@@ -1150,7 +1131,7 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 				if (key.equals(MEASURE)) {
 					String measure = getAsString(MEASURE);
 					measure = measure == null ? getDefaultMeasure() : measure;
-					return (Serializable) JOptionPane.showInputDialog(
+					Serializable value = (Serializable) JOptionPane.showInputDialog(
 							comp, 
 							"Please choose one similar measure", 
 							"Choosing similar measure", 
@@ -1158,6 +1139,10 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 							null, 
 							getMainMeasures().toArray(), 
 							measure);
+					
+					if (value != null) updateConfig(value.toString());
+					
+					return new ImportantProperty(value);
 				}
 				else 
 					return tempConfig.userEdit(comp, key, defaultValue);
@@ -1166,6 +1151,7 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 		};
 
 		config.putAll(tempConfig);
+		
 		return config;
 	}
 

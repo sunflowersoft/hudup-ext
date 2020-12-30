@@ -10,9 +10,12 @@ package net.hudup.core.client;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.FlowLayout;
+import java.awt.GraphicsEnvironment;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.Console;
 import java.rmi.RemoteException;
 import java.util.Timer;
@@ -26,8 +29,10 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import net.hudup.core.Constants;
+import net.hudup.core.client.ServerStatusEvent.Status;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.ui.PropPane;
+import net.hudup.core.logistic.Counter;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.NextUpdate;
 import net.hudup.core.logistic.ui.UIUtil;
@@ -40,7 +45,7 @@ import net.hudup.core.logistic.ui.UIUtil;
  * @version 10.0
  *
  */
-@NextUpdate
+@NextUpdate //Next updating for console
 public class LightRemoteServerCP extends JFrame {
 
 	
@@ -51,9 +56,14 @@ public class LightRemoteServerCP extends JFrame {
 	
 	
 	/**
+	 * Current server status.
+	 */
+	protected Status currentStatus = Status.unknown;
+	
+	/**
 	 * Pane of server configuration as {@link PropPane}. 
 	 */
-	private PropPane paneConfig = null;
+	protected PropPane paneConfig = null;
 	
 	/**
 	 * Exiting server button.
@@ -63,43 +73,43 @@ public class LightRemoteServerCP extends JFrame {
 	/**
 	 * Button to start server.
 	 */
-	private JButton btnStart = null;
+	protected JButton btnStart = null;
 	
 	/**
 	 * Button to pause/resume server.
 	 */
-	private JButton btnPauseResume = null;
+	protected JButton btnPauseResume = null;
 	
 	/**
 	 * Button to stop server.
 	 */
-	private JButton btnStop = null;
+	protected JButton btnStop = null;
 	
 	/**
 	 * Button to apply changes of server configuration.
 	 */
-	private JButton btnApplyConfig = null;
+	protected JButton btnApplyConfig = null;
 	
 	/**
 	 * Button to reset server configuration.
 	 */
-	private JButton btnResetConfig = null;
+	protected JButton btnResetConfig = null;
 	
 	/**
 	 * Button to refresh this control panel.
 	 */
-	private JButton btnRefresh = null;
+	protected JButton btnRefresh = null;
 	
 	/**
 	 * Reference to remote server.
 	 */
-	private Server server = null;
+	protected Server server = null;
 	
 	/**
 	 * Internal time counter.
-	 * Every 30 seconds, this control panel updates itself by server information.
+	 * Every period in seconds, this control panel updates itself by server information.
 	 */
-	private Timer timer = null;
+	protected Timer timer = null;
 	
 	
 	/**
@@ -139,7 +149,7 @@ public class LightRemoteServerCP extends JFrame {
 			JPanel configbar = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 			footer.add(configbar);
 			
-			btnApplyConfig = new JButton("Apply config");
+			btnApplyConfig = new JButton("Apply configuration");
 			btnApplyConfig.addActionListener(new ActionListener() {
 				
 				@Override
@@ -149,7 +159,7 @@ public class LightRemoteServerCP extends JFrame {
 			});
 			configbar.add(btnApplyConfig);
 	
-			btnResetConfig = new JButton("Reset config");
+			btnResetConfig = new JButton("Reset configuration");
 			btnResetConfig.addActionListener(new ActionListener() {
 				
 				@Override
@@ -170,12 +180,7 @@ public class LightRemoteServerCP extends JFrame {
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					try {
-						updateControls();
-					} 
-					catch (RemoteException e1) {
-						e1.printStackTrace();
-					}
+					updateControls();
 				}
 			});
 			leftToolbar.add(btnRefresh);
@@ -212,6 +217,11 @@ public class LightRemoteServerCP extends JFrame {
 					pauseResume();
 				}
 			});
+			/*
+			 * Hide pause/resume button in some cases because of error remote lock. The next version will be improve this method.
+			 * So the following code lines need to be removed.
+			 */
+			btnPauseResume.setVisible(false);
 			centerToolbar.add(btnPauseResume);
 			
 			btnStop = new JButton("Stop");
@@ -224,31 +234,41 @@ public class LightRemoteServerCP extends JFrame {
 			});
 			centerToolbar.add(btnStop);
 			
-			timer = new Timer();
-			int milisec = 30 * 60 * 1000; //Every 30 seconds, this control panel updates itself by server information.
-			timer.schedule(
-				new TimerTask() {
-				
-					@Override
-					public void run() {
-						try {
-							updateControls();
-						} 
-						catch (Throwable e) {
-							LogUtil.trace(e);
-						}
-					}
-				}, 
-				milisec, 
-				milisec);
-
 			updateControls();
+			
+			addWindowListener(new WindowAdapter() {
+
+				@Override
+				public void windowOpened(WindowEvent e) {
+					super.windowOpened(e);
+					
+					if (timer != null) return;
+					
+					timer = new Timer();
+					long milisec = 10 * Counter.PERIOD * 1000; //Every 10 seconds, this control panel updates itself by server information.
+					timer.schedule(
+						new TimerTask() {
+						
+							@Override
+							public void run() {
+								Status status = ServerStatusEvent.getStatus(server);
+								if (status == Status.unknown || ServerStatusEvent.isSame(status, currentStatus))
+									return;
+
+								updateControls();
+							}
+						}, 
+						milisec, 
+						milisec);
+				}
+				
+			});
+			
 			setVisible(true);
 		}
 		catch (Exception e) {
 			LogUtil.trace(e);
 		}
-		
 		
 	}
 	
@@ -256,7 +276,7 @@ public class LightRemoteServerCP extends JFrame {
 	/**
 	 * Start server remotely.
 	 */
-	private synchronized void start() {
+	protected synchronized void start() {
 		try {
 			server.start();
 			updateControls();
@@ -269,7 +289,7 @@ public class LightRemoteServerCP extends JFrame {
 	/**
 	 * Pause/resume server remotely.
 	 */
-	private synchronized void pauseResume() {
+	protected synchronized void pauseResume() {
 		try {
 			if (server.isPaused())
 				server.resume();
@@ -286,7 +306,7 @@ public class LightRemoteServerCP extends JFrame {
 	/**
 	 * Stop server remotely.
 	 */
-	private synchronized void stop() {
+	protected synchronized void stop() {
 		try {
 			server.stop();
 			updateControls();
@@ -299,7 +319,7 @@ public class LightRemoteServerCP extends JFrame {
 	/**
 	 * Exiting remote server.
 	 */
-	private synchronized void exit() {
+	protected synchronized void exit() {
 		try {
 			server.exit();
 		} 
@@ -312,7 +332,7 @@ public class LightRemoteServerCP extends JFrame {
 	/**
 	 * Apply changes into server configuration remotely.
 	 */
-	private synchronized void applyConfig() {
+	protected synchronized void applyConfig() {
 		try {
 			if (server.isRunning()) {
 				JOptionPane.showMessageDialog(
@@ -349,7 +369,7 @@ public class LightRemoteServerCP extends JFrame {
 	/**
 	 * Reset server configuration.
 	 */
-	private synchronized void resetConfig() {
+	protected synchronized void resetConfig() {
 		try {
 			if (server.isRunning()) {
 				JOptionPane.showMessageDialog(
@@ -364,8 +384,8 @@ public class LightRemoteServerCP extends JFrame {
 			JOptionPane.showMessageDialog(
 					this, 
 					"Reset configuration successfully. \n" + 
-					"Please press button 'Apply Config' to make store configuration effect", 
-					"Please press button 'Apply Config' to make store configuration effect", 
+					"Please press button 'Apply configuration' to make store configuration effect", 
+					"Please press button 'Apply configuration'", 
 					JOptionPane.INFORMATION_MESSAGE);
 		}
 		catch (Exception e) {
@@ -379,7 +399,7 @@ public class LightRemoteServerCP extends JFrame {
 	 * 
 	 * @param enabled if {@code true}, all controls are enabled. Otherwise, all controls are disabled.
 	 */
-	private void enableControls(boolean enabled) {
+	protected void enableControls(boolean enabled) {
 		btnExitServer.setEnabled(enabled);
 		btnStart.setEnabled(enabled);
 		btnPauseResume.setEnabled(enabled);
@@ -394,14 +414,14 @@ public class LightRemoteServerCP extends JFrame {
 	/**
 	 * Update all controls (components) in this control panel according to current server status.
 	 * This method currently hide pause/resume button because of error remote lock. The next version will be improve this method.
-	 * @throws RemoteException if any error raises.
 	 */
-	@NextUpdate
-	private synchronized void updateControls() throws RemoteException {
-		if (server == null)
-			return;
-		
-		if (server.isRunning()) {
+	protected synchronized void updateControls() {
+		if (server == null) return;
+		Status status = ServerStatusEvent.getStatus(server);
+		if (status == Status.unknown) return;
+
+		currentStatus = status;
+		if (status == Status.started || status == Status.resumed) {
 			enableControls(false);
 
 			btnExitServer.setEnabled(true);
@@ -412,10 +432,14 @@ public class LightRemoteServerCP extends JFrame {
 			
 			btnApplyConfig.setEnabled(false);
 			btnResetConfig.setEnabled(false);
-			btnRefresh.setEnabled(true);
 			paneConfig.setEnabled(false);
+			
+			try {
+				paneConfig.update(server.getConfig());
+			}
+			catch (Throwable e) {LogUtil.trace(e);}
 		}
-		else if (server.isPaused()) {
+		else if (status == Status.paused) {
 			enableControls(false);
 
 			btnExitServer.setEnabled(true);
@@ -426,7 +450,6 @@ public class LightRemoteServerCP extends JFrame {
 			
 			btnApplyConfig.setEnabled(false);
 			btnResetConfig.setEnabled(false);
-			btnRefresh.setEnabled(true);
 			paneConfig.setEnabled(false);
 		}
 		else {
@@ -440,23 +463,10 @@ public class LightRemoteServerCP extends JFrame {
 			
 			btnApplyConfig.setEnabled(true);
 			btnResetConfig.setEnabled(true);
-			btnRefresh.setEnabled(true);
 			paneConfig.setEnabled(true);
 		}
 		
-		try {
-			paneConfig.update(server.getConfig());
-		}
-		catch (Throwable e) {
-			LogUtil.trace(e);
-		}
-		
-		
-		/**
-		 * This method currently hide pause/resume button because of error remote lock. The next version will be improve this method.
-		 * So the following code lines need to be removed.
-		 */
-		btnPauseResume.setVisible(false);
+		btnRefresh.setEnabled(true);
 	}
 	
 
@@ -472,19 +482,19 @@ public class LightRemoteServerCP extends JFrame {
 	
 	
 	/**
-	 * The main method shows the {@link ConnectDlg} for users to enter authenticated information to connect server.
+	 * The main method shows the {@link Connector} for users to enter authenticated information to connect server.
 	 * Later on this method shows this light remote control panel for users to start, stop, pause and configure sever remotely.
 	 * @param args argument parameter of main method. It contains command line arguments.
 	 */
 	public static void main(String[] args) {
 		boolean console = args != null && args.length >= 1 
 				&& args[0] != null && args[0].toLowerCase().equals("console");
-		if (console)
+		if (console || GraphicsEnvironment.isHeadless())
 			console();
 		else {
-			ConnectDlg dlg = ConnectDlg.connect();
+			Connector connector = Connector.connect();
 			
-			Server server = dlg.getServer();
+			Server server = connector.getServer();
 			if (server != null)
 				new LightRemoteServerCP(server);
 			else {

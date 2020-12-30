@@ -56,7 +56,8 @@ public class AlgDesc implements Serializable, net.hudup.core.Cloneable {
 	 */
 	public AlgDesc(String algClassName, DataConfig config) {
 		this.algClassName = algClassName;
-		this.config = config != null ? (DataConfig)config.clone() : null;
+		this.config = new DataConfig();
+		if (config != null) this.config.putAll(config);
 	}
 	
 	

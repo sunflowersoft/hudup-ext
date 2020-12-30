@@ -51,7 +51,6 @@ public class ExternalConfig extends SysConfig {
 	 */
 	public ExternalConfig() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
 
@@ -61,13 +60,11 @@ public class ExternalConfig extends SysConfig {
 	 */
 	public ExternalConfig(xURI uri) {
 		super(uri);
-		// TODO Auto-generated constructor stub
 	}
 
 
 	@Override
 	public void reset() {
-		// TODO Auto-generated method stub
 		super.reset();
 		
 		setItemUnit(ITEM_UNIT);
@@ -279,14 +276,12 @@ public class ExternalConfig extends SysConfig {
 
 	@Override
 	protected String encrypt(HiddenText hidden) {
-		// TODO Auto-generated method stub
 		return Util.getCipher().encrypt(hidden.getText());
 	}
 
 
 	@Override
 	protected HiddenText decrypt(String text) {
-		// TODO Auto-generated method stub
 		return new HiddenText(Util.getCipher().decrypt(text));
 	}
 

@@ -205,6 +205,13 @@ public class PropPane extends JPanel {
 	
 	
 	/**
+	 * Updating this panel.
+	 */
+	public void update() {
+		tblProp.update();
+	}
+
+	/**
 	 * Updating this panel by specified property list.
 	 * @param propList specified property list.
 	 */

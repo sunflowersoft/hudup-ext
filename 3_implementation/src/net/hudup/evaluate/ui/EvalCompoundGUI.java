@@ -49,8 +49,8 @@ import net.hudup.core.PluginChangedListener;
 import net.hudup.core.PluginStorage;
 import net.hudup.core.RegisterTable;
 import net.hudup.core.Util;
-import net.hudup.core.client.ConnectDlg;
 import net.hudup.core.client.ConnectInfo;
+import net.hudup.core.client.Connector;
 import net.hudup.core.client.Service;
 import net.hudup.core.data.BooleanWrapper;
 import net.hudup.core.data.ui.SysConfigDlgExt;
@@ -140,11 +140,12 @@ public class EvalCompoundGUI extends JFrame {
 		}
 		batchEvaluateGUI = new BatchEvaluateGUI(evaluator, connectInfo, referredData);
 		
-		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		addWindowListener(new WindowAdapter() {
 			@Override
-			public void windowClosed(WindowEvent e) {
-				super.windowClosed(e);
+			public void windowClosing(WindowEvent e) {
+				super.windowClosing(e);
+				handleClose();
 			}
 		});
 		
@@ -194,7 +195,95 @@ public class EvalCompoundGUI extends JFrame {
 	private JMenuBar createMenuBar() {
 		JMenuBar mnBar = new JMenuBar();
 		
+		JMenu mnFile = new JMenu(I18nUtil.message("file"));
+		mnFile.setMnemonic('f');
+		mnBar.add(mnFile);
+
+		JMenuItem mniSaveScript = new JMenuItem(
+			new AbstractAction(I18nUtil.message("save_script")) {
+				
+				/**
+				 * Serial version UID for serializable class. 
+				 */
+				private static final long serialVersionUID = 1L;
+
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					batchEvaluateGUI.saveBatchScript(false);
+				}
+			});
+		mniSaveScript.setMnemonic('s');
+		mniSaveScript.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK));
+		mnFile.add(mniSaveScript);
+
+		boolean agent = false;
+		Service service = null;
+		try {
+			agent = batchEvaluateGUI.getEvaluator().isAgent();
+			service = batchEvaluateGUI.getEvaluator().getReferredService();
+		}
+		catch (Throwable e) {LogUtil.trace(e);}
+		if (!agent && service == null) {
+			mnFile.addSeparator();
+
+			JMenuItem mniSwitchLocalEvaluator = new JMenuItem(
+				new AbstractAction(I18nUtil.message("switch_local_evaluator")) {
+					
+					/**
+					 * Serial version UID for serializable class. 
+					 */
+					private static final long serialVersionUID = 1L;
+
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						switchEvaluator(false);
+					}
+				});
+			mniSwitchLocalEvaluator.setMnemonic('l');
+			mnFile.add(mniSwitchLocalEvaluator);
+
+			JMenuItem mniSwitchRemoteEvaluator = new JMenuItem(
+				new AbstractAction(I18nUtil.message("switch_remote_evaluator")) {
+					
+					/**
+					 * Serial version UID for serializable class. 
+					 */
+					private static final long serialVersionUID = 1L;
+
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						switchEvaluator(true);
+					}
+				});
+			mniSwitchRemoteEvaluator.setMnemonic('m');
+			mnFile.add(mniSwitchRemoteEvaluator);
+
+			if (batchEvaluateGUI.getConnectInfo().bindUri == null)
+				mniSwitchLocalEvaluator.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, InputEvent.CTRL_DOWN_MASK));
+			else
+				mniSwitchRemoteEvaluator.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, InputEvent.CTRL_DOWN_MASK));
+		}
+
+		mnFile.addSeparator();
+		JMenuItem mniClose = new JMenuItem(
+			new AbstractAction(I18nUtil.message("close")) {
+				
+				/**
+				 * Serial version UID for serializable class. 
+				 */
+				private static final long serialVersionUID = 1L;
+
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					getThisEvalGUI().handleClose();
+				}
+			});
+		mniClose.setMnemonic('c');
+		mniClose.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, InputEvent.ALT_DOWN_MASK));
+		mnFile.add(mniClose);
+		
 		JMenu mnTools = new JMenu(I18nUtil.message("tool"));
+		mnTools.setMnemonic('t');
 		mnBar.add(mnTools);
 		
 		JMenuItem mniSysConfig = new JMenuItem(
@@ -210,7 +299,7 @@ public class EvalCompoundGUI extends JFrame {
 					sysConfig();
 				}
 			});
-		mniSysConfig.setMnemonic('c');
+		mniSysConfig.setMnemonic('s');
 		mnTools.add(mniSysConfig);
 
 		if (batchEvaluateGUI.getConnectInfo().bindUri != null) {
@@ -228,10 +317,10 @@ public class EvalCompoundGUI extends JFrame {
 					}
 				});
 			mniUpdateFromServer.setMnemonic('u');
+			mniUpdateFromServer.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F5, InputEvent.CTRL_DOWN_MASK));
 			mnTools.add(mniUpdateFromServer);
 		}
 
-		
 		mnTools.addSeparator();
 		JMenuItem mniRefresh = new JMenuItem(
 			new AbstractAction(I18nUtil.message("refresh_evaluate")) {
@@ -247,7 +336,7 @@ public class EvalCompoundGUI extends JFrame {
 				}
 				
 			});
-		mniRefresh.setMnemonic('e');
+		mniRefresh.setMnemonic('f');
 		mniRefresh.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F5, 0));
 		mnTools.add(mniRefresh);
 
@@ -310,53 +399,12 @@ public class EvalCompoundGUI extends JFrame {
 					}
 				}
 			});
-		mniRecoverResult.setMnemonic('o');
+		mniRecoverResult.setMnemonic('c');
 		mnTools.add(mniRecoverResult);
 
-		mnTools.addSeparator();
-		JMenuItem mniSaveScript = new JMenuItem(
-			new AbstractAction(I18nUtil.message("save_script")) {
-				
-				/**
-				 * Serial version UID for serializable class. 
-				 */
-				private static final long serialVersionUID = 1L;
-
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					batchEvaluateGUI.saveBatchScript(false);
-				}
-			});
-		mniSaveScript.setMnemonic('s');
-		mnTools.add(mniSaveScript);
-
-		boolean agent = false;
-		try {
-			agent = batchEvaluateGUI.getEvaluator().isAgent();
-		}
-		catch (Throwable e) {LogUtil.trace(e);}
-		
-		if (batchEvaluateGUI.getConnectInfo().bindUri != null || !agent) {
-			mnTools.addSeparator();
-			JMenuItem mniSwitchEvaluator = new JMenuItem(
-				new AbstractAction(I18nUtil.message("switch_evaluator")) {
-					
-					/**
-					 * Serial version UID for serializable class. 
-					 */
-					private static final long serialVersionUID = 1L;
-
-					@Override
-					public void actionPerformed(ActionEvent e) {
-						switchEvaluator();
-					}
-				});
-			mniSwitchEvaluator.setMnemonic('w');
-			mnTools.add(mniSwitchEvaluator);
-		}
-			
 		
 		JMenu mnHelp = new JMenu(I18nUtil.message("help"));
+		mnHelp.setMnemonic('h');
 		mnBar.add(mnHelp);
 		
 		JMenuItem mniHelpContent = new JMenuItem(
@@ -372,7 +420,7 @@ public class EvalCompoundGUI extends JFrame {
 					new HelpContent(getThisEvalGUI());
 				}
 			});
-		mniHelpContent.setMnemonic('h');
+		mniHelpContent.setMnemonic('c');
 		mniHelpContent.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F1, 0));
 		mnHelp.add(mniHelpContent);
 
@@ -409,40 +457,6 @@ public class EvalCompoundGUI extends JFrame {
 	
 	
 	/**
-	 * Switch evaluator.
-	 */
-	private void switchEvaluator() {
-		boolean isIdle = false;
-		try {
-			isIdle = batchEvaluateGUI.isIdle();
-		} catch (Exception e) {LogUtil.trace(e);}
-
-		if (!isIdle) {
-			int confirm = JOptionPane.showConfirmDialog(
-					UIUtil.getFrameForComponent(getThisEvalGUI()), 
-					"Evaluation task will be terminated if switching evaluator.\n" +
-						"Are you sure to switch evaluator?", 
-					"Switching evaluator", 
-					JOptionPane.YES_NO_OPTION, 
-					JOptionPane.QUESTION_MESSAGE);
-				
-			if (confirm != JOptionPane.YES_OPTION)
-				return;
-		}
-	
-		try {
-			if (batchEvaluateGUI.getConnectInfo().bindUri == null)
-				switchEvaluator(batchEvaluateGUI.getEvaluator().getName(), this);
-			else
-				switchRemoteEvaluator(batchEvaluateGUI.getEvaluator().getName(), this);
-		}
-		catch (Exception e) {
-			LogUtil.trace(e);
-		}
-	}
-	
-	
-	/**
 	 * Show an dialog allowing users to see and modify the configuration of system.
 	 */
 	private void sysConfig() {
@@ -464,7 +478,7 @@ public class EvalCompoundGUI extends JFrame {
 		if (batchEvaluateGUI.getConnectInfo().bindUri == null)
 			pluginChangedListener = EvaluatorAbstract.getTopMostPluginChangedListener((Evaluator)pluginChangedListener, true);
 		
-		SysConfigDlgExt cfg = new SysConfigDlgExt(this, I18nUtil.message("system_configure"), pluginChangedListener, batchEvaluateGUI.getConnectInfo().bindUri) {
+		SysConfigDlgExt cfg = new SysConfigDlgExt(this, I18nUtil.message("system_configure"), pluginChangedListener, batchEvaluateGUI.getConnectInfo()) {
 
 			/**
 			 * Serial version UID for serializable class.
@@ -532,6 +546,52 @@ public class EvalCompoundGUI extends JFrame {
 	}
 	
 	
+	/**
+	 * Handling closing windows
+	 */
+	private void handleClose() {
+		if (batchEvaluateGUI.getConnectInfo().bindUri != null) {
+			dispose();
+			return;
+		}
+
+		try {
+			if (batchEvaluateGUI.getEvaluator().getReferredService() != null) {
+				dispose();
+				return;
+			}
+		}
+		catch (Throwable e) {
+			dispose();
+			LogUtil.trace(e);
+		}
+		
+		boolean isIdle = false;
+		try {
+			isIdle = batchEvaluateGUI.isIdle();
+		} 
+		catch (Exception e) {
+			dispose();
+			LogUtil.trace(e);
+		}
+
+		if (!isIdle) {
+			int confirm = JOptionPane.showConfirmDialog(
+				UIUtil.getFrameForComponent(getThisEvalGUI()), 
+				"Evaluation task will be terminated if closing window.\n" +
+					"Are you sure to close window?", 
+				"Close window", 
+				JOptionPane.YES_NO_OPTION, 
+				JOptionPane.QUESTION_MESSAGE);
+				
+			if (confirm == JOptionPane.YES_OPTION)
+				dispose();
+		}
+		else
+			dispose();
+	}
+
+	
 	@Override
 	public void dispose() {
 		try {
@@ -554,6 +614,41 @@ public class EvalCompoundGUI extends JFrame {
 	}
 
 
+	/**
+	 * Switch evaluator.
+	 * @param remote remote flag.
+	 */
+	private void switchEvaluator(boolean remote) {
+		boolean isIdle = false;
+		try {
+			isIdle = batchEvaluateGUI.isIdle();
+		} catch (Exception e) {LogUtil.trace(e);}
+
+		if (!isIdle) {
+			int confirm = JOptionPane.showConfirmDialog(
+					UIUtil.getFrameForComponent(getThisEvalGUI()), 
+					"Evaluation task will be terminated if switching evaluator.\n" +
+						"Are you sure to switch evaluator?", 
+					"Switching evaluator", 
+					JOptionPane.YES_NO_OPTION, 
+					JOptionPane.QUESTION_MESSAGE);
+				
+			if (confirm != JOptionPane.YES_OPTION)
+				return;
+		}
+	
+		try {
+			if (!remote)
+				switchEvaluator(batchEvaluateGUI.getEvaluator().getName(), this);
+			else
+				switchRemoteEvaluator(batchEvaluateGUI.getEvaluator().getName(), this);
+		}
+		catch (Exception e) {
+			LogUtil.trace(e);
+		}
+	}
+
+	
 	/**
 	 * Switching evaluator.
 	 * @param selectedEvName selected evaluator name.
@@ -873,7 +968,7 @@ public class EvalCompoundGUI extends JFrame {
 				connectInfo.globalAddress = globalAddress;
 
 				if (chkHosting.isSelected()) {
-					String namingPath = ConnectDlg.normalizeNamingPath(txtNamingPath.getText());
+					String namingPath = Connector.normalizeNamingPath(txtNamingPath.getText());
 					int namingPort = txtNamingPort.getValue() instanceof Number ? ( (Number) txtNamingPort.getValue()).intValue() : 0;
 					namingPort = NetUtil.getPort(namingPort, Constants.TRY_RANDOM_PORT);
 					
@@ -937,7 +1032,7 @@ public class EvalCompoundGUI extends JFrame {
 	 * @param oldGUI old GUI.
 	 */
 	public static void switchRemoteEvaluator(String selectedEvName, Window oldGUI) {
-		final ConnectDlg connectDlg = ConnectDlg.connect();
+		final Connector connectDlg = Connector.connect();
 		Service service = connectDlg.getService();
 		ConnectInfo connectInfo = connectDlg.getConnectInfo();
 		boolean pullMode = connectInfo != null ? connectInfo.pullMode : false;
@@ -949,7 +1044,7 @@ public class EvalCompoundGUI extends JFrame {
 					null, "Can't retrieve evaluator", "Retrieval to evaluator failed", JOptionPane.ERROR_MESSAGE);
 			}
 			else {
-				if (EvaluatorAbstract.isRequirePullMode(ev) && !pullMode) {
+				if (EvaluatorAbstract.isPullModeRequired(ev) && !pullMode) {
 					JOptionPane.showMessageDialog(null,
 						"Can't retrieve evaluator because PULL MODE is not set\n" +
 						"whereas the remote evaluator requires PULL MODE.\n" +
@@ -1008,7 +1103,7 @@ public class EvalCompoundGUI extends JFrame {
 								this, "Can't get remote evaluator", "Connection to evaluator fail", JOptionPane.ERROR_MESSAGE);
 							return;
 						}
-						if (EvaluatorAbstract.isRequirePullMode(ev) && !pullMode) {
+						if (EvaluatorAbstract.isPullModeRequired(ev) && !pullMode) {
 							JOptionPane.showMessageDialog(this,
 								"Can't retrieve evaluator because PULL MODE is not set\n" +
 								"whereas the remote evaluator requires PULL MODE.\n" +
@@ -1046,7 +1141,7 @@ public class EvalCompoundGUI extends JFrame {
 					super.dispose();
 					
 					if (service != null)
-						ConnectDlg.disconnect(service);
+						Connector.disconnect(service);
 					service = null;
 				}
 				

@@ -56,7 +56,7 @@ public final class Constants {
 	/**
 	 * Default evaluator name.
 	 */
-	public final static String DEFAULT_EVALUATOR_NAME    = "Recommendation Evaluator";
+	public final static String DEFAULT_EVALUATOR_NAME    = "recommend";
 
 	/**
 	 * The maximum number digits in decimal precision.
@@ -274,9 +274,9 @@ public final class Constants {
 	public static boolean COMPRESSED_FILE_SUPPORT         = false;
 
 	/**
-	 * By default, pull mode requirement is false.
+	 * By default, pull mode advice is false.
 	 */
-	public static boolean REQUIRE_PULL_MODE               = false;
+	public static boolean PULL_MODE_ADVICE                = false;
 
 	
 	
@@ -408,7 +408,7 @@ public final class Constants {
 				SERVER_UI = Boolean.parseBoolean(serverUI);
 		}
 		catch (Throwable e) {
-			System.out.println("Error when parsing server ui");
+			System.out.println("Error when parsing gui support");
 		}
 
 		try {
@@ -421,12 +421,12 @@ public final class Constants {
 		}
 
 		try {
-			String requirePullMode = Util.getHudupProperty("require_pull_mode");
-			if (requirePullMode != null)
-				REQUIRE_PULL_MODE = Boolean.parseBoolean(requirePullMode);
+			String pullModeAdvice = Util.getHudupProperty("pull_mode_advice");
+			if (pullModeAdvice != null)
+				PULL_MODE_ADVICE = Boolean.parseBoolean(pullModeAdvice);
 		}
 		catch (Throwable e) {
-			System.out.println("Error when parsing pull mode requirement");
+			System.out.println("Error when parsing pull mode advice");
 		}
 	}
 	
