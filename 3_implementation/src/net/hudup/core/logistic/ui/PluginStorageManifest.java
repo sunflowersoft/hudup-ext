@@ -26,12 +26,13 @@ import net.hudup.core.PluginChangedListener;
 import net.hudup.core.PluginStorage;
 import net.hudup.core.RegisterTable;
 import net.hudup.core.RegisterTableList;
-import net.hudup.core.Util;
 import net.hudup.core.RegisterTableList.RegisterTableItem;
+import net.hudup.core.Util;
 import net.hudup.core.alg.Alg;
+import net.hudup.core.alg.AlgDesc2;
 import net.hudup.core.alg.AlgList;
 import net.hudup.core.alg.ui.AlgConfigDlg;
-import net.hudup.core.data.DataConfig;
+import net.hudup.core.alg.ui.AlgDesc2ConfigDlg;
 import net.hudup.core.data.Exportable;
 import net.hudup.core.logistic.LogUtil;
 
@@ -130,9 +131,8 @@ public class PluginStorageManifest extends SortableSelectableTable {
 		JPopupMenu contextMenu = new JPopupMenu();
 		
 		int selectedRow = getSelectedRow();
-		Alg alg = selectedRow < 0 ? null : (Alg) getModel().getValueAt(selectedRow, 3);
-		DataConfig config = alg == null ? null : alg.getConfig(); 
-		if (config != null) {
+		Object value = selectedRow < 0 ? null : getModel().getValueAt(selectedRow, 3);
+		if (value != null) {
 			JMenuItem miConfig = UIUtil.makeMenuItem( (String)null, "Configuration", 
 				new ActionListener() {
 					
@@ -220,22 +220,32 @@ public class PluginStorageManifest extends SortableSelectableTable {
 	 */
 	private void showConfig() {
 		int selectedRow = getSelectedRow();
-		Alg alg = selectedRow < 0 ? null : (Alg) getModel().getValueAt(selectedRow, 3);
-		DataConfig config = alg == null ? null : alg.getConfig(); 
-		
-		if (config == null) {
-			JOptionPane.showMessageDialog(
-					this, 
-					"No configuration", 
-					"No configuration", 
-					JOptionPane.INFORMATION_MESSAGE);
+		Object value = selectedRow < 0 ? null : getModel().getValueAt(selectedRow, 3);
+		if (value == null) {
+			JOptionPane.showMessageDialog(this, "No configuration", "No configuration", JOptionPane.INFORMATION_MESSAGE);
 		}
-		else {
+		else if (value instanceof Alg) {
+			Alg alg = (Alg)value;
+			if (alg.getConfig() == null) {
+				JOptionPane.showMessageDialog(this, "No configuration", "No configuration", JOptionPane.INFORMATION_MESSAGE);
+				return;
+			}
+			
 			AlgConfigDlg dlgConfig = new AlgConfigDlg(UIUtil.getFrameForComponent(this), alg);
 			dlgConfig.getPropPane().setToolbarVisible(false);
 			dlgConfig.getPropPane().setControlVisible(false);
 			dlgConfig.getPropPane().setEnabled(false);
 			dlgConfig.setVisible(true);
+		}
+		else if (value instanceof AlgDesc2) {
+			AlgDesc2ConfigDlg dlgConfig = new AlgDesc2ConfigDlg(UIUtil.getFrameForComponent(this), (AlgDesc2)value);
+			dlgConfig.getPropPane().setToolbarVisible(false);
+			dlgConfig.getPropPane().setControlVisible(false);
+			dlgConfig.getPropPane().setEnabled(false);
+			dlgConfig.setVisible(true);
+		}
+		else {
+			JOptionPane.showMessageDialog(this, "No configuration", "No configuration", JOptionPane.INFORMATION_MESSAGE);
 		}
 	}
 	
@@ -254,6 +264,23 @@ public class PluginStorageManifest extends SortableSelectableTable {
 		}
 	}
 
+	
+	/**
+	 * Reloading plug-in storage.
+	 * @return true if reloading plug-in storage successfully.
+	 */
+	protected boolean reload() {
+		boolean idle = isListenersIdle();
+		if (!idle) return false;
+		
+//		tblRegister.fireCleanupSomething(); //Force to unsetting up algorithms.
+		Util.getPluginManager().discover();
+		firePluginChangedEvent(new PluginChangedEvent(this));
+		update();
+		
+		return true;
+	}
+	
 	
 	/**
 	 * This public method is called from outside in order to update {@link PluginStorageManifest} according to {@link RegisterTM}.

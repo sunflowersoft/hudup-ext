@@ -24,6 +24,7 @@ import net.hudup.core.PluginStorage;
 import net.hudup.core.RegisterTable;
 import net.hudup.core.Util;
 import net.hudup.core.alg.Alg;
+import net.hudup.core.alg.AlgDesc2;
 import net.hudup.core.alg.AlgDesc2List;
 import net.hudup.core.alg.AlgList;
 import net.hudup.core.client.ActiveMeasure;
@@ -36,6 +37,7 @@ import net.hudup.core.client.ServerStatusEvent.Status;
 import net.hudup.core.client.ServerStatusListener;
 import net.hudup.core.client.Service;
 import net.hudup.core.data.DataConfig;
+import net.hudup.core.data.Exportable;
 import net.hudup.core.logistic.AbstractRunner;
 import net.hudup.core.logistic.AbstractRunner.Priority;
 import net.hudup.core.logistic.LogUtil;
@@ -753,6 +755,7 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 	
 	@Override
 	public synchronized boolean reloadPlugin(String account, String password) throws RemoteException {
+		if (!isIdle()) return false;
 		if (!validateAccount(account, password, DataConfig.ACCOUNT_ADMIN_PRIVILEGE))
 			return false;
 		
@@ -763,15 +766,134 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 
 
 	@Override
-	public boolean applyPlugin(PluginAlgDesc2ListMap pluginDescMap, String account, String password)
+	public synchronized boolean applyPlugin(PluginAlgDesc2ListMap pluginDescMap, String account, String password)
 			throws RemoteException {
+		if (!isIdle()) return false;
 		if (!validateAccount(account, password, DataConfig.ACCOUNT_ADMIN_PRIVILEGE))
 			return false;
+		if (pluginDescMap == null) return false;
+		if (pluginDescMap.size() == 0) return true;
 		
+		String[] tableNames = PluginStorage.getRegisterTableNames();
+		for (String tableName : tableNames) {
+			AlgDesc2List algDescs = pluginDescMap.get(tableName);
+			if (algDescs != null && algDescs.size() > 0)
+				applyPlugin(tableName, algDescs);
+		}
+
+		pluginChanged(new PluginChangedEvent(this));
 		return true;
 	}
 
 
+	/**
+	 * Applying algorithms with regard to specified table name and list of algorithm descriptions.
+	 * @param tableName specified table name.
+	 * @param algDescs specified list of algorithm descriptions.
+	 */
+	private void applyPlugin(String tableName, AlgDesc2List algDescs) {
+		RegisterTable table = PluginStorage.lookupTable(tableName);
+		if (table == null || algDescs == null) return;
+		
+		List<Alg> unexportedAlgList = Util.newList();
+		AlgList nextUpdateList = PluginStorage.getNextUpdateList();
+		for (int i = 0; i < algDescs.size(); i++) {
+			AlgDesc2 algDesc = (AlgDesc2) algDescs.get(i);
+			if (algDesc == null) continue;
+			Alg alg = null;
+			
+			if (algDesc.removed) {
+				if (!table.contains(algDesc.algName))
+					alg = removeNextUpdateAlg(algDesc.getAlgClassName(), algDesc.algName);
+				else
+					alg = table.unregister(algDesc.algName);
+				
+				if (alg != null && algDesc.isExported)
+					unexportedAlgList.add(alg);
+			}
+			else {
+				if (algDesc.registered) {
+					if (!table.contains(algDesc.algName)) {
+						alg = removeNextUpdateAlg(algDesc.getAlgClassName(), algDesc.algName);
+						if (alg != null) table.register(alg);
+					}
+					else
+						alg = table.query(algDesc.algName);
+				}
+				else if(table.contains(algDesc.algName)) {
+					alg = table.unregister(algDesc.algName);
+					if (alg != null) nextUpdateList.add(alg);
+				}
+				else
+					alg = getNextUpdateAlg(algDesc.getAlgClassName(), algDesc.algName);
+				
+				if ((alg == null) || !(alg instanceof Exportable))
+					continue;
+				else if (algDesc.isExported) {
+					try {
+						((Exportable)alg).export(getPort());
+					} catch (Throwable e) {LogUtil.trace(e);}
+				}
+				else
+					unexportedAlgList.add(alg);
+			}
+			
+		}
+		
+		for (Alg alg : unexportedAlgList) {
+			if (alg instanceof Exportable) {
+				try {
+					((Exportable)alg).unexport(); //Finalize method will call unsetup method if unsetup method exists in this algorithm.
+				} catch (Throwable e) {LogUtil.trace(e);}
+			}
+		}
+	}
+	
+	
+	/**
+	 * Removing the algorithm from next update list via its class name and name.
+	 * @param algClassName algorithm class name.
+	 * @param algName algorithm name.
+	 * @return the removed algorithm. Return null if no algorithm is removed.
+	 */
+	private Alg removeNextUpdateAlg(String algClassName, String algName) {
+		try {
+			@SuppressWarnings("unchecked")
+			Class<? extends Alg> algClass = (Class<? extends Alg>)Class.forName(algClassName);
+			int index = PluginStorage.lookupNextUpdateList(algClass, algName);
+			
+			if (index >= 0)
+				return PluginStorage.getNextUpdateList().remove(index);
+			else
+				return null;
+		} catch (Exception e) {LogUtil.trace(e);}
+		
+		return null;
+	}
+	
+	
+	/**
+	 * Getting the algorithm from next update list via its class name and name.
+	 * @param algClassName algorithm class name.
+	 * @param algName algorithm name.
+	 * @return the algorithm with specified class name and name. Return null there is no such algorithm.
+	 */
+	private Alg getNextUpdateAlg(String algClassName, String algName) {
+		try {
+			@SuppressWarnings("unchecked")
+			Class<? extends Alg> algClass = (Class<? extends Alg>)Class.forName(algClassName);
+			int index = PluginStorage.lookupNextUpdateList(algClass, algName);
+			
+			if (index >= 0)
+				return PluginStorage.getNextUpdateList().get(index);
+			else
+				return null;
+		} catch (Exception e) {LogUtil.trace(e);}
+		
+		return null;
+	}
+	
+	
 	@Override
 	public synchronized void pluginChanged(PluginChangedEvent evt) throws RemoteException {
 		
@@ -784,20 +906,23 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 		if (!validateAccount(account, password, DataConfig.ACCOUNT_EVALUATE_PRIVILEGE))
 			return pluginMap;
 		
-		String[] regNames = PluginStorage.getRegisterTableNames();
-		for (String regName : regNames) {
-			AlgDesc2List algDescs = getPluginAlgDescs0(regName);
+		String[] tableNames = PluginStorage.getRegisterTableNames();
+		for (String tableName : tableNames) {
+			AlgDesc2List algDescs = getPluginAlgDescs0(tableName);
 			if (algDescs != null && algDescs.size() > 0)
-				pluginMap.put(regName, algDescs);
+				pluginMap.put(tableName, algDescs);
 		}
 		
 		AlgList algList = PluginStorage.getNextUpdateList();
-		AlgDesc2List algDescs = new AlgDesc2List();
     	for (int i = 0; i < algList.size(); i++) {
-       		algDescs.add(algList.get(i));
+    		AlgDesc2 algDesc = new AlgDesc2(algList.get(i));
+    		AlgDesc2List algDescs = pluginMap.get(algDesc.tableName);
+    		if (algDescs == null) {
+    			algDescs = new AlgDesc2List();
+    			pluginMap.put(algDesc.tableName, algDescs);
+    		}
+    		algDescs.add(algDesc);
     	}
-		if (algDescs.size() > 0)
-			pluginMap.put(PluginStorage.NEXT_UPDATE_LIST, algDescs);
 		
 		return pluginMap;
 	}

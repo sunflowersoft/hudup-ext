@@ -171,6 +171,12 @@ public class AlgDesc2 extends AlgDesc {
 	
 	
 	/**
+	 * Flag indicates whether algorithm is removed from plug-in storage.
+	 */
+	public boolean removed = false;
+	
+	
+	/**
 	 * Default constructor.
 	 */
 	public AlgDesc2() {
@@ -215,6 +221,8 @@ public class AlgDesc2 extends AlgDesc {
 		isWrapper = alg instanceof AlgRemoteWrapper;
 		if (isWrapper)
 			isExclusive = ((AlgRemoteWrapper)alg).isExclusive();
+		
+		removed = !PluginStorage.contains(alg);
 	}
 
 	

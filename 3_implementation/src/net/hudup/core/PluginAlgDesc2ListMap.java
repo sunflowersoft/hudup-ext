@@ -58,10 +58,7 @@ public class PluginAlgDesc2ListMap implements Serializable {
 	 * @return descriptions list of registered table specified by its name.
 	 */
 	public AlgDesc2List get(String regName) {
-		if (algDescListMap.containsKey(regName))
-			return algDescListMap.get(regName);
-		else
-			return new AlgDesc2List();
+		return algDescListMap.get(regName);
 	}
 	
 	
@@ -94,5 +91,14 @@ public class PluginAlgDesc2ListMap implements Serializable {
 		return algDescListMap.remove(regName);
 	}
 
+	
+	/**
+	 * Getting the size of this map.
+	 * @return the size of this map.
+	 */
+	public int size() {
+		return algDescListMap.size();
+	}
+	
 
 }

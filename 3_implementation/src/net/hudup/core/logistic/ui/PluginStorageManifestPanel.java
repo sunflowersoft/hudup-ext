@@ -281,12 +281,6 @@ public class PluginStorageManifestPanel extends JPanel {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				reload();
-				
-				JOptionPane.showMessageDialog(
-					null, 
-					"Reloading plug-in storage finished", 
-					"Finished reloading", 
-					JOptionPane.INFORMATION_MESSAGE);
 			}
 		});
 		reloadAlg.setToolTipText("Reload plugin storage from built packages");
@@ -353,12 +347,25 @@ public class PluginStorageManifestPanel extends JPanel {
 	
 	/**
 	 * Reloading plug-in storage.
+	 * @return true if reloading plug-in storage successfully.
 	 */
-	protected void reload() {
-//		tblRegister.fireCleanupSomething(); //Force to unsetting up algorithms.
-		Util.getPluginManager().discover();
-		tblRegister.firePluginChangedEvent(new PluginChangedEvent(tblRegister));
-		tblRegister.update();
+	protected boolean reload() {
+		boolean ret = tblRegister.reload();
+		if (ret) {
+			JOptionPane.showMessageDialog(
+				UIUtil.getFrameForComponent(tblRegister), 
+				"Reloading plug-in storage successful", 
+				"Reloading successful", 
+				JOptionPane.INFORMATION_MESSAGE);
+		}
+		else {
+			JOptionPane.showMessageDialog(
+				UIUtil.getFrameForComponent(tblRegister), 
+				"Reloading plug-in storage failed", 
+				"Reloading failed", 
+				JOptionPane.INFORMATION_MESSAGE);
+		}
+		return ret;
 	}
 	
 	
@@ -368,16 +375,26 @@ public class PluginStorageManifestPanel extends JPanel {
 	protected void import0() {
 		if (tblRegister.isModified()) {
 			int confirm = JOptionPane.showConfirmDialog(
-					tblRegister, 
-					"System properties are modified. Do you want to apply them?", 
-					"System properties are modified", 
-					JOptionPane.YES_NO_OPTION,
-					JOptionPane.QUESTION_MESSAGE);
+				this, 
+				"System properties are modified. Do you want to apply them?", 
+				"System properties are modified", 
+				JOptionPane.YES_NO_OPTION,
+				JOptionPane.QUESTION_MESSAGE);
 			
 			if (confirm == JOptionPane.YES_OPTION)
 				apply();
 		}
 		
+		boolean idle = tblRegister.isListenersIdle();
+		if (!idle) {
+			JOptionPane.showMessageDialog(
+				UIUtil.getFrameForComponent(this), 
+				"Unable to import due to busy listeners", 
+				"Unable to import", 
+				JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+
 		ImportAlgDlg importAlgDlg = new ImportAlgDlg(tblRegister);
 		importAlgDlg.setVisible(true);
 		if (importAlgDlg.getImportedCount() > 0) {
@@ -404,17 +421,17 @@ public class PluginStorageManifestPanel extends JPanel {
 		boolean ret = tblRegister.apply();
 		if (ret) {
 			JOptionPane.showMessageDialog(
-					UIUtil.getFrameForComponent(tblRegister), 
-					"Apply plug-in storage successfully.\nAlgorithms were registered/unregistered exported/unexported removed/unremoved.", 
-					"Apply successfully", 
-					JOptionPane.INFORMATION_MESSAGE);
+				UIUtil.getFrameForComponent(this), 
+				"Apply plug-in storage successfully.\nAlgorithms were registered/unregistered exported/unexported removed/unremoved.", 
+				"Apply successfully", 
+				JOptionPane.INFORMATION_MESSAGE);
 		}
 		else {
 			JOptionPane.showMessageDialog(
-					UIUtil.getFrameForComponent(tblRegister), 
-					"Apply plug-in storage failed", 
-					"Apply failed", 
-					JOptionPane.INFORMATION_MESSAGE);
+				UIUtil.getFrameForComponent(this), 
+				"Apply plug-in storage failed", 
+				"Apply failed", 
+				JOptionPane.INFORMATION_MESSAGE);
 		}
 		return ret;
 	}

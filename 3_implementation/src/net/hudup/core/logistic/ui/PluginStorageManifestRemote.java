@@ -16,7 +16,6 @@ import net.hudup.core.alg.AlgDesc2;
 import net.hudup.core.alg.AlgDesc2List;
 import net.hudup.core.client.ConnectInfo;
 import net.hudup.core.client.PowerServer;
-import net.hudup.core.data.Wrapper;
 import net.hudup.core.logistic.LogUtil;
 
 /**
@@ -57,13 +56,78 @@ public class PluginStorageManifestRemote extends PluginStorageManifest {
 
 
 	@Override
-	protected void update() {
-		super.update();
-		setEditable(false);
+	protected boolean reload() {
+		boolean idle = isListenersIdle();
+		if (!idle) return false;
+
+		ConnectInfo connectInfo = getConnectInfo();
+		PowerServer server = getServer();
+		try {
+			boolean reloaded = server.reloadPlugin(connectInfo.account.getName(), connectInfo.account.getPassword());
+			if (reloaded) update();
+			return reloaded;
+		}
+		catch (Exception e) {
+			LogUtil.trace(e);
+		}
+
+		return false;
+	}
+
+
+	@Override
+	public boolean apply() {
+		boolean idle = isListenersIdle();
+		if (!idle) return false;
+		
+		PluginAlgDesc2ListMap pluginDescMap = new PluginAlgDesc2ListMap();
+		
+		int n = getRowCount();
+		for (int i = 0; i < n; i++) {
+			AlgDesc2 algDesc = (AlgDesc2) getValueAt(i, 3);
+
+			algDesc.inNextUpdateList= !(Boolean)getValueAt(i, 4);
+			algDesc.isExported = (Boolean)getValueAt(i, 5);
+			algDesc.removed = (Boolean)getValueAt(i, 6);
+		}
+		
+		if (pluginDescMap.size() == 0) return true;
+		
+		ConnectInfo connectInfo = getConnectInfo();
+		PowerServer server = getServer();
+		try {
+			boolean applied = server.applyPlugin(pluginDescMap, connectInfo.account.getName(), connectInfo.account.getPassword());
+			if (applied) update();
+			return applied;
+		}
+		catch (Exception e) {
+			LogUtil.trace(e);
+		}
+
+		return false;
+	}
+
+
+	/**
+	 * Getting server.
+	 * @return server.
+	 */
+	public PowerServer getServer() {
+		return ((RegisterTMRemote)getRegisterTM()).getServer();
+	}
+
+	
+	/**
+	 * Getting connection information.
+	 * @return connection information.
+	 */
+	public ConnectInfo getConnectInfo() {
+		return ((RegisterTMRemote)getRegisterTM()).getConnectInfo();
 	}
 
 
 }
+
 
 
 /**
@@ -93,6 +157,11 @@ class RegisterTMRemote extends RegisterTM {
 	 */
 	protected ConnectInfo connectInfo;
 	
+	/**
+	 * Internal plug-in map.
+	 */
+	PluginAlgDesc2ListMap pluginMap;
+	
 	
 	/**
 	 * Default constructor.
@@ -104,6 +173,8 @@ class RegisterTMRemote extends RegisterTM {
 		this.server = server;
 		this.connectInfo = connectInfo != null ? connectInfo : new ConnectInfo(); 
 		
+		this.pluginMap = new PluginAlgDesc2ListMap();
+		
 		update();
 	}
 
@@ -113,12 +184,10 @@ class RegisterTMRemote extends RegisterTM {
 		if (server == null) {
 			Vector<Vector<Object>> data = Util.newVector();
 			setDataVector(data, toColumns());
-			modified = false;
-			return;
-		}
-		
-		if (connectInfo.bindUri == null) {
-			super.update();
+			
+			this.pluginMap = new PluginAlgDesc2ListMap();
+			this.modified = false;
+			
 			return;
 		}
 		
@@ -141,22 +210,9 @@ class RegisterTMRemote extends RegisterTM {
 				row.add(algDesc.algName);
 				row.add(algDesc.getAlgClassName());
 				
-				Wrapper algDescWrapper = new Wrapper(algDesc) {
-
-					/**
-					 * Serial version UID for serializable class.
-					 */
-					private static final long serialVersionUID = 1L;
-
-					@Override
-					public String toString() {
-						return ((AlgDesc2)getObject()).algName;
-					}
-					
-				};
-				row.add(algDescWrapper);
+				row.add(algDesc);
 				
-				row.add(true);
+				row.add(!algDesc.inNextUpdateList);
 				row.add(algDesc.isExported);
 				row.add(false);
 				
@@ -164,38 +220,8 @@ class RegisterTMRemote extends RegisterTM {
 			}
 		}
 		
-		AlgDesc2List algDescs = pluginMap.get(PluginStorage.NEXT_UPDATE_LIST);
-		if (algDescs == null) algDescs = new AlgDesc2List();
-		for (int i = 0; i < algDescs.size(); i++) {
-			AlgDesc2 algDesc = algDescs.get(i);
-			Vector<Object> row = Util.newVector();
-			
-			row.add(algDesc.tableName);
-			row.add(algDesc.algName);
-			row.add(algDesc.getAlgClassName());
-			
-			Wrapper algDescWrapper = new Wrapper(algDesc) {
-
-				/**
-				 * Serial version UID for serializable class.
-				 */
-				private static final long serialVersionUID = 1L;
-
-				@Override
-				public String toString() {
-					return ((AlgDesc2)getObject()).algName;
-				}
-				
-			};
-			row.add(algDescWrapper);
-			
-			row.add(false);
-			row.add(algDesc.isExported);
-			row.add(false);
-			
-			data.add(row);
-		}
-
+		this.pluginMap = pluginMap;
+		
 		setDataVector(data, toColumns());
 	}
 	

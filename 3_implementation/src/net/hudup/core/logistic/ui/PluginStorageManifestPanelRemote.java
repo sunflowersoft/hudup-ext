@@ -52,7 +52,9 @@ public class PluginStorageManifestPanelRemote extends PluginStorageManifestPanel
 		
 		if (connectInfo.bindUri != null) {
 			setEnabled(false);
+			tblRegister.setEditable(this.server != null);
 			reloadAlg.setEnabled(this.server != null);
+			reset.setEnabled(this.server != null);
 		}
 	}
 
@@ -79,24 +81,6 @@ public class PluginStorageManifestPanelRemote extends PluginStorageManifestPanel
 		}
 		else
 			return super.createPluginStorageManifest(listener, connectInfo);
-	}
-
-
-	@Override
-	protected void reload() {
-		if (connectInfo.bindUri == null)
-			super.reload();
-		else if (server != null) {
-			try {
-				boolean reloaded = server.reloadPlugin(connectInfo.account.getName(), connectInfo.account.getPassword());
-				if (reloaded) {
-					tblRegister.update();
-				}
-			}
-			catch (Exception e) {
-				LogUtil.trace(e);
-			}
-		}
 	}
 
 
