@@ -7,6 +7,7 @@
  */
 package net.hudup.core.logistic.ui;
 
+import java.util.List;
 import java.util.Vector;
 
 import net.hudup.core.PluginAlgDesc2ListMap;
@@ -85,10 +86,24 @@ public class PluginStorageManifestRemote extends PluginStorageManifest {
 		int n = getRowCount();
 		for (int i = 0; i < n; i++) {
 			AlgDesc2 algDesc = (AlgDesc2) getValueAt(i, 3);
-
-			algDesc.inNextUpdateList= !(Boolean)getValueAt(i, 4);
-			algDesc.isExported = (Boolean)getValueAt(i, 5);
-			algDesc.removed = (Boolean)getValueAt(i, 6);
+			boolean registered = (Boolean)getValueAt(i, 4);
+			boolean isExported = (Boolean)getValueAt(i, 5);
+			boolean removed = (Boolean)getValueAt(i, 6);
+			
+			if (registered == algDesc.registered && isExported == algDesc.isExported && removed == algDesc.removed)
+				continue;
+			
+			algDesc.registered = registered;
+			algDesc.inNextUpdateList = !registered;
+			algDesc.isExported = isExported;
+			algDesc.removed = removed;
+			
+			AlgDesc2List algDescs = pluginDescMap.get(algDesc.tableName);
+			if (algDescs == null) {
+				algDescs = new AlgDesc2List();
+				pluginDescMap.put(algDesc.tableName, algDescs);
+			}
+			algDescs.add(algDesc);
 		}
 		
 		if (pluginDescMap.size() == 0) return true;
@@ -198,12 +213,18 @@ class RegisterTMRemote extends RegisterTM {
 		
 		Vector<Vector<Object>> data = Util.newVector();
 		String[] regNames = PluginStorage.getRegisterTableNames();
+		List<AlgDesc2> nextUpdateList = Util.newList();
 		for (String regName : regNames) {
 			AlgDesc2List algDescs = pluginMap.get(regName);
 			if (algDescs == null) continue;
 			
 			for (int i = 0; i < algDescs.size(); i++) {
 				AlgDesc2 algDesc = algDescs.get(i);
+				if (algDesc.inNextUpdateList) {
+					nextUpdateList.add(algDesc);
+					continue;
+				}
+
 				Vector<Object> row = Util.newVector();
 				
 				row.add(algDesc.tableName);
@@ -212,7 +233,7 @@ class RegisterTMRemote extends RegisterTM {
 				
 				row.add(algDesc);
 				
-				row.add(!algDesc.inNextUpdateList);
+				row.add(algDesc.registered);
 				row.add(algDesc.isExported);
 				row.add(false);
 				
@@ -220,9 +241,27 @@ class RegisterTMRemote extends RegisterTM {
 			}
 		}
 		
+		for (AlgDesc2 algDesc : nextUpdateList) {
+			Vector<Object> row = Util.newVector();
+			
+			row.add(algDesc.tableName);
+			row.add(algDesc.algName);
+			row.add(algDesc.getAlgClassName());
+			
+			row.add(algDesc);
+			
+			row.add(algDesc.registered);
+			row.add(algDesc.isExported);
+			row.add(false);
+			
+			data.add(row);
+		}
+		
 		this.pluginMap = pluginMap;
 		
 		setDataVector(data, toColumns());
+		
+		modified = false;
 	}
 	
 	

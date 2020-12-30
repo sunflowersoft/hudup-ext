@@ -133,7 +133,7 @@ public class ListenerCP extends JFrame implements ServerStatusListener {
 	
 	/**
 	 * Constructor with specified server and connection information of such server.
-	 * @param server specified server
+	 * @param listener specified listener.
 	 * @param connectInfo connection information of the specified.
 	 */
 	public ListenerCP(Server listener, ConnectInfo connectInfo) {
@@ -209,7 +209,7 @@ public class ListenerCP extends JFrame implements ServerStatusListener {
 	
 	/**
 	 * Binding (exposing) this control panel as remote RMI object so that server or other applications can interact with it via RMI protocol.
-	 * The internal variable {@link #bindUri} pointing to where to locate this control panel.
+	 * The bind URI of the internal variable {@link #connectInfo} pointing to where to locate this control panel.
 	 */
 	protected void bindServer() {
 		if (connectInfo.bindUri == null) {

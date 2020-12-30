@@ -47,18 +47,18 @@ public class PluginAlgDesc2ListMap implements Serializable {
 	 * Getting names of registered tables.
 	 * @return names of registered tables.
 	 */
-	public Set<String> regNames() {
+	public Set<String> tableNames() {
 		return algDescListMap.keySet();
 	}
 	
 	
 	/**
 	 * Getting descriptions list of registered table specified by its name. 
-	 * @param regName name of registered table.
+	 * @param tableName name of registered table.
 	 * @return descriptions list of registered table specified by its name.
 	 */
-	public AlgDesc2List get(String regName) {
-		return algDescListMap.get(regName);
+	public AlgDesc2List get(String tableName) {
+		return algDescListMap.get(tableName);
 	}
 	
 	
@@ -73,22 +73,22 @@ public class PluginAlgDesc2ListMap implements Serializable {
 	
 	/**
 	 * Putting descriptions list of registered table. 
-	 * @param regName name of registered table.
+	 * @param tableName name of registered table.
 	 * @param algDesc2List descriptions list of registered table.
 	 * @return the old descriptions list.
 	 */
-	public AlgDesc2List put(String regName, AlgDesc2List algDesc2List) {
-		return algDescListMap.put(regName, algDesc2List);
+	public AlgDesc2List put(String tableName, AlgDesc2List algDesc2List) {
+		return algDescListMap.put(tableName, algDesc2List);
 	}
 	
 	
 	/**
 	 * Removing descriptions list of registered table. 
-	 * @param regName name of registered table.
+	 * @param tableName name of registered table.
 	 * @return the old descriptions list.
 	 */
-	public AlgDesc2List remove(String regName) {
-		return algDescListMap.remove(regName);
+	public AlgDesc2List remove(String tableName) {
+		return algDescListMap.remove(tableName);
 	}
 
 	

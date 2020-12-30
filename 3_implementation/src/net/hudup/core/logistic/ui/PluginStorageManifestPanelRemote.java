@@ -54,6 +54,7 @@ public class PluginStorageManifestPanelRemote extends PluginStorageManifestPanel
 			setEnabled(false);
 			tblRegister.setEditable(this.server != null);
 			reloadAlg.setEnabled(this.server != null);
+			apply.setEnabled(this.server != null);
 			reset.setEnabled(this.server != null);
 		}
 	}

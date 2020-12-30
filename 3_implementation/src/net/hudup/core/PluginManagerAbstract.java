@@ -129,6 +129,10 @@ public abstract class PluginManagerAbstract implements PluginManager {
 			if (!adapter.exists(backup))
 				adapter.create(backup, true);
 			
+			xURI lib = xURI.create(Constants.LIB_DIRECTORY);
+			if (!adapter.exists(lib))
+				adapter.create(lib, true);
+			
 			adapter.close();
 		}
 		catch (Throwable e) {

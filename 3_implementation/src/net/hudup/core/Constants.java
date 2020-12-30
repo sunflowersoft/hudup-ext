@@ -115,6 +115,11 @@ public final class Constants {
 	 * Backup directory.
 	 */
 	public final static String  BACKUP_DIRECTORY         = WORKING_DIRECTORY + "/backup";
+	
+	/**
+	 * Library directory.
+	 */
+	public final static String  LIB_DIRECTORY            = WORKING_DIRECTORY + "/lib";
 
 	/**
 	 * The root package (root directory) of all classes.

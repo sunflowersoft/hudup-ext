@@ -287,7 +287,7 @@ public class RemoteServerCP extends JFrame implements ServerStatusListener {
 	
 	/**
 	 * Binding (exposing) this control panel as remote RMI object so that server or other applications can interact with it via RMI protocol.
-	 * The internal variable {@link #bindUri} pointing to where to locate this control panel.
+	 * The bind URI in internal variable {@link #connectInfo} pointing to where to locate this control panel.
 	 */
 	protected void bindServer() {
 		if (connectInfo.bindUri == null) {

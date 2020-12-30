@@ -845,35 +845,13 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 		} catch (Exception e) {}
 		server = null;
 
-//		if (connectInfo.bindUri != null) {
-//			try {
-//				if (!connectInfo.pullMode)
-//					server.removeStatusListener(this);
-//			} catch (Exception e) {LogUtil.trace(e);}
-//			try {
-//				server.exit();
-//			} catch (Exception e) {}
-//			server = null;
-//		}
-//		else {
-//			if (provider != null) provider.close();
-//			provider = null;
-//
-//			try {
-//				server.removeStatusListener(this);
-//			} catch (Exception e) {LogUtil.trace(e);}
-//			try {
-//				server.exit();
-//			} catch (Exception e) {}
-//			server = null;
-//		}
-		
 		dispose();
 	}
 	
 	
 	/**
 	 * Applying configuration to remote server.
+	 * @return true if configuration is applied successfully.
 	 */
 	protected synchronized boolean applyConfig() {
 		try {

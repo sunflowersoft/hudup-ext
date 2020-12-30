@@ -13,6 +13,7 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.List;
+import java.util.Set;
 
 import javax.swing.event.EventListenerList;
 
@@ -774,7 +775,7 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 		if (pluginDescMap == null) return false;
 		if (pluginDescMap.size() == 0) return true;
 		
-		String[] tableNames = PluginStorage.getRegisterTableNames();
+		Set<String> tableNames = pluginDescMap.tableNames();
 		for (String tableName : tableNames) {
 			AlgDesc2List algDescs = pluginDescMap.get(tableName);
 			if (algDescs != null && algDescs.size() > 0)
