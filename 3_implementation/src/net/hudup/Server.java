@@ -69,7 +69,7 @@ public final class Server implements AccessPoint {
 			if (Constants.COMPRESSED_FILE_SUPPORT) {
 				xURI storeUri = xURI.create(PowerServerConfig.STORE_PATH_DEFAULT);
 				if (!adapter.exists(storeUri))
-					adapter.copyAsFile(sampleDataUri, storeUri, false);
+					adapter.copy(sampleDataUri, storeUri, false, null);
 			}
 			else {
 				UnitList basicUnitList = DataConfig.getBasicUnitList();

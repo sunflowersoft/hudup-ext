@@ -192,7 +192,7 @@ public abstract class PluginManagerAbstract implements PluginManager {
 			if (adapter.exists(resourceWorkingLibKeyUri)) {
 				xURI workingLibKeyUri = xURI.create(Constants.LIB_DIRECTORY + "/" + WORKING_LIB_KEY_JAR);
 				if (!adapter.exists(workingLibKeyUri))
-					adapter.copyAsFile(resourceWorkingLibKeyUri, workingLibKeyUri, false);
+					adapter.copy(resourceWorkingLibKeyUri, workingLibKeyUri, false, null);
 			}
 			adapter.close();
 		}
