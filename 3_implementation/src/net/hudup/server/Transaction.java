@@ -42,6 +42,13 @@ public interface Transaction {
 	
 	
 	/**
+	 * Testing whether write locked.
+	 * @return whether write locked.
+	 */
+    boolean isWriteLocked();
+
+    
+    /**
 	 * Testing whether write locked by current thread.
 	 * @return whether write locked by current thread.
 	 */

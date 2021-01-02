@@ -952,8 +952,8 @@ public class DatasetCreator extends JPanel implements Dispose {
 					else {
 						JDialog wait = new JDialog(UIUtil.getFrameForComponent(getCreator()), "Please waiting", false);
 						wait.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
-						wait.setLocationRelativeTo(UIUtil.getFrameForComponent(getCreator()));
 						wait.setSize(200, 100);
+						wait.setLocationRelativeTo(UIUtil.getFrameForComponent(getCreator()));
 						wait.setVisible(true);
 	
 						externalQuery.importData(null);

@@ -77,7 +77,6 @@ import net.hudup.core.data.ui.DatasetConfigurator;
 import net.hudup.core.evaluate.Evaluator;
 import net.hudup.core.evaluate.MetaMetric;
 import net.hudup.core.evaluate.Metric;
-import net.hudup.core.evaluate.MetricRemoteWrapper;
 import net.hudup.core.evaluate.MetricValue;
 import net.hudup.core.evaluate.MetricWrapper;
 import net.hudup.core.evaluate.Metrics;
@@ -93,7 +92,6 @@ import net.hudup.core.parser.DatasetParser;
 import net.hudup.core.parser.RmiServerIndicator;
 import net.hudup.core.parser.SnapshotParserImpl;
 import net.hudup.core.parser.SocketServerIndicator;
-import net.hudup.evaluate.MAE;
 import net.hudup.listener.RemoteInfo;
 import net.hudup.listener.RemoteInfoList;
 
@@ -143,10 +141,17 @@ public class Test {
 //		};
 		
 //		System.out.println(NetUtil.testPort(80));
-		MAE mae = new MAE();
-		MetricRemoteWrapper w = new MetricRemoteWrapper(mae);
-		MetricRemoteWrapper w2 = (MetricRemoteWrapper)w.newInstance();
-		w2.createDefaultConfig();
+//		MAE mae = new MAE();
+//		MetricRemoteWrapper w = new MetricRemoteWrapper(mae);
+//		MetricRemoteWrapper w2 = (MetricRemoteWrapper)w.newInstance();
+//		w2.createDefaultConfig();
+		
+//		URL[] urls = ((URLClassLoader)Test.class.getClassLoader()).getURLs();
+//		for (URL url : urls) {
+//			System.out.println(url);
+//		}
+		
+		System.out.println(xURI.create("E:/").getRoot());
 	}
 
 	
@@ -2693,7 +2698,7 @@ class ImportAlgDlag extends JDialog {
 	private void loadClassesFromStore(xURI storeUri, List<Alg> outAlgList) {
 		if (storeUri == null) return;
 
-		List<Alg> algList = Util.getPluginManager().loadInstances(storeUri, Alg.class);
+		List<Alg> algList = Util.getPluginManager().loadInstances(Alg.class, storeUri);
 		RegisterTable normalReg = PluginStorage.getNormalAlgReg();
 		AlgList nextUpdateList = PluginStorage.getNextUpdateList();
 		for (Alg alg : algList) {

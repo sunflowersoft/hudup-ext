@@ -16,6 +16,8 @@ import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -80,6 +82,33 @@ public class xURI implements Serializable, net.hudup.core.Cloneable {
 	
 	
 	/**
+	 * Getting parent URI.
+	 * @return parent URI.
+	 */
+	public xURI getParent() {
+		Path parent = null;
+		try {
+			parent = toPath().getParent();
+		} catch (Exception e) {LogUtil.trace(e);}
+		
+		if (parent == null)
+			return null;
+		else
+			return xURI.create(parent);
+	}
+	
+	
+	/**
+	 * Getting parent URI.
+	 * @return parent URI.
+	 */
+	public xURI getRoot() {
+		return xURI.create(getScheme(), getHost(), getPort(), "/");
+	}
+
+	
+	/**
+	 * 
 	 * Getting the scheme of URI. 
 	 * @return the scheme of URI
 	 */
@@ -571,6 +600,47 @@ public class xURI implements Serializable, net.hudup.core.Cloneable {
 		}
 		
 		return text;
+	}
+
+
+	/**
+	 * Converting a collection of URI (s) into to list of URL (s).
+	 * @param uris specified collection of URI (s).
+	 * @return list of URL (s).
+	 */
+	public static List<URL> toUrl(Collection<xURI> uris) {
+		List<URL> urlList = Util.newList();
+		for (xURI uri : uris) {
+			try {
+				xURI storeUri = uri.getParent();
+				storeUri = storeUri != null ? storeUri : uri.getRoot();
+				if (storeUri == null) storeUri = uri;
+				UriAdapter adapter = new UriAdapter(storeUri);
+				
+				if (!adapter.exists(uri)) continue;
+	
+				if (adapter.isStore(uri) && !adapter.isArchive(uri))
+					uri = uri.concat("/");
+				URL url = uri.toURL();
+				if (url != null) urlList.add(url);
+				
+				adapter.close();
+			} catch (Exception e) {LogUtil.trace(e);}
+		}
+		
+		return urlList;
+	}
+
+	
+	/**
+	 * Converting an array of URI (s) into to list of URL (s).
+	 * @param uris specified array of URI (s).
+	 * @return list of URL (s).
+	 */
+	public static List<URL> toUrl(xURI...uris) {
+		if (uris == null || uris.length == 0) return Util.newList();
+		
+		return toUrl(Arrays.asList(uris));
 	}
 
 

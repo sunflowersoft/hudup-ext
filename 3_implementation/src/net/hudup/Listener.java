@@ -34,15 +34,12 @@ public final class Listener implements AccessPoint {
 	 * @param args The argument parameter of main method. It contains command line arguments.
 	 */
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-		
 		new Listener().run(args);
 	}
 
 	
 	@Override
 	public void run(String[] args) {
-		// TODO Auto-generated method stub
 		Util.getPluginManager().fire();
 		
 		net.hudup.listener.Listener listener = net.hudup.listener.Listener.create();
@@ -52,17 +49,14 @@ public final class Listener implements AccessPoint {
 
 	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
 		return "Listener";
 	}
 
 
 	@Override
 	public String toString() {
-		// TODO Auto-generated method stub
 		return getName();
 	}
 
-	
 	
 }

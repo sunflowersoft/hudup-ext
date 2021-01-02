@@ -195,6 +195,12 @@ public class UriAdapter implements UriAssoc, AutoCloseable {
 
 
 	@Override
+	public boolean copyAsFile(xURI src, xURI dst, boolean moved) {
+		return assoc.copyAsFile(src, dst, moved);
+	}
+
+
+	@Override
 	public boolean rename(xURI src, xURI dst) {
 		return assoc.rename(src, dst);
 	}
@@ -206,6 +212,37 @@ public class UriAdapter implements UriAssoc, AutoCloseable {
 	}
 
 
+	/**
+	 * Getting stores or archives of parent store or archive.
+	 * @param parentStoreOrArchive parent store or archive.
+	 * @return stores or archives of parent store or archive.
+	 */
+	public List<xURI> getUriListOfStoresArchives(xURI parentStoreOrArchive) {
+		if (!exists(parentStoreOrArchive) || !(isStore(parentStoreOrArchive) || isArchive(parentStoreOrArchive))) {
+			return Util.newList();
+		}
+		
+		List<xURI> storesArchivesList = getUriList(parentStoreOrArchive, new UriFilter() {
+			
+			@Override
+			public String getDescription() {
+				return "Working class paths";
+			}
+			
+			@Override
+			public boolean accept(xURI uri) {
+				if (isStore(uri) || isArchive(uri))
+					return true;
+				else
+					return false;
+			}
+			
+		});
+		
+		return storesArchivesList;
+	}
+	
+	
 	@Override
 	public InputStream getInputStream(xURI uri) {
 		return assoc.getInputStream(uri);

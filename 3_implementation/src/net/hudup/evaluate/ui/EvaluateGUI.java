@@ -42,6 +42,7 @@ import javax.swing.SwingWorker;
 
 import net.hudup.core.Constants;
 import net.hudup.core.PluginChangedEvent;
+import net.hudup.core.PluginStorage;
 import net.hudup.core.RegisterTable;
 import net.hudup.core.Util;
 import net.hudup.core.alg.Alg;
@@ -1027,7 +1028,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 	 */
 	protected void openTrainingSet() {
 		try {
-			if (evaluator.remoteIsStarted())
+			if (evaluator.remoteIsStarted() || PluginStorage.getParserReg().size() == 0)
 				return;
 			
 			DataConfig defaultConfig = txtTrainingBrowse.getConfig(); 
@@ -1158,7 +1159,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 	 */
 	protected void openTestingSet() {
 		try {
-			if (evaluator.remoteIsStarted())
+			if (evaluator.remoteIsStarted() || PluginStorage.getParserReg().size() == 0)
 				return;
 	
 			DataConfig defaultConfig = txtTestingBrowse.getConfig();
@@ -1564,6 +1565,8 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 				setInternalEnable(false);
 				setResultVisible(result != null && result.size() > 0);
 				
+				btnTrainingBrowse.setEnabled(PluginStorage.getParserReg().size() > 0);
+				btnTestingBrowse.setEnabled(PluginStorage.getParserReg().size() > 0);
 				btnClear.setEnabled(training != null || testing != null);
 				btnUpload.setEnabled((training == null && testing == null) || (training != null && testing != null));
 				btnDownload.setEnabled(true);
@@ -1629,6 +1632,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 				btnStop.setEnabled(false);
 				btnForceStop.setEnabled(false);
 	
+				btnMetricsOption.setEnabled(PluginStorage.getMetricReg().size() > 0);
 				tblMetrics.update(result);
 				prgRunning.setMaximum(0);
 				prgRunning.setValue(0);
@@ -1648,11 +1652,10 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			setResultVisible(flag);
 			
 			cmbAlgs.setEnabled(algRegTable.size() > 0);
-			btnTrainingBrowse.setEnabled(true);
-			btnTestingBrowse.setEnabled(true);
-			btnUpload.setEnabled(
-					flag && ((training == null && testing == null) || (training != null && testing != null)) );
-			btnDownload.setEnabled(cmbAlgs.getItemCount() > 0);
+			btnTrainingBrowse.setEnabled(PluginStorage.getParserReg().size() > 0);
+			btnTestingBrowse.setEnabled(PluginStorage.getParserReg().size() > 0);
+			btnUpload.setEnabled((training == null && testing == null) || (training != null && testing != null));
+			btnDownload.setEnabled(true);
 		}
 	}
 	

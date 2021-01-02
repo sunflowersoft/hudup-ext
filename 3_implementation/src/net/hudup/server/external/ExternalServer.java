@@ -156,7 +156,7 @@ public class ExternalServer extends DefaultServer {
 					finished = wizard.isFinished();
 				}
 				else {
-					SetupExternalServerWizard wizard = new SetupExternalServerWizard(null, config);
+					SetupExternalServerWizard wizard = new SetupExternalServerWizard(null, config, null);
 					finished = wizard.isFinished();
 				}
 			}

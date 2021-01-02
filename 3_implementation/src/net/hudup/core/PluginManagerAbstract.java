@@ -1,9 +1,18 @@
+/**
+ * HUDUP: A FRAMEWORK OF E-COMMERCIAL RECOMMENDATION ALGORITHMS
+ * (C) Copyright by Loc Nguyen's Academic Network
+ * Project homepage: hudup.locnguyen.net
+ * Email: ng_phloc@yahoo.com
+ * Phone: +84-975250362
+ */
 package net.hudup.core;
 
 import java.io.InputStream;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.Collection;
 import java.util.List;
 import java.util.Properties;
 
@@ -47,8 +56,13 @@ import net.hudup.core.evaluate.MetricRemote;
 import net.hudup.core.evaluate.MetricRemoteWrapper;
 import net.hudup.core.evaluate.MetricWrapper;
 import net.hudup.core.logistic.BaseClass;
+import net.hudup.core.logistic.Composite;
 import net.hudup.core.logistic.LogUtil;
+import net.hudup.core.logistic.NextUpdate;
 import net.hudup.core.logistic.UriAdapter;
+import net.hudup.core.logistic.UriAdapter.AdapterWriter;
+import net.hudup.core.logistic.UriFilter;
+import net.hudup.core.logistic.UriProcessor;
 import net.hudup.core.logistic.xURI;
 import net.hudup.core.logistic.ui.UIUtil;
 import net.hudup.core.parser.DatasetParser;
@@ -67,9 +81,27 @@ public abstract class PluginManagerAbstract implements PluginManager {
 
 	
 	/**
+	 * Working class path key jar.
+	 */
+	protected final static String WORKING_LIB_KEY_JAR = "working-lib-key.jar";
+	
+	
+	/**
+	 * Working class path key jar.
+	 */
+	protected final static String WORKING_LIB_KEY_CLASS = "net.hudup.core.security.WorkingLibKey";
+
+	
+	/**
 	 * Flag to indicate whether {@link #fire()} method was fired.
 	 */
 	protected boolean fired = false;
+	
+	
+	/**
+	 * Flag to indicate whether working class path was added.
+	 */
+	protected boolean workingLibClassAdded = false;
 	
 	
 	/**
@@ -88,6 +120,20 @@ public abstract class PluginManagerAbstract implements PluginManager {
 	
 	@Override
 	public void fire() {
+		if (isFired()) return;
+		
+		fireSimply();
+		
+		discover();
+		
+		extraTasks();
+		
+		fired = true;
+	}
+	
+	
+	@Override
+	public void fireSimply() {
 		if (isFired()) return;
 		
 		try {
@@ -140,6 +186,24 @@ public abstract class PluginManagerAbstract implements PluginManager {
 		}
 		
 		try {
+			URL resourceWorkingLibKeyUrl = getClass().getResource(Constants.RESOURCES_PACKAGE + "lib/" + WORKING_LIB_KEY_JAR);
+			xURI resourceWorkingLibKeyUri = xURI.create(resourceWorkingLibKeyUrl.toURI());
+			UriAdapter adapter = new UriAdapter(xURI.create(Constants.LIB_DIRECTORY));
+			if (adapter.exists(resourceWorkingLibKeyUri)) {
+				xURI workingLibKeyUri = xURI.create(Constants.LIB_DIRECTORY + "/" + WORKING_LIB_KEY_JAR);
+				if (!adapter.exists(workingLibKeyUri))
+					adapter.copyAsFile(resourceWorkingLibKeyUri, workingLibKeyUri, false);
+			}
+			adapter.close();
+		}
+		catch (Throwable e) {
+			LogUtil.trace(e);
+		}
+		
+		addWorkingLibClassPath();
+		
+		
+		try {
 			Properties p = System.getProperties();
 			p.setProperty("derby.system.home", Constants.DATABASE_DIRECTORY + "/derby");
 		}
@@ -151,16 +215,10 @@ public abstract class PluginManagerAbstract implements PluginManager {
 		loadDrivers();
 		
 		
-		discover();
-		
-		
-		extraTasks();
-		
-		
 		fired = true;
 	}
-	
-	
+
+
 	@Override
 	public boolean isFired() {
 		return fired;
@@ -187,7 +245,7 @@ public abstract class PluginManagerAbstract implements PluginManager {
 
 
 	/**
-	 * Defining extra tasks for {@link #fire()} method.
+	 * Defining extra tasks for {@link #fire()} method. These tasks must not be important.
 	 */
 	protected void extraTasks() {
 		try {
@@ -352,7 +410,7 @@ public abstract class PluginManagerAbstract implements PluginManager {
 	public Class<?> loadClass(String name) throws ClassNotFoundException {
 		Class<?> foundClass = null;
 		try {
-			foundClass = getClass().getClassLoader().loadClass(name);
+			foundClass = Class.forName(name);
 		}
 		catch (ClassNotFoundException e) {}
 		if (foundClass != null) return foundClass;
@@ -373,30 +431,383 @@ public abstract class PluginManagerAbstract implements PluginManager {
 
 	@Override
 	public InputStream getResourceAsStream(String name) {
-		InputStream is = getClass().getClassLoader().getResourceAsStream(name);
+		InputStream is = getClass().getResourceAsStream(name);
 		if (is != null) return is;
 		
 		for (URLClassLoader classLoader : extraClassLoaders) {
-			try {
-				is = classLoader.getResourceAsStream(name);
-				if (is != null) return is;
-
-				URL[] urls = classLoader.getURLs();
-				if (urls == null || urls.length == 0) continue;
-				
-				xURI classPath = xURI.create(urls[0].toURI());
-				classPath = classPath.concat(name);
-				UriAdapter adapter = new UriAdapter(classPath);
-				
-				is = adapter.getInputStream(classPath);
-				adapter.close();
-				if (is != null) return is;
-				
-			} catch (Exception e) {LogUtil.trace(e);}
+			is = getResourceAsStream(classLoader, name);
+			if (is != null) return is;
 		}
 		
 		return null;
 	}
 
+	
+	/**
+	 * Getting resource as stream from resource name by specified class loader.
+	 * @param classLoader specified class loader.
+	 * @param name resource name
+	 * @return resource as stream from resource name by specified class loader.
+	 */
+	private static InputStream getResourceAsStream(URLClassLoader classLoader, String name) {
+		try {
+			InputStream is = classLoader.getResourceAsStream(name);
+			if (is != null) return is;
+
+			URL[] urls = classLoader.getURLs();
+			if (urls == null || urls.length == 0) return null;
+			for (URL url : urls) {
+				xURI resourcePath = xURI.create(url.toURI());
+				UriAdapter adapter = new UriAdapter(resourcePath);
+				resourcePath = resourcePath.concat(name);
+				
+				is = adapter.getInputStream(resourcePath);
+				adapter.close();
+				if (is != null) return is;
+			}
+		}
+		catch (Exception e) {
+			LogUtil.trace(e);
+		}
+		
+		return null;
+	}
+	
+	
+	/**
+	 * Adding working library class path.
+	 * @return true if adding is successful.
+	 */
+	protected boolean addWorkingLibClassPath() {
+		if (workingLibClassAdded) return true;
+		
+		boolean exist = false;
+		try {
+			PluginManagerAbstract.class.getClassLoader().loadClass(WORKING_LIB_KEY_CLASS);
+			exist = true;
+		} catch (Exception e) {
+			exist = false;
+		}
+		if (exist) {
+			workingLibClassAdded = true;
+			return true;
+		}
+		
+		URLClassLoader sysClassLoader = null;
+		try {
+			if (getClass().getClassLoader() instanceof URLClassLoader)
+				sysClassLoader = (URLClassLoader) getClass().getClassLoader();
+		}
+		catch (Exception e) {LogUtil.trace(e);}
+		if (sysClassLoader == null) return false;
+
+		workingLibClassAdded = addClassPaths2(sysClassLoader, xURI.create(Constants.LIB_DIRECTORY));
+
+		return workingLibClassAdded;
+	}
+	
+	
+	/**
+	 * Loading a list of classes and instances from specified store and class loader.
+	 * This method does not affect plug-in storage.
+	 * @param <T> class type.
+	 * @param storeUri specified store.
+	 * @param rootPath root path.
+	 * @param adapter URI adapter.
+	 * @param classLoader specified class loader.
+	 * @param referredClass referred class. If this referred class is null, all classes are retrieved.
+	 * @param outClassList collection of classes as output.
+	 * @param outObjList collection of objects (instances) as output.
+	 */
+	protected <T> void loadClassesInstances(xURI storeUri, String rootPath, UriAdapter adapter, ClassLoader classLoader, Class<T> referredClass, Collection<Class<? extends T>> outClassList, Collection<T> outObjList) {
+		adapter.uriListProcess(storeUri,
+			new UriFilter() {
+			
+				@Override
+				public String getDescription() {
+					return "*.class";
+				}
+				
+				@Override
+				public boolean accept(xURI uri) {
+					if (adapter.isStore(uri))
+						return true;
+					
+					String ext = uri.getLastNameExtension();
+					if (ext == null || !ext.toLowerCase().equals("class"))
+						return false;
+					
+					String lastName = uri.getLastName();
+					if (lastName == null || lastName.isEmpty())
+						return false;
+					else if (lastName.contains("$"))
+						return false;
+					else
+						return true;
+				}
+			},
+			new UriProcessor() {
+			
+				@SuppressWarnings("unchecked")
+				@Override
+				public void uriProcess(xURI uri) throws Exception {
+					if (adapter.isStore(uri)) {
+						loadClassesInstances(uri, rootPath, adapter, classLoader, referredClass, outClassList, outObjList);
+						return;
+					}
+					
+					String path = uri.getPath();
+					if (path == null || path.isEmpty()) return;
+					if (path.startsWith(rootPath))
+						path = path.substring(rootPath.length());
+					if (path == null || path.isEmpty()) return;
+					
+					String classPath = UriAdapter.packageSlashToDot(path);
+					int idx = classPath.lastIndexOf(".class");
+					if (idx >= 0) classPath = classPath.substring(0, idx);
+					
+					Class<?> cls = null;
+					try {
+						cls = Class.forName(classPath, true, classLoader);
+					}
+					catch (Throwable e) {
+						System.out.println("Loading class \"" + classPath + "\" error");
+						cls = null;
+					}
+					if (cls == null) return;
+					if (referredClass != null && !referredClass.isAssignableFrom(cls))
+						return;
+					if (!isClassValid(cls)) return;
+					
+					if (outClassList != null) outClassList.add((Class<? extends T>)cls);
+					
+					if (outObjList != null) {
+						T obj = null;
+						try {
+							obj = (T) cls.getDeclaredConstructor().newInstance();
+						}
+						catch (Throwable e) {
+							System.out.println("Instantiate class \"" + classPath + "\" error");
+							obj = null;
+						}
+						
+						if (obj != null) outObjList.add(obj);
+					}
+				}
+			});
+	}
+
+	
+	/**
+	 * Analyzing algorithm classes.
+	 * @param algClasses specified algorithm classes.
+	 */
+	protected void analyzeAlgClasses(Collection<Class<? extends Alg>> algClasses) {
+		if (algClasses == null) return;
+		
+		AdapterWriter nextUpdateLog = null;
+		try {
+			nextUpdateLog = new AdapterWriter(xURI.create(Constants.LOGS_DIRECTORY +"/nextupdate.log"), false);
+		}
+		catch (Throwable e) {
+			LogUtil.trace(e);
+		}
+
+		List<Alg> compositeAlgList = Util.newList();
+		for (Class<? extends Alg> algClass : algClasses) {
+			if (algClass == null) continue;
+			
+			try {
+				if (!isClassValid(algClass)) continue;
+				
+				Alg alg = Util.newInstance(algClass);
+				if (!isValidAlg(alg)) continue;
+
+				if (algClass.getAnnotation(Composite.class) != null) {
+					compositeAlgList.add(alg);
+					continue;
+				}
+				
+				NextUpdate nextUpdate = algClass.getAnnotation(NextUpdate.class);
+				if (nextUpdate != null) {
+					if (PluginStorage.lookupNextUpdateList(alg.getClass(), alg.getName()) >= 0)
+						continue;
+					
+					PluginStorage.getNextUpdateList().add(alg);
+					if (nextUpdateLog != null) {
+						nextUpdateLog.write("\n\n");
+						nextUpdateLog.write(algClass.toString() + "\n\tNote: " + nextUpdate.note());
+					}
+					
+					continue;
+				}
+			
+				registerAlg(alg);
+			}
+			catch (Exception e) {LogUtil.trace(e);}
+		}
+			
+		for (Alg compositeAlg : compositeAlgList) {
+			try {
+				NextUpdate nextUpdate = compositeAlg.getClass().getAnnotation(NextUpdate.class);
+				if (nextUpdate != null) {
+					if (PluginStorage.lookupNextUpdateList(compositeAlg.getClass(), compositeAlg.getName()) >= 0)
+						continue;
+
+					PluginStorage.getNextUpdateList().add(compositeAlg);
+					if (nextUpdateLog != null) {
+						nextUpdateLog.write("\n\n");
+						nextUpdateLog.write(compositeAlg.getClass().getName() + "\n\tNote: " + nextUpdate.note());
+					}
+					
+					continue;
+				}
+				else
+					registerAlg(compositeAlg);
+			}
+			catch (Exception e) {LogUtil.trace(e);}
+		}
+		
+		try {
+			if (nextUpdateLog != null) nextUpdateLog.close();
+			nextUpdateLog = null;
+		}
+		catch (Throwable e) {
+			LogUtil.trace(e);
+		}
+		
+	}
+
+	
+	/**
+	 * Creating class loader from store URI (s).
+	 * @param storeUris store URI (s).
+	 * @return class loader from store URI (s).
+	 */
+	protected static URLClassLoader createClassLoader(xURI...storeUris) {
+		if (storeUris == null || storeUris.length == 0) return null;
+		
+		List<xURI> uriList = Util.newList();
+		for (xURI storeUri : storeUris) {
+			UriAdapter adapter = new UriAdapter(storeUri);
+			if (adapter.exists(storeUri)) uriList.add(storeUri);
+			
+			adapter.close();
+		}
+		
+		List<URL> urlList = xURI.toUrl(uriList);
+		if (urlList.size() == 0) return null;
+		
+		try {
+			return new URLClassLoader(urlList.toArray(new URL[] {}), PluginManagerAbstract.class.getClassLoader());
+		} catch (Exception e) {LogUtil.trace(e);}
+		
+		return null;
+	}
+
+	
+	/**
+	 * Creating class loader from parent URI.
+	 * @param parentUri parent URI.
+	 * @return class loader from parent URI.
+	 */
+	protected static URLClassLoader createClassLoader2(xURI parentUri) {
+		if (parentUri == null) return null;
+		
+		UriAdapter adapter = new UriAdapter(parentUri);
+		List<xURI> uriList = adapter.getUriListOfStoresArchives(parentUri);
+		adapter.close();
+		
+		return createClassLoader(uriList.toArray(new xURI[] {}));
+	}
+	
+
+	/**
+	 * Adding class paths from store URI (s) into the specified URL class loader.
+	 * @param classLoader specified URL class loader.
+	 * @param storeUris store URI (s).
+	 * @return true if successful adding.
+	 */
+	protected static boolean addClassPaths(URLClassLoader classLoader, xURI...storeUris) {
+		if (classLoader == null || storeUris == null || storeUris.length == 0)
+			return false;
+		
+		List<URL> urlList = xURI.toUrl(storeUris);
+		if (urlList.size() == 0) return false;
+		
+	    Method method = null;
+		try {
+		    method = URLClassLoader.class.getDeclaredMethod("addURL", URL.class);
+		    method.setAccessible(true);
+		}
+		catch (Exception e) {
+			LogUtil.trace(e);
+			method = null;
+		}
+		if (method == null) return false;
+		
+		boolean result = false;
+	    for (URL url : urlList) {
+			try {
+			    method.invoke(classLoader, url);
+			    result = true;
+			}
+			catch (Exception e) {
+				LogUtil.trace(e);
+			}
+		}
+	    
+	    return result;
+	}
+
+	
+	/**
+	 * Adding class paths from parent URI into the specified URL class loader.
+	 * @param classLoader specified URL class loader.
+	 * @param parentUri parent URI (s).
+	 * @return true if successful adding.
+	 */
+	protected static boolean addClassPaths2(URLClassLoader classLoader, xURI parentUri) {
+		if (parentUri == null) return false;
+		
+		UriAdapter adapter = new UriAdapter(parentUri);
+		List<xURI> uriList = adapter.getUriListOfStoresArchives(parentUri);
+		adapter.close();
+		
+		return addClassPaths(classLoader, uriList.toArray(new xURI[] {}));
+	}
+
+	
+	@Override
+	public void close() throws Exception {
+		if (extraClassLoaders == null || extraClassLoaders.size() == 0)
+			return;
+		
+		for (URLClassLoader cl : extraClassLoaders) {
+			try {
+				cl.close();
+			} catch (Throwable e) {LogUtil.trace(e);}
+		}
+		
+		extraClassLoaders.clear();
+	}
+	
+	
+	/**
+	 * Adding shutdown hook to release all plug-in resources.
+	 */
+	static {
+		Runtime.getRuntime().addShutdownHook(new Thread() {
+
+			@Override
+			public void run() {
+				try {
+					Util.getPluginManager().close();
+				} catch (Exception e) {LogUtil.trace(e);}
+			}
+		});
+		
+	}
+	
 	
 }

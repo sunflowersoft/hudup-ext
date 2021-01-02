@@ -143,7 +143,6 @@ public class DatasetPoolDlg extends JDialog {
 
 			@Override
 			public void windowClosed(WindowEvent e) {
-				// TODO Auto-generated method stub
 				super.windowClosed(e);
 			}
 			
@@ -163,7 +162,6 @@ public class DatasetPoolDlg extends JDialog {
 					
 					@Override
 					public void actionPerformed(ActionEvent e) {
-						// TODO Auto-generated method stub
 						refresh();
 					}
 				});
@@ -180,7 +178,6 @@ public class DatasetPoolDlg extends JDialog {
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					// TODO Auto-generated method stub
 					clear();
 				}
 			});
@@ -199,7 +196,6 @@ public class DatasetPoolDlg extends JDialog {
 
 			@Override
 			public boolean removeSelectedRows() {
-				// TODO Auto-generated method stub
 				boolean ret = super.removeSelectedRows();
 				if (ret)
 					updateGUI();
@@ -223,7 +219,6 @@ public class DatasetPoolDlg extends JDialog {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				loadBatchScript();
 			}
 		});
@@ -235,7 +230,6 @@ public class DatasetPoolDlg extends JDialog {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				addDataset();
 			}
 		});
@@ -246,7 +240,6 @@ public class DatasetPoolDlg extends JDialog {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				dispose();
 			}
 		});
@@ -350,7 +343,6 @@ public class DatasetPoolDlg extends JDialog {
 			updateGUI();
 		}
 		catch (Exception e) {
-			// TODO Auto-generated catch block
 			LogUtil.trace(e);
 		}
 			

@@ -23,6 +23,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import net.hudup.core.client.Connector;
+import net.hudup.core.PluginStorage;
 import net.hudup.core.client.ConnectInfo;
 import net.hudup.core.client.LightRemoteServerCP;
 import net.hudup.core.client.PowerServer;
@@ -116,6 +117,12 @@ public class ExternalServerCP extends PowerServerCP {
 						protected PluginStorageManifestPanel createPluginStorageManifest(Object... vars) {
 							return new PluginStorageManifestPanelRemote(server, connectInfo);
 						}
+
+						@Override
+						protected void onApply() {
+							super.onApply();
+							updateControls();
+						}
 						
 					};
 					
@@ -130,6 +137,8 @@ public class ExternalServerCP extends PowerServerCP {
 //					catch (Exception e1) {LogUtil.trace(e1);}
 					
 					cfg.setVisible(true);
+					
+					updateControls();
 				}
 			});
 		btnSystem.setMargin(new Insets(0, 0 , 0, 0));
@@ -279,7 +288,7 @@ public class ExternalServerCP extends PowerServerCP {
 			btnExternalConfig.setEnabled(false);
 		}
 		else if (state == Status.stopped) {
-			btnExternalConfig.setEnabled(true);
+			btnExternalConfig.setEnabled(PluginStorage.getExternalQueryReg().size() > 0);
 		}
 		else if (state == Status.setconfig) {
 			
@@ -361,8 +370,7 @@ public class ExternalServerCP extends PowerServerCP {
 					applyConfig();
 			}
 
-			SetupExternalServerWizard dlg = new SetupExternalServerWizard(this,
-					(ExternalServerConfig)server.getConfig());
+			SetupExternalServerWizard dlg = new SetupExternalServerWizard(this, (ExternalServerConfig)server.getConfig(), connectInfo);
 			
 			DataConfig config = dlg.getServerConfig();
 			if (connectInfo.bindUri != null) {

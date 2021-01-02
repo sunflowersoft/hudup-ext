@@ -73,6 +73,7 @@ import net.hudup.core.logistic.ui.HelpContent;
 import net.hudup.core.logistic.ui.StartDlg;
 import net.hudup.core.logistic.ui.TextArea;
 import net.hudup.core.logistic.ui.UIUtil;
+import net.hudup.core.parser.SnapshotParserImpl;
 
 /**
  * This class represents the entire frame allowing users to interact fully with evaluator.
@@ -1170,7 +1171,8 @@ public class EvalCompoundGUI extends JFrame {
 		try {
 			RegisterTable parserReg = PluginStorage.getParserReg();
 			if (parserReg.size() == 0) {
-				Util.getPluginManager().discover();
+				parserReg.register(new SnapshotParserImpl());
+//				Util.getPluginManager().discover();
 			}
 			
 			RegisterTable metricReg = PluginStorage.getMetricReg();

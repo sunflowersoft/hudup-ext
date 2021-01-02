@@ -122,6 +122,16 @@ public interface UriAssoc extends AutoCloseable {
 
 	
 	/**
+	 * Copying the object from source URI to destination URI as file.
+	 * @param src Source URI
+	 * @param dst Destination URI
+	 * @param moved Whether or not moving the object
+	 * @return Whether copy successfully
+	 */
+	boolean copyAsFile(xURI src, xURI dst, boolean moved);
+	
+	
+	/**
 	 * Copying and renaming the object from source URI to destination URI.
 	 * @param src Source URI
 	 * @param dst Destination URI

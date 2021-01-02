@@ -453,7 +453,7 @@ public class DefaultServer extends PowerServerImpl {
 					finished = wizard.isFinished(); 
 				}
 				else {
-					SetupServerWizard wizard = new SetupServerWizard(null, config);
+					SetupServerWizard wizard = new SetupServerWizard(null, config, null);
 					finished = wizard.isFinished(); 
 				}
 			}

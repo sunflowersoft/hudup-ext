@@ -53,6 +53,8 @@ import net.hudup.core.client.ServerStatusEvent;
 import net.hudup.core.client.ServerStatusEvent.Status;
 import net.hudup.core.client.ServerStatusListener;
 import net.hudup.core.data.DataConfig;
+import net.hudup.core.data.DataDriver;
+import net.hudup.core.data.DataDriver.DataType;
 import net.hudup.core.data.DatasetUtil2;
 import net.hudup.core.data.Profile;
 import net.hudup.core.data.Provider;
@@ -67,6 +69,7 @@ import net.hudup.core.data.ui.UnitTable.SelectionChangedListener;
 import net.hudup.core.logistic.Counter;
 import net.hudup.core.logistic.I18nUtil;
 import net.hudup.core.logistic.LogUtil;
+import net.hudup.core.logistic.xURI;
 import net.hudup.core.logistic.ui.HelpContent;
 import net.hudup.core.logistic.ui.PluginStorageManifestPanel;
 import net.hudup.core.logistic.ui.PluginStorageManifestPanelRemote;
@@ -220,7 +223,7 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 	/**
 	 * Constructor with specified server and connection information of such server.
 	 * @param server specified server
-	 * @param connectInfo connection information of the specified.
+	 * @param connectInfo connection information.
 	 */
 	public PowerServerCP(PowerServer server, ConnectInfo connectInfo) {
 		super("Server control panel");
@@ -257,7 +260,8 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 				public void windowOpened(WindowEvent e) {
 					super.windowOpened(e);
 					
-					if (timer != null || !thisConnectInfo.pullMode) return;
+					if (timer != null || thisConnectInfo.bindUri == null || !thisConnectInfo.pullMode)
+						return;
 					
 					timer = new Timer();
 					long milisec = thisConnectInfo.accessPeriod < Counter.PERIOD*1000 ? Counter.PERIOD*1000 : thisConnectInfo.accessPeriod;
@@ -400,6 +404,12 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 						protected PluginStorageManifestPanel createPluginStorageManifest(Object... vars) {
 							return new PluginStorageManifestPanelRemote(server, connectInfo);
 						}
+
+						@Override
+						protected void onApply() {
+							super.onApply();
+							updateControls();
+						}
 						
 					};
 					
@@ -414,6 +424,8 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 //					catch (Exception e1) {LogUtil.trace(e1);}
 					
 					cfg.setVisible(true);
+					
+					updateControls();
 				}
 			});
 		btnSystem.setMargin(new Insets(0, 0 , 0, 0));
@@ -807,8 +819,7 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 					applyConfig();
 			}
 
-			SetupServerWizard dlg = new SetupServerWizard(this,
-					(PowerServerConfig)server.getConfig());
+			SetupServerWizard dlg = new SetupServerWizard(this, (PowerServerConfig)server.getConfig(), connectInfo);
 			
 			DataConfig config = dlg.getServerConfig();
 			if (connectInfo.bindUri != null) {
@@ -1006,22 +1017,6 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 	 * @param status specified remote status.
 	 */
 	protected void updateControls(Status status) {
-		if (status == Status.exit) {
-			updateControls0(status);
-		}
-		else {
-			synchronized (this) {
-				updateControls0(status);
-			}
-		}
-	}
-	
-	
-	/**
-	 * Update current controls when receiving specified remote status.
-	 * @param status specified remote status.
-	 */
-	private void updateControls0(Status status) {
 		if (status == Status.unknown) return;
 		currentStatus = status;
 
@@ -1032,10 +1027,6 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 				config = server.getConfig();
 			}
 			catch (Throwable e) {LogUtil.trace(e);}
-
-			if (provider != null)
-				provider.close();
-			provider = new ProviderImpl(config);
 
 			btnSetupServer.setEnabled(false);
 			btnExitServer.setEnabled(true);
@@ -1049,24 +1040,39 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 			btnResetConfig.setEnabled(false);
 			btnLoadStore.setEnabled(false);
 			paneConfig.setEnabled(false);
-			
-			btnUpdateAcc.setEnabled(true);
-			btnDeleteAcc.setEnabled(true);
-			txtAccName.setEnabled(true);
-			txtAccPass.setEnabled(true);
-			txtAccPrivs.setEnabled(true);
-			
-			unitList.connectUpdate(config);
-			unitList.validate();
-			unitList.updateUI();
-			
-			try {
-				accUnitTable.update(provider.getAssoc(), config.getAccountUnit());
-			}
-			catch (Throwable e) {LogUtil.trace(e);}
-			updateAccData();
-			
 			paneConfig.update(config);
+			
+			boolean editData = isEditData(config);
+			btnUpdateAcc.setEnabled(editData && true);
+			btnDeleteAcc.setEnabled(editData && true);
+			txtAccName.setEnabled(editData && true);
+			txtAccPass.setEnabled(editData && true);
+			txtAccPrivs.setEnabled(editData && true);
+			
+			if (provider != null) provider.close();
+			provider = null;
+			if (editData) {
+				provider = new ProviderImpl(config);
+	
+				unitList.connectUpdate(config);
+				unitList.validate();
+				unitList.updateUI();
+				
+				try {
+					accUnitTable.update(provider.getAssoc(), config.getAccountUnit());
+				}
+				catch (Throwable e) {LogUtil.trace(e);}
+				updateAccData();
+			}
+			else {
+				unitTable.clear();
+				unitList.setListData(new Unit[0]);
+				unitList.validate();
+				unitList.updateUI();
+				
+				accUnitTable.clear();
+				updateAccData();
+			}
 		}
 		else if (status == Status.paused) {
 			enableControls(false);
@@ -1084,11 +1090,12 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 			btnLoadStore.setEnabled(false);
 			paneConfig.setEnabled(false);
 			
-			btnUpdateAcc.setEnabled(true);
-			btnDeleteAcc.setEnabled(true);
-			txtAccName.setEnabled(true);
-			txtAccPass.setEnabled(true);
-			txtAccPrivs.setEnabled(true);
+			boolean editData = isEditData();
+			btnUpdateAcc.setEnabled(editData && true);
+			btnDeleteAcc.setEnabled(editData && true);
+			txtAccName.setEnabled(editData && true);
+			txtAccPass.setEnabled(editData && true);
+			txtAccPrivs.setEnabled(editData && true);
 		}
 		else if (status == Status.stopped) {
 			enableControls(false);
@@ -1112,21 +1119,15 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 			txtAccPass.setEnabled(false);
 			txtAccPrivs.setEnabled(false);
 
-			try {
-				unitTable.clear();
-				accUnitTable.clear();
-				updateAccData();
-			}
-			catch (Exception e) {
-				LogUtil.trace(e);
-			}
-			
+			unitTable.clear();
 			unitList.setListData(new Unit[0]);
 			unitList.validate();
 			unitList.updateUI();
 			
-			if (provider != null)
-				provider.close();
+			accUnitTable.clear();
+			updateAccData();
+			
+			if (provider != null) provider.close();
 			provider = null;
 		}
 		else if (status == Status.setconfig) {
@@ -1149,25 +1150,23 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 		}
 		
 		btnRefresh.setEnabled(true);
+		
+		//Fixing error when deadlock with pause/resume because of transaction lock. The solution is work-around. User can exit server from command line or system tray.
+		try {
+			if (status == Status.paused) btnStop.setEnabled(false);
+		} catch (Exception e) {LogUtil.trace(e);}
 	}
 	
 	
 	/**
 	 * Update controls.
 	 */
-	protected void updateControls() {
+	protected synchronized void updateControls() {
 		if (server == null) return;
 		
 		Status status = ServerStatusEvent.getStatus(server);
 		
-		if (status == Status.exit) {
-			updateControls(status);
-		}
-		else {
-			synchronized (this) {
-				updateControls(status);
-			}
-		}
+		updateControls(status);
 	}
 	
 	
@@ -1175,23 +1174,62 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 	public void statusChanged(ServerStatusEvent evt) throws RemoteException {
 		Status status = evt.getStatus();
 		
-		if (status == Status.exit) {
+		if (connectInfo.bindUri == null || !connectInfo.pullMode) {
 			if (connectInfo.bindUri != null)
-				updateControls0(status);
+				updateControls(status);
 			else if (!evt.getShutdownHookStatus())
-				updateControls0(status);
+				updateControls(status);
 		}
 		else {
 			synchronized (this) {
 				if (connectInfo.bindUri != null)
-					updateControls0(status);
+					updateControls(status);
 				else if (!evt.getShutdownHookStatus())
-					updateControls0(status);
+					updateControls(status);
 			}
 		}
+
 	}
 	
+	
+	/**
+	 * Testing whether data can be edited remotely.
+	 * @param config configuration.
+	 * @return whether data can be edited remotely.
+	 */
+	protected boolean isEditData(DataConfig config) {
+		if (config == null) return false;
+		xURI storeUri = config.getStoreUri();
+		if (storeUri == null) return false;
+		
+		DataDriver driver = DataDriver.create(storeUri);
+		return connectInfo.bindUri == null || !driver.isLocal();
+	}
 
+	
+	/**
+	 * Testing whether data can be edited remotely.
+	 * @return whether data can be edited remotely.
+	 */
+	protected boolean isEditData() {
+		DataConfig config = null;
+		try {
+			config = server.getConfig();
+		}
+		catch (Exception e) {
+			config = null;
+			LogUtil.trace(e);
+		}
+		
+		if (config == null) return false;
+		xURI storeUri = config.getStoreUri();
+		if (storeUri == null) return false;
+		
+		DataDriver driver = DataDriver.create(storeUri);
+		return connectInfo.bindUri == null || driver.getType() != DataType.file;
+	}
+
+	
 	@Override
 	public void dispose() {
 		try {

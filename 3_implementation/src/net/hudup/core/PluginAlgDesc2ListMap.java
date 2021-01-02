@@ -93,6 +93,14 @@ public class PluginAlgDesc2ListMap implements Serializable {
 
 	
 	/**
+	 * Clearing this map.
+	 */
+	public void clear() {
+		algDescListMap.clear();
+	}
+	
+	
+	/**
 	 * Getting the size of this map.
 	 * @return the size of this map.
 	 */

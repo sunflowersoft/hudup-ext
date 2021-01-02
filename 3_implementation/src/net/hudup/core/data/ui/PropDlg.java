@@ -242,12 +242,11 @@ class PropDlg2 extends JDialog {
 	 */
 	public PropDlg2(final Component comp, final PropList propList, String key) {
 		super(UIUtil.getFrameForComponent(comp), "Configure properties list for key " + key, true);
-		// TODO Auto-generated constructor stub
 		
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		setSize(600, 400);
-		setLayout(new BorderLayout());
 		setLocationRelativeTo(UIUtil.getFrameForComponent(comp));
+		setLayout(new BorderLayout());
 		addWindowListener(new WindowAdapter() {
 
 			@Override

@@ -176,7 +176,8 @@ public class BalancerCP extends JFrame implements ServerStatusListener {
 				public void windowOpened(WindowEvent e) {
 					super.windowOpened(e);
 					
-					if (timer != null || !thisConnectInfo.pullMode) return;
+					if (timer != null || thisConnectInfo.bindUri == null || !thisConnectInfo.pullMode)
+						return;
 					
 					timer = new Timer();
 					long milisec = thisConnectInfo.accessPeriod < Counter.PERIOD*1000 ? Counter.PERIOD*1000 : thisConnectInfo.accessPeriod;
@@ -589,27 +590,11 @@ public class BalancerCP extends JFrame implements ServerStatusListener {
 	
 	
 	/**
-	 * Update all controls (components) in this control panel according to current listener status.
-	 * @param status listener current status.
-	 */
-	protected void updateControls(Status status) {
-		if (status == Status.exit) {
-			updateControls0(status);
-		}
-		else {
-			synchronized (this) {
-				updateControls0(status);
-			}
-		}
-	}
-	
-	
-	/**
 	 * Update all controls (components) in this control panel according to current balancer status.
 	 * Please see {@link ServerStatusEvent#status} for more details about balancer statuses.
 	 * @param status balancer current status.
 	 */
-	private void updateControls0(Status status) {
+	private void updateControls(Status status) {
 		if (status == Status.unknown) return;
 		currentStatus = status;
 
@@ -679,6 +664,11 @@ public class BalancerCP extends JFrame implements ServerStatusListener {
 		}
 		
 		btnRefresh.setEnabled(true);
+		
+		//Fixing error when deadlock with pause/resume because of transaction lock. The solution is work-around. User can exit server from command line or system tray.
+		try {
+			if (status == Status.paused) btnStop.setEnabled(false);
+		} catch (Exception e) {LogUtil.trace(e);}
 	}
 	
 	
@@ -686,19 +676,12 @@ public class BalancerCP extends JFrame implements ServerStatusListener {
 	 * Update all controls (components) in this control panel according to current balancer status.
 	 * Please see {@link ServerStatusEvent#status} for more details about balancer statuses.
 	 */
-	protected void updateControls() {
+	protected synchronized void updateControls() {
 		if (listener == null) return;
 		
 		Status status = ServerStatusEvent.getStatus(listener);
 		
-		if (status == Status.exit) {
-			updateControls(status);
-		}
-		else {
-			synchronized (this) {
-				updateControls(status);
-			}
-		}
+		updateControls(status);
 	}
 	
 	
@@ -707,20 +690,21 @@ public class BalancerCP extends JFrame implements ServerStatusListener {
 			throws RemoteException {
 		Status status = evt.getStatus();
 		
-		if (status == Status.exit) {
+		if (connectInfo.bindUri == null || !connectInfo.pullMode) {
 			if (connectInfo.bindUri != null)
-				updateControls0(status);
+				updateControls(status);
 			else if (!evt.getShutdownHookStatus())
-				updateControls0(status);
+				updateControls(status);
 		}
 		else {
 			synchronized (this) {
 				if (connectInfo.bindUri != null)
-					updateControls0(status);
+					updateControls(status);
 				else if (!evt.getShutdownHookStatus())
-					updateControls0(status);
+					updateControls(status);
 			}
 		}
+
 	}
 	
 

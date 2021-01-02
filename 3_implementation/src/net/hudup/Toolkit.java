@@ -39,15 +39,12 @@ public class Toolkit implements AccessPoint {
 	 * @param args The argument parameter of main method. It contains command line arguments.
 	 */
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-		
 		new Toolkit().run(args);
 	}
 
 	
 	@Override
 	public void run(String[] args) {
-		// TODO Auto-generated method stub
 		Util.getPluginManager().fire();
 		
 		RegisterTable parserReg = PluginStorage.getParserReg();
@@ -64,14 +61,12 @@ public class Toolkit implements AccessPoint {
 
 	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
 		return "Toolkit";
 	}
 
 
 	@Override
 	public String toString() {
-		// TODO Auto-generated method stub
 		return getName();
 	}
 

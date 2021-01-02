@@ -24,6 +24,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import net.hudup.core.Util;
+import net.hudup.core.client.ConnectInfo;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.DataDriverList;
 import net.hudup.core.data.DatasetUtil2;
@@ -57,12 +58,23 @@ public class SetupExternalServerWizard extends SetupServerWizard {
 
 	
 	/**
-	 * Constructor with configuration.
+	 * Constructor with server configuration and connection information.
 	 * @param comp parent component.
-	 * @param srvConfig external server configuration.
+	 * @param srvConfig server configuration.
 	 */
 	public SetupExternalServerWizard(Component comp, ExternalServerConfig srvConfig) {
-		super(comp, srvConfig);
+		this(comp, srvConfig, null);
+	}
+	
+	
+	/**
+	 * Constructor with server configuration and connection information.
+	 * @param comp parent component.
+	 * @param srvConfig external server configuration.
+	 * @param connectInfo connection information.
+	 */
+	public SetupExternalServerWizard(Component comp, ExternalServerConfig srvConfig, ConnectInfo connectInfo) {
+		super(comp, srvConfig, connectInfo);
 	}
 
 	
@@ -357,8 +369,8 @@ public class SetupExternalServerWizard extends SetupServerWizard {
 					else {
 						JDialog wait = new JDialog(getWizard(), "Please wait...", false);
 						wait.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-						wait.setLocationRelativeTo(getWizard());
 						wait.setSize(200, 100);
+						wait.setLocationRelativeTo(getWizard());
 						wait.setVisible(true);
 	
 						externalQuery.importData(null);

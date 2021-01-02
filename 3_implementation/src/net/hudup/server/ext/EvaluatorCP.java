@@ -162,8 +162,8 @@ public class EvaluatorCP extends JFrame implements EvaluatorListener {
 		}
 
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		setLocationRelativeTo(null);
 		setSize(600, 400);
+		setLocationRelativeTo(null);
         Image image = UIUtil.getImage("evaluator-32x32.png");
         if (image != null)
         	setIconImage(image);

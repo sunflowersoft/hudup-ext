@@ -28,6 +28,7 @@ import javax.swing.event.ListSelectionListener;
 
 import net.hudup.core.Constants;
 import net.hudup.core.Util;
+import net.hudup.core.client.ConnectInfo;
 import net.hudup.core.data.Attribute;
 import net.hudup.core.data.AttributeList;
 import net.hudup.core.data.BooleanWrapper;
@@ -129,6 +130,12 @@ public class SetupServerWizard extends JDialog {
 
 	
 	/**
+	 * Connection information.
+	 */
+	protected ConnectInfo connectInfo = null;
+
+	
+	/**
 	 * Server configuration.
 	 */
 	protected PowerServerConfig config = null;
@@ -140,12 +147,26 @@ public class SetupServerWizard extends JDialog {
 
 	
 	/**
-	 * Constructor with server configuration.
+	 * Constructor with server configuration and connection information.
 	 * @param comp parent component.
 	 * @param srvConfig server configuration.
 	 */
 	public SetupServerWizard(Component comp, PowerServerConfig srvConfig) {
+		this(comp, srvConfig, null);
+	}
+	
+	
+	/**
+	 * Constructor with server configuration and connection information.
+	 * @param comp parent component.
+	 * @param srvConfig server configuration.
+	 * @param connectInfo connection information.
+	 */
+	public SetupServerWizard(Component comp, PowerServerConfig srvConfig, ConnectInfo connectInfo) {
 		super(UIUtil.getFrameForComponent(comp), "Setup server", true);
+		this.config = srvConfig;
+		this.connectInfo = (connectInfo != null ? connectInfo : new ConnectInfo());
+		
 		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 		setSize(600, 400);
 		setLocationRelativeTo(UIUtil.getFrameForComponent(comp));
@@ -154,8 +175,6 @@ public class SetupServerWizard extends JDialog {
 	        if (image != null)
 	        	setIconImage(image);
 		}
-		
-		this.config = srvConfig;
 		
 		setLayout(new BorderLayout());
 		main = new JPanel(new BorderLayout());
@@ -281,7 +300,6 @@ public class SetupServerWizard extends JDialog {
 							"Cannot apply configuration", 
 							"Cannot apply configuration", 
 							JOptionPane.ERROR_MESSAGE);
-					return;
 				}
 				else {
 					JOptionPane.showMessageDialog(
@@ -290,6 +308,7 @@ public class SetupServerWizard extends JDialog {
 							"Apply successfully", 
 							JOptionPane.INFORMATION_MESSAGE);
 				}
+				
 			}
 		});
 		footer.add(btnApplyConfig);

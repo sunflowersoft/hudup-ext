@@ -89,7 +89,6 @@ public class MetricsOptionDlg extends JDialog {
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					// TODO Auto-generated method stub
 					tblMetricsOption.selectAll(true);
 				}
 			});
@@ -104,7 +103,6 @@ public class MetricsOptionDlg extends JDialog {
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					// TODO Auto-generated method stub
 					tblMetricsOption.selectAll(false);
 				}
 			});
@@ -119,7 +117,6 @@ public class MetricsOptionDlg extends JDialog {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				result = tblMetricsOption.getSelectedMetricList();
 				dispose();
 			}
@@ -131,7 +128,6 @@ public class MetricsOptionDlg extends JDialog {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				dispose();
 			}
 		});
@@ -180,7 +176,6 @@ class MetricsOptionTable extends SortableTable {
 
 	@Override
 	protected void init() {
-		// TODO Auto-generated method stub
 		super.init();
 		
 		if (getColumnCount() > 4) {
@@ -222,7 +217,6 @@ class MetricsOptionTable extends SortableTable {
 
 	@Override
 	public void setValueAt(Object aValue, int row, int column) {
-		// TODO Auto-generated method stub
 		super.setValueAt(aValue, row, column);
 		
         if (column != 3)
@@ -401,7 +395,6 @@ class MetricsOptionTM extends SortableTableModel {
 	
 	@Override
 	public Class<?> getColumnClass(int columnIndex) {
-		// TODO Auto-generated method stub
 		if (columnIndex == 3)
 			return Boolean.class;
 		else
@@ -411,7 +404,6 @@ class MetricsOptionTM extends SortableTableModel {
 
 	@Override
 	public boolean isCellEditable(int row, int column) {
-		// TODO Auto-generated method stub
 		return column == 3;
 	}
 	

@@ -92,10 +92,11 @@ public interface PowerServer extends Server, PluginChangedListener {
 	 * @param pluginDescMap descriptions of algorithms in plug-in storage.
 	 * @param account specified account.
 	 * @param password specified password.
+	 * @param cp class processor.
 	 * @return true if reloading is successful.
 	 * @throws RemoteException if any error raises.
 	 */
-	boolean applyPlugin(PluginAlgDesc2ListMap pluginDescMap, String account, String password) throws RemoteException;
+	boolean applyPlugin(PluginAlgDesc2ListMap pluginDescMap, String account, String password, ClassProcessor cp) throws RemoteException;
 
 	
 	/**

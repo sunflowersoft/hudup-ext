@@ -422,6 +422,15 @@ public final class DataDriver implements Cloneable, Serializable {
 	
 	
 	/**
+	 * Testing whether the driver is used for local system.
+	 * @return whether the driver is used for local system.
+	 */
+	public boolean isLocal() {
+		return type == DataType.file || type == DataType.derby_engine;
+	}
+	
+	
+	/**
 	 * Indicating whether the data driver is valid where the valid driver is associated with the valid driver class returned by {@link #getInnerClass()}.
 	 * @return Whether data driver is valid
 	 */

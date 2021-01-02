@@ -33,7 +33,7 @@ import net.hudup.core.logistic.xURI;
  * @version 10.0
  *
  */
-public interface PluginManager {
+public interface PluginManager extends AutoCloseable {
 	
 	
 //	/**
@@ -68,6 +68,13 @@ public interface PluginManager {
 
 	
 	/**
+	 * This is the first method which needs to be called firstly for any Hudup application.
+	 * However, it is simpler than {@link #fire()} method and it does not call {@link #discover()} method.
+	 */
+	void fireSimply();
+	
+	
+	/**
 	 * Testing whether {@link #fire()} method was fired.
 	 * @return whether {@link #fire()} method was fired.
 	 */
@@ -82,24 +89,25 @@ public interface PluginManager {
 	
 	
 	/**
-	 * Getting a list of instances belonging referred class. Packages are specified in Hudup property file.
+	 * Getting classes from stores and referred class. Packages specified in Hudup property file are not used because this method uses store URI (s).
 	 * This method does not affect plug-in storage.
-	 * @param <T> type of returned instances.
-	 * @param referredClass referred class. If this referred class is null, all classes are retrieved. 
-	 * @return list of instances belonging referred class.
+	 * @param <T> object type.
+	 * @param storeUris array of store URI (s). If this store URI is null or empty, current directory is used.
+	 * @param referredClass referred class. If this referred class is null, all classes are retrieved.
+	 * @return list of classes from stores which are sub-classes of referred class.
 	 */
-	<T> List<T> loadInstances(Class<T> referredClass);
+	<T> List<Class<? extends T>> loadClasses(Class<T> referredClass, xURI...storeUris);
 
 	
 	/**
-	 * Getting a list of instances from store and referred class. Packages specified in Hudup property file are not used because this method uses store URI.
+	 * Getting instances from stores and referred class. Packages specified in Hudup property file are not used because this method uses store URI (s).
 	 * This method does not affect plug-in storage.
 	 * @param <T> object type.
-	 * @param storeUri store URI. If this store URI is null, current directory is used.
+	 * @param storeUris array of store URI (s). If this store URI is null or empty, current directory is used.
 	 * @param referredClass referred class. If this referred class is null, all classes are retrieved.
-	 * @return list of algorithms from store and referred class.
+	 * @return list of instances from stores and referred class.
 	 */
-	<T> List<T> loadInstances(xURI storeUri, Class<T> referredClass);
+	<T> List<T> loadInstances(Class<T> referredClass, xURI...storeUris);
 
 	
 	/**

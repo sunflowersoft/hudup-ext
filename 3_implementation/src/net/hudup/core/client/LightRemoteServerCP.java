@@ -467,6 +467,11 @@ public class LightRemoteServerCP extends JFrame {
 		}
 		
 		btnRefresh.setEnabled(true);
+		
+		//Fixing error when deadlock with pause/resume because of transaction lock. The solution is work-around. User can exit server from command line or system tray.
+		try {
+			if (status == Status.paused) btnStop.setEnabled(false);
+		} catch (Exception e) {LogUtil.trace(e);}
 	}
 	
 

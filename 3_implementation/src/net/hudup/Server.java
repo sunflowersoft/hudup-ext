@@ -14,6 +14,9 @@ import net.hudup.core.AccessPoint;
 import net.hudup.core.Constants;
 import net.hudup.core.Util;
 import net.hudup.core.client.PowerServer;
+import net.hudup.core.data.DataConfig;
+import net.hudup.core.data.Unit;
+import net.hudup.core.data.UnitList;
 import net.hudup.core.data.ui.toolkit.DatasetToolkit;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.UriAdapter;
@@ -59,18 +62,27 @@ public final class Server implements AccessPoint {
 		try {
 			URL sampleDataUrl = getClass().getResource(PowerServerConfig.TEMPLATES_SAMPLE_DATA_PATH);
 			xURI sampleDataUri = xURI.create(sampleDataUrl.toURI());
-			UriAdapter adapter = new UriAdapter(sampleDataUri);
+			xURI fileStore = xURI.create(PowerServerConfig.FILE_DIRECTORY); 
+			UriAdapter adapter = new UriAdapter(fileStore);
+			if (!adapter.exists(fileStore)) adapter.create(fileStore, true);
+			
 			if (Constants.COMPRESSED_FILE_SUPPORT) {
 				xURI storeUri = xURI.create(PowerServerConfig.STORE_PATH_DEFAULT);
 				if (!adapter.exists(storeUri))
-					adapter.copy(sampleDataUri, storeUri, false, null);
+					adapter.copyAsFile(sampleDataUri, storeUri, false);
 			}
 			else {
-				xURI storeUri = xURI.create(PowerServerConfig.STORE_PATH_DEFAULT2);
-				if (!adapter.exists(storeUri)) {
-					adapter.create(storeUri, true);
-					adapter.unzip(sampleDataUri, storeUri);
+				UnitList basicUnitList = DataConfig.getBasicUnitList();
+				boolean exist = true;
+				for (int i = 0; i < basicUnitList.size(); i++) {
+					Unit unit = basicUnitList.get(i);
+					if (!adapter.exists(fileStore.concat(unit.getName()))) {
+						exist = false;
+						break;
+					}
 				}
+				if (!exist)
+					adapter.unzip(sampleDataUri, fileStore);
 			}
 			adapter.close();
 		}
@@ -100,7 +112,6 @@ public final class Server implements AccessPoint {
 		catch (RemoteException e) {
 			LogUtil.trace(e);
 		}
-		
 		
 	}
 

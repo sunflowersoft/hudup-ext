@@ -55,7 +55,6 @@ import net.hudup.core.data.DataDriverList;
 import net.hudup.core.data.ui.DatasetConfigurator;
 import net.hudup.core.logistic.I18nUtil;
 import net.hudup.core.logistic.LogUtil;
-import net.hudup.core.logistic.NextUpdate;
 import net.hudup.core.logistic.xURI;
 import net.hudup.core.parser.DatasetParser;
 import net.hudup.core.parser.RmiServerIndicator;
@@ -757,10 +756,10 @@ class ImportAlgDlg extends JDialog {
 	 * @param storeUri store URI.
 	 * @param outAlgList list of algorithms as output.
 	 */
-	private void loadClassesFromStore(xURI storeUri, List<Alg> outAlgList) {
+	protected void loadClassesFromStore(xURI storeUri, List<Alg> outAlgList) {
 		if (storeUri == null) return;
 
-		List<Alg> algList = Util.getPluginManager().loadInstances(storeUri, Alg.class);
+		List<Alg> algList = Util.getPluginManager().loadInstances(Alg.class, storeUri);
 		RegisterTable normalReg = PluginStorage.getNormalAlgReg();
 		AlgList nextUpdateList = PluginStorage.getNextUpdateList();
 		for (Alg alg : algList) {
@@ -782,7 +781,6 @@ class ImportAlgDlg extends JDialog {
 	/**
 	 * Event-driven method response to OK button command.
 	 */
-	@NextUpdate
 	protected void ok() {
 		importedCount = 0;
 
@@ -877,7 +875,7 @@ class ImportAlgDlg extends JDialog {
 				JOptionPane.INFORMATION_MESSAGE);
 		else
 			JOptionPane.showMessageDialog(this, 
-				"Importing " + importedCount + " algorithm successfully", 
+				"Importing " + importedCount + " algorithms successfully", 
 				"Successful importing", 
 				JOptionPane.INFORMATION_MESSAGE);
 		

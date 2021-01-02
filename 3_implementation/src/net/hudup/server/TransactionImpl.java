@@ -9,6 +9,8 @@ package net.hudup.server;
 
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import net.hudup.core.logistic.LogUtil;
+
 /**
  * This class implements the transaction interface, please see {@link Transaction}.
  * 
@@ -38,7 +40,6 @@ public class TransactionImpl implements Transaction {
 	 * @param fair true if using the fair ordering policy. Please see {@link ReentrantReadWriteLock}.
 	 */
 	public TransactionImpl(boolean fair) {
-		
 		lock = new ReentrantReadWriteLock(fair);
 	}
 
@@ -63,18 +64,23 @@ public class TransactionImpl implements Transaction {
 	
 	@Override
 	public void unlockWrite() {
-		lock.writeLock().unlock();
+		try {
+			lock.writeLock().unlock();
+		}
+		catch (Throwable e) {LogUtil.trace(e);}
+	}
+
+
+	@Override
+	public boolean isWriteLocked() {
+		return lock.isWriteLocked();
 	}
 
 
 	@Override
 	public boolean isWriteLockedByCurrentThread() {
-		
 		return lock.isWriteLockedByCurrentThread();
 	}
 
 
-	
-	
-	
 }

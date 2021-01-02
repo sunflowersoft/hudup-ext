@@ -29,7 +29,9 @@ import net.hudup.core.alg.AlgDesc2;
 import net.hudup.core.alg.AlgDesc2List;
 import net.hudup.core.alg.AlgList;
 import net.hudup.core.client.ActiveMeasure;
+import net.hudup.core.client.ClassProcessor;
 import net.hudup.core.client.Gateway;
+import net.hudup.core.client.HudupRMIClassLoader;
 import net.hudup.core.client.PowerServer;
 import net.hudup.core.client.Protocol;
 import net.hudup.core.client.Server;
@@ -296,11 +298,11 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 		if (isPaused()) {
 			//Which thread locked server can unlock server. This feature is used for security of service.
 			//However, this feature causes trouble in remote control.
-			if (!trans.isWriteLockedByCurrentThread())
+			if (trans.isWriteLocked() && !trans.isWriteLockedByCurrentThread())
 				return false;
 			
 			paused = false;
-        	trans.unlockWrite();
+			if (trans.isWriteLocked()) trans.unlockWrite();
 		}
 		
     	trans.lockWrite();
@@ -355,6 +357,9 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 		
 		if (config == null) return;
 
+		//Fixing bug for pause/resume deadlock, date 2020.12.31 by Loc Nguyen
+		if (trans.isWriteLockedByCurrentThread()) trans.unlockWrite();
+		
 		Object sync = new Object();
 		
 		AbstractRunner worker = new AbstractRunner() {
@@ -767,7 +772,7 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 
 
 	@Override
-	public synchronized boolean applyPlugin(PluginAlgDesc2ListMap pluginDescMap, String account, String password)
+	public synchronized boolean applyPlugin(PluginAlgDesc2ListMap pluginDescMap, String account, String password, ClassProcessor cp)
 			throws RemoteException {
 		if (!isIdle()) return false;
 		if (!validateAccount(account, password, DataConfig.ACCOUNT_ADMIN_PRIVILEGE))
@@ -775,11 +780,15 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 		if (pluginDescMap == null) return false;
 		if (pluginDescMap.size() == 0) return true;
 		
+		ClassLoader cl = null;
+		if (cp != null)
+			cl = new HudupRMIClassLoader(getClass().getClassLoader(), (ClassProcessor)cp);
+
 		Set<String> tableNames = pluginDescMap.tableNames();
 		for (String tableName : tableNames) {
 			AlgDesc2List algDescs = pluginDescMap.get(tableName);
 			if (algDescs != null && algDescs.size() > 0)
-				applyPlugin(tableName, algDescs);
+				applyPlugin(tableName, algDescs, cl);
 		}
 
 		pluginChanged(new PluginChangedEvent(this));
@@ -791,8 +800,9 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 	 * Applying algorithms with regard to specified table name and list of algorithm descriptions.
 	 * @param tableName specified table name.
 	 * @param algDescs specified list of algorithm descriptions.
+	 * @param cl class loader.
 	 */
-	private void applyPlugin(String tableName, AlgDesc2List algDescs) {
+	private void applyPlugin(String tableName, AlgDesc2List algDescs, ClassLoader cl) {
 		RegisterTable table = PluginStorage.lookupTable(tableName);
 		if (table == null || algDescs == null) return;
 		
@@ -816,7 +826,18 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 				if (algDesc.registered) {
 					if (!table.contains(algDesc.algName)) {
 						alg = removeNextUpdateAlg(algDesc.getAlgClassName(), algDesc.algName);
-						if (alg != null) table.register(alg);
+						if (alg != null) {
+							table.register(alg);
+						}
+						else if (cl != null) {
+							try {
+								Class<?> newAlgClass = cl.loadClass(algDesc.getAlgClassName());
+								if (newAlgClass != null && Alg.class.isAssignableFrom(newAlgClass)) {
+									Alg newAlg = (Alg)newAlgClass.getDeclaredConstructor().newInstance();
+									table.register(newAlg);
+								}
+							} catch (Exception e) {LogUtil.trace(e);}
+						}
 					}
 					else
 						alg = table.query(algDesc.algName);
@@ -867,7 +888,10 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 				return PluginStorage.getNextUpdateList().remove(index);
 			else
 				return null;
-		} catch (Exception e) {LogUtil.trace(e);}
+		}
+		catch (Exception e) {
+			LogUtil.error("Error by " + e.getMessage());;
+		}
 		
 		return null;
 	}
@@ -948,6 +972,10 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 	}
 
 	
+	/*
+	 * It is understood that a server is not idle if it is stopped to re-configure.
+	 * Otherwise, it is always willing to serve (considered idle) if it is started.
+	 */
 	@Override
 	public boolean isIdle() throws RemoteException {
 		return isStarted();

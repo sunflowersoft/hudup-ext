@@ -111,7 +111,7 @@ public class PluginStorageManifestRemote extends PluginStorageManifest {
 		ConnectInfo connectInfo = getConnectInfo();
 		PowerServer server = getServer();
 		try {
-			boolean applied = server.applyPlugin(pluginDescMap, connectInfo.account.getName(), connectInfo.account.getPassword());
+			boolean applied = server.applyPlugin(pluginDescMap, connectInfo.account.getName(), connectInfo.account.getPassword(), null);
 			if (applied) update();
 			return applied;
 		}

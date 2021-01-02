@@ -1378,6 +1378,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 				setResultVisible(result != null && result.size() > 0);
 				
 				btnConfigAlgs.setEnabled(algRegTable.size() > 0);
+				btnAddDataset.setEnabled(PluginStorage.getParserReg().size() > 0);
 				btnClear.setEnabled(guiData.pool.size() > 0);
 				btnUpload.setEnabled(true);
 				btnDownload.setEnabled(true);
@@ -1442,6 +1443,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 				btnStop.setEnabled(false);
 				btnForceStop.setEnabled(false);
 				
+				btnMetricsOption.setEnabled(PluginStorage.getMetricReg().size() > 0);
 				tblMetrics.update(result);
 				prgRunning.setMaximum(0);
 				prgRunning.setValue(0);
@@ -1459,9 +1461,9 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			setResultVisible(flag);
 			
 			btnConfigAlgs.setEnabled(algRegTable.size() > 0);
-			btnAddDataset.setEnabled(true);
-			btnUpload.setEnabled(lbAlgs.getAlgList().size() > 0);
-			btnDownload.setEnabled(lbAlgs.getAlgList().size() > 0);
+			btnAddDataset.setEnabled(PluginStorage.getParserReg().size() > 0);
+			btnUpload.setEnabled(true);
+			btnDownload.setEnabled(true);
 		}
 		
 		updateGUI();
@@ -1715,7 +1717,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 	 */
 	private void addDataset(boolean nullTesting) {
 		try {
-			if (evaluator.remoteIsStarted() || this.lbAlgs.getAlgList().size() == 0)
+			if (evaluator.remoteIsStarted() || PluginStorage.getParserReg().size() == 0)
 				return;
 			
 			clearResult();

@@ -33,6 +33,7 @@ import net.hudup.core.alg.AlgDesc2;
 import net.hudup.core.alg.AlgList;
 import net.hudup.core.alg.ui.AlgConfigDlg;
 import net.hudup.core.alg.ui.AlgDesc2ConfigDlg;
+import net.hudup.core.client.Server;
 import net.hudup.core.data.Exportable;
 import net.hudup.core.logistic.LogUtil;
 
@@ -484,15 +485,16 @@ public class PluginStorageManifest extends SortableSelectableTable {
     
     
     /**
-     * Testing whether a registered {@link PluginChangedListener} is idle.
-     * @return whether a registered {@link PluginChangedListener} is idle. Note, there can be many registered {@link PluginChangedListener} (s). 
+     * Testing whether registered plug-in changed listeners are idle.
+     * @return whether registered plug-in changed listeners are idle. Note, there can be many registered plug-in changed listeners {@link PluginChangedListener}. 
      */
     protected boolean isListenersIdle() {
 		PluginChangedListener[] listeners = getPluginChangedListeners();
 		
 		for (PluginChangedListener listener : listeners) {
 			try {
-				if (!listener.isIdle())
+				//If listener is server, it is considered as idle even though it is stopped (it is always to be considered idle.
+				if (!(listener instanceof Server) && !listener.isIdle())
 					return false;
 			}
 			catch (Throwable e) {
