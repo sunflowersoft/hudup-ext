@@ -7,6 +7,8 @@
  */
 package net.hudup.core;
 
+import static net.hudup.core.Constants.ROOT_PACKAGE;
+
 import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -122,10 +124,13 @@ public abstract class PluginManagerAbstract implements PluginManager {
 	public void fire() {
 		if (isFired()) return;
 		
+		//Doing basic tasks.
 		fireSimply();
 		
+		//Registering algorithms, which is fill in the plug-in storage.
 		discover();
 		
+		//Doing extra tasks.
 		extraTasks();
 		
 		fired = true;
@@ -136,14 +141,17 @@ public abstract class PluginManagerAbstract implements PluginManager {
 	public void fireSimply() {
 		if (isFired()) return;
 		
+		//Clear plug-in storage.
 		try {
 			PluginStorage.clear();
 		} catch (Exception e) {LogUtil.trace(e);}
 		
+		//Clear extra storage.
 		try {
 			ExtraStorage.clear();
 		} catch (Exception e) {LogUtil.trace(e);}
 		
+		//Create directories in working directory.
 		try {
 			UriAdapter adapter = new UriAdapter(Constants.WORKING_DIRECTORY);
 			
@@ -185,6 +193,7 @@ public abstract class PluginManagerAbstract implements PluginManager {
 			LogUtil.trace(e);
 		}
 		
+		//Copying working library key.
 		try {
 			URL resourceWorkingLibKeyUrl = getClass().getResource(Constants.RESOURCES_PACKAGE + "lib/" + WORKING_LIB_KEY_JAR);
 			xURI resourceWorkingLibKeyUri = xURI.create(resourceWorkingLibKeyUrl.toURI());
@@ -200,9 +209,41 @@ public abstract class PluginManagerAbstract implements PluginManager {
 			LogUtil.trace(e);
 		}
 		
+		//Copying the last property file.
+		try {
+			UriAdapter adapter = new UriAdapter(Constants.WORKING_DIRECTORY);
+			xURI templatePropUri = xURI.create(Constants.WORKING_DIRECTORY	+ "/" + Util.hudupTemplatePropName);
+			if (!adapter.exists(templatePropUri)) {
+				xURI lastUri = null;
+				for (int i = 0; i <= Util.MAX_PROPS_FILES; i++) {
+					String path = ROOT_PACKAGE + Util.hudupPropName + "." + i;
+					xURI uri = null;
+					try {
+						URL url = getClass().getResource(path);
+						if (url != null)
+							uri = xURI.create(url.toURI());
+					}
+					catch (Throwable e) {uri = null;}
+					
+					if (uri != null) lastUri = uri;
+				}
+				
+				if (lastUri != null) {
+					adapter.copy(lastUri, templatePropUri, false, null);
+				}
+			}
+			
+			adapter.close();
+		}
+		catch (Throwable e) {
+			LogUtil.trace(e);
+		}
+
+		//Adding working library class path into Java class path.
 		addWorkingLibClassPath();
 		
 		
+		//Setting derby database.
 		try {
 			Properties p = System.getProperties();
 			p.setProperty("derby.system.home", Constants.DATABASE_DIRECTORY + "/derby");
@@ -212,6 +253,7 @@ public abstract class PluginManagerAbstract implements PluginManager {
 		}
 		
 		
+		//Loading drivers.
 		loadDrivers();
 		
 		

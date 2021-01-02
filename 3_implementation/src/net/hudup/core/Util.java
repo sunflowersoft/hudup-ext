@@ -57,18 +57,31 @@ public class Util {
 	/**
 	 * System properties.
 	 */
-	private final static int MAX_PROPS_FILES = 10;
+	public final static int MAX_PROPS_FILES = 10;
 
+	
+	/**
+	 * Hudup properties name.
+	 */
+	public final static String hudupPropName = "hudup.properties";
+	
+	
+	/**
+	 * Second Hudup temporal properties name.
+	 */
+	public final static String hudupTemplatePropName = hudupPropName + ".template";
+	
+
+	/**
+	 * Hudup temporal properties name.
+	 */
+	public final static String hudupBackupPropName = hudupPropName + ".backup";
+	
 	
 	/**
 	 * System properties.
 	 */
 	protected final static Properties props = new Properties();
-	
-	/**
-	 * Hudup properties name.
-	 */
-	private final static String hudupPropName = "hudup.properties";
 	
 	
 	/**
@@ -159,7 +172,7 @@ public class Util {
 			if (lastPath != null) {
 				try {
 					Files.copy(lastPath,
-						Paths.get(Constants.WORKING_DIRECTORY + "/" + hudupPropName + ".temp"),
+						Paths.get(Constants.WORKING_DIRECTORY + "/" + hudupTemplatePropName),
 						StandardCopyOption.REPLACE_EXISTING);
 					copied = true;
 				}
@@ -169,8 +182,8 @@ public class Util {
 			if ((!copied) && (lastProps != null)) {
 				try {
 					OutputStream out = Files.newOutputStream(
-							Paths.get(Constants.WORKING_DIRECTORY + "/" + hudupPropName + ".temp"),
-							StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+						Paths.get(Constants.WORKING_DIRECTORY + "/" + hudupBackupPropName),
+						StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
 					lastProps.store(out, "Following are last properties");
 					out.close();
 				}

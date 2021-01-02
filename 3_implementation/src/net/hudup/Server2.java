@@ -59,17 +59,18 @@ public final class Server2 implements AccessPoint {
 		Util.getPluginManager().fire();
 		
 		//Not important.
+		UriAdapter adapter = null;
 		try {
 			URL sampleDataUrl = getClass().getResource(PowerServerConfig.TEMPLATES_SAMPLE_DATA_PATH);
 			xURI sampleDataUri = xURI.create(sampleDataUrl.toURI());
 			xURI fileStore = xURI.create(PowerServerConfig.FILE_DIRECTORY); 
-			UriAdapter adapter = new UriAdapter(fileStore);
+			adapter = new UriAdapter(fileStore);
 			if (!adapter.exists(fileStore)) adapter.create(fileStore, true);
 			
 			if (Constants.COMPRESSED_FILE_SUPPORT) {
 				xURI storeUri = xURI.create(PowerServerConfig.STORE_PATH_DEFAULT);
 				if (!adapter.exists(storeUri))
-					adapter.copyAsFile(sampleDataUri, storeUri, false);
+					adapter.copy(sampleDataUri, storeUri, false, null);
 			}
 			else {
 				UnitList basicUnitList = DataConfig.getBasicUnitList();
@@ -88,6 +89,11 @@ public final class Server2 implements AccessPoint {
 		}
 		catch (Throwable e) {
 			LogUtil.trace(e);
+		}
+		finally {
+			try {
+				if (adapter != null) adapter.close();
+			} catch (Throwable e) {}
 		}
 
 		PowerServer server = ExtendedServer2.create();
