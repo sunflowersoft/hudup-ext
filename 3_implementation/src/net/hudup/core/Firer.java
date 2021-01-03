@@ -104,7 +104,7 @@ public class Firer extends PluginManagerAbstract {
 	 */
 	protected <T> void loadClassesInstances(Class<T> referredClass, Collection<Class<? extends T>> outClassList, Collection<T> outObjList, xURI...storeUris) {
 		if (storeUris == null || storeUris.length == 0) {
-			addWorkingLibClassPath();
+			boolean added = addWorkingLibClassPath();
 			
 			String[] prefixList = Util.getLoadablePackages();
 			if (prefixList == null || prefixList.length == 0)
@@ -142,7 +142,7 @@ public class Firer extends PluginManagerAbstract {
 				}
 			}
 			
-			if (workingLibClassAdded) return;
+			if (added) return;
 		}
 		
 		List<xURI> uriList = Util.newList();
@@ -157,11 +157,23 @@ public class Firer extends PluginManagerAbstract {
 		URL[] uris = xURI.toUrl(uriList).toArray(new URL[] {});
 		if (uris == null || uris.length == 0) return;
 		
+		if (storeUris != null && storeUris.length > 0) {
+			try {
+				if (getClass().getClassLoader() instanceof URLClassLoader) {
+					URLClassLoader sysClassLoader = (URLClassLoader) getClass().getClassLoader();
+					if (contains(sysClassLoader.getURLs(), uris)) {
+						loadClassesInstances(referredClass, outClassList, outObjList);
+						return;
+					}
+				}
+			}
+			catch (Exception e) {LogUtil.trace(e);}
+		}
+		
 		boolean createNewCP = false;
 		URLClassLoader classLoader = null;
 		for (URLClassLoader cl : extraClassLoaders) {
-			URL[] uris0 = cl.getURLs();
-			if (isEqual(uris, uris0)) {
+			if (contains(cl.getURLs(), uris)) {
 				classLoader = cl;
 				break;
 			}
@@ -195,33 +207,38 @@ public class Firer extends PluginManagerAbstract {
 	
 	
 	/**
-	 * Testing whether two URL (s) are equal.
-	 * @param urls1 first URL.
-	 * @param urls2 second URL.
-	 * @return whether two URL (s) are equal.
+	 * Testing whether the super URL set contains the sub URL set.
+	 * @param superUrls super URL set.
+	 * @param subUrls2 sub URL set.
+	 * @return whether the super URL set contains the sub URL set.
 	 */
-	private boolean isEqual(URL[] urls1, URL[] urls2) {
-		if (urls1 == null && urls2 == null) return true;
-		if (urls1 == null || urls2 == null) return false;
-		if (urls1.length == 0 && urls2.length == 0) return true;
-		if (urls1.length != urls2.length) return false;
+	private boolean contains(URL[] superUrls, URL[] subUrls2) {
+		if (superUrls == null || subUrls2 == null) return false;
+		if (subUrls2.length == 0) return true;
 		
-		for (int i = 0; i < urls1.length; i++) {
-			URL url1 = urls1[i];
-			for (int j = 0; j < urls2.length; j++) {
-				URL url2 = urls2[j];
-				if (url1 == url2)
-					continue;
-				else if (url1 == null)
-					return false;
-				else if (!url1.equals(url2))
-					return false;
+		for (int i = 0; i < subUrls2.length; i++) {
+			URL subUrl = subUrls2[i];
+			
+			boolean found = false;
+			for (int j = 0; j < superUrls.length; j++) {
+				URL superUrl = superUrls[j];
+				if (subUrl == null && superUrl == null) {
+					found = true;
+					break;
+				}
+				else if (subUrl != null && superUrl != null) {
+					if (subUrl == superUrl || subUrl.equals(superUrl)) {
+						found = true;
+						break;
+					}
+				}
 			}
+			
+			if (!found) return false;
 		}
 		
 		return true;
-		
 	}
-	
+
 	
 }

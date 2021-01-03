@@ -112,6 +112,11 @@ public final class Constants {
 	public final static String  DATABASE_DIRECTORY       = WORKING_DIRECTORY + "/db";
 	
 	/**
+	 * File directory.
+	 */
+	public final static String  FILE_DIRECTORY           = DATABASE_DIRECTORY + "/file";
+	
+	/**
 	 * Backup directory.
 	 */
 	public final static String  BACKUP_DIRECTORY         = WORKING_DIRECTORY + "/backup";
@@ -135,6 +140,11 @@ public final class Constants {
 	 * The directory contains images.
 	 */
 	public final static String  IMAGES_PACKAGE           = RESOURCES_PACKAGE + "images/";
+	
+	/**
+	 * The directory contains images.
+	 */
+	public final static String  LIB_PACKAGE              = RESOURCES_PACKAGE + "lib/";
 	
 	/**
 	 * The directory contains template files.

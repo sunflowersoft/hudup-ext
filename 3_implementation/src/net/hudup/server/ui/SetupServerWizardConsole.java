@@ -125,7 +125,7 @@ public class SetupServerWizardConsole {
 				}
 			}
 			else {
-				if (storeUri == null) storeUri = xURI.create(PowerServerConfig.FILE_DIRECTORY);
+				if (storeUri == null) storeUri = xURI.create(Constants.FILE_DIRECTORY);
 				
 				System.out.print("\nEnter store URI (default <" + storeUri.toString() + ">: ");
 				String storeUriText = scanner.next().trim();
@@ -139,7 +139,7 @@ public class SetupServerWizardConsole {
 		}
 		else {
 			if (storeUri == null || !adapter.exists(storeUri)) {
-				if (storeUri == null) storeUri = xURI.create(PowerServerConfig.FILE_DIRECTORY);
+				if (storeUri == null) storeUri = xURI.create(Constants.FILE_DIRECTORY);
 				adapter.create(storeUri, true);
 			}
 			else {

@@ -63,7 +63,7 @@ public final class Server implements AccessPoint {
 		try {
 			URL sampleDataUrl = getClass().getResource(PowerServerConfig.TEMPLATES_SAMPLE_DATA_PATH);
 			xURI sampleDataUri = xURI.create(sampleDataUrl.toURI());
-			xURI fileStore = xURI.create(PowerServerConfig.FILE_DIRECTORY); 
+			xURI fileStore = xURI.create(Constants.FILE_DIRECTORY); 
 			adapter = new UriAdapter(fileStore);
 			if (!adapter.exists(fileStore)) adapter.create(fileStore, true);
 			

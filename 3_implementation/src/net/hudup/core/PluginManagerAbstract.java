@@ -101,12 +101,6 @@ public abstract class PluginManagerAbstract implements PluginManager {
 	
 	
 	/**
-	 * Flag to indicate whether working class path was added.
-	 */
-	protected boolean workingLibClassAdded = false;
-	
-	
-	/**
 	 * List of extra class loaders.
 	 */
 	protected List<URLClassLoader> extraClassLoaders = Util.newList();
@@ -156,36 +150,32 @@ public abstract class PluginManagerAbstract implements PluginManager {
 			UriAdapter adapter = new UriAdapter(Constants.WORKING_DIRECTORY);
 			
 			xURI working = xURI.create(Constants.WORKING_DIRECTORY);
-			if (!adapter.exists(working))
-				adapter.create(working, true);
+			if (!adapter.exists(working)) adapter.create(working, true);
 			
 			xURI kb = xURI.create(Constants.KNOWLEDGE_BASE_DIRECTORY);
-			if (!adapter.exists(kb))
-				adapter.create(kb, true);
+			if (!adapter.exists(kb)) adapter.create(kb, true);
 				
 			xURI log = xURI.create(Constants.LOGS_DIRECTORY);
-			if (!adapter.exists(log))
-				adapter.create(log, true);
+			if (!adapter.exists(log)) adapter.create(log, true);
 			
 			xURI temp = xURI.create(Constants.LOGS_DIRECTORY);
 			if (!adapter.exists(temp))
 				adapter.create(temp, true);
 	
 			xURI q = xURI.create(Constants.Q_DIRECTORY);
-			if (!adapter.exists(q))
-				adapter.create(q, true);
+			if (!adapter.exists(q)) adapter.create(q, true);
 	
 			xURI db = xURI.create(Constants.DATABASE_DIRECTORY);
-			if (!adapter.exists(db))
-				adapter.create(db, true);
+			if (!adapter.exists(db)) adapter.create(db, true);
 			
+			xURI file = xURI.create(Constants.FILE_DIRECTORY);
+			if (!adapter.exists(file)) adapter.create(file, true);
+
 			xURI backup = xURI.create(Constants.BACKUP_DIRECTORY);
-			if (!adapter.exists(backup))
-				adapter.create(backup, true);
+			if (!adapter.exists(backup)) adapter.create(backup, true);
 			
 			xURI lib = xURI.create(Constants.LIB_DIRECTORY);
-			if (!adapter.exists(lib))
-				adapter.create(lib, true);
+			if (!adapter.exists(lib)) adapter.create(lib, true);
 			
 			adapter.close();
 		}
@@ -195,7 +185,7 @@ public abstract class PluginManagerAbstract implements PluginManager {
 		
 		//Copying working library key.
 		try {
-			URL resourceWorkingLibKeyUrl = getClass().getResource(Constants.RESOURCES_PACKAGE + "lib/" + WORKING_LIB_KEY_JAR);
+			URL resourceWorkingLibKeyUrl = getClass().getResource(Constants.LIB_PACKAGE + WORKING_LIB_KEY_JAR);
 			xURI resourceWorkingLibKeyUri = xURI.create(resourceWorkingLibKeyUrl.toURI());
 			UriAdapter adapter = new UriAdapter(xURI.create(Constants.LIB_DIRECTORY));
 			if (adapter.exists(resourceWorkingLibKeyUri)) {
@@ -521,20 +511,6 @@ public abstract class PluginManagerAbstract implements PluginManager {
 	 * @return true if adding is successful.
 	 */
 	protected boolean addWorkingLibClassPath() {
-		if (workingLibClassAdded) return true;
-		
-		boolean exist = false;
-		try {
-			PluginManagerAbstract.class.getClassLoader().loadClass(WORKING_LIB_KEY_CLASS);
-			exist = true;
-		} catch (Exception e) {
-			exist = false;
-		}
-		if (exist) {
-			workingLibClassAdded = true;
-			return true;
-		}
-		
 		URLClassLoader sysClassLoader = null;
 		try {
 			if (getClass().getClassLoader() instanceof URLClassLoader)
@@ -543,9 +519,34 @@ public abstract class PluginManagerAbstract implements PluginManager {
 		catch (Exception e) {LogUtil.trace(e);}
 		if (sysClassLoader == null) return false;
 
-		workingLibClassAdded = addClassPaths2(sysClassLoader, xURI.create(Constants.LIB_DIRECTORY));
-
-		return workingLibClassAdded;
+		xURI libStoreUri = xURI.create(Constants.LIB_DIRECTORY);
+		UriAdapter adapter = new UriAdapter(libStoreUri);
+		List<xURI> uris = adapter.getUriListOfStoresArchives(libStoreUri);
+		adapter.close();
+		if (uris.size() == 0) return true;
+		
+		URL[] sysUrls = sysClassLoader.getURLs();
+		sysUrls = sysUrls != null ? sysUrls : new URL[0];
+		List<xURI> addUris = Util.newList();
+		for (xURI uri : uris) {
+			URL url = uri.toURL();
+			if (url == null) continue;
+			
+			boolean found = false;
+			for (URL sysUrl : sysUrls) {
+				if (url.equals(sysUrl)) {
+					found = true;
+					break;
+				}
+			}
+			
+			if (!found) addUris.add(uri);
+		}
+		
+		if (addUris.size() == 0)
+			return true;
+		else
+			return addClassPaths(sysClassLoader, addUris.toArray(new xURI[] {}));
 	}
 	
 	
@@ -788,13 +789,13 @@ public abstract class PluginManagerAbstract implements PluginManager {
 		}
 		if (method == null) return false;
 		
-		boolean result = false;
+		boolean result = true;
 	    for (URL url : urlList) {
 			try {
 			    method.invoke(classLoader, url);
-			    result = true;
 			}
 			catch (Exception e) {
+			    result = false;
 				LogUtil.trace(e);
 			}
 		}

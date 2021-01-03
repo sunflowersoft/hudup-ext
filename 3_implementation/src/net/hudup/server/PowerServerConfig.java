@@ -52,15 +52,9 @@ public class PowerServerConfig extends ServerConfig {
 	
 
 	/**
-	 * File directory.
-	 */
-	public final static String  FILE_DIRECTORY = Constants.DATABASE_DIRECTORY + "/file";
-
-	
-	/**
 	 * Default store path.
 	 */
-	public final static String  STORE_PATH_DEFAULT = FILE_DIRECTORY + "/" + TEMPLATES_SAMPLE_DATA_NAME;
+	public final static String  STORE_PATH_DEFAULT = Constants.FILE_DIRECTORY + "/" + TEMPLATES_SAMPLE_DATA_NAME;
 
 	
 	/**
@@ -122,7 +116,7 @@ public class PowerServerConfig extends ServerConfig {
 	public void reset() {
 		super.reset();
 		try {
-			xURI storeUri = Constants.COMPRESSED_FILE_SUPPORT ? xURI.create(STORE_PATH_DEFAULT) : xURI.create(FILE_DIRECTORY);
+			xURI storeUri = Constants.COMPRESSED_FILE_SUPPORT ? xURI.create(STORE_PATH_DEFAULT) : xURI.create(Constants.FILE_DIRECTORY);
 			putDefaultUnitList(storeUri);
 			setRecommender(new GreenFallCF());
 			setParser(new SnapshotParserImpl());
