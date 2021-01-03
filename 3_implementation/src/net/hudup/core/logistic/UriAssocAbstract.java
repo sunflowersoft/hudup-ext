@@ -283,36 +283,6 @@ public abstract class UriAssocAbstract implements UriAssoc {
 
 
 	@Override
-	public boolean copyAsFile(xURI src, xURI dst, boolean moved) {
-		src = normalize(src);
-		dst = normalize(dst);
-		Path srcPath = src.toPath();
-		Path dstPath = dst.toPath();
-		
-		try {
-			
-			if (moved) {
-				if (exists(dst))
-					return Files.move(srcPath, dstPath, StandardCopyOption.REPLACE_EXISTING) != null;
-				else
-					return Files.move(srcPath, dstPath) != null;
-			}
-			else {
-				if (exists(dst))
-					return Files.copy(srcPath, dstPath, StandardCopyOption.REPLACE_EXISTING) != null;
-				else
-					return Files.copy(srcPath, dstPath) != null;
-			}
-		} 
-		catch (Throwable e) {
-			LogUtil.trace(e);
-		}
-		
-		return false;
-	}
-
-
-	@Override
 	public boolean rename(xURI src, xURI dst) {
 		src = normalize(src);
 		dst = normalize(dst);

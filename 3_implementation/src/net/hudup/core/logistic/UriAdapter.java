@@ -195,12 +195,6 @@ public class UriAdapter implements UriAssoc, AutoCloseable {
 
 
 	@Override
-	public boolean copyAsFile(xURI src, xURI dst, boolean moved) {
-		return assoc.copyAsFile(src, dst, moved);
-	}
-
-
-	@Override
 	public boolean rename(xURI src, xURI dst) {
 		return assoc.rename(src, dst);
 	}

@@ -305,7 +305,7 @@ public class DefaultServer extends PowerServerImpl {
 						new HelpContent(null);
 					} 
 					catch (Throwable ex) {
-						ex.printStackTrace();
+						LogUtil.trace(ex);
 					}
 				}
 			});
@@ -320,7 +320,7 @@ public class DefaultServer extends PowerServerImpl {
 						exit();
 					} 
 					catch (Throwable ex) {
-						ex.printStackTrace();
+						LogUtil.trace(ex);
 					}
 				}
 			});

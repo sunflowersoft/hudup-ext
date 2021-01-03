@@ -219,7 +219,11 @@ public abstract class PluginManagerAbstract implements PluginManager {
 				}
 				
 				if (lastUri != null) {
-					adapter.copy(lastUri, templatePropUri, false, null);
+					try {
+						adapter.copy(lastUri, templatePropUri, false, null);
+					} catch (Exception e) {
+						LogUtil.error("Copying last properties error by " + e.getMessage());
+					}
 				}
 			}
 			

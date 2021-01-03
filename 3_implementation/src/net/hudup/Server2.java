@@ -85,10 +85,9 @@ public final class Server2 implements AccessPoint {
 				if (!exist)
 					adapter.unzip(sampleDataUri, fileStore);
 			}
-			adapter.close();
 		}
 		catch (Throwable e) {
-			LogUtil.trace(e);
+			LogUtil.error("Server: coppying sample data error by " + e.getMessage());
 		}
 		finally {
 			try {

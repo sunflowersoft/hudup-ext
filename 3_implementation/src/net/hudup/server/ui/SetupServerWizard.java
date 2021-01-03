@@ -608,9 +608,10 @@ public class SetupServerWizard extends JDialog {
 	private boolean createSchema() {
 		final JDialog createAttDlg = new JDialog(
 				UIUtil.getFrameForComponent(this), "Creating schema", true);
-		createAttDlg.setLayout(new BorderLayout());
 		createAttDlg.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		createAttDlg.setSize(600, 400);
+		createAttDlg.setLocationRelativeTo(UIUtil.getFrameForComponent(this));
+		createAttDlg.setLayout(new BorderLayout());
 		
 		JPanel body = new JPanel(new GridLayout(1, 0));
 		createAttDlg.add(body, BorderLayout.CENTER);
@@ -723,9 +724,10 @@ public class SetupServerWizard extends JDialog {
 		
 		final JDialog createDlg = new JDialog(
 				UIUtil.getFrameForComponent(this), "Creating unit", true);
-		createDlg.setLayout(new BorderLayout());
 		createDlg.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		createDlg.setSize(600, 400);
+		createDlg.setLocationRelativeTo(UIUtil.getFrameForComponent(this));
+		createDlg.setLayout(new BorderLayout());
 		
 		JPanel header = new JPanel();
 		createDlg.add(header, BorderLayout.NORTH);

@@ -104,7 +104,6 @@ public class ServerTrayIcon extends TrayIcon implements ServerStatusListener {
 			server.addStatusListener(this);
 		} 
 		catch (Throwable e) {
-			// TODO Auto-generated catch block
 			LogUtil.trace(e);
 		}
 		
@@ -151,7 +150,6 @@ public class ServerTrayIcon extends TrayIcon implements ServerStatusListener {
 	
 	@Override
 	public void statusChanged(ServerStatusEvent evt) throws RemoteException {
-		// TODO Auto-generated method stub
 		if (!evt.getShutdownHookStatus())
 			updateStatus();
 	}
