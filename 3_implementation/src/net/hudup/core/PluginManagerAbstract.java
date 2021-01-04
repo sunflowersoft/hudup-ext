@@ -61,6 +61,7 @@ import net.hudup.core.logistic.BaseClass;
 import net.hudup.core.logistic.Composite;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.NextUpdate;
+import net.hudup.core.logistic.ClassLoader2;
 import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.UriAdapter.AdapterWriter;
 import net.hudup.core.logistic.UriFilter;
@@ -566,6 +567,7 @@ public abstract class PluginManagerAbstract implements PluginManager {
 	 * @param outClassList collection of classes as output.
 	 * @param outObjList collection of objects (instances) as output.
 	 */
+	@NextUpdate
 	protected <T> void loadClassesInstances(xURI storeUri, String rootPath, UriAdapter adapter, ClassLoader classLoader, Class<T> referredClass, Collection<Class<? extends T>> outClassList, Collection<T> outObjList) {
 		adapter.uriListProcess(storeUri,
 			new UriFilter() {
@@ -613,12 +615,14 @@ public abstract class PluginManagerAbstract implements PluginManager {
 					int idx = classPath.lastIndexOf(".class");
 					if (idx >= 0) classPath = classPath.substring(0, idx);
 					
+					//Finding class.
 					Class<?> cls = null;
 					try {
-						cls = Class.forName(classPath, true, classLoader);
+//						cls = Class.forName(classPath, true, classLoader);
+						cls = ClassLoader2.findClass(classLoader, classPath);
 					}
 					catch (Throwable e) {
-						System.out.println("Loading class \"" + classPath + "\" error");
+						System.out.println("Finding class \"" + classPath + "\" error");
 						cls = null;
 					}
 					if (cls == null) return;
@@ -626,6 +630,19 @@ public abstract class PluginManagerAbstract implements PluginManager {
 						return;
 					if (!isClassValid(cls)) return;
 					
+//					//Initializing class.
+//					if (outClassList != null || outObjList != null) {
+//						cls = null;
+//						try {
+//							cls = Class.forName(classPath, true, classLoader);
+//						}
+//						catch (Throwable e) {
+//							System.out.println("Initializing class \"" + classPath + "\" error");
+//							cls = null;
+//						}
+//						if (cls == null) return;
+//					}
+
 					if (outClassList != null) outClassList.add((Class<? extends T>)cls);
 					
 					if (outObjList != null) {

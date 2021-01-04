@@ -151,7 +151,6 @@ public class Test {
 //			System.out.println(url);
 //		}
 		
-		System.out.println(xURI.create("E:/").getRoot());
 	}
 
 	

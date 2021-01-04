@@ -114,6 +114,11 @@ public class PluginStorageManifestPanelRemote extends PluginStorageManifestPanel
 
 	@Override
 	protected void import0() {
+		if (connectInfo.bindUri == null) {
+			super.import0();
+			return;
+		}
+		
 		if (connectInfo.pullMode) {
 			JOptionPane.showMessageDialog(
 				UIUtil.getFrameForComponent(this), 

@@ -294,7 +294,7 @@ public class PluginStorageManifestPanel extends JPanel {
 				import0();
 			}
 		});
-		importAlg.setToolTipText("Only import normal algorithms");
+		importAlg.setToolTipText("Only import normal algorithms in remote case");
 		toolbar2Grp1.add(importAlg);
 		
 		JPanel toolbar2Grp2 = new JPanel();
