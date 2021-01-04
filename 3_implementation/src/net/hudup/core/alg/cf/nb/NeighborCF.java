@@ -5,7 +5,7 @@
  * Email: ng_phloc@yahoo.com
  * Phone: +84-975250362
  */
-package net.hudup.core.alg.cf;
+package net.hudup.core.alg.cf.nb;
 
 import java.awt.Component;
 import java.io.Serializable;
@@ -20,6 +20,8 @@ import javax.swing.JOptionPane;
 import net.hudup.core.Constants;
 import net.hudup.core.Util;
 import net.hudup.core.alg.SupportCacheAlg;
+import net.hudup.core.alg.cf.MemoryBasedCF;
+import net.hudup.core.alg.cf.MemoryBasedCFAbstract;
 import net.hudup.core.data.Attribute;
 import net.hudup.core.data.Attribute.Type;
 import net.hudup.core.data.AttributeList;
@@ -219,7 +221,8 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 		}
 
 		this.ratingMedian = getRelevantRatingThreshold();
-		this.ratingMedian = Util.isUsed(this.ratingMedian) ? this.ratingMedian : this.ratingMean;
+		if (!Util.isUsed(this.ratingMedian) && Util.isUsed(this.ratingMean))
+			this.ratingMedian = this.ratingMean;
 	}
 
 

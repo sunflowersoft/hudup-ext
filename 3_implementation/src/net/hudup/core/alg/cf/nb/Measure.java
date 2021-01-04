@@ -5,7 +5,7 @@
  * Email: ng_phloc@yahoo.com
  * Phone: +84-975250362
  */
-package net.hudup.core.alg.cf;
+package net.hudup.core.alg.cf.nb;
 
 /**
  * This class lists measures which may be supported by the nearest neighbors collaborative filtering algorithm built in {@link NeighborCF}.
@@ -15,6 +15,8 @@ package net.hudup.core.alg.cf;
  *
  */
 public class Measure {
+	
+	
 	/**
 	 * Name of cosine measure.
 	 */

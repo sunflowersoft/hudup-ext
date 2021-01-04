@@ -11,7 +11,7 @@ import java.rmi.RemoteException;
 
 import net.hudup.core.Constants;
 import net.hudup.core.Util;
-import net.hudup.core.alg.cf.NeighborCFItemBased;
+import net.hudup.core.alg.cf.nb.NeighborCFItemBased;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.logistic.Composite;
