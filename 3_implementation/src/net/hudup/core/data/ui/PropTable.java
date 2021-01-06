@@ -594,6 +594,32 @@ class PropTableModel extends DefaultTableModel {
 	
 	
 	/**
+	 * Setting value at specified key.
+	 * @param key specified key.
+	 * @param value value to be set at specified key.
+	 */
+	protected void setValueAt(String key, Serializable value) {
+		int n = getRowCount();
+		for (int i = 0; i < n; i++) {
+			String key0 = (String) getValueAt(i, 0);
+			if (key0.equals(key)) {
+				try {
+					value = propList.getValueOf(key, value);
+					super.setValueAt(value, i, 1);
+				}
+				catch (Throwable e) {
+					JOptionPane.showMessageDialog(null, "Invalid format", "Invalid format", JOptionPane.ERROR_MESSAGE);
+				}
+				modified = true;
+				return;
+			}
+		}
+		
+		
+	}
+	
+	
+	/**
 	 * Applying changes in the model into the internal property list.
 	 * @return whether apply successfully.
 	 */
@@ -712,12 +738,16 @@ class PropTableModel extends DefaultTableModel {
 			if (result == null)
 				return;
 			else if (result instanceof ImportantProperty) {
-				Serializable object = ((ImportantProperty)result).getObject();
-				if (object != null)
-					setValueAt(object, selectedRow, 1);
-				else
-					setValueAt(result, selectedRow, 1);
-				fireTableDataChanged();
+				value = ((ImportantProperty)result).getObject();
+				if (value != null) {
+//					update();
+//					setValueAt(value, selectedRow, 1);
+//					fireTableDataChanged();
+					
+					update();
+					setValueAt(key, value);
+					apply();
+				}
 			}
 			else
 				setValueAt(result, selectedRow, 1);

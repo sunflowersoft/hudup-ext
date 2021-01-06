@@ -86,7 +86,7 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 	/**
 	 * Default value for statistics calculation mode.
 	 */
-	protected static final boolean CALC_STATISTICS_DEFAULT = true;
+	protected static final boolean CALC_STATISTICS_DEFAULT = false;
 
 	
 	/**
@@ -552,68 +552,97 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 	protected void updateConfig(String measure) {
 		if (config == null || measure == null) return;
 		
+		config.removeReadOnly(CALC_STATISTICS);
 		config.removeReadOnly(COSINE_NORMALIZED_FIELD);
 		config.removeReadOnly(MSD_FRACTION_FIELD);
 		if (measure.equals(Measure.COSINE)) {
+			config.put(CALC_STATISTICS, false);
+			config.addReadOnly(CALC_STATISTICS);
 			config.addReadOnly(MSD_FRACTION_FIELD);
 		}
 		else if (measure.equals(Measure.COSINEJ)) {
+			config.put(CALC_STATISTICS, false);
+			config.addReadOnly(CALC_STATISTICS);
 			config.addReadOnly(MSD_FRACTION_FIELD);
 		}
 		else if (measure.equals(Measure.COJ)) {
+			config.put(CALC_STATISTICS, false);
+			config.addReadOnly(CALC_STATISTICS);
 			config.addReadOnly(MSD_FRACTION_FIELD);
 		}
 		else if (measure.equals(Measure.PEARSON)) {
+			config.put(CALC_STATISTICS, false);
+			config.addReadOnly(CALC_STATISTICS);
 			config.addReadOnly(COSINE_NORMALIZED_FIELD);
 			config.addReadOnly(MSD_FRACTION_FIELD);
 		}
 		else if (measure.equals(Measure.PEARSONJ)) {
+			config.put(CALC_STATISTICS, false);
+			config.addReadOnly(CALC_STATISTICS);
 			config.addReadOnly(COSINE_NORMALIZED_FIELD);
 			config.addReadOnly(MSD_FRACTION_FIELD);
 		}
 		else if (measure.equals(Measure.COD)) {
+			config.put(CALC_STATISTICS, false);
+			config.addReadOnly(CALC_STATISTICS);
 			config.addReadOnly(COSINE_NORMALIZED_FIELD);
 			config.addReadOnly(MSD_FRACTION_FIELD);
 		}
 		else if (measure.equals(Measure.CPC)) {
+			config.put(CALC_STATISTICS, false);
+			config.addReadOnly(CALC_STATISTICS);
 			config.addReadOnly(COSINE_NORMALIZED_FIELD);
 			config.addReadOnly(MSD_FRACTION_FIELD);
 		}
 		else if (measure.equals(Measure.WPC)) {
+			config.put(CALC_STATISTICS, false);
+			config.addReadOnly(CALC_STATISTICS);
 			config.addReadOnly(COSINE_NORMALIZED_FIELD);
 			config.addReadOnly(MSD_FRACTION_FIELD);
 		}
 		else if (measure.equals(Measure.SPC)) {
+			config.put(CALC_STATISTICS, false);
+			config.addReadOnly(CALC_STATISTICS);
 			config.addReadOnly(COSINE_NORMALIZED_FIELD);
 			config.addReadOnly(MSD_FRACTION_FIELD);
 		}
 		else if (measure.equals(Measure.JACCARD)) {
+			config.put(CALC_STATISTICS, false);
+			config.addReadOnly(CALC_STATISTICS);
 			config.addReadOnly(COSINE_NORMALIZED_FIELD);
 			config.addReadOnly(MSD_FRACTION_FIELD);
 		}
 		else if (measure.equals(Measure.JACCARD2)) {
+			config.put(CALC_STATISTICS, false);
+			config.addReadOnly(CALC_STATISTICS);
 			config.addReadOnly(COSINE_NORMALIZED_FIELD);
 			config.addReadOnly(MSD_FRACTION_FIELD);
 		}
 		else if (measure.equals(Measure.MSD)) {
+			config.put(CALC_STATISTICS, false);
+			config.addReadOnly(CALC_STATISTICS);
 			config.addReadOnly(COSINE_NORMALIZED_FIELD);
 		}
 		else if (measure.equals(Measure.MSDJ)) {
+			config.put(CALC_STATISTICS, false);
+			config.addReadOnly(CALC_STATISTICS);
 			config.addReadOnly(COSINE_NORMALIZED_FIELD);
 		}
 		else if (measure.equals(Measure.URP)) {
+			config.put(CALC_STATISTICS, false);
+			config.addReadOnly(CALC_STATISTICS);
 			config.addReadOnly(COSINE_NORMALIZED_FIELD);
 			config.addReadOnly(MSD_FRACTION_FIELD);
 		}
 		else if (measure.equals(Measure.TRIANGLE)) {
+			config.put(CALC_STATISTICS, false);
+			config.addReadOnly(CALC_STATISTICS);
 			config.addReadOnly(COSINE_NORMALIZED_FIELD);
 			config.addReadOnly(MSD_FRACTION_FIELD);
 		}
 		else if (measure.equals(Measure.TJM)) {
-			config.addReadOnly(COSINE_NORMALIZED_FIELD);
-			config.addReadOnly(MSD_FRACTION_FIELD);
-		}
-		else {
+			config.put(CALC_STATISTICS, false);
+			config.addReadOnly(CALC_STATISTICS);
 			config.addReadOnly(COSINE_NORMALIZED_FIELD);
 			config.addReadOnly(MSD_FRACTION_FIELD);
 		}
@@ -1143,9 +1172,20 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 							getMainMeasures().toArray(), 
 							measure);
 					
-					if (value != null) updateConfig(value.toString());
+					if (value == null) return null;
 					
-					return new ImportantProperty(value);
+					int confirm = JOptionPane.showConfirmDialog(
+							comp, 
+							"Changing important property requires immediate appliance.\nAre you sure?", 
+							"Attributes are modified",
+							JOptionPane.YES_NO_OPTION,
+							JOptionPane.QUESTION_MESSAGE);
+					if (confirm == JOptionPane.YES_OPTION) {
+						updateConfig(value.toString());
+						return new ImportantProperty(value);
+					}
+					else
+						return value;
 				}
 				else 
 					return tempConfig.userEdit(comp, key, defaultValue);

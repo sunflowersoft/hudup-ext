@@ -34,5 +34,14 @@ public class ImportantProperty extends Wrapper {
 		super(value);
 	}
 
+
+	@Override
+	public String toString() {
+		if (object != null)
+			return object.toString();
+		else
+			return super.toString();
+	}
+
 	
 }

@@ -28,7 +28,7 @@ public class Wrapper implements Serializable {
 	/**
 	 * The internal object wrapped by this wrapper.
 	 */
-	private Serializable object = null;
+	protected Serializable object = null;
 	
 	
 	/**

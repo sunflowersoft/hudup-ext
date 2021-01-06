@@ -37,6 +37,7 @@ public class Cosine extends NeighborCFUserBased {
 
 	@Override
 	protected void updateConfig(String measure) {
+		config.remove(MEASURE);
 		config.remove(CALC_STATISTICS);
 		config.remove(MSD_FRACTION_FIELD);
 	}
