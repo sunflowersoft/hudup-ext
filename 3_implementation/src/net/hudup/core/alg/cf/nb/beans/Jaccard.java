@@ -7,6 +7,7 @@
  */
 package net.hudup.core.alg.cf.nb.beans;
 
+import net.hudup.core.alg.cf.nb.Measure;
 import net.hudup.core.alg.cf.nb.NeighborCFUserBased;
 import net.hudup.core.data.Profile;
 import net.hudup.core.data.RatingVector;
@@ -32,6 +33,12 @@ public class Jaccard extends NeighborCFUserBased {
 	 */
 	public Jaccard() {
 
+	}
+
+
+	@Override
+	public String getMeasure() {
+		return Measure.JACCARD;
 	}
 
 

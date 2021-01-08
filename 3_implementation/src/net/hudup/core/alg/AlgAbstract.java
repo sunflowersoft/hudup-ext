@@ -11,6 +11,7 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 
 import net.hudup.core.ExtraStorage;
+import net.hudup.core.alg.SetupAlgEvent.Type;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.logistic.DSUtil;
 import net.hudup.core.logistic.EventListenerList2;
@@ -84,7 +85,10 @@ public abstract class AlgAbstract implements Alg, AlgRemote {
 		
 		while (learnStarted) {
 			
-			//Do something here.
+			//Do something with main tasks here.
+			
+			//Pseudo-code to fire doing setup event.
+			fireSetupEvent(new SetupAlgEvent(this, Type.doing, getName(), null, "Setting up is doing"));
 			
 			synchronized (this) {
 				while (learnPaused) {
@@ -102,6 +106,9 @@ public abstract class AlgAbstract implements Alg, AlgRemote {
 			learnStarted = false;
 			learnPaused = false;
 			
+			//Pseudo-code to fire done setup event.
+			fireSetupEvent(new SetupAlgEvent(this, Type.done, getName(), null, "Setting up is done"));
+
 			notifyAll();
 		}
 		

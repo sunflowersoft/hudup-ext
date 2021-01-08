@@ -54,14 +54,15 @@ public abstract class ExecutableAlgAbstract extends AlgAbstract implements Execu
      */
     public ExecutableAlgAbstract() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
 
+	/*
+	 * In the this version, the setup method is not marked synchronized because it calls learnStart method.
+	 */
 	@SuppressWarnings("unchecked")
 	@Override
 	public /*synchronized*/ void setup(Dataset dataset, Object...info) throws RemoteException {
-		// TODO Auto-generated method stub
 		unsetup();
 		this.dataset = dataset;
 		if (info != null && info.length > 0 && (info[0] instanceof Fetcher<?>))
@@ -83,7 +84,6 @@ public abstract class ExecutableAlgAbstract extends AlgAbstract implements Execu
 	
 	@Override
 	public void setup(Fetcher<Profile> sample, Object...info) throws RemoteException {
-		// TODO Auto-generated method stub
 		List<Object> additionalInfo = Util.newList();
 		additionalInfo.add(sample);
 		additionalInfo.addAll(Arrays.asList(info));
@@ -113,7 +113,6 @@ public abstract class ExecutableAlgAbstract extends AlgAbstract implements Execu
 	
 	@Override
 	public synchronized Inspector getInspector() {
-		// TODO Auto-generated method stub
 		String desc = "";
 		try {
 			desc = getDescription();
@@ -155,14 +154,12 @@ public abstract class ExecutableAlgAbstract extends AlgAbstract implements Execu
 	
 	@Override
 	public String[] getBaseRemoteInterfaceNames() throws RemoteException {
-		// TODO Auto-generated method stub
 		return new String[] {ExecutableAlgRemote.class.getName()};
 	}
 
 	
 	@Override
 	protected void finalize() throws Throwable {
-		// TODO Auto-generated method stub
 		super.finalize();
 		
 		try {
