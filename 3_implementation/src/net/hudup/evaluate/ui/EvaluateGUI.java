@@ -1392,7 +1392,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			clearResult();
 			boolean started = false;
 			if (connectInfo.bindUri == null)
-				started = evaluator.remoteStart0(algList, toDatasetPoolExchangedClient(guiData.pool), timestamp = new Timestamp(), null);
+				started = evaluator.remoteStart(algList, toDatasetPoolExchangedClient(guiData.pool), timestamp = new Timestamp(), null);
 			else {
 				DataConfig config = AlgList.getAlgDescMap(algList);
 				started = evaluator.remoteStart(AlgList.getAlgNameList(algList), toDatasetPoolExchangedClient(guiData.pool), connectInfo.checkPullMode() ? null : this, config, timestamp = new Timestamp(), null);

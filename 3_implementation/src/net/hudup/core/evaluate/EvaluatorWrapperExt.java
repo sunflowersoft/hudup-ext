@@ -801,20 +801,20 @@ public class EvaluatorWrapperExt implements Evaluator, EvaluatorListener, Evalua
 
 
 	@Override
-	public synchronized boolean remoteStart0(List<Alg> algList, DatasetPoolExchanged pool, Timestamp timestamp, Serializable parameter) throws RemoteException {
-		TaskQueue.waitForTaskQueue(taskMap);
-		stimulate();
-		
-		return remoteEvaluator.remoteStart0(algList, pool, timestamp, parameter);
-	}
-
-	
-	@Override
 	public boolean classPathContains(String className) throws RemoteException {
 		return remoteEvaluator.classPathContains(className);
 	}
 
 
+	@Override
+	public synchronized boolean remoteStart(List<Alg> algList, DatasetPoolExchanged pool, Timestamp timestamp, Serializable parameter) throws RemoteException {
+		TaskQueue.waitForTaskQueue(taskMap);
+		stimulate();
+		
+		return remoteEvaluator.remoteStart(algList, pool, timestamp, parameter);
+	}
+
+	
 	@Override
 	public synchronized boolean remoteStart(List<String> algNameList, DatasetPoolExchanged pool, ClassProcessor cp, DataConfig config, Timestamp timestamp, Serializable parameter)
 			throws RemoteException {

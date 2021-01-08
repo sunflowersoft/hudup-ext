@@ -463,14 +463,36 @@ public class UriAdapter implements UriAssoc, AutoCloseable {
 	
 	/**
 	 * Unzipping the specified file to specified store.
-	 * @param zipFile specified compressed file.
+	 * @param zipUri specified compressed file from URI.
 	 * @param store specified store.
 	 * @return true if unzipping is successful.
 	 */
-	public boolean unzip(xURI zipFile, xURI store) {
+	public boolean unzip(xURI zipUri, xURI store) {
 		boolean ret = true;
 		
-		try (ZipInputStream zis = new ZipInputStream(getInputStream(zipFile));) {
+		try (InputStream zipStream = getInputStream(zipUri);) {
+			ret = unzip(zipStream, store);
+		}
+		catch (Exception e) {
+			ret = false;
+			LogUtil.trace(e);
+		}
+		
+		return ret;
+	}
+
+	
+	/**
+	 * Unzipping the specified input stream to specified store.
+	 * @param zipStream specified input stream from compressed file.
+	 * @param store specified store.
+	 * @return true if unzipping is successful.
+	 */
+	public boolean unzip(InputStream zipStream, xURI store) {
+		boolean ret = true;
+		
+		try {
+			ZipInputStream zis = new ZipInputStream(zipStream);
 			ZipEntry zipEntry = null;
 			byte[] buffer = new byte[1024];
 	        while ((zipEntry = zis.getNextEntry()) != null) {

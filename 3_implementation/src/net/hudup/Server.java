@@ -7,6 +7,7 @@
  */
 package net.hudup;
 
+import java.io.InputStream;
 import java.net.URL;
 import java.rmi.RemoteException;
 
@@ -82,8 +83,12 @@ public final class Server implements AccessPoint {
 						break;
 					}
 				}
-				if (!exist)
-					adapter.unzip(sampleDataUri, fileStore);
+				if (!exist) {
+					try (InputStream zipStream = getClass().getResourceAsStream(PowerServerConfig.TEMPLATES_SAMPLE_DATA_PATH)) {
+						adapter.unzip(zipStream, fileStore);
+					}
+					catch (Exception e) {LogUtil.trace(e);}
+				}
 			}
 		}
 		catch (Throwable e) {

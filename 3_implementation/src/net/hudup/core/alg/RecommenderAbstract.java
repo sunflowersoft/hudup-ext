@@ -55,7 +55,7 @@ public abstract class RecommenderAbstract extends AlgAbstract implements Recomme
 	/**
 	 * Re-configuring minimum-maximum ratings mode.
 	 */
-	public static final String MINMAX_RATING_RECONFIG = "minmax_rating_reconfig";
+	public static final String MINMAX_RATING_RECONFIG = "minmax_rating_reconfigure";
 
 	
 	/**

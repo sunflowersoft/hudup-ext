@@ -445,16 +445,16 @@ class DelegatorEvaluator extends EvaluatorWrapperExt {
 	
 	
 	@Override
-	public synchronized boolean remoteStart0(List<Alg> algList, DatasetPoolExchanged pool, Timestamp timestamp, Serializable parameter) throws RemoteException {
+	public synchronized boolean remoteStart(List<Alg> algList, DatasetPoolExchanged pool, Timestamp timestamp, Serializable parameter) throws RemoteException {
 		TaskQueue.waitForTaskQueue(taskMap);
 		stimulate();
 		
 		boolean flag = socketServer.getFlag();
 		
 		if (flag)
-			return remoteEvaluator.remoteStart0(algList, pool, timestamp, parameter);
+			return remoteEvaluator.remoteStart(algList, pool, timestamp, parameter);
 		else if (socketServer.isRunning())
-			return remoteEvaluator.remoteStart0(algList, pool, timestamp, parameter);
+			return remoteEvaluator.remoteStart(algList, pool, timestamp, parameter);
 		else
 			throw new RemoteException("Socket server is not running");
 	}

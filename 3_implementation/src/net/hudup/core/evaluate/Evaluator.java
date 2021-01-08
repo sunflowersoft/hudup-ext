@@ -101,7 +101,7 @@ public interface Evaluator extends Remote, RemoteRunner, SetupAlgListener, Plugi
 
 	
 	/**
-	 * Stimulating the evaluator with internal tasks.
+	 * Stimulating the evaluator with internal tasks. This method is often called by {@link #remoteStart(List, DatasetPoolExchanged, Timestamp, Serializable)} method.
 	 * @throws RemoteException if any error raises.
 	 */
 	void stimulate() throws RemoteException;
@@ -116,7 +116,7 @@ public interface Evaluator extends Remote, RemoteRunner, SetupAlgListener, Plugi
 	 * @return true if successful.
 	 * @throws RemoteException if any error raises.
 	 */
-	boolean remoteStart0(List<Alg> algList, DatasetPoolExchanged pool, Timestamp timestamp, Serializable parameter) throws RemoteException;
+	boolean remoteStart(List<Alg> algList, DatasetPoolExchanged pool, Timestamp timestamp, Serializable parameter) throws RemoteException;
 
 	
 	/**

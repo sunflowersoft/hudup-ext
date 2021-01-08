@@ -1146,7 +1146,7 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 		tempConfig.put(SUPPORT_CACHE_FIELD, SUPPORT_CACHE_DEFAULT);
 		tempConfig.put(KNN, KNN_DEFAULT);
 		tempConfig.put(CALC_STATISTICS, CALC_STATISTICS_DEFAULT);
-		tempConfig.put(MEASURE, getDefaultMeasure()); //tempConfig.addReadOnly(MEASURE);
+		tempConfig.put(MEASURE, getDefaultMeasure()); tempConfig.addReadOnly(MEASURE);
 		tempConfig.put(HYBRID, false); tempConfig.addInvisible(HYBRID);
 		tempConfig.put(COSINE_NORMALIZED_FIELD, COSINE_NORMALIZED_DEFAULT);
 		tempConfig.put(MSD_FRACTION_FIELD, MSD_FRACTION_DEFAULT);

@@ -298,7 +298,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 
 
 	@Override
-	public synchronized boolean remoteStart0(List<Alg> algList, DatasetPoolExchanged pool, Timestamp timestamp, Serializable parameter) throws RemoteException {
+	public synchronized boolean remoteStart(List<Alg> algList, DatasetPoolExchanged pool, Timestamp timestamp, Serializable parameter) throws RemoteException {
 		if (isStarted() || this.evAlgList != null || this.evPool != null) {
 			LogUtil.error("Evaluator is running and so evaluation is not run");
 			return false;
@@ -1982,7 +1982,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 		if (algList.size() == 0)
 			return false;
 		else
-			return remoteStart0(algList, pool, timestamp, parameter);
+			return remoteStart(algList, pool, timestamp, parameter);
 	}
 	
 	
