@@ -134,7 +134,7 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 	/**
 	 * General rating median.
 	 */
-	protected double ratingMedian = Constants.UNUSED;
+	protected double ratingMedian = DataConfig.RELEVANT_RATING_DEFAULT;
 
 	
 	/**
@@ -230,7 +230,7 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 	public synchronized void unsetup() throws RemoteException {
 		super.unsetup();
 		
-		this.ratingMedian = Constants.UNUSED;
+		this.ratingMedian = DataConfig.RELEVANT_RATING_DEFAULT;
 		
 		this.ratingMean = Constants.UNUSED;
 		this.ratingVar = Constants.UNUSED;
