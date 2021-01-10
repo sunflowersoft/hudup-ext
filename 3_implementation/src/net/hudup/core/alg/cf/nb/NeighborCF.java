@@ -80,7 +80,7 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 	/**
 	 * Statistics calculation mode.
 	 */
-	protected static final String CALC_STATISTICS = "calc_statistics";
+	protected static final String CALC_STATISTICS_FIELD = "calc_statistics";
 
 	
 	/**
@@ -99,6 +99,18 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 	 * Name of hybrid measure.
 	 */
 	protected static final String HYBRID = "hybrid";
+
+	
+	/**
+	 * Similarity threshold.
+	 */
+	protected static final String SIMILARITY_THRESHOLD_FIELD = "similarity_threshold";
+
+	
+	/**
+	 * Default value for statistics calculation mode.
+	 */
+	protected static final String SIMILARITY_THRESHOLD_DEFAULT = "NaN";
 
 	
 	/**
@@ -215,7 +227,7 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 	public synchronized void setup(Dataset dataset, Object...params) throws RemoteException {
 		super.setup(dataset, params);
 		
-		if (getConfig().getAsBoolean(CALC_STATISTICS)) {
+		if (getConfig().getAsBoolean(CALC_STATISTICS_FIELD)) {
 			updateUserMeanVars(dataset);
 			updateItemMeanVars(dataset);
 		}
@@ -552,97 +564,97 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 	protected void updateConfig(String measure) {
 		if (config == null || measure == null) return;
 		
-		config.removeReadOnly(CALC_STATISTICS);
+		config.removeReadOnly(CALC_STATISTICS_FIELD);
 		config.removeReadOnly(COSINE_NORMALIZED_FIELD);
 		config.removeReadOnly(MSD_FRACTION_FIELD);
 		if (measure.equals(Measure.COSINE)) {
-			config.put(CALC_STATISTICS, false);
-			config.addReadOnly(CALC_STATISTICS);
+			config.put(CALC_STATISTICS_FIELD, false);
+			config.addReadOnly(CALC_STATISTICS_FIELD);
 			config.addReadOnly(MSD_FRACTION_FIELD);
 		}
 		else if (measure.equals(Measure.COSINEJ)) {
-			config.put(CALC_STATISTICS, false);
-			config.addReadOnly(CALC_STATISTICS);
+			config.put(CALC_STATISTICS_FIELD, false);
+			config.addReadOnly(CALC_STATISTICS_FIELD);
 			config.addReadOnly(MSD_FRACTION_FIELD);
 		}
 		else if (measure.equals(Measure.COJ)) {
-			config.put(CALC_STATISTICS, false);
-			config.addReadOnly(CALC_STATISTICS);
+			config.put(CALC_STATISTICS_FIELD, false);
+			config.addReadOnly(CALC_STATISTICS_FIELD);
 			config.addReadOnly(MSD_FRACTION_FIELD);
 		}
 		else if (measure.equals(Measure.PEARSON)) {
-			config.put(CALC_STATISTICS, false);
-			config.addReadOnly(CALC_STATISTICS);
+			config.put(CALC_STATISTICS_FIELD, false);
+			config.addReadOnly(CALC_STATISTICS_FIELD);
 			config.addReadOnly(COSINE_NORMALIZED_FIELD);
 			config.addReadOnly(MSD_FRACTION_FIELD);
 		}
 		else if (measure.equals(Measure.PEARSONJ)) {
-			config.put(CALC_STATISTICS, false);
-			config.addReadOnly(CALC_STATISTICS);
+			config.put(CALC_STATISTICS_FIELD, false);
+			config.addReadOnly(CALC_STATISTICS_FIELD);
 			config.addReadOnly(COSINE_NORMALIZED_FIELD);
 			config.addReadOnly(MSD_FRACTION_FIELD);
 		}
 		else if (measure.equals(Measure.COD)) {
-			config.put(CALC_STATISTICS, false);
-			config.addReadOnly(CALC_STATISTICS);
+			config.put(CALC_STATISTICS_FIELD, false);
+			config.addReadOnly(CALC_STATISTICS_FIELD);
 			config.addReadOnly(COSINE_NORMALIZED_FIELD);
 			config.addReadOnly(MSD_FRACTION_FIELD);
 		}
 		else if (measure.equals(Measure.CPC)) {
-			config.put(CALC_STATISTICS, false);
-			config.addReadOnly(CALC_STATISTICS);
+			config.put(CALC_STATISTICS_FIELD, false);
+			config.addReadOnly(CALC_STATISTICS_FIELD);
 			config.addReadOnly(COSINE_NORMALIZED_FIELD);
 			config.addReadOnly(MSD_FRACTION_FIELD);
 		}
 		else if (measure.equals(Measure.WPC)) {
-			config.put(CALC_STATISTICS, false);
-			config.addReadOnly(CALC_STATISTICS);
+			config.put(CALC_STATISTICS_FIELD, false);
+			config.addReadOnly(CALC_STATISTICS_FIELD);
 			config.addReadOnly(COSINE_NORMALIZED_FIELD);
 			config.addReadOnly(MSD_FRACTION_FIELD);
 		}
 		else if (measure.equals(Measure.SPC)) {
-			config.put(CALC_STATISTICS, false);
-			config.addReadOnly(CALC_STATISTICS);
+			config.put(CALC_STATISTICS_FIELD, false);
+			config.addReadOnly(CALC_STATISTICS_FIELD);
 			config.addReadOnly(COSINE_NORMALIZED_FIELD);
 			config.addReadOnly(MSD_FRACTION_FIELD);
 		}
 		else if (measure.equals(Measure.JACCARD)) {
-			config.put(CALC_STATISTICS, false);
-			config.addReadOnly(CALC_STATISTICS);
+			config.put(CALC_STATISTICS_FIELD, false);
+			config.addReadOnly(CALC_STATISTICS_FIELD);
 			config.addReadOnly(COSINE_NORMALIZED_FIELD);
 			config.addReadOnly(MSD_FRACTION_FIELD);
 		}
 		else if (measure.equals(Measure.JACCARD2)) {
-			config.put(CALC_STATISTICS, false);
-			config.addReadOnly(CALC_STATISTICS);
+			config.put(CALC_STATISTICS_FIELD, false);
+			config.addReadOnly(CALC_STATISTICS_FIELD);
 			config.addReadOnly(COSINE_NORMALIZED_FIELD);
 			config.addReadOnly(MSD_FRACTION_FIELD);
 		}
 		else if (measure.equals(Measure.MSD)) {
-			config.put(CALC_STATISTICS, false);
-			config.addReadOnly(CALC_STATISTICS);
+			config.put(CALC_STATISTICS_FIELD, false);
+			config.addReadOnly(CALC_STATISTICS_FIELD);
 			config.addReadOnly(COSINE_NORMALIZED_FIELD);
 		}
 		else if (measure.equals(Measure.MSDJ)) {
-			config.put(CALC_STATISTICS, false);
-			config.addReadOnly(CALC_STATISTICS);
+			config.put(CALC_STATISTICS_FIELD, false);
+			config.addReadOnly(CALC_STATISTICS_FIELD);
 			config.addReadOnly(COSINE_NORMALIZED_FIELD);
 		}
 		else if (measure.equals(Measure.URP)) {
-			config.put(CALC_STATISTICS, false);
-			config.addReadOnly(CALC_STATISTICS);
+			config.put(CALC_STATISTICS_FIELD, false);
+			config.addReadOnly(CALC_STATISTICS_FIELD);
 			config.addReadOnly(COSINE_NORMALIZED_FIELD);
 			config.addReadOnly(MSD_FRACTION_FIELD);
 		}
 		else if (measure.equals(Measure.TRIANGLE)) {
-			config.put(CALC_STATISTICS, false);
-			config.addReadOnly(CALC_STATISTICS);
+			config.put(CALC_STATISTICS_FIELD, false);
+			config.addReadOnly(CALC_STATISTICS_FIELD);
 			config.addReadOnly(COSINE_NORMALIZED_FIELD);
 			config.addReadOnly(MSD_FRACTION_FIELD);
 		}
 		else if (measure.equals(Measure.TJM)) {
-			config.put(CALC_STATISTICS, false);
-			config.addReadOnly(CALC_STATISTICS);
+			config.put(CALC_STATISTICS_FIELD, false);
+			config.addReadOnly(CALC_STATISTICS_FIELD);
 			config.addReadOnly(COSINE_NORMALIZED_FIELD);
 			config.addReadOnly(MSD_FRACTION_FIELD);
 		}
@@ -1145,9 +1157,10 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 		DataConfig tempConfig = super.createDefaultConfig();
 		tempConfig.put(SUPPORT_CACHE_FIELD, SUPPORT_CACHE_DEFAULT);
 		tempConfig.put(KNN, KNN_DEFAULT);
-		tempConfig.put(CALC_STATISTICS, CALC_STATISTICS_DEFAULT);
+		tempConfig.put(CALC_STATISTICS_FIELD, CALC_STATISTICS_DEFAULT);
 		tempConfig.put(MEASURE, getDefaultMeasure()); tempConfig.addReadOnly(MEASURE);
 		tempConfig.put(HYBRID, false); tempConfig.addInvisible(HYBRID);
+		tempConfig.put(SIMILARITY_THRESHOLD_FIELD, SIMILARITY_THRESHOLD_DEFAULT);
 		tempConfig.put(COSINE_NORMALIZED_FIELD, COSINE_NORMALIZED_DEFAULT);
 		tempConfig.put(MSD_FRACTION_FIELD, MSD_FRACTION_DEFAULT);
 
@@ -1199,4 +1212,23 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 	}
 
 
+	/**
+	 * Getting similarity threshold.
+	 * @param config specified configuration.
+	 * @return similarity threshold.
+	 */
+	public static double getSimThreshold(DataConfig config) {
+		try {
+			String thresholdText = config.getAsString(SIMILARITY_THRESHOLD_FIELD);
+			if (thresholdText == null || thresholdText.toLowerCase().equals("nan"))
+				return Constants.UNUSED;
+			else
+				return config.getAsReal(SIMILARITY_THRESHOLD_FIELD);
+		}
+		catch (Throwable e) {}
+		
+		return Constants.UNUSED;
+	}
+	
+	
 }

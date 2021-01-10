@@ -103,6 +103,7 @@ public class NeighborCFUserBased extends NeighborCF implements DuplicatableAlg {
 		double minValue = cf.getMinRating();
 		double maxValue = cf.getMaxRating();
 		boolean isBoundedMinMax = cf.isBoundedMinMaxRating();
+		double simThreshold = getSimThreshold(cf.getConfig());
 		double thisMean = thisUser.mean();
 		Map<Integer, Double> localUserSimCache = Util.newMap();
 		Fetcher<RatingVector> userRatings = cf.getDataset().fetchUserRatings();
@@ -136,7 +137,8 @@ public class NeighborCFUserBased extends NeighborCF implements DuplicatableAlg {
 					}
 					else
 						sim = cf.sim(thisUser, thatUser, thisProfile, thatProfile, itemId);
-					if (!Util.isUsed(sim)) continue;
+					if (!Util.isUsed(sim) || (Util.isUsed(simThreshold) && sim < simThreshold))
+						continue;
 					
 					if (knn == 0) {
 						double deviate = thatUser.get(itemId).value - thatUser.mean();

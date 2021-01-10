@@ -82,6 +82,7 @@ public class NeighborCFItemBased extends NeighborCF implements DuplicatableAlg {
 		double minValue = cf.getMinRating();
 		double maxValue = cf.getMaxRating();
 		boolean isBoundedMinMax = cf.isBoundedMinMaxRating();; 
+		double simThreshold = getSimThreshold(cf.getConfig());
 		Fetcher<RatingVector> itemRatings = cf.getDataset().fetchItemRatings();
 		int knn = cf.getConfig().getAsInt(KNN);
 		knn = knn < 0 ? 0 : knn;
@@ -119,7 +120,8 @@ public class NeighborCFItemBased extends NeighborCF implements DuplicatableAlg {
 					
 					// computing similarity
 					double sim = cf.sim(thisItem, thatItem, thisProfile, thatProfile, thisUser.id());
-					if (!Util.isUsed(sim)) continue;
+					if (!Util.isUsed(sim) || (Util.isUsed(simThreshold) && sim < simThreshold))
+						continue;
 					
 					if (knn == 0) {
 						double deviate = thatItem.get(thisUser.id()).value - thatItem.mean();
