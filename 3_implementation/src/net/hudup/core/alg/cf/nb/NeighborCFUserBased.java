@@ -104,7 +104,7 @@ public class NeighborCFUserBased extends NeighborCF implements DuplicatableAlg {
 		double maxValue = cf.getMaxRating();
 		boolean isBoundedMinMax = cf.isBoundedMinMaxRating();
 		double simThreshold = getSimThreshold(cf.getConfig());
-		double thisMean = thisUser.mean();
+		double thisMean = cf.calcRowMean(thisUser);
 		Map<Integer, Double> localUserSimCache = Util.newMap();
 		Fetcher<RatingVector> userRatings = cf.getDataset().fetchUserRatings();
 		for (int itemId : queryIds) {
@@ -141,7 +141,7 @@ public class NeighborCFUserBased extends NeighborCF implements DuplicatableAlg {
 						continue;
 					
 					if (knn == 0) {
-						double deviate = thatUser.get(itemId).value - thatUser.mean();
+						double deviate = thatUser.get(itemId).value - cf.calcRowMean(thatUser);
 						accum += sim * deviate;
 						simTotal += Math.abs(sim);
 						
@@ -172,7 +172,7 @@ public class NeighborCFUserBased extends NeighborCF implements DuplicatableAlg {
 				for (ObjectPair<RatingVector> pair : pairs) {
 					RatingVector thatUser = pair.key();
 
-					double deviate = thatUser.get(itemId).value - thatUser.mean();
+					double deviate = thatUser.get(itemId).value - cf.calcRowMean(thatUser);
 					double sim = pair.value();
 					accum +=  sim * deviate;
 					simTotal += Math.abs(sim);
@@ -245,7 +245,7 @@ public class NeighborCFUserBased extends NeighborCF implements DuplicatableAlg {
 		double minValue = cf.getMinRating();
 		double maxValue = cf.getMaxRating();
 		boolean isBoundedMinMax = cf.isBoundedMinMaxRating();; 
-		double thisMean = thisUser.mean();
+		double thisMean = cf.calcRowMean(thisUser);
 		for (int itemId : queryIds) {
 			if (thisUser.isRated(itemId)) {
 				result.put(itemId, thisUser.get(itemId));
@@ -260,7 +260,7 @@ public class NeighborCFUserBased extends NeighborCF implements DuplicatableAlg {
 				if (!thatUser.isRated(itemId)) continue;
 				
 				double sim = pair.value();
-				double deviate = thatUser.get(itemId).value - thatUser.mean();
+				double deviate = thatUser.get(itemId).value - cf.calcRowMean(thatUser);
 				accum +=  sim * deviate;
 				simTotal += Math.abs(sim);
 				
@@ -344,7 +344,43 @@ public class NeighborCFUserBased extends NeighborCF implements DuplicatableAlg {
 		return cod(vRating1, vRating2, this.itemMeans);
 	}
 
+
+	@Override
+	protected Set<Integer> getRowIds() {
+		return userIds;
+	}
+
+
+	@Override
+	protected RatingVector getRowRating(int rowId) {
+		return dataset.getUserRating(rowId);
+	}
+
+
+	@Override
+	protected double calcRowMean(RatingVector vRating) {
+		return calcMean(this, userMeans, vRating);
+	}
+
+
+	@Override
+	protected Set<Integer> getColumnIds() {
+		return itemIds;
+	}
+
 	
+	@Override
+	protected RatingVector getColumnRating(int columnId) {
+		return dataset.getItemRating(columnId);
+	}
+
+
+	@Override
+	protected double calcColumnMean(RatingVector vRating) {
+		return calcMean(this, itemMeans, vRating);
+	}
+
+
 	@Override
 	public String getName() {
 		String name = getConfig().getAsString(DUPLICATED_ALG_NAME_FIELD);

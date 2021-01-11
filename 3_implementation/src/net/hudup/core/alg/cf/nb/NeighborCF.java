@@ -1125,6 +1125,52 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 
 	
 	/**
+	 * Getting set of row identifiers.
+	 * @return set of row identifiers.
+	 */
+	protected abstract Set<Integer> getRowIds();
+
+	
+	/**
+	 * Getting rating vector given row ID (item ID or user ID).
+	 * @param rowId specified row ID (item ID or user ID).
+	 * @return rating vector given row ID (item ID or user ID).
+	 */
+	protected abstract RatingVector getRowRating(int rowId);
+
+	
+	/**
+	 * Calculating mean of row rating vector.
+	 * @param vRating specified row rating vector.
+	 * @return mean of row rating vector.
+	 */
+	protected abstract double calcRowMean(RatingVector vRating);
+
+	
+	/**
+	 * Getting set of column identifiers.
+	 * @return set of column identifiers.
+	 */
+	protected abstract Set<Integer> getColumnIds();
+
+	
+	/**
+	 * Getting rating vector given column ID (item ID or user ID).
+	 * @param columnId specified column ID (item ID or user ID).
+	 * @return rating vector given column ID (item ID or user ID).
+	 */
+	protected abstract RatingVector getColumnRating(int columnId);
+
+	
+	/**
+	 * Calculating mean of column rating vector.
+	 * @param vRating specified column rating vector.
+	 * @return mean of column rating vector.
+	 */
+	protected abstract double calcColumnMean(RatingVector vRating);
+	
+	
+	/**
 	 * Computing common field IDs of two rating vectors.
 	 * @param vRating1 first rating vector.
 	 * @param vRating2 second rating vector.
@@ -1217,10 +1263,12 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 	 * @param config specified configuration.
 	 * @return similarity threshold.
 	 */
-	public static double getSimThreshold(DataConfig config) {
+	protected static double getSimThreshold(DataConfig config) {
 		try {
 			String thresholdText = config.getAsString(SIMILARITY_THRESHOLD_FIELD);
-			if (thresholdText == null || thresholdText.toLowerCase().equals("nan"))
+			if (thresholdText == null) return Constants.UNUSED;
+			thresholdText = thresholdText.trim().toLowerCase();
+			if (thresholdText.isEmpty() || thresholdText.equals("nan"))
 				return Constants.UNUSED;
 			else
 				return config.getAsReal(SIMILARITY_THRESHOLD_FIELD);
@@ -1228,6 +1276,30 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 		catch (Throwable e) {}
 		
 		return Constants.UNUSED;
+	}
+	
+	
+	/**
+	 * Getting mean of rating vector.
+	 * @param cf nearest neighbors algorithm.
+	 * @param means map of means.
+	 * @param vRating specified rating vector. It can be null.
+	 * @return mean of rating vector.
+	 */
+	protected static double calcMean(NeighborCF cf, Map<Integer, Double> means, RatingVector vRating) {
+		if (means == null && vRating == null) return Constants.UNUSED;
+		if (means == null) return vRating.mean();
+		
+		Integer id = vRating.id();
+		if (means.containsKey(id))
+			return means.get(id);
+		else if (cf == null || !cf.isCached())
+			return vRating.mean();
+		else {
+			double mean = vRating.mean();
+			if (id >= 0) means.put(id, mean);
+			return mean;
+		}
 	}
 	
 	

@@ -295,7 +295,7 @@ class NeighborCF2dDeprecated extends NeighborCFUserBased {
 			}
 			
 			
-			double value = (simTotal == 0 ? param.ratingVector.mean() : accum / simTotal);
+			double value = (simTotal == 0 ? calcRowMean(param.ratingVector) : accum / simTotal);
 			result.put(queryId, value);
 		}
 		

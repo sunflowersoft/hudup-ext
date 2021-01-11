@@ -124,7 +124,7 @@ public class NeighborCFItemBased extends NeighborCF implements DuplicatableAlg {
 						continue;
 					
 					if (knn == 0) {
-						double deviate = thatItem.get(thisUser.id()).value - thatItem.mean();
+						double deviate = thatItem.get(thisUser.id()).value - cf.calcRowMean(thatItem);
 						accum += sim * deviate;
 						simTotal += Math.abs(sim);
 						
@@ -156,7 +156,7 @@ public class NeighborCFItemBased extends NeighborCF implements DuplicatableAlg {
 					RatingVector thatItem = pair.key();
 
 					double sim = pair.value();
-					double deviate = thatItem.get(thisUser.id()).value - thatItem.mean();
+					double deviate = thatItem.get(thisUser.id()).value - cf.calcRowMean(thatItem);
 					accum += sim * deviate;
 					simTotal += Math.abs(sim);
 					
@@ -165,7 +165,7 @@ public class NeighborCFItemBased extends NeighborCF implements DuplicatableAlg {
 			}
 			if (!calculated) continue;
 			
-			double thisMean = thisItem.mean();
+			double thisMean = cf.calcRowMean(thisItem);
 			double value = simTotal == 0 ? thisMean : thisMean + accum / simTotal;
 			value = isBoundedMinMax ? Math.min(value, maxValue) : value;
 			value = isBoundedMinMax ? Math.max(value, minValue) : value;
@@ -181,11 +181,49 @@ public class NeighborCFItemBased extends NeighborCF implements DuplicatableAlg {
 		
 		return result.size() == 0 ? null : result;
 	}
+	
+	
 	@Override
 	protected double cod(
 			RatingVector vRating1, RatingVector vRating2,
 			Profile profile1, Profile profile2) {
 		return cod(vRating1, vRating2, this.userMeans);
+	}
+
+
+	@Override
+	protected Set<Integer> getRowIds() {
+		return itemIds;
+	}
+
+
+	@Override
+	protected RatingVector getRowRating(int rowId) {
+		return dataset.getItemRating(rowId);
+	}
+
+	
+	@Override
+	protected double calcRowMean(RatingVector vRating) {
+		return calcMean(this, itemMeans, vRating);
+	}
+
+
+	@Override
+	protected Set<Integer> getColumnIds() {
+		return userIds;
+	}
+
+	
+	@Override
+	protected RatingVector getColumnRating(int columnId) {
+		return dataset.getUserRating(columnId);
+	}
+
+
+	@Override
+	protected double calcColumnMean(RatingVector vRating) {
+		return calcMean(this, userMeans, vRating);
 	}
 
 	
