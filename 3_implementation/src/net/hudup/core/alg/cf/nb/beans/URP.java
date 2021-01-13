@@ -7,6 +7,9 @@
  */
 package net.hudup.core.alg.cf.nb.beans;
 
+import java.util.Arrays;
+import java.util.List;
+
 import net.hudup.core.alg.cf.nb.Measure;
 import net.hudup.core.alg.cf.nb.NeighborCFUserBased;
 import net.hudup.core.data.Profile;
@@ -33,6 +36,24 @@ public class URP extends NeighborCFUserBased {
 	 */
 	public URP() {
 
+	}
+
+
+	@Override
+	public List<String> getAllMeasures() {
+		return getMainMeasures();
+	}
+
+
+	@Override
+	public List<String> getMainMeasures() {
+		return Arrays.asList(Measure.URP);
+	}
+
+
+	@Override
+	protected String getDefaultMeasure() {
+		return Measure.URP;
 	}
 
 
