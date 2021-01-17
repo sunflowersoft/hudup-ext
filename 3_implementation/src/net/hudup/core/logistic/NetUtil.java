@@ -338,7 +338,6 @@ public class NetUtil {
 				stub = UnicastRemoteObject.exportObject(remote, port);
 			}
 			catch (Exception e) {
-				// TODO Auto-generated catch block
 				LogUtil.trace(e);
 				try {
 					if (stub != null)
@@ -571,7 +570,6 @@ public class NetUtil {
 				return result;
 			}
 			catch (Exception e) {
-				// TODO Auto-generated catch block
 				LogUtil.trace(e);
 			}
 			
@@ -611,7 +609,6 @@ public class NetUtil {
 					result = result && true;
 				}
 				catch (Exception e) {
-					// TODO Auto-generated catch block
 					LogUtil.trace(e);
 					result = result && false;
 				}
@@ -640,7 +637,6 @@ public class NetUtil {
 					result = result && true;
 				}
 				catch (Exception e) {
-					// TODO Auto-generated catch block
 					LogUtil.trace(e);
 					result = result && false;
 				}

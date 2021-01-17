@@ -373,14 +373,12 @@ public class Vector implements Cloneable, TextParsable, Serializable {
 	
 	@Override
 	public String toText() {
-		// TODO Auto-generated method stub
 		return TextParserUtil.toText(data, ",");
 	}
 
 
 	@Override
 	public void parseText(String spec) {
-		// TODO Auto-generated method stub
 		List<String> list = TextParserUtil.parseTextList(spec, ",");
 		data = new double[list.size()];
 		for (int i = 0; i < data.length; i++) {
@@ -398,7 +396,6 @@ public class Vector implements Cloneable, TextParsable, Serializable {
 
 	@Override
 	public String toString() {
-		// TODO Auto-generated method stub
 		return toText();
 	}
     
