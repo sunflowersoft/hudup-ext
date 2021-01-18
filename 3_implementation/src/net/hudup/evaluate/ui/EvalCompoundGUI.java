@@ -984,7 +984,13 @@ public class EvalCompoundGUI extends JFrame {
 
 				Evaluator evaluator = (Evaluator) cmbEvs.getSelectedItem();
 				dlgEvStarter.dispose();
-				if (oldGUI != null) oldGUI.dispose();
+				if (oldGUI != null) {
+					oldGUI.dispose();
+					if (!Util.getPluginManager().isFired())
+						Util.getPluginManager().fire();
+					else
+						Util.getPluginManager().discover();
+				}
 
 				for (Evaluator ev : evList) {
 					if (ev != evaluator) {
@@ -1053,7 +1059,13 @@ public class EvalCompoundGUI extends JFrame {
 						"Retrieval to evaluator failed", JOptionPane.ERROR_MESSAGE);
 				}
 				else {
-					if (oldGUI != null) oldGUI.dispose();
+					if (oldGUI != null) {
+						oldGUI.dispose();
+						if (!Util.getPluginManager().isFired())
+							Util.getPluginManager().fire();
+						else
+							Util.getPluginManager().discover();
+					}
 					run(ev, connectInfo, null, null);
 				}
 			}
@@ -1114,7 +1126,13 @@ public class EvalCompoundGUI extends JFrame {
 						}
 						
 						dispose();
-						if (oldGUI != null) oldGUI.dispose();
+						if (oldGUI != null) {
+							oldGUI.dispose();
+							if (!Util.getPluginManager().isFired())
+								Util.getPluginManager().fire();
+							else
+								Util.getPluginManager().discover();
+						}
 						
 						run(ev, connectInfo, null, null);
 					}
@@ -1165,6 +1183,8 @@ public class EvalCompoundGUI extends JFrame {
 	 * @param oldGUI old GUI.
 	 */
 	public static void run(Evaluator evaluator, ConnectInfo connectInfo, EvaluateGUIData referredData, Window oldGUI) {
+		if (oldGUI != null) oldGUI.dispose();
+
 		if (!Util.getPluginManager().isFired())
 			Util.getPluginManager().fire();
 			
@@ -1172,7 +1192,6 @@ public class EvalCompoundGUI extends JFrame {
 			RegisterTable parserReg = PluginStorage.getParserReg();
 			if (parserReg.size() == 0) {
 				parserReg.register(new SnapshotParserImpl());
-//				Util.getPluginManager().discover();
 			}
 			
 			RegisterTable metricReg = PluginStorage.getMetricReg();
@@ -1188,7 +1207,6 @@ public class EvalCompoundGUI extends JFrame {
 					LogUtil.info("Registered algorithm: " + metricList.get(i).getName());
 			}
 
-			if (oldGUI != null) oldGUI.dispose();
 			new EvalCompoundGUI(evaluator, connectInfo, referredData);
 		}
 		catch (Exception e) {LogUtil.trace(e);}

@@ -86,6 +86,11 @@ public class AlgDesc2 extends AlgDesc {
 		execute,
 		
 		/**
+		 * Non-executable algorithm.
+		 */
+		nonexecute,
+		
+		/**
 		 * Unknown algorithm.
 		 */
 		unknown
@@ -366,6 +371,8 @@ public class AlgDesc2 extends AlgDesc {
 			return FunctionType.recommend;
 		case 1:
 			return FunctionType.execute;
+		case 2:
+			return FunctionType.nonexecute;
 		case -1:
 			return FunctionType.unknown;
 		default:
@@ -385,6 +392,8 @@ public class AlgDesc2 extends AlgDesc {
 			return "recommend";
 		case execute:
 			return "execute";
+		case nonexecute:
+			return "nonexecute";
 		case unknown:
 			return "unknown";
 		default:
@@ -402,20 +411,28 @@ public class AlgDesc2 extends AlgDesc {
 		if (algs == null || algs.size() == 0)
 			return FunctionType.unknown;
 		
-		boolean recommend = true, execute = true;
+		boolean recommend = true, execute = true, nonexecute = true;
 		for (Alg alg : algs) {
 			FunctionType type = functionTypeOf(alg);
 			if (type == FunctionType.recommend) {
 				recommend = recommend && true;
 				execute = execute && false;
+				nonexecute = nonexecute && false;
 			}
 			else if (type == FunctionType.execute) {
 				recommend = recommend && false;
 				execute = execute && true;
+				nonexecute = nonexecute && false;
+			}
+			else if (type == FunctionType.nonexecute) {
+				recommend = recommend && false;
+				execute = execute && false;
+				nonexecute = nonexecute && true;
 			}
 			else {
 				recommend = recommend && false;
 				execute = execute && false;
+				nonexecute = nonexecute && false;
 			}
 		}
 		
@@ -423,6 +440,8 @@ public class AlgDesc2 extends AlgDesc {
 			return FunctionType.recommend;
 		else if (execute)
 			return FunctionType.execute;
+		else if (nonexecute)
+			return FunctionType.nonexecute;
 		else
 			return FunctionType.unknown;
 	}

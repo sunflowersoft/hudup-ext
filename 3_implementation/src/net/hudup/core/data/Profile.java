@@ -15,6 +15,8 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import net.hudup.core.Cloneable;
 import net.hudup.core.Constants;
@@ -1219,7 +1221,6 @@ public class Profile implements Cloneable, TextParsable, Serializable {
 					value = Profile.createValue(attributes.get(i), record[i]);
 				} 
 				catch (Exception e) {
-					// TODO Auto-generated catch block
 					LogUtil.trace(e);
 				}
 				profile.setValue(i, value);
@@ -1227,11 +1228,56 @@ public class Profile implements Cloneable, TextParsable, Serializable {
 			return profile;
 		}
 		catch (Throwable e) {
-			// TODO Auto-generated catch block
 			LogUtil.trace(e);
 		}
 		return null;
 	}
 
 
+	/**
+	 * Creating profile from specified attribute list and object.
+	 * @param attList specified attribute list
+	 * @param object specified object.
+	 * @return profile from specified attribute list and object.
+	 */
+	public static Profile createProfile(AttributeList attList, Object object) {
+		if (attList == null || attList.size() == 0)
+			return null;
+		
+		List<Double> values = null;
+		Map<String, Object> mapValues = null;
+		if (object == null)
+			values = Util.newList();
+		else {
+			if (object instanceof Map<?, ?>) {
+				Map<?, ?> map = (Map<?, ?>)object;
+				Set<?> keys = map.keySet();
+				mapValues = Util.newMap();
+				for (Object key : keys) {
+					mapValues.put(key.toString(), map.get(key));
+				}
+			}
+			else
+				values = DSUtil.toDoubleList(object, false);
+		}
+		
+		Profile profile = new Profile(attList);
+		if (values != null) {
+			int n = Math.min(values.size(), attList.size());
+			for (int j = 0; j < n; j++) {
+				int start = values.size() > attList.size() ? 1 : 0;
+				profile.setValue(j, values.get(j + start));
+			}
+		}
+		else if (mapValues != null) {
+			Set<String> keys = mapValues.keySet();
+			for (String key : keys) {
+				profile.setValue(key, mapValues.get(key));
+			}
+		}
+		
+		return profile;
+	}
+	
+	
 }

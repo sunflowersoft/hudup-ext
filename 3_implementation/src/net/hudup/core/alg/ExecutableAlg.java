@@ -10,7 +10,7 @@ package net.hudup.core.alg;
 import net.hudup.core.logistic.Inspectable;
 
 /**
- * This interface represents extension of an executable algorithm.
+ * This interface represents an executable algorithm.
  * 
  * @author Loc Nguyen
  * @version 1.0

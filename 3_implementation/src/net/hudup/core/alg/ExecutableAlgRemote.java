@@ -8,7 +8,7 @@
 package net.hudup.core.alg;
 
 /**
- * This interface represents a executable remote algorithm.
+ * This interface represents an executable remote algorithm.
  * 
  * @author Loc Nguyen
  * @version 1.0

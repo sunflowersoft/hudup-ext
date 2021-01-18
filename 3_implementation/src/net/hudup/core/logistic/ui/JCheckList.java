@@ -52,8 +52,6 @@ public class JCheckList<E> extends JList<CheckListItem<E>> {
 
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				// TODO Auto-generated method stub
-				
 				int index = locationToIndex(e.getPoint());
 				if (index == -1)
 					return;
@@ -73,7 +71,6 @@ public class JCheckList<E> extends JList<CheckListItem<E>> {
 	 */
 	public JCheckList(List<? extends E> listData) {
 		this();
-		// TODO Auto-generated constructor stub
 		setListData(listData);
 	}
 
@@ -159,7 +156,6 @@ class CheckListRenderer<E> extends JCheckBox implements ListCellRenderer<CheckLi
 	public Component getListCellRendererComponent(
 			JList<? extends CheckListItem<E>> list, CheckListItem<E> value,
 			int index, boolean isSelected, boolean cellHasFocus) {
-		// TODO Auto-generated method stub
 		
 		setEnabled(list.isEnabled());
 		setSelected(value.isSelected());

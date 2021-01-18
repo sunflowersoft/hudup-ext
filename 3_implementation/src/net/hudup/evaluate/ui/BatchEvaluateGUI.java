@@ -45,6 +45,7 @@ import net.hudup.core.RegisterTable;
 import net.hudup.core.Util;
 import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.AlgRemote;
+import net.hudup.core.alg.AllowNullTrainingSet;
 import net.hudup.core.alg.SetupAlgEvent;
 import net.hudup.core.alg.ui.AlgListBox;
 import net.hudup.core.alg.ui.AlgListBox.AlgListChangedEvent;
@@ -58,8 +59,7 @@ import net.hudup.core.data.DatasetPool;
 import net.hudup.core.data.DatasetPoolExchanged;
 import net.hudup.core.data.DatasetUtil2;
 import net.hudup.core.data.NullPointer;
-import net.hudup.core.data.ui.AddingDatasetDlg;
-import net.hudup.core.data.ui.AddingTrainingDatasetNullTestingDatasetDlg;
+import net.hudup.core.data.ui.AddingDatasetDlg2;
 import net.hudup.core.data.ui.DatasetPoolTable;
 import net.hudup.core.evaluate.EvaluateEvent;
 import net.hudup.core.evaluate.EvaluateEvent.Type;
@@ -438,15 +438,28 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 		    	}
 
 		    	contextMenu.addSeparator();
-				JMenuItem miTraining = UIUtil.makeMenuItem((String)null, "Add training", 
+				JMenuItem miTraining = UIUtil.makeMenuItem((String)null, "Add training set", 
 					new ActionListener() {
 						
 						@Override
 						public void actionPerformed(ActionEvent e) {
-							addDataset(true);
+							addDataset(false, true);
 						}
 					});
 				contextMenu.add(miTraining);
+				
+				Alg alg = getSelectedAlg();
+				if ((alg != null) && (alg instanceof AllowNullTrainingSet)) {
+					JMenuItem miNull = UIUtil.makeMenuItem((String)null, "Add null set",
+						new ActionListener() {
+							
+							@Override
+							public void actionPerformed(ActionEvent e) {
+								addDataset(true, true);
+							}
+						});
+					contextMenu.add(miNull);
+				}
 			}
 			
 		};
@@ -553,7 +566,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 
 			@Override
 			protected void addTraining() {
-				addDataset(true);
+				addDataset(false, true);
 			}
 
 		};
@@ -572,7 +585,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				addDataset(false);
+				addDataset(false, false);
 			}
 		});
 		this.btnAddDataset.setMnemonic('a');
@@ -1713,19 +1726,25 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 	
 	/**
 	 * Adding dataset.
+	 * @param nullTraining true if add null training dataset {@link NullPointer}.
 	 * @param nullTesting true if add null testing dataset {@link NullPointer}.
 	 */
-	private void addDataset(boolean nullTesting) {
+	protected void addDataset(boolean nullTraining, boolean nullTesting) {
 		try {
 			if (evaluator.remoteIsStarted() || PluginStorage.getParserReg().size() == 0)
 				return;
 			
 			clearResult();
 
-			if (nullTesting)
-				new AddingTrainingDatasetNullTestingDatasetDlg(this, guiData.pool, this.lbAlgs.getAlgList(), evaluator.getMainUnit(), connectInfo.bindUri).setVisible(true);
-			else
-				new AddingDatasetDlg(this, guiData.pool, this.lbAlgs.getAlgList(), evaluator.getMainUnit(), connectInfo.bindUri).setVisible(true);
+			if (nullTraining && nullTesting) {
+				DatasetPair pair = new DatasetPair(new NullPointer(), new NullPointer(), null);
+				guiData.pool.add(pair);
+			}
+			else {
+				AddingDatasetDlg2 adder = new AddingDatasetDlg2(this, guiData.pool, this.lbAlgs.getAlgList(), evaluator.getMainUnit(), connectInfo.bindUri);
+				adder.setMode(nullTraining, nullTesting);
+				adder.setVisible(true);
+			}
 			
 			if (connectInfo.bindUri == null) {
 				try {
@@ -1736,7 +1755,6 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 				this.tblDatasetPool.update(guiData.pool);
 				updateMode();
 			}
-			
 		}
 		catch (Throwable e) {
 			LogUtil.trace(e);

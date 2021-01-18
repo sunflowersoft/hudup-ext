@@ -215,7 +215,7 @@ public class DatasetPoolTable extends JTable {
 				});
 			contextMenu.add(miAddScript);
 			
-			JMenuItem miAddTraining = UIUtil.makeMenuItem((String)null, "Add training", 
+			JMenuItem miAddTraining = UIUtil.makeMenuItem((String)null, "Add training set", 
 				new ActionListener() {
 					
 					@Override

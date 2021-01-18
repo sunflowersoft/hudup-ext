@@ -416,6 +416,23 @@ public class AttributeList implements Cloneable, TextParsable, Serializable, Tra
 	
 	
 	/**
+	 * Creating default attribute list with real fields.
+	 * By default, all variables are real numbers.
+	 * @param maxVarNumber maximum number of variables.
+	 * @return default attribute list with real fields.
+	 */
+	public static AttributeList defaultRealAttributeList(int maxVarNumber) {
+		AttributeList attList = new AttributeList();
+		for (int i = 0; i < maxVarNumber; i++) {
+			Attribute att = new Attribute("var" + i, Type.real);
+			attList.add(att);
+		}
+		
+		return attList;
+	}
+
+	
+	/**
 	 * Creating the default attribute list of a configuration in which the key attribute has name specified by {@link DataConfig#ATTRIBUTE_FIELD} and the value attribute has name specified by {@link DataConfig#ATTRIBUTE_VALUE_FIELD}.
 	 * @return Default attribute list of a configuration. Such attribute list forms a structure of a configuration storage such as a table of configuration in database.
 	 */

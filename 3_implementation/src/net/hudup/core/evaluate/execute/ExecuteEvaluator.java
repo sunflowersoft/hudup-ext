@@ -26,7 +26,7 @@ import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.NextUpdate;
 
 /**
- * Abstract evaluator for evaluating testing algorithm.
+ * Abstract evaluator for evaluating testing executable algorithms.
  * 
  * @author Loc Nguyen
  * @version 1.0

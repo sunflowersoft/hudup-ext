@@ -47,6 +47,7 @@ import net.hudup.core.RegisterTable;
 import net.hudup.core.Util;
 import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.AlgList;
+import net.hudup.core.alg.AllowNullTrainingSet;
 import net.hudup.core.alg.CompositeAlg;
 import net.hudup.core.alg.ModelBasedAlg;
 import net.hudup.core.alg.Recommender;
@@ -62,8 +63,9 @@ import net.hudup.core.data.DatasetPool;
 import net.hudup.core.data.DatasetPoolExchanged;
 import net.hudup.core.data.DatasetUtil;
 import net.hudup.core.data.DatasetUtil2;
+import net.hudup.core.data.NullPointer;
 import net.hudup.core.data.Pointer;
-import net.hudup.core.data.ui.AddingTrainingDatasetNullTestingDatasetDlg;
+import net.hudup.core.data.ui.AddingDatasetDlg2;
 import net.hudup.core.data.ui.DatasetTextField;
 import net.hudup.core.evaluate.EvaluateEvent;
 import net.hudup.core.evaluate.EvaluateEvent.Type;
@@ -421,15 +423,28 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 
 				contextMenu.addSeparator();
 		    	
-				JMenuItem miTraining = UIUtil.makeMenuItem((String)null, "Training", 
+				JMenuItem miTraining = UIUtil.makeMenuItem((String)null, "Add training set", 
 					new ActionListener() {
 						
 						@Override
 						public void actionPerformed(ActionEvent e) {
-							addTrainingSet();
+							addDataset(false, true);
 						}
 					});
 				contextMenu.add(miTraining);
+				
+				Alg alg = getSelectedAlg();
+				if ((alg != null) && (alg instanceof AllowNullTrainingSet)) {
+					JMenuItem miNull = UIUtil.makeMenuItem((String)null, "Add null set",
+						new ActionListener() {
+							
+							@Override
+							public void actionPerformed(ActionEvent e) {
+								addDataset(true, true);
+							}
+						});
+					contextMenu.add(miNull);
+				}
 			}
 			
 		};
@@ -1116,15 +1131,26 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 	
 	
 	/**
-	 * Adding training dataset.
+	 * Adding dataset.
+	 * @param nullTraining true if add null training dataset {@link NullPointer}.
+	 * @param nullTesting true if add null testing dataset {@link NullPointer}.
 	 */
-	protected void addTrainingSet() {
+	protected void addDataset(boolean nullTraining, boolean nullTesting) {
 		try {
 			if (evaluator.remoteIsStarted())
 				return;
 			
 			DatasetPool pool = new DatasetPool();
-			new AddingTrainingDatasetNullTestingDatasetDlg(this, pool, Arrays.asList(getAlg()), evaluator.getMainUnit(), connectInfo.bindUri).setVisible(true);
+			if (nullTraining && nullTesting) {
+				DatasetPair pair = new DatasetPair(new NullPointer(), new NullPointer(), null);
+				pool.add(pair);
+			}
+			else {
+				AddingDatasetDlg2 adder = new AddingDatasetDlg2(this, pool, Arrays.asList(getAlg()), evaluator.getMainUnit(), connectInfo.bindUri);
+				adder.setMode(nullTraining, nullTesting);
+				adder.setVisible(true);
+			}
+
 			if (pool.size() == 0) {
 				JOptionPane.showMessageDialog(
 						this, 
@@ -1135,6 +1161,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			}
 			
 			clearResult();
+			
 			guiData.pool = pool;
 			if (connectInfo.bindUri == null) {
 				try {

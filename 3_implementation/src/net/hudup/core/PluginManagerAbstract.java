@@ -32,6 +32,8 @@ import net.hudup.core.alg.MemoryBasedAlg;
 import net.hudup.core.alg.MemoryBasedAlgRemote;
 import net.hudup.core.alg.ModelBasedAlg;
 import net.hudup.core.alg.ModelBasedAlgRemote;
+import net.hudup.core.alg.NonexecutableAlgRemote;
+import net.hudup.core.alg.NonexecutableAlgRemoteWrapper;
 import net.hudup.core.alg.Recommender;
 import net.hudup.core.alg.RecommenderRemote;
 import net.hudup.core.alg.RecommenderRemoteWrapper;
@@ -337,6 +339,8 @@ public abstract class PluginManagerAbstract implements PluginManager {
 			return new RecommenderRemoteWrapper((RecommenderRemote)remoteAlg, exclusive);
 		else if (remoteAlg instanceof ExecutableAlgRemote)
 			return new ExecutableAlgRemoteWrapper((ExecutableAlgRemote)remoteAlg, exclusive);
+		else if (remoteAlg instanceof NonexecutableAlgRemote)
+			return new NonexecutableAlgRemoteWrapper((NonexecutableAlgRemote)remoteAlg, exclusive);
 		else if (remoteAlg instanceof AugRemote)
 			return new AugRemoteWrapper((AugRemote)remoteAlg, exclusive);
 		else

@@ -42,6 +42,7 @@ import net.hudup.core.logistic.ui.WaitDialog;
  * @author Loc Nguyen
  * @version 10.0
  */
+@Deprecated
 public class AddingDatasetDlg extends JDialog {
 
 	
