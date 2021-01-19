@@ -603,7 +603,6 @@ public class Profile implements Cloneable, TextParsable, Serializable {
 			newValue = createValue(att, value);
 		} 
 		catch (Throwable e) {
-			// TODO Auto-generated catch block
 			LogUtil.trace(e);
 			newValue = null;
 		}
@@ -629,7 +628,6 @@ public class Profile implements Cloneable, TextParsable, Serializable {
 			newValue = createValue(att, value, df);
 		} 
 		catch (Throwable e) {
-			// TODO Auto-generated catch block
 			LogUtil.trace(e);
 			newValue = null;
 		}
@@ -962,7 +960,6 @@ public class Profile implements Cloneable, TextParsable, Serializable {
 					return null;
 			} 
 			catch (Throwable e) {
-				// TODO Auto-generated catch block
 				LogUtil.trace(e);
 			}
 			return null;
@@ -1128,7 +1125,6 @@ public class Profile implements Cloneable, TextParsable, Serializable {
 	
 	@Override
 	public void parseText(String spec) {
-		// TODO Auto-generated method stub
 		
 		List<String> list = TextParserUtil.split(spec, TextParserUtil.MAIN_SEP, null);
 		attRef.parseText(list.get(0));
