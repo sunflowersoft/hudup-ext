@@ -97,6 +97,18 @@ public class SetupAlgEvent extends EventObject {
 	
 	
 	/**
+	 * Constructor with a source of event, algorithm name, and setting up result.
+	 * @param source source of event. It is usually an evaluator but it can be the algorithm itself.
+	 * @param type type of event.
+	 * @param algName name of the algorithm issuing the setup result.
+	 * @param setupResult specified result.
+	 */
+	public SetupAlgEvent(Object source, Type type, String algName, Serializable setupResult) {
+		this(source, type, algName, -1, null, setupResult, 0, 0);
+	}
+
+	
+	/**
 	 * Constructor with a source of event, algorithm name, training dataset identifier, and setting up result.
 	 * @param source source of event. It is usually an evaluator but it can be the algorithm itself.
 	 * @param type type of event.
@@ -133,6 +145,21 @@ public class SetupAlgEvent extends EventObject {
 	 */
 	public SetupAlgEvent(Object source, Type type, String algName, int trainingDatasetId, Dataset trainingDataset, Serializable setupResult) {
 		this(source, type, algName, trainingDatasetId, trainingDataset, setupResult, 0, 0);
+	}
+
+	
+	/**
+	 * Constructor with a source of event, algorithm name, setting up result, progress step, and progress total.
+	 * @param source source of event. It is usually an evaluator but it can be the algorithm itself. This source is invalid in remote call because the source is transient variable.
+	 * @param type type of event.
+	 * @param algName name of the algorithm issuing the setup result.
+	 * @param setupResult specified result.
+	 * @param progressStep progress step.
+	 * @param progressTotalEstimated progress total estimated.
+	 */
+	public SetupAlgEvent(Object source, Type type, String algName, Serializable setupResult,
+			int progressStep, int progressTotalEstimated) {
+		this(source, type, algName, -1, null, setupResult, progressStep, progressTotalEstimated);
 	}
 
 	
