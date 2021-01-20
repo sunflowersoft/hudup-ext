@@ -289,20 +289,6 @@
 
 
 	<!--
-	Function: SwingX is a library of components and utilities extending the Java Swing library
-	Affected packages, classes: net.hudup.core.data.ctx.ui.CTStable, net.hudup.core.data.ctx.ui.CTSviewer
-	Referred jars:
-	Source: https://github.com/tmyroadctfig/swingx
-	Vendor: swingLabs
-	Archive: newtech-research/ui/java/SWINGX, newtech-research/prog-language/java/ui/SWINGX
-	Version: 1.6.4 build 2012
-	Status: using
-	Note:
-	-->
-	<property name="swingx-all.jar" value="${lib.home}/swingx-all-1.6.4.jar"/>
-
-
-	<!--
 	Function: creating a table whose rows can be sorted according to columns
 	Affected packages, classes: net.hudup.core.logistic.ui.SortableTable2, net.hudup.core.logistic.ui.SortableTableModel2
 	Referred jars:
@@ -315,6 +301,20 @@
 	-->
 	<property name="SortableTable2.class" value="${bin.home}/net/hudup/core/logistic/ui/SortableTable2.class"/>
 	<property name="SortableTableModel2.class" value="${bin.home}/net/hudup/core/logistic/ui/SortableTableModel2.class"/>
+
+
+	<!--
+	Function: SwingX is a library of components and utilities extending the Java Swing library
+	Affected packages, classes: net.hudup.core.data.ctx.ui.CTStable, net.hudup.core.data.ctx.ui.CTSviewer
+	Referred jars:
+	Source: https://github.com/tmyroadctfig/swingx
+	Vendor: swingLabs
+	Archive: newtech-research/ui/java/SWINGX, newtech-research/prog-language/java/ui/SWINGX
+	Version: 1.6.4 build 2012
+	Status: using
+	Note:
+	-->
+	<property name="swingx-all.jar" value="${lib.home}/swingx-all-1.6.4.jar"/>
 
 
 	<!--

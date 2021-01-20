@@ -17,8 +17,7 @@ import net.hudup.core.logistic.BaseClass;
  *
  */
 @BaseClass //The annotation is very important which prevent Firer to instantiate the wrapper without referred remote object. This wrapper is not normal algorithm.
-public class NonexecutableAlgRemoteWrapper extends ExecutableAlgRemoteWrapper
-		implements NonexecutableAlg, NonexecutableAlgRemote {
+public class NonexecutableAlgRemoteWrapper extends ExecutableAlgRemoteWrapper implements NonexecutableAlg, NonexecutableAlgRemote {
 
 	
 	/**

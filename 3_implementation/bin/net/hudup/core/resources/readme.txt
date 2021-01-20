@@ -9,7 +9,7 @@ Tel: 84-975250362
 
 
 --------------------
-Hudup product is the recommender framework dedicated to scientists and software developers who create or deploy recommendation solutions and algorithms in e-commerce and e-learning. Current version of Hudup is ${version}. The last built date is March 30, 2020. Hudup framework is composed of three modules:
+Hudup product is the recommender framework dedicated to scientists and software developers who create or deploy recommendation solutions and algorithms in e-commerce and e-learning. Current version of Hudup is ${version}. The last built date is March 30, 2020. Hudup framework is composed of three systems:
 1. The infrastructure to set up recommendation algorithms.
 2. The evaluation system to measure recommendation algorithms according to metrics.
 3. The simulation environment to execute and test recommendation algorithms before deploying them in real-time applications.
@@ -26,19 +26,13 @@ The easiest way to install Hudup is to download the all-in-one version (hudup-${
 
 3. Running access point Server, which in turn, running access point Listener (listener.bat, listener.sh) or Balancer (balancer.bat, balancer.sh), which in turn, running access point Evaluator so as to deploy Hudup in client-listener-server environment. You select "socket_server_query" algorithm in Evaluator in order to evaluate Hudup in client-listener-server environment. 
 
-Hudup software also provides 10 developing packages:
-- datasets.zip: contains movielens datasets
-- hudup-${version}.zip: contains hudup.jar including five modules Evaluator, Server, Listener, Balancer and Toolkit.
-- hudup-${version}-all-in-one.zip: contains whole Hudup product both code and source.
-- hudup-${version}-core.zip: contains core classes
-- hudup-${version}-doc.zip: contains Hudup document and API
-- hudup-${version}-evaluator.zip: contains hudup-evaluator.jar which is Evaluator module
-- hudup-${version}-listener.zip: contains hudup-listener.jar which is Listener module
-- hudup-${version}-server.zip: contains hudup-server.jar which is Server module
-- hudup-${version}-toolkit.zip: contains hudup-toolkit.jar which is Toolkit module
-- hudup-runtime-lib.jar: contains libraries Hudup framework used
+Hudup software also provides 4 developing packages:
+- datasets.zip: contains sample datasets.
+- hudup-runtime-lib.jar: contains runtime libraries necessary for Hudup framework to run.
+- hudup-${version}.zip: contains Hudup framework (hudup.jar) including five modules Evaluator, Server, Listener, Balancer and Toolkit.
+- hudup-${version}-all-in-one.zip: contains whole Hudup product including code, source, and runtime libraries.
 
-When you uncompress hudup-${version}-*.zip, there are a respective hudup-*.jar module and shell command files used to execute such jar module. You should copy hudup-runtime-lib.jar to the same directory with such jar module for running successfully. You can copy these jar modules to your application's library directory in order to develop new software.
+When you uncompress hudup-${version}.zip or hudup-${version}-all-in-one.zip, there are the respective jar module (hudup.jar), sub-directories, and shell command files used to run Hudup framework. With hudup-${version}.zip, you need to copy hudup-runtime-lib.jar to the same uncompressed directory for running successfully. You can copy the jar module (hudup.jar) to your application's library directory in order to develop new software.
 
 Thank you for enjoying product.
 Best regards,
@@ -71,6 +65,8 @@ Java CSV Team provided Java library for processing CSV files available at https:
 JBoss provided Javassist (Java Programming Assistant) to make Java bytecode manipulation simple, available at https://goo.gl/ncSmbS.
 
 JGraph Ltd provided the graph visualization software JGraph available at https://github.com/jgraph.
+
+Jos de Jong provided the mathematical expression parser available at http://www.speqmath.com/tutorials/expression_parser_java.
 
 John DeRegnaucourt provided Java library for JSON format available at https://goo.gl/c9k6N4.
 

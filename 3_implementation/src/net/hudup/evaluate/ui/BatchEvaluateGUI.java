@@ -44,8 +44,8 @@ import net.hudup.core.PluginStorage;
 import net.hudup.core.RegisterTable;
 import net.hudup.core.Util;
 import net.hudup.core.alg.Alg;
+import net.hudup.core.alg.AlgDesc2;
 import net.hudup.core.alg.AlgRemote;
-import net.hudup.core.alg.AllowNullTrainingSet;
 import net.hudup.core.alg.SetupAlgEvent;
 import net.hudup.core.alg.ui.AlgListBox;
 import net.hudup.core.alg.ui.AlgListBox.AlgListChangedEvent;
@@ -449,7 +449,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 				contextMenu.add(miTraining);
 				
 				Alg alg = getSelectedAlg();
-				if ((alg != null) && (alg instanceof AllowNullTrainingSet)) {
+				if (AlgDesc2.isAllowNullTrainingSet(alg)) {
 					JMenuItem miNull = UIUtil.makeMenuItem((String)null, "Add null set",
 						new ActionListener() {
 							

@@ -631,4 +631,21 @@ public class AlgDesc2 extends AlgDesc {
 	}
 	
 	
+	/**
+	 * Checking whether the specified algorithm allows null training dataset.
+	 * @param alg specified algorithm.
+	 * @return whether the specified algorithm allows null training dataset.
+	 */
+	public static boolean isAllowNullTrainingSet(Alg alg) {
+		if (alg == null) return false;
+		
+		Object obj = getMostInner(alg);
+		if (obj == null)
+			return false;
+		else
+			return obj instanceof AllowNullTrainingSet;
+		
+	}
+	
+	
 }

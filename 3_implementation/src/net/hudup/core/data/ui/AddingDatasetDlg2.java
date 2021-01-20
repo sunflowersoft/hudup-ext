@@ -9,7 +9,9 @@ package net.hudup.core.data.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.FlowLayout;
 import java.awt.GridLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -205,7 +207,7 @@ public class AddingDatasetDlg2 extends JDialog {
 		JPanel body = new JPanel(new GridLayout(1, 0));
 		add(body, BorderLayout.CENTER);
 		
-		chkTraining = new JCheckBox("Training", true);
+		chkTraining = new JCheckBox(I18nUtil.message("training_set"), true);
 		chkTraining.addItemListener(new ItemListener() {
 			
 			@Override
@@ -216,7 +218,7 @@ public class AddingDatasetDlg2 extends JDialog {
 		});
 		body.add(chkTraining);
 		
-		chkTesting = new JCheckBox("Testing", true);
+		chkTesting = new JCheckBox(I18nUtil.message("testing_set"), true);
 		chkTesting.addItemListener(new ItemListener() {
 			
 			@Override
@@ -227,7 +229,7 @@ public class AddingDatasetDlg2 extends JDialog {
 		});
 		body.add(chkTesting);
 		
-		chkWhole = new JCheckBox("Whole", false);
+		chkWhole = new JCheckBox(I18nUtil.message("whole_set"), false);
 		chkWhole.addItemListener(new ItemListener() {
 			
 			@Override
@@ -239,18 +241,21 @@ public class AddingDatasetDlg2 extends JDialog {
 		body.add(chkWhole);
 		
 		
-		JPanel footer = new JPanel();
+		JPanel footer = new JPanel(new BorderLayout());
 		add(footer, BorderLayout.SOUTH);
+		
+		JPanel mainButtons = new JPanel();
+		footer.add(mainButtons, BorderLayout.CENTER);
 		
 		JButton btnAdd = new JButton(I18nUtil.message("add_dataset"));
 		btnAdd.addActionListener(new ActionListener() {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				addDataset();
+				addDataset(false);
 			}
 		});
-		footer.add(btnAdd);
+		mainButtons.add(btnAdd);
 		
 		JButton btnClose = new JButton(I18nUtil.message("close"));
 		btnClose.addActionListener(new ActionListener() {
@@ -260,7 +265,27 @@ public class AddingDatasetDlg2 extends JDialog {
 				dispose();
 			}
 		});
-		footer.add(btnClose);
+		mainButtons.add(btnClose);
+		
+		JPanel extraButtons = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+		footer.add(extraButtons, BorderLayout.EAST);
+		
+		JButton btnAddNull = UIUtil.makeIconButton(
+			"add_nullset-16x16.png", 
+			"add_nullset", 
+			I18nUtil.message("add_nullsets"), 
+			I18nUtil.message("add_nullsets"), 
+				
+			new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					addDataset(true);
+				}
+			});
+		btnAddNull.setMargin(new Insets(0, 0 , 0, 0));
+		extraButtons.add(btnAddNull);
+
 		
 		algChanged(); //Update GUI according to algorithm.
 		
@@ -397,9 +422,23 @@ public class AddingDatasetDlg2 extends JDialog {
 	
 	
 	/**
-	 * Adding a pair of training dataset and testing dataset. 
+	 * Adding a pair of training dataset and testing dataset.
+	 * @param addNullSet true if adding null sets.
 	 */
-	protected void addDataset() {
+	protected void addDataset(boolean addNullSet) {
+		if (addNullSet) {
+			DatasetPair pair = new DatasetPair(new NullPointer(), new NullPointer(), null);
+			pool.add(pair);
+			
+			JOptionPane.showMessageDialog(this, 
+				"Added successfully", "Added successfully", JOptionPane.INFORMATION_MESSAGE);
+
+			clear();
+			dispose();
+			
+			return;
+		}
+		
 		DataConfig trainingCfg = txtTrainingBrowse.getConfig();
 		DataConfig testingCfg = txtTestingBrowse.getConfig();
 		
@@ -489,6 +528,20 @@ public class AddingDatasetDlg2 extends JDialog {
 		}
 		
 
+		if (trainingSet instanceof NullPointer && testingSet instanceof NullPointer) {
+			int confirm = JOptionPane.showConfirmDialog(
+				this, 
+				"Both training set and testing set are null pointers.\n" +
+					"Are you sure to add null sets?", 
+				"Add null sets", 
+				JOptionPane.YES_NO_OPTION, 
+				JOptionPane.QUESTION_MESSAGE);
+			if (confirm != JOptionPane.YES_OPTION) {
+				clear();
+				return;
+			}
+		}
+		
 		DatasetPair pair = new DatasetPair(trainingSet, testingSet, wholeSet);
 		pool.add(pair);
 		

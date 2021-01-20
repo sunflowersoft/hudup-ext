@@ -32,6 +32,7 @@ import net.hudup.core.alg.MemoryBasedAlg;
 import net.hudup.core.alg.MemoryBasedAlgRemote;
 import net.hudup.core.alg.ModelBasedAlg;
 import net.hudup.core.alg.ModelBasedAlgRemote;
+import net.hudup.core.alg.NonexecutableAlg;
 import net.hudup.core.alg.NonexecutableAlgRemote;
 import net.hudup.core.alg.NonexecutableAlgRemoteWrapper;
 import net.hudup.core.alg.Recommender;
@@ -60,10 +61,10 @@ import net.hudup.core.evaluate.MetricRemote;
 import net.hudup.core.evaluate.MetricRemoteWrapper;
 import net.hudup.core.evaluate.MetricWrapper;
 import net.hudup.core.logistic.BaseClass;
+import net.hudup.core.logistic.ClassLoader2;
 import net.hudup.core.logistic.Composite;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.NextUpdate;
-import net.hudup.core.logistic.ClassLoader2;
 import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.UriAdapter.AdapterWriter;
 import net.hudup.core.logistic.UriFilter;
@@ -395,16 +396,24 @@ public abstract class PluginManagerAbstract implements PluginManager {
 	public int functionTypeOf(Alg alg) {
 		if (alg instanceof Recommender)
 			return 0;
-		else if (alg instanceof ExecutableAlg)
-			return 1;
+		else if (alg instanceof ExecutableAlg) {
+			if (alg instanceof NonexecutableAlg)
+				return 2;
+			else
+				return 1;
+		}
 		else if (alg instanceof AlgRemoteWrapper) {
 			AlgRemote remoteAlg = ((AlgRemoteWrapper)alg).getRemoteAlg();
 			if (remoteAlg instanceof Alg)
 				return functionTypeOf((Alg)remoteAlg);
 			else if (remoteAlg instanceof RecommenderRemote)
 				return 0;
-			else if (remoteAlg instanceof ExecutableAlgRemote)
-				return 1;
+			else if (remoteAlg instanceof ExecutableAlgRemote) {
+				if (remoteAlg instanceof NonexecutableAlgRemote)
+					return 2;
+				else
+					return 1;
+			}
 			else
 				return -1;
 		}

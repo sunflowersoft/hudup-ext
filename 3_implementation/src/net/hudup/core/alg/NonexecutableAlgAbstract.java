@@ -15,8 +15,7 @@ import java.rmi.RemoteException;
  * @author Loc Nguyen
  * @version 1.0
  */
-public abstract class NonexecutableAlgAbstract extends ExecutableAlgAbstract
-		implements NonexecutableAlg, NonexecutableAlgRemote {
+public abstract class NonexecutableAlgAbstract extends ExecutableAlgAbstract implements NonexecutableAlg, NonexecutableAlgRemote {
 
 
 	/**

@@ -7,6 +7,8 @@
  */
 package net.hudup.core.alg;
 
+import java.rmi.Remote;
+
 /**
  * This interface is the flag to indicate the implemented object does not require training dataset.
  * 
@@ -14,6 +16,6 @@ package net.hudup.core.alg;
  * @version 1.0
  *
  */
-public interface AllowNullTrainingSet {
+public interface AllowNullTrainingSet extends Remote {
 
 }
