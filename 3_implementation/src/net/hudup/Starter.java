@@ -98,6 +98,7 @@ public class Starter {
 		
 		dlgStarter.getItemControl().setSelectedItem(initialAP);
 		dlgStarter.setSize(600, 300);
+		dlgStarter.setLocationRelativeTo(null);
         dlgStarter.setVisible(true);
 	}
 	

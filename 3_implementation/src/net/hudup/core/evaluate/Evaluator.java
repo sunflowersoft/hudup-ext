@@ -376,6 +376,15 @@ public interface Evaluator extends Remote, RemoteRunner, SetupAlgListener, Plugi
 
     
     /**
+     * Getting evaluated algorithm description in text.
+     * @param algName algorithm name.
+     * @return evaluated algorithm description in text.
+     * @throws RemoteException if any error raises.
+     */
+    String getEvaluatedAlgDescText(String algName) throws RemoteException;
+
+    
+    /**
      * Updating resulted dataset pool.
      * @param pool specified dataset pool.
      * @param localTargetListener local target listener. It can be null.

@@ -988,6 +988,20 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 	}
 
 
+	@Override
+	public String getEvaluatedAlgDescText(String algName) throws RemoteException {
+		if (algRegResult == null) return null;
+		Alg alg = algRegResult.query(algName);
+		
+		if (alg == null) 
+			return null;
+		else if (alg instanceof AlgRemote)
+			return ((AlgRemote)alg).getDescription();
+		else
+			return null;
+	}
+
+
 	/**
 	 * Retrieving algorithm from register table. Current version only exports normal algorithms.
 	 * @param algReg register table.

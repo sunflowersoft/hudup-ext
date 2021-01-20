@@ -252,6 +252,12 @@ public class EvaluatorWrapperExt implements Evaluator, EvaluatorListener, Evalua
 
 
 	@Override
+	public String getEvaluatedAlgDescText(String algName) throws RemoteException {
+		return remoteEvaluator.getEvaluatedAlgDescText(algName);
+	}
+
+
+	@Override
 	public EvaluatorConfig getConfig() throws RemoteException {
 		return remoteEvaluator.getConfig();
 	}

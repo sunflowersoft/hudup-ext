@@ -1169,6 +1169,7 @@ public class EvalCompoundGUI extends JFrame {
 			if (initialEvName != null)
 				dlgEvStarter.getItemControl().setSelectedItem(initialEvName);
 			dlgEvStarter.setSize(400, 150);
+			dlgEvStarter.setLocationRelativeTo(null);
 	        dlgEvStarter.setVisible(true);
 		}
 		catch (Exception e) {LogUtil.trace(e);}

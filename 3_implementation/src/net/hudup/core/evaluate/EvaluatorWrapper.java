@@ -352,6 +352,12 @@ public class EvaluatorWrapper implements Evaluator, Serializable {
 
 
 	@Override
+	public String getEvaluatedAlgDescText(String algName) throws RemoteException {
+		return remoteEvaluator.getEvaluatedAlgDescText(algName);
+	}
+
+
+	@Override
 	public void pluginChanged(PluginChangedEvent evt) throws RemoteException {
 		remoteEvaluator.pluginChanged(evt);
 	}

@@ -25,6 +25,7 @@ import net.hudup.core.evaluate.EvaluatorAbstract;
 import net.hudup.core.logistic.Inspectable;
 import net.hudup.core.logistic.Inspector;
 import net.hudup.core.logistic.LogUtil;
+import net.hudup.core.logistic.ui.DescriptionDlg;
 import net.hudup.core.logistic.ui.UIUtil;
 
 /**
@@ -86,14 +87,39 @@ public final class AlgListUIUtil {
 		ctxMenu.add(miConfig);
 		
 		//Showing inspector of the algorithm
-		if (alg instanceof Inspectable) {
+		if ((alg instanceof Inspectable) || (EvaluatorAbstract.isRemote(evaluator))) {
 			JMenuItem miInspect = new JMenuItem("Inspect");
 			miInspect.addActionListener( 
 				new ActionListener() {
 					
 					@Override
 					public void actionPerformed(ActionEvent e) {
-						Inspector inspector = getInspector(alg, evaluator);
+						Inspector inspector = null;
+						
+						if (EvaluatorAbstract.isRemote(evaluator)) {
+							int confirm = JOptionPane.showConfirmDialog(
+								UIUtil.getFrameForComponent((Component)ui), 
+								"Because of using remote evaluator.\n" +
+									"Would you like to show remote description?\n" +
+									"If press Yes, description dialog will be shown.\n" + 
+									"If press No, inspector can be shown.", 
+								"Inspector option", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+							
+							if (confirm == JOptionPane.NO_OPTION) {
+								if (alg instanceof Inspectable) inspector = getInspector(alg, evaluator);
+							}
+							else {
+								try {
+									String desc = evaluator.getEvaluatedAlgDescText(alg.getName());
+									if (desc != null)
+										inspector = new DescriptionDlg(UIUtil.getFrameForComponent((Component)ui), "Inspector", desc);
+								} catch (Exception ex) {LogUtil.trace(ex);}
+							}
+						}
+						else if (alg instanceof Inspectable) {
+							inspector = getInspector(alg, evaluator);
+						}
+						
 						if (inspector != null)
 							inspector.inspect();
 						else
