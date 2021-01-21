@@ -57,9 +57,10 @@ public abstract class ExecutableAlgAbstract extends AlgAbstract implements Execu
 	}
 
 
-	/*
-	 * In the this version, the setup method is not marked synchronized because it calls learnStart method.
-	 */
+    /**
+     * In the this version, the setup method is not marked synchronized because it calls {@link #learnStart(Object...)} method.
+     * Note, method {@link #learnStart(Object...)} can have thread-supporting loop with synchronization.
+     */
 	@SuppressWarnings("unchecked")
 	@Override
 	public /*synchronized*/ void setup(Dataset dataset, Object...info) throws RemoteException {
