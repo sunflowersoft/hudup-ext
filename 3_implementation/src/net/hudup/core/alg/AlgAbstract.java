@@ -81,15 +81,22 @@ public abstract class AlgAbstract implements Alg, AlgRemote {
 	public Object learnStart(Object... info) throws RemoteException {
 		if (isLearnStarted()) return null;
 		
+		int maxIteration = 1000;
+		int iteration = 0;
 		learnStarted = true;
-		
-		while (learnStarted) {
+		while (learnStarted && (maxIteration <= 0 || iteration < maxIteration)) {
 			
 			//Do something with main tasks here.
 			
-			//Pseudo-code to fire doing setup event.
-			fireSetupEvent(new SetupAlgEvent(this, Type.doing, getName(), null, "Setting up is doing"));
 			
+			iteration ++;
+
+			//Pseudo-code to fire doing setup event.
+			fireSetupEvent(new SetupAlgEvent(this, Type.doing, getName(), "Setting up is doing: " + getDescription(), iteration, maxIteration));
+			
+			//if (terminatedCondition)
+				learnStarted = false; //Pseudo-code to stop learning process.
+
 			synchronized (this) {
 				while (learnPaused) {
 					notifyAll();
@@ -99,7 +106,6 @@ public abstract class AlgAbstract implements Alg, AlgRemote {
 				}
 			}
 			
-			learnStarted = false; //Pseudo-code to stop learning process.
 		}
 		
 		synchronized (this) {
@@ -107,7 +113,7 @@ public abstract class AlgAbstract implements Alg, AlgRemote {
 			learnPaused = false;
 			
 			//Pseudo-code to fire done setup event.
-			fireSetupEvent(new SetupAlgEvent(this, Type.done, getName(), null, "Setting up is done"));
+			fireSetupEvent(new SetupAlgEvent(this, Type.done, getName(), "Setting up is done: " + getDescription(), iteration, maxIteration));
 
 			notifyAll();
 		}
