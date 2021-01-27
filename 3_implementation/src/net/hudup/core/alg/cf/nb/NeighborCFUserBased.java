@@ -296,7 +296,7 @@ public class NeighborCFUserBased extends NeighborCF implements DuplicatableAlg {
 		try {
 			while (userRatings.next()) {
 				RatingVector thatUser = userRatings.pick();
-				if (thatUser == null || thatUser.id() == thisUser.id() || !thatUser.isRated())
+				if (thatUser == null || thatUser.id() == thisUser.id() /*|| !thatUser.isRated()*/)
 					continue;
 				
 				Profile thatProfile = hybrid ? cf.getDataset().getUserProfile(thatUser.id()) : null;
