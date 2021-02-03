@@ -597,7 +597,7 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 			config.addReadOnly(MSD_FRACTION_FIELD);
 		}
 		else if (measure.equals(Measure.COD)) {
-			config.put(CALC_STATISTICS_FIELD, false);
+			config.put(CALC_STATISTICS_FIELD, true);
 			config.addReadOnly(CALC_STATISTICS_FIELD);
 			config.addReadOnly(COSINE_NORMALIZED_FIELD);
 			config.addReadOnly(MSD_FRACTION_FIELD);
