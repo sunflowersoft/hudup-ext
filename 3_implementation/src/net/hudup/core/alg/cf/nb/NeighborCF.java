@@ -542,6 +542,8 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 			return jaccard(vRating1, vRating2, profile1, profile2);
 		else if (measure.equals(Measure.JACCARD2))
 			return jaccard2(vRating1, vRating2, profile1, profile2);
+		else if (measure.equals(Measure.DICE))
+			return dice(vRating1, vRating2, profile1, profile2);
 		else if (measure.equals(Measure.MSD))
 			return msd(vRating1, vRating2, profile1, profile2);
 		else if (measure.equals(Measure.MSDJ))
@@ -625,6 +627,12 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 			config.addReadOnly(MSD_FRACTION_FIELD);
 		}
 		else if (measure.equals(Measure.JACCARD2)) {
+			config.put(CALC_STATISTICS_FIELD, false);
+			config.addReadOnly(CALC_STATISTICS_FIELD);
+			config.addReadOnly(COSINE_NORMALIZED_FIELD);
+			config.addReadOnly(MSD_FRACTION_FIELD);
+		}
+		else if (measure.equals(Measure.DICE)) {
 			config.put(CALC_STATISTICS_FIELD, false);
 			config.addReadOnly(CALC_STATISTICS_FIELD);
 			config.addReadOnly(COSINE_NORMALIZED_FIELD);
@@ -1026,6 +1034,30 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 		
 		Set<Integer> common = commonFieldIds(vRating1, vRating2);
 		return (double)common.size() / (double)(ratedIds1.size()*ratedIds2.size());
+	}
+
+	
+	/**
+	 * Calculating the Dice measure between two pairs.
+	 * The first pair includes the first rating vector and the first profile.
+	 * The second pair includes the second rating vector and the second profile.
+	 * 
+	 * @param vRating1 first rating vector.
+	 * @param vRating2 second rating vector.
+	 * @param profile1 first profile.
+	 * @param profile2 second profile.
+	 * @return Dice measure between both two rating vectors and profiles.
+	 */
+	protected double dice(RatingVector vRating1, RatingVector vRating2,
+			Profile profile1, Profile profile2) {
+		Set<Integer> ratedIds1 = vRating1.fieldIds(true);
+		Set<Integer> ratedIds2 = vRating2.fieldIds(true);
+
+		Set<Integer> common = Util.newSet();
+		common.addAll(ratedIds1);
+		common.retainAll(ratedIds2);
+		
+		return ((double)2*common.size()) / ((double)(ratedIds1.size()+ratedIds2.size()));
 	}
 
 	

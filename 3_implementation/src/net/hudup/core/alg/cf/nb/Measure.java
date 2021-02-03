@@ -84,6 +84,12 @@ public class Measure {
 
 	
 	/**
+	 * Name of Dice measure.
+	 */
+	public static final String DICE = "dice";
+
+	
+	/**
 	 * Name of MSD measure.
 	 */
 	public static final String MSD = "msd";
