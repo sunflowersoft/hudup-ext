@@ -39,27 +39,24 @@ public class ErrorRange extends ArrayMetric {
 	 * Default constructor.
 	 */
 	public ErrorRange() {
-		// TODO Auto-generated constructor stub
+
 	}
 
 	
 	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
 		return "ErrorRange.exe";
 	}
 	
 	
 	@Override
 	public String getTypeName() throws RemoteException {
-		// TODO Auto-generated method stub
 		return "Accuracy";
 	}
 
 
 	@Override
 	public String getDescription() throws RemoteException {
-		// TODO Auto-generated method stub
 		return "Error range for executable algorithms";
 	}
 	
@@ -97,7 +94,6 @@ public class ErrorRange extends ArrayMetric {
 
 		@Override
 		public Object value() {
-			// TODO Auto-generated method stub
 			Vector v = toVector();
 			double mean = v.mean();
 			double sd = Math.sqrt(v.mleVar());
@@ -112,7 +108,6 @@ public class ErrorRange extends ArrayMetric {
 
 		@Override
 		public Object clone() {
-			// TODO Auto-generated method stub
 			ErrorRangeMetricValue errorRangeValue = new ErrorRangeMetricValue();
 			errorRangeValue.update(this.array);
 			return errorRangeValue;
@@ -120,7 +115,6 @@ public class ErrorRange extends ArrayMetric {
 
 		@Override
 		public String toString() {
-			// TODO Auto-generated method stub
 			@SuppressWarnings("unchecked")
 			List<Object> valueList = (List<Object>)value();
 			return ArrayMeanMetricValue.toString(valueList);
