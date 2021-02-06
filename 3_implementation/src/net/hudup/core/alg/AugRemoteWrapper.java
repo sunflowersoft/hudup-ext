@@ -10,7 +10,6 @@ package net.hudup.core.alg;
 import java.rmi.RemoteException;
 import java.util.Map;
 
-import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.logistic.BaseClass;
 import net.hudup.core.logistic.LogUtil;
@@ -151,17 +150,6 @@ public class AugRemoteWrapper extends ExecutableAlgRemoteWrapper implements Aug,
 	@Override
 	public String[] getBaseRemoteInterfaceNames() throws RemoteException {
 		return new String[] {AugRemote.class.getName()};
-	}
-
-	
-	@Override
-	public DataConfig createDefaultConfig() {
-		if (remoteAlg instanceof Aug)
-			return ((Aug)remoteAlg).createDefaultConfig();
-		else {
-			LogUtil.info("AUgorithm does not support method createDefaultConfig()");
-			return null;
-		}
 	}
 
 	

@@ -7,7 +7,10 @@
  */
 package net.hudup.core.data;
 
+import java.rmi.RemoteException;
+
 import net.hudup.core.alg.AlgRemote;
+import net.hudup.core.logistic.ui.ProgressListener;
 
 /**
  * This interface represents a remote external query.
@@ -16,6 +19,25 @@ import net.hudup.core.alg.AlgRemote;
  * @version 12.0
  *
  */
-public interface ExternalQueryRemote extends ExternalQueryRemoteTask2, AlgRemote {
+public interface ExternalQueryRemote extends ExternalQueryRemoteTask, AlgRemote {
+
+
+	@Override
+	boolean setup(
+			DataConfig internalConfig, 
+			ExternalConfig externalConfig) throws RemoteException;
+	
+	
+	@Override
+	ExternalItemInfo getItemInfo(int itemId) throws RemoteException;
+	
+	
+	@Override
+	ExternalUserInfo getUserInfo(int userId) throws RemoteException;
+	
+	
+	@Override
+	void importData(ProgressListener registeredListener) throws RemoteException;
+
 
 }

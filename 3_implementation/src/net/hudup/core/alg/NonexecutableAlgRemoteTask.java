@@ -14,6 +14,7 @@ package net.hudup.core.alg;
  * @version 12.0
  *
  */
-public interface NonexecutableAlgRemoteTask extends ExecutableAlgRemoteTask {
+public interface NonexecutableAlgRemoteTask extends AlgExtRemoteTask {
+
 
 }

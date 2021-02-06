@@ -15,7 +15,7 @@ import java.rmi.RemoteException;
  * @author Loc Nguyen
  * @version 1.0
  */
-public abstract class ExecuteAsLearnAlgAbstract extends ExecutableAlgAbstract implements ExecuteAsLearnAlg, ExecuteAsLearnAlgRemote {
+public abstract class ExecuteAsLearnAlgAbstract extends AlgExtAbstract implements ExecuteAsLearnAlg, ExecuteAsLearnAlgRemote {
 
 
 	/**
@@ -25,17 +25,23 @@ public abstract class ExecuteAsLearnAlgAbstract extends ExecutableAlgAbstract im
 
 	
 	/**
-	 * Default constructor.
-	 */
-	public ExecuteAsLearnAlgAbstract() {
+     * Default constructor.
+     */
+    public ExecuteAsLearnAlgAbstract() {
 		super();
 	}
 
-	
+
 	@Override
-	public Object execute(Object input) throws RemoteException {
-		return learnAsExecuteStart(input);
+	public Object learnStart(Object... info) throws RemoteException {
+		return executeAsLearn(null);
 	}
 
 
+	@Override
+	public String[] getBaseRemoteInterfaceNames() throws RemoteException {
+		return new String[] {ExecuteAsLearnAlgRemote.class.getName()};
+	}
+
+	
 }

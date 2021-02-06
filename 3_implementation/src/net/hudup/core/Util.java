@@ -13,6 +13,7 @@ import static net.hudup.core.Constants.ROOT_PACKAGE;
 import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.Array;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -191,6 +192,35 @@ public class Util {
 			}
 		}
 		
+	}
+
+	
+	/**
+	 * Creating a new array.
+	 * @param tClass element type.
+	 * @param length array length.
+	 * @return new array
+	 */
+	public static <T> T[] newArray(Class<T> tClass, int length) {
+		@SuppressWarnings("unchecked")
+		T[] array = (T[]) Array.newInstance(tClass, length);
+		
+		return array;
+	}
+	
+	
+	/**
+	 * Creating a new array.
+	 * @param tClass element type.
+	 * @param length array length.
+	 * @param initialValue initial value.
+	 * @return new array
+	 */
+	public static <T> T[] newArray(Class<T> tClass, int length, T initialValue) {
+		T[] array = newArray(tClass, length);
+		for (int i = 0; i < length; i++) array[i] = initialValue;
+		
+		return array;
 	}
 
 	

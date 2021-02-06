@@ -7,6 +7,8 @@
  */
 package net.hudup.core.evaluate;
 
+import java.rmi.RemoteException;
+
 import net.hudup.core.alg.AlgRemote;
 
 /**
@@ -17,6 +19,34 @@ import net.hudup.core.alg.AlgRemote;
  *
  */
 public interface MetricRemote extends MetricRemoteTask, AlgRemote {
+
+
+	@Override
+	String getTypeName() throws RemoteException;
 	
 	
+	@Override
+	void setup(Object...params) throws RemoteException;
+	
+	
+	@Override
+	MetricValue getCurrentValue() throws RemoteException;
+	
+	
+	@Override
+	MetricValue getAccumValue() throws RemoteException;
+
+	
+	@Override
+	boolean recalc(Object...params) throws RemoteException;
+	
+	
+	@Override
+	void reset() throws RemoteException;
+	
+	
+	@Override
+	boolean isValid() throws RemoteException;
+
+
 }

@@ -50,7 +50,6 @@ public abstract class AugAbstract extends ExecutableAlgAbstract implements Aug, 
 	 * Default constructor.
 	 */
 	public AugAbstract() {
-		// TODO Auto-generated constructor stub
 		try {
 			if (kb == null)
 				kb = newKB();
@@ -63,7 +62,6 @@ public abstract class AugAbstract extends ExecutableAlgAbstract implements Aug, 
 	@SuppressWarnings("unchecked")
 	@Override
 	public synchronized void setup(Dataset dataset, Object...info) throws RemoteException {
-		// TODO Auto-generated method stub
 		unsetup();
 		this.dataset = dataset;
 		
@@ -108,7 +106,6 @@ public abstract class AugAbstract extends ExecutableAlgAbstract implements Aug, 
 	
 	@Override
 	public synchronized void unsetup() throws RemoteException {
-		// TODO Auto-generated method stub
 		super.unsetup();
 		
 		if (kb != null) {
@@ -141,42 +138,36 @@ public abstract class AugAbstract extends ExecutableAlgAbstract implements Aug, 
 	
 	@Override
 	public Dataset getDataset() throws RemoteException {
-		// TODO Auto-generated method stub
 		return dataset;
 	}
 
 
 	@Override
 	public Object cacheTask(int id1, int id2, Map<Integer, Map<Integer, Object>> cache, Task task, Object... params) {
-		// TODO Auto-generated method stub
 		return SupportCacheAlg.cacheTask(this, id1, id2, cache, task, params);
 	}
 
 	
 	@Override
 	public Object cacheTask(int id, Map<Integer, Object> cache, Task task, Object... params) {
-		// TODO Auto-generated method stub
 		return SupportCacheAlg.cacheTask(this, id, cache, task, params);
 	}
 
 
 	@Override
 	public boolean isCached() {
-		// TODO Auto-generated method stub
 		return getConfig().getAsBoolean(SupportCacheAlg.SUPPORT_CACHE_FIELD);
 	}
 
 	
 	@Override
 	public void setCached(boolean cached) {
-		// TODO Auto-generated method stub
 		getConfig().put(SupportCacheAlg.SUPPORT_CACHE_FIELD, cached);
 	}
 
 	
 	@Override
 	public String[] getBaseRemoteInterfaceNames() throws RemoteException {
-		// TODO Auto-generated method stub
 		return new String[] {AugRemote.class.getName()};
 	}
 

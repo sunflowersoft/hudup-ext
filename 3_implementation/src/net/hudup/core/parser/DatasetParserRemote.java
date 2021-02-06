@@ -7,7 +7,12 @@
  */
 package net.hudup.core.parser;
 
+import java.rmi.RemoteException;
+
 import net.hudup.core.alg.AlgRemote;
+import net.hudup.core.data.DataConfig;
+import net.hudup.core.data.DataDriver;
+import net.hudup.core.data.Dataset;
 
 /**
  * This interface establishes a remote parser.
@@ -16,7 +21,15 @@ import net.hudup.core.alg.AlgRemote;
  * @version 12.0
  *
  */
-public interface DatasetParserRemote extends DatasetParserRemoteTask2, AlgRemote {
+public interface DatasetParserRemote extends DatasetParserRemoteTask, AlgRemote {
+
+	
+	@Override
+	Dataset parse(DataConfig config) throws RemoteException;
+	
+	
+	@Override
+	boolean support(DataDriver driver) throws RemoteException;
 
 
 }

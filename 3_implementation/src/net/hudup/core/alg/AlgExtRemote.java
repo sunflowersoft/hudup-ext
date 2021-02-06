@@ -16,13 +16,13 @@ import net.hudup.core.data.Fetcher;
 import net.hudup.core.data.Profile;
 
 /**
- * This interface declares methods for remote executable algorithm.
+ * This interface represents an extensive remote algorithm.
  * 
  * @author Loc Nguyen
- * @version 12.0
+ * @version 1.0
  *
  */
-public interface ExecutableAlgRemoteTask2 extends ExecutableAlgRemoteTask, Remote {
+public interface AlgExtRemote extends AlgExtRemoteTask, AlgRemote {
 
 	
 	@Override
@@ -35,10 +35,6 @@ public interface ExecutableAlgRemoteTask2 extends ExecutableAlgRemoteTask, Remot
 	
 	@Override
 	public void unsetup() throws RemoteException;
-	
-	
-	@Override
-	Object execute(Object input) throws RemoteException;
 	
 	
 	@Override

@@ -28,6 +28,9 @@ import net.hudup.core.alg.CompositeAlgRemote;
 import net.hudup.core.alg.ExecutableAlg;
 import net.hudup.core.alg.ExecutableAlgRemote;
 import net.hudup.core.alg.ExecutableAlgRemoteWrapper;
+import net.hudup.core.alg.ExecuteAsLearnAlg;
+import net.hudup.core.alg.ExecuteAsLearnAlgRemote;
+import net.hudup.core.alg.ExecuteAsLearnAlgRemoteWrapper;
 import net.hudup.core.alg.MemoryBasedAlg;
 import net.hudup.core.alg.MemoryBasedAlgRemote;
 import net.hudup.core.alg.ModelBasedAlg;
@@ -338,12 +341,14 @@ public abstract class PluginManagerAbstract implements PluginManager {
 			return new CTSManagerRemoteWrapper((CTSManagerRemote)remoteAlg, exclusive);
 		else if (remoteAlg instanceof RecommenderRemote)
 			return new RecommenderRemoteWrapper((RecommenderRemote)remoteAlg, exclusive);
+		else if (remoteAlg instanceof AugRemote)
+			return new AugRemoteWrapper((AugRemote)remoteAlg, exclusive);
 		else if (remoteAlg instanceof ExecutableAlgRemote)
 			return new ExecutableAlgRemoteWrapper((ExecutableAlgRemote)remoteAlg, exclusive);
 		else if (remoteAlg instanceof NonexecutableAlgRemote)
 			return new NonexecutableAlgRemoteWrapper((NonexecutableAlgRemote)remoteAlg, exclusive);
-		else if (remoteAlg instanceof AugRemote)
-			return new AugRemoteWrapper((AugRemote)remoteAlg, exclusive);
+		else if (remoteAlg instanceof ExecuteAsLearnAlgRemote)
+			return new ExecuteAsLearnAlgRemoteWrapper((ExecuteAsLearnAlgRemote)remoteAlg, exclusive);
 		else
 			return new AlgRemoteWrapper(remoteAlg, exclusive);
 	}
@@ -396,12 +401,12 @@ public abstract class PluginManagerAbstract implements PluginManager {
 	public int functionTypeOf(Alg alg) {
 		if (alg instanceof Recommender)
 			return 0;
-		else if (alg instanceof ExecutableAlg) {
-			if (alg instanceof NonexecutableAlg)
-				return 2;
-			else
-				return 1;
-		}
+		else if (alg instanceof ExecutableAlg)
+			return 1;
+		else if (alg instanceof NonexecutableAlg)
+			return 2;
+		else if (alg instanceof ExecuteAsLearnAlg)
+			return 3;
 		else if (alg instanceof AlgRemoteWrapper) {
 			AlgRemote remoteAlg = ((AlgRemoteWrapper)alg).getRemoteAlg();
 			if (remoteAlg instanceof Alg)

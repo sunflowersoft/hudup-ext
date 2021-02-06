@@ -14,7 +14,7 @@ package net.hudup.core.data;
  * @version 1.0
  *
  */
-public interface KBasePointerRemote extends KBasePointerRemoteTask2, PointerRemote {
+public interface KBasePointerRemote extends KBasePointerRemoteTask, PointerRemote {
 
 	
 }

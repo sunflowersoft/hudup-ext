@@ -9,15 +9,7 @@ package net.hudup.core.alg;
 
 import java.rmi.RemoteException;
 
-import net.hudup.core.data.DataConfig;
-import net.hudup.core.data.Dataset;
-import net.hudup.core.data.Fetcher;
-import net.hudup.core.data.Profile;
 import net.hudup.core.logistic.BaseClass;
-import net.hudup.core.logistic.Inspector;
-import net.hudup.core.logistic.LogUtil;
-import net.hudup.core.logistic.ui.DescriptionDlg;
-import net.hudup.core.logistic.ui.UIUtil;
 
 /**
  * The class is a wrapper of remote executable algorithm. This is a trick to use RMI object but not to break the defined programming architecture.
@@ -30,7 +22,7 @@ import net.hudup.core.logistic.ui.UIUtil;
  *
  */
 @BaseClass //The annotation is very important which prevent Firer to instantiate the wrapper without referred remote object. This wrapper is not normal algorithm.
-public class ExecutableAlgRemoteWrapper extends AlgRemoteWrapper implements ExecutableAlg, ExecutableAlgRemote {
+public class ExecutableAlgRemoteWrapper extends AlgExtRemoteWrapper implements ExecutableAlg, ExecutableAlgRemote {
 
 	
 	/**
@@ -59,75 +51,14 @@ public class ExecutableAlgRemoteWrapper extends AlgRemoteWrapper implements Exec
 
 
 	@Override
-	public Inspector getInspector() {
-		String desc = "";
-		try {
-			desc = getDescription();
-		} catch (Exception e) {LogUtil.trace(e);}
-		
-		return new DescriptionDlg(UIUtil.getFrameForComponent(null), "Inspector", desc);
-	}
-
-	
-	@Override
-	public void setup(Dataset dataset, Object... info) throws RemoteException {
-		((ExecutableAlgRemote)remoteAlg).setup(dataset, info);
-	}
-
-	
-	@Override
-	public void setup(Fetcher<Profile> sample, Object... info) throws RemoteException {
-		((ExecutableAlgRemote)remoteAlg).setup(sample, info);
-	}
-
-	
-	@Override
-	public void unsetup() throws RemoteException {
-		((ExecutableAlgRemote)remoteAlg).unsetup();
-	}
-
-	
-	@Override
 	public Object execute(Object input) throws RemoteException {
 		return ((ExecutableAlgRemote)remoteAlg).execute(input);
 	}
 
 	
 	@Override
-	public Object getParameter() throws RemoteException {
-		return ((ExecutableAlgRemote)remoteAlg).getParameter();
-	}
-
-	@Override
-	public String parameterToShownText(Object parameter, Object... info) throws RemoteException {
-		return ((ExecutableAlgRemote)remoteAlg).parameterToShownText(parameter, info);
-	}
-
-	
-	@Override
-	public synchronized void unexport() throws RemoteException {
-		if (exclusive && remoteAlg != null) {
-			((ExecutableAlgRemote)remoteAlg).unsetup();
-		}
-
-		super.unexport();
-	}
-
-
-	@Override
 	public String[] getBaseRemoteInterfaceNames() throws RemoteException {
 		return new String[] {ExecutableAlgRemote.class.getName()};
-	}
-
-	
-	@Override
-	public DataConfig createDefaultConfig() {
-		if (remoteAlg instanceof ExecutableAlg)
-			return ((ExecutableAlg)remoteAlg).createDefaultConfig();
-		else {
-			LogUtil.warn("Wrapper of remote executable algorithm does not support createDefaultConfig()");
-			return null;
-		}
 	}
 
 	

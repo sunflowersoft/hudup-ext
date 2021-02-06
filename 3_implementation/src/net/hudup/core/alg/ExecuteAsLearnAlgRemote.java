@@ -16,11 +16,11 @@ import java.rmi.RemoteException;
  * @version 1.0
  *
  */
-public interface ExecuteAsLearnAlgRemote extends ExecuteAsLearnAlgRemoteTask, ExecutableAlgRemote {
+public interface ExecuteAsLearnAlgRemote extends ExecuteAsLearnAlgRemoteTask, AlgExtRemote {
 
-	
+
 	@Override
-	Object learnAsExecuteStart(Object input) throws RemoteException;
-	
-	
+	Object executeAsLearn(Object input) throws RemoteException;
+
+
 }

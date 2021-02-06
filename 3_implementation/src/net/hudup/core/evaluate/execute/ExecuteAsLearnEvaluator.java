@@ -7,11 +7,14 @@
  */
 package net.hudup.core.evaluate.execute;
 
+import java.io.Serializable;
 import java.rmi.RemoteException;
 
 import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.AlgDesc2;
 import net.hudup.core.alg.ExecuteAsLearnAlg;
+import net.hudup.core.data.Profile;
+import net.hudup.core.logistic.LogUtil;
 
 /**
  * Evaluator for evaluating testing executing-learning algorithms.
@@ -20,7 +23,7 @@ import net.hudup.core.alg.ExecuteAsLearnAlg;
  * @version 1.0
  *
  */
-public abstract class ExecuteAsLearnEvaluator extends ExecuteEvaluator {
+public abstract class ExecuteAsLearnEvaluator extends SampleEvaluator {
 
 	
 	/**
@@ -34,6 +37,28 @@ public abstract class ExecuteAsLearnEvaluator extends ExecuteEvaluator {
 	 */
 	public ExecuteAsLearnEvaluator() {
 
+	}
+
+	
+	@Override
+	protected Profile prepareExecuteAlg(Alg alg, Profile testingProfile) {
+		return testingProfile;
+	}
+
+	
+	@Override
+	protected Serializable executeAlg(Alg alg, Profile param) {
+		try {
+			Object result = ((ExecuteAsLearnAlg)alg).executeAsLearn(param);
+			if (result instanceof Serializable)
+				return (Serializable) result;
+			else
+				return null;
+		} catch (Exception e) {
+			LogUtil.trace(e);
+		}
+		
+		return null;
 	}
 
 	

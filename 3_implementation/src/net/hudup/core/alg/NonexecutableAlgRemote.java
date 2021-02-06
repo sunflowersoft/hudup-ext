@@ -8,13 +8,13 @@
 package net.hudup.core.alg;
 
 /**
- * This interface represents a non-executable remote algorithm.
+ * This interface represents an non-executable remote algorithm.
  * 
  * @author Loc Nguyen
  * @version 1.0
  *
  */
-public interface NonexecutableAlgRemote extends NonexecutableAlgRemoteTask, ExecutableAlgRemote {
+public interface NonexecutableAlgRemote extends NonexecutableAlgRemoteTask, AlgExtRemote {
 
-	
+
 }

@@ -11,6 +11,9 @@ import java.io.Serializable;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
+import net.hudup.core.data.DataConfig;
+import net.hudup.core.data.Dataset;
+
 /**
  * This interface represents a remote knowledge base.
  * 
@@ -18,9 +21,37 @@ import java.rmi.RemoteException;
  * @version 12.0
  *
  */
-public interface KBaseRemote extends KBaseRemoteTask2, AlgRemoteTask2, SetupAlgListener, Remote, Serializable {
+public interface KBaseRemote extends KBaseRemoteTask, AlgRemoteTask, SetupAlgListener, Remote, Serializable {
+	
+	
+	@Override
+	void load() throws RemoteException;
+	
+
+	@Override
+	void learn(Dataset dataset, Alg alg) throws RemoteException;
+	
+	
+	@Override
+	void save() throws RemoteException;
+	
+	
+	@Override
+	void save(DataConfig storeConfig) throws RemoteException;
+	
+	
+	@Override
+	void close() throws Exception;
 
 	
+	@Override
+	void clear() throws RemoteException;
+	
+	
+	@Override
+	boolean isEmpty() throws RemoteException;
+
+
 	/**
 	 * Getting remote base class names.
 	 * @return remote base class names.

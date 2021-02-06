@@ -12,14 +12,17 @@ import java.rmi.RemoteException;
 import net.hudup.core.logistic.BaseClass;
 
 /**
- * The class is a wrapper of remote executing-learning algorithm.
+ * The class is a wrapper of remote executing-learning algorithm. This is a trick to use RMI object but not to break the defined programming architecture.
+ * In fact, RMI mechanism has some troubles or it it affect negatively good architecture.
+ * For usage, an algorithm as REM will has a pair: REM stub (remote executing-learning algorithm) and REM wrapper (normal executing-learning algorithm).
+ * The server creates REM stub (remote executing-learning algorithm) and the client creates and uses the REM wrapper as normal executing-learning algorithm.
  * 
  * @author Loc Nguyen
  * @version 1.0
  *
  */
 @BaseClass //The annotation is very important which prevent Firer to instantiate the wrapper without referred remote object. This wrapper is not normal algorithm.
-public class ExecuteAsLearnAlgRemoteWrapper extends ExecutableAlgRemoteWrapper implements ExecuteAsLearnAlg, ExecuteAsLearnAlgRemote {
+public class ExecuteAsLearnAlgRemoteWrapper extends AlgExtRemoteWrapper implements ExecuteAsLearnAlg, ExecuteAsLearnAlgRemote {
 
 	
 	/**
@@ -27,10 +30,10 @@ public class ExecuteAsLearnAlgRemoteWrapper extends ExecutableAlgRemoteWrapper i
 	 */
 	private static final long serialVersionUID = 1L;
 
-	
+
 	/**
 	 * Constructor with specified remote executing-learning algorithm.
-	 * @param remoteExecuteAsLearnAlg remote non-executable algorithm.
+	 * @param remoteExecuteAsLearnAlg remote executing-learning algorithm.
 	 */
 	public ExecuteAsLearnAlgRemoteWrapper(ExecuteAsLearnAlgRemote remoteExecuteAsLearnAlg) {
 		super(remoteExecuteAsLearnAlg);
@@ -38,7 +41,7 @@ public class ExecuteAsLearnAlgRemoteWrapper extends ExecutableAlgRemoteWrapper i
 
 	
 	/**
-	 * Constructor with specified remote non-executable algorithm and exclusive mode.
+	 * Constructor with specified remote executing-learning algorithm and exclusive mode.
 	 * @param remoteExecuteAsLearnAlg remote executing-learning algorithm.
 	 * @param exclusive exclusive mode.
 	 */
@@ -48,8 +51,14 @@ public class ExecuteAsLearnAlgRemoteWrapper extends ExecutableAlgRemoteWrapper i
 
 
 	@Override
-	public Object learnAsExecuteStart(Object input) throws RemoteException {
-		return ((ExecuteAsLearnAlgRemote)remoteAlg).learnAsExecuteStart(input);
+	public Object executeAsLearn(Object input) throws RemoteException {
+		return ((ExecuteAsLearnAlgRemote)remoteAlg).executeAsLearn(input);
+	}
+
+	
+	@Override
+	public String[] getBaseRemoteInterfaceNames() throws RemoteException {
+		return new String[] {ExecuteAsLearnAlgRemote.class.getName()};
 	}
 
 	

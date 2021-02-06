@@ -24,7 +24,7 @@ import net.hudup.core.evaluate.SetupTimeMetric;
  * @version 1.0
  *
  */
-public abstract class NonexecuteEvaluator extends ExecuteEvaluator {
+public abstract class NonexecuteEvaluator extends SampleEvaluator {
 
 	
 	/**
@@ -41,9 +41,12 @@ public abstract class NonexecuteEvaluator extends ExecuteEvaluator {
 	}
 
 	
+	/**
+	 * This method is not supported for non-executable algorithms.
+	 */
 	@Override
-	public boolean acceptAlg(Alg alg) throws RemoteException {
-		return (alg != null) && (alg instanceof NonexecutableAlg) && !(AlgDesc2.isForTest(alg));
+	protected Profile prepareExecuteAlg(Alg alg, Profile testingProfile) {
+		return null;
 	}
 
 	
@@ -55,13 +58,19 @@ public abstract class NonexecuteEvaluator extends ExecuteEvaluator {
 		return null;
 	}
 
-
+	
 	/**
 	 * This method is not supported for non-executable algorithms.
 	 */
 	@Override
 	protected Serializable extractTestValue(Alg alg, Profile testingProfile) {
 		return null;
+	}
+
+	
+	@Override
+	public boolean acceptAlg(Alg alg) throws RemoteException {
+		return (alg != null) && (alg instanceof NonexecutableAlg) && !(AlgDesc2.isForTest(alg));
 	}
 
 	

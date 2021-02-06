@@ -7,6 +7,8 @@
  */
 package net.hudup.core.alg;
 
+import java.rmi.RemoteException;
+
 /**
  * This interface represents an executable remote algorithm.
  * 
@@ -14,7 +16,11 @@ package net.hudup.core.alg;
  * @version 1.0
  *
  */
-public interface ExecutableAlgRemote extends ExecutableAlgRemoteTask2, AlgRemote {
+public interface ExecutableAlgRemote extends ExecutableAlgRemoteTask, AlgExtRemote {
+
+
+	@Override
+	Object execute(Object input) throws RemoteException;
 
 
 }

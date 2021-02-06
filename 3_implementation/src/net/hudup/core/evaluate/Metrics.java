@@ -17,6 +17,8 @@ import java.util.Set;
 
 import net.hudup.core.Util;
 import net.hudup.core.alg.Alg;
+import net.hudup.core.alg.AlgDesc2;
+import net.hudup.core.alg.AlgDesc2.FunctionType;
 import net.hudup.core.alg.AlgRemote;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.xURI;
@@ -183,8 +185,12 @@ public class Metrics implements Serializable/*, Cloneable , Exportable*/ {
 			Object[] params) {
 		Metrics result = recalc(alg.getName(), datasetId, metricClass, params);
 
-		//if (alg instanceof AlgRemote) { //This code line makes program run redundantly.
-		if ((alg instanceof AlgRemote) && (metricClass != null) && (metricClass.isAssignableFrom(SetupTimeMetric.class))) {
+		//Following code snippet stores algorithm description.
+		FunctionType type = AlgDesc2.functionTypeOf(alg);
+		boolean enableDesc = (alg instanceof AlgRemote) && (metricClass != null) && 
+			(metricClass.isAssignableFrom(SetupTimeMetric.class) || (metricClass.isAssignableFrom(SpeedMetric.class) && (type == FunctionType.execute_as_learn)));
+		
+		if (enableDesc) {
 			String algName = alg.getName();
 			String algDesc = "";
 			try {

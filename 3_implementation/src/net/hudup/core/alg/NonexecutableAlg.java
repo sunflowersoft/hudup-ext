@@ -7,14 +7,16 @@
  */
 package net.hudup.core.alg;
 
+import net.hudup.core.logistic.Inspectable;
+
 /**
- * This interface represents a non-executable algorithm.
+ * This interface represents an non-executable algorithm.
  * 
  * @author Loc Nguyen
  * @version 1.0
  *
  */
-public interface NonexecutableAlg extends NonexecutableAlgRemoteTask, ExecutableAlg {
-
+public interface NonexecutableAlg extends NonexecutableAlgRemoteTask, AlgExt, Inspectable {
+	
 	
 }

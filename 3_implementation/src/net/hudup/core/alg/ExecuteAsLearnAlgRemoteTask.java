@@ -16,16 +16,16 @@ import java.rmi.RemoteException;
  * @version 12.0
  *
  */
-public interface ExecuteAsLearnAlgRemoteTask extends ExecutableAlgRemoteTask {
+public interface ExecuteAsLearnAlgRemoteTask extends AlgExtRemoteTask {
 
-	
+
 	/**
-	 * Learning as execution.
-	 * @param input input parameter which is often profile.
-	 * @return executed result.
+	 * Executing this algorithm by input parameter. The execution process is the same to the learning process.
+	 * @param input specified input parameter.
+	 * @return result of execution. Return null if execution is failed.
 	 * @throws RemoteException if any error raises.
 	 */
-	Object learnAsExecuteStart(Object input) throws RemoteException;
-
+	Object executeAsLearn(Object input) throws RemoteException;
+	
 	
 }

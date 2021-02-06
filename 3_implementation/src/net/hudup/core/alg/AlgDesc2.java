@@ -91,6 +91,11 @@ public class AlgDesc2 extends AlgDesc {
 		nonexecute,
 		
 		/**
+		 * Executing-learning algorithm.
+		 */
+		execute_as_learn,
+
+		/**
 		 * Unknown algorithm.
 		 */
 		unknown
@@ -373,6 +378,8 @@ public class AlgDesc2 extends AlgDesc {
 			return FunctionType.execute;
 		case 2:
 			return FunctionType.nonexecute;
+		case 3:
+			return FunctionType.execute_as_learn;
 		case -1:
 			return FunctionType.unknown;
 		default:
@@ -394,6 +401,8 @@ public class AlgDesc2 extends AlgDesc {
 			return "execute";
 		case nonexecute:
 			return "nonexecute";
+		case execute_as_learn:
+			return "execute_as_learn";
 		case unknown:
 			return "unknown";
 		default:
@@ -411,28 +420,38 @@ public class AlgDesc2 extends AlgDesc {
 		if (algs == null || algs.size() == 0)
 			return FunctionType.unknown;
 		
-		boolean recommend = true, execute = true, nonexecute = true;
+		boolean recommend = true, execute = true, nonexecute = true, execute_as_learn = true;
 		for (Alg alg : algs) {
 			FunctionType type = functionTypeOf(alg);
 			if (type == FunctionType.recommend) {
 				recommend = recommend && true;
 				execute = execute && false;
 				nonexecute = nonexecute && false;
+				execute_as_learn = execute_as_learn && false;
 			}
 			else if (type == FunctionType.execute) {
 				recommend = recommend && false;
 				execute = execute && true;
 				nonexecute = nonexecute && false;
+				execute_as_learn = execute_as_learn && false;
 			}
 			else if (type == FunctionType.nonexecute) {
 				recommend = recommend && false;
 				execute = execute && false;
 				nonexecute = nonexecute && true;
+				execute_as_learn = execute_as_learn && false;
+			}
+			else if (type == FunctionType.execute_as_learn) {
+				recommend = recommend && false;
+				execute = execute && false;
+				nonexecute = nonexecute && false;
+				execute_as_learn = execute_as_learn && true;
 			}
 			else {
 				recommend = recommend && false;
 				execute = execute && false;
 				nonexecute = nonexecute && false;
+				execute_as_learn = execute_as_learn && false;
 			}
 		}
 		
@@ -442,6 +461,8 @@ public class AlgDesc2 extends AlgDesc {
 			return FunctionType.execute;
 		else if (nonexecute)
 			return FunctionType.nonexecute;
+		else if (execute_as_learn)
+			return FunctionType.execute_as_learn;
 		else
 			return FunctionType.unknown;
 	}

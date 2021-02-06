@@ -7,6 +7,8 @@
  */
 package net.hudup.core.alg;
 
+import net.hudup.core.logistic.Inspectable;
+
 /**
  * This interface represents an executing-learning algorithm.
  * 
@@ -14,7 +16,7 @@ package net.hudup.core.alg;
  * @version 1.0
  *
  */
-public interface ExecuteAsLearnAlg extends ExecuteAsLearnAlgRemoteTask, ExecutableAlg {
-
+public interface ExecuteAsLearnAlg extends ExecuteAsLearnAlgRemoteTask, AlgExt, Inspectable {
+	
 	
 }

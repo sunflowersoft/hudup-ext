@@ -7,6 +7,12 @@
  */
 package net.hudup.core.alg;
 
+import java.rmi.RemoteException;
+import java.util.Set;
+
+import net.hudup.core.data.Dataset;
+import net.hudup.core.data.RatingVector;
+
 /**
  * This interface represents a remote recomendation algorithm.
  * 
@@ -14,7 +20,27 @@ package net.hudup.core.alg;
  * @version 1.0
  *
  */
-public interface RecommenderRemote extends RecommenderRemoteTask2, AlgRemote {
+public interface RecommenderRemote extends RecommenderRemoteTask, AlgRemote {
+
+
+	@Override
+	void setup(Dataset dataset, Object...params) throws RemoteException;
+	
+	
+	@Override
+	void unsetup() throws RemoteException;
+
+	
+	@Override
+	RecommendFilterList getFilterList() throws RemoteException;
+	
+	
+	@Override
+	RatingVector estimate(RecommendParam param, Set<Integer> queryIds) throws RemoteException;
+
+	
+	@Override
+	RatingVector recommend(RecommendParam param, int maxRecommend) throws RemoteException;
 
 	
 }

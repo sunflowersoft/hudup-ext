@@ -7,13 +7,16 @@
  */
 package net.hudup.core.alg;
 
+import net.hudup.core.logistic.Inspectable;
+
 /**
- * This interface declares methods for remote AUgorithm.
+ * This interface represents an extensive algorithm.
  * 
  * @author Loc Nguyen
- * @version 12.0
+ * @version 1.0
  *
  */
-public interface AugRemoteTask2 extends ExecutableAlgRemoteTask2 {
-
+public interface AlgExt extends AlgExtRemoteTask, Alg, Inspectable {
+	
+	
 }

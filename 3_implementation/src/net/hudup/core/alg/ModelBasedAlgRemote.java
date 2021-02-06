@@ -7,6 +7,10 @@
  */
 package net.hudup.core.alg;
 
+import java.rmi.RemoteException;
+
+import net.hudup.core.data.Dataset;
+
 /**
  * This interface indicates a remote model-based algorithm.
  * 
@@ -14,6 +18,19 @@ package net.hudup.core.alg;
  * @version 1.0
  *
  */
-public interface ModelBasedAlgRemote extends ModelBasedAlgRemoteTask2, AlgRemote {
+public interface ModelBasedAlgRemote extends ModelBasedAlgRemoteTask, AlgRemote {
+
+
+	@Override
+	KBase getKBase() throws RemoteException;
+	
+	
+	@Override
+	KBase newKB() throws RemoteException;
+	
+	
+	@Override
+	KBase createKBase(Dataset dataset) throws RemoteException;
+
 
 }

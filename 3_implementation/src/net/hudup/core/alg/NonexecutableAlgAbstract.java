@@ -15,7 +15,7 @@ import java.rmi.RemoteException;
  * @author Loc Nguyen
  * @version 1.0
  */
-public abstract class NonexecutableAlgAbstract extends ExecutableAlgAbstract implements NonexecutableAlg, NonexecutableAlgRemote {
+public abstract class NonexecutableAlgAbstract extends AlgExtAbstract implements NonexecutableAlg, NonexecutableAlgRemote {
 
 
 	/**
@@ -25,20 +25,17 @@ public abstract class NonexecutableAlgAbstract extends ExecutableAlgAbstract imp
 
 	
 	/**
-	 * Default constructor.
-	 */
-	public NonexecutableAlgAbstract() {
+     * Default constructor.
+     */
+    public NonexecutableAlgAbstract() {
 		super();
 	}
 
-	
-	/**
-	 * This method is not used for non-executable algorithm.
-	 */
+
 	@Override
-	public Object execute(Object input) throws RemoteException {
-		return null;
+	public String[] getBaseRemoteInterfaceNames() throws RemoteException {
+		return new String[] {NonexecutableAlgRemote.class.getName()};
 	}
 
-
+	
 }
