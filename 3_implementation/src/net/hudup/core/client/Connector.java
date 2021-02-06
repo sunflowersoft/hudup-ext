@@ -295,7 +295,13 @@ public abstract class Connector extends JDialog {
 	 * Text field to generate bind path.
 	 */
 	protected JButton btnGenMyGlobalAddress = null; 
-			
+
+	
+	/**
+	 * Label to show public internet address.
+	 */
+	protected JLabel lblPublicIP = null;
+
 	
 	/**
 	 * Remote connector.
@@ -535,7 +541,11 @@ public abstract class Connector extends JDialog {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					String publicIP = NetUtil.getPublicInetAddress();
-					txtMyGlobalAddress.setText(publicIP != null ? publicIP : "");
+					publicIP = publicIP != null ? publicIP.trim() : "";
+					txtMyGlobalAddress.setText(publicIP);
+					
+					if (!publicIP.isEmpty())
+						lblPublicIP.setText("Internet address: " + publicIP);
 				}
 			});
 		paneMyGlobalAddress.add(btnGenMyGlobalAddress, BorderLayout.EAST);
@@ -595,11 +605,13 @@ public abstract class Connector extends JDialog {
 		JPanel status = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		footer.add(status, BorderLayout.SOUTH);
 		
+		JLabel lblLocalIP = new JLabel();
+		status.add(lblLocalIP);
 		if (Constants.hostAddress != null)
-			status.add(new JLabel("Local address: " + Constants.hostAddress + "  "));
-		String publicIP = NetUtil.getPublicInetAddress();
-		if (publicIP != null)
-			status.add(new JLabel("Internet address: " + publicIP));
+			lblLocalIP.setText("Local address: " + Constants.hostAddress + "  ");
+		
+		lblPublicIP = new JLabel();
+		status.add(lblPublicIP);
 	}
 	
 	

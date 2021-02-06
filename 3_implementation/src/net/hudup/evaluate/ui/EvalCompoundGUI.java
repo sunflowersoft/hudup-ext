@@ -925,6 +925,7 @@ public class EvalCompoundGUI extends JFrame {
 		JTextField txtGlobalAddress = new JTextField("");
 		paneGlobalAddress.add(txtGlobalAddress, BorderLayout.CENTER);
 
+		final JLabel lblPublicIP = new JLabel();
 		JButton btnGenGlobalAddress = UIUtil.makeIconButton(
 			"generate-16x16.png",
 			"generate", 
@@ -936,7 +937,11 @@ public class EvalCompoundGUI extends JFrame {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					String publicIP = NetUtil.getPublicInetAddress();
-					txtGlobalAddress.setText(publicIP != null ? publicIP : "");
+					publicIP = publicIP != null ? publicIP.trim() : "";
+					txtGlobalAddress.setText(publicIP);
+					
+					if (!publicIP.isEmpty())
+						lblPublicIP.setText("Internet address: " + publicIP);
 				}
 			});
 		paneGlobalAddress.add(btnGenGlobalAddress, BorderLayout.EAST);
@@ -1023,12 +1028,13 @@ public class EvalCompoundGUI extends JFrame {
 		JPanel status = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		footer.add(status, BorderLayout.SOUTH);
 		
-		status.add(new JLabel("Local address: " + Constants.hostAddress + "  "));
-		String publicIP = NetUtil.getPublicInetAddress();
-		if (publicIP != null)
-			status.add(new JLabel("Internet address: " + publicIP));
+		JLabel lblLocalIP = new JLabel();
+		status.add(lblLocalIP);
+		if (Constants.hostAddress != null)
+			lblLocalIP.setText("Local address: " + Constants.hostAddress + "  ");
 
-		
+		status.add(lblPublicIP);
+
 		dlgEvStarter.setVisible(true);
 	}
 	

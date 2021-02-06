@@ -10,6 +10,7 @@ package net.hudup.core.logistic;
 import java.net.URL;
 import java.util.Properties;
 
+import net.hudup.core.Constants;
 import net.hudup.core.data.PropList;
 
 /**
@@ -86,7 +87,7 @@ public final class SystemUtil {
 			double freeMemory = runtime.freeMemory() / 1024.0 / 1024.0;
 			double maxMemory = runtime.maxMemory() / 1024.0 / 1024.0;
 			
-			props.put("Memory(VM)", 
+			props.put("Memory (VM)", 
 					"Allocated memory = " + MathUtil.format(allocatedMemory, 2) + "MB, " +
 					"Free memory = " + MathUtil.format(freeMemory, 2) + "MB, " +
 					"Max memory = " + MathUtil.format(maxMemory, 2) + "MB"
@@ -106,6 +107,21 @@ public final class SystemUtil {
 			LogUtil.trace(e);
 		}
 		
+		try {
+			StringBuffer na = new StringBuffer(); 
+			if (Constants.hostAddress != null)
+				na.append("Local address is " + Constants.hostAddress);
+//			String publicIP = NetUtil.getPublicInetAddress();
+//			if (publicIP != null) {
+//				if (na.length() > 0) na.append(", ");
+//				na.append("Internet address is " + publicIP);
+//			}
+			props.put("Network", na.toString());
+		}
+		catch (Throwable e) {
+			LogUtil.trace(e);
+		}
+
 		return props;
 	}
 	
