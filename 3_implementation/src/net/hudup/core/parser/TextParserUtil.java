@@ -671,7 +671,6 @@ public final class TextParserUtil {
 				list.add(t);
 			} 
 			catch (Exception e) {
-				// TODO Auto-generated catch block
 				LogUtil.trace(e);
 			}
 			
@@ -773,7 +772,6 @@ public final class TextParserUtil {
 			return parseObjectByClass(string, Class.forName(className));
 		}
 		catch (Throwable e) {
-			// TODO Auto-generated catch block
 			LogUtil.trace(e);
 			return null;
 		}

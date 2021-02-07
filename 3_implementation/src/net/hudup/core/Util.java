@@ -197,9 +197,10 @@ public class Util {
 	
 	/**
 	 * Creating a new array.
-	 * @param tClass element type.
+	 * @param <T> element type.
+	 * @param tClass element type class.
 	 * @param length array length.
-	 * @return new array
+	 * @return new array.
 	 */
 	public static <T> T[] newArray(Class<T> tClass, int length) {
 		@SuppressWarnings("unchecked")
@@ -211,7 +212,8 @@ public class Util {
 	
 	/**
 	 * Creating a new array.
-	 * @param tClass element type.
+	 * @param <T> element type.
+	 * @param tClass element type class.
 	 * @param length array length.
 	 * @param initialValue initial value.
 	 * @return new array
