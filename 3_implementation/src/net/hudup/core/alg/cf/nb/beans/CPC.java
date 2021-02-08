@@ -16,13 +16,13 @@ import net.hudup.core.data.Profile;
 import net.hudup.core.data.RatingVector;
 
 /**
- * Cosine measure.
+ * Constrained Pearson correlation coefficient measure.
  * 
  * @author Loc Nguyen
  * @version 1.0
  *
  */
-public class Cosine extends NeighborCFUserBased {
+public class CPC extends NeighborCFUserBased {
 
 	
 	/**
@@ -34,7 +34,7 @@ public class Cosine extends NeighborCFUserBased {
 	/**
 	 * Default constructor.
 	 */
-	public Cosine() {
+	public CPC() {
 
 	}
 
@@ -53,7 +53,7 @@ public class Cosine extends NeighborCFUserBased {
 
 	@Override
 	protected String getDefaultMeasure() {
-		return Measure.COSINE;
+		return Measure.CPC;
 	}
 
 
@@ -69,6 +69,7 @@ public class Cosine extends NeighborCFUserBased {
 		
 		config.remove(MEASURE);
 		config.remove(CALC_STATISTICS_FIELD);
+		config.remove(COSINE_NORMALIZED_FIELD);
 		config.remove(MSD_FRACTION_FIELD);
 	}
 
@@ -76,7 +77,7 @@ public class Cosine extends NeighborCFUserBased {
 	@Override
 	protected double sim0(String measure, RatingVector vRating1, RatingVector vRating2, Profile profile1,
 			Profile profile2, Object... params) {
-		return cosine(vRating1, vRating2, profile1, profile2);
+		return cpc(vRating1, vRating2, profile1, profile2);
 	}
 
 	
@@ -86,7 +87,7 @@ public class Cosine extends NeighborCFUserBased {
 		if (name != null && !name.isEmpty())
 			return name;
 		else
-			return "neighborcf_cosine";
+			return "neighborcf_pearson";
 	}
 
 

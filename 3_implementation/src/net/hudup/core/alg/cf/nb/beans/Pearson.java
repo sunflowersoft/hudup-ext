@@ -47,7 +47,7 @@ public class Pearson extends NeighborCFUserBased {
 
 	@Override
 	public List<String> getMainMeasures() {
-		return Arrays.asList(Measure.PEARSON);
+		return Arrays.asList(getDefaultMeasure());
 	}
 
 
@@ -59,12 +59,14 @@ public class Pearson extends NeighborCFUserBased {
 
 	@Override
 	public String getMeasure() {
-		return Measure.PEARSON;
+		return getDefaultMeasure();
 	}
 
 
 	@Override
 	protected void updateConfig(String measure) {
+		super.updateConfig(measure);
+		
 		config.remove(MEASURE);
 		config.remove(CALC_STATISTICS_FIELD);
 		config.remove(COSINE_NORMALIZED_FIELD);
