@@ -134,7 +134,7 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 	/**
 	 * Default MSD fraction mode.
 	 */
-	protected static final boolean MSD_FRACTION_DEFAULT = false;
+	protected static final boolean MSD_FRACTION_DEFAULT = true;
 
 	
 	/**
