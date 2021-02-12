@@ -31,6 +31,7 @@ import net.hudup.core.data.Fetcher;
 import net.hudup.core.data.Profile;
 import net.hudup.core.data.RatingVector;
 import net.hudup.core.data.ui.ImportantProperty;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.NextUpdate;
 import net.hudup.core.logistic.Vector;
 
@@ -75,18 +76,6 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 	 * Default value of the maximum number of nearest neighbors.
 	 */
 	protected static final int KNN_DEFAULT = 0;
-
-	
-	/**
-	 * Statistics calculation mode.
-	 */
-	protected static final String CALC_STATISTICS_FIELD = "calc_statistics";
-
-	
-	/**
-	 * Default value for statistics calculation mode.
-	 */
-	protected static final boolean CALC_STATISTICS_DEFAULT = false;
 
 	
 	/**
@@ -152,49 +141,49 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 	/**
 	 * General rating mean.
 	 */
-	protected double ratingMean = Constants.UNUSED;
+	private double ratingMean = Constants.UNUSED;
 
 	
 	/**
 	 * General user variance.
 	 */
-	protected double ratingVar = Constants.UNUSED;
+	private double ratingVar = Constants.UNUSED;
 
 	
 	/**
 	 * Internal item identifiers.
 	 */
-	protected Set<Integer> userIds = Util.newSet();
+	private Set<Integer> userIds = Util.newSet();
 
 	
 	/**
 	 * Internal user means.
 	 */
-	protected Map<Integer, Double> userMeans = Util.newMap();
+	private Map<Integer, Double> userMeans = Util.newMap();
 
 	
 	/**
 	 * Internal user variances.
 	 */
-	protected Map<Integer, Double> userVars = Util.newMap();
+	private Map<Integer, Double> userVars = Util.newMap();
 
 	
 	/**
 	 * Internal item identifiers.
 	 */
-	protected Set<Integer> itemIds = Util.newSet();
+	private Set<Integer> itemIds = Util.newSet();
 
 	
 	/**
 	 * Internal item means.
 	 */
-	protected Map<Integer, Double> itemMeans = Util.newMap();
+	private Map<Integer, Double> itemMeans = Util.newMap();
 
 	
 	/**
 	 * Internal item variances.
 	 */
-	protected Map<Integer, Double> itemVars = Util.newMap();
+	private Map<Integer, Double> itemVars = Util.newMap();
 	
 	
 //	/**
@@ -227,14 +216,8 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 	public synchronized void setup(Dataset dataset, Object...params) throws RemoteException {
 		super.setup(dataset, params);
 		
-		if (getConfig().getAsBoolean(CALC_STATISTICS_FIELD)) {
-			updateUserMeanVars(dataset);
-			updateItemMeanVars(dataset);
-		}
-
 		this.ratingMedian = getRelevantRatingThreshold();
-		if (!Util.isUsed(this.ratingMedian) && Util.isUsed(this.ratingMean))
-			this.ratingMedian = this.ratingMean;
+		if (!Util.isUsed(this.ratingMedian)) this.ratingMedian = getRatingMean();
 	}
 
 
@@ -261,115 +244,284 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 
 
 	/**
-	 * Updating individual user means and variances from specified dataset.
-	 * @param dataset specified dataset.
-	 * @throws RemoteException if any error raises.
+	 * Getting rating mean.
+	 * @return rating mean.
 	 */
-	private void updateUserMeanVars(Dataset dataset) throws RemoteException {
+	protected double getRatingMean() {
+		if (userMeans.size() == 0) getUserMeans();
+		return ratingMean;
+	}
+	
+	
+	/**
+	 * Getting rating mean.
+	 * @return rating mean.
+	 */
+	protected double getRatingVar() {
+		if (userVars.size() == 0) getUserVars();
+		return ratingVar;
+	}
+
+	
+	/**
+	 * Getting user identifiers.
+	 * @return set of user identifiers.
+	 */
+	protected Set<Integer> getUserIds() {
+		if (this.userIds.size() > 0) return this.userIds;
+		
+		this.userIds.clear();
+		try {
+			Fetcher<RatingVector> users = dataset.fetchUserRatings();
+			while (users.next()) {
+				RatingVector user = users.pick();
+				if (user != null && user.fieldIds(true).size() > 0)
+					this.userIds.add(user.id());
+			}
+			users.close();
+		} catch (Throwable e) {LogUtil.trace(e);}
+		return this.userIds;
+	}
+	
+	
+	/**
+	 * Getting user means.
+	 * @return user means.
+	 */
+	protected Map<Integer, Double> getUserMeans() {
+		if (this.userMeans.size() > 0) return this.userMeans;
+		
+		int totalRatingCount = 0;
+		this.ratingMean = 0.0;
+		this.userIds.clear();
+		this.userMeans.clear();
+		try {
+			//Calculating user means
+			Fetcher<RatingVector> users = dataset.fetchUserRatings();
+			while (users.next()) {
+				RatingVector user = users.pick();
+				if (user == null) continue;
+				Set<Integer> itemIds = user.fieldIds(true);
+				if (itemIds.size() == 0) continue;
+				
+				int userId = user.id();
+				this.userIds.add(userId);
+				
+				double meanSum = 0;
+				for (int itemId : itemIds) {
+					double value = user.get(itemId).value;
+					meanSum += value;
+					
+					totalRatingCount++;
+					this.ratingMean += value;
+				}
+				this.userMeans.put(userId, meanSum / (double)(itemIds.size()));
+			}
+			if (totalRatingCount != 0)
+				this.ratingMean = this.ratingMean / (double)totalRatingCount;
+			users.close();
+		} catch (Throwable e) {LogUtil.trace(e);}
+		return this.userMeans;
+	}
+	
+	
+	/**
+	 * Getting user variances from specified dataset.
+	 * @return user variances.
+	 */
+	protected Map<Integer, Double> getUserVars() {
+		if (this.userVars.size() > 0) return this.userVars;
+		
 		int totalRatingCount = 0;
 		this.ratingMean = 0.0;
 		this.ratingVar = 0.0;
 		this.userIds.clear();
 		this.userMeans.clear();
 		this.userVars.clear();
-		
-		//Calculating user means
-		Fetcher<RatingVector> users = dataset.fetchUserRatings();
-		while (users.next()) {
-			RatingVector user = users.pick();
-			if (user == null) continue;
-			
-			int userId = user.id();
-			this.userIds.add(userId);
-			
-			Set<Integer> itemIds = user.fieldIds(true);
-			double meanSum = 0;
-			for (int itemId : itemIds) {
-				double value = user.get(itemId).value;
-				meanSum += value;
+		try {
+			//Calculating user means
+			Fetcher<RatingVector> users = dataset.fetchUserRatings();
+			while (users.next()) {
+				RatingVector user = users.pick();
+				if (user == null) continue;
+				Set<Integer> itemIds = user.fieldIds(true);
+				if (itemIds.size() == 0) continue;
 				
-				totalRatingCount++;
-				this.ratingMean += value;
-			}
-			this.userMeans.put(userId, meanSum / (double)(itemIds.size()));
-		}
-		this.ratingMean = this.ratingMean / (double)totalRatingCount;
-
-		//Calculating user variances
-		users.reset();
-		while (users.next()) {
-			RatingVector user = users.pick();
-			if (user == null) continue;
-		
-			Set<Integer> itemIds = user.fieldIds(true);
-			int userId = user.id();
-			double varSum = 0;
-			double userMean = this.userMeans.get(userId);
-			for (int itemId : itemIds) {
-				double value = user.get(itemId).value;
-				double d = value - userMean;
-				varSum += d*d;
+				int userId = user.id();
+				this.userIds.add(userId);
 				
-				double D = value - this.ratingMean;
-				this.ratingVar += D*D;
+				double meanSum = 0;
+				for (int itemId : itemIds) {
+					double value = user.get(itemId).value;
+					meanSum += value;
+					
+					totalRatingCount++;
+					this.ratingMean += value;
+				}
+				this.userMeans.put(userId, meanSum / (double)(itemIds.size()));
 			}
-			this.userVars.put(userId, varSum / (double)(itemIds.size()));
-		}
-		this.ratingVar = this.ratingVar / (double)totalRatingCount;
+			if (totalRatingCount != 0)
+				this.ratingMean = this.ratingMean / (double)totalRatingCount;
+	
+			//Calculating user variances
+			users.reset();
+			while (users.next()) {
+				RatingVector user = users.pick();
+				if (user == null) continue;
+				Set<Integer> itemIds = user.fieldIds(true);
+				if (itemIds.size() == 0) continue;
+				
+				int userId = user.id();
+				double varSum = 0;
+				double userMean = this.userMeans.get(userId);
+				for (int itemId : itemIds) {
+					double value = user.get(itemId).value;
+					double d = value - userMean;
+					varSum += d*d;
+					
+					double D = value - this.ratingMean;
+					this.ratingVar += D*D;
+				}
+				this.userVars.put(userId, varSum / (double)(itemIds.size()));
+			}
+			if (totalRatingCount != 0)
+				this.ratingVar = this.ratingVar / (double)totalRatingCount;
+			users.close();
+		} catch (Throwable e) {LogUtil.trace(e);}
 		
-		users.close();
+		return this.userVars;
 	}
 
 	
 	/**
-	 * Updating individual item means and variances from specified dataset.
-	 * @param dataset specified dataset.
-	 * @throws RemoteException if any error raises.
+	 * Getting item identifiers.
+	 * @return set of item identifiers.
 	 */
-	private void updateItemMeanVars(Dataset dataset) throws RemoteException {
+	protected Set<Integer> getItemIds() {
+		if (this.itemIds.size() > 0) return this.itemIds;
+		
+		this.itemIds.clear();
+		try {
+			Fetcher<RatingVector> items = dataset.fetchItemRatings();
+			while (items.next()) {
+				RatingVector item = items.pick();
+				if (item != null && item.fieldIds(true).size() > 0) 
+					this.itemIds.add(item.id());
+			}
+			items.close();
+		} catch (Throwable e) {LogUtil.trace(e);}
+		return this.itemIds;
+	}
+
+	
+	/**
+	 * Getting item means.
+	 * @return item means.
+	 */
+	protected Map<Integer, Double> getItemMeans() {
+		if (this.itemMeans.size() > 0) return this.itemMeans;
+
+		int totalRatingCount = 0;
+		this.ratingMean = 0.0;
+		this.itemIds.clear();
+		this.itemMeans.clear();
+		try {
+			//Calculating item means
+			Fetcher<RatingVector> items = dataset.fetchItemRatings();
+			while (items.next()) {
+				RatingVector item = items.pick();
+				if (item == null) continue;
+				Set<Integer> userIds = item.fieldIds(true);
+				if (userIds.size() == 0) continue;
+				
+				int itemId = item.id();
+				this.itemIds.add(itemId);
+				
+				double meanSum = 0;
+				for (int userId : userIds) {
+					double value = item.get(userId).value;
+					meanSum += value;
+					
+					totalRatingCount++;
+					this.ratingMean += value;
+				}
+				this.itemMeans.put(itemId, meanSum / (double)(userIds.size()));
+			}
+			if (totalRatingCount != 0)
+				this.ratingMean = this.ratingMean / (double)totalRatingCount;
+			items.close();
+		} catch (Throwable e) {LogUtil.trace(e);}
+		return this.itemMeans;
+	}
+	
+	
+	/**
+	 * Getting item variances from specified dataset.
+	 * @return item variances.
+	 */
+	protected Map<Integer, Double> getItemVars() {
+		if (this.itemVars.size() > 0) return this.itemVars;
+
+		int totalRatingCount = 0;
+		this.ratingMean = 0.0;
+		this.ratingVar = 0.0;
 		this.itemIds.clear();
 		this.itemMeans.clear();
 		this.itemVars.clear();
-		
-		//Calculating item means
-		Fetcher<RatingVector> items = dataset.fetchItemRatings();
-		while (items.next()) {
-			RatingVector item = items.pick();
-			if (item == null) continue;
-			
-			int itemId = item.id();
-			this.itemIds.add(itemId);
-			
-			Set<Integer> userIds = item.fieldIds(true);
-			double meanSum = 0;
-			for (int userId : userIds) {
-				double value = item.get(userId).value;
-				meanSum += value;
+		try {
+			//Calculating item means
+			Fetcher<RatingVector> items = dataset.fetchItemRatings();
+			while (items.next()) {
+				RatingVector item = items.pick();
+				if (item == null) continue;
+				Set<Integer> userIds = item.fieldIds(true);
+				if (userIds.size() == 0) continue;
+				
+				int itemId = item.id();
+				this.itemIds.add(itemId);
+				
+				double meanSum = 0;
+				for (int userId : userIds) {
+					double value = item.get(userId).value;
+					meanSum += value;
+					
+					totalRatingCount++;
+					this.ratingMean += value;
+				}
+				this.itemMeans.put(itemId, meanSum / (double)(userIds.size()));
 			}
-			this.itemMeans.put(itemId, meanSum / (double)(userIds.size()));
-		}
+			if (totalRatingCount != 0)
+				this.ratingMean = this.ratingMean / (double)totalRatingCount;
 
-		//Calculating user variances
-		items.reset();
-		while (items.next()) {
-			RatingVector item = items.pick();
-			if (item == null) continue;
-		
-			Set<Integer> userIds = item.fieldIds(true);
-			int itemId = item.id();
-			double varSum = 0;
-			double itemMean = this.itemMeans.get(itemId);
-			for (int userId : userIds) {
-				double value = item.get(userId).value;
-				double d = value - itemMean;
-				varSum += d*d;
+			//Calculating user variances
+			items.reset();
+			while (items.next()) {
+				RatingVector item = items.pick();
+				if (item == null) continue;
+				Set<Integer> userIds = item.fieldIds(true);
+				if (userIds.size() == 0) continue;
+				
+				int itemId = item.id();
+				double varSum = 0;
+				double itemMean = this.itemMeans.get(itemId);
+				for (int userId : userIds) {
+					double value = item.get(userId).value;
+					double d = value - itemMean;
+					varSum += d*d;
+					
+					double D = value - this.ratingMean;
+					this.ratingVar += D*D;
+				}
+				this.itemVars.put(itemId, varSum / (double)(userIds.size()));
 			}
-			this.itemVars.put(itemId, varSum / (double)(userIds.size()));
-		}
+			if (totalRatingCount != 0)
+				this.ratingVar = this.ratingVar / (double)totalRatingCount;
+			items.close();
+		} catch (Throwable e) {LogUtil.trace(e);}
 		
-		items.close();
+		return this.itemVars;
 	}
-	
+
 	
 	/**
 	 * Getting the list of all similar measures in names.
@@ -566,103 +718,68 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 	protected void updateConfig(String measure) {
 		if (config == null || measure == null) return;
 		
-		config.removeReadOnly(CALC_STATISTICS_FIELD);
 		config.removeReadOnly(COSINE_NORMALIZED_FIELD);
 		config.removeReadOnly(MSD_FRACTION_FIELD);
 		if (measure.equals(Measure.COSINE)) {
-			config.put(CALC_STATISTICS_FIELD, false);
-			config.addReadOnly(CALC_STATISTICS_FIELD);
 			config.addReadOnly(MSD_FRACTION_FIELD);
 		}
 		else if (measure.equals(Measure.COSINEJ)) {
-			config.put(CALC_STATISTICS_FIELD, false);
-			config.addReadOnly(CALC_STATISTICS_FIELD);
 			config.addReadOnly(MSD_FRACTION_FIELD);
 		}
 		else if (measure.equals(Measure.COJ)) {
-			config.put(CALC_STATISTICS_FIELD, false);
-			config.addReadOnly(CALC_STATISTICS_FIELD);
 			config.addReadOnly(MSD_FRACTION_FIELD);
 		}
 		else if (measure.equals(Measure.PEARSON)) {
-			config.put(CALC_STATISTICS_FIELD, false);
-			config.addReadOnly(CALC_STATISTICS_FIELD);
 			config.addReadOnly(COSINE_NORMALIZED_FIELD);
 			config.addReadOnly(MSD_FRACTION_FIELD);
 		}
 		else if (measure.equals(Measure.PEARSONJ)) {
-			config.put(CALC_STATISTICS_FIELD, false);
-			config.addReadOnly(CALC_STATISTICS_FIELD);
 			config.addReadOnly(COSINE_NORMALIZED_FIELD);
 			config.addReadOnly(MSD_FRACTION_FIELD);
 		}
 		else if (measure.equals(Measure.COD)) {
-			config.put(CALC_STATISTICS_FIELD, true);
-			config.addReadOnly(CALC_STATISTICS_FIELD);
 			config.addReadOnly(COSINE_NORMALIZED_FIELD);
 			config.addReadOnly(MSD_FRACTION_FIELD);
 		}
 		else if (measure.equals(Measure.CPC)) {
-			config.put(CALC_STATISTICS_FIELD, false);
-			config.addReadOnly(CALC_STATISTICS_FIELD);
 			config.addReadOnly(COSINE_NORMALIZED_FIELD);
 			config.addReadOnly(MSD_FRACTION_FIELD);
 		}
 		else if (measure.equals(Measure.WPC)) {
-			config.put(CALC_STATISTICS_FIELD, false);
-			config.addReadOnly(CALC_STATISTICS_FIELD);
 			config.addReadOnly(COSINE_NORMALIZED_FIELD);
 			config.addReadOnly(MSD_FRACTION_FIELD);
 		}
 		else if (measure.equals(Measure.SPC)) {
-			config.put(CALC_STATISTICS_FIELD, false);
-			config.addReadOnly(CALC_STATISTICS_FIELD);
 			config.addReadOnly(COSINE_NORMALIZED_FIELD);
 			config.addReadOnly(MSD_FRACTION_FIELD);
 		}
 		else if (measure.equals(Measure.JACCARD)) {
-			config.put(CALC_STATISTICS_FIELD, false);
-			config.addReadOnly(CALC_STATISTICS_FIELD);
 			config.addReadOnly(COSINE_NORMALIZED_FIELD);
 			config.addReadOnly(MSD_FRACTION_FIELD);
 		}
 		else if (measure.equals(Measure.JACCARD2)) {
-			config.put(CALC_STATISTICS_FIELD, false);
-			config.addReadOnly(CALC_STATISTICS_FIELD);
 			config.addReadOnly(COSINE_NORMALIZED_FIELD);
 			config.addReadOnly(MSD_FRACTION_FIELD);
 		}
 		else if (measure.equals(Measure.DICE)) {
-			config.put(CALC_STATISTICS_FIELD, false);
-			config.addReadOnly(CALC_STATISTICS_FIELD);
 			config.addReadOnly(COSINE_NORMALIZED_FIELD);
 			config.addReadOnly(MSD_FRACTION_FIELD);
 		}
 		else if (measure.equals(Measure.MSD)) {
-			config.put(CALC_STATISTICS_FIELD, false);
-			config.addReadOnly(CALC_STATISTICS_FIELD);
 			config.addReadOnly(COSINE_NORMALIZED_FIELD);
 		}
 		else if (measure.equals(Measure.MSDJ)) {
-			config.put(CALC_STATISTICS_FIELD, false);
-			config.addReadOnly(CALC_STATISTICS_FIELD);
 			config.addReadOnly(COSINE_NORMALIZED_FIELD);
 		}
 		else if (measure.equals(Measure.URP)) {
-			config.put(CALC_STATISTICS_FIELD, false);
-			config.addReadOnly(CALC_STATISTICS_FIELD);
 			config.addReadOnly(COSINE_NORMALIZED_FIELD);
 			config.addReadOnly(MSD_FRACTION_FIELD);
 		}
 		else if (measure.equals(Measure.TRIANGLE)) {
-			config.put(CALC_STATISTICS_FIELD, false);
-			config.addReadOnly(CALC_STATISTICS_FIELD);
 			config.addReadOnly(COSINE_NORMALIZED_FIELD);
 			config.addReadOnly(MSD_FRACTION_FIELD);
 		}
 		else if (measure.equals(Measure.TJM)) {
-			config.put(CALC_STATISTICS_FIELD, false);
-			config.addReadOnly(CALC_STATISTICS_FIELD);
 			config.addReadOnly(COSINE_NORMALIZED_FIELD);
 			config.addReadOnly(MSD_FRACTION_FIELD);
 		}
@@ -1235,7 +1352,6 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 		DataConfig tempConfig = super.createDefaultConfig();
 		tempConfig.put(SUPPORT_CACHE_FIELD, SUPPORT_CACHE_DEFAULT);
 		tempConfig.put(KNN, KNN_DEFAULT);
-		tempConfig.put(CALC_STATISTICS_FIELD, CALC_STATISTICS_DEFAULT);
 		tempConfig.put(MEASURE, getDefaultMeasure()); tempConfig.addReadOnly(MEASURE);
 		tempConfig.put(HYBRID, false); tempConfig.addInvisible(HYBRID);
 		tempConfig.put(SIMILARITY_THRESHOLD_FIELD, SIMILARITY_THRESHOLD_DEFAULT);

@@ -68,7 +68,6 @@ public class MSDJ extends NeighborCFUserBased {
 		super.updateConfig(measure);
 		
 		config.remove(MEASURE);
-		config.remove(CALC_STATISTICS_FIELD);
 		config.remove(COSINE_NORMALIZED_FIELD);
 	}
 

@@ -187,13 +187,13 @@ public class NeighborCFItemBased extends NeighborCF implements DuplicatableAlg {
 	protected double cod(
 			RatingVector vRating1, RatingVector vRating2,
 			Profile profile1, Profile profile2) {
-		return cod(vRating1, vRating2, this.userMeans);
+		return cod(vRating1, vRating2, getUserMeans());
 	}
 
 
 	@Override
 	protected Set<Integer> getRowIds() {
-		return itemIds;
+		return getItemIds();
 	}
 
 
@@ -205,13 +205,13 @@ public class NeighborCFItemBased extends NeighborCF implements DuplicatableAlg {
 	
 	@Override
 	protected double calcRowMean(RatingVector vRating) {
-		return calcMean(this, itemMeans, vRating);
+		return calcMean(this, getItemMeans(), vRating);
 	}
 
 
 	@Override
 	protected Set<Integer> getColumnIds() {
-		return userIds;
+		return getUserIds();
 	}
 
 	
@@ -223,7 +223,7 @@ public class NeighborCFItemBased extends NeighborCF implements DuplicatableAlg {
 
 	@Override
 	protected double calcColumnMean(RatingVector vRating) {
-		return calcMean(this, userMeans, vRating);
+		return calcMean(this, getUserMeans(), vRating);
 	}
 
 	
