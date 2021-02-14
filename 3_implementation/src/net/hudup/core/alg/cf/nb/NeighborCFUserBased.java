@@ -28,9 +28,6 @@ import net.hudup.core.logistic.LogUtil;
  * It is often called Neighbor User-Based CF because the similar measure is calculated between two user rating vectors (possibly, plus two user profiles).
  * Note, user rating vector contains all ratings of the same user on many items.
  * This class is completed because it defines the {@link #estimate(RecommendParam, Set)} method.<br>
- * <br>
- * There are many authors who contributed measure to this class.<br>
- * Authors Shuang-Bo Sun, Zhi-Heng Zhang, Xin-Ling Dong, Heng-Ru Zhang, Tong-Jun Li, Lin Zhang, and Fan Min contributed Triangle measure and TJM measure.<br>
  * 
  * @author Loc Nguyen
  * @version 10.0

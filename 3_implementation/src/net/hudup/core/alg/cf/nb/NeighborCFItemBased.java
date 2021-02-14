@@ -27,9 +27,6 @@ import net.hudup.core.logistic.LogUtil;
  * It is often called Neighbor Item-Based CF because the similar measure is calculated between two item rating vectors (possibly, plus two item profiles).
  * Note, item rating vector contains all ratings of many users on the same item.
  * This class is completed because it defines the {@link #estimate(RecommendParam, Set)} method.<br>
- * <br>
- * There are many authors who contributed measure to this class.<br>
- * Authors Shuang-Bo Sun, Zhi-Heng Zhang, Xin-Ling Dong, Heng-Ru Zhang, Tong-Jun Li, Lin Zhang, and Fan Min contributed Triangle measure and TJM measure.<br>
  * 
  * @author Loc Nguyen
  * @version 10.0

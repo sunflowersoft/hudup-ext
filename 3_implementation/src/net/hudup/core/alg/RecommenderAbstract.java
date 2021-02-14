@@ -73,7 +73,7 @@ public abstract class RecommenderAbstract extends AlgAbstract implements Recomme
 	/**
 	 * Default value for the fast recommendation mode.
 	 */
-	public static final boolean FAST_RECOMMEND_DEFAULT = false;
+	public static final boolean FAST_RECOMMEND_DEFAULT = true;
 
 	
 	/**

@@ -51,7 +51,8 @@ import net.hudup.core.logistic.Vector;
  * Hybrid measure means that profile is merged into rating vector as a unified vector for calculating Pearson measure or cosine measure.<br>
  * <br>
  * There are many authors who contributed measure to this class.<br>
- * Authors Shuang-Bo Sun, Zhi-Heng Zhang, Xin-Ling Dong, Heng-Ru Zhang, Tong-Jun Li, Lin Zhang, and Fan Min contributed Triangle measure and TJM measure.<br>
+ * <br>
+ * Shuang-Bo Sun, Zhi-Heng Zhang, Xin-Ling Dong, Heng-Ru Zhang, Tong-Jun Li, Lin Zhang, and Fan Min contributed Triangle measure and TJM measure.<br>
  * 
  * @author Loc Nguyen
  * @version 10.0
@@ -75,7 +76,7 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 	/**
 	 * Default value of the maximum number of nearest neighbors.
 	 */
-	protected static final int KNN_DEFAULT = 0;
+	protected static final int KNN_DEFAULT = 100;
 
 	
 	/**
@@ -1122,20 +1123,20 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 	 */
 	protected double jaccard(RatingVector vRating1, RatingVector vRating2,
 			Profile profile1, Profile profile2) {
-		Set<Integer> common = commonFieldIds(vRating1, vRating2);
-		Set<Integer> union = unionFieldIds(vRating1, vRating2);
-		if (union.size() == 0)
-			return Constants.UNUSED;
-		else
-			return (double)common.size() / (double)(union.size());
+		Set<Integer> set1 = vRating1.fieldIds(true);
+		Set<Integer> set2 = vRating2.fieldIds(true);
+		Set<Integer> common = Util.newSet();
+		common.addAll(set1);
+		common.retainAll(set2);
+
+		double n = common.size();
+		double N = set1.size() + set2.size() - n;
+		return n/N;
 	}
 	
 	
 	/**
 	 * Calculating the Jaccard2 measure between two pairs.
-	 * The first pair includes the first rating vector and the first profile.
-	 * The second pair includes the second rating vector and the second profile.
-	 * 
 	 * @param vRating1 first rating vector.
 	 * @param vRating2 second rating vector.
 	 * @param profile1 first profile.
@@ -1144,21 +1145,20 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 	 */
 	protected double jaccard2(RatingVector vRating1, RatingVector vRating2,
 			Profile profile1, Profile profile2) {
-		Set<Integer> ratedIds1 = vRating1.fieldIds(true);
-		Set<Integer> ratedIds2 = vRating2.fieldIds(true);
-		if (ratedIds1.size() == 0 || ratedIds2.size() == 0)
-			return Constants.UNUSED;
-		
-		Set<Integer> common = commonFieldIds(vRating1, vRating2);
-		return (double)common.size() / (double)(ratedIds1.size()*ratedIds2.size());
+		Set<Integer> set1 = vRating1.fieldIds(true);
+		Set<Integer> set2 = vRating2.fieldIds(true);
+		Set<Integer> common = Util.newSet();
+		common.addAll(set1);
+		common.retainAll(set2);
+
+		double n = common.size();
+		double N = set1.size() * set2.size();
+		return n/N;
 	}
 
 	
 	/**
 	 * Calculating the Dice measure between two pairs.
-	 * The first pair includes the first rating vector and the first profile.
-	 * The second pair includes the second rating vector and the second profile.
-	 * 
 	 * @param vRating1 first rating vector.
 	 * @param vRating2 second rating vector.
 	 * @param profile1 first profile.
@@ -1167,14 +1167,15 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 	 */
 	protected double dice(RatingVector vRating1, RatingVector vRating2,
 			Profile profile1, Profile profile2) {
-		Set<Integer> ratedIds1 = vRating1.fieldIds(true);
-		Set<Integer> ratedIds2 = vRating2.fieldIds(true);
-
+		Set<Integer> set1 = vRating1.fieldIds(true);
+		Set<Integer> set2 = vRating2.fieldIds(true);
 		Set<Integer> common = Util.newSet();
-		common.addAll(ratedIds1);
-		common.retainAll(ratedIds2);
-		
-		return ((double)2*common.size()) / ((double)(ratedIds1.size()+ratedIds2.size()));
+		common.addAll(set1);
+		common.retainAll(set2);
+
+		double n = 2 * common.size();
+		double N = set1.size() + set2.size();
+		return n/N;
 	}
 
 	
@@ -1192,7 +1193,6 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 	protected double msd(RatingVector vRating1, RatingVector vRating2,
 			Profile profile1, Profile profile2) {
 		Set<Integer> common = commonFieldIds(vRating1, vRating2);
-		if (common.size() == 0) return Constants.UNUSED;
 		
 		double sum = 0;
 		for (int id : common) {
