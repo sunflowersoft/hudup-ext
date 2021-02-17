@@ -133,7 +133,7 @@ public class EvalCompoundGUI extends JFrame {
 
 		try {
 			thisConfig = evaluator.getConfig();
-			thisConfig.setSaveAbility(connectInfo.bindUri == null); //Save only local configuration.
+			thisConfig.setSaveAbility(connectInfo.bindUri == null && !thisConfig.isReproduced()); //Save only local configuration.
 		}
 		catch (Throwable e) {
 			LogUtil.trace(e);
