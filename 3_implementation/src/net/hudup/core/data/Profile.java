@@ -396,7 +396,7 @@ public class Profile implements Cloneable, TextParsable, Serializable {
 			else if (value instanceof String || value instanceof Nominal) {
 				
 				String string = value instanceof Nominal ? 
-					((Nominal)value).getValue().trim() : value.toString().trim();
+					((Nominal)value).getValue().trim() : ((String)value).trim();
 						
 				if (string.isEmpty())
 					number = 0;
@@ -447,7 +447,9 @@ public class Profile implements Cloneable, TextParsable, Serializable {
 			break;
 			
 		case integer:
-			if (value instanceof Number)
+			if (value instanceof Integer)
+				newValue = (Integer)value;
+			else if (value instanceof Number)
 				newValue = ((Number)value).intValue();
 			else if (value instanceof String || value instanceof Nominal) {
 				String string = value instanceof Nominal ? 
@@ -460,7 +462,9 @@ public class Profile implements Cloneable, TextParsable, Serializable {
 			break;
 			
 		case real:
-			if (value instanceof Number)
+			if (value instanceof Double)
+				newValue = (Double)value;
+			else if (value instanceof Number)
 				newValue = ((Number)value).doubleValue();
 			else if (value instanceof String || value instanceof Nominal) {
 				String string = value instanceof Nominal ? 
@@ -578,8 +582,8 @@ public class Profile implements Cloneable, TextParsable, Serializable {
 					newValue = df.parse(string);
 				} 
 				catch (ParseException e) {
-					LogUtil.trace(e);
 					newValue = null;
+					LogUtil.trace(e);
 				} // end try
 				
 			} // end if
@@ -603,8 +607,8 @@ public class Profile implements Cloneable, TextParsable, Serializable {
 			newValue = createValue(att, value);
 		} 
 		catch (Throwable e) {
-			LogUtil.trace(e);
 			newValue = null;
+			LogUtil.trace(e);
 		}
 		
 //		if (newValue != null && !(newValue instanceof Serializable))
@@ -628,8 +632,8 @@ public class Profile implements Cloneable, TextParsable, Serializable {
 			newValue = createValue(att, value, df);
 		} 
 		catch (Throwable e) {
-			LogUtil.trace(e);
 			newValue = null;
+			LogUtil.trace(e);
 		}
 		
 //		if (newValue != null && !(newValue instanceof Serializable))
@@ -705,8 +709,15 @@ public class Profile implements Cloneable, TextParsable, Serializable {
 			int valueIndex = (Integer)attValues.get(index);
 			return att.getNominal(valueIndex).getValue();
 		}
-		else
-			return getValue(index).toString();
+		else {
+			Object value = getValue(index);
+			if (value == null)
+				return null;
+			else if (value instanceof String)
+				return (String)value;
+			else
+				return value.toString();
+		}
 	}
 	
 	
