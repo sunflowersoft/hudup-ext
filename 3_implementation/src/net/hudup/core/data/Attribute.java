@@ -67,7 +67,47 @@ public class Attribute implements Cloneable, TextParsable, Serializable {
 	 *
 	 */
 	public static enum Type {
-		bit, nominal, integer, real, string, date, time, object
+		
+		/**
+		 * Binary, boolean.
+		 */
+		bit,
+		
+		/**
+		 * Nominal data.
+		 */
+		nominal,
+		
+		/**
+		 * Integer number.
+		 */
+		integer,
+		
+		/**
+		 * Real number.
+		 */
+		real,
+		
+		/**
+		 * Text data.
+		 */
+		string,
+		
+		/**
+		 * Date.
+		 */
+		date,
+		
+		/**
+		 * Time.
+		 */
+		time,
+		
+		/**
+		 * Object.
+		 */
+		object
+		
 	};
 	
 	

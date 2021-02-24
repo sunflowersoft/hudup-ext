@@ -753,8 +753,8 @@ public final class TextParserUtil {
 				v = null;
 		}
 		catch (Throwable e) {
-			LogUtil.trace(e);
 			v = null;
+			LogUtil.trace(e);
 		} 
 	
 		return v;
