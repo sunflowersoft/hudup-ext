@@ -426,7 +426,7 @@ public class Util {
 	 * @return whether or not the specified value is used.
 	 */
 	public static boolean isUsed(double value) {
-		return (!(Double.isNaN(value))) && (value != Constants.UNUSED);
+		return !Double.isNaN(value);
 	}
 
 	
