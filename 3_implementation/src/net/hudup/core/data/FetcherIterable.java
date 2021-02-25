@@ -10,6 +10,8 @@ package net.hudup.core.data;
 import java.io.Serializable;
 import java.util.Iterator;
 
+import net.hudup.core.logistic.LogUtil;
+
 /**
  * This class implements the iterable object for fetcher.
  * 
@@ -44,6 +46,9 @@ public class FetcherIterable<T> implements Iterable<T>, Serializable {
 	
 	@Override
 	public Iterator<T> iterator() {
+		try {
+			fetcher.reset();
+		} catch (Throwable e) {LogUtil.trace(e);}
 		return new FetchIterator<T>(fetcher);
 	}
 
