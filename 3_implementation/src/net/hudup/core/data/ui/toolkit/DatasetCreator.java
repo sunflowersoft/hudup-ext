@@ -180,7 +180,6 @@ public class DatasetCreator extends JPanel implements Dispose {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				back();
 			}
 		});
@@ -191,7 +190,6 @@ public class DatasetCreator extends JPanel implements Dispose {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				next();
 			}
 		});
@@ -203,7 +201,6 @@ public class DatasetCreator extends JPanel implements Dispose {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				finished();
 			}
 		});
@@ -215,7 +212,6 @@ public class DatasetCreator extends JPanel implements Dispose {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				cancel();
 			}
 		});
@@ -267,7 +263,6 @@ public class DatasetCreator extends JPanel implements Dispose {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				boolean apply = paneConfig.apply();
 				if (!apply) {
 					JOptionPane.showMessageDialog(
@@ -293,7 +288,6 @@ public class DatasetCreator extends JPanel implements Dispose {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				paneConfig.reset();
 				int confirm = JOptionPane.showConfirmDialog(
 						getCreator(), 
@@ -323,7 +317,6 @@ public class DatasetCreator extends JPanel implements Dispose {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				
 				DataConfig configExt = DatasetUtil2.chooseConfig(getCreator(), config);
 				
@@ -383,7 +376,6 @@ public class DatasetCreator extends JPanel implements Dispose {
 
 			@Override
 			public void clearData() {
-				// TODO Auto-generated method stub
 				JOptionPane.showMessageDialog(
 						getCreator(), 
 						"Not support this method", 
@@ -393,7 +385,6 @@ public class DatasetCreator extends JPanel implements Dispose {
 
 			@Override
 			public void modify() {
-				// TODO Auto-generated method stub
 				Unit selected = getSelectedValue();
 				if (selected == null)
 					return;
@@ -427,7 +418,6 @@ public class DatasetCreator extends JPanel implements Dispose {
 
 			@Override
 			public void drop() {
-				// TODO Auto-generated method stub
 				super.drop();
 				clearSelection();
 				attTable.clear();
@@ -441,7 +431,6 @@ public class DatasetCreator extends JPanel implements Dispose {
 			
 			@Override
 			public void valueChanged(ListSelectionEvent e) {
-				// TODO Auto-generated method stub
 			
 				Unit unit = unitList.getSelectedValue();
 				if (unit == null) {
@@ -463,7 +452,6 @@ public class DatasetCreator extends JPanel implements Dispose {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				
 				if (unitList.getUnitList().getMainList().size() > 0) {
 					int confirm = JOptionPane.showConfirmDialog(
@@ -517,7 +505,6 @@ public class DatasetCreator extends JPanel implements Dispose {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				
 				if (unitList.getUnitList().size() == 0) {
 					JOptionPane.showMessageDialog(
@@ -550,7 +537,6 @@ public class DatasetCreator extends JPanel implements Dispose {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				
 				boolean result = createModifyUnit(null);
 				unitList.connectUpdate(config);
@@ -626,7 +612,6 @@ public class DatasetCreator extends JPanel implements Dispose {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				userTable.apply();
 				itemTable.apply();
 				flag.set(true);
@@ -640,7 +625,6 @@ public class DatasetCreator extends JPanel implements Dispose {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				createAttDlg.dispose();
 			}
 		});
@@ -726,7 +710,6 @@ public class DatasetCreator extends JPanel implements Dispose {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				String unitName = txtUnitName.getText().trim();
 				if (unitName.isEmpty()) {
 					JOptionPane.showMessageDialog(
@@ -769,7 +752,6 @@ public class DatasetCreator extends JPanel implements Dispose {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				createDlg.dispose();
 			}
 		});
@@ -821,14 +803,12 @@ public class DatasetCreator extends JPanel implements Dispose {
 
 			@Override
 			public void clearData() {
-				// TODO Auto-generated method stub
 				super.clearData();
 				unitTable.clear();
 			}
 
 			@Override
 			public void modify() {
-				// TODO Auto-generated method stub
 				JOptionPane.showMessageDialog(
 						getCreator(), 
 						"Not support this method", 
@@ -838,7 +818,6 @@ public class DatasetCreator extends JPanel implements Dispose {
 
 			@Override
 			public void drop() {
-				// TODO Auto-generated method stub
 				JOptionPane.showMessageDialog(
 						getCreator(), 
 						"Not support this method", 
@@ -853,7 +832,6 @@ public class DatasetCreator extends JPanel implements Dispose {
 			
 			@Override
 			public void valueChanged(ListSelectionEvent e) {
-				// TODO Auto-generated method stub
 			
 				Unit unit = unitList.getSelectedValue();
 				if (unit == null) {
@@ -884,7 +862,6 @@ public class DatasetCreator extends JPanel implements Dispose {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				DataConfig srcConfig = DatasetUtil2.chooseConfig(getCreator(), null);
 				
 				if (srcConfig == null) {
@@ -930,7 +907,6 @@ public class DatasetCreator extends JPanel implements Dispose {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				ExternalConfigurator configurator = new ExternalConfigurator(
 						getCreator(), DataDriverList.get(), null);
 				
@@ -1173,7 +1149,6 @@ public class DatasetCreator extends JPanel implements Dispose {
 	
 	@Override
 	public boolean isRunning() {
-		// TODO Auto-generated method stub
 		return provider != null;
 	}
 

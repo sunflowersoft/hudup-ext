@@ -97,7 +97,6 @@ public class DatasetInput extends JPanel implements Dispose {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				
 				DataConfig config = DatasetUtil2.chooseConfig(getThis(), txtConfig.getConfig());
 				if (config == null) {
@@ -126,7 +125,6 @@ public class DatasetInput extends JPanel implements Dispose {
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					// TODO Auto-generated method stub
 					
 					update(txtConfig.getConfig());
 				}
@@ -150,14 +148,12 @@ public class DatasetInput extends JPanel implements Dispose {
 
 			@Override
 			public void clearData() {
-				// TODO Auto-generated method stub
 				super.clearData();
 				unitTable.clear();
 			}
 
 			@Override
 			public void modify() {
-				// TODO Auto-generated method stub
 				JOptionPane.showMessageDialog(
 						getThis(), 
 						"Not support this method", 
@@ -167,7 +163,6 @@ public class DatasetInput extends JPanel implements Dispose {
 
 			@Override
 			public void drop() {
-				// TODO Auto-generated method stub
 				JOptionPane.showMessageDialog(
 						getThis(), 
 						"Not support this method", 
@@ -183,7 +178,6 @@ public class DatasetInput extends JPanel implements Dispose {
 			
 			@Override
 			public void valueChanged(ListSelectionEvent e) {
-				// TODO Auto-generated method stub
 			
 				Unit unit = unitList.getSelectedValue();
 				if (unit == null) {
@@ -232,7 +226,6 @@ public class DatasetInput extends JPanel implements Dispose {
 			unitTable.close();
 		}
 		catch (Exception e) {
-			// TODO Auto-generated catch block
 			LogUtil.trace(e);
 		}
 		unitTable = Util.getFactory().createUnitTable(config.getStoreUri());
@@ -244,7 +237,6 @@ public class DatasetInput extends JPanel implements Dispose {
 
 	@Override
 	public void dispose() {
-		// TODO Auto-generated method stub
 		unitTable.clear();
 		if (provider != null) {
 			provider.close();
@@ -255,7 +247,6 @@ public class DatasetInput extends JPanel implements Dispose {
 
 	@Override
 	public boolean isRunning() {
-		// TODO Auto-generated method stub
 		return provider != null;
 	}
 	

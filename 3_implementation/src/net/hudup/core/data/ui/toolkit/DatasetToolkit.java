@@ -83,7 +83,6 @@ public class DatasetToolkit extends JFrame {
 
 			@Override
 			public void windowClosing(WindowEvent e) {
-				// TODO Auto-generated method stub
 				super.windowClosing(e);
 				
 				try {
@@ -115,7 +114,7 @@ public class DatasetToolkit extends JFrame {
 
 			@Override
 			public void reset() {
-				// TODO Auto-generated method stub
+
 			}
 		});
 		body.add("Dataset creator", datasetCreator);

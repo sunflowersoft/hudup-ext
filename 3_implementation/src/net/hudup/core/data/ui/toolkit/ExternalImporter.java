@@ -104,7 +104,6 @@ public class ExternalImporter extends JPanel implements ProgressListener, Dispos
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				externalConfig();
 			}
 		});
@@ -115,7 +114,6 @@ public class ExternalImporter extends JPanel implements ProgressListener, Dispos
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				internalConfig();
 			}
 		});
@@ -140,7 +138,6 @@ public class ExternalImporter extends JPanel implements ProgressListener, Dispos
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				
 				importData();
 			}
@@ -242,7 +239,6 @@ public class ExternalImporter extends JPanel implements ProgressListener, Dispos
 
 			@Override
 			public void run() {
-				// TODO Auto-generated method stub
 				ExternalQuery externalQuery = new DefaultExternalQuery();
 				try {
 					boolean setup = externalQuery.setup(internalConfig, externalConfig);
@@ -294,7 +290,6 @@ public class ExternalImporter extends JPanel implements ProgressListener, Dispos
 
 	@Override
 	public void receiveProgress(ProgressEvent evt) throws RemoteException {
-		// TODO Auto-generated method stub
 		int progressTotal = evt.getProgressTotal();
 		int progressStep = evt.getProgressStep();
 		
@@ -309,7 +304,6 @@ public class ExternalImporter extends JPanel implements ProgressListener, Dispos
 	@SuppressWarnings("deprecation")
 	@Override
 	public void dispose() {
-		// TODO Auto-generated method stub
 		if (runningThread == null)
 			return;
 		
@@ -324,7 +318,6 @@ public class ExternalImporter extends JPanel implements ProgressListener, Dispos
 
 	@Override
 	public boolean isRunning() {
-		// TODO Auto-generated method stub
 		
 		return runningThread != null;
 	}
