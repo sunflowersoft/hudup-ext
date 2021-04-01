@@ -82,7 +82,7 @@ public final class Constants {
 	/**
 	 * Default relative working directory.
 	 */
-	public final static String  WORKING_DIRECTORY        = "working";
+	public final static String  WORKING_DIRECTORY        = Configuration.getProperty(Configuration.WORKING_NAME, Configuration.WORKING_NAME);
 	
 	/**
 	 * Default relative knowledge base directory. This directory is used to store knowledge bases called {@code KBase} (s).

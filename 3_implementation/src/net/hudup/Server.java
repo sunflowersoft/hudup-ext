@@ -12,6 +12,7 @@ import java.net.URL;
 import java.rmi.RemoteException;
 
 import net.hudup.core.AccessPoint;
+import net.hudup.core.Configuration;
 import net.hudup.core.Constants;
 import net.hudup.core.Util;
 import net.hudup.core.client.PowerServer;
@@ -57,6 +58,10 @@ public final class Server implements AccessPoint {
 	
 	@Override
 	public void run(String[] args) {
+		try {
+			new Configuration();
+		} catch (Throwable e) {}
+		
 		Util.getPluginManager().fire();
 		
 		//Not important.

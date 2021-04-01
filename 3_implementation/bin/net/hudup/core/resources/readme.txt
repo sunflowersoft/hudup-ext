@@ -18,7 +18,7 @@ Hudup application has five main modules such as Evaluator, Server, Listener, Bal
 
 Hudup is available at http://www.locnguyen.net/st/products/hudup or http://www.hudup.net. Its GitHub source is available at https://github.com/sunflowersoft/hudup-ext. The tutorial is available at https://www.scitepress.org/PublicationsDetail.aspx?ID=3Tk7XB8m0LA=
 
-The easiest way to install Hudup is to download the all-in-one version (hudup-${version}-all-in-one.zip) available at https://drive.google.com/file/d/1XdU2I-yLzJ5uSXzrgehe2LFZMJidm9IJ or http://www.locnguyen.net/st/products/hudup and then to uncompress such version. Hudup runs on standard edition Java with version JRE 1.8.0 or JDK 1.8.0 that you have to download and install before installing Hudup. Finally, you start Hudup application and there are three experimental scripts:
+The easiest way to install Hudup is to download the all-in-one version (hudup-${version}-all-in-one.zip) available at https://drive.google.com/file/d/1XdU2I-yLzJ5uSXzrgehe2LFZMJidm9IJ or http://www.locnguyen.net/st/products/hudup and then to uncompress such version. Hudup runs on standard edition Java with version OpenJDK 15 that you have to download and install before installing Hudup. Finally, you start Hudup application and there are three experimental scripts:
 
 1. Running access point Evaluator (evaluator.bat, evaluator.sh, evaluator-remote.bat, evaluator-remote.sh). You press "Load script" button and open "batch-sample.script" file at current directory. All sample datasets in folder "datasets" at current directory.
 

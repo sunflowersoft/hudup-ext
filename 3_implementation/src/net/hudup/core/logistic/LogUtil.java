@@ -7,7 +7,11 @@
  */
 package net.hudup.core.logistic;
 
+import java.io.InputStream;
+import java.util.Properties;
+
 import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
 
 import net.hudup.core.Constants;
 
@@ -24,7 +28,7 @@ public class LogUtil {
 	/**
 	 * Logger of this class.
 	 */
-	protected final static Logger logger = Constants.LOG4J ? Logger.getLogger("Hudup") : null;
+	protected static Logger logger = null; //Constants.LOG4J ? Logger.getLogger("Hudup") : null;
 
 	
 //	/**
@@ -32,6 +36,35 @@ public class LogUtil {
 //	 */
 //	protected final static SimpleDateFormat df = new SimpleDateFormat(Constants.DATE_FORMAT);
 
+	
+	/**
+	 * Static code
+	 */
+	static {
+		InputStream cis = null;
+	    try { 
+			Properties props = new Properties(); 
+	        cis = LogUtil.class.getResourceAsStream( "/log4j.properties");
+	        props.load(cis); 
+	        cis.close(); 
+	        
+	        String logFilePath = "./" + Constants.WORKING_DIRECTORY + "/log/hudup.log";
+		    props.setProperty("log4j.appender.output.file", logFilePath);
+		    PropertyConfigurator.configure(props);
+		    
+		    logger = Constants.LOG4J ? Logger.getLogger("Hudup") : null;
+	    }
+	    catch (Throwable e) {
+	    	logger = null;
+	    }
+	    finally {
+	    	try {
+	    		if (cis != null) cis.close();
+		    }
+		    catch (Throwable e) {}
+	    }
+	}
+	
 	
 	/**
 	 * Printing out logging information.

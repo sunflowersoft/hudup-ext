@@ -16,6 +16,7 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 import net.hudup.core.AccessPoint;
+import net.hudup.core.Configuration;
 import net.hudup.core.Util;
 import net.hudup.core.logistic.ui.StartDlg;
 import net.hudup.core.logistic.ui.TextArea;
@@ -42,6 +43,10 @@ public class Starter {
 	 * @param args The argument parameter of main method. It contains command line arguments.
 	 */
 	public static void main(final String[] args) {
+		try {
+			new Configuration();
+		} catch (Throwable e) {}
+		
 		List<AccessPoint> apList = Util.getPluginManager().loadInstances(AccessPoint.class);
 		
 		if (apList.size() == 0) {
