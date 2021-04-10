@@ -8,6 +8,7 @@
 package net.hudup.core.data;
 
 import java.io.Serializable;
+import java.util.Collection;
 
 import net.hudup.core.Cloneable;
 import net.hudup.core.Transfer;
@@ -36,6 +37,13 @@ public interface Profiles extends Cloneable, Transfer, Serializable {
 	
 	
 	/**
+	 * Retrieving collection of profile identifications (IDs).
+	 * @return collection of profile identifications (IDs).
+	 */
+	Collection<Integer> fetchIds2();
+	
+	
+	/**
 	 * Clearing profiles, which means that all profile (s) are removed from this profile list.
 	 */
 	void clear();
@@ -55,6 +63,13 @@ public interface Profiles extends Cloneable, Transfer, Serializable {
 	 * @return Fetcher of profiles.
 	 */
 	Fetcher<Profile> fetch();
+	
+	
+	/**
+	 * Retrieving collection of profiles.
+	 * @return collection of profiles.
+	 */
+	Collection<Profile> fetch2();
 	
 	
 	/**

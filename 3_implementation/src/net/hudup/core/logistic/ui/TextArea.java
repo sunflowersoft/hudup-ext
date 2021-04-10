@@ -27,6 +27,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.text.Document;
 
 import net.hudup.core.logistic.ClipboardUtil;
@@ -41,7 +43,7 @@ import net.hudup.core.logistic.xURI;
  * @version 12.0
  *
  */
-public class TextArea extends JTextArea {
+public class TextArea extends JTextArea implements DocumentListener {
 
 	
 	/**
@@ -49,6 +51,12 @@ public class TextArea extends JTextArea {
 	 */
 	private static final long serialVersionUID = 1L;
 
+	
+	/**
+	 * Changed flag.
+	 */
+	protected boolean changed = false;
+	
 	
 	/**
 	 * Default constructor.
@@ -116,6 +124,16 @@ public class TextArea extends JTextArea {
 
 
 	/**
+	 * Constructor with byte array.
+	 * @param data byte array.
+	 */
+	public TextArea(byte[] data) {
+		setText(new String(data));
+		init();
+	}
+	
+	
+	/**
 	 * Initializing method.
 	 */
 	protected void init() {
@@ -139,6 +157,9 @@ public class TextArea extends JTextArea {
 			}
 			
 		});
+		
+		getDocument().addDocumentListener(this);
+		changed = false;
 	}
 	
 	
@@ -232,10 +253,63 @@ public class TextArea extends JTextArea {
 	}
 
 
+	/**
+	 * Setting byte array.
+	 * @param data byte array.
+	 */
+	public void setText(byte[] data) {
+		if (data != null) setText(new String(data));
+	}
+	
+	
 	@Override
 	public void setText(String t) {
 		super.setText(t);
 		setCaretPosition(0);
+	}
+	
+	
+	@Override
+	public void insertUpdate(DocumentEvent e) {
+		onChanged();
+	}
+
+
+	@Override
+	public void removeUpdate(DocumentEvent e) {
+		onChanged();
+	}
+
+
+	@Override
+	public void changedUpdate(DocumentEvent e) {
+		onChanged();
+	}
+
+
+	/**
+	 * Event-driven changed event method.
+	 */
+	protected void onChanged() {
+		changed = true;
+	}
+	
+	
+	/**
+	 * Checking whether the document is changed.
+	 * @return whether the document is changed.
+	 */
+	public boolean isChanged() {
+		return changed;
+	}
+	
+	
+	/**
+	 * Setting whether the document is changed.
+	 * @param changed flag to indicate whether the document is changed.
+	 */
+	public void setChanged(boolean changed) {
+		this.changed = changed;
 	}
 	
 	

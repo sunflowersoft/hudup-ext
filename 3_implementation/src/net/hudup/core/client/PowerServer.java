@@ -78,6 +78,14 @@ public interface PowerServer extends Server, PluginChangedListener {
 
 	
 	/**
+	 * Getting storage service.
+	 * @return storage service.
+	 * @throws RemoteException if any error raises.
+	 */
+	VirtualStorageService getStorageService() throws RemoteException;
+	
+	
+	/**
 	 * Reloading plug-in storage.
 	 * @param account specified account.
 	 * @param password specified password.

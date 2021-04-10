@@ -16,6 +16,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
 import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -151,6 +152,8 @@ public class Test {
 //			System.out.println(url);
 //		}
 		
+//		Path path = Paths.get(new File("working").getAbsolutePath());
+		System.out.println(new File("a b c").toURI().getPath());
 	}
 
 	

@@ -12,6 +12,7 @@ import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+import java.rmi.RemoteException;
 
 import javax.swing.AbstractAction;
 import javax.swing.JMenu;
@@ -20,8 +21,8 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 
-import net.hudup.core.client.Connector;
 import net.hudup.core.client.ConnectInfo;
+import net.hudup.core.client.Connector;
 import net.hudup.core.client.LightRemoteServerCP;
 import net.hudup.core.client.PowerServer;
 import net.hudup.core.client.RemoteServerCP;
@@ -57,7 +58,6 @@ public class ExtendedServer2CP extends ExternalServerCP {
 	 */
 	public ExtendedServer2CP(PowerServer server, ConnectInfo connectInfo) {
 		super(server, connectInfo);
-	    setJMenuBar(createMenuBar());
 	}
 
 
@@ -88,12 +88,14 @@ public class ExtendedServer2CP extends ExternalServerCP {
 
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					WorkingDirectoryManager.showManager(cp, server, connectInfo.bindUri);
+					try {
+						WorkingDirectoryManager.showManager(cp, server.getStorageService());
+					} catch (RemoteException ex) {LogUtil.trace(ex);}
 				}
 			});
 		mniWorkingDirectoryManager.setMnemonic('w');
-//		mnTool.add(mniWorkingDirectoryManager);
-//		mnTool.addSeparator();
+		mnTool.add(mniWorkingDirectoryManager);
+		mnTool.addSeparator();
 
 		JMenuItem mniInstallService = new JMenuItem(
 			new AbstractAction(I18nUtil.message("install_service")) {

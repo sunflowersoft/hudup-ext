@@ -68,8 +68,13 @@ public class MemProfiles implements Profiles {
 
 	@Override
 	public Fetcher<Integer> fetchIds() {
-		// TODO Auto-generated method stub
 		return new MemFetcher<Integer>(profileMap.keySet());
+	}
+
+
+	@Override
+	public Collection<Integer> fetchIds2() {
+		return profileMap.keySet();
 	}
 
 
@@ -85,6 +90,12 @@ public class MemProfiles implements Profiles {
 	}
 	
 	
+	@Override
+	public Collection<Profile> fetch2() {
+		return profileMap.values();
+	}
+
+
 	@Override
 	public boolean contains(int id) {
 		return profileMap.containsKey(id);
@@ -116,7 +127,6 @@ public class MemProfiles implements Profiles {
 	
 	@Override
 	public int size() {
-		// TODO Auto-generated method stub
 		return profileMap.size();
 	}
 
@@ -191,8 +201,6 @@ public class MemProfiles implements Profiles {
 	
 	@Override
 	public Object clone() {
-		// TODO Auto-generated method stub
-		
 		AttributeList newAttList = (AttributeList)this.attList.clone();
 		Map<Integer, Profile> newProfileMap = Util.newMap();
 		
@@ -316,7 +324,6 @@ public class MemProfiles implements Profiles {
 					fetcher.reset();
 			} 
 			catch (Throwable e) {
-				// TODO Auto-generated catch block
 				LogUtil.trace(e);
 			}
 		}

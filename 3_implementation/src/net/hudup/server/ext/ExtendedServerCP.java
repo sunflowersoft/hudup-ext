@@ -12,6 +12,7 @@ import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+import java.rmi.RemoteException;
 
 import javax.swing.AbstractAction;
 import javax.swing.JMenu;
@@ -55,7 +56,6 @@ public class ExtendedServerCP extends PowerServerCP {
 	 */
 	public ExtendedServerCP(PowerServer server, ConnectInfo connectInfo) {
 		super(server, connectInfo);
-	    setJMenuBar(createMenuBar());
 	}
 
 
@@ -86,12 +86,14 @@ public class ExtendedServerCP extends PowerServerCP {
 
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					WorkingDirectoryManager.showManager(cp, server, connectInfo.bindUri);
+					try {
+						WorkingDirectoryManager.showManager(cp, server.getStorageService());
+					} catch (RemoteException ex) {LogUtil.trace(ex);}
 				}
 			});
 		mniWorkingDirectoryManager.setMnemonic('w');
-//		mnTool.add(mniWorkingDirectoryManager);
-//		mnTool.addSeparator();
+		mnTool.add(mniWorkingDirectoryManager);
+		mnTool.addSeparator();
 
 		JMenuItem mniInstallService = new JMenuItem(
 			new AbstractAction(I18nUtil.message("install_service")) {

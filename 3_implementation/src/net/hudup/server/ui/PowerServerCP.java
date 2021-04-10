@@ -237,8 +237,9 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 			setLocationRelativeTo(null);
 			
 	        Image image = UIUtil.getImage("server-32x32.png");
-	        if (image != null)
-	        	setIconImage(image);
+	        if (image != null) setIconImage(image);
+
+		    setJMenuBar(createMenuBar());
 
 		    Container container = getContentPane();
 			JTabbedPane main = new JTabbedPane();
@@ -298,7 +299,6 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 	 */
 	public PowerServerCP(PowerServer server) {
 		this(server, null);
-	    setJMenuBar(createMenuBar());
 	}
 	
 	
