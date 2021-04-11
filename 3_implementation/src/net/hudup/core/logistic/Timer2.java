@@ -17,13 +17,13 @@ public abstract class Timer2 extends AbstractRunner {
 
 	
 	/**
-	 * Delay at starting time.
+	 * Delay at starting time in milisecond.
 	 */
 	protected long delay = 0;
 
 	
 	/**
-	 * Period to perform task.
+	 * Period to perform task in milisecond.
 	 */
 	protected long period = 0;
 

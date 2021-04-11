@@ -25,6 +25,7 @@ import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import net.hudup.core.Util;
 
@@ -109,17 +110,18 @@ public abstract class DirWatcher extends Timer2 {
 
     @Override
 	protected void task() {
-    	WatchKey key = watcher.poll();
+    	WatchKey key = null;
+    	try {
+    		key = watcher.poll(period, TimeUnit.MILLISECONDS);
+    	}
+    	catch (Throwable e) {}
+    	
     	if (key == null) return;
     	Path dir = keys.get(key);
         if (dir == null) {
             System.err.println("WatchKey not recognized!!");
             return;
         }
-        
-        try {
-            Thread.sleep(1);
-		} catch (Throwable e) {LogUtil.trace(e);}
         
         for (WatchEvent<?> event: key.pollEvents()) {
         	WatchEvent.Kind<?> kind = event.kind();
@@ -226,7 +228,7 @@ public abstract class DirWatcher extends Timer2 {
 	protected void clear() {
     	if (watcher != null) {
     		try {watcher.close();}
-    		catch (IOException e) {LogUtil.trace(e);}
+    		catch (Throwable e) {LogUtil.trace(e);}
     		watcher = null;
     	}
 		recursive = false;
