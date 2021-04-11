@@ -35,7 +35,6 @@ public class KBasePointerImpl extends PointerAbstract implements KBasePointer, K
 	 */
 	public KBasePointerImpl() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
 

@@ -9,8 +9,11 @@ package net.hudup.core.client;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
@@ -27,6 +30,7 @@ import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
@@ -39,6 +43,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 
 import net.hudup.core.Util;
+import net.hudup.core.logistic.DSUtil;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.ui.TextArea;
 import net.hudup.core.logistic.ui.UIUtil;
@@ -97,7 +102,7 @@ public class RemoteStorageList extends JList<StorageItem> {
 							
 							@Override
 							public void actionPerformed(ActionEvent e) {
-								edit(item);
+								edit();
 							}
 							
 						});
@@ -211,6 +216,16 @@ public class RemoteStorageList extends JList<StorageItem> {
 			
 		});
 
+		addKeyListener(new KeyAdapter() {
+			
+			@Override
+			public void keyPressed(KeyEvent e) {
+				if(e.getKeyCode() == KeyEvent.VK_F5) {
+					refresh();
+				}
+			}
+		});
+
 		update(parent);
 	}
 	
@@ -254,27 +269,34 @@ public class RemoteStorageList extends JList<StorageItem> {
 
 	/**
 	 * Editing item.
-	 * @param item item.
 	 */
-	private void edit(final StorageItem item) {
+	public void edit() {
+		StorageItem item = getSelectedValue();
 		if (item == null) return;
-		JDialog dlgTextArea = new JDialog(UIUtil.getFrameForComponent(this), true);
-		dlgTextArea.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-		dlgTextArea.setSize(400, 400);
-		dlgTextArea.setLocationRelativeTo(UIUtil.getFrameForComponent(this));
-		dlgTextArea.setLayout(new BorderLayout());
 		
+		JDialog editor = new JDialog(UIUtil.getFrameForComponent(this), DSUtil.shortenVerbalName(item.toString()), true);
+		editor.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+		editor.setSize(400, 400);
+		editor.setLocationRelativeTo(UIUtil.getFrameForComponent(this));
+		editor.setLayout(new BorderLayout());
+		
+		JPanel header = new JPanel(new FlowLayout(FlowLayout.LEFT));
+		editor.add(header, BorderLayout.NORTH);
+		header.add(new JLabel("Editing file \"" + DSUtil.shortenVerbalName(item.toString()) + "\""));
+		
+		JPanel body = new JPanel(new BorderLayout());
+		editor.add(body, BorderLayout.CENTER);
 		String content = "";
 		try {
-			byte[] data = service.readArchive(item.unit);
+			byte[] data = service.readFile(item.unit);
 			if (data != null) content = new String(data);
 		} catch (Exception e) {LogUtil.trace(e);}
 		final TextArea txtArea = new TextArea(content);
 		txtArea.setEditable(true);
-		dlgTextArea.add(new JScrollPane(txtArea), BorderLayout.CENTER);
+		body.add(new JScrollPane(txtArea), BorderLayout.CENTER);
 		
 		JPanel footer = new JPanel();
-		dlgTextArea.add(footer, BorderLayout.SOUTH);
+		editor.add(footer, BorderLayout.SOUTH);
 
 		JButton save = new JButton("Save");
 		save.addActionListener(new ActionListener() {
@@ -293,12 +315,12 @@ public class RemoteStorageList extends JList<StorageItem> {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				dlgTextArea.dispose();
+				editor.dispose();
 			}
 		});
 		footer.add(close);
 
-		dlgTextArea.addWindowListener(new WindowAdapter() {
+		editor.addWindowListener(new WindowAdapter() {
 
 			@Override
 			public void windowClosed(WindowEvent e) {
@@ -314,7 +336,7 @@ public class RemoteStorageList extends JList<StorageItem> {
 			
 		});
 		
-		dlgTextArea.setVisible(true);
+		editor.setVisible(true);
 	}
 	
 	
@@ -392,7 +414,7 @@ public class RemoteStorageList extends JList<StorageItem> {
 	/**
 	 * Deleting selected items.
 	 */
-	private void delete() {
+	public void delete() {
 		List<StorageItem> items = getSelectedValuesList();
 		for (StorageItem item : items) {
 			try {
@@ -405,7 +427,7 @@ public class RemoteStorageList extends JList<StorageItem> {
 	/**
 	 * Adding new item.
 	 */
-	private void addNew() {
+	public void addNew() {
 		if (parent == null) return;
 		String newName = JOptionPane.showInputDialog(this, "Node name", "new node");
 		if (newName == null) return;
@@ -415,7 +437,7 @@ public class RemoteStorageList extends JList<StorageItem> {
 		if (exists(newName)) return;
 
 		try {
-			VirtualStorageUnit unit = service.createArchive(parent.contact(newName));
+			VirtualStorageUnit unit = service.createFile(parent.contact(newName));
 			if (unit != null) {
 				StorageItem item = new StorageItem(unit);
 				getListModel().addElement(item);
@@ -430,7 +452,8 @@ public class RemoteStorageList extends JList<StorageItem> {
 	/**
 	 * Uploading items.
 	 */
-	private void upload() {
+	public void upload() {
+		if (parent == null) return;
 		JFileChooser fc = new JFileChooser();
 		fc.setCurrentDirectory(new File("."));
 		fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
@@ -456,7 +479,7 @@ public class RemoteStorageList extends JList<StorageItem> {
 			try {
 				byte[] data = Files.readAllBytes(file.toPath());
 				VirtualStorageUnit unit = parent.contact(newName);
-				boolean ret = service.writeArchive(parent.contact(newName), data);
+				boolean ret = service.writeFile(parent.contact(newName), data);
 				if (ret && !overwrite) getListModel().addElement(new StorageItem(unit));
 			}
 			catch (Exception e) {
@@ -476,7 +499,7 @@ public class RemoteStorageList extends JList<StorageItem> {
 		
 		try {
 			VirtualStorageUnit unit = parent.contact(unitName);
-			boolean ret = service.writeArchive(unit, data.getBytes());
+			boolean ret = service.writeFile(unit, data.getBytes());
 			if (ret && !exists(unit.getLastName())) getListModel().addElement(new StorageItem(unit));
 			return ret;
 		}
@@ -491,7 +514,7 @@ public class RemoteStorageList extends JList<StorageItem> {
 	/**
 	 * Downloading selected items.
 	 */
-	private void download() {
+	public void download() {
 		List<StorageItem> items = getSelectedValuesList();
 		if (items == null || items.size() == 0) return;
 		
@@ -516,7 +539,7 @@ public class RemoteStorageList extends JList<StorageItem> {
 			}
 			
 			try {
-				byte[] data = service.readArchive(item.unit);
+				byte[] data = service.readFile(item.unit);
 				if (data != null) {
 					Files.write(new File(dir, newName).toPath(), data);
 				}
@@ -531,7 +554,7 @@ public class RemoteStorageList extends JList<StorageItem> {
 	/**
 	 * Refreshing the list.
 	 */
-	private void refresh() {
+	public void refresh() {
 		update(parent);
 	}
 	

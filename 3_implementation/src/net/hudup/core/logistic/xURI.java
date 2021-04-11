@@ -33,11 +33,11 @@ import net.hudup.core.parser.TextParserUtil;
  * All URI (s) used in the framework are represented by <i>xURI</i> and so we can identify {@link URI} with this {@link xURI}.<br>
  * A hierarchical URI follows the syntax below: 
  * <blockquote>
- * [<i>scheme</i><tt><b>:</b></tt>][<tt><b>//</b></tt><i>authority</i>][<i>path</i>][<tt><b>?</b></tt><i>query</i>][<tt><b>#</b></tt><i>fragment</i>]
+ * [<i>scheme</i><b>:</b>][<b>//</b><i>authority</i>][<i>path</i>][<b>?</b><i>query</i>][<b>#</b><i>fragment</i>]
  * </blockquote>
  * The authority component follows the syntax below:
  * <blockquote>
- * [<i>user-info</i><tt><b>@</b></tt>]<i>host</i>[<tt><b>:</b></tt><i>port</i>]
+ * [<i>user-info</i><b>@</b>]<i>host</i>[<b>:</b><i>port</i>]
  * </blockquote>
  * Note, square brackets [...] delineate optional components.<br>
  * For example, given the URI &ldquo;http://jack:secret@localhost:8080/hudup/recommend?itemid=1#filter=0&ldquo;<br>

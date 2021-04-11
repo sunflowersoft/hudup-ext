@@ -7,6 +7,7 @@
  */
 package net.hudup.server;
 
+import java.nio.file.Path;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -21,6 +22,7 @@ import net.hudup.core.Constants;
 import net.hudup.core.ExtraStorage;
 import net.hudup.core.PluginAlgDesc2ListMap;
 import net.hudup.core.PluginChangedEvent;
+import net.hudup.core.PluginManager;
 import net.hudup.core.PluginStorage;
 import net.hudup.core.RegisterTable;
 import net.hudup.core.Util;
@@ -39,6 +41,7 @@ import net.hudup.core.client.ServerStatusEvent;
 import net.hudup.core.client.ServerStatusEvent.Status;
 import net.hudup.core.client.ServerStatusListener;
 import net.hudup.core.client.Service;
+import net.hudup.core.client.VirtualStorageService;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Exportable;
 import net.hudup.core.logistic.AbstractRunner;
@@ -112,6 +115,12 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 	
 	
 	/**
+	 * Internal watcher.
+	 */
+	protected Watcher watcher = null;
+	
+	
+	/**
 	 * Internal timer.
 	 */
 	protected Timer2 timer = null;
@@ -160,8 +169,7 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 			SystemUtil.setSecurityPolicy(getClass().getResource(SERVER_POLICY));
 			
 			int port = NetUtil.getPort(this.config.getServerPort(), Constants.TRY_RANDOM_PORT);
-			if (port < 0)
-				throw new Exception("Invalid port number");
+			if (port < 0) throw new Exception("Invalid port number");
 			this.config.setServerPort(port);
 			
 			registry = LocateRegistry.createRegistry(port);
@@ -172,6 +180,7 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 			
 			initStorageSystem();
 			
+			watcher = createWatcher();
 		} 
 		catch (Throwable e) {
 			LogUtil.trace(e);
@@ -219,6 +228,16 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 			activeMeasure.reset();
 
 			UnicastRemoteObject.exportObject(getService(), config.getServerPort());
+
+			try {
+				VirtualStorageService storageService = getStorageService();
+				if (storageService != null) UnicastRemoteObject.exportObject(storageService, config.getServerPort());
+			} catch (Throwable e) {LogUtil.trace(e);}
+
+			try {
+				String we = Util.getHudupProperty("watcher_enabled");
+				if (we != null && Boolean.parseBoolean(we)) watcher.start();
+			} catch (Throwable e) {LogUtil.trace(e);}
 
 			createTimer();
 			
@@ -314,7 +333,16 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 				UnicastRemoteObject.unexportObject(getService(), true);
 			} catch (Exception e) {LogUtil.trace(e);}
 			
-        	doWhenStop();
+			try {
+				VirtualStorageService storageService = getStorageService();
+				if (storageService != null) UnicastRemoteObject.unexportObject(getStorageService(), true);
+			} catch (Throwable e) {LogUtil.trace(e);}
+
+			try {
+				watcher.stop();
+			} catch (Throwable e) {LogUtil.trace(e);}
+
+			doWhenStop();
 			activeMeasure.reset();
 			started = false;
     		fireStatusEvent(new ServerStatusEvent(this, Status.stopped));
@@ -440,6 +468,51 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 		PluginStorage.clear();
 	}
 
+	
+	/**
+	 * Create watcher.
+	 * @return created watcher.
+	 */
+	private Watcher createWatcher() {
+		return new Watcher() {
+			
+			@Override
+			protected boolean onLoadLib(Path libPath) {
+				try {
+					return onWatcherLoadLib(libPath);
+				} catch (Throwable e) {LogUtil.trace(e);}
+				return false;
+			}
+			
+		};
+	}
+	
+	
+	/**
+	 * Event-driven method for loading library.
+	 * @param libPath library path.
+	 * @return true if loading is successful.
+	 */
+	protected boolean onWatcherLoadLib(Path libPath) {
+		PluginManager pm = Util.getPluginManager();
+		List<Alg> algList = pm.loadInstances(Alg.class, xURI.create(libPath));
+		AlgList nextUpdateList = PluginStorage.getNextUpdateList();
+		int addedCount = 0;
+		for (Alg alg : algList) {
+			if (!pm.isValidAlg(alg)) continue;
+			RegisterTable table = PluginStorage.lookupTable(alg.getClass());
+			if (table == null || table.contains(alg.getName())) continue;
+			
+			int idx = nextUpdateList.indexOf(alg.getName());
+			if (idx < 0) {
+				nextUpdateList.add(alg);
+				addedCount++;
+			}
+		}
+		
+		return addedCount > 0;
+	}
+	
 	
 	/**
 	 * Creating server task scheduler as timer, called by methods: {@link #start()} and {@link #resume()}

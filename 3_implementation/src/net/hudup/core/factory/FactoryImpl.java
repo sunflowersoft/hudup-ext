@@ -11,6 +11,7 @@ import java.awt.Component;
 import java.io.File;
 import java.nio.file.Path;
 import java.sql.SQLException;
+import java.util.Collection;
 import java.util.Map;
 
 import javax.swing.JFileChooser;
@@ -24,6 +25,7 @@ import de.schlichtherle.truezip.file.TFile;
 import de.schlichtherle.truezip.file.swing.TFileChooser;
 import de.schlichtherle.truezip.nio.file.TPath;
 import net.hudup.core.Constants;
+import net.hudup.core.Util;
 import net.hudup.core.client.Service;
 import net.hudup.core.client.SocketConnection;
 import net.hudup.core.data.AttributeList;
@@ -246,6 +248,13 @@ class HudupProviderAssoc extends ProviderAssocAbstract {
 
 	
 	@Override
+	public Collection<Profile> getProfiles2(String profileUnit, Profile condition) {
+		System.out.println("Hudup server does not provide any Provider or ProviderAssoc and so this HudupProviderAssoc is only pointer to Hudup server.");
+		return Util.newList();
+	}
+
+	
+	@Override
 	public Fetcher<Profile> getProfiles(ParamSql selectSql, Profile condition) {
 		System.out.println("Hudup server does not provide any Provider or ProviderAssoc and so this HudupProviderAssoc is only pointer to Hudup server.");
 		return new MemFetcher<Profile>(); //Fixing bug date: 2019.08.07 by Loc Nguyen
@@ -253,9 +262,23 @@ class HudupProviderAssoc extends ProviderAssocAbstract {
 
 	
 	@Override
+	public Collection<Profile> getProfiles2(ParamSql selectSql, Profile condition) {
+		System.out.println("Hudup server does not provide any Provider or ProviderAssoc and so this HudupProviderAssoc is only pointer to Hudup server.");
+		return Util.newList();
+	}
+
+	
+	@Override
 	public Fetcher<Integer> getProfileIds(String profileUnit) {
 		System.out.println("Hudup server does not provide any Provider or ProviderAssoc and so this HudupProviderAssoc is only pointer to Hudup server.");
 		return new MemFetcher<Integer>(); //Fixing bug date: 2019.08.07 by Loc Nguyen
+	}
+
+	
+	@Override
+	public Collection<Integer> getProfileIds2(String profileUnit) {
+		System.out.println("Hudup server does not provide any Provider or ProviderAssoc and so this HudupProviderAssoc is only pointer to Hudup server.");
+		return Util.newList();
 	}
 
 	

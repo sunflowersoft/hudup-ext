@@ -44,7 +44,7 @@ public class LogUtil {
 		InputStream cis = null;
 	    try { 
 			Properties props = new Properties(); 
-	        cis = LogUtil.class.getResourceAsStream( "/log4j.properties");
+	        cis = LogUtil.class.getResourceAsStream( "/net/hudup/core/resources/log4j.properties");
 	        props.load(cis); 
 	        cis.close(); 
 	        

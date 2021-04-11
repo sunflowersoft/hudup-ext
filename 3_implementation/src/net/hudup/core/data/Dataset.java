@@ -8,6 +8,7 @@
 package net.hudup.core.data;
 
 import java.io.Serializable;
+import java.util.Collection;
 
 import net.hudup.core.Cloneable;
 import net.hudup.core.data.ctx.Context;
@@ -77,6 +78,14 @@ public interface Dataset extends Cloneable, Serializable {
 
 
 	/**
+	 * 
+	 * Retrieving collection of user ID (s).
+	 * @return collection of user ID (s).
+	 */
+	Collection<Integer> fetchUserIds2();
+
+
+	/**
 	 * In the case that a user ID is associated with an external user ID stored in external database,
 	 * this function returns the user ID of specified external user ID.
 	 * @param externalUserId External user ID stored in external database
@@ -100,6 +109,13 @@ public interface Dataset extends Cloneable, Serializable {
 	 * @return {@link Fetcher} of item ID (s)
 	 */
 	Fetcher<Integer> fetchItemIds();
+
+	
+	/**
+	 * Retrieving collection of item ID (s).
+	 * @return collection of item ID (s)
+	 */
+	Collection<Integer> fetchItemIds2();
 
 	
 	/**
@@ -149,6 +165,13 @@ public interface Dataset extends Cloneable, Serializable {
 	
 	
 	/**
+	 * Retrieving collection of user rating vectors.
+	 * @return collection of user rating vectors.
+	 */
+	Collection<RatingVector> fetchUserRatings2();
+
+	
+	/**
 	 * Getting rating vector {@link RatingVector} of specified item ID.
 	 * @param itemId Specified item ID
 	 * @return {@link RatingVector} of specified item ID
@@ -161,6 +184,13 @@ public interface Dataset extends Cloneable, Serializable {
 	 * @return {@link Fetcher} of item {@link RatingVector}
 	 */
 	Fetcher<RatingVector> fetchItemRatings();
+	
+	
+	/**
+	 * Retrieving collection of item rating vectors.
+	 * @return collection of item rating vectors.
+	 */
+	Collection<RatingVector> fetchItemRatings2();
 	
 	
 	/**
@@ -199,6 +229,13 @@ public interface Dataset extends Cloneable, Serializable {
 	
 	
 	/**
+	 * Retrieving collection of user user profiles.
+	 * @return collection of user profiles.
+	 */
+	Collection<Profile> fetchUserProfiles2();
+
+	
+	/**
 	 * Getting list of user attributes via {@link AttributeList}.
 	 * For example, user attributes can include user name, gender, email address, etc.
 	 * @return {@link AttributeList} represents list of user attributes
@@ -223,6 +260,13 @@ public interface Dataset extends Cloneable, Serializable {
 	 * @return {@link Fetcher} of item {@link Profile} (s)
 	 */
 	Fetcher<Profile> fetchItemProfiles();
+
+	
+	/**
+	 * Retrieving collection of item profiles.
+	 * @return collection of item profiles.
+	 */
+	Collection<Profile> fetchItemProfiles2();
 
 	
 	/**
@@ -260,6 +304,13 @@ public interface Dataset extends Cloneable, Serializable {
 	 */
 	Fetcher<Profile> fetchSample();
 	
+	
+	/**
+	 * Retrieving collection of sample profiles.
+	 * @return collection of sample profiles.
+	 */
+	Collection<Profile> fetchSample2();
+
 	
 	@Override
 	Object clone();

@@ -170,7 +170,47 @@ public class PropList implements TextParsable, Serializable, Cloneable {
 	 *
 	 */
 	public static enum ExtendedType {
-		hidden, cdata, proplist, alg, alg_list, alg_desc, alg_desc_list, unknown
+		
+		/**
+		 * Hidden.
+		 */
+		hidden,
+		
+		/**
+		 * CDATA
+		 */
+		cdata,
+		
+		/**
+		 * Properties list.
+		 */
+		proplist,
+		
+		/**
+		 * Algorithm.
+		 */
+		alg,
+		
+		/**
+		 * Algorithm list.
+		 */
+		alg_list,
+		
+		/**
+		 * Algorithm description.
+		 */
+		alg_desc,
+		
+		/**
+		 * Algorithm description list.
+		 */
+		alg_desc_list,
+		
+		/**
+		 * Unknown.
+		 */
+		unknown,
+		
 	};
 	
 	

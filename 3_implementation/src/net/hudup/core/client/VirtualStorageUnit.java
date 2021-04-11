@@ -171,6 +171,30 @@ public class VirtualStorageUnit implements Serializable {
 
 	
 	/**
+	 * Getting parent unit.
+	 * @return parent unit.
+	 */
+	public VirtualStorageUnit getParent() {
+		if (path.equals("/")) return null;
+		
+		int last = path.lastIndexOf("/");
+		if (last == 0)
+			return new VirtualStorageUnit(base, "/", physicBase);
+		else
+			return new VirtualStorageUnit(base, path.substring(0, last), physicBase);
+	}
+	
+	
+	/**
+	 * Getting root unit.
+	 * @return root unit.
+	 */
+	public VirtualStorageUnit getRoot() {
+		return new VirtualStorageUnit(base, "/", physicBase);
+	}
+	
+	
+	/**
 	 * Contacting with other path.
 	 * @param otherPath other path.
 	 * @return contacted unit.

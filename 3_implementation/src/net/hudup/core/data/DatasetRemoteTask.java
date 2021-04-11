@@ -9,6 +9,7 @@ package net.hudup.core.data;
 
 import java.io.Serializable;
 import java.rmi.RemoteException;
+import java.util.Collection;
 
 import net.hudup.core.data.ctx.Context;
 import net.hudup.core.data.ctx.ContextList;
@@ -42,6 +43,14 @@ public interface DatasetRemoteTask extends Exportable {
 
 
 	/**
+	 * Retrieving collection of user ID (s).
+	 * @return collection of user ID (s).
+	 * @throws RemoteException if any error raises.
+	 */
+	Collection<Integer> remoteFetchUserIds2() throws RemoteException;
+
+
+	/**
 	 * In the case that a user ID is associated with an external user ID stored in external database,
 	 * this function returns the user ID of specified external user ID remotely.
 	 * @param externalUserId External user ID stored in external database
@@ -68,6 +77,14 @@ public interface DatasetRemoteTask extends Exportable {
 	 * @throws RemoteException if any error raises.
 	 */
 	Fetcher<Integer> remoteFetchItemIds() throws RemoteException;
+
+	
+	/**
+	 * Retrieving collection of item ID (s).
+	 * @return collection of item ID (s)
+	 * @throws RemoteException if any error raises.
+	 */
+	Collection<Integer> remoteFetchItemIds2() throws RemoteException;
 
 	
 	/**
@@ -122,6 +139,14 @@ public interface DatasetRemoteTask extends Exportable {
 	
 	
 	/**
+	 * Retrieving collection of user rating vectors remotely.
+	 * @return collection of user rating vectors.
+	 * @throws RemoteException if any error raises.
+	 */
+	Collection<RatingVector> remoteFetchUserRatings2() throws RemoteException;
+	
+	
+	/**
 	 * Getting rating vector {@link RatingVector} of specified item ID remotely.
 	 * @param itemId Specified item ID
 	 * @return {@link RatingVector} of specified item ID
@@ -136,6 +161,14 @@ public interface DatasetRemoteTask extends Exportable {
 	 * @throws RemoteException if any error raises.
 	 */
 	Fetcher<RatingVector> remoteFetchItemRatings() throws RemoteException;
+	
+	
+	/**
+	 * Retrieving collection of item rating vectors remotely.
+	 * @return collection of item rating vectors.
+	 * @throws RemoteException if any error raises.
+	 */
+	Collection<RatingVector> remoteFetchItemRatings2() throws RemoteException;
 	
 	
 	/**
@@ -178,6 +211,14 @@ public interface DatasetRemoteTask extends Exportable {
 	
 	
 	/**
+	 * Retrieving collection of user profiles remotely.
+	 * @return collection of user profiles.
+	 * @throws RemoteException if any error raises.
+	 */
+	Collection<Profile> remoteFetchUserProfiles2() throws RemoteException;
+	
+	
+	/**
 	 * Getting list of user attributes via {@link AttributeList} remotely.
 	 * For example, user attributes can include user name, gender, email address, etc.
 	 * @return {@link AttributeList} represents list of user attributes
@@ -205,6 +246,14 @@ public interface DatasetRemoteTask extends Exportable {
 	 * @throws RemoteException if any error raises.
 	 */
 	Fetcher<Profile> remoteFetchItemProfiles() throws RemoteException;
+
+	
+	/**
+	 * Retrieving collection of item profiles remotely.
+	 * @return collection of item profiles.
+	 * @throws RemoteException if any error raises.
+	 */
+	Collection<Profile> remoteFetchItemProfiles2() throws RemoteException;
 
 	
 	/**
@@ -246,6 +295,14 @@ public interface DatasetRemoteTask extends Exportable {
 	 */
 	Fetcher<Profile> remoteFetchSample() throws RemoteException;
 	
+	
+	/**
+	 * Retrieving remotely collection of sample profiles.
+	 * @return collection of sample profiles.
+	 * @throws RemoteException if any error raises.
+	 */
+	Collection<Profile> remoteFetchSample2() throws RemoteException;
+
 	
 	/**
 	 * Retrieving remotely the {@link Snapshot} of this {@code Dataset} remotely.
@@ -298,4 +355,5 @@ public interface DatasetRemoteTask extends Exportable {
 	 */
     void remoteClear() throws RemoteException;
 
+    
 }

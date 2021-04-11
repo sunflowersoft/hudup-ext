@@ -8,6 +8,7 @@
 package net.hudup.core.data;
 
 import java.io.IOException;
+import java.util.Collection;
 
 /**
  * Any class that implements this interface is called {@code provider associator} which assists the provider specified by interface {@code Provider} to performs read-write operations.
@@ -147,6 +148,15 @@ public interface ProviderAssoc extends AutoCloseable {
 
 	
 	/**
+	 * Getting profiles.
+	 * @param profileUnit specified unit name.
+	 * @param condition specified condition
+	 * @return collection of profiles.
+	 */
+	Collection<Profile> getProfiles2(String profileUnit, Profile condition);
+	
+	
+	/**
 	 * Getting many profiles queried by specified select SQL statement with specified condition. Such profiles are retrieved via fetcher.
 	 * Note, {@code Profile} is one of important data structures, like record of table in database, has a list of values. Each value belongs to a particular attribute. Profile uses a attribute list to specify its data types. 
 	 * Attribute represented by {@code Attribute} class indicates the data type, which is also a wrapper of data type. Attribute list represented by {@link AttributeList} is the list of many attributes. 
@@ -159,6 +169,15 @@ public interface ProviderAssoc extends AutoCloseable {
 	
 	
 	/**
+	 * Getting profiles.
+	 * @param selectSql specified select SQL statement.
+	 * @param condition specified condition.
+	 * @return collection of profiles.
+	 */
+	Collection<Profile> getProfiles2(ParamSql selectSql, Profile condition);
+
+	
+	/**
 	 * Getting many profile identifications (IDs) from specified unit. Such profiles are retrieved via fetcher.
 	 * Note, {@code Profile} is one of important data structures, like record of table in database, has a list of values. Each value belongs to a particular attribute. Profile uses a attribute list to specify its data types.
 	 * Each profile has an identification (ID). 
@@ -169,6 +188,14 @@ public interface ProviderAssoc extends AutoCloseable {
 	 * @return {@link Fetcher} of profile IDS from specified unit.
 	 */
 	Fetcher<Integer> getProfileIds(String profileUnit);
+	
+	
+	/**
+	 * Getting many profile identifications (IDs) from specified unit.
+	 * @param profileUnit specified unit name.
+	 * @return collection of profile IDS from specified unit.
+	 */
+	Collection<Integer> getProfileIds2(String profileUnit);
 	
 	
 	/**
@@ -305,6 +332,7 @@ public interface ProviderAssoc extends AutoCloseable {
 		 * Close this writer.
 		 */
 		void close();
+		
 	}
 	
 	

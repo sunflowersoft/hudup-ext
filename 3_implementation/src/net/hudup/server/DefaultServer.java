@@ -17,15 +17,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.PrintWriter;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.rmi.RemoteException;
-import java.rmi.server.UnicastRemoteObject;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Collection;
-import java.util.List;
 import java.util.Scanner;
 
 import javax.swing.ImageIcon;
@@ -33,16 +28,11 @@ import javax.swing.JOptionPane;
 
 import net.hudup.core.Constants;
 import net.hudup.core.PluginChangedEvent;
-import net.hudup.core.PluginManager;
-import net.hudup.core.PluginStorage;
-import net.hudup.core.RegisterTable;
 import net.hudup.core.Util;
-import net.hudup.core.alg.Alg;
-import net.hudup.core.alg.AlgList;
 import net.hudup.core.client.ServerTrayIcon;
 import net.hudup.core.client.Service;
-import net.hudup.core.client.VirtualStorageService;
 import net.hudup.core.client.VirtualFileService;
+import net.hudup.core.client.VirtualStorageService;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.DataDriver;
 import net.hudup.core.data.DataDriver.DataType;
@@ -50,7 +40,6 @@ import net.hudup.core.data.Provider;
 import net.hudup.core.data.ProviderImpl;
 import net.hudup.core.data.UnitList;
 import net.hudup.core.evaluate.EvaluatorConfig;
-import net.hudup.core.logistic.DirWatcher;
 import net.hudup.core.logistic.I18nUtil;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.UriAdapter;
@@ -96,12 +85,6 @@ public class DefaultServer extends PowerServerImpl {
 	
 	
 	/**
-	 * Internal directory watcher.
-	 */
-	protected DirWatcher dirWatcher = null;
-	
-	
-	/**
 	 * Constructor with configuration.
 	 * @param config power server configuration.
 	 */
@@ -110,31 +93,6 @@ public class DefaultServer extends PowerServerImpl {
 		
 		service = createService();
 		storageService = createStorageService();
-		
-		try {
-			dirWatcher = new DirWatcher() {
-				
-				@Override
-				protected boolean onModify(Path entry) {
-					return addAlgFromStore(xURI.create(entry)) > 0;
-				}
-				
-				@Override
-				protected boolean onDelete(Path entry) {
-					return false;
-				}
-				
-				@Override
-				protected boolean onCreate(Path entry) {
-					if (Files.isDirectory(entry))
-						return addAlgFromStore(xURI.create(entry)) > 0;
-					else
-						return false;
-				}
-				
-			};
-		}
-		catch (Throwable e) {LogUtil.trace(e);}
 		
 		if (Constants.SERVER_UI) {
 			if (!createSysTray()) showCP();
@@ -150,16 +108,10 @@ public class DefaultServer extends PowerServerImpl {
 	
 	/**
 	 * Create default service.
-	 * @return {@link Service}
+	 * @return service.
 	 */
 	protected DefaultService createService() {
-		try {
-			return new DefaultService(trans);
-		}
-		catch (Throwable e) {
-			LogUtil.trace(e);
-		}
-		return null;
+		return new DefaultService(trans);
 	}
 	
 	
@@ -168,27 +120,13 @@ public class DefaultServer extends PowerServerImpl {
 	 * @return storage service.
 	 */
 	protected VirtualStorageService createStorageService() {
-		try {
-			return new VirtualFileService();
-		}
-		catch (Throwable e) {
-			LogUtil.trace(e);
-		}
-		return null;
+		return new VirtualFileService();
 	}
 	
 	
 	@Override
 	protected void doWhenStart() {
 		service.open(config);
-		
-		try {
-			UnicastRemoteObject.exportObject(getStorageService(), config.getServerPort());
-		} catch (Throwable e) {LogUtil.trace(e);}
-
-		try {
-			dirWatcher.start(Paths.get(Constants.LIB_DIRECTORY), false);
-		} catch (Throwable e) {LogUtil.trace(e);}
 	}
 	
 	
@@ -207,14 +145,6 @@ public class DefaultServer extends PowerServerImpl {
 		}
 		
 		service.close();
-		
-		try {
-			UnicastRemoteObject.unexportObject(getStorageService(), true);
-		} catch (Throwable e) {LogUtil.trace(e);}
-
-		try {
-			dirWatcher.stop();
-		} catch (Throwable e) {LogUtil.trace(e);}
 	}
 	
 	
@@ -484,32 +414,6 @@ public class DefaultServer extends PowerServerImpl {
 			 * Hence, create control panel with console here or improve PowerServerCP to support console.
 			 */
 		}
-	}
-	
-	
-	/**
-	 * Adding algorithms from store URIs.
-	 * @param storeUris store URIs.
-	 * @return count of added algorithms.
-	 */
-	private static int addAlgFromStore(xURI...storeUris) {
-		PluginManager pm = Util.getPluginManager();
-		List<Alg> algList = pm.loadInstances(Alg.class, storeUris);
-		AlgList nextUpdateList = PluginStorage.getNextUpdateList();
-		int addedCount = 0;
-		for (Alg alg : algList) {
-			if (!pm.isValidAlg(alg)) continue;
-			RegisterTable table = PluginStorage.lookupTable(alg.getClass());
-			if (table == null || table.contains(alg.getName())) continue;
-			
-			int idx = nextUpdateList.indexOf(alg.getName());
-			if (idx < 0) {
-				nextUpdateList.add(alg);
-				addedCount++;
-			}
-		}
-		
-		return addedCount;
 	}
 	
 	

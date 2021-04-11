@@ -8,6 +8,7 @@
 package net.hudup.core.data;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -308,8 +309,7 @@ public class ProviderImpl implements Provider {
 	
 	@Override
 	public Fetcher<RatingTriple> getRatings() {
-		Fetcher<Profile> fetcher = assoc.getProfiles(
-				getConfig().getRatingUnit(), null);
+		Fetcher<Profile> fetcher = assoc.getProfiles(getConfig().getRatingUnit(), null);
 		
 		return new MetaFetcher<Profile, RatingTriple>(fetcher) {
 
@@ -320,30 +320,26 @@ public class ProviderImpl implements Provider {
 
 			@Override
 			public RatingTriple create(Profile u) {
-				if (u == null)
-					return null;
-				
-				int userId = u.getValueAsInt(DataConfig.USERID_FIELD);
-				int itemId = u.getValueAsInt(DataConfig.ITEMID_FIELD);
-				double ratingValue = u.getValueAsReal(DataConfig.RATING_FIELD);
-				if (userId < 0 || itemId < 0 || !Util.isUsed(ratingValue))
-					return null;
-				
-				Rating rating = new Rating(ratingValue);
-				RatingTriple triple = new RatingTriple(userId, itemId, rating);
-				
-				rating.ratedDate = u.getValueAsTime(DataConfig.RATING_DATE_FIELD); 
-				
-				ContextList contexts = ctsManager.getContexts(userId, itemId, rating.ratedDate);
-				if (contexts != null && contexts.size() > 0)
-					rating.contexts = contexts;
-				
-				return triple;
+				return RatingTriple.create(u, ctsManager);
 			}
 		};
 	}
 	
 	
+	
+	@Override
+	public Collection<RatingTriple> getRatings2() {
+		Collection<Profile> ratings = assoc.getProfiles2(getConfig().getRatingUnit(), null);
+		List<RatingTriple> triples = Util.newList(ratings.size());
+		for (Profile rating : ratings) {
+			RatingTriple triple = RatingTriple.create(rating, ctsManager);
+			if (triple != null) triples.add(triple);
+		}
+		
+		return triples;
+	}
+
+
 	/**
 	 * Inserting rating value with user identifier, item identifier, and rating date.
 	 * @param userId user identifier.
@@ -1159,14 +1155,32 @@ public class ProviderImpl implements Provider {
 
 
 	@Override
+	public Collection<Profile> getProfiles2(String profileUnit, Profile condition) {
+		return assoc.getProfiles2(profileUnit, condition);
+	}
+
+
+	@Override
 	public Fetcher<Profile> getProfiles(ParamSql selectSql, Profile condition) {
 		return assoc.getProfiles(selectSql, condition);
 	}
 
 
 	@Override
+	public Collection<Profile> getProfiles2(ParamSql selectSql, Profile condition) {
+		return assoc.getProfiles2(selectSql, condition);
+	}
+
+
+	@Override
 	public Fetcher<Integer> getProfileIds(String profileUnit) {
 		return assoc.getProfileIds(profileUnit);
+	}
+
+
+	@Override
+	public Collection<Integer> getProfileIds2(String profileUnit) {
+		return assoc.getProfileIds2(profileUnit);
 	}
 
 

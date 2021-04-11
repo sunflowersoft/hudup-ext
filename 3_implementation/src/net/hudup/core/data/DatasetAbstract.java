@@ -10,6 +10,7 @@ package net.hudup.core.data;
 import java.io.Serializable;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
+import java.util.Collection;
 
 import net.hudup.core.data.ctx.Context;
 import net.hudup.core.data.ctx.ContextList;
@@ -185,6 +186,12 @@ public abstract class DatasetAbstract implements Dataset, DatasetRemote {
 
 
 	@Override
+	public Collection<Integer> remoteFetchUserIds2() throws RemoteException {
+		return fetchUserIds2();
+	}
+
+	
+	@Override
 	public int remoteGetUserId(Serializable externalUserId) throws RemoteException {
 		return getUserId(externalUserId);
 	}
@@ -199,6 +206,12 @@ public abstract class DatasetAbstract implements Dataset, DatasetRemote {
 	@Override
 	public Fetcher<Integer> remoteFetchItemIds() throws RemoteException {
 		return FetcherUtil.fixFetcherSerialized(fetchItemIds());
+	}
+
+
+	@Override
+	public Collection<Integer> remoteFetchItemIds2() throws RemoteException {
+		return fetchItemIds2();
 	}
 
 
@@ -233,6 +246,12 @@ public abstract class DatasetAbstract implements Dataset, DatasetRemote {
 
 
 	@Override
+	public Collection<RatingVector> remoteFetchUserRatings2() throws RemoteException {
+		return fetchUserRatings2();
+	}
+
+
+	@Override
 	public RatingVector remoteGetItemRating(int itemId) throws RemoteException {
 		return getItemRating(itemId);
 	}
@@ -241,6 +260,12 @@ public abstract class DatasetAbstract implements Dataset, DatasetRemote {
 	@Override
 	public Fetcher<RatingVector> remoteFetchItemRatings() throws RemoteException {
 		return FetcherUtil.fixFetcherSerialized(fetchItemRatings());
+	}
+
+
+	@Override
+	public Collection<RatingVector> remoteFetchItemRatings2() throws RemoteException {
+		return fetchItemRatings2();
 	}
 
 
@@ -269,6 +294,12 @@ public abstract class DatasetAbstract implements Dataset, DatasetRemote {
 
 
 	@Override
+	public Collection<Profile> remoteFetchUserProfiles2() throws RemoteException {
+		return fetchUserProfiles2();
+	}
+
+
+	@Override
 	public AttributeList remoteGetUserAttributes() throws RemoteException {
 		return getUserAttributes();
 	}
@@ -283,6 +314,12 @@ public abstract class DatasetAbstract implements Dataset, DatasetRemote {
 	@Override
 	public Fetcher<Profile> remoteFetchItemProfiles() throws RemoteException {
 		return FetcherUtil.fixFetcherSerialized(fetchItemProfiles());
+	}
+
+
+	@Override
+	public Collection<Profile> remoteFetchItemProfiles2() throws RemoteException {
+		return fetchItemProfiles2();
 	}
 
 
@@ -307,6 +344,12 @@ public abstract class DatasetAbstract implements Dataset, DatasetRemote {
 	@Override
 	public Fetcher<Profile> remoteFetchSample() throws RemoteException {
 		return FetcherUtil.fixFetcherSerialized(fetchSample());
+	}
+
+
+	@Override
+	public Collection<Profile> remoteFetchSample2() throws RemoteException {
+		return fetchSample2();
 	}
 
 

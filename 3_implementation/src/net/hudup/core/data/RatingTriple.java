@@ -14,6 +14,8 @@ import java.util.Set;
 import net.hudup.core.Cloneable;
 import net.hudup.core.Constants;
 import net.hudup.core.Util;
+import net.hudup.core.data.ctx.CTSManager;
+import net.hudup.core.data.ctx.ContextList;
 import net.hudup.core.parser.TextParsable;
 
 
@@ -160,6 +162,35 @@ public class RatingTriple implements Cloneable, TextParsable, Serializable {
 	}
 
 
+	/**
+	 * Creating rating triple from rating profile.
+	 * @param ratingProfile rating profile.
+	 * @param ctsm context template schema manager.
+	 * @return rating triple created from rating profile.
+	 */
+	public static RatingTriple create(Profile ratingProfile, CTSManager ctsm) {
+		if (ratingProfile == null) return null;
+		
+		int userId = ratingProfile.getValueAsInt(DataConfig.USERID_FIELD);
+		int itemId = ratingProfile.getValueAsInt(DataConfig.ITEMID_FIELD);
+		double ratingValue = ratingProfile.getValueAsReal(DataConfig.RATING_FIELD);
+		if (userId < 0 || itemId < 0 || !Util.isUsed(ratingValue))
+			return null;
+		
+		Rating rating = new Rating(ratingValue);
+		RatingTriple triple = new RatingTriple(userId, itemId, rating);
+		
+		rating.ratedDate = ratingProfile.getValueAsTime(DataConfig.RATING_DATE_FIELD); 
+		
+		if (ctsm != null) {
+			ContextList contexts = ctsm.getContexts(userId, itemId, rating.ratedDate);
+			if (contexts != null && contexts.size() > 0) rating.contexts = contexts;
+		}
+		
+		return triple;
+	}
+	
+	
 	@Override
 	public String toString() {
 		return toText();
@@ -168,15 +199,12 @@ public class RatingTriple implements Cloneable, TextParsable, Serializable {
 	
 	@Override
 	public String toText() {
-		// TODO Auto-generated method stub
-		
 		throw new RuntimeException("Not support this method");
 	}
 
 
 	@Override
 	public void parseText(String spec) {
-		// TODO Auto-generated method stub
 		clear();
 		
 		throw new RuntimeException("Not support this method");

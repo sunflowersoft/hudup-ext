@@ -7,9 +7,11 @@
  */
 package net.hudup.core.logistic;
 
-import static java.nio.file.StandardWatchEventKinds.*;
+import static java.nio.file.LinkOption.NOFOLLOW_LINKS;
+import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
 import static java.nio.file.StandardWatchEventKinds.ENTRY_DELETE;
 import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
+import static java.nio.file.StandardWatchEventKinds.OVERFLOW;
 
 import java.io.IOException;
 import java.nio.file.FileSystems;
@@ -23,7 +25,6 @@ import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Map;
-import static java.nio.file.LinkOption.*;
 
 import net.hudup.core.Util;
 
@@ -34,7 +35,7 @@ import net.hudup.core.Util;
  * @version 1.0
  *
  */
-public abstract class DirWatcher extends AbstractRunner {
+public abstract class DirWatcher extends Timer2 {
 	
 	
 	/**
@@ -55,11 +56,22 @@ public abstract class DirWatcher extends AbstractRunner {
     protected boolean recursive = false;
     
     
-    /**
-     * Default constructor.
-     */
-    public DirWatcher() {
+	/**
+	 * Constructor with period.
+	 * @param period period time in miliseconds.
+	 */
+    public DirWatcher(long period) {
+    	super(period);
+    }
 
+    
+	/**
+	 * Constructor with delay and period.
+	 * @param delay delay time in miliseconds.
+	 * @param period period time in miliseconds.
+	 */
+    public DirWatcher(long delay, long period) {
+    	super(delay, period);
     }
     
     

@@ -8,6 +8,7 @@
 package net.hudup.core.data;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -82,6 +83,12 @@ public class ScannerImpl extends Scanner {
 
 	
 	@Override
+	public Collection<Integer> fetchUserIds2() {
+		return provider.getProfileIds2(config.getUserUnit());
+	}
+
+	
+	@Override
 	public int getUserId(Serializable externalUserId) {
 		Fetcher<Integer> userIds = fetchUserIds();
 		int returnUserId = -1;
@@ -128,8 +135,13 @@ public class ScannerImpl extends Scanner {
 
 	@Override
 	public Fetcher<Integer> fetchItemIds() {
-		
 		return provider.getProfileIds(config.getItemUnit());
+	}
+
+	
+	@Override
+	public Collection<Integer> fetchItemIds2() {
+		return provider.getProfileIds2(config.getItemUnit());
 	}
 
 	
@@ -169,7 +181,6 @@ public class ScannerImpl extends Scanner {
 	
 	@Override
 	public ExternalRecord getItemExternalRecord(int itemId) {
-		
 		InterchangeAttributeMap attributeMap = provider.getItemAttributeMap(itemId);
 		
 		if (attributeMap != null)
@@ -191,7 +202,6 @@ public class ScannerImpl extends Scanner {
 	
 	@Override
 	public RatingVector getUserRating(int userId) {
-		
 		return provider.getUserRatingVector(userId);
 	}
 
@@ -218,8 +228,20 @@ public class ScannerImpl extends Scanner {
 
 	
 	@Override
-	public RatingVector getItemRating(int itemId) {
+	public Collection<RatingVector> fetchUserRatings2() {
+		Collection<Integer> userIds = fetchUserIds2();
+		List<RatingVector> vRatings = Util.newList(userIds.size());
+		for (int userId : userIds) {
+			RatingVector vRating = getUserRating(userId);
+			if (vRating != null) vRatings.add(vRating);
+		}
 		
+		return vRatings;
+	}
+
+
+	@Override
+	public RatingVector getItemRating(int itemId) {
 		return provider.getItemRatingVector(itemId);
 	}
 
@@ -246,6 +268,19 @@ public class ScannerImpl extends Scanner {
 
 	
 	@Override
+	public Collection<RatingVector> fetchItemRatings2() {
+		Collection<Integer> itemIds = fetchItemIds2();
+		List<RatingVector> vRatings = Util.newList(itemIds.size());
+		for (int itemId : itemIds) {
+			RatingVector vRating = getItemRating(itemId);
+			if (vRating != null) vRatings.add(vRating);
+		}
+		
+		return vRatings;
+	}
+
+
+	@Override
 	public RatingMatrix createUserMatrix() {
 		return new DatasetAssoc(this).createMatrix(true);
 	}
@@ -259,7 +294,6 @@ public class ScannerImpl extends Scanner {
 	
 	@Override
 	public Profile getUserProfile(int userId) {
-		
 		return provider.getUserProfile(userId);
 	}
 
@@ -272,6 +306,13 @@ public class ScannerImpl extends Scanner {
 
 	
 	@Override
+	public Collection<Profile> fetchUserProfiles2() {
+		return provider.getProfiles2(config.getUserUnit(), null);
+		
+	}
+
+	
+	@Override
 	public AttributeList getUserAttributes() {
 		return userAttributes;
 	}
@@ -279,7 +320,6 @@ public class ScannerImpl extends Scanner {
 	
 	@Override
 	public Profile getItemProfile(int itemId) {
-		
 		return provider.getItemProfile(itemId);
 	}
 
@@ -291,8 +331,13 @@ public class ScannerImpl extends Scanner {
 
 	
 	@Override
+	public Collection<Profile> fetchItemProfiles2() {
+		return provider.getProfiles2(config.getItemUnit(), null);
+	}
+
+	
+	@Override
 	public AttributeList getItemAttributes() {
-		
 		return itemAttributes;
 	}
 
@@ -312,6 +357,12 @@ public class ScannerImpl extends Scanner {
 	@Override
 	public Fetcher<Profile> fetchSample() {
 		return provider.getProfiles(config.getSampleUnit(), null);
+	}
+
+
+	@Override
+	public Collection<Profile> fetchSample2() {
+		return provider.getProfiles2(config.getSampleUnit(), null);
 	}
 
 

@@ -13,6 +13,7 @@ import java.io.OutputStream;
 import java.io.Reader;
 import java.io.Writer;
 import java.text.SimpleDateFormat;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -352,9 +353,13 @@ class FlatProviderAssoc extends ProviderAssocAbstract {
 	
 	
 	@Override
-	public Fetcher<Profile> getProfiles(String profileUnit,
-			Profile condition) {
+	public Fetcher<Profile> getProfiles(String profileUnit, Profile condition) {
+		return new MemFetcher<Profile>(getProfiles2(profileUnit, condition));
+	}
 
+
+	@Override
+	public Collection<Profile> getProfiles2(String profileUnit, Profile condition) {
 		List<Profile> list = Util.newList();
 		
 		AttributeList attributes = getAttributes(profileUnit);
@@ -381,22 +386,20 @@ class FlatProviderAssoc extends ProviderAssocAbstract {
 		}
 		catch (Throwable e) {
 			LogUtil.trace(e);
-			
 		}
 		finally {
 			try {
-				if (reader != null)
-					reader.close();
+				if (reader != null) reader.close();
 			}
 			catch (Throwable e) {
 				LogUtil.trace(e);
 			}
 		}
 		
-		return new MemFetcher<Profile>(list);
+		return list;
 	}
 
-
+	
 	@Override
 	public Fetcher<Profile> getProfiles(ParamSql selectSql, Profile condition) {
 		throw new RuntimeException("Not implement yet");
@@ -404,13 +407,25 @@ class FlatProviderAssoc extends ProviderAssocAbstract {
 
 
 	@Override
+	public Collection<Profile> getProfiles2(ParamSql selectSql, Profile condition) {
+		throw new RuntimeException("Not implement yet");
+	}
+
+
+	@Override
 	public Fetcher<Integer> getProfileIds(String profileUnit) {
+		return new MemFetcher<Integer>(getProfileIds2(profileUnit));
+	}
+
+
+	@Override
+	public Collection<Integer> getProfileIds2(String profileUnit) {
+		List<Integer> ids = Util.newList();
 		AttributeList attributes = getAttributes(profileUnit);
 		final Attribute idAtt = attributes.getId();
 		if (idAtt == null || idAtt.getType() != Type.integer)
-			return new MemFetcher<Integer>();
+			return ids;
 		
-		List<Integer> ids = Util.newList();
 		Fetcher<Profile> fetcher = getProfiles(profileUnit, null);
 		try {
 			while (fetcher.next()) {
@@ -436,10 +451,10 @@ class FlatProviderAssoc extends ProviderAssocAbstract {
 			}
 		}
 		
-		return new MemFetcher<Integer>(ids);
+		return ids;
 	}
 
-
+	
 	@Override
 	public int getProfileMaxId(String profileUnit) {
 		

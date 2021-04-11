@@ -32,8 +32,8 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import net.hudup.core.Util;
-import net.hudup.core.client.Connector;
 import net.hudup.core.client.ConnectInfo;
+import net.hudup.core.client.Connector;
 import net.hudup.core.client.Service;
 import net.hudup.core.client.ServiceExt;
 import net.hudup.core.data.DataConfig;
@@ -764,16 +764,14 @@ public class EvaluatorCP extends JFrame implements EvaluatorListener {
 		
 		for (int i = 0; i < cmbEvaluators.getItemCount(); i++) {
 			EvaluatorItem item = cmbEvaluators.getItemAt(i);
-			try {
-				if (item.addedListener) continue;
-				
-				if (!EvaluatorAbstract.isPullModeRequired(item.evaluator) && !connectInfo.pullMode) {
+			if (item.addedListener) continue;
+			
+			if (!EvaluatorAbstract.isPullModeRequired(item.evaluator) && !connectInfo.pullMode) {
+				try {
 					item.evaluator.addEvaluatorListener(this);
-					item.addedListener = true;
-				}
-			}
-			catch (Exception e) {
-				LogUtil.trace(e);
+				} catch (Exception e) {LogUtil.trace(e);}
+				
+				item.addedListener = true;
 			}
 		}
 	}
@@ -787,13 +785,13 @@ public class EvaluatorCP extends JFrame implements EvaluatorListener {
 		
 		for (int i = 0; i < cmbEvaluators.getItemCount(); i++) {
 			EvaluatorItem item = cmbEvaluators.getItemAt(i);
+			if (!item.addedListener) continue;
+			
 			try {
-				if (!item.addedListener) continue;
-				
 				item.evaluator.removeEvaluatorListener(this);
-				item.addedListener = false;
-			}
-			catch (Exception e) {LogUtil.trace(e);}
+			} catch (Exception e) {LogUtil.trace(e);}
+			
+			item.addedListener = false;
 		}
 	}
 	
@@ -892,8 +890,7 @@ public class EvaluatorCP extends JFrame implements EvaluatorListener {
 			return;
 		}
 		
-		EvaluatorCP ecp = null;
-		ecp = new EvaluatorCP(service, connector.getConnectInfo());
+		EvaluatorCP ecp = new EvaluatorCP(service, connector.getConnectInfo());
 		ecp.setVisible(true);
 	}
 	

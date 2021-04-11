@@ -11,6 +11,8 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Collections;
@@ -60,19 +62,19 @@ public class RemoteStorageTree extends JTree implements TreeSelectionListener {
 	
 	
 	/**
-	 * Showing archive mode.
+	 * Showing file mode.
 	 */
-	protected boolean showArchive = false;
+	protected boolean showFile = false;
 	
 	
 	/**
 	 * Constructor with root directory.
 	 * @param service storage service.
-	 * @param showArchive showing archive mode.
+	 * @param showFile showing file mode.
 	 */
-	public RemoteStorageTree(VirtualStorageService service, boolean showArchive) {
+	public RemoteStorageTree(VirtualStorageService service, boolean showFile) {
 		this.service = service;
-		this.showArchive = showArchive;
+		this.showFile = showFile;
 		
 		setModel(new DefaultTreeModel(null));
 		getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
@@ -163,7 +165,7 @@ public class RemoteStorageTree extends JTree implements TreeSelectionListener {
 						
 						@Override
 						public void actionPerformed(ActionEvent e) {
-							update((Node)null);
+							refresh();
 						}
 						
 					});
@@ -174,6 +176,16 @@ public class RemoteStorageTree extends JTree implements TreeSelectionListener {
 			
 		});
 		
+		addKeyListener(new KeyAdapter() {
+			
+			@Override
+			public void keyPressed(KeyEvent e) {
+				if(e.getKeyCode() == KeyEvent.VK_F5) {
+					refresh();
+				}
+			}
+		});
+
 		update((Node)null);
 	}
 	
@@ -213,11 +225,7 @@ public class RemoteStorageTree extends JTree implements TreeSelectionListener {
 		
 		try {
 			VirtualStorageUnit childUnit = service.rename(node.unit, newName);
-			if (childUnit != null) {
-				((DefaultTreeModel)getModel()).removeNodeFromParent(node);
-				Node child = new Node(childUnit);
-				((DefaultTreeModel)getModel()).insertNodeInto(child, parent, parent.getChildCount());
-			}
+			if (childUnit != null) refresh();
 		}
 		catch (Exception e) {
 			LogUtil.trace(e);
@@ -236,12 +244,11 @@ public class RemoteStorageTree extends JTree implements TreeSelectionListener {
 		
 		try {
 			service.copy(node.unit, selectedStore.contact(node.unit.getLastName()));
+			refresh();
 		}
 		catch (Exception e) {
 			LogUtil.trace(e);
 		}
-		
-		update((Node)null);
 	}
 	
 	
@@ -256,12 +263,11 @@ public class RemoteStorageTree extends JTree implements TreeSelectionListener {
 		
 		try {
 			service.move(node.unit, selectedStore.contact(node.unit.getLastName()));
+			refresh();
 		}
 		catch (Exception e) {
 			LogUtil.trace(e);
 		}
-		
-		update((Node)null);
 	}
 	
 	
@@ -312,6 +318,14 @@ public class RemoteStorageTree extends JTree implements TreeSelectionListener {
 	
 	
 	/**
+	 * Refreshing tree.
+	 */
+	public void refresh() {
+		update((Node)null);
+	}
+	
+	
+	/**
 	 * Adding sub-directories.
 	 * @param parent node.
 	 */
@@ -348,7 +362,7 @@ public class RemoteStorageTree extends JTree implements TreeSelectionListener {
 		    		parent.add(node);
 		    		update(node);
 		    	}
-		    	else if (showArchive) {
+		    	else if (showFile) {
 		    		uList.add(unit);
 		    	}
 		    }
@@ -417,8 +431,8 @@ public class RemoteStorageTree extends JTree implements TreeSelectionListener {
 		public VirtualStorageUnit unit = null;
 		
 		/**
-		 * Construction with directory.
-		 * @param dir directory.
+		 * Construction with unit.
+		 * @param unit unit.
 		 */
 		public Node(VirtualStorageUnit unit) {
 			this.unit = unit;

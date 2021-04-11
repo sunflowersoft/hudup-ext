@@ -9,7 +9,9 @@ package net.hudup.server.ext;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.FlowLayout;
 import java.awt.Image;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
@@ -30,7 +32,9 @@ import net.hudup.core.client.RemoteStorageTree;
 import net.hudup.core.client.Server;
 import net.hudup.core.client.VirtualFileService;
 import net.hudup.core.client.VirtualStorageService;
+import net.hudup.core.client.VirtualStorageUnit;
 import net.hudup.core.data.ui.toolkit.Dispose;
+import net.hudup.core.logistic.DSUtil;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.ui.UIUtil;
 
@@ -69,6 +73,12 @@ public class WorkingDirectoryManager extends JPanel implements Dispose {
 	
 	
 	/**
+	 * Label about selected directory.
+	 */
+	protected JLabel lblSelectedDir = null;
+	
+	
+	/**
 	 * Default constructor with storage service.
 	 * @param service specified storage service.
 	 */
@@ -77,6 +87,7 @@ public class WorkingDirectoryManager extends JPanel implements Dispose {
 		
 		setLayout(new BorderLayout());
 		
+		lblSelectedDir = new JLabel("No selected directory");
 		list = new RemoteStorageList(service);
 		tree = new RemoteStorageTree(service, false) {
 
@@ -87,18 +98,110 @@ public class WorkingDirectoryManager extends JPanel implements Dispose {
 
 			@Override
 			public void onSelectNode(Node node) {
-				list.update(node != null ? node.unit : null);
+				if (node != null) {
+					lblSelectedDir.setText("Files of directory \"" + DSUtil.shortenVerbalName(node.toString()) + "\"");
+					list.update(node.unit);
+				}
+				else {
+					lblSelectedDir.setText("No selected directory");
+					list.update((VirtualStorageUnit)null);
+				}
 			}
 			
 		};
 
+		
 		JPanel left = new JPanel(new BorderLayout());
 		left.add(new JLabel("Directories"), BorderLayout.NORTH);
 		left.add(new JScrollPane(tree), BorderLayout.CENTER);
 		
+		JPanel leftToolbar = new JPanel(new FlowLayout(FlowLayout.LEFT));
+		left.add(leftToolbar, BorderLayout.SOUTH);
+
+		JButton btnRefreshTree = UIUtil.makeIconButton("refresh-16x16.png", "refresh_tree", "Refresh", "Refresh",
+		new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				tree.refresh();
+			}
+		});
+		btnRefreshTree.setMargin(new Insets(0, 0 , 0, 0));
+		leftToolbar.add(btnRefreshTree);
+			
+		
 		JPanel right = new JPanel(new BorderLayout());
-		right.add(new JLabel("Files"), BorderLayout.NORTH);
+		right.add(lblSelectedDir, BorderLayout.NORTH);
 		right.add(new JScrollPane(list), BorderLayout.CENTER);
+		
+		JPanel rightToolbars = new JPanel(new BorderLayout());
+		right.add(rightToolbars, BorderLayout.SOUTH);
+		
+		JPanel rightToolbar1 = new JPanel(new FlowLayout(FlowLayout.LEFT));
+		rightToolbars.add(rightToolbar1, BorderLayout.WEST);
+		
+		JButton btnAdd = UIUtil.makeIconButton("add-16x16.png", "add", "Add new", "Add new",
+			new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					list.addNew();
+				}
+			});
+		btnAdd.setMargin(new Insets(0, 0 , 0, 0));
+		rightToolbar1.add(btnAdd);
+
+		JButton btnEdit = UIUtil.makeIconButton("edit-16x16.png", "edit", "Edit", "Edit",
+			new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					list.edit();
+				}
+			});
+		btnEdit.setMargin(new Insets(0, 0 , 0, 0));
+		rightToolbar1.add(btnEdit);
+
+		JButton btnDelete = UIUtil.makeIconButton("delete-16x16.png", "delete", "Delete", "Delete",
+			new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					list.delete();
+				}
+			});
+		btnDelete.setMargin(new Insets(0, 0 , 0, 0));
+		rightToolbar1.add(btnDelete);
+
+		JPanel rightToolbar2 = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+		rightToolbars.add(rightToolbar2, BorderLayout.EAST);
+		
+		JButton btnDownload = UIUtil.makeIconButton("download-16x16.png", "download", "Download", "Download",
+			new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					list.download();
+				}
+			});
+		btnDownload.setMargin(new Insets(0, 0 , 0, 0));
+		rightToolbar2.add(btnDownload);
+
+		JButton btnUpload = UIUtil.makeIconButton("upload-16x16.png", "upload", "Upload", "Upload",
+			new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					list.upload();
+				}
+			});
+		btnUpload.setMargin(new Insets(0, 0 , 0, 0));
+		rightToolbar2.add(btnUpload);
+
+		JButton btnRefresh = UIUtil.makeIconButton("refresh-16x16.png", "refresh", "Refresh", "Refresh",
+			new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					list.refresh();
+				}
+			});
+		btnRefresh.setMargin(new Insets(0, 0 , 0, 0));
+		rightToolbar2.add(btnRefresh);
+
 		
 		JSplitPane body = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, left, right);
 		body.setOneTouchExpandable(true);
@@ -125,7 +228,7 @@ public class WorkingDirectoryManager extends JPanel implements Dispose {
 	 * @param service storage service.
 	 */
 	public static void showManager(Component comp, VirtualStorageService service) {
-		JDialog dlgManager = new JDialog(UIUtil.getFrameForComponent(comp), true);
+		JDialog dlgManager = new JDialog(UIUtil.getFrameForComponent(comp), "Working directory manager", true);
 		dlgManager.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		dlgManager.setSize(600, 600);
 		dlgManager.setLocationRelativeTo(UIUtil.getFrameForComponent(comp));
@@ -155,7 +258,7 @@ public class WorkingDirectoryManager extends JPanel implements Dispose {
 				dlgManager.dispose();
 			}
 		});
-		footer.add(close);
+		//footer.add(close);
 
 		dlgManager.setVisible(true);
 	}

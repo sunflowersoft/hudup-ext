@@ -10,6 +10,7 @@ package net.hudup.core.data;
 import java.io.Serializable;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
+import java.util.Collection;
 
 import net.hudup.core.data.ctx.Context;
 import net.hudup.core.data.ctx.ContextList;
@@ -34,6 +35,10 @@ public interface DatasetRemote extends DatasetRemoteTask, Remote {
 
 
 	@Override
+	Collection<Integer> remoteFetchUserIds2() throws RemoteException;
+
+
+	@Override
 	int remoteGetUserId(Serializable externalUserId) throws RemoteException;
 	
 	
@@ -43,6 +48,10 @@ public interface DatasetRemote extends DatasetRemoteTask, Remote {
 	
 	@Override
 	Fetcher<Integer> remoteFetchItemIds() throws RemoteException;
+
+	
+	@Override
+	Collection<Integer> remoteFetchItemIds2() throws RemoteException;
 
 	
 	@Override
@@ -66,11 +75,19 @@ public interface DatasetRemote extends DatasetRemoteTask, Remote {
 	
 	
 	@Override
+	Collection<RatingVector> remoteFetchUserRatings2() throws RemoteException;
+
+	
+	@Override
 	RatingVector remoteGetItemRating(int itemId) throws RemoteException;
 	
 	
 	@Override
 	Fetcher<RatingVector> remoteFetchItemRatings() throws RemoteException;
+	
+	
+	@Override
+	Collection<RatingVector> remoteFetchItemRatings2() throws RemoteException;
 	
 	
 	@Override
@@ -90,6 +107,10 @@ public interface DatasetRemote extends DatasetRemoteTask, Remote {
 	
 	
 	@Override
+	Collection<Profile> remoteFetchUserProfiles2() throws RemoteException;
+	
+	
+	@Override
 	AttributeList remoteGetUserAttributes() throws RemoteException;
 
 	
@@ -99,6 +120,10 @@ public interface DatasetRemote extends DatasetRemoteTask, Remote {
 	
 	@Override
 	Fetcher<Profile> remoteFetchItemProfiles() throws RemoteException;
+
+	
+	@Override
+	Collection<Profile> remoteFetchItemProfiles2() throws RemoteException;
 
 	
 	@Override
@@ -115,6 +140,10 @@ public interface DatasetRemote extends DatasetRemoteTask, Remote {
 	
 	@Override
 	Fetcher<Profile> remoteFetchSample() throws RemoteException;
+	
+	
+	@Override
+	Collection<Profile> remoteFetchSample2() throws RemoteException;
 	
 	
 	@Override

@@ -96,9 +96,25 @@ public abstract class Connector extends JDialog {
 	 * @version 1.0
 	 */
 	public enum ConnectType {
+		
+		/**
+		 * Server.
+		 */
 		server,
+		
+		/**
+		 * Service.
+		 */
 		service,
+		
+		/**
+		 * Socket service.
+		 */
 		socket_service,
+		
+		/**
+		 * Evaluator.
+		 */
 		evaluator
 	}
 	

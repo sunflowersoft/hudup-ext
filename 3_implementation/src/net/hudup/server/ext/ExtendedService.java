@@ -98,25 +98,7 @@ public class ExtendedService extends DefaultService implements ServiceExt, Servi
 		boolean opened = super.open(serverConfig, params);
 		if (!opened) return false;
 		
-		List<Evaluator> evList = Util.getPluginManager().loadInstances(Evaluator.class);
-		for (int i = 0; i < evList.size(); i++) {
-			Evaluator ev = evList.get(i);
-			try {
-				if (pairMap.containsKey(ev.getName())) continue;
-				
-				ev.getConfig().setEvaluatorPort(serverConfig.getServerPort());
-				ev.setAgent(true);
-				ev.setReferredService(this);
-				ev.export(serverConfig.getServerPort());
-				if (ev instanceof EvaluatorAbstract)
-					((EvaluatorAbstract)ev).removePurgeTimer();
-				ev.stimulate();
-				
-				pairMap.put(ev.getName(), ev);
-				guiDataMap.put(ev.getName(), new EvaluateGUIData());
-			}
-			catch (Throwable e) {LogUtil.trace(e);}
-		}
+		loadEvaluators();
 
 		if (timer != null) timer.stop(); timer = null;
 		if (!Constants.SERVER_PURGE_LISTENERS) {
@@ -138,6 +120,32 @@ public class ExtendedService extends DefaultService implements ServiceExt, Servi
 		return opened;
 	}
 
+	
+	/**
+	 * Loading evaluators.
+	 */
+	protected void loadEvaluators() {
+		List<Evaluator> evList = Util.getPluginManager().loadInstances(Evaluator.class);
+		for (int i = 0; i < evList.size(); i++) {
+			Evaluator ev = evList.get(i);
+			try {
+				if (pairMap.containsKey(ev.getName())) continue;
+				
+				ev.getConfig().setEvaluatorPort(serverConfig.getServerPort());
+				ev.setAgent(true);
+				ev.setReferredService(this);
+				ev.export(serverConfig.getServerPort());
+				if (ev instanceof EvaluatorAbstract)
+					((EvaluatorAbstract)ev).removePurgeTimer();
+				ev.stimulate();
+				
+				pairMap.put(ev.getName(), ev);
+				guiDataMap.put(ev.getName(), new EvaluateGUIData());
+			}
+			catch (Throwable e) {LogUtil.trace(e);}
+		}
+	}
+	
 	
 	@Override
 	public void close() {

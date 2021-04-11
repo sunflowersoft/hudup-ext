@@ -125,6 +125,12 @@ public class SnapshotImpl extends Snapshot {
 
 	
 	@Override
+	public Collection<Integer> fetchUserIds2() {
+		return userProfiles.fetchIds2();
+	}
+
+	
+	@Override
 	public int getUserId(Serializable externalUserId) {
 		Set<Integer> userIds = externalUserRecordMap.keySet();
 		for (int userId : userIds) {
@@ -146,6 +152,12 @@ public class SnapshotImpl extends Snapshot {
 	@Override
 	public Fetcher<Integer> fetchItemIds() {
 		return itemProfiles.fetchIds();
+	}
+	
+	
+	@Override
+	public Collection<Integer> fetchItemIds2() {
+		return itemProfiles.fetchIds2();
 	}
 	
 	
@@ -218,6 +230,12 @@ public class SnapshotImpl extends Snapshot {
 	
 
 	@Override
+	public Collection<RatingVector> fetchUserRatings2() {
+		return userRatingMap.values();
+	}
+	
+
+	@Override
 	public RatingVector getItemRating(int itemId) {
 		if (!itemRatingMap.containsKey(itemId))
 			return null;
@@ -229,6 +247,12 @@ public class SnapshotImpl extends Snapshot {
 	@Override
 	public Fetcher<RatingVector> fetchItemRatings() {
 		return new MemFetcher<RatingVector>(itemRatingMap.values());
+	}
+
+
+	@Override
+	public Collection<RatingVector> fetchItemRatings2() {
+		return itemRatingMap.values();
 	}
 
 
@@ -257,6 +281,12 @@ public class SnapshotImpl extends Snapshot {
 	
 	
 	@Override
+	public Collection<Profile> fetchUserProfiles2() {
+		return userProfiles.fetch2();
+	}
+	
+	
+	@Override
 	public AttributeList getUserAttributes() {
 		return userProfiles.getAttributes();
 	}
@@ -271,6 +301,12 @@ public class SnapshotImpl extends Snapshot {
 	@Override
 	public Fetcher<Profile> fetchItemProfiles() {
 		return itemProfiles.fetch();
+	}
+
+	
+	@Override
+	public Collection<Profile> fetchItemProfiles2() {
+		return itemProfiles.fetch2();
 	}
 
 	
@@ -301,6 +337,12 @@ public class SnapshotImpl extends Snapshot {
 	@Override
 	public Fetcher<Profile> fetchSample() {
 		return new MemFetcher<Profile>(sampleProfiles);
+	}
+
+
+	@Override
+	public Collection<Profile> fetchSample2() {
+		return sampleProfiles;
 	}
 
 

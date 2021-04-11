@@ -13,6 +13,7 @@ import java.awt.MenuItem;
 import java.awt.PopupMenu;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.nio.file.Path;
 import java.util.Scanner;
 
 import javax.swing.ImageIcon;
@@ -57,6 +58,18 @@ public class ExtendedServer extends DefaultServer {
 	@Override
 	protected DefaultService createService() {
 		return new ExtendedService(trans, this);
+	}
+
+
+	@Override
+	protected boolean onWatcherLoadLib(Path libPath) {
+		boolean ret = super.onWatcherLoadLib(libPath);
+		if (!ret) return false;
+		
+		if ((service instanceof ExtendedService) && service.isOpened())
+			((ExtendedService)service).loadEvaluators();
+		
+		return ret;
 	}
 
 

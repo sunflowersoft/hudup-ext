@@ -8,6 +8,7 @@
 package net.hudup.core.data;
 
 import java.io.Serializable;
+import java.util.Collection;
 
 import net.hudup.core.Cloneable;
 import net.hudup.core.alg.RecommendParam;
@@ -109,7 +110,14 @@ public interface Provider extends AutoCloseable, Cloneable, Serializable {
 	 * Rating triple contains the rating that a user gives on an item.
 	 * @return {@link Fetcher} of {@link RatingTriple}.
 	 */
-	public Fetcher<RatingTriple> getRatings();
+	Fetcher<RatingTriple> getRatings();
+	
+	
+	/**
+	 * Retrieving all ratings.
+	 * @return collection of rating triples.
+	 */
+	Collection<RatingTriple> getRatings2();
 	
 	
 	/**
@@ -545,6 +553,15 @@ public interface Provider extends AutoCloseable, Cloneable, Serializable {
 
 	
 	/**
+	 * Getting profiles.
+	 * @param profileUnit specified unit name.
+	 * @param condition specified condition
+	 * @return collection of profiles.
+	 */
+	Collection<Profile> getProfiles2(String profileUnit, Profile condition);
+
+	
+	/**
 	 * Getting many profiles queried by specified select SQL statement with specified condition. Such profiles are retrieved via fetcher.
 	 * Note, {@code Profile} is one of important data structures, like record of table in database, has a list of values. Each value belongs to a particular attribute. Profile uses a attribute list to specify its data types. Every object can be modeled as profile to be stored in archive (file). 
 	 * Fetcher is the interface for iterating each item of an associated collection. 
@@ -556,6 +573,15 @@ public interface Provider extends AutoCloseable, Cloneable, Serializable {
 
 	
 	/**
+	 * Getting profiles.
+	 * @param selectSql specified select SQL statement.
+	 * @param condition specified condition.
+	 * @return collection of profiles.
+	 */
+	Collection<Profile> getProfiles2(ParamSql selectSql, Profile condition);
+
+	
+	/**
 	 * Getting many profile identifications (IDs) from specified unit. Such profiles are retrieved via fetcher.
 	 * Note, {@code Profile} is one of important data structures, like record of table in database, has a list of values. Each value belongs to a particular attribute. Profile uses a attribute list to specify its data types. Every object can be modeled as profile to be stored in archive (file). 
 	 * {@code Unit} represents a CSV file, database table, Excel sheet, etc. Unit is used to store object such as user profile, item profile, rating matrix, etc.
@@ -564,6 +590,14 @@ public interface Provider extends AutoCloseable, Cloneable, Serializable {
 	 * @return {@link Fetcher} of profile IDS from specified unit.
 	 */
 	Fetcher<Integer> getProfileIds(String profileUnit);
+	
+	
+	/**
+	 * Getting profile identifications.
+	 * @param profileUnit specified unit name.
+	 * @return collection of profile identifications.
+	 */
+	Collection<Integer> getProfileIds2(String profileUnit);
 	
 	
 	/**

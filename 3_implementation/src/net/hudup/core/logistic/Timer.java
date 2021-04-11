@@ -13,6 +13,7 @@ package net.hudup.core.logistic;
  * @version 1.0
  *
  */
+@Deprecated
 public abstract class Timer extends AbstractRunner {
 
 	
@@ -172,7 +173,6 @@ public abstract class Timer extends AbstractRunner {
 	}
 	
 	
-	@SuppressWarnings("deprecation")
 	@Override
 	public synchronized boolean forceStop() {
 		if (!isStarted()) return false;

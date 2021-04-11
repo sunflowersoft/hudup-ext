@@ -90,13 +90,13 @@ public class VirtualFileService implements VirtualStorageService {
 
 
 	@Override
-	public VirtualStorageUnit createArchive(VirtualStorageUnit archive) throws RemoteException {
-		if (archive == null) return null;
+	public VirtualStorageUnit createFile(VirtualStorageUnit file) throws RemoteException {
+		if (file == null) return null;
 		
 		try {
-			Path archivePath = Files.createFile(archive.getPhysicAbsolutePath());
-			if (archivePath != null)
-				return archive;
+			Path filePath = Files.createFile(file.getPhysicAbsolutePath());
+			if (filePath != null)
+				return file;
 			else
 				return null;
 		}
@@ -109,11 +109,11 @@ public class VirtualFileService implements VirtualStorageService {
 
 
 	@Override
-	public byte[] readArchive(VirtualStorageUnit archive) throws RemoteException {
-		if (archive == null) return null;
+	public byte[] readFile(VirtualStorageUnit file) throws RemoteException {
+		if (file == null) return null;
 		
 		try {
-			return Files.readAllBytes(archive.getPhysicAbsolutePath());
+			return Files.readAllBytes(file.getPhysicAbsolutePath());
 		}
 		catch (Exception e) {
 			LogUtil.trace(e);
@@ -124,11 +124,11 @@ public class VirtualFileService implements VirtualStorageService {
 
 
 	@Override
-	public boolean writeArchive(VirtualStorageUnit archive, byte[] data) throws RemoteException {
-		if (archive == null) return false;
+	public boolean writeFile(VirtualStorageUnit file, byte[] data) throws RemoteException {
+		if (file == null) return false;
 		
 		try {
-			Path path = Files.write(archive.getPhysicAbsolutePath(), data);
+			Path path = Files.write(file.getPhysicAbsolutePath(), data);
 			return path != null;
 		}
 		catch (Exception e) {

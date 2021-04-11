@@ -24,16 +24,19 @@ import net.hudup.core.logistic.MathUtil;
 @Deprecated
 public class ItemPaddingMatrix extends PaddingMatrix {
 
-	public ItemPaddingMatrix(Dataset dataset, RatingVector vRat) {
-		super(dataset, vRat);
-		// TODO Auto-generated constructor stub
+	
+	/**
+	 * Constructor with dataset and rating vector.
+	 * @param dataset specified dataset.
+	 * @param vRating rating vector.
+	 */
+	public ItemPaddingMatrix(Dataset dataset, RatingVector vRating) {
+		super(dataset, vRating);
 	}
 
+	
 	@Override
 	public void setup(Dataset dataset, RatingVector vRating) {
-		// TODO Auto-generated method stub
-
-		
 		RatingMatrix rMatrix = dataset.createItemMatrix();
 		List<Integer> itemIdList = rMatrix.rowIdList;
 		List<Integer> userIdList = rMatrix.columnIdList;
@@ -83,7 +86,6 @@ public class ItemPaddingMatrix extends PaddingMatrix {
 	
 	@Override
 	public List<Integer> getUserIdList() {
-		// TODO Auto-generated method stub
 		List<Integer> userIdList = Util.newList();
 		
 		double[] row0 = matrix[0];
@@ -96,7 +98,6 @@ public class ItemPaddingMatrix extends PaddingMatrix {
 	
 	@Override
 	public List<Integer> getItemIdList() {
-		// TODO Auto-generated method stub
 		List<Integer> itemIdList = Util.newList();
 		
 		for (int i = 1; i < matrix.length; i++) {
@@ -109,7 +110,6 @@ public class ItemPaddingMatrix extends PaddingMatrix {
 
 	@Override
 	public double getRating(int userId, int itemId) {
-		// TODO Auto-generated method stub
 		double[] itemRow = getItemRatingVector(itemId);
 		
 		List<Integer> userIdList = getUserIdList();
@@ -162,13 +162,11 @@ public class ItemPaddingMatrix extends PaddingMatrix {
 
 	@Override
 	public int numberOfUsers() {
-		// TODO Auto-generated method stub
 		return matrix[0].length - 1;
 	}
 
 	@Override
 	public int numberOfItems() {
-		// TODO Auto-generated method stub
 		return matrix.length - 1;
 	}
 
@@ -184,7 +182,5 @@ public class ItemPaddingMatrix extends PaddingMatrix {
 		return new Point(col, row);
 	}
 
-	
-	
 	
 }

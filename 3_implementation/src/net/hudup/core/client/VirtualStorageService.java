@@ -57,31 +57,31 @@ public interface VirtualStorageService extends Remote {
 	
 	
 	/**
-	 * Create archive.
-	 * @param archive archive.
-	 * @return created archive.
+	 * Create file.
+	 * @param file file.
+	 * @return created file.
 	 * @throws RemoteException if any error raises.
 	 */
-	VirtualStorageUnit createArchive(VirtualStorageUnit archive) throws RemoteException;
+	VirtualStorageUnit createFile(VirtualStorageUnit file) throws RemoteException;
 	
 	
 	/**
-	 * Reading archive.
-	 * @param archive archive.
+	 * Reading file.
+	 * @param file file.
 	 * @return read byte array.
 	 * @throws RemoteException if any error raises.
 	 */
-	byte[] readArchive(VirtualStorageUnit archive) throws RemoteException;
+	byte[] readFile(VirtualStorageUnit file) throws RemoteException;
 	
 	
 	/**
-	 * Writing archive.
-	 * @param archive archive.
+	 * Writing file.
+	 * @param file file.
 	 * @param data data to write.
 	 * @return true if writing is successful.
 	 * @throws RemoteException if any error raises.
 	 */
-	boolean writeArchive(VirtualStorageUnit archive, byte[] data) throws RemoteException;
+	boolean writeFile(VirtualStorageUnit file, byte[] data) throws RemoteException;
 	
 	
 	/**
@@ -99,7 +99,7 @@ public interface VirtualStorageService extends Remote {
 	 * @param src source unit.
 	 * @param dst destination unit.
 	 * @return true if copying is successful.
-	 * @throws RemoteException
+	 * @throws RemoteException if any error raises.
 	 */
 	boolean copy(VirtualStorageUnit src, VirtualStorageUnit dst) throws RemoteException;
 	
@@ -109,7 +109,7 @@ public interface VirtualStorageService extends Remote {
 	 * @param src source unit.
 	 * @param dst destination unit.
 	 * @return true if copying is successful.
-	 * @throws RemoteException
+	 * @throws RemoteException if any error raises.
 	 */
 	boolean move(VirtualStorageUnit src, VirtualStorageUnit dst) throws RemoteException;
 

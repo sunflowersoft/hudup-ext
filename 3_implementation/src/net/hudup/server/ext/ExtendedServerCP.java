@@ -139,12 +139,12 @@ public class ExtendedServerCP extends PowerServerCP {
 				public void actionPerformed(ActionEvent e) {
 					if (server instanceof ExtendedServer)
 						((ExtendedServer)server).showEvaluatorCP();
-					else
-						JOptionPane.showMessageDialog(
-							null, 
-							"Server control panel does not provide evaluator control panel", 
-							"Evaluator control panel not provided", 
-							JOptionPane.ERROR_MESSAGE);
+					else {
+						try {
+							EvaluatorCP ecp = new EvaluatorCP(server.getService(), connectInfo);
+							ecp.setVisible(true);
+						} catch (Exception ex) {LogUtil.trace(ex);}
+					}
 				}
 			});
 		mniEvaluatorCP.setMnemonic('e');

@@ -10,7 +10,9 @@ package net.hudup.core.data;
 import java.io.Serializable;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
+import java.util.Collection;
 
+import net.hudup.core.Util;
 import net.hudup.core.data.ctx.Context;
 import net.hudup.core.data.ctx.ContextList;
 import net.hudup.core.data.ctx.ContextTemplateSchema;
@@ -116,6 +118,20 @@ public class DatasetRemoteWrapper implements Dataset, DatasetRemote {
 
 	
 	@Override
+	public Collection<Integer> fetchUserIds2() {
+		try {
+			if (remoteDataset instanceof Dataset)
+				return ((Dataset)remoteDataset).fetchUserIds2();
+			else
+				return remoteDataset.remoteFetchUserIds2();
+		}
+		catch (Exception e) {LogUtil.trace(e);}
+		
+		return Util.newList();
+	}
+
+	
+	@Override
 	public int getUserId(Serializable externalUserId) {
 		try {
 			return remoteDataset.remoteGetUserId(externalUserId);
@@ -148,6 +164,20 @@ public class DatasetRemoteWrapper implements Dataset, DatasetRemote {
 		catch (Exception e) {LogUtil.trace(e);}
 		
 		return new MemFetcher<>();
+	}
+
+	
+	@Override
+	public Collection<Integer> fetchItemIds2() {
+		try {
+			if (remoteDataset instanceof Dataset)
+				return ((Dataset)remoteDataset).fetchItemIds2();
+			else
+				return remoteDataset.remoteFetchItemIds2();
+		}
+		catch (Exception e) {LogUtil.trace(e);}
+		
+		return Util.newList();
 	}
 
 	
@@ -210,6 +240,20 @@ public class DatasetRemoteWrapper implements Dataset, DatasetRemote {
 
 	
 	@Override
+	public Collection<RatingVector> fetchUserRatings2() {
+		try {
+			if (remoteDataset instanceof Dataset)
+				return ((Dataset)remoteDataset).fetchUserRatings2();
+			else
+				return remoteDataset.remoteFetchUserRatings2();
+		}
+		catch (Exception e) {LogUtil.trace(e);}
+		
+		return Util.newList();
+	}
+
+	
+	@Override
 	public RatingVector getItemRating(int itemId) {
 		try {
 			return remoteDataset.remoteGetItemRating(itemId);
@@ -231,6 +275,20 @@ public class DatasetRemoteWrapper implements Dataset, DatasetRemote {
 		catch (Exception e) {LogUtil.trace(e);}
 		
 		return new MemFetcher<>();
+	}
+
+	
+	@Override
+	public Collection<RatingVector> fetchItemRatings2() {
+		try {
+			if (remoteDataset instanceof Dataset)
+				return ((Dataset)remoteDataset).fetchItemRatings2();
+			else
+				return remoteDataset.remoteFetchItemRatings2();
+		}
+		catch (Exception e) {LogUtil.trace(e);}
+		
+		return Util.newList();
 	}
 
 	
@@ -282,6 +340,20 @@ public class DatasetRemoteWrapper implements Dataset, DatasetRemote {
 
 	
 	@Override
+	public Collection<Profile> fetchUserProfiles2() {
+		try {
+			if (remoteDataset instanceof Dataset)
+				return ((Dataset)remoteDataset).fetchUserProfiles2();
+			else
+				return remoteDataset.remoteFetchUserProfiles2();
+		}
+		catch (Exception e) {LogUtil.trace(e);}
+		
+		return Util.newList();
+	}
+
+	
+	@Override
 	public AttributeList getUserAttributes() {
 		try {
 			return remoteDataset.remoteGetUserAttributes();
@@ -314,6 +386,20 @@ public class DatasetRemoteWrapper implements Dataset, DatasetRemote {
 		catch (Exception e) {LogUtil.trace(e);}
 		
 		return new MemFetcher<>();
+	}
+
+	
+	@Override
+	public Collection<Profile> fetchItemProfiles2() {
+		try {
+			if (remoteDataset instanceof Dataset)
+				return ((Dataset)remoteDataset).fetchItemProfiles2();
+			else
+				return remoteDataset.remoteFetchItemProfiles2();
+		}
+		catch (Exception e) {LogUtil.trace(e);}
+		
+		return Util.newList();
 	}
 
 	
@@ -361,6 +447,20 @@ public class DatasetRemoteWrapper implements Dataset, DatasetRemote {
 		catch (Exception e) {LogUtil.trace(e);}
 		
 		return new MemFetcher<>();
+	}
+
+	
+	@Override
+	public Collection<Profile> fetchSample2() {
+		try {
+			if (remoteDataset instanceof Dataset)
+				return ((Dataset)remoteDataset).fetchSample2();
+			else
+				return remoteDataset.remoteFetchSample2();
+		}
+		catch (Exception e) {LogUtil.trace(e);}
+		
+		return Util.newList();
 	}
 
 	
@@ -593,6 +693,12 @@ public class DatasetRemoteWrapper implements Dataset, DatasetRemote {
 
 
 	@Override
+	public Collection<Integer> remoteFetchUserIds2() throws RemoteException {
+		return fetchUserIds2();
+	}
+
+
+	@Override
 	public int remoteGetUserId(Serializable externalUserId) throws RemoteException {
 		return getUserId(externalUserId);
 	}
@@ -607,6 +713,12 @@ public class DatasetRemoteWrapper implements Dataset, DatasetRemote {
 	@Override
 	public Fetcher<Integer> remoteFetchItemIds() throws RemoteException {
 		return fetchItemIds();
+	}
+
+
+	@Override
+	public Collection<Integer> remoteFetchItemIds2() throws RemoteException {
+		return fetchItemIds2();
 	}
 
 
@@ -641,6 +753,12 @@ public class DatasetRemoteWrapper implements Dataset, DatasetRemote {
 
 
 	@Override
+	public Collection<RatingVector> remoteFetchUserRatings2() throws RemoteException {
+		return fetchUserRatings2();
+	}
+
+
+	@Override
 	public RatingVector remoteGetItemRating(int itemId) throws RemoteException {
 		return getItemRating(itemId);
 	}
@@ -649,6 +767,12 @@ public class DatasetRemoteWrapper implements Dataset, DatasetRemote {
 	@Override
 	public Fetcher<RatingVector> remoteFetchItemRatings() throws RemoteException {
 		return fetchItemRatings();
+	}
+
+
+	@Override
+	public Collection<RatingVector> remoteFetchItemRatings2() throws RemoteException {
+		return fetchItemRatings2();
 	}
 
 
@@ -677,6 +801,12 @@ public class DatasetRemoteWrapper implements Dataset, DatasetRemote {
 
 
 	@Override
+	public Collection<Profile> remoteFetchUserProfiles2() throws RemoteException {
+		return fetchUserProfiles2();
+	}
+
+
+	@Override
 	public AttributeList remoteGetUserAttributes() throws RemoteException {
 		return getUserAttributes();
 	}
@@ -691,6 +821,12 @@ public class DatasetRemoteWrapper implements Dataset, DatasetRemote {
 	@Override
 	public Fetcher<Profile> remoteFetchItemProfiles() throws RemoteException {
 		return fetchItemProfiles();
+	}
+
+
+	@Override
+	public Collection<Profile> remoteFetchItemProfiles2() throws RemoteException {
+		return fetchItemProfiles2();
 	}
 
 
@@ -715,6 +851,12 @@ public class DatasetRemoteWrapper implements Dataset, DatasetRemote {
 	@Override
 	public Fetcher<Profile> remoteFetchSample() throws RemoteException {
 		return fetchSample();
+	}
+
+
+	@Override
+	public Collection<Profile> remoteFetchSample2() throws RemoteException {
+		return fetchSample2();
 	}
 
 
