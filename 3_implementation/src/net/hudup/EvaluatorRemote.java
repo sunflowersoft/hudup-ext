@@ -8,7 +8,6 @@
 package net.hudup;
 
 import net.hudup.core.AccessPoint;
-import net.hudup.core.Constants;
 import net.hudup.evaluate.ui.EvalCompoundGUI;
 
 
@@ -42,7 +41,7 @@ public class EvaluatorRemote implements AccessPoint {
 	
 	@Override
 	public void run(String[] args) {
-		EvalCompoundGUI.switchRemoteEvaluator(Constants.DEFAULT_EVALUATOR_NAME, null);
+		EvalCompoundGUI.switchRemoteEvaluator(null, null);
 	}
 
 	

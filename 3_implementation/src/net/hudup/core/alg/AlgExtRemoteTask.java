@@ -8,6 +8,7 @@
 package net.hudup.core.alg;
 
 import java.rmi.RemoteException;
+import java.util.Collection;
 
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.Fetcher;
@@ -24,7 +25,7 @@ public interface AlgExtRemoteTask extends AlgRemoteTask {
 
 
 	/**
-	 * Setting up this testing algorithm based on specified dataset.
+	 * Setting up this algorithm based on specified dataset.
 	 * In this current version, this method initializes the data sample for learning parameter and then calls learning method.
 	 * @param dataset specified dataset.
 	 * @param info additional parameters to set up this algorithm. This parameter is really an array of sub-parameters.
@@ -34,7 +35,7 @@ public interface AlgExtRemoteTask extends AlgRemoteTask {
 	
 	
 	/**
-	 * Setting up this testing algorithm based on specified sample.
+	 * Setting up this algorithm based on specified sample.
 	 * In this current version, this method calls learning method.
 	 * @param sample specified sample.
 	 * @param info additional parameters to set up this algorithm. This parameter is really an array of sub-parameters.
@@ -44,7 +45,17 @@ public interface AlgExtRemoteTask extends AlgRemoteTask {
 
 	
 	/**
-	 * Unset up this testing algorithm, which release resources used by the {@link #setup(Dataset, Object...)} method.
+	 * Setting up this algorithm based on specified sample.
+	 * In this current version, this method calls learning method.
+	 * @param sample specified sample.
+	 * @param info additional parameters to set up this algorithm.
+	 * @throws RemoteException if any error raises.
+	 */
+	void setup(Collection<Profile> sample, Object...info) throws RemoteException;
+
+	
+	/**
+	 * Unset up this algorithm, which release resources used by the {@link #setup(Dataset, Object...)} method.
 	 * Exceptionally, for some algorithm, after this method is called, this algorithm can be used (dependent on specific application).
 	 * So this unsetup method of extensive algorithm should not clear parameter.
 	 * @throws RemoteException if any error raises.

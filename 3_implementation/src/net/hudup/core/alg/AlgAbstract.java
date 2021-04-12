@@ -11,6 +11,7 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 
 import net.hudup.core.ExtraStorage;
+import net.hudup.core.Util;
 import net.hudup.core.alg.SetupAlgEvent.Type;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.logistic.DSUtil;
@@ -307,7 +308,7 @@ public abstract class AlgAbstract implements Alg, AlgRemote {
 	@Override
 	public boolean classPathContains(String className) throws RemoteException {
     	try {
-    		Class.forName(className);
+    		Util.getPluginManager().loadClass(className, false);
     		return true;
     	} catch (Exception e) {}
     	

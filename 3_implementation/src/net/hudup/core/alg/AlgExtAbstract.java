@@ -9,6 +9,7 @@ package net.hudup.core.alg;
 
 import java.rmi.RemoteException;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import net.hudup.core.Util;
@@ -44,9 +45,9 @@ public abstract class AlgExtAbstract extends AlgAbstract implements AlgExt, AlgE
 	
 	
 	/**
-	 * Data sample for testing algorithm.
+	 * Data sample for this algorithm.
 	 */
-	protected Fetcher<Profile> sample = null;
+	protected Object sample = null;
 	
 	
 	/**
@@ -57,21 +58,36 @@ public abstract class AlgExtAbstract extends AlgAbstract implements AlgExt, AlgE
 	}
 
 
+	/**
+	 * Fetching sample from dataset.
+	 * @param dataset specified dataset.
+	 * @return sample fetched from dataset.
+	 */
+	protected abstract Object fetchSample(Dataset dataset);
+	
+	
     /**
      * In the this version, the setup method is not marked synchronized because it calls {@link #learnStart(Object...)} method.
      * Note, method {@link #learnStart(Object...)} can have thread-supporting loop with synchronization.
      */
-	@SuppressWarnings("unchecked")
 	@Override
 	public /*synchronized*/ void setup(Dataset dataset, Object...info) throws RemoteException {
 		unsetup();
 		this.dataset = dataset;
-		if (info != null && info.length > 0 && (info[0] instanceof Fetcher<?>))
-			this.sample = (Fetcher<Profile>)info[0];
+		if (info != null && info.length > 0 && (info[0] instanceof Fetcher<?> || info[0] instanceof Collection<?>)) {
+			this.sample = info[0];
+			if (info.length ==  1)
+				info = null;
+			else
+				info = Arrays.copyOfRange(info, 1, info.length);
+		}
 		else
-			this.sample = dataset.fetchSample();
+			this.sample = fetchSample(dataset);
 		
-		learnStart();
+		if (info != null)
+			learnStart(info);
+		else
+			learnStart();
 		
 		SetupAlgEvent evt = new SetupAlgEvent(
 				this,
@@ -94,10 +110,21 @@ public abstract class AlgExtAbstract extends AlgAbstract implements AlgExt, AlgE
 
 
 	@Override
+	public void setup(Collection<Profile> sample, Object...info) throws RemoteException {
+		List<Object> additionalInfo = Util.newList();
+		additionalInfo.add(sample);
+		additionalInfo.addAll(Arrays.asList(info));
+
+		setup((Dataset)null, additionalInfo.toArray());
+	}
+
+
+	@Override
 	public synchronized void unsetup() throws RemoteException {
 		try {
-			if (dataset != null && sample != null)
-				sample.close();
+			if (dataset != null && sample != null) {
+				if (sample instanceof Fetcher<?>) ((Fetcher<?>)sample).close();
+			}
 		}
 		catch(Exception e) {
 			LogUtil.trace(e);

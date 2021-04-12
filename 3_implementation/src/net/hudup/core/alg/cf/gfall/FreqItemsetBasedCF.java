@@ -514,7 +514,7 @@ abstract class FreqItemsetKB extends KBaseAbstract {
 	
 	@Override
 	public boolean isEmpty() throws RemoteException {
-		return freqResults.size() == 0;
+		return freqResults == null || freqResults.size() == 0;
 	}
 
 	
@@ -522,8 +522,8 @@ abstract class FreqItemsetKB extends KBaseAbstract {
 	public void close() throws Exception {
 		super.close();
 		
-		freqResults.clear();
-		bitItemMap.clear();
+		if (freqResults != null) freqResults.clear();
+		if (bitItemMap != null) bitItemMap.clear();
 	}
 
 

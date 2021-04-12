@@ -58,14 +58,14 @@ public class Evaluator implements AccessPoint {
 		Util.getPluginManager().fire();
 		
 		if (args == null || args.length == 0) {
-			EvalCompoundGUI.switchEvaluator(Constants.DEFAULT_EVALUATOR_NAME, null);
+			EvalCompoundGUI.switchEvaluator(null, null);
 			return;
 		}
 		
 		String evClassName = args[0];
 		net.hudup.core.evaluate.Evaluator ev = null;
 		try {
-			ev = (net.hudup.core.evaluate.Evaluator)Class.forName(evClassName).getDeclaredConstructor().newInstance();
+			ev = (net.hudup.core.evaluate.Evaluator)Util.getPluginManager().loadClass(evClassName, true).getDeclaredConstructor().newInstance();
 		}
 		catch (Throwable e) {
 			ev = null;
@@ -153,7 +153,7 @@ public class Evaluator implements AccessPoint {
 				@Override
 				public boolean classPathContains(String className) throws RemoteException {
 					try {
-						Class.forName(className);
+						Util.getPluginManager().loadClass(className, false);
 						return true;
 					} catch (Exception e) {}
 					

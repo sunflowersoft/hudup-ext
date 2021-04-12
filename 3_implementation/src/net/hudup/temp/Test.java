@@ -16,7 +16,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.io.File;
 import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -153,7 +152,16 @@ public class Test {
 //		}
 		
 //		Path path = Paths.get(new File("working").getAbsolutePath());
-		System.out.println(new File("a b c").toURI().getPath());
+//		System.out.println(new File("a b c").toURI().getPath());
+//		Test.class.getClassLoader().loadClass("net.hudup.core.Util");
+//		Test.class.forName("net.hudup.core.Util");
+		
+//		Class<?> c = Util.getPluginManager().loadClass("net.hudup.core.logistic.ClipboardUtil", false);
+//		if (!c.isAssignableFrom(Object.class)) {
+//			System.out.println("aaaa");
+//		}
+		
+		System.out.print(false);
 	}
 
 	
@@ -229,7 +237,7 @@ public class Test {
 				formalJarUrlList.toArray(new URL[] {})/*, Test.class.getClassLoader()*/);
 		try {
 			//URL c = classLoader.findResource("net/hudup/em/AbstractEM.class");
-			//Class<?> c = Class.forName("org.apache.commons.math3.Field", true, classLoader);
+			//Class<?> c = Util.getPluginManager().loadClass("org.apache.commons.math3.Field", true, classLoader);
 			//System.out.println(c.toString());
 		}
 		catch (Exception e) {

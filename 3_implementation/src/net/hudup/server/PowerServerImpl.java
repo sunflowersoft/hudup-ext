@@ -658,7 +658,7 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 	@Override
 	public boolean classPathContains(String className) throws RemoteException {
     	try {
-    		Class.forName(className);
+    		Util.getPluginManager().loadClass(className, false);
     		return true;
     	} catch (Exception e) {}
     	
@@ -954,7 +954,7 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 	private Alg removeNextUpdateAlg(String algClassName, String algName) {
 		try {
 			@SuppressWarnings("unchecked")
-			Class<? extends Alg> algClass = (Class<? extends Alg>)Class.forName(algClassName);
+			Class<? extends Alg> algClass = (Class<? extends Alg>)Util.getPluginManager().loadClass(algClassName, false);
 			int index = PluginStorage.lookupNextUpdateList(algClass, algName);
 			
 			if (index >= 0)
@@ -979,7 +979,7 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 	private Alg getNextUpdateAlg(String algClassName, String algName) {
 		try {
 			@SuppressWarnings("unchecked")
-			Class<? extends Alg> algClass = (Class<? extends Alg>)Class.forName(algClassName);
+			Class<? extends Alg> algClass = (Class<? extends Alg>)Util.getPluginManager().loadClass(algClassName, false);
 			int index = PluginStorage.lookupNextUpdateList(algClass, algName);
 			
 			if (index >= 0)

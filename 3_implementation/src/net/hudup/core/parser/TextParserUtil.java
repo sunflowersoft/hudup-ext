@@ -769,7 +769,7 @@ public final class TextParserUtil {
 	 */
 	public static Object parseObjectByClass(String string, String className) {
 		try {
-			return parseObjectByClass(string, Class.forName(className));
+			return parseObjectByClass(string, Util.getPluginManager().loadClass(className, false));
 		}
 		catch (Throwable e) {
 			LogUtil.trace(e);

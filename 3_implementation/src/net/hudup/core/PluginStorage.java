@@ -18,6 +18,7 @@ import net.hudup.core.data.Exportable;
 import net.hudup.core.data.ExternalQuery;
 import net.hudup.core.data.ctx.CTSManager;
 import net.hudup.core.evaluate.Evaluator;
+import net.hudup.core.evaluate.EvaluatorAbstract;
 import net.hudup.core.evaluate.Metric;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.parser.DatasetParser;
@@ -602,14 +603,7 @@ public class PluginStorage implements Serializable {
 			Alg alg = algReg.query(pluginAlgName);
 			if ((alg == null) || (alg instanceof NullAlg)) continue;
 			
-			AlgDesc2 algDesc = null;
-			try {
-				algDesc = evaluator.getPluginAlgDesc(alg.getClass(), alg.getName());
-			}
-			catch (Exception e) {
-				algDesc = null;
-				LogUtil.error("Error when evaluator gets plug-in algorithm, caused by " + e.getMessage());
-			}
+			AlgDesc2 algDesc = EvaluatorAbstract.getPluginAlgDesc(evaluator, alg);
 			if (algDesc != null) alg.getConfig().putAll(algDesc.getConfig());
 		}
 		

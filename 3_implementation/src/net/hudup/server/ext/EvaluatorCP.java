@@ -705,7 +705,7 @@ public class EvaluatorCP extends JFrame implements EvaluatorListener {
 	@Override
 	public boolean classPathContains(String className) throws RemoteException {
     	try {
-    		Class.forName(className);
+    		Util.getPluginManager().loadClass(className, false);
     		return true;
     	} catch (Exception e) {}
     	

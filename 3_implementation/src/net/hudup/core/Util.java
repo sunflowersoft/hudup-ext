@@ -352,7 +352,7 @@ public class Util {
 		try {
 			if (className.contains("$")) {
 				try {
-					instance = Class.forName(className).getDeclaredConstructor().newInstance();
+					instance = getPluginManager().loadClass(className, true).getDeclaredConstructor().newInstance();
 				}
 				catch (Throwable e) {
 					System.out.println("Cannot instantiate inner class " + className);
@@ -360,7 +360,7 @@ public class Util {
 				}
 			}
 			else
-				instance = Class.forName(className).getDeclaredConstructor().newInstance();
+				instance = Util.getPluginManager().loadClass(className, true).getDeclaredConstructor().newInstance();
 		} 
 		catch (Throwable e) {
 			LogUtil.trace(e);
@@ -478,7 +478,7 @@ public class Util {
 			if (factoryClassName == null)
 				return new FactoryImpl();
 			else
-				return (Factory)Class.forName(factoryClassName).getDeclaredConstructor().newInstance();
+				return (Factory)Util.getPluginManager().loadClass(factoryClassName, true).getDeclaredConstructor().newInstance();
 		}
 		catch (Throwable e) {
 			LogUtil.trace(e);
@@ -498,7 +498,7 @@ public class Util {
 			if (cipherClassName == null)
 				return new CipherImpl();
 			else
-				return (Cipher)Class.forName(cipherClassName).getDeclaredConstructor().newInstance();
+				return (Cipher)Util.getPluginManager().loadClass(cipherClassName, true).getDeclaredConstructor().newInstance();
 		}
 		catch (Throwable e) {
 			LogUtil.trace(e);
@@ -518,7 +518,7 @@ public class Util {
 			if (jsonParserClassName == null)
 				return new JsonParserImpl();
 			else
-				return (JsonParser)Class.forName(jsonParserClassName).getDeclaredConstructor().newInstance();
+				return (JsonParser)Util.getPluginManager().loadClass(jsonParserClassName, true).getDeclaredConstructor().newInstance();
 		}
 		catch (Throwable e) {
 			LogUtil.trace(e);

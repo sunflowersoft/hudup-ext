@@ -11,6 +11,7 @@ import java.io.Serializable;
 
 import net.hudup.core.Cloneable;
 import net.hudup.core.Constants;
+import net.hudup.core.Util;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.xSubURI;
 import net.hudup.core.logistic.xURI;
@@ -301,10 +302,9 @@ public final class DataDriver implements Cloneable, Serializable {
 	 */
 	public Class<?> getInnerClass() {
 		try {
-			return Class.forName(getInnerClassName());
+			return Util.getPluginManager().loadClass(getInnerClassName(), false);
 		} 
 		catch (Throwable e) {
-			// TODO Auto-generated catch block
 			LogUtil.error("Data driver can not load inner class " + getInnerClassName() + ", caused by " + e.getMessage());
 		}
 		
@@ -316,7 +316,12 @@ public final class DataDriver implements Cloneable, Serializable {
 	 * Loading (reloading) driver which is its inner class name. In current implementation, it call {@link #getInnerClass()} method.
 	 */
 	public void loadDriver() {
-		getInnerClass();
+		try {
+			Util.getPluginManager().loadClass(getInnerClassName(), true);
+		} 
+		catch (Throwable e) {
+			LogUtil.error("Cannot load data driver" + getInnerClassName() + ", caused by " + e.getMessage());
+		}
 	}
 	
 	

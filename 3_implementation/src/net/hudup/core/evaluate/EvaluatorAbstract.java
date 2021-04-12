@@ -797,7 +797,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 	public boolean acceptAlg(String algClassName) throws RemoteException {
 		try {
 			@SuppressWarnings("unchecked")
-			Class<? extends Alg> algClass = (Class<? extends Alg>)Class.forName(algClassName);
+			Class<? extends Alg> algClass = (Class<? extends Alg>)Util.getPluginManager().loadClass(algClassName, false);
 			return acceptAlg(algClass);
 		} catch (Exception e) {LogUtil.trace(e);}
 		
@@ -954,6 +954,20 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 		if (alg == null) return null;
 		
 		return new AlgDesc2(alg);
+	}
+
+
+	@Override
+	public AlgDesc2 getPluginAlgDesc(String algClassName, String algName) throws RemoteException {
+		try {
+			@SuppressWarnings("unchecked")
+			Class<? extends Alg> algClass = (Class<? extends Alg>) Util.getPluginManager().loadClass(algClassName, false);
+			return getPluginAlgDesc(algClass, algName);
+		}
+		catch (Throwable e) {
+			LogUtil.error("Error when evaluator gets plug-in algorithm description, caused by " + e.getMessage());
+		}
+		return null;
 	}
 
 
@@ -1711,7 +1725,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
     @Override
 	public boolean classPathContains(String className) throws RemoteException {
     	try {
-    		Class.forName(className);
+    		Util.getPluginManager().loadClass(className, false);
     		return true;
     	} catch (Exception e) {}
     	
@@ -2401,6 +2415,41 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 			}
 		}
 		
+	}
+	
+	
+	/**
+	 * Getting algorithm description from evaluator.
+	 * @param evaluator specified evaluator.
+	 * @param alg specified algorithm.
+	 * @return algorithm description from evaluator.
+	 */
+	public static AlgDesc2 getPluginAlgDesc(Evaluator evaluator, Alg alg) {
+		if (evaluator == null || alg == null) return null;
+		
+		AlgDesc2 algDesc = null;
+		Class<? extends Alg> algClass = null;
+		String algName = null;
+		try {
+			algClass = alg.getClass();
+			algName = alg.getName();
+			algDesc = evaluator.getPluginAlgDesc(algClass, algName);
+		}
+		catch (RemoteException e) {
+			algDesc = null;
+			try {
+				algDesc = evaluator.getPluginAlgDesc(algClass.getName(), algName);
+			}
+			catch (Exception e1) {
+				LogUtil.error("Error when evaluator gets plug-in algorithm description, caused by " + e1.getMessage());
+			}
+		}
+		catch (Exception e) {
+			algDesc = null;
+			LogUtil.error("Error when evaluator gets plug-in algorithm description, caused by " + e.getMessage());
+		}
+		
+		return algDesc;
 	}
 	
 	

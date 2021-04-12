@@ -97,7 +97,7 @@ public class SocketClassLoaderServer0 extends AbstractRunner {
 					else {
 						Class<?> cls = null;
 						try {
-							cls = Util.getPluginManager().loadClass(requestText);
+							cls = Util.getPluginManager().loadClass(requestText, false);
 						}
 						catch (Exception e) {LogUtil.trace(e);}
 						

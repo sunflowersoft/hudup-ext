@@ -9,6 +9,7 @@ package net.hudup.core.alg;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
+import java.util.Collection;
 
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Dataset;
@@ -31,6 +32,10 @@ public interface AlgExtRemote extends AlgExtRemoteTask, AlgRemote {
 	
 	@Override
 	void setup(Fetcher<Profile> sample, Object...info) throws RemoteException;
+
+	
+	@Override
+	void setup(Collection<Profile> sample, Object...info) throws RemoteException;
 
 	
 	@Override

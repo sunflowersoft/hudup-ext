@@ -417,7 +417,6 @@ class ProfileTableModel extends DefaultTableModel implements TableModelListener 
 			fetcher.reset();;
 		} 
 		catch (Throwable e) {
-			// TODO Auto-generated catch block
 			LogUtil.trace(e);
 		}
 		
@@ -491,7 +490,6 @@ class ProfileTableModel extends DefaultTableModel implements TableModelListener 
 	
 	@Override
 	public boolean isCellEditable(int row, int column) {
-		// TODO Auto-generated method stub
 		return isEditable();
 	}
 
@@ -514,7 +512,6 @@ class ProfileTableModel extends DefaultTableModel implements TableModelListener 
 	
 	@Override
 	public Class<?> getColumnClass(int columnIndex) {
-		// TODO Auto-generated method stub
 		if (attRef == null || columnIndex >= attRef.size())
 			return super.getColumnClass(columnIndex);
 		
@@ -526,7 +523,6 @@ class ProfileTableModel extends DefaultTableModel implements TableModelListener 
 	@NextUpdate
 	@Override
 	public void tableChanged(TableModelEvent e) {
-		// TODO Auto-generated method stub
 //		System.out.println("ProfileTableModel.tableChanged(TableModelEvent) not implemented yet");
 //		apply(); //This code line is not optimized, which is a work-around solution.
 	}

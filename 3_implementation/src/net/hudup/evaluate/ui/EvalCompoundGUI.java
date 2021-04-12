@@ -686,7 +686,7 @@ public class EvalCompoundGUI extends JFrame {
 		if (selectedEvName != null) {
 			for (Evaluator ev : evList) {
 				try {
-					if (ev.getName().equals(Constants.DEFAULT_EVALUATOR_NAME)) {
+					if (ev.getName().equals(selectedEvName)) {
 						initialEv = ev;
 						break;
 					}
@@ -799,7 +799,7 @@ public class EvalCompoundGUI extends JFrame {
 		if (selectedEvName != null) {
 			for (Evaluator ev : evList) {
 				try {
-					if (ev.getName().equals(Constants.DEFAULT_EVALUATOR_NAME)) {
+					if (ev.getName().equals(selectedEvName)) {
 						initialEv = ev;
 						break;
 					}

@@ -12,6 +12,7 @@ import java.lang.reflect.Constructor;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
+import net.hudup.core.Util;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.logistic.BaseClass;
 import net.hudup.core.logistic.DSUtil;
@@ -286,7 +287,7 @@ public class AlgRemoteWrapper implements Alg, AlgRemote, Serializable {
 	@Override
 	public boolean classPathContains(String className) throws RemoteException {
     	try {
-    		Class.forName(className);
+    		Util.getPluginManager().loadClass(className, false);
     		return true;
     	} catch (Exception e) {}
     	

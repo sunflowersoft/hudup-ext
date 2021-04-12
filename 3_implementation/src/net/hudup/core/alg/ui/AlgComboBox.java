@@ -54,7 +54,6 @@ public class AlgComboBox extends JComboBox<Alg> implements AlgListUI {
 
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				// TODO Auto-generated method stub
 				if (!getThis().isEnabled())
 					return;
 				
@@ -191,7 +190,6 @@ public class AlgComboBox extends JComboBox<Alg> implements AlgListUI {
 
 			@Override
 			public int compare(Alg alg1, Alg alg2) {
-				// TODO Auto-generated method stub
 				return alg1.getName().compareTo(alg2.getName());
 			}
 		});
@@ -250,7 +248,7 @@ public class AlgComboBox extends JComboBox<Alg> implements AlgListUI {
 		}
 		
 		try {
-			Class<?> c = Class.forName(name);
+			Class<?> c = Util.getPluginManager().loadClass(name, false);
 			if (Alg.class.isAssignableFrom(c))
 				return findItem((Class<? extends Alg>)c);
 		}

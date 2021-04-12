@@ -811,7 +811,7 @@ class ImportAlgDlg extends JDialog {
 				if (algDesc.baseRemoteInterfaceNames != null) {
 					for (String iName : algDesc.baseRemoteInterfaceNames) {
 						try {
-							Class.forName(iName);
+							Util.getPluginManager().loadClass(iName, false);
 						}
 						catch (Throwable e) {
 							LogUtil.error("Interface '" + iName + "' not exists, error by " + e.getMessage());

@@ -27,7 +27,6 @@ import net.hudup.core.PluginStorage;
 import net.hudup.core.RegisterTable;
 import net.hudup.core.Util;
 import net.hudup.core.alg.Alg;
-import net.hudup.core.alg.AlgDesc;
 import net.hudup.core.alg.AlgDesc2;
 import net.hudup.core.alg.NullAlg;
 import net.hudup.core.alg.SetupAlgEvent;
@@ -385,7 +384,7 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 		try {
 			boolean classPathContains = true;
 			try {
-				Class.forName(evaluator.getClassName());
+				Util.getPluginManager().loadClass(evaluator.getClassName(), false);
 			}
 			catch (Throwable e) {classPathContains = false;}
 			
@@ -829,7 +828,7 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	@Override
 	public boolean classPathContains(String className) throws RemoteException {
     	try {
-    		Class.forName(className);
+    		Util.getPluginManager().loadClass(className, false);
     		return true;
     	} catch (Exception e) {}
     	
@@ -1023,10 +1022,7 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 			Alg alg = algRegTable.query(algName);
 			if (alg instanceof NullAlg) continue;
 			
-			AlgDesc algDesc = null;
-			try {
-				algDesc = evaluator.getPluginAlgDesc(alg.getClass(), alg.getName());
-			} catch (Exception e) {LogUtil.error("Error when evaluator gets plug-in algorithm, caused by " + e.getMessage());}
+			AlgDesc2 algDesc = EvaluatorAbstract.getPluginAlgDesc(evaluator, alg);
 			if (algDesc != null) alg.getConfig().putAll(algDesc.getConfig());
 		}
 	}

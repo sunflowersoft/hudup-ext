@@ -269,7 +269,7 @@ public interface ProviderAssoc extends AutoCloseable {
 	 * @author Loc Nguyen
 	 * @version 1.0
 	 */
-	interface CsvReader {
+	public static interface CsvReader {
 		
 		/**
 		 * Reading header of CSV file.

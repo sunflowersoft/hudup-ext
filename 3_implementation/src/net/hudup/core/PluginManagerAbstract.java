@@ -64,7 +64,6 @@ import net.hudup.core.evaluate.MetricRemote;
 import net.hudup.core.evaluate.MetricRemoteWrapper;
 import net.hudup.core.evaluate.MetricWrapper;
 import net.hudup.core.logistic.BaseClass;
-import net.hudup.core.logistic.ClassLoader2;
 import net.hudup.core.logistic.Composite;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.NextUpdate;
@@ -462,17 +461,23 @@ public abstract class PluginManagerAbstract implements PluginManager {
 
 	
 	@Override
-	public Class<?> loadClass(String name) throws ClassNotFoundException {
+	public Class<?> loadClass(String name, boolean initialized) throws ClassNotFoundException {
 		Class<?> foundClass = null;
 		try {
-			foundClass = Class.forName(name);
+			if (initialized)
+				foundClass = Class.forName(name);
+			else
+				foundClass = Class.forName(name, initialized, this.getClass().getClassLoader());
 		}
 		catch (ClassNotFoundException e) {}
 		if (foundClass != null) return foundClass;
 		
 		for (ClassLoader classLoader : extraClassLoaders) {
 			try {
-				foundClass = classLoader.loadClass(name);
+				if (initialized)
+					foundClass = Class.forName(name, initialized, classLoader);
+				else
+					foundClass = classLoader.loadClass(name);
 			}
 			catch (ClassNotFoundException e) {
 				foundClass = null;
@@ -636,7 +641,6 @@ public abstract class PluginManagerAbstract implements PluginManager {
 					//Finding class.
 					Class<?> cls = null;
 					try {
-//						cls = Class.forName(classPath, true, classLoader);
 						cls = ClassLoader2.findClass(classLoader, classPath);
 					}
 					catch (Throwable e) {
@@ -652,7 +656,7 @@ public abstract class PluginManagerAbstract implements PluginManager {
 //					if (outClassList != null || outObjList != null) {
 //						cls = null;
 //						try {
-//							cls = Class.forName(classPath, true, classLoader);
+//							cls = ClassLoader2.findClass(classLoader, classPath);
 //						}
 //						catch (Throwable e) {
 //							System.out.println("Initializing class \"" + classPath + "\" error");
@@ -891,5 +895,98 @@ public abstract class PluginManagerAbstract implements PluginManager {
 		
 	}
 	
+	
+}
+
+
+
+/**
+ * This is an extension of URL class loader with support of finding classes.
+ * 
+ * @author Loc Nguyen
+ * @version 1.0
+ *
+ */
+class ClassLoader2 extends URLClassLoader {
+
+	
+	/**
+	 * Internal URL class loader.
+	 */
+	protected URLClassLoader cl = null;
+	
+	
+	/**
+	 * Constructor with other URL class loader.
+	 * @param cl other URL class loader.
+	 */
+	public ClassLoader2(URLClassLoader cl) {
+		super(new URL[0]);
+		this.cl = cl;
+	}
+
+
+	@Override
+	protected Class<?> findClass(String name) throws ClassNotFoundException {
+		if (cl == null) return null;
+		
+	    Method method = null;
+		try {
+		    method = URLClassLoader.class.getDeclaredMethod("findClass", String.class);
+		    method.setAccessible(true);
+		}
+		catch (Exception e) {
+			method = null;
+		}
+		if (method == null) return null;
+		
+		try {
+		    return (Class<?>)method.invoke(cl, name);
+		}
+		catch (Exception e) {}
+		
+		return null;
+	}
+
+	
+	/**
+	 * Loading class by name.
+	 * @param cl class loader.
+	 * @param name specified.
+	 * @return class given name.
+	 */
+	public static Class<?> findClass(ClassLoader cl, String name) {
+		if (cl == null || name == null) return null;
+		
+		if (cl instanceof URLClassLoader) {
+			ClassLoader2 cl2 = new ClassLoader2((URLClassLoader)cl);
+			Class<?> cls = null;
+			try {
+				cls = cl2.findClass(name);
+			}
+			catch (Exception e) {
+			}
+			finally {
+				try {
+					cl2.close();
+				}
+				catch (Exception e) {}
+			}
+			if (cls != null) return cls;
+		}
+		
+		try {
+			Class<?> cls = cl.loadClass(name);
+			if (cls != null) return cls;
+		} catch (Exception e) {}
+		
+		try {
+			Class<?> cls = Class.forName(name, false, cl);
+			if (cls != null) return cls;
+		} catch (Exception e) {}
+		
+		return null;
+	}
+
 	
 }

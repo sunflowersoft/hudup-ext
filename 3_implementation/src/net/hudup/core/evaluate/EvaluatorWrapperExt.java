@@ -228,6 +228,12 @@ public class EvaluatorWrapperExt implements Evaluator, EvaluatorListener, Evalua
 
 
 	@Override
+	public AlgDesc2 getPluginAlgDesc(String algClassName, String algName) throws RemoteException {
+		return remoteEvaluator.getPluginAlgDesc(algClassName, algName);
+	}
+
+
+	@Override
 	public AlgDesc2 getPluginNormalAlgDesc(String algName) throws RemoteException {
 		return remoteEvaluator.getPluginNormalAlgDesc(algName);
 	}
@@ -352,7 +358,7 @@ public class EvaluatorWrapperExt implements Evaluator, EvaluatorListener, Evalua
 	public List<EventObject> doTask2(UUID listenerID) throws RemoteException {
 		boolean classPathContains = true;
 		try {
-			Class.forName(remoteEvaluator.getClassName());
+			Util.getPluginManager().loadClass(remoteEvaluator.getClassName(), false);
 		}
 		catch (Throwable e) {classPathContains = false;}
 
@@ -412,7 +418,7 @@ public class EvaluatorWrapperExt implements Evaluator, EvaluatorListener, Evalua
 		
 		boolean classPathContains = true;
 		try {
-			Class.forName(remoteEvaluator.getClassName());
+			Util.getPluginManager().loadClass(remoteEvaluator.getClassName(), false);
 		}
 		catch (Throwable e) {classPathContains = false;}
 		

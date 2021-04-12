@@ -34,14 +34,16 @@ public abstract class Watcher extends DirWatcher {
 	 * Default constructor.
 	 */
 	public Watcher() {
-		super(PERIOD*1000, PERIOD*1000);
+		super(PERIOD*1000, false);
 		setPriority(Priority.min);
 	}
 	
 	
 	@Override
 	public synchronized boolean start() {
-		return start(Paths.get(Constants.LIB_DIRECTORY), false);
+		boolean ret = super.start();
+		if (ret) register(Paths.get(Constants.LIB_DIRECTORY));
+		return ret;
 	}
 
 	

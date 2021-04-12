@@ -328,6 +328,12 @@ public class EvaluatorWrapper implements Evaluator, Serializable {
 
 
 	@Override
+	public AlgDesc2 getPluginAlgDesc(String algClassName, String algName) throws RemoteException {
+		return remoteEvaluator.getPluginAlgDesc(algClassName, algName);
+	}
+
+
+	@Override
 	public AlgDesc2 getPluginNormalAlgDesc(String algName) throws RemoteException {
 		return remoteEvaluator.getPluginNormalAlgDesc(algName);
 	}

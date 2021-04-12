@@ -64,7 +64,7 @@ public class RecommendContextPrefilterImpl extends CompositeRecommenderAbstract 
 		
 		Recommender recommender = null;
 		try {
-			recommender = (Recommender) Class.forName(INNER_RECOMMENDER).getDeclaredConstructor().newInstance();
+			recommender = (Recommender) Util.getPluginManager().loadClass(INNER_RECOMMENDER, true).getDeclaredConstructor().newInstance();
 		}
 		catch (Throwable e) {
 			LogUtil.info("Inner recommender " + INNER_RECOMMENDER + " initiated " + this.getClass() + " not exist");

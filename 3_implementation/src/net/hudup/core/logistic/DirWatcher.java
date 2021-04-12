@@ -18,7 +18,6 @@ import java.nio.file.FileSystems;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
@@ -60,29 +59,16 @@ public abstract class DirWatcher extends Timer2 {
 	/**
 	 * Constructor with period.
 	 * @param period period time in miliseconds.
+	 * @param recursive recursive mode.
 	 */
-    public DirWatcher(long period) {
-    	super(period);
+    public DirWatcher(long period, boolean recursive) {
+    	super(period, period);
+    	this.recursive = recursive;
     }
 
     
-	/**
-	 * Constructor with delay and period.
-	 * @param delay delay time in miliseconds.
-	 * @param period period time in miliseconds.
-	 */
-    public DirWatcher(long delay, long period) {
-    	super(delay, period);
-    }
-    
-    
-    /**
-     * Start watching the specified directory.
-     * @param watchedDir specified directory.
-     * @param recursive recursive mode.
-     * @return true if watching is successful.
-     */
-    public synchronized boolean start(Path watchedDir, boolean recursive) {
+	@Override
+	public synchronized boolean start() {
     	if (isStarted()) return false;
     	
     	clear();
@@ -92,24 +78,26 @@ public abstract class DirWatcher extends Timer2 {
 		}
     	catch (Exception e) {LogUtil.trace(e);}
 
-    	if (recursive)
-    		registerAll(watchedDir);
+    	if (watcher != null)
+    		return super.start();
     	else
-    		register(watchedDir);
-    	this.recursive = recursive;
-    	
-    	return super.start();
-    }
-    
-    
-	@Override
-	public synchronized boolean start() {
-		return start(Paths.get("."), false);
+    		return false;
 	}
 
 
+	
     @Override
 	protected void task() {
+    	synchronized (watcher) {
+			task0();
+		}
+	}
+
+    
+    /**
+     * Task definition.
+     */
+    private void task0() {
     	WatchKey key = null;
     	try {
     		key = watcher.poll(period, TimeUnit.MILLISECONDS);
@@ -135,7 +123,7 @@ public abstract class DirWatcher extends Timer2 {
 
             if (kind == ENTRY_CREATE) {
             	if (recursive && Files.isDirectory(entry, NOFOLLOW_LINKS))
-            		registerAll(entry);
+            		registerAll0(entry);
             	else {
             		onCreate(entry);
             	}
@@ -151,9 +139,92 @@ public abstract class DirWatcher extends Timer2 {
         //Reset key
         boolean valid = key.reset();
         if (!valid) keys.remove(key);
+    }
+    
+    
+    /**
+     * Register to watch specified directory.
+     * @param watchedDir specified directory.
+     * @return true if registering is successful.
+     */
+    public boolean register(Path watchedDir) {
+    	if (watcher == null || watchedDir == null) return false;
+    	
+    	synchronized (watcher) {
+        	if (recursive)
+        		return registerAll0(watchedDir);
+        	else
+        		return register0(watchedDir);
+		}
+    }
+    
+    
+    /**
+     * Registering watched directory and all its sub-directories.
+     * @param dir watched directory.
+     * @return true if registering is successful.
+     */
+    private boolean registerAll0(Path startDir) {
+    	try {
+    		System.out.format("Scanning %s ...\n", startDir);
+			Files.walkFileTree(startDir, new SimpleFileVisitor<Path>() {
+				 
+				@Override
+				public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+					register0(dir);
+					return FileVisitResult.CONTINUE;
+				}
+			     
+			});
+			System.out.println("Done.");
+			return true;
+    	}
+    	catch (Exception e) {
+    		LogUtil.trace(e);
+    	}
+    	
+    	return false;
+    }
+    
+    
+    /**
+     * Registering watched directory.
+     * @param dir watched directory.
+     * @return true if registering is successful.
+     */
+    private boolean register0(Path dir) {
+    	try {
+			WatchKey key = dir.register(watcher, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);
+			Path prev = keys.get(key);
+			if (prev == null)
+				System.out.format("Register: %s\n", dir);
+			else {
+				if (!dir.equals(prev)) System.out.format("Update: %s -> %s\n", prev, dir);
+			}
+			
+			keys.put(key, dir);
+			return true;
+    	}
+    	catch (Exception e) {
+    		LogUtil.trace(e);
+    	}
+    	
+    	return false;
+    }
+    
+    
+	@Override
+	protected void clear() {
+    	if (watcher != null) {
+    		try {watcher.close();}
+    		catch (Throwable e) {LogUtil.trace(e);}
+    		watcher = null;
+    	}
+    	
+    	keys.clear();
 	}
 
-    
+
     /**
      * Event-driven method for entry creation.
      * @param entry event-driven entry.
@@ -178,61 +249,4 @@ public abstract class DirWatcher extends Timer2 {
     protected abstract boolean onModify(Path entry);
     
     
-    /**
-     * Registering watched directory and all its sub-directories.
-     * @param dir watched directory.
-     */
-    private void registerAll(Path startDir) {
-    	try {
-    		System.out.format("Scanning %s ...\n", startDir);
-			Files.walkFileTree(startDir, new SimpleFileVisitor<Path>() {
-				 
-				@Override
-				public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
-					register(dir);
-					return FileVisitResult.CONTINUE;
-				}
-			     
-			});
-			System.out.println("Done.");
-    	}
-    	catch (Exception e) {
-    		LogUtil.trace(e);
-    	}
-    }
-    
-    
-    /**
-     * Registering watched directory.
-     * @param dir watched directory.
-     */
-    private void register(Path dir) {
-    	try {
-			WatchKey key = dir.register(watcher, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);
-			Path prev = keys.get(key);
-			if (prev == null)
-				System.out.format("Register: %s\n", dir);
-			else {
-				if (!dir.equals(prev)) System.out.format("Update: %s -> %s\n", prev, dir);
-			}
-			
-			keys.put(key, dir);
-    	}
-    	catch (Exception e) {
-    		LogUtil.trace(e);
-    	}
-    }
-    
-    
-	@Override
-	protected void clear() {
-    	if (watcher != null) {
-    		try {watcher.close();}
-    		catch (Throwable e) {LogUtil.trace(e);}
-    		watcher = null;
-    	}
-		recursive = false;
-	}
-
-
 }

@@ -3,6 +3,7 @@ package net.hudup.core.alg;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
+import net.hudup.core.Util;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.Datasource;
@@ -230,7 +231,7 @@ public class KBaseRemoteWrapper implements KBase, KBaseRemote {
 	@Override
 	public boolean classPathContains(String className) throws RemoteException {
     	try {
-    		Class.forName(className);
+    		Util.getPluginManager().loadClass(className, false);
     		return true;
     	} catch (Exception e) {}
     	

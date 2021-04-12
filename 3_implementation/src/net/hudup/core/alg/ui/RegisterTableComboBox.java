@@ -18,6 +18,7 @@ import javax.swing.SwingUtilities;
 import net.hudup.core.PluginStorage;
 import net.hudup.core.RegisterTable;
 import net.hudup.core.RegisterTableList;
+import net.hudup.core.Util;
 import net.hudup.core.RegisterTableList.RegisterTableItem;
 import net.hudup.core.alg.Alg;
 
@@ -208,7 +209,7 @@ public class RegisterTableComboBox extends JComboBox<RegisterTableItem> {
 		}
 		
 		try {
-			Class<?> c = Class.forName(name);
+			Class<?> c = Util.getPluginManager().loadClass(name, false);
 			if (Alg.class.isAssignableFrom(c))
 				return findItem((Class<? extends Alg>)c);
 		}

@@ -179,148 +179,148 @@ class HudupProviderAssoc extends ProviderAssocAbstract {
 	
 	@Override
 	public boolean createUnit(String unitName, AttributeList attList) {
-		System.out.println("Hudup server does not provide any Provider or ProviderAssoc and so this HudupProviderAssoc is only pointer to Hudup server.");
-		return false; //Fixing bug date: 2019.08.07 by Loc Nguyen
+		System.out.println("HudupProviderAssoc does not support this method.");
+		return false;
 	}
 
 	
 	@Override
 	public boolean deleteUnitData(String unitName) {
-		System.out.println("Hudup server does not provide any Provider or ProviderAssoc and so this HudupProviderAssoc is only pointer to Hudup server.");
-		return false; //Fixing bug date: 2019.08.07 by Loc Nguyen
+		System.out.println("HudupProviderAssoc does not support this method.");
+		return false;
 	}
 
 	
 	@Override
 	public boolean dropUnit(String unitName) {
-		System.out.println("Hudup server does not provide any Provider or ProviderAssoc and so this HudupProviderAssoc is only pointer to Hudup server.");
-		return false; //Fixing bug date: 2019.08.07 by Loc Nguyen
+		System.out.println("HudupProviderAssoc does not support this method.");
+		return false;
 	}
 
 	
 	@Override
 	public UnitList getUnitList() {
-		System.out.println("Hudup server does not provide any Provider or ProviderAssoc and so this HudupProviderAssoc is only pointer to Hudup server.");
-		return new UnitList(); //Fixing bug date: 2019.08.07 by Loc Nguyen
+		System.out.println("HudupProviderAssoc does not support this method.");
+		return new UnitList();
 	}
 
 	
 	@Override
 	public NominalList getNominalList(String filterUnit, String attName) {
-		System.out.println("Hudup server does not provide any Provider or ProviderAssoc and so this HudupProviderAssoc is only pointer to Hudup server.");
-		return new NominalList(); //Fixing bug date: 2019.08.07 by Loc Nguyen
+		System.out.println("HudupProviderAssoc does not support this method.");
+		return new NominalList();
 	}
 
 	
 	@Override
 	public AttributeList getAttributes(String profileUnit) {
-		System.out.println("Hudup server does not provide any Provider or ProviderAssoc and so this HudupProviderAssoc is only pointer to Hudup server.");
-		return new AttributeList(); //Fixing bug date: 2019.08.07 by Loc Nguyen
+		System.out.println("HudupProviderAssoc does not support this method.");
+		return new AttributeList();
 	}
 
 	
 	@Override
 	public AttributeList getAttributes(ParamSql selectSql, Profile condition) {
-		System.out.println("Hudup server does not provide any Provider or ProviderAssoc and so this HudupProviderAssoc is only pointer to Hudup server.");
-		return new AttributeList(); //Fixing bug date: 2019.08.07 by Loc Nguyen
+		System.out.println("HudupProviderAssoc does not support this method.");
+		return new AttributeList();
 	}
 
 	
 	@Override
 	public boolean containsProfile(String profileUnit, Profile profile) {
-		System.out.println("Hudup server does not provide any Provider or ProviderAssoc and so this HudupProviderAssoc is only pointer to Hudup server.");
-		return false; //Fixing bug date: 2019.08.07 by Loc Nguyen
+		System.out.println("HudupProviderAssoc does not support this method.");
+		return false;
 	}
 
 	
 	@Override
 	public Profile getProfile(String profileUnit, Profile condition) {
-		System.out.println("Hudup server does not provide any Provider or ProviderAssoc and so this HudupProviderAssoc is only pointer to Hudup server.");
-		return null; //Fixing bug date: 2019.08.07 by Loc Nguyen
+		System.out.println("HudupProviderAssoc does not support this method.");
+		return null;
 	}
 
 	
 	@Override
 	public Fetcher<Profile> getProfiles(String profileUnit, Profile condition) {
-		System.out.println("Hudup server does not provide any Provider or ProviderAssoc and so this HudupProviderAssoc is only pointer to Hudup server.");
-		return new MemFetcher<Profile>(); //Fixing bug date: 2019.08.07 by Loc Nguyen
+		System.out.println("HudupProviderAssoc does not support this method.");
+		return new MemFetcher<Profile>();
 	}
 
 	
 	@Override
 	public Collection<Profile> getProfiles2(String profileUnit, Profile condition) {
-		System.out.println("Hudup server does not provide any Provider or ProviderAssoc and so this HudupProviderAssoc is only pointer to Hudup server.");
+		System.out.println("HudupProviderAssoc does not support this method.");
 		return Util.newList();
 	}
 
 	
 	@Override
 	public Fetcher<Profile> getProfiles(ParamSql selectSql, Profile condition) {
-		System.out.println("Hudup server does not provide any Provider or ProviderAssoc and so this HudupProviderAssoc is only pointer to Hudup server.");
-		return new MemFetcher<Profile>(); //Fixing bug date: 2019.08.07 by Loc Nguyen
+		System.out.println("HudupProviderAssoc does not support this method.");
+		return new MemFetcher<Profile>();
 	}
 
 	
 	@Override
 	public Collection<Profile> getProfiles2(ParamSql selectSql, Profile condition) {
-		System.out.println("Hudup server does not provide any Provider or ProviderAssoc and so this HudupProviderAssoc is only pointer to Hudup server.");
+		System.out.println("HudupProviderAssoc does not support this method.");
 		return Util.newList();
 	}
 
 	
 	@Override
 	public Fetcher<Integer> getProfileIds(String profileUnit) {
-		System.out.println("Hudup server does not provide any Provider or ProviderAssoc and so this HudupProviderAssoc is only pointer to Hudup server.");
-		return new MemFetcher<Integer>(); //Fixing bug date: 2019.08.07 by Loc Nguyen
+		System.out.println("HudupProviderAssoc does not support this method.");
+		return new MemFetcher<Integer>();
 	}
 
 	
 	@Override
 	public Collection<Integer> getProfileIds2(String profileUnit) {
-		System.out.println("Hudup server does not provide any Provider or ProviderAssoc and so this HudupProviderAssoc is only pointer to Hudup server.");
+		System.out.println("HudupProviderAssoc does not support this method.");
 		return Util.newList();
 	}
 
 	
 	@Override
 	public int getProfileMaxId(String profileUnit) {
-		System.out.println("Hudup server does not provide any Provider or ProviderAssoc and so this HudupProviderAssoc is only pointer to Hudup server.");
-		return -1; //Fixing bug date: 2019.08.07 by Loc Nguyen
+		System.out.println("HudupProviderAssoc does not support this method.");
+		return -1;
 	}
 
 	
 	@Override
 	public boolean insertProfile(String profileUnit, Profile profile) {
-		System.out.println("Hudup server does not provide any Provider or ProviderAssoc and so this HudupProviderAssoc is only pointer to Hudup server.");
-		return false; //Fixing bug date: 2019.08.07 by Loc Nguyen
+		System.out.println("HudupProviderAssoc does not support this method.");
+		return false;
 	}
 
 	
 	@Override
 	public boolean updateProfile(String profileUnit, Profile profile) {
-		System.out.println("Hudup server does not provide any Provider or ProviderAssoc and so this HudupProviderAssoc is only pointer to Hudup server.");
-		return false; //Fixing bug date: 2019.08.07 by Loc Nguyen
+		System.out.println("HudupProviderAssoc does not support this method.");
+		return false;
 	}
 
 	
 	@Override
 	public boolean deleteProfile(String profileUnit, Profile condition) {
-		System.out.println("Hudup server does not provide any Provider or ProviderAssoc and so this HudupProviderAssoc is only pointer to Hudup server.");
-		return false; //Fixing bug date: 2019.08.07 by Loc Nguyen
+		System.out.println("HudupProviderAssoc does not support this method.");
+		return false;
 	}
 
 	
 	@Override
 	public CsvReader getReader(String unit) {
-		System.out.println("Hudup server does not provide any Provider or ProviderAssoc and so this HudupProviderAssoc is only pointer to Hudup server.");
-		return null; //Fixing bug date: 2019.08.07 by Loc Nguyen
+		System.out.println("HudupProviderAssoc does not support this method.");
+		return null;
 	}
 
 
 	@Override
 	public CsvWriter getWriter(String unit, boolean append) {
-		System.out.println("Hudup server does not provide any Provider or ProviderAssoc and so this HudupProviderAssoc is only pointer to Hudup server.");
-		return null; //Fixing bug date: 2019.08.07 by Loc Nguyen
+		System.out.println("HudupProviderAssoc does not support this method.");
+		return null;
 	}
 
 

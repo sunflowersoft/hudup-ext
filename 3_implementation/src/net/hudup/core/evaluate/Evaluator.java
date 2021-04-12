@@ -337,6 +337,16 @@ public interface Evaluator extends Remote, RemoteRunner, SetupAlgListener, Plugi
     
     
     /**
+     * Getting description of a plug-in algorithm.
+     * @param algClassName specified algorithm class name.
+     * @param algName algorithm name.
+     * @return description of a plug-in algorithm.
+     * @throws RemoteException if any error raises.
+     */
+    AlgDesc2 getPluginAlgDesc(String algClassName, String algName) throws RemoteException;
+
+    
+    /**
      * Getting description of a plug-in normal algorithm.
      * @param algName algorithm name.
      * @return description of a plug-in normal algorithm.
