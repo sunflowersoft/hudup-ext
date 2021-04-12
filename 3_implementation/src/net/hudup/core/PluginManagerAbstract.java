@@ -469,21 +469,39 @@ public abstract class PluginManagerAbstract implements PluginManager {
 			else
 				foundClass = Class.forName(name, initialized, this.getClass().getClassLoader());
 		}
-		catch (ClassNotFoundException e) {}
+		catch (Exception e) {}
 		if (foundClass != null) return foundClass;
 		
-		for (ClassLoader classLoader : extraClassLoaders) {
-			try {
-				if (initialized)
-					foundClass = Class.forName(name, initialized, classLoader);
-				else
-					foundClass = classLoader.loadClass(name);
+		
+		try {
+			for (ClassLoader classLoader : extraClassLoaders) {
+				try {
+					if (initialized)
+						foundClass = Class.forName(name, initialized, classLoader);
+					else
+						foundClass = classLoader.loadClass(name);
+				}
+				catch (Exception e) {}
+				if (foundClass != null) return foundClass;
 			}
-			catch (ClassNotFoundException e) {
-				foundClass = null;
+		} catch (Exception e) {}
+		
+		
+		try {
+			List<Alg> algList = PluginStorage.getAlgListByClassName(name);
+			for (Alg alg : algList) {
+				try {
+					ClassLoader classLoader = alg.getClass().getClassLoader();
+					if (initialized)
+						foundClass = Class.forName(name, initialized, classLoader);
+					else
+						foundClass = classLoader.loadClass(name);
+				}
+				catch (Exception e) {}
+				if (foundClass != null) return foundClass;
 			}
-			if (foundClass != null) return foundClass;
-		}
+		} catch (Exception e) {}
+		
 		
 		throw new ClassNotFoundException("Class " + name + " not found");
 	}

@@ -425,6 +425,31 @@ public class PluginStorage implements Serializable {
 
 		
 	/**
+	 * Getting algorithm list by algorithm class name.
+	 * @param algClassName algorithm class name.
+	 * @return algorithm list.
+	 */
+	public final static List<Alg> getAlgListByClassName(String algClassName) {
+		List<Alg> algList = Util.newList();
+		if (algClassName == null) return algList;
+		
+		RegisterTableList list = getRegisterTableList();
+		for (int i = 0; i < list.size(); i++) {
+			RegisterTable table = list.get(i).registerTable;
+			algList.addAll(table.getAlgListByClassName(algClassName));
+		}
+		
+		for (int i = 0; i < nextUpdateList.size(); i++) {
+			Alg alg = nextUpdateList.get(i); 
+			if (alg.getClass().getName().equals(algClassName))
+				algList.add(alg);
+		}
+		
+		return algList;
+	}
+	
+	
+	/**
 	 * Looking whether the specified algorithm stored in next update list.
 	 * @param alg specified algorithm class.
 	 * @return the index of the specified algorithm stored in next update list.
@@ -455,6 +480,28 @@ public class PluginStorage implements Serializable {
 			String tableName1 = PluginStorage.lookupTableName(algClass);
 			String tableName2 = PluginStorage.lookupTableName(alg.getClass()); 
 			if (tableName1 != null && tableName2 != null && tableName1.equals(tableName2))
+				return i;
+		}
+
+		return -1;
+	}
+	
+	
+	/**
+	 * Looking whether the specified algorithm class name and algorithm name stored in next update list.
+	 * Using this algorithm is careful because that specified class name is not exactly the the class name of the algorithm that has the specified name,
+	 * maybe such class name is class name of the super class-interface. However, this method is always right in the found case.
+	 * @param algClass specified algorithm class name.
+	 * @param algName specified algorithm name.
+	 * @return the index of the specified algorithm class name and algorithm name stored in next update list.
+	 * Return -1 if not found.
+	 */
+	public final static int lookupNextUpdateList(String algClassName, String algName) {
+		if (algClassName == null || algName == null) return -1;
+		
+		for (int i = 0; i < nextUpdateList.size(); i++) {
+			Alg alg = nextUpdateList.get(i); 
+			if (alg.getClass().getName().equals(algClassName) && alg.getName().equals(algName))
 				return i;
 		}
 

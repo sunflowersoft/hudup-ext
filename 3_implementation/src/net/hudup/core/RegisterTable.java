@@ -278,6 +278,25 @@ public final class RegisterTable implements Cloneable, Serializable {
 	
 	
 	/**
+	 * Getting algorithm list by algorithm class name.
+	 * @param algClassName algorithm class name.
+	 * @return algorithm list.
+	 */
+	public List<Alg> getAlgListByClassName(String algClassName) {
+		List<Alg> algList = Util.newList();
+		if (algClassName == null) return algList;
+		
+		Collection<Alg> algs = algMap.values();
+		for (Alg alg : algs) {
+			if (alg.getClass().getName().equals(algClassName))
+				algList.add(alg);
+		}
+		
+		return algList;
+	}
+	
+	
+	/**
 	 * Testing whether or not this table registers an algorithm having specified name.
 	 * @param algName specified algorithm name.
 	 * @return whether or not this table registers an algorithm having specified name.

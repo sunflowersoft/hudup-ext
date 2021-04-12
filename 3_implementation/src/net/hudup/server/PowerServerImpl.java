@@ -953,9 +953,13 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 	 */
 	private Alg removeNextUpdateAlg(String algClassName, String algName) {
 		try {
-			@SuppressWarnings("unchecked")
-			Class<? extends Alg> algClass = (Class<? extends Alg>)Util.getPluginManager().loadClass(algClassName, false);
-			int index = PluginStorage.lookupNextUpdateList(algClass, algName);
+			int index = PluginStorage.lookupNextUpdateList(algClassName, algName);
+			
+			if (index < 0) {
+				@SuppressWarnings("unchecked")
+				Class<? extends Alg> algClass = (Class<? extends Alg>)Util.getPluginManager().loadClass(algClassName, false);
+				index = PluginStorage.lookupNextUpdateList(algClass, algName);
+			}
 			
 			if (index >= 0)
 				return PluginStorage.getNextUpdateList().remove(index);
