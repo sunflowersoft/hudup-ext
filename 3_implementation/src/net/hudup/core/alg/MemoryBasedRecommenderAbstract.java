@@ -66,9 +66,11 @@ public abstract class MemoryBasedRecommenderAbstract extends RecommenderAbstract
 	public synchronized void unsetup() throws RemoteException {
 		super.unsetup();
 		
-		this.config.setMetadata(null);
-		this.config.removeReadOnly(DataConfig.MIN_RATING_FIELD);
-		this.config.removeReadOnly(DataConfig.MAX_RATING_FIELD);
+		if (this.config != null) {
+			this.config.setMetadata(null);
+			this.config.removeReadOnly(DataConfig.MIN_RATING_FIELD);
+			this.config.removeReadOnly(DataConfig.MAX_RATING_FIELD);
+		}
 		
 		this.dataset = null;
 	}
