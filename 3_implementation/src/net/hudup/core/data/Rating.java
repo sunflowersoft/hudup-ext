@@ -142,7 +142,6 @@ public class Rating implements Cloneable, Serializable, TextParsable {
 	
 	@Override
 	public Object clone() {
-		// TODO Auto-generated method stub
 		Rating rating = new Rating(this.value);
 		rating.contexts = (ContextList) this.contexts.clone();
 		rating.ratedDate = this.ratedDate;
@@ -153,14 +152,12 @@ public class Rating implements Cloneable, Serializable, TextParsable {
 
 	@Override
 	public String toText() {
-		// TODO Auto-generated method stub
 		throw new RuntimeException("Not support this method yet");
 	}
 
 	
 	@Override
 	public void parseText(String spec) {
-		// TODO Auto-generated method stub
 		throw new RuntimeException("Not support this method yet");
 	}
 
