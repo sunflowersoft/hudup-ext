@@ -76,6 +76,12 @@ public class MovielensParser extends SnapshotParser {
 
 	
 	/**
+	 * Movielens 100K type.
+	 */
+	public static final String MOVIELENS_TYPE_100KNEW = "100knew";
+
+	
+	/**
 	 * Movielens 1M type.
 	 */
 	public static final String MOVIELENS_TYPE_1M = "1m";
@@ -86,6 +92,7 @@ public class MovielensParser extends SnapshotParser {
 	 */
 	public static final String[] MOVIELENS_TYPES_SUPPORTED = {
 		MOVIELENS_TYPE_100K,
+		MOVIELENS_TYPE_100KNEW,
 		MOVIELENS_TYPE_1M,
 	};
 	
@@ -115,6 +122,9 @@ public class MovielensParser extends SnapshotParser {
 		if (type.equalsIgnoreCase(MOVIELENS_TYPE_100K)) {
 			users = load100KUserProfiles(config);
 			items = load100KItemProfiles(config);
+		}
+		else if (type.equalsIgnoreCase(MOVIELENS_TYPE_100KNEW)) {
+			items = load100KItemProfilesNew(config);
 		}
 		else if (type.equalsIgnoreCase(MOVIELENS_TYPE_1M)) {
 			users = load1MUserProfiles(config);
@@ -592,6 +602,163 @@ public class MovielensParser extends SnapshotParser {
 		
 		return memProfiles;
 		
+	}
+
+	
+	/**
+	 * Private method to load item profiles for new 100K Movielens database.
+	 * @return {@link MemProfiles} as item profiles for new 100K Movielens database.
+	 */
+	private MemProfiles load100KItemProfilesNew(DataConfig config) {
+		UriAdapter adapter = null;
+		BufferedReader reader = null;
+		MemProfiles memProfiles = MemProfiles.createEmpty();
+		if (config.getItemUnit() == null) return memProfiles;
+		
+		try {
+			Attribute itemid = new Attribute(DataConfig.ITEMID_FIELD, Type.integer);
+			Attribute title = new Attribute("title", Type.string);
+			
+			Attribute unknown = new Attribute("unknown", Type.bit);
+			Attribute action = new Attribute("action", Type.bit);
+			Attribute adventure = new Attribute("adventure", Type.bit);
+			Attribute animation = new Attribute("animation", Type.bit);
+			Attribute children = new Attribute("children", Type.bit);
+			Attribute comedy = new Attribute("comedy", Type.bit);
+			Attribute crime = new Attribute("crime", Type.bit);
+			Attribute documentary = new Attribute("documentary", Type.bit);
+			Attribute drama = new Attribute("drama", Type.bit);
+			Attribute fantasy = new Attribute("fantasy", Type.bit);
+			Attribute film_noir = new Attribute("film_noir", Type.bit);
+			Attribute horror = new Attribute("horror", Type.bit);
+			Attribute musical = new Attribute("musical", Type.bit);
+			Attribute mystery = new Attribute("mystery", Type.bit);
+			Attribute romance = new Attribute("romance", Type.bit);
+			Attribute sci_fi = new Attribute("sci_fi", Type.bit);
+			Attribute thriller = new Attribute("thriller", Type.bit);
+			Attribute war = new Attribute("war", Type.bit);
+			Attribute western = new Attribute("western", Type.bit);
+
+			final AttributeList attList = AttributeList.create(new Attribute[] {
+					itemid,
+					title,
+					unknown, action, adventure, animation, children, 
+					comedy, crime, documentary, drama, fantasy, film_noir,
+					horror, musical, mystery, romance, sci_fi, thriller, 
+					war, western});
+			final Map<Integer, Profile> profileMap = Util.newMap();
+			
+			adapter = new UriAdapter(config);
+			
+			xURI store = config.getStoreUri();
+			xURI itemsUri = store.concat(config.getItemUnit());
+			reader = new BufferedReader(adapter.getReader(itemsUri));
+
+			DSUtil.lineProcess(reader, new LineProcessor() {
+				
+				@Override
+				public void process(String line) {
+					List<String> array = DSUtil.splitAllowEmpty(line, TextParserUtil.DEFAULT_SEP, null);
+					if (array.size() < 2) return;
+					
+					Profile profile = new Profile(attList);
+					profile.setKey(0);
+					int id = Integer.parseInt(array.get(0));
+					profile.setValue(0, id);
+					profile.setValue(1, array.get(1));
+					
+					profile.setValue(2, 0);
+					profile.setValue(3, 0);
+					profile.setValue(4, 0);
+					profile.setValue(5, 0);
+					profile.setValue(6, 0);
+					profile.setValue(7, 0);
+					profile.setValue(8, 0);
+					profile.setValue(9, 0);
+					profile.setValue(10, 0);
+					profile.setValue(11, 0);
+					profile.setValue(12, 0);
+					profile.setValue(13, 0);
+					profile.setValue(14, 0);
+					profile.setValue(15, 0);
+					profile.setValue(16, 0);
+					profile.setValue(17, 0);
+					profile.setValue(18, 0);
+					profile.setValue(19, 0);
+					profile.setValue(20, 0);
+					
+					profileMap.put(id, profile);
+					if (array.size() < 3) return;
+					
+					List<String> genres = DSUtil.splitAllowEmpty(line, "|", null);
+					for (String genre : genres) {
+						Attribute att = null;
+						if (genre == null || genre.isEmpty())
+							continue;
+						else if (genre.equals("Action"))
+							att = action;
+						else if (genre.equals("Adventure"))
+							att = adventure;
+						else if (genre.equals("Animation"))
+							att = animation;
+						else if (genre.equals("Children"))
+							att = children;
+						else if (genre.equals("Comedy"))
+							att = comedy;
+						else if (genre.equals("Crime"))
+							att = crime;
+						else if (genre.equals("Documentary"))
+							att = documentary;
+						else if (genre.equals("Drama"))
+							att = drama;
+						else if (genre.equals("Fantasy"))
+							att = fantasy;
+						else if (genre.equals("Film-Noir"))
+							att = film_noir;
+						else if (genre.equals("Horror"))
+							att = horror;
+						else if (genre.equals("Musical"))
+							att = musical;
+						else if (genre.equals("Mystery"))
+							att = mystery;
+						else if (genre.equals("Romance"))
+							att = romance;
+						else if (genre.equals("Sci-Fi"))
+							att = sci_fi;
+						else if (genre.equals("Thriller"))
+							att = thriller;
+						else if (genre.equals("War"))
+							att = war;
+						else if (genre.equals("Western"))
+							att = western;
+						else
+							att = unknown;
+						
+						profile.setValue(att.getName(), 0);
+					}
+				}
+			});
+			
+			memProfiles = MemProfiles.assign(attList, profileMap);
+			
+		}
+		catch (Exception e) {
+			LogUtil.trace(e);
+		}
+		finally {
+			try {
+				if (reader != null)
+					reader.close();
+			}
+			catch (Exception e) {
+				LogUtil.trace(e);
+			}
+			
+			if (adapter != null)
+				adapter.close();
+		}
+		
+		return memProfiles;
 	}
 
 	
