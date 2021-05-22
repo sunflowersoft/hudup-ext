@@ -1893,6 +1893,18 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 	
 	
 	@Override
+	public String getVersionName() throws RemoteException {
+		String name = getName();
+		try {
+			String reproducedVersion = config.getReproducedVersion();
+			if (reproducedVersion != null && !reproducedVersion.isEmpty()) name += "-" + reproducedVersion;
+		} catch (Exception e) {}
+		
+		return name;
+	}
+
+
+	@Override
 	public boolean ping() throws RemoteException {
 		return true;
 	}

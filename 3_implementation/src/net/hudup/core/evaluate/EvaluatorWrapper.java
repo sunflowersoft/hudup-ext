@@ -188,6 +188,12 @@ public class EvaluatorWrapper implements Evaluator, Serializable {
 
 	
 	@Override
+	public String getVersionName() throws RemoteException {
+		return remoteEvaluator.getVersionName();
+	}
+
+
+	@Override
 	public EvaluatorConfig getConfig() throws RemoteException {
 		return remoteEvaluator.getConfig();
 	}

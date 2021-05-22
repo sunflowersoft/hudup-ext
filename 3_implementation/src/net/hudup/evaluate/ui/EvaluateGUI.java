@@ -1778,7 +1778,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			this.result = null;
 			this.tblMetrics.clear();
 			this.statusBar.clearText();
-			this.statusBar.setTextPane0(DSUtil.shortenVerbalName(evaluator.getName()));
+			this.statusBar.setTextPane0(DSUtil.shortenVerbalName(evaluator.getVersionName()));
 			this.timestamp = null;
 		}
 		catch (Throwable e) {
@@ -1794,7 +1794,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 		if (statusBar == null) return;
 		
 		try {
-			this.statusBar.setTextPane0(DSUtil.shortenVerbalName(evaluator.getName()));
+			this.statusBar.setTextPane0(DSUtil.shortenVerbalName(evaluator.getVersionName()));
 		} catch (Exception e) {LogUtil.trace(e);}
 		
 		if (otherResult.statuses != null && otherResult.statuses.length > 0) {

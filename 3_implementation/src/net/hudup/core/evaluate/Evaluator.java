@@ -174,6 +174,14 @@ public interface Evaluator extends Remote, RemoteRunner, SetupAlgListener, Plugi
 	
 	
 	/**
+	 * Returning version name of this evaluator.
+	 * @return version name of this evaluator.
+	 * @throws RemoteException if any error raises.
+	 */
+	String getVersionName() throws RemoteException;
+
+	
+	/**
 	 * Returning class name of this evaluator.
 	 * @return class name of this evaluator.
 	 * @throws RemoteException if any error raises.

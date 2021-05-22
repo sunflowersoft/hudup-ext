@@ -129,6 +129,12 @@ public class EvaluatorWrapperExt implements Evaluator, EvaluatorListener, Evalua
 
 
 	@Override
+	public String getVersionName() throws RemoteException {
+		return remoteEvaluator.getVersionName();
+	}
+
+
+	@Override
 	public boolean acceptAlg(String algClassName) throws RemoteException {
 		return remoteEvaluator.acceptAlg(algClassName);
 	}
