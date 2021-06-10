@@ -236,7 +236,7 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 
 			try {
 				String we = Util.getHudupProperty("watcher_enabled");
-				if (we != null && Boolean.parseBoolean(we)) watcher.start();
+				if (we != null && Boolean.parseBoolean(we) && watcher != null) watcher.start();
 			} catch (Throwable e) {LogUtil.trace(e);}
 
 			createTimer();

@@ -27,7 +27,7 @@ public abstract class Watcher extends DirWatcher {
 	/**
 	 * Timer period in second.
 	 */
-	public static int PERIOD = 1;
+	public static int PERIOD = 5;
 	
 	
 	/**
