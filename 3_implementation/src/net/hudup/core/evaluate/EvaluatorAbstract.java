@@ -309,6 +309,15 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 			return false;
 		}
 
+		//Initialized tasks.
+		try {
+			if (config.isReproduced()) {
+				String txtDuplicate = Util.getHudupProperty("evaluator_duplicate_algorithm");
+				if (txtDuplicate != null && Boolean.parseBoolean(txtDuplicate)) algList = AlgList.clone(algList);
+			}
+		}
+		catch (Throwable e) {}
+		
 		this.evTaskQueue.stop();
 
 		this.evPool = updatePoolResult(pool);
