@@ -309,7 +309,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 			return false;
 		}
 
-		//Initialized tasks.
+		//Initialized tasks. This code snippet can be removed.
 		try {
 			if (config.isReproduced()) {
 				String txtDuplicate = Util.getHudupProperty("evaluator_duplicate_algorithm");
@@ -317,6 +317,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 			}
 		}
 		catch (Throwable e) {}
+		
 		
 		this.evTaskQueue.stop();
 
