@@ -124,7 +124,19 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 	/**
 	 * Default MSD fraction mode.
 	 */
-	protected static final boolean MSD_FRACTION_DEFAULT = true;
+	protected static final boolean MSD_FRACTION_DEFAULT = false;
+
+	
+	/**
+	 * Entropy support mode.
+	 */
+	protected static final String ENTROPY_SUPPORT_FIELD = "entropy_support";
+
+	
+	/**
+	 * Default value for entropy support mode.
+	 */
+	protected static final boolean ENTROPY_SUPPORT_DEFAULT = false;
 
 	
 	/**
@@ -206,6 +218,12 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 
 	
 	/**
+	 * Value cache.
+	 */
+	protected Map<Integer, Object> valueCache = Util.newMap();
+
+	
+	/**
 	 * Default constructor.
 	 */
 	public NeighborCF() {
@@ -241,6 +259,7 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 //		this.userRatingCache.clear();
 		this.rowSimCache.clear();
 		this.columnSimCache.clear();
+		this.valueCache.clear();
 	}
 
 
@@ -721,6 +740,7 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 		
 		config.removeReadOnly(COSINE_NORMALIZED_FIELD);
 		config.removeReadOnly(MSD_FRACTION_FIELD);
+		config.removeReadOnly(ENTROPY_SUPPORT_FIELD);
 		if (measure.equals(Measure.COSINE)) {
 			config.addReadOnly(MSD_FRACTION_FIELD);
 		}
@@ -757,32 +777,40 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 		else if (measure.equals(Measure.JACCARD)) {
 			config.addReadOnly(COSINE_NORMALIZED_FIELD);
 			config.addReadOnly(MSD_FRACTION_FIELD);
+			config.addReadOnly(ENTROPY_SUPPORT_FIELD);
 		}
 		else if (measure.equals(Measure.JACCARD2)) {
 			config.addReadOnly(COSINE_NORMALIZED_FIELD);
 			config.addReadOnly(MSD_FRACTION_FIELD);
+			config.addReadOnly(ENTROPY_SUPPORT_FIELD);
 		}
 		else if (measure.equals(Measure.DICE)) {
 			config.addReadOnly(COSINE_NORMALIZED_FIELD);
 			config.addReadOnly(MSD_FRACTION_FIELD);
+			config.addReadOnly(ENTROPY_SUPPORT_FIELD);
 		}
 		else if (measure.equals(Measure.MSD)) {
 			config.addReadOnly(COSINE_NORMALIZED_FIELD);
+			config.addReadOnly(ENTROPY_SUPPORT_FIELD);
 		}
 		else if (measure.equals(Measure.MSDJ)) {
 			config.addReadOnly(COSINE_NORMALIZED_FIELD);
+			config.addReadOnly(ENTROPY_SUPPORT_FIELD);
 		}
 		else if (measure.equals(Measure.URP)) {
 			config.addReadOnly(COSINE_NORMALIZED_FIELD);
 			config.addReadOnly(MSD_FRACTION_FIELD);
+			config.addReadOnly(ENTROPY_SUPPORT_FIELD);
 		}
 		else if (measure.equals(Measure.TRIANGLE)) {
 			config.addReadOnly(COSINE_NORMALIZED_FIELD);
 			config.addReadOnly(MSD_FRACTION_FIELD);
+			config.addReadOnly(ENTROPY_SUPPORT_FIELD);
 		}
 		else if (measure.equals(Measure.TJM)) {
 			config.addReadOnly(COSINE_NORMALIZED_FIELD);
 			config.addReadOnly(MSD_FRACTION_FIELD);
+			config.addReadOnly(ENTROPY_SUPPORT_FIELD);
 		}
 	}
 	
@@ -803,8 +831,8 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 			RatingVector vRating1, RatingVector vRating2,
 			Profile profile1, Profile profile2) {
 		
-		boolean normalized = getConfig().getAsBoolean(COSINE_NORMALIZED_FIELD);
-		return normalized ? vRating1.cosine(vRating2, this.ratingMedian) : vRating1.cosine(vRating2);
+		boolean normalized = config.getAsBoolean(COSINE_NORMALIZED_FIELD);
+		return normalized ? cosine(vRating1, vRating2, this.ratingMedian) : cosine(vRating1, vRating2);
 
 //		boolean normalized = getConfig().getAsBoolean(COSINE_NORMALIZED_FIELD);
 //		if (profile1 == null || profile2 == null)
@@ -844,22 +872,25 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 		Set<Integer> common = commonFieldIds(vRating1, vRating2);
 		if (common.size() == 0) return Constants.UNUSED;
 
+		boolean entropySupport = config.getAsBoolean(ENTROPY_SUPPORT_FIELD);
 		double VX = 0, VY = 0;
 		double VXY = 0;
 		for (int fieldId : common) {
 			double mean = fieldMeans.get(fieldId);
-			double deviate1 = vRating1.get(fieldId).value - mean;
-			double deviate2 = vRating2.get(fieldId).value - mean;
+			double dev1 = vRating1.get(fieldId).value - mean;
+			double dev2 = vRating2.get(fieldId).value - mean;
+			VX  += dev1 * dev1;
+			VY  += dev2 * dev2;
 			
-			VX  += deviate1 * deviate1;
-			VY  += deviate2 * deviate2;
-			VXY += deviate1 * deviate2;
+			double entropy = 1;
+			if (entropySupport) {
+				entropy = calcEntropy(fieldId, isCached());
+				entropy = Util.isUsed(entropy) ? entropy : 1;
+			}
+			VXY += dev1 * dev2 * entropy;
 		}
 		
-		if (VX == 0 || VY == 0)
-			return Constants.UNUSED;
-		else
-			return VXY / Math.sqrt(VX * VY);
+		return VXY / Math.sqrt(VX * VY);
 	}
 
 	
@@ -877,29 +908,33 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 			Profile profile1, Profile profile2) {
 		Set<Integer> union = unionFieldIds(vRating1, vRating2);
 		
+		boolean entropySupport = config.getAsBoolean(ENTROPY_SUPPORT_FIELD);
 		boolean normalized = getConfig().getAsBoolean(COSINE_NORMALIZED_FIELD);
 		double VX = 0, VY = 0;
 		double VXY = 0;
 		for (int fieldId : union) {
-			double deviate1 = Constants.UNUSED;
-			double deviate2 = Constants.UNUSED;
+			double dev1 = Constants.UNUSED;
+			double dev2 = Constants.UNUSED;
 			if (vRating1.isRated(fieldId))
-				deviate1 = vRating1.get(fieldId).value - (normalized ? this.ratingMedian : 0);
+				dev1 = vRating1.get(fieldId).value - (normalized ? this.ratingMedian : 0);
 			if (vRating2.isRated(fieldId))
-				deviate2 = vRating2.get(fieldId).value - (normalized ? this.ratingMedian : 0);
+				dev2 = vRating2.get(fieldId).value - (normalized ? this.ratingMedian : 0);
 			
-			if (Util.isUsed(deviate1))
-				VX  += deviate1 * deviate1;
-			if (Util.isUsed(deviate2))
-				VY  += deviate2 * deviate2;
-			if (Util.isUsed(deviate1) && Util.isUsed(deviate2))
-				VXY += deviate1 * deviate2;
+			if (Util.isUsed(dev1))
+				VX  += dev1 * dev1;
+			if (Util.isUsed(dev2))
+				VY  += dev2 * dev2;
+			if (Util.isUsed(dev1) && Util.isUsed(dev2)) {
+				double entropy = 1;
+				if (entropySupport) {
+					entropy = calcEntropy(fieldId, isCached());
+					entropy = Util.isUsed(entropy) ? entropy : 1;
+				}
+				VXY += dev1 * dev2 * entropy;
+			}
 		}
 		
-		if (VX == 0 || VY == 0)
-			return Constants.UNUSED;
-		else
-			return VXY / Math.sqrt(VX * VY);
+		return VXY / Math.sqrt(VX * VY);
 	}
 	
 	
@@ -919,7 +954,7 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 			RatingVector vRating1, RatingVector vRating2,
 			Profile profile1, Profile profile2) {
 		
-		return vRating1.corr(vRating2);
+		return corr(vRating1, vRating2);
 		
 //		if (profile1 == null || profile2 == null)
 //			return vRating1.corr(vRating2);
@@ -1062,7 +1097,7 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 	protected double cpc(
 			RatingVector vRating1, RatingVector vRating2,
 			Profile profile1, Profile profile2) {
-		return vRating1.cosine(vRating2, this.ratingMedian);
+		return cosine(vRating1, vRating2, this.ratingMedian);
 	}
 	
 	
@@ -1204,8 +1239,8 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 		if (fraction)
 			return 1 / (1 + sum/common.size());
 		else {
-			double maxRating = getMaxRating();
-			return 1.0 - sum/(common.size()*maxRating*maxRating);
+			double range = getMaxRating() - getMinRating();
+			return 1.0 - sum/(common.size()*range*range);
 		}
 	}
 	
@@ -1248,6 +1283,130 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 		return 1 - vRating1.distance(vRating2) / (vRating1.module()+vRating2.module());
 	}
 	
+	
+	/**
+	 * Calculating the entropy of rating vector of given column identifier.
+	 * @param columnId given column identifier.
+	 * @param cached flag to indicate whether to cache the entropy.
+	 * @return the entropy of rating vector of given column identifier.
+	 */
+	protected double calcEntropy(int columnId, boolean cached) {
+		Task task = new Task() {
+			
+			@Override
+			public Object perform(Object...params) {
+				double minRating = getMinRating();
+				double maxRating = getMaxRating();
+				double value = minRating;
+				double e = 0;
+				double log2 = Math.log(2);
+				while (value <= maxRating) {
+					double prob = columnProb(columnId, value);
+					e += prob * Math.log(prob)/log2;
+					value = value + 1;
+				}
+				
+				return -e;
+			}
+		};
+		
+		if (cached)
+			return (double)cacheTask(columnId, this.valueCache, task);
+		else
+			return (Double)task.perform();
+	}
+
+	
+	/**
+	 * Calculating the probability of specified column identifier with given value.
+	 * @param columnId specified column identifier.
+	 * @param value given value.
+	 * @return the probability of specified column identifier with given value.
+	 */
+	private double columnProb(int columnId, double value) {
+		Set<Integer> rowIds = getRowIds();
+		int n = 0, N = 0;
+		for (int rowId : rowIds) {
+			RatingVector row = getRowRating(rowId);
+			if (row.isRated(columnId)) {
+				N++;
+				if (row.get(columnId).value == value) n++;
+			}
+		}
+		
+		return (double)n / (double)N;
+	}
+	
+	
+	/**
+	 * Calculating correlation coefficient between two rating vectors.
+	 * @param thisVector the first rating vector.
+	 * @param thatVector the second rating vector.
+	 * @return correlation coefficient between two rating vectors.
+	 */
+	protected double corr(RatingVector thisVector, RatingVector thatVector) {
+		Set<Integer> fieldIds = commonFieldIds(thisVector, thatVector);
+		boolean entropySupport = config.getAsBoolean(ENTROPY_SUPPORT_FIELD);
+		double VX = 0, VY = 0, VXY = 0;
+		double mean1 = thisVector.mean();
+		double mean2 = thatVector.mean();
+		for (int fieldId : fieldIds) {
+			double dev1 = thisVector.get(fieldId).value - mean1;
+			double dev2 = thatVector.get(fieldId).value - mean2;
+			VX  += dev1 * dev1;
+			VY  += dev2 * dev2;
+			
+			double entropy = 1;
+			if (entropySupport) {
+				entropy = calcEntropy(fieldId, isCached());
+				entropy = Util.isUsed(entropy) ? entropy : 1;
+			}
+			VXY += dev1 * dev2 * entropy;
+		}
+		
+		return VXY / Math.sqrt(VX * VY);
+	}
+
+	
+	/**
+	 * Calculating correlation coefficient between two rating vectors.
+	 * @param thisVector the first rating vector.
+	 * @param thatVector the second rating vector.
+	 * @return correlation coefficient between two rating vectors.
+	 */
+	protected double cosine(RatingVector thisVector, RatingVector thatVector) {
+		return cosine(thisVector, thatVector, 0);
+	}
+
+	
+	/**
+	 * Calculating correlation coefficient between two rating vectors.
+	 * @param thisVector the first rating vector.
+	 * @param thatVector the second rating vector.
+	 * @param average averaged value.
+	 * @return correlation coefficient between two rating vectors.
+	 */
+	protected double cosine(RatingVector thisVector, RatingVector thatVector, double average) {
+		Set<Integer> fieldIds = commonFieldIds(thisVector, thatVector);
+		boolean entropySupport = config.getAsBoolean(ENTROPY_SUPPORT_FIELD);
+		double VX = 0, VY = 0, VXY = 0;
+		for (int fieldId : fieldIds) {
+			double dev1 = thisVector.get(fieldId).value - average;
+			double dev2 = thatVector.get(fieldId).value - average;
+			VX  += dev1 * dev1;
+			VY  += dev2 * dev2;
+			
+			double entropy = 1;
+			if (entropySupport) {
+				entropy = calcEntropy(fieldId, isCached());
+				entropy = Util.isUsed(entropy) ? entropy : 1;
+			}
+			VXY += dev1 * dev2 * entropy;
+		}
+		
+		return VXY / Math.sqrt(VX * VY);
+	}
+
 	
 	@Override
 	public Object cacheTask(int id1, int id2, Map<Integer, Map<Integer, Object>> cache, Task task, Object...params) {
@@ -1357,6 +1516,7 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 		tempConfig.put(SIMILARITY_THRESHOLD_FIELD, SIMILARITY_THRESHOLD_DEFAULT);
 		tempConfig.put(COSINE_NORMALIZED_FIELD, COSINE_NORMALIZED_DEFAULT);
 		tempConfig.put(MSD_FRACTION_FIELD, MSD_FRACTION_DEFAULT);
+		tempConfig.put(ENTROPY_SUPPORT_FIELD, ENTROPY_SUPPORT_DEFAULT);
 
 		DataConfig config = new DataConfig() {
 
