@@ -311,10 +311,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 
 		//Initialized tasks. This code snippet can be removed.
 		try {
-			if (config.isReproduced()) {
-				String txtDuplicate = Util.getHudupProperty("evaluator_duplicate_algorithm");
-				if (txtDuplicate != null && Boolean.parseBoolean(txtDuplicate)) algList = AlgList.clone(algList);
-			}
+			if (config.isDuplicateAlgorithm()) algList = AlgList.clone(algList);
 		}
 		catch (Throwable e) {}
 		

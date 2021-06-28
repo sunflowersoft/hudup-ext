@@ -8,6 +8,7 @@
 package net.hudup.core.evaluate;
 
 import net.hudup.core.Constants;
+import net.hudup.core.Util;
 import net.hudup.core.data.SysConfig;
 import net.hudup.core.logistic.xURI;
 
@@ -50,13 +51,13 @@ public class EvaluatorConfig extends SysConfig {
 	/**
 	 * This constant specifies key name of evaluator port.
 	 */
-	public final static String EVALUATOR_PORT_FIELD = changeCase("evaluator_port");
+	public final static String EVALUATOR_PORT_FIELD = "evaluator_port";
 
 	
 	/**
 	 * Flag indicates whether recommendation is heuristic.
 	 */
-	public final static String HEURISTIC_RECOMMEND_FIELD = changeCase("heuristic_recommend");
+	public final static String HEURISTIC_RECOMMEND_FIELD = "heuristic_recommend";
 
 	
 	/**
@@ -75,7 +76,7 @@ public class EvaluatorConfig extends SysConfig {
 	 * Maximum recommended items. This field is effected if recommendation all field is false.
 	 * If it is 0 and recommendation all field is false, evaluator will have heuristic mechanism to calculate the real maximum recommended items.
 	 */
-	public final static String MAX_RECOMMEND_FIELD  = changeCase("max_recommend");
+	public final static String MAX_RECOMMEND_FIELD  = "max_recommend";
 	
 	
 	/**
@@ -88,13 +89,13 @@ public class EvaluatorConfig extends SysConfig {
 	/**
 	 * This constant specifies pull mode requirement.
 	 */
-	public final static String PULL_MODE_REQUIRED_FIELD = changeCase("pull_mode_required");
+	public final static String PULL_MODE_REQUIRED_FIELD = "pull_mode_required";
 
 	
 	/**
 	 * This constant specifies result summary saving field. If true, only done evaluated results are saved.
 	 */
-	public final static String EVALUATOR_SAVE_RESULT_SUMMARY_FIELD = changeCase("save_result_summary");
+	public final static String EVALUATOR_SAVE_RESULT_SUMMARY_FIELD = "save_result_summary";
 
 	
 	/**
@@ -106,19 +107,31 @@ public class EvaluatorConfig extends SysConfig {
 	/**
 	 * This constant specifies reproduction field. If true, evaluator is reproduced.
 	 */
-	public final static String EVALUATOR_REPRODUCED_VERSION_FIELD = changeCase("reproduced_version");
+	public final static String EVALUATOR_REPRODUCED_VERSION_FIELD = "reproduced_version";
 
 	
 	/**
 	 * This constant specifies tied synchronized with client.
 	 */
-	public final static String EVALUATOR_TIED_SYNC_FIELD = changeCase("tied_sync");
+	public final static String EVALUATOR_TIED_SYNC_FIELD = "tied_sync";
 
 	
 	/**
 	 * By default, tied synchronized with client is false.
 	 */
 	public final static boolean EVALUATOR_TIED_SYNC_DEFAULT = false;
+
+	
+	/**
+	 * Field of duplicating algorithm.
+	 */
+	public final static String EVALUATOR_DUPLICATE_ALGORITHM_FIELD = "evaluator_duplicate_algorithm";
+
+	
+	/**
+	 * Default value for field of duplicating algorithm.
+	 */
+	public final static boolean EVALUATOR_DUPLICATE_ALGORITHM_DEFAULT = false;
 
 	
 	/**
@@ -319,4 +332,33 @@ public class EvaluatorConfig extends SysConfig {
 	}
 	
 	
+
+
+	/**
+	 * Checking whether algorithm is duplicated. 
+	 * @return whether algorithm is duplicated.
+	 */
+	public boolean isDuplicateAlgorithm() {
+		if (getAsBoolean(EVALUATOR_DUPLICATE_ALGORITHM_FIELD))
+			return true;
+		else if (isReproduced()) {
+			try {
+				String txtDuplicate = Util.getHudupProperty(EVALUATOR_DUPLICATE_ALGORITHM_FIELD);
+				return txtDuplicate != null && Boolean.parseBoolean(txtDuplicate);
+			}
+			catch (Throwable e) {}
+			return false;
+		}
+		else
+			return false;
+	}
+	
+	
+	/**
+	 * Setting whether algorithm is duplicated.
+	 * @param duplicated whether algorithm is duplicated.
+	 */
+	public void setDuplicateAlgorithm(boolean duplicated) {
+		put(EVALUATOR_DUPLICATE_ALGORITHM_FIELD, duplicated);
+	}
 }

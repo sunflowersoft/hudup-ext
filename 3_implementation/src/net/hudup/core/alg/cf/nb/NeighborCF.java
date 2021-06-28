@@ -1228,6 +1228,7 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 	protected double msd(RatingVector vRating1, RatingVector vRating2,
 			Profile profile1, Profile profile2) {
 		Set<Integer> common = commonFieldIds(vRating1, vRating2);
+		if (common.size() == 0) return Constants.UNUSED;
 		
 		double sum = 0;
 		for (int id : common) {
@@ -1280,6 +1281,9 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 	 */
 	protected double triangle(RatingVector vRating1, RatingVector vRating2,
 			Profile profile1, Profile profile2) {
+		Set<Integer> common = commonFieldIds(vRating1, vRating2);
+		if (common.size() == 0) return Constants.UNUSED;
+		
 		return 1 - vRating1.distance(vRating2) / (vRating1.module()+vRating2.module());
 	}
 	
