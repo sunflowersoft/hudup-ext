@@ -225,7 +225,6 @@ class NeighborCF2dDeprecated extends NeighborCFUserBased {
 	
 	@Override
 	public synchronized RatingVector estimate(RecommendParam param, Set<Integer> queryIds) throws RemoteException {
-		
 		Fetcher<RatingVector> vUserRatings = null;
 		Fetcher<RatingVector> vItemRatings = null;
 		vUserRatings = dataset.fetchUserRatings();

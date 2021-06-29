@@ -53,6 +53,8 @@ import net.hudup.core.logistic.Vector;
  * There are many authors who contributed measure to this class.<br>
  * <br>
  * Shuang-Bo Sun, Zhi-Heng Zhang, Xin-Ling Dong, Heng-Ru Zhang, Tong-Jun Li, Lin Zhang, and Fan Min contributed Triangle measure and TJM measure.<br>
+ * <br>
+ * Mubbashir Ayub, Mustansar Ali Ghazanfar, Zahid MehmoodID, Tanzila Saba, Riad Alharbey, Asmaa Mahdi Munshi, Mayda Abdullateef Alrige contributed measures IPC and RPB.<br>
  * 
  * @author Loc Nguyen
  * @version 10.0
@@ -268,16 +270,78 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 	 * @return rating mean.
 	 */
 	protected double getRatingMean() {
-		if (userMeans.size() == 0) getUserMeans();
+		if (Util.isUsed(this.ratingMean)) return this.ratingMean;
+		
+		int totalRatingCount = 0;
+		this.ratingMean = 0.0;
+		try {
+			Fetcher<RatingVector> users = dataset.fetchUserRatings();
+			while (users.next()) {
+				RatingVector user = users.pick();
+				if (user == null) continue;
+				Set<Integer> itemIds = user.fieldIds(true);
+				if (itemIds.size() == 0) continue;
+				
+				for (int itemId : itemIds) {
+					this.ratingMean += user.get(itemId).value;
+					totalRatingCount++;
+				}
+			}
+			if (totalRatingCount != 0)
+				this.ratingMean = this.ratingMean / (double)totalRatingCount;
+			users.close();
+		} catch (Throwable e) {LogUtil.trace(e);}
+
 		return ratingMean;
 	}
 	
 	
 	/**
-	 * Getting rating mean.
-	 * @return rating mean.
+	 * Getting rating variance.
+	 * @return rating variance.
 	 */
 	protected double getRatingVar() {
+		if (Util.isUsed(this.ratingVar)) return this.ratingVar;
+
+		int totalRatingCount = 0;
+		this.ratingMean = 0.0;
+		this.ratingVar = 0.0;
+		try {
+			//Calculating user means
+			Fetcher<RatingVector> users = dataset.fetchUserRatings();
+			while (users.next()) {
+				RatingVector user = users.pick();
+				if (user == null) continue;
+				Set<Integer> itemIds = user.fieldIds(true);
+				if (itemIds.size() == 0) continue;
+				
+				for (int itemId : itemIds) {
+					this.ratingMean += user.get(itemId).value;
+					totalRatingCount++;
+				}
+			}
+			if (totalRatingCount != 0)
+				this.ratingMean = this.ratingMean / (double)totalRatingCount;
+	
+			//Calculating user variances
+			users.reset();
+			while (users.next()) {
+				RatingVector user = users.pick();
+				if (user == null) continue;
+				Set<Integer> itemIds = user.fieldIds(true);
+				if (itemIds.size() == 0) continue;
+				
+				for (int itemId : itemIds) {
+					double D = user.get(itemId).value - this.ratingMean;
+					this.ratingVar += D*D;
+				}
+			}
+			if (totalRatingCount != 0)
+				this.ratingVar = this.ratingVar / (double)totalRatingCount;
+			users.close();
+		} catch (Throwable e) {LogUtil.trace(e);}
+		
+
 		if (userVars.size() == 0) getUserVars();
 		return ratingVar;
 	}
@@ -342,6 +406,16 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 			users.close();
 		} catch (Throwable e) {LogUtil.trace(e);}
 		return this.userMeans;
+	}
+	
+	
+	/**
+	 * Calculating user mean.
+	 * @param vRating user rating vector.
+	 * @return user mean.
+	 */
+	protected double calcUserMean(RatingVector vRating) {
+		return calcMean(this, userMeans, vRating);
 	}
 	
 	
@@ -472,6 +546,16 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 			items.close();
 		} catch (Throwable e) {LogUtil.trace(e);}
 		return this.itemMeans;
+	}
+	
+	
+	/**
+	 * Calculating item mean.
+	 * @param vRating item rating vector.
+	 * @return item mean.
+	 */
+	protected double calcItemMean(RatingVector vRating) {
+		return calcMean(this, itemMeans, vRating);
 	}
 	
 	
@@ -710,6 +794,10 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 			return wpc(vRating1, vRating2, profile1, profile2);
 		else if (measure.equals(Measure.SPC))
 			return spc(vRating1, vRating2, profile1, profile2);
+		else if (measure.equals(Measure.IPC))
+			return ipc(vRating1, vRating2, profile1, profile2);
+		else if (measure.equals(Measure.RPB))
+			return rpb(vRating1, vRating2, profile1, profile2);
 		else if (measure.equals(Measure.JACCARD))
 			return jaccard(vRating1, vRating2, profile1, profile2);
 		else if (measure.equals(Measure.JACCARD2))
@@ -773,6 +861,15 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 		else if (measure.equals(Measure.SPC)) {
 			config.addReadOnly(COSINE_NORMALIZED_FIELD);
 			config.addReadOnly(MSD_FRACTION_FIELD);
+		}
+		else if (measure.equals(Measure.IPC)) {
+			config.addReadOnly(COSINE_NORMALIZED_FIELD);
+			config.addReadOnly(MSD_FRACTION_FIELD);
+		}
+		else if (measure.equals(Measure.RPB)) {
+			config.addReadOnly(COSINE_NORMALIZED_FIELD);
+			config.addReadOnly(MSD_FRACTION_FIELD);
+			config.addReadOnly(ENTROPY_SUPPORT_FIELD);
 		}
 		else if (measure.equals(Measure.JACCARD)) {
 			config.addReadOnly(COSINE_NORMALIZED_FIELD);
@@ -857,8 +954,7 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 	 * @param profile2 second profile.
 	 * @return ACOS measure between both two rating vectors.
 	 */
-	protected abstract double cod(RatingVector vRating1, RatingVector vRating2,
-			Profile profile1, Profile profile2);
+	protected abstract double cod(RatingVector vRating1, RatingVector vRating2, Profile profile1, Profile profile2);
 	
 
 	/**
@@ -903,8 +999,7 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 	 * @author Loc Nguyen
 	 * @return Cosine-Jaccard measure between both two rating vectors and profiles.
 	 */
-	protected double coj(
-			RatingVector vRating1, RatingVector vRating2,
+	protected double coj(RatingVector vRating1, RatingVector vRating2,
 			Profile profile1, Profile profile2) {
 		Set<Integer> union = unionFieldIds(vRating1, vRating2);
 		
@@ -920,10 +1015,8 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 			if (vRating2.isRated(fieldId))
 				dev2 = vRating2.get(fieldId).value - (normalized ? this.ratingMedian : 0);
 			
-			if (Util.isUsed(dev1))
-				VX  += dev1 * dev1;
-			if (Util.isUsed(dev2))
-				VY  += dev2 * dev2;
+			if (Util.isUsed(dev1)) VX  += dev1 * dev1;
+			if (Util.isUsed(dev2)) VY  += dev2 * dev2;
 			if (Util.isUsed(dev1) && Util.isUsed(dev2)) {
 				double entropy = 1;
 				if (entropySupport) {
@@ -949,9 +1042,7 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 	 * @param profile2 second profile.
 	 * @return correlation coefficient between both two {@link RatingVector} (s) and two {@link Profile} (s).
 	 */
-	@NextUpdate
-	protected double corr(
-			RatingVector vRating1, RatingVector vRating2,
+	protected double corr(RatingVector vRating1, RatingVector vRating2,
 			Profile profile1, Profile profile2) {
 		
 		return corr(vRating1, vRating2);
@@ -986,10 +1077,7 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 	 */
 	@SuppressWarnings("unused")
 	@Deprecated
-	private Vector[] toNormVector(
-			RatingVector vRating1, RatingVector vRating2, 
-			Profile profile1, Profile profile2) {
-		
+	private Vector[] toNormVector(RatingVector vRating1, RatingVector vRating2, Profile profile1, Profile profile2) {
 		Vector vector1 = new Vector(0, 0);
 		Vector vector2 = new Vector(0, 0);
 		
@@ -1019,7 +1107,6 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 	 */
 	@Deprecated
 	private Vector[] toNormVector(RatingVector vRating1, RatingVector vRating2) {
-		
 		List<Integer> common = Util.newList();
 		common.addAll(vRating1.fieldIds(true));
 		common.retainAll(vRating2.fieldIds(true));
@@ -1142,6 +1229,73 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 		double N = common.size();
 		
 		return corr(vRating1, vRating2, profile1, profile2) / (1 + Math.exp(-N/2.0));
+	}
+	
+	
+	/**
+	 * Calculating the IPC measure between two pairs.
+	 * Mubbashir Ayub, Mustansar Ali Ghazanfar, Zahid MehmoodID, Tanzila Saba, Riad Alharbey, Asmaa Mahdi Munshi, and Mayda Abdullateef Alrige developed the IPC measure. Loc Nguyen implements it.
+	 * @param vRating1 first rating vector.
+	 * @param vRating2 second rating vector.
+	 * @param profile1 first profile.
+	 * @param profile2 second profile.
+	 * @author Mubbashir Ayub, Mustansar Ali Ghazanfar, Zahid MehmoodID, Tanzila Saba, Riad Alharbey, Asmaa Mahdi Munshi, Mayda Abdullateef Alrige
+	 * @return IPC measure between both two rating vectors.
+	 */
+	protected double ipc(RatingVector vRating1, RatingVector vRating2, Profile profile1, Profile profile2) {
+		Set<Integer> union = unionFieldIds(vRating1, vRating2);
+		
+		boolean entropySupport = config.getAsBoolean(ENTROPY_SUPPORT_FIELD);
+		double VX = 0, VY = 0;
+		double VXY = 0;
+		double mean1 = vRating1.mean();
+		double mean2 = vRating2.mean();
+		for (int fieldId : union) {
+			double mean = calcColumnMean(getColumnRating(fieldId));
+			double dev1 = Constants.UNUSED;
+			double dev2 = Constants.UNUSED;
+			if (vRating1.isRated(fieldId))
+				dev1 = vRating1.get(fieldId).value * (mean1-mean);
+			if (vRating2.isRated(fieldId))
+				dev2 = vRating2.get(fieldId).value * (mean2-mean);
+			
+			if (Util.isUsed(dev1)) VX  += dev1 * dev1;
+			if (Util.isUsed(dev2)) VY  += dev2 * dev2;
+			if (Util.isUsed(dev1) && Util.isUsed(dev2)) {
+				double entropy = 1;
+				if (entropySupport) {
+					entropy = calcEntropy(fieldId, isCached());
+					entropy = Util.isUsed(entropy) ? entropy : 1;
+				}
+				VXY += dev1 * dev2 * entropy;
+			}
+		}
+		
+		return VXY / Math.sqrt(VX * VY);
+	}
+	
+	
+	/**
+	 * Calculating the RPB measure between two pairs.
+	 * Mubbashir Ayub, Mustansar Ali Ghazanfar, Zahid MehmoodID, Tanzila Saba, Riad Alharbey, Asmaa Mahdi Munshi, and Mayda Abdullateef Alrige developed the RPB measure. Loc Nguyen implements it.
+	 * @param vRating1 first rating vector.
+	 * @param vRating2 second rating vector.
+	 * @param profile1 first profile.
+	 * @param profile2 second profile.
+	 * @author Mubbashir Ayub, Mustansar Ali Ghazanfar, Zahid MehmoodID, Tanzila Saba, Riad Alharbey, Asmaa Mahdi Munshi, Mayda Abdullateef Alrige
+	 * @return RPB measure between both two rating vectors.
+	 */
+	protected double rpb(RatingVector vRating1, RatingVector vRating2, Profile profile1, Profile profile2) {
+		double min = getMinRating(), max = getMaxRating();
+		vRating1 = vRating1.normalize(min, max);
+		vRating2 = vRating2.normalize(min, max);
+		
+		double mean1 = vRating1.mean();
+		double sd1 = Math.sqrt(vRating1.var());
+		double mean2 = vRating2.mean();
+		double sd2 = Math.sqrt(vRating2.var());
+		
+		return Math.cos(Math.abs(mean1-mean2) * Math.abs(sd1-sd2));
 	}
 	
 	
@@ -1277,7 +1431,7 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 	 * @param profile1 first profile.
 	 * @param profile2 second profile.
 	 * @author Shuang-Bo Sun, Zhi-Heng Zhang, Xin-Ling Dong, Heng-Ru Zhang, Tong-Jun Li, Lin Zhang, Fan Min
-	 * @return Triangle measure between both two rating vectors and profiles.
+	 * @return Triangle measure between both two rating vectors.
 	 */
 	protected double triangle(RatingVector vRating1, RatingVector vRating2,
 			Profile profile1, Profile profile2) {
@@ -1598,7 +1752,7 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 	 * @param vRating specified rating vector. It can be null.
 	 * @return mean of rating vector.
 	 */
-	protected static double calcMean(NeighborCF cf, Map<Integer, Double> means, RatingVector vRating) {
+	private static double calcMean(NeighborCF cf, Map<Integer, Double> means, RatingVector vRating) {
 		if (means == null && vRating == null) return Constants.UNUSED;
 		if (means == null) return vRating.mean();
 		

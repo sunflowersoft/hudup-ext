@@ -356,7 +356,7 @@ public class NeighborCFUserBased extends NeighborCF implements DuplicatableAlg {
 
 	@Override
 	protected double calcRowMean(RatingVector vRating) {
-		return calcMean(this, getUserMeans(), vRating);
+		return calcUserMean(vRating);
 	}
 
 
@@ -374,7 +374,7 @@ public class NeighborCFUserBased extends NeighborCF implements DuplicatableAlg {
 
 	@Override
 	protected double calcColumnMean(RatingVector vRating) {
-		return calcMean(this, getItemMeans(), vRating);
+		return calcItemMean(vRating);
 	}
 
 

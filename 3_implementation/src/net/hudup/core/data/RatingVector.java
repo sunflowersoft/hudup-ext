@@ -502,6 +502,27 @@ public class RatingVector implements Cloneable, TextParsable, Serializable {
 	
 	
 	/**
+	 * Normalizing this vector.
+	 * @param min minimum rating value.
+	 * @param max maximum rating value.
+	 * @return normalized vector.
+	 */
+	public RatingVector normalize(double min, double max) {
+		RatingVector newOne = newInstance();
+		newOne.setId(id);
+		Set<Integer> fieldIds = fieldIds(true);
+		double range = max - min;
+		for (int fieldId : fieldIds) {
+			Rating rating = (Rating)ratedMap.get(fieldId).clone();
+			rating.value = (rating.value-min) / range;
+			newOne.put(fieldId, rating);
+		}
+		
+		return newOne;
+	}
+	
+	
+	/**
 	 * Calculating the correlation coefficient of this rating vector and the specified rating vector according to their values.
 	 * Concretely, this rating vector and the specified rating vector produce two vectors of their values and this method calculates the correlation coefficient of such two value vectors.
 	 * @param that specified rating vector.

@@ -16,13 +16,13 @@ import net.hudup.core.data.Profile;
 import net.hudup.core.data.RatingVector;
 
 /**
- * Constrained Pearson correlation coefficient measure.
+ * TJM measure.
  * 
  * @author Loc Nguyen
  * @version 1.0
  *
  */
-public class CPC extends NeighborCFUserBased {
+public class TJM extends NeighborCFUserBased {
 
 	
 	/**
@@ -34,7 +34,7 @@ public class CPC extends NeighborCFUserBased {
 	/**
 	 * Default constructor.
 	 */
-	public CPC() {
+	public TJM() {
 
 	}
 
@@ -53,7 +53,7 @@ public class CPC extends NeighborCFUserBased {
 
 	@Override
 	protected String getDefaultMeasure() {
-		return Measure.CPC;
+		return Measure.TJM;
 	}
 
 
@@ -70,13 +70,14 @@ public class CPC extends NeighborCFUserBased {
 		config.remove(MEASURE);
 		config.remove(COSINE_NORMALIZED_FIELD);
 		config.remove(MSD_FRACTION_FIELD);
+		config.remove(ENTROPY_SUPPORT_FIELD);
 	}
 
 
 	@Override
 	protected double sim0(String measure, RatingVector vRating1, RatingVector vRating2, Profile profile1,
 			Profile profile2, Object... params) {
-		return cpc(vRating1, vRating2, profile1, profile2);
+		return triangle(vRating1, vRating2, profile1, profile2) * jaccard(vRating1, vRating2, profile1, profile2);
 	}
 
 	
@@ -86,7 +87,7 @@ public class CPC extends NeighborCFUserBased {
 		if (name != null && !name.isEmpty())
 			return name;
 		else
-			return "neighborcf_cpc";
+			return "neighborcf_tjm";
 	}
 
 

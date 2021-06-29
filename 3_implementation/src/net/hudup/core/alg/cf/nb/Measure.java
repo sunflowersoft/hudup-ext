@@ -119,4 +119,16 @@ public class Measure {
 	public static final String TJM = "tjm";
 
 	
+	/**
+	 * Name of IPC measure.
+	 */
+	public static final String IPC = "ipc";
+
+	
+	/**
+	 * Name of RPB measure.
+	 */
+	public static final String RPB = "rpb";
+	
+	
 }
