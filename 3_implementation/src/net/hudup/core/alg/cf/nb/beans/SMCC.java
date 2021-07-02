@@ -1,7 +1,7 @@
 /**
- * HUDUP: A FRAMEWORK OF E-COMMERCIAL RECOMMENDATION ALGORITHMS
+ * SIM: MACHINE LEARNING ALGORITHMS FRAMEWORK
  * (C) Copyright by Loc Nguyen's Academic Network
- * Project homepage: hudup.locnguyen.net
+ * Project homepage: sim.locnguyen.net
  * Email: ng_phloc@yahoo.com
  * Phone: +84-975250362
  */
@@ -16,13 +16,13 @@ import net.hudup.core.data.Profile;
 import net.hudup.core.data.RatingVector;
 
 /**
- * COJ measure.
+ * SMCC measure.
  * 
  * @author Loc Nguyen
  * @version 1.0
  *
  */
-public class COJ extends NeighborCFUserBased {
+public class SMCC extends NeighborCFUserBased {
 
 	
 	/**
@@ -34,7 +34,7 @@ public class COJ extends NeighborCFUserBased {
 	/**
 	 * Default constructor.
 	 */
-	public COJ() {
+	public SMCC() {
 
 	}
 
@@ -53,7 +53,7 @@ public class COJ extends NeighborCFUserBased {
 
 	@Override
 	protected String getDefaultMeasure() {
-		return Measure.COJ;
+		return Measure.SMCC;
 	}
 
 
@@ -68,14 +68,23 @@ public class COJ extends NeighborCFUserBased {
 		super.updateConfig(measure);
 		
 		config.remove(MEASURE);
+		config.remove(COSINE_NORMALIZED_FIELD);
 		config.remove(MSD_FRACTION_FIELD);
+		config.remove(ENTROPY_SUPPORT_FIELD);
+		config.remove(JACCARD_TYPE);
+		config.remove(COSINE_TYPE);
+		config.remove(PEARSON_TYPE);
+		config.remove(MSD_TYPE);
+		config.remove(TRIANGLE_TYPE);
+		config.remove(IPWR_ALPHA_FIELD);
+		config.remove(IPWR_BETA_FIELD);
 	}
 
 
 	@Override
 	protected double sim0(String measure, RatingVector vRating1, RatingVector vRating2, Profile profile1,
 			Profile profile2, Object... params) {
-		return coj(vRating1, vRating2, profile1, profile2);
+		return smcc(vRating1, vRating2, profile1, profile2);
 	}
 
 	
@@ -85,7 +94,7 @@ public class COJ extends NeighborCFUserBased {
 		if (name != null && !name.isEmpty())
 			return name;
 		else
-			return "neighborcf_coj";
+			return "neighborcf_smcc";
 	}
 
 

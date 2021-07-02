@@ -70,6 +70,12 @@ public class MSD extends NeighborCFUserBased {
 		config.remove(MEASURE);
 		config.remove(COSINE_NORMALIZED_FIELD);
 		config.remove(ENTROPY_SUPPORT_FIELD);
+		config.remove(JACCARD_TYPE);
+		config.remove(COSINE_TYPE);
+		config.remove(PEARSON_TYPE);
+		config.remove(TRIANGLE_TYPE);
+		config.remove(IPWR_ALPHA_FIELD);
+		config.remove(IPWR_BETA_FIELD);
 	}
 
 

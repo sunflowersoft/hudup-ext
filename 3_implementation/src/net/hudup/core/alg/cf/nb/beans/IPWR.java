@@ -16,13 +16,13 @@ import net.hudup.core.data.Profile;
 import net.hudup.core.data.RatingVector;
 
 /**
- * MSDJ measure.
+ * IPWR measure.
  * 
  * @author Loc Nguyen
  * @version 1.0
  *
  */
-public class MSDJ extends NeighborCFUserBased {
+public class IPWR extends NeighborCFUserBased {
 
 	
 	/**
@@ -34,7 +34,7 @@ public class MSDJ extends NeighborCFUserBased {
 	/**
 	 * Default constructor.
 	 */
-	public MSDJ() {
+	public IPWR() {
 
 	}
 
@@ -53,7 +53,7 @@ public class MSDJ extends NeighborCFUserBased {
 
 	@Override
 	protected String getDefaultMeasure() {
-		return Measure.MSDJ;
+		return Measure.IPWR;
 	}
 
 
@@ -69,14 +69,20 @@ public class MSDJ extends NeighborCFUserBased {
 		
 		config.remove(MEASURE);
 		config.remove(COSINE_NORMALIZED_FIELD);
+		config.remove(MSD_FRACTION_FIELD);
 		config.remove(ENTROPY_SUPPORT_FIELD);
+		config.remove(JACCARD_TYPE);
+		config.remove(COSINE_TYPE);
+		config.remove(PEARSON_TYPE);
+		config.remove(MSD_TYPE);
+		config.remove(TRIANGLE_TYPE);
 	}
 
 
 	@Override
 	protected double sim0(String measure, RatingVector vRating1, RatingVector vRating2, Profile profile1,
 			Profile profile2, Object... params) {
-		return msd(vRating1, vRating2, profile1, profile2) * jaccard(vRating1, vRating2, profile1, profile2);
+		return ipwr(vRating1, vRating2, profile1, profile2);
 	}
 
 	
@@ -86,7 +92,7 @@ public class MSDJ extends NeighborCFUserBased {
 		if (name != null && !name.isEmpty())
 			return name;
 		else
-			return "neighborcf_msdj";
+			return "neighborcf_ipwr";
 	}
 
 

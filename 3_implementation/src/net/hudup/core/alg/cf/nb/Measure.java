@@ -24,51 +24,9 @@ public class Measure {
 
 	
 	/**
-	 * Name of cosine + Jaccard measure.
-	 */
-	public static final String COSINEJ = "cosinej";
-
-	
-	/**
-	 * Name of pseudo Cosine + Jaccard.
-	 */
-	public static final String COJ = "coj";
-
-	
-	/**
 	 * Name of Pearson measure.
 	 */
 	public static final String PEARSON = "pearson";
-
-	
-	/**
-	 * Name of Pearson + Jaccard measure.
-	 */
-	public static final String PEARSONJ = "pearsonj";
-
-	
-	/**
-	 * Name of adjusted cosine measure.
-	 */
-	public static final String COD = "cod";
-
-	
-	/**
-	 * Name of constrained Pearson correlation coefficient measure. It is also cosine normalized (CON) measure.
-	 */
-	public static final String CPC = "cpc";
-	
-	
-	/**
-	 * Name of weighted Pearson correlation coefficient measure.
-	 */
-	public static final String WPC = "wpc";
-	
-	
-	/**
-	 * Name of sigmoid Pearson correlation coefficient measure.
-	 */
-	public static final String SPC = "spc";
 
 	
 	/**
@@ -78,27 +36,9 @@ public class Measure {
 
 	
 	/**
-	 * Name of Jaccard2 measure.
-	 */
-	public static final String JACCARD2 = "jaccard2";
-
-	
-	/**
-	 * Name of Dice measure.
-	 */
-	public static final String DICE = "dice";
-
-	
-	/**
 	 * Name of MSD measure.
 	 */
 	public static final String MSD = "msd";
-
-	
-	/**
-	 * Name of MSD + Jaccard measure.
-	 */
-	public static final String MSDJ = "msdj";
 
 	
 	/**
@@ -114,21 +54,33 @@ public class Measure {
 
 	
 	/**
-	 * Name of TJM measure.
-	 */
-	public static final String TJM = "tjm";
-
-	
-	/**
-	 * Name of IPC measure.
-	 */
-	public static final String IPC = "ipc";
-
-	
-	/**
 	 * Name of RPB measure.
 	 */
 	public static final String RPB = "rpb";
 	
 	
+	/**
+	 * SMCC measure.
+	 */
+	public static final String SMCC = "smcc";
+
+	
+	/**
+	 * Absolute Difference of Ratings (ADR) measure.
+	 */
+	public static final String ADR = "adr";
+	
+	
+	/**
+	 * OS measure.
+	 */
+	public static final String OS = "os";
+	
+	
+	/**
+	 * IPWR measure.
+	 */
+	public static final String IPWR = "ipwr";
+
+
 }

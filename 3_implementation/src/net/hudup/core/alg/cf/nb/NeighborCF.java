@@ -31,8 +31,8 @@ import net.hudup.core.data.Fetcher;
 import net.hudup.core.data.Profile;
 import net.hudup.core.data.RatingVector;
 import net.hudup.core.data.ui.ImportantProperty;
+import net.hudup.core.evaluate.recommend.Accuracy;
 import net.hudup.core.logistic.LogUtil;
-import net.hudup.core.logistic.NextUpdate;
 import net.hudup.core.logistic.Vector;
 
 /**
@@ -54,7 +54,11 @@ import net.hudup.core.logistic.Vector;
  * <br>
  * Shuang-Bo Sun, Zhi-Heng Zhang, Xin-Ling Dong, Heng-Ru Zhang, Tong-Jun Li, Lin Zhang, and Fan Min contributed Triangle measure and TJM measure.<br>
  * <br>
- * Mubbashir Ayub, Mustansar Ali Ghazanfar, Zahid MehmoodID, Tanzila Saba, Riad Alharbey, Asmaa Mahdi Munshi, Mayda Abdullateef Alrige contributed measures IPC and RPB.<br>
+ * Mubbashir Ayub, Mustansar Ali Ghazanfar, Zahid MehmoodID, Tanzila Saba, Riad Alharbey, Asmaa Mahdi Munshi, Mayda Abdullateef Alrige contributed measures RDP, IPC, and IPWR.<br>
+ * <br>
+ * Vijay Verma and Rajesh Kumar Aggarwal contributed SMCC measure.<br>
+ * <br>
+ * Achraf Gazdar and Lotfi Hidri contributed Absolute Difference of Ratings (ADR) measure and OS measure.<br>
  * 
  * @author Loc Nguyen
  * @version 10.0
@@ -106,6 +110,48 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 
 	
 	/**
+	 * Entropy support mode.
+	 */
+	protected static final String ENTROPY_SUPPORT_FIELD = "entropy_support";
+
+	
+	/**
+	 * Default value for entropy support mode.
+	 */
+	protected static final boolean ENTROPY_SUPPORT_DEFAULT = false;
+
+	
+	/**
+	 * Cosine type.
+	 */
+	protected static final String COSINE_TYPE = "cosine_type";
+
+	
+	/**
+	 * Normal cosine.
+	 */
+	protected static final String COSINE_TYPE_NORMAL = "cosine";
+	
+	
+	/**
+	 * Adjusted cosine.
+	 */
+	protected static final String COSINE_TYPE_ADJUSTED = "cod";
+
+	
+	/**
+	 * Jaccard-like cosine.
+	 */
+	protected static final String COSINE_TYPE_JACCARD_LIKE = "coj";
+
+	
+	/**
+	 * Jaccard cosine.
+	 */
+	protected static final String COSINE_TYPE_JACCARD = "cosinej";
+
+	
+	/**
 	 * Cosine normalized mode.
 	 */
 	protected static final String COSINE_NORMALIZED_FIELD = "cosine_normalized";
@@ -115,6 +161,24 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 	 * Default cosine normalized mode.
 	 */
 	protected static final boolean COSINE_NORMALIZED_DEFAULT = false;
+
+	
+	/**
+	 * MSD type.
+	 */
+	protected static final String MSD_TYPE = "msd_type";
+
+	
+	/**
+	 * Normal MSD.
+	 */
+	protected static final String MSD_TYPE_NORMAL = "msd";
+	
+	
+	/**
+	 * Jaccard MSD.
+	 */
+	protected static final String MSD_TYPE_JACCARD = "msdj";
 
 	
 	/**
@@ -130,21 +194,123 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 
 	
 	/**
-	 * Entropy support mode.
+	 * Pearson type.
 	 */
-	protected static final String ENTROPY_SUPPORT_FIELD = "entropy_support";
+	protected static final String PEARSON_TYPE = "pearson_type";
 
 	
 	/**
-	 * Default value for entropy support mode.
+	 * Normal Pearson.
 	 */
-	protected static final boolean ENTROPY_SUPPORT_DEFAULT = false;
+	protected static final String PEARSON_TYPE_NORMAL = "pearson";
+	
+	
+	/**
+	 * Jaccard Pearson.
+	 */
+	protected static final String PEARSON_TYPE_JACCARD = "pearsonj";
+
+	
+	/**
+	 * Constrained Pearson.
+	 */
+	protected static final String PEARSON_TYPE_CPC = "cpc";
+
+	
+	/**
+	 * Weighted Pearson.
+	 */
+	protected static final String PEARSON_TYPE_WPC = "wpc";
+
+	
+	/**
+	 * Sigmoid Pearson.
+	 */
+	protected static final String PEARSON_TYPE_SPC = "spc";
+
+	
+	/**
+	 * IPC.
+	 */
+	protected static final String PEARSON_TYPE_IPC = "ipc";
 
 	
 	/**
 	 * Threshold for WPCC (weighted Pearson correlation coefficient).
 	 */
 	protected static final double WPC_THRESHOLD = 50;
+
+	
+	/**
+	 * Jaccard type.
+	 */
+	protected static final String JACCARD_TYPE = "jaccard_type";
+
+	
+	/**
+	 * Normal Jaccard.
+	 */
+	protected static final String JACCARD_TYPE_NORMAL = "normal";
+	
+	
+	/**
+	 * Multiplication Jaccard.
+	 */
+	protected static final String JACCARD_TYPE_MULTI = "multi";
+
+	
+	/**
+	 * Dice Jaccard.
+	 */
+	protected static final String JACCARD_TYPE_DICE = "dice";
+
+	
+	/**
+	 * Percentage of Non Common Ratings (PNCR).
+	 */
+	protected static final String JACCARD_TYPE_PNCR = "pncr";
+
+	
+	/**
+	 * Triangle type.
+	 */
+	protected static final String TRIANGLE_TYPE = "triangle_type";
+
+	
+	/**
+	 * Normal triangle.
+	 */
+	protected static final String TRIANGLE_TYPE_NORMAL = "triangle";
+	
+	
+	/**
+	 * TJM.
+	 */
+	protected static final String TRIANGLE_TYPE_TJM = "tjm";
+
+	
+	/**
+	 * IPWR alpha field.
+	 */
+	protected static final String IPWR_ALPHA_FIELD = "ipwr_alpha";
+
+	
+	/**
+	 * Default IPWR alpha.
+	 */
+	protected static final double IPWR_ALPHA_DEFAULT = 0.5;
+
+	
+	/**
+	 * IPWR beta field.
+	 */
+	protected static final String IPWR_BETA_FIELD = "ipwr_beta";
+
+	
+	/**
+	 * Default IPWR beta.
+	 */
+	protected static final double IPWR_BETA_DEFAULT = 0.5;
 
 	
 	/**
@@ -634,10 +800,6 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 	public List<String> getAllMeasures() {
 		Set<String> mSet = Util.newSet();
 		mSet.addAll(getMainMeasures());
-		mSet.add(Measure.COSINEJ);
-		mSet.add(Measure.PEARSONJ);
-		mSet.add(Measure.MSDJ);
-		mSet.add(Measure.TJM);
 		
 		List<String> measures = Util.newList();
 		measures.addAll(mSet);
@@ -653,17 +815,14 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 	public List<String> getMainMeasures() {
 		Set<String> mSet = Util.newSet();
 		mSet.add(Measure.COSINE);
-		mSet.add(Measure.COJ);
 		mSet.add(Measure.PEARSON);
-		mSet.add(Measure.COD);
-		mSet.add(Measure.CPC);
-		mSet.add(Measure.WPC);
-		mSet.add(Measure.SPC);
 		mSet.add(Measure.JACCARD);
-		mSet.add(Measure.JACCARD2);
 		mSet.add(Measure.MSD);
 		mSet.add(Measure.URP);
 		mSet.add(Measure.TRIANGLE);
+		mSet.add(Measure.IPWR);
+		mSet.add(Measure.SMCC);
+		mSet.add(Measure.ADR);
 		
 		List<String> measures = Util.newList();
 		measures.addAll(mSet);
@@ -778,42 +937,26 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 		
 		if (measure.equals(Measure.COSINE))
 			return cosine(vRating1, vRating2, profile1, profile2);
-		else if (measure.equals(Measure.COSINEJ))
-			return cosine(vRating1, vRating2, profile1, profile2) * jaccard(vRating1, vRating2, profile1, profile2);
-		else if (measure.equals(Measure.COJ))
-			return coj(vRating1, vRating2, profile1, profile2);
 		else if (measure.equals(Measure.PEARSON))
-			return corr(vRating1, vRating2, profile1, profile2);
-		else if (measure.equals(Measure.PEARSONJ))
-			return corr(vRating1, vRating2, profile1, profile2) * jaccard(vRating1, vRating2, profile1, profile2);
-		else if (measure.equals(Measure.COD))
-			return cod(vRating1, vRating2, profile1, profile2);
-		else if (measure.equals(Measure.CPC))
-			return cpc(vRating1, vRating2, profile1, profile2);
-		else if (measure.equals(Measure.WPC))
-			return wpc(vRating1, vRating2, profile1, profile2);
-		else if (measure.equals(Measure.SPC))
-			return spc(vRating1, vRating2, profile1, profile2);
-		else if (measure.equals(Measure.IPC))
-			return ipc(vRating1, vRating2, profile1, profile2);
+			return pearson(vRating1, vRating2, profile1, profile2);
 		else if (measure.equals(Measure.RPB))
 			return rpb(vRating1, vRating2, profile1, profile2);
 		else if (measure.equals(Measure.JACCARD))
 			return jaccard(vRating1, vRating2, profile1, profile2);
-		else if (measure.equals(Measure.JACCARD2))
-			return jaccard2(vRating1, vRating2, profile1, profile2);
-		else if (measure.equals(Measure.DICE))
-			return dice(vRating1, vRating2, profile1, profile2);
 		else if (measure.equals(Measure.MSD))
 			return msd(vRating1, vRating2, profile1, profile2);
-		else if (measure.equals(Measure.MSDJ))
-			return msd(vRating1, vRating2, profile1, profile2) * jaccard(vRating1, vRating2, profile1, profile2);
 		else if (measure.equals(Measure.URP))
 			return urp(vRating1, vRating2, profile1, profile2);
 		else if (measure.equals(Measure.TRIANGLE))
 			return triangle(vRating1, vRating2, profile1, profile2);
-		else if (measure.equals(Measure.TJM))
-			return triangle(vRating1, vRating2, profile1, profile2) * jaccard(vRating1, vRating2, profile1, profile2);
+		else if (measure.equals(Measure.SMCC))
+			return smcc(vRating1, vRating2, profile1, profile2);
+		else if (measure.equals(Measure.ADR))
+			return adr(vRating1, vRating2, profile1, profile2);
+		else if (measure.equals(Measure.IPWR))
+			return ipwr(vRating1, vRating2, profile1, profile2);
+		else if (measure.equals(Measure.OS))
+			return os(vRating1, vRating2, profile1, profile2);
 		else
 			return Constants.UNUSED;
 	}
@@ -829,91 +972,164 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 		config.removeReadOnly(COSINE_NORMALIZED_FIELD);
 		config.removeReadOnly(MSD_FRACTION_FIELD);
 		config.removeReadOnly(ENTROPY_SUPPORT_FIELD);
+		config.removeReadOnly(JACCARD_TYPE);
+		config.removeReadOnly(COSINE_TYPE);
+		config.removeReadOnly(PEARSON_TYPE);
+		config.removeReadOnly(MSD_TYPE);
+		config.removeReadOnly(TRIANGLE_TYPE);
+		config.removeReadOnly(IPWR_ALPHA_FIELD);
+		config.removeReadOnly(IPWR_BETA_FIELD);
 		if (measure.equals(Measure.COSINE)) {
 			config.addReadOnly(MSD_FRACTION_FIELD);
-		}
-		else if (measure.equals(Measure.COSINEJ)) {
-			config.addReadOnly(MSD_FRACTION_FIELD);
-		}
-		else if (measure.equals(Measure.COJ)) {
-			config.addReadOnly(MSD_FRACTION_FIELD);
+			config.addReadOnly(JACCARD_TYPE);
+			config.addReadOnly(PEARSON_TYPE);
+			config.addReadOnly(MSD_TYPE);
+			config.addReadOnly(TRIANGLE_TYPE);
+			config.addReadOnly(IPWR_ALPHA_FIELD);
+			config.addReadOnly(IPWR_BETA_FIELD);
 		}
 		else if (measure.equals(Measure.PEARSON)) {
 			config.addReadOnly(COSINE_NORMALIZED_FIELD);
 			config.addReadOnly(MSD_FRACTION_FIELD);
-		}
-		else if (measure.equals(Measure.PEARSONJ)) {
-			config.addReadOnly(COSINE_NORMALIZED_FIELD);
-			config.addReadOnly(MSD_FRACTION_FIELD);
-		}
-		else if (measure.equals(Measure.COD)) {
-			config.addReadOnly(COSINE_NORMALIZED_FIELD);
-			config.addReadOnly(MSD_FRACTION_FIELD);
-		}
-		else if (measure.equals(Measure.CPC)) {
-			config.addReadOnly(COSINE_NORMALIZED_FIELD);
-			config.addReadOnly(MSD_FRACTION_FIELD);
-		}
-		else if (measure.equals(Measure.WPC)) {
-			config.addReadOnly(COSINE_NORMALIZED_FIELD);
-			config.addReadOnly(MSD_FRACTION_FIELD);
-		}
-		else if (measure.equals(Measure.SPC)) {
-			config.addReadOnly(COSINE_NORMALIZED_FIELD);
-			config.addReadOnly(MSD_FRACTION_FIELD);
-		}
-		else if (measure.equals(Measure.IPC)) {
-			config.addReadOnly(COSINE_NORMALIZED_FIELD);
-			config.addReadOnly(MSD_FRACTION_FIELD);
+			config.addReadOnly(JACCARD_TYPE);
+			config.addReadOnly(COSINE_TYPE);
+			config.addReadOnly(MSD_TYPE);
+			config.addReadOnly(TRIANGLE_TYPE);
+			config.addReadOnly(IPWR_ALPHA_FIELD);
+			config.addReadOnly(IPWR_BETA_FIELD);
 		}
 		else if (measure.equals(Measure.RPB)) {
 			config.addReadOnly(COSINE_NORMALIZED_FIELD);
 			config.addReadOnly(MSD_FRACTION_FIELD);
 			config.addReadOnly(ENTROPY_SUPPORT_FIELD);
+			config.addReadOnly(JACCARD_TYPE);
+			config.addReadOnly(COSINE_TYPE);
+			config.addReadOnly(PEARSON_TYPE);
+			config.addReadOnly(MSD_TYPE);
+			config.addReadOnly(TRIANGLE_TYPE);
+			config.addReadOnly(IPWR_ALPHA_FIELD);
+			config.addReadOnly(IPWR_BETA_FIELD);
 		}
 		else if (measure.equals(Measure.JACCARD)) {
 			config.addReadOnly(COSINE_NORMALIZED_FIELD);
 			config.addReadOnly(MSD_FRACTION_FIELD);
 			config.addReadOnly(ENTROPY_SUPPORT_FIELD);
-		}
-		else if (measure.equals(Measure.JACCARD2)) {
-			config.addReadOnly(COSINE_NORMALIZED_FIELD);
-			config.addReadOnly(MSD_FRACTION_FIELD);
-			config.addReadOnly(ENTROPY_SUPPORT_FIELD);
-		}
-		else if (measure.equals(Measure.DICE)) {
-			config.addReadOnly(COSINE_NORMALIZED_FIELD);
-			config.addReadOnly(MSD_FRACTION_FIELD);
-			config.addReadOnly(ENTROPY_SUPPORT_FIELD);
+			config.addReadOnly(COSINE_TYPE);
+			config.addReadOnly(PEARSON_TYPE);
+			config.addReadOnly(MSD_TYPE);
+			config.addReadOnly(TRIANGLE_TYPE);
+			config.addReadOnly(IPWR_ALPHA_FIELD);
+			config.addReadOnly(IPWR_BETA_FIELD);
 		}
 		else if (measure.equals(Measure.MSD)) {
 			config.addReadOnly(COSINE_NORMALIZED_FIELD);
 			config.addReadOnly(ENTROPY_SUPPORT_FIELD);
-		}
-		else if (measure.equals(Measure.MSDJ)) {
-			config.addReadOnly(COSINE_NORMALIZED_FIELD);
-			config.addReadOnly(ENTROPY_SUPPORT_FIELD);
+			config.addReadOnly(JACCARD_TYPE);
+			config.addReadOnly(COSINE_TYPE);
+			config.addReadOnly(PEARSON_TYPE);
+			config.addReadOnly(TRIANGLE_TYPE);
+			config.addReadOnly(IPWR_ALPHA_FIELD);
+			config.addReadOnly(IPWR_BETA_FIELD);
 		}
 		else if (measure.equals(Measure.URP)) {
 			config.addReadOnly(COSINE_NORMALIZED_FIELD);
 			config.addReadOnly(MSD_FRACTION_FIELD);
 			config.addReadOnly(ENTROPY_SUPPORT_FIELD);
+			config.addReadOnly(JACCARD_TYPE);
+			config.addReadOnly(COSINE_TYPE);
+			config.addReadOnly(PEARSON_TYPE);
+			config.addReadOnly(MSD_TYPE);
+			config.addReadOnly(TRIANGLE_TYPE);
+			config.addReadOnly(IPWR_ALPHA_FIELD);
+			config.addReadOnly(IPWR_BETA_FIELD);
 		}
 		else if (measure.equals(Measure.TRIANGLE)) {
 			config.addReadOnly(COSINE_NORMALIZED_FIELD);
 			config.addReadOnly(MSD_FRACTION_FIELD);
 			config.addReadOnly(ENTROPY_SUPPORT_FIELD);
+			config.addReadOnly(JACCARD_TYPE);
+			config.addReadOnly(COSINE_TYPE);
+			config.addReadOnly(PEARSON_TYPE);
+			config.addReadOnly(MSD_TYPE);
+			config.addReadOnly(IPWR_ALPHA_FIELD);
+			config.addReadOnly(IPWR_BETA_FIELD);
 		}
-		else if (measure.equals(Measure.TJM)) {
+		else if (measure.equals(Measure.SMCC)) {
 			config.addReadOnly(COSINE_NORMALIZED_FIELD);
 			config.addReadOnly(MSD_FRACTION_FIELD);
 			config.addReadOnly(ENTROPY_SUPPORT_FIELD);
+			config.addReadOnly(JACCARD_TYPE);
+			config.addReadOnly(COSINE_TYPE);
+			config.addReadOnly(PEARSON_TYPE);
+			config.addReadOnly(MSD_TYPE);
+			config.addReadOnly(TRIANGLE_TYPE);
+			config.addReadOnly(IPWR_ALPHA_FIELD);
+			config.addReadOnly(IPWR_BETA_FIELD);
+		}
+		else if (measure.equals(Measure.ADR)) {
+			config.addReadOnly(COSINE_NORMALIZED_FIELD);
+			config.addReadOnly(MSD_FRACTION_FIELD);
+			config.addReadOnly(ENTROPY_SUPPORT_FIELD);
+			config.addReadOnly(JACCARD_TYPE);
+			config.addReadOnly(COSINE_TYPE);
+			config.addReadOnly(PEARSON_TYPE);
+			config.addReadOnly(MSD_TYPE);
+			config.addReadOnly(TRIANGLE_TYPE);
+			config.addReadOnly(IPWR_ALPHA_FIELD);
+			config.addReadOnly(IPWR_BETA_FIELD);
+		}
+		else if (measure.equals(Measure.IPWR)) {
+			config.addReadOnly(COSINE_NORMALIZED_FIELD);
+			config.addReadOnly(MSD_FRACTION_FIELD);
+			config.addReadOnly(ENTROPY_SUPPORT_FIELD);
+			config.addReadOnly(JACCARD_TYPE);
+			config.addReadOnly(COSINE_TYPE);
+			config.addReadOnly(PEARSON_TYPE);
+			config.addReadOnly(MSD_TYPE);
+			config.addReadOnly(TRIANGLE_TYPE);
+		}
+		else if (measure.equals(Measure.OS)) {
+			config.addReadOnly(COSINE_NORMALIZED_FIELD);
+			config.addReadOnly(MSD_FRACTION_FIELD);
+			config.addReadOnly(ENTROPY_SUPPORT_FIELD);
+			config.addReadOnly(JACCARD_TYPE);
+			config.addReadOnly(COSINE_TYPE);
+			config.addReadOnly(PEARSON_TYPE);
+			config.addReadOnly(MSD_TYPE);
+			config.addReadOnly(TRIANGLE_TYPE);
+			config.addReadOnly(IPWR_ALPHA_FIELD);
+			config.addReadOnly(IPWR_BETA_FIELD);
 		}
 	}
 	
 	
 	/**
 	 * Calculating the cosine measure between two pairs.
+	 * The first pair includes the first rating vector and the first profile.
+	 * The second pair includes the second rating vector and the second profile.
+	 * @param vRating1 first rating vector.
+	 * @param vRating2 second rating vector.
+	 * @param profile1 first profile.
+	 * @param profile2 second profile.
+	 * @return the cosine between both two {@link RatingVector} (s) and two {@link Profile} (s).
+	 */
+	protected double cosine(RatingVector vRating1, RatingVector vRating2, Profile profile1, Profile profile2) {
+		String ctype = config.getAsString(COSINE_TYPE);
+		if (ctype.equals(COSINE_TYPE_NORMAL))
+			return cosineNormal(vRating1, vRating2, profile1, profile2);
+		else if (ctype.equals(COSINE_TYPE_ADJUSTED))
+			return cod(vRating1, vRating2, profile1, profile2);
+		else if (ctype.equals(COSINE_TYPE_JACCARD_LIKE))
+			return coj(vRating1, vRating2, profile1, profile2);
+		else if (ctype.equals(COSINE_TYPE_JACCARD))
+			return jaccardNormal(vRating1, vRating2, profile1, profile2) * cosineNormal(vRating1, vRating2, profile1, profile2);
+		else
+			return cosineNormal(vRating1, vRating2, profile1, profile2);
+	}
+	
+	
+	/**
+	 * Calculating the normal cosine measure between two pairs.
 	 * The first pair includes the first rating vector and the first profile.
 	 * The second pair includes the second rating vector and the second profile.
 	 * 
@@ -923,8 +1139,7 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 	 * @param profile2 second profile.
 	 * @return the cosine between both two {@link RatingVector} (s) and two {@link Profile} (s).
 	 */
-	@NextUpdate
-	protected double cosine(
+	protected double cosineNormal(
 			RatingVector vRating1, RatingVector vRating2,
 			Profile profile1, Profile profile2) {
 		
@@ -991,13 +1206,13 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 
 	
 	/**
-	 * Calculating the Cosine-Jaccard measure between two pairs. Cosine-Jaccard is developed by Loc Nguyen.
+	 * Calculating the Jaccard-like cosine measure between two pairs. Jaccard-like cosine is developed by Loc Nguyen.
 	 * @param vRating1 first rating vector.
 	 * @param vRating2 second rating vector.
 	 * @param profile1 first profile.
 	 * @param profile2 second profile.
 	 * @author Loc Nguyen
-	 * @return Cosine-Jaccard measure between both two rating vectors and profiles.
+	 * @return Jaccard-like cosine measure between both two rating vectors and profiles.
 	 */
 	protected double coj(RatingVector vRating1, RatingVector vRating2,
 			Profile profile1, Profile profile2) {
@@ -1032,7 +1247,7 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 	
 	
 	/**
-	 * Calculating the correlation coefficient between two pairs.
+	 * Calculating the Pearson measure between two pairs.
 	 * The first pair includes the first rating vector and the first profile.
 	 * The second pair includes the second rating vector and the second profile.
 	 * 
@@ -1040,12 +1255,24 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 	 * @param vRating2 second rating vector.
 	 * @param profile1 first profile.
 	 * @param profile2 second profile.
-	 * @return correlation coefficient between both two {@link RatingVector} (s) and two {@link Profile} (s).
+	 * @return Pearson measure between both two {@link RatingVector} (s) and two {@link Profile} (s).
 	 */
-	protected double corr(RatingVector vRating1, RatingVector vRating2,
-			Profile profile1, Profile profile2) {
-		
-		return corr(vRating1, vRating2);
+	protected double pearson(RatingVector vRating1, RatingVector vRating2, Profile profile1, Profile profile2) {
+		String ptype = config.getAsString(PEARSON_TYPE);
+		if (ptype.equals(PEARSON_TYPE_NORMAL))
+			return corr(vRating1, vRating2);
+		else if (ptype.equals(PEARSON_TYPE_JACCARD))
+			return corr(vRating1, vRating2) * jaccardNormal(vRating1, vRating2, profile1, profile2);
+		else if (ptype.equals(PEARSON_TYPE_CPC))
+			return cpc(vRating1, vRating2, profile1, profile2);
+		else if (ptype.equals(PEARSON_TYPE_WPC))
+			return wpc(vRating1, vRating2, profile1, profile2);
+		else if (ptype.equals(PEARSON_TYPE_SPC))
+			return spc(vRating1, vRating2, profile1, profile2);
+		else if (ptype.equals(PEARSON_TYPE_IPC))
+			return ipc(vRating1, vRating2, profile1, profile2);
+		else
+			return corr(vRating1, vRating2);
 		
 //		if (profile1 == null || profile2 == null)
 //			return vRating1.corr(vRating2);
@@ -1205,9 +1432,9 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 		Set<Integer> common = commonFieldIds(vRating1, vRating2);
 		double N = common.size();
 		if (N <= WPC_THRESHOLD)
-			return corr(vRating1, vRating2, profile1, profile2) * (N/WPC_THRESHOLD);
+			return corr(vRating1, vRating2) * (N/WPC_THRESHOLD);
 		else
-			return corr(vRating1, vRating2, profile1, profile2);
+			return corr(vRating1, vRating2);
 	}
 	
 	
@@ -1228,7 +1455,7 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 		Set<Integer> common = commonFieldIds(vRating1, vRating2);
 		double N = common.size();
 		
-		return corr(vRating1, vRating2, profile1, profile2) / (1 + Math.exp(-N/2.0));
+		return corr(vRating1, vRating2) / (1 + Math.exp(-N/2.0));
 	}
 	
 	
@@ -1299,11 +1526,27 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 	}
 	
 	
+	
+	
+	/**
+	 * Calculating the IPWR measure between two pairs.
+	 * Mubbashir Ayub, Mustansar Ali Ghazanfar, Zahid MehmoodID, Tanzila Saba, Riad Alharbey, Asmaa Mahdi Munshi, and Mayda Abdullateef Alrige developed the IPWR measure. Loc Nguyen implements it.
+	 * @param vRating1 first rating vector.
+	 * @param vRating2 second rating vector.
+	 * @param profile1 first profile.
+	 * @param profile2 second profile.
+	 * @author Mubbashir Ayub, Mustansar Ali Ghazanfar, Zahid MehmoodID, Tanzila Saba, Riad Alharbey, Asmaa Mahdi Munshi, Mayda Abdullateef Alrige
+	 * @return IPWR measure between both two rating vectors.
+	 */
+	protected double ipwr(RatingVector vRating1, RatingVector vRating2, Profile profile1, Profile profile2) {
+		double alpha = config.getAsReal(IPWR_ALPHA_FIELD);
+		double beta = config.getAsReal(IPWR_BETA_FIELD);
+		return alpha*rpb(vRating1, vRating2, profile1, profile2) + beta*ipc(vRating1, vRating2, profile1, profile2);
+	}
+
+		
 	/**
 	 * Calculating the Jaccard measure between two pairs.
-	 * The first pair includes the first rating vector and the first profile.
-	 * The second pair includes the second rating vector and the second profile.
-	 * 
 	 * @param vRating1 first rating vector.
 	 * @param vRating2 second rating vector.
 	 * @param profile1 first profile.
@@ -1311,6 +1554,30 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 	 * @return Jaccard measure between both two rating vectors and profiles.
 	 */
 	protected double jaccard(RatingVector vRating1, RatingVector vRating2,
+			Profile profile1, Profile profile2) {
+		String jtype = config.getAsString(JACCARD_TYPE);
+		if (jtype.equals(JACCARD_TYPE_NORMAL))
+			return jaccardNormal(vRating1, vRating2, profile1, profile2);
+		else if (jtype.equals(JACCARD_TYPE_MULTI))
+			return jaccardMulti(vRating1, vRating2, profile1, profile2);
+		else if (jtype.equals(JACCARD_TYPE_DICE))
+			return jaccardDice(vRating1, vRating2, profile1, profile2);
+		else if (jtype.equals(JACCARD_TYPE_PNCR))
+			return Math.exp(jaccardNormal(vRating1, vRating2, profile1, profile2) - 1.0);
+		else
+			return jaccardNormal(vRating1, vRating2, profile1, profile2);
+	}
+	
+	
+	/**
+	 * Calculating the normal Jaccard measure between two pairs.
+	 * @param vRating1 first rating vector.
+	 * @param vRating2 second rating vector.
+	 * @param profile1 first profile.
+	 * @param profile2 second profile.
+	 * @return Jaccard measure between both two rating vectors and profiles.
+	 */
+	protected double jaccardNormal(RatingVector vRating1, RatingVector vRating2,
 			Profile profile1, Profile profile2) {
 		Set<Integer> set1 = vRating1.fieldIds(true);
 		Set<Integer> set2 = vRating2.fieldIds(true);
@@ -1325,14 +1592,14 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 	
 	
 	/**
-	 * Calculating the Jaccard2 measure between two pairs.
+	 * Calculating the multiplied Jaccard measure between two pairs.
 	 * @param vRating1 first rating vector.
 	 * @param vRating2 second rating vector.
 	 * @param profile1 first profile.
 	 * @param profile2 second profile.
 	 * @return Jaccard2 measure between both two rating vectors and profiles.
 	 */
-	protected double jaccard2(RatingVector vRating1, RatingVector vRating2,
+	protected double jaccardMulti(RatingVector vRating1, RatingVector vRating2,
 			Profile profile1, Profile profile2) {
 		Set<Integer> set1 = vRating1.fieldIds(true);
 		Set<Integer> set2 = vRating2.fieldIds(true);
@@ -1347,14 +1614,14 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 
 	
 	/**
-	 * Calculating the Dice measure between two pairs.
+	 * Calculating the Dice Jaccard measure between two pairs.
 	 * @param vRating1 first rating vector.
 	 * @param vRating2 second rating vector.
 	 * @param profile1 first profile.
 	 * @param profile2 second profile.
 	 * @return Dice measure between both two rating vectors and profiles.
 	 */
-	protected double dice(RatingVector vRating1, RatingVector vRating2,
+	protected double jaccardDice(RatingVector vRating1, RatingVector vRating2,
 			Profile profile1, Profile profile2) {
 		Set<Integer> set1 = vRating1.fieldIds(true);
 		Set<Integer> set2 = vRating2.fieldIds(true);
@@ -1372,14 +1639,34 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 	 * Calculating the MSD measure between two pairs.
 	 * The first pair includes the first rating vector and the first profile.
 	 * The second pair includes the second rating vector and the second profile.
-	 * 
 	 * @param vRating1 first rating vector.
 	 * @param vRating2 second rating vector.
 	 * @param profile1 first profile.
 	 * @param profile2 second profile.
 	 * @return MSD measure between both two rating vectors and profiles.
 	 */
-	protected double msd(RatingVector vRating1, RatingVector vRating2,
+	protected double msd(RatingVector vRating1, RatingVector vRating2, Profile profile1, Profile profile2) {
+		String mtype = config.getAsString(MSD_TYPE);
+		if (mtype.equals(MSD_TYPE_NORMAL))
+			return msdNormal(vRating1, vRating2, profile1, profile2);
+		else if (mtype.equals(MSD_TYPE_JACCARD))
+			return msdNormal(vRating1, vRating2, profile1, profile2) * jaccardNormal(vRating1, vRating2, profile1, profile2);
+		else
+			return msdNormal(vRating1, vRating2, profile1, profile2);
+	}
+
+	
+	/**
+	 * Calculating the normal MSD measure between two pairs.
+	 * The first pair includes the first rating vector and the first profile.
+	 * The second pair includes the second rating vector and the second profile.
+	 * @param vRating1 first rating vector.
+	 * @param vRating2 second rating vector.
+	 * @param profile1 first profile.
+	 * @param profile2 second profile.
+	 * @return normal MSD measure between both two rating vectors and profiles.
+	 */
+	protected double msdNormal(RatingVector vRating1, RatingVector vRating2,
 			Profile profile1, Profile profile2) {
 		Set<Integer> common = commonFieldIds(vRating1, vRating2);
 		if (common.size() == 0) return Constants.UNUSED;
@@ -1433,12 +1720,110 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 	 * @author Shuang-Bo Sun, Zhi-Heng Zhang, Xin-Ling Dong, Heng-Ru Zhang, Tong-Jun Li, Lin Zhang, Fan Min
 	 * @return Triangle measure between both two rating vectors.
 	 */
-	protected double triangle(RatingVector vRating1, RatingVector vRating2,
+	protected double triangle(RatingVector vRating1, RatingVector vRating2, Profile profile1, Profile profile2) {
+		String ttype = config.getAsString(TRIANGLE_TYPE);
+		if (ttype.equals(TRIANGLE_TYPE_NORMAL))
+			return triangleNormal(vRating1, vRating2, profile1, profile2);
+		else if (ttype.equals(TRIANGLE_TYPE_TJM))
+			return triangleNormal(vRating1, vRating2, profile1, profile2) * jaccardNormal(vRating1, vRating2, profile1, profile2);
+		else
+			return triangleNormal(vRating1, vRating2, profile1, profile2);
+	}
+	
+	
+	/**
+	 * Calculating the Triangle measure between two pairs.
+	 * Shuang-Bo Sun, Zhi-Heng Zhang, Xin-Ling Dong, Heng-Ru Zhang, Tong-Jun Li, Lin Zhang, and Fan Min developed the Triangle measure. Loc Nguyen implements it.
+	 * The first pair includes the first rating vector and the first profile.
+	 * The second pair includes the second rating vector and the second profile.
+	 * @param vRating1 first rating vector.
+	 * @param vRating2 second rating vector.
+	 * @param profile1 first profile.
+	 * @param profile2 second profile.
+	 * @author Shuang-Bo Sun, Zhi-Heng Zhang, Xin-Ling Dong, Heng-Ru Zhang, Tong-Jun Li, Lin Zhang, Fan Min
+	 * @return Triangle measure between both two rating vectors.
+	 */
+	protected double triangleNormal(RatingVector vRating1, RatingVector vRating2,
 			Profile profile1, Profile profile2) {
 		Set<Integer> common = commonFieldIds(vRating1, vRating2);
 		if (common.size() == 0) return Constants.UNUSED;
 		
 		return 1 - vRating1.distance(vRating2) / (vRating1.module()+vRating2.module());
+	}
+	
+	
+	/**
+	 * Calculating the SMCC measure between two pairs.
+	 * Vijay Verma and Rajesh Kumar Aggarwal developed the MPIP. Loc Nguyen implements it.
+	 * @param vRating1 first rating vector.
+	 * @param vRating2 second rating vector.
+	 * @param profile1 first profile.
+	 * @param profile2 second profile.
+	 * @return SMCC measure between both two rating vectors and profiles.
+	 * @author Vijay Verma, Rajesh Kumar Aggarwal
+	 */
+	protected double smcc(RatingVector vRating1, RatingVector vRating2, Profile profile1, Profile profile2) {
+		Set<Integer> set1 = vRating1.fieldIds(true);
+		Set<Integer> set2 = vRating2.fieldIds(true);
+		Set<Integer> common = Util.newSet();
+		common.addAll(set1);
+		common.retainAll(set2);
+		double N = set1.size() + set2.size() - common.size();
+		if (N == 0) return Constants.UNUSED;
+		
+		int matchedCount = 0;
+		for (int id : common) {
+			double v1 = vRating1.get(id).value;
+			boolean r1 = Accuracy.isRelevant(v1, ratingMedian);
+			double v2 = vRating2.get(id).value;
+			boolean r2 = Accuracy.isRelevant(v2, ratingMedian);
+			
+			if ((r1 && r2) || ((!r1) && (!r2)) || (v1 == ratingMedian && v2 == ratingMedian))
+				matchedCount++;
+		}
+		
+		return (double)matchedCount / (double)N;
+	}
+	
+	
+	/**
+	 * Calculating the Absolute Difference of Ratings (ADR) measure between two pairs.
+	 * Achraf Gazdar and Lotfi Hidri developed the ADR. Loc Nguyen implements it.
+	 * @param vRating1 first rating vector.
+	 * @param vRating2 second rating vector.
+	 * @param profile1 first profile.
+	 * @param profile2 second profile.
+	 * @return Absolute Difference of Ratings (ADR) measure between both two rating vectors and profiles.
+	 * @author Achraf Gazdar, Lotfi Hidri
+	 */
+	protected double adr(RatingVector vRating1, RatingVector vRating2, Profile profile1, Profile profile2) {
+		Set<Integer> common = commonFieldIds(vRating1, vRating2);
+		if (common.size() == 0) return Constants.UNUSED;
+		
+		double range = getMaxRating() - getMinRating();
+		double adr = 0;
+		for (int id : common) {
+			double v1 = vRating1.get(id).value;
+			double v2 = vRating2.get(id).value;
+			adr += Math.exp(-Math.abs(v1-v2)/range);
+		}
+		
+		return adr / (double)common.size();
+	}
+	
+	
+	/**
+	 * Calculating the OS measure between two pairs.
+	 * Achraf Gazdar and Lotfi Hidri developed the ADR. Loc Nguyen implements it.
+	 * @param vRating1 first rating vector.
+	 * @param vRating2 second rating vector.
+	 * @param profile1 first profile.
+	 * @param profile2 second profile.
+	 * @return OS measure between both two rating vectors and profiles.
+	 * @author Achraf Gazdar, Lotfi Hidri
+	 */
+	protected double os(RatingVector vRating1, RatingVector vRating2, Profile profile1, Profile profile2) {
+		return adr(vRating1, vRating2, profile1, profile2) * Math.exp(jaccardNormal(vRating1, vRating2, profile1, profile2)-1.0);
 	}
 	
 	
@@ -1669,12 +2054,19 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 		DataConfig tempConfig = super.createDefaultConfig();
 		tempConfig.put(SUPPORT_CACHE_FIELD, SUPPORT_CACHE_DEFAULT);
 		tempConfig.put(KNN, KNN_DEFAULT);
-		tempConfig.put(MEASURE, getDefaultMeasure()); tempConfig.addReadOnly(MEASURE);
+		tempConfig.put(MEASURE, getDefaultMeasure());
 		tempConfig.put(HYBRID, false); tempConfig.addInvisible(HYBRID);
 		tempConfig.put(SIMILARITY_THRESHOLD_FIELD, SIMILARITY_THRESHOLD_DEFAULT);
-		tempConfig.put(COSINE_NORMALIZED_FIELD, COSINE_NORMALIZED_DEFAULT);
-		tempConfig.put(MSD_FRACTION_FIELD, MSD_FRACTION_DEFAULT);
 		tempConfig.put(ENTROPY_SUPPORT_FIELD, ENTROPY_SUPPORT_DEFAULT);
+		tempConfig.put(COSINE_TYPE, COSINE_TYPE_NORMAL);
+		tempConfig.put(COSINE_NORMALIZED_FIELD, COSINE_NORMALIZED_DEFAULT);
+		tempConfig.put(PEARSON_TYPE, PEARSON_TYPE_NORMAL);
+		tempConfig.put(MSD_TYPE, MSD_TYPE_NORMAL);
+		tempConfig.put(MSD_FRACTION_FIELD, MSD_FRACTION_DEFAULT);
+		tempConfig.put(JACCARD_TYPE, JACCARD_TYPE_NORMAL);
+		tempConfig.put(TRIANGLE_TYPE, TRIANGLE_TYPE_NORMAL);
+		tempConfig.put(IPWR_ALPHA_FIELD, IPWR_ALPHA_DEFAULT);
+		tempConfig.put(IPWR_BETA_FIELD, IPWR_BETA_DEFAULT);
 
 		DataConfig config = new DataConfig() {
 
@@ -1689,22 +2081,22 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 					String measure = getAsString(MEASURE);
 					measure = measure == null ? getDefaultMeasure() : measure;
 					Serializable value = (Serializable) JOptionPane.showInputDialog(
-							comp, 
-							"Please choose one similar measure", 
-							"Choosing similar measure", 
-							JOptionPane.INFORMATION_MESSAGE, 
-							null, 
-							getMainMeasures().toArray(), 
-							measure);
+						comp, 
+						"Please choose one similar measure", 
+						"Choosing similar measure", 
+						JOptionPane.INFORMATION_MESSAGE, 
+						null, 
+						getMainMeasures().toArray(), 
+						measure);
 					
 					if (value == null) return null;
 					
 					int confirm = JOptionPane.showConfirmDialog(
-							comp, 
-							"Changing important property requires immediate appliance.\nAre you sure?", 
-							"Attributes are modified",
-							JOptionPane.YES_NO_OPTION,
-							JOptionPane.QUESTION_MESSAGE);
+						comp, 
+						"Changing important property requires immediate appliance.\nAre you sure?", 
+						"Attributes are modified",
+						JOptionPane.YES_NO_OPTION,
+						JOptionPane.QUESTION_MESSAGE);
 					if (confirm == JOptionPane.YES_OPTION) {
 						updateConfig(value.toString());
 						return new ImportantProperty(value);
@@ -1712,7 +2104,100 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 					else
 						return value;
 				}
-				else 
+				else if (key.equals(JACCARD_TYPE)) {
+					String jtype = getAsString(JACCARD_TYPE);
+					jtype = jtype == null ? JACCARD_TYPE_NORMAL : jtype;
+					List<String> jtypes = Util.newList();
+					jtypes.add(JACCARD_TYPE_DICE);
+					jtypes.add(JACCARD_TYPE_MULTI);
+					jtypes.add(JACCARD_TYPE_NORMAL);
+					jtypes.add(JACCARD_TYPE_PNCR);
+					Collections.sort(jtypes);
+					
+					return (Serializable) JOptionPane.showInputDialog(
+						comp, 
+						"Please choose one Jaccard type", 
+						"Choosing Jaccard type", 
+						JOptionPane.INFORMATION_MESSAGE, 
+						null, 
+						jtypes.toArray(new String[] {}), 
+						jtype);
+				}
+				else if (key.equals(COSINE_TYPE)) {
+					String ctype = getAsString(COSINE_TYPE);
+					ctype = ctype == null ? COSINE_TYPE_NORMAL : ctype;
+					List<String> ctypes = Util.newList();
+					ctypes.add(COSINE_TYPE_NORMAL);
+					ctypes.add(COSINE_TYPE_ADJUSTED);
+					ctypes.add(COSINE_TYPE_JACCARD_LIKE);
+					ctypes.add(COSINE_TYPE_JACCARD);
+					Collections.sort(ctypes);
+					
+					return (Serializable) JOptionPane.showInputDialog(
+						comp, 
+						"Please choose one cosine type", 
+						"Choosing cosine type", 
+						JOptionPane.INFORMATION_MESSAGE, 
+						null, 
+						ctypes.toArray(new String[] {}), 
+						ctype);
+				}
+				else if (key.equals(PEARSON_TYPE)) {
+					String ptype = getAsString(PEARSON_TYPE);
+					ptype = ptype == null ? PEARSON_TYPE_NORMAL : ptype;
+					List<String> ptypes = Util.newList();
+					ptypes.add(PEARSON_TYPE_NORMAL);
+					ptypes.add(PEARSON_TYPE_JACCARD);
+					ptypes.add(PEARSON_TYPE_CPC);
+					ptypes.add(PEARSON_TYPE_WPC);
+					ptypes.add(PEARSON_TYPE_SPC);
+					ptypes.add(PEARSON_TYPE_IPC);
+					Collections.sort(ptypes);
+					
+					return (Serializable) JOptionPane.showInputDialog(
+						comp, 
+						"Please choose one Pearson type", 
+						"Choosing Pearson type", 
+						JOptionPane.INFORMATION_MESSAGE, 
+						null, 
+						ptypes.toArray(new String[] {}), 
+						ptype);
+				}
+				else if (key.equals(MSD_TYPE)) {
+					String mtype = getAsString(MSD_TYPE);
+					mtype = mtype == null ? MSD_TYPE_NORMAL : mtype;
+					List<String> mtypes = Util.newList();
+					mtypes.add(MSD_TYPE_NORMAL);
+					mtypes.add(MSD_TYPE_JACCARD);
+					Collections.sort(mtypes);
+					
+					return (Serializable) JOptionPane.showInputDialog(
+						comp, 
+						"Please choose one MSD type", 
+						"Choosing MSD type", 
+						JOptionPane.INFORMATION_MESSAGE, 
+						null, 
+						mtypes.toArray(new String[] {}), 
+						mtype);
+				}
+				else if (key.equals(TRIANGLE_TYPE)) {
+					String ttype = getAsString(TRIANGLE_TYPE);
+					ttype = ttype == null ? TRIANGLE_TYPE_NORMAL : ttype;
+					List<String> ttypes = Util.newList();
+					ttypes.add(TRIANGLE_TYPE_NORMAL);
+					ttypes.add(TRIANGLE_TYPE_TJM);
+					Collections.sort(ttypes);
+					
+					return (Serializable) JOptionPane.showInputDialog(
+						comp, 
+						"Please choose one triangle type", 
+						"Choosing triangle type", 
+						JOptionPane.INFORMATION_MESSAGE, 
+						null, 
+						ttypes.toArray(new String[] {}), 
+						ttype);
+				}
+				else
 					return tempConfig.userEdit(comp, key, defaultValue);
 			}
 			

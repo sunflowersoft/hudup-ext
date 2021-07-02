@@ -69,6 +69,12 @@ public class Cosine extends NeighborCFUserBased {
 		
 		config.remove(MEASURE);
 		config.remove(MSD_FRACTION_FIELD);
+		config.remove(JACCARD_TYPE);
+		config.remove(PEARSON_TYPE);
+		config.remove(MSD_TYPE);
+		config.remove(TRIANGLE_TYPE);
+		config.remove(IPWR_ALPHA_FIELD);
+		config.remove(IPWR_BETA_FIELD);
 	}
 
 

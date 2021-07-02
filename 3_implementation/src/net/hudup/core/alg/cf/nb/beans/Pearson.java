@@ -70,13 +70,19 @@ public class Pearson extends NeighborCFUserBased {
 		config.remove(MEASURE);
 		config.remove(COSINE_NORMALIZED_FIELD);
 		config.remove(MSD_FRACTION_FIELD);
+		config.remove(JACCARD_TYPE);
+		config.remove(COSINE_TYPE);
+		config.remove(MSD_TYPE);
+		config.remove(TRIANGLE_TYPE);
+		config.remove(IPWR_ALPHA_FIELD);
+		config.remove(IPWR_BETA_FIELD);
 	}
 
 
 	@Override
 	protected double sim0(String measure, RatingVector vRating1, RatingVector vRating2, Profile profile1,
 			Profile profile2, Object... params) {
-		return corr(vRating1, vRating2, profile1, profile2);
+		return pearson(vRating1, vRating2, profile1, profile2);
 	}
 
 	
