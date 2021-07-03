@@ -34,6 +34,7 @@ import net.hudup.core.data.ui.ImportantProperty;
 import net.hudup.core.evaluate.recommend.Accuracy;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.Vector;
+import net.hudup.core.parser.TextParserUtil;
 
 /**
  * This class sets up the nearest neighbors collaborative filtering algorithm. It is memory-based CF because it extends directly {@link MemoryBasedCF} class.
@@ -269,6 +270,48 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 	 * Percentage of Non Common Ratings (PNCR).
 	 */
 	protected static final String JACCARD_TYPE_PNCR = "pncr";
+
+	
+	/**
+	 * Relevant Jaccard (IJ).
+	 */
+	public static final String JACCARD_TYPE_RJ = "rj";
+
+	
+	/**
+	 * Rating Jaccard.
+	 */
+	public static final String JACCARD_TYPE_RATINGJ = "ratingj";
+
+	
+	/**
+	 * Indexed Jaccard.
+	 */
+	public static final String JACCARD_TYPE_INDEXEDJ = "indexedj";
+
+	
+	/**
+	 * Threshold of rating relevant measure.
+	 */
+	protected static final String RATINGJ_THRESHOLD_FIELD = "jaccard_ratingj_threshold";
+
+	
+	/**
+	 * Default value for the threshold of rating relevant measure..
+	 */
+	protected static final double RATINGJ_THRESHOLD_DEFAULT = 0.1;
+
+	
+	/**
+	 * Intervals of indexed Jaccard measures.
+	 */
+	protected static final String INDEXEDJ_INTERVALS_FIELD = "jaccard_indexedj_intervals";
+
+	
+	/**
+	 * Default value for intervals of indexed Jaccard measures.
+	 */
+	protected static final String INDEXEDJ_INTERVALS_DEFAULT = "2, 4";
 
 	
 	/**
@@ -820,9 +863,11 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 		mSet.add(Measure.MSD);
 		mSet.add(Measure.URP);
 		mSet.add(Measure.TRIANGLE);
+		mSet.add(Measure.RPB);
 		mSet.add(Measure.IPWR);
 		mSet.add(Measure.SMCC);
 		mSet.add(Measure.ADR);
+		mSet.add(Measure.OS);
 		
 		List<String> measures = Util.newList();
 		measures.addAll(mSet);
@@ -969,136 +1014,53 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 	protected void updateConfig(String measure) {
 		if (config == null || measure == null) return;
 		
-		config.removeReadOnly(COSINE_NORMALIZED_FIELD);
-		config.removeReadOnly(MSD_FRACTION_FIELD);
-		config.removeReadOnly(ENTROPY_SUPPORT_FIELD);
-		config.removeReadOnly(JACCARD_TYPE);
-		config.removeReadOnly(COSINE_TYPE);
-		config.removeReadOnly(PEARSON_TYPE);
-		config.removeReadOnly(MSD_TYPE);
-		config.removeReadOnly(TRIANGLE_TYPE);
-		config.removeReadOnly(IPWR_ALPHA_FIELD);
-		config.removeReadOnly(IPWR_BETA_FIELD);
+		config.addReadOnly(COSINE_NORMALIZED_FIELD);
+		config.addReadOnly(MSD_FRACTION_FIELD);
+		config.addReadOnly(ENTROPY_SUPPORT_FIELD);
+		config.addReadOnly(RATINGJ_THRESHOLD_FIELD);
+		config.addReadOnly(INDEXEDJ_INTERVALS_FIELD);
+		config.addReadOnly(JACCARD_TYPE);
+		config.addReadOnly(COSINE_TYPE);
+		config.addReadOnly(PEARSON_TYPE);
+		config.addReadOnly(MSD_TYPE);
+		config.addReadOnly(TRIANGLE_TYPE);
+		config.addReadOnly(IPWR_ALPHA_FIELD);
+		config.addReadOnly(IPWR_BETA_FIELD);
+		
 		if (measure.equals(Measure.COSINE)) {
-			config.addReadOnly(MSD_FRACTION_FIELD);
-			config.addReadOnly(JACCARD_TYPE);
-			config.addReadOnly(PEARSON_TYPE);
-			config.addReadOnly(MSD_TYPE);
-			config.addReadOnly(TRIANGLE_TYPE);
-			config.addReadOnly(IPWR_ALPHA_FIELD);
-			config.addReadOnly(IPWR_BETA_FIELD);
+			config.removeReadOnly(COSINE_NORMALIZED_FIELD);
+			config.removeReadOnly(ENTROPY_SUPPORT_FIELD);
+			config.removeReadOnly(COSINE_TYPE);
 		}
 		else if (measure.equals(Measure.PEARSON)) {
-			config.addReadOnly(COSINE_NORMALIZED_FIELD);
-			config.addReadOnly(MSD_FRACTION_FIELD);
-			config.addReadOnly(JACCARD_TYPE);
-			config.addReadOnly(COSINE_TYPE);
-			config.addReadOnly(MSD_TYPE);
-			config.addReadOnly(TRIANGLE_TYPE);
-			config.addReadOnly(IPWR_ALPHA_FIELD);
-			config.addReadOnly(IPWR_BETA_FIELD);
+			config.removeReadOnly(ENTROPY_SUPPORT_FIELD);
+			config.removeReadOnly(PEARSON_TYPE);
 		}
 		else if (measure.equals(Measure.RPB)) {
-			config.addReadOnly(COSINE_NORMALIZED_FIELD);
-			config.addReadOnly(MSD_FRACTION_FIELD);
-			config.addReadOnly(ENTROPY_SUPPORT_FIELD);
-			config.addReadOnly(JACCARD_TYPE);
-			config.addReadOnly(COSINE_TYPE);
-			config.addReadOnly(PEARSON_TYPE);
-			config.addReadOnly(MSD_TYPE);
-			config.addReadOnly(TRIANGLE_TYPE);
-			config.addReadOnly(IPWR_ALPHA_FIELD);
-			config.addReadOnly(IPWR_BETA_FIELD);
 		}
 		else if (measure.equals(Measure.JACCARD)) {
-			config.addReadOnly(COSINE_NORMALIZED_FIELD);
-			config.addReadOnly(MSD_FRACTION_FIELD);
-			config.addReadOnly(ENTROPY_SUPPORT_FIELD);
-			config.addReadOnly(COSINE_TYPE);
-			config.addReadOnly(PEARSON_TYPE);
-			config.addReadOnly(MSD_TYPE);
-			config.addReadOnly(TRIANGLE_TYPE);
-			config.addReadOnly(IPWR_ALPHA_FIELD);
-			config.addReadOnly(IPWR_BETA_FIELD);
+			config.removeReadOnly(RATINGJ_THRESHOLD_FIELD);
+			config.removeReadOnly(INDEXEDJ_INTERVALS_FIELD);
+			config.removeReadOnly(JACCARD_TYPE);
 		}
 		else if (measure.equals(Measure.MSD)) {
-			config.addReadOnly(COSINE_NORMALIZED_FIELD);
-			config.addReadOnly(ENTROPY_SUPPORT_FIELD);
-			config.addReadOnly(JACCARD_TYPE);
-			config.addReadOnly(COSINE_TYPE);
-			config.addReadOnly(PEARSON_TYPE);
-			config.addReadOnly(TRIANGLE_TYPE);
-			config.addReadOnly(IPWR_ALPHA_FIELD);
-			config.addReadOnly(IPWR_BETA_FIELD);
+			config.removeReadOnly(MSD_FRACTION_FIELD);
+			config.removeReadOnly(MSD_TYPE);
 		}
 		else if (measure.equals(Measure.URP)) {
-			config.addReadOnly(COSINE_NORMALIZED_FIELD);
-			config.addReadOnly(MSD_FRACTION_FIELD);
-			config.addReadOnly(ENTROPY_SUPPORT_FIELD);
-			config.addReadOnly(JACCARD_TYPE);
-			config.addReadOnly(COSINE_TYPE);
-			config.addReadOnly(PEARSON_TYPE);
-			config.addReadOnly(MSD_TYPE);
-			config.addReadOnly(TRIANGLE_TYPE);
-			config.addReadOnly(IPWR_ALPHA_FIELD);
-			config.addReadOnly(IPWR_BETA_FIELD);
 		}
 		else if (measure.equals(Measure.TRIANGLE)) {
-			config.addReadOnly(COSINE_NORMALIZED_FIELD);
-			config.addReadOnly(MSD_FRACTION_FIELD);
-			config.addReadOnly(ENTROPY_SUPPORT_FIELD);
-			config.addReadOnly(JACCARD_TYPE);
-			config.addReadOnly(COSINE_TYPE);
-			config.addReadOnly(PEARSON_TYPE);
-			config.addReadOnly(MSD_TYPE);
-			config.addReadOnly(IPWR_ALPHA_FIELD);
-			config.addReadOnly(IPWR_BETA_FIELD);
+			config.removeReadOnly(TRIANGLE_TYPE);
 		}
 		else if (measure.equals(Measure.SMCC)) {
-			config.addReadOnly(COSINE_NORMALIZED_FIELD);
-			config.addReadOnly(MSD_FRACTION_FIELD);
-			config.addReadOnly(ENTROPY_SUPPORT_FIELD);
-			config.addReadOnly(JACCARD_TYPE);
-			config.addReadOnly(COSINE_TYPE);
-			config.addReadOnly(PEARSON_TYPE);
-			config.addReadOnly(MSD_TYPE);
-			config.addReadOnly(TRIANGLE_TYPE);
-			config.addReadOnly(IPWR_ALPHA_FIELD);
-			config.addReadOnly(IPWR_BETA_FIELD);
 		}
 		else if (measure.equals(Measure.ADR)) {
-			config.addReadOnly(COSINE_NORMALIZED_FIELD);
-			config.addReadOnly(MSD_FRACTION_FIELD);
-			config.addReadOnly(ENTROPY_SUPPORT_FIELD);
-			config.addReadOnly(JACCARD_TYPE);
-			config.addReadOnly(COSINE_TYPE);
-			config.addReadOnly(PEARSON_TYPE);
-			config.addReadOnly(MSD_TYPE);
-			config.addReadOnly(TRIANGLE_TYPE);
-			config.addReadOnly(IPWR_ALPHA_FIELD);
-			config.addReadOnly(IPWR_BETA_FIELD);
 		}
 		else if (measure.equals(Measure.IPWR)) {
-			config.addReadOnly(COSINE_NORMALIZED_FIELD);
-			config.addReadOnly(MSD_FRACTION_FIELD);
-			config.addReadOnly(ENTROPY_SUPPORT_FIELD);
-			config.addReadOnly(JACCARD_TYPE);
-			config.addReadOnly(COSINE_TYPE);
-			config.addReadOnly(PEARSON_TYPE);
-			config.addReadOnly(MSD_TYPE);
-			config.addReadOnly(TRIANGLE_TYPE);
+			config.removeReadOnly(IPWR_ALPHA_FIELD);
+			config.removeReadOnly(IPWR_BETA_FIELD);
 		}
 		else if (measure.equals(Measure.OS)) {
-			config.addReadOnly(COSINE_NORMALIZED_FIELD);
-			config.addReadOnly(MSD_FRACTION_FIELD);
-			config.addReadOnly(ENTROPY_SUPPORT_FIELD);
-			config.addReadOnly(JACCARD_TYPE);
-			config.addReadOnly(COSINE_TYPE);
-			config.addReadOnly(PEARSON_TYPE);
-			config.addReadOnly(MSD_TYPE);
-			config.addReadOnly(TRIANGLE_TYPE);
-			config.addReadOnly(IPWR_ALPHA_FIELD);
-			config.addReadOnly(IPWR_BETA_FIELD);
 		}
 	}
 	
@@ -1564,6 +1526,12 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 			return jaccardDice(vRating1, vRating2, profile1, profile2);
 		else if (jtype.equals(JACCARD_TYPE_PNCR))
 			return Math.exp(jaccardNormal(vRating1, vRating2, profile1, profile2) - 1.0);
+		else if (jtype.equals(JACCARD_TYPE_RJ))
+			return relevantJaccard(vRating1, vRating2, profile1, profile2);
+		else if (jtype.equals(JACCARD_TYPE_RATINGJ))
+			return ratingJaccard(vRating1, vRating2, profile1, profile2);
+		else if (jtype.equals(JACCARD_TYPE_INDEXEDJ))
+			return indexedJaccard(vRating1, vRating2, profile1, profile2);
 		else
 			return jaccardNormal(vRating1, vRating2, profile1, profile2);
 	}
@@ -1634,6 +1602,143 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 		return n/N;
 	}
 
+	
+	/**
+	 * Calculating the relevant Jaccard (RJ) measure between two pairs.
+	 * Sujoy Bag, Sri Krishna Kumar, and Manoj Kumar Tiwari developed the relevant Jaccard (RJ) measure. Loc Nguyen implements it.
+	 * @param vRating1 first rating vector.
+	 * @param vRating2 second rating vector.
+	 * @param profile1 first profile.
+	 * @param profile2 second profile.
+	 * @return Relevant Jaccard (RJ) measure between both two rating vectors and profiles.
+	 * @author Sujoy Bag, Sri Krishna Kumar, Manoj Kumar Tiwari
+	 */
+	protected double relevantJaccard(RatingVector vRating1, RatingVector vRating2, Profile profile1, Profile profile2) {
+		Set<Integer> set1 = vRating1.fieldIds(true);
+		Set<Integer> set2 = vRating2.fieldIds(true);
+		Set<Integer> common = Util.newSet();
+		common.addAll(set1);
+		common.retainAll(set2);
+		
+		double n = common.size();
+		if (n == 0 && (set1.size() != 0 || set2.size() != 0)) return 0;
+		double n1 = set1.size() - n;
+		double n2 = set2.size() - n;
+		
+		return 1 / (1 + 1/n + n1/(1+n1) + 1/(1+n2));
+	}
+	
+	
+	/**
+	 * Calculating the rating Jaccard measure between two pairs.
+	 * Mubbashir Ayub1, Mustansar Ali Ghazanfar1, Tasawer Khan1, Asjad Saleem developed the rating Jaccard measure. Loc Nguyen implements it.
+	 * @param vRating1 first rating vector.
+	 * @param vRating2 second rating vector.
+	 * @param profile1 first profile.
+	 * @param profile2 second profile.
+	 * @return Rating Jaccard measure between both two rating vectors and profiles.
+	 * @author Mubbashir Ayub1, Mustansar Ali Ghazanfar1, Tasawer Khan1, Asjad Saleem
+	 */
+	protected double ratingJaccard(RatingVector vRating1, RatingVector vRating2, Profile profile1, Profile profile2) {
+		Set<Integer> common = commonFieldIds(vRating1, vRating2);
+		if (common.size() == 0) return 0;
+		
+		int nt = 0;
+		boolean equal = true;
+		for (int fieldId : common) {
+			double v1 = vRating1.get(fieldId).value;
+			double v2 = vRating2.get(fieldId).value;
+			if (Math.abs(v1) == Math.abs(v2)) nt++;
+			
+			if (!equal) continue;
+			if (v1 != v2) equal = false;
+		}
+		
+		if (equal)
+			nt++;
+		else {
+			double mean1 = vRating1.mean(), mean2 = vRating1.mean();
+			double t = config.getAsReal(RATINGJ_THRESHOLD_FIELD);
+			if (Util.isUsed(t)) {
+				double bias = Math.abs(mean2 - mean1);
+				if (bias <= t * Math.min(mean1, mean2)) nt++;
+			}
+		}
+		
+		return (double)nt / common.size();
+	}
+	
+	
+	/**
+	 * Calculating the indexed Jaccard measure between two pairs.
+	 * Soojung Lee developed the indexed Jaccard measure. Loc Nguyen implements it.
+	 * @param vRating1 first rating vector.
+	 * @param vRating2 second rating vector.
+	 * @param profile1 first profile.
+	 * @param profile2 second profile.
+	 * @return Indexed Jaccard measure between both two rating vectors and profiles.
+	 * @author Soojung Lee
+	 */
+	protected double indexedJaccard(RatingVector vRating1, RatingVector vRating2, Profile profile1, Profile profile2) {
+		List<Double> intervals = TextParserUtil.parseListByClass(getConfig().getAsString(INDEXEDJ_INTERVALS_FIELD), Double.class, ",");
+		if (intervals.size() == 0) return jaccardNormal(vRating1, vRating2, profile1, profile2);
+		
+		Set<Integer> A = vRating1.fieldIds(true);
+		Set<Integer> B = vRating2.fieldIds(true);
+		List<Set<Integer>> setList1 = Util.newList(intervals.size());
+		List<Set<Integer>> setList2 = Util.newList(intervals.size());
+		for (int i = 0; i < intervals.size(); i++) {
+			Set<Integer> set1 = Util.newSet();
+			for (int id : A) {
+				double v = vRating1.get(id).value;
+				if (i == 0) {
+					if (v < intervals.get(i)) set1.add(id);
+				}
+				else if (i < intervals.size() - 1 ) {
+					if (v >= intervals.get(i) && v < intervals.get(i+1)) set1.add(id);
+				}
+				else {
+					if (v >= intervals.get(i)) set1.add(id);
+				}
+
+			}
+			setList1.add(set1);
+			
+			Set<Integer> set2 = Util.newSet();
+			for (int id : B) {
+				double v = vRating2.get(id).value;
+				if (i == 0) {
+					if (v < intervals.get(i)) set2.add(id);
+				}
+				else if (i < intervals.size() - 1 ) {
+					if (v >= intervals.get(i) && v < intervals.get(i+1)) set2.add(id);
+				}
+				else {
+					if (v >= intervals.get(i)) set2.add(id);
+				}
+			}
+			setList2.add(set2);
+		}
+		
+		double sumJ = 0;
+		int M = 0;
+		for (int i = 0; i < intervals.size(); i++) {
+			Set<Integer> set1 = setList1.get(i);
+			Set<Integer> set2 = setList2.get(i);
+			if (set1.size() == 0 && set2.size() == 0) continue;
+			
+			Set<Integer> common = Util.newSet();
+			common.addAll(set1);
+			common.retainAll(set2);
+			double n = common.size();
+			double N = set1.size() + set2.size() - n;
+			sumJ += n / N;
+			M++;
+		}
+		
+		return sumJ / M;
+	}
+	
 	
 	/**
 	 * Calculating the MSD measure between two pairs.
@@ -2064,6 +2169,8 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 		tempConfig.put(MSD_TYPE, MSD_TYPE_NORMAL);
 		tempConfig.put(MSD_FRACTION_FIELD, MSD_FRACTION_DEFAULT);
 		tempConfig.put(JACCARD_TYPE, JACCARD_TYPE_NORMAL);
+		tempConfig.put(RATINGJ_THRESHOLD_FIELD, RATINGJ_THRESHOLD_DEFAULT);
+		tempConfig.put(INDEXEDJ_INTERVALS_FIELD, INDEXEDJ_INTERVALS_DEFAULT);
 		tempConfig.put(TRIANGLE_TYPE, TRIANGLE_TYPE_NORMAL);
 		tempConfig.put(IPWR_ALPHA_FIELD, IPWR_ALPHA_DEFAULT);
 		tempConfig.put(IPWR_BETA_FIELD, IPWR_BETA_DEFAULT);
@@ -2112,6 +2219,9 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 					jtypes.add(JACCARD_TYPE_MULTI);
 					jtypes.add(JACCARD_TYPE_NORMAL);
 					jtypes.add(JACCARD_TYPE_PNCR);
+					jtypes.add(JACCARD_TYPE_RJ);
+					jtypes.add(JACCARD_TYPE_RATINGJ);
+					jtypes.add(JACCARD_TYPE_INDEXEDJ);
 					Collections.sort(jtypes);
 					
 					return (Serializable) JOptionPane.showInputDialog(
