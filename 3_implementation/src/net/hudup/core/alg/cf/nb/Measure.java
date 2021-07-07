@@ -81,6 +81,6 @@ public class Measure {
 	 * IPWR measure.
 	 */
 	public static final String IPWR = "ipwr";
-
-
+	
+	
 }

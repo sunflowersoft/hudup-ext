@@ -60,6 +60,8 @@ import net.hudup.core.parser.TextParserUtil;
  * Vijay Verma and Rajesh Kumar Aggarwal contributed SMCC measure.<br>
  * <br>
  * Achraf Gazdar and Lotfi Hidri contributed Absolute Difference of Ratings (ADR) measure and OS measure.<br>
+ * <br>
+ * Ling-Jiao Chen, Zi-Ke Zhang, Jin-Hu Liu, Jian Gao, and Tao Zhou contributed resource-allocation (RA) measure..<br>
  * 
  * @author Loc Nguyen
  * @version 10.0
@@ -165,6 +167,30 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 
 	
 	/**
+	 * Cosine weighted mode.
+	 */
+	protected static final String COSINE_WEIGHTED_FIELD = "cosine_weighted";
+
+	
+	/**
+	 * Default weighted mode.
+	 */
+	protected static final boolean COSINE_WEIGHTED_DEFAULT = false;
+
+	
+	/**
+	 * Resource-allocation (RA) for cosine.
+	 */
+	protected static final String COSINE_RA_FIELD = "cosine_ra";
+	
+	
+	/**
+	 * Default value of resource-allocation (RA) for cosine.
+	 */
+	protected static final boolean COSINE_RA_DEFAULT = false;
+	
+	
+	/**
 	 * MSD type.
 	 */
 	protected static final String MSD_TYPE = "msd_type";
@@ -235,6 +261,36 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 	 */
 	protected static final String PEARSON_TYPE_IPC = "ipc";
 
+	
+	/**
+	 * Resource-allocation (RA) Pearson.
+	 */
+	protected static final String PEARSON_TYPE_RA = "ra";
+
+	
+	/**
+	 * Pearson weighted mode.
+	 */
+	protected static final String PEARSON_WEIGHTED_FIELD = "pearson_weighted";
+
+	
+	/**
+	 * Default Pearson weighted mode.
+	 */
+	protected static final boolean PEARSON_WEIGHTED_DEFAULT = false;
+
+	
+	/**
+	 * Resource-allocation (RA) for Pearson.
+	 */
+	protected static final String PEARSON_RA_FIELD = "pearson_ra";
+	
+	
+	/**
+	 * Default value of resource-allocation (RA) for Pearson.
+	 */
+	protected static final boolean PEARSON_RA_DEFAULT = false;
+	
 	
 	/**
 	 * Threshold for WPCC (weighted Pearson correlation coefficient).
@@ -410,12 +466,6 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 	private Map<Integer, Double> itemVars = Util.newMap();
 	
 	
-//	/**
-//	 * User rating cache (user id, item id, rating value).
-//	 */
-//	protected Map<Integer, Map<Integer, Object>> userRatingCache = Util.newMap();
-	
-	
 	/**
 	 * Row similarity cache.
 	 */
@@ -433,6 +483,12 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 	 */
 	protected Map<Integer, Object> valueCache = Util.newMap();
 
+	
+	/**
+	 * Dual value cache.
+	 */
+	protected Map<Integer, Object> dualValueCache = Util.newMap();
+	
 	
 	/**
 	 * Default constructor.
@@ -471,6 +527,7 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 		this.rowSimCache.clear();
 		this.columnSimCache.clear();
 		this.valueCache.clear();
+		this.dualValueCache.clear();
 	}
 
 
@@ -1015,6 +1072,10 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 		if (config == null || measure == null) return;
 		
 		config.addReadOnly(COSINE_NORMALIZED_FIELD);
+		config.addReadOnly(COSINE_WEIGHTED_FIELD);
+		config.addReadOnly(COSINE_RA_FIELD);
+		config.addReadOnly(PEARSON_WEIGHTED_FIELD);
+		config.addReadOnly(PEARSON_RA_FIELD);
 		config.addReadOnly(MSD_FRACTION_FIELD);
 		config.addReadOnly(ENTROPY_SUPPORT_FIELD);
 		config.addReadOnly(RATINGJ_THRESHOLD_FIELD);
@@ -1028,12 +1089,16 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 		config.addReadOnly(IPWR_BETA_FIELD);
 		
 		if (measure.equals(Measure.COSINE)) {
-			config.removeReadOnly(COSINE_NORMALIZED_FIELD);
 			config.removeReadOnly(ENTROPY_SUPPORT_FIELD);
+			config.removeReadOnly(COSINE_NORMALIZED_FIELD);
+			config.removeReadOnly(COSINE_WEIGHTED_FIELD);
+			config.removeReadOnly(COSINE_RA_FIELD);
 			config.removeReadOnly(COSINE_TYPE);
 		}
 		else if (measure.equals(Measure.PEARSON)) {
 			config.removeReadOnly(ENTROPY_SUPPORT_FIELD);
+			config.removeReadOnly(PEARSON_WEIGHTED_FIELD);
+			config.removeReadOnly(PEARSON_RA_FIELD);
 			config.removeReadOnly(PEARSON_TYPE);
 		}
 		else if (measure.equals(Measure.RPB)) {
@@ -1157,7 +1222,7 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 			
 			double entropy = 1;
 			if (entropySupport) {
-				entropy = calcEntropy(fieldId, isCached());
+				entropy = calcEntropy(fieldId, isCached() ? this.valueCache : null);
 				entropy = Util.isUsed(entropy) ? entropy : 1;
 			}
 			VXY += dev1 * dev2 * entropy;
@@ -1197,7 +1262,7 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 			if (Util.isUsed(dev1) && Util.isUsed(dev2)) {
 				double entropy = 1;
 				if (entropySupport) {
-					entropy = calcEntropy(fieldId, isCached());
+					entropy = calcEntropy(fieldId, isCached() ? this.valueCache : null);
 					entropy = Util.isUsed(entropy) ? entropy : 1;
 				}
 				VXY += dev1 * dev2 * entropy;
@@ -1440,7 +1505,7 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 		double mean1 = vRating1.mean();
 		double mean2 = vRating2.mean();
 		for (int fieldId : union) {
-			double mean = calcColumnMean(getColumnRating(fieldId));
+			double mean = calcColumnMean(getColumnRating(fieldId), isCached() ? this.dualValueCache : null);
 			double dev1 = Constants.UNUSED;
 			double dev2 = Constants.UNUSED;
 			if (vRating1.isRated(fieldId))
@@ -1453,7 +1518,7 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 			if (Util.isUsed(dev1) && Util.isUsed(dev2)) {
 				double entropy = 1;
 				if (entropySupport) {
-					entropy = calcEntropy(fieldId, isCached());
+					entropy = calcEntropy(fieldId, isCached() ? this.valueCache : null);
 					entropy = Util.isUsed(entropy) ? entropy : 1;
 				}
 				VXY += dev1 * dev2 * entropy;
@@ -1527,11 +1592,11 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 		else if (jtype.equals(JACCARD_TYPE_PNCR))
 			return Math.exp(jaccardNormal(vRating1, vRating2, profile1, profile2) - 1.0);
 		else if (jtype.equals(JACCARD_TYPE_RJ))
-			return relevantJaccard(vRating1, vRating2, profile1, profile2);
+			return jaccardRelevant(vRating1, vRating2, profile1, profile2);
 		else if (jtype.equals(JACCARD_TYPE_RATINGJ))
-			return ratingJaccard(vRating1, vRating2, profile1, profile2);
+			return jaccardRating(vRating1, vRating2, profile1, profile2);
 		else if (jtype.equals(JACCARD_TYPE_INDEXEDJ))
-			return indexedJaccard(vRating1, vRating2, profile1, profile2);
+			return jaccardIndexed(vRating1, vRating2, profile1, profile2);
 		else
 			return jaccardNormal(vRating1, vRating2, profile1, profile2);
 	}
@@ -1613,7 +1678,7 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 	 * @return Relevant Jaccard (RJ) measure between both two rating vectors and profiles.
 	 * @author Sujoy Bag, Sri Krishna Kumar, Manoj Kumar Tiwari
 	 */
-	protected double relevantJaccard(RatingVector vRating1, RatingVector vRating2, Profile profile1, Profile profile2) {
+	protected double jaccardRelevant(RatingVector vRating1, RatingVector vRating2, Profile profile1, Profile profile2) {
 		Set<Integer> set1 = vRating1.fieldIds(true);
 		Set<Integer> set2 = vRating2.fieldIds(true);
 		Set<Integer> common = Util.newSet();
@@ -1631,7 +1696,7 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 	
 	/**
 	 * Calculating the rating Jaccard measure between two pairs.
-	 * Mubbashir Ayub1, Mustansar Ali Ghazanfar1, Tasawer Khan1, Asjad Saleem developed the rating Jaccard measure. Loc Nguyen implements it.
+	 * Mubbashir Ayub1, Mustansar Ali Ghazanfar1, Tasawer Khan1, Asjad Saleem developed the rating Jaccard measure. Loc Nguyen modified and implemented it.
 	 * @param vRating1 first rating vector.
 	 * @param vRating2 second rating vector.
 	 * @param profile1 first profile.
@@ -1639,20 +1704,26 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 	 * @return Rating Jaccard measure between both two rating vectors and profiles.
 	 * @author Mubbashir Ayub1, Mustansar Ali Ghazanfar1, Tasawer Khan1, Asjad Saleem
 	 */
-	protected double ratingJaccard(RatingVector vRating1, RatingVector vRating2, Profile profile1, Profile profile2) {
-		Set<Integer> common = commonFieldIds(vRating1, vRating2);
-		if (common.size() == 0) return 0;
-		
+	protected double jaccardRating(RatingVector vRating1, RatingVector vRating2, Profile profile1, Profile profile2) {
+		Set<Integer> set1 = vRating1.fieldIds(true);
+		Set<Integer> set2 = vRating2.fieldIds(true);
+		Set<Integer> common = Util.newSet();
+		common.addAll(set1);
+		common.retainAll(set2);
+		double N = set1.size() + set2.size() - common.size();
+		if (N == 0) return Constants.UNUSED;
+
 		int nt = 0;
 		boolean equal = true;
 		for (int fieldId : common) {
 			double v1 = vRating1.get(fieldId).value;
 			double v2 = vRating2.get(fieldId).value;
-			if (Math.abs(v1) == Math.abs(v2)) nt++;
+			if (v1 == v2) nt++;
 			
 			if (!equal) continue;
 			if (v1 != v2) equal = false;
 		}
+		if (nt == 0) return 0;
 		
 		if (equal)
 			nt++;
@@ -1665,7 +1736,7 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 			}
 		}
 		
-		return (double)nt / common.size();
+		return (double)nt / N;
 	}
 	
 	
@@ -1679,7 +1750,7 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 	 * @return Indexed Jaccard measure between both two rating vectors and profiles.
 	 * @author Soojung Lee
 	 */
-	protected double indexedJaccard(RatingVector vRating1, RatingVector vRating2, Profile profile1, Profile profile2) {
+	protected double jaccardIndexed(RatingVector vRating1, RatingVector vRating2, Profile profile1, Profile profile2) {
 		List<Double> intervals = TextParserUtil.parseListByClass(getConfig().getAsString(INDEXEDJ_INTERVALS_FIELD), Double.class, ",");
 		if (intervals.size() == 0) return jaccardNormal(vRating1, vRating2, profile1, profile2);
 		
@@ -1935,10 +2006,10 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 	/**
 	 * Calculating the entropy of rating vector of given column identifier.
 	 * @param columnId given column identifier.
-	 * @param cached flag to indicate whether to cache the entropy.
+	 * @param cachedMap cached map.
 	 * @return the entropy of rating vector of given column identifier.
 	 */
-	protected double calcEntropy(int columnId, boolean cached) {
+	protected double calcEntropy(int columnId,  Map<Integer, Object> cachedMap) {
 		Task task = new Task() {
 			
 			@Override
@@ -1947,10 +2018,9 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 				double maxRating = getMaxRating();
 				double value = minRating;
 				double e = 0;
-				double log2 = Math.log(2);
 				while (value <= maxRating) {
-					double prob = columnProb(columnId, value);
-					e += prob * Math.log(prob)/log2;
+					double prob = prob(columnId, value, false);
+					e += prob * Math.log(prob+Float.MIN_VALUE);
 					value = value + 1;
 				}
 				
@@ -1958,33 +2028,77 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 			}
 		};
 		
-		if (cached)
-			return (double)cacheTask(columnId, this.valueCache, task);
+		if (cachedMap != null)
+			return (double)cacheTask(columnId, cachedMap, task);
 		else
 			return (Double)task.perform();
 	}
 
 	
 	/**
-	 * Calculating the probability of specified column identifier with given value.
-	 * @param columnId specified column identifier.
+	 * Calculating the probability of specified identifier with given value.
+	 * @param id specified identifier.
 	 * @param value given value.
-	 * @return the probability of specified column identifier with given value.
+	 * @param isRow flag to indicate whether the specified identifier is of row rating vector.
+	 * @return the probability of specified identifier with given value.
 	 */
-	private double columnProb(int columnId, double value) {
-		Set<Integer> rowIds = getRowIds();
+	protected double prob(int id, double value, boolean isRow) {
+		Set<Integer> ids = isRow ? getColumnIds() : getRowIds();
 		int n = 0, N = 0;
-		for (int rowId : rowIds) {
-			RatingVector row = getRowRating(rowId);
-			if (row.isRated(columnId)) {
+		for (int fieldId : ids) {
+			RatingVector vRating = isRow ? getColumnRating(fieldId) : getRowRating(fieldId);
+			if (vRating.isRated(id)) {
 				N++;
-				if (row.get(columnId).value == value) n++;
+				if (vRating.get(id).value == value) n++;
 			}
 		}
 		
 		return (double)n / (double)N;
 	}
 	
+	
+	/**
+	 * Calculating the probability of specified identifier.
+	 * @param id specified identifier.
+	 * @param isRow flag to indicate whether the specified identifier is of row rating vector.
+	 * @return the probability of specified identifier.
+	 */
+	protected double prob(int id, boolean isRow) {
+		Set<Integer> ids = isRow ? getColumnIds() : getRowIds();
+		int N = 0;
+		for (int fieldId : ids) {
+			RatingVector vRating = isRow ? getColumnRating(fieldId) : getRowRating(fieldId);
+			if (vRating.isRated(id)) N++;
+		}
+		
+		return (double)N / (double)ids.size();
+	}
+
+	
+	/**
+	 * Calculating the probability of column identifier.
+	 * @param columnId column identifier.
+	 * @return the probability of column identifier.
+	 */
+	protected abstract double prob(int columnId);
+	
+	
+	/**
+	 * Counting the number given specified identifier.
+	 * @param id specified identifier.
+	 * @return the number given specified identifier.
+	 */
+	protected int count(int id, boolean isRow) {
+		Set<Integer> ids = isRow ? getColumnIds() : getRowIds();
+		int N = 0;
+		for (int fieldId : ids) {
+			RatingVector vRating = isRow ? getColumnRating(fieldId) : getRowRating(fieldId);
+			if (vRating.isRated(id)) N++;
+		}
+		
+		return N;
+	}
+
 	
 	/**
 	 * Calculating correlation coefficient between two rating vectors.
@@ -1995,21 +2109,34 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 	protected double corr(RatingVector thisVector, RatingVector thatVector) {
 		Set<Integer> fieldIds = commonFieldIds(thisVector, thatVector);
 		boolean entropySupport = config.getAsBoolean(ENTROPY_SUPPORT_FIELD);
+		boolean isWeighted = config.getAsBoolean(PEARSON_WEIGHTED_FIELD);
+		boolean ra = config.getAsBoolean(PEARSON_RA_FIELD);
 		double VX = 0, VY = 0, VXY = 0;
 		double mean1 = thisVector.mean();
 		double mean2 = thatVector.mean();
 		for (int fieldId : fieldIds) {
+			double weight = 1;
+			if (isWeighted) {
+				weight = prob(fieldId);
+				weight = Util.isUsed(weight) ? weight : 1;
+			}
+			
 			double dev1 = thisVector.get(fieldId).value - mean1;
 			double dev2 = thatVector.get(fieldId).value - mean2;
-			VX  += dev1 * dev1;
-			VY  += dev2 * dev2;
+			VX  += dev1 * dev1 * weight;
+			VY  += dev2 * dev2 * weight;
 			
 			double entropy = 1;
 			if (entropySupport) {
-				entropy = calcEntropy(fieldId, isCached());
+				entropy = calcEntropy(fieldId, isCached() ? this.valueCache : null);
 				entropy = Util.isUsed(entropy) ? entropy : 1;
 			}
-			VXY += dev1 * dev2 * entropy;
+			double module = 1;
+			if (ra) {
+				module = calcModule(getColumnRating(fieldId), isCached() ? this.dualValueCache : null);
+				module = Util.isUsed(module) ? module*module : 1;
+			}
+			VXY += dev1 * dev2 * weight * entropy / module;
 		}
 		
 		return VXY / Math.sqrt(VX * VY);
@@ -2037,19 +2164,32 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 	protected double cosine(RatingVector thisVector, RatingVector thatVector, double average) {
 		Set<Integer> fieldIds = commonFieldIds(thisVector, thatVector);
 		boolean entropySupport = config.getAsBoolean(ENTROPY_SUPPORT_FIELD);
+		boolean isWeighted = config.getAsBoolean(COSINE_WEIGHTED_FIELD);
+		boolean ra = config.getAsBoolean(COSINE_RA_FIELD);
 		double VX = 0, VY = 0, VXY = 0;
 		for (int fieldId : fieldIds) {
+			double weight = 1;
+			if (isWeighted) {
+				weight = prob(fieldId);
+				weight = Util.isUsed(weight) ? weight : 1;
+			}
+
 			double dev1 = thisVector.get(fieldId).value - average;
 			double dev2 = thatVector.get(fieldId).value - average;
-			VX  += dev1 * dev1;
-			VY  += dev2 * dev2;
+			VX  += dev1 * dev1 * weight;
+			VY  += dev2 * dev2 * weight;
 			
 			double entropy = 1;
 			if (entropySupport) {
-				entropy = calcEntropy(fieldId, isCached());
+				entropy = calcEntropy(fieldId, isCached() ? this.valueCache : null);
 				entropy = Util.isUsed(entropy) ? entropy : 1;
 			}
-			VXY += dev1 * dev2 * entropy;
+			double module = 1;
+			if (ra) {
+				module = calcModule(getColumnRating(fieldId), isCached() ? this.dualValueCache : null);
+				module = Util.isUsed(module) ? module*module : 1;
+			}
+			VXY += dev1 * dev2 * weight * entropy / module;
 		}
 		
 		return VXY / Math.sqrt(VX * VY);
@@ -2104,6 +2244,28 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 
 	
 	/**
+	 * Calculating mean of row rating vector.
+	 * @param vRating specified row rating vector.
+	 * @param cachedMap cached map.
+	 * @return mean of row rating vector.
+	 */
+	protected double calcRowMean(RatingVector vRating,  Map<Integer, Object> cachedMap) {
+		Task task = new Task() {
+			
+			@Override
+			public Object perform(Object...params) {
+				return calcRowMean(vRating);
+			}
+		};
+		
+		if (cachedMap != null)
+			return (double)cacheTask(vRating.id(), cachedMap, task);
+		else
+			return (Double)task.perform();
+	}
+
+	
+	/**
 	 * Getting set of column identifiers.
 	 * @return set of column identifiers.
 	 */
@@ -2125,6 +2287,50 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 	 */
 	protected abstract double calcColumnMean(RatingVector vRating);
 	
+	
+	/**
+	 * Calculating mean of column rating vector.
+	 * @param vRating specified column rating vector.
+	 * @param cachedMap cached map.
+	 * @return mean of column rating vector.
+	 */
+	protected double calcColumnMean(RatingVector vRating,  Map<Integer, Object> cachedMap) {
+		Task task = new Task() {
+			
+			@Override
+			public Object perform(Object...params) {
+				return calcColumnMean(vRating);
+			}
+		};
+		
+		if (cachedMap != null)
+			return (double)cacheTask(vRating.id(), cachedMap, task);
+		else
+			return (Double)task.perform();
+	}
+	
+	
+	/**
+	 * Calculating module (length) of row rating vector.
+	 * @param vRating specified row rating vector.
+	 * @param cachedMap cached map.
+	 * @return mean of row rating vector.
+	 */
+	protected double calcModule(RatingVector vRating,  Map<Integer, Object> cachedMap) {
+		Task task = new Task() {
+			
+			@Override
+			public Object perform(Object...params) {
+				return vRating.module();
+			}
+		};
+		
+		if (cachedMap != null)
+			return (double)cacheTask(vRating.id(), cachedMap, task);
+		else
+			return (Double)task.perform();
+	}
+
 	
 	/**
 	 * Computing common field IDs of two rating vectors.
@@ -2165,7 +2371,11 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 		tempConfig.put(ENTROPY_SUPPORT_FIELD, ENTROPY_SUPPORT_DEFAULT);
 		tempConfig.put(COSINE_TYPE, COSINE_TYPE_NORMAL);
 		tempConfig.put(COSINE_NORMALIZED_FIELD, COSINE_NORMALIZED_DEFAULT);
+		tempConfig.put(COSINE_WEIGHTED_FIELD, COSINE_WEIGHTED_DEFAULT);
+		tempConfig.put(COSINE_RA_FIELD, COSINE_RA_DEFAULT);
 		tempConfig.put(PEARSON_TYPE, PEARSON_TYPE_NORMAL);
+		tempConfig.put(PEARSON_WEIGHTED_FIELD, PEARSON_WEIGHTED_DEFAULT);
+		tempConfig.put(PEARSON_RA_FIELD, PEARSON_RA_DEFAULT);
 		tempConfig.put(MSD_TYPE, MSD_TYPE_NORMAL);
 		tempConfig.put(MSD_FRACTION_FIELD, MSD_FRACTION_DEFAULT);
 		tempConfig.put(JACCARD_TYPE, JACCARD_TYPE_NORMAL);
@@ -2262,6 +2472,7 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 					ptypes.add(PEARSON_TYPE_WPC);
 					ptypes.add(PEARSON_TYPE_SPC);
 					ptypes.add(PEARSON_TYPE_IPC);
+					ptypes.add(PEARSON_TYPE_RA);
 					Collections.sort(ptypes);
 					
 					return (Serializable) JOptionPane.showInputDialog(

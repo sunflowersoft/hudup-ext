@@ -69,6 +69,8 @@ public class IPWR extends NeighborCFUserBased {
 		
 		config.remove(MEASURE);
 		config.remove(COSINE_NORMALIZED_FIELD);
+		config.remove(COSINE_RA_FIELD);
+		config.remove(PEARSON_RA_FIELD);
 		config.remove(MSD_FRACTION_FIELD);
 		config.remove(ENTROPY_SUPPORT_FIELD);
 		config.remove(JACCARD_TYPE);

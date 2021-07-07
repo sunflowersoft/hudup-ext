@@ -411,6 +411,7 @@ public class RatingVector implements Cloneable, TextParsable, Serializable {
 	 */
 	public double module() {
 		Set<Integer> fieldIds = fieldIds(true);
+		if (fieldIds.size() == 0) return Constants.UNUSED;
 		
 		double module = 0;
 		for (int fieldId : fieldIds) {
@@ -427,8 +428,7 @@ public class RatingVector implements Cloneable, TextParsable, Serializable {
 	 */
 	public double mean() {
 		Set<Integer> fieldIds = fieldIds(true);
-		if (fieldIds.size() == 0)
-			return Constants.UNUSED;
+		if (fieldIds.size() == 0) return Constants.UNUSED;
 		
 		double accum = 0;
 		for (int fieldId : fieldIds) {
@@ -446,8 +446,7 @@ public class RatingVector implements Cloneable, TextParsable, Serializable {
 	 */
 	public double var() {
 		Set<Integer> fieldIds = fieldIds(true);
-		if (fieldIds.size() < 2)
-			return Constants.UNUSED;
+		if (fieldIds.size() < 2) return Constants.UNUSED;
 
 		double mean = mean();
 		double sum = 0;
@@ -465,8 +464,7 @@ public class RatingVector implements Cloneable, TextParsable, Serializable {
 	 */
 	public double mleVar() {
 		Set<Integer> fieldIds = fieldIds(true);
-		if (fieldIds.size() == 0)
-			return Constants.UNUSED;
+		if (fieldIds.size() == 0) return Constants.UNUSED;
 
 		double mean = mean();
 		double sum = 0;

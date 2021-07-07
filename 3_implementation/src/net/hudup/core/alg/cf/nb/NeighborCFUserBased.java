@@ -379,6 +379,12 @@ public class NeighborCFUserBased extends NeighborCF implements DuplicatableAlg {
 
 
 	@Override
+	protected double prob(int columnId) {
+		return prob(columnId, false);
+	}
+
+
+	@Override
 	public String getName() {
 		String name = getConfig().getAsString(DUPLICATED_ALG_NAME_FIELD);
 		if (name != null && !name.isEmpty())
