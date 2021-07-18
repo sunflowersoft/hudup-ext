@@ -162,6 +162,7 @@ public class EvaluatorConfig extends SysConfig {
 		setSaveResultSummary(EVALUATOR_SAVE_RESULT_SUMMARY_DEFAULT);
 		setTiedSync(EVALUATOR_TIED_SYNC_DEFAULT);
 		setPullModeRequired(Constants.PULL_MODE_ADVICE);
+		setDuplicateAlgorithm(EVALUATOR_DUPLICATE_ALGORITHM_DEFAULT);
 		
 		addReadOnly(EVALUATOR_REPRODUCED_VERSION_FIELD);
 	}

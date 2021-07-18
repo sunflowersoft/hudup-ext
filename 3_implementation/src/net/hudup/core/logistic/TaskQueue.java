@@ -238,7 +238,7 @@ public class TaskQueue extends AbstractRunner {
 					EventTask task = taskMap.get(listenerUUID);
 					if (task == null) continue;
 					
-					if (System.currentTimeMillis() - task.getLastDone() > Constants.DEFAULT_LONG_TIMEOUT*1000) {
+					if (task.getLastDone() > 0 && System.currentTimeMillis() - task.getLastDone() > Constants.DEFAULT_LONG_TIMEOUT*1000) {
 						task.clear();
 						taskMap.remove(listenerUUID);
 					}
