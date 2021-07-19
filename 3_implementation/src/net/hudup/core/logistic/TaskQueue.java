@@ -251,6 +251,7 @@ public class TaskQueue extends AbstractRunner {
 					Collection<EventTask> tasks = taskMap.values();
 					for (EventTask task : tasks) {
 						task.clear();
+						if (task.getLastDone() <= 0) task.updateLastDone(); //Fixing bug date 2021.07.18 by Loc Nguyen.
 					}
 					break;
 				}
