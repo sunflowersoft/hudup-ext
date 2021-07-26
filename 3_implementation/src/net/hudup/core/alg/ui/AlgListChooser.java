@@ -25,6 +25,7 @@ import javax.swing.JScrollPane;
 
 import net.hudup.core.Util;
 import net.hudup.core.alg.Alg;
+import net.hudup.core.alg.ui.AlgListBox.AlgListChangedEvent;
 import net.hudup.core.evaluate.Evaluator;
 import net.hudup.core.logistic.ui.UIUtil;
 
@@ -152,6 +153,12 @@ public class AlgListChooser extends JDialog {
 		leftList = new AlgListBox(true, referredEvaluator);
 		leftList.update(remainList);
 		leftList.setEnableDoubleClick(false);
+		leftList.addAlgListChangedListener(new AlgListBox.AlgListChangedListener() {
+			@Override
+			public void algListChanged(AlgListChangedEvent evt) {
+				updateAlgNumbers();
+			}
+		});
 		left.add(new JScrollPane(leftList), BorderLayout.CENTER);
 
 		JPanel buttons = new JPanel();
@@ -215,6 +222,12 @@ public class AlgListChooser extends JDialog {
 		rightList = new AlgListBox(true, referredEvaluator);
 		rightList.setEnableDoubleClick(false);
 		rightList.update(selectedList);
+		rightList.addAlgListChangedListener(new AlgListBox.AlgListChangedListener() {
+			@Override
+			public void algListChanged(AlgListChangedEvent evt) {
+				updateAlgNumbers();
+			}
+		});
 		right.add(new JScrollPane(rightList), BorderLayout.CENTER);
 		
 		

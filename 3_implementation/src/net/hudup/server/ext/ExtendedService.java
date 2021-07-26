@@ -18,7 +18,9 @@ import net.hudup.core.Constants;
 import net.hudup.core.PluginChangedEvent;
 import net.hudup.core.PluginChangedListener;
 import net.hudup.core.Util;
+import net.hudup.core.client.ConnectInfo;
 import net.hudup.core.client.PowerServer;
+import net.hudup.core.client.Service;
 import net.hudup.core.client.ServiceExt;
 import net.hudup.core.client.ServiceLocal;
 import net.hudup.core.data.DataConfig;
@@ -520,6 +522,63 @@ public class ExtendedService extends DefaultService implements ServiceExt, Servi
 				evaluator.pluginChanged(evt);
 			} catch (Exception e) {LogUtil.trace(e);}
 		}
+	}
+
+
+	
+	/**
+	 * Getting list of evaluators.
+	 * @param service specified service.
+	 * @param connectInfo connection information.
+	 * @return list of evaluators.
+	 */
+	public static List<Evaluator> getEvaluators(Service service, ConnectInfo connectInfo) {
+		List<Evaluator> evaluators = Util.newList();
+		if (service == null) return evaluators;
+		
+		if (service instanceof ServiceExt) {
+			try {
+				if (connectInfo.account != null)
+					evaluators = ((ServiceExt)service).getEvaluators(connectInfo.account.getName(), connectInfo.account.getPassword());
+				else if (service instanceof ExtendedService)
+					evaluators = ((ExtendedService)service).getEvaluators();
+				else
+					evaluators = Util.newList();
+			}
+			catch (Exception e) {
+				LogUtil.trace(e);
+			}
+			
+			return evaluators;
+		}
+		
+		String[] evaluatorNames = null;
+		try {
+			evaluatorNames = service.getEvaluatorNames();
+		}
+		catch (Exception e) {
+			LogUtil.trace(e);
+		}
+		if (evaluatorNames == null || evaluatorNames.length == 0)
+			return evaluators;
+		
+		for (String evaluatorName : evaluatorNames) {
+			Evaluator evaluator = null;
+			try {
+				if (connectInfo.account != null)
+					evaluator = service.getEvaluator(evaluatorName, connectInfo.account.getName(), connectInfo.account.getPassword());
+				else if (service instanceof DefaultService)
+					evaluator = ((DefaultService)service).getEvaluator(evaluatorName);
+				else
+					evaluator = null;
+			}
+			catch (Exception e) {
+				LogUtil.trace(e);
+			}
+			if (evaluator != null) evaluators.add(evaluator);
+		}
+		
+		return evaluators;
 	}
 
 

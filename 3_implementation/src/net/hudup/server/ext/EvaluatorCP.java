@@ -22,11 +22,15 @@ import java.rmi.RemoteException;
 import java.util.Date;
 import java.util.List;
 
+import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -50,7 +54,6 @@ import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.NetUtil;
 import net.hudup.core.logistic.ui.UIUtil;
 import net.hudup.evaluate.ui.EvalCompoundGUI;
-import net.hudup.server.DefaultService;
 
 /**
  * This class is control panel for evaluator.
@@ -167,7 +170,9 @@ public class EvaluatorCP extends JFrame implements EvaluatorListener {
         Image image = UIUtil.getImage("evaluator-32x32.png");
         if (image != null) setIconImage(image);
 		
-        addWindowListener(new WindowAdapter() {
+	    setJMenuBar(createMenuBar());
+
+	    addWindowListener(new WindowAdapter() {
 			
 			@Override
 			public void windowClosed(WindowEvent e) {
@@ -377,56 +382,34 @@ public class EvaluatorCP extends JFrame implements EvaluatorListener {
 	
 	
 	/**
-	 * Getting list of evaluators.
-	 * @return list of evaluators.
+	 * Create menu bar.
+	 * @return menu bar.
 	 */
-	protected List<Evaluator> getEvaluators() {
-		List<Evaluator> evaluators = Util.newList();
-		if (service == null) return evaluators;
+	protected JMenuBar createMenuBar() {
+		JMenuBar mnBar = new JMenuBar();
 		
-		if (service instanceof ServiceExt) {
-			try {
-				if (connectInfo.account != null)
-					evaluators = ((ServiceExt)service).getEvaluators(connectInfo.account.getName(), connectInfo.account.getPassword());
-				else if (service instanceof ExtendedService)
-					evaluators = ((ExtendedService)service).getEvaluators();
-				else
-					evaluators = Util.newList();
-			}
-			catch (Exception e) {
-				LogUtil.trace(e);
-			}
-			
-			return evaluators;
-		}
+		JMenu mnTool = new JMenu(I18nUtil.message("tool"));
+		mnTool.setMnemonic('t');
+		mnBar.add(mnTool);
 		
-		String[] evaluatorNames = null;
-		try {
-			evaluatorNames = service.getEvaluatorNames();
-		}
-		catch (Exception e) {
-			LogUtil.trace(e);
-		}
-		if (evaluatorNames == null || evaluatorNames.length == 0)
-			return evaluators;
-		
-		for (String evaluatorName : evaluatorNames) {
-			Evaluator evaluator = null;
-			try {
-				if (connectInfo.account != null)
-					evaluator = service.getEvaluator(evaluatorName, connectInfo.account.getName(), connectInfo.account.getPassword());
-				else if (service instanceof DefaultService)
-					evaluator = ((DefaultService)service).getEvaluator(evaluatorName);
-				else
-					evaluator = null;
-			}
-			catch (Exception e) {
-				LogUtil.trace(e);
-			}
-			if (evaluator != null) evaluators.add(evaluator);
-		}
-		
-		return evaluators;
+		JMenuItem mniEvaluatorList = new JMenuItem(
+			new AbstractAction(I18nUtil.message("evaluator_list")) {
+				
+				/**
+				 * Serial version UID for serializable class. 
+				 */
+				private static final long serialVersionUID = 1L;
+
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					EvaluatorCP2 ecp = new EvaluatorCP2(service, connectInfo);
+					ecp.setVisible(true);
+				}
+			});
+		mniEvaluatorList.setMnemonic('l');
+		mnTool.add(mniEvaluatorList);
+
+		return mnBar;
 	}
 	
 	
@@ -492,7 +475,7 @@ public class EvaluatorCP extends JFrame implements EvaluatorListener {
 		unsetupListeners();
 		
         cmbEvaluators.removeAllItems();
-        List<Evaluator> evaluators = getEvaluators();
+        List<Evaluator> evaluators = ExtendedService.getEvaluators(service, connectInfo);
         for  (Evaluator evaluator : evaluators) {
         	cmbEvaluators.addItem(new EvaluatorItem(evaluator));
         }
@@ -512,7 +495,7 @@ public class EvaluatorCP extends JFrame implements EvaluatorListener {
 		unsetupListeners();
 		
         cmbEvaluators.removeAllItems();
-        List<Evaluator> evaluators = getEvaluators();
+        List<Evaluator> evaluators = ExtendedService.getEvaluators(service, connectInfo);
         EvaluatorItem selectedItem = null;
         for (Evaluator evaluator : evaluators) {
         	EvaluatorItem item = new EvaluatorItem(evaluator);
@@ -801,7 +784,7 @@ public class EvaluatorCP extends JFrame implements EvaluatorListener {
 	 * @author Loc Nguyen
 	 * @version 1.0
 	 */
-	protected class EvaluatorItem {
+	public static class EvaluatorItem {
 		
 		/**
 		 * Internal evaluator.

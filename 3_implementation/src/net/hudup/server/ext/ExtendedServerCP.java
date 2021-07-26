@@ -73,6 +73,7 @@ public class ExtendedServerCP extends PowerServerCP {
 		JMenuBar mnBar = new JMenuBar();
 		
 		JMenu mnTool = new JMenu(I18nUtil.message("tool"));
+		mnTool.setMnemonic('t');
 		mnBar.add(mnTool);
 		
 		PowerServerCP cp = this;

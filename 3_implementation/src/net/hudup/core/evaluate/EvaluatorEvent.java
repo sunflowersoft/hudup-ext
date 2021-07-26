@@ -151,11 +151,10 @@ public class EvaluatorEvent extends EventObject {
 	
 	/**
 	 * Getting evaluator. This method cannot be called remotely because the source is transient variable.
+	 * Therefore, please be careful to use this method.
 	 * @return evaluator that fires this event.
 	 */
-	@SuppressWarnings("unused")
-	@Deprecated
-	private Evaluator getEvaluator() {
+	public Evaluator getEvaluator() {
 		Object source = getSource();
 		if (source == null)
 			return null;
