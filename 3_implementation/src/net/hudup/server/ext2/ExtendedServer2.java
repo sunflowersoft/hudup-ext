@@ -26,7 +26,7 @@ import net.hudup.core.logistic.xURI;
 import net.hudup.core.logistic.ui.UIUtil;
 import net.hudup.core.parser.SnapshotParserImpl;
 import net.hudup.server.DefaultService;
-import net.hudup.server.ext.EvaluatorCP;
+import net.hudup.server.ext.EvaluatorCPList;
 import net.hudup.server.ext.ExtendedService;
 import net.hudup.server.external.ExternalServer;
 import net.hudup.server.external.ExternalServerConfig;
@@ -160,7 +160,7 @@ public class ExtendedServer2 extends ExternalServer {
 				return;
 			}
 			
-			EvaluatorCP ecp = new EvaluatorCP((ExtendedService)service);
+			EvaluatorCPList ecp = new EvaluatorCPList((ExtendedService)service);
 			ecp.setVisible(true);
 		}
 		catch (Exception e) {

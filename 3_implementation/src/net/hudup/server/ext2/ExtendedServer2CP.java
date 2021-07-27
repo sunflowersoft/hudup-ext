@@ -31,6 +31,7 @@ import net.hudup.core.logistic.I18nUtil;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.ui.HelpContent;
 import net.hudup.core.logistic.ui.UIUtil;
+import net.hudup.server.ext.EvaluatorCPList;
 import net.hudup.server.ext.WorkingDirectoryManager;
 import net.hudup.server.external.ui.ExternalServerCP;
 import net.hudup.server.ui.PowerServerCP;
@@ -142,12 +143,12 @@ public class ExtendedServer2CP extends ExternalServerCP {
 				public void actionPerformed(ActionEvent e) {
 					if (server instanceof ExtendedServer2)
 						((ExtendedServer2)server).showEvaluatorCP();
-					else
-						JOptionPane.showMessageDialog(
-							null, 
-							"Server control panel does not provide evaluator control panel", 
-							"Evaluator control panel not provided", 
-							JOptionPane.ERROR_MESSAGE);
+					else {
+						try {
+							EvaluatorCPList ecp = new EvaluatorCPList(server.getService(), connectInfo);
+							ecp.setVisible(true);
+						} catch (Exception ex) {LogUtil.trace(ex);}
+					}
 				}
 			});
 		mniEvaluatorCP.setMnemonic('e');

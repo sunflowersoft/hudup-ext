@@ -142,7 +142,7 @@ public class ExtendedServerCP extends PowerServerCP {
 						((ExtendedServer)server).showEvaluatorCP();
 					else {
 						try {
-							EvaluatorCP ecp = new EvaluatorCP(server.getService(), connectInfo);
+							EvaluatorCPList ecp = new EvaluatorCPList(server.getService(), connectInfo);
 							ecp.setVisible(true);
 						} catch (Exception ex) {LogUtil.trace(ex);}
 					}

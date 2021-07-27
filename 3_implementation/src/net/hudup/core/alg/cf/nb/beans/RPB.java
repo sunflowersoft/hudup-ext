@@ -75,6 +75,8 @@ public class RPB extends NeighborCFUserBased {
 		config.remove(PEARSON_WEIGHTED_FIELD);
 		config.remove(MSD_FRACTION_FIELD);
 		config.remove(ENTROPY_SUPPORT_FIELD);
+		config.remove(RATINGJ_THRESHOLD_FIELD);
+		config.remove(INDEXEDJ_INTERVALS_FIELD);
 		config.remove(JACCARD_TYPE);
 		config.remove(COSINE_TYPE);
 		config.remove(PEARSON_TYPE);

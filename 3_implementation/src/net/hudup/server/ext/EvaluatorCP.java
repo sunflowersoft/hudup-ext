@@ -8,13 +8,16 @@
 package net.hudup.server.ext;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.Image;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.InputEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.rmi.Remote;
@@ -34,6 +37,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.KeyStroke;
 
 import net.hudup.core.Util;
 import net.hudup.core.client.ConnectInfo;
@@ -212,53 +216,10 @@ public class EvaluatorCP extends JFrame implements EvaluatorListener {
 			I18nUtil.message("open"), 
 			
 			new ActionListener() {
-				
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					EvaluatorItem evaluatorItem = (EvaluatorItem)cmbEvaluators.getSelectedItem();
-					if (evaluatorItem == null || evaluatorItem.evaluator == null) {
-						JOptionPane.showMessageDialog(
-								getThisEvaluatorCP(), 
-								"Cannot open evaluator", 
-								"Cannot open evaluator", 
-								JOptionPane.ERROR_MESSAGE);
-						return;
-					}
-					
-					if (EvaluatorAbstract.isPullModeRequired(evaluatorItem.evaluator) && !getThisEvaluatorCP().connectInfo.pullMode) {
-						JOptionPane.showMessageDialog(getThisEvaluatorCP(),
-							"Can't retrieve evaluator because PULL MODE is not set\n" +
-							"whereas the remote evaluator requires PULL MODE.\n" +
-							"You have to check PULL MODE in connection dialog.",
-							"Retrieval to evaluator failed", JOptionPane.ERROR_MESSAGE);
-						return;
-					}
-
-					if (evaluatorItem.guiData == null)
-						evaluatorItem.guiData = new EvaluateGUIData();
-					
-					if (evaluatorItem.guiData.active) {
-						JOptionPane.showMessageDialog(
-							getThisEvaluatorCP(), 
-							"GUI of evaluator named '" + DSUtil.shortenVerbalName(evaluatorItem.getName()) + "' is running.", 
-							"Evaluator GUI running", 
-							JOptionPane.INFORMATION_MESSAGE);
-						return;
-					}
-					
-					try {
-						EvalCompoundGUI.class.getClass();
-					}
-					catch (Exception ex) {
-						JOptionPane.showMessageDialog(
-								getThisEvaluatorCP(), 
-								"Cannot open evaluator control panel due to lack of evaluate package", 
-								"lack of evaluate package", 
-								JOptionPane.ERROR_MESSAGE);
-						return;
-					}
-
-					EvalCompoundGUI.run(evaluatorItem.evaluator, getThisEvaluatorCP().connectInfo, evaluatorItem.guiData, null);
+					EvaluatorItem.openEvaluator(evaluatorItem, getThisEvaluatorCP().connectInfo, getThisEvaluatorCP());
 				}
 			});
 		btnOpenStart.setMargin(new Insets(0, 0 , 0, 0));
@@ -392,8 +353,8 @@ public class EvaluatorCP extends JFrame implements EvaluatorListener {
 		mnTool.setMnemonic('t');
 		mnBar.add(mnTool);
 		
-		JMenuItem mniEvaluatorList = new JMenuItem(
-			new AbstractAction(I18nUtil.message("evaluator_list")) {
+		JMenuItem mniCPList = new JMenuItem(
+			new AbstractAction("Switch list mode") {
 				
 				/**
 				 * Serial version UID for serializable class. 
@@ -402,12 +363,14 @@ public class EvaluatorCP extends JFrame implements EvaluatorListener {
 
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					EvaluatorCP2 ecp = new EvaluatorCP2(service, connectInfo);
+					getThisEvaluatorCP().dispose();
+					EvaluatorCPList ecp = new EvaluatorCPList(service, connectInfo);
 					ecp.setVisible(true);
 				}
 			});
-		mniEvaluatorList.setMnemonic('l');
-		mnTool.add(mniEvaluatorList);
+		mniCPList.setMnemonic('w');
+		mniCPList.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, InputEvent.CTRL_DOWN_MASK));
+		mnTool.add(mniCPList);
 
 		return mnBar;
 	}
@@ -576,11 +539,7 @@ public class EvaluatorCP extends JFrame implements EvaluatorListener {
         selectDlgNameDlg.setVisible(true);
         
         if (versionName.length() == 0) {
-			JOptionPane.showMessageDialog(
-					this, 
-					"Empty reproduced version", 
-					"Empty reproduced version", 
-					JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(this, "Empty reproduced version", "Empty reproduced version", JOptionPane.ERROR_MESSAGE);
         	return;
         }
         
@@ -609,11 +568,7 @@ public class EvaluatorCP extends JFrame implements EvaluatorListener {
         	LogUtil.trace(e);
         }
         
-		JOptionPane.showMessageDialog(
-			this, 
-			"Fail to reproduce evaluator", 
-			"Fail to reproduce evaluator", 
-			JOptionPane.ERROR_MESSAGE);
+		JOptionPane.showMessageDialog(this, "Fail to reproduce evaluator", "Fail to reproduce evaluator", JOptionPane.ERROR_MESSAGE);
 	}
 	
 	
@@ -671,11 +626,7 @@ public class EvaluatorCP extends JFrame implements EvaluatorListener {
         	LogUtil.trace(e);
         }
         
-		JOptionPane.showMessageDialog(
-			this, 
-			"Fail to remove evaluator", 
-			"Fail to remove evaluator", 
-			JOptionPane.ERROR_MESSAGE);
+		JOptionPane.showMessageDialog(this, "Fail to remove evaluator", "Fail to remove evaluator", JOptionPane.ERROR_MESSAGE);
 	}
 	
 	
@@ -841,6 +792,53 @@ public class EvaluatorCP extends JFrame implements EvaluatorListener {
 			return DSUtil.shortenVerbalName(getName());
 		}
 		
+		/**
+		 * Open evaluator.
+		 * @param evaluatorItem specified evaluator item.
+		 * @param connectInfo connection information.
+		 * @param parent parent component.
+		 */
+		public static void openEvaluator(EvaluatorItem evaluatorItem, ConnectInfo connectInfo, Component parent) {
+			if (evaluatorItem == null || evaluatorItem.evaluator == null) {
+				JOptionPane.showMessageDialog(parent, "Cannot open evaluator", "Cannot open evaluator", JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+			
+			if (EvaluatorAbstract.isPullModeRequired(evaluatorItem.evaluator) && !connectInfo.pullMode) {
+				JOptionPane.showMessageDialog(parent,
+					"Can't retrieve evaluator because PULL MODE is not set\n" +
+					"whereas the remote evaluator requires PULL MODE.\n" +
+					"You have to check PULL MODE in connection dialog.",
+					"Retrieval to evaluator failed", JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+
+			if (evaluatorItem.guiData == null) evaluatorItem.guiData = new EvaluateGUIData();
+			
+			if (evaluatorItem.guiData.active) {
+				JOptionPane.showMessageDialog(
+					parent, 
+					"GUI of evaluator named '" + DSUtil.shortenVerbalName(evaluatorItem.getName()) + "' is running.", 
+					"Evaluator GUI running", 
+					JOptionPane.INFORMATION_MESSAGE);
+				return;
+			}
+			
+			try {
+				EvalCompoundGUI.class.getClass();
+			}
+			catch (Exception ex) {
+				JOptionPane.showMessageDialog(
+						parent, 
+						"Cannot open evaluator control panel due to lack of evaluate package", 
+						"lack of evaluate package", 
+						JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+
+			EvalCompoundGUI.run(evaluatorItem.evaluator, connectInfo, evaluatorItem.guiData, null);
+		}
+
 	}
 	
 	

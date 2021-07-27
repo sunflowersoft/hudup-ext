@@ -169,7 +169,7 @@ public class ExtendedServer extends DefaultServer {
 				return;
 			}
 			
-			EvaluatorCP ecp = new EvaluatorCP((ExtendedService)service);
+			EvaluatorCPList ecp = new EvaluatorCPList((ExtendedService)service);
 			ecp.setVisible(true);
 		}
 		catch (Exception e) {
