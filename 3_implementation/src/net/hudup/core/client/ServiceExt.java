@@ -11,6 +11,8 @@ import java.rmi.RemoteException;
 import java.util.List;
 
 import net.hudup.core.evaluate.Evaluator;
+import net.hudup.server.ext.ServiceNoticeEvent;
+import net.hudup.server.ext.ServiceNoticeListener;
 
 /**
  * This interface represents extended version of service.
@@ -65,5 +67,29 @@ public interface ServiceExt extends Service {
 	 */
 	PowerServer getReferredServer(String account, String password) throws RemoteException;
 	
+	
+	/**
+	 * Adding service notice listener.
+	 * @param listener service notice listener.
+	 * @throws RemoteException if any error raises.
+	 */
+	void addNoticeListener(ServiceNoticeListener listener) throws RemoteException;
+	
+	
+	/**
+	 * Adding service notice listener.
+	 * @param listener service notice listener.
+	 * @throws RemoteException if any error raises.
+	 */
+	void removeNoticeListener(ServiceNoticeListener listener) throws RemoteException;
+	
+
+	/**
+	 * Firing service notice event.
+	 * @param evt service notice event.
+	 * @throws RemoteException if any error raises.
+	 */
+	void fireNoticeEvent(ServiceNoticeEvent evt) throws RemoteException;
+
 	
 }

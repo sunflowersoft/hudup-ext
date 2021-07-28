@@ -273,6 +273,11 @@ public class Request extends ProtocolParam {
 	 */
 	public String                           algName                       = null;
 
+	/**
+	 * Time stamp.
+	 */
+	public long                             timestamp                     = 0;
+
 	
 	/**
 	 * Default constructor.

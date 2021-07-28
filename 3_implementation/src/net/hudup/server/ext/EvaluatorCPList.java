@@ -8,6 +8,7 @@
 package net.hudup.server.ext;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.Image;
 import java.awt.Insets;
@@ -15,12 +16,15 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.Date;
 import java.util.List;
+import java.util.Vector;
 
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
@@ -34,8 +38,10 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 import javax.swing.table.DefaultTableModel;
 
@@ -44,13 +50,9 @@ import net.hudup.core.client.ConnectInfo;
 import net.hudup.core.client.Connector;
 import net.hudup.core.client.Service;
 import net.hudup.core.client.ServiceExt;
-import net.hudup.core.data.Attribute;
-import net.hudup.core.data.Attribute.Type;
-import net.hudup.core.data.AttributeList;
 import net.hudup.core.data.DataConfig;
-import net.hudup.core.data.Profile;
-import net.hudup.core.data.ui.ProfileTable;
 import net.hudup.core.data.ui.SysConfigPane;
+import net.hudup.core.data.ui.toolkit.Dispose;
 import net.hudup.core.evaluate.Evaluator;
 import net.hudup.core.evaluate.EvaluatorAbstract;
 import net.hudup.core.evaluate.EvaluatorConfig;
@@ -62,6 +64,7 @@ import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.NetUtil;
 import net.hudup.core.logistic.ui.UIUtil;
 import net.hudup.server.ext.EvaluatorCP.EvaluatorItem;
+import net.hudup.server.ext.ServiceNoticeEvent.Type;
 
 /**
  * This class is advanced control panel for evaluator.
@@ -70,31 +73,13 @@ import net.hudup.server.ext.EvaluatorCP.EvaluatorItem;
  * @version 1.0
  *
  */
-public class EvaluatorCPList extends JFrame implements Remote {
+public class EvaluatorCPList extends JFrame {
 
 	
 	/**
 	 * Serial version UID for serializable class.
 	 */
 	private static final long serialVersionUID = 1L;
-
-	
-	/**
-	 * Internal service.
-	 */
-	protected Service service = null;
-	
-	
-	/**
-	 * Connection information.
-	 */
-	protected ConnectInfo connectInfo = null;
-
-	
-	/**
-	 * Exported stub (EvaluatorListener).
-	 */
-	protected Remote exportedStub = null;
 
 	
 	/**
@@ -155,24 +140,16 @@ public class EvaluatorCPList extends JFrame implements Remote {
 	 */
 	public EvaluatorCPList(Service service, ConnectInfo connectInfo) {
 		super("Evaluator control panel list");
-		this.service = service;
-		this.connectInfo = connectInfo != null ? connectInfo : (connectInfo = new ConnectInfo());
+		connectInfo = connectInfo != null ? connectInfo : (connectInfo = new ConnectInfo());
+		tblEvaluator = new EvaluatorTable(service, connectInfo);
 		
-		if (connectInfo.bindUri != null) { //Evaluator is remote
-			this.exportedStub = NetUtil.RegistryRemote.export(this, connectInfo.bindUri.getPort());
-			if (this.exportedStub != null)
-				LogUtil.info("Evaluator control panel exported at port " + connectInfo.bindUri.getPort());
-			else
-				LogUtil.info("Evaluator control panel failed to exported");
-		}
-
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setSize(600, 400);
 		setLocationRelativeTo(null);
         Image image = UIUtil.getImage("evaluator-32x32.png");
         if (image != null) setIconImage(image);
 		
-	    setJMenuBar(createMenuBar());
+	    setJMenuBar(createMenuBar(service, connectInfo));
 
         addWindowListener(new WindowAdapter() {
 			
@@ -190,7 +167,6 @@ public class EvaluatorCPList extends JFrame implements Remote {
 		JPanel body = new JPanel(new BorderLayout());
 		add(body, BorderLayout.CENTER);
 		
-		tblEvaluator = new EvaluatorTable(service, connectInfo);
 		body.add(new JScrollPane(tblEvaluator), BorderLayout.CENTER);
 
 		JPanel toolbar = new JPanel(new FlowLayout(FlowLayout.RIGHT));
@@ -288,16 +264,35 @@ public class EvaluatorCPList extends JFrame implements Remote {
 	
 	/**
 	 * Create menu bar.
+	 * @param service specified service.
+	 * @param connectInfo connection information.
 	 * @return menu bar.
 	 */
-	protected JMenuBar createMenuBar() {
+	protected JMenuBar createMenuBar(Service service, ConnectInfo connectInfo) {
 		JMenuBar mnBar = new JMenuBar();
 		
 		JMenu mnTool = new JMenu(I18nUtil.message("tool"));
 		mnTool.setMnemonic('t');
 		mnBar.add(mnTool);
 		
-		JMenuItem mniCP = new JMenuItem(
+		JMenuItem mniRefresh = new JMenuItem(
+			new AbstractAction(I18nUtil.message("refresh")) {
+				
+				/**
+				 * Serial version UID for serializable class. 
+				 */
+				private static final long serialVersionUID = 1L;
+
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					refreshAll();
+				}
+			});
+		mniRefresh.setMnemonic('r');
+		mniRefresh.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F5, 0));
+		mnTool.add(mniRefresh);
+
+		JMenuItem mniSwitch = new JMenuItem(
 			new AbstractAction("Switch single mode") {
 				
 				/**
@@ -312,9 +307,9 @@ public class EvaluatorCPList extends JFrame implements Remote {
 					ecp.setVisible(true);
 				}
 			});
-		mniCP.setMnemonic('w');
-		mniCP.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, InputEvent.CTRL_DOWN_MASK));
-		mnTool.add(mniCP);
+		mniSwitch.setMnemonic('w');
+		mniSwitch.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, InputEvent.CTRL_DOWN_MASK));
+		mnTool.add(mniSwitch);
 
 		return mnBar;
 	}
@@ -332,7 +327,7 @@ public class EvaluatorCPList extends JFrame implements Remote {
 		EvaluatorCP.EvaluatorItem evItem = (EvaluatorCP.EvaluatorItem)tblEvaluator.getValueAt(selectedRow, 0);
 		if (evItem == null || evItem.evaluator == null) return;
 		
-		EvaluatorItem.openEvaluator(evItem, connectInfo, this);
+		EvaluatorItem.openEvaluator(evItem, tblEvaluator.getEvaluatorTableModel().connectInfo, this);
 	}
 	
 	
@@ -394,17 +389,7 @@ public class EvaluatorCPList extends JFrame implements Remote {
 		
 	@Override
 	public void dispose() {
-		tblEvaluator.clear();
-		
-		if (exportedStub != null) {
-			boolean ret = NetUtil.RegistryRemote.unexport(this);
-			if (ret)
-				LogUtil.info("Evaluator control panel unexported successfully");
-			else
-				LogUtil.info("Evaluator control panel unexported failedly");
-			exportedStub = null;
-		}
-
+		tblEvaluator.dispose();
 		super.dispose();
 	}
 
@@ -463,7 +448,7 @@ public class EvaluatorCPList extends JFrame implements Remote {
  * @version 1.0
  *
  */
-class EvaluatorTable extends ProfileTable implements EvaluatorListener {
+class EvaluatorTable extends JTable implements EvaluatorListener, ServiceNoticeListener, Remote, Dispose {
 
 	
 	/**
@@ -473,36 +458,70 @@ class EvaluatorTable extends ProfileTable implements EvaluatorListener {
 	
 	
 	/**
-	 * Internal service.
+	 * Exported stub (EvaluatorListener).
 	 */
-	protected Service service = null;
-	
+	Remote exportedStub = null;
+
 	
 	/**
-	 * Connection information.
+	 * Time stamp.
 	 */
-	protected ConnectInfo connectInfo = null;
-
-
+	long timestamp = 0;
+	
+	
 	/**
 	 * Constructor with specified service and connection information.
 	 * @param service specified service.
 	 * @param connectInfo specified connection information.
 	 */
 	public EvaluatorTable(Service service, ConnectInfo connectInfo) {
-		this.service = service;
-		this.connectInfo = connectInfo;
+		super();
+		
+		timestamp = System.currentTimeMillis();
+		if (connectInfo.bindUri != null) { //Evaluator is remote
+			exportedStub = NetUtil.RegistryRemote.export(this, connectInfo.bindUri.getPort());
+			if (exportedStub != null)
+				LogUtil.info("Evaluator control panel (table) exported at port " + connectInfo.bindUri.getPort());
+			else
+				LogUtil.info("Evaluator control panel (table) failed to exported");
+		}
+
+		setModel(new EvaluatorTableModel(service, connectInfo, this));
+		setAutoCreateRowSorter(true); 
+		addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if(SwingUtilities.isRightMouseButton(e) ) {
+					JPopupMenu contextMenu = createContextMenu();
+					if(contextMenu == null) return;
+					contextMenu.show((Component)e.getSource(), e.getX(), e.getY());
+				}
+			}
+		});
+		
+		update();
+		
+		if ((!connectInfo.pullMode) && (service instanceof ServiceExt)) {
+			try {
+				((ServiceExt)service).addNoticeListener(this);
+			} catch (Exception e) {LogUtil.trace(e);}
+		}
 	}
 	
 	
-	@Override
-	protected void initGUI() {
-		super.initGUI();
-		setAutoResizeMode(AUTO_RESIZE_SUBSEQUENT_COLUMNS);
+	/**
+	 * Getting profile table.
+	 * @return profile table model.
+	 */
+	EvaluatorTableModel getEvaluatorTableModel() {
+		return (EvaluatorTableModel)getModel();
 	}
 
-
-	@Override
+	
+	/**
+	 * Create context menu.
+	 * @return context menu.
+	 */
 	protected JPopupMenu createContextMenu() {
 		int selectedRow = getSelectedRow();
 		if (selectedRow < 0) return null;
@@ -516,7 +535,7 @@ class EvaluatorTable extends ProfileTable implements EvaluatorListener {
 			new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					EvaluatorItem.openEvaluator(evItem, connectInfo, getEvaluatorTable());
+					EvaluatorItem.openEvaluator(evItem, getEvaluatorTableModel().connectInfo, getEvaluatorTable());
 				}
 			});
 		ctxMenu.add(miOpen);
@@ -594,13 +613,13 @@ class EvaluatorTable extends ProfileTable implements EvaluatorListener {
 			public boolean apply() {
 				boolean ret = super.apply();
 				if (!ret) return false;
-				if (service == null) return ret;
+				if (getEvaluatorTableModel().service == null) return ret;
 				
 				EvaluatorConfig config = (EvaluatorConfig) tblProp.getPropList();
 				if (config == null) return ret;
 				
 				try {
-					if (connectInfo.bindUri != null) evItem.evaluator.setConfig(config);
+					if (getEvaluatorTableModel().connectInfo.bindUri != null) evItem.evaluator.setConfig(config);
 				}
 				catch (Exception e) {LogUtil.trace(e);}
 				
@@ -626,7 +645,7 @@ class EvaluatorTable extends ProfileTable implements EvaluatorListener {
 			
 			EvaluatorConfig config = evItem.evaluator.getConfig();
 			if (config != null) {
-				if (connectInfo.bindUri != null) config.setSaveAbility(false);
+				if (getEvaluatorTableModel().connectInfo.bindUri != null) config.setSaveAbility(false);
 				paneConfig.update(evItem.evaluator.getConfig());
 			}
 		}
@@ -670,7 +689,7 @@ class EvaluatorTable extends ProfileTable implements EvaluatorListener {
 	 * @param evItem evaluator item.
 	 */
 	protected synchronized void refresh(EvaluatorCP.EvaluatorItem evItem, int selectedRow) {
-		setValueAt(getStatusText(evItem.evaluator), selectedRow, 1);
+		setValueAt(EvaluatorTableModel.getStatusText(evItem.evaluator), selectedRow, 1);
 	}
 
 	
@@ -680,6 +699,8 @@ class EvaluatorTable extends ProfileTable implements EvaluatorListener {
 	 * @param evItem evaluator item.
 	 */
 	protected synchronized void reproduce(EvaluatorCP.EvaluatorItem evItem, int selectedRow) {
+		Service service = getEvaluatorTableModel().service;
+		ConnectInfo connectInfo = getEvaluatorTableModel().connectInfo;
 		if (!(service instanceof ServiceExt)) {
 			JOptionPane.showMessageDialog(
 				this, 
@@ -752,14 +773,15 @@ class EvaluatorTable extends ProfileTable implements EvaluatorListener {
             if (evaluator != null) {
         		JOptionPane.showMessageDialog(
     				this, 
-    				"Success to reproduce evaluator '" + evaluatorName + "-" + versionName.toString() + "'", 
+    				"Success to reproduce evaluator '" + EvaluatorAbstract.createVersionName(evaluatorName, evaluatorName) + "'", 
     				"Success to reproduce evaluator", 
     				JOptionPane.INFORMATION_MESSAGE);
         		
-        		((DefaultTableModel)getModel()).addRow(new Object[] {new EvaluatorCP.EvaluatorItem(evaluator), getStatusText(evaluator)});
+        		((DefaultTableModel)getModel()).addRow(new Object[] {new EvaluatorCP.EvaluatorItem(evaluator), EvaluatorTableModel.getStatusText(evaluator)});
     			if (!EvaluatorAbstract.isPullModeRequired(evaluator) && !connectInfo.pullMode)
 					evaluator.addEvaluatorListener(this);
     			
+    			((ServiceExt)service).fireNoticeEvent(new ServiceNoticeEvent(this, Type.add_reproduced_evaluator, evaluatorName, versionName.toString(), timestamp));
         		return;
             }
         }
@@ -772,15 +794,59 @@ class EvaluatorTable extends ProfileTable implements EvaluatorListener {
 
 	
 	/**
+	 * Adding row.
+	 * @param evName evaluator name.
+	 * @param evVersion evaluator version.
+	 * @return whether adding row is successful.
+	 */
+	protected synchronized boolean addRow(String evName, String evVersion) {
+		String name = EvaluatorAbstract.createVersionName(evName, evVersion);
+		if (name == null) return false;
+		int n = getRowCount(); if (n == 0) return false;
+		
+		for (int i = 0; i < n; i++) {
+			try {
+				Evaluator evaluator = ((EvaluatorCP.EvaluatorItem)getValueAt(i, 0)).evaluator;
+				if (evaluator.getVersionName().equals(name)) return false;
+			} catch (Exception e) {LogUtil.trace(e);}
+		}
+
+		Service service = getEvaluatorTableModel().service;
+		ConnectInfo connectInfo = getEvaluatorTableModel().connectInfo;
+		if (!(service instanceof ServiceExt)) return false;
+
+		Evaluator evaluator = null;
+		try {
+			if (connectInfo.account != null)
+				evaluator = ((ServiceExt)service).getEvaluator(evName, connectInfo.account.getName(), connectInfo.account.getPassword(), evVersion);
+			else if (service instanceof ExtendedService)
+				evaluator = ((ExtendedService)service).getEvaluator(evName, evVersion);
+			
+            if (evaluator != null) {
+        		((DefaultTableModel)getModel()).addRow(new Object[] {new EvaluatorCP.EvaluatorItem(evaluator), EvaluatorTableModel.getStatusText(evaluator)});
+    			if (!EvaluatorAbstract.isPullModeRequired(evaluator) && !connectInfo.pullMode)
+					evaluator.addEvaluatorListener(this);
+        		return true;
+            }
+			
+		} catch (Exception e) {LogUtil.trace(e);}
+		
+		return false;
+	}
+
+	
+	/**
 	 * Removing evaluator.
 	 * @param selectedRow selected row.
 	 * @param evItem evaluator item.
 	 */
 	protected synchronized void remove(EvaluatorCP.EvaluatorItem evItem, int selectedRow) {
+		Service service = getEvaluatorTableModel().service;
+		ConnectInfo connectInfo = getEvaluatorTableModel().connectInfo;
 		if (!(service instanceof ServiceExt)) {
 			JOptionPane.showMessageDialog(
 				this, 
-				"This service does not support to reproduce evaluator", 
+				"This service does not support to remove reproduced evaluator", 
 				"Evaluator reproduction not supported", 
 				JOptionPane.ERROR_MESSAGE);
         	return;
@@ -814,12 +880,15 @@ class EvaluatorTable extends ProfileTable implements EvaluatorListener {
             if (ret) {
         		JOptionPane.showMessageDialog(
     				this, 
-    				"Success to remove evaluator '" + evaluatorName + "-" + versionName.toString() + "'", 
+    				"Success to remove evaluator '" + EvaluatorAbstract.createVersionName(evaluatorName, versionName) + "'", 
     				"Success to remove evaluator", 
     				JOptionPane.INFORMATION_MESSAGE);
         		
-				((DefaultTableModel)getModel()).removeRow(selectedRow);
-        		return;
+				getEvaluatorTableModel().removeRow(selectedRow);
+				
+    			((ServiceExt)service).fireNoticeEvent(new ServiceNoticeEvent(this, Type.remove_reproduced_evaluator, evaluatorName, versionName.toString(), timestamp));
+
+    			return;
             }
 		}
         catch (Exception e) {
@@ -829,6 +898,31 @@ class EvaluatorTable extends ProfileTable implements EvaluatorListener {
 		JOptionPane.showMessageDialog(this, "Fail to remove evaluator", "Fail to remove evaluator", JOptionPane.ERROR_MESSAGE);
 	}
 
+	
+	/**
+	 * Remove row.
+	 * @param evName evaluator name.
+	 * @param evVersion evaluator version.
+	 * @return whether adding row is successful.
+	 */
+	protected synchronized boolean removeRow(String evName, String evVersion) {
+		String versionName = EvaluatorAbstract.createVersionName(evName, evVersion);
+		if (versionName == null) return false;
+		int n = getRowCount(); if (n == 0) return false;
+		
+		for (int i = 0; i < n; i++) {
+			try {
+				String name = ((EvaluatorCP.EvaluatorItem)getValueAt(i, 0)).getName();
+				if (name.equals(versionName)) {
+					getEvaluatorTableModel().removeRow(i);
+					return true;
+				}
+			} catch (Exception e) {LogUtil.trace(e);}
+		}
+
+		return false;
+	}
+	
 	
 	/**
 	 * Getting this evaluator table.
@@ -843,16 +937,7 @@ class EvaluatorTable extends ProfileTable implements EvaluatorListener {
 	 * Clearing evaluator table.
 	 */
 	public synchronized void clear() {
-		List<Profile> data = getData();
-		for (Profile profile : data) {
-			try {
-				Evaluator evaluator = ((EvaluatorCP.EvaluatorItem) profile.getValue(0)).evaluator;
-				if (!EvaluatorAbstract.isPullModeRequired(evaluator) && !connectInfo.pullMode)
-					evaluator.removeEvaluatorListener(this);
-			} catch (Exception e) {LogUtil.trace(e);}
-		}
-		
-		super.update(Util.newList());
+		getEvaluatorTableModel().clear();
 	}
 	
 	
@@ -860,40 +945,18 @@ class EvaluatorTable extends ProfileTable implements EvaluatorListener {
 	 * Updating evaluator table.
 	 */
 	public synchronized void update() {
-		clear();
-		
-		List<Profile> newData = Util.newList();
-		List<Evaluator> evaluators = ExtendedService.getEvaluators(service, connectInfo);
-		if (evaluators.size() == 0) return;
-		
-		for (Evaluator evaluator : evaluators) {
-			Profile profile = emptyProfile();
-			profile.setValue(0, new EvaluatorCP.EvaluatorItem(evaluator));
-			profile.setValue(1, getStatusText(evaluator));
-			newData.add(profile);
-		}
-		
-		super.update(newData);
-		
-		for (Evaluator evaluator : evaluators) {
-			if (!EvaluatorAbstract.isPullModeRequired(evaluator) && !connectInfo.pullMode) {
-				try {
-					evaluator.addEvaluatorListener(this);
-				} catch (Exception e) {LogUtil.trace(e);}
-			}
-		}
+		getEvaluatorTableModel().update();
 	}
 	
 	
 	@Override
 	public synchronized void receivedEvaluator(EvaluatorEvent evt) throws RemoteException {
-		int n = getRowCount();
-		if (n == 0) return;
+		int n = getRowCount(); if (n == 0) return;
 		for (int i = 0; i < n; i++) {
 			try {
 				Evaluator evaluator = ((EvaluatorCP.EvaluatorItem)getValueAt(i, 0)).evaluator;
 				if (evaluator == evt.getEvaluator()) {
-					setValueAt(getStatusText(evaluator), i, 1);
+					setValueAt(EvaluatorTableModel.getStatusText(evaluator), i, 1);
 					return;
 				}
 			} catch (Exception e) {LogUtil.trace(e);}
@@ -918,12 +981,183 @@ class EvaluatorTable extends ProfileTable implements EvaluatorListener {
 	}
 
 
+	@Override
+	public void notify(ServiceNoticeEvent evt) throws RemoteException {
+		if (evt.getTimestamp() == this.timestamp) return;
+		String evaluatorName = evt.getEvaluatorName();
+		String evaluatorVersion = evt.getEvaluatorVersion();
+		
+		switch (evt.getType()) {
+		case add_reproduced_evaluator:
+			addRow(evaluatorName, evaluatorVersion);
+			break;
+		case remove_reproduced_evaluator:
+			removeRow(evaluatorName, evaluatorVersion);
+			break;
+		default:
+			break;
+		}
+	}
+
+
+	@Override
+	public synchronized void dispose() {
+		clear();
+		
+		EvaluatorTableModel m = getEvaluatorTableModel();
+		if ((!m.connectInfo.pullMode) && (m.service instanceof ServiceExt)) {
+			try {
+				((ServiceExt)m.service).removeNoticeListener(this);
+			} catch (Exception e) {LogUtil.trace(e);}
+		}
+
+		if (exportedStub != null) {
+			boolean ret = NetUtil.RegistryRemote.unexport(this);
+			if (ret)
+				LogUtil.info("Evaluator control panel (table) unexported successfully");
+			else
+				LogUtil.info("Evaluator control panel (table) unexported failedly");
+			exportedStub = null;
+		}
+	}
+
+
+	@Override
+	public boolean isRunning() {
+		return true;
+	}
+
+
+	/**
+	 * Getting evaluator items.
+	 * @return list of evaluator items.
+	 */
+	public synchronized List<EvaluatorItem> getEvaluatorItems() {
+		List<EvaluatorItem> evItems = Util.newList();
+		int rows = getRowCount();
+		for (int i = 0; i < rows; i++) {
+			try {
+				evItems.add((EvaluatorCP.EvaluatorItem)getValueAt(i, 0));
+			} catch (Exception e) {LogUtil.trace(e);}
+		} 
+		
+		return evItems;
+	}
+	
+	
+}
+
+
+
+/**
+ * This class is the model for evaluator table.
+ * 
+ * @author Loc Nguyen
+ * @version 10.0
+ *
+ */
+class EvaluatorTableModel extends DefaultTableModel {
+
+	
+	/**
+	 * Serial version UID for serializable class. 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	
+	/**
+	 * Internal service.
+	 */
+	Service service = null;
+	
+	
+	/**
+	 * Connection information.
+	 */
+	ConnectInfo connectInfo = null;
+
+	
+	/**
+	 * Evaluator listener.
+	 */
+	EvaluatorListener listener = null;
+	
+	
+	/**
+	 * Constructor with service and connection information.
+	 * @param service specified service.
+	 * @param connectInfo connection information.
+	 * @param listener evaluator listener.
+	 */
+	public EvaluatorTableModel(Service service, ConnectInfo connectInfo, EvaluatorListener listener) {
+		super();
+		this.service = service;
+		this.connectInfo = connectInfo;
+		this.listener = listener;
+	}
+
+	
+	/**
+	 * Clearing this model.
+	 */
+	void clear() {
+		int rows = getRowCount();
+		for (int i = 0; i < rows; i++) {
+			try {
+				Evaluator evaluator = ((EvaluatorCP.EvaluatorItem)getValueAt(i, 0)).evaluator;
+				if (!EvaluatorAbstract.isPullModeRequired(evaluator) && !connectInfo.pullMode) {
+					evaluator.removeEvaluatorListener(listener);
+				}
+			} catch (Exception e) {LogUtil.error("Clear table error: " + e.getMessage());}
+		} 
+
+		setDataVector(new Object[][] {}, new Object[] {});
+	}
+
+	
+	/**
+	 * Updating this model.
+	 */
+	void update() {
+		clear();
+		
+		List<Evaluator> evaluators = ExtendedService.getEvaluators(service, connectInfo);
+		if (evaluators.size() == 0) return;
+		
+		Vector<Vector<Object>> data = Util.newVector();
+		for (Evaluator evaluator : evaluators) {
+			Vector<Object> row = Util.newVector();
+			row.add(new EvaluatorCP.EvaluatorItem(evaluator));
+			row.add(getStatusText(evaluator));
+
+			data.add(row);
+		}
+		
+		setDataVector(data, toColumns());
+		
+		for (Evaluator evaluator : evaluators) {
+			if (!EvaluatorAbstract.isPullModeRequired(evaluator) && !connectInfo.pullMode) {
+				try {
+					evaluator.addEvaluatorListener(listener);
+				} catch (Exception e) {LogUtil.trace(e);}
+			}
+		}
+		
+	}
+
+	
+	@Override
+	public boolean isCellEditable(int row, int column) {
+		return false;
+	}
+
+
 	/**
 	 * Getting status text of specified evaluator.
 	 * @param evaluator specified evaluator.
 	 * @return status text of specified evaluator.
 	 */
-	public static String getStatusText(Evaluator evaluator) {
+	static String getStatusText(Evaluator evaluator) {
 		try {
 			if (!evaluator.remoteIsStarted())
 				return "stopped";
@@ -936,15 +1170,17 @@ class EvaluatorTable extends ProfileTable implements EvaluatorListener {
 
 		return "unknown";
 	}
-	
+
 	
 	/**
-	 * Creating empty profile.
-	 * @return empty profile.
+	 * Getting list of column names.
+	 * @return list of column names.
 	 */
-	private Profile emptyProfile() {
-		AttributeList attList = AttributeList.create(new Attribute[] {new Attribute("Evaluator", Type.object), new Attribute("Status", Type.string)});
-		return Profile.createProfile(attList, null);
+	static Vector<String> toColumns() {
+		Vector<String> columns = Util.newVector();
+		columns.add("Evaluator");
+		columns.add("Status");
+		return columns;
 	}
 	
 	

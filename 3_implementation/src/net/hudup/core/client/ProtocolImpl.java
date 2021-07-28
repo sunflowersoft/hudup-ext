@@ -32,7 +32,6 @@ public class ProtocolImpl implements Protocol {
 	
 	@Override
 	public Request createControlRequest(String controlCommand) {
-		// TODO Auto-generated method stub
 		Request request = new Request();
 		request.action = CONTROL;
 		request.control_command = controlCommand;
@@ -95,7 +94,6 @@ public class ProtocolImpl implements Protocol {
 	
 	@Override
 	public Request createInsertRatingRequest(RatingVector vRating) {
-		// TODO Auto-generated method stub
 		Request request = new Request();
 		request.action = INSERT_RATING;
 		request.rating_vector = vRating;
@@ -128,7 +126,6 @@ public class ProtocolImpl implements Protocol {
 	
 	@Override
 	public Request createGetUserIdsRequest() {
-		// TODO Auto-generated method stub
 		Request request = new Request();
 		request.action = GET_USERIDS;
 		
@@ -193,7 +190,6 @@ public class ProtocolImpl implements Protocol {
 	@Override
 	public Request createGetUserProfileByExternalRequest(
 			Serializable externalUserId) {
-		// TODO Auto-generated method stub
 		Request request = new Request();
 		request.action = GET_USER_PROFILE_BY_EXTERNAL;
 		request.external_userid = externalUserId;
@@ -276,7 +272,6 @@ public class ProtocolImpl implements Protocol {
 	
 	@Override
 	public Request createGetItemIdsRequest() {
-		// TODO Auto-generated method stub
 		Request request = new Request();
 		request.action = GET_ITEMIDS;
 		
@@ -337,7 +332,6 @@ public class ProtocolImpl implements Protocol {
 	@Override
 	public Request createGetItemProfileByExternalRequest(
 			Serializable externalItemId) {
-		// TODO Auto-generated method stub
 		Request request = new Request();
 		request.action = GET_ITEM_PROFILE_BY_EXTERNAL;
 		request.external_itemid = externalItemId;
@@ -435,7 +429,6 @@ public class ProtocolImpl implements Protocol {
 	@Override
 	public Request createInsertNominalRequest(String unit, String attribute,
 			Nominal nominal) {
-		// TODO Auto-generated method stub
 		Request request = new Request();
 		request.action = INSERT_NOMINAL;
 		request.unit = unit;
@@ -473,7 +466,6 @@ public class ProtocolImpl implements Protocol {
 
 	@Override
 	public Request createGetExternalRecordRequest(InternalRecord internalRecord) {
-		// TODO Auto-generated method stub
 		Request request = new Request();
 		request.action = GET_EXTERNAL_RECORD;
 		request.internal_record = internalRecord;
@@ -485,7 +477,6 @@ public class ProtocolImpl implements Protocol {
 	@Override
 	public Request createInsertExternalRecordRequest(
 			InternalRecord internalRecord, ExternalRecord externalRecord) {
-		// TODO Auto-generated method stub
 		Request request = new Request();
 		request.action = INSERT_EXTERNAL_RECORD;
 		request.internal_record = internalRecord;
@@ -498,7 +489,6 @@ public class ProtocolImpl implements Protocol {
 	@Override
 	public Request createUpdateExternalRecordRequest(
 			InternalRecord internalRecord, ExternalRecord externalRecord) {
-		// TODO Auto-generated method stub
 		Request request = new Request();
 		request.action = UPDATE_EXTERNAL_RECORD;
 		request.internal_record = internalRecord;
@@ -511,7 +501,6 @@ public class ProtocolImpl implements Protocol {
 	@Override
 	public Request createDeleteExternalRecordRequest(
 			InternalRecord internalRecord) {
-		// TODO Auto-generated method stub
 		Request request = new Request();
 		request.action = DELETE_EXTERNAL_RECORD;
 		request.internal_record = internalRecord;
@@ -699,7 +688,6 @@ public class ProtocolImpl implements Protocol {
 
 	@Override
 	public Request createGetEvaluatorRequest(String evaluatorName, String account, String password) {
-		// TODO Auto-generated method stub
 		Request request = new Request();
 		request.notJsonParsing = true;
 		request.action = GET_EVALUATOR;
@@ -713,7 +701,6 @@ public class ProtocolImpl implements Protocol {
 
 	@Override
 	public Request createGetEvaluatorNamesRequest() {
-		// TODO Auto-generated method stub
 		Request request = new Request();
 		request.action = GET_EVALUATOR_NAMES;
 		
@@ -723,7 +710,6 @@ public class ProtocolImpl implements Protocol {
 
 	@Override
 	public Request createGetAlgRequest(String algName) {
-		// TODO Auto-generated method stub
 		Request request = new Request();
 		request.notJsonParsing = true;
 		request.action = GET_ALG;
@@ -735,7 +721,6 @@ public class ProtocolImpl implements Protocol {
 
 	@Override
 	public Request createGetAlgNamesRequest() {
-		// TODO Auto-generated method stub
 		Request request = new Request();
 		request.action = GET_ALG_NAMES;
 		
@@ -745,7 +730,6 @@ public class ProtocolImpl implements Protocol {
 	
 	@Override
 	public Request createGetAlgDescsRequest() {
-		// TODO Auto-generated method stub
 		Request request = new Request();
 		request.notJsonParsing = true;
 		request.action = GET_ALG_DESCS;

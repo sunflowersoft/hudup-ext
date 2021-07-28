@@ -353,7 +353,24 @@ public class EvaluatorCP extends JFrame implements EvaluatorListener {
 		mnTool.setMnemonic('t');
 		mnBar.add(mnTool);
 		
-		JMenuItem mniCPList = new JMenuItem(
+		JMenuItem mniRefresh = new JMenuItem(
+			new AbstractAction(I18nUtil.message("refresh")) {
+				
+				/**
+				 * Serial version UID for serializable class. 
+				 */
+				private static final long serialVersionUID = 1L;
+
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					refresh();
+				}
+			});
+		mniRefresh.setMnemonic('r');
+		mniRefresh.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F5, 0));
+		mnTool.add(mniRefresh);
+
+		JMenuItem mniSwitch = new JMenuItem(
 			new AbstractAction("Switch list mode") {
 				
 				/**
@@ -368,9 +385,9 @@ public class EvaluatorCP extends JFrame implements EvaluatorListener {
 					ecp.setVisible(true);
 				}
 			});
-		mniCPList.setMnemonic('w');
-		mniCPList.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, InputEvent.CTRL_DOWN_MASK));
-		mnTool.add(mniCPList);
+		mniSwitch.setMnemonic('w');
+		mniSwitch.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, InputEvent.CTRL_DOWN_MASK));
+		mnTool.add(mniSwitch);
 
 		return mnBar;
 	}
@@ -467,7 +484,7 @@ public class EvaluatorCP extends JFrame implements EvaluatorListener {
         	if (service != null && service instanceof ExtendedService)
         		item.guiData = ((ExtendedService)service).getEvaluateGUIData(evaluator);
         	
-        	if (item.getName().equals(evaluatorName + "-" + reproducedVersion))
+        	if (item.getName().equals(EvaluatorAbstract.createVersionName(evaluatorName, reproducedVersion)))
         		selectedItem = item;
         }
         if (selectedItem != null)
@@ -556,7 +573,7 @@ public class EvaluatorCP extends JFrame implements EvaluatorListener {
             if (evaluator != null) {
         		JOptionPane.showMessageDialog(
     				this, 
-    				"Success to reproduce evaluator '" + evaluatorName + "-" + versionName.toString() + "'", 
+    				"Success to reproduce evaluator '" + EvaluatorAbstract.createVersionName(evaluatorName, versionName.toString()) + "'", 
     				"Success to reproduce evaluator", 
     				JOptionPane.INFORMATION_MESSAGE);
         		
@@ -614,7 +631,7 @@ public class EvaluatorCP extends JFrame implements EvaluatorListener {
             if (ret) {
         		JOptionPane.showMessageDialog(
     				this, 
-    				"Success to remove evaluator '" + evaluatorName + "-" + versionName.toString() + "'", 
+    				"Success to remove evaluator '" + EvaluatorAbstract.createVersionName(evaluatorName, versionName) + "'", 
     				"Success to remove evaluator", 
     				JOptionPane.INFORMATION_MESSAGE);
         		
@@ -766,11 +783,7 @@ public class EvaluatorCP extends JFrame implements EvaluatorListener {
 			this.name = "";
 			if (evaluator != null) {
 				try {
-					EvaluatorConfig config = evaluator.getConfig();
-					if (config.isReproduced())
-						name = evaluator.getName() + "-" + config.getReproducedVersion();
-					else
-						name = evaluator.getName();
+					name = evaluator.getVersionName();
 				}
 				catch (Exception e) {
 					LogUtil.trace(e);

@@ -111,7 +111,6 @@ public class SocketWrapper extends ProtocolImpl implements Service {
 	@Override
 	public RatingVector recommend(int userId, int maxRecommend)
 			throws RemoteException {
-		// TODO Auto-generated method stub
 		Request request = createRecommendUserRequest(userId, maxRecommend);
 		Response response = sendRequest(request);
 		if (response == null)
@@ -131,7 +130,6 @@ public class SocketWrapper extends ProtocolImpl implements Service {
 			Serializable externalItemId,
 			int maxRecommend, 
 			Rating rating) throws RemoteException {
-		// TODO Auto-generated method stub
 		
 		Request request = createRecommendletRequest(
 				listenerHost, 
@@ -164,7 +162,6 @@ public class SocketWrapper extends ProtocolImpl implements Service {
 	@Override
 	public boolean updateRating(int userId, int itemId, Rating rating)
 			throws RemoteException {
-		// TODO Auto-generated method stub
 		RatingVector vRating = new UserRating(userId);
 		vRating.put(itemId, rating);
 		
@@ -174,7 +171,6 @@ public class SocketWrapper extends ProtocolImpl implements Service {
 
 	@Override
 	public boolean deleteRating(RatingVector vRating) throws RemoteException {
-		// TODO Auto-generated method stub
 
 		Request request = createDeleteRatingRequest(vRating);
 		Response response = sendRequest(request);
@@ -187,7 +183,6 @@ public class SocketWrapper extends ProtocolImpl implements Service {
 
 	@Override
 	public Fetcher<Integer> getUserIds() throws RemoteException {
-		// TODO Auto-generated method stub
 		Request request = createGetUserIdsRequest();
 		Response response = sendRequest(request);
 		if (response == null)
@@ -199,7 +194,6 @@ public class SocketWrapper extends ProtocolImpl implements Service {
 
 	@Override
 	public RatingVector getUserRating(int userId) throws RemoteException {
-		// TODO Auto-generated method stub
 		Request request = createGetUserRatingRequest(userId);
 		Response response = sendRequest(request);
 		if (response == null)
@@ -211,7 +205,6 @@ public class SocketWrapper extends ProtocolImpl implements Service {
 	
 	@Override
 	public Fetcher<RatingVector> getUserRatings() throws RemoteException {
-		// TODO Auto-generated method stub
 		
 		Request request = createGetUserRatingsRequest();
 		Response response = sendRequest(request);
@@ -224,7 +217,6 @@ public class SocketWrapper extends ProtocolImpl implements Service {
 
 	@Override
 	public boolean deleteUserRating(int userId) throws RemoteException {
-		// TODO Auto-generated method stub
 		Request request = createDeleteUserRatingRequest(userId);
 		Response response = sendRequest(request);
 		if (response == null)
@@ -249,7 +241,6 @@ public class SocketWrapper extends ProtocolImpl implements Service {
 	@Override
 	public Profile getUserProfileByExternal(Serializable externalUserId)
 			throws RemoteException {
-		// TODO Auto-generated method stub
 		Request request = createGetUserProfileByExternalRequest(externalUserId);
 		Response response = sendRequest(request);
 		if (response == null)
@@ -261,7 +252,6 @@ public class SocketWrapper extends ProtocolImpl implements Service {
 
 	@Override
 	public Fetcher<Profile> getUserProfiles() throws RemoteException {
-		// TODO Auto-generated method stub
 		
 		Request request = createGetUserProfilesRequest();
 		Response response = sendRequest(request);
@@ -274,7 +264,6 @@ public class SocketWrapper extends ProtocolImpl implements Service {
 
 	@Override
 	public boolean updateUserProfile(Profile user) throws RemoteException {
-		// TODO Auto-generated method stub
 		Request request = createUpdateUserProfileRequest(user);
 		Response response = sendRequest(request);
 		if (response == null)
@@ -286,7 +275,6 @@ public class SocketWrapper extends ProtocolImpl implements Service {
 
 	@Override
 	public boolean deleteUserProfile(int userId) throws RemoteException {
-		// TODO Auto-generated method stub
 
 		Request request = createDeleteUserProfileRequest(userId);
 		Response response = sendRequest(request);
@@ -311,7 +299,6 @@ public class SocketWrapper extends ProtocolImpl implements Service {
 	
 	@Override
 	public ExternalRecord getUserExternalRecord(int userId) throws RemoteException {
-		// TODO Auto-generated method stub
 		Request request = createGetUserExternalRecordRequest(userId);
 		Response response = sendRequest(request);
 		if (response == null)
@@ -323,7 +310,6 @@ public class SocketWrapper extends ProtocolImpl implements Service {
 
 	@Override
 	public Fetcher<Integer> getItemIds() throws RemoteException {
-		// TODO Auto-generated method stub
 		Request request = createGetItemIdsRequest();
 		Response response = sendRequest(request);
 		if (response == null)
@@ -335,7 +321,6 @@ public class SocketWrapper extends ProtocolImpl implements Service {
 	
 	@Override
 	public RatingVector getItemRating(int itemId) throws RemoteException {
-		// TODO Auto-generated method stub
 		
 		Request request = createGetItemRatingRequest(itemId);
 		Response response = sendRequest(request);
@@ -348,7 +333,6 @@ public class SocketWrapper extends ProtocolImpl implements Service {
 
 	@Override
 	public Fetcher<RatingVector> getItemRatings() throws RemoteException {
-		// TODO Auto-generated method stub
 		Request request = createGetItemRatingsRequest();
 		Response response = sendRequest(request);
 		if (response == null)
@@ -360,7 +344,6 @@ public class SocketWrapper extends ProtocolImpl implements Service {
 
 	@Override
 	public boolean deleteItemRating(int itemId) throws RemoteException {
-		// TODO Auto-generated method stub
 		Request request = createDeleteUserRatingRequest(itemId);
 		Response response = sendRequest(request);
 		if (response == null)
@@ -385,7 +368,6 @@ public class SocketWrapper extends ProtocolImpl implements Service {
 	@Override
 	public Profile getItemProfileByExternal(Serializable externalItemId)
 			throws RemoteException {
-		// TODO Auto-generated method stub
 		Request request = createGetItemProfileByExternalRequest(externalItemId);
 		Response response = sendRequest(request);
 		if (response == null)
@@ -397,7 +379,6 @@ public class SocketWrapper extends ProtocolImpl implements Service {
 	
 	@Override
 	public Fetcher<Profile> getItemProfiles() throws RemoteException {
-		// TODO Auto-generated method stub
 		
 		Request request = createGetItemProfilesRequest();
 		Response response = sendRequest(request);
@@ -410,7 +391,6 @@ public class SocketWrapper extends ProtocolImpl implements Service {
 
 	@Override
 	public boolean updateItemProfile(Profile item) throws RemoteException {
-		// TODO Auto-generated method stub
 		Request request = createUpdateItemProfileRequest(item);
 		Response response = sendRequest(request);
 		if (response == null)
@@ -422,7 +402,6 @@ public class SocketWrapper extends ProtocolImpl implements Service {
 
 	@Override
 	public boolean deleteItemProfile(int itemId) throws RemoteException {
-		// TODO Auto-generated method stub
 		
 		Request request = createDeleteItemProfileRequest(itemId);
 		Response response = sendRequest(request);
@@ -448,7 +427,6 @@ public class SocketWrapper extends ProtocolImpl implements Service {
 	@Override
 	public ExternalRecord getItemExternalRecord(int itemId)
 			throws RemoteException {
-		// TODO Auto-generated method stub
 
 		Request request = createGetItemExternalRecordRequest(itemId);
 		Response response = sendRequest(request);
@@ -461,7 +439,6 @@ public class SocketWrapper extends ProtocolImpl implements Service {
 
 	@Override
 	public NominalList getNominal(String unitName, String attribute) throws RemoteException {
-		// TODO Auto-generated method stub
 
 		Request request = createGetNominalRequest(unitName, attribute);
 		Response response = sendRequest(request);
@@ -487,7 +464,6 @@ public class SocketWrapper extends ProtocolImpl implements Service {
 	@Override
 	public boolean deleteNominal(String unitName, String attribute)
 			throws RemoteException {
-		// TODO Auto-generated method stub
 
 		Request request = createDeleteNominalRequest(unitName, attribute);
 		Response response = sendRequest(request);
@@ -500,7 +476,6 @@ public class SocketWrapper extends ProtocolImpl implements Service {
 
 	@Override
 	public ExternalRecord getExternalRecord(InternalRecord internalRecord) throws RemoteException {
-		// TODO Auto-generated method stub
 		Request request = createGetExternalRecordRequest(internalRecord);
 		Response response = sendRequest(request);
 		if (response == null)
@@ -513,7 +488,6 @@ public class SocketWrapper extends ProtocolImpl implements Service {
 	@Override
 	public boolean updateExternalRecord(InternalRecord internalRecord,
 			ExternalRecord externalRecord) throws RemoteException {
-		// TODO Auto-generated method stub
 		Request request = createUpdateExternalRecordRequest(internalRecord, externalRecord);
 		Response response = sendRequest(request);
 		if (response == null)
@@ -526,7 +500,6 @@ public class SocketWrapper extends ProtocolImpl implements Service {
 	@Override
 	public boolean deleteExternalRecord(InternalRecord internalRecord)
 			throws RemoteException {
-		// TODO Auto-generated method stub
 		Request request = createDeleteExternalRecordRequest(internalRecord);
 		Response response = sendRequest(request);
 		if (response == null)
@@ -550,7 +523,6 @@ public class SocketWrapper extends ProtocolImpl implements Service {
 	@Override
 	public Profile getSampleProfile(Profile condition)
 			throws RemoteException {
-		// TODO Auto-generated method stub
 		
 		Request request = createGetSampleProfileRequest(condition);
 		Response response = sendRequest(request);
@@ -564,7 +536,6 @@ public class SocketWrapper extends ProtocolImpl implements Service {
 	@Override
 	public AttributeList getSampleProfileAttributeList()
 			throws RemoteException {
-		// TODO Auto-generated method stub
 		Request request = createGetSampleProfileAttributeListRequest();
 		Response response = sendRequest(request);
 		if (response == null)
@@ -577,7 +548,6 @@ public class SocketWrapper extends ProtocolImpl implements Service {
 	@Override
 	public boolean updateSampleProfile(Profile profile)
 			throws RemoteException {
-		// TODO Auto-generated method stub
 		Request request = createUpdateSampleProfileRequest(profile);
 		Response response = sendRequest(request);
 		if (response == null)
@@ -590,7 +560,6 @@ public class SocketWrapper extends ProtocolImpl implements Service {
 	@Override
 	public boolean deleteSampleProfile(Profile condition)
 			throws RemoteException {
-		// TODO Auto-generated method stub
 		
 		Request request = createDeleteSampleProfileRequest(condition);
 		Response response = sendRequest(request);
@@ -604,7 +573,6 @@ public class SocketWrapper extends ProtocolImpl implements Service {
 	@Override
 	public Profile getProfile(String profileUnit, Profile condition)
 			throws RemoteException {
-		// TODO Auto-generated method stub
 		
 		Request request = createGetProfileRequest(profileUnit, condition);
 		Response response = sendRequest(request);
@@ -618,7 +586,6 @@ public class SocketWrapper extends ProtocolImpl implements Service {
 	@Override
 	public AttributeList getProfileAttributeList(String unitName)
 			throws RemoteException {
-		// TODO Auto-generated method stub
 		Request request = createGetProfileAttributeListRequest(unitName);
 		Response response = sendRequest(request);
 		if (response == null)
@@ -631,7 +598,6 @@ public class SocketWrapper extends ProtocolImpl implements Service {
 	@Override
 	public boolean updateProfile(String profileUnit, Profile profile)
 			throws RemoteException {
-		// TODO Auto-generated method stub
 		Request request = createUpdateProfileRequest(profileUnit, profile);
 		Response response = sendRequest(request);
 		if (response == null)
@@ -644,7 +610,6 @@ public class SocketWrapper extends ProtocolImpl implements Service {
 	@Override
 	public boolean deleteProfile(String profileUnit, Profile condition)
 			throws RemoteException {
-		// TODO Auto-generated method stub
 		
 		Request request = createDeleteProfileRequest(profileUnit, condition);
 		Response response = sendRequest(request);
@@ -686,7 +651,6 @@ public class SocketWrapper extends ProtocolImpl implements Service {
 	
 	@Override
 	public Snapshot getSnapshot() throws RemoteException {
-		// TODO Auto-generated method stub
 		Request request = createGetSnapshotRequest();
 		Response response = sendRequest(request);
 		if (response == null)
@@ -698,7 +662,6 @@ public class SocketWrapper extends ProtocolImpl implements Service {
 
 	@Override
 	public Evaluator getEvaluator(String evaluatorName, String account, String password) throws RemoteException {
-		// TODO Auto-generated method stub
 		Request request = createGetEvaluatorRequest(evaluatorName, account, password);
 		Response response = sendRequest(request);
 		if (response == null)
@@ -710,7 +673,6 @@ public class SocketWrapper extends ProtocolImpl implements Service {
 
 	@Override
 	public String[] getEvaluatorNames() throws RemoteException {
-		// TODO Auto-generated method stub
 		Request request = createGetEvaluatorNamesRequest();
 		Response response = sendRequest(request);
 		if (response == null)
@@ -722,7 +684,6 @@ public class SocketWrapper extends ProtocolImpl implements Service {
 
 	@Override
 	public Alg getAlg(String algName) throws RemoteException {
-		// TODO Auto-generated method stub
 		Request request = createGetAlgRequest(algName);
 		Response response = sendRequest(request);
 		if (response == null)
@@ -734,7 +695,6 @@ public class SocketWrapper extends ProtocolImpl implements Service {
 
 	@Override
 	public String[] getAlgNames() throws RemoteException {
-		// TODO Auto-generated method stub
 		Request request = createGetAlgNamesRequest();
 		Response response = sendRequest(request);
 		if (response == null)

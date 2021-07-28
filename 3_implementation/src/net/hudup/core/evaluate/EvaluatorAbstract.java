@@ -1904,7 +1904,8 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 		String name = getName();
 		try {
 			String reproducedVersion = config.getReproducedVersion();
-			if (reproducedVersion != null && !reproducedVersion.isEmpty()) name += "-" + reproducedVersion;
+			if (reproducedVersion != null && !reproducedVersion.isEmpty())
+				name = EvaluatorAbstract.createVersionName(name, reproducedVersion);
 		} catch (Exception e) {}
 		
 		return name;
@@ -2472,4 +2473,50 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 	}
 	
 	
+	/**
+	 * Create version name of evaluator.
+	 * @param evaluatorName evaluator name.
+	 * @param version version name.
+	 * @return version name of evaluator.
+	 */
+	public static String createVersionName(String evaluatorName, String version) {
+		if (evaluatorName == null)
+			return null;
+		else if (version == null || version.isEmpty())
+			return evaluatorName;
+		else
+			return evaluatorName + "-" + version;
+	}
+	
+	
+	/**
+	 * Extracting name from version name.
+	 * @param evaluatorVersionName version name of evaluator.
+	 * @return name of evaluator.
+	 */
+	public static String extractName(String evaluatorVersionName) {
+		if (evaluatorVersionName == null) return null;
+		int lastIdx = evaluatorVersionName.lastIndexOf("-");
+		if (lastIdx < 0)
+			return null;
+		else
+			return evaluatorVersionName.substring(0, lastIdx);
+	}
+	
+	
+	/**
+	 * Extracting name from version name.
+	 * @param evaluatorVersionName version name of evaluator.
+	 * @return name of evaluator.
+	 */
+	public static String extractVersion(String evaluatorVersionName) {
+		if (evaluatorVersionName == null) return null;
+		int lastIdx = evaluatorVersionName.lastIndexOf("-");
+		if (lastIdx < 0 || lastIdx == evaluatorVersionName.length() - 1)
+			return null;
+		else
+			return evaluatorVersionName.substring(lastIdx + 1);
+	}
+
+
 }

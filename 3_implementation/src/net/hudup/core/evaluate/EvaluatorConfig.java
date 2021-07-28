@@ -284,7 +284,10 @@ public class EvaluatorConfig extends SysConfig {
 	 * @return whether the evaluator is reproduced.
 	 */
 	public boolean isReproduced() {
-		return containsKey(EVALUATOR_REPRODUCED_VERSION_FIELD);
+		if (containsKey(EVALUATOR_REPRODUCED_VERSION_FIELD))
+			return getReproducedVersion() != null;
+		else
+			return false;
 	}
 	
 	

@@ -14,6 +14,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
+import javax.swing.event.EventListenerList;
+
 import net.hudup.core.Constants;
 import net.hudup.core.PluginChangedEvent;
 import net.hudup.core.PluginChangedListener;
@@ -76,6 +78,12 @@ public class ExtendedService extends DefaultService implements ServiceExt, Servi
 	
 	
 	/**
+	 * List of listeners.
+	 */
+    protected EventListenerList listenerList = new EventListenerList();
+
+    
+    /**
 	 * Constructor with specified transaction.
 	 * @param trans specified transaction.
 	 */
@@ -265,7 +273,7 @@ public class ExtendedService extends DefaultService implements ServiceExt, Servi
 				@Override
 				public int compare(Evaluator o1, Evaluator o2) {
 					try {
-						return extractName(o1).compareToIgnoreCase(extractName(o2));
+						return o1.getVersionName().compareToIgnoreCase(o2.getVersionName());
 					}
 					catch (Throwable e) {
 						LogUtil.trace(e);
@@ -326,7 +334,7 @@ public class ExtendedService extends DefaultService implements ServiceExt, Servi
 			return null;
 		
 		if (reproducedVersion != null && !reproducedVersion.isEmpty()) {
-			String evaluatorReproducedName = evaluatorName + "-" + reproducedVersion;
+			String evaluatorReproducedName = EvaluatorAbstract.createVersionName(evaluatorName, reproducedVersion);
 			synchronized (pairReproducedMap) {
 				if (!pairReproducedMap.containsKey(evaluatorReproducedName)) {
 					if (!validateAccount(account, password, DataConfig.ACCOUNT_ADMIN_PRIVILEGE))
@@ -353,7 +361,7 @@ public class ExtendedService extends DefaultService implements ServiceExt, Servi
 			if (reproducedVersion == null || reproducedVersion.isEmpty())
 				reproducedEvaluator = getEvaluator(evaluatorName);
 			else {
-				String evaluatorReproducedName = evaluatorName + "-" + reproducedVersion;
+				String evaluatorReproducedName = EvaluatorAbstract.createVersionName(evaluatorName, reproducedVersion);
 				
 				synchronized (pairReproducedMap) {
 					if (pairReproducedMap.containsKey(evaluatorReproducedName))
@@ -418,7 +426,7 @@ public class ExtendedService extends DefaultService implements ServiceExt, Servi
 		boolean ret = true;
 		trans.lockRead();
 		try {
-			String evaluatorReproducedName = evaluatorName + "-" + reproducedVersion;
+			String evaluatorReproducedName = EvaluatorAbstract.createVersionName(evaluatorName, reproducedVersion);
 			
 			synchronized (pairReproducedMap) {
 				if (pairReproducedMap.containsKey(evaluatorReproducedName)) {
@@ -477,38 +485,19 @@ public class ExtendedService extends DefaultService implements ServiceExt, Servi
 
 
 	/**
-	 * Extracting name of specified evaluator with reproduction support.
-	 * @param evaluator specified evaluator.
-	 * @return name of specified evaluator with reproduction support.
-	 */
-	private String extractName(Evaluator evaluator) {
-		String name = "";
-		if (evaluator != null) {
-			try {
-				EvaluatorConfig config = evaluator.getConfig();
-				if (config.isReproduced())
-					name = evaluator.getName() + "-" + config.getReproducedVersion();
-				else
-					name = evaluator.getName();
-			}
-			catch (Exception e) {
-				LogUtil.trace(e);
-				name = "";
-			}
-		}
-		
-		return name;
-	}
-	
-	
-	/**
 	 * Getting evaluation GUI data of specified evaluator.
 	 * @param evaluator specified evaluator.
 	 * @return evaluation GUI data of specified evaluator.
 	 */
 	public EvaluateGUIData getEvaluateGUIData(Evaluator evaluator) {
-		String evaluatorName = extractName(evaluator);
-		return guiDataMap.get(evaluatorName);
+		try {
+			return guiDataMap.get(evaluator.getVersionName());
+		}
+		catch (Throwable e) {
+			LogUtil.trace(e);
+		}
+		
+		return null;
 	}
 
 
@@ -525,6 +514,46 @@ public class ExtendedService extends DefaultService implements ServiceExt, Servi
 	}
 
 
+	@Override
+	public void addNoticeListener(ServiceNoticeListener listener) throws RemoteException {
+		synchronized (listenerList) {
+			listenerList.add(ServiceNoticeListener.class, listener);
+		}
+	}
+	
+	
+	@Override
+	public void removeNoticeListener(ServiceNoticeListener listener) throws RemoteException {
+		synchronized (listenerList) {
+			listenerList.remove(ServiceNoticeListener.class, listener);
+		}
+	}
+
+	
+	/**
+	 * Getting array of service notice listeners.
+	 * @return array of service notice listeners.
+	 */
+	protected ServiceNoticeListener[] getNoticeListeners() {
+    	synchronized (listenerList) {
+	        return listenerList.getListeners(ServiceNoticeListener.class);
+    	}
+	}
+	
+	
+	@Override
+	public void fireNoticeEvent(ServiceNoticeEvent evt)  throws RemoteException {
+		ServiceNoticeListener[] listeners = getNoticeListeners();
+		for (ServiceNoticeListener listener : listeners) {
+			try {
+				listener.notify(evt);
+			}
+			catch (Throwable e) {
+				LogUtil.trace(e);
+			}
+		}
+	}
+	
 	
 	/**
 	 * Getting list of evaluators.
