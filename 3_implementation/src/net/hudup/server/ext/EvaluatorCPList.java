@@ -15,6 +15,7 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
+import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -24,6 +25,8 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.Date;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.Vector;
 
 import javax.swing.AbstractAction;
@@ -45,6 +48,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 import javax.swing.table.DefaultTableModel;
 
+import net.hudup.core.Constants;
 import net.hudup.core.Util;
 import net.hudup.core.client.ConnectInfo;
 import net.hudup.core.client.Connector;
@@ -53,17 +57,21 @@ import net.hudup.core.client.ServiceExt;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.ui.SysConfigPane;
 import net.hudup.core.data.ui.toolkit.Dispose;
+import net.hudup.core.evaluate.EvaluateInfo;
+import net.hudup.core.evaluate.EvaluateProgressEvent;
+import net.hudup.core.evaluate.EvaluateProgressListener;
 import net.hudup.core.evaluate.Evaluator;
 import net.hudup.core.evaluate.EvaluatorAbstract;
 import net.hudup.core.evaluate.EvaluatorConfig;
 import net.hudup.core.evaluate.EvaluatorEvent;
 import net.hudup.core.evaluate.EvaluatorListener;
+import net.hudup.core.evaluate.ui.EvaluatorWrapper;
 import net.hudup.core.logistic.DSUtil;
 import net.hudup.core.logistic.I18nUtil;
 import net.hudup.core.logistic.LogUtil;
+import net.hudup.core.logistic.MathUtil;
 import net.hudup.core.logistic.NetUtil;
 import net.hudup.core.logistic.ui.UIUtil;
-import net.hudup.server.ext.EvaluatorCP.EvaluatorItem;
 import net.hudup.server.ext.ServiceNoticeEvent.Type;
 
 /**
@@ -124,7 +132,7 @@ public class EvaluatorCPList extends JFrame {
     protected JButton btnClose = null;
 
     
-    /**
+	/**
 	 * Constructor with specified service.
 	 * @param service specified service.
 	 */
@@ -139,7 +147,7 @@ public class EvaluatorCPList extends JFrame {
 	 * @param connectInfo connection information.
 	 */
 	public EvaluatorCPList(Service service, ConnectInfo connectInfo) {
-		super("Evaluator control panel list");
+		super("Evaluator control panel");
 		connectInfo = connectInfo != null ? connectInfo : (connectInfo = new ConnectInfo());
 		tblEvaluator = new EvaluatorTable(service, connectInfo);
 		
@@ -148,7 +156,11 @@ public class EvaluatorCPList extends JFrame {
 		setLocationRelativeTo(null);
         Image image = UIUtil.getImage("evaluator-32x32.png");
         if (image != null) setIconImage(image);
-		
+        if (connectInfo.bindUri == null)
+        	setTitle(getTitle() + " (local)");
+        else
+        	setTitle(getTitle() + " (remote)");
+        	
 	    setJMenuBar(createMenuBar(service, connectInfo));
 
         addWindowListener(new WindowAdapter() {
@@ -324,10 +336,11 @@ public class EvaluatorCPList extends JFrame {
 			JOptionPane.showMessageDialog(this, "There is no selected evaluator", "No selected evaluator", JOptionPane.ERROR_MESSAGE);
 			return;
 		}
-		EvaluatorCP.EvaluatorItem evItem = tblEvaluator.getModel2().getEvaluatorItem(selectedRow);
+		EvaluatorTableModel m = tblEvaluator.getModel2();
+		EvaluatorWrapper evItem = m.getEvaluatorItem(selectedRow);
 		if (evItem == null || evItem.evaluator == null) return;
 		
-		EvaluatorItem.openEvaluator(evItem, tblEvaluator.getModel2().connectInfo, this);
+		EvaluatorWrapper.openEvaluator(evItem, m.connectInfo, this);
 	}
 	
 	
@@ -340,7 +353,7 @@ public class EvaluatorCPList extends JFrame {
 			JOptionPane.showMessageDialog(this, "There is no selected evaluator", "No selected evaluator", JOptionPane.ERROR_MESSAGE);
 			return;
 		}
-		EvaluatorCP.EvaluatorItem evItem = tblEvaluator.getModel2().getEvaluatorItem(selectedRow);
+		EvaluatorWrapper evItem = tblEvaluator.getModel2().getEvaluatorItem(selectedRow);
 		if (evItem == null || evItem.evaluator == null) return;
 		
 		tblEvaluator.config(evItem, selectedRow);
@@ -356,10 +369,10 @@ public class EvaluatorCPList extends JFrame {
 			JOptionPane.showMessageDialog(this, "There is no selected evaluator", "No selected evaluator", JOptionPane.ERROR_MESSAGE);
 			return;
 		}
-		EvaluatorCP.EvaluatorItem evItem = tblEvaluator.getModel2().getEvaluatorItem(selectedRow);
+		EvaluatorWrapper evItem = tblEvaluator.getModel2().getEvaluatorItem(selectedRow);
 		if (evItem == null || evItem.evaluator == null) return;
 		
-		tblEvaluator.reproduce(evItem, selectedRow);
+		tblEvaluator.reproduce(evItem.evaluator, selectedRow);
 	}
 	
 	
@@ -372,10 +385,10 @@ public class EvaluatorCPList extends JFrame {
 			JOptionPane.showMessageDialog(this, "There is no selected evaluator", "No selected evaluator", JOptionPane.ERROR_MESSAGE);
 			return;
 		}
-		EvaluatorCP.EvaluatorItem evItem = tblEvaluator.getModel2().getEvaluatorItem(selectedRow);
+		EvaluatorWrapper evItem = tblEvaluator.getModel2().getEvaluatorItem(selectedRow);
 		if (evItem == null || evItem.evaluator == null) return;
 		
-		tblEvaluator.remove(evItem, selectedRow);
+		tblEvaluator.remove(selectedRow, true);
 	}
 	
 	
@@ -448,7 +461,7 @@ public class EvaluatorCPList extends JFrame {
  * @version 1.0
  *
  */
-class EvaluatorTable extends JTable implements EvaluatorListener, ServiceNoticeListener, Remote, Dispose {
+class EvaluatorTable extends JTable implements EvaluatorListener, EvaluateProgressListener, ServiceNoticeListener, Remote, Dispose {
 
 	
 	/**
@@ -470,6 +483,12 @@ class EvaluatorTable extends JTable implements EvaluatorListener, ServiceNoticeL
 	
 	
 	/**
+	 * Internal time counter.
+	 */
+	protected Timer timer = null;
+
+	
+	/**
 	 * Constructor with specified service and connection information.
 	 * @param service specified service.
 	 * @param connectInfo specified connection information.
@@ -487,23 +506,51 @@ class EvaluatorTable extends JTable implements EvaluatorListener, ServiceNoticeL
 		}
 
 		setModel(new EvaluatorTableModel(service, connectInfo, this));
+		
 		setAutoCreateRowSorter(true); 
 		addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
+				int selectedRow = getSelectedRow();
+				if (selectedRow < 0) return;
 				if(SwingUtilities.isRightMouseButton(e) ) {
 					JPopupMenu contextMenu = createContextMenu();
 					if(contextMenu == null) return;
 					contextMenu.show((Component)e.getSource(), e.getX(), e.getY());
+				}
+				else if (e.getClickCount() >= 2) {
+					config(getModel2().getEvaluatorItem(selectedRow), selectedRow);
+				}
+			}
+		});
+		addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyPressed(KeyEvent e) {
+				int selectedRow = getSelectedRow();
+				if (selectedRow < 0) return;
+				if(e.getKeyCode() == KeyEvent.VK_DELETE) {
+					remove(selectedRow, true);
 				}
 			}
 		});
 		
 		update();
 		
-		if ((!connectInfo.pullMode) && (service instanceof ServiceExt)) {
+		if (connectInfo.pullMode) {
+			timer = new Timer();
+			long milisec = Constants.DEFAULT_SHORT_TIMEOUT * 1000; //Every 5 minutes, this control panel updates itself by server information.
+			timer.schedule(new TimerTask() {
+				@Override
+				public void run() {
+					refreshByTimer();
+				}
+			}, milisec, milisec);
+
+		}
+		else {
 			try {
-				((ServiceExt)service).addNoticeListener(this);
+				if (service instanceof ServiceExt)
+					((ServiceExt)service).addNoticeListener(this);
 			} catch (Exception e) {LogUtil.trace(e);}
 		}
 	}
@@ -525,7 +572,7 @@ class EvaluatorTable extends JTable implements EvaluatorListener, ServiceNoticeL
 	protected JPopupMenu createContextMenu() {
 		int selectedRow = getSelectedRow();
 		if (selectedRow < 0) return null;
-		EvaluatorCP.EvaluatorItem evItem = getModel2().getEvaluatorItem(selectedRow);
+		EvaluatorWrapper evItem = getModel2().getEvaluatorItem(selectedRow);
 		if (evItem == null || evItem.evaluator == null) return null;
 		
 		JPopupMenu ctxMenu = new JPopupMenu();
@@ -535,7 +582,7 @@ class EvaluatorTable extends JTable implements EvaluatorListener, ServiceNoticeL
 			new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					EvaluatorItem.openEvaluator(evItem, getModel2().connectInfo, getEvaluatorTable());
+					EvaluatorWrapper.openEvaluator(evItem, getModel2().connectInfo, getEvaluatorTable());
 				}
 			});
 		ctxMenu.add(miOpen);
@@ -557,7 +604,7 @@ class EvaluatorTable extends JTable implements EvaluatorListener, ServiceNoticeL
 			new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					refresh(evItem, selectedRow);
+					refresh(evItem.evaluator, selectedRow);
 				}
 			});
 		ctxMenu.add(miRefresh);
@@ -567,7 +614,7 @@ class EvaluatorTable extends JTable implements EvaluatorListener, ServiceNoticeL
 			new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					reproduce(evItem, selectedRow);
+					reproduce(evItem.evaluator, selectedRow);
 				}
 			});
 		ctxMenu.add(miReproduce);
@@ -579,7 +626,7 @@ class EvaluatorTable extends JTable implements EvaluatorListener, ServiceNoticeL
 					new ActionListener() {
 						@Override
 						public void actionPerformed(ActionEvent e) {
-							remove(evItem, selectedRow);
+							remove(selectedRow, true);
 						}
 					});
 				ctxMenu.add(miRemove);
@@ -593,9 +640,9 @@ class EvaluatorTable extends JTable implements EvaluatorListener, ServiceNoticeL
 	/**
 	 * Configure evaluator.
 	 * @param selectedRow selected row.
-	 * @param evItem evaluator item.
+	 * @param evItem specified evaluator item.
 	 */
-	protected synchronized void config(EvaluatorCP.EvaluatorItem evItem, int selectedRow) {
+	protected synchronized void config(EvaluatorWrapper evItem, int selectedRow) {
 		JDialog dlgConfig = new JDialog(UIUtil.getFrameForComponent(this), "Configure evaluator", true);
 		dlgConfig.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		dlgConfig.setSize(600, 400);
@@ -632,6 +679,7 @@ class EvaluatorTable extends JTable implements EvaluatorListener, ServiceNoticeL
 			}
 
 		};
+		
 		try {
 			paneConfig.setToolbarVisible(true);
 			paneConfig.setEnabled(false);
@@ -646,7 +694,7 @@ class EvaluatorTable extends JTable implements EvaluatorListener, ServiceNoticeL
 			EvaluatorConfig config = evItem.evaluator.getConfig();
 			if (config != null) {
 				if (getModel2().connectInfo.bindUri != null) config.setSaveAbility(false);
-				paneConfig.update(evItem.evaluator.getConfig());
+				paneConfig.update(config);
 			}
 		}
 		catch (Exception e) {
@@ -675,7 +723,7 @@ class EvaluatorTable extends JTable implements EvaluatorListener, ServiceNoticeL
 		});
 
 		try {
-			String name = evItem.evaluator.getVersionName();
+			String name = evItem.getName();
 			dlgConfig.setTitle("Configure evaluator \"" + DSUtil.shortenVerbalName(name) + "\"");
 		} catch (Exception e) {LogUtil.trace(e);}
 		
@@ -686,32 +734,59 @@ class EvaluatorTable extends JTable implements EvaluatorListener, ServiceNoticeL
 	/**
 	 * Refreshing evaluator.
 	 * @param selectedRow selected row.
-	 * @param evItem evaluator item.
+	 * @param evaluator specified evaluator.
 	 */
-	protected synchronized void refresh(EvaluatorCP.EvaluatorItem evItem, int selectedRow) {
-		setValueAt(EvaluatorTableModel.getStatusText(evItem.evaluator), selectedRow, 1);
+	protected synchronized void refresh(Evaluator evaluator, int selectedRow) {
+		getModel2().setInfoAt(selectedRow, evaluator);
 	}
 
 	
 	/**
+	 * Create timer.
+	 */
+	protected synchronized void refreshByTimer() {
+		EvaluatorTableModel m = getModel2();
+		List<Evaluator> evaluators = ExtendedService.getEvaluators(m.service, m.connectInfo);
+		for (Evaluator evaluator : evaluators) {
+			try {
+				int row = m.lookupEvaluator(evaluator.getVersionName());
+				if (row < 0) {
+	        		m.addRow(EvaluatorTableModel.toRow(evaluator));
+	        		setupListeners(evaluator);
+				}
+				else
+					m.setInfoAt(row, evaluator);
+			}
+			catch (Exception e) {
+				LogUtil.trace(e);
+			}
+		}
+		
+		List<EvaluatorWrapper> items = m.getEvaluatorItems();
+		for (EvaluatorWrapper item : items) {
+			try {
+				int row = EvaluatorTableModel.lookupEvaluator(evaluators, item.getName());
+				if (row < 0) removeRow(item.getName());
+			}
+			catch (Exception e) {
+				LogUtil.trace(e);
+			}
+		}
+	}
+	
+	
+	/**
 	 * Reproducing evaluator.
 	 * @param selectedRow selected row.
-	 * @param evItem evaluator item.
+	 * @param evaluator specified evaluator.
 	 */
-	protected synchronized void reproduce(EvaluatorCP.EvaluatorItem evItem, int selectedRow) {
+	protected synchronized void reproduce(Evaluator evaluator, int selectedRow) {
 		Service service = getModel2().service;
 		ConnectInfo connectInfo = getModel2().connectInfo;
 		if (!(service instanceof ServiceExt)) {
-			JOptionPane.showMessageDialog(
-				this, 
-				"This service does not support to reproduce evaluator", 
-				"Evaluator reproduction not supported", 
-				JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(this, "This service does not support to reproduce evaluator", "Evaluator reproduction not supported", JOptionPane.ERROR_MESSAGE);
         	return;
 		}
-		
-		if (evItem == null || evItem.evaluator == null) return;
-		Evaluator evaluator = evItem.evaluator;
 		
 		JDialog selectDlgNameDlg = new JDialog(UIUtil.getFrameForComponent(this), "Select a algorithm name", true);
 		selectDlgNameDlg.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -774,12 +849,10 @@ class EvaluatorTable extends JTable implements EvaluatorListener, ServiceNoticeL
         		JOptionPane.showMessageDialog(
     				this, 
     				"Success to reproduce evaluator '" + EvaluatorAbstract.createVersionName(evaluatorName, evaluatorName) + "'", 
-    				"Success to reproduce evaluator", 
-    				JOptionPane.INFORMATION_MESSAGE);
+    				"Success to reproduce evaluator", JOptionPane.INFORMATION_MESSAGE);
         		
         		((DefaultTableModel)getModel()).addRow(EvaluatorTableModel.toRow(evaluator));
-    			if (!EvaluatorAbstract.isPullModeRequired(evaluator) && !connectInfo.pullMode)
-					evaluator.addEvaluatorListener(this);
+        		setupListeners(evaluator);
     			
     			((ServiceExt)service).fireNoticeEvent(new ServiceNoticeEvent(this, Type.add_reproduced_evaluator, evaluatorName, versionName.toString(), timestamp));
         		return;
@@ -802,16 +875,10 @@ class EvaluatorTable extends JTable implements EvaluatorListener, ServiceNoticeL
 	protected synchronized boolean addRow(String evName, String evVersion) {
 		String name = EvaluatorAbstract.createVersionName(evName, evVersion);
 		if (name == null) return false;
-		int n = getRowCount(); if (n == 0) return false;
+		EvaluatorTableModel m = getModel2();
+		if (m.lookupEvaluator(name) >= 0) return false;
 		
-		for (int i = 0; i < n; i++) {
-			try {
-				Evaluator evaluator = getModel2().getEvaluatorItem(i).evaluator;
-				if (evaluator.getVersionName().equals(name)) return false;
-			} catch (Exception e) {LogUtil.trace(e);}
-		}
-
-		Service service = getModel2().service;
+		Service service = m.service;
 		ConnectInfo connectInfo = getModel2().connectInfo;
 		if (!(service instanceof ServiceExt)) return false;
 
@@ -823,12 +890,10 @@ class EvaluatorTable extends JTable implements EvaluatorListener, ServiceNoticeL
 				evaluator = ((ExtendedService)service).getEvaluator(evName, evVersion);
 			
             if (evaluator != null) {
-        		((DefaultTableModel)getModel()).addRow(EvaluatorTableModel.toRow(evaluator));
-    			if (!EvaluatorAbstract.isPullModeRequired(evaluator) && !connectInfo.pullMode)
-					evaluator.addEvaluatorListener(this);
+        		m.addRow(EvaluatorTableModel.toRow(evaluator));
+        		setupListeners(evaluator);
         		return true;
             }
-			
 		} catch (Exception e) {LogUtil.trace(e);}
 		
 		return false;
@@ -839,30 +904,25 @@ class EvaluatorTable extends JTable implements EvaluatorListener, ServiceNoticeL
 	 * Removing evaluator.
 	 * @param selectedRow selected row.
 	 * @param evItem evaluator item.
+	 * @param notice notice flag.
 	 */
-	protected synchronized void remove(EvaluatorCP.EvaluatorItem evItem, int selectedRow) {
-		Service service = getModel2().service;
-		ConnectInfo connectInfo = getModel2().connectInfo;
+	protected synchronized void remove(int selectedRow, boolean notice) {
+		EvaluatorTableModel m = getModel2();
+		Service service = m.service;
+		ConnectInfo connectInfo = m.connectInfo;
 		if (!(service instanceof ServiceExt)) {
-			JOptionPane.showMessageDialog(
-				this, 
-				"This service does not support to remove reproduced evaluator", 
-				"Evaluator reproduction not supported", 
-				JOptionPane.ERROR_MESSAGE);
+			if (notice) JOptionPane.showMessageDialog(this, "This service does not support to remove reproduced evaluator", "Evaluator reproduction not supported", JOptionPane.ERROR_MESSAGE);
         	return;
 		}
 		
+		EvaluatorWrapper evItem = m.getEvaluatorItem(selectedRow);
 		if (evItem == null || evItem.evaluator == null) return;
 		Evaluator evaluator = evItem.evaluator;
 		
 		try {
 			EvaluatorConfig config = evaluator.getConfig();
 			if (!config.isReproduced()) {
-				JOptionPane.showMessageDialog(
-						this, 
-						"Cannot remove non-reproduced evaluator", 
-						"Evaluator removal fails", 
-						JOptionPane.ERROR_MESSAGE);
+				if (notice) JOptionPane.showMessageDialog(this, "Cannot remove non-reproduced evaluator", "Evaluator removal fails", JOptionPane.ERROR_MESSAGE);
 				return;
 			}
 			
@@ -878,11 +938,10 @@ class EvaluatorTable extends JTable implements EvaluatorListener, ServiceNoticeL
 				ret = false;
 			
             if (ret) {
-        		JOptionPane.showMessageDialog(
-    				this, 
-    				"Success to remove evaluator '" + EvaluatorAbstract.createVersionName(evaluatorName, versionName) + "'", 
-    				"Success to remove evaluator", 
-    				JOptionPane.INFORMATION_MESSAGE);
+            	if (notice)
+	        		JOptionPane.showMessageDialog(this,
+	    				"Success to remove evaluator '" + EvaluatorAbstract.createVersionName(evaluatorName, versionName) + "'", 
+	    				"Success to remove evaluator", JOptionPane.INFORMATION_MESSAGE);
         		
 				getModel2().removeRow(selectedRow);
 				
@@ -895,7 +954,7 @@ class EvaluatorTable extends JTable implements EvaluatorListener, ServiceNoticeL
         	LogUtil.trace(e);
         }
         
-		JOptionPane.showMessageDialog(this, "Fail to remove evaluator", "Fail to remove evaluator", JOptionPane.ERROR_MESSAGE);
+		if (notice) JOptionPane.showMessageDialog(this, "Fail to remove evaluator", "Fail to remove evaluator", JOptionPane.ERROR_MESSAGE);
 	}
 
 	
@@ -907,13 +966,21 @@ class EvaluatorTable extends JTable implements EvaluatorListener, ServiceNoticeL
 	 */
 	protected synchronized boolean removeRow(String evName, String evVersion) {
 		String versionName = EvaluatorAbstract.createVersionName(evName, evVersion);
-		if (versionName == null) return false;
-		int n = getRowCount(); if (n == 0) return false;
-		
+		return removeRow(versionName);
+	}
+	
+	
+	/**
+	 * Remove row.
+	 * @param evVersionName evaluator version name.
+	 * @return whether adding row is successful.
+	 */
+	protected synchronized boolean removeRow(String evVersionName) {
+		int n = getRowCount();
 		for (int i = 0; i < n; i++) {
 			try {
 				String name = getModel2().getEvaluatorItem(i).getName();
-				if (name.equals(versionName)) {
+				if (name.equals(evVersionName)) {
 					getModel2().removeRow(i);
 					return true;
 				}
@@ -922,7 +989,7 @@ class EvaluatorTable extends JTable implements EvaluatorListener, ServiceNoticeL
 
 		return false;
 	}
-	
+
 	
 	/**
 	 * Getting this evaluator table.
@@ -951,16 +1018,10 @@ class EvaluatorTable extends JTable implements EvaluatorListener, ServiceNoticeL
 	
 	@Override
 	public synchronized void receivedEvaluator(EvaluatorEvent evt) throws RemoteException {
-		int n = getRowCount(); if (n == 0) return;
-		for (int i = 0; i < n; i++) {
-			try {
-				Evaluator evaluator = getModel2().getEvaluatorItem(i).evaluator;
-				if (evaluator == evt.getEvaluator()) {
-					setValueAt(EvaluatorTableModel.getStatusText(evaluator), i, 1);
-					return;
-				}
-			} catch (Exception e) {LogUtil.trace(e);}
-		}
+		int row = getModel2().lookupEvaluator(evt.getEvaluatorVersionName());
+		if (row < 0) return;
+		Evaluator evaluator = getModel2().getEvaluatorItem(row).evaluator;
+		getModel2().setInfoAt(row, evaluator);
 	}
 
 	
@@ -978,6 +1039,15 @@ class EvaluatorTable extends JTable implements EvaluatorListener, ServiceNoticeL
 	@Override
 	public boolean ping() throws RemoteException {
 		return true;
+	}
+
+
+	@Override
+	public synchronized void receivedProgress(EvaluateProgressEvent evt) throws RemoteException {
+		int row = getModel2().lookupEvaluator(evt.getEvaluatorVersionName());
+		if (row < 0) return;
+		Evaluator evaluator = getModel2().getEvaluatorItem(row).evaluator;
+		getModel2().setInfoAt(row, evaluator, evt);
 	}
 
 
@@ -1011,6 +1081,9 @@ class EvaluatorTable extends JTable implements EvaluatorListener, ServiceNoticeL
 			} catch (Exception e) {LogUtil.trace(e);}
 		}
 
+		if (timer != null) timer.cancel();
+		timer = null;
+		
 		if (exportedStub != null) {
 			boolean ret = NetUtil.RegistryRemote.unexport(this);
 			if (ret)
@@ -1025,6 +1098,40 @@ class EvaluatorTable extends JTable implements EvaluatorListener, ServiceNoticeL
 	@Override
 	public boolean isRunning() {
 		return true;
+	}
+
+
+	/**
+	 * Setting up listeners of specified evaluators.
+	 * @param evaluator specified evaluators.
+	 */
+	protected void setupListeners(Evaluator evaluator) {
+		try {
+			if (!EvaluatorAbstract.isPullModeRequired(evaluator) && !getModel2().connectInfo.pullMode) {
+				evaluator.addEvaluatorListener(this);
+				evaluator.addEvaluateProgressListener(this);
+			}
+		}
+		catch (Exception e) {
+			LogUtil.trace(e);
+		}
+	}
+	
+	
+	/**
+	 * Setting up listeners of specified evaluators.
+	 * @param evaluator specified evaluators.
+	 */
+	protected void unsetupListeners(Evaluator evaluator) {
+		try {
+			if (!EvaluatorAbstract.isPullModeRequired(evaluator) && !getModel2().connectInfo.pullMode) {
+				evaluator.removeEvaluatorListener(this);
+				evaluator.removeEvaluateProgressListener(this);
+			}
+		}
+		catch (Exception e) {
+			LogUtil.trace(e);
+		}
 	}
 
 
@@ -1061,22 +1168,22 @@ class EvaluatorTableModel extends DefaultTableModel {
 
 	
 	/**
-	 * Evaluator listener.
+	 * Evaluator table.
 	 */
-	protected EvaluatorListener listener = null;
+	protected EvaluatorTable table = null;
 	
 	
 	/**
 	 * Constructor with service and connection information.
 	 * @param service specified service.
 	 * @param connectInfo connection information.
-	 * @param listener evaluator listener.
+	 * @param table evaluator table.
 	 */
-	public EvaluatorTableModel(Service service, ConnectInfo connectInfo, EvaluatorListener listener) {
+	public EvaluatorTableModel(Service service, ConnectInfo connectInfo, EvaluatorTable table) {
 		super();
 		this.service = service;
 		this.connectInfo = connectInfo;
-		this.listener = listener;
+		this.table = table;
 	}
 
 	
@@ -1087,10 +1194,8 @@ class EvaluatorTableModel extends DefaultTableModel {
 		int rows = getRowCount();
 		for (int i = 0; i < rows; i++) {
 			try {
-				Evaluator evaluator = ((EvaluatorCP.EvaluatorItem)getValueAt(i, 0)).evaluator;
-				if (!EvaluatorAbstract.isPullModeRequired(evaluator) && !connectInfo.pullMode) {
-					evaluator.removeEvaluatorListener(listener);
-				}
+				Evaluator evaluator = getEvaluator(i);
+				table.unsetupListeners(evaluator);
 			} catch (Exception e) {LogUtil.error("Clear table error: " + e.getMessage());}
 		} 
 
@@ -1115,11 +1220,8 @@ class EvaluatorTableModel extends DefaultTableModel {
 		setDataVector(data, toColumns());
 		
 		for (Evaluator evaluator : evaluators) {
-			if (!EvaluatorAbstract.isPullModeRequired(evaluator) && !connectInfo.pullMode) {
-				try {
-					evaluator.addEvaluatorListener(listener);
-				} catch (Exception e) {LogUtil.trace(e);}
-			}
+			if (!EvaluatorAbstract.isPullModeRequired(evaluator) && !connectInfo.pullMode)
+				table.setupListeners(evaluator);
 		}
 		
 	}
@@ -1135,12 +1237,12 @@ class EvaluatorTableModel extends DefaultTableModel {
 	 * Getting evaluator items.
 	 * @return list of evaluator items.
 	 */
-	public List<EvaluatorItem> getEvaluatorItems() {
-		List<EvaluatorItem> evItems = Util.newList();
+	public List<EvaluatorWrapper> getEvaluatorItems() {
+		List<EvaluatorWrapper> evItems = Util.newList();
 		int rows = getRowCount();
 		for (int i = 0; i < rows; i++) {
 			try {
-				evItems.add((EvaluatorCP.EvaluatorItem)getValueAt(i, 0));
+				evItems.add((EvaluatorWrapper)getValueAt(i, 0));
 			} catch (Exception e) {LogUtil.trace(e);}
 		} 
 		
@@ -1149,14 +1251,49 @@ class EvaluatorTableModel extends DefaultTableModel {
 	
 	
 	/**
+	 * Getting evaluators.
+	 * @return list of evaluators.
+	 */
+	public List<Evaluator> getEvaluators() {
+		List<EvaluatorWrapper> evItems = getEvaluatorItems();
+		List<Evaluator> evaluators = Util.newList(evItems.size());
+		for (EvaluatorWrapper evItem : evItems) {
+			if (evItem.evaluator != null) evaluators.add(evItem.evaluator);
+		}
+		
+		return evaluators;
+	}
+
+	
+	/**
 	 * Getting evaluator item at specified row.
 	 * @param row specified row.
 	 * @return evaluator item at specified row.
 	 */
-	public EvaluatorItem getEvaluatorItem(int row) {
-		return (EvaluatorCP.EvaluatorItem)getValueAt(row, 0);
+	public EvaluatorWrapper getEvaluatorItem(int row) {
+		return (EvaluatorWrapper)getValueAt(row, 0);
 	}
 	
+	
+	/**
+	 * Getting evaluator at specified row.
+	 * @param row specified row.
+	 * @return evaluator at specified row.
+	 */
+	public Evaluator getEvaluator(int row) {
+		return getEvaluatorItem(row).evaluator;
+	}
+
+	
+	/**
+	 * Getting evaluator name at specified row.
+	 * @param row specified row.
+	 * @return evaluator name at specified row.
+	 */
+	public String getEvaluatorName(int row) {
+		return getEvaluatorItem(row).getName();
+	}
+
 	
 	/**
 	 * Getting evaluator status at specified row.
@@ -1165,6 +1302,87 @@ class EvaluatorTableModel extends DefaultTableModel {
 	 */
 	public String getEvaluatorStatus(int row) {
 		return (String)getValueAt(row, 1);
+	}
+
+	
+	/**
+	 * Looking up evaluator by its version name.
+	 * @param evVersionName specified version name.
+	 * @return the evaluator whose version name is specified.
+	 */
+	public int lookupEvaluator(String evVersionName) {
+		int n = getRowCount();
+		for (int i = 0; i < n; i++) {
+			try {
+				if (getEvaluatorItem(i).getName().equals(evVersionName))
+					return i;
+			} catch (Exception e) {LogUtil.trace(e);}
+		}
+		
+		return -1;
+	}
+
+	
+	/**
+	 * Looking up evaluator by its version name.
+	 * @param evaluators list of evaluators.
+	 * @param evVersionName specified version name.
+	 * @return the evaluator whose version name is specified.
+	 */
+	public static int lookupEvaluator(List<Evaluator> evaluators, String evVersionName) {
+		int n = evaluators.size();
+		for (int i = 0; i < n; i++) {
+			try {
+				if (evaluators.get(i).getVersionName().equals(evVersionName))
+					return i;
+			} catch (Exception e) {LogUtil.trace(e);}
+		}
+		
+		return -1;
+	}
+
+	
+	/**
+	 * Setting information at specified row with specified evaluator.
+	 * @param row specified row.
+	 * @param evaluator specified evaluator.
+	 */
+	public void setInfoAt(int row, Evaluator evaluator) {
+		try {
+			setValueAt(EvaluatorTableModel.getStatusText(evaluator), row, 1);
+			EvaluateInfo info = evaluator.getOtherResult();
+			if (info.progressTotal != 0) {
+				String progress = MathUtil.format((double)info.progressStep/info.progressTotal*100.0, 2) + "%";
+				setValueAt(progress, row, 2);
+			}
+			else
+				setValueAt("", row, 2);
+		}
+		catch (Exception e) {
+			LogUtil.trace(e);
+		}
+	}
+	
+	
+	/**
+	 * Setting information at specified row with specified evaluator and progression event.
+	 * @param row specified row.
+	 * @param evaluator specified evaluator.
+	 * @param evt progression event.
+	 */
+	public void setInfoAt(int row, Evaluator evaluator, EvaluateProgressEvent evt) {
+		try {
+			setValueAt(EvaluatorTableModel.getStatusText(evaluator), row, 1);
+			if (evt.getProgressTotal() != 0) {
+				String progress = MathUtil.format((double)evt.getProgressStep()/evt.getProgressTotal()*100.0, 2) + "%";
+				setValueAt(progress, row, 2);
+			}
+			else
+				setValueAt("", row, 2);
+		}
+		catch (Exception e) {
+			LogUtil.trace(e);
+		}
 	}
 
 	
@@ -1195,8 +1413,20 @@ class EvaluatorTableModel extends DefaultTableModel {
 	 */
 	public static Vector<Object> toRow(Evaluator evaluator) {
 		Vector<Object> row = Util.newVector();
-		row.add(new EvaluatorCP.EvaluatorItem(evaluator));
+		row.add(new EvaluatorWrapper(evaluator));
 		row.add(getStatusText(evaluator));
+		try {
+			EvaluateInfo info = evaluator.getOtherResult();
+			if (info.progressTotal != 0) {
+				String progress = MathUtil.format((double)info.progressStep/info.progressTotal*100.0, 2) + "%";
+				row.add(progress);
+			}
+			else
+				row.add("");
+		}
+		catch (Exception e) {
+			LogUtil.trace(e);
+		}
 		return row;
 	}
 	
@@ -1209,6 +1439,7 @@ class EvaluatorTableModel extends DefaultTableModel {
 		Vector<String> columns = Util.newVector();
 		columns.add("Evaluator");
 		columns.add("Status");
+		columns.add("Progress");
 		return columns;
 	}
 	

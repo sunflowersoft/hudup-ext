@@ -11,6 +11,7 @@ import java.io.Serializable;
 import java.util.EventObject;
 
 import net.hudup.core.data.DatasetPoolExchanged;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.Timestamp;
 
 /**
@@ -100,6 +101,12 @@ public class EvaluatorEvent extends EventObject {
 
 	
 	/**
+	 * Evaluator version name.
+	 */
+	protected String evaluatorVersionName = null;
+	
+	
+	/**
 	 * Constructor with specified evaluator and event type.
 	 * @param evaluator reference to evaluator. This evaluator is invalid in remote call because the source is transient variable.
 	 * @param type type of this event.
@@ -146,6 +153,9 @@ public class EvaluatorEvent extends EventObject {
 		this.otherResult = otherResult;
 		this.poolResult = poolResult;
 		this.timestamp = timestamp;
+		try {
+			this.evaluatorVersionName = evaluator.getVersionName();
+		} catch (Exception e) {LogUtil.trace(null);}
 	}
 
 	
@@ -162,6 +172,15 @@ public class EvaluatorEvent extends EventObject {
 			return (Evaluator)source;
 		else
 			return null;
+	}
+	
+	
+	/**
+	 * Getting evaluator version name.
+	 * @return evaluator version name.
+	 */
+	public String getEvaluatorVersionName() {
+		return evaluatorVersionName;
 	}
 	
 	

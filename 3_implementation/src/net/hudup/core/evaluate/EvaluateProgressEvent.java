@@ -9,6 +9,7 @@ package net.hudup.core.evaluate;
 
 import java.util.EventObject;
 
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.NextUpdate;
 
 /**
@@ -32,6 +33,12 @@ public class EvaluateProgressEvent extends EventObject {
 //	 */
 //	protected Evaluator evaluator = null;
 
+	
+	/**
+	 * Evaluator version name.
+	 */
+	protected String evaluatorVersionName = null;
+	
 	
 	/**
 	 * Total number of steps in progress.
@@ -82,6 +89,9 @@ public class EvaluateProgressEvent extends EventObject {
 //		this.evaluator = evaluator;
 		this.progressTotal = progressTotal;
 		this.progressStep = progressStep;
+		try {
+			this.evaluatorVersionName = evaluator.getVersionName();
+		} catch (Exception e) {LogUtil.trace(null);}
 	}
 	
 	
@@ -189,6 +199,15 @@ public class EvaluateProgressEvent extends EventObject {
 	 */
 	public void setCurrentCount(int vRatingCount) {
 		this.vCurrentCount = vRatingCount;
+	}
+	
+	
+	/**
+	 * Getting evaluator version name.
+	 * @return evaluator version name.
+	 */
+	public String getEvaluatorVersionName() {
+		return evaluatorVersionName;
 	}
 	
 	
