@@ -489,6 +489,12 @@ class EvaluatorTable extends JTable implements EvaluatorListener, EvaluateProgre
 	 */
 	protected Timer timer = null;
 
+
+	/**
+	 * Remote synchronization object.
+	 */
+	protected Object remoteSyncObject = new Object();
+	
 	
 	/**
 	 * Constructor with specified service and connection information.
@@ -1065,23 +1071,18 @@ class EvaluatorTable extends JTable implements EvaluatorListener, EvaluateProgre
 	
 	
 	/*
-	 * Using thread instead of synchronization is a work-around solution.
+	 * Using sync object of synchronization is a work-around solution.
 	 */
 	@Override
 	public /*synchronized*/ void receivedEvaluator(EvaluatorEvent evt) throws RemoteException {
-		new Thread() {
-
-			@Override
-			public void run() {
-				try {
-					int row = getModel2().lookupEvaluator(evt.getEvaluatorVersionName());
-					if (row < 0) return;
-					Evaluator evaluator = getModel2().getEvaluatorItem(row).evaluator;
-					getModel2().setInfoAt(row, evaluator);
-				} catch (Exception e) {LogUtil.error("Receiving evaluator event error: " + e.getMessage());}
-			}
-			
-		}.start();
+		synchronized (remoteSyncObject) {
+			try {
+				int row = getModel2().lookupEvaluator(evt.getEvaluatorVersionName());
+				if (row < 0) return;
+				Evaluator evaluator = getModel2().getEvaluatorItem(row).evaluator;
+				getModel2().setInfoAt(row, evaluator);
+			} catch (Exception e) {LogUtil.error("Receiving evaluator event error: " + e.getMessage());}
+		}
 	}
 
 	
@@ -1103,23 +1104,18 @@ class EvaluatorTable extends JTable implements EvaluatorListener, EvaluateProgre
 
 
 	/*
-	 * Using thread instead of synchronization is a work-around solution.
+	 * Using sync object instead of synchronization is a work-around solution.
 	 */
 	@Override
 	public /*synchronized*/ void receivedProgress(EvaluateProgressEvent evt) throws RemoteException {
-		new Thread() {
-
-			@Override
-			public void run() {
-				try {
-					int row = getModel2().lookupEvaluator(evt.getEvaluatorVersionName());
-					if (row < 0) return;
-					Evaluator evaluator = getModel2().getEvaluatorItem(row).evaluator;
-					getModel2().setInfoAt(row, evaluator, evt);
-				} catch (Exception e) {LogUtil.error("Receiving progress event error: " + e.getMessage());}
-			}
-			
-		}.start();
+		synchronized (remoteSyncObject) {
+			try {
+				int row = getModel2().lookupEvaluator(evt.getEvaluatorVersionName());
+				if (row < 0) return;
+				Evaluator evaluator = getModel2().getEvaluatorItem(row).evaluator;
+				getModel2().setInfoAt(row, evaluator, evt);
+			} catch (Exception e) {LogUtil.error("Receiving progress event error: " + e.getMessage());}
+		}
 	}
 
 
