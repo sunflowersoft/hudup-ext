@@ -7,6 +7,7 @@ import javax.swing.JOptionPane;
 import net.hudup.core.client.ConnectInfo;
 import net.hudup.core.evaluate.Evaluator;
 import net.hudup.core.evaluate.EvaluatorAbstract;
+import net.hudup.core.evaluate.EvaluatorConfig;
 import net.hudup.core.logistic.DSUtil;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.evaluate.ui.EvalCompoundGUI;
@@ -33,6 +34,12 @@ public class EvaluatorWrapper {
 	
 	
 	/**
+	 * Configuration.
+	 */
+	private EvaluatorConfig tempConfig = null;
+	
+	
+	/**
 	 * Evaluation GUI data.
 	 */
 	public EvaluateGUIData guiData = null;
@@ -51,13 +58,14 @@ public class EvaluatorWrapper {
 	public EvaluatorWrapper(Evaluator evaluator) {
 		this.evaluator = evaluator;
 		this.name = "";
+		this.tempConfig = new EvaluatorConfig();
 		if (evaluator != null) {
 			try {
-				name = evaluator.getVersionName();
+				this.name = evaluator.getVersionName();
+				this.tempConfig = evaluator.getConfig();
 			}
 			catch (Exception e) {
 				LogUtil.trace(e);
-				name = "";
 			}
 		}
 	}
@@ -69,6 +77,15 @@ public class EvaluatorWrapper {
 	 */
 	public String getName() {
 		return name;
+	}
+	
+	
+	/**
+	 * Getting temporal configuration.
+	 * @return temporal configuration.
+	 */
+	public EvaluatorConfig getTempConfig() {
+		return tempConfig;
 	}
 	
 	

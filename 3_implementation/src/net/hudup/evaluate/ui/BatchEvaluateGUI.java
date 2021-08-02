@@ -18,7 +18,6 @@ import java.awt.event.ActionListener;
 import java.io.Reader;
 import java.io.Writer;
 import java.rmi.RemoteException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -79,6 +78,7 @@ import net.hudup.core.logistic.CounterElapsedTimeEvent;
 import net.hudup.core.logistic.DSUtil;
 import net.hudup.core.logistic.I18nUtil;
 import net.hudup.core.logistic.LogUtil;
+import net.hudup.core.logistic.MathUtil;
 import net.hudup.core.logistic.Timestamp;
 import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.xURI;
@@ -1068,11 +1068,10 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 				
 				if (otherResult0 != null) {
 					otherResult = otherResult0;
-					SimpleDateFormat df = new SimpleDateFormat(Constants.DATE_FORMAT);
 					if (otherResult.startDate > 0)
-						texts.add("Started date: " + df.format(new Date(otherResult.startDate)));
+						texts.add("Started date: " + MathUtil.format(new Date(otherResult.startDate)));
 					if (otherResult.endDate > 0)
-						texts.add("Ended date: " + df.format(new Date(otherResult.endDate)));
+						texts.add("Ended date: " + MathUtil.format(new Date(otherResult.endDate)));
 				}
 				
 				if (connectInfo != null)

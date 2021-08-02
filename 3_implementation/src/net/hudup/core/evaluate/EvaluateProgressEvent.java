@@ -77,6 +77,12 @@ public class EvaluateProgressEvent extends EventObject {
 	
 	
 	/**
+	 * Elapsed time in miliseconds.
+	 */
+	public long elapsedTime = 0;
+	
+	
+	/**
 	 * Constructor with specified evaluator, total number of steps in progress, and current step.
 	 * @param evaluator specified evaluator. This evaluator is invalid in remote call because the source is transient variable.
 	 * @param progressTotal total number of steps in progress.

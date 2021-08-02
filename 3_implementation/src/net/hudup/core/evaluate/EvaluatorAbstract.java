@@ -1576,6 +1576,8 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
      * @param evt the specified for evaluation progress.
      */
     protected void fireEvaluateProgressEvent(EvaluateProgressEvent evt) {
+    	evt.elapsedTime = otherResult.elapsedTime; //Loc Nguyen added 2021.08.02
+    	
 		evTaskQueue.addTask(evt);
 
     	EvaluateProgressListener[] listeners = getEvaluateProgressListeners();

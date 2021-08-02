@@ -7,6 +7,8 @@
  */
 package net.hudup.core.logistic;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -198,6 +200,17 @@ public final class MathUtil {
 	}
 
 
+	/**
+	 * Formatting specified date.
+	 * @param date specified date.
+	 * @return formatted text.
+	 */
+	public static String format(Date date) {
+		SimpleDateFormat df = new SimpleDateFormat(Constants.DATE_FORMAT);
+		return df.format(date);
+	}
+	
+	
 	/**
 	 * Rounding the specified number with decimal precision specified by the number of decimal digits.
 	 * 
