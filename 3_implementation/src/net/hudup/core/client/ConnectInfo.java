@@ -66,7 +66,7 @@ public class ConnectInfo implements Serializable {
 	/**
 	 * Server access period constant in milisecond.
 	 */
-	public long accessPeriod = Counter.PERIOD;
+	public long accessPeriod = 1000 * Counter.PERIOD;
 	
 	
 	/**

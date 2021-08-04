@@ -491,7 +491,7 @@ public class PluginStorage implements Serializable {
 	 * Looking whether the specified algorithm class name and algorithm name stored in next update list.
 	 * Using this algorithm is careful because that specified class name is not exactly the the class name of the algorithm that has the specified name,
 	 * maybe such class name is class name of the super class-interface. However, this method is always right in the found case.
-	 * @param algClass specified algorithm class name.
+	 * @param algClassName specified algorithm class name.
 	 * @param algName specified algorithm name.
 	 * @return the index of the specified algorithm class name and algorithm name stored in next update list.
 	 * Return -1 if not found.

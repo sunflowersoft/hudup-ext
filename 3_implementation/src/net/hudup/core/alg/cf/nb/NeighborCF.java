@@ -2086,6 +2086,7 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 	/**
 	 * Counting the number given specified identifier.
 	 * @param id specified identifier.
+	 * @param isRow flag to indicate whether rows are counted.
 	 * @return the number given specified identifier.
 	 */
 	protected int count(int id, boolean isRow) {

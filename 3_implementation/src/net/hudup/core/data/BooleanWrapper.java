@@ -53,7 +53,6 @@ public class BooleanWrapper implements TextParsable, Serializable, Cloneable {
 	
 	@Override
 	public void parseText(String spec) {
-		// TODO Auto-generated method stub
 		value = Boolean.parseBoolean(spec);
 	}
 
@@ -90,7 +89,6 @@ public class BooleanWrapper implements TextParsable, Serializable, Cloneable {
 
 	@Override
 	public Object clone() {
-		// TODO Auto-generated method stub
 		return new BooleanWrapper(value);
 	}
 	

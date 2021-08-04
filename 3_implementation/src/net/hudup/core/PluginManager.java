@@ -206,7 +206,7 @@ public interface PluginManager extends AutoCloseable {
 	/**
 	 * Loading class from specified class name.
 	 * @param name specified class name.
-	 * @param initialize initialization flag.
+	 * @param initialized initialization flag.
 	 * @return class loaded from specified class name.
 	 * @throws ClassNotFoundException if class is not found.
 	 */

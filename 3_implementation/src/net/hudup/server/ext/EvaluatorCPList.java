@@ -48,12 +48,12 @@ import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 import javax.swing.table.DefaultTableModel;
 
-import net.hudup.core.Constants;
 import net.hudup.core.Util;
 import net.hudup.core.client.ConnectInfo;
 import net.hudup.core.client.Connector;
 import net.hudup.core.client.Service;
 import net.hudup.core.client.ServiceExt;
+import net.hudup.core.data.BooleanWrapper;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.ui.SysConfigPane;
 import net.hudup.core.data.ui.toolkit.Dispose;
@@ -101,7 +101,7 @@ public class EvaluatorCPList extends JFrame {
     /**
      * Starting button.
      */
-    protected JButton btnOpenStart = null;
+    protected JButton btnOpen = null;
 
     
     /**
@@ -121,6 +121,12 @@ public class EvaluatorCPList extends JFrame {
      */
     protected JButton btnDelete = null;
     
+    
+    /**
+     * Receiving server event button.
+     */
+    protected JButton btnServerEvent = null;
+
     
     /**
      * Refreshing all evaluator button.
@@ -178,6 +184,7 @@ public class EvaluatorCPList extends JFrame {
         JPanel header = new JPanel(new BorderLayout());
         add(header, BorderLayout.NORTH);
         
+        
 		JPanel body = new JPanel(new BorderLayout());
 		add(body, BorderLayout.CENTER);
 		
@@ -186,7 +193,7 @@ public class EvaluatorCPList extends JFrame {
 		JPanel toolbar = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 		body.add(toolbar, BorderLayout.SOUTH);
 		
-		btnOpenStart = UIUtil.makeIconButton(
+		btnOpen = UIUtil.makeIconButton(
 			"open-start-16x16.png", 
 			"start", 
 			I18nUtil.message("open"), 
@@ -197,8 +204,8 @@ public class EvaluatorCPList extends JFrame {
 					open();
 				}
 			});
-		btnOpenStart.setMargin(new Insets(0, 0 , 0, 0));
-        toolbar.add(btnOpenStart);
+		btnOpen.setMargin(new Insets(0, 0 , 0, 0));
+        toolbar.add(btnOpen);
 
 	    btnConfig = UIUtil.makeIconButton(
 			"config-16x16.png", 
@@ -242,6 +249,21 @@ public class EvaluatorCPList extends JFrame {
 		btnDelete.setMargin(new Insets(0, 0 , 0, 0));
 		toolbar.add(btnDelete);
 
+		btnServerEvent = UIUtil.makeIconButton(
+			"pause-16x16.png", 
+			"receive", 
+			"Pause receving server events", 
+			"Pause receving server events", 
+			new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					serverEvent();
+				}
+			});
+		btnServerEvent.setMargin(new Insets(0, 0 , 0, 0));
+		toolbar.add(btnServerEvent);
+
+		
 		JPanel footer = new JPanel();
 		add(footer, BorderLayout.SOUTH);
 
@@ -395,10 +417,39 @@ public class EvaluatorCPList extends JFrame {
 	
 	
 	/**
+	 * Remove evaluator.
+	 */
+	private void serverEvent() {
+		synchronized (tblEvaluator.remoteSyncObject) {
+			tblEvaluator.remoteSyncObject.set(!tblEvaluator.remoteSyncObject.get());
+			setServerEventButton();
+		}
+	}
+	
+	
+	/**
+	 * Setting server event button.
+	 */
+	private void setServerEventButton() {
+		synchronized (tblEvaluator.remoteSyncObject) {
+			if (tblEvaluator.remoteSyncObject.get()) {
+				btnServerEvent.setIcon(UIUtil.getImageIcon("pause-16x16.png", "Pause receving server events"));
+				btnServerEvent.setToolTipText("Pause receving server events");
+			}
+			else {
+				btnServerEvent.setIcon(UIUtil.getImageIcon("start-16x16.png", "Start receving server events"));
+				btnServerEvent.setToolTipText("Start receving server events");
+			}
+		}
+	}
+	
+	
+	/**
 	 * Refreshing evaluators.
 	 */
 	private void refreshAll() {
 		tblEvaluator.update();
+		setServerEventButton();
 	}
 
 		
@@ -493,7 +544,7 @@ class EvaluatorTable extends JTable implements EvaluatorListener, EvaluateProgre
 	/**
 	 * Remote synchronization object.
 	 */
-	protected Object remoteSyncObject = new Object();
+	protected BooleanWrapper remoteSyncObject = new BooleanWrapper(true);
 	
 	
 	/**
@@ -546,10 +597,11 @@ class EvaluatorTable extends JTable implements EvaluatorListener, EvaluateProgre
 		
 		if (connectInfo.pullMode) {
 			timer = new Timer();
-			long milisec = Constants.DEFAULT_SHORT_TIMEOUT * 1000; //Every 5 minutes, this control panel updates itself by server information.
+			long milisec = connectInfo.accessPeriod;
 			timer.schedule(new TimerTask() {
 				@Override
 				public void run() {
+					synchronized (remoteSyncObject) {if (!remoteSyncObject.get()) return;}
 					refreshByTimer();
 				}
 			}, milisec, milisec);
@@ -803,6 +855,7 @@ class EvaluatorTable extends JTable implements EvaluatorListener, EvaluateProgre
 				LogUtil.trace(e);
 			}
 		}
+		
 	}
 	
 	
@@ -1076,6 +1129,8 @@ class EvaluatorTable extends JTable implements EvaluatorListener, EvaluateProgre
 	@Override
 	public /*synchronized*/ void receivedEvaluator(EvaluatorEvent evt) throws RemoteException {
 		synchronized (remoteSyncObject) {
+			if (!remoteSyncObject.get()) return;
+			
 			try {
 				int row = getModel2().lookupEvaluator(evt.getEvaluatorVersionName());
 				if (row < 0) return;
@@ -1109,6 +1164,8 @@ class EvaluatorTable extends JTable implements EvaluatorListener, EvaluateProgre
 	@Override
 	public /*synchronized*/ void receivedProgress(EvaluateProgressEvent evt) throws RemoteException {
 		synchronized (remoteSyncObject) {
+			if (!remoteSyncObject.get()) return;
+			
 			try {
 				int row = getModel2().lookupEvaluator(evt.getEvaluatorVersionName());
 				if (row < 0) return;
