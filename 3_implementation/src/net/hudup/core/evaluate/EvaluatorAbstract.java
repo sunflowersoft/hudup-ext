@@ -340,6 +340,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 			this.otherResult.algNames.add(alg.getName());
 		}
 		this.otherResult.algName = this.otherResult.algNames.get(0);
+		this.otherResult.startDate = System.currentTimeMillis();
 		
 		if (!start()) {
 			clear();
@@ -390,7 +391,6 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 			}
 		}
 		otherResult.progressTotal *= evAlgList.size();
-		otherResult.startDate = System.currentTimeMillis();
 		
 		result = new Metrics();
 		

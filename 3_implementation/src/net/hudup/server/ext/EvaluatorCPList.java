@@ -1135,7 +1135,11 @@ class EvaluatorTable extends JTable implements EvaluatorListener, EvaluateProgre
 				int row = getModel2().lookupEvaluator(evt.getEvaluatorVersionName());
 				if (row < 0) return;
 				Evaluator evaluator = getModel2().getEvaluatorItem(row).evaluator;
-				getModel2().setInfoAt(row, evaluator);
+				EvaluateInfo info = evt.getOtherResult();
+				if (info != null)
+					getModel2().setInfoAt(row, evaluator, info);
+				else
+					getModel2().setInfoAt(row, evaluator);
 			} catch (Exception e) {LogUtil.error("Receiving evaluator event error: " + e.getMessage());}
 		}
 	}
@@ -1496,6 +1500,18 @@ class EvaluatorTableModel extends DefaultTableModel {
 	
 	
 	/**
+	 * Setting information at specified row with specified evaluator and evaluation information.
+	 * @param row specified row.
+	 * @param evaluator specified evaluator.
+	 * @param info evaluation information.
+	 */
+	public void setInfoAt(int row, Evaluator evaluator, EvaluateInfo info) {
+		Vector<Object> rowData = toRow(evaluator, info);
+		setInfoAt(row, rowData);
+	}
+	
+	
+	/**
 	 * Setting information at specified row with specified evaluator and progression event.
 	 * @param row specified row.
 	 * @param evaluator specified evaluator.
@@ -1514,7 +1530,8 @@ class EvaluatorTableModel extends DefaultTableModel {
 	 */
 	private void setInfoAt(int row, Vector<Object> rowData) {
 		for (int i = 1; i < rowData.size(); i++) {
-			if (rowData.get(i) != null) setValueAt(rowData.get(i), row, i);
+			Object value = rowData.get(i);
+			if (value != null) setValueAt(value, row, i);
 		}
 	}
 	
@@ -1545,32 +1562,46 @@ class EvaluatorTableModel extends DefaultTableModel {
 	 * @return row the contains evaluator.
 	 */
 	public static Vector<Object> toRow(Evaluator evaluator) {
-		Vector<Object> row = toRow();
-		row.set(0, new EvaluatorWrapper(evaluator));
-		row.set(1, getStatusText(evaluator));
 		try {
-			EvaluateInfo info = evaluator.getOtherResult();
-			if (info.progressTotal != 0) {
-				String progress = MathUtil.format((double)info.progressStep/info.progressTotal*100.0, 2) + "%";
-				row.set(2, progress);
-			}
-			
-			if (info.elapsedTime > 0)
-				row.set(3, formatTime(info.elapsedTime));
-			if (info.startDate > 0)
-				row.set(4, MathUtil.format(new Date(info.startDate)));
-			if (info.endDate > 0)
-				row.set(5, MathUtil.format(new Date(info.endDate)));
+			return toRow(evaluator, evaluator.getOtherResult());
 		}
 		catch (Exception e) {
 			LogUtil.trace(e);
 		}
-		return row;
+		
+		return toRow();
 	}
 	
 	
 	/**
-	 * Converting evaluator to row.
+	 * Converting evaluator and information to row.
+	 * @param evaluator specified evaluator.
+	 * @param info evaluation information.
+	 * @return row the contains evaluator.
+	 */
+	public static Vector<Object> toRow(Evaluator evaluator, EvaluateInfo info) {
+		Vector<Object> row = toRow();
+		row.set(0, new EvaluatorWrapper(evaluator));
+		row.set(1, getStatusText(evaluator));
+
+		if (info.progressTotal != 0) {
+			String progress = MathUtil.format((double)info.progressStep/info.progressTotal*100.0, 2) + "%";
+			row.set(2, progress);
+		}
+		
+		if (info.elapsedTime > 0)
+			row.set(3, formatTime(info.elapsedTime));
+		if (info.startDate != 0)
+			row.set(4, MathUtil.format(new Date(info.startDate)));
+		if (info.endDate != 0)
+			row.set(5, MathUtil.format(new Date(info.endDate)));
+
+		return row;
+	}
+
+	
+	/**
+	 * Converting evaluator and progress event to row.
 	 * @param evaluator specified evaluator.
 	 * @param evt progression event.
 	 * @return row the contains evaluator.
