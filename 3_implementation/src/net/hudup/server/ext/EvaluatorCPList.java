@@ -57,14 +57,14 @@ import net.hudup.core.data.BooleanWrapper;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.ui.SysConfigPane;
 import net.hudup.core.data.ui.toolkit.Dispose;
+import net.hudup.core.evaluate.EvaluateEvent;
 import net.hudup.core.evaluate.EvaluateInfo;
+import net.hudup.core.evaluate.EvaluateListener;
 import net.hudup.core.evaluate.EvaluateProgressEvent;
 import net.hudup.core.evaluate.EvaluateProgressListener;
 import net.hudup.core.evaluate.Evaluator;
 import net.hudup.core.evaluate.EvaluatorAbstract;
 import net.hudup.core.evaluate.EvaluatorConfig;
-import net.hudup.core.evaluate.EvaluatorEvent;
-import net.hudup.core.evaluate.EvaluatorListener;
 import net.hudup.core.evaluate.ui.EvaluatorWrapper;
 import net.hudup.core.logistic.ClipboardUtil;
 import net.hudup.core.logistic.DSUtil;
@@ -514,7 +514,7 @@ public class EvaluatorCPList extends JFrame {
  * @version 1.0
  *
  */
-class EvaluatorTable extends JTable implements EvaluatorListener, EvaluateProgressListener, ServiceNoticeListener, Remote, Dispose {
+class EvaluatorTable extends JTable implements EvaluateListener, EvaluateProgressListener, ServiceNoticeListener, Remote, Dispose {
 
 	
 	/**
@@ -1127,7 +1127,7 @@ class EvaluatorTable extends JTable implements EvaluatorListener, EvaluateProgre
 	 * Using sync object of synchronization is a work-around solution.
 	 */
 	@Override
-	public /*synchronized*/ void receivedEvaluator(EvaluatorEvent evt) throws RemoteException {
+	public /*synchronized*/ void receivedEvaluation(EvaluateEvent evt) throws RemoteException {
 		synchronized (remoteSyncObject) {
 			if (!remoteSyncObject.get()) return;
 			
@@ -1140,11 +1140,11 @@ class EvaluatorTable extends JTable implements EvaluatorListener, EvaluateProgre
 					getModel2().setInfoAt(row, evaluator, info);
 				else
 					getModel2().setInfoAt(row, evaluator);
-			} catch (Exception e) {LogUtil.error("Receiving evaluator event error: " + e.getMessage());}
+			} catch (Exception e) {LogUtil.error("Receiving evaluation event error: " + e.getMessage());}
 		}
 	}
 
-	
+
 	@Override
 	public boolean classPathContains(String className) throws RemoteException {
     	try {
@@ -1237,7 +1237,7 @@ class EvaluatorTable extends JTable implements EvaluatorListener, EvaluateProgre
 	protected void setupListeners(Evaluator evaluator) {
 		try {
 			if (!EvaluatorAbstract.isPullModeRequired(evaluator) && !getModel2().connectInfo.pullMode) {
-				evaluator.addEvaluatorListener(this);
+				evaluator.addEvaluateListener(this);
 				evaluator.addEvaluateProgressListener(this);
 			}
 		}
@@ -1254,7 +1254,7 @@ class EvaluatorTable extends JTable implements EvaluatorListener, EvaluateProgre
 	protected void unsetupListeners(Evaluator evaluator) {
 		try {
 			if (!EvaluatorAbstract.isPullModeRequired(evaluator) && !getModel2().connectInfo.pullMode) {
-				evaluator.removeEvaluatorListener(this);
+				evaluator.removeEvaluateListener(this);
 				evaluator.removeEvaluateProgressListener(this);
 			}
 		}
@@ -1343,7 +1343,8 @@ class EvaluatorTableModel extends DefaultTableModel {
 		
 		Vector<Vector<Object>> data = Util.newVector();
 		for (Evaluator evaluator : evaluators) {
-			data.add(toRow(evaluator));
+			Vector<Object> row = toRow(evaluator);
+			if (row != null) data.add(row);
 		}
 		
 		setDataVector(data, toColumns());
@@ -1495,7 +1496,7 @@ class EvaluatorTableModel extends DefaultTableModel {
 	 */
 	public void setInfoAt(int row, Evaluator evaluator) {
 		Vector<Object> rowData = toRow(evaluator);
-		setInfoAt(row, rowData);
+		if (rowData != null) setInfoAt(row, rowData);
 	}
 	
 	
@@ -1507,7 +1508,7 @@ class EvaluatorTableModel extends DefaultTableModel {
 	 */
 	public void setInfoAt(int row, Evaluator evaluator, EvaluateInfo info) {
 		Vector<Object> rowData = toRow(evaluator, info);
-		setInfoAt(row, rowData);
+		if (rowData != null) setInfoAt(row, rowData);
 	}
 	
 	
@@ -1519,7 +1520,7 @@ class EvaluatorTableModel extends DefaultTableModel {
 	 */
 	public void setInfoAt(int row, Evaluator evaluator, EvaluateProgressEvent evt) {
 		Vector<Object> rowData = toRow(evaluator, evt);
-		setInfoAt(row, rowData);
+		if (rowData != null) setInfoAt(row, rowData);
 	}
 
 	
@@ -1569,7 +1570,7 @@ class EvaluatorTableModel extends DefaultTableModel {
 			LogUtil.trace(e);
 		}
 		
-		return toRow();
+		return null;
 	}
 	
 	
@@ -1615,8 +1616,8 @@ class EvaluatorTableModel extends DefaultTableModel {
 			row.set(2, progress);
 		}
 		
-		if (evt.elapsedTime > 0)
-			row.set(3, formatTime(evt.elapsedTime));
+		if (evt.getElapsedTime() > 0)
+			row.set(3, formatTime(evt.getElapsedTime()));
 		else
 			row.set(3, null);
 		row.set(4, null);

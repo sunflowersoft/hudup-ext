@@ -126,6 +126,7 @@ public class EvaluateInfo implements Serializable {
 		evt.setCurrentCount(vCurrentCount);
 		evt.setDatasetId(datasetId);
 		evt.setAlgName(algName);
+		evt.setElapsedTime(elapsedTime);
 		
 		return evt;
 	}

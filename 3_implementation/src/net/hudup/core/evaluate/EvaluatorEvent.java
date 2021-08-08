@@ -153,9 +153,10 @@ public class EvaluatorEvent extends EventObject {
 		this.otherResult = otherResult;
 		this.poolResult = poolResult;
 		this.timestamp = timestamp;
+		
 		try {
 			this.evaluatorVersionName = evaluator.getVersionName();
-		} catch (Exception e) {LogUtil.trace(null);}
+		} catch (Throwable e) {LogUtil.trace(e);}
 	}
 
 	

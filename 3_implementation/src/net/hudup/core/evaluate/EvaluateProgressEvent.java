@@ -79,7 +79,7 @@ public class EvaluateProgressEvent extends EventObject {
 	/**
 	 * Elapsed time in miliseconds.
 	 */
-	public long elapsedTime = 0;
+	protected long elapsedTime = 0;
 	
 	
 	/**
@@ -214,6 +214,24 @@ public class EvaluateProgressEvent extends EventObject {
 	 */
 	public String getEvaluatorVersionName() {
 		return evaluatorVersionName;
+	}
+	
+	
+	/**
+	 * Getting elapsed time in miliseconds.
+	 * @return elapsed time in miliseconds.
+	 */
+	public long getElapsedTime() {
+		return elapsedTime;
+	}
+	
+	
+	/**
+	 * Getting elapsed time in miliseconds.
+	 * @param elapsedTime elapsed time in miliseconds.
+	 */
+	public void setElapsedTime(long elapsedTime) {
+		this.elapsedTime = elapsedTime;
 	}
 	
 	

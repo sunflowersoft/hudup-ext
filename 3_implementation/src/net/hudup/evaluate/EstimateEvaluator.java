@@ -148,6 +148,7 @@ public class EstimateEvaluator extends RecommendEvaluator {
 						progressEvt.setDatasetId(datasetId);
 						progressEvt.setCurrentCount(otherResult.vCurrentCount);
 						progressEvt.setCurrentTotal(otherResult.vCurrentTotal);
+						progressEvt.setElapsedTime(otherResult.elapsedTime);
 						otherResult.statuses = extractEvaluateProgressInfo(progressEvt);
 						//Fire progress event.
 						fireEvaluateProgressEvent(progressEvt);

@@ -14,6 +14,7 @@ import java.util.EventObject;
 import java.util.List;
 
 import net.hudup.core.data.RatingVector;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.parser.TextParsable;
 
 /**
@@ -68,6 +69,12 @@ public class EvaluateEvent extends EventObject {
 
 	
 	/**
+	 * Evaluator version name.
+	 */
+	protected String evaluatorVersionName = null;
+	
+	
+	/**
 	 * List of metrics.
 	 */
 	protected Metrics metrics = null;
@@ -77,6 +84,12 @@ public class EvaluateEvent extends EventObject {
 	 * Additional information for calculating metrics.
 	 */
 	protected Serializable[] params = null;
+
+	
+	/**
+	 * Evaluation information as other result.
+	 */
+	protected EvaluateInfo otherResult = null;
 	
 	
 	/**
@@ -86,8 +99,11 @@ public class EvaluateEvent extends EventObject {
 	 */
 	public EvaluateEvent(Evaluator evaluator, Type type) {
 		super(evaluator);
-		
 		this.type = type;
+		
+		try {
+			this.evaluatorVersionName = evaluator.getVersionName();
+		} catch (Throwable e) {LogUtil.trace(e);}
 	}
 
 	
@@ -99,7 +115,6 @@ public class EvaluateEvent extends EventObject {
 	 */
 	public EvaluateEvent(Evaluator evaluator, Type type, Metrics metrics) {
 		this(evaluator, type);
-		
 		setMetrics(metrics);
 	}
 
@@ -113,7 +128,6 @@ public class EvaluateEvent extends EventObject {
 	 */
 	public EvaluateEvent(Evaluator evaluator, Type type, Metrics metrics, Serializable... params) {
 		this(evaluator, type, metrics);
-		
 		setParams(params);
 	}
 
@@ -141,6 +155,15 @@ public class EvaluateEvent extends EventObject {
 	 */
 	public Type getType() {
 		return type;
+	}
+	
+	
+	/**
+	 * Getting evaluator version name.
+	 * @return evaluator version name.
+	 */
+	public String getEvaluatorVersionName() {
+		return evaluatorVersionName;
 	}
 	
 	
@@ -179,6 +202,24 @@ public class EvaluateEvent extends EventObject {
 		this.params = params;
 	}
 	
+	
+	/**
+	 * Setting evaluation information as other result.
+	 * @param otherResult evaluation information as other result.
+	 */
+	public void setOtherResult(EvaluateInfo otherResult) {
+		this.otherResult = otherResult;
+	}
+
+	
+	/**
+	 * Getting evaluation information as other result.
+	 * @return evaluation information as other result.
+	 */
+	public EvaluateInfo getOtherResult() {
+		return otherResult;
+	}
+
 	
 	/**
 	 * Translating this event into text for all algorithm and all datasets.

@@ -340,7 +340,6 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 			this.otherResult.algNames.add(alg.getName());
 		}
 		this.otherResult.algName = this.otherResult.algNames.get(0);
-		this.otherResult.startDate = System.currentTimeMillis();
 		
 		if (!start()) {
 			clear();
@@ -391,6 +390,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 			}
 		}
 		otherResult.progressTotal *= evAlgList.size();
+		otherResult.startDate = System.currentTimeMillis();
 		
 		result = new Metrics();
 		
@@ -461,6 +461,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 						progressEvt.setDatasetId(datasetId);
 						progressEvt.setCurrentCount(otherResult.vCurrentCount);
 						progressEvt.setCurrentTotal(otherResult.vCurrentTotal);
+						progressEvt.setElapsedTime(otherResult.elapsedTime);
 						otherResult.statuses = extractEvaluateProgressInfo(progressEvt);
 						fireEvaluateProgressEvent(progressEvt);
 						
@@ -1576,8 +1577,6 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
      * @param evt the specified for evaluation progress.
      */
     protected void fireEvaluateProgressEvent(EvaluateProgressEvent evt) {
-    	evt.elapsedTime = otherResult.elapsedTime; //Loc Nguyen added 2021.08.02
-    	
 		evTaskQueue.addTask(evt);
 
     	EvaluateProgressListener[] listeners = getEvaluateProgressListeners();
