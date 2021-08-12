@@ -78,8 +78,29 @@ public class NeighborCFUserBased extends NeighborCF implements DuplicatableAlg {
 		knn = knn < 0 ? 0 : knn;
 		if (cf.getConfig().getAsBoolean(FAST_RECOMMEND) && knn > 0)
 			return estimateFast(cf, param, queryIds);
-		
+		else
+			return estimateNormal(cf, param, queryIds);
+	}
+
+	
+	/**
+	 * Estimate rating values of given items (users) in normal recommendation mode. This method is the second version.
+	 * @param cf current neighbor algorithm.
+	 * @param param recommendation parameter. Please see {@link RecommendParam} for more details of this parameter.
+	 * There are three cases of <code>param.ratingVector</code>:
+	 * <ol>
+	 * <li>Its id < 0, which indicates it is not stored in training dataset then, caching does not work even though this is cached algorithm.</li>
+	 * <li>Its id &ge; 0 and, it must be empty or the same to the existing one in training dataset. If it is empty, it will be fulfilled as the same to the existing one in training dataset.</li>
+	 * <li>Its id is &ge; 0 but, it is not stored in training dataset then, it must be a full rating vector of a user.</li>
+	 * </ol>
+	 * @param queryIds set of identifications (IDs) of items that need to be estimated their rating values.
+	 * @return rating vector contains estimated rating values of the specified set of IDs of items (users). Return null if cannot estimate.
+	 * @throws RemoteException if any error raises.
+	 */
+	public static RatingVector estimateNormal(NeighborCF cf, RecommendParam param, Set<Integer> queryIds) throws RemoteException {
 		if (param.ratingVector == null) return null;
+		int knn = cf.getConfig().getAsInt(KNN);
+		knn = knn < 0 ? 0 : knn;
 		
 		RatingVector thisUser = param.ratingVector;
 		RatingVector innerUser = cf.getDataset().getUserRating(thisUser.id());
@@ -211,7 +232,7 @@ public class NeighborCFUserBased extends NeighborCF implements DuplicatableAlg {
 	 * @return rating vector contains estimated rating values of the specified set of IDs of items (users). Return null if cannot estimate.
 	 * @throws RemoteException if any error raises.
 	 */
-	private static RatingVector estimateFast(NeighborCF cf, RecommendParam param, Set<Integer> queryIds) throws RemoteException {
+	public static RatingVector estimateFast(NeighborCF cf, RecommendParam param, Set<Integer> queryIds) throws RemoteException {
 		if (param.ratingVector == null) return null;
 		
 		RatingVector thisUser = param.ratingVector;
