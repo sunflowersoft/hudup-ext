@@ -58,7 +58,6 @@ public class SortableSelectableTable extends JTable {
 	 * Default constructor.
 	 */
 	public SortableSelectableTable() {
-		// TODO Auto-generated constructor stub
 		super(new SortableSelectableTableModel());
 		init();
 	}
@@ -69,7 +68,6 @@ public class SortableSelectableTable extends JTable {
 	 * @param model model of this table.
 	 */
 	public SortableSelectableTable(SortableSelectableTableModel model) {
-		// TODO Auto-generated constructor stub
 		super(model);
 		init();
 	}
