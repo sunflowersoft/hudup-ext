@@ -48,7 +48,7 @@ public final class TextParserUtil {
 	public final static String DEFAULT_SEP         = "[[\\s][::][\\|][,][;]]";
 	
 	/**
-	 * Default Java regular expression for splitting a sentence into many words (tokens), including space.
+	 * Default Java regular expression for splitting a sentence into many words (tokens), not including white space.
 	 * Note that regular expression is a string pattern for editing and finding texts (words, characters) in string of texts.
 	 * Please see <a href="https://docs.oracle.com/javase/tutorial/essential/regex">https://docs.oracle.com/javase/tutorial/essential/regex</a> for more details about regular expression.
 	 */
