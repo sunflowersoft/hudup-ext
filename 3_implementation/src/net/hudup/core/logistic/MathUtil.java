@@ -186,7 +186,8 @@ public final class MathUtil {
 	 * @return text format of the specified number.
 	 */
 	public static String format(double number, int decimal) {
-		return String.format("%." + decimal + "f", number);
+		return "" + round(number, decimal);
+		//return String.format("%." + decimal + "f", number);
 	}
 
 
