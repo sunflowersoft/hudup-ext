@@ -478,10 +478,10 @@ public class RemoteStorageTree extends JTree implements TreeSelectionListener {
 		 * @param service storage service.
 		 */
 		public StoreChooser(Component comp, VirtualStorageService service) {
-			super(UIUtil.getFrameForComponent(comp), true);
+			super(UIUtil.getDialogForComponent(comp), true);
 			setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 			setSize(300, 400);
-			setLocationRelativeTo(UIUtil.getFrameForComponent(comp));
+			setLocationRelativeTo(UIUtil.getDialogForComponent(comp));
 			setLayout(new BorderLayout());
 			
 			if (service == null) service = new VirtualFileService();

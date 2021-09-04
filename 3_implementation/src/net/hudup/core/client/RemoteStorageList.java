@@ -274,10 +274,10 @@ public class RemoteStorageList extends JList<StorageItem> {
 		StorageItem item = getSelectedValue();
 		if (item == null) return;
 		
-		JDialog editor = new JDialog(UIUtil.getFrameForComponent(this), DSUtil.shortenVerbalName(item.toString()), true);
+		JDialog editor = new JDialog(UIUtil.getDialogForComponent(this), DSUtil.shortenVerbalName(item.toString()), true);
 		editor.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		editor.setSize(400, 400);
-		editor.setLocationRelativeTo(UIUtil.getFrameForComponent(this));
+		editor.setLocationRelativeTo(UIUtil.getDialogForComponent(this));
 		editor.setLayout(new BorderLayout());
 		
 		JPanel header = new JPanel(new FlowLayout(FlowLayout.LEFT));

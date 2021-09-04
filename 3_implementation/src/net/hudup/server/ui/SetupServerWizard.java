@@ -163,14 +163,14 @@ public class SetupServerWizard extends JDialog {
 	 * @param connectInfo connection information.
 	 */
 	public SetupServerWizard(Component comp, PowerServerConfig srvConfig, ConnectInfo connectInfo) {
-		super(UIUtil.getFrameForComponent(comp), "Setup server", true);
+		super(UIUtil.getDialogForComponent(comp), "Setup server", true);
 		this.config = srvConfig;
 		this.connectInfo = (connectInfo != null ? connectInfo : new ConnectInfo());
 		
 		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 		setSize(600, 400);
-		setLocationRelativeTo(UIUtil.getFrameForComponent(comp));
-		if (UIUtil.getFrameForComponent(comp) == null) {
+		setLocationRelativeTo(UIUtil.getDialogForComponent(comp));
+		if (UIUtil.getDialogForComponent(comp) == null) {
 	        Image image = UIUtil.getImage("server-32x32.png");
 	        if (image != null)
 	        	setIconImage(image);
@@ -607,10 +607,10 @@ public class SetupServerWizard extends JDialog {
 	 */
 	private boolean createSchema() {
 		final JDialog createAttDlg = new JDialog(
-				UIUtil.getFrameForComponent(this), "Creating schema", true);
+				UIUtil.getDialogForComponent(this), "Creating schema", true);
 		createAttDlg.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		createAttDlg.setSize(600, 400);
-		createAttDlg.setLocationRelativeTo(UIUtil.getFrameForComponent(this));
+		createAttDlg.setLocationRelativeTo(UIUtil.getDialogForComponent(this));
 		createAttDlg.setLayout(new BorderLayout());
 		
 		JPanel body = new JPanel(new GridLayout(1, 0));
@@ -723,10 +723,10 @@ public class SetupServerWizard extends JDialog {
 		}
 		
 		final JDialog createDlg = new JDialog(
-				UIUtil.getFrameForComponent(this), "Creating unit", true);
+				UIUtil.getDialogForComponent(this), "Creating unit", true);
 		createDlg.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		createDlg.setSize(600, 400);
-		createDlg.setLocationRelativeTo(UIUtil.getFrameForComponent(this));
+		createDlg.setLocationRelativeTo(UIUtil.getDialogForComponent(this));
 		createDlg.setLayout(new BorderLayout());
 		
 		JPanel header = new JPanel();

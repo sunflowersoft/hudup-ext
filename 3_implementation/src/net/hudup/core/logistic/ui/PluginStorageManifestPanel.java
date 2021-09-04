@@ -352,14 +352,14 @@ public class PluginStorageManifestPanel extends JPanel {
 		boolean ret = tblRegister.reload();
 		if (ret) {
 			JOptionPane.showMessageDialog(
-				UIUtil.getFrameForComponent(tblRegister), 
+				UIUtil.getDialogForComponent(tblRegister), 
 				"Reloading plug-in storage successful", 
 				"Reloading successful", 
 				JOptionPane.INFORMATION_MESSAGE);
 		}
 		else {
 			JOptionPane.showMessageDialog(
-				UIUtil.getFrameForComponent(tblRegister), 
+				UIUtil.getDialogForComponent(tblRegister), 
 				"Reloading plug-in storage failed", 
 				"Reloading failed", 
 				JOptionPane.INFORMATION_MESSAGE);
@@ -387,7 +387,7 @@ public class PluginStorageManifestPanel extends JPanel {
 		boolean idle = tblRegister.isListenersIdle();
 		if (!idle) {
 			JOptionPane.showMessageDialog(
-				UIUtil.getFrameForComponent(this), 
+				UIUtil.getDialogForComponent(this), 
 				"Unable to import due to busy listeners", 
 				"Unable to import", 
 				JOptionPane.ERROR_MESSAGE);
@@ -420,14 +420,14 @@ public class PluginStorageManifestPanel extends JPanel {
 		boolean ret = tblRegister.apply();
 		if (ret) {
 			JOptionPane.showMessageDialog(
-				UIUtil.getFrameForComponent(this), 
+				UIUtil.getDialogForComponent(this), 
 				"Apply plug-in storage successfully.\nAlgorithms were registered/unregistered exported/unexported removed/unremoved.", 
 				"Apply successfully", 
 				JOptionPane.INFORMATION_MESSAGE);
 		}
 		else {
 			JOptionPane.showMessageDialog(
-				UIUtil.getFrameForComponent(this), 
+				UIUtil.getDialogForComponent(this), 
 				"Apply plug-in storage failed", 
 				"Apply failed", 
 				JOptionPane.INFORMATION_MESSAGE);
@@ -461,10 +461,10 @@ public class PluginStorageManifestPanel extends JPanel {
 	 * @param connectInfo connection information.
 	 */
 	public static void showDlg(Component comp, PluginChangedListener listener, ConnectInfo connectInfo) {
-		JDialog dlg = new JDialog(UIUtil.getFrameForComponent(comp), I18nUtil.message("plugin_manager"), true);
+		JDialog dlg = new JDialog(UIUtil.getDialogForComponent(comp), I18nUtil.message("plugin_manager"), true);
 		dlg.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		dlg.setSize(600, 400);
-		dlg.setLocationRelativeTo(UIUtil.getFrameForComponent(comp));
+		dlg.setLocationRelativeTo(UIUtil.getDialogForComponent(comp));
 		dlg.setLayout(new BorderLayout());
 		
 		
@@ -591,10 +591,10 @@ class ImportAlgDlg extends JDialog {
 	 * @param comp parent component.
 	 */
 	public ImportAlgDlg(Component comp) {
-		super(UIUtil.getFrameForComponent(comp), "Import remotely algorithms from Hudup server/service", true);
+		super(UIUtil.getDialogForComponent(comp), "Import remotely algorithms from Hudup server/service", true);
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		setSize(600, 400);
-		setLocationRelativeTo(UIUtil.getFrameForComponent(comp));
+		setLocationRelativeTo(UIUtil.getDialogForComponent(comp));
 		JPanel pane = null;
 		
 		setLayout(new BorderLayout());
@@ -1016,13 +1016,13 @@ class AlgDescImportTable extends SortableSelectableTable {
 		AlgDesc2 algDesc = selectedRow < 0 ? null : (AlgDesc2) getModel().getValueAt(selectedRow, 3);
 		if (algDesc == null) {
 			JOptionPane.showMessageDialog(
-					UIUtil.getFrameForComponent(this), 
+					UIUtil.getDialogForComponent(this), 
 					"No algorithm description", 
 					"No algorithm description", 
 					JOptionPane.INFORMATION_MESSAGE);
 		}
 		else {
-			AlgDesc2ConfigDlg dlgConfig = new AlgDesc2ConfigDlg(UIUtil.getFrameForComponent(this), algDesc);
+			AlgDesc2ConfigDlg dlgConfig = new AlgDesc2ConfigDlg(UIUtil.getDialogForComponent(this), algDesc);
 			dlgConfig.setVisible(true);
 		}
 	}
@@ -1124,10 +1124,10 @@ class AlgDescImportTable extends SortableSelectableTable {
 	 * @param algDescList list of extended algorithm descriptions.
 	 */
 	public static void showDlg(Component comp, AlgDesc2List algDescList) {
-		JDialog dlg = new JDialog(UIUtil.getFrameForComponent(comp), "Extended algorithm descriptions", true);
+		JDialog dlg = new JDialog(UIUtil.getDialogForComponent(comp), "Extended algorithm descriptions", true);
 		dlg.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		dlg.setSize(600, 400);
-		dlg.setLocationRelativeTo(UIUtil.getFrameForComponent(comp));
+		dlg.setLocationRelativeTo(UIUtil.getDialogForComponent(comp));
 		
 		dlg.setLayout(new BorderLayout());
 		

@@ -97,7 +97,7 @@ public class MetricsGraphDlg extends JDialog {
 	 * @throws RemoteException if any error raises.
 	 */
 	public MetricsGraphDlg(Component comp, final Metrics metrics, final RegisterTable algTable, Evaluator referredEvaluator) throws RemoteException {
-		super(UIUtil.getFrameForComponent(comp), "Metrics graph viewer", true);
+		super(UIUtil.getDialogForComponent(comp), "Metrics graph viewer", true);
 		this.metrics = metrics;
 		this.algTable = algTable;
 		this.referredEvaluator = referredEvaluator;
@@ -105,7 +105,7 @@ public class MetricsGraphDlg extends JDialog {
 		
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		setSize(600, 500);
-		setLocationRelativeTo(UIUtil.getFrameForComponent(comp));
+		setLocationRelativeTo(UIUtil.getDialogForComponent(comp));
 		
 		setLayout(new BorderLayout());
 		
@@ -186,7 +186,7 @@ public class MetricsGraphDlg extends JDialog {
 						public void actionPerformed(ActionEvent e) {
 							// TODO Auto-generated method stub
 							JDialog dlg = new JDialog(
-									UIUtil.getFrameForComponent(comp), 
+									UIUtil.getDialogForComponent(comp), 
 									"Graph for metric \"" + metricName + "\"", true);
 							try {
 								dlg.setSize(400, 400);

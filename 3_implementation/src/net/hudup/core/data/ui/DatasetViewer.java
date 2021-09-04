@@ -145,13 +145,13 @@ public class DatasetViewer extends JDialog {
 	 * @param dataset specified dataset.
 	 */
 	public DatasetViewer(Component comp, Dataset dataset) {
-		super(UIUtil.getFrameForComponent(comp), "Dataset viewer", true);
+		super(UIUtil.getDialogForComponent(comp), "Dataset viewer", true);
 		
 		this.dataset = dataset;
 		
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		setSize(600, 600);
-		setLocationRelativeTo(UIUtil.getFrameForComponent(comp));
+		setLocationRelativeTo(UIUtil.getDialogForComponent(comp));
 		addWindowListener(new WindowAdapter() {
 
 			@Override
@@ -273,10 +273,10 @@ public class DatasetViewer extends JDialog {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				JDialog exportDlg = new JDialog(UIUtil.getFrameForComponent(comp), "Export", true);
+				JDialog exportDlg = new JDialog(UIUtil.getDialogForComponent(comp), "Export", true);
 				exportDlg.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 				exportDlg.setSize(500, 300);
-				exportDlg.setLocationRelativeTo(UIUtil.getFrameForComponent(comp));
+				exportDlg.setLocationRelativeTo(UIUtil.getDialogForComponent(comp));
 				
 				DatasetExporter exporter = new DatasetExporter();
 				exportDlg.addWindowListener(new WindowAdapter() {
@@ -426,9 +426,9 @@ public class DatasetViewer extends JDialog {
 							
 							@Override
 							public void actionPerformed(ActionEvent e) {
-								final JDialog dlg = new JDialog(UIUtil.getFrameForComponent(main), "Profile", true);
+								final JDialog dlg = new JDialog(UIUtil.getDialogForComponent(main), "Profile", true);
 								dlg.setSize(400, 300);
-								dlg.setLocationRelativeTo(UIUtil.getFrameForComponent(main));
+								dlg.setLocationRelativeTo(UIUtil.getDialogForComponent(main));
 								
 								dlg.setLayout(new BorderLayout());
 								

@@ -510,7 +510,7 @@ public class EvaluatorCP extends JFrame implements EvaluatorListener {
 		if (evaluatorItem == null || evaluatorItem.evaluator == null) return;
 		Evaluator evaluator = evaluatorItem.evaluator;
 		
-		JDialog selectDlgNameDlg = new JDialog(UIUtil.getFrameForComponent(this), "Select a algorithm name", true);
+		JDialog selectDlgNameDlg = new JDialog(UIUtil.getDialogForComponent(this), "Select a algorithm name", true);
 		selectDlgNameDlg.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		selectDlgNameDlg.setLocationRelativeTo(this);
 		

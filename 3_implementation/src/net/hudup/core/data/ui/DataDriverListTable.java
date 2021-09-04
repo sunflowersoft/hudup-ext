@@ -125,10 +125,10 @@ public class DataDriverListTable extends SortableTable {
 	 * @param modal if {@code true}, the dialog blocks user inputs.
 	 */
 	public static void showDlg(Component comp, DataDriverList dataDriverList, boolean modal) {
-		JDialog dlg = new JDialog(UIUtil.getFrameForComponent(comp), "Register table", modal);
+		JDialog dlg = new JDialog(UIUtil.getDialogForComponent(comp), "Register table", modal);
 		dlg.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		dlg.setSize(600, 400);
-		dlg.setLocationRelativeTo(UIUtil.getFrameForComponent(comp));
+		dlg.setLocationRelativeTo(UIUtil.getDialogForComponent(comp));
 		
 		dlg.setLayout(new BorderLayout());
 		dlg.add(createPane(dataDriverList), BorderLayout.CENTER);

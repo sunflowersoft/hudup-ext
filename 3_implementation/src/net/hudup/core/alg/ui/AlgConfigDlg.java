@@ -80,12 +80,12 @@ public class AlgConfigDlg extends JDialog {
 	 * @param alg specified algorithm whose configuration is edited.
 	 */
 	public AlgConfigDlg(final Component comp, final Alg alg) {
-		super(UIUtil.getFrameForComponent(comp), "Algorithm configuration", true);
+		super(UIUtil.getDialogForComponent(comp), "Algorithm configuration", true);
 		this.thisAlg = alg;
 		
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		setSize(600, 400);
-		setLocationRelativeTo(UIUtil.getFrameForComponent(comp));
+		setLocationRelativeTo(UIUtil.getDialogForComponent(comp));
 		setLayout(new BorderLayout());
 		
 		addWindowListener(new WindowAdapter() {

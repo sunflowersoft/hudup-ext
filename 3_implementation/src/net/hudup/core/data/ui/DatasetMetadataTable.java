@@ -116,11 +116,11 @@ public class DatasetMetadataTable extends JTable {
 	 * @param dataset specified dataset.
 	 */
 	public static void showDlg(Component comp, Dataset dataset) {
-		JDialog dlg = new JDialog(UIUtil.getFrameForComponent(comp), "Dataset metadata", true);
+		JDialog dlg = new JDialog(UIUtil.getDialogForComponent(comp), "Dataset metadata", true);
 		dlg.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		
 		dlg.setSize(400, 250);
-		dlg.setLocationRelativeTo(UIUtil.getFrameForComponent(comp));
+		dlg.setLocationRelativeTo(UIUtil.getDialogForComponent(comp));
 		dlg.setLayout(new BorderLayout());
 
 		TextField txtUriId = new TextField("Metadata of dataset \"" + dataset.getConfig().getUriId() + "\"");

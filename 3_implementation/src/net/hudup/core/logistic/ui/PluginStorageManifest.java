@@ -232,14 +232,14 @@ public class PluginStorageManifest extends SortableSelectableTable {
 				return;
 			}
 			
-			AlgConfigDlg dlgConfig = new AlgConfigDlg(UIUtil.getFrameForComponent(this), alg);
+			AlgConfigDlg dlgConfig = new AlgConfigDlg(UIUtil.getDialogForComponent(this), alg);
 			dlgConfig.getPropPane().setToolbarVisible(false);
 			dlgConfig.getPropPane().setControlVisible(false);
 			dlgConfig.getPropPane().setEnabled(false);
 			dlgConfig.setVisible(true);
 		}
 		else if (value instanceof AlgDesc2) {
-			AlgDesc2ConfigDlg dlgConfig = new AlgDesc2ConfigDlg(UIUtil.getFrameForComponent(this), (AlgDesc2)value);
+			AlgDesc2ConfigDlg dlgConfig = new AlgDesc2ConfigDlg(UIUtil.getDialogForComponent(this), (AlgDesc2)value);
 			dlgConfig.getPropPane().setToolbarVisible(false);
 			dlgConfig.getPropPane().setControlVisible(false);
 			dlgConfig.getPropPane().setEnabled(false);

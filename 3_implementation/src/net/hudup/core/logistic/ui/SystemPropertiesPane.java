@@ -69,7 +69,7 @@ public class SystemPropertiesPane extends JPanel {
 					txtSystemProperties.refresh();
 					
 					JOptionPane.showMessageDialog(
-							UIUtil.getFrameForComponent(getThis()), 
+							UIUtil.getDialogForComponent(getThis()), 
 							"Enhance performance successfully", 
 							"Enhance performance", 
 							JOptionPane.INFORMATION_MESSAGE);

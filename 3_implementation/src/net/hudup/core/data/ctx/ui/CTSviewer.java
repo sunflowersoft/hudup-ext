@@ -123,9 +123,9 @@ public class CTSviewer extends JXTreeTable {
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					final JDialog dlg = new JDialog(UIUtil.getFrameForComponent(getThis()), "Profile", true);
+					final JDialog dlg = new JDialog(UIUtil.getDialogForComponent(getThis()), "Profile", true);
 					dlg.setSize(400, 300);
-					dlg.setLocationRelativeTo(UIUtil.getFrameForComponent(getThis()));
+					dlg.setLocationRelativeTo(UIUtil.getDialogForComponent(getThis()));
 					
 					dlg.setLayout(new BorderLayout());
 					

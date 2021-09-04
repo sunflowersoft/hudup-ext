@@ -162,10 +162,10 @@ public class DatasetConfigurator extends JDialog {
 			List<Alg> parserList, 
 			DataDriverList dataDriverList,
 			DataConfig defaultConfig) {
-		super(UIUtil.getFrameForComponent(comp), "Data configurator", true);
+		super(UIUtil.getDialogForComponent(comp), "Data configurator", true);
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		setSize(800, 600);
-		setLocationRelativeTo(UIUtil.getFrameForComponent(comp));
+		setLocationRelativeTo(UIUtil.getDialogForComponent(comp));
 		
 		this.thisDataDriverList = dataDriverList;
 		this.internalConfig = new DataConfig();

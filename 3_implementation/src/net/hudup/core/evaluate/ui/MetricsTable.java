@@ -280,10 +280,10 @@ public class MetricsTable extends SortableTable {
 			return;
 		}
 
-		JDialog dlgMetrics = new JDialog(UIUtil.getFrameForComponent(comp), true);
+		JDialog dlgMetrics = new JDialog(UIUtil.getDialogForComponent(comp), true);
 		dlgMetrics.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		dlgMetrics.setSize(600, 400);
-		dlgMetrics.setLocationRelativeTo(UIUtil.getFrameForComponent(comp));
+		dlgMetrics.setLocationRelativeTo(UIUtil.getDialogForComponent(comp));
 		dlgMetrics.setLayout(new BorderLayout());
 		
 		MetricsTable tblMetrics = referredEvaluator != null ? new MetricsTable(algTable, referredEvaluator) : new MetricsTable(algTable);

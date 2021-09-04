@@ -61,13 +61,13 @@ public class MetricsOptionDlg extends JDialog {
 	 * @param selectedMetricList specified default selected metrics.
 	 */
 	public MetricsOptionDlg(Component comp, List<Metric> selectedMetricList) {
-		super(UIUtil.getFrameForComponent(comp), "Metrics option", true);
+		super(UIUtil.getDialogForComponent(comp), "Metrics option", true);
 		
 		result.addAll(selectedMetricList);
 		
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		setSize(600, 400);
-		setLocationRelativeTo(UIUtil.getFrameForComponent(comp));
+		setLocationRelativeTo(UIUtil.getDialogForComponent(comp));
 
 		setLayout(new BorderLayout());
 		

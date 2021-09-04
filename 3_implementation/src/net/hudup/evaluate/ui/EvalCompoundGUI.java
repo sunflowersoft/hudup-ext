@@ -578,7 +578,7 @@ public class EvalCompoundGUI extends JFrame {
 
 		if (!isIdle) {
 			int confirm = JOptionPane.showConfirmDialog(
-				UIUtil.getFrameForComponent(getThisEvalGUI()), 
+				UIUtil.getDialogForComponent(getThisEvalGUI()), 
 				"Evaluation task will be terminated if closing window.\n" +
 					"Are you sure to close window?", 
 				"Close window", 
@@ -627,7 +627,7 @@ public class EvalCompoundGUI extends JFrame {
 
 		if (!isIdle) {
 			int confirm = JOptionPane.showConfirmDialog(
-					UIUtil.getFrameForComponent(getThisEvalGUI()), 
+					UIUtil.getDialogForComponent(getThisEvalGUI()), 
 					"Evaluation task will be terminated if switching evaluator.\n" +
 						"Are you sure to switch evaluator?", 
 					"Switching evaluator", 

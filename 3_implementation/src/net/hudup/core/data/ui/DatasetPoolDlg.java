@@ -130,7 +130,7 @@ public class DatasetPoolDlg extends JDialog {
 	 * @param bindUri bound URI.
 	 */
 	public DatasetPoolDlg(Component comp, DatasetPool pool, List<Alg> algList, String mainUnit, xURI bindUri) {
-		super(UIUtil.getFrameForComponent(comp), "Dataset pool dialog", true);
+		super(UIUtil.getDialogForComponent(comp), "Dataset pool dialog", true);
 		this.pool = pool;
 		this.algList = algList;
 		this.mainUnit = mainUnit;
@@ -138,7 +138,7 @@ public class DatasetPoolDlg extends JDialog {
 		
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		setSize(600, 400);
-		setLocationRelativeTo(UIUtil.getFrameForComponent(comp));
+		setLocationRelativeTo(UIUtil.getDialogForComponent(comp));
 		addWindowListener(new WindowAdapter() {
 
 			@Override

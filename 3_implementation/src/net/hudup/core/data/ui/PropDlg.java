@@ -60,12 +60,12 @@ public class PropDlg extends JDialog {
 	 * @param key the key shown on the title of dialog.
 	 */
 	public PropDlg(final Component comp, final PropList propList, String key) {
-		super(UIUtil.getFrameForComponent(comp), "Configure key " + key, true);
+		super(UIUtil.getDialogForComponent(comp), "Configure key " + key, true);
 		this.result = null;
 		
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		setSize(600, 400);
-		setLocationRelativeTo(UIUtil.getFrameForComponent(comp));
+		setLocationRelativeTo(UIUtil.getDialogForComponent(comp));
 		setLayout(new BorderLayout());
 		addWindowListener(new WindowAdapter() {
 
@@ -241,11 +241,11 @@ class PropDlg2 extends JDialog {
 	 * @param key the key shown on the title of dialog.
 	 */
 	public PropDlg2(final Component comp, final PropList propList, String key) {
-		super(UIUtil.getFrameForComponent(comp), "Configure properties list for key " + key, true);
+		super(UIUtil.getDialogForComponent(comp), "Configure properties list for key " + key, true);
 		
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		setSize(600, 400);
-		setLocationRelativeTo(UIUtil.getFrameForComponent(comp));
+		setLocationRelativeTo(UIUtil.getDialogForComponent(comp));
 		setLayout(new BorderLayout());
 		addWindowListener(new WindowAdapter() {
 

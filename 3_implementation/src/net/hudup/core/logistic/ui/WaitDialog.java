@@ -105,7 +105,7 @@ public class WaitDialog implements Serializable {
 	 * @return dialog for waiting.
 	 */
 	public static JDialog createDialog(Component comp) {
-		JDialog waitDlg = new JDialog(UIUtil.getFrameForComponent(comp), "Please wait...", true);
+		JDialog waitDlg = new JDialog(UIUtil.getDialogForComponent(comp), "Please wait...", true);
 		waitDlg.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		waitDlg.setSize(200, 100);
 		waitDlg.setLocationRelativeTo(null);

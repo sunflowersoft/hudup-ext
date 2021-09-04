@@ -55,10 +55,10 @@ public class RemoteInfoDlg extends JDialog {
 	 * @param rInfoList {@link RemoteInfoList} to initialize the internal panel {@link #paneRemoteInfo}.
 	 */
 	public RemoteInfoDlg(Component comp, RemoteInfoList rInfoList) {
-		super(UIUtil.getFrameForComponent(comp), "Remote information dialog", true);
+		super(UIUtil.getDialogForComponent(comp), "Remote information dialog", true);
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		setSize(600, 400);
-		setLocationRelativeTo(UIUtil.getFrameForComponent(comp));
+		setLocationRelativeTo(UIUtil.getDialogForComponent(comp));
 		setLayout(new BorderLayout());
 		
 		JPanel body = new JPanel(new BorderLayout());

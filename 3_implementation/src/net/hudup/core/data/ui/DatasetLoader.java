@@ -78,10 +78,10 @@ public class DatasetLoader extends JDialog {
 	 * @param comp parent component.
 	 */
 	public DatasetLoader(Component comp, String mainUnit) {
-		super(UIUtil.getFrameForComponent(comp), "Dataset loader", true);
+		super(UIUtil.getDialogForComponent(comp), "Dataset loader", true);
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		setSize(600, 200);
-		setLocationRelativeTo(UIUtil.getFrameForComponent(comp));
+		setLocationRelativeTo(UIUtil.getDialogForComponent(comp));
 		
 		this.mainUnit = mainUnit;
 		

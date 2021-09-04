@@ -9,6 +9,7 @@ package net.hudup.core.alg.ui;
 
 import java.awt.Component;
 import java.awt.Frame;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -98,7 +99,7 @@ public final class AlgListUIUtil {
 						
 						if (EvaluatorAbstract.isRemote(evaluator)) {
 							int confirm = JOptionPane.showConfirmDialog(
-								UIUtil.getFrameForComponent((Component)ui), 
+								UIUtil.getDialogForComponent((Component)ui), 
 								"Because of using remote evaluator.\n" +
 									"Would you like to show remote description?\n" +
 									"If press Yes, description dialog will be shown.\n" + 
@@ -112,7 +113,7 @@ public final class AlgListUIUtil {
 								try {
 									String desc = evaluator.getEvaluatedAlgDescText(alg.getName());
 									if (desc != null)
-										inspector = new DescriptionDlg(UIUtil.getFrameForComponent((Component)ui), "Inspector", desc);
+										inspector = new DescriptionDlg(UIUtil.getDialogForComponent((Component)ui), "Inspector", desc);
 								} catch (Exception ex) {LogUtil.trace(ex);}
 							}
 						}
@@ -123,7 +124,7 @@ public final class AlgListUIUtil {
 						if (inspector != null)
 							inspector.inspect();
 						else
-							JOptionPane.showMessageDialog(UIUtil.getFrameForComponent((Component)ui), "Cannot retrieve inspector", "Cannot retrieve inspector", JOptionPane.ERROR_MESSAGE);
+							JOptionPane.showMessageDialog(UIUtil.getDialogForComponent((Component)ui), "Cannot retrieve inspector", "Cannot retrieve inspector", JOptionPane.ERROR_MESSAGE);
 					}
 				});
 			ctxMenu.add(miInspect);
@@ -155,7 +156,7 @@ public final class AlgListUIUtil {
 						@Override
 						public void actionPerformed(ActionEvent e) {
 							int confirm = JOptionPane.showConfirmDialog(
-									UIUtil.getFrameForComponent((Component)ui), 
+									UIUtil.getDialogForComponent((Component)ui), 
 									"Be careful, out of memory in case of huge knowledge base", 
 									"Out of memory in case of huge knowledge base", 
 									JOptionPane.OK_CANCEL_OPTION, 
@@ -167,7 +168,7 @@ public final class AlgListUIUtil {
 							if (inspector != null)
 								inspector.inspect();
 							else
-								JOptionPane.showMessageDialog(UIUtil.getFrameForComponent((Component)ui), "Cannot view knowledge base", "Cannot view knowledge base", JOptionPane.ERROR_MESSAGE);
+								JOptionPane.showMessageDialog(UIUtil.getDialogForComponent((Component)ui), "Cannot view knowledge base", "Cannot view knowledge base", JOptionPane.ERROR_MESSAGE);
 						}
 					});
 				ctxMenu.add(miViewKB);
@@ -178,7 +179,7 @@ public final class AlgListUIUtil {
 						
 						@Override
 						public void actionPerformed(ActionEvent e) {
-							KBaseConfigDlg dlgKBase = new KBaseConfigDlg(UIUtil.getFrameForComponent((Component)ui), kbase);
+							KBaseConfigDlg dlgKBase = new KBaseConfigDlg(UIUtil.getDialogForComponent((Component)ui), kbase);
 							dlgKBase.setVisible(true);
 						}
 					});
@@ -225,11 +226,11 @@ public final class AlgListUIUtil {
 	 * @param ui specified algorithm list UI.
 	 * @return windows frame of specified algorithm list UI.
 	 */
-	private static Frame getFrame(AlgListUI ui) {
+	private static Window getWindow(AlgListUI ui) {
 		if (ui instanceof Frame)
 			return (Frame) ui;
 		else if (ui instanceof Component)
-			return UIUtil.getFrameForComponent((Component)ui);
+			return UIUtil.getDialogForComponent((Component)ui);
 		else
 			return null;
 	}
@@ -244,7 +245,7 @@ public final class AlgListUIUtil {
 		if (alg == null || alg.getConfig() == null)
 			return;
 
-		new AlgConfigDlg(getFrame(ui), alg).setVisible(true);
+		new AlgConfigDlg(getWindow(ui), alg).setVisible(true);
 	}
 
 	

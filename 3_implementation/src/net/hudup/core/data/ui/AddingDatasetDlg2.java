@@ -139,7 +139,7 @@ public class AddingDatasetDlg2 extends JDialog {
 	 * @param bindUri bound URI.
 	 */
 	public AddingDatasetDlg2(Component comp, DatasetPool pool, List<Alg> algList, final String mainUnit, xURI bindUri) {
-		super(UIUtil.getFrameForComponent(comp), "Add datasets", true);
+		super(UIUtil.getDialogForComponent(comp), "Add datasets", true);
 		this.setTitle(I18nUtil.message("add_datasets"));
 		this.pool = pool;
 		this.algList = algList;
@@ -147,7 +147,7 @@ public class AddingDatasetDlg2 extends JDialog {
 		
 		this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		this.setSize(600, 200);
-		this.setLocationRelativeTo(UIUtil.getFrameForComponent(comp));
+		this.setLocationRelativeTo(UIUtil.getDialogForComponent(comp));
 
 		setLayout(new BorderLayout());
 		

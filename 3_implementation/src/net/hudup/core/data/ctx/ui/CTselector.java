@@ -50,10 +50,10 @@ public class CTselector extends JDialog {
 	 * @param cts specified context template schema.
 	 */
 	public CTselector(Component comp, ContextTemplateSchema cts) {
-		super(UIUtil.getFrameForComponent(comp), "Context template selector", true);
+		super(UIUtil.getDialogForComponent(comp), "Context template selector", true);
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		setSize(600, 400);
-		setLocationRelativeTo(UIUtil.getFrameForComponent(comp));
+		setLocationRelativeTo(UIUtil.getDialogForComponent(comp));
 		setLayout(new BorderLayout());
 		
 		final CTSviewer viewer = new CTSviewer(cts);

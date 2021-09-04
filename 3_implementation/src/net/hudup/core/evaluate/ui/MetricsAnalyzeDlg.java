@@ -100,7 +100,7 @@ public class MetricsAnalyzeDlg extends JDialog {
 	 * @throws RemoteException if any error raises.
 	 */
 	public MetricsAnalyzeDlg(Component comp, final Metrics metrics, final RegisterTable algTable, Evaluator referredEvaluator) throws RemoteException {
-		super(UIUtil.getFrameForComponent(comp), "Metrics viewer", true);
+		super(UIUtil.getDialogForComponent(comp), "Metrics viewer", true);
 		this.metrics = metrics;
 		this.algTable = algTable;
 		this.referredEvaluator = referredEvaluator;
@@ -108,7 +108,7 @@ public class MetricsAnalyzeDlg extends JDialog {
 		
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		setSize(800, 600);
-		setLocationRelativeTo(UIUtil.getFrameForComponent(comp));
+		setLocationRelativeTo(UIUtil.getDialogForComponent(comp));
 
 		setLayout(new BorderLayout());
 		

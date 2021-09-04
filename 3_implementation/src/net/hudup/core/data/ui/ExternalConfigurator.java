@@ -131,11 +131,11 @@ public class ExternalConfigurator extends JDialog {
 			Component comp, 
 			DataDriverList dataDriverList, 
 			ExternalConfig defaultConfig) {
-		super(UIUtil.getFrameForComponent(comp), "External configurator", true);
+		super(UIUtil.getDialogForComponent(comp), "External configurator", true);
 		
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		setSize(800, 600);
-		setLocationRelativeTo(UIUtil.getFrameForComponent(comp));
+		setLocationRelativeTo(UIUtil.getDialogForComponent(comp));
 		
 		externalConfig = new ExternalConfig();
 
@@ -714,7 +714,7 @@ class MappingColumnDlg extends JDialog {
 	 * @param unit specified unit.
 	 */
 	public MappingColumnDlg(final Component comp, ExternalConfig externalConfig, final List<String> mappingFields, String unit) {
-		super(UIUtil.getFrameForComponent(comp), "Mapping fields", true);
+		super(UIUtil.getDialogForComponent(comp), "Mapping fields", true);
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		setSize(600, 400);
 		setLocationRelativeTo(this);
@@ -749,7 +749,7 @@ class MappingColumnDlg extends JDialog {
 				if (config.size() == 0) {
 					result.clear();
 					JOptionPane.showMessageDialog(
-							UIUtil.getFrameForComponent(comp), 
+							UIUtil.getDialogForComponent(comp), 
 							"Some fields not mapped", 
 							"Some fields not mapped", 
 							JOptionPane.WARNING_MESSAGE);
@@ -839,7 +839,7 @@ class MappingColumnDlg2 extends JDialog {
 	 * @param unit specified unit.
 	 */
 	public MappingColumnDlg2(final Component comp, final ExternalConfig externalConfig, final List<String> mappingFields, String unit) {
-		super(UIUtil.getFrameForComponent(comp), "Mapping fields", true);
+		super(UIUtil.getDialogForComponent(comp), "Mapping fields", true);
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		setSize(600, 400);
 		setLocationRelativeTo(this);
@@ -894,7 +894,7 @@ class MappingColumnDlg2 extends JDialog {
 				if (config.size() == 0) {
 					result.clear();
 					JOptionPane.showMessageDialog(
-							UIUtil.getFrameForComponent(comp), 
+							UIUtil.getDialogForComponent(comp), 
 							"Some fields not mapped", 
 							"Some fields not mapped", 
 							JOptionPane.WARNING_MESSAGE);

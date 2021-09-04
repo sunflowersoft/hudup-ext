@@ -62,11 +62,11 @@ public class SimpleDatasetChooser extends JDialog {
 	 */
 	public SimpleDatasetChooser(Component comp, String title, 
 			final String[] exts, final String[] descs, final int mode) {
-		super(UIUtil.getFrameForComponent(comp), "Choose data configuration", true);
+		super(UIUtil.getDialogForComponent(comp), "Choose data configuration", true);
 		
 		this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		this.setSize(600, 300);
-		setLocationRelativeTo(UIUtil.getFrameForComponent(comp));
+		setLocationRelativeTo(UIUtil.getDialogForComponent(comp));
 
 		setLayout(new BorderLayout());
 		

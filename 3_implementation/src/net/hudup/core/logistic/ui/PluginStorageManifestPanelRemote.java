@@ -121,7 +121,7 @@ public class PluginStorageManifestPanelRemote extends PluginStorageManifestPanel
 		
 		if (connectInfo.pullMode) {
 			JOptionPane.showMessageDialog(
-				UIUtil.getFrameForComponent(this), 
+				UIUtil.getDialogForComponent(this), 
 				"Unable to import due to pull mode", 
 				"Unable to import", 
 				JOptionPane.ERROR_MESSAGE);
@@ -143,7 +143,7 @@ public class PluginStorageManifestPanelRemote extends PluginStorageManifestPanel
 		boolean idle = tblRegister.isListenersIdle();
 		if (!idle) {
 			JOptionPane.showMessageDialog(
-				UIUtil.getFrameForComponent(this), 
+				UIUtil.getDialogForComponent(this), 
 				"Unable to import due to busy listeners", 
 				"Unable to import", 
 				JOptionPane.ERROR_MESSAGE);

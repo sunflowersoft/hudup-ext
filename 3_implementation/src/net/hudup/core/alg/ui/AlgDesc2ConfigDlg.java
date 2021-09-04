@@ -73,11 +73,11 @@ public class AlgDesc2ConfigDlg extends JDialog {
 	 * @param algDesc specified extended algorithm description.
 	 */
 	public AlgDesc2ConfigDlg(final Component comp, final AlgDesc2 algDesc) {
-		super(UIUtil.getFrameForComponent(comp), "Algorithm description", true);
+		super(UIUtil.getDialogForComponent(comp), "Algorithm description", true);
 		
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		setSize(600, 400);
-		setLocationRelativeTo(UIUtil.getFrameForComponent(comp));
+		setLocationRelativeTo(UIUtil.getDialogForComponent(comp));
 		setLayout(new BorderLayout());
 		
 		JPanel paneInfo = new JPanel(new BorderLayout());

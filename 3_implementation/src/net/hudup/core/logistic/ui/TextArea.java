@@ -325,10 +325,10 @@ public class TextArea extends JTextArea implements DocumentListener {
 			return;
 		}
 
-		JDialog dlgTextArea = new JDialog(UIUtil.getFrameForComponent(comp), true);
+		JDialog dlgTextArea = new JDialog(UIUtil.getDialogForComponent(comp), true);
 		dlgTextArea.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		dlgTextArea.setSize(400, 400);
-		dlgTextArea.setLocationRelativeTo(UIUtil.getFrameForComponent(comp));
+		dlgTextArea.setLocationRelativeTo(UIUtil.getDialogForComponent(comp));
 		dlgTextArea.setLayout(new BorderLayout());
 		
 		TextArea txtArea = null;

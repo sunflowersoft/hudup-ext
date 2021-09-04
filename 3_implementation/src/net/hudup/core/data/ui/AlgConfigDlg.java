@@ -148,12 +148,12 @@ class AlgConfigDlg extends JDialog {
 	 * @param key specified key to shown in the title of this dialog.
 	 */
 	public AlgConfigDlg(Component comp, AlgList defaultAlgList, xURI storeUri, String key) {
-		super(UIUtil.getFrameForComponent(comp), "Configure key " + key, true);
+		super(UIUtil.getDialogForComponent(comp), "Configure key " + key, true);
 		this.resultAlgList = null;
 		
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		setSize(600, 400);
-		setLocationRelativeTo(UIUtil.getFrameForComponent(comp));
+		setLocationRelativeTo(UIUtil.getDialogForComponent(comp));
 		setLayout(new BorderLayout());
 		addWindowListener(new WindowAdapter() {
 

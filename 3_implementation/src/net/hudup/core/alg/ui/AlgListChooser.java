@@ -113,10 +113,10 @@ public class AlgListChooser extends JDialog {
 	 * @param referredEvaluator referred evaluator.
 	 */
 	public AlgListChooser(Component comp, List<Alg> wholeList, List<Alg> selectedList, Evaluator referredEvaluator) {
-		super(UIUtil.getFrameForComponent(comp), "Choosing algorithms", true);
+		super(UIUtil.getDialogForComponent(comp), "Choosing algorithms", true);
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		setSize(600, 400);
-		setLocationRelativeTo(UIUtil.getFrameForComponent(comp));
+		setLocationRelativeTo(UIUtil.getDialogForComponent(comp));
 		JPanel pane = null;
 		
 		Collections.sort(wholeList, new Comparator<Alg>() {

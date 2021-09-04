@@ -726,10 +726,10 @@ class EvaluatorTable extends JTable implements EvaluateListener, EvaluateProgres
 	 * @param evItem specified evaluator item.
 	 */
 	protected synchronized void config(EvaluatorWrapper evItem, int selectedRow) {
-		JDialog dlgConfig = new JDialog(UIUtil.getFrameForComponent(this), "Configure evaluator", true);
+		JDialog dlgConfig = new JDialog(UIUtil.getDialogForComponent(this), "Configure evaluator", true);
 		dlgConfig.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		dlgConfig.setSize(600, 400);
-		dlgConfig.setLocationRelativeTo(UIUtil.getFrameForComponent(this));
+		dlgConfig.setLocationRelativeTo(UIUtil.getDialogForComponent(this));
 		dlgConfig.setLayout(new BorderLayout());
 		
 		SysConfigPane paneConfig = new SysConfigPane() {
@@ -872,7 +872,7 @@ class EvaluatorTable extends JTable implements EvaluateListener, EvaluateProgres
         	return;
 		}
 		
-		JDialog selectDlgNameDlg = new JDialog(UIUtil.getFrameForComponent(this), "Select a algorithm name", true);
+		JDialog selectDlgNameDlg = new JDialog(UIUtil.getDialogForComponent(this), "Select a algorithm name", true);
 		selectDlgNameDlg.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		selectDlgNameDlg.setLocationRelativeTo(this);
 		

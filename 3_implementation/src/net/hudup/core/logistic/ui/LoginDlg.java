@@ -78,7 +78,7 @@ public class LoginDlg extends JDialog {
 	 */
 	public LoginDlg(Component comp, String title) {
 		// TODO Auto-generated constructor stub
-		super(UIUtil.getFrameForComponent(comp), title, true);
+		super(UIUtil.getDialogForComponent(comp), title, true);
 		
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		setSize(250, 150);

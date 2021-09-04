@@ -574,7 +574,7 @@ public class DatasetCreator extends JPanel implements Dispose {
 	 */
 	private boolean createSchema() {
 		final JDialog createAttDlg = new JDialog(
-				UIUtil.getFrameForComponent(this), "Creating schema", true);
+				UIUtil.getDialogForComponent(this), "Creating schema", true);
 		createAttDlg.setLayout(new BorderLayout());
 		createAttDlg.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		createAttDlg.setSize(600, 400);
@@ -671,7 +671,7 @@ public class DatasetCreator extends JPanel implements Dispose {
 		}
 		
 		final JDialog createDlg = new JDialog(
-				UIUtil.getFrameForComponent(this), "Creating unit", true);
+				UIUtil.getDialogForComponent(this), "Creating unit", true);
 		createDlg.setLayout(new BorderLayout());
 		createDlg.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		createDlg.setSize(600, 400);
@@ -873,7 +873,7 @@ public class DatasetCreator extends JPanel implements Dispose {
 					return;
 				}
 				
-				JDialog dlgWait = WaitDialog.createDialog(UIUtil.getFrameForComponent(getCreator())); dlgWait.setUndecorated(true);
+				JDialog dlgWait = WaitDialog.createDialog(UIUtil.getDialogForComponent(getCreator())); dlgWait.setUndecorated(true);
 				SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
 					@Override
 					protected Void doInBackground() throws Exception {
@@ -926,10 +926,10 @@ public class DatasetCreator extends JPanel implements Dispose {
 					if (!setup)
 						externalQuery.close();
 					else {
-						JDialog wait = new JDialog(UIUtil.getFrameForComponent(getCreator()), "Please waiting", false);
+						JDialog wait = new JDialog(UIUtil.getDialogForComponent(getCreator()), "Please waiting", false);
 						wait.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 						wait.setSize(200, 100);
-						wait.setLocationRelativeTo(UIUtil.getFrameForComponent(getCreator()));
+						wait.setLocationRelativeTo(UIUtil.getDialogForComponent(getCreator()));
 						wait.setVisible(true);
 	
 						externalQuery.importData(null);

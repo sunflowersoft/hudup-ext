@@ -240,7 +240,7 @@ public class CTStable extends JXTreeTable {
 		ContextTemplate template = (ContextTemplate)object;
 		
 		final JDialog createAttDlg = new JDialog(
-				UIUtil.getFrameForComponent(this), "Configure profile", true);
+				UIUtil.getDialogForComponent(this), "Configure profile", true);
 		
 		createAttDlg.setLayout(new BorderLayout());
 		createAttDlg.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);

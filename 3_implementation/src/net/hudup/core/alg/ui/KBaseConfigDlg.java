@@ -83,11 +83,11 @@ public class KBaseConfigDlg extends JDialog {
 	 * @param kbaseConfig specified configuration of knowledge base.
 	 */
 	public KBaseConfigDlg(final Component comp, DataConfig kbaseConfig) {
-		super(UIUtil.getFrameForComponent(comp), "Knowledge base configuration", true);
+		super(UIUtil.getDialogForComponent(comp), "Knowledge base configuration", true);
 		
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		setSize(600, 400);
-		setLocationRelativeTo(UIUtil.getFrameForComponent(comp));
+		setLocationRelativeTo(UIUtil.getDialogForComponent(comp));
 		setLayout(new BorderLayout());
 		
 		addWindowListener(new WindowAdapter() {

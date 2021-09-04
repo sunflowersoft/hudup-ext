@@ -55,11 +55,11 @@ public class ProgressDlg extends JDialog implements ProgressListener {
 	 * @param modal if {@code true}, the dialog blocks user inputs.
 	 */
 	public ProgressDlg(Component comp, boolean modal) {
-		super(UIUtil.getFrameForComponent(comp), "Progressing", modal);
+		super(UIUtil.getDialogForComponent(comp), "Progressing", modal);
 		
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		setSize(200, 100);
-		setLocationRelativeTo(UIUtil.getFrameForComponent(comp));
+		setLocationRelativeTo(UIUtil.getDialogForComponent(comp));
 		
 		setLayout(new BorderLayout());
 		

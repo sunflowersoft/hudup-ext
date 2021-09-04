@@ -273,7 +273,7 @@ public class AlgListBox extends JList<Alg> implements AlgListUI {
 		if (!(alg instanceof DuplicatableAlg))
 			return;
 		
-		JDialog selectDlgNameDlg = new JDialog(UIUtil.getFrameForComponent(this), "Select a algorithm name", true);
+		JDialog selectDlgNameDlg = new JDialog(UIUtil.getDialogForComponent(this), "Select a algorithm name", true);
 		selectDlgNameDlg.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		selectDlgNameDlg.setLocationRelativeTo(this);
 		

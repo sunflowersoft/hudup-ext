@@ -146,7 +146,7 @@ public abstract class AlgExtAbstract extends AlgAbstract implements AlgExt, AlgE
 			desc = getDescription();
 		} catch (Exception e) {LogUtil.trace(e);}
 		
-		return new DescriptionDlg(UIUtil.getFrameForComponent(null), "Inspector", desc);
+		return new DescriptionDlg(UIUtil.getDialogForComponent(null), "Inspector", desc);
 	}
 
 	

@@ -207,7 +207,7 @@ public class FreqItemsetListTable extends JTable {
 		if (dlg != null)
 			viewer = new JDialog(dlg, "Row values", false);
 		else
-			viewer = new JDialog(UIUtil.getFrameForComponent(this), "Row values", false);
+			viewer = new JDialog(UIUtil.getDialogForComponent(this), "Row values", false);
 			
 		viewer.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		viewer.setSize(600, 200);

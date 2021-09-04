@@ -43,10 +43,10 @@ public class DescriptionDlg extends JDialog implements Inspector {
 	 * @param description description.
 	 */
 	public DescriptionDlg(Component comp, String title, String description) {
-		super(UIUtil.getFrameForComponent(comp), title, true);
+		super(UIUtil.getDialogForComponent(comp), title, true);
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setSize(400, 200);
-		setLocationRelativeTo(UIUtil.getFrameForComponent(comp));
+		setLocationRelativeTo(UIUtil.getDialogForComponent(comp));
 		setLayout(new BorderLayout());
 		
 		JPanel body = new JPanel(new BorderLayout());

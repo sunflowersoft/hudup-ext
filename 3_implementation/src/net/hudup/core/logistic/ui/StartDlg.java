@@ -49,7 +49,7 @@ public abstract class StartDlg extends JDialog {
 	 * @param title title of dialog.
 	 */
 	public StartDlg(Component comp, String title) {
-		super(UIUtil.getFrameForComponent(comp), title, true);
+		super(UIUtil.getDialogForComponent(comp), title, true);
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setLocationRelativeTo(null);
 		

@@ -464,13 +464,13 @@ class PluginStorageManifest2 extends JTable {
 		
 		if (config == null) {
 			JOptionPane.showMessageDialog(
-					UIUtil.getFrameForComponent(this), 
+					UIUtil.getDialogForComponent(this), 
 					"Apply plug-in storage successfully. Algorithms are registered/unregistered/removed/unremoved", 
 					"Apply successfully", 
 					JOptionPane.INFORMATION_MESSAGE);
 		}
 		else {
-			AlgConfigDlg dlgConfig = new AlgConfigDlg(UIUtil.getFrameForComponent(getThisManifest()), alg);
+			AlgConfigDlg dlgConfig = new AlgConfigDlg(UIUtil.getDialogForComponent(getThisManifest()), alg);
 			dlgConfig.getPropPane().setToolbarVisible(false);
 			dlgConfig.getPropPane().setControlVisible(false);
 			dlgConfig.getPropPane().setEnabled(false);
@@ -955,14 +955,14 @@ class PluginStorageManifest2 extends JTable {
 			boolean ret = tblRegister.apply();
 			if (ret) {
 				JOptionPane.showMessageDialog(
-						UIUtil.getFrameForComponent(tblRegister), 
+						UIUtil.getDialogForComponent(tblRegister), 
 						"Apply plug-in storage successfully.\nAlgorithms were registered/unregistered exported/unexported removed/unremoved.", 
 						"Apply successfully", 
 						JOptionPane.INFORMATION_MESSAGE);
 			}
 			else {
 				JOptionPane.showMessageDialog(
-						UIUtil.getFrameForComponent(tblRegister), 
+						UIUtil.getDialogForComponent(tblRegister), 
 						"Apply plug-in storage failed", 
 						"Apply failed", 
 						JOptionPane.INFORMATION_MESSAGE);
@@ -980,10 +980,10 @@ class PluginStorageManifest2 extends JTable {
 	 * @param modal whether or not the dialog is modal. The modal dialog will block user inputs. Please see {@link JDialog} for more details. 
 	 */
 	public static void showDlg(Component comp, PluginChangedListener listener, boolean modal) {
-		JDialog dlg = new JDialog(UIUtil.getFrameForComponent(comp), "Plugin storage", modal);
+		JDialog dlg = new JDialog(UIUtil.getDialogForComponent(comp), "Plugin storage", modal);
 		dlg.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		dlg.setSize(600, 400);
-		dlg.setLocationRelativeTo(UIUtil.getFrameForComponent(comp));
+		dlg.setLocationRelativeTo(UIUtil.getDialogForComponent(comp));
 		
 		dlg.setLayout(new BorderLayout());
 		dlg.add(new PluginStorageManifestPanel(listener), BorderLayout.CENTER);
@@ -1273,10 +1273,10 @@ class DataDriverListTable2 extends JTable {
 	 * @param modal if {@code true}, the dialog blocks user inputs.
 	 */
 	public static void showDlg(Component comp, DataDriverList dataDriverList, boolean modal) {
-		JDialog dlg = new JDialog(UIUtil.getFrameForComponent(comp), "Register table", modal);
+		JDialog dlg = new JDialog(UIUtil.getDialogForComponent(comp), "Register table", modal);
 		dlg.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		dlg.setSize(600, 400);
-		dlg.setLocationRelativeTo(UIUtil.getFrameForComponent(comp));
+		dlg.setLocationRelativeTo(UIUtil.getDialogForComponent(comp));
 		
 		dlg.setLayout(new BorderLayout());
 		dlg.add(createPane(dataDriverList), BorderLayout.CENTER);
@@ -2253,11 +2253,11 @@ class JarImportAlgDlag extends JDialog {
 	 * @param comp parent component.
 	 */
 	public JarImportAlgDlag(Component comp) {
-		super(UIUtil.getFrameForComponent(comp), "Import algorithms from jar file", true);
+		super(UIUtil.getDialogForComponent(comp), "Import algorithms from jar file", true);
 		
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		setSize(600, 400);
-		setLocationRelativeTo(UIUtil.getFrameForComponent(comp));
+		setLocationRelativeTo(UIUtil.getDialogForComponent(comp));
 		
 		setLayout(new BorderLayout());
 		
@@ -2371,10 +2371,10 @@ class ImportAlgDlag extends JDialog {
 	 * @param comp parent component.
 	 */
 	public ImportAlgDlag(Component comp) {
-		super(UIUtil.getFrameForComponent(comp), "Import remotely algorithms from Hudup server/service", true);
+		super(UIUtil.getDialogForComponent(comp), "Import remotely algorithms from Hudup server/service", true);
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		setSize(600, 400);
-		setLocationRelativeTo(UIUtil.getFrameForComponent(comp));
+		setLocationRelativeTo(UIUtil.getDialogForComponent(comp));
 		JPanel pane = null;
 		
 		setLayout(new BorderLayout());

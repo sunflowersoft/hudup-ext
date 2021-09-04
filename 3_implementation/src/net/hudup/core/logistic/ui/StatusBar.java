@@ -105,10 +105,10 @@ public class StatusBar extends JPanel {
 	 * Showing evaluation progress.
 	 */
 	private void showEvaluateProgress() {
-		JDialog dlgShow = new JDialog(UIUtil.getFrameForComponent(this), false);
+		JDialog dlgShow = new JDialog(UIUtil.getDialogForComponent(this), false);
 		dlgShow.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		dlgShow.setSize(800, 100);
-		dlgShow.setLocationRelativeTo(UIUtil.getFrameForComponent(this));
+		dlgShow.setLocationRelativeTo(UIUtil.getDialogForComponent(this));
 		dlgShow.setLayout(new BorderLayout());
 		
 		TextArea textArea = new TextArea();

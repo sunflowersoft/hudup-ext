@@ -71,10 +71,10 @@ public class CTScreator extends JDialog implements Inspector {
 	 * @param ctxManager Context template schema (CTS) manager.
 	 */
 	public CTScreator(Component comp, CTSManager ctxManager) {
-		super(UIUtil.getFrameForComponent(comp), "Context creator", true);
+		super(UIUtil.getDialogForComponent(comp), "Context creator", true);
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		setSize(600, 400);
-		setLocationRelativeTo(UIUtil.getFrameForComponent(comp));
+		setLocationRelativeTo(UIUtil.getDialogForComponent(comp));
 		setLayout(new BorderLayout());
 		
 		ctsManager = ctxManager;

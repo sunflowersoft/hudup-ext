@@ -40,11 +40,11 @@ public class HelpContent extends JDialog {
 	 * @param comp parent component.
 	 */
 	public HelpContent(Component comp) {
-		super(UIUtil.getFrameForComponent(comp), "Help content", true);
+		super(UIUtil.getDialogForComponent(comp), "Help content", true);
 		
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		setSize(600, 400);
-		setLocationRelativeTo(UIUtil.getFrameForComponent(comp));
+		setLocationRelativeTo(UIUtil.getDialogForComponent(comp));
 		
 		setLayout(new BorderLayout());
 		

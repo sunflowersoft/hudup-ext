@@ -69,7 +69,7 @@ public class StatDlg extends JDialog {
 	 * @param modal model mode.
 	 */
 	public StatDlg(Component comp, double[] data, boolean modal) {
-		super(UIUtil.getFrameForComponent(comp), "Estimated values Statistics", modal);
+		super(UIUtil.getDialogForComponent(comp), "Estimated values Statistics", modal);
 	
 		this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		
@@ -137,7 +137,7 @@ public class StatDlg extends JDialog {
 		footer.add(btnClose);
 		
 		setSize(600, 480);
-		setLocationRelativeTo(UIUtil.getFrameForComponent(comp));
+		setLocationRelativeTo(UIUtil.getDialogForComponent(comp));
 		setVisible(true);
 	}
 	

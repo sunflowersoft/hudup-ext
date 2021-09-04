@@ -101,10 +101,10 @@ public class AlgChooser extends JDialog {
 	 * @param referredEvaluator referred evaluator.
 	 */
 	public AlgChooser(Component comp, Object defaultAlg, List<Alg> initAlgList, List<Alg> removedAlgList, Evaluator referredEvaluator) {
-		super(UIUtil.getFrameForComponent(comp), "Choosing algorithms", true);
+		super(UIUtil.getDialogForComponent(comp), "Choosing algorithms", true);
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		setSize(400, 200);
-		setLocationRelativeTo(UIUtil.getFrameForComponent(comp));
+		setLocationRelativeTo(UIUtil.getDialogForComponent(comp));
 		this.defaultAlg = defaultAlg;
 		this.removedAlgList = removedAlgList; 
 		

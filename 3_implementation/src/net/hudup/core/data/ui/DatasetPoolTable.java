@@ -353,7 +353,7 @@ public class DatasetPoolTable extends JTable {
 								return;
 							}
 							
-							KBaseConfigDlg dlgKBase = new KBaseConfigDlg(UIUtil.getFrameForComponent(getThis()), kbaseConfig);
+							KBaseConfigDlg dlgKBase = new KBaseConfigDlg(UIUtil.getDialogForComponent(getThis()), kbaseConfig);
 							dlgKBase.setVisible(true);
 						} //end actionPerformed
 						

@@ -231,7 +231,7 @@ public class RatingValueTable extends JTable {
 		if (dlg != null)
 			viewer = new JDialog(dlg, "Row values", false);
 		else
-			viewer = new JDialog(UIUtil.getFrameForComponent(this), "Row values", false);
+			viewer = new JDialog(UIUtil.getDialogForComponent(this), "Row values", false);
 
 		viewer.setLayout(new BorderLayout());
 		viewer.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
@@ -264,10 +264,10 @@ public class RatingValueTable extends JTable {
 	 * @param modal rating value table.
 	 */
 	public void showDlg(Component comp, boolean modal) {
-		JDialog dlg = new JDialog(UIUtil.getFrameForComponent(comp), "Rating matrix dialog", modal);
+		JDialog dlg = new JDialog(UIUtil.getDialogForComponent(comp), "Rating matrix dialog", modal);
 		dlg.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		dlg.setSize(400, 300);
-		dlg.setLocationRelativeTo(UIUtil.getFrameForComponent(comp));
+		dlg.setLocationRelativeTo(UIUtil.getDialogForComponent(comp));
 		
 		dlg.setLayout(new BorderLayout());
 		dlg.add(new JScrollPane(this), BorderLayout.CENTER);

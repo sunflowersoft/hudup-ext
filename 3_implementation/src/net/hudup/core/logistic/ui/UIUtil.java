@@ -224,14 +224,14 @@ public final class UIUtil {
 
 	
 	/**
-	 * Getting the parent frame {@link Frame} of the specified component.
+	 * Getting the parent frame of the specified component.
 	 * @param comp specified component.
-	 * @return {@link Frame} of the specified component. The method return {@code null} if the specified component has no parent {@link Frame}.
+	 * @return {@link Frame} of the specified component. The method return {@code null} if the specified component has no parent Frame.
 	 */
 	public static Frame getFrameForComponent(Component comp) {
 	    if (comp == null)
 	        return null;
-	    if (comp instanceof Frame)
+	    else if (comp instanceof Frame)
 	        return (Frame)comp;
 	    else
 	    	return getFrameForComponent(comp.getParent());
@@ -239,20 +239,20 @@ public final class UIUtil {
 
 	
 	/**
-	 * Getting the parent dialog {@link Dialog} of the specified component.
+	 * Getting the parent dialog of the specified component.
 	 * @param comp specified component.
-	 * @return {@link Dialog} of the specified component. The method return {@code null} if the specified component has no parent {@link Dialog}.
+	 * @return {@link Dialog} of the specified component. The method return {@code null} if the specified component has no parent dialog.
 	 */
 	public static Dialog getDialogForComponent(Component comp) {
 	    if (comp == null)
 	        return null;
-	    if (comp instanceof Dialog)
+	    else if (comp instanceof Dialog)
 	        return (Dialog)comp;
 	    else
 	    	return getDialogForComponent(comp.getParent());
 	}
 
-
+	
 	/**
 	 * Setting UI look and feel randomly. 
 	 */

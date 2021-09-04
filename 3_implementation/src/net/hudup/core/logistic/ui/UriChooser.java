@@ -155,10 +155,10 @@ public class UriChooser extends JDialog {
 			List<Alg> parserList, 
 			DataDriverList dataDriverList,
 			DataConfig defaultConfig) {
-		super(UIUtil.getFrameForComponent(comp), "URI chooser", true);
+		super(UIUtil.getDialogForComponent(comp), "URI chooser", true);
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		setSize(800, 600);
-		setLocationRelativeTo(UIUtil.getFrameForComponent(comp));
+		setLocationRelativeTo(UIUtil.getDialogForComponent(comp));
 		
 		thisDataDriverList = dataDriverList;
 		internalConfig = new DataConfig();

@@ -43,10 +43,10 @@ public class SysConfigDlg extends JDialog {
 	 * @param vars specified variables.
 	 */
 	public SysConfigDlg(Component comp, String title, Object...vars) {
-		super(UIUtil.getFrameForComponent(comp), title, true);
+		super(UIUtil.getDialogForComponent(comp), title, true);
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		setSize(600, 400);
-		setLocationRelativeTo(UIUtil.getFrameForComponent(comp));
+		setLocationRelativeTo(UIUtil.getDialogForComponent(comp));
 		
 		init(vars);
 	}
