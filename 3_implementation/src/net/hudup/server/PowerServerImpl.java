@@ -494,6 +494,19 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 	 * @return true if loading is successful.
 	 */
 	protected boolean onWatcherLoadLib(Path libPath) {
+		//Testing code, not important.
+		try {
+			if (libPath.getFileName() != null) {
+				String fileName = libPath.getFileName().toString();
+				if (fileName.equals(Watcher.TEST_WATCH_FILE_NAME)) {
+					String notice = "WATCHER SERVICE IS RUNNING. TESTING WATCH FILE NAME is \"" + Watcher.TEST_WATCH_FILE_NAME + "\""; 
+					LogUtil.info(notice);
+					System.out.println(notice);
+				}
+			}
+		}
+		catch (Exception e) {}
+		
 		PluginManager pm = Util.getPluginManager();
 		List<Alg> algList = pm.loadInstances(Alg.class, xURI.create(libPath));
 		AlgList nextUpdateList = PluginStorage.getNextUpdateList();

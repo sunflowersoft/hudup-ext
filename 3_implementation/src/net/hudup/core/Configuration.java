@@ -116,12 +116,18 @@ public class Configuration implements Serializable {
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					if (!Files.exists(Paths.get(WORKING_NAME))) {
-						JOptionPane.showMessageDialog(cfg, "Woring directory \"" + WORKING_NAME + "\" is inexistent.", "Inexistent", JOptionPane.INFORMATION_MESSAGE);
+					String enterWorkingName = txtWorkingName.getText();
+					enterWorkingName = enterWorkingName != null ? enterWorkingName.trim() : "";
+					if (enterWorkingName.isEmpty()) {
+						JOptionPane.showMessageDialog(cfg, "Empty working directory name", "Empty name", JOptionPane.ERROR_MESSAGE);
 						return;
 					}
-					
-					String msg = "Woring directory \"" + WORKING_NAME + "\" is existent.";
+					else if (!Files.exists(Paths.get(enterWorkingName))) {
+						JOptionPane.showMessageDialog(cfg, "Woring directory \"" + enterWorkingName + "\" is inexistent.", "Inexistent", JOptionPane.INFORMATION_MESSAGE);
+						return;
+					}
+							
+					String msg = "Woring directory \"" + enterWorkingName + "\" is existent.";
 					msg += "\nSuggested working directory is \"" + WORKING_NAME + new Date().getTime() + "\"";
 					JOptionPane.showMessageDialog(cfg, msg, "Existent", JOptionPane.INFORMATION_MESSAGE);
 				}
@@ -141,7 +147,7 @@ public class Configuration implements Serializable {
 			public void actionPerformed(ActionEvent e) {
 				String workingName = txtWorkingName.getText();
 				workingName = workingName != null ? workingName.trim() : null;
-				if (!workingName.isEmpty()) {
+				if (workingName != null && !workingName.isEmpty()) {
 					properties.put(WORKING_NAME, workingName);
 				}
 				cfg.dispose();

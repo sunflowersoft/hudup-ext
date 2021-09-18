@@ -31,6 +31,12 @@ public abstract class Watcher extends DirWatcher {
 	
 	
 	/**
+	 * Testing watch file name.
+	 */
+	public static String TEST_WATCH_FILE_NAME = "test";
+			
+
+	/**
 	 * Default constructor.
 	 */
 	public Watcher() {
