@@ -43,7 +43,7 @@ import net.hudup.server.external.ExternalServer;
  * @version 10.0
  *
  */
-public final class Server implements AccessPoint {
+public class Server implements AccessPoint {
 
 	
 	/**
@@ -100,21 +100,19 @@ public final class Server implements AccessPoint {
 			} catch (Throwable e) {}
 		}
 
+		
 		PowerServer server = null;
-		if (args.length == 0) {
-			server = ExtendedServer.create();
-		}
+		if (args.length == 0)
+			server = create(false);
 		else {
 			String serverKind = args[0].trim().toLowerCase();
-			
 			if (serverKind.equals("-external"))
-				server = ExternalServer.create();
+				server = create(true);
 			else
-				server = ExtendedServer.create();
+				server = create(false);
 		}
 		
-		if (server == null)
-			return;
+		if (server == null) return;
 		
 		try {
 			server.start();
@@ -137,5 +135,18 @@ public final class Server implements AccessPoint {
 		return getName();
 	}
 
+	
+	/**
+	 * Create server.
+	 * @param external external flag.
+	 * @return created server.
+	 */
+	protected PowerServer create(boolean external) {
+		if (external)
+			return ExternalServer.create();
+		else
+			return ExtendedServer.create();
+	}
+	
 	
 }

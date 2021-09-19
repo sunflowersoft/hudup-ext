@@ -7,22 +7,9 @@
  */
 package net.hudup;
 
-import java.io.InputStream;
-import java.net.URL;
-import java.rmi.RemoteException;
-
 import net.hudup.core.AccessPoint;
-import net.hudup.core.Constants;
-import net.hudup.core.Util;
 import net.hudup.core.client.PowerServer;
-import net.hudup.core.data.DataConfig;
-import net.hudup.core.data.Unit;
-import net.hudup.core.data.UnitList;
 import net.hudup.core.data.ui.toolkit.DatasetToolkit;
-import net.hudup.core.logistic.LogUtil;
-import net.hudup.core.logistic.UriAdapter;
-import net.hudup.core.logistic.xURI;
-import net.hudup.server.PowerServerConfig;
 import net.hudup.server.ext2.ExtendedServer2;
 
 /**
@@ -42,7 +29,7 @@ import net.hudup.server.ext2.ExtendedServer2;
  * @version 10.0
  *
  */
-public final class Server2 implements AccessPoint {
+public class Server2 extends Server {
 
 	
 	/**
@@ -56,59 +43,7 @@ public final class Server2 implements AccessPoint {
 	
 	@Override
 	public void run(String[] args) {
-		Util.getPluginManager().fire();
-		
-		//Not important.
-		UriAdapter adapter = null;
-		try {
-			URL sampleDataUrl = getClass().getResource(PowerServerConfig.TEMPLATES_SAMPLE_DATA_PATH);
-			xURI sampleDataUri = xURI.create(sampleDataUrl.toURI());
-			xURI fileStore = xURI.create(Constants.FILE_DIRECTORY); 
-			adapter = new UriAdapter(fileStore);
-			if (!adapter.exists(fileStore)) adapter.create(fileStore, true);
-			
-			if (Constants.COMPRESSED_FILE_SUPPORT) {
-				xURI storeUri = xURI.create(PowerServerConfig.STORE_PATH_DEFAULT);
-				if (!adapter.exists(storeUri))
-					adapter.copy(sampleDataUri, storeUri, false, null);
-			}
-			else {
-				UnitList basicUnitList = DataConfig.getBasicUnitList();
-				boolean exist = true;
-				for (int i = 0; i < basicUnitList.size(); i++) {
-					Unit unit = basicUnitList.get(i);
-					if (!adapter.exists(fileStore.concat(unit.getName()))) {
-						exist = false;
-						break;
-					}
-				}
-				if (!exist) {
-					try (InputStream zipStream = getClass().getResourceAsStream(PowerServerConfig.TEMPLATES_SAMPLE_DATA_PATH)) {
-						adapter.unzip(zipStream, fileStore);
-					}
-					catch (Exception e) {LogUtil.trace(e);}
-				}
-			}
-		}
-		catch (Throwable e) {
-			LogUtil.error("Server: coppying sample data error by " + e.getMessage());
-		}
-		finally {
-			try {
-				if (adapter != null) adapter.close();
-			} catch (Throwable e) {}
-		}
-
-		PowerServer server = ExtendedServer2.create();
-		if (server == null) return;
-		
-		try {
-			server.start();
-		} 
-		catch (RemoteException e) {
-			LogUtil.trace(e);
-		}
-		
+		super.run(args);
 	}
 
 
@@ -121,6 +56,11 @@ public final class Server2 implements AccessPoint {
 	@Override
 	public String toString() {
 		return getName();
+	}
+
+	
+	protected PowerServer create(boolean external) {
+		return ExtendedServer2.create();
 	}
 
 	

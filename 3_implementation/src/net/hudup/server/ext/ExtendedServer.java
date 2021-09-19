@@ -20,6 +20,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 
 import net.hudup.core.Constants;
+import net.hudup.core.client.PowerServer;
 import net.hudup.core.logistic.I18nUtil;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.xURI;
@@ -179,25 +180,48 @@ public class ExtendedServer extends DefaultServer {
 	
 	
 	/**
+	 * This class represents the creator to create server.
+	 * @author Loc Nguyen
+	 * @version 1.0
+	 */
+	public static interface Creator {
+		
+		/**
+		 * Create server from configuration.
+		 * @param config specified configuration.
+		 * @return server created from configuration.
+		 */
+		PowerServer create(PowerServerConfig config);
+		
+	}
+	
+	
+	/**
 	 * Static method to create default server.
 	 * @return extended default server.
 	 */
-	public static ExtendedServer create() {
-		return create(xURI.create(PowerServerConfig.serverConfig));
+	public static DefaultServer create() {
+		return (DefaultServer) create(xURI.create(PowerServerConfig.serverConfig), new Creator() {
+			@Override
+			public PowerServer create(PowerServerConfig config) {
+				return new ExtendedServer(config);
+			}
+		});
 	}
 	
 	
 	/**
 	 * Static method to create extended default server with specified configuration URI.
 	 * @param srvConfigUri specified configuration URI.
+	 * @param creator the creator to create server.
 	 * @return extended default server.
 	 */
-	public static ExtendedServer create(xURI srvConfigUri) {
+	public static PowerServer create(xURI srvConfigUri, Creator creator) {
 		boolean require = requireSetup(srvConfigUri);
 		PowerServerConfig config = new PowerServerConfig(srvConfigUri);
 		
 		if (!require)
-			return new ExtendedServer(config);
+			return creator.create(config);
 		else {
 			boolean finished = true;
 			if (Constants.SERVER_UI) {
@@ -243,7 +267,7 @@ public class ExtendedServer extends DefaultServer {
 			}
 			
 			if (finished && !requireSetup(srvConfigUri))
-				return new ExtendedServer(config);
+				return creator.create(config);
 			else {
 				LogUtil.error("Server not created");
 				return null;
