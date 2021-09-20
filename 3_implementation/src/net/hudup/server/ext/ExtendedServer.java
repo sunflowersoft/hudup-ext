@@ -7,16 +7,12 @@
  */
 package net.hudup.server.ext;
 
-import java.awt.GraphicsEnvironment;
-import java.awt.Image;
 import java.awt.MenuItem;
 import java.awt.PopupMenu;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.nio.file.Path;
-import java.util.Scanner;
 
-import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 
 import net.hudup.core.Constants;
@@ -24,12 +20,9 @@ import net.hudup.core.client.PowerServer;
 import net.hudup.core.logistic.I18nUtil;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.xURI;
-import net.hudup.core.logistic.ui.UIUtil;
 import net.hudup.server.DefaultServer;
 import net.hudup.server.DefaultService;
 import net.hudup.server.PowerServerConfig;
-import net.hudup.server.ui.SetupServerWizard;
-import net.hudup.server.ui.SetupServerWizardConsole;
 
 /**
  * This class is extended version of default server.
@@ -180,28 +173,11 @@ public class ExtendedServer extends DefaultServer {
 	
 	
 	/**
-	 * This class represents the creator to create server.
-	 * @author Loc Nguyen
-	 * @version 1.0
-	 */
-	public static interface Creator {
-		
-		/**
-		 * Create server from configuration.
-		 * @param config specified configuration.
-		 * @return server created from configuration.
-		 */
-		PowerServer create(PowerServerConfig config);
-		
-	}
-	
-	
-	/**
 	 * Static method to create default server.
-	 * @return extended default server.
+	 * @return extended server.
 	 */
-	public static DefaultServer create() {
-		return (DefaultServer) create(xURI.create(PowerServerConfig.serverConfig), new Creator() {
+	public static PowerServer create() {
+		return create(xURI.create(PowerServerConfig.serverConfig), new Creator() {
 			@Override
 			public PowerServer create(PowerServerConfig config) {
 				return new ExtendedServer(config);
@@ -210,71 +186,4 @@ public class ExtendedServer extends DefaultServer {
 	}
 	
 	
-	/**
-	 * Static method to create extended default server with specified configuration URI.
-	 * @param srvConfigUri specified configuration URI.
-	 * @param creator the creator to create server.
-	 * @return extended default server.
-	 */
-	public static PowerServer create(xURI srvConfigUri, Creator creator) {
-		boolean require = requireSetup(srvConfigUri);
-		PowerServerConfig config = new PowerServerConfig(srvConfigUri);
-		
-		if (!require)
-			return creator.create(config);
-		else {
-			boolean finished = true;
-			if (Constants.SERVER_UI) {
-				boolean isHeadLess = GraphicsEnvironment.isHeadless();
-				if (isHeadLess) {
-					@SuppressWarnings("resource")
-					Scanner scanner = new Scanner(System.in);
-					System.out.print("\nServer not set up yet.\nDo you want to setup server? (y|n): ");
-					String confirm = scanner.next().trim();
-					if (confirm.compareToIgnoreCase("n") == 0) {
-						LogUtil.error("Server not created due to not confirm");
-						return null;
-					}
-				}
-				else {
-			        Image image = UIUtil.getImage("server-32x32.png");
-					int confirm = JOptionPane.showConfirmDialog(
-							null, 
-							"Server not set up yet.\nDo you want to setup server?", 
-							"Setup server", 
-							JOptionPane.OK_CANCEL_OPTION, 
-							JOptionPane.INFORMATION_MESSAGE, 
-							image == null ? null : new ImageIcon(image));
-					
-					if (confirm != JOptionPane.OK_OPTION) {
-						LogUtil.error("Server not created");
-						return null;
-					}
-				}
-				
-				if (isHeadLess) {
-					SetupServerWizardConsole wizard = new SetupServerWizardConsole(config);
-					finished = wizard.isFinished(); 
-				}
-				else {
-					SetupServerWizard wizard = new SetupServerWizard(null, config, null);
-					finished = wizard.isFinished(); 
-				}
-			}
-			else {
-				SetupServerWizardConsole wizard = new SetupServerWizardConsole(config);
-				finished = wizard.isFinished(); 
-			}
-			
-			if (finished && !requireSetup(srvConfigUri))
-				return creator.create(config);
-			else {
-				LogUtil.error("Server not created");
-				return null;
-			}
-		}
-		
-	}
-
-
 }

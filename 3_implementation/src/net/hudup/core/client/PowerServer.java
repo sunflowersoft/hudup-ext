@@ -86,6 +86,14 @@ public interface PowerServer extends Server, PluginChangedListener {
 	
 	
 	/**
+	 * Getting extra service.
+	 * @return extra service.
+	 * @throws RemoteException if any error raises.
+	 */
+	ExtraService getExtraService() throws RemoteException;
+
+	
+	/**
 	 * Reloading plug-in storage.
 	 * @param account specified account.
 	 * @param password specified password.

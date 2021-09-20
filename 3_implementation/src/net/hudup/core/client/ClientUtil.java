@@ -88,12 +88,12 @@ public final class ClientUtil {
 		else
 			uri += ":" + port + "/" + Protocol.GATEWAY;
 			
-		
 		try {
 			Gateway gateway = (Gateway)Naming.lookup(uri);
 			if (gateway == null)
 				return null;
-			return gateway.getRemoteService(username, password);
+			else
+				return gateway.getRemoteService(username, password);
 		}
 		catch (Exception e) {
 			LogUtil.trace(e);

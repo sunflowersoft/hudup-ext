@@ -20,12 +20,14 @@ import javax.swing.JOptionPane;
 
 import net.hudup.core.Constants;
 import net.hudup.core.alg.cf.gfall.GreenFallCF;
+import net.hudup.core.client.PowerServer;
 import net.hudup.core.logistic.I18nUtil;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.xURI;
 import net.hudup.core.logistic.ui.UIUtil;
 import net.hudup.core.parser.SnapshotParserImpl;
 import net.hudup.server.DefaultService;
+import net.hudup.server.PowerServerConfig;
 import net.hudup.server.ext.EvaluatorCPList;
 import net.hudup.server.ext.ExtendedService;
 import net.hudup.server.external.ExternalServer;
@@ -171,26 +173,31 @@ public class ExtendedServer2 extends ExternalServer {
 	
 	/**
 	 * Static method to create default server.
-	 * @return extended default server.
+	 * @return extended server with external support.
 	 */
-	public static ExtendedServer2 create() {
-		return create(xURI.create(ExternalServerConfig.serverConfig));
+	public static PowerServer create() {
+		return create(xURI.create(ExternalServerConfig.serverConfig), new Creator() {
+			@Override
+			public PowerServer create(PowerServerConfig config) {
+				return new ExtendedServer2((ExternalServerConfig)config);
+			}
+		});
 	}
 	
 	
 	/**
 	 * Static method to create extended default server with specified configuration URI.
 	 * @param srvConfigUri specified configuration URI.
-	 * @return extended default server.
+	 * @return extended server with external support.
 	 */
-	public static ExtendedServer2 create(xURI srvConfigUri) {
+	protected static PowerServer create(xURI srvConfigUri, Creator creator) {
 		boolean require = requireSetup(srvConfigUri);
 		ExternalServerConfig config = new ExternalServerConfig(srvConfigUri);
 		config.setRecommender(new GreenFallCF());
 		config.setParser(new SnapshotParserImpl());
 		
 		if (!require)
-			return new ExtendedServer2(config);
+			return creator.create(config);
 		else {
 			boolean finished = true;
 			if (Constants.SERVER_UI) {
@@ -236,7 +243,7 @@ public class ExtendedServer2 extends ExternalServer {
 			}
 			
 			if (finished && !requireSetup(srvConfigUri))
-				return new ExtendedServer2(config);
+				return creator.create(config);
 			else {
 				LogUtil.error("Server not created");
 				return null;

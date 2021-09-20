@@ -29,6 +29,8 @@ import javax.swing.JOptionPane;
 import net.hudup.core.Constants;
 import net.hudup.core.PluginChangedEvent;
 import net.hudup.core.Util;
+import net.hudup.core.client.ExtraService;
+import net.hudup.core.client.PowerServer;
 import net.hudup.core.client.ServerTrayIcon;
 import net.hudup.core.client.Service;
 import net.hudup.core.client.VirtualFileService;
@@ -85,6 +87,12 @@ public class DefaultServer extends PowerServerImpl {
 	
 	
 	/**
+	 * Internal extra service.
+	 */
+	protected ExtraService extraService = null;
+
+	
+	/**
 	 * Constructor with configuration.
 	 * @param config power server configuration.
 	 */
@@ -93,6 +101,7 @@ public class DefaultServer extends PowerServerImpl {
 		
 		service = createService();
 		storageService = createStorageService();
+		extraService = createExtraService();
 		
 		if (Constants.SERVER_UI) {
 			if (!createSysTray()) showCP();
@@ -123,6 +132,15 @@ public class DefaultServer extends PowerServerImpl {
 		return new VirtualFileService();
 	}
 	
+	
+	/**
+	 * Create extra service.
+	 * @return extra service.
+	 */
+	protected ExtraService createExtraService() {
+		return null;
+	}
+
 	
 	@Override
 	protected void doWhenStart() {
@@ -283,6 +301,12 @@ public class DefaultServer extends PowerServerImpl {
 	}
 
 
+	@Override
+	public ExtraService getExtraService() throws RemoteException {
+		return extraService;
+	}
+
+
 	/**
 	 * Create system tray.
 	 * @return whether create system tray successfully.
@@ -418,35 +442,58 @@ public class DefaultServer extends PowerServerImpl {
 	
 	
 	/**
-	 * Static method to create default server.
-	 * @return {@link DefaultServer}.
+	 * This class represents the creator to create server.
+	 * @author Loc Nguyen
+	 * @version 1.0
 	 */
-	public static DefaultServer create() {
-		return create(xURI.create(PowerServerConfig.serverConfig));
+	public static interface Creator {
+		
+		/**
+		 * Create server from configuration.
+		 * @param config specified configuration.
+		 * @return server created from configuration.
+		 */
+		PowerServer create(PowerServerConfig config);
+		
 	}
 	
 	
 	/**
-	 * Static method to create default server with specified configuration URI.
-	 * @param srvConfigUri specified configuration URI.
-	 * @return {@link DefaultServer}
+	 * Static method to create server.
+	 * @return default server.
 	 */
-	public static DefaultServer create(xURI srvConfigUri) {
+	public static PowerServer create() {
+		return create(xURI.create(PowerServerConfig.serverConfig), new Creator() {
+			@Override
+			public PowerServer create(PowerServerConfig config) {
+				return new DefaultServer(config);
+			}
+		});
+	}
+	
+	
+	/**
+	 * Static method to create extended default server with specified configuration URI.
+	 * @param srvConfigUri specified configuration URI.
+	 * @param creator the creator to create server.
+	 * @return default server.
+	 */
+	protected static PowerServer create(xURI srvConfigUri, Creator creator) {
 		boolean require = requireSetup(srvConfigUri);
+		PowerServerConfig config = new PowerServerConfig(srvConfigUri);
 		
 		if (!require)
-			return new DefaultServer(new PowerServerConfig(srvConfigUri));
+			return creator.create(config);
 		else {
 			boolean finished = true;
 			if (Constants.SERVER_UI) {
 				boolean isHeadLess = GraphicsEnvironment.isHeadless();
 				if (isHeadLess) {
+					@SuppressWarnings("resource")
 					Scanner scanner = new Scanner(System.in);
 					System.out.print("\nServer not set up yet.\nDo you want to setup server? (y|n): ");
 					String confirm = scanner.next().trim();
-					scanner.close();
-					
-					if (confirm.compareToIgnoreCase("y") != 0) {
+					if (confirm.compareToIgnoreCase("n") == 0) {
 						LogUtil.error("Server not created due to not confirm");
 						return null;
 					}
@@ -467,7 +514,6 @@ public class DefaultServer extends PowerServerImpl {
 					}
 				}
 				
-				PowerServerConfig config = new PowerServerConfig(srvConfigUri);
 				if (isHeadLess) {
 					SetupServerWizardConsole wizard = new SetupServerWizardConsole(config);
 					finished = wizard.isFinished(); 
@@ -478,13 +524,12 @@ public class DefaultServer extends PowerServerImpl {
 				}
 			}
 			else {
-				PowerServerConfig config = new PowerServerConfig(srvConfigUri);
 				SetupServerWizardConsole wizard = new SetupServerWizardConsole(config);
-				finished = wizard.isFinished();
+				finished = wizard.isFinished(); 
 			}
 			
 			if (finished && !requireSetup(srvConfigUri))
-				return new DefaultServer(new PowerServerConfig(srvConfigUri));
+				return creator.create(config);
 			else {
 				LogUtil.error("Server not created");
 				return null;

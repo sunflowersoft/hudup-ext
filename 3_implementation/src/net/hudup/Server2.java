@@ -59,6 +59,7 @@ public class Server2 extends Server {
 	}
 
 	
+	@Override
 	protected PowerServer create(boolean external) {
 		return ExtendedServer2.create();
 	}

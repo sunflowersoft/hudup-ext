@@ -32,6 +32,7 @@ import net.hudup.core.alg.AlgDesc2List;
 import net.hudup.core.alg.AlgList;
 import net.hudup.core.client.ActiveMeasure;
 import net.hudup.core.client.ClassProcessor;
+import net.hudup.core.client.ExtraService;
 import net.hudup.core.client.Gateway;
 import net.hudup.core.client.HudupRMIClassLoader;
 import net.hudup.core.client.PowerServer;
@@ -235,6 +236,14 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 			} catch (Throwable e) {LogUtil.trace(e);}
 
 			try {
+				ExtraService extraService = getExtraService();
+				if (extraService != null) {
+					extraService.open();
+					UnicastRemoteObject.exportObject(extraService, config.getServerPort());
+				}
+			} catch (Throwable e) {LogUtil.trace(e);}
+
+			try {
 				String we = Util.getHudupProperty("watcher_enabled");
 				if (we != null && Boolean.parseBoolean(we) && watcher != null) watcher.start();
 			} catch (Throwable e) {LogUtil.trace(e);}
@@ -335,7 +344,15 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 			
 			try {
 				VirtualStorageService storageService = getStorageService();
-				if (storageService != null) UnicastRemoteObject.unexportObject(getStorageService(), true);
+				if (storageService != null) UnicastRemoteObject.unexportObject(storageService, true);
+			} catch (Throwable e) {LogUtil.trace(e);}
+
+			try {
+				ExtraService extraService = getExtraService();
+				if (extraService != null) {
+					extraService.close();
+					UnicastRemoteObject.unexportObject(extraService, true);
+				}
 			} catch (Throwable e) {LogUtil.trace(e);}
 
 			try {
@@ -828,6 +845,18 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 
 	
 	@Override
+	public VirtualStorageService getStorageService() throws RemoteException {
+		return null;
+	}
+
+	
+	@Override
+	public ExtraService getExtraService() throws RemoteException {
+		return null;
+	}
+
+	
+	@Override
 	public void incRequest() throws RemoteException {
 		activeMeasure.incRequestCount();
 	}
@@ -1119,7 +1148,7 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 			
 			return gateway.getRemoteService(account, password);
 		}
-		
+
 	}
 
 

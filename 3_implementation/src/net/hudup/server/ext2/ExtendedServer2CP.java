@@ -155,8 +155,17 @@ public class ExtendedServer2CP extends ExternalServerCP {
 		mniEvaluatorCP.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, InputEvent.CTRL_DOWN_MASK));
 		mnTool.add(mniEvaluatorCP);
 
+		addToToolMenu(mnTool);
+
+		
+		JMenu mnApps = new JMenu(I18nUtil.message("applications"));
+		mnApps.setMnemonic('a');
+		addToAppsMenu(mnApps);
+		if (mnApps.getItemCount() > 0) mnBar.add(mnApps);
+
 		
 		JMenu mnHelp = new JMenu(I18nUtil.message("help"));
+		mnHelp.setMnemonic('h');
 		mnBar.add(mnHelp);
 		
 		PowerServerCP thisCP = this;
@@ -173,9 +182,12 @@ public class ExtendedServer2CP extends ExternalServerCP {
 					new HelpContent(thisCP);
 				}
 			});
-		mniHelpContent.setMnemonic('h');
+		mniHelpContent.setMnemonic('c');
 		mniHelpContent.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F1, 0));
 		mnHelp.add(mniHelpContent);
+		
+		addToHelpMenu(mnHelp);
+		
 		
 		return mnBar;
 	}
@@ -280,6 +292,21 @@ public class ExtendedServer2CP extends ExternalServerCP {
 //		}
 	}
 	
+	
+	protected void addToToolMenu(JMenu mnTool) {
+		
+	}
+	
+	
+	protected void addToHelpMenu(JMenu mnHelp) {
+		
+	}
+	
+	
+	protected void addToAppsMenu(JMenu mnApps) {
+		
+	}
+
 	
 	/**
 	 * Main method.

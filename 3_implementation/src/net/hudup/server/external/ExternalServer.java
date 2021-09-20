@@ -15,6 +15,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 
 import net.hudup.core.Constants;
+import net.hudup.core.client.PowerServer;
 import net.hudup.core.data.DefaultExternalQuery;
 import net.hudup.core.data.ExternalConfig;
 import net.hudup.core.data.ExternalQuery;
@@ -22,6 +23,7 @@ import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.xURI;
 import net.hudup.core.logistic.ui.UIUtil;
 import net.hudup.server.DefaultServer;
+import net.hudup.server.PowerServerConfig;
 import net.hudup.server.external.ui.ExternalServerCP;
 import net.hudup.server.external.ui.SetupExternalServerWizard;
 import net.hudup.server.external.ui.SetupExternalServerWizardConsole;
@@ -103,24 +105,30 @@ public class ExternalServer extends DefaultServer {
 	
 	/**
 	 * Creating external server.
-	 * @return {@link ExternalServer}
+	 * @return external server.
 	 */
-	public static ExternalServer create() {
-		return create(xURI.create(ExternalServerConfig.serverConfig));
+	public static PowerServer create() {
+		return create(xURI.create(ExternalServerConfig.serverConfig), new Creator() {
+			@Override
+			public PowerServer create(PowerServerConfig config) {
+				return new ExternalServer((ExternalServerConfig)config);
+			}
+		});
 	}
 
 	
 	/**
 	 * Creating external server by configuration URI.
 	 * @param srvConfigUri configuration URI.
+	 * @param creator creator to create external server.
 	 * @return external server by configuration URI.
 	 */
-	public static ExternalServer create(xURI srvConfigUri) {
+	protected static PowerServer create(xURI srvConfigUri, Creator creator) {
 		boolean require = requireSetup(srvConfigUri);
 		ExternalServerConfig config = new ExternalServerConfig(srvConfigUri);
 		
 		if (!require)
-			return new ExternalServer(config);
+			return creator.create(config);
 		else {
 			boolean finished = true;
 			if (Constants.SERVER_UI) {
@@ -166,7 +174,7 @@ public class ExternalServer extends DefaultServer {
 			}
 			
 			if (finished && !requireSetup(srvConfigUri))
-				return new ExternalServer(config);
+				return creator.create(config);
 			else {
 				LogUtil.error("Server not created");
 				return null;
