@@ -33,6 +33,7 @@ import net.hudup.core.alg.AlgList;
 import net.hudup.core.client.ActiveMeasure;
 import net.hudup.core.client.ClassProcessor;
 import net.hudup.core.client.ExtraService;
+import net.hudup.core.client.ExtraServiceAbstract;
 import net.hudup.core.client.Gateway;
 import net.hudup.core.client.HudupRMIClassLoader;
 import net.hudup.core.client.PowerServer;
@@ -800,7 +801,6 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 			return null;
 		
 		Server server = null;
-		
 		try {
 			if (validateAccount(account, password, DataConfig.ACCOUNT_ADMIN_PRIVILEGE))
 				server = this;
@@ -814,8 +814,21 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 			LogUtil.error("Remote client failed to connect to this power server as control panel, caused by " + e.getMessage());
 		}
 		
-		return server;
+		if (server != null) {
+			try {
+				ExtraService extraService = getExtraService();
+				if (extraService != null && extraService instanceof ExtraServiceAbstract) {
+					boolean isAdminAccount = validateAccount(account, password, DataConfig.ACCOUNT_ADMIN_PRIVILEGE);
+					((ExtraServiceAbstract)extraService).setAccount(account, password, isAdminAccount);
+				}
+			}
+			catch (Throwable e) {
+				LogUtil.error("Validating extra service causes error: " + e.getMessage());
+			}
+		}
 		
+		
+		return server;
 	}
 	
 
@@ -827,9 +840,8 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 		
 		Service service = null;
 		try {
-			if (validateAccount(account, password, DataConfig.ACCOUNT_ACCESS_PRIVILEGE)) {
+			if (validateAccount(account, password, DataConfig.ACCOUNT_ACCESS_PRIVILEGE))
 				service = getService();
-			}
 			else
 				service = null;
 			
@@ -840,6 +852,20 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 			LogUtil.error("Remote client failed to connect to this power server as service, caused by " + e.getMessage());
 		}
 		
+		
+		if (service != null) {
+			try {
+				ExtraService extraService = getExtraService();
+				if (extraService != null && extraService instanceof ExtraServiceAbstract) {
+					boolean isAdminAccount = validateAccount(account, password, DataConfig.ACCOUNT_ADMIN_PRIVILEGE);
+					((ExtraServiceAbstract)extraService).setAccount(account, password, isAdminAccount);
+				}
+			}
+			catch (Throwable e) {
+				LogUtil.error("Validating extra service causes error: " + e.getMessage());
+			}
+		}
+
 		return service;
 	}
 
