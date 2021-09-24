@@ -1279,8 +1279,8 @@ public class DefaultService implements Service, PluginChangedListener, AutoClose
 		boolean validated = provider.validateAccount(account, password, privileges);
 		if (validated)
 			return true;
-		else if (account.equals("admin")) {
-			String pwd = Util.getHudupProperty("admin");
+		else if (account.equals(DataConfig.ADMIN_ACCOUNT)) {
+			String pwd = Util.getHudupProperty(DataConfig.ADMIN_ACCOUNT);
 			if (pwd == null)
 				return false;
 			else

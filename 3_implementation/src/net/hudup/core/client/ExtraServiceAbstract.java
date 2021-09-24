@@ -1,3 +1,10 @@
+/**
+ * HUDUP: A FRAMEWORK OF E-COMMERCIAL RECOMMENDATION ALGORITHMS
+ * (C) Copyright by Loc Nguyen's Academic Network
+ * Project homepage: hudup.locnguyen.net
+ * Email: ng_phloc@yahoo.com
+ * Phone: +84-975250362
+ */
 package net.hudup.core.client;
 
 import java.io.Serializable;
@@ -11,7 +18,7 @@ import net.hudup.core.logistic.Account;
  * @version 1.0
  *
  */
-public abstract class ExtraServiceAbstract implements ExtraService, Serializable, Cloneable {
+public abstract class ExtraServiceAbstract implements ExtraService, Serializable {
 
 	
 	/**
@@ -33,12 +40,6 @@ public abstract class ExtraServiceAbstract implements ExtraService, Serializable
 	
 	
 	/**
-	 * Flag to indicate the account is administration.
-	 */
-	protected boolean isAdminAccount = false;
-	
-	
-	/**
 	 * Default constructor.
 	 * @param server power server.
 	 */
@@ -51,15 +52,10 @@ public abstract class ExtraServiceAbstract implements ExtraService, Serializable
 	 * Setting account.
 	 * @param account specified account name.
 	 * @param password specified password.
-	 * @param isAdminAccount Flag to indicate the account is administration.
-	 * @return whether account and password are valid.
+	 * @param privileges specified privileges.
 	 */
-	public void setAccount(String account, String password, boolean isAdminAccount) {
-		this.account = Account.create(account, password);
-		if (this.account != null)
-			this.isAdminAccount = isAdminAccount;
-		else
-			this.isAdminAccount = false;
+	public void setAccount(String account, String password, int privileges) {
+		this.account = Account.create(account, password, privileges);
 	}
 	
 
@@ -67,7 +63,7 @@ public abstract class ExtraServiceAbstract implements ExtraService, Serializable
 	 * Getting account.
 	 * @return internal account.
 	 */
-	protected Account getAccount() {
+	public Account getAccount() {
 		return account;
 	}
 	
@@ -77,7 +73,7 @@ public abstract class ExtraServiceAbstract implements ExtraService, Serializable
 	 * @return whether the internal account is administration.
 	 */
 	public boolean isAdminAccount() {
-		return account != null ? isAdminAccount : false;
+		return account != null ? account.isAdmin() : false;
 	}
 	
 	

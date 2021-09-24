@@ -363,8 +363,18 @@ public class DataConfig extends PropList {
 	 * Administration privilege for access account
 	 */
 	public final static int ACCOUNT_ADMIN_PRIVILEGE            = 0b11111111;
-	
 
+	/**
+	 * Administrator account.
+	 */
+	public final static String ADMIN_ACCOUNT                   = "admin";
+
+	/**
+	 * Administrator password.
+	 */
+	public final static String ADMIN_PASSWORD                  = "admin";
+
+	
 	/**
 	 * Default value for the relevant rating threshold.
 	 */

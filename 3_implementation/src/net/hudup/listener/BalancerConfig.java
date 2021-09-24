@@ -13,6 +13,7 @@ import java.io.Serializable;
 import javax.swing.JOptionPane;
 
 import net.hudup.core.Constants;
+import net.hudup.core.data.DataConfig;
 import net.hudup.core.logistic.xURI;
 import net.hudup.listener.ui.RemoteInfoDlg;
 
@@ -99,7 +100,7 @@ public class BalancerConfig extends ListenerConfig {
 		
 		clearRemoteInfoList();
 		RemoteInfo rInfo = 
-				new RemoteInfo("localhost", Constants.DEFAULT_SERVER_PORT, "admin", "admin");
+				new RemoteInfo("localhost", Constants.DEFAULT_SERVER_PORT, DataConfig.ADMIN_ACCOUNT, DataConfig.ADMIN_PASSWORD);
 		addRemoteInfo(rInfo);
 		
 		setExportPort(Constants.DEFAULT_BALANCER_EXPORT_PORT);

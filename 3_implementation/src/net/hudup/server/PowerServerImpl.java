@@ -131,8 +131,14 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 	/**
 	 * Gateway
 	 */
-	protected Gateway gateway = null;
+	private Gateway gateway = null;
 	
+	
+	/**
+	 * Gateway
+	 */
+	protected Gateway extraGateway = null;
+
 	
 	/**
 	 * Active measures.
@@ -166,7 +172,11 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 			this.config.addReadOnly(DataConfig.MAX_RATING_FIELD);
 			this.config.addReadOnly(DataConfig.MIN_RATING_FIELD);
 			this.trans = createTransaction();
-			this.gateway = new GatewayImpl(this);		
+			this.gateway = new GatewayImpl(this);
+			try {
+				this.extraGateway = createExtraGateway();
+			}
+			catch (Throwable e) {LogUtil.trace(e);}
 			
 			SystemUtil.setSecurityPolicy(getClass().getResource(SERVER_POLICY));
 			
@@ -177,8 +187,16 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 			registry = LocateRegistry.createRegistry(port);
 			UnicastRemoteObject.exportObject(this, port);
 			UnicastRemoteObject.exportObject(gateway, port);
+			try {
+				if (extraGateway != null) UnicastRemoteObject.exportObject(extraGateway, port);
+			}
+			catch (Throwable e) {LogUtil.trace(e);}
 			
 			Naming.rebind(getGatewayBindName(), gateway);
+			try {
+				if (extraGateway != null) Naming.rebind(getExtraGatewayBindName(), extraGateway);
+			}
+			catch (Throwable e) {LogUtil.trace(e);}
 			
 			initStorageSystem();
 			
@@ -454,7 +472,15 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 		
     	trans.lockWrite();
     	try {
-        	UnicastRemoteObject.unexportObject(gateway, true);
+			try {
+				if (extraGateway != null) {
+					UnicastRemoteObject.unexportObject(extraGateway, true);
+					Naming.unbind(getExtraGatewayBindName());
+				}
+			}
+			catch (Throwable e) {LogUtil.trace(e);}
+
+			UnicastRemoteObject.unexportObject(gateway, true);
 			Naming.unbind(getGatewayBindName());
 			
         	UnicastRemoteObject.unexportObject(this, true);
@@ -491,7 +517,7 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 	 * Create watcher.
 	 * @return created watcher.
 	 */
-	private Watcher createWatcher() {
+	protected Watcher createWatcher() {
 		return new Watcher() {
 			
 			@Override
@@ -647,14 +673,33 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 
 
 	/**
-	 * Getting bind name.
+	 * Getting bind name for gateway.
 	 * @return gateway bind name.
 	 */
-	protected String getGatewayBindName() {
+	private String getGatewayBindName() {
 		xURI uri = xURI.create( "rmi://localhost:" + config.getServerPort() + "/" + Protocol.GATEWAY);
 		return uri.toString(); 
 	}
 
+	
+	/**
+	 * Getting bind name for extra gateway.
+	 * @return extra gateway bind name.
+	 */
+	protected String getExtraGatewayBindName() {
+		xURI uri = xURI.create( "rmi://localhost:" + config.getServerPort() + "/" + Protocol.EXTRAGATEWAY);
+		return uri.toString(); 
+	}
+
+	
+	/**
+	 * Creating the extra gateway.
+	 * @return the extra gateway.
+	 */
+	protected Gateway createExtraGateway() {
+		return null;
+	}
+	
 	
 	@Override
 	public boolean addStatusListener(ServerStatusListener listener) 
@@ -817,10 +862,8 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 		if (server != null) {
 			try {
 				ExtraService extraService = getExtraService();
-				if (extraService != null && extraService instanceof ExtraServiceAbstract) {
-					boolean isAdminAccount = validateAccount(account, password, DataConfig.ACCOUNT_ADMIN_PRIVILEGE);
-					((ExtraServiceAbstract)extraService).setAccount(account, password, isAdminAccount);
-				}
+				if (extraService != null && extraService instanceof ExtraServiceAbstract)
+					((ExtraServiceAbstract)extraService).setAccount(account, password, getPrivileges(account, password));
 			}
 			catch (Throwable e) {
 				LogUtil.error("Validating extra service causes error: " + e.getMessage());
@@ -856,10 +899,8 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 		if (service != null) {
 			try {
 				ExtraService extraService = getExtraService();
-				if (extraService != null && extraService instanceof ExtraServiceAbstract) {
-					boolean isAdminAccount = validateAccount(account, password, DataConfig.ACCOUNT_ADMIN_PRIVILEGE);
-					((ExtraServiceAbstract)extraService).setAccount(account, password, isAdminAccount);
-				}
+				if (extraService != null && extraService instanceof ExtraServiceAbstract)
+					((ExtraServiceAbstract)extraService).setAccount(account, password, getPrivileges(account, password));
 			}
 			catch (Throwable e) {
 				LogUtil.error("Validating extra service causes error: " + e.getMessage());
@@ -909,6 +950,34 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 		Util.getPluginManager().discover();
 		pluginChanged(new PluginChangedEvent(this));
 		return true;
+	}
+
+
+	@Override
+	public synchronized boolean validateAccount(String account, String password, int privileges) throws RemoteException {
+		if (account.equals(DataConfig.ADMIN_ACCOUNT)) {
+			String pwd = Util.getHudupProperty(DataConfig.ADMIN_ACCOUNT);
+			if (pwd == null)
+				return false;
+			else
+				return password.equals(pwd);
+		}
+		else
+			return false;
+	}
+
+
+	@Override
+	public synchronized int getPrivileges(String account, String password) throws RemoteException {
+		if (account.equals(DataConfig.ADMIN_ACCOUNT)) {
+			String pwd = Util.getHudupProperty(DataConfig.ADMIN_ACCOUNT);
+			if (pwd == null)
+				return 0;
+			else
+				return password.equals(pwd) ? DataConfig.ACCOUNT_ADMIN_PRIVILEGE : 0;
+		}
+		else
+			return 0;
 	}
 
 

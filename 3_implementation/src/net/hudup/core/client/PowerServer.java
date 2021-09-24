@@ -69,6 +69,16 @@ public interface PowerServer extends Server, PluginChangedListener {
 	
 	
 	/**
+	 * Getting privileges.
+	 * @param account specified account.
+	 * @param password specified password.
+	 * @return privileges.
+	 * @throws RemoteException if any error raises.
+	 */
+	int getPrivileges(String account, String password) throws RemoteException;
+
+	
+	/**
 	 * Each server is responsible for creating service represented by {@link Service} interface to serve user requests.
 	 * In other words, each server own a service.
 	 * @return Service the service own by this server.

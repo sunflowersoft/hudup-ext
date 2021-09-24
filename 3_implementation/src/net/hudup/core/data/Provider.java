@@ -501,6 +501,15 @@ public interface Provider extends AutoCloseable, Cloneable, Serializable {
 
 	
 	/**
+	 * Getting privileges of give account and password.
+	 * @param account given account.
+	 * @param password given password.
+	 * @return privileges of give account and password.
+	 */
+	int getPrivileges(String account, String password);
+	
+	
+	/**
 	 * Inserting a new account (account profile) into framework database.
 	 * Note, {@code Profile} is one of important data structures, like record of table in database, has a list of values. Each value belongs to a particular attribute. Profile uses a attribute list to specify its data types. Every object can be modeled as profile to be stored in archive (file). 
 	 * Account is the information of a user who has access to Hudup server with her/his previleges. Account is modeled and stored in framework database as profile. 

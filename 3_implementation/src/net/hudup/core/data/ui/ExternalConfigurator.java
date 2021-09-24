@@ -226,10 +226,10 @@ public class ExternalConfigurator extends JDialog {
 			}
 		});
 		//
-		txtUsername = new JTextField("admin");
+		txtUsername = new JTextField(DataConfig.ADMIN_ACCOUNT);
 		attValues.add(txtUsername);
 		//
-		txtPassword = new JPasswordField("admin");
+		txtPassword = new JPasswordField(DataConfig.ADMIN_PASSWORD);
 		attValues.add(txtPassword);
 
 		pane = new JPanel();

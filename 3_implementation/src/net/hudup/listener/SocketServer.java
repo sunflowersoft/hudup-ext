@@ -745,7 +745,7 @@ public abstract class SocketServer extends AbstractRunner implements Server, Acc
 	
 	@Override
 	public boolean validateAdminAccount(String account, String password) {
-		if (!account.equals("admin"))
+		if (!account.equals(DataConfig.ADMIN_ACCOUNT))
 			return false;
 		
 		//Checking Hudup properties.

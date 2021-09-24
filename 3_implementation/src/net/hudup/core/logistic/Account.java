@@ -9,6 +9,7 @@ package net.hudup.core.logistic;
 
 import java.io.Serializable;
 
+import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.HiddenText2;
 
 /**
@@ -40,13 +41,21 @@ public class Account implements Serializable {
 
 	
 	/**
+	 * Privileges of account.
+	 */
+	private int privileges = -1;
+	
+	
+	/**
 	 * Constructor with name and password.
 	 * @param name name.
 	 * @param password password.
+	 * @param privileges privileges.
 	 */
-	private Account(String name, String password) {
+	private Account(String name, String password, int privileges) {
 		this.name = name;
 		this.password = new HiddenText2(password);
+		this.privileges = privileges;
 	}
 	
 	
@@ -71,6 +80,24 @@ public class Account implements Serializable {
 	}
 	
 	
+	/**
+	 * Getting privileges.
+	 * @return privileges.
+	 */
+	public int getPrivileges() {
+		return privileges;
+	}
+	
+	
+	/**
+	 * Checking whether account is administrator.
+	 * @return whether account is administrator.
+	 */
+	public boolean isAdmin() {
+		return (privileges & DataConfig.ACCOUNT_ADMIN_PRIVILEGE) == DataConfig.ACCOUNT_ADMIN_PRIVILEGE;
+	}
+	
+	
 //	/**
 //	 * Testing whether this account is valid.
 //	 * @return whether this account is valid.
@@ -87,11 +114,23 @@ public class Account implements Serializable {
 	 * @return account with specified name and password. Return null if name or password is null.
 	 */
 	public static Account create(String name, String password) {
-		if (name == null || password == null)
-			return null;
-		else
-			return new Account(name, password);
+		return create(name, password, 0);
 	}
 	
 	
+	/**
+	 * Creating account with specified name, password, and privileges.
+	 * @param name specified name.
+	 * @param password specified password.
+	 * @param privileges specified privileges.
+	 * @return account with specified name, password, and privileges. Return null if name or password is null.
+	 */
+	public static Account create(String name, String password, int privileges) {
+		if (name == null || password == null)
+			return null;
+		else
+			return new Account(name, password, privileges);
+	}
+
+
 }

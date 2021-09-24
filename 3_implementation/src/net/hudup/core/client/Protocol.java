@@ -90,6 +90,12 @@ public interface Protocol {
 
 
 	/**
+	 * Name of extra gateway.
+	 */
+	static final String EXTRAGATEWAY = "extragateway";
+
+
+	/**
 	 * Name of quit command.
 	 */
 	static final String QUIT =                              "quit";

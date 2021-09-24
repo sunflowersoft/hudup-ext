@@ -324,10 +324,10 @@ public class UriChooser extends JDialog {
 			}
 		});
 		//
-		txtUsername = new JTextField("admin");
+		txtUsername = new JTextField(DataConfig.ADMIN_ACCOUNT);
 		attValues.add(txtUsername);
 		//
-		txtPassword = new JPasswordField("admin");
+		txtPassword = new JPasswordField(DataConfig.ADMIN_PASSWORD);
 		attValues.add(txtPassword);
 
 		pane = new JPanel();
@@ -487,8 +487,8 @@ public class UriChooser extends JDialog {
 		setConnectInfoControlVisible(true);
 		txtPort.setValue(driver.getDefaultPort());
 		txtHost.setText("localhost");
-		txtUsername.setText("admin");
-		txtPassword.setText("admin");
+		txtUsername.setText(DataConfig.ADMIN_ACCOUNT);
+		txtPassword.setText(DataConfig.ADMIN_PASSWORD);
 		
 		if (driver.getType() == DataType.file) {
 			txtHost.setText("");

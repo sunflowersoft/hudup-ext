@@ -374,7 +374,7 @@ public class Delegator extends AbstractDelegator {
 		boolean validated = validateAccount(account, password, DataConfig.ACCOUNT_ADMIN_PRIVILEGE);
 		if (validated)
 			return true;
-		else if (!account.equals("admin"))
+		else if (!account.equals(DataConfig.ADMIN_ACCOUNT))
 			return false;
 		else {
 			//Checking Hudup properties.

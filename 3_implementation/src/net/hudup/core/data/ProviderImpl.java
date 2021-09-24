@@ -1094,30 +1094,48 @@ public class ProviderImpl implements Provider {
 	}
 
 	
-	@Override
-	public boolean validateAccount(String account, String password,
-			int privileges) {
-		
+	/**
+	 * Validating account and password.
+	 * @param account given account name.
+	 * @param password given password.
+	 * @return whether account and password are valid.
+	 */
+	private boolean validateAccount(String account, String password) {
 		Profile profile = getAccount(account);
-		if (profile == null)
-			return false;
+		if (profile == null) return false;
 		
 		String pwd = profile.getValueAsString(DataConfig.ACCOUNT_PASSWORD_FIELD);
-		if (pwd == null)
-			return false;
+		if (pwd == null) return false;
 		
 		String digest = Util.getCipher().md5Encrypt(password);
-		if (!digest.equals(pwd))
-			return false;
-		
-		int priv = profile.getValueAsInt(DataConfig.ACCOUNT_PRIVILEGES_FIELD);
-		if ( (priv & privileges) != privileges)
-			return false;
+		if (!digest.equals(pwd)) return false;
 		
 		return true;
 	}
+	
+	
+	@Override
+	public boolean validateAccount(String account, String password, int privileges) {
+		if (!validateAccount(account, password)) return false;
+		
+		Profile profile = getAccount(account);
+		int priv = profile.getValueAsInt(DataConfig.ACCOUNT_PRIVILEGES_FIELD);
+		if ((priv & privileges) != privileges)
+			return false;
+		else
+			return true;
+	}
 
 	
+	@Override
+	public int getPrivileges(String account, String password) {
+		if (!validateAccount(account, password)) return 0;
+		
+		Profile profile = getAccount(account);
+		return profile.getValueAsInt(DataConfig.ACCOUNT_PRIVILEGES_FIELD);
+	}
+
+
 	@Override
 	public boolean insertAccount(Profile acc) {
 		return assoc.insertProfile(getConfig().getAccountUnit(), acc);
@@ -1342,8 +1360,8 @@ public class ProviderImpl implements Provider {
 		
 		// Updating administrator account
 		Profile accProfile = new Profile(getProfileAttributes(config.getAccountUnit()));
-		accProfile.setValue(DataConfig.ACCOUNT_NAME_FIELD, "admin");
-		accProfile.setValue(DataConfig.ACCOUNT_PASSWORD_FIELD, Util.getCipher().md5Encrypt("admin"));
+		accProfile.setValue(DataConfig.ACCOUNT_NAME_FIELD, DataConfig.ADMIN_ACCOUNT);
+		accProfile.setValue(DataConfig.ACCOUNT_PASSWORD_FIELD, Util.getCipher().md5Encrypt(DataConfig.ADMIN_PASSWORD));
 		accProfile.setValue(DataConfig.ACCOUNT_PRIVILEGES_FIELD, "255");
 		result &= insertAccount(accProfile);
 		

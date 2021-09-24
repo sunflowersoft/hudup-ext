@@ -463,12 +463,12 @@ public abstract class Connector extends JDialog {
 		right.add(txtConnectPath);
 		txtConnectPath.setVisible(false);
 
-		txtUsername = new JTextField("admin");
+		txtUsername = new JTextField(DataConfig.ADMIN_ACCOUNT);
 		right.add(txtUsername);
 
-		txtPassword = new JPasswordField("admin");
+		txtPassword = new JPasswordField(DataConfig.ADMIN_PASSWORD);
 		right.add(txtPassword);
-		String pwd = Util.getHudupProperty("admin");
+		String pwd = Util.getHudupProperty(DataConfig.ADMIN_ACCOUNT);
 		if (pwd == null) txtPassword.setText(pwd);
 
 		chkPullMode = new JCheckBox("", false);

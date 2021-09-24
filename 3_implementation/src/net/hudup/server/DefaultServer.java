@@ -269,8 +269,8 @@ public class DefaultServer extends PowerServerImpl {
 				boolean validated = provider.validateAccount(account, password, privileges);
 				if (validated)
 					return true;
-				else if (account.equals("admin")) {
-					String pwd = Util.getHudupProperty("admin");
+				else if (account.equals(DataConfig.ADMIN_ACCOUNT)) {
+					String pwd = Util.getHudupProperty(DataConfig.ADMIN_ACCOUNT);
 					if (pwd == null)
 						return false;
 					else
@@ -289,6 +289,36 @@ public class DefaultServer extends PowerServerImpl {
 	}
 
 	
+	@Override
+	public synchronized int getPrivileges(String account, String password) throws RemoteException {
+		if (service.isOpened()) {
+			Provider provider = service.getProvider();
+			if (provider == null)
+				return 0;
+			else {
+				int privs = provider.getPrivileges(account, password);
+				if (privs != 0)
+					return privs;
+				else if (account.equals(DataConfig.ADMIN_ACCOUNT)) {
+					String pwd = Util.getHudupProperty(DataConfig.ADMIN_ACCOUNT);
+					if (pwd == null)
+						return 0;
+					else
+						return password.equals(pwd) ? DataConfig.ACCOUNT_ADMIN_PRIVILEGE : 0;
+				}
+				else
+					return 0;
+				
+			}
+		}
+		
+		ProviderImpl provider = new ProviderImpl(config);
+		int privs = provider.getPrivileges(account, password);
+		provider.close();
+		return privs;
+	}
+
+
 	@Override
 	public Service getService() throws RemoteException {
 		return service;

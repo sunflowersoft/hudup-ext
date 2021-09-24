@@ -20,6 +20,7 @@ import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
+import net.hudup.core.data.DataConfig;
 import net.hudup.core.logistic.Account;
 import net.hudup.core.logistic.LogUtil;
 
@@ -96,10 +97,10 @@ public class LoginDlg extends JDialog {
 		JPanel right = new JPanel(new GridLayout(0, 1));
 		header.add(right, BorderLayout.CENTER);
 		
-		txtUsername = new JTextField("admin");
+		txtUsername = new JTextField(DataConfig.ADMIN_ACCOUNT);
 		right.add(txtUsername);
 
-		txtPassword = new JPasswordField("admin");
+		txtPassword = new JPasswordField(DataConfig.ADMIN_PASSWORD);
 		right.add(txtPassword);
 		
 		

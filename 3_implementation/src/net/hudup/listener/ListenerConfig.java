@@ -10,6 +10,7 @@ package net.hudup.listener;
 import net.hudup.core.Constants;
 import net.hudup.core.Util;
 import net.hudup.core.client.ServerConfig;
+import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.HiddenText;
 import net.hudup.core.logistic.xURI;
 
@@ -93,9 +94,9 @@ public class ListenerConfig extends ServerConfig {
 		setRemoteHost("localhost");
 		setRemotePort(Constants.DEFAULT_SERVER_PORT);
 		try {
-			String pwd = Util.getHudupProperty("admin");
+			String pwd = Util.getHudupProperty(DataConfig.ADMIN_ACCOUNT);
 			if (pwd != null) {
-				setRemoteAccount("admin");
+				setRemoteAccount(DataConfig.ADMIN_ACCOUNT);
 				setRemotePassword(new HiddenText(pwd));
 			}
 		}

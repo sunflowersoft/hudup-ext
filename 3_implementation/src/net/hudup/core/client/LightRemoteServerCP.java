@@ -549,13 +549,13 @@ public class LightRemoteServerCP extends JFrame {
 		System.out.print("Enter user name (\"admin\" default): ");
 		String username = console.readLine();
 		if (username == null || username.isEmpty())
-			username = "admin";
+			username = DataConfig.ADMIN_ACCOUNT;
 		System.out.println("User name is \"" + username + "\"\n");
 
 		System.out.print("Enter password (\"admin\" default): ");
 		String password = new String(console.readPassword());
 		if (password == null || password.isEmpty())
-			password = "admin";
+			password = DataConfig.ADMIN_PASSWORD;
 		System.out.println();
 		
 		
