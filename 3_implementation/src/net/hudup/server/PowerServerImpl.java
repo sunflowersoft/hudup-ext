@@ -32,6 +32,7 @@ import net.hudup.core.alg.AlgDesc2List;
 import net.hudup.core.alg.AlgList;
 import net.hudup.core.client.ActiveMeasure;
 import net.hudup.core.client.ClassProcessor;
+import net.hudup.core.client.ExtraGateway;
 import net.hudup.core.client.ExtraService;
 import net.hudup.core.client.ExtraServiceAbstract;
 import net.hudup.core.client.Gateway;
@@ -135,9 +136,9 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 	
 	
 	/**
-	 * Gateway
+	 * Extra gateway
 	 */
-	protected Gateway extraGateway = null;
+	protected ExtraGateway extraGateway = null;
 
 	
 	/**
@@ -696,7 +697,7 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 	 * Creating the extra gateway.
 	 * @return the extra gateway.
 	 */
-	protected Gateway createExtraGateway() {
+	protected ExtraGateway createExtraGateway() {
 		return null;
 	}
 	
