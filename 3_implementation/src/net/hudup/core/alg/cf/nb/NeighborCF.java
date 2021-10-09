@@ -263,12 +263,6 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 
 	
 	/**
-	 * Resource-allocation (RA) Pearson.
-	 */
-	protected static final String PEARSON_TYPE_RA = "ra";
-
-	
-	/**
 	 * Pearson weighted mode.
 	 */
 	protected static final String PEARSON_WEIGHTED_FIELD = "pearson_weighted";
@@ -2473,7 +2467,6 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 					ptypes.add(PEARSON_TYPE_WPC);
 					ptypes.add(PEARSON_TYPE_SPC);
 					ptypes.add(PEARSON_TYPE_IPC);
-					ptypes.add(PEARSON_TYPE_RA);
 					Collections.sort(ptypes);
 					
 					return (Serializable) JOptionPane.showInputDialog(
