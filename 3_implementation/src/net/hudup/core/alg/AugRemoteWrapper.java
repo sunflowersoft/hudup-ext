@@ -106,6 +106,12 @@ public class AugRemoteWrapper extends ExecutableAlgRemoteWrapper implements Aug,
 
 
 	@Override
+	public boolean isSymmetric() {
+		return true;
+	}
+
+
+	@Override
 	public Object cacheTask(int id1, int id2, Map<Integer, Map<Integer, Object>> cache, Task task, Object... params) {
 		if (remoteAlg instanceof Aug)
 			return ((Aug)remoteAlg).cacheTask(id1, id2, cache, task, params);

@@ -969,6 +969,12 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 		updateConfig(measure);
 	}
 	
+
+	@Override
+	public boolean isSymmetric() {
+		return true;
+	}
+	
 	
 	/**
 	 * Checking whether the supported similarity can be cached. In some case, the algorithm is cached but the similarity measure is not cached.

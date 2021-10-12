@@ -53,6 +53,13 @@ public interface SupportCacheAlg extends Alg {
 
 	
 	/**
+	 * Indicating whether the quantity on this algorithm is symmetric.
+	 * @return whether the quantity on this algorithm is symmetric.
+	 */
+	boolean isSymmetric();
+	
+	
+	/**
 	 * Doing some task and put the result into the specified cache.
 	 * @param id1 first ID.
 	 * @param id2 second ID.
@@ -99,15 +106,29 @@ public interface SupportCacheAlg extends Alg {
 				}
 			}
 		}
-		else if (cache.containsKey(id2)) {
-			result = task.perform(params);
-			Map<Integer, Object> map2 = cache.get(id2);
-			map2.put(id1, result);
-			
-			if (id1 != id2) {
+		else if (alg.isSymmetric()) {
+			if (cache.containsKey(id2)) {
+				result = task.perform(params);
+				Map<Integer, Object> map2 = cache.get(id2);
+				map2.put(id1, result);
+				
+				if (id1 != id2) {
+					Map<Integer, Object> map1 = Util.newMap();
+					cache.put(id1, map1);
+					map1.put(id2, result);
+				}
+			}
+			else {
+				result = task.perform(params);
 				Map<Integer, Object> map1 = Util.newMap();
 				cache.put(id1, map1);
 				map1.put(id2, result);
+				
+				if (id1 != id2) {
+					Map<Integer, Object> map2 = Util.newMap();
+					cache.put(id2, map2);
+					map2.put(id1, result);
+				}
 			}
 		}
 		else {
@@ -115,13 +136,8 @@ public interface SupportCacheAlg extends Alg {
 			Map<Integer, Object> map1 = Util.newMap();
 			cache.put(id1, map1);
 			map1.put(id2, result);
-			
-			if (id1 != id2) {
-				Map<Integer, Object> map2 = Util.newMap();
-				cache.put(id2, map2);
-				map2.put(id1, result);
-			}
 		}
+		
 		
 		return result;
 	}
