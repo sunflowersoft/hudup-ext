@@ -347,6 +347,12 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 
 	
 	/**
+	 * Improved Jaccard (IJ).
+	 */
+	public static final String JACCARD_TYPE_IJ = "ij";
+
+	
+	/**
 	 * Default value for the threshold of rating relevant measure..
 	 */
 	protected static final double RATINGJ_THRESHOLD_DEFAULT = 0.1;
@@ -2433,6 +2439,7 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 					jtypes.add(JACCARD_TYPE_RJ);
 					jtypes.add(JACCARD_TYPE_RATINGJ);
 					jtypes.add(JACCARD_TYPE_INDEXEDJ);
+					jtypes.add(JACCARD_TYPE_IJ);
 					Collections.sort(jtypes);
 					
 					return (Serializable) JOptionPane.showInputDialog(
