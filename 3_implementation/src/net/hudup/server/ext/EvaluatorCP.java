@@ -510,31 +510,31 @@ public class EvaluatorCP extends JFrame implements EvaluatorListener {
 		if (evaluatorItem == null || evaluatorItem.evaluator == null) return;
 		Evaluator evaluator = evaluatorItem.evaluator;
 		
-		JDialog selectDlgNameDlg = new JDialog(UIUtil.getDialogForComponent(this), "Select a algorithm name", true);
-		selectDlgNameDlg.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		selectDlgNameDlg.setLocationRelativeTo(this);
+		JDialog reproducer = new JDialog(UIUtil.getDialogForComponent(this), "Reproduce evaluator", true);
+		reproducer.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		reproducer.setLocationRelativeTo(this);
 		
-		selectDlgNameDlg.setLayout(new BorderLayout());
+		reproducer.setLayout(new BorderLayout());
         JPanel header = new JPanel(new BorderLayout());
-        selectDlgNameDlg.add(header, BorderLayout.NORTH);
+        reproducer.add(header, BorderLayout.NORTH);
 		
         header.add(new JLabel("Type reproduced version"), BorderLayout.WEST);
-        final JTextField txtVersionName = new JTextField("" + new Date().getTime());
-        header.add(txtVersionName, BorderLayout.CENTER);
+        final JTextField txtVersion = new JTextField("" + new Date().getTime());
+        header.add(txtVersion, BorderLayout.CENTER);
         
-        final StringBuffer versionName = new StringBuffer();
+        final StringBuffer version = new StringBuffer();
         JPanel footer = new JPanel();
-        selectDlgNameDlg.add(footer, BorderLayout.SOUTH);
+        reproducer.add(footer, BorderLayout.SOUTH);
         
         JButton btnOK = new JButton("OK");
         btnOK.addActionListener(new ActionListener() {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				String text = txtVersionName.getText();
+				String text = txtVersion.getText();
 				if (text != null && !text.trim().isEmpty())
-					versionName.append(text.trim());
-				selectDlgNameDlg.dispose();
+					version.append(text.trim());
+				reproducer.dispose();
 			}
 		});
         footer.add(btnOK);
@@ -544,15 +544,15 @@ public class EvaluatorCP extends JFrame implements EvaluatorListener {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				selectDlgNameDlg.dispose();
+				reproducer.dispose();
 			}
 		});
         footer.add(btnCancel);
         
-        selectDlgNameDlg.setSize(400, 150);
-        selectDlgNameDlg.setVisible(true);
+        reproducer.setSize(400, 150);
+        reproducer.setVisible(true);
         
-        if (versionName.length() == 0) {
+        if (version.length() == 0) {
 			JOptionPane.showMessageDialog(this, "Empty reproduced version", "Empty reproduced version", JOptionPane.ERROR_MESSAGE);
         	return;
         }
@@ -561,20 +561,20 @@ public class EvaluatorCP extends JFrame implements EvaluatorListener {
         	String evaluatorName = evaluator.getName();
         	
 			if (connectInfo.account != null)
-				evaluator = ((ServiceExt)service).getEvaluator(evaluatorName, connectInfo.account.getName(), connectInfo.account.getPassword(), versionName.toString());
+				evaluator = ((ServiceExt)service).getEvaluator(evaluatorName, connectInfo.account.getName(), connectInfo.account.getPassword(), version.toString());
 			else if (service instanceof ExtendedService)
-				evaluator = ((ExtendedService)service).getEvaluator(evaluatorName, versionName.toString());
+				evaluator = ((ExtendedService)service).getEvaluator(evaluatorName, version.toString());
 			else
 				evaluator = null;
         	
             if (evaluator != null) {
         		JOptionPane.showMessageDialog(
     				this, 
-    				"Success to reproduce evaluator '" + EvaluatorAbstract.createVersionName(evaluatorName, versionName.toString()) + "'", 
+    				"Success to reproduce evaluator '" + EvaluatorAbstract.createVersionName(evaluatorName, version.toString()) + "'", 
     				"Success to reproduce evaluator", 
     				JOptionPane.INFORMATION_MESSAGE);
         		
-        		refresh(evaluatorName, versionName.toString());
+        		refresh(evaluatorName, version.toString());
         		return;
             }
         }
