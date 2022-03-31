@@ -62,7 +62,7 @@ public class Measure {
 	/**
 	 * SMCC measure.
 	 */
-	public static final String SMCC = "smcc";
+	public static final String SMC = "smc";
 
 	
 	/**

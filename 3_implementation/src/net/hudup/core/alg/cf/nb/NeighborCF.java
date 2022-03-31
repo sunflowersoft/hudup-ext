@@ -34,7 +34,6 @@ import net.hudup.core.data.ui.ImportantProperty;
 import net.hudup.core.evaluate.recommend.Accuracy;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.Vector;
-import net.hudup.core.parser.TextParserUtil;
 
 /**
  * This class sets up the nearest neighbors collaborative filtering algorithm. It is memory-based CF because it extends directly {@link MemoryBasedCF} class.
@@ -367,7 +366,7 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 	/**
 	 * Default value for intervals of indexed Jaccard measures.
 	 */
-	protected static final String INDEXEDJ_INTERVALS_DEFAULT = "2, 4";
+	protected static final int INDEXEDJ_INTERVALS_DEFAULT = 3;
 
 	
 	/**
@@ -383,9 +382,9 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 	
 	
 	/**
-	 * TJM.
+	 * TMJ.
 	 */
-	protected static final String TRIANGLE_TYPE_TJM = "tjm";
+	protected static final String TRIANGLE_TYPE_TMJ = "tmj";
 
 	
 	/**
@@ -922,7 +921,7 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 		mSet.add(Measure.TRIANGLE);
 		mSet.add(Measure.RPB);
 		mSet.add(Measure.IPWR);
-		mSet.add(Measure.SMCC);
+		mSet.add(Measure.SMC);
 		mSet.add(Measure.ADR);
 		mSet.add(Measure.OS);
 		
@@ -1057,8 +1056,8 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 			return urp(vRating1, vRating2, profile1, profile2);
 		else if (measure.equals(Measure.TRIANGLE))
 			return triangle(vRating1, vRating2, profile1, profile2);
-		else if (measure.equals(Measure.SMCC))
-			return smcc(vRating1, vRating2, profile1, profile2);
+		else if (measure.equals(Measure.SMC))
+			return smc(vRating1, vRating2, profile1, profile2);
 		else if (measure.equals(Measure.ADR))
 			return adr(vRating1, vRating2, profile1, profile2);
 		else if (measure.equals(Measure.IPWR))
@@ -1123,7 +1122,7 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 		else if (measure.equals(Measure.TRIANGLE)) {
 			config.removeReadOnly(TRIANGLE_TYPE);
 		}
-		else if (measure.equals(Measure.SMCC)) {
+		else if (measure.equals(Measure.SMC)) {
 		}
 		else if (measure.equals(Measure.ADR)) {
 		}
@@ -1757,8 +1756,19 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 	 * @author Soojung Lee
 	 */
 	protected double jaccardIndexed(RatingVector vRating1, RatingVector vRating2, Profile profile1, Profile profile2) {
-		List<Double> intervals = TextParserUtil.parseListByClass(getConfig().getAsString(INDEXEDJ_INTERVALS_FIELD), Double.class, ",");
-		if (intervals.size() == 0) return jaccardNormal(vRating1, vRating2, profile1, profile2);
+		int interval = getConfig().getAsInt(INDEXEDJ_INTERVALS_FIELD);
+		if (interval == 1) return jaccardNormal(vRating1, vRating2, profile1, profile2);
+		if (interval < 0) interval = INDEXEDJ_INTERVALS_DEFAULT;
+		double min = getMinRating(), max = getMaxRating();
+		double inc = (max - min) / (double)interval;
+		if (inc <= 0) return jaccardNormal(vRating1, vRating2, profile1, profile2);
+		
+		List<Double> intervals = Util.newList(interval);
+		for (int i = 1; i < interval; i++) {
+			double point = min + i*inc;
+			intervals.add(point);
+		}
+		if (intervals.size() != interval - 1) return jaccardNormal(vRating1, vRating2, profile1, profile2);
 		
 		Set<Integer> A = vRating1.fieldIds(true);
 		Set<Integer> B = vRating2.fieldIds(true);
@@ -1906,7 +1916,7 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 		String ttype = config.getAsString(TRIANGLE_TYPE);
 		if (ttype.equals(TRIANGLE_TYPE_NORMAL))
 			return triangleNormal(vRating1, vRating2, profile1, profile2);
-		else if (ttype.equals(TRIANGLE_TYPE_TJM))
+		else if (ttype.equals(TRIANGLE_TYPE_TMJ))
 			return triangleNormal(vRating1, vRating2, profile1, profile2) * jaccardNormal(vRating1, vRating2, profile1, profile2);
 		else
 			return triangleNormal(vRating1, vRating2, profile1, profile2);
@@ -1935,8 +1945,8 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 	
 	
 	/**
-	 * Calculating the SMCC measure between two pairs.
-	 * Vijay Verma and Rajesh Kumar Aggarwal developed the MPIP. Loc Nguyen implements it.
+	 * Calculating the SMC measure between two pairs.
+	 * Vijay Verma and Rajesh Kumar Aggarwal developed the SMC. Loc Nguyen implements it.
 	 * @param vRating1 first rating vector.
 	 * @param vRating2 second rating vector.
 	 * @param profile1 first profile.
@@ -1944,7 +1954,7 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 	 * @return SMCC measure between both two rating vectors and profiles.
 	 * @author Vijay Verma, Rajesh Kumar Aggarwal
 	 */
-	protected double smcc(RatingVector vRating1, RatingVector vRating2, Profile profile1, Profile profile2) {
+	protected double smc(RatingVector vRating1, RatingVector vRating2, Profile profile1, Profile profile2) {
 		Set<Integer> set1 = vRating1.fieldIds(true);
 		Set<Integer> set2 = vRating2.fieldIds(true);
 		Set<Integer> common = Util.newSet();
@@ -2513,7 +2523,7 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 					ttype = ttype == null ? TRIANGLE_TYPE_NORMAL : ttype;
 					List<String> ttypes = Util.newList();
 					ttypes.add(TRIANGLE_TYPE_NORMAL);
-					ttypes.add(TRIANGLE_TYPE_TJM);
+					ttypes.add(TRIANGLE_TYPE_TMJ);
 					Collections.sort(ttypes);
 					
 					return (Serializable) JOptionPane.showInputDialog(

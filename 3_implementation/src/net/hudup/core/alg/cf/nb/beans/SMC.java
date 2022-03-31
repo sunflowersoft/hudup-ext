@@ -22,7 +22,7 @@ import net.hudup.core.data.RatingVector;
  * @version 1.0
  *
  */
-public class SMCC extends NeighborCFUserBased {
+public class SMC extends NeighborCFUserBased {
 
 	
 	/**
@@ -34,7 +34,7 @@ public class SMCC extends NeighborCFUserBased {
 	/**
 	 * Default constructor.
 	 */
-	public SMCC() {
+	public SMC() {
 
 	}
 
@@ -53,7 +53,7 @@ public class SMCC extends NeighborCFUserBased {
 
 	@Override
 	protected String getDefaultMeasure() {
-		return Measure.SMCC;
+		return Measure.SMC;
 	}
 
 
@@ -90,7 +90,7 @@ public class SMCC extends NeighborCFUserBased {
 	@Override
 	protected double sim0(String measure, RatingVector vRating1, RatingVector vRating2, Profile profile1,
 			Profile profile2, Object... params) {
-		return smcc(vRating1, vRating2, profile1, profile2);
+		return smc(vRating1, vRating2, profile1, profile2);
 	}
 
 	
