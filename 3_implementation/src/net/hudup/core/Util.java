@@ -7,9 +7,6 @@
  */
 package net.hudup.core;
 
-import static net.hudup.core.Constants.RESOURCES_PACKAGE;
-import static net.hudup.core.Constants.ROOT_PACKAGE;
-
 import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -53,6 +50,24 @@ import net.hudup.core.security.CipherImpl;
  * @version 10.0
  */
 public class Util {
+
+	
+	/**
+	 * Default relative working directory.
+	 */
+	public final static String  WORKING_DIRECTORY  = Configuration.getProperty(Configuration.WORKING_NAME, Configuration.WORKING_NAME);
+
+	
+	/**
+	 * The root package (root directory) of all classes.
+	 */
+	public final static String  ROOT_PACKAGE = Configuration.ROOT_PACKAGE; 
+
+	
+	/**
+	 * The resources directory that contains any resources except classes such as images, template files.
+	 */
+	public final static String  RESOURCES_PACKAGE  = Configuration.RESOURCES_PACKAGE;
 
 	
 	/**
@@ -142,7 +157,7 @@ public class Util {
 			catch (Throwable e) {}
 		}
 		
-		Path workingPath = Paths.get(Constants.WORKING_DIRECTORY + "/" + hudupPropName);
+		Path workingPath = Paths.get(WORKING_DIRECTORY + "/" + hudupPropName);
 		if (Files.exists(workingPath)) {
 			InputStream in = null;
 			try {
@@ -160,7 +175,7 @@ public class Util {
 		}
 		else {
 			try {
-				Path workingDir = Paths.get(Constants.WORKING_DIRECTORY);
+				Path workingDir = Paths.get(WORKING_DIRECTORY);
 				if (!Files.exists(workingPath)) Files.createDirectory(workingDir);
 				
 				OutputStream out = Files.newOutputStream(workingPath, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
@@ -173,7 +188,7 @@ public class Util {
 			if (lastPath != null) {
 				try {
 					Files.copy(lastPath,
-						Paths.get(Constants.WORKING_DIRECTORY + "/" + hudupTemplatePropName),
+						Paths.get(WORKING_DIRECTORY + "/" + hudupTemplatePropName),
 						StandardCopyOption.REPLACE_EXISTING);
 					copied = true;
 				}
@@ -183,7 +198,7 @@ public class Util {
 			if ((!copied) && (lastProps != null)) {
 				try {
 					OutputStream out = Files.newOutputStream(
-						Paths.get(Constants.WORKING_DIRECTORY + "/" + hudupBackupPropName),
+						Paths.get(WORKING_DIRECTORY + "/" + hudupBackupPropName),
 						StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
 					lastProps.store(out, "Following are last properties");
 					out.close();
@@ -543,7 +558,7 @@ public class Util {
 	 */
 	public static String[] getLoadablePackages() {
 		List<String> prefixList = Util.newList();
-		String rootPackage = UriAdapter.packageSlashToDot(Constants.ROOT_PACKAGE);
+		String rootPackage = UriAdapter.packageSlashToDot(ROOT_PACKAGE);
 		prefixList.add(rootPackage);
 		
 		//Load additional packages.

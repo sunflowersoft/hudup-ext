@@ -44,6 +44,18 @@ public class Configuration implements Serializable {
 
 	
 	/**
+	 * The root package (root directory) of all classes.
+	 */
+	public final static String  ROOT_PACKAGE = "/net/hudup/"; //Setting ROOT_PACKAGE="" will retrieve all classes from plug-in manager. 
+	
+	
+	/**
+	 * The resources directory that contains any resources except classes such as images, template files.
+	 */
+	public final static String  RESOURCES_PACKAGE = ROOT_PACKAGE + "core/resources/";
+
+	
+	/**
 	 * Working directory name.
 	 */
 	public static String WORKING_NAME = "working";

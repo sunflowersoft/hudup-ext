@@ -129,12 +129,12 @@ public final class Constants {
 	/**
 	 * The root package (root directory) of all classes.
 	 */
-	public final static String  ROOT_PACKAGE             = "/net/hudup/"; //Setting ROOT_PACKAGE="" will retrieve all classes from plug-in manager. 
+	public final static String  ROOT_PACKAGE             = Configuration.ROOT_PACKAGE; 
 	
 	/**
 	 * The resources directory that contains any resources except classes such as images, template files.
 	 */
-	public final static String  RESOURCES_PACKAGE        = ROOT_PACKAGE + "core/resources/";
+	public final static String  RESOURCES_PACKAGE        = Configuration.RESOURCES_PACKAGE;
 	
 	/**
 	 * The directory contains images.
