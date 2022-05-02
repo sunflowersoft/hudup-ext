@@ -155,7 +155,7 @@ public class ExtendedServerCP extends PowerServerCP {
 		addToToolMenu(mnTool);
 
 		
-		JMenu mnApps = new JMenu(I18nUtil.message("applications"));
+		JMenu mnApps = new JMenu(I18nUtil.message("apps"));
 		mnApps.setMnemonic('a');
 		addToAppsMenu(mnApps);
 		if (mnApps.getItemCount() > 0) mnBar.add(mnApps);

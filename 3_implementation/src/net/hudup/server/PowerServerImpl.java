@@ -7,6 +7,7 @@
  */
 package net.hudup.server;
 
+import java.net.URL;
 import java.nio.file.Path;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
@@ -179,25 +180,41 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 			}
 			catch (Throwable e) {LogUtil.trace(e);}
 			
-			SystemUtil.setSecurityPolicy(getClass().getResource(SERVER_POLICY));
+			try {
+				URL serverPolicyUrl = getClass().getResource(SERVER_POLICY);
+				if (serverPolicyUrl != null) SystemUtil.setSecurityPolicy(serverPolicyUrl);
+			}
+			catch (Throwable e) {LogUtil.trace(e);}
 			
-			int port = NetUtil.getPort(this.config.getServerPort(), Constants.TRY_RANDOM_PORT);
-			if (port < 0) throw new Exception("Invalid port number");
+			int port = this.config.getServerPort();
+			port = port <= 0 ? Constants.DEFAULT_SERVER_PORT : port;
+			port = NetUtil.getPort(port, Constants.TRY_RANDOM_PORT);
+			if (port < 0) {
+				LogUtil.warn("Invalid port number, thus, port 0 (system random) is used instead of throwing exception");
+				port = 0;
+			}
 			this.config.setServerPort(port);
 			
 			registry = LocateRegistry.createRegistry(port);
 			UnicastRemoteObject.exportObject(this, port);
 			UnicastRemoteObject.exportObject(gateway, port);
-			try {
-				if (extraGateway != null) UnicastRemoteObject.exportObject(extraGateway, port);
+			if (extraGateway != null) {
+				try {
+					UnicastRemoteObject.exportObject(extraGateway, port);
+				}
+				catch (Throwable e) {LogUtil.trace(e);}
 			}
-			catch (Throwable e) {LogUtil.trace(e);}
 			
-			Naming.rebind(getGatewayBindName(), gateway);
 			try {
-				if (extraGateway != null) Naming.rebind(getExtraGatewayBindName(), extraGateway);
+				Naming.rebind(getGatewayBindName(), gateway);
 			}
-			catch (Throwable e) {LogUtil.trace(e);}
+			catch (Throwable e) {LogUtil.warn("Unable to rebind gateway");}
+			if (extraGateway != null) {
+				try {
+					Naming.rebind(getExtraGatewayBindName(), extraGateway);
+				}
+				catch (Throwable e) {LogUtil.warn("Unable to rebind extra gateway");}
+			}
 			
 			initStorageSystem();
 			
@@ -473,24 +490,34 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 		
     	trans.lockWrite();
     	try {
-			try {
-				if (extraGateway != null) {
+			if (extraGateway != null) {
+				try {
 					UnicastRemoteObject.unexportObject(extraGateway, true);
+				}
+				catch (Throwable e) {LogUtil.trace(e);}
+				try {
 					Naming.unbind(getExtraGatewayBindName());
 				}
+				catch (Throwable e) {LogUtil.warn("Unable to unbind extra gateway");}
+			}
+
+			try {
+				UnicastRemoteObject.unexportObject(gateway, true);
 			}
 			catch (Throwable e) {LogUtil.trace(e);}
-
-			UnicastRemoteObject.unexportObject(gateway, true);
-			Naming.unbind(getGatewayBindName());
+			try {
+				Naming.unbind(getGatewayBindName());
+			}
+			catch (Throwable e) {LogUtil.warn("Unable to unbind gateway");}
 			
-        	UnicastRemoteObject.unexportObject(this, true);
+        	try {
+            	UnicastRemoteObject.unexportObject(this, true);
+        	}
+        	catch (Throwable e) {LogUtil.trace(e);}
         	try {
         		UnicastRemoteObject.unexportObject(registry, true);
         	}
-        	catch (Throwable e) {
-        		LogUtil.trace(e);
-        	}
+        	catch (Throwable e) {LogUtil.trace(e);}
         	
         	destroyStorageSystem();
 			
