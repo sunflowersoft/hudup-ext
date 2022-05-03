@@ -293,16 +293,28 @@ public class ExtendedServer2CP extends ExternalServerCP {
 	}
 	
 	
+	/**
+	 * Adding menu items to the specified tool menu.
+	 * @param mnTool tool menu.
+	 */
 	protected void addToToolMenu(JMenu mnTool) {
 		
 	}
 	
 	
+	/**
+	 * Adding menu items to the specified help menu.
+	 * @param mnHelp help menu.
+	 */
 	protected void addToHelpMenu(JMenu mnHelp) {
 		
 	}
 	
 	
+	/**
+	 * Adding menu items to the specified applications menu.
+	 * @param mnApps applications menu.
+	 */
 	protected void addToAppsMenu(JMenu mnApps) {
 		
 	}

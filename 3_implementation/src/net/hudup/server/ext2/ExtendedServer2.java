@@ -188,6 +188,7 @@ public class ExtendedServer2 extends ExternalServer {
 	/**
 	 * Static method to create extended default server with specified configuration URI.
 	 * @param srvConfigUri specified configuration URI.
+	 * @param creator the creator.
 	 * @return extended server with external support.
 	 */
 	protected static PowerServer create(xURI srvConfigUri, Creator creator) {
