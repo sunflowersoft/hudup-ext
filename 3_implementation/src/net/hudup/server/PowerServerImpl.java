@@ -35,7 +35,6 @@ import net.hudup.core.client.ActiveMeasure;
 import net.hudup.core.client.ClassProcessor;
 import net.hudup.core.client.ExtraGateway;
 import net.hudup.core.client.ExtraService;
-import net.hudup.core.client.ExtraServiceAbstract;
 import net.hudup.core.client.Gateway;
 import net.hudup.core.client.HudupRMIClassLoader;
 import net.hudup.core.client.PowerServer;
@@ -888,14 +887,14 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 		}
 		
 		if (server != null) {
-			try {
-				ExtraService extraService = getExtraService();
-				if (extraService != null && extraService instanceof ExtraServiceAbstract)
-					((ExtraServiceAbstract)extraService).setAccount(account, password, getPrivileges(account, password));
-			}
-			catch (Throwable e) {
-				LogUtil.error("Validating extra service causes error: " + e.getMessage());
-			}
+//			try {
+//				ExtraService extraService = getExtraService();
+//				if (extraService != null && extraService instanceof ExtraServiceImpl)
+//					((ExtraServiceImpl)extraService).setAccount(account, password, getPrivileges(account, password));
+//			}
+//			catch (Throwable e) {
+//				LogUtil.error("Validating extra service causes error: " + e.getMessage());
+//			}
 		}
 		
 		
@@ -925,14 +924,14 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 		
 		
 		if (service != null) {
-			try {
-				ExtraService extraService = getExtraService();
-				if (extraService != null && extraService instanceof ExtraServiceAbstract)
-					((ExtraServiceAbstract)extraService).setAccount(account, password, getPrivileges(account, password));
-			}
-			catch (Throwable e) {
-				LogUtil.error("Validating extra service causes error: " + e.getMessage());
-			}
+//			try {
+//				ExtraService extraService = getExtraService();
+//				if (extraService != null && extraService instanceof ExtraServiceImpl)
+//					((ExtraServiceImpl)extraService).setAccount(account, password, getPrivileges(account, password));
+//			}
+//			catch (Throwable e) {
+//				LogUtil.error("Validating extra service causes error: " + e.getMessage());
+//			}
 		}
 
 		return service;

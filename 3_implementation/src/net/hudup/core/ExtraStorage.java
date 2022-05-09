@@ -1,6 +1,15 @@
+/**
+ * HUDUP: A FRAMEWORK OF E-COMMERCIAL RECOMMENDATION ALGORITHMS
+ * (C) Copyright by Loc Nguyen's Academic Network
+ * Project homepage: hudup.locnguyen.net
+ * Email: ng_phloc@yahoo.com
+ * Phone: +84-975250362
+ */
 package net.hudup.core;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import net.hudup.core.data.Exportable;
 import net.hudup.core.logistic.LogUtil;
@@ -16,10 +25,26 @@ public class ExtraStorage {
 
 
 	/**
+	 * Map of extra taskers.
+	 */
+	protected final static Map<String, Tasker> taskers = Util.newMap();
+	
+	
+	/**
 	 * List of unmanaged exported objects.
 	 */
 	protected final static List<Exportable> unmanagedExportedObjects = Util.newList();
 	
+	
+	/**
+	 * Clearing taskers.
+	 */
+	public final static void clearTaskers() {
+		synchronized (taskers) {
+			taskers.clear();
+		}
+	}
+
 	
 	/**
 	 * Clearing unmanaged exported objects.
@@ -38,6 +63,23 @@ public class ExtraStorage {
 	
 	
 	/**
+	 * Adding tasker.
+	 * @param tasker tasker.
+	 * @return true if adding is successful.
+	 */
+	public final static boolean addTasker(Tasker tasker) {
+		synchronized (taskers) {
+			if (taskers.containsKey(tasker.getName()))
+				return false;
+			else {
+				taskers.put(tasker.getName(), tasker);
+				return true;
+			}
+		}
+	}
+	
+	
+	/**
 	 * Adding unmanaged exported object.
 	 * @param obj unmanaged exported object added.
 	 */
@@ -47,6 +89,22 @@ public class ExtraStorage {
 		}
 	}
 
+	
+	/**
+	 * Removing tasker based on tasker name.
+	 * @param taskerName tasker name.
+	 * @return true if adding is successful.
+	 */
+	public final static boolean removeTasker(String taskerName) {
+		synchronized (taskers) {
+			if (taskers.containsKey(taskerName)) {
+				return taskers.remove(taskerName) != null;
+			}
+			else
+				return false;
+		}
+	}
+	
 	
 	/**
 	 * Adding unmanaged exported object.
@@ -62,10 +120,39 @@ public class ExtraStorage {
 
 	
 	/**
+	 * Getting task given tasker name.
+	 * @param taskerName tasker name.
+	 * @return task given tasker name.
+	 */
+	public final static Tasker getTasker(String taskerName) {
+		synchronized (taskers) {
+			return taskers.get(taskerName);
+		}
+	}
+	
+	
+	/**
+	 * Getting collection of taskers.
+	 * @return collection of taskers.
+	 */
+	public final static Collection<Tasker> getTaskers() {
+		synchronized (taskers) {
+			return taskers.values();
+		}
+	}
+	
+	
+	/**
 	 * Clearing this extra storage.
 	 */
 	public final static void clear() {
-		clearUnmanagedExportedObjects();
+		try {
+			clearTaskers();
+		} catch (Throwable e) {LogUtil.trace(e);}
+		
+		try {
+			clearUnmanagedExportedObjects();
+		} catch (Throwable e) {LogUtil.trace(e);}
 	}
 	
 	

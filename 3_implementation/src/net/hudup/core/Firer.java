@@ -54,6 +54,7 @@ public class Firer extends PluginManagerAbstract {
 	public void discover() {
 		try { //Redundant try-catch because it is impossible to solve the problem caused by PluginStorage.clear(). Solving later. 
 			PluginStorage.clear();
+			ExtraStorage.clear();
 			discover(Util.getLoadablePackages());
 		}
 		catch (Throwable e) {LogUtil.trace(e);}
@@ -75,6 +76,8 @@ public class Firer extends PluginManagerAbstract {
 		List<Class<? extends Alg>> algClasses = loadClasses(Alg.class);
 		analyzeAlgClasses(algClasses);
 		
+		List<Class<? extends Tasker>> taskClasses = loadClasses(Tasker.class);
+		analyzeTaskClasses(taskClasses);
 	}
 	
 	

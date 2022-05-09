@@ -784,6 +784,26 @@ public abstract class PluginManagerAbstract implements PluginManager {
 
 	
 	/**
+	 * Analyzing task classes.
+	 * @param taskClasses specified task classes.
+	 */
+	protected void analyzeTaskClasses(Collection<Class<? extends Tasker>> taskClasses) {
+		if (taskClasses == null) return;
+		
+		for (Class<? extends Tasker> taskClass : taskClasses) {
+			if (taskClass == null) continue;
+			try {
+				if (!isClassValid(taskClass)) continue;
+				Tasker task = Util.newInstance(taskClass);
+				if (task != null && ExtraStorage.addTasker(task)) LogUtil.info("Registered task: " + task.getName());
+			}
+			catch (Throwable e) {LogUtil.trace(e);}
+		}
+		
+	}
+
+		
+	/**
 	 * Creating class loader from store URI (s).
 	 * @param storeUris store URI (s).
 	 * @return class loader from store URI (s).

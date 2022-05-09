@@ -239,7 +239,7 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 	        Image image = UIUtil.getImage("server-32x32.png");
 	        if (image != null) setIconImage(image);
 
-		    setJMenuBar(createMenuBar());
+		    //setJMenuBar(createMenuBar());
 
 		    Container container = getContentPane();
 			JTabbedPane main = new JTabbedPane();
@@ -1154,6 +1154,13 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 		//Fixing error when deadlock with pause/resume because of transaction lock. The solution is work-around. User can exit server from command line or system tray.
 		try {
 			if (status == Status.paused) btnStop.setEnabled(false);
+		} catch (Exception e) {LogUtil.trace(e);}
+		
+		//Resetting menu bar, this code can be removed because it is unimportant.
+		try {
+			JMenuBar mnBar = createMenuBar();
+			setJMenuBar(mnBar);
+			mnBar.revalidate();
 		} catch (Exception e) {LogUtil.trace(e);}
 	}
 	

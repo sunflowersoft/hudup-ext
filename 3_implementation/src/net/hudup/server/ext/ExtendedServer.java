@@ -12,10 +12,16 @@ import java.awt.PopupMenu;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.nio.file.Path;
+import java.util.List;
 
 import javax.swing.JOptionPane;
 
 import net.hudup.core.Constants;
+import net.hudup.core.Task;
+import net.hudup.core.client.ExtraGateway;
+import net.hudup.core.client.ExtraGatewayImpl;
+import net.hudup.core.client.ExtraService;
+import net.hudup.core.client.ExtraServiceImpl;
 import net.hudup.core.client.PowerServer;
 import net.hudup.core.logistic.I18nUtil;
 import net.hudup.core.logistic.LogUtil;
@@ -56,6 +62,23 @@ public class ExtendedServer extends DefaultServer {
 
 
 	@Override
+	protected ExtraService createExtraService() {
+		try {
+			return new ExtraServiceImpl(this);
+		}
+		catch (Throwable e) {LogUtil.trace(e);}
+		
+		return null;
+	}
+
+
+	@Override
+	protected ExtraGateway createExtraGateway() {
+		return new ExtraGatewayImpl(this);
+	}
+
+
+	@Override
 	protected boolean onWatcherLoadLib(Path libPath) {
 		boolean ret = super.onWatcherLoadLib(libPath);
 		if (!ret) return false;
@@ -73,9 +96,25 @@ public class ExtendedServer extends DefaultServer {
 		
 		//Task 1: Purging disconnected listeners.
 		if (Constants.SERVER_PURGE_LISTENERS && (service != null) && (service instanceof ExtendedService)) {
-			((ExtendedService)service).purgeListeners();
+			try {
+				((ExtendedService)service).purgeListeners();
+			} catch (Throwable e) {LogUtil.trace(e);}
 			LogUtil.info("Server timer internal tasks: Purging disconnected listeners is successful");
 		}
+		
+		//Task 2: doing extra service tasks.
+		try {
+			ExtraService extraService = getExtraService();
+			if (extraService != null) {
+				List<Task> tasks = extraService.getTasks();
+				for (Task task : tasks) {
+					try {
+						task.serverDo();
+					} catch (Throwable e) {LogUtil.trace(e);}
+				}
+			}
+		} catch (Throwable e) {LogUtil.trace(e);}
+		
 	}
 
 
@@ -101,7 +140,6 @@ public class ExtendedServer extends DefaultServer {
 	
 	@Override
 	protected PopupMenu createSysTrayMenuExt() {
-		
 		try {
 			
 	        PopupMenu popup = new PopupMenu();
