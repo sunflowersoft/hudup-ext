@@ -14,6 +14,9 @@ import java.util.List;
 import net.hudup.core.App;
 import net.hudup.core.data.DataConfig;
 
+/**
+ * This abstract class is a partial implementation of extra gateway. 
+ */
 public class ExtraGatewayImpl implements ExtraGateway {
 
 	
