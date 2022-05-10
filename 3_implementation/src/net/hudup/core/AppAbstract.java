@@ -10,13 +10,13 @@ package net.hudup.core;
 import java.rmi.RemoteException;
 
 /**
- * This is abstract implementation of task;
+ * This is abstract implementation of application;
  * 
  * @author Loc Nguyen
  * @version 1.0
  *
  */
-public abstract class TaskAbstract implements Task {
+public abstract class AppAbstract implements App {
 
 	
 	/**
@@ -26,23 +26,23 @@ public abstract class TaskAbstract implements Task {
 
 	
 	/**
-	 * Internal tasker.
+	 * Internal application creator.
 	 */
-	protected Tasker tasker = null;
+	protected Appor appor = null;
 	
 	
 	/**
-	 * Constructor with tasker.
+	 * Constructor with application creator.
 	 * @param tasker specified tasker.
 	 */
-	public TaskAbstract(Tasker tasker) {
-		this.tasker = tasker;
+	public AppAbstract(Appor tasker) {
+		this.appor = tasker;
 	}
 
 	
 	@Override
 	public String getName() throws RemoteException {
-		return tasker.getName();
+		return appor != null ? appor.getName() : "Noname";
 	}
 
 	

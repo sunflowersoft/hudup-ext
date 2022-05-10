@@ -546,7 +546,7 @@
 		<equals arg1="${include-runtime-lib}" arg2="embed" />
 		<then>
 			<jar destfile="${archive.home}/${product}-core.jar">
-				<fileset dir="${bin.home}" includes="net/hudup/core/**, vn/pimath/**" />
+				<fileset dir="${bin.home}" includes="net/hudup/core/**" />
 
 	    		<restrict>
 	     			<name name="**"/>
@@ -568,19 +568,65 @@
 			</if>
 
 			<jar destfile="${archive.home}/${product}-core.jar">
-				<fileset dir="${bin.home}" includes="net/hudup/core/**, vn/pimath/**" />
+				<fileset dir="${bin.home}" includes="net/hudup/core/**" />
 			</jar>
 		</else>
 		</if>
 
 		<copy todir="${archive.home}">
-			<fileset dir="." includes="${doctype}"/>
+			<fileset dir="." includes="${doctype}, *.bat, *.sh, *.script" excludes="build.*"/>
 		</copy>
 
 		<zip destfile="${archive.home}/${product}-${version}-core.zip" basedir="${archive.home}"/>
 		
 		<delete quiet="true" includeEmptyDirs="true">
 			<fileset dir="${archive.home}" includes="**" excludes="${product}-${version}-core.zip"/>
+		</delete>
+	</target>
+
+
+	<target name="jar-core-src" depends="compile" description="Packing core sources">
+		<mkdir dir="${archive.home}"/>
+		<antcall target="clean-archive" />
+		
+		<if>
+		<equals arg1="${include-runtime-lib-src}" arg2="embed" />
+		<then>
+			<jar destfile="${archive.home}/${product}-core-src.jar">
+	    		<fileset dir="${src.home}" includes="net/hudup/core/**"/>
+				
+	    		<restrict>
+	     			<name name="**"/>
+					<archives>
+						<zips>
+							<fileset dir="${lib.home}/src" includes="*.jar, *.zip"/>
+						</zips>
+					</archives>
+	    		</restrict>
+			</jar>
+		</then>
+		<else>
+			<if>
+			<equals arg1="${include-runtime-lib-src}" arg2="normal" />
+			<then>
+				<antcall target="jar-runtime-lib-src" />
+			</then>
+			</if>
+
+			<jar destfile="${archive.home}/${product}-core-src.jar">
+	    		<fileset dir="${src.home}" includes="net/hudup/core/**"/>
+			</jar>
+		</else>
+		</if>
+		
+		<copy todir="${archive.home}">
+			<fileset dir="." includes="${doctype}, *.bat, *.sh, *.xml, *.script"/>
+		</copy>
+		
+		<zip destfile="${archive.home}/${product}-${version}-core-src.zip" basedir="${archive.home}"/>
+		
+		<delete quiet="true" includeEmptyDirs="true">
+			<fileset dir="${archive.home}" includes="**" excludes="${product}-${version}-core-src.zip"/>
 		</delete>
 	</target>
 

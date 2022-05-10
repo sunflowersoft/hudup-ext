@@ -14,33 +14,33 @@ import java.rmi.RemoteException;
 import net.hudup.core.client.ConnectInfo;
 
 /**
- * This interface represents a task.
+ * This interface represents an application.
  * 
  * @author Loc Nguyen
  * @version 1.0
  *
  */
-public interface Task extends java.lang.Cloneable, Remote, Serializable {
+public interface App extends java.lang.Cloneable, Remote, Serializable {
 
 	
 	/**
-	 * Getting task name.
-	 * @return task name
+	 * Getting application name.
+	 * @return application name
 	 * @throws RemoteException if any error raises.
 	 */
 	String getName() throws RemoteException;
 	
 	
 	/**
-	 * Getting task description.
-	 * @return task description.
+	 * Getting application description.
+	 * @return application description.
 	 * @throws RemoteException if any error raises.
 	 */
 	String getDesc() throws RemoteException;
 
 	
 	/**
-	 * Discard this task.
+	 * Discard this application.
 	 * @return true if closing is successful.
 	 * @throws RemoteException if any error raises.
 	 */
@@ -48,15 +48,15 @@ public interface Task extends java.lang.Cloneable, Remote, Serializable {
 	
 	
 	/**
-	 * Server do this task.
+	 * Server task of this application.
 	 * @return true if closing is successful.
 	 * @throws RemoteException if any error raises.
 	 */
-	boolean serverDo() throws RemoteException;
+	boolean serverTask() throws RemoteException;
 	
 	
 	/**
-	 * Show this task.
+	 * Show this application.
 	 * @param connectInfo connection information.
 	 * @throws RemoteException if any error raises.
 	 */

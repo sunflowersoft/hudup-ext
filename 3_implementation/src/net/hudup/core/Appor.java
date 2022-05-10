@@ -7,31 +7,33 @@
  */
 package net.hudup.core;
 
+import java.io.Serializable;
+
 import net.hudup.core.client.PowerServer;
 
 /**
- * This interface represents a tasker.
+ * This interface represents an application creator.
  * 
  * @author Loc Nguyen
  * @version 1.0
  *
  */
-public interface Tasker {
+public interface Appor extends java.lang.Cloneable, Serializable {
 
 	
 	/**
-	 * Getting name of this tasker.
-	 * @return name of this tasker.
+	 * Getting name of this application creator.
+	 * @return name of this application creator.
 	 */
 	String getName();
 	
 	
 	/**
-	 * Create a task.
+	 * Create a application.
 	 * @param server power server.
-	 * @return created task.
+	 * @return created application.
 	 */
-	Task create(PowerServer server);
+	App create(PowerServer server);
 	
 	
 }

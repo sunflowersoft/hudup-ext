@@ -19,6 +19,7 @@ import java.util.Set;
 
 import javax.swing.event.EventListenerList;
 
+import net.hudup.core.Appor;
 import net.hudup.core.Constants;
 import net.hudup.core.ExtraStorage;
 import net.hudup.core.PluginAlgDesc2ListMap;
@@ -593,6 +594,15 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 				addedCount++;
 			}
 		}
+		
+		//Loading application creators.
+		try {
+			List<Appor> appors = pm.loadInstances(Appor.class, xURI.create(libPath));
+			for (Appor appor : appors) {
+				if (ExtraStorage.addAppor(appor)) addedCount++;
+			}
+			
+		} catch (Throwable e) {}
 		
 		return addedCount > 0;
 	}

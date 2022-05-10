@@ -4,7 +4,7 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.List;
 
-import net.hudup.core.Task;
+import net.hudup.core.App;
 
 /**
  * This interface represents extra service.
@@ -25,11 +25,18 @@ public interface ExtraService extends Remote, AutoCloseable {
 	
 	
 	/**
-	 * Getting internal tasks;
-	 * @return internal tasks.
+	 * Getting internal applications;
+	 * @return internal applications.
 	 * @throws RemoteException if any error raises.
 	 */
-	List<Task> getTasks() throws RemoteException;
+	List<App> getApps() throws RemoteException;
+	
+	
+	/**
+	 * Update list of applications.
+	 * @throws RemoteException if any error raises.
+	 */
+	void updateApps() throws RemoteException;
 	
 	
 }

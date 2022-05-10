@@ -11,7 +11,7 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.List;
 
-import net.hudup.core.Task;
+import net.hudup.core.App;
 import net.hudup.core.data.DataConfig;
 
 public class ExtraGatewayImpl implements ExtraGateway {
@@ -39,7 +39,7 @@ public class ExtraGatewayImpl implements ExtraGateway {
 
 	
 	@Override
-	public Remote getTaskRemoteObject(String account, String password, String taskName) throws RemoteException {
+	public Remote getAppRemoteObject(String account, String password, String appName) throws RemoteException {
 		if (server == null) return null;
 		ExtraService extraService = server.getExtraService();
 		if (extraService == null) return null;
@@ -47,9 +47,9 @@ public class ExtraGatewayImpl implements ExtraGateway {
 		int privs = server.getPrivileges(account, password);
 		if ((privs & DataConfig.ACCOUNT_EVALUATE_PRIVILEGE) != DataConfig.ACCOUNT_EVALUATE_PRIVILEGE) return null;
 		
-		List<Task> tasks = extraService.getTasks();
-		for (Task task : tasks) {
-			if (task.getName().equals(taskName)) return task.getRemoteObject();
+		List<App> apps = extraService.getApps();
+		for (App app : apps) {
+			if (app.getName().equals(appName)) return app.getRemoteObject();
 		}
 		
 		return null;

@@ -16,8 +16,8 @@ import java.util.List;
 
 import javax.swing.JOptionPane;
 
+import net.hudup.core.App;
 import net.hudup.core.Constants;
-import net.hudup.core.Task;
 import net.hudup.core.client.ExtraGateway;
 import net.hudup.core.client.ExtraGatewayImpl;
 import net.hudup.core.client.ExtraService;
@@ -83,8 +83,15 @@ public class ExtendedServer extends DefaultServer {
 		boolean ret = super.onWatcherLoadLib(libPath);
 		if (!ret) return false;
 		
-		if ((service instanceof ExtendedService) && service.isOpened())
-			((ExtendedService)service).loadEvaluators();
+		try {
+			if ((service instanceof ExtendedService) && service.isOpened())
+				((ExtendedService)service).loadEvaluators();
+		} catch (Throwable e) {}
+		
+		try {
+			ExtraService extraService = getExtraService();
+			if (extraService != null) extraService.updateApps();
+		} catch (Throwable e) {}
 		
 		return ret;
 	}
@@ -102,14 +109,14 @@ public class ExtendedServer extends DefaultServer {
 			LogUtil.info("Server timer internal tasks: Purging disconnected listeners is successful");
 		}
 		
-		//Task 2: doing extra service tasks.
+		//Task 2: doing applications.
 		try {
 			ExtraService extraService = getExtraService();
 			if (extraService != null) {
-				List<Task> tasks = extraService.getTasks();
-				for (Task task : tasks) {
+				List<App> apps = extraService.getApps();
+				for (App app : apps) {
 					try {
-						task.serverDo();
+						app.serverTask();
 					} catch (Throwable e) {LogUtil.trace(e);}
 				}
 			}

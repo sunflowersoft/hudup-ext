@@ -76,8 +76,8 @@ public class Firer extends PluginManagerAbstract {
 		List<Class<? extends Alg>> algClasses = loadClasses(Alg.class);
 		analyzeAlgClasses(algClasses);
 		
-		List<Class<? extends Tasker>> taskClasses = loadClasses(Tasker.class);
-		analyzeTaskClasses(taskClasses);
+		List<Class<? extends Appor>> apporClasses = loadClasses(Appor.class);
+		analyzeApporClasses(apporClasses);
 	}
 	
 	

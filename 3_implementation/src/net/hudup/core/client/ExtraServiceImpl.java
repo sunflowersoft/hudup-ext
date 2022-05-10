@@ -10,11 +10,14 @@ package net.hudup.core.client;
 import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import net.hudup.core.ExtraStorage;
-import net.hudup.core.Task;
-import net.hudup.core.Tasker;
+import net.hudup.core.App;
+import net.hudup.core.Appor;
 import net.hudup.core.Util;
 import net.hudup.core.logistic.LogUtil;
 
@@ -41,9 +44,9 @@ public class ExtraServiceImpl implements ExtraService, Serializable {
 	
 	
 	/**
-	 * List of tasks.
+	 * List of application creators.
 	 */
-	protected List<Task> tasks = Util.newList();
+	protected Map<String, App> apps = Util.newMap();
 	
 	
 	/**
@@ -63,14 +66,15 @@ public class ExtraServiceImpl implements ExtraService, Serializable {
 		catch (Exception e) {LogUtil.trace(e);}
 		
 		try {
-			Collection<Tasker> taskers = ExtraStorage.getTaskers();
-			tasks.clear();
-			for (Tasker tasker : taskers) {
-				try {
-					Task task = tasker.create(this.server);
-					if (task != null) tasks.add(task);
+			synchronized (this.apps) {
+				List<Appor> appors = ExtraStorage.getAppors();
+				for (Appor appor : appors) {
+					try {
+						App app = appor.create(this.server);
+						if (app != null) this.apps.put(app.getName(), app);
+					}
+					catch (Exception e) {LogUtil.trace(e);}
 				}
-				catch (Exception e) {LogUtil.trace(e);}
 			}
 		}
 		catch (Exception e) {LogUtil.trace(e);}
@@ -81,20 +85,93 @@ public class ExtraServiceImpl implements ExtraService, Serializable {
 
 	@Override
 	public void close() throws Exception {
-		for (Task task : tasks) {
-			try {
-				task.discard();
-			} catch (Throwable e) {LogUtil.trace(e);}
+		synchronized (this.apps) {
+			Collection<App> appList = this.apps.values();
+			for (App app : appList) {
+				try {
+					app.discard();
+				} catch (Throwable e) {LogUtil.trace(e);}
+			}
+			this.apps.clear();
+		}
+	}
+
+
+	/**
+	 * Getting application names.
+	 * @return application names.
+	 */
+	public List<String> getAppNames() {
+		synchronized (this.apps) {
+			List<String> appNames = Util.newList();
+			appNames.addAll(this.apps.keySet());
+			Collections.sort(appNames);
+			return appNames;
+		}
+	}
+	
+	
+	/**
+	 * Getting application by name.
+	 * @param appName application name.
+	 * @return application given name.
+	 */
+	public App getApp(String appName) {
+		synchronized (this.apps) {
+			return this.apps.get(appName);
+		}
+	}
+	
+	
+	@Override
+	public List<App> getApps() throws RemoteException {
+		synchronized (this.apps) {
+			List<String> appNames = getAppNames();
+			List<App> appList = Util.newList(appNames.size());
+			for (String appName : appNames) {
+				appList.add(this.apps.get(appName));
+			}
+			return appList;
+		}
+	}
+	
+	
+	@Override
+	public void updateApps() throws RemoteException {
+		synchronized (this.apps) {
+			List<Appor> appors = ExtraStorage.getAppors();
+			Set<String> sysAppNames= Util.newSet();
+			for (Appor appor : appors) {
+				try {
+					sysAppNames.add(appor.getName());
+					if (this.apps.containsKey(appor.getName())) continue;
+					App app = appor.create(this.server);
+					if (app == null) continue;
+					
+					sysAppNames.add(app.getName());
+					
+					if (this.apps.containsKey(app.getName()))
+						app.discard();
+					else 
+						this.apps.put(app.getName(), app);
+				}
+				catch (Exception e) {LogUtil.trace(e);}
+			}
+			
+			List<String> appNames = getAppNames();
+			appNames.removeAll(sysAppNames);
+			for (String appName : appNames) {
+				try {
+					App app = this.apps.get(appName);
+					if (app == null) continue;
+					
+					app.discard();
+					this.apps.remove(appName);
+				} catch (Exception e) {LogUtil.trace(e);}
+			}
 		}
 		
-		tasks.clear();
 	}
 
 
-	@Override
-	public List<Task> getTasks() throws RemoteException {
-		return tasks;
-	}
-	
-	
 }

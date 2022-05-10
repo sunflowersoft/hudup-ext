@@ -1158,9 +1158,11 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 		
 		//Resetting menu bar, this code can be removed because it is unimportant.
 		try {
-			JMenuBar mnBar = createMenuBar();
-			setJMenuBar(mnBar);
-			mnBar.revalidate();
+			if (server != null) {
+				JMenuBar mnBar = createMenuBar();
+				setJMenuBar(mnBar);
+				mnBar.revalidate();
+			}
 		} catch (Exception e) {LogUtil.trace(e);}
 	}
 	

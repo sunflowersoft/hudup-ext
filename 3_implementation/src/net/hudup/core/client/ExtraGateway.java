@@ -22,14 +22,14 @@ public interface ExtraGateway extends Remote, Serializable {
 
 	
 	/**
-	 * Getting remote task object.
+	 * Getting remote application object.
 	 * @param account account name.
 	 * @param password account password.
-	 * @param taskName task name.
-	 * @return remote task object.
+	 * @param appName application name.
+	 * @return remote application object.
 	 * @throws RemoteException if any error raises.
 	 */
-	Remote getTaskRemoteObject(String account, String password, String taskName) throws RemoteException;
+	Remote getAppRemoteObject(String account, String password, String appName) throws RemoteException;
 	
 	
 }

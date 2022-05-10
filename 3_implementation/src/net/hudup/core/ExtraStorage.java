@@ -7,7 +7,7 @@
  */
 package net.hudup.core;
 
-import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -25,9 +25,9 @@ public class ExtraStorage {
 
 
 	/**
-	 * Map of extra taskers.
+	 * Map of extra application creators.
 	 */
-	protected final static Map<String, Tasker> taskers = Util.newMap();
+	protected final static Map<String, Appor> appors = Util.newMap();
 	
 	
 	/**
@@ -37,11 +37,11 @@ public class ExtraStorage {
 	
 	
 	/**
-	 * Clearing taskers.
+	 * Clearing application creators.
 	 */
-	public final static void clearTaskers() {
-		synchronized (taskers) {
-			taskers.clear();
+	public final static void clearAppors() {
+		synchronized (appors) {
+			appors.clear();
 		}
 	}
 
@@ -63,16 +63,16 @@ public class ExtraStorage {
 	
 	
 	/**
-	 * Adding tasker.
-	 * @param tasker tasker.
+	 * Adding application creator.
+	 * @param appor application creator.
 	 * @return true if adding is successful.
 	 */
-	public final static boolean addTasker(Tasker tasker) {
-		synchronized (taskers) {
-			if (taskers.containsKey(tasker.getName()))
+	public final static boolean addAppor(Appor appor) {
+		synchronized (appors) {
+			if (appors.containsKey(appor.getName()))
 				return false;
 			else {
-				taskers.put(tasker.getName(), tasker);
+				appors.put(appor.getName(), appor);
 				return true;
 			}
 		}
@@ -91,14 +91,14 @@ public class ExtraStorage {
 
 	
 	/**
-	 * Removing tasker based on tasker name.
-	 * @param taskerName tasker name.
+	 * Removing application creator based on application creator name.
+	 * @param apporName application creator name.
 	 * @return true if adding is successful.
 	 */
-	public final static boolean removeTasker(String taskerName) {
-		synchronized (taskers) {
-			if (taskers.containsKey(taskerName)) {
-				return taskers.remove(taskerName) != null;
+	public final static boolean removeAppor(String apporName) {
+		synchronized (appors) {
+			if (appors.containsKey(apporName)) {
+				return appors.remove(apporName) != null;
 			}
 			else
 				return false;
@@ -120,24 +120,44 @@ public class ExtraStorage {
 
 	
 	/**
-	 * Getting task given tasker name.
-	 * @param taskerName tasker name.
-	 * @return task given tasker name.
+	 * Getting application creator given name.
+	 * @param apporName application creator name.
+	 * @return application creator given name.
 	 */
-	public final static Tasker getTasker(String taskerName) {
-		synchronized (taskers) {
-			return taskers.get(taskerName);
+	public final static Appor getAppor(String apporName) {
+		synchronized (appors) {
+			return appors.get(apporName);
 		}
 	}
 	
 	
 	/**
-	 * Getting collection of taskers.
-	 * @return collection of taskers.
+	 * Getting application creators names.
+	 * @return application creators names.
 	 */
-	public final static Collection<Tasker> getTaskers() {
-		synchronized (taskers) {
-			return taskers.values();
+	public final static List<String> getApporNames() {
+		synchronized (appors) {
+			List<String> apporNames = Util.newList();
+			apporNames.addAll(appors.keySet());
+			Collections.sort(apporNames);
+			return apporNames;
+		}
+		
+	}
+	
+	
+	/**
+	 * Getting list of application creators.
+	 * @return list of application creators.
+	 */
+	public final static List<Appor> getAppors() {
+		synchronized (appors) {
+			List<String> apporNames = getApporNames();
+			List<Appor> apporList = Util.newList(apporNames.size());
+			for (String appName : apporNames) {
+				apporList.add(appors.get(appName));
+			}
+			return apporList;
 		}
 	}
 	
@@ -147,7 +167,7 @@ public class ExtraStorage {
 	 */
 	public final static void clear() {
 		try {
-			clearTaskers();
+			clearAppors();
 		} catch (Throwable e) {LogUtil.trace(e);}
 		
 		try {

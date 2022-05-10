@@ -22,7 +22,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 
-import net.hudup.core.Task;
+import net.hudup.core.App;
 import net.hudup.core.client.ConnectInfo;
 import net.hudup.core.client.Connector;
 import net.hudup.core.client.ExtraService;
@@ -161,12 +161,12 @@ public class ExtendedServerCP extends PowerServerCP {
 		JMenu mnApps = new JMenu(I18nUtil.message("apps"));
 		mnApps.setMnemonic('a');
 		try {
-			ExtraService extraService = server.getExtraService();
+			ExtraService extraService = server != null ? server.getExtraService() : null;
 			if (extraService != null) {
-				List<Task> tasks = extraService.getTasks();
-				for (Task task : tasks) {
+				List<App> apps = extraService.getApps();
+				for (App app : apps) {
 					JMenuItem mniTask = new JMenuItem(
-						new AbstractAction(task.getDesc()) {
+						new AbstractAction(app.getDesc()) {
 							
 							/**
 							 * Serial version UID for serializable class. 
@@ -176,7 +176,7 @@ public class ExtendedServerCP extends PowerServerCP {
 							@Override
 							public void actionPerformed(ActionEvent e) {
 								try {
-									task.show(connectInfo);
+									app.show(connectInfo);
 								}
 								catch (Exception ex) {LogUtil.trace(ex);}
 							}
