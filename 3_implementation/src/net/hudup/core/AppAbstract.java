@@ -33,10 +33,10 @@ public abstract class AppAbstract implements App {
 	
 	/**
 	 * Constructor with application creator.
-	 * @param tasker specified tasker.
+	 * @param appor specified application creator.
 	 */
-	public AppAbstract(Appor tasker) {
-		this.appor = tasker;
+	public AppAbstract(Appor appor) {
+		this.appor = appor;
 	}
 
 	
