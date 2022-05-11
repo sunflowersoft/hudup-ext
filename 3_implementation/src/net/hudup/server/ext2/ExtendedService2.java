@@ -41,6 +41,12 @@ public class ExtendedService2 extends ExtendedService {
 
 
 	@Override
+	protected void loadEvaluators() {
+		super.loadEvaluators();
+	}
+
+
+	@Override
 	protected void purgeListeners() {
 		super.purgeListeners();
 	}

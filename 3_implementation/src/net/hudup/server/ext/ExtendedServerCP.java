@@ -159,7 +159,6 @@ public class ExtendedServerCP extends PowerServerCP {
 
 		
 		JMenu mnApps = new JMenu(I18nUtil.message("apps"));
-		mnApps.setMnemonic('a');
 		try {
 			ExtraService extraService = server != null ? server.getExtraService() : null;
 			if (extraService != null) {
@@ -185,10 +184,11 @@ public class ExtendedServerCP extends PowerServerCP {
 				}
 			}
 		} catch (Throwable e) {LogUtil.trace(e);}
+		mnApps.setMnemonic('a');
 		addToAppsMenu(mnApps);
 		if (mnApps.getItemCount() > 0) {
 			try {
-				if (server.isRunning()) mnBar.add(mnApps);
+				if (server != null && server.isRunning()) mnBar.add(mnApps);
 				
 			} catch (Throwable e) {LogUtil.trace(e);}
 		}

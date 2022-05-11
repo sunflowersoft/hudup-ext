@@ -13,6 +13,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.rmi.RemoteException;
+import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.JMenu;
@@ -21,8 +22,10 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 
+import net.hudup.core.App;
 import net.hudup.core.client.ConnectInfo;
 import net.hudup.core.client.Connector;
+import net.hudup.core.client.ExtraService;
 import net.hudup.core.client.LightRemoteServerCP;
 import net.hudup.core.client.PowerServer;
 import net.hudup.core.client.RemoteServerCP;
@@ -159,10 +162,39 @@ public class ExtendedServer2CP extends ExternalServerCP {
 
 		
 		JMenu mnApps = new JMenu(I18nUtil.message("apps"));
+		try {
+			ExtraService extraService = server != null ? server.getExtraService() : null;
+			if (extraService != null) {
+				List<App> apps = extraService.getApps();
+				for (App app : apps) {
+					JMenuItem mniTask = new JMenuItem(
+						new AbstractAction(app.getDesc()) {
+							
+							/**
+							 * Serial version UID for serializable class. 
+							 */
+							private static final long serialVersionUID = 1L;
+
+							@Override
+							public void actionPerformed(ActionEvent e) {
+								try {
+									app.show(connectInfo);
+								}
+								catch (Exception ex) {LogUtil.trace(ex);}
+							}
+						});
+					mnApps.add(mniTask);
+				}
+			}
+		} catch (Throwable e) {LogUtil.trace(e);}
 		mnApps.setMnemonic('a');
 		addToAppsMenu(mnApps);
-		if (mnApps.getItemCount() > 0) mnBar.add(mnApps);
-
+		if (mnApps.getItemCount() > 0) {
+			try {
+				if (server != null && server.isRunning()) mnBar.add(mnApps);
+				
+			} catch (Throwable e) {LogUtil.trace(e);}
+		}
 		
 		JMenu mnHelp = new JMenu(I18nUtil.message("help"));
 		mnHelp.setMnemonic('h');

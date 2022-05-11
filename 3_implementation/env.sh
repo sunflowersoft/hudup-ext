@@ -13,7 +13,7 @@ PATH=.:$JDK_HOME/bin:$JAVA_HOME/bin:$ANT_HOME/bin:$HUDUP_OLD_PATH
 
 echo PATH=$PATH
 
-CLASSPATH=./hudup.jar:./hudup-runtime-lib.jar:./bin:./lib/*:./working/lib/*
+CLASSPATH=./hudup-core.jar:./hudup.jar:./hudup-runtime-lib.jar:./bin:./lib/*:./working/lib/*:$EXTRA_CLASSPATH
 
 echo CLASSPATH=$CLASSPATH
 

@@ -13,13 +13,20 @@ import java.awt.MenuItem;
 import java.awt.PopupMenu;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.nio.file.Path;
+import java.util.List;
 import java.util.Scanner;
 
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 
+import net.hudup.core.App;
 import net.hudup.core.Constants;
 import net.hudup.core.alg.cf.gfall.GreenFallCF;
+import net.hudup.core.client.ExtraGateway;
+import net.hudup.core.client.ExtraGatewayImpl;
+import net.hudup.core.client.ExtraService;
+import net.hudup.core.client.ExtraServiceImpl;
 import net.hudup.core.client.PowerServer;
 import net.hudup.core.logistic.I18nUtil;
 import net.hudup.core.logistic.LogUtil;
@@ -67,14 +74,66 @@ public class ExtendedServer2 extends ExternalServer {
 
 
 	@Override
+	protected ExtraService createExtraService() {
+		try {
+			return new ExtraServiceImpl(this);
+		}
+		catch (Throwable e) {LogUtil.trace(e);}
+		
+		return null;
+	}
+
+
+	@Override
+	protected ExtraGateway createExtraGateway() {
+		return new ExtraGatewayImpl(this);
+	}
+
+
+	@Override
+	protected boolean onWatcherLoadLib(Path libPath) {
+		boolean ret = super.onWatcherLoadLib(libPath);
+		if (!ret) return false;
+		
+		try {
+			if ((service instanceof ExtendedService2) && service.isOpened())
+				((ExtendedService2)service).loadEvaluators();
+		} catch (Throwable e) {}
+		
+		try {
+			ExtraService extraService = getExtraService();
+			if (extraService != null) extraService.updateApps();
+		} catch (Throwable e) {}
+		
+		return ret;
+	}
+
+
+	@Override
 	protected void serverTasks() {
 		super.serverTasks();
 		
 		//Task 1: Purging disconnected listeners.
 		if (Constants.SERVER_PURGE_LISTENERS && (service != null) && (service instanceof ExtendedService2)) {
-			((ExtendedService2)service).purgeListeners();
+			try {
+				((ExtendedService2)service).purgeListeners();
+			} catch (Throwable e) {LogUtil.trace(e);}
 			LogUtil.info("Server timer internal tasks: Purging disconnected listeners is successful");
 		}
+	
+		//Task 2: doing applications.
+		try {
+			ExtraService extraService = getExtraService();
+			if (extraService != null) {
+				List<App> apps = extraService.getApps();
+				for (App app : apps) {
+					try {
+						app.serverTask();
+					} catch (Throwable e) {LogUtil.trace(e);}
+				}
+			}
+		} catch (Throwable e) {LogUtil.trace(e);}
+
 	}
 
 
