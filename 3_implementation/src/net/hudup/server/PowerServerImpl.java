@@ -538,6 +538,9 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 		
 		//Added date: 2019.09.15 by Loc Nguyen.
 		PluginStorage.clear();
+		
+		//Added date: 2022.05.11 by Loc Nguyen.
+		ExtraStorage.clear();
 	}
 
 	
