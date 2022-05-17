@@ -61,6 +61,11 @@ import net.hudup.core.logistic.Vector;
  * Achraf Gazdar and Lotfi Hidri contributed Absolute Difference of Ratings (ADR) measure and OS measure.<br>
  * <br>
  * Ling-Jiao Chen, Zi-Ke Zhang, Jin-Hu Liu, Jian Gao, and Tao Zhou contributed resource-allocation (RA) measure..<br>
+ * <br>
+ * Shunpan Liang, Lin Ma, and Fuyong Yuan contributed improved Jaccard (IJ) measure.<br>
+ * <br>
+ * Wu, Huang, and Wang contributed JacRA measure.<br>
+ * <br>
  * 
  * @author Loc Nguyen
  * @version 10.0
@@ -340,15 +345,21 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 
 	
 	/**
-	 * Threshold of rating relevant measure.
-	 */
-	protected static final String RATINGJ_THRESHOLD_FIELD = "jaccard_ratingj_threshold";
-
-	
-	/**
 	 * Improved Jaccard (IJ).
 	 */
 	public static final String JACCARD_TYPE_IJ = "ij";
+
+	
+	/**
+	 * RA Jaccard (JacRA).
+	 */
+	public static final String JACCARD_TYPE_RA = "ra";
+
+	
+	/**
+	 * Threshold of rating relevant measure.
+	 */
+	protected static final String RATINGJ_THRESHOLD_FIELD = "jaccard_ratingj_threshold";
 
 	
 	/**
@@ -1602,6 +1613,10 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 			return jaccardRating(vRating1, vRating2, profile1, profile2);
 		else if (jtype.equals(JACCARD_TYPE_INDEXEDJ))
 			return jaccardIndexed(vRating1, vRating2, profile1, profile2);
+		if (jtype.equals(JACCARD_TYPE_IJ))
+			return jaccardImproved(vRating1, vRating2, profile1, profile2);
+		else if (jtype.equals(JACCARD_TYPE_RA))
+			return jaccardRA(vRating1, vRating2, profile1, profile2);
 		else
 			return jaccardNormal(vRating1, vRating2, profile1, profile2);
 	}
@@ -1824,6 +1839,152 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 		}
 		
 		return sumJ / M;
+	}
+	
+	
+	/**
+	 * Calculating the improved Jaccard (IJ) measure between two pairs.
+	 * Shunpan Liang, Lin Ma, and Fuyong YuanShunpan Liang, Lin Ma, and Fuyong Yuan developed the improved Jaccard (IJ) measure. Loc Nguyen implements it.
+	 * The first pair includes the first rating vector and the first profile.
+	 * The second pair includes the second rating vector and the second profile.
+	 * 
+	 * @param vRating1 first rating vector.
+	 * @param vRating2 second rating vector.
+	 * @param profile1 first profile.
+	 * @param profile2 second profile.
+	 * @return Improved Jaccard (IJ) measure between both two rating vectors and profiles.
+	 * @author Shunpan Liang, Lin Ma, Fuyong Yuan
+	 */
+	protected double jaccardImproved(RatingVector vRating1, RatingVector vRating2,
+			Profile profile1, Profile profile2) {
+		Set<Integer> PA = Util.newSet(), NA = Util.newSet(), D = Util.newSet(), PO = Util.newSet(), NO = Util.newSet();
+		Set<Integer> ids = unionFieldIds(vRating1, vRating2);
+		if (ids.size() == 0) return Constants.UNUSED;
+		
+		for (int id : ids) {
+			if (vRating1.isRated(id) && vRating2.isRated(id)) {
+				double v1 = vRating1.get(id).value;
+				double v2 = vRating2.get(id).value;
+				if (Accuracy.isRelevant(v1, this.ratingMedian) && Accuracy.isRelevant(v2, this.ratingMedian))
+					PA.add(id);
+				else if ((!Accuracy.isRelevant(v1, this.ratingMedian)) && (!Accuracy.isRelevant(v2, this.ratingMedian)))
+					NA.add(id);
+				else
+					D.add(id);
+			}
+			else {
+				double v = vRating1.isRated(id) ? vRating1.get(id).value : Constants.UNUSED;
+				if (!Util.isUsed(v)) v = vRating2.get(id).value;
+				if (Accuracy.isRelevant(v, this.ratingMedian))
+					PO.add(id);
+				else
+					NO.add(id);
+			}
+		}
+		
+		double numerator = 0;
+		for (int id : PA) {
+			double[] PNE = improvedJaccardCalcSingularities(id);
+			if (PNE != null) numerator += PNE[0];
+		}
+		for (int id : NA) {
+			double[] PNE = improvedJaccardCalcSingularities(id);
+			if (PNE != null) numerator += PNE[1];
+		}
+		for (int id : D) {
+			double[] PNE = improvedJaccardCalcSingularities(id);
+			if (PNE != null) numerator += Math.sqrt(PNE[0]*PNE[1]);
+		}
+
+		double denominator = numerator;
+		for (int id : PO) {
+			double[] PNE = improvedJaccardCalcSingularities(id);
+			if (PNE != null) denominator += Math.sqrt(PNE[0]*PNE[2]);
+		}
+		for (int id : NO) {
+			double[] PNE = improvedJaccardCalcSingularities(id);
+			if (PNE != null) denominator += Math.sqrt(PNE[1]*PNE[2]);
+		}
+		
+		return numerator / denominator;
+	}
+
+	
+	/**
+	 * Calculating singularities for improved Jaccard measure given column identifier.
+	 * The improved Jaccard measure was developed by Shunpan Liang, Lin Ma, Fuyong Yuan.
+	 * @param columnId given column identifier.
+	 * @return singularities for improved Jaccard measure.
+	 * @author Shunpan Liang, Lin Ma, Fuyong Yuan
+	 */
+	protected double[] improvedJaccardCalcSingularities(int columnId) {
+		Task task = new Task() {
+			
+			@Override
+			public Object perform(Object...params) {
+				RatingVector columnVector = getColumnRating(columnId);
+				if (columnVector == null || columnVector.size() == 0)
+					return null;
+				
+				Set<Integer> columnIds = getColumnIds();
+				double total = columnIds.size();
+				if (total == 0) return null;
+				int P = 0, N = 0, E = 0;
+				for (int columnId : columnIds) {
+					if (columnVector.isRated(columnId)) {
+						double rating = columnVector.get(columnId).value;
+						if (Accuracy.isRelevant(rating, ratingMedian))
+							P++;
+						else
+							N++;
+					}
+					else
+						E++;
+				}
+				
+				return new double[] {1.0-(double)P/total, 1.0-(double)N/total, 1.0-(double)E/total};
+			}
+		};
+		
+		return (double[])cacheTask(columnId, this.valueCache, task);
+	}
+
+	
+	/**
+	 * Calculating the JacRA measure between two pairs.
+	 * Wu, Huang, and Wang developed the improved JacRA measure. Loc Nguyen implements it.
+	 * @param vRating1 first rating vector.
+	 * @param vRating2 second rating vector.
+	 * @param profile1 first profile.
+	 * @param profile2 second profile.
+	 * @return JacRA measure between both two rating vectors.
+	 * @author Wu, Huang, Wang
+	 */
+	protected double jaccardRA(RatingVector vRating1, RatingVector vRating2,
+			Profile profile1, Profile profile2) {
+		Set<Integer> set1 = vRating1.fieldIds(true);
+		Set<Integer> set2 = vRating2.fieldIds(true);
+		Set<Integer> common = Util.newSet();
+		common.addAll(set1);
+		common.retainAll(set2);
+		double N = set1.size() + set2.size() - common.size();
+		if (N == 0) return Constants.UNUSED;
+
+		double sum = 0;
+		for (int id : common) {
+			double v1 = vRating1.get(id).value;
+			double v2 = vRating2.get(id).value;
+			if (v1 == 0 && v2 == 0) {
+				sum += 1;
+				continue;
+			}
+
+			double min = Math.min(v1, v2);
+			double max = Math.max(v1, v2);
+			if (max != 0) sum += min/max;
+		}
+		
+		return sum / (double)N;
 	}
 	
 	
@@ -2450,6 +2611,7 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 					jtypes.add(JACCARD_TYPE_RATINGJ);
 					jtypes.add(JACCARD_TYPE_INDEXEDJ);
 					jtypes.add(JACCARD_TYPE_IJ);
+					jtypes.add(JACCARD_TYPE_RA);
 					Collections.sort(jtypes);
 					
 					return (Serializable) JOptionPane.showInputDialog(

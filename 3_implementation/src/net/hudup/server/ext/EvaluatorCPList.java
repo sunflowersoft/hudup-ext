@@ -53,6 +53,9 @@ import net.hudup.core.client.ConnectInfo;
 import net.hudup.core.client.Connector;
 import net.hudup.core.client.Service;
 import net.hudup.core.client.ServiceExt;
+import net.hudup.core.client.ServiceNoticeEvent;
+import net.hudup.core.client.ServiceNoticeListener;
+import net.hudup.core.client.ServiceNoticeEvent.Type;
 import net.hudup.core.data.BooleanWrapper;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.ui.SysConfigPane;
@@ -74,7 +77,7 @@ import net.hudup.core.logistic.MathUtil;
 import net.hudup.core.logistic.NetUtil;
 import net.hudup.core.logistic.ui.UIUtil;
 import net.hudup.core.parser.TextParserUtil;
-import net.hudup.server.ext.ServiceNoticeEvent.Type;
+import net.hudup.evaluate.ui.EvalCompoundGUI;
 
 /**
  * This class is advanced control panel for evaluator.
@@ -363,7 +366,7 @@ public class EvaluatorCPList extends JFrame {
 		EvaluatorWrapper evItem = tblEvaluator.getEvaluatorItem(selectedRow);
 		if (evItem == null || evItem.evaluator == null) return;
 		
-		EvaluatorWrapper.openEvaluator(evItem, tblEvaluator.getConnectInfo(), this);
+		EvalCompoundGUI.run(evItem, tblEvaluator.getConnectInfo(), this);
 	}
 	
 	
@@ -641,7 +644,7 @@ class EvaluatorTable extends JTable implements EvaluateListener, EvaluateProgres
 			new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					EvaluatorWrapper.openEvaluator(evItem, getModel2().connectInfo, getEvaluatorTable());
+					EvalCompoundGUI.run(evItem, getModel2().connectInfo, getEvaluatorTable());
 				}
 			});
 		ctxMenu.add(miOpen);

@@ -52,4 +52,29 @@ public abstract class AppAbstract implements App {
 	}
 
 
+	@Override
+	public boolean discard() throws RemoteException {
+		boolean discarded = false;
+		if (appor == null || !(appor instanceof ApporAbstract))
+			discarded = discard0();
+		else {
+			ApporAbstract aa = (ApporAbstract)appor;
+			if (this != aa.app)
+				discarded = discard0();
+			else
+				discarded = aa.discard(this);
+		}
+		
+		this.appor = null;
+		return discarded;
+	}
+
+
+	/**
+	 * Discard this application.
+	 * @return true if closing is successful.
+	 */
+	protected abstract boolean discard0();
+
+
 }

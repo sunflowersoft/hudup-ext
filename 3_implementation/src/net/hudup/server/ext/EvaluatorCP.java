@@ -55,6 +55,7 @@ import net.hudup.core.logistic.I18nUtil;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.NetUtil;
 import net.hudup.core.logistic.ui.UIUtil;
+import net.hudup.evaluate.ui.EvalCompoundGUI;
 
 /**
  * This class is control panel for evaluator.
@@ -216,7 +217,7 @@ public class EvaluatorCP extends JFrame implements EvaluatorListener {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					EvaluatorWrapper evaluatorItem = (EvaluatorWrapper)cmbEvaluators.getSelectedItem();
-					EvaluatorWrapper.openEvaluator(evaluatorItem, getThisEvaluatorCP().connectInfo, getThisEvaluatorCP());
+					EvalCompoundGUI.run(evaluatorItem, getThisEvaluatorCP().connectInfo, getThisEvaluatorCP());
 				}
 			});
 		btnOpenStart.setMargin(new Insets(0, 0 , 0, 0));

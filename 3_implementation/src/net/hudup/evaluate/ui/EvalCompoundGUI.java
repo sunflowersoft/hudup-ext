@@ -8,6 +8,7 @@
 package net.hudup.evaluate.ui;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.Image;
@@ -62,9 +63,11 @@ import net.hudup.core.evaluate.Metric;
 import net.hudup.core.evaluate.Metrics;
 import net.hudup.core.evaluate.NoneWrapperMetricList;
 import net.hudup.core.evaluate.ui.EvaluateGUIData;
+import net.hudup.core.evaluate.ui.EvaluatorWrapper;
 import net.hudup.core.evaluate.ui.MetricsAnalyzeDlg;
 import net.hudup.core.evaluate.ui.MetricsTable;
 import net.hudup.core.logistic.Account;
+import net.hudup.core.logistic.DSUtil;
 import net.hudup.core.logistic.I18nUtil;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.NetUtil;
@@ -1217,6 +1220,54 @@ public class EvalCompoundGUI extends JFrame {
 			new EvalCompoundGUI(evaluator, connectInfo, referredData);
 		}
 		catch (Exception e) {LogUtil.trace(e);}
+	}
+
+
+	/**
+	 * Open evaluator.
+	 * @param evaluatorItem specified evaluator item.
+	 * @param connectInfo connection information.
+	 * @param parent parent component.
+	 */
+	public static void run(EvaluatorWrapper evaluatorItem, ConnectInfo connectInfo, Component parent) {
+		if (evaluatorItem == null || evaluatorItem.evaluator == null) {
+			JOptionPane.showMessageDialog(parent, "Cannot open evaluator", "Cannot open evaluator", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+		
+		if (EvaluatorAbstract.isPullModeRequired(evaluatorItem.evaluator) && !connectInfo.pullMode) {
+			JOptionPane.showMessageDialog(parent,
+				"Can't retrieve evaluator because PULL MODE is not set\n" +
+				"whereas the remote evaluator requires PULL MODE.\n" +
+				"You have to check PULL MODE in connection dialog.",
+				"Retrieval to evaluator failed", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+
+		if (evaluatorItem.guiData == null) evaluatorItem.guiData = new EvaluateGUIData();
+		
+		if (evaluatorItem.guiData.active) {
+			JOptionPane.showMessageDialog(
+				parent, 
+				"GUI of evaluator named '" + DSUtil.shortenVerbalName(evaluatorItem.getName()) + "' is running.", 
+				"Evaluator GUI running", 
+				JOptionPane.INFORMATION_MESSAGE);
+			return;
+		}
+		
+		try {
+			EvalCompoundGUI.class.getClass();
+		}
+		catch (Exception ex) {
+			JOptionPane.showMessageDialog(
+					parent, 
+					"Cannot open evaluator control panel due to lack of evaluate package", 
+					"lack of evaluate package", 
+					JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+
+		run(evaluatorItem.evaluator, connectInfo, evaluatorItem.guiData, null);
 	}
 
 

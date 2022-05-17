@@ -7,6 +7,7 @@
  */
 package net.hudup.core;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -41,6 +42,11 @@ public class ExtraStorage {
 	 */
 	public final static void clearAppors() {
 		synchronized (appors) {
+			Collection<Appor> apporList = appors.values();
+			for (Appor appor : apporList) {
+				try {appor.close();} catch (Throwable e) {}
+			}
+			
 			appors.clear();
 		}
 	}
@@ -98,7 +104,9 @@ public class ExtraStorage {
 	public final static boolean removeAppor(String apporName) {
 		synchronized (appors) {
 			if (appors.containsKey(apporName)) {
-				return appors.remove(apporName) != null;
+				Appor appor = appors.remove(apporName);
+				try {if (appor != null) appor.close();} catch (Throwable e) {}
+				return appor != null;
 			}
 			else
 				return false;
