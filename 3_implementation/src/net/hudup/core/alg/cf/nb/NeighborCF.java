@@ -1069,10 +1069,10 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 			return triangle(vRating1, vRating2, profile1, profile2);
 		else if (measure.equals(Measure.SMC))
 			return smc(vRating1, vRating2, profile1, profile2);
-		else if (measure.equals(Measure.ADR))
-			return adr(vRating1, vRating2, profile1, profile2);
 		else if (measure.equals(Measure.IPWR))
 			return ipwr(vRating1, vRating2, profile1, profile2);
+		else if (measure.equals(Measure.ADR))
+			return adr(vRating1, vRating2, profile1, profile2);
 		else if (measure.equals(Measure.OS))
 			return os(vRating1, vRating2, profile1, profile2);
 		else
