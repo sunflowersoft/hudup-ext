@@ -996,8 +996,13 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 						texts.add("Ended date: " + df.format(new Date(otherResult.endDate)));
 				}
 				
-				if (connectInfo != null)
-					texts.add("Connection information: " + connectInfo.toString());
+				if (connectInfo != null) texts.add("Connection information: " + connectInfo.toString());
+				
+				if (guiData.isRefPool) {
+					try {
+						texts.add("Referred pool: " + DSUtil.shortenVerbalName(evaluator.getInfo().refPoolResultName));
+					} catch (Throwable e) {}
+				}
 				
 				return texts;
 			}
@@ -1599,7 +1604,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 				btnTestingBrowse.setEnabled(PluginStorage.getParserReg().size() > 0 && !guiData.isRefPool);
 				btnClear.setEnabled( (training != null || testing != null)  && !guiData.isRefPool );
 				btnUpload.setEnabled( ((training == null && testing == null) || (training != null && testing != null)) && !guiData.isRefPool );
-				btnDownload.setEnabled(true && !guiData.isRefPool);
+				btnDownload.setEnabled(true);
 
 				tblMetrics.update(result);
 				prgRunning.setMaximum(0);
@@ -1614,10 +1619,10 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 				btnConfig.setEnabled(true);
 				btnTrainingBrowse.setEnabled(true);
 				btnTestingBrowse.setEnabled(true);
-				btnRefresh.setEnabled( (training != null || testing != null) && !guiData.isRefPool );
+				btnRefresh.setEnabled( (training != null || testing != null) );
 				btnClear.setEnabled( (training != null || testing != null) && !guiData.isRefPool );
 				btnUpload.setEnabled( ((training == null && testing == null) || (training != null && testing != null)) && !guiData.isRefPool );
-				btnDownload.setEnabled(true && !guiData.isRefPool);
+				btnDownload.setEnabled(true);
 				
 				tblMetrics.update(result);
 				prgRunning.setMaximum(0);
@@ -1685,7 +1690,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			btnTrainingBrowse.setEnabled(PluginStorage.getParserReg().size() > 0 && !guiData.isRefPool);
 			btnTestingBrowse.setEnabled(PluginStorage.getParserReg().size() > 0 && !guiData.isRefPool);
 			btnUpload.setEnabled( ((training == null && testing == null) || (training != null && testing != null)) && !guiData.isRefPool );
-			btnDownload.setEnabled(true && !guiData.isRefPool);
+			btnDownload.setEnabled(true);
 		}
 	}
 	
@@ -1707,10 +1712,10 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 		this.btnTestingBrowse.setEnabled(flag && trainingSet != null && !guiData.isRefPool);
 		this.txtTestingBrowse.setEnabled(flag && trainingSet != null && !guiData.isRefPool);
 		
-		this.btnRefresh.setEnabled( flag && (trainingSet != null || testingSet != null) && !guiData.isRefPool );
+		this.btnRefresh.setEnabled( flag && (trainingSet != null || testingSet != null) );
 		this.btnClear.setEnabled( flag && (trainingSet != null || testingSet != null) && !guiData.isRefPool );
 		this.btnUpload.setEnabled( flag && ((trainingSet == null && testingSet == null) || (trainingSet != null && testingSet != null)) && !guiData.isRefPool );
-		this.btnDownload.setEnabled(flag && !guiData.isRefPool);
+		this.btnDownload.setEnabled(flag);
 
 		this.btnRun.setEnabled(
 			flag && 

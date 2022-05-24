@@ -1088,7 +1088,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 				
 				if (guiData.isRefPool) {
 					try {
-						texts.add("Referred pool: " + evaluator.getInfo().refPoolResultName);
+						texts.add("Referred pool: " + DSUtil.shortenVerbalName(evaluator.getInfo().refPoolResultName));
 					} catch (Throwable e) {}
 				}
 				
@@ -1409,7 +1409,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 				btnAddDataset.setEnabled(PluginStorage.getParserReg().size() > 0 && !guiData.isRefPool);
 				btnClear.setEnabled(guiData.pool.size() > 0 && !guiData.isRefPool);
 				btnUpload.setEnabled(true && !guiData.isRefPool);
-				btnDownload.setEnabled(true && !guiData.isRefPool);
+				btnDownload.setEnabled(true);
 				
 				tblMetrics.update(result);
 				prgRunning.setMaximum(0);
@@ -1425,7 +1425,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 				btnAddDataset.setEnabled(true && !guiData.isRefPool);
 				btnLoadBatchScript.setEnabled(true && !guiData.isRefPool);
 				btnUpload.setEnabled(true && !guiData.isRefPool);
-				btnDownload.setEnabled(true && !guiData.isRefPool);
+				btnDownload.setEnabled(true);
 				
 				tblMetrics.update(result);
 				prgRunning.setMaximum(0);
@@ -1491,7 +1491,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			btnConfigAlgs.setEnabled(algRegTable.size() > 0);
 			btnAddDataset.setEnabled(PluginStorage.getParserReg().size() > 0 && !guiData.isRefPool);
 			btnUpload.setEnabled(true && !guiData.isRefPool);
-			btnDownload.setEnabled(true && !guiData.isRefPool);
+			btnDownload.setEnabled(true);
 		}
 		
 		updateGUI();
@@ -1512,10 +1512,10 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 		this.btnLoadBatchScript.setEnabled(flag && !guiData.isRefPool);
 		this.btnSaveBatchScript.setEnabled(flag && guiData.pool.size() > 0 && !guiData.isRefPool);
 		
-		this.btnRefresh.setEnabled(flag && guiData.pool.size() > 0 && !guiData.isRefPool);
+		this.btnRefresh.setEnabled(flag && guiData.pool.size() > 0);
 		this.btnClear.setEnabled(flag && guiData.pool.size() > 0 && !guiData.isRefPool);
 		this.btnUpload.setEnabled(flag && !guiData.isRefPool);
-		this.btnDownload.setEnabled(flag && !guiData.isRefPool);
+		this.btnDownload.setEnabled(flag);
 
 		this.btnRun.setEnabled(flag && guiData.pool.size() > 0);
 		this.btnPauseResume.setEnabled(flag && guiData.pool.size() > 0);
@@ -1948,7 +1948,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			JOptionPane.showMessageDialog(this, "Empty dataset pool", "Empty pool", JOptionPane.ERROR_MESSAGE);
 			return;
 		}
-		if (guiData.pool.containsClients()) {
+		if (guiData.pool.containsOnlyUUID()) {
 			JOptionPane.showMessageDialog(this, "Client dataset pool", "Client dataset pool", JOptionPane.ERROR_MESSAGE);
 			return;
 		}
@@ -1979,15 +1979,20 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 				return;
 			}
 			
-			if (poolsService.contains(evaluator.getName())) {
+			String name = JOptionPane.showInputDialog(this, "Enter pool name", evaluator.getName());
+			if (name == null || name.isEmpty()) {
+				JOptionPane.showMessageDialog(this, "Empty pool name", "Empty pool name", JOptionPane.WARNING_MESSAGE);
+				return;
+			}
+			if (poolsService.contains(name)) {
 				JOptionPane.showMessageDialog(this, "This pool was put before", "This pool was put before", JOptionPane.WARNING_MESSAGE);
 				return;
 			}
 			
 			DatasetPoolExchanged exchangedPool = guiData.pool.toDatasetPoolExchanged().toDatasetPool(null).toDatasetPoolExchanged();
 			evaluator.updatePoolWithoutClear(null, this, timestamp = new Timestamp());
-			if (poolsService.put(evaluator.getName(), exchangedPool)) {
-				JOptionPane.showMessageDialog(this, "Successfull to put this pool", "Successfull to put this pool", JOptionPane.INFORMATION_MESSAGE);
+			if (poolsService.put(name, exchangedPool)) {
+				JOptionPane.showMessageDialog(this, "Successfull to put this pool \"" + DSUtil.shortenVerbalName(name) + "\"", "Successfull to put pool", JOptionPane.INFORMATION_MESSAGE);
 			}
 		}
 		catch (Throwable e) {

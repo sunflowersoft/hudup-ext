@@ -539,7 +539,7 @@ public class ExtendedService extends DefaultService implements ServiceExt, Servi
 
 	/**
 	 * Getting dataset pools service.
-	 * @return
+	 * @return dataset pools service.
 	 */
 	public DatasetPoolsService getDatasetPoolsService() {
 		return poolsService;

@@ -9,6 +9,8 @@ package net.hudup.core.data;
 
 import java.io.Serializable;
 
+import net.hudup.core.logistic.DSUtil;
+
 /**
  * This class represents an item of dataset pool with given name.
  * 
@@ -74,7 +76,7 @@ public class DatasetPoolExchangedItem implements Cloneable, Serializable, Compar
 
 	@Override
 	public String toString() {
-		return name != null ? name : super.toString();
+		return name != null ? DSUtil.shortenVerbalName(name) : super.toString();
 	}
 	
 	

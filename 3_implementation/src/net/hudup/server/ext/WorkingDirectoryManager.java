@@ -227,7 +227,7 @@ public class WorkingDirectoryManager extends JPanel implements Dispose {
 	 * @param comp parent component.
 	 * @param service storage service.
 	 */
-	public static void showManager(Component comp, VirtualStorageService service) {
+	public static void show(Component comp, VirtualStorageService service) {
 		JDialog dlgManager = new JDialog(UIUtil.getDialogForComponent(comp), "Working directory manager", true);
 		dlgManager.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		dlgManager.setSize(600, 600);
@@ -269,7 +269,7 @@ public class WorkingDirectoryManager extends JPanel implements Dispose {
 	 * @param comp parent component.
 	 */
 	public static void showManager(Component comp) {
-		showManager(comp, null);
+		show(comp, null);
 	}
 	
 	
@@ -288,7 +288,7 @@ public class WorkingDirectoryManager extends JPanel implements Dispose {
 		}
 		else {
 			try {
-				showManager(null, ((PowerServer)server).getStorageService());
+				show(null, ((PowerServer)server).getStorageService());
 			} catch (Exception e) {LogUtil.trace(e);}
 		}
 	}

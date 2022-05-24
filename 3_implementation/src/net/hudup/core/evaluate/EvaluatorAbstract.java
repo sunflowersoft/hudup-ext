@@ -1211,14 +1211,13 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 	
 	@Override
 	public synchronized boolean reloadPool(EvaluatorListener localTargetListener, Timestamp timestamp) throws RemoteException {
-		//Loc Nguyen added: 2022.05.24
-		if (evInfo.isRefPoolResult) return false;
-		
 		if (poolResult == null) return false;
 		
-		this.poolResult.reload();
-		this.poolResult.fillMissingUUID();
-		this.poolResult.export(config.getEvaluatorPort(), false);
+		if (!evInfo.isRefPoolResult) {
+			this.poolResult.reload();
+			this.poolResult.fillMissingUUID();
+			this.poolResult.export(config.getEvaluatorPort(), false);
+		}
 		
 		fireEvaluatorEvent(new EvaluatorEvent(
 			this, 
@@ -2398,6 +2397,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 	
 	/**
 	 * Getting power server according to plug-in changed listeners.
+	 * @param evaluator specified evaluator.
 	 * @return power server;
 	 */
 	public static PowerServer getServerByPluginChangedListenersPath(Evaluator evaluator) {

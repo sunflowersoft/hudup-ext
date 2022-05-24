@@ -55,7 +55,8 @@ public class DatasetPoolsServiceImpl implements DatasetPoolsService, Serializabl
 	
 	
 	/**
-	 * Default constructor.
+	 * Default constructor with server.
+	 * @param server specified server.
 	 */
 	public DatasetPoolsServiceImpl(PowerServer server) {
 		this.server = server;
@@ -64,7 +65,9 @@ public class DatasetPoolsServiceImpl implements DatasetPoolsService, Serializabl
 	
 	@Override
 	public synchronized Set<String> names() throws RemoteException {
-		return pools.keySet();
+		Set<String> names = Util.newSet();
+		names.addAll(pools.keySet());
+		return names;
 	}
 
 

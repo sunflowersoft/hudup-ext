@@ -94,7 +94,7 @@ public class ExtendedServer2CP extends ExternalServerCP {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					try {
-						WorkingDirectoryManager.showManager(cp, server.getStorageService());
+						WorkingDirectoryManager.show(cp, server.getStorageService());
 					} catch (RemoteException ex) {LogUtil.trace(ex);}
 				}
 			});

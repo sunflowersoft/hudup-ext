@@ -13,11 +13,17 @@ import java.awt.FlowLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
+import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
@@ -84,7 +90,20 @@ public class DatasetPoolsManager extends JDialog {
 		setSize(600, 400);
 		setLocationRelativeTo(UIUtil.getDialogForComponent(comp));
 		setLayout(new BorderLayout());
-		
+
+		DatasetPoolsManager thisManager = this;
+		setJMenuBar(createMenuBar());
+		addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if(SwingUtilities.isRightMouseButton(e) ) {
+					JPopupMenu contextMenu = createContextMenu();
+					if(contextMenu == null) return;
+					contextMenu.show((Component)e.getSource(), e.getX(), e.getY());
+				}
+			}
+		});
+	    
 		
 		JPanel left = new JPanel(new BorderLayout());
 		add(left, BorderLayout.WEST);
@@ -224,7 +243,6 @@ public class DatasetPoolsManager extends JDialog {
 		footer.add(btnOK);
 		
 		JButton btnCancel = new JButton("Cancel");
-		DatasetPoolsManager thisManager = this;
 		btnCancel.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -234,6 +252,31 @@ public class DatasetPoolsManager extends JDialog {
 		footer.add(btnCancel);
 	}
 
+	
+	/**
+	 * Creating main menu bar.
+	 * @return main menu bar.
+	 */
+	protected JMenuBar createMenuBar() {
+		JMenuBar mnBar = new JMenuBar();
+		
+		JMenu mnTool = new JMenu("Tool");
+		mnTool.setMnemonic('t');
+		mnBar.add(mnTool);
+		
+		return mnBar;
+	}
+
+	
+	/**
+	 * Creating context menu.
+	 * @return pop-up menu.
+	 */
+	protected JPopupMenu createContextMenu() {
+		JPopupMenu ctxMenu = new JPopupMenu();
+		return ctxMenu;
+	}
+	
 	
 	/**
 	 * Driven function for pool selection.

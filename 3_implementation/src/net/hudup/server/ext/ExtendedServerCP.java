@@ -95,7 +95,7 @@ public class ExtendedServerCP extends PowerServerCP {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					try {
-						WorkingDirectoryManager.showManager(cp, server.getStorageService());
+						WorkingDirectoryManager.show(cp, server.getStorageService());
 					} catch (Exception ex) {LogUtil.trace(ex);}
 				}
 			});
