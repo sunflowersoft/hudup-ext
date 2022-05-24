@@ -344,6 +344,10 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 				guiData.pool = new DatasetPool();
 		}
 		
+		try {
+			guiData.isRefPool = this.evaluator.getInfo().isRefPoolResult; //From server
+		} catch (RemoteException e) {LogUtil.trace(e);}
+
 		if (connectInfo.bindUri == null) {
 			String evStorePath = null;
 			try {
@@ -836,6 +840,15 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	}
 
 
+	/**
+	 * Getting GUI data.
+	 * @return GUI data.
+	 */
+	public EvaluateGUIData getGUIData() {
+		return guiData;
+	}
+	
+	
 	/**
 	 * Updating GUI data.
 	 */

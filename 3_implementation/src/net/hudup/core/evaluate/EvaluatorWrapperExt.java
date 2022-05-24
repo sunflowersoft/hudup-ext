@@ -183,6 +183,12 @@ public class EvaluatorWrapperExt implements Evaluator, EvaluatorListener, Evalua
 
 
 	@Override
+	public EvaluateInfoPersit getInfo() throws RemoteException {
+		return remoteEvaluator.getInfo();
+	}
+
+
+	@Override
 	public List<String> getMetricNameList() throws RemoteException {
 		return remoteEvaluator.getMetricNameList();
 	}
@@ -1016,6 +1022,19 @@ public class EvaluatorWrapperExt implements Evaluator, EvaluatorListener, Evalua
 	@Override
 	public boolean reloadPool(EvaluatorListener localTargetListener, Timestamp timestamp) throws RemoteException {
 		return remoteEvaluator.reloadPool(localTargetListener, timestamp);
+	}
+
+
+	@Override
+	public boolean updatePoolWithoutClear(DatasetPoolExchanged pool, EvaluatorListener localTargetListener,
+			Timestamp timestamp) throws RemoteException {
+		return remoteEvaluator.updatePoolWithoutClear(pool, localTargetListener, timestamp);
+	}
+
+
+	@Override
+	public boolean refPool(boolean ref, DatasetPoolExchanged refPool, String refName, EvaluatorListener localTargetListener, Timestamp timestamp) throws RemoteException {
+		return remoteEvaluator.refPool(ref, refPool, refName, localTargetListener, timestamp);
 	}
 
 

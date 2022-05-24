@@ -78,7 +78,6 @@ public class LoginDlg extends JDialog {
 	 * @param title title.
 	 */
 	public LoginDlg(Component comp, String title) {
-		// TODO Auto-generated constructor stub
 		super(UIUtil.getDialogForComponent(comp), title, true);
 		
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
@@ -124,7 +123,6 @@ public class LoginDlg extends JDialog {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				username = password = null;
 				dispose();
 			}

@@ -67,6 +67,15 @@ public class EvaluatorEvent extends EventObject {
 		 */
 		update_pool,
 		
+		/**
+		 * Referring pool. 
+		 */
+		ref_pool,
+		
+		/**
+		 * unreferring pool. 
+		 */
+		unref_pool,
 	}
 	
 	
@@ -79,7 +88,7 @@ public class EvaluatorEvent extends EventObject {
 	/**
 	 * Evaluation information as other result.
 	 */
-	protected EvaluateInfo otherResult = null;
+	protected EvaluateInfo otherResult = new EvaluateInfo();
 	
 	
 	/**
@@ -87,6 +96,12 @@ public class EvaluatorEvent extends EventObject {
 	 */
 	protected DatasetPoolExchanged poolResult = null;
 
+	
+	/**
+	 * Evaluation information.
+	 */
+	protected EvaluateInfoPersit evInfo = new EvaluateInfoPersit();
+	
 	
 	/**
 	 * Time stamp.
@@ -112,46 +127,61 @@ public class EvaluatorEvent extends EventObject {
 	 * @param type type of this event.
 	 */
 	public EvaluatorEvent(Evaluator evaluator, Type type) {
-		this(evaluator, type, null, null, null);
+		this(evaluator, type, null, null, null, null);
 	}
 
 	
 	/**
-	 * Constructor with specified evaluator and evaluation information. 
+	 * Constructor with specified evaluator, type, and evaluation information result. 
 	 * @param evaluator specified evaluator. This evaluator is invalid in remote call because the source is transient variable.
 	 * @param type specified type of evaluation event.
 	 * @param otherResult evaluation information as other result.
 	 */
 	public EvaluatorEvent(Evaluator evaluator, Type type, EvaluateInfo otherResult) {
-		this(evaluator, type, otherResult, null, null);
+		this(evaluator, type, otherResult, null, null, null);
 	}
 
 	
 	/**
-	 * Constructor with specified evaluator, evaluation information, and time stamp. 
+	 * Constructor with specified evaluator, type, evaluation information result, and pool result. 
 	 * @param evaluator specified evaluator. This evaluator is invalid in remote call because the source is transient variable.
 	 * @param type specified type of evaluation event.
 	 * @param otherResult evaluation information as other result.
 	 * @param poolResult specified pool result.
 	 */
 	public EvaluatorEvent(Evaluator evaluator, Type type, EvaluateInfo otherResult, DatasetPoolExchanged poolResult) {
-		this(evaluator, type, otherResult, poolResult, null);
+		this(evaluator, type, otherResult, poolResult, null, null);
 	}
 	
 	
 	/**
-	 * Constructor with specified evaluator, evaluation information, and time stamp. 
+	 * Constructor with specified evaluator, type, evaluation information result, pool result, evaluation information. 
 	 * @param evaluator specified evaluator. This evaluator is invalid in remote call because the source is transient variable.
 	 * @param type specified type of evaluation event.
 	 * @param otherResult evaluation information as other result.
 	 * @param poolResult specified pool result.
+	 * @param evInfo evaluation information.
+	 */
+	public EvaluatorEvent(Evaluator evaluator, Type type, EvaluateInfo otherResult, DatasetPoolExchanged poolResult, EvaluateInfoPersit evInfo) {
+		this(evaluator, type, otherResult, poolResult, evInfo, null);
+	}
+
+	
+	/**
+	 * Constructor with specified evaluator, type, evaluation information result, pool result, evaluation information, and time stamp. 
+	 * @param evaluator specified evaluator. This evaluator is invalid in remote call because the source is transient variable.
+	 * @param type specified type of evaluation event.
+	 * @param otherResult evaluation information as other result.
+	 * @param poolResult specified pool result.
+	 * @param evInfo evaluation information.
 	 * @param timestamp times tamp.
 	 */
-	public EvaluatorEvent(Evaluator evaluator, Type type, EvaluateInfo otherResult, DatasetPoolExchanged poolResult, Timestamp timestamp) {
+	public EvaluatorEvent(Evaluator evaluator, Type type, EvaluateInfo otherResult, DatasetPoolExchanged poolResult, EvaluateInfoPersit evInfo, Timestamp timestamp) {
 		super(evaluator);
 		this.type = type;
-		this.otherResult = otherResult;
+		this.otherResult = otherResult != null ? otherResult : new EvaluateInfo();
 		this.poolResult = poolResult;
+		this.evInfo = evInfo != null ? evInfo : new EvaluateInfoPersit();
 		this.timestamp = timestamp;
 		
 		try {
@@ -227,6 +257,24 @@ public class EvaluatorEvent extends EventObject {
 	 */
 	public DatasetPoolExchanged getPoolResult() {
 		return poolResult;
+	}
+
+	
+	/**
+	 * Setting evaluation information.
+	 * @param evInfo evaluation information.
+	 */
+	public void setEvInfo(EvaluateInfoPersit evInfo) {
+		this.evInfo = evInfo;
+	}
+
+	
+	/**
+	 * Getting evaluation information.
+	 * @return evaluation information.
+	 */
+	public EvaluateInfoPersit getEvInfo() {
+		return evInfo;
 	}
 
 	

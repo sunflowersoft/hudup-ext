@@ -493,6 +493,20 @@ public class DatasetPool implements Serializable {
 
 	
 	/**
+	 * Checking whether if containing clients.
+	 */
+	public boolean containsClients() {
+		for (DatasetPair pair : dspList) {
+			if (pair.training == null && pair.trainingUUID != null) return true;
+			if (pair.testing == null && pair.testingUUID != null) return true;
+			if (pair.whole == null && pair.wholeUUID != null) return true;
+		}
+		
+		return false;
+	}
+
+	
+	/**
 	 * Converting normal dataset pool to exchanged dataset.
 	 * @return exchanged dataset pool.
 	 */

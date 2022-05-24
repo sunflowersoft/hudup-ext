@@ -274,6 +274,14 @@ public interface Evaluator extends Remote, RemoteRunner, SetupAlgListener, Plugi
 
 	
 	/**
+	 * Getting evaluation information.
+	 * @return evaluation information.
+	 * @throws RemoteException if any error raises.
+	 */
+	EvaluateInfoPersit getInfo() throws RemoteException;
+	
+	
+	/**
 	 * Getting the metric name list resulted from the evaluation process.
 	 * @return metric name list resulted from the evaluation process.
 	 * @throws RemoteException if any error raises.
@@ -414,6 +422,17 @@ public interface Evaluator extends Remote, RemoteRunner, SetupAlgListener, Plugi
     
     
     /**
+     * Updating resulted dataset pool without clearing.
+     * @param pool specified dataset pool.
+     * @param localTargetListener local target listener. It can be null.
+     * @param timestamp time stamp. It can be null.
+     * @return true if successful.
+     * @throws RemoteException if any error raises.
+     */
+	boolean updatePoolWithoutClear(DatasetPoolExchanged pool, EvaluatorListener localTargetListener, Timestamp timestamp) throws RemoteException;
+	
+	
+    /**
      * Reloading resulted dataset pool.
      * @param localTargetListener local target listener. It can be null.
      * @param timestamp time stamp. It can be null.
@@ -423,6 +442,19 @@ public interface Evaluator extends Remote, RemoteRunner, SetupAlgListener, Plugi
     boolean reloadPool(EvaluatorListener localTargetListener, Timestamp timestamp) throws RemoteException;
 
     
+    /**
+     * Setting referred pool to pool result.
+     * @param ref reference flag.
+     * @param refPool referred pool.
+     * @param refName referred pool name.
+     * @param localTargetListener local target listener. It can be null.
+     * @param timestamp time stamp. It can be null.
+     * @return true if successful.
+     * @throws RemoteException if any error raises.
+     */
+	boolean refPool(boolean ref, DatasetPoolExchanged refPool, String refName, EvaluatorListener localTargetListener, Timestamp timestamp) throws RemoteException;
+	
+	
 	/**
 	 * Performing event task of specified listener.
 	 * @param listenerID specified listener ID.

@@ -20,7 +20,7 @@ import net.hudup.core.client.ConnectInfo;
  * @version 1.0
  *
  */
-public interface App extends java.lang.Cloneable, Remote, Serializable {
+public interface App extends Remote, Serializable {
 
 	
 	/**

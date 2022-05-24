@@ -215,6 +215,12 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
     protected EvaluateProcessor evProcessor = null;
 
     
+	/**
+	 * Evaluation information.
+	 */
+	protected EvaluateInfoPersit evInfo = new EvaluateInfoPersit();
+	
+	
     /**
      * The list of metrics resulted from the evaluation process.
      */
@@ -354,6 +360,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 				EvaluatorEvent.Type.start,
 				this.otherResult,
 				this.poolResult,
+				this.evInfo,
 				timestamp),
 				null);
 		
@@ -715,6 +722,12 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 
 
 	@Override
+	public EvaluateInfoPersit getInfo() throws RemoteException {
+		return evInfo;
+	}
+
+
+	@Override
 	public List<String> getMetricNameList() throws RemoteException {
 		synchronized(evMetricList) {
 			return this.evMetricList.nameList();
@@ -1071,8 +1084,14 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 	 * @throws RemoteException if any error raises.
 	 */
 	private synchronized DatasetPool updatePoolResult(DatasetPoolExchanged pool) throws RemoteException {
+		//Loc Nguyen added: 2022.05.24
+		if (evInfo.isRefPoolResult) {
+			DatasetPool returnedPool = this.poolResult != null ? this.poolResult.toDatasetPool(null) : new DatasetPool();
+			returnedPool.fillMissingUUID();
+			return returnedPool;
+		}
+		
 		if (pool == null) pool = new DatasetPoolExchanged();
-
 		if (poolResult != null) {
 			List<DatasetPairExchanged> tempDspList = Util.newList(poolResult.dspList.size());
 			tempDspList.addAll(poolResult.dspList);
@@ -1124,8 +1143,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 		
 		DatasetPool returnedPool = pool.toDatasetPool(this.poolResult);
 		returnedPool.fillMissingUUID();
-		if (this.poolResult != null)
-			this.poolResult.unexport(true);
+		if (this.poolResult != null) this.poolResult.unexport(true);
 		this.poolResult = returnedPool.toDatasetPoolExchanged();
 		this.poolResult.export(config.getEvaluatorPort(), false);
 		
@@ -1144,12 +1162,13 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 		
 		if (returnedPool != null) {
 			fireEvaluatorEvent(new EvaluatorEvent(
-					this, 
-					EvaluatorEvent.Type.update_pool,
-					this.otherResult,
-					this.poolResult,
-					timestamp),
-					localTargetListener);
+				this, 
+				EvaluatorEvent.Type.update_pool,
+				this.otherResult,
+				this.poolResult,
+				this.evInfo,
+				timestamp),
+				localTargetListener);
 			return true;
 		}
 		else
@@ -1158,7 +1177,43 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 
 
 	@Override
+	public synchronized boolean updatePoolWithoutClear(DatasetPoolExchanged pool, EvaluatorListener localTargetListener, Timestamp timestamp) throws RemoteException {
+		if (isStarted() || this.evPool != null) {
+			LogUtil.error("Evaluator is running and so it cannot update pool");
+			return false;
+		}
+		
+		DatasetPool returnedPool = null;
+		if (evInfo.isRefPoolResult) {
+			returnedPool = this.poolResult != null ? this.poolResult.toDatasetPool(null) : new DatasetPool();
+			returnedPool.fillMissingUUID();
+		}
+		else {
+			if (pool == null) pool = new DatasetPoolExchanged();
+			returnedPool = pool.toDatasetPool(this.poolResult);
+			returnedPool.fillMissingUUID();
+			if (this.poolResult != null) this.poolResult.unexport(true);
+			this.poolResult = returnedPool.toDatasetPoolExchanged();
+			this.poolResult.export(config.getEvaluatorPort(), false);
+		}
+		
+		fireEvaluatorEvent(new EvaluatorEvent(
+			this, 
+			EvaluatorEvent.Type.update_pool,
+			this.otherResult,
+			this.poolResult,
+			this.evInfo,
+			timestamp),
+			localTargetListener);
+		return true;
+	}
+
+	
+	@Override
 	public synchronized boolean reloadPool(EvaluatorListener localTargetListener, Timestamp timestamp) throws RemoteException {
+		//Loc Nguyen added: 2022.05.24
+		if (evInfo.isRefPoolResult) return false;
+		
 		if (poolResult == null) return false;
 		
 		this.poolResult.reload();
@@ -1166,12 +1221,39 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 		this.poolResult.export(config.getEvaluatorPort(), false);
 		
 		fireEvaluatorEvent(new EvaluatorEvent(
-				this, 
-				EvaluatorEvent.Type.update_pool,
-				this.otherResult,
-				this.poolResult,
-				timestamp),
-				localTargetListener);
+			this, 
+			EvaluatorEvent.Type.update_pool,
+			this.otherResult,
+			this.poolResult,
+			this.evInfo,
+			timestamp),
+			localTargetListener);
+		return true;
+	}
+
+	
+	@Override
+	public synchronized boolean refPool(boolean ref, DatasetPoolExchanged refPool, String refName, EvaluatorListener localTargetListener, Timestamp timestamp) throws RemoteException {
+		if (isStarted() || this.evPool != null) {
+			LogUtil.error("Evaluator is running and so it cannot update pool");
+			return false;
+		}
+		if (this.evInfo.isRefPoolResult == ref)
+			return false;
+		
+		if (this.poolResult != null && !this.evInfo.isRefPoolResult) this.poolResult.unexport(true);
+		this.poolResult = ref ? (refPool != null ? refPool : new DatasetPoolExchanged()) : new DatasetPoolExchanged();
+		this.evInfo.isRefPoolResult = ref;
+		this.evInfo.refPoolResultName = refName;
+		
+		fireEvaluatorEvent(new EvaluatorEvent(
+			this, 
+			ref ? EvaluatorEvent.Type.ref_pool : EvaluatorEvent.Type.unref_pool,
+			this.otherResult,
+			this.poolResult,
+			this.evInfo,
+			timestamp),
+			localTargetListener);
 		return true;
 	}
 
@@ -1932,7 +2014,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 		catch (Throwable e) {LogUtil.trace(e);}
 		
 		try {
-			if (poolResult != null)
+			if (poolResult != null && !evInfo.isRefPoolResult)
 				poolResult.clear(true);
 			poolResult = null;
 
@@ -2313,6 +2395,16 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 			return evaluator;
 	}
 	
+	
+	/**
+	 * Getting power server according to plug-in changed listeners.
+	 * @return power server;
+	 */
+	public static PowerServer getServerByPluginChangedListenersPath(Evaluator evaluator) {
+		PluginChangedListener listener = EvaluatorAbstract.getTopMostPluginChangedListener(evaluator);
+		return (listener != null) && (listener instanceof PowerServer) ? (PowerServer)listener : null;
+	}
+
 	
 	/**
 	 * Checking whether the specified evaluator is wrapped evaluator.

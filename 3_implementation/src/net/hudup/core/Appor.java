@@ -18,7 +18,7 @@ import net.hudup.core.client.PowerServer;
  * @version 1.0
  *
  */
-public interface Appor extends java.lang.Cloneable, Serializable, java.lang.AutoCloseable {
+public interface Appor extends Serializable, java.lang.AutoCloseable {
 
 	
 	/**

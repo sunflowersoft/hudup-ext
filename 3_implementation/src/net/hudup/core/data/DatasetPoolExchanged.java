@@ -235,6 +235,20 @@ public class DatasetPoolExchanged  implements Serializable {
 
 
 	/**
+	 * Checking whether if containing clients.
+	 */
+	public boolean containsClients() {
+		for (DatasetPairExchanged pair : dspList) {
+			if (pair.training == null && pair.trainingUUID != null) return true;
+			if (pair.testing == null && pair.testingUUID != null) return true;
+			if (pair.whole == null && pair.wholeUUID != null) return true;
+		}
+		
+		return false;
+	}
+
+	
+	/**
 	 * Converting exchanged dataset pool to normal dataset.
 	 * @param referredPool referred pool.
 	 * @return normal dataset.

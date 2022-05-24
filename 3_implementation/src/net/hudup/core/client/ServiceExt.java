@@ -10,6 +10,7 @@ package net.hudup.core.client;
 import java.rmi.RemoteException;
 import java.util.List;
 
+import net.hudup.core.data.DatasetPoolsService;
 import net.hudup.core.evaluate.Evaluator;
 
 /**
@@ -54,6 +55,16 @@ public interface ServiceExt extends Service {
 	 * @throws RemoteException if any error raises.
 	 */
 	boolean removeEvaluator(String evaluatorName, String account, String password, String reproducedVersion) throws RemoteException;
+	
+	
+	/**
+	 * Getting dataset pools service.
+	 * @param account account.
+	 * @param password password.
+	 * @return dataset pools service.
+	 * @throws RemoteException if any error raises.
+	 */
+	DatasetPoolsService getDatasetPoolsService(String account, String password) throws RemoteException;
 	
 	
 	/**

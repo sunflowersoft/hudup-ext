@@ -52,6 +52,7 @@ import net.hudup.core.RegisterTable;
 import net.hudup.core.Util;
 import net.hudup.core.client.ConnectInfo;
 import net.hudup.core.client.Connector;
+import net.hudup.core.client.PowerServer;
 import net.hudup.core.client.Service;
 import net.hudup.core.data.BooleanWrapper;
 import net.hudup.core.data.ui.SysConfigDlgExt;
@@ -219,6 +220,61 @@ public class EvalCompoundGUI extends JFrame {
 		mniSaveScript.setMnemonic('s');
 		mniSaveScript.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK));
 		mnFile.add(mniSaveScript);
+
+		PowerServer server = EvaluatorAbstract.getServerByPluginChangedListenersPath(batchEvaluateGUI.getEvaluator());;
+		if (server != null) {
+			mnFile.addSeparator();
+			JMenu mnDatasetPool = new JMenu(I18nUtil.message("dataset_pool"));
+			mnFile.add(mnDatasetPool);
+			
+			JMenuItem mniDatasetPoolAttach = new JMenuItem(
+				new AbstractAction("Attach") {
+					
+					/**
+					 * Serial version UID for serializable class. 
+					 */
+					private static final long serialVersionUID = 1L;
+	
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						batchEvaluateGUI.attachRefDatasetPool();
+					}
+				});
+			mniDatasetPoolAttach.setMnemonic('a');
+			mnDatasetPool.add(mniDatasetPoolAttach);
+	
+			JMenuItem mniDatasetPoolDetach = new JMenuItem(
+				new AbstractAction("Detach") {
+					
+					/**
+					 * Serial version UID for serializable class. 
+					 */
+					private static final long serialVersionUID = 1L;
+	
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						batchEvaluateGUI.detachRefDatasetPool();
+					}
+				});
+			mniDatasetPoolDetach.setMnemonic('d');
+			mnDatasetPool.add(mniDatasetPoolDetach);
+			
+			JMenuItem mniDatasetPoolPut = new JMenuItem(
+				new AbstractAction("Put") {
+					
+					/**
+					 * Serial version UID for serializable class. 
+					 */
+					private static final long serialVersionUID = 1L;
+	
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						batchEvaluateGUI.putRefDatasetPool();
+					}
+				});
+			mniDatasetPoolPut.setMnemonic('p');
+			mnDatasetPool.add(mniDatasetPoolPut);
+		}
 
 		boolean agent = false;
 		Service service = null;

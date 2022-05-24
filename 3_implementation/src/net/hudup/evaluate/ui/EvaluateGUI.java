@@ -421,29 +421,31 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			protected void addToContextMenu(JPopupMenu contextMenu) {
 				super.addToContextMenu(contextMenu);
 
-				contextMenu.addSeparator();
-		    	
-				JMenuItem miTraining = UIUtil.makeMenuItem((String)null, "Add training set", 
-					new ActionListener() {
-						
-						@Override
-						public void actionPerformed(ActionEvent e) {
-							addDataset(false, true);
-						}
-					});
-				contextMenu.add(miTraining);
-				
-				Alg alg = getSelectedAlg();
-				if (AlgDesc2.isAllowNullTrainingSet(alg)) {
-					JMenuItem miNull = UIUtil.makeMenuItem((String)null, "Add null set",
+				if (!guiData.isRefPool) {
+					contextMenu.addSeparator();
+			    	
+					JMenuItem miTraining = UIUtil.makeMenuItem((String)null, "Add training set", 
 						new ActionListener() {
 							
 							@Override
 							public void actionPerformed(ActionEvent e) {
-								addDataset(true, true);
+								addDataset(false, true);
 							}
 						});
-					contextMenu.add(miNull);
+					contextMenu.add(miTraining);
+					
+					Alg alg = getSelectedAlg();
+					if (AlgDesc2.isAllowNullTrainingSet(alg)) {
+						JMenuItem miNull = UIUtil.makeMenuItem((String)null, "Add null set",
+							new ActionListener() {
+								
+								@Override
+								public void actionPerformed(ActionEvent e) {
+									addDataset(true, true);
+								}
+							});
+						contextMenu.add(miNull);
+					}
 				}
 			}
 			
@@ -1450,7 +1452,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 		else
 			timeDiff = !timestamp.equals(evt.getTimestamp());
 
-		if (type == EvaluatorEvent.Type.start || type == EvaluatorEvent.Type.update_pool) {
+		if (type == EvaluatorEvent.Type.start || type == EvaluatorEvent.Type.update_pool || type == EvaluatorEvent.Type.ref_pool || type == EvaluatorEvent.Type.unref_pool) {
 			if (evt.getType() == EvaluatorEvent.Type.start) {
 				updatePluginFromEvaluator();
 	
@@ -1472,6 +1474,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			else
 				guiData.pool = new DatasetPool();
 			guiData.pool.add(evt.getPoolResult().toDatasetPoolClient());
+			guiData.isRefPool = evt.getEvInfo().isRefPoolResult;
 			
 			if (guiData.pool.size() > 0) {
 				txtTrainingBrowse.setDataset(guiData.pool.get(0).getTraining(), false);
@@ -1592,11 +1595,11 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 				setInternalEnable(false);
 				setResultVisible(result != null && result.size() > 0);
 				
-				btnTrainingBrowse.setEnabled(PluginStorage.getParserReg().size() > 0);
-				btnTestingBrowse.setEnabled(PluginStorage.getParserReg().size() > 0);
-				btnClear.setEnabled(training != null || testing != null);
-				btnUpload.setEnabled((training == null && testing == null) || (training != null && testing != null));
-				btnDownload.setEnabled(true);
+				btnTrainingBrowse.setEnabled(PluginStorage.getParserReg().size() > 0 && !guiData.isRefPool);
+				btnTestingBrowse.setEnabled(PluginStorage.getParserReg().size() > 0 && !guiData.isRefPool);
+				btnClear.setEnabled( (training != null || testing != null)  && !guiData.isRefPool );
+				btnUpload.setEnabled( ((training == null && testing == null) || (training != null && testing != null)) && !guiData.isRefPool );
+				btnDownload.setEnabled(true && !guiData.isRefPool);
 
 				tblMetrics.update(result);
 				prgRunning.setMaximum(0);
@@ -1611,10 +1614,10 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 				btnConfig.setEnabled(true);
 				btnTrainingBrowse.setEnabled(true);
 				btnTestingBrowse.setEnabled(true);
-				btnRefresh.setEnabled(training != null || testing != null);
-				btnClear.setEnabled(training != null || testing != null);
-				btnUpload.setEnabled((training == null && testing == null) || (training != null && testing != null));
-				btnDownload.setEnabled(true);
+				btnRefresh.setEnabled( (training != null || testing != null) && !guiData.isRefPool );
+				btnClear.setEnabled( (training != null || testing != null) && !guiData.isRefPool );
+				btnUpload.setEnabled( ((training == null && testing == null) || (training != null && testing != null)) && !guiData.isRefPool );
+				btnDownload.setEnabled(true && !guiData.isRefPool);
 				
 				tblMetrics.update(result);
 				prgRunning.setMaximum(0);
@@ -1679,10 +1682,10 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			setResultVisible(flag);
 			
 			cmbAlgs.setEnabled(algRegTable.size() > 0);
-			btnTrainingBrowse.setEnabled(PluginStorage.getParserReg().size() > 0);
-			btnTestingBrowse.setEnabled(PluginStorage.getParserReg().size() > 0);
-			btnUpload.setEnabled((training == null && testing == null) || (training != null && testing != null));
-			btnDownload.setEnabled(true);
+			btnTrainingBrowse.setEnabled(PluginStorage.getParserReg().size() > 0 && !guiData.isRefPool);
+			btnTestingBrowse.setEnabled(PluginStorage.getParserReg().size() > 0 && !guiData.isRefPool);
+			btnUpload.setEnabled( ((training == null && testing == null) || (training != null && testing != null)) && !guiData.isRefPool );
+			btnDownload.setEnabled(true && !guiData.isRefPool);
 		}
 	}
 	
@@ -1699,20 +1702,15 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 		
 		Dataset trainingSet = txtTrainingBrowse.getDataset();
 		Dataset testingSet = txtTestingBrowse.getDataset();
-		this.btnTrainingBrowse.setEnabled(flag);
-		this.txtTrainingBrowse.setEnabled(flag);
-		this.btnTestingBrowse.setEnabled(
-			flag && trainingSet != null);
-		this.txtTestingBrowse.setEnabled(
-			flag && trainingSet != null);
+		this.btnTrainingBrowse.setEnabled(flag && !guiData.isRefPool);
+		this.txtTrainingBrowse.setEnabled(flag && !guiData.isRefPool);
+		this.btnTestingBrowse.setEnabled(flag && trainingSet != null && !guiData.isRefPool);
+		this.txtTestingBrowse.setEnabled(flag && trainingSet != null && !guiData.isRefPool);
 		
-		this.btnRefresh.setEnabled(
-			flag && (trainingSet != null || testingSet != null) );
-		this.btnClear.setEnabled(
-			flag && (trainingSet != null || testingSet != null));
-		this.btnUpload.setEnabled(
-			flag && ((trainingSet == null && testingSet == null) || (trainingSet != null && testingSet != null)) );
-		this.btnDownload.setEnabled(flag);
+		this.btnRefresh.setEnabled( flag && (trainingSet != null || testingSet != null) && !guiData.isRefPool );
+		this.btnClear.setEnabled( flag && (trainingSet != null || testingSet != null) && !guiData.isRefPool );
+		this.btnUpload.setEnabled( flag && ((trainingSet == null && testingSet == null) || (trainingSet != null && testingSet != null)) && !guiData.isRefPool );
+		this.btnDownload.setEnabled(flag && !guiData.isRefPool);
 
 		this.btnRun.setEnabled(
 			flag && 

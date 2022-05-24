@@ -50,16 +50,22 @@ import net.hudup.core.alg.ui.AlgListBox;
 import net.hudup.core.alg.ui.AlgListBox.AlgListChangedEvent;
 import net.hudup.core.alg.ui.AlgListChooser;
 import net.hudup.core.client.ConnectInfo;
+import net.hudup.core.client.PowerServer;
+import net.hudup.core.client.Service;
+import net.hudup.core.client.ServiceExt;
 import net.hudup.core.data.BatchScript;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.DatasetPair;
 import net.hudup.core.data.DatasetPool;
 import net.hudup.core.data.DatasetPoolExchanged;
+import net.hudup.core.data.DatasetPoolExchangedItem;
+import net.hudup.core.data.DatasetPoolsService;
 import net.hudup.core.data.DatasetUtil2;
 import net.hudup.core.data.NullPointer;
 import net.hudup.core.data.ui.AddingDatasetDlg2;
 import net.hudup.core.data.ui.DatasetPoolTable;
+import net.hudup.core.data.ui.DatasetPoolsManager;
 import net.hudup.core.evaluate.EvaluateEvent;
 import net.hudup.core.evaluate.EvaluateEvent.Type;
 import net.hudup.core.evaluate.EvaluateInfo;
@@ -83,6 +89,7 @@ import net.hudup.core.logistic.Timestamp;
 import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.xURI;
 import net.hudup.core.logistic.ui.Light;
+import net.hudup.core.logistic.ui.LoginDlg;
 import net.hudup.core.logistic.ui.SortableSelectableTable;
 import net.hudup.core.logistic.ui.SortableSelectableTableModel;
 import net.hudup.core.logistic.ui.SortableTable;
@@ -92,6 +99,7 @@ import net.hudup.core.logistic.ui.TextField;
 import net.hudup.core.logistic.ui.TxtOutput;
 import net.hudup.core.logistic.ui.UIUtil;
 import net.hudup.core.logistic.ui.WaitDialog;
+import net.hudup.server.ext.ExtendedService;
 
 /**
  * This class represents a graphic user interface (GUI) for {@link EvaluatorAbstract} with many pairs of training dataset and testing dataset.
@@ -437,28 +445,30 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 					contextMenu.add(miDiscard);
 		    	}
 
-		    	contextMenu.addSeparator();
-				JMenuItem miTraining = UIUtil.makeMenuItem((String)null, "Add training set", 
-					new ActionListener() {
-						
-						@Override
-						public void actionPerformed(ActionEvent e) {
-							addDataset(false, true);
-						}
-					});
-				contextMenu.add(miTraining);
-				
-				Alg alg = getSelectedAlg();
-				if (AlgDesc2.isAllowNullTrainingSet(alg)) {
-					JMenuItem miNull = UIUtil.makeMenuItem((String)null, "Add null set",
+				if (!guiData.isRefPool) {
+			    	contextMenu.addSeparator();
+					JMenuItem miTraining = UIUtil.makeMenuItem((String)null, "Add training set", 
 						new ActionListener() {
 							
 							@Override
 							public void actionPerformed(ActionEvent e) {
-								addDataset(true, true);
+								addDataset(false, true);
 							}
 						});
-					contextMenu.add(miNull);
+					contextMenu.add(miTraining);
+					
+					Alg alg = getSelectedAlg();
+					if (AlgDesc2.isAllowNullTrainingSet(alg)) {
+						JMenuItem miNull = UIUtil.makeMenuItem((String)null, "Add null set",
+							new ActionListener() {
+								
+								@Override
+								public void actionPerformed(ActionEvent e) {
+									addDataset(true, true);
+								}
+							});
+						contextMenu.add(miNull);
+					}
 				}
 			}
 			
@@ -1074,8 +1084,13 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 						texts.add("Ended date: " + MathUtil.format(new Date(otherResult.endDate)));
 				}
 				
-				if (connectInfo != null)
-					texts.add("Connection information: " + connectInfo.toString());
+				if (connectInfo != null) texts.add("Connection information: " + connectInfo.toString());
+				
+				if (guiData.isRefPool) {
+					try {
+						texts.add("Referred pool: " + evaluator.getInfo().refPoolResultName);
+					} catch (Throwable e) {}
+				}
 				
 				return texts;
 			}
@@ -1261,7 +1276,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 		else
 			timeDiff = !timestamp.equals(evt.getTimestamp());
 
-		if (type == EvaluatorEvent.Type.start || type == EvaluatorEvent.Type.update_pool) {
+		if (type == EvaluatorEvent.Type.start || type == EvaluatorEvent.Type.update_pool || type == EvaluatorEvent.Type.ref_pool || type == EvaluatorEvent.Type.unref_pool) {
 			if (evt.getType() == EvaluatorEvent.Type.start) {
 				updatePluginFromEvaluator();
 				
@@ -1281,6 +1296,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			else
 				guiData.pool = new DatasetPool();
 			guiData.pool.add(evt.getPoolResult().toDatasetPoolClient());
+			guiData.isRefPool = evt.getEvInfo().isRefPoolResult;
 			
 			tblDatasetPool.update(guiData.pool);
 			
@@ -1390,10 +1406,10 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 				setResultVisible(result != null && result.size() > 0);
 				
 				btnConfigAlgs.setEnabled(algRegTable.size() > 0);
-				btnAddDataset.setEnabled(PluginStorage.getParserReg().size() > 0);
-				btnClear.setEnabled(guiData.pool.size() > 0);
-				btnUpload.setEnabled(true);
-				btnDownload.setEnabled(true);
+				btnAddDataset.setEnabled(PluginStorage.getParserReg().size() > 0 && !guiData.isRefPool);
+				btnClear.setEnabled(guiData.pool.size() > 0 && !guiData.isRefPool);
+				btnUpload.setEnabled(true && !guiData.isRefPool);
+				btnDownload.setEnabled(true && !guiData.isRefPool);
 				
 				tblMetrics.update(result);
 				prgRunning.setMaximum(0);
@@ -1406,10 +1422,10 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 				
 				lbAlgs.setEnabled(true);
 				btnConfigAlgs.setEnabled(true);
-				btnAddDataset.setEnabled(true);
-				btnLoadBatchScript.setEnabled(true);
-				btnUpload.setEnabled(true);
-				btnDownload.setEnabled(true);
+				btnAddDataset.setEnabled(true && !guiData.isRefPool);
+				btnLoadBatchScript.setEnabled(true && !guiData.isRefPool);
+				btnUpload.setEnabled(true && !guiData.isRefPool);
+				btnDownload.setEnabled(true && !guiData.isRefPool);
 				
 				tblMetrics.update(result);
 				prgRunning.setMaximum(0);
@@ -1473,9 +1489,9 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			setResultVisible(flag);
 			
 			btnConfigAlgs.setEnabled(algRegTable.size() > 0);
-			btnAddDataset.setEnabled(PluginStorage.getParserReg().size() > 0);
-			btnUpload.setEnabled(true);
-			btnDownload.setEnabled(true);
+			btnAddDataset.setEnabled(PluginStorage.getParserReg().size() > 0 && !guiData.isRefPool);
+			btnUpload.setEnabled(true && !guiData.isRefPool);
+			btnDownload.setEnabled(true && !guiData.isRefPool);
 		}
 		
 		updateGUI();
@@ -1491,15 +1507,15 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 		
 		this.btnConfigAlgs.setEnabled(flag);
 		this.lbAlgs.setEnabled(flag);
-		this.tblDatasetPool.setEnabled2(flag && guiData.pool.size() > 0);
-		this.btnAddDataset.setEnabled(flag);
-		this.btnLoadBatchScript.setEnabled(flag);
-		this.btnSaveBatchScript.setEnabled(flag && guiData.pool.size() > 0);
+		this.tblDatasetPool.setEnabled2(flag && guiData.pool.size() > 0 && !guiData.isRefPool);
+		this.btnAddDataset.setEnabled(flag && !guiData.isRefPool);
+		this.btnLoadBatchScript.setEnabled(flag && !guiData.isRefPool);
+		this.btnSaveBatchScript.setEnabled(flag && guiData.pool.size() > 0 && !guiData.isRefPool);
 		
-		this.btnRefresh.setEnabled(flag && guiData.pool.size() > 0);
-		this.btnClear.setEnabled(flag && guiData.pool.size() > 0);
-		this.btnUpload.setEnabled(flag);
-		this.btnDownload.setEnabled(flag);
+		this.btnRefresh.setEnabled(flag && guiData.pool.size() > 0 && !guiData.isRefPool);
+		this.btnClear.setEnabled(flag && guiData.pool.size() > 0 && !guiData.isRefPool);
+		this.btnUpload.setEnabled(flag && !guiData.isRefPool);
+		this.btnDownload.setEnabled(flag && !guiData.isRefPool);
 
 		this.btnRun.setEnabled(flag && guiData.pool.size() > 0);
 		this.btnPauseResume.setEnabled(flag && guiData.pool.size() > 0);
@@ -1833,6 +1849,149 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 //			updateUI();
 		}
 		catch (Throwable e) {
+			LogUtil.trace(e);
+		}
+	}
+	
+	
+	/**
+	 * Attaching referred dataset pool.
+	 */
+	protected void attachRefDatasetPool() {
+		if (guiData.isRefPool) {
+			JOptionPane.showMessageDialog(this, "Dataset pool was attached", "Dataset pool was attached", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+		PowerServer server = EvaluatorAbstract.getServerByPluginChangedListenersPath(this.evaluator);
+		if (server == null) {
+			JOptionPane.showMessageDialog(this, "This is not server related evaluator", "Not server related evaluator", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+		
+		try {
+			if (evaluator.remoteIsStarted()) {
+				JOptionPane.showMessageDialog(this, "Evaluator started", "Evaluator started", JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+
+			Service service = server.getService();
+			if (service == null || !(service instanceof ServiceExt)) return;
+			DatasetPoolsService poolsService = null;
+			if (service instanceof ExtendedService)
+				poolsService = ((ExtendedService)service).getDatasetPoolsService();
+			else {
+				LoginDlg login = new LoginDlg(this, "Enter user name and password");
+				if (!login.wasLogin()) return;
+				poolsService = ((ServiceExt)service).getDatasetPoolsService(login.getUsername(), login.getPassword());
+			}
+			if (poolsService == null) {
+				JOptionPane.showMessageDialog(this, "Cannot get pools service", "Cannot get pools service.", JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+			
+			DatasetPoolsManager manager = DatasetPoolsManager.show(poolsService, this);
+			DatasetPoolExchangedItem poolItem = manager.getSelectedPool();
+			if (poolItem == null) {
+				JOptionPane.showMessageDialog(this, "Pool not selected", "Pool not selected.", JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+			
+			try {
+				evaluator.refPool(true, poolItem.getDatasetPool(), poolItem.getName(), this, timestamp = new Timestamp());
+			} catch (Throwable e) {LogUtil.trace(e);}
+		}
+		catch (Throwable e) {
+			updateMode();
+			LogUtil.trace(e);
+		}
+	}
+	
+	
+	/**
+	 * Detaching referred dataset pool.
+	 */
+	protected void detachRefDatasetPool() {
+		if (!guiData.isRefPool) {
+			JOptionPane.showMessageDialog(this, "Dataset pool was not attached", "Dataset pool was not attached", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+		PowerServer server = EvaluatorAbstract.getServerByPluginChangedListenersPath(this.evaluator);;
+		if (server == null) {
+			JOptionPane.showMessageDialog(this, "This is not server related evaluator", "Not server related evaluator", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+		
+		try {
+			if (evaluator.remoteIsStarted()) {
+				JOptionPane.showMessageDialog(this, "Evaluator started", "Evaluator started", JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+
+			evaluator.refPool(false, null, null, this, timestamp = new Timestamp());
+		}
+		catch (Throwable e) {
+			updateMode();
+			LogUtil.trace(e);
+		}
+	}
+
+	
+	/**
+	 * Putting referred dataset pool.
+	 */
+	protected void putRefDatasetPool() {
+		if (guiData.isRefPool) {
+			JOptionPane.showMessageDialog(this, "Dataset pool was attached", "Dataset pool was attached", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+		if (guiData.pool.size() == 0) {
+			JOptionPane.showMessageDialog(this, "Empty dataset pool", "Empty pool", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+		if (guiData.pool.containsClients()) {
+			JOptionPane.showMessageDialog(this, "Client dataset pool", "Client dataset pool", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+		PowerServer server = EvaluatorAbstract.getServerByPluginChangedListenersPath(this.evaluator);;
+		if (server == null) {
+			JOptionPane.showMessageDialog(this, "This is not server related evaluator", "Not server related evaluator", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+
+		try {
+			if (evaluator.remoteIsStarted()) {
+				JOptionPane.showMessageDialog(this, "Evaluator started", "Evaluator started", JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+
+			Service service = server.getService();
+			if (service == null || !(service instanceof ServiceExt)) return;
+			DatasetPoolsService poolsService = null;
+			if (service instanceof ExtendedService)
+				poolsService = ((ExtendedService)service).getDatasetPoolsService();
+			else {
+				LoginDlg login = new LoginDlg(this, "Enter user name and password");
+				if (!login.wasLogin()) return;
+				poolsService = ((ServiceExt)service).getDatasetPoolsService(login.getUsername(), login.getPassword());
+			}
+			if (poolsService == null) {
+				JOptionPane.showMessageDialog(this, "Cannot get pools service", "Cannot get pools service.", JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+			
+			if (poolsService.contains(evaluator.getName())) {
+				JOptionPane.showMessageDialog(this, "This pool was put before", "This pool was put before", JOptionPane.WARNING_MESSAGE);
+				return;
+			}
+			
+			DatasetPoolExchanged exchangedPool = guiData.pool.toDatasetPoolExchanged().toDatasetPool(null).toDatasetPoolExchanged();
+			evaluator.updatePoolWithoutClear(null, this, timestamp = new Timestamp());
+			if (poolsService.put(evaluator.getName(), exchangedPool)) {
+				JOptionPane.showMessageDialog(this, "Successfull to put this pool", "Successfull to put this pool", JOptionPane.INFORMATION_MESSAGE);
+			}
+		}
+		catch (Throwable e) {
+			updateMode();
 			LogUtil.trace(e);
 		}
 	}

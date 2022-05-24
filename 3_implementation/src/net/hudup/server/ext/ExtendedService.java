@@ -28,6 +28,8 @@ import net.hudup.core.client.ServiceLocal;
 import net.hudup.core.client.ServiceNoticeEvent;
 import net.hudup.core.client.ServiceNoticeListener;
 import net.hudup.core.data.DataConfig;
+import net.hudup.core.data.DatasetPoolsService;
+import net.hudup.core.data.DatasetPoolsServiceImpl;
 import net.hudup.core.evaluate.Evaluator;
 import net.hudup.core.evaluate.EvaluatorAbstract;
 import net.hudup.core.evaluate.EvaluatorConfig;
@@ -80,6 +82,12 @@ public class ExtendedService extends DefaultService implements ServiceExt, Servi
 	
 	
 	/**
+	 * Dataset pools service.
+	 */
+	protected DatasetPoolsServiceImpl poolsService = null;
+	
+	
+	/**
 	 * List of listeners.
 	 */
     protected EventListenerList listenerList = new EventListenerList();
@@ -112,6 +120,18 @@ public class ExtendedService extends DefaultService implements ServiceExt, Servi
 		
 		loadEvaluators();
 
+		try {
+			if (poolsService != null) poolsService.close();
+			poolsService = new DatasetPoolsServiceImpl(referredServer);
+			poolsService.export(serverConfig.getServerPort());
+		} catch (Throwable e) {
+			if (poolsService != null) {
+				try {poolsService.close();} catch (Throwable ex) {}
+				poolsService = null;
+			}
+			LogUtil.trace(e);
+		}
+		
 		if (timer != null) timer.stop(); timer = null;
 		if (!Constants.SERVER_PURGE_LISTENERS) {
 			timer = new Timer2(Constants.DEFAULT_SHORT_TIMEOUT*1000, Constants.DEFAULT_LONG_TIMEOUT*1000) {
@@ -185,6 +205,11 @@ public class ExtendedService extends DefaultService implements ServiceExt, Servi
 		
 		if (guiDataMap != null) guiDataMap.clear();
 		
+		if (poolsService != null) {
+			try {poolsService.close();} catch (Throwable ex) {}
+			poolsService = null;
+		}
+
 		if (timer != null) timer.stop(); timer = null;
 	}
 
@@ -503,6 +528,24 @@ public class ExtendedService extends DefaultService implements ServiceExt, Servi
 	}
 
 
+	@Override
+	public DatasetPoolsService getDatasetPoolsService(String account, String password) throws RemoteException {
+		if (!validateAccount(account, password, DataConfig.ACCOUNT_EVALUATE_PRIVILEGE))
+			return null;
+		else
+			return poolsService;
+	}
+
+
+	/**
+	 * Getting dataset pools service.
+	 * @return
+	 */
+	public DatasetPoolsService getDatasetPoolsService() {
+		return poolsService;
+	}
+	
+	
 	@Override
 	public void pluginChanged(PluginChangedEvent evt) throws RemoteException {
 		super.pluginChanged(evt);

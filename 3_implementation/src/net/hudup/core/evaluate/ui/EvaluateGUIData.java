@@ -59,6 +59,12 @@ public class EvaluateGUIData implements Serializable {
 
 	
 	/**
+	 * Flag to indicate referred pool.
+	 */
+	public boolean isRefPool = false;
+	
+	
+	/**
 	 * Text field to show place of saving running information.
 	 */
 	public String txtRunSaveBrowse = null;
@@ -80,6 +86,7 @@ public class EvaluateGUIData implements Serializable {
 		algName = null;
 		algNames = null;
 		pool = null;
+		isRefPool = false;
 		txtRunSaveBrowse = null;
 		chkVerbal = false;
 	}
