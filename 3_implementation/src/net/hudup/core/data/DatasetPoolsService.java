@@ -44,17 +44,18 @@ public interface DatasetPoolsService extends Remote {
 	 * @return dataset pool.
 	 * @throws RemoteException if any error raises.
 	 */
-	DatasetPoolExchanged get(String name) throws RemoteException;
+	DatasetPoolExchangedItem get(String name) throws RemoteException;
 	
 	
 	/**
 	 * Putting dataset pool given name.
 	 * @param name dataset pool.
 	 * @param pool given name.
+	 * @param clients array of clients.
 	 * @return true if putting is successful.
 	 * @throws RemoteException  if any error raises.
 	 */
-	boolean put(String name, DatasetPoolExchanged pool) throws RemoteException;
+	boolean put(String name, DatasetPoolExchanged pool, Remote...clients) throws RemoteException;
 	
 	
 	/**
@@ -64,6 +65,16 @@ public interface DatasetPoolsService extends Remote {
 	 * @throws RemoteException if any error raises.
 	 */
 	boolean remove(String name) throws RemoteException;
+	
+	
+	/**
+	 * Removing client.
+	 * @param client specified client.
+	 * @param released released flag.
+	 * @return true if removing is successful.
+	 * @throws RemoteException if any error raises.
+	 */
+	boolean removeClient(Remote client, boolean released) throws RemoteException;
 	
 	
 	/**

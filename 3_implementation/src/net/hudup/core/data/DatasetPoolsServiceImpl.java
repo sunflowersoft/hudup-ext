@@ -51,7 +51,7 @@ public class DatasetPoolsServiceImpl implements DatasetPoolsService, Serializabl
     /**
 	 * Internal pool.
 	 */
-	protected Map<String, DatasetPoolExchanged> pools = Util.newMap();
+	protected Map<String, DatasetPoolExchangedItem> pools = Util.newMap();
 	
 	
 	/**
@@ -72,23 +72,26 @@ public class DatasetPoolsServiceImpl implements DatasetPoolsService, Serializabl
 
 
 	@Override
-	public boolean contains(String name) throws RemoteException {
+	public synchronized boolean contains(String name) throws RemoteException {
 		return pools.containsKey(name);
 	}
 
 
 	@Override
-	public synchronized DatasetPoolExchanged get(String name) throws RemoteException {
+	public synchronized DatasetPoolExchangedItem get(String name) throws RemoteException {
 		return pools.get(name);
 	}
 
 
 	@Override
-	public synchronized boolean put(String name, DatasetPoolExchanged pool) throws RemoteException {
+	public synchronized boolean put(String name, DatasetPoolExchanged pool, Remote...clients) throws RemoteException {
 		try {
-			DatasetPoolExchanged prev = pools.put(name, pool);
-			pool.export(server.getPort(), false);
-			if (prev != null) prev.unexport(true);
+			if (name == null || pools.containsKey(name)) return false;
+			DatasetPoolExchangedItem item = create(name, pool, clients);
+			if (item == null) return false;
+			
+			DatasetPoolExchangedItem prev = pools.put(name, item);
+			if (prev != null) prev.close();
 			return true;
 		} catch (Throwable e) {LogUtil.trace(e);}
 		
@@ -99,8 +102,8 @@ public class DatasetPoolsServiceImpl implements DatasetPoolsService, Serializabl
 	@Override
 	public synchronized boolean remove(String name) throws RemoteException {
 		try {
-			DatasetPoolExchanged prev = pools.remove(name);
-			if (prev != null) prev.unexport(true);
+			DatasetPoolExchangedItem prev = pools.remove(name);
+			if (prev != null) prev.close();
 			return prev != null;
 		} catch (Throwable e) {LogUtil.trace(e);}
 		
@@ -109,11 +112,31 @@ public class DatasetPoolsServiceImpl implements DatasetPoolsService, Serializabl
 
 
 	@Override
-	public synchronized void clear() throws RemoteException {
-		Collection<DatasetPoolExchanged> values = pools.values();
-		for (DatasetPoolExchanged pool : values) {
+	public synchronized boolean removeClient(Remote client, boolean released) throws RemoteException {
+		Collection<DatasetPoolExchangedItem> items = pools.values();
+		boolean doReleased = false;
+		for (DatasetPoolExchangedItem item : items) {
 			try {
-				pool.clear(true);
+				if (!item.containsClient(client)) continue;
+				if (item.removeClient(client)) {
+					if (released && !doReleased) {
+						item.releaseClient(client);
+						doReleased = true;
+					}
+				}
+			} catch (Throwable e) {LogUtil.trace(e);}
+		}
+
+		return false;
+	}
+
+
+	@Override
+	public synchronized void clear() throws RemoteException {
+		Collection<DatasetPoolExchangedItem> items = pools.values();
+		for (DatasetPoolExchangedItem item : items) {
+			try {
+				item.close();
 			} catch (Throwable e) {LogUtil.trace(e);}
 		}
 		pools.clear();
@@ -166,5 +189,29 @@ public class DatasetPoolsServiceImpl implements DatasetPoolsService, Serializabl
 		} catch (Throwable e) {LogUtil.trace(e);}
 	}
 
+	
+	/**
+	 * Creating (new) an instance of pool.
+	 * @param name name of pool.
+	 * @param pool pool.
+	 * @param clients list of clients.
+	 * @return an instance of pool.
+	 */
+	protected DatasetPoolExchangedItem create(String name, DatasetPoolExchanged pool, Remote...clients) {
+		if (name == null || pool == null) return null;
+		try {
+			pool.export(server.getPort(), false);
+		} catch (Throwable e) {LogUtil.trace(e);}
+
+		DatasetPoolExchangedItem item = new DatasetPoolExchangedItem(name, pool);
+		if (clients != null && clients.length > 0) {
+			for (Remote client : clients) {
+				if (client != null) item.addClient(client);
+			}
+		}
+		
+		return item;
+	}
+	
 	
 }

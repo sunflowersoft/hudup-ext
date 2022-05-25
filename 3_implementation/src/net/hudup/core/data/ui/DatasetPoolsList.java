@@ -14,7 +14,6 @@ import java.util.Vector;
 import javax.swing.JList;
 
 import net.hudup.core.Util;
-import net.hudup.core.data.DatasetPoolExchanged;
 import net.hudup.core.data.DatasetPoolExchangedItem;
 import net.hudup.core.data.DatasetPoolsService;
 import net.hudup.core.logistic.LogUtil;
@@ -69,8 +68,8 @@ public class DatasetPoolsList extends JList<DatasetPoolExchangedItem> {
 		
 		for (String name : names) {
 			try {
-				DatasetPoolExchanged pool = poolsService.get(name);
-				if (pool != null) items.add(new DatasetPoolExchangedItem(name, pool));
+				DatasetPoolExchangedItem pool = poolsService.get(name);
+				if (pool != null) items.add(pool);
 			} catch (Throwable e) {names = Util.newSet(); LogUtil.trace(e);}
 		}
 		

@@ -187,6 +187,10 @@ public class ExtendedService extends DefaultService implements ServiceExt, Servi
 			Collection<Evaluator> evs = pairMap.values();
 			for (Evaluator ev : evs) {
 				try {
+					if (poolsService != null) poolsService.removeClient(ev, false);
+				} catch (Throwable e) {LogUtil.trace(e);}
+
+				try {
 					ev.close();
 				} catch (Throwable e) {LogUtil.trace(e);}
 			}
@@ -196,6 +200,10 @@ public class ExtendedService extends DefaultService implements ServiceExt, Servi
 		if (pairReproducedMap != null) {
 			Collection<Evaluator> evs = pairReproducedMap.values();
 			for (Evaluator ev : evs) {
+				try {
+					if (poolsService != null) poolsService.removeClient(ev, false);
+				} catch (Throwable e) {LogUtil.trace(e);}
+
 				try {
 					ev.close();
 				} catch (Throwable e) {LogUtil.trace(e);}

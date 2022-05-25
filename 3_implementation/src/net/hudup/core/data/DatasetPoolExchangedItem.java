@@ -8,8 +8,13 @@
 package net.hudup.core.data;
 
 import java.io.Serializable;
+import java.rmi.Remote;
+import java.util.List;
 
+import net.hudup.core.Util;
+import net.hudup.core.evaluate.Evaluator;
 import net.hudup.core.logistic.DSUtil;
+import net.hudup.core.logistic.LogUtil;
 
 /**
  * This class represents an item of dataset pool with given name.
@@ -18,7 +23,7 @@ import net.hudup.core.logistic.DSUtil;
  * @version 1.0
  *
  */
-public class DatasetPoolExchangedItem implements Cloneable, Serializable, Comparable<DatasetPoolExchangedItem> {
+public class DatasetPoolExchangedItem implements Serializable, Comparable<DatasetPoolExchangedItem>, AutoCloseable {
 
 	
 	/**
@@ -37,6 +42,12 @@ public class DatasetPoolExchangedItem implements Cloneable, Serializable, Compar
 	 * Internal dataset pool.
 	 */
 	protected DatasetPoolExchanged pool = null;
+	
+	
+	/**
+	 * List of clients.
+	 */
+	protected List<Remote> clients = Util.newList();
 	
 	
 	/**
@@ -63,8 +74,87 @@ public class DatasetPoolExchangedItem implements Cloneable, Serializable, Compar
 	 * Getting pool.
 	 * @return pool.
 	 */
-	public DatasetPoolExchanged getDatasetPool() {
+	public DatasetPoolExchanged getPool() {
 		return pool;
+	}
+	
+	
+	/**
+	 * Getting client size.
+	 * @return client size.
+	 */
+	public int getClientSize() {
+		return clients.size();
+	}
+	
+	
+	/**
+	 * Checking if containing specified client.
+	 * @param client specified client.
+	 * @return true if containing specified client.
+	 */
+	public boolean containsClient(Remote client) {
+		return clients.contains(client);
+	}
+	
+	
+	/**
+	 * Getting client at specified index.
+	 * @param index specified index.
+	 * @return client at specified index.
+	 */
+	public Remote getClient(int index) {
+		return clients.get(index);
+	}
+	
+	
+	/**
+	 * Adding client.
+	 * @param client specified client.
+	 * @return true if adding client is successful.
+	 */
+	public boolean addClient(Remote client) {
+		if (client == null || clients.contains(client))
+			return false;
+		else
+			return clients.add(client);
+	}
+	
+	
+	/**
+	 * Removing client at specified index.
+	 * @param index specified index.
+	 * @return removed client.
+	 */
+	public Remote removeClient(int index) {
+		return clients.remove(index);
+	}
+	
+
+	/**
+	 * Removing specified client.
+	 * @param client specified client.
+	 * @return true if removing client is successful.
+	 */
+	public boolean removeClient(Remote client) {
+		return clients.remove(client);
+	}
+	
+	
+	/**
+	 * Releasing client.
+	 * @param client specified client.
+	 */
+	protected void releaseClient(Remote client) {
+		try {
+			if (client == null)
+				return;
+			else if (client instanceof Evaluator)
+				((Evaluator)client).remoteStop();
+		}
+		catch (Throwable e) {
+			LogUtil.trace(e);
+		}
 	}
 	
 	
@@ -77,6 +167,24 @@ public class DatasetPoolExchangedItem implements Cloneable, Serializable, Compar
 	@Override
 	public String toString() {
 		return name != null ? DSUtil.shortenVerbalName(name) : super.toString();
+	}
+
+
+	@Override
+	public void close() throws Exception {
+		for (Remote client : clients) {
+			try {
+				releaseClient(client);
+			} catch (Throwable e) {LogUtil.trace(e);}
+		}
+		clients.clear();
+		
+		if (pool != null) {
+			try {
+				pool.unexport(true);
+			} catch (Throwable e) {LogUtil.trace(e);}
+		}
+		pool = null;
 	}
 	
 	

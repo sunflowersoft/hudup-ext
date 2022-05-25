@@ -1862,33 +1862,18 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			JOptionPane.showMessageDialog(this, "Dataset pool was attached", "Dataset pool was attached", JOptionPane.ERROR_MESSAGE);
 			return;
 		}
-		PowerServer server = EvaluatorAbstract.getServerByPluginChangedListenersPath(this.evaluator);
-		if (server == null) {
-			JOptionPane.showMessageDialog(this, "This is not server related evaluator", "Not server related evaluator", JOptionPane.ERROR_MESSAGE);
-			return;
-		}
 		
 		try {
 			if (evaluator.remoteIsStarted()) {
 				JOptionPane.showMessageDialog(this, "Evaluator started", "Evaluator started", JOptionPane.ERROR_MESSAGE);
 				return;
 			}
-
-			Service service = server.getService();
-			if (service == null || !(service instanceof ServiceExt)) return;
-			DatasetPoolsService poolsService = null;
-			if (service instanceof ExtendedService)
-				poolsService = ((ExtendedService)service).getDatasetPoolsService();
-			else {
-				LoginDlg login = new LoginDlg(this, "Enter user name and password");
-				if (!login.wasLogin()) return;
-				poolsService = ((ServiceExt)service).getDatasetPoolsService(login.getUsername(), login.getPassword());
-			}
+			
+			DatasetPoolsService poolsService = retrievePoolsService();
 			if (poolsService == null) {
 				JOptionPane.showMessageDialog(this, "Cannot get pools service", "Cannot get pools service.", JOptionPane.ERROR_MESSAGE);
 				return;
 			}
-			
 			DatasetPoolsManager manager = DatasetPoolsManager.show(poolsService, this);
 			DatasetPoolExchangedItem poolItem = manager.getSelectedPool();
 			if (poolItem == null) {
@@ -1897,7 +1882,8 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			}
 			
 			try {
-				evaluator.refPool(true, poolItem.getDatasetPool(), poolItem.getName(), this, timestamp = new Timestamp());
+				evaluator.refPool(true, poolItem.getPool(), poolItem.getName(), this, timestamp = new Timestamp());
+				poolItem.addClient(evaluator);
 			} catch (Throwable e) {LogUtil.trace(e);}
 		}
 		catch (Throwable e) {
@@ -1915,11 +1901,6 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			JOptionPane.showMessageDialog(this, "Dataset pool was not attached", "Dataset pool was not attached", JOptionPane.ERROR_MESSAGE);
 			return;
 		}
-		PowerServer server = EvaluatorAbstract.getServerByPluginChangedListenersPath(this.evaluator);;
-		if (server == null) {
-			JOptionPane.showMessageDialog(this, "This is not server related evaluator", "Not server related evaluator", JOptionPane.ERROR_MESSAGE);
-			return;
-		}
 		
 		try {
 			if (evaluator.remoteIsStarted()) {
@@ -1927,7 +1908,14 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 				return;
 			}
 
+			DatasetPoolsService poolsService = retrievePoolsService();
+			if (poolsService == null) {
+				JOptionPane.showMessageDialog(this, "Cannot get pools service", "Cannot get pools service.", JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+
 			evaluator.refPool(false, null, null, this, timestamp = new Timestamp());
+			poolsService.removeClient(evaluator, false);
 		}
 		catch (Throwable e) {
 			updateMode();
@@ -1952,11 +1940,6 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			JOptionPane.showMessageDialog(this, "Client dataset pool", "Client dataset pool", JOptionPane.ERROR_MESSAGE);
 			return;
 		}
-		PowerServer server = EvaluatorAbstract.getServerByPluginChangedListenersPath(this.evaluator);;
-		if (server == null) {
-			JOptionPane.showMessageDialog(this, "This is not server related evaluator", "Not server related evaluator", JOptionPane.ERROR_MESSAGE);
-			return;
-		}
 
 		try {
 			if (evaluator.remoteIsStarted()) {
@@ -1964,21 +1947,11 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 				return;
 			}
 
-			Service service = server.getService();
-			if (service == null || !(service instanceof ServiceExt)) return;
-			DatasetPoolsService poolsService = null;
-			if (service instanceof ExtendedService)
-				poolsService = ((ExtendedService)service).getDatasetPoolsService();
-			else {
-				LoginDlg login = new LoginDlg(this, "Enter user name and password");
-				if (!login.wasLogin()) return;
-				poolsService = ((ServiceExt)service).getDatasetPoolsService(login.getUsername(), login.getPassword());
-			}
+			DatasetPoolsService poolsService = retrievePoolsService();
 			if (poolsService == null) {
 				JOptionPane.showMessageDialog(this, "Cannot get pools service", "Cannot get pools service.", JOptionPane.ERROR_MESSAGE);
 				return;
 			}
-			
 			String name = JOptionPane.showInputDialog(this, "Enter pool name", evaluator.getName());
 			if (name == null || name.isEmpty()) {
 				JOptionPane.showMessageDialog(this, "Empty pool name", "Empty pool name", JOptionPane.WARNING_MESSAGE);
@@ -1999,6 +1972,37 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			updateMode();
 			LogUtil.trace(e);
 		}
+	}
+	
+	
+	/**
+	 * Retrieving pools service.
+	 * @return pools service.
+	 */
+	private DatasetPoolsService retrievePoolsService() {
+		PowerServer server = EvaluatorAbstract.getServerByPluginChangedListenersPath(this.evaluator);;
+		if (server == null) return null;
+		
+		try {
+			Service service = server.getService();
+			if (service == null || !(service instanceof ServiceExt)) return null;
+			
+			DatasetPoolsService poolsService = null;
+			if (service instanceof ExtendedService)
+				poolsService = ((ExtendedService)service).getDatasetPoolsService();
+			else {
+				LoginDlg login = new LoginDlg(this, "Enter user name and password");
+				if (!login.wasLogin()) return null;
+				poolsService = ((ServiceExt)service).getDatasetPoolsService(login.getUsername(), login.getPassword());
+			}
+			
+			return poolsService;
+		}
+		catch (Throwable e) {
+			LogUtil.trace(e);
+		}
+		
+		return null;
 	}
 	
 	
