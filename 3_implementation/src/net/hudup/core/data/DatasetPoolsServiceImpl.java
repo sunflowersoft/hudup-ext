@@ -102,9 +102,9 @@ public class DatasetPoolsServiceImpl implements DatasetPoolsService, Serializabl
 	@Override
 	public synchronized boolean remove(String name) throws RemoteException {
 		try {
-			DatasetPoolExchangedItem prev = pools.remove(name);
-			if (prev != null) prev.close();
-			return prev != null;
+			DatasetPoolExchangedItem removed = pools.remove(name);
+			if (removed != null) removed.close();
+			return removed != null;
 		} catch (Throwable e) {LogUtil.trace(e);}
 		
 		return false;

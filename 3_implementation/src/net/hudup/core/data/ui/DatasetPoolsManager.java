@@ -20,6 +20,7 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
@@ -33,6 +34,7 @@ import javax.swing.event.ListSelectionListener;
 import net.hudup.core.data.DatasetPoolExchangedItem;
 import net.hudup.core.data.DatasetPoolsService;
 import net.hudup.core.logistic.I18nUtil;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.NextUpdate;
 import net.hudup.core.logistic.ui.UIUtil;
 
@@ -93,7 +95,12 @@ public class DatasetPoolsManager extends JDialog {
 
 		DatasetPoolsManager thisManager = this;
 		setJMenuBar(createMenuBar());
-		addMouseListener(new MouseAdapter() {
+		
+		JPanel left = new JPanel(new BorderLayout());
+		add(left, BorderLayout.WEST);
+		
+		poolList = new DatasetPoolsList(poolsService);
+		poolList.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				if(SwingUtilities.isRightMouseButton(e) ) {
@@ -103,12 +110,6 @@ public class DatasetPoolsManager extends JDialog {
 				}
 			}
 		});
-	    
-		
-		JPanel left = new JPanel(new BorderLayout());
-		add(left, BorderLayout.WEST);
-		
-		poolList = new DatasetPoolsList(poolsService);
 		poolList.addListSelectionListener(new ListSelectionListener() {
 			@Override
 			public void valueChanged(ListSelectionEvent e) {
@@ -117,16 +118,13 @@ public class DatasetPoolsManager extends JDialog {
 		});
 		poolList.getModel().addListDataListener(new ListDataListener() {
 			@Override
-			public void intervalRemoved(ListDataEvent e) {
-			}
+			public void intervalRemoved(ListDataEvent e) {}
 			
 			@Override
-			public void intervalAdded(ListDataEvent e) {
-			}
+			public void intervalAdded(ListDataEvent e) {}
 			
 			@Override
-			public void contentsChanged(ListDataEvent e) {
-			}
+			public void contentsChanged(ListDataEvent e) {}
 		});
 		left.add(new JScrollPane(poolList), BorderLayout.CENTER);
 		
@@ -147,7 +145,16 @@ public class DatasetPoolsManager extends JDialog {
 			new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-				
+					DatasetPoolExchangedItem pool = poolList.getSelectedValue();
+					if (pool == null) {
+						JOptionPane.showMessageDialog(thisManager, "No pool selected", "No pool selected", JOptionPane.ERROR_MESSAGE);
+						return;
+					}
+					
+					try {
+						poolsService.remove(pool.getName());
+						poolList.update();
+					} catch (Throwable ex) {LogUtil.trace(ex);}
 				}
 			});
 		btnDeletePool.setMargin(new Insets(0, 0 , 0, 0));
@@ -167,7 +174,11 @@ public class DatasetPoolsManager extends JDialog {
 			new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-
+					try {
+						poolsService.clear();
+					} catch (Throwable ex) {LogUtil.trace(ex);}
+					
+					poolList.update();
 				}
 			});
 		btnClearAll.setMargin(new Insets(0, 0 , 0, 0));

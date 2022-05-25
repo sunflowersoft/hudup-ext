@@ -149,8 +149,11 @@ public class DatasetPoolExchangedItem implements Serializable, Comparable<Datase
 		try {
 			if (client == null)
 				return;
-			else if (client instanceof Evaluator)
-				((Evaluator)client).remoteStop();
+			else if (client instanceof Evaluator) {
+				Evaluator evaluator = (Evaluator)client;
+				evaluator.remoteStop();
+				evaluator.refPool(false, null, name, null, null);
+			}
 		}
 		catch (Throwable e) {
 			LogUtil.trace(e);
