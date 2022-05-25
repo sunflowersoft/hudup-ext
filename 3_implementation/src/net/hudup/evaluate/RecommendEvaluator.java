@@ -29,6 +29,7 @@ import net.hudup.core.evaluate.EvaluateEvent.Type;
 import net.hudup.core.evaluate.EvaluateProgressEvent;
 import net.hudup.core.evaluate.EvaluatorAbstract;
 import net.hudup.core.evaluate.ExactRecallMetric;
+import net.hudup.core.evaluate.ExactRecallMetric2;
 import net.hudup.core.evaluate.FractionMetricValue;
 import net.hudup.core.evaluate.HudupRecallMetric;
 import net.hudup.core.evaluate.Metrics;
@@ -223,6 +224,9 @@ public class RecommendEvaluator extends EvaluatorAbstract {
 					//
 					int vExactCurrentTotal = 0; //Exact total vector count for exact recall metric.
 					int vExactRecommendedCount = 0; //Exact recommended vector count for exact recall metric.
+					//
+					int vItemsRecommendRequiredTotal = 0; //Items recommend required total for exact recall metric 2.
+					int vItemsRecommendDoneCount = 0; //Items recommend done count for exact recall metric 2.
 					while (current == thread && testingUsers.next()) {
 						
 						otherResult.progressStep++;
@@ -245,17 +249,24 @@ public class RecommendEvaluator extends EvaluatorAbstract {
 						RecommendParam param = new RecommendParam(testingUser.id());
 						//Setting up maximum recommendation number by binomial distribution. Added date: 2019.08.23 by Loc Nguyen.
 						int maxRecommend = 0;
+						int ratedItemCount = 0;
 						if (heuristicRecommend && trainingData != null) {
-							int ratedItemCount = 0;
 							RatingVector trainingUser = trainingData.getUserRating(testingUser.id());
 							if (trainingUser != null) ratedItemCount = trainingUser.count(true); 
 							maxRecommend = (int)(relevantRatio*(totalRatedItemCount-ratedItemCount)+0.5);
+							maxRecommend = maxRecommend >= 0 ? maxRecommend : 0;
 							trainingData = null;
 						}
 						else if (config.getMaxRecommend() > 0) {
 							maxRecommend = config.getMaxRecommend();
 						}
 						vExactCurrentTotal++; //Increase exact total vector count.
+						if (maxRecommend > 0)
+							vItemsRecommendRequiredTotal += maxRecommend;
+						else {
+							vItemsRecommendRequiredTotal += totalRatedItemCount - ratedItemCount;
+							vItemsRecommendRequiredTotal = vItemsRecommendRequiredTotal >= 0 ? vItemsRecommendRequiredTotal : 0;
+						}
 						
 						//
 						long beginRecommendTime = System.currentTimeMillis();
@@ -291,6 +302,7 @@ public class RecommendEvaluator extends EvaluatorAbstract {
 							
 							vRecommendedCount++;
 							vExactRecommendedCount++; //Increase exact recommended count.
+							vItemsRecommendDoneCount += recommended.size();
 							
 							//Fire doing event with most of accuracy metrics.
 							fireEvaluateEvent(new EvaluateEvent(
@@ -328,6 +340,15 @@ public class RecommendEvaluator extends EvaluatorAbstract {
 							new Object[] { new FractionMetricValue(vExactRecommendedCount, vExactCurrentTotal) }
 						);
 					fireEvaluateEvent(new EvaluateEvent(this, Type.doing, exactRecallMetrics));
+
+					//Fire exact recall2.
+					Metrics exactRecallMetrics2 = result.recalc(
+							recommender.getName(), 
+							datasetId, 
+							ExactRecallMetric2.class, 
+							new Object[] { new FractionMetricValue(vItemsRecommendDoneCount, vItemsRecommendRequiredTotal) }
+						);
+					fireEvaluateEvent(new EvaluateEvent(this, Type.doing, exactRecallMetrics2));
 
 					//Fire done-one event (1 algorithm is finished with 1 dataset).
 					Metrics doneOneMetrics = result.gets(recommender.getName(), datasetId);
@@ -501,6 +522,9 @@ public class RecommendEvaluator extends EvaluatorAbstract {
 		
 		ExactRecallMetric exactRecall = new ExactRecallMetric();
 		metricList.add(exactRecall);
+
+		ExactRecallMetric2 exactRecall2 = new ExactRecallMetric2();
+		metricList.add(exactRecall2);
 
 		MAE mae = new MAE();
 		metricList.add(mae);

@@ -51,7 +51,6 @@ public abstract class ClassificationAccuracy extends Accuracy {
 	 */
 	public ClassificationAccuracy() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
 
