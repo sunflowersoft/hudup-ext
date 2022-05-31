@@ -357,12 +357,6 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 
 	
 	/**
-	 * EDS Jaccard.
-	 */
-	public static final String JACCARD_TYPE_EDS = "eds";
-
-	
-	/**
 	 * Threshold of rating relevant measure.
 	 */
 	protected static final String RATINGJ_THRESHOLD_FIELD = "jaccard_ratingj_threshold";
@@ -1623,8 +1617,6 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 			return jaccardImproved(vRating1, vRating2, profile1, profile2);
 		else if (jtype.equals(JACCARD_TYPE_RA))
 			return jaccardRA(vRating1, vRating2, profile1, profile2);
-		else if (jtype.equals(JACCARD_TYPE_EDS))
-			return jaccardEDS(vRating1, vRating2, profile1, profile2);
 		else
 			return jaccardNormal(vRating1, vRating2, profile1, profile2);
 	}
@@ -1692,31 +1684,6 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 
 		double n = 2 * common.size();
 		double N = set1.size() + set2.size();
-		return n/N;
-	}
-
-	
-	/**
-	 * Calculating the EDS Jaccard measure between two pairs.
-	 * @param vRating1 first rating vector.
-	 * @param vRating2 second rating vector.
-	 * @param profile1 first profile.
-	 * @param profile2 second profile.
-	 * @return Dice measure between both two rating vectors and profiles.
-	 */
-	protected double jaccardEDS(RatingVector vRating1, RatingVector vRating2,
-			Profile profile1, Profile profile2) {
-		Set<Integer> set1 = vRating1.fieldIds(true);
-		Set<Integer> set2 = vRating2.fieldIds(true);
-		Set<Integer> common = Util.newSet(); common.addAll(set1); common.retainAll(set2);
-		Set<Integer> union = Util.newSet(); union.addAll(set1); union.addAll(set2);
-
-		int N = 0;
-		for (int fieldId : union) {
-			if (vRating1.isRated(fieldId) || vRating2.isRated(fieldId)) N++;
-		}
-
-		double n = 2 * common.size();
 		return n/N;
 	}
 
@@ -2645,7 +2612,6 @@ public abstract class NeighborCF extends MemoryBasedCFAbstract implements Suppor
 					jtypes.add(JACCARD_TYPE_INDEXEDJ);
 					jtypes.add(JACCARD_TYPE_IJ);
 					jtypes.add(JACCARD_TYPE_RA);
-					jtypes.add(JACCARD_TYPE_EDS);
 					Collections.sort(jtypes);
 					
 					return (Serializable) JOptionPane.showInputDialog(
