@@ -212,6 +212,18 @@ public class AlgListChooser extends JDialog {
 		pane = new JPanel();
 		pane.add(rightToLeftAll);
 		buttons.add(pane);
+		
+		JButton switchLeftRight = new JButton("<>");
+		switchLeftRight.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				switchLeftRight();
+			}
+		});
+		pane = new JPanel();
+		pane.add(switchLeftRight);
+		buttons.add(pane);
 
 		
 		JPanel right = new JPanel(new BorderLayout());
@@ -277,10 +289,10 @@ public class AlgListChooser extends JDialog {
 		List<Alg> list = leftList.removeSelectedList();
 		if (list.isEmpty()) {
 			JOptionPane.showMessageDialog(
-					this, 
-					"Algorithm not selected or empty list", 
-					"Algorithm not selected or empty list", 
-					JOptionPane.WARNING_MESSAGE);
+				this, 
+				"Algorithm not selected or empty list", 
+				"Algorithm not selected or empty list", 
+				JOptionPane.WARNING_MESSAGE);
 			return;
 		}
 		rightList.addAll(list);
@@ -296,10 +308,10 @@ public class AlgListChooser extends JDialog {
 		List<Alg> list = leftList.getAlgList();
 		if (list.isEmpty()) {
 			JOptionPane.showMessageDialog(
-					this, 
-					"List empty", 
-					"List empty", 
-					JOptionPane.WARNING_MESSAGE);
+				this, 
+				"List empty", 
+				"List empty", 
+				JOptionPane.WARNING_MESSAGE);
 			return;
 		}
 		
@@ -317,10 +329,10 @@ public class AlgListChooser extends JDialog {
 		List<Alg> list = rightList.removeSelectedList();
 		if (list.isEmpty()) {
 			JOptionPane.showMessageDialog(
-					this, 
-					"Algorithm not selected or empty list", 
-					"Algorithm not selected or empty list", 
-					JOptionPane.WARNING_MESSAGE);
+				this, 
+				"Algorithm not selected or empty list", 
+				"Algorithm not selected or empty list", 
+				JOptionPane.WARNING_MESSAGE);
 			return;
 		}
 		leftList.addAll(list);
@@ -336,10 +348,10 @@ public class AlgListChooser extends JDialog {
 		List<Alg> list = rightList.getAlgList();
 		if (list.isEmpty()) {
 			JOptionPane.showMessageDialog(
-					this, 
-					"List empty", 
-					"List empty", 
-					JOptionPane.WARNING_MESSAGE);
+				this, 
+				"List empty", 
+				"List empty", 
+				JOptionPane.WARNING_MESSAGE);
 			return;
 		}
 
@@ -349,6 +361,28 @@ public class AlgListChooser extends JDialog {
 		updateAlgNumbers();
 	}
 
+	
+	/**
+	 * Switching left and right algorithms.
+	 */
+	private void switchLeftRight() {
+		List<Alg> leftAlgs = leftList.getAlgList();
+		List<Alg> rightAlgs = rightList.getAlgList();
+		if (leftAlgs.isEmpty() && rightAlgs.isEmpty()) {
+			JOptionPane.showMessageDialog(
+				this, 
+				"List empty", 
+				"List empty", 
+				JOptionPane.WARNING_MESSAGE);
+			return;
+		}
+
+		leftList.update(rightAlgs);
+		rightList.update(leftAlgs);
+		
+		updateAlgNumbers();
+	}
+	
 	
 	/**
 	 * This is event-driven method which responses the action user pressed on OK button.
