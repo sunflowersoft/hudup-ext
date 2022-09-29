@@ -101,39 +101,54 @@ public class AlgListChooser extends JDialog {
 	 * @param selectedList list of firstly selected algorithms.
 	 */
 	public AlgListChooser(Component comp, List<Alg> wholeList, List<Alg> selectedList) {
-		this(comp, wholeList, selectedList, null);
+		this(comp, wholeList, selectedList, false, null);
+	}
+
+	
+	/**
+	 * Constructor with parent component, the whole list of algorithms, the list of firstly selected algorithms, and sorting mode.
+	 * @param comp parent component.
+	 * @param wholeList whole list of algorithms.
+	 * @param selectedList list of firstly selected algorithms.
+	 * @param sorting sorting mode.
+	 */
+	public AlgListChooser(Component comp, List<Alg> wholeList, List<Alg> selectedList, boolean sorting) {
+		this(comp, wholeList, selectedList, sorting, null);
 	}
 	
 	
 	/**
-	 * Constructor with parent component, the whole list of algorithms, the list of firstly selected algorithms, and referred evaluator.
+	 * Constructor with parent component, the whole list of algorithms, the list of firstly selected algorithms, sorting mode, and referred evaluator.
 	 * @param comp parent component.
 	 * @param wholeList whole list of algorithms.
 	 * @param selectedList list of firstly selected algorithms.
+	 * @param sorting sorting mode.
 	 * @param referredEvaluator referred evaluator.
 	 */
-	public AlgListChooser(Component comp, List<Alg> wholeList, List<Alg> selectedList, Evaluator referredEvaluator) {
+	public AlgListChooser(Component comp, List<Alg> wholeList, List<Alg> selectedList, boolean sorting, Evaluator referredEvaluator) {
 		super(UIUtil.getDialogForComponent(comp), "Choosing algorithms", true);
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		setSize(600, 400);
 		setLocationRelativeTo(UIUtil.getDialogForComponent(comp));
 		JPanel pane = null;
 		
-		Collections.sort(wholeList, new Comparator<Alg>() {
-			
-			@Override
-			public int compare(Alg alg1, Alg alg2) {
-				return alg1.getName().compareTo(alg2.getName());
-			}
-		});
-		Collections.sort(selectedList, new Comparator<Alg>() {
-			
-			@Override
-			public int compare(Alg alg1, Alg alg2) {
-				return alg1.getName().compareTo(alg2.getName());
-			}
-		});
-
+		if (sorting) {
+			Collections.sort(wholeList, new Comparator<Alg>() {
+				
+				@Override
+				public int compare(Alg alg1, Alg alg2) {
+					return alg1.getName().compareTo(alg2.getName());
+				}
+			});
+			Collections.sort(selectedList, new Comparator<Alg>() {
+				
+				@Override
+				public int compare(Alg alg1, Alg alg2) {
+					return alg1.getName().compareTo(alg2.getName());
+				}
+			});
+		}
+		
 		this.result = Util.newList();
 		this.result.addAll(selectedList);
 		
@@ -150,7 +165,7 @@ public class AlgListChooser extends JDialog {
 		
 		leftLabel = new JLabel(AVAILABLE);
 		left.add(leftLabel, BorderLayout.NORTH);
-		leftList = new AlgListBox(true, referredEvaluator);
+		leftList = new AlgListBox(sorting, referredEvaluator);
 		leftList.update(remainList);
 		leftList.setEnableDoubleClick(false);
 		leftList.addAlgListChangedListener(new AlgListBox.AlgListChangedListener() {
@@ -231,7 +246,7 @@ public class AlgListChooser extends JDialog {
 		
 		rightLabel = new JLabel(SELECTED);
 		right.add(rightLabel, BorderLayout.NORTH);
-		rightList = new AlgListBox(true, referredEvaluator);
+		rightList = new AlgListBox(sorting, referredEvaluator);
 		rightList.setEnableDoubleClick(false);
 		rightList.update(selectedList);
 		rightList.addAlgListChangedListener(new AlgListBox.AlgListChangedListener() {

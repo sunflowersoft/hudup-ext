@@ -132,16 +132,56 @@ public class AlgListBox extends JList<Alg> implements AlgListUI {
 	
 	
     /**
+     * Getting sorting mode.
+     * @return sorting mode.
+     */
+    public boolean isSorting() {
+    	return sorting;
+    }
+    
+    
+    /**
      * Adding the context menu to this list.
      * @param contextMenu specified context menu.
      */
     protected void addToContextMenu(JPopupMenu contextMenu) {
-    	final int selectedRow = getSelectedIndex();
-    	if (selectedRow == -1) return;
+		int miCount = contextMenu.getSubElements() != null ? contextMenu.getSubElements().length : 0; 
+		if (miCount > 0) contextMenu.addSeparator();
+		JMenuItem miSortingMode = UIUtil.makeMenuItem((String)null, sorting ? "Unsorting mode" : "Sorting mode", 
+			new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					update(!sorting);
+				}
+			});
+		contextMenu.add(miSortingMode);
 		
-    	if (getModel().getSize() > 1) {
-    		contextMenu.addSeparator();
 
+		int algCount = getModel().getSize();
+    	if (algCount == 0) return;
+		JMenuItem miReverse = UIUtil.makeMenuItem((String)null, "Reverse", 
+			new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					reverseRows();
+				}
+			});
+
+		final int selectedRow = getSelectedIndex();
+    	if (selectedRow == -1) {
+    		if (algCount > 1) {
+    			miCount = contextMenu.getSubElements() != null ? contextMenu.getSubElements().length : 0; 
+    			if (miCount > 0) contextMenu.addSeparator();
+    			contextMenu.add(miReverse);
+    		}
+    		return;
+    	}
+		
+    	if (algCount > 1) {
+    		miCount = contextMenu.getSubElements() != null ? contextMenu.getSubElements().length : 0; 
+			if (miCount > 0) contextMenu.addSeparator();
     		if (selectedRow == 0) {
 				JMenuItem miMoveDown = UIUtil.makeMenuItem((String)null, "Move down", 
 					new ActionListener() {
@@ -226,12 +266,15 @@ public class AlgListBox extends JList<Alg> implements AlgListUI {
 				contextMenu.add(miMoveLast);
 			}
 			
+    		contextMenu.add(miReverse);
+    		
     	} // End if
     	
     	
     	Alg selectedAlg = getSelectedAlg();
     	if (selectedAlg instanceof DuplicatableAlg) {
-    		contextMenu.addSeparator();
+    		miCount = contextMenu.getSubElements() != null ? contextMenu.getSubElements().length : 0; 
+    		if (miCount > 0) contextMenu.addSeparator();
 
     		JMenuItem miDuplicate = UIUtil.makeMenuItem((String)null, "Duplicate", 
 				new ActionListener() {
@@ -381,6 +424,17 @@ public class AlgListBox extends JList<Alg> implements AlgListUI {
 	
 	
 	/**
+	 * Updating sorting mode.
+	 * @param sorting sorting mode.
+	 */
+	protected void update(boolean sorting) {
+		this.sorting = sorting;
+		List<Alg> algList = getAlgList();
+		update(algList);
+	}
+	
+	
+	/**
 	 * Adding an algorithm into this {@link AlgListBox}.
 	 * @param alg specified algorithm which is added into this {@link AlgListBox}.  
 	 */
@@ -526,6 +580,19 @@ public class AlgListBox extends JList<Alg> implements AlgListUI {
 		List<Alg> algList = getAlgList();
 		DSUtil.moveRow(algList, start, end, to);
 		update(algList);
+	}
+	
+	
+	/**
+	 * Reversing rows
+	 */
+	protected void reverseRows() {
+		List<Alg> algList = getAlgList();
+		if (algList.size() == 0) return;
+		List<Alg> algReversedList = Util.newList(algList.size());
+		for (int i = algList.size() - 1; i >= 0; i--) algReversedList.add(algList.get(i));
+		
+		update(algReversedList);
 	}
 	
 	

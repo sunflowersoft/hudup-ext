@@ -407,13 +407,14 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			@Override
 			protected void addToContextMenu(JPopupMenu contextMenu) {
 				super.addToContextMenu(contextMenu);
-				
+
 		    	final Alg selectedAlg = getSelectedAlg();
 		    	if (selectedAlg == null) return;
 				
-		    	if (!PluginStorage.contains(selectedAlg) &&
-		    			algRegTable.contains(selectedAlg.getName())) {
-			    	
+				if (!PluginStorage.contains(selectedAlg) && algRegTable.contains(selectedAlg.getName())) {
+					int miCount = contextMenu.getSubElements() != null ? contextMenu.getSubElements().length : 0; 
+	    			if (miCount > 0) contextMenu.addSeparator();
+
 					JMenuItem miRegister = UIUtil.makeMenuItem((String)null, "Register", 
 						new ActionListener() {
 							@Override
@@ -446,7 +447,8 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 		    	}
 
 				if (!guiData.isRefPool) {
-			    	contextMenu.addSeparator();
+					int miCount = contextMenu.getSubElements() != null ? contextMenu.getSubElements().length : 0; 
+					if (miCount > 0) contextMenu.addSeparator();
 					JMenuItem miTraining = UIUtil.makeMenuItem((String)null, "Add training set", 
 						new ActionListener() {
 							
@@ -518,7 +520,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					AlgListChooser dlg = new AlgListChooser(getThisGUI(), algRegTable.getAlgList(), lbAlgs.getAlgList(), evaluator);
+					AlgListChooser dlg = new AlgListChooser(getThisGUI(), algRegTable.getAlgList(), lbAlgs.getAlgList(), lbAlgs.isSorting(), evaluator);
 					if (!dlg.isOK())
 						return;
 					
