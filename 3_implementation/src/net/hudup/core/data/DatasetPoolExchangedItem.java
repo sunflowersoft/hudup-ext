@@ -12,7 +12,6 @@ import java.rmi.Remote;
 import java.util.List;
 
 import net.hudup.core.Util;
-import net.hudup.core.evaluate.Evaluator;
 import net.hudup.core.logistic.DSUtil;
 import net.hudup.core.logistic.LogUtil;
 
@@ -23,7 +22,7 @@ import net.hudup.core.logistic.LogUtil;
  * @version 1.0
  *
  */
-public class DatasetPoolExchangedItem implements Serializable, Comparable<DatasetPoolExchangedItem>, AutoCloseable {
+public class DatasetPoolExchangedItem implements Serializable, Comparable<DatasetPoolExchangedItem>, java.lang.AutoCloseable {
 
 	
 	/**
@@ -47,7 +46,7 @@ public class DatasetPoolExchangedItem implements Serializable, Comparable<Datase
 	/**
 	 * List of clients.
 	 */
-	protected List<Remote> clients = Util.newList();
+	protected List<ClientWrapper> clients = Util.newList();
 	
 	
 	/**
@@ -89,12 +88,42 @@ public class DatasetPoolExchangedItem implements Serializable, Comparable<Datase
 	
 	
 	/**
+	 * Getting wrapper of remote client.
+	 * @param remoteClient remote client.
+	 * @return wrapper of remote client.
+	 */
+	public ClientWrapper wrapperOf(Remote remoteClient) {
+		if (remoteClient == null) return null;
+		for (ClientWrapper wrapper : clients) {
+			if (wrapper.getClient() == remoteClient) return wrapper;
+		}
+		
+		return null;
+	}
+	
+	
+	/**
 	 * Checking if containing specified client.
 	 * @param client specified client.
 	 * @return true if containing specified client.
 	 */
-	public boolean containsClient(Remote client) {
-		return clients.contains(client);
+	public boolean containsClient(ClientWrapper client) {
+		if (client == null)
+			return false;
+		else if (clients.contains(client))
+			return true;
+		else
+			return containsClient(client.getClient());
+	}
+	
+	
+	/**
+	 * Checking if containing remote client.
+	 * @param remoteClient remote client.
+	 * @return true if containing remote client.
+	 */
+	public boolean containsClient(Remote remoteClient) {
+		return wrapperOf(remoteClient) != null;
 	}
 	
 	
@@ -103,7 +132,7 @@ public class DatasetPoolExchangedItem implements Serializable, Comparable<Datase
 	 * @param index specified index.
 	 * @return client at specified index.
 	 */
-	public Remote getClient(int index) {
+	public ClientWrapper getClient(int index) {
 		return clients.get(index);
 	}
 	
@@ -113,8 +142,8 @@ public class DatasetPoolExchangedItem implements Serializable, Comparable<Datase
 	 * @param client specified client.
 	 * @return true if adding client is successful.
 	 */
-	public boolean addClient(Remote client) {
-		if (client == null || clients.contains(client))
+	public boolean addClient(ClientWrapper client) {
+		if (client == null || client.getClient() == null || containsClient(client))
 			return false;
 		else
 			return clients.add(client);
@@ -122,11 +151,28 @@ public class DatasetPoolExchangedItem implements Serializable, Comparable<Datase
 	
 	
 	/**
+	 * Adding client.
+	 * @param client remote client.
+	 * @return true if adding client is successful.
+	 */
+	public boolean addClient(Remote remoteClient) {
+		if (remoteClient == null || containsClient(remoteClient))
+			return false;
+
+		ClientWrapper wrapper = ClientWrapper.create(remoteClient, name, name);
+		if (wrapper != null)
+			return clients.add(wrapper);
+		else
+			return false;
+	}
+
+	
+	/**
 	 * Removing client at specified index.
 	 * @param index specified index.
 	 * @return removed client.
 	 */
-	public Remote removeClient(int index) {
+	public ClientWrapper removeClient(int index) {
 		return clients.remove(index);
 	}
 	
@@ -136,7 +182,7 @@ public class DatasetPoolExchangedItem implements Serializable, Comparable<Datase
 	 * @param client specified client.
 	 * @return true if removing client is successful.
 	 */
-	public boolean removeClient(Remote client) {
+	public boolean removeClient(ClientWrapper client) {
 		return clients.remove(client);
 	}
 	
@@ -144,20 +190,17 @@ public class DatasetPoolExchangedItem implements Serializable, Comparable<Datase
 	/**
 	 * Releasing client.
 	 * @param client specified client.
+	 * @return true if releasing client is successful.
 	 */
-	protected void releaseClient(Remote client) {
+	protected boolean releaseClient(ClientWrapper client) {
+		if (client == null) return false;
 		try {
-			if (client == null)
-				return;
-			else if (client instanceof Evaluator) {
-				Evaluator evaluator = (Evaluator)client;
-				evaluator.remoteStop();
-				evaluator.refPool(false, null, name, null, null);
-			}
+			client.close();
+			return true;
 		}
-		catch (Throwable e) {
-			LogUtil.trace(e);
-		}
+		catch (Throwable e) {LogUtil.trace(e);}
+		
+		return false;
 	}
 	
 	
@@ -175,7 +218,7 @@ public class DatasetPoolExchangedItem implements Serializable, Comparable<Datase
 
 	@Override
 	public void close() throws Exception {
-		for (Remote client : clients) {
+		for (ClientWrapper client : clients) {
 			try {
 				releaseClient(client);
 			} catch (Throwable e) {LogUtil.trace(e);}

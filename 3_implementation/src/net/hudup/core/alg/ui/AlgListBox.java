@@ -140,24 +140,23 @@ public class AlgListBox extends JList<Alg> implements AlgListUI {
     }
     
     
+	/**
+	 * Setting sorting mode.
+	 * @param sorting sorting mode.
+	 */
+	protected void setSorting(boolean sorting) {
+		this.sorting = sorting;
+		List<Alg> algList = getAlgList();
+		update(algList);
+	}
+	
+	
     /**
      * Adding the context menu to this list.
      * @param contextMenu specified context menu.
      */
     protected void addToContextMenu(JPopupMenu contextMenu) {
 		int miCount = contextMenu.getSubElements() != null ? contextMenu.getSubElements().length : 0; 
-		if (miCount > 0) contextMenu.addSeparator();
-		JMenuItem miSortingMode = UIUtil.makeMenuItem((String)null, sorting ? "Unsorting mode" : "Sorting mode", 
-			new ActionListener() {
-				
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					update(!sorting);
-				}
-			});
-		contextMenu.add(miSortingMode);
-		
-
 		int algCount = getModel().getSize();
     	if (algCount == 0) return;
 		JMenuItem miReverse = UIUtil.makeMenuItem((String)null, "Reverse", 
@@ -268,6 +267,15 @@ public class AlgListBox extends JList<Alg> implements AlgListUI {
 			
     		contextMenu.add(miReverse);
     		
+    		JMenuItem miSort = UIUtil.makeMenuItem((String)null, "Sort", 
+    			new ActionListener() {
+    				
+    				@Override
+    				public void actionPerformed(ActionEvent e) {
+    					sort();
+    				}
+    			});
+    		contextMenu.add(miSort);
     	} // End if
     	
     	
@@ -420,17 +428,6 @@ public class AlgListBox extends JList<Alg> implements AlgListUI {
 	 */
 	public void update(Alg[] algList) {
 		update(Arrays.asList(algList));
-	}
-	
-	
-	/**
-	 * Updating sorting mode.
-	 * @param sorting sorting mode.
-	 */
-	protected void update(boolean sorting) {
-		this.sorting = sorting;
-		List<Alg> algList = getAlgList();
-		update(algList);
 	}
 	
 	
@@ -593,6 +590,28 @@ public class AlgListBox extends JList<Alg> implements AlgListUI {
 		for (int i = algList.size() - 1; i >= 0; i--) algReversedList.add(algList.get(i));
 		
 		update(algReversedList);
+	}
+	
+	
+	/**
+	 * Sorting algorithm.
+	 */
+	protected void sort() {
+		List<Alg> algList = getAlgList();
+		if (algList.size() < 2) return;
+		
+		Vector<Alg> data = Util.newVector(algList.size());
+		data.addAll(algList);
+		Collections.sort(data, new Comparator<Alg>() {
+
+			@Override
+			public int compare(Alg alg1, Alg alg2) {
+				return alg1.getName().compareTo(alg2.getName());
+			}
+		});
+		setListData(data);
+		
+		fireAlgListChangedEvent(new AlgListChangedEvent(this, algList));
 	}
 	
 	
