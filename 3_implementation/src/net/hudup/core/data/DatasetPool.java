@@ -12,8 +12,11 @@ import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
+import net.hudup.core.Constants;
 import net.hudup.core.Util;
+import net.hudup.core.client.ConnectInfo;
 import net.hudup.core.logistic.DSUtil;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.xURI;
 
 /**
@@ -625,6 +628,76 @@ public class DatasetPool implements Serializable {
 		DatasetPoolExchanged exchangedPool = new DatasetPoolExchanged();
 		exchangedPool.dspList = exchangeDspList;
 		return exchangedPool;
+	}
+	
+	
+	/**
+	 * Converting normal dataset pool to exchanged dataset in client. This method is called by evaluator GUI.
+	 * @return exchanged dataset in client.
+	 */
+	public DatasetPoolExchanged toDatasetPoolExchangedClient(ConnectInfo connectInfo) {
+		DatasetPoolExchanged exchangedPool = toDatasetPoolExchangedClient();
+		if (connectInfo.bindUri == null) return exchangedPool;
+		
+		for (DatasetPairExchanged pair : exchangedPool.dspList) {
+			setupDatasetExchanged(pair.training, connectInfo);
+			setupDatasetExchanged(pair.testing, connectInfo);
+			setupDatasetExchanged(pair.whole, connectInfo);
+		}
+		
+		return exchangedPool;
+	}
+	
+	
+	/**
+	 * Setting specified remote dataset.
+	 * @param remoteDataset specified remote dataset.
+	 * @param connectInfo connection information.
+	 */
+	private static void setupDatasetExchanged(DatasetRemote remoteDataset, ConnectInfo connectInfo) {
+		if (remoteDataset == null || connectInfo.bindUri == null) return;
+		if (DatasetUtil.getMostInnerDataset2(remoteDataset) == null)
+			return;
+		
+		try {
+			DataConfig config = remoteDataset.remoteGetConfig();
+			if (config == null) return;
+			
+			if (!config.containsKey(DatasetAbstract.ONLY_MEMORY_FIELD))
+				config.put(DatasetAbstract.ONLY_MEMORY_FIELD, true);
+			
+			if (Constants.hardwareAddress != null && Constants.hostAddress != null &&
+					!config.containsKey(DatasetAbstract.HARDWARE_ADDR_FIELD) &&
+					!config.containsKey(DatasetAbstract.HOST_ADDR_FIELD)) {
+				config.put(DatasetAbstract.HARDWARE_ADDR_FIELD, Constants.hardwareAddress);
+				
+				String globalAddress = connectInfo.extractGlobalAddress();
+				String hostAddr = globalAddress != null ? globalAddress : Constants.hostAddress;
+				config.put(DatasetAbstract.HOST_ADDR_FIELD, hostAddr);
+			}
+		}
+		catch (Exception e) {
+			LogUtil.trace(e);
+		}
+	}
+	
+	
+	/**
+	 * Getting local dataset pool which contains unuploaded datasets. 
+	 * @return local dataset pool which contains unuploaded datasets.
+	 */
+	public DatasetPool getLocals() {
+		DatasetPool newPool= new DatasetPool();
+		for (int i = 0; i < size(); i++) {
+			DatasetPair pair = get(i);
+			boolean added = true;
+			added = added && pair.getTrainingUUID() == null && pair.getTestingUUID() == null && pair.getWholeUUID() == null;
+			added = added && pair.getTraining() != null && pair.getTesting() != null;
+			
+			if (added) newPool.add(pair);
+		}
+		
+		return newPool;
 	}
 	
 	

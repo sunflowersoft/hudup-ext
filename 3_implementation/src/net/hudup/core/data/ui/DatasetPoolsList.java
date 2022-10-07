@@ -78,6 +78,21 @@ public class DatasetPoolsList extends JList<DatasetPoolExchangedItem> {
 	}
 	
 	
+	/**
+	 * Selecting pool given pool name.
+	 * @param poolName given pool name.
+	 */
+	public void selectPool(String poolName) {
+		for (int i = 0; i < getModel().getSize(); i++) {
+			DatasetPoolExchangedItem item = getModel().getElementAt(i);
+			if (item.getName().equals(poolName)) {
+				setSelectedIndex(i);
+				return;
+			}
+		}
+	}
+	
+	
 }
 
 

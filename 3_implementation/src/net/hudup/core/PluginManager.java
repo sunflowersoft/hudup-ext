@@ -89,6 +89,13 @@ public interface PluginManager extends AutoCloseable {
 	
 	
 	/**
+	 * Discovering classes.
+	 * @param referredClass referred classes.
+	 */
+	<T extends Alg> void discover(Class<T> referredClass);
+
+		
+	/**
 	 * Getting classes from stores and referred class. Packages specified in Hudup property file are not used because this method uses store URI (s).
 	 * This method does not affect plug-in storage.
 	 * @param <T> object type.

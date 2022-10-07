@@ -59,6 +59,16 @@ public interface DatasetPoolsService extends Remote {
 	
 	
 	/**
+	 * Replacing pool.
+	 * @param name pool name.
+	 * @param pool new pool
+	 * @return true if replacing successfully current pool by new pool.
+	 * @throws RemoteException if any error raises.
+	 */
+	public boolean replacePool(String name, DatasetPoolExchanged pool) throws RemoteException;
+
+		
+	/**
 	 * Removing dataset pool.
 	 * @param name dataset pool name.
 	 * @return true if removing is successful.

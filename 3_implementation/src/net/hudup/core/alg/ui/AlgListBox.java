@@ -170,7 +170,7 @@ public class AlgListBox extends JList<Alg> implements AlgListUI {
 
 		final int selectedRow = getSelectedIndex();
     	if (selectedRow == -1) {
-    		if (algCount > 1) {
+    		if (algCount > 1 && !sorting) {
     			miCount = contextMenu.getSubElements() != null ? contextMenu.getSubElements().length : 0; 
     			if (miCount > 0) contextMenu.addSeparator();
     			contextMenu.add(miReverse);
@@ -178,7 +178,7 @@ public class AlgListBox extends JList<Alg> implements AlgListUI {
     		return;
     	}
 		
-    	if (algCount > 1) {
+    	if (algCount > 1 && !sorting) {
     		miCount = contextMenu.getSubElements() != null ? contextMenu.getSubElements().length : 0; 
 			if (miCount > 0) contextMenu.addSeparator();
     		if (selectedRow == 0) {

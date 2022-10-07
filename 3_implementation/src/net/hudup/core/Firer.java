@@ -16,7 +16,6 @@ import java.util.Set;
 
 import org.reflections.Reflections;
 
-import net.hudup.core.alg.Alg;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.xURI;
@@ -47,37 +46,6 @@ public class Firer extends PluginManagerAbstract {
 	 */
 	public Firer() {
 		super();
-	}
-	
-	
-	@Override
-	public void discover() {
-		try { //Redundant try-catch because it is impossible to solve the problem caused by PluginStorage.clear(). Solving later. 
-			PluginStorage.clear();
-			ExtraStorage.clear();
-			discover(Util.getLoadablePackages());
-		}
-		catch (Throwable e) {LogUtil.trace(e);}
-	}
-
-
-	/**
-	 * The main method discovers automatically all algorithms via their names, given list of prefixes.
-	 * This method affects plug-in storage.
-	 * @param prefixList list of text strings of root paths to discover algorithms, for example, &quot;/net/hudup/&quot;.
-	 * If this list is null or empty, all packages are browsed.
-	 */
-	private void discover(String...prefixList) {
-		if (prefixList == null || prefixList.length == 0) {
-			discover("");
-			return;
-		}
-		
-		List<Class<? extends Alg>> algClasses = loadClasses(Alg.class);
-		analyzeAlgClasses(algClasses);
-		
-		List<Class<? extends Appor>> apporClasses = loadClasses(Appor.class);
-		analyzeApporClasses(apporClasses);
 	}
 	
 	

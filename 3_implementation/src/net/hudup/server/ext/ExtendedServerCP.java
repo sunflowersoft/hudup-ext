@@ -133,7 +133,7 @@ public class ExtendedServerCP extends PowerServerCP {
 							return;
 						}
 						
-						DatasetPoolsManager.show(poolsService, cp);
+						DatasetPoolsManager.show(poolsService, connectInfo, cp);
 					} catch (Exception ex) {LogUtil.trace(ex);}
 				}
 		});

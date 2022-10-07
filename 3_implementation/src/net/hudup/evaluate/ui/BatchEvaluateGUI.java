@@ -366,7 +366,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			
 			clearResult();
 			
-			guiData.pool = getLocalDatasetPool();
+			guiData.pool = guiData.pool.getLocals();
 			tblDatasetPool.update(guiData.pool);
 
 			updateMode();
@@ -543,11 +543,6 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			private static final long serialVersionUID = 1L;
 
 			@Override
-			protected void addToContextMenu(JPopupMenu contextMenu) {
-				super.addToContextMenu(contextMenu);
-			}
-
-			@Override
 			public boolean removeSelectedRows() {
 				boolean ret = super.removeSelectedRows();
 				
@@ -556,7 +551,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 					
 					if (bindUri == null) {
 						try {
-							evaluator.updatePool(toDatasetPoolExchangedClient(guiData.pool), getThisGUI(), timestamp = new Timestamp());
+							evaluator.updatePool(guiData.pool != null ? guiData.pool.toDatasetPoolExchangedClient(connectInfo) : null, getThisGUI(), timestamp = new Timestamp());
 						} catch (Throwable e) {LogUtil.trace(e);}
 					}
 					else
@@ -664,9 +659,9 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 					boolean ret = true;
 					try {
 						if (connectInfo.bindUri == null)
-							ret = evaluator.updatePool(toDatasetPoolExchangedClient(guiData.pool), null, timestamp = new Timestamp());
+							ret = evaluator.updatePool(guiData.pool != null ? guiData.pool.toDatasetPoolExchangedClient(connectInfo) : null, null, timestamp = new Timestamp());
 						else
-							ret = evaluator.updatePool(toDatasetPoolExchangedClient(guiData.pool), null, timestamp = new Timestamp());
+							ret = evaluator.updatePool(guiData.pool != null ? guiData.pool.toDatasetPoolExchangedClient(connectInfo) : null, null, timestamp = new Timestamp());
 					} catch (Exception ex) {ex.printStackTrace();}
 					
 					if (ret) {
@@ -1246,10 +1241,10 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			clearResult();
 			boolean started = false;
 			if (connectInfo.bindUri == null)
-				started = evaluator.remoteStart(lbAlgs.getAlgList(), toDatasetPoolExchangedClient(guiData.pool), timestamp = new Timestamp(), null);
+				started = evaluator.remoteStart(lbAlgs.getAlgList(), guiData.pool != null ? guiData.pool.toDatasetPoolExchangedClient(connectInfo) : null, timestamp = new Timestamp(), null);
 			else {
 				DataConfig config = lbAlgs.getAlgDescMapRemote();
-				started = evaluator.remoteStart(lbAlgs.getAlgNameList(), toDatasetPoolExchangedClient(guiData.pool), connectInfo.checkPullMode() ? null : this, config, timestamp = new Timestamp(), null);
+				started = evaluator.remoteStart(lbAlgs.getAlgNameList(), guiData.pool != null ? guiData.pool.toDatasetPoolExchangedClient(connectInfo) : null, connectInfo.checkPullMode() ? null : this, config, timestamp = new Timestamp(), null);
 			}
 				
 			if (!started) updateMode();
@@ -1294,7 +1289,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			}
 			
 			if (type != EvaluatorEvent.Type.start && timeDiff)
-				guiData.pool = getLocalDatasetPool();
+				guiData.pool = guiData.pool.getLocals();
 			else
 				guiData.pool = new DatasetPool();
 			guiData.pool.add(evt.getPoolResult().toDatasetPoolClient());
@@ -1563,20 +1558,20 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			
 			UriAdapter adapter = new UriAdapter();
 			xURI uri = adapter.chooseUri(
-					this, 
-					true, 
-					new String[] {"properties", "script", Constants.DEFAULT_EXT}, 
-					new String[] {"Properties files (*.properties)", "Script files (*.script)", "Hudup files (*." + Constants.DEFAULT_EXT + ")"},
-					null,
-					null);
+				this, 
+				true, 
+				new String[] {"properties", "script", Constants.DEFAULT_EXT}, 
+				new String[] {"Properties files (*.properties)", "Script files (*.script)", "Hudup files (*." + Constants.DEFAULT_EXT + ")"},
+				null,
+				null);
 			adapter.close();
 			
 			if (uri == null) {
 				JOptionPane.showMessageDialog(
-						this, 
-						"URI not open", 
-						"URI not open", 
-						JOptionPane.ERROR_MESSAGE);
+					this, 
+					"URI not open", 
+					"URI not open", 
+					JOptionPane.ERROR_MESSAGE);
 				return;
 			}
 			
@@ -1601,20 +1596,20 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			
 			if (script == null) {
 				JOptionPane.showMessageDialog(
-						this, 
-						"Batch not created", 
-						"Batch not created", 
-						JOptionPane.ERROR_MESSAGE);
+					this, 
+					"Batch not created", 
+					"Batch not created", 
+					JOptionPane.ERROR_MESSAGE);
 				return;
 			}
 
 			List<Alg> batchAlgList = algRegTable.getAlgList(script.getAlgNameListNoDuplicate());
 			if (batchAlgList.size() == 0) {
 				JOptionPane.showMessageDialog(
-						this, 
-						"Algorithms in batch script are not suitable to this evaluator",
-						"Batch script has unsuitable algorithms", 
-						JOptionPane.WARNING_MESSAGE);
+					this, 
+					"Algorithms in batch script are not suitable to this evaluator",
+					"Batch script has unsuitable algorithms", 
+					JOptionPane.WARNING_MESSAGE);
 			}
 			else {
 				if (append)
@@ -1639,7 +1634,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			clearResult();
 			if (connectInfo.bindUri == null) {
 				try {
-					evaluator.updatePool(toDatasetPoolExchangedClient(guiData.pool), this, timestamp = new Timestamp());
+					evaluator.updatePool(guiData.pool != null ? guiData.pool.toDatasetPoolExchangedClient(connectInfo) : null, this, timestamp = new Timestamp());
 				} catch (Throwable e) {LogUtil.trace(e);}
 				
 			}
@@ -1672,12 +1667,12 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 		
 		UriAdapter adapter = new UriAdapter();
         xURI uri = adapter.chooseUri(
-				this, 
-				false, 
-				new String[] {"properties", "script", Constants.DEFAULT_EXT}, 
-				new String[] {"Properties files (*.properties)", "Script files (*.script)", "Hudup files (*." + Constants.DEFAULT_EXT + ")"},
-				null,
-				null);
+			this, 
+			false, 
+			new String[] {"properties", "script", Constants.DEFAULT_EXT}, 
+			new String[] {"Properties files (*.properties)", "Script files (*.script)", "Hudup files (*." + Constants.DEFAULT_EXT + ")"},
+			null,
+			null);
         adapter.close();
         
         if (uri == null) {
@@ -1720,23 +1715,18 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
     		writer.close();
     		writer = null;
 	        
-        	JOptionPane.showMessageDialog(this, 
-        			"URI saved successfully", "URI saved successfully", JOptionPane.INFORMATION_MESSAGE);
+        	JOptionPane.showMessageDialog(this, "URI saved successfully", "URI saved successfully", JOptionPane.INFORMATION_MESSAGE);
         }
 		catch(Exception e) {
 			LogUtil.trace(e);
 		}
         finally {
         	try {
-        		if (writer != null)
-        			writer.close();
+        		if (writer != null) writer.close();
         	}
-        	catch (Exception e) {
-        		LogUtil.trace(e);
-        	}
+        	catch (Exception e) {LogUtil.trace(e);}
         	
-        	if (adapter != null)
-        		adapter.close();
+        	if (adapter != null) adapter.close();
         }
 	}
 	
@@ -1765,7 +1755,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			
 			if (connectInfo.bindUri == null) {
 				try {
-					evaluator.updatePool(toDatasetPoolExchangedClient(guiData.pool), this, timestamp = new Timestamp());
+					evaluator.updatePool(guiData.pool != null ? guiData.pool.toDatasetPoolExchangedClient(connectInfo) : null, this, timestamp = new Timestamp());
 				} catch (Throwable e) {LogUtil.trace(e);}
 			}
 			else {
@@ -1876,7 +1866,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 				JOptionPane.showMessageDialog(this, "Cannot get pools service", "Cannot get pools service.", JOptionPane.ERROR_MESSAGE);
 				return;
 			}
-			DatasetPoolsManager manager = DatasetPoolsManager.show(poolsService, this);
+			DatasetPoolsManager manager = DatasetPoolsManager.show(poolsService, connectInfo, this);
 			DatasetPoolExchangedItem poolItem = manager.getSelectedPool();
 			if (poolItem == null) {
 				JOptionPane.showMessageDialog(this, "Pool not selected", "Pool not selected.", JOptionPane.ERROR_MESSAGE);

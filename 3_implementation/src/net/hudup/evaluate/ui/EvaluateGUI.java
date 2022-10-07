@@ -379,7 +379,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			
 			clearResult();
 			
-			guiData.pool = getLocalDatasetPool();
+			guiData.pool = guiData.pool.getLocals();
 			txtTrainingBrowse.setDataset(guiData.pool.get(0).getTraining(), false);
 			txtTestingBrowse.setDataset(guiData.pool.get(0).getTesting(), false);
 
@@ -574,9 +574,9 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 					boolean ret = true;
 					try {
 						if (connectInfo.bindUri == null)
-							ret = evaluator.updatePool(toDatasetPoolExchangedClient(guiData.pool), null, timestamp = new Timestamp());
+							ret = evaluator.updatePool(guiData.pool != null ? guiData.pool.toDatasetPoolExchangedClient(connectInfo) : null, null, timestamp = new Timestamp());
 						else
-							ret = evaluator.updatePool(toDatasetPoolExchangedClient(guiData.pool), null, timestamp = new Timestamp());
+							ret = evaluator.updatePool(guiData.pool != null ? guiData.pool.toDatasetPoolExchangedClient(connectInfo) : null, null, timestamp = new Timestamp());
 					} catch (Exception ex) {ex.printStackTrace();}
 					
 					if (ret) {
@@ -1122,7 +1122,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			addTrainingToPool(dataset);
 			if (connectInfo.bindUri == null) {
 				try {
-					evaluator.updatePool(toDatasetPoolExchangedClient(guiData.pool), this, timestamp = new Timestamp());
+					evaluator.updatePool(guiData.pool != null ? guiData.pool.toDatasetPoolExchangedClient(connectInfo) : null, this, timestamp = new Timestamp());
 				} catch (Throwable e) {LogUtil.trace(e);}
 			}
 			else {
@@ -1172,7 +1172,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			guiData.pool = pool;
 			if (connectInfo.bindUri == null) {
 				try {
-					evaluator.updatePool(toDatasetPoolExchangedClient(guiData.pool), this, timestamp = new Timestamp());
+					evaluator.updatePool(guiData.pool != null ? guiData.pool.toDatasetPoolExchangedClient(connectInfo) : null, this, timestamp = new Timestamp());
 				} catch (Throwable e) {LogUtil.trace(e);}
 			}
 			else {
@@ -1271,7 +1271,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			addTestingToPool(dataset);
 			if (connectInfo.bindUri == null) {
 				try {
-					evaluator.updatePool(toDatasetPoolExchangedClient(guiData.pool), this, timestamp = new Timestamp());
+					evaluator.updatePool(guiData.pool != null ? guiData.pool.toDatasetPoolExchangedClient(connectInfo) : null, this, timestamp = new Timestamp());
 				} catch (Throwable e) {LogUtil.trace(e);}
 			}
 			else {
@@ -1426,10 +1426,10 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			clearResult();
 			boolean started = false;
 			if (connectInfo.bindUri == null)
-				started = evaluator.remoteStart(algList, toDatasetPoolExchangedClient(guiData.pool), timestamp = new Timestamp(), null);
+				started = evaluator.remoteStart(algList, guiData.pool != null ? guiData.pool.toDatasetPoolExchangedClient(connectInfo) : null, timestamp = new Timestamp(), null);
 			else {
 				DataConfig config = AlgList.getAlgDescMap(algList);
-				started = evaluator.remoteStart(AlgList.getAlgNameList(algList), toDatasetPoolExchangedClient(guiData.pool), connectInfo.checkPullMode() ? null : this, config, timestamp = new Timestamp(), null);
+				started = evaluator.remoteStart(AlgList.getAlgNameList(algList), guiData.pool != null ? guiData.pool.toDatasetPoolExchangedClient(connectInfo) : null, connectInfo.checkPullMode() ? null : this, config, timestamp = new Timestamp(), null);
 			}
 			if (!started) updateMode();
 		}
@@ -1475,7 +1475,7 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 			}
 			
 			if (type != EvaluatorEvent.Type.start && timeDiff)
-				guiData.pool = getLocalDatasetPool();
+				guiData.pool = guiData.pool.getLocals();
 			else
 				guiData.pool = new DatasetPool();
 			guiData.pool.add(evt.getPoolResult().toDatasetPoolClient());

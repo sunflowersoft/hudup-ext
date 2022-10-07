@@ -46,6 +46,37 @@ public class DatasetPoolExchanged  implements Serializable {
 	}
 
 	
+    /**
+     * Adding other pool to this pool.
+     * @param pool other pool.
+     * @param isExport exporting flag.
+     */
+    public void addRestrict(DatasetPoolExchanged pool) {
+    	if (pool == null) return;
+		for (DatasetPairExchanged pair : pool.dspList) {
+			if (pair.trainingUUID == null) continue;
+			if (pair.trainingUUID != null && pair.training == null) continue;
+			if (pair.testingUUID != null && pair.testing == null) continue;
+			if (pair.wholeUUID != null && pair.whole == null) continue;
+			
+			if (!containsPairByUUID(pair)) this.dspList.add(pair);
+		}
+    }
+    
+    
+    /**
+     * Checking whether containing the specified pair.
+     * @param pair specified pair.
+     * @return whether containing the specified pair.
+     */
+    private boolean containsPairByUUID(DatasetPairExchanged pair) {
+    	if (pair == null) return false;
+    	if (findByTrainingUUID(pair.trainingUUID) == null) return false;
+    	if (findByTestingUUID(pair.testingUUID) == null) return false;
+    	return true;
+    }
+    
+    
 	/**
      * Clearing this dataset pool, which means that all dataset pairs are removed from this dataset pool.
 	 * @param forced forced mode to unexport datasets.

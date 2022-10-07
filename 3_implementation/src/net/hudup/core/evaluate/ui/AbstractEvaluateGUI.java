@@ -20,7 +20,6 @@ import java.util.UUID;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-import net.hudup.core.Constants;
 import net.hudup.core.PluginChangedEvent;
 import net.hudup.core.PluginChangedListener;
 import net.hudup.core.PluginStorage;
@@ -33,14 +32,8 @@ import net.hudup.core.alg.SetupAlgEvent;
 import net.hudup.core.alg.SetupAlgListener;
 import net.hudup.core.client.ClassProcessor;
 import net.hudup.core.client.ConnectInfo;
-import net.hudup.core.data.DataConfig;
-import net.hudup.core.data.DatasetAbstract;
-import net.hudup.core.data.DatasetPair;
-import net.hudup.core.data.DatasetPairExchanged;
 import net.hudup.core.data.DatasetPool;
 import net.hudup.core.data.DatasetPoolExchanged;
-import net.hudup.core.data.DatasetRemote;
-import net.hudup.core.data.DatasetUtil;
 import net.hudup.core.data.Exportable;
 import net.hudup.core.evaluate.EvaluateEvent;
 import net.hudup.core.evaluate.EvaluateInfo;
@@ -854,78 +847,6 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	 */
 	protected abstract void updateGUIData();
 
-	
-	/**
-	 * Converting normal dataset pool to exchanged dataset in client. This method is called by evaluator GUI.
-	 * @param pool normal dataset pool.
-	 * @return exchanged dataset in client.
-	 */
-	protected DatasetPoolExchanged toDatasetPoolExchangedClient(DatasetPool pool) {
-		if (pool == null) return null;
-		
-		DatasetPoolExchanged exchangedPool = pool.toDatasetPoolExchangedClient();
-		if (connectInfo.bindUri == null) return exchangedPool;
-		
-		for (DatasetPairExchanged pair : exchangedPool.dspList) {
-			setupDatasetExchanged(pair.training);
-			setupDatasetExchanged(pair.testing);
-			setupDatasetExchanged(pair.whole);
-		}
-		
-		return exchangedPool;
-	}
-	
-	
-	/**
-	 * Setting specified remote dataset.
-	 * @param remoteDataset specified remote dataset.
-	 */
-	private void setupDatasetExchanged(DatasetRemote remoteDataset) {
-		if (remoteDataset == null || connectInfo.bindUri == null) return;
-		if (DatasetUtil.getMostInnerDataset2(remoteDataset) == null)
-			return;
-		
-		try {
-			DataConfig config = remoteDataset.remoteGetConfig();
-			if (config == null) return;
-			
-			if (!config.containsKey(DatasetAbstract.ONLY_MEMORY_FIELD))
-				config.put(DatasetAbstract.ONLY_MEMORY_FIELD, true);
-			
-			if (Constants.hardwareAddress != null && Constants.hostAddress != null &&
-					!config.containsKey(DatasetAbstract.HARDWARE_ADDR_FIELD) &&
-					!config.containsKey(DatasetAbstract.HOST_ADDR_FIELD)) {
-				config.put(DatasetAbstract.HARDWARE_ADDR_FIELD, Constants.hardwareAddress);
-				
-				String globalAddress = connectInfo.extractGlobalAddress();
-				String hostAddr = globalAddress != null ? globalAddress : Constants.hostAddress;
-				config.put(DatasetAbstract.HOST_ADDR_FIELD, hostAddr);
-			}
-		}
-		catch (Exception e) {
-			LogUtil.trace(e);
-		}
-	}
-	
-	
-	/**
-	 * Getting local dataset pool which contains unuploaded datasets. 
-	 * @return local dataset pool which contains unuploaded datasets.
-	 */
-	protected DatasetPool getLocalDatasetPool() {
-		DatasetPool newPool= new DatasetPool();
-		for (int i = 0; i < guiData.pool.size(); i++) {
-			DatasetPair pair = guiData.pool.get(i);
-			boolean added = true;
-			added = added && pair.getTrainingUUID() == null && pair.getTestingUUID() == null && pair.getWholeUUID() == null;
-			added = added && pair.getTraining() != null && pair.getTesting() != null;
-			
-			if (added) newPool.add(pair);
-		}
-		
-		return newPool;
-	}
-	
 	
 	/**
 	 * Updating both plug-in storage, evaluated algorithms, and dataset pool from server.

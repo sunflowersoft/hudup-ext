@@ -151,6 +151,19 @@ public class DatasetPoolExchangedItem implements Serializable, Comparable<Datase
 	
 	
 	/**
+	 * Adding clients
+	 * @param clients clients.
+	 */
+	public void addClients(ClientWrapper...clients) {
+		if (clients == null || clients.length == 0) return;
+		
+		for (ClientWrapper client : clients) {
+			if (client != null) addClient(client);
+		}
+	}
+	
+	
+	/**
 	 * Adding client.
 	 * @param client remote client.
 	 * @return true if adding client is successful.
