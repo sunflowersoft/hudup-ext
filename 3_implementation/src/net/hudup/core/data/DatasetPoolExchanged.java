@@ -54,11 +54,6 @@ public class DatasetPoolExchanged  implements Serializable {
     public void addRestrict(DatasetPoolExchanged pool) {
     	if (pool == null) return;
 		for (DatasetPairExchanged pair : pool.dspList) {
-			if (pair.trainingUUID == null) continue;
-			if (pair.trainingUUID != null && pair.training == null) continue;
-			if (pair.testingUUID != null && pair.testing == null) continue;
-			if (pair.wholeUUID != null && pair.whole == null) continue;
-			
 			if (!containsPairByUUID(pair)) this.dspList.add(pair);
 		}
     }

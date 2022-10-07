@@ -410,32 +410,14 @@ public class DatasetPoolsManager extends JDialog {
 		JPopupMenu ctxMenu = new JPopupMenu();
 		DatasetPoolsManager thisManager = this;
 		
-		JMenuItem miListClients = UIUtil.makeMenuItem((String)null, "List clients", 
+		JMenuItem miClients = UIUtil.makeMenuItem((String)null, "Clients", 
 			new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					JOptionPane.showMessageDialog(thisManager, "Not implemented yet");
 				}
 			});
-		ctxMenu.add(miListClients);
-
-		JMenuItem miAttachClient = UIUtil.makeMenuItem((String)null, "Attach client", 
-			new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					JOptionPane.showMessageDialog(thisManager, "Not implemented yet");
-				}
-			});
-		ctxMenu.add(miAttachClient);
-
-		JMenuItem miDetachClient = UIUtil.makeMenuItem((String)null, "Detach client", 
-			new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					JOptionPane.showMessageDialog(thisManager, "Not implemented yet");
-				}
-			});
-		ctxMenu.add(miDetachClient);
+		ctxMenu.add(miClients);
 
 		return ctxMenu;
 	}
@@ -515,7 +497,7 @@ public class DatasetPoolsManager extends JDialog {
 		String poolName = item.getName();
 		if (connectInfo.bindUri != null) {
 			try {
-				DatasetPoolExchanged expool = pool.toDatasetPoolExchangedClient(connectInfo);
+				DatasetPoolExchanged expool = pool.toDatasetPoolExchanged();
 				if (expool != null) poolsService.put(poolName, expool);
 			} catch (Exception e) {LogUtil.trace(e);}
 		}
@@ -543,7 +525,7 @@ public class DatasetPoolsManager extends JDialog {
 
 		String poolName = item.getName();
 		try {
-			DatasetPoolExchanged expool = pool.toDatasetPoolExchangedClient(connectInfo);
+			DatasetPoolExchanged expool = pool.toDatasetPoolExchanged();
 			if (expool == null) return;
 			
 			if (replace)
