@@ -49,7 +49,6 @@ public class DatasetPoolExchanged  implements Serializable {
     /**
      * Adding other pool to this pool.
      * @param pool other pool.
-     * @param isExport exporting flag.
      */
     public void addRestrict(DatasetPoolExchanged pool) {
     	if (pool == null) return;

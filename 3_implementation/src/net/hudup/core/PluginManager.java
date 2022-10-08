@@ -90,6 +90,7 @@ public interface PluginManager extends AutoCloseable {
 	
 	/**
 	 * Discovering classes.
+	 * @param <T> template type.
 	 * @param referredClass referred classes.
 	 */
 	<T extends Alg> void discover(Class<T> referredClass);

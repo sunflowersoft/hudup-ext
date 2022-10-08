@@ -297,11 +297,8 @@ public abstract class PluginManagerAbstract implements PluginManager {
 		analyzeApporClasses(apporClasses);
 	}
 	
-	
-	/**
-	 * Discovering classes.
-	 * @param referredClass referred classes.
-	 */
+
+	@Override
 	public <T extends Alg> void discover(Class<T> referredClass) {
 		List<Class<? extends T>> classes = loadClasses(referredClass);
 		List<Class<? extends Alg>> algClasses = Util.newList();

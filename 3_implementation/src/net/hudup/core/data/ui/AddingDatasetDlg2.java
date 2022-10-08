@@ -119,6 +119,12 @@ public class AddingDatasetDlg2 extends JDialog {
 	
 	
 	/**
+	 * Getting added dataset pair.
+	 */
+	protected DatasetPair addedPair = null;
+	
+	
+	/**
 	 * Constructor with specified dataset pool and algorithm list.
 	 * @param comp parent component.
 	 * @param pool specified dataset pool.
@@ -252,7 +258,7 @@ public class AddingDatasetDlg2 extends JDialog {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				addDataset(false);
+				addedPair = addDataset(false);
 			}
 		});
 		mainButtons.add(btnAdd);
@@ -424,8 +430,9 @@ public class AddingDatasetDlg2 extends JDialog {
 	/**
 	 * Adding a pair of training dataset and testing dataset.
 	 * @param addNullSet true if adding null sets.
+	 * @return added dataset pair.
 	 */
-	protected void addDataset(boolean addNullSet) {
+	protected DatasetPair addDataset(boolean addNullSet) {
 		if (addNullSet) {
 			DatasetPair pair = new DatasetPair(new NullPointer(), new NullPointer(), null);
 			pool.add(pair);
@@ -436,7 +443,7 @@ public class AddingDatasetDlg2 extends JDialog {
 			clear();
 			dispose();
 			
-			return;
+			return pair;
 		}
 		
 		DataConfig trainingCfg = txtTrainingBrowse.getConfig();
@@ -448,7 +455,7 @@ public class AddingDatasetDlg2 extends JDialog {
 				JOptionPane.showMessageDialog(this,
 					"Can't add training dataset", "Empty dataset", JOptionPane.ERROR_MESSAGE);
 				clear();
-				return;
+				return null;
 			}
 			
 			if (bindUri == null && testingCfg != null) {
@@ -468,13 +475,13 @@ public class AddingDatasetDlg2 extends JDialog {
 				JOptionPane.showMessageDialog(this, 
 					"Training dataset is null", "Invalid training dataset", JOptionPane.ERROR_MESSAGE);
 				clear();
-				return;
+				return null;
 			}
 			
 			if (!DatasetUtil2.validateTrainingset(this, trainingSet, algList.toArray(new Alg[] { })) ) {
 				trainingSet.clear();
 				clear();
-				return;
+				return null;
 			}
 		}
 		else {
@@ -488,7 +495,7 @@ public class AddingDatasetDlg2 extends JDialog {
 				JOptionPane.showMessageDialog(this, 
 					"Can't add testing dataset", "Empty dataset", JOptionPane.ERROR_MESSAGE);
 				clear();
-				return;
+				return null;
 			}
 
 			testingSet = loadDataset(testingCfg);
@@ -497,13 +504,13 @@ public class AddingDatasetDlg2 extends JDialog {
 				JOptionPane.showMessageDialog(this, 
 					"Testing dataset is null", "Invalid testing dataset", JOptionPane.ERROR_MESSAGE);
 				clear();
-				return;
+				return null;
 			}
 			if (testingSet instanceof Pointer) {
 				JOptionPane.showMessageDialog(this, 
 					"Testing dataset is pointer", "Invalid testing dataset", JOptionPane.ERROR_MESSAGE);
 				clear();
-				return;
+				return null;
 			}
 		}
 		else {
@@ -538,7 +545,7 @@ public class AddingDatasetDlg2 extends JDialog {
 				JOptionPane.QUESTION_MESSAGE);
 			if (confirm != JOptionPane.YES_OPTION) {
 				clear();
-				return;
+				return null;
 			}
 		}
 		
@@ -550,6 +557,7 @@ public class AddingDatasetDlg2 extends JDialog {
 
 		clear();
 		dispose();
+		return pair;
 	}
 	
 	
@@ -634,6 +642,15 @@ public class AddingDatasetDlg2 extends JDialog {
 		} catch (Exception e) {LogUtil.trace(e);}
 		
 		return null;
+	}
+	
+	
+	/**
+	 * Getting added dataset pair.
+	 * @return added dataset pair.
+	 */
+	public DatasetPair getAddedPair() {
+		return addedPair;
 	}
 	
 	

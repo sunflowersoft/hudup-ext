@@ -71,7 +71,6 @@ public class PropDlg extends JDialog {
 
 			@Override
 			public void windowClosing(WindowEvent e) {
-				// TODO Auto-generated method stub
 				super.windowClosing(e);
 				if (!tblProp.isModified())
 					return;
@@ -251,7 +250,6 @@ class PropDlg2 extends JDialog {
 
 			@Override
 			public void windowClosing(WindowEvent e) {
-				// TODO Auto-generated method stub
 				super.windowClosing(e);
 				if (paneCfg.getPropTable().isModified()) {
 					int confirm = JOptionPane.showConfirmDialog(
@@ -277,7 +275,6 @@ class PropDlg2 extends JDialog {
 
 			@Override
 			public void close() {
-				// TODO Auto-generated method stub
 				if (paneCfg.getPropTable().isModified()) {
 					int confirm = JOptionPane.showConfirmDialog(
 							comp, 
@@ -294,7 +291,6 @@ class PropDlg2 extends JDialog {
 
 			@Override
 			public void reset() {
-				// TODO Auto-generated method stub
 				paneCfg.update(propList);
 				JOptionPane.showMessageDialog(
 						comp, 
@@ -305,13 +301,11 @@ class PropDlg2 extends JDialog {
 
 			@Override
 			public boolean apply() {
-				// TODO Auto-generated method stub
 				return super.apply();
 			}
 
 			@Override
 			protected void onOK() {
-				// TODO Auto-generated method stub
 				boolean isModified = paneCfg.getPropTable().isModified();
 				super.onOK();
 				

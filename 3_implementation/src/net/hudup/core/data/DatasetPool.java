@@ -633,6 +633,7 @@ public class DatasetPool implements Serializable {
 	
 	/**
 	 * Converting normal dataset pool to exchanged dataset in client. This method is called by evaluator GUI.
+	 * @param connectInfo connection information.
 	 * @return exchanged dataset in client.
 	 */
 	public DatasetPoolExchanged toDatasetPoolExchangedClient(ConnectInfo connectInfo) {

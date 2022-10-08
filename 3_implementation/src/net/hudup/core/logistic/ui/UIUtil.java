@@ -218,6 +218,8 @@ public final class UIUtil {
 	        return null;
 	    if (comp instanceof Frame || comp instanceof Dialog)
 	        return (Window)comp;
+	    else if (comp instanceof Window)
+	        return (Window)comp;
 	    else
 	    	return getWindowForComponent(comp.getParent());
 	}
@@ -252,6 +254,21 @@ public final class UIUtil {
 	    	return getDialogForComponent(comp.getParent());
 	}
 
+	
+//	/**
+//	 * Getting parent dialog, frame, or window of the specified component.
+//	 * @param comp  specified component.
+//	 * @return parent dialog, frame, or window of the specified component.
+//	 */
+//	public static Window getDialogOrFrameOrWindowForComponent(Component comp) {
+//		Dialog dlgParent = getDialogForComponent(comp);
+//		Frame frmParent = getFrameForComponent(comp);
+//		if (dlgParent == null && frmParent == null) return getWindowForComponent(comp);
+//		if (dlgParent != null && frmParent == null) return dlgParent;
+//		if (dlgParent == null && frmParent != null) return frmParent;
+//		
+//	}
+	
 	
 	/**
 	 * Setting UI look and feel randomly. 

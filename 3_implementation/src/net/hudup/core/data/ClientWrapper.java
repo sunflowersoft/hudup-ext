@@ -11,6 +11,7 @@ import java.io.Serializable;
 import java.rmi.Remote;
 
 import net.hudup.core.evaluate.Evaluator;
+import net.hudup.core.evaluate.EvaluatorAbstract;
 import net.hudup.core.logistic.DSUtil;
 import net.hudup.core.logistic.LogUtil;
 
@@ -57,18 +58,27 @@ public class ClientWrapper implements Serializable, java.lang.AutoCloseable {
 		this.client = client;
 		this.name = name != null ? name : "noname";
 		this.auxName = auxName;
+		
+		initialize();
+	}
+
+
+	/**
+	 * Initialize something.
+	 */
+	protected void initialize() {
 		if (client == null) return;
 		
 		if (client instanceof Evaluator) {
 			try {
 				Evaluator evaluator = (Evaluator)client;
-				this.name = evaluator.getName();
+				this.name = evaluator.getVersionName();
 			}
 			catch (Throwable e) {LogUtil.trace(e);}
 		}
 	}
-
-
+	
+	
 	/**
 	 * Getting client name.
 	 * @return client name.
@@ -84,6 +94,23 @@ public class ClientWrapper implements Serializable, java.lang.AutoCloseable {
 	 */
 	public Remote getClient() {
 		return client;
+	}
+	
+	
+	/**
+	 * Getting client status.
+	 * @return client status.
+	 */
+	public String getStatus() {
+		if (client == null) return "";
+		if (client instanceof Evaluator) {
+			Evaluator evaluator = (Evaluator)client;
+			try {
+				return EvaluatorAbstract.getStatusText(evaluator);
+			} catch (Throwable e) {LogUtil.trace(e);}
+		}
+		
+		return "";
 	}
 	
 	

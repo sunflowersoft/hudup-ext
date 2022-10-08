@@ -684,7 +684,6 @@ class RegisterTM extends SortableSelectableTableModel {
 	
 	@Override
 	public Class<?> getColumnClass(int columnIndex) {
-		// TODO Auto-generated method stub
 		if (columnIndex == 4 || columnIndex == 5 || columnIndex == 6)
 			return Boolean.class;
 		else
@@ -694,7 +693,6 @@ class RegisterTM extends SortableSelectableTableModel {
 	
 	@Override
 	public boolean isCellEditable(int row, int column) {
-		// TODO Auto-generated method stub
 		if (!isEditable())
 			return false;
 		else if (column == 4 || column == 5 || column == 6)
@@ -706,7 +704,6 @@ class RegisterTM extends SortableSelectableTableModel {
 
 	@Override
 	public void setValueAt(Object aValue, int row, int column) {
-		// TODO Auto-generated method stub
 		super.setValueAt(aValue, row, column);
 		
 		modified = true;

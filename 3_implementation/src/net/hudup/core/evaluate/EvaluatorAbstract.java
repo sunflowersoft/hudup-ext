@@ -2612,4 +2612,24 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 	}
 
 
+	/**
+	 * Getting status text of specified evaluator.
+	 * @param evaluator specified evaluator.
+	 * @return status text of specified evaluator.
+	 */
+	public static String getStatusText(Evaluator evaluator) {
+		try {
+			if (!evaluator.remoteIsStarted())
+				return "stopped";
+			else if (evaluator.remoteIsRunning())
+				return "running...";
+			else
+				return "paused";
+		}
+		catch (Exception e) {LogUtil.trace(e);}
+
+		return "unknown";
+	}
+
+	
 }

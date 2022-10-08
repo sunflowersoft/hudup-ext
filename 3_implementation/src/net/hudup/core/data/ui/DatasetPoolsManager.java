@@ -50,9 +50,9 @@ import net.hudup.core.data.DatasetPoolsService;
 import net.hudup.core.data.DatasetPoolsServiceImpl;
 import net.hudup.core.data.NullPointer;
 import net.hudup.core.evaluate.Evaluator;
+import net.hudup.core.evaluate.ui.EvaluatorSysInfoGetter;
 import net.hudup.core.logistic.I18nUtil;
 import net.hudup.core.logistic.LogUtil;
-import net.hudup.core.logistic.NextUpdate;
 import net.hudup.core.logistic.Timestamp;
 import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.xURI;
@@ -67,7 +67,6 @@ import net.hudup.core.parser.DatasetParser;
  * @version 1.0
  *
  */
-@NextUpdate
 public class DatasetPoolsManager extends JDialog {
 
 	
@@ -414,7 +413,7 @@ public class DatasetPoolsManager extends JDialog {
 			new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					JOptionPane.showMessageDialog(thisManager, "Not implemented yet");
+					PoolClientManager.show(item, thisManager);
 				}
 			});
 		ctxMenu.add(miClients);
@@ -601,14 +600,12 @@ public class DatasetPoolsManager extends JDialog {
 	 * @param append Flag to indicate whether to append to current pool.
 	 */
 	private void loadBatchScript(boolean append) {
-		try {
-			DatasetPoolExchangedItem item = poolList.getSelectedValue();
-			if (item == null) return;
+		DatasetPoolExchangedItem item = poolList.getSelectedValue();
+		if (item == null) return;
 
-			String defaultUnit = JOptionPane.showInputDialog(this, "Enter main unit", DataConfig.RATING_UNIT);
-			if (defaultUnit == null || defaultUnit.isEmpty()) return;
-			defaultUnit = defaultUnit.trim();
-			if (defaultUnit.isEmpty()) {
+		try {
+			final String mainUnit = EvaluatorSysInfoGetter.get(Constants.DEFAULT_EVALUATOR_NAME, EvaluatorSysInfoGetter.MAIN_UNIT, this);
+			if (mainUnit == null) {
 				JOptionPane.showMessageDialog(this, "Invalid main unit", "Invalid main unit", JOptionPane.ERROR_MESSAGE);
 				return;
 			}
@@ -635,7 +632,6 @@ public class DatasetPoolsManager extends JDialog {
 			adapter = new UriAdapter(uri);
 			Reader reader = adapter.getReader(uri);
 			JDialog dlgWait = WaitDialog.createDialog(this); dlgWait.setUndecorated(true);
-			final String mainUnit = defaultUnit;
 			SwingWorker<BatchScript, BatchScript> worker = new SwingWorker<BatchScript, BatchScript>() {
 				@Override
 				protected BatchScript doInBackground() throws Exception {
@@ -758,10 +754,11 @@ public class DatasetPoolsManager extends JDialog {
 	 * @param nullTesting true if add null testing dataset {@link NullPointer}.
 	 */
 	private void addDataset(boolean nullTraining, boolean nullTesting) {
-		String mainUnit = JOptionPane.showInputDialog(this, "Enter main unit", DataConfig.RATING_UNIT);
-		if (mainUnit == null || mainUnit.isEmpty()) return;
-		mainUnit = mainUnit.trim();
-		if (mainUnit.isEmpty()) {
+		DatasetPoolExchangedItem item = poolList.getSelectedValue();
+		if (item == null) return;
+
+		String mainUnit = EvaluatorSysInfoGetter.get(Constants.DEFAULT_EVALUATOR_NAME, EvaluatorSysInfoGetter.MAIN_UNIT, this);
+		if (mainUnit == null) {
 			JOptionPane.showMessageDialog(this, "Invalid main unit", "Invalid main unit", JOptionPane.ERROR_MESSAGE);
 			return;
 		}
@@ -777,6 +774,8 @@ public class DatasetPoolsManager extends JDialog {
 				AddingDatasetDlg2 adder = new AddingDatasetDlg2(this, pool, Util.newList(), mainUnit, connectInfo.bindUri);
 				adder.setMode(nullTraining, nullTesting);
 				adder.setVisible(true);
+				
+				if (adder.getAddedPair() == null) return;
 			}
 			
 			poolTable.update(pool);
@@ -828,7 +827,7 @@ public class DatasetPoolsManager extends JDialog {
 	 * @param args arguments.
 	 */
 	public static void main(String[] args) {
-		Util.getPluginManager().fire();
+		Util.getPluginManager().discover(DatasetParser.class);
 		DatasetPoolsServiceImpl service = new DatasetPoolsServiceImpl(null);
 		DatasetPoolsManager.show(service, null, null);
 		try {

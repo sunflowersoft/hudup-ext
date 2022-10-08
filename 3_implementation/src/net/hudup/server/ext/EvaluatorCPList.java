@@ -1589,26 +1589,6 @@ class EvaluatorTableModel extends DefaultTableModel {
 
 	
 	/**
-	 * Getting status text of specified evaluator.
-	 * @param evaluator specified evaluator.
-	 * @return status text of specified evaluator.
-	 */
-	private static String getStatusText(Evaluator evaluator) {
-		try {
-			if (!evaluator.remoteIsStarted())
-				return "stopped";
-			else if (evaluator.remoteIsRunning())
-				return "running...";
-			else
-				return "paused";
-		}
-		catch (Exception e) {LogUtil.trace(e);}
-
-		return "unknown";
-	}
-
-	
-	/**
 	 * Converting evaluator to row.
 	 * @param evaluator specified evaluator.
 	 * @return row the contains evaluator.
@@ -1634,7 +1614,7 @@ class EvaluatorTableModel extends DefaultTableModel {
 	protected static Vector<Object> toRow(Evaluator evaluator, EvaluateInfo info) {
 		Vector<Object> row = toRow();
 		row.set(0, new EvaluatorWrapper(evaluator));
-		row.set(1, getStatusText(evaluator));
+		row.set(1, EvaluatorAbstract.getStatusText(evaluator));
 
 		if (info.progressTotal != 0) {
 			String progress = MathUtil.format((double)info.progressStep/info.progressTotal*100.0, 2) + "%";
@@ -1661,7 +1641,7 @@ class EvaluatorTableModel extends DefaultTableModel {
 	protected static Vector<Object> toRow(Evaluator evaluator, EvaluateProgressEvent evt) {
 		Vector<Object> row = toRow();
 		row.set(0, new EvaluatorWrapper(evaluator));
-		row.set(1, getStatusText(evaluator));
+		row.set(1, EvaluatorAbstract.getStatusText(evaluator));
 		if (evt.getProgressTotal() != 0) {
 			String progress = MathUtil.format((double)evt.getProgressStep()/evt.getProgressTotal()*100.0, 2) + "%";
 			row.set(2, progress);
