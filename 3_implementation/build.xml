@@ -453,7 +453,7 @@
 		<javadoc destdir="${docs.home}/api"
 			classpathref="build.class.path"
 			sourcepath="${src.home}"
-			excludepackagenames="net.hudup.temp.*">
+			excludepackagenames="net.temp.*">
 		</javadoc>
 	</target>
 
@@ -467,7 +467,7 @@
 			classpathref="build.class.path"
 			packagenames="net.hudup.core.*"
 			sourcepath="${src.home}"
-			excludepackagenames="net.hudup.temp.*">
+			excludepackagenames="net.temp.*">
 		</javadoc>
 	</target>
 
@@ -478,7 +478,7 @@
 		<javadoc destdir="${archive.home}"
 			classpathref="build.class.path"
 			sourcepath="${src.home}"
-			excludepackagenames="net.hudup.temp.*">
+			excludepackagenames="net.temp.*">
 		</javadoc>
 
 		<zip destfile="${archive.home}/${product}-${version}-doc.zip" basedir="${archive.home}"/>
