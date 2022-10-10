@@ -30,11 +30,17 @@ import net.hudup.core.client.LightRemoteServerCP;
 import net.hudup.core.client.PowerServer;
 import net.hudup.core.client.RemoteServerCP;
 import net.hudup.core.client.Server;
+import net.hudup.core.client.Service;
+import net.hudup.core.client.ServiceExt;
+import net.hudup.core.data.DatasetPoolsService;
+import net.hudup.core.data.ui.DatasetPoolsManager;
 import net.hudup.core.logistic.I18nUtil;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.ui.HelpContent;
+import net.hudup.core.logistic.ui.LoginDlg;
 import net.hudup.core.logistic.ui.UIUtil;
 import net.hudup.server.ext.EvaluatorCPList;
+import net.hudup.server.ext.ExtendedService;
 import net.hudup.server.ext.WorkingDirectoryManager;
 import net.hudup.server.external.ui.ExternalServerCP;
 import net.hudup.server.ui.PowerServerCP;
@@ -100,6 +106,45 @@ public class ExtendedServer2CP extends ExternalServerCP {
 			});
 		mniWorkingDirectoryManager.setMnemonic('w');
 		mnTool.add(mniWorkingDirectoryManager);
+		
+		JMenuItem mniDatasetPoolsManager = new JMenuItem(
+			new AbstractAction(I18nUtil.message("dataset_pools_manager")) {
+				
+				/**
+				 * Serial version UID for serializable class. 
+				 */
+				private static final long serialVersionUID = 1L;
+	
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					try {
+						Service service = server.getService();
+						if (service == null || !(service instanceof ServiceExt)) {
+							JOptionPane.showMessageDialog(cp, "Not extended service", "Not extended service", JOptionPane.ERROR_MESSAGE);
+							return;
+						}
+						
+						DatasetPoolsService poolsService = null;
+						if (service instanceof ExtendedService)
+							poolsService = ((ExtendedService)service).getDatasetPoolsService();
+						else {
+							LoginDlg login = new LoginDlg(cp, "Enter user name and password");
+							if (!login.wasLogin()) return;
+							poolsService = ((ServiceExt)service).getDatasetPoolsService(login.getUsername(), login.getPassword());
+						}
+						
+						if (poolsService == null) {
+							JOptionPane.showMessageDialog(cp, "Cannot get pools service.\nMaybe wrong username / password", "Cannot get pools service.", JOptionPane.ERROR_MESSAGE);
+							return;
+						}
+						
+						DatasetPoolsManager.show(poolsService, connectInfo, cp);
+					} catch (Exception ex) {LogUtil.trace(ex);}
+				}
+		});
+		mniDatasetPoolsManager.setMnemonic('d');
+		mnTool.add(mniDatasetPoolsManager);
+
 		mnTool.addSeparator();
 
 		JMenuItem mniInstallService = new JMenuItem(

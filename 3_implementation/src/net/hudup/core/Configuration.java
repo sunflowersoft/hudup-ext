@@ -139,7 +139,7 @@ public class Configuration implements Serializable {
 						return;
 					}
 							
-					String msg = "Woring directory \"" + enterWorkingName + "\" is existent.";
+					String msg = "Working directory \"" + enterWorkingName + "\" is existent.";
 					msg += "\nSuggested working directory is \"" + WORKING_NAME + new Date().getTime() + "\"";
 					JOptionPane.showMessageDialog(cfg, msg, "Existent", JOptionPane.INFORMATION_MESSAGE);
 				}
