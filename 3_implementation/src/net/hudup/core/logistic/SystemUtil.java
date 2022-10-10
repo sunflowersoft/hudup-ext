@@ -73,7 +73,8 @@ public final class SystemUtil {
 					sysProps.getProperty("java.runtime.name") + " version " + sysProps.getProperty("java.runtime.version") + ", " +
 					sysProps.getProperty("java.vm.name") + " version " + sysProps.getProperty("java.vm.version") + ", " +
 					"Class version " + sysProps.getProperty("java.class.version") + ", " +
-					"Vendor \"" + sysProps.getProperty("java.vendor") + "\" at " + sysProps.getProperty("java.vendor.url") 
+					"Vendor \"" + sysProps.getProperty("java.vendor") + "\" at " + sysProps.getProperty("java.vendor.url") + ", " +
+					"Home \"" + sysProps.getProperty("java.home") + "\""
 				);
 			
 			props.put("OS", 
