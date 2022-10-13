@@ -7,11 +7,13 @@
  */
 package net.hudup.core.data;
 
+import java.rmi.RemoteException;
 import java.util.Set;
 
 import net.hudup.core.Constants;
 import net.hudup.core.Util;
 import net.hudup.core.logistic.LogUtil;
+import net.hudup.core.logistic.NetUtil;
 import net.hudup.core.logistic.xURI;
 import net.hudup.core.parser.DatasetParser;
 
@@ -286,6 +288,52 @@ public final class DatasetUtil {
 		}
 		else
 			return dataset.getConfig() != null;
+	}
+	
+	
+	/**
+	 * 
+	 * Exporting remote dataset as wrapper.
+	 * @param serverPort port to export. Using port 0 if not concerning registry or naming.
+     * @param exclusive exclusive mode.
+	 * @return exported remote dataset.
+	 */
+	public static DatasetRemoteWrapper exportAsWrapper(DatasetRemote remoteDataset, int serverPort, boolean exclusive) {
+		if (remoteDataset == null) return null;
+		
+		DatasetRemoteWrapper newRemoteDataset = null;
+		if (remoteDataset instanceof DatasetRemoteWrapper)
+			newRemoteDataset = (DatasetRemoteWrapper)remoteDataset;
+		else
+			newRemoteDataset = Util.getPluginManager().wrap(remoteDataset, exclusive);
+		
+		try {
+			((DatasetRemoteWrapper)newRemoteDataset).exportInside(serverPort);
+		} catch (RemoteException e) {LogUtil.trace(e);}
+
+		return newRemoteDataset;
+	}
+	
+	
+	/**
+	 * Unexporting the specified remote dataset.
+	 * @param remoteDataset specified remote dataset.
+	 * @param forced forced mode to unexport datasets.
+	 */
+	public static void unexport(DatasetRemote remoteDataset, boolean forced) {
+		try {
+			if (remoteDataset == null)
+				return;
+			else if (remoteDataset instanceof DatasetRemoteWrapper) {
+				if (forced)
+					((DatasetRemoteWrapper)remoteDataset).forceUnexport();
+				else
+					((DatasetRemoteWrapper)remoteDataset).unexport();
+			}
+			else
+				NetUtil.RegistryRemote.unexport(remoteDataset);
+
+		} catch (Throwable e) {LogUtil.trace(e);}
 	}
 	
 	

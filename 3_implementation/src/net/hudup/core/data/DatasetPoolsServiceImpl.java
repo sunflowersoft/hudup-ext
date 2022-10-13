@@ -92,12 +92,13 @@ public class DatasetPoolsServiceImpl implements DatasetPoolsService, Serializabl
 			item = poolItems.get(name);
 			if (pool != null) {
 				DatasetPoolExchanged itemPool = item.getPool();
-				if (itemPool == null) return false;
-				try {
-					itemPool.addRestrict(pool);
-					itemPool.export(server != null ? server.getPort() : 0, false);
-					itemPool.fillMissingUUID();
-				} catch (Throwable e) {LogUtil.trace(e);}
+				if (itemPool != null) {
+					try {
+						itemPool.syncWith(pool);
+						itemPool.export(server != null ? server.getPort() : 0, false);
+						itemPool.fillMissingUUID();
+					} catch (Throwable e) {LogUtil.trace(e);}
+				}
 			}
 			
 			item.addClients(clients);
@@ -112,26 +113,6 @@ public class DatasetPoolsServiceImpl implements DatasetPoolsService, Serializabl
 				} catch (Exception e) {LogUtil.trace(e);
 			}
 		}
-		
-		return true;
-	}
-
-	
-	@Override
-	public synchronized boolean replacePool(String name, DatasetPoolExchanged pool) throws RemoteException {
-		if (name == null || pool == null) return false;
-		if (!poolItems.containsKey(name)) return false;
-		
-		DatasetPoolExchangedItem item = poolItems.get(name);
-		DatasetPoolExchanged itemPool = item.getPool();
-		if (itemPool == null) return false;
-		try {
-			itemPool.unexport(true);
-			itemPool.clear(true);
-			itemPool.addRestrict(pool);
-			itemPool.fillMissingUUID();
-			itemPool.export(server != null ? server.getPort() : 0, false);
-		} catch (Throwable e) {LogUtil.trace(e);}
 		
 		return true;
 	}

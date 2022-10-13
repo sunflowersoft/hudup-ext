@@ -190,4 +190,15 @@ public class DatasetPairExchanged implements Serializable {
 	}
 	
 	
+	/**
+	 * Unexporting this pair.
+	 * @param forced forced mode to unexport datasets.
+	 */
+	public void unexport(boolean forced) {
+		DatasetUtil.unexport(training, forced);
+		DatasetUtil.unexport(testing, forced);
+		DatasetUtil.unexport(whole, forced);
+	}
+	
+	
 }

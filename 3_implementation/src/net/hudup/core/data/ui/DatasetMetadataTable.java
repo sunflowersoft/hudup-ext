@@ -13,6 +13,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.UUID;
 
 import javax.swing.JDialog;
 import javax.swing.JMenuItem;
@@ -117,6 +118,14 @@ public class DatasetMetadataTable extends JTable {
 	 */
 	public static void showDlg(Component comp, Dataset dataset) {
 		JDialog dlg = new JDialog(UIUtil.getDialogForComponent(comp), "Dataset metadata", true);
+		try {
+			if (comp != null && comp instanceof DatasetPoolTable) {
+				DatasetPoolTable dpt = (DatasetPoolTable)comp;
+				UUID uuid = dpt.findUUIDByRef(dataset);
+				if (uuid != null) dlg.setTitle("Dataset metadata of " + uuid.toString());
+			}
+		} catch (Throwable e) {}
+		
 		dlg.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		
 		dlg.setSize(400, 250);

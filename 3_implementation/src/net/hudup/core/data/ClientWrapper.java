@@ -14,6 +14,7 @@ import net.hudup.core.evaluate.Evaluator;
 import net.hudup.core.evaluate.EvaluatorAbstract;
 import net.hudup.core.logistic.DSUtil;
 import net.hudup.core.logistic.LogUtil;
+import net.hudup.core.logistic.Timestamp;
 
 /**
  * This class wraps a client.
@@ -103,6 +104,7 @@ public class ClientWrapper implements Serializable, java.lang.AutoCloseable {
 	 */
 	public String getStatus() {
 		if (client == null) return "";
+		
 		if (client instanceof Evaluator) {
 			Evaluator evaluator = (Evaluator)client;
 			try {
@@ -111,6 +113,22 @@ public class ClientWrapper implements Serializable, java.lang.AutoCloseable {
 		}
 		
 		return "";
+	}
+	
+	
+	/**
+	 * Resetting client.
+	 */
+	public void reset() {
+		if (client == null) return;
+		
+		if (client instanceof Evaluator) {
+			try {
+				Evaluator evaluator = (Evaluator)client;
+				evaluator.remoteStop();
+				evaluator.reloadPool(null, new Timestamp());
+			} catch (Exception e) {LogUtil.trace(e);}
+		}
 	}
 	
 	
@@ -153,4 +171,15 @@ public class ClientWrapper implements Serializable, java.lang.AutoCloseable {
 	}
 	
 	
+	/**
+	 * Create client wrapper.
+	 * @param client remote client.
+	 * @param name client name.
+	 * @return client wrapper.
+	 */
+	public static ClientWrapper create(Remote client, String name) {
+		return create(client, name, null);
+	}
+
+
 }

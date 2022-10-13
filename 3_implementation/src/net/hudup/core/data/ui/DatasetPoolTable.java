@@ -15,6 +15,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.UUID;
 import java.util.Vector;
 
 import javax.swing.JMenuItem;
@@ -184,6 +185,28 @@ public class DatasetPoolTable extends JTable {
 	 */
 	public DatasetPool getPool() {
 		return getPoolTableModel().getPool();
+	}
+	
+	
+	/**
+	 * Finding UUID of specified dataset.
+	 * @param dataset specified dataset.
+	 * @return UUID of specified dataset.
+	 */
+	protected UUID findUUIDByRef(Dataset dataset) {
+		DatasetPool pool = getPool();
+		if (dataset == null || pool == null) return null;
+		for (int i = 0; i < pool.size(); i++) {
+			DatasetPair pair = pool.get(i);
+			if (pair.getTraining() == dataset)
+				return pair.getTrainingUUID();
+			if (pair.getTesting() == dataset)
+				return pair.getTestingUUID();
+			if (pair.getWhole() == dataset)
+				return pair.getWholeUUID();
+		}
+		
+		return null;
 	}
 	
 	
@@ -642,11 +665,17 @@ public class DatasetPoolTable extends JTable {
 		 */
 		private Color defaultBackgroundColor = null;
 		
+		/**
+		 * Default selected background color.
+		 */
+		private Color defaultSelectedBackgroundColor = null;
+
 		@Override
 		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus,
 				int row, int column) {
 			Component comp = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
 			defaultBackgroundColor = defaultBackgroundColor != null ? defaultBackgroundColor : comp.getBackground();
+			defaultSelectedBackgroundColor = defaultSelectedBackgroundColor != null ? defaultSelectedBackgroundColor : table.getSelectionBackground();
 			
 			if (bindUri == null) return comp;
 			
@@ -662,10 +691,19 @@ public class DatasetPoolTable extends JTable {
 				dataset = pool.get(row).getWhole();
 				
 			dataset = DatasetUtil.getMostInnerDataset(dataset);
-			if (dataset != null)
-				comp.setBackground(new Color(0, 255, 0));
-			else
-				comp.setBackground(defaultBackgroundColor);
+			if (dataset != null) {
+				if (!isSelected)
+					comp.setBackground(new Color(0, 255, 0));
+				else
+					comp.setBackground(new Color(0, 200, 200));
+			}
+			else {
+				if (!isSelected)
+					comp.setBackground(defaultBackgroundColor);
+				else
+					comp.setBackground(defaultSelectedBackgroundColor);
+			}
+			
 			return comp;
 		}
 		

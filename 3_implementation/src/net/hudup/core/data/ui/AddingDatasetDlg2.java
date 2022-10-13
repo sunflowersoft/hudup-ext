@@ -286,7 +286,7 @@ public class AddingDatasetDlg2 extends JDialog {
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					addDataset(true);
+					addedPair = addDataset(true);
 				}
 			});
 		btnAddNull.setMargin(new Insets(0, 0 , 0, 0));

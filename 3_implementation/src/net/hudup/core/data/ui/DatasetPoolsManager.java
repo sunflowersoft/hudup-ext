@@ -10,15 +10,18 @@ package net.hudup.core.data.ui;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.FlowLayout;
+import java.awt.Image;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.Reader;
 import java.io.Writer;
 import java.rmi.Remote;
 
+import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JMenu;
@@ -28,6 +31,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
+import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.WindowConstants;
@@ -40,6 +44,9 @@ import net.hudup.core.Constants;
 import net.hudup.core.PluginManager;
 import net.hudup.core.Util;
 import net.hudup.core.client.ConnectInfo;
+import net.hudup.core.client.Connector;
+import net.hudup.core.client.Service;
+import net.hudup.core.client.ServiceExt;
 import net.hudup.core.data.BatchScript;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.DatasetPair;
@@ -47,7 +54,6 @@ import net.hudup.core.data.DatasetPool;
 import net.hudup.core.data.DatasetPoolExchanged;
 import net.hudup.core.data.DatasetPoolExchangedItem;
 import net.hudup.core.data.DatasetPoolsService;
-import net.hudup.core.data.DatasetPoolsServiceImpl;
 import net.hudup.core.data.NullPointer;
 import net.hudup.core.evaluate.Evaluator;
 import net.hudup.core.evaluate.ui.EvaluatorSysInfoGetter;
@@ -267,8 +273,7 @@ public class DatasetPoolsManager extends JDialog {
 				boolean ret = super.removeSelectedRows();
 				if (!ret) return false;
 
-				poolTable.update(new DatasetPool());
-				updateLocalServicePool(false);
+				updateLocalServicePool();
 				
 				enableControls(true);
 				JOptionPane.showMessageDialog(this, "Remove rows successfully.\nYou need to upload/scatter the pool change.", "Remove successfully rows", JOptionPane.INFORMATION_MESSAGE);
@@ -390,10 +395,27 @@ public class DatasetPoolsManager extends JDialog {
 	protected JMenuBar createMenuBar() {
 		JMenuBar mnBar = new JMenuBar();
 		
-		JMenu mnTool = new JMenu("Tool");
+		JMenu mnTool = new JMenu(I18nUtil.message("tool"));
 		mnTool.setMnemonic('t');
 		mnBar.add(mnTool);
 		
+		JMenuItem mniRefresh = new JMenuItem(
+			new AbstractAction(I18nUtil.message("refresh")) {
+				
+				/**
+				 * Serial version UID for serializable class. 
+				 */
+				private static final long serialVersionUID = 1L;
+
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					poolList.update();
+				}
+			});
+		mniRefresh.setMnemonic('r');
+		mniRefresh.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F5, 0));
+		mnTool.add(mniRefresh);
+
 		return mnBar;
 	}
 
@@ -512,9 +534,8 @@ public class DatasetPoolsManager extends JDialog {
 	
 	/**
 	 * Updating local pool.
-	 * @param replace replacing flag.
 	 */
-	private void updateLocalServicePool(boolean replace) {
+	private void updateLocalServicePool() {
 		if (connectInfo.bindUri != null) return;
 
 		DatasetPoolExchangedItem item = poolList.getSelectedValue();
@@ -525,12 +546,7 @@ public class DatasetPoolsManager extends JDialog {
 		String poolName = item.getName();
 		try {
 			DatasetPoolExchanged expool = pool.toDatasetPoolExchanged();
-			if (expool == null) return;
-			
-			if (replace)
-				poolsService.replacePool(poolName, expool);
-			else
-				poolsService.put(poolName, expool);
+			if (expool != null) poolsService.put(poolName, expool);
 		} catch (Exception e) {LogUtil.trace(e);}
 	}
 	
@@ -543,12 +559,8 @@ public class DatasetPoolsManager extends JDialog {
 		if (item == null) return;
 
 		for (int i = 0; i < item.getClientSize(); i++) {
-			Remote client = item.getClient(i).getClient();
-			if (client == null || !(client instanceof Evaluator)) continue;
 			try {
-				Evaluator evaluator = (Evaluator)client;
-				evaluator.remoteStop();
-				evaluator.reloadPool(null, new Timestamp());
+				item.getClient(i).reset();
 			} catch (Exception e) {LogUtil.trace(e);}
 		}
 	}
@@ -588,7 +600,7 @@ public class DatasetPoolsManager extends JDialog {
 		if (item == null) return;
 
 		poolTable.update(new DatasetPool());
-		updateLocalServicePool(true);
+		updateLocalServicePool();
 		
 		enableControls(true);
 		JOptionPane.showMessageDialog(this, "Clear successfully batch.\nYou need to upload/scatter the pool change.", "Clear successfully batch", JOptionPane.INFORMATION_MESSAGE);
@@ -666,7 +678,7 @@ public class DatasetPoolsManager extends JDialog {
 				pool.add(pair);
 			}
 			poolTable.update(pool);
-			updateLocalServicePool(true);
+			updateLocalServicePool();
 			
 			JOptionPane.showMessageDialog(this, "Load successfully batch.\nYou need to upload/scatter the pool change.", "Load successfully batch", JOptionPane.INFORMATION_MESSAGE);
 		}
@@ -779,7 +791,7 @@ public class DatasetPoolsManager extends JDialog {
 			}
 			
 			poolTable.update(pool);
-			updateLocalServicePool(false);
+			updateLocalServicePool();
 			
 			enableControls(true);
 			JOptionPane.showMessageDialog(this, "Add dataset successfully.\nYou need to upload/scatter the pool change.", "Add successfully dataset", JOptionPane.INFORMATION_MESSAGE);
@@ -827,12 +839,33 @@ public class DatasetPoolsManager extends JDialog {
 	 * @param args arguments.
 	 */
 	public static void main(String[] args) {
-		Util.getPluginManager().discover(DatasetParser.class);
-		DatasetPoolsServiceImpl service = new DatasetPoolsServiceImpl(null);
-		DatasetPoolsManager.show(service, null, null);
+		final Connector connector = Connector.connect();
+        Image image = UIUtil.getImage("evaluator-32x32.png");
+        if (image != null) connector.setIconImage(image);
+        
+		Service service = connector.getService();
+
+		if ((service == null) || !(service instanceof ServiceExt)) {
+			JOptionPane.showMessageDialog(null, "Fail to retrieve service", "Fail to retrieve service", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+
+		boolean validated = false;
+		ConnectInfo connectInfo = connector.getConnectInfo();
 		try {
-			service.close();
-		} catch (Exception e) {LogUtil.trace(e);}
+			validated = service.validateAccount(connectInfo.account.getName(), connectInfo.account.getPassword(), DataConfig.ACCOUNT_ADMIN_PRIVILEGE);
+		} 
+		catch (Throwable e) {
+			LogUtil.trace(e);
+		}
+		if (!validated) {
+			JOptionPane.showMessageDialog(null, "Account is not administrator", "Not administration account", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+
+		try {
+			DatasetPoolsManager.show(((ServiceExt)service).getDatasetPoolsService(connectInfo.account.getName(), connectInfo.account.getPassword()), connectInfo, null);
+		} catch (Throwable e) {LogUtil.trace(e);}
 	}
 	
 	

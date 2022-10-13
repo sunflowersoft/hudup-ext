@@ -13,8 +13,6 @@ import java.util.List;
 import java.util.UUID;
 
 import net.hudup.core.Util;
-import net.hudup.core.logistic.LogUtil;
-import net.hudup.core.logistic.NetUtil;
 
 /**
  * This class is the exchanged data for dataset pool.
@@ -50,11 +48,26 @@ public class DatasetPoolExchanged  implements Serializable {
      * Adding other pool to this pool.
      * @param pool other pool.
      */
-    public void addRestrict(DatasetPoolExchanged pool) {
+    public void syncWith(DatasetPoolExchanged pool) {
     	if (pool == null) return;
+    	
+		List<DatasetPairExchanged> removedList = Util.newList();
+		for (DatasetPairExchanged pair : this.dspList) {
+			if (!pool.containsPairByUUID(pair)) removedList.add(pair);
+		}
+		for (DatasetPairExchanged pair : removedList) {
+			this.dspList.remove(pair);
+			pair.unexport(true);
+		}
+
 		for (DatasetPairExchanged pair : pool.dspList) {
+			if (pair.trainingUUID != null && pair.training == null) continue;
+			if (pair.testingUUID != null && pair.testing == null) continue;
+			if (pair.wholeUUID != null && pair.whole == null) continue;
+			
 			if (!containsPairByUUID(pair)) this.dspList.add(pair);
 		}
+		
     }
     
     
@@ -122,45 +135,9 @@ public class DatasetPoolExchanged  implements Serializable {
 		for (DatasetPairExchanged pair : dspList) {
 			if (pair == null) continue;
 			
-			DatasetRemote newTraining = null;
-			if (pair.training != null) {
-				if (pair.training instanceof DatasetRemoteWrapper)
-					newTraining = pair.training;
-				else
-					newTraining = Util.getPluginManager().wrap(pair.training, exclusive);
-				
-				try {
-					((DatasetRemoteWrapper)newTraining).exportInside(serverPort);
-				} catch (RemoteException e) {LogUtil.trace(e);}
-			}
-			
-			
-			DatasetRemote newTesting = null;
-			if (pair.testing != null) {
-				if (pair.testing instanceof DatasetRemoteWrapper)
-					newTesting = pair.testing;
-				else
-					newTesting = Util.getPluginManager().wrap(pair.testing, exclusive);
-				
-				try {
-					((DatasetRemoteWrapper)newTesting).exportInside(serverPort);
-				} catch (RemoteException e) {LogUtil.trace(e);}
-			}
-			
-			
-			DatasetRemote newWhole = null;
-			if (pair.whole != null) {
-				if (pair.whole instanceof DatasetRemoteWrapper)
-					newWhole = pair.whole;
-				else
-					newWhole = Util.getPluginManager().wrap(pair.whole, exclusive);
-				
-				try {
-					((DatasetRemoteWrapper)newWhole).exportInside(serverPort);
-				} catch (RemoteException e) {LogUtil.trace(e);}
-			}
-
-			
+			DatasetRemote newTraining = DatasetUtil.exportAsWrapper(pair.training, serverPort, exclusive);
+			DatasetRemote newTesting = DatasetUtil.exportAsWrapper(pair.testing, serverPort, exclusive);
+			DatasetRemote newWhole = DatasetUtil.exportAsWrapper(pair.whole, serverPort, exclusive);
 			DatasetPairExchanged newPair = new DatasetPairExchanged(newTraining, newTesting, newWhole);
 			exporteDspList.add(newPair);
 		}
@@ -176,40 +153,11 @@ public class DatasetPoolExchanged  implements Serializable {
 	 * @param forced forced mode to unexport datasets.
 	 * @throws RemoteException if any error raises.
 	 */
-	public void unexport(boolean forced) throws RemoteException {
+	public void unexport(boolean forced) {
 		for (DatasetPairExchanged pair : dspList) {
-			if (pair.training != null) {
-				if (pair.training instanceof DatasetRemoteWrapper) {
-					if (forced)
-						((DatasetRemoteWrapper)pair.training).forceUnexport();
-					else
-						((DatasetRemoteWrapper)pair.training).unexport();
-				}
-				else
-					NetUtil.RegistryRemote.unexport(pair.training);
-			}
-			
-			if (pair.testing != null) {
-				if (pair.testing instanceof DatasetRemoteWrapper) {
-					if (forced)
-						((DatasetRemoteWrapper)pair.testing).forceUnexport();
-					else
-						((DatasetRemoteWrapper)pair.testing).unexport();
-				}
-				else
-					NetUtil.RegistryRemote.unexport(pair.testing);
-			}
-
-			if (pair.whole != null) {
-				if (pair.whole instanceof DatasetRemoteWrapper) {
-					if (forced)
-						((DatasetRemoteWrapper)pair.whole).forceUnexport();
-					else
-						((DatasetRemoteWrapper)pair.whole).unexport();
-				}
-				else
-					NetUtil.RegistryRemote.unexport(pair.whole);
-			}
+			DatasetUtil.unexport(pair.training, forced);
+			DatasetUtil.unexport(pair.testing, forced);
+			DatasetUtil.unexport(pair.whole, forced);
 		}
 	}
 
