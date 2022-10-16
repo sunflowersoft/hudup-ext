@@ -2061,6 +2061,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 //		super.finalize();
 		
 		try {
+			if (!Constants.CALL_FINALIZE) return;
 			close();
 		}
 		catch (Throwable e) {

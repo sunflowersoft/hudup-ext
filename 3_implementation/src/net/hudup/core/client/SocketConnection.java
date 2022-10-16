@@ -13,6 +13,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 
+import net.hudup.core.Constants;
 import net.hudup.core.data.AutoCloseable;
 import net.hudup.core.logistic.LogUtil;
 
@@ -173,6 +174,7 @@ public class SocketConnection extends SocketWrapper implements AutoCloseable {
 //		super.finalize();
 		
 		try {
+			if (!Constants.CALL_FINALIZE) return;
 			close();
 		}
 		catch (Throwable e) {

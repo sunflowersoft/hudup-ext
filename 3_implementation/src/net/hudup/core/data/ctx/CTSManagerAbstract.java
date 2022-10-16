@@ -10,6 +10,7 @@ package net.hudup.core.data.ctx;
 import java.io.Serializable;
 import java.rmi.RemoteException;
 
+import net.hudup.core.Constants;
 import net.hudup.core.alg.AlgAbstract;
 import net.hudup.core.data.Attribute;
 import net.hudup.core.data.DataConfig;
@@ -80,7 +81,6 @@ public abstract class CTSManagerAbstract extends AlgAbstract implements CTSManag
 				
 				@Override
 				public void process(ContextTemplate template) {
-					// TODO Auto-generated method stub
 					CTSMemMultiProfiles ctsProfiles = (CTSMemMultiProfiles)param;
 					
 					Profiles profiles = profilesOf(template.getId());
@@ -134,21 +134,18 @@ public abstract class CTSManagerAbstract extends AlgAbstract implements CTSManag
 	
 	@Override
 	public void resetConfig() {
-		// TODO Auto-generated method stub
 		LogUtil.warn("CTSManager.resetConfig() not supported");
 	}
 
 
 	@Override
 	public DataConfig createDefaultConfig() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	
 	@Override
 	public void close() throws Exception {
-		// TODO Auto-generated method stub
 		try {
 			unexport();
 		} catch (Throwable e) {LogUtil.trace(e);}
@@ -157,15 +154,14 @@ public abstract class CTSManagerAbstract extends AlgAbstract implements CTSManag
 
 	@Override
 	public String[] getBaseRemoteInterfaceNames() throws RemoteException {
-		// TODO Auto-generated method stub
 		return new String[] {CTSManagerRemote.class.getName()};
 	}
 
 	
 	@Override
 	protected void finalize() throws Throwable {
-		// TODO Auto-generated method stub
 		try {
+			if (!Constants.CALL_FINALIZE) return;
 			close();
 		} catch (Throwable e) {LogUtil.trace(e);}
 	}
@@ -173,105 +169,90 @@ public abstract class CTSManagerAbstract extends AlgAbstract implements CTSManag
 	
 	@Override
 	public void remoteSetup(DataConfig config) throws RemoteException {
-		// TODO Auto-generated method stub
 		setup(config);
 	}
 
 
 	@Override
 	public ContextTemplateSchema remoteGetCTSchema() throws RemoteException {
-		// TODO Auto-generated method stub
 		return getCTSchema();
 	}
 
 
 	@Override
 	public boolean remoteCreateContextTemplateUnit() throws RemoteException {
-		// TODO Auto-generated method stub
 		return createContextTemplateUnit();
 	}
 
 
 	@Override
 	public void remoteReload() throws RemoteException {
-		// TODO Auto-generated method stub
 		reload();
 	}
 
 
 	@Override
 	public Context remoteCreateContext(int ctxTemplateId, Serializable assignedValue) throws RemoteException {
-		// TODO Auto-generated method stub
 		return createContext(ctxTemplateId, assignedValue);
 	}
 
 
 	@Override
 	public ContextList remoteGetContexts(int userId, int itemId) throws RemoteException {
-		// TODO Auto-generated method stub
 		return getContexts(userId, itemId);
 	}
 
 
 	@Override
 	public ContextList remoteGetContexts(int userId, int itemId, long ratedDate) throws RemoteException {
-		// TODO Auto-generated method stub
 		return getContexts(userId, itemId, ratedDate);
 	}
 
 
 	@Override
 	public Profile remoteProfileOf(Context context) throws RemoteException {
-		// TODO Auto-generated method stub
 		return profileOf(context);
 	}
 
 
 	@Override
 	public Profile remoteProfileOf(int ctxTemplateId, ContextValue ctxValue) throws RemoteException {
-		// TODO Auto-generated method stub
 		return profileOf(ctxTemplateId, ctxValue);
 	}
 
 
 	@Override
 	public Profiles remoteProfilesOf(int ctxTemplateId) throws RemoteException {
-		// TODO Auto-generated method stub
 		return profilesOf(ctxTemplateId);
 	}
 
 
 	@Override
 	public CTSMultiProfiles remoteCreateCTSProfiles() throws RemoteException {
-		// TODO Auto-generated method stub
 		return createCTSProfiles();
 	}
 
 
 	@Override
 	public boolean remoteCommitCTSchema() throws RemoteException {
-		// TODO Auto-generated method stub
 		return commitCTSchema();
 	}
 
 
 	@Override
 	public boolean remoteImportCTSchema(CTSManager ctsm) throws RemoteException {
-		// TODO Auto-generated method stub
 		return importCTSchema(ctsm);
 	}
 
 
 	@Override
 	public boolean remoteImportCTSchema(Dataset dataset) throws RemoteException {
-		// TODO Auto-generated method stub
 		return importCTSchema(dataset);
 	}
 
 
 	@Override
 	public void remoteDefaultCTSchema() throws RemoteException {
-		// TODO Auto-generated method stub
 		defaultCTSchema();
 	}
 

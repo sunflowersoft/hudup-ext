@@ -44,46 +44,6 @@ public class DatasetPoolExchanged  implements Serializable {
 	}
 
 	
-    /**
-     * Adding other pool to this pool.
-     * @param pool other pool.
-     */
-    public void syncWith(DatasetPoolExchanged pool) {
-    	if (pool == null) return;
-    	
-		List<DatasetPairExchanged> removedList = Util.newList();
-		for (DatasetPairExchanged pair : this.dspList) {
-			if (!pool.containsPairByUUID(pair)) removedList.add(pair);
-		}
-		for (DatasetPairExchanged pair : removedList) {
-			this.dspList.remove(pair);
-			pair.unexport(true);
-		}
-
-		for (DatasetPairExchanged pair : pool.dspList) {
-			if (pair.trainingUUID != null && pair.training == null) continue;
-			if (pair.testingUUID != null && pair.testing == null) continue;
-			if (pair.wholeUUID != null && pair.whole == null) continue;
-			
-			if (!containsPairByUUID(pair)) this.dspList.add(pair);
-		}
-		
-    }
-    
-    
-    /**
-     * Checking whether containing the specified pair.
-     * @param pair specified pair.
-     * @return whether containing the specified pair.
-     */
-    private boolean containsPairByUUID(DatasetPairExchanged pair) {
-    	if (pair == null) return false;
-    	if (findByTrainingUUID(pair.trainingUUID) == null) return false;
-    	if (findByTestingUUID(pair.testingUUID) == null) return false;
-    	return true;
-    }
-    
-    
 	/**
      * Clearing this dataset pool, which means that all dataset pairs are removed from this dataset pool.
 	 * @param forced forced mode to unexport datasets.
@@ -338,6 +298,72 @@ public class DatasetPoolExchanged  implements Serializable {
 		}
 		
 		return pool;
+	}
+
+	
+    /**
+     * Adding client pool to this pool.
+     * @param clientPool client pool.
+     */
+    public void syncWithClientPool(DatasetPoolExchanged clientPool) {
+    	if (clientPool == null) return;
+    	
+		List<DatasetPairExchanged> removedList = Util.newList();
+		for (DatasetPairExchanged pair : this.dspList) {
+			if (!clientPool.containsPairUUID(pair)) removedList.add(pair);
+		}
+		for (DatasetPairExchanged pair : removedList) {
+			this.dspList.remove(pair);
+			pair.unexport(true);
+		}
+
+		for (DatasetPairExchanged pair : clientPool.dspList) {
+			if (pair.training == null || pair.testing == null) continue;
+			if (pair.wholeUUID != null && pair.whole == null) continue;
+			
+			if (!containsPairUUID(pair)) this.dspList.add(pair);
+		}
+		
+    }
+    
+    
+    /**
+     * Checking whether containing the specified pair.
+     * @param pair specified pair.
+     * @return whether containing the specified pair.
+     */
+    private boolean containsPairUUID(DatasetPairExchanged pair) {
+    	return pair != null && containsTrainingUUID(pair.trainingUUID) && containsTestingUUID(pair.testingUUID);
+    }
+    
+    
+	/**
+	 * Checking whether containing training UUID.
+	 * @param trainingUUID training UUID;
+	 * @return whether containing training UUID.
+	 */
+	private boolean containsTrainingUUID(UUID trainingUUID) {
+		if (trainingUUID == null) return false;
+		for (DatasetPairExchanged pair : dspList) {
+			if (pair != null && pair.trainingUUID != null && pair.trainingUUID.equals(trainingUUID))
+				return true; 
+		}
+		return false;
+	}
+	
+	
+	/**
+	 * Checking whether containing testing UUID.
+	 * @param testingUUID testing UUID;
+	 * @return whether containing testing UUID.
+	 */
+	private boolean containsTestingUUID(UUID testingUUID) {
+		if (testingUUID == null) return false;
+		for (DatasetPairExchanged pair : dspList) {
+			if (pair != null && pair.testingUUID != null && pair.testingUUID.equals(testingUUID))
+				return true; 
+		}
+		return false;
 	}
 
 	

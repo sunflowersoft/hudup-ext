@@ -770,6 +770,7 @@ public abstract class UriAssocAbstract implements UriAssoc {
 //		super.finalize();
 		
 		try {
+			if (!Constants.CALL_FINALIZE) return;
 			close();
 		}
 		catch (Exception e) {

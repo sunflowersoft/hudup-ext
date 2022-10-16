@@ -9,6 +9,7 @@ package net.hudup.core.data;
 
 import java.io.Serializable;
 
+import net.hudup.core.Constants;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.NextUpdate;
 import net.hudup.core.logistic.xURI;
@@ -161,6 +162,7 @@ public class Datasource implements AutoCloseable, Serializable {
 //		super.finalize();
 		
 		try {
+			if (!Constants.CALL_FINALIZE) return;
 			close();
 		}
 		catch (Throwable e) {

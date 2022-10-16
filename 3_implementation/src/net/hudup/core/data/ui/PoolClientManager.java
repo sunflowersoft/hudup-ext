@@ -19,6 +19,7 @@ import java.util.Vector;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
@@ -109,6 +110,15 @@ public class PoolClientManager extends JDialog {
 			}
 		});
 		footer.add(btnApply);
+
+		JButton btnRefresh = new JButton("Refresh");
+		btnRefresh.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				tblPoolClient.update();
+			}
+		});
+		footer.add(btnRefresh);
 
 		JButton btnCancel = new JButton("Cancel");
 		btnCancel.addActionListener(new ActionListener() {
@@ -245,7 +255,32 @@ class PoolClientTable extends SortableSelectableTable {
 	 * @return context menu.
 	 */
 	private JPopupMenu createContextMenu() {
-		return null;
+		JPopupMenu contextMenu = new JPopupMenu();
+		
+		JMenuItem miSaveScript = UIUtil.makeMenuItem((String)null, "Reset", 
+			new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					resetClient();
+				}
+			});
+		contextMenu.add(miSaveScript);
+		
+		return contextMenu;
+	}
+	
+	
+	/**
+	 * Resetting client
+	 */
+	private void resetClient() {
+		int selectedRow = getSelectedRow();
+		if (selectedRow < 0) return;
+		ClientWrapper client = (ClientWrapper)getValueAt(selectedRow, 1);
+		if (client == null) return;
+		
+		client.reset();
+		setValueAt(client.getStatus(), selectedRow, 2);
 	}
 	
 	

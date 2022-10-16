@@ -1292,6 +1292,7 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 //		super.finalize();
 		
 		try {
+			if (!Constants.CALL_FINALIZE) return;
 			shutdown();
 		}
 		catch (Throwable e) {

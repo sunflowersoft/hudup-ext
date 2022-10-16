@@ -244,6 +244,7 @@ public class HudupSocketClassLoaderServer extends AbstractRunner {
 //		super.finalize();
 		
 		try {
+			if (!Constants.CALL_FINALIZE) return;
 			stop();
 		}
 		catch (Throwable e) {

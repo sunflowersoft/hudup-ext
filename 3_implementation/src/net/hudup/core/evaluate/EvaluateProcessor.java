@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import net.hudup.core.Constants;
 import net.hudup.core.RegisterTable;
 import net.hudup.core.Util;
 import net.hudup.core.alg.SetupAlgEvent;
@@ -330,6 +331,7 @@ public class EvaluateProcessor {
 //		super.finalize();
 		
 		try {
+			if (!Constants.CALL_FINALIZE) return;
 			close();
 		}
 		catch (Throwable e) {

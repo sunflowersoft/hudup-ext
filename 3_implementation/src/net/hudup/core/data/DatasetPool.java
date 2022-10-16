@@ -566,7 +566,7 @@ public class DatasetPool implements Serializable {
 
 	
 	/**
-	 * Converting normal dataset pool to exchanged dataset in client. This method is called by evaluator GUI.
+	 * Converting normal dataset pool to exchanged dataset from client, preparing to send to server. This method is often called by evaluator GUI.
 	 * @return exchanged dataset pool in client.
 	 */
 	public DatasetPoolExchanged toDatasetPoolExchangedClient() {
@@ -632,7 +632,7 @@ public class DatasetPool implements Serializable {
 	
 	
 	/**
-	 * Converting normal dataset pool to exchanged dataset in client. This method is called by evaluator GUI.
+	 * Converting normal dataset pool to exchanged dataset in client, preparing to send to server. This method is often called by evaluator GUI.
 	 * @param connectInfo connection information.
 	 * @return exchanged dataset in client.
 	 */

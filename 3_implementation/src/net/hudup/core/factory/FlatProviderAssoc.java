@@ -998,6 +998,7 @@ class DefaultCsvReader implements CsvReader {
 //		super.finalize();
 		
 		try {
+			if (!Constants.CALL_FINALIZE) return;
 			close();
 		} catch (Throwable e) {LogUtil.trace(e);}
 	}
@@ -1061,6 +1062,7 @@ class DefaultCsvWriter implements CsvWriter {
 //		super.finalize();
 		
 		try {
+			if (!Constants.CALL_FINALIZE) return;
 			close();
 		} catch (Throwable e) {LogUtil.trace(e);}
 	}
@@ -1203,6 +1205,7 @@ class ExcelReader implements CsvReader {
 //		super.finalize();
 		
 		try {
+			if (!Constants.CALL_FINALIZE) return;
 			close();
 		} catch (Throwable e) {LogUtil.trace(e);}
 	}
@@ -1411,6 +1414,7 @@ class ExcelWriter implements CsvWriter {
 //		super.finalize();
 		
 		try {
+			if (!Constants.CALL_FINALIZE) return;
 			close();
 		} catch (Throwable e) {LogUtil.trace(e);}
 	}

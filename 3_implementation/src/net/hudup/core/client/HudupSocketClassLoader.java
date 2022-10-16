@@ -171,6 +171,7 @@ public class HudupSocketClassLoader extends ClassLoader {
 //		super.finalize();
 		
 		try {
+			if (!Constants.CALL_FINALIZE) return;
 			close();
 		}
 		catch (Exception e) {LogUtil.trace(e);}

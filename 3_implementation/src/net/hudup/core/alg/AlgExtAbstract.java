@@ -12,6 +12,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import net.hudup.core.Constants;
 import net.hudup.core.Util;
 import net.hudup.core.alg.SetupAlgEvent.Type;
 import net.hudup.core.data.AttributeList;
@@ -191,6 +192,7 @@ public abstract class AlgExtAbstract extends AlgAbstract implements AlgExt, AlgE
 		super.finalize();
 		
 		try {
+			if (!Constants.CALL_FINALIZE) return;
 			unsetup();
 		}
 		catch (Throwable e) {

@@ -7,6 +7,7 @@
  */
 package net.hudup.core.data;
 
+import net.hudup.core.Constants;
 import net.hudup.core.logistic.LogUtil;
 
 /**
@@ -46,6 +47,7 @@ public abstract class ProviderAssocAbstract implements ProviderAssoc {
 	protected void finalize() throws Throwable {
 		
 		try {
+			if (!Constants.CALL_FINALIZE) return;
 			close();
 		}
 		catch (Throwable e) {

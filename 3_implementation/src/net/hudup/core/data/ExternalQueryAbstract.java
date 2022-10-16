@@ -9,6 +9,7 @@ package net.hudup.core.data;
 
 import java.rmi.RemoteException;
 
+import net.hudup.core.Constants;
 import net.hudup.core.alg.AlgAbstract;
 import net.hudup.core.logistic.LogUtil;
 
@@ -67,6 +68,7 @@ public abstract class ExternalQueryAbstract extends AlgAbstract implements Exter
 		super.finalize();
 		
 		try {
+			if (!Constants.CALL_FINALIZE) return;
 			close();
 		}
 		catch (Throwable e) {

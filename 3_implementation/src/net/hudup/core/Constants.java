@@ -21,7 +21,7 @@ public final class Constants {
 	/**
 	 * Current version of Hudup framework.
 	 */
-	public final static String  VERSION                  = "v13";
+	public static String  VERSION                        = "v13";
 	
 	/**
 	 * Unused double number.
@@ -292,13 +292,28 @@ public final class Constants {
 	 * By default, pull mode advice is false.
 	 */
 	public static boolean PULL_MODE_ADVICE                = false;
-
+	
+	/**
+	 * This mode is calling explicitly finalize method, which is true if the finalize method of an object is called explicitly when the object is discarded. 
+	 */
+	public static boolean CALL_FINALIZE                   = true;
 	
 	
 	/**
 	 * Static code to load dynamic constant.
 	 */
 	static {
+		try {
+			String version = Util.getHudupProperty("version");
+			if (version != null) {
+				version = version.trim();
+				if (!version.isEmpty()) VERSION = version;
+			}
+		}
+		catch (Throwable e) {
+			System.out.println("Error when parsing debug property");
+		}
+
 		try {
 			String debug = Util.getHudupProperty("debug");
 			if (debug != null)
@@ -442,6 +457,15 @@ public final class Constants {
 		}
 		catch (Throwable e) {
 			System.out.println("Error when parsing pull mode advice");
+		}
+		
+		try {
+			String callFinalize = Util.getHudupProperty("call_finalize");
+			if (callFinalize != null)
+				CALL_FINALIZE = Boolean.parseBoolean(callFinalize);
+		}
+		catch (Throwable e) {
+			System.out.println("Error when parsing call finalize mode");
 		}
 	}
 	

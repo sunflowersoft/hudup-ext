@@ -10,6 +10,7 @@ package net.hudup.core.alg;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
+import net.hudup.core.Constants;
 import net.hudup.core.Util;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Dataset;
@@ -368,6 +369,10 @@ public abstract class KBaseAbstract implements KBase, KBaseRemote {
 	@Override
 	protected void finalize() throws Throwable {
 //		super.finalize();
+		
+		try {
+			if (!Constants.CALL_FINALIZE) return;
+		} catch (Throwable e) {}
 		
 		try {
 			if (!isEmpty()) close();

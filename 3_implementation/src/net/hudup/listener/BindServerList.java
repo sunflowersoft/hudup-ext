@@ -9,6 +9,7 @@ package net.hudup.listener;
 
 import java.util.List;
 
+import net.hudup.core.Constants;
 import net.hudup.core.Util;
 import net.hudup.core.client.ActiveMeasure;
 import net.hudup.core.client.PowerServer;
@@ -339,6 +340,7 @@ public class BindServerList {
 	@Override
 	protected void finalize() throws Throwable {
 		try {
+			if (!Constants.CALL_FINALIZE) return;
 			unbindAll();
 		}
 		catch (Throwable e) {

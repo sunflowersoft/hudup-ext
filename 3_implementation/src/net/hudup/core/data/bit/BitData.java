@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.Set;
 
 import net.hudup.core.Cloneable;
+import net.hudup.core.Constants;
 import net.hudup.core.Util;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.FetcherUtil;
@@ -450,6 +451,7 @@ public class BitData implements Cloneable, net.hudup.core.data.AutoCloseable, Se
 //		super.finalize();
 		
 		try {
+			if (!Constants.CALL_FINALIZE) return;
 			close();
 		}
 		catch (Throwable e) {

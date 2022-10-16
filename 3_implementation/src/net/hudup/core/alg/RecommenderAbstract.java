@@ -11,6 +11,7 @@ import java.rmi.RemoteException;
 import java.util.List;
 import java.util.Set;
 
+import net.hudup.core.Constants;
 import net.hudup.core.Util;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Dataset;
@@ -407,6 +408,7 @@ public abstract class RecommenderAbstract extends AlgAbstract implements Recomme
 		super.finalize();
 		
 		try {
+			if (!Constants.CALL_FINALIZE) return;
 			unsetup();
 		}
 		catch (Throwable e) {

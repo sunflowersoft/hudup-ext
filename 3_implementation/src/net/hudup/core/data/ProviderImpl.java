@@ -12,6 +12,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import net.hudup.core.Constants;
 import net.hudup.core.PluginStorage;
 import net.hudup.core.Util;
 import net.hudup.core.alg.RecommendParam;
@@ -2147,6 +2148,7 @@ public class ProviderImpl implements Provider {
 //		super.finalize();
 		
 		try {
+			if (!Constants.CALL_FINALIZE) return;
 			close();
 		}
 		catch (Throwable e) {

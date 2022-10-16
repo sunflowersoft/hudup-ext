@@ -488,6 +488,7 @@ class FlatUnitTable extends ProfileTable implements UnitTable, AutoCloseable {
 //		super.finalize();
 		
 		try {
+			if (!Constants.CALL_FINALIZE) return;
 			close();
 		}
 		catch (Throwable e) {

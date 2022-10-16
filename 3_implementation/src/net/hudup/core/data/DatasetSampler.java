@@ -12,6 +12,7 @@ import java.util.Random;
 
 import javax.swing.event.EventListenerList;
 
+import net.hudup.core.Constants;
 import net.hudup.core.Util;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.ui.ProgressEvent;
@@ -419,6 +420,7 @@ public class DatasetSampler implements AutoCloseable {
 //		super.finalize();
 		
 		try {
+			if (!Constants.CALL_FINALIZE) return;
 			close();
 		}
 		catch (Throwable e) {

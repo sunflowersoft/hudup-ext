@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import net.hudup.core.Constants;
 import net.hudup.core.Util;
 import net.hudup.core.data.AutoCloseable;
 import net.hudup.core.data.DataConfig;
@@ -520,6 +521,7 @@ public class UriAdapter implements UriAssoc, AutoCloseable {
 //		super.finalize();
 		
 		try {
+			if (!Constants.CALL_FINALIZE) return;
 			close();
 		}
 		catch (Exception e) {
@@ -623,6 +625,7 @@ public class UriAdapter implements UriAssoc, AutoCloseable {
 //			super.finalize();
 			
 			try {
+				if (!Constants.CALL_FINALIZE) return;
 				close();
 			}
 			catch (Throwable e) {
@@ -698,6 +701,7 @@ public class UriAdapter implements UriAssoc, AutoCloseable {
 //			super.finalize();
 			
 			try {
+				if (!Constants.CALL_FINALIZE) return;
 				close();
 			}
 			catch (Throwable e) {
@@ -791,6 +795,7 @@ public class UriAdapter implements UriAssoc, AutoCloseable {
 //			super.finalize();
 			
 			try {
+				if (!Constants.CALL_FINALIZE) return;
 				close();
 			}
 			catch (Throwable e) {

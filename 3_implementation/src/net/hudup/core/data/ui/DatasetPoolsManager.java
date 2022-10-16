@@ -518,7 +518,7 @@ public class DatasetPoolsManager extends JDialog {
 		String poolName = item.getName();
 		if (connectInfo.bindUri != null) {
 			try {
-				DatasetPoolExchanged expool = pool.toDatasetPoolExchanged();
+				DatasetPoolExchanged expool = pool.toDatasetPoolExchangedClient(connectInfo);
 				if (expool != null) poolsService.put(poolName, expool);
 			} catch (Exception e) {LogUtil.trace(e);}
 		}

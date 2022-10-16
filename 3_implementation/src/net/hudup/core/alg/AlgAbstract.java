@@ -10,6 +10,7 @@ package net.hudup.core.alg;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
+import net.hudup.core.Constants;
 import net.hudup.core.ExtraStorage;
 import net.hudup.core.Util;
 import net.hudup.core.alg.SetupAlgEvent.Type;
@@ -386,6 +387,7 @@ public abstract class AlgAbstract implements Alg, AlgRemote {
 //		super.finalize();
 		
 		try {
+			if (!Constants.CALL_FINALIZE) return;
 			unexport();
 		}
 		catch (Throwable e) {LogUtil.trace(e);}

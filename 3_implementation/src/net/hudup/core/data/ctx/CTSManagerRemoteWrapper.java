@@ -10,6 +10,7 @@ package net.hudup.core.data.ctx;
 import java.io.Serializable;
 import java.rmi.RemoteException;
 
+import net.hudup.core.Constants;
 import net.hudup.core.alg.AlgRemoteWrapper;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Dataset;
@@ -242,6 +243,7 @@ public class CTSManagerRemoteWrapper extends AlgRemoteWrapper implements CTSMana
 	@Override
 	protected void finalize() throws Throwable {
 		try {
+			if (!Constants.CALL_FINALIZE) return;
 			close();
 		}
 		catch (Throwable e) {LogUtil.trace(e);}

@@ -14,6 +14,7 @@ import java.util.EventObject;
 import java.util.List;
 import java.util.UUID;
 
+import net.hudup.core.Constants;
 import net.hudup.core.PluginChangedEvent;
 import net.hudup.core.PluginChangedListener;
 import net.hudup.core.PluginStorageWrapper;
@@ -679,6 +680,7 @@ public class EvaluatorWrapper implements Evaluator, Serializable {
 //		super.finalize();
 		
 		try {
+			if (!Constants.CALL_FINALIZE) return;
 			close();
 		}
 		catch (Throwable e) {

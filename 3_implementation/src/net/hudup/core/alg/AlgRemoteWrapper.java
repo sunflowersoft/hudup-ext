@@ -12,6 +12,7 @@ import java.lang.reflect.Constructor;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
+import net.hudup.core.Constants;
 import net.hudup.core.Util;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.logistic.BaseClass;
@@ -380,6 +381,7 @@ public class AlgRemoteWrapper implements Alg, AlgRemote, Serializable {
 //		super.finalize();
 		
 		try {
+			if (!Constants.CALL_FINALIZE) return;
 			unexport();
 		}
 		catch (Throwable e) {

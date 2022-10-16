@@ -12,6 +12,7 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.Collection;
 
+import net.hudup.core.Constants;
 import net.hudup.core.Util;
 import net.hudup.core.data.ctx.Context;
 import net.hudup.core.data.ctx.ContextList;
@@ -671,6 +672,7 @@ public class DatasetRemoteWrapper implements Dataset, DatasetRemote {
 //		super.finalize();
 		
 		try {
+			if (!Constants.CALL_FINALIZE) return;
 //			clear(); //Clear method can close provider with scanner.
 			unexport();
 		}

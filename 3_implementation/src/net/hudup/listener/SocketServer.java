@@ -970,6 +970,7 @@ public abstract class SocketServer extends AbstractRunner implements Server, Acc
 //		super.finalize();
 		
 		try {
+			if (!Constants.CALL_FINALIZE) return;
 			shutdown();
 		}
 		catch (Throwable e) {
