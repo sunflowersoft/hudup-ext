@@ -8,7 +8,6 @@
 package net.hudup.core.data;
 
 import java.io.Serializable;
-import java.rmi.RemoteException;
 import java.util.List;
 import java.util.UUID;
 
@@ -111,7 +110,6 @@ public class DatasetPoolExchanged  implements Serializable {
 	/**
 	 * Unexporting inner datasets.
 	 * @param forced forced mode to unexport datasets.
-	 * @throws RemoteException if any error raises.
 	 */
 	public void unexport(boolean forced) {
 		for (DatasetPairExchanged pair : dspList) {

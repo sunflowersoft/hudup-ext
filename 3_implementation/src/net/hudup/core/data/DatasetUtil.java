@@ -294,6 +294,7 @@ public final class DatasetUtil {
 	/**
 	 * 
 	 * Exporting remote dataset as wrapper.
+	 * @param remoteDataset remote dataset.
 	 * @param serverPort port to export. Using port 0 if not concerning registry or naming.
      * @param exclusive exclusive mode.
 	 * @return exported remote dataset.
