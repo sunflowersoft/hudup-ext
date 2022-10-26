@@ -123,7 +123,7 @@ public class DatasetMetadataTable extends JTable {
 			if (comp != null && comp instanceof DatasetPoolTable) {
 				DatasetPoolTable dpt = (DatasetPoolTable)comp;
 				UUID uuid = dpt.findUUIDByRef(dataset);
-				if (uuid != null) dlg.setTitle("Dataset metadata of " + uuid.toString());
+				if (uuid != null) dlg.setTitle("Metadata " + uuid.toString());
 			}
 		} catch (Throwable e) {}
 		

@@ -892,6 +892,12 @@ public class EvaluatorWrapperExt implements Evaluator, EvaluatorListener, Evalua
 
 	
 	@Override
+	public void remoteStopAndClearResults(boolean clearPool) throws RemoteException {
+		remoteEvaluator.remoteStopAndClearResults(clearPool);
+	}
+
+
+	@Override
 	public boolean remoteIsStarted() throws RemoteException {
 		return remoteEvaluator.remoteIsStarted();
 	}

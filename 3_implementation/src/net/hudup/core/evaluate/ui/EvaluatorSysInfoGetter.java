@@ -27,8 +27,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import net.hudup.core.Util;
-import net.hudup.core.data.DataConfig;
 import net.hudup.core.evaluate.Evaluator;
+import net.hudup.core.evaluate.EvaluatorAbstract;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.ui.TextArea;
 import net.hudup.core.logistic.ui.UIUtil;
@@ -156,7 +156,7 @@ public class EvaluatorSysInfoGetter extends JDialog {
 		JPanel body = new JPanel(new BorderLayout());
 		add(body, BorderLayout.CENTER);
 		
-		txtInfo = new TextArea(DataConfig.RATING_UNIT);
+		txtInfo = new TextArea(EvaluatorAbstract.MAIN_UNIT_DEFAULT);
 		body.add(new JScrollPane(txtInfo), BorderLayout.CENTER);
 
 		JPanel footer = new JPanel();

@@ -149,6 +149,12 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 
 
 	/**
+	 * Default main unit.
+	 */
+	public final static String MAIN_UNIT_DEFAULT = DataConfig.RATING_UNIT;
+	
+	
+	/**
 	 * Flag to indicate whether the evaluator is agent. The agent evaluator runs on server.
 	 */
 	protected boolean isAgent = false;
@@ -629,7 +635,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 	 * Clearing all evaluated results.
 	 */
     private synchronized void clearResult() {
-//    	if (result != null) result.clear(); //Keep for recovery locally.
+//    	if (result != null) result.clear(); //Keep for local recovery.
     	result = null;
     	
     	if (poolResult != null) poolResult.clear(true);
@@ -705,7 +711,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 
 	@Override
 	public String getMainUnit() throws RemoteException {
-		return DataConfig.RATING_UNIT;
+		return MAIN_UNIT_DEFAULT;
 	}
 	
 	
@@ -2215,6 +2221,28 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 	}
 
 	
+	@Override
+	public synchronized void remoteStopAndClearResults(boolean clearPool) throws RemoteException {
+		remoteStop();
+		
+		clearDelayUnsetupAlgs();
+
+		DatasetPoolExchanged oldPool = poolResult;
+		if (!clearPool) poolResult = null;
+		clearResult();
+		if (!clearPool) poolResult = oldPool;
+		
+		fireEvaluatorEvent(new EvaluatorEvent(
+			this,
+			EvaluatorEvent.Type.update_pool,
+			this.otherResult,
+			this.poolResult,
+			this.evInfo,
+			null),
+			null);
+	}
+
+
 	@Override
 	public boolean remoteForceStop() throws RemoteException {
 		return forceStop();

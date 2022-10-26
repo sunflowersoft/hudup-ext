@@ -142,6 +142,14 @@ public interface Evaluator extends Remote, RemoteRunner, SetupAlgListener, Plugi
 
 	
 	/**
+	 * Stopping evaluator and clearing evaluation results. If evaluator was stopped, this method will clear evaluation results.
+	 * @param clearPool clearing pool flag.
+	 * @throws RemoteException if any error raises.
+	 */
+	void remoteStopAndClearResults(boolean clearPool) throws RemoteException;
+	
+	
+	/**
 	 * Checking whether evaluator started.
 	 * @return true if evaluator started.
 	 * @throws RemoteException if any error raises.
@@ -445,8 +453,8 @@ public interface Evaluator extends Remote, RemoteRunner, SetupAlgListener, Plugi
     /**
      * Setting referred pool to pool result.
      * @param ref reference flag.
-     * @param refPool referred pool.
-     * @param refName referred pool name.
+     * @param refPool referred pool. If it is null, an empty pool is created.
+     * @param refName referred pool name. It can be null.
      * @param localTargetListener local target listener. It can be null.
      * @param timestamp time stamp. It can be null.
      * @return true if successful.

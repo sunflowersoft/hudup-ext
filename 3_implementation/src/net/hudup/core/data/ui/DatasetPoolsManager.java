@@ -56,6 +56,7 @@ import net.hudup.core.data.DatasetPoolExchangedItem;
 import net.hudup.core.data.DatasetPoolsService;
 import net.hudup.core.data.NullPointer;
 import net.hudup.core.evaluate.Evaluator;
+import net.hudup.core.evaluate.EvaluatorAbstract;
 import net.hudup.core.evaluate.ui.EvaluatorSysInfoGetter;
 import net.hudup.core.logistic.I18nUtil;
 import net.hudup.core.logistic.LogUtil;
@@ -416,6 +417,24 @@ public class DatasetPoolsManager extends JDialog {
 		mniRefresh.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F5, 0));
 		mnTool.add(mniRefresh);
 
+		mnTool.addSeparator();
+		
+		DatasetPoolsManager thisManager = this;
+		JMenuItem mniAllClients = new JMenuItem(
+			new AbstractAction("All clients") {
+				/**
+				 * Serial version UID for serializable class. 
+				 */
+				private static final long serialVersionUID = 1L;
+
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					JOptionPane.showMessageDialog(thisManager, "This function not implemented yet", "Not implemented yet", JOptionPane.INFORMATION_MESSAGE);
+				}
+			});
+		mniAllClients.setMnemonic('c');
+		mnTool.add(mniAllClients);
+
 		return mnBar;
 	}
 
@@ -617,11 +636,6 @@ public class DatasetPoolsManager extends JDialog {
 
 		try {
 			final String mainUnit = EvaluatorSysInfoGetter.get(Constants.DEFAULT_EVALUATOR_NAME, EvaluatorSysInfoGetter.MAIN_UNIT, this);
-			if (mainUnit == null) {
-				JOptionPane.showMessageDialog(this, "Invalid main unit", "Invalid main unit", JOptionPane.ERROR_MESSAGE);
-				return;
-			}
-
 			UriAdapter adapter = new UriAdapter();
 			xURI uri = adapter.chooseUri(
 				this, 
@@ -647,7 +661,7 @@ public class DatasetPoolsManager extends JDialog {
 			SwingWorker<BatchScript, BatchScript> worker = new SwingWorker<BatchScript, BatchScript>() {
 				@Override
 				protected BatchScript doInBackground() throws Exception {
-					return BatchScript.parse(reader, mainUnit);
+					return BatchScript.parse(reader, mainUnit != null && !mainUnit.isEmpty() ? mainUnit : EvaluatorAbstract.MAIN_UNIT_DEFAULT);
 				}
 				
 				@Override
@@ -692,13 +706,8 @@ public class DatasetPoolsManager extends JDialog {
 	 * Saving batch script.
 	 */
 	private void saveBatchScript() {
-		String mainUnit = JOptionPane.showInputDialog(this, "Enter main unit", DataConfig.RATING_UNIT);
-		if (mainUnit == null || mainUnit.isEmpty()) return;
-		mainUnit = mainUnit.trim();
-		if (mainUnit.isEmpty()) {
-			JOptionPane.showMessageDialog(this, "Invalid main unit", "Invalid main unit", JOptionPane.ERROR_MESSAGE);
-			return;
-		}
+		String mainUnit = EvaluatorSysInfoGetter.get(Constants.DEFAULT_EVALUATOR_NAME, EvaluatorSysInfoGetter.MAIN_UNIT, this);
+		mainUnit = mainUnit != null && !mainUnit.isEmpty() ? mainUnit : EvaluatorAbstract.MAIN_UNIT_DEFAULT;
 
 		UriAdapter adapter = new UriAdapter();
         xURI uri = adapter.chooseUri(
@@ -770,10 +779,7 @@ public class DatasetPoolsManager extends JDialog {
 		if (item == null) return;
 
 		String mainUnit = EvaluatorSysInfoGetter.get(Constants.DEFAULT_EVALUATOR_NAME, EvaluatorSysInfoGetter.MAIN_UNIT, this);
-		if (mainUnit == null) {
-			JOptionPane.showMessageDialog(this, "Invalid main unit", "Invalid main unit", JOptionPane.ERROR_MESSAGE);
-			return;
-		}
+		mainUnit = mainUnit != null && !mainUnit.isEmpty() ? mainUnit : EvaluatorAbstract.MAIN_UNIT_DEFAULT;
 
 		try {
 			DatasetPool pool = poolTable.getPool();

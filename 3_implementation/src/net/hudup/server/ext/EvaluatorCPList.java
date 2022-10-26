@@ -659,6 +659,16 @@ class EvaluatorTable extends JTable implements EvaluateListener, EvaluateProgres
 			});
 		ctxMenu.add(miConfig);
 
+		JMenuItem miReset = new JMenuItem("Reset");
+		miReset.addActionListener( 
+			new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					reset();
+				}
+			});
+		ctxMenu.add(miReset);
+
 		ctxMenu.addSeparator();
 		
 		JMenuItem miRefresh = new JMenuItem("Refresh");
@@ -1115,6 +1125,49 @@ class EvaluatorTable extends JTable implements EvaluateListener, EvaluateProgres
     	getModel2().removeRow(convertRowIndexToModel(row));
     }
 
+    
+    /**
+     * Resetting selected evaluators.
+     */
+    protected synchronized void reset() {
+		int[] indices = getSelectedRows();
+		if (indices == null || indices.length == 0) {
+			JOptionPane.showMessageDialog(this, "No evaluator selected", "No selection", JOptionPane.WARNING_MESSAGE);
+			return;
+		}
+		
+		boolean clearPool = JOptionPane.showConfirmDialog(this, "Do you want to keep dataset pool if possible?", "Keeping pool confirmation", JOptionPane.YES_NO_OPTION) == JOptionPane.NO_OPTION;
+		for (int index : indices) {
+			try {
+				reset(index, clearPool, false);
+			} catch (Throwable e) {LogUtil.trace(e);}
+		}
+    }
+    
+    
+    /**
+     * Resetting evaluator.
+     * @param selectedRow selected row.
+     * @param clearPool clearing pool flag.
+     * @param notice notice flag.
+     * @return true if resetting evaluator is successful.
+     */
+    protected synchronized boolean reset(int selectedRow, boolean clearPool, boolean notice) {
+		EvaluatorWrapper evItem = getEvaluatorItem(selectedRow);
+		if (evItem == null || evItem.evaluator == null) return false;
+		Evaluator evaluator = evItem.evaluator;
+
+		try {
+			evaluator.remoteStopAndClearResults(clearPool && !evaluator.getInfo().isRefPoolResult);
+			setInfoAt(selectedRow, evaluator);
+			if (notice) JOptionPane.showMessageDialog(this, "Successful to reset evaluator", "Successful reset", JOptionPane.INFORMATION_MESSAGE);
+			return true;
+		}
+		catch (Throwable e) {LogUtil.trace(e);}
+		
+		return false;
+    }
+    
     
     /**
 	 * Getting this evaluator table.

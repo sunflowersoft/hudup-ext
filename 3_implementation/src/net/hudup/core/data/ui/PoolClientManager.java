@@ -80,7 +80,7 @@ public class PoolClientManager extends JDialog {
 		JPanel header = new JPanel();
 		add(header, BorderLayout.NORTH);
 		
-		JLabel lblIntro = new JLabel("Clients of item \"" + dpeItem.getName() + "\"");
+		JLabel lblIntro = new JLabel("Clients of pool \"" + dpeItem.toString() + "\"");
 		header.add(lblIntro);
 		
 		JPanel body = new JPanel(new BorderLayout());
