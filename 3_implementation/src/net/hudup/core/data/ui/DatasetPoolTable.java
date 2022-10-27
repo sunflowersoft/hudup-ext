@@ -584,7 +584,7 @@ public class DatasetPoolTable extends JTable {
 	 * @param end specified ending index.
 	 * @param to specified location.
 	 */
-	private void moveRow(int start, int end, int to) {
+	protected void moveRow(int start, int end, int to) {
 		DatasetPoolTableModel model = getPoolTableModel();
 		DatasetPool pool = model.getPool();
 		

@@ -96,7 +96,6 @@ public class DatasetPoolsServiceImpl implements DatasetPoolsService, Serializabl
 					try {
 						itemPool.syncWithClientPool(pool);
 						itemPool.export(server != null ? server.getPort() : 0, false);
-						itemPool.fillMissingUUID();
 					} catch (Throwable e) {LogUtil.trace(e);}
 				}
 			}

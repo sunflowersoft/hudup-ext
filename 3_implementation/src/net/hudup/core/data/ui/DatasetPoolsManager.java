@@ -269,8 +269,6 @@ public class DatasetPoolsManager extends JDialog {
 
 			@Override
 			public boolean removeSelectedRows() {
-				DatasetPoolExchangedItem item = poolList.getSelectedValue();
-				if (item == null) return false;
 				boolean ret = super.removeSelectedRows();
 				if (!ret) return false;
 
@@ -279,9 +277,15 @@ public class DatasetPoolsManager extends JDialog {
 				enableControls(true);
 				JOptionPane.showMessageDialog(this, "Remove rows successfully.\nYou need to upload/scatter the pool change.", "Remove successfully rows", JOptionPane.INFORMATION_MESSAGE);
 				
-				return true;
+				return ret;
 			}
 			
+			@Override
+			protected void moveRow(int start, int end, int to) {
+				super.moveRow(start, end, to);
+				updateLocalServicePool();
+			}
+
 			@Override
 			public void saveScript() {
 				saveBatchScript();
@@ -565,7 +569,12 @@ public class DatasetPoolsManager extends JDialog {
 		String poolName = item.getName();
 		try {
 			DatasetPoolExchanged expool = pool.toDatasetPoolExchanged();
-			if (expool != null) poolsService.put(poolName, expool);
+			if (expool != null) {
+				poolsService.put(poolName, expool);
+				
+				pool = item.getPool().toDatasetPoolClient();
+				poolTable.update(pool);
+			}
 		} catch (Exception e) {LogUtil.trace(e);}
 	}
 	

@@ -1478,7 +1478,8 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 				guiData.pool = guiData.pool.getLocals();
 			else
 				guiData.pool = new DatasetPool();
-			guiData.pool.add(evt.getPoolResult().toDatasetPoolClient());
+			DatasetPoolExchanged poolResult = evt.getPoolResult();
+			if (poolResult != null) guiData.pool.add(poolResult.toDatasetPoolClient());
 			guiData.isRefPool = evt.getEvInfo().isRefPoolResult;
 			
 			if (guiData.pool.size() > 0) {

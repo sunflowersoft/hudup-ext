@@ -169,11 +169,10 @@ public class DatasetPoolExchanged  implements Serializable {
 	 * Checking whether containing only UUID (at clients).
 	 * @return true if containing only UUID (at clients).
 	 */
-	public boolean containsOnlyUUID() {
+	public boolean containsOnlyTrainingTestingUUIDs() {
 		for (DatasetPairExchanged pair : dspList) {
 			if (pair.training == null && pair.trainingUUID != null) return true;
 			if (pair.testing == null && pair.testingUUID != null) return true;
-			if (pair.whole == null && pair.wholeUUID != null) return true;
 		}
 		
 		return false;
@@ -304,65 +303,74 @@ public class DatasetPoolExchanged  implements Serializable {
      * @param clientPool client pool.
      */
     public void syncWithClientPool(DatasetPoolExchanged clientPool) {
+    	this.fillMissingUUID();
     	if (clientPool == null) return;
     	
 		List<DatasetPairExchanged> removedList = Util.newList();
 		for (DatasetPairExchanged pair : this.dspList) {
-			if (!clientPool.containsPairUUID(pair)) removedList.add(pair);
+			if (clientPool.findByTrainingUUID(pair.trainingUUID) == null) removedList.add(pair);
 		}
 		for (DatasetPairExchanged pair : removedList) {
 			this.dspList.remove(pair);
 			pair.unexport(true);
 		}
 
-		for (DatasetPairExchanged pair : clientPool.dspList) {
-			if (pair.training == null || pair.testing == null) continue;
-			if (pair.wholeUUID != null && pair.whole == null) continue;
+		List<DatasetPairExchanged> newDspList = Util.newList();
+		for (DatasetPairExchanged clientPair : clientPool.dspList) {
+			if (clientPair.trainingUUID == null && clientPair.training == null) continue;
+			if (clientPair.testingUUID == null && clientPair.testing == null) continue;
 			
-			if (!containsPairUUID(pair)) this.dspList.add(pair);
+			DatasetPairExchanged found = this.findByTrainingUUID(clientPair.trainingUUID);
+			if (found != null)
+				newDspList.add(found);
+			else if (clientPair.training != null && clientPair.testing != null)
+				newDspList.add(clientPair);
 		}
 		
+		this.dspList.clear();
+		this.dspList.addAll(newDspList);
+		this.fillMissingUUID();
     }
     
     
-    /**
-     * Checking whether containing the specified pair.
-     * @param pair specified pair.
-     * @return whether containing the specified pair.
-     */
-    private boolean containsPairUUID(DatasetPairExchanged pair) {
-    	return pair != null && containsTrainingUUID(pair.trainingUUID) && containsTestingUUID(pair.testingUUID);
-    }
-    
-    
-	/**
-	 * Checking whether containing training UUID.
-	 * @param trainingUUID training UUID;
-	 * @return whether containing training UUID.
-	 */
-	private boolean containsTrainingUUID(UUID trainingUUID) {
-		if (trainingUUID == null) return false;
-		for (DatasetPairExchanged pair : dspList) {
-			if (pair != null && pair.trainingUUID != null && pair.trainingUUID.equals(trainingUUID))
-				return true; 
-		}
-		return false;
-	}
-	
-	
-	/**
-	 * Checking whether containing testing UUID.
-	 * @param testingUUID testing UUID;
-	 * @return whether containing testing UUID.
-	 */
-	private boolean containsTestingUUID(UUID testingUUID) {
-		if (testingUUID == null) return false;
-		for (DatasetPairExchanged pair : dspList) {
-			if (pair != null && pair.testingUUID != null && pair.testingUUID.equals(testingUUID))
-				return true; 
-		}
-		return false;
-	}
-
-	
+//    /**
+//     * Checking whether containing the specified pair.
+//     * @param pair specified pair.
+//     * @return whether containing the specified pair.
+//     */
+//    private boolean containsPairUUID(DatasetPairExchanged pair) {
+//    	return pair != null && containsTrainingUUID(pair.trainingUUID) && containsTestingUUID(pair.testingUUID);
+//    }
+//    
+//    
+//	/**
+//	 * Checking whether containing training UUID.
+//	 * @param trainingUUID training UUID;
+//	 * @return whether containing training UUID.
+//	 */
+//	private boolean containsTrainingUUID(UUID trainingUUID) {
+//		if (trainingUUID == null) return false;
+//		for (DatasetPairExchanged pair : dspList) {
+//			if (pair != null && pair.trainingUUID != null && pair.trainingUUID.equals(trainingUUID))
+//				return true; 
+//		}
+//		return false;
+//	}
+//	
+//	
+//	/**
+//	 * Checking whether containing testing UUID.
+//	 * @param testingUUID testing UUID;
+//	 * @return whether containing testing UUID.
+//	 */
+//	private boolean containsTestingUUID(UUID testingUUID) {
+//		if (testingUUID == null) return false;
+//		for (DatasetPairExchanged pair : dspList) {
+//			if (pair != null && pair.testingUUID != null && pair.testingUUID.equals(testingUUID))
+//				return true; 
+//		}
+//		return false;
+//	}
+//
+//	
 }

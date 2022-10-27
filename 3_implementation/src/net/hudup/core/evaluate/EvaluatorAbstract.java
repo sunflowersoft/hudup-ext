@@ -2238,7 +2238,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 			this.otherResult,
 			this.poolResult,
 			this.evInfo,
-			null),
+			new Timestamp()),
 			null);
 	}
 
