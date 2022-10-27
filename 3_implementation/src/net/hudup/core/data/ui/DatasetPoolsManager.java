@@ -269,21 +269,41 @@ public class DatasetPoolsManager extends JDialog {
 
 			@Override
 			public boolean removeSelectedRows() {
+				DatasetPoolExchangedItem item = poolList.getSelectedValue();
+				if (item == null) return false;
 				boolean ret = super.removeSelectedRows();
 				if (!ret) return false;
-
 				updateLocalServicePool();
 				
 				enableControls(true);
-				JOptionPane.showMessageDialog(this, "Remove rows successfully.\nYou need to upload/scatter the pool change.", "Remove successfully rows", JOptionPane.INFORMATION_MESSAGE);
-				
+				JOptionPane.showMessageDialog(this, "Remove rows successfully.\nYou should upload/scatter the pool change.", "Remove successfully rows", JOptionPane.INFORMATION_MESSAGE);
 				return ret;
 			}
 			
 			@Override
-			protected void moveRow(int start, int end, int to) {
-				super.moveRow(start, end, to);
+			public boolean moveRow(int start, int end, int to) {
+				DatasetPoolExchangedItem item = poolList.getSelectedValue();
+				if (item == null) return false;
+				boolean ret = super.moveRow(start, end, to);
+				if (!ret) return false;
 				updateLocalServicePool();
+				
+				enableControls(true);
+				JOptionPane.showMessageDialog(this, "Move rows successfully.\nYou should upload/scatter the pool change.", "Move successfully rows", JOptionPane.INFORMATION_MESSAGE);
+				return ret;
+			}
+
+			@Override
+			public boolean reverseRows() {
+				DatasetPoolExchangedItem item = poolList.getSelectedValue();
+				if (item == null) return false;
+				boolean ret = super.reverseRows();
+				if (!ret) return false;
+				updateLocalServicePool();
+				
+				enableControls(true);
+				JOptionPane.showMessageDialog(this, "Reverse rows successfully.\nYou should upload/scatter the pool change.", "Reverse successfully rows", JOptionPane.INFORMATION_MESSAGE);
+				return ret;
 			}
 
 			@Override
@@ -292,12 +312,12 @@ public class DatasetPoolsManager extends JDialog {
 			}
 
 			@Override
-			protected void addScript() {
+			public void addScript() {
 				loadBatchScript(true);
 			}
 
 			@Override
-			protected void addTraining() {
+			public void addTraining() {
 				addDataset(false, true);
 			}
 
@@ -433,7 +453,7 @@ public class DatasetPoolsManager extends JDialog {
 
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					JOptionPane.showMessageDialog(thisManager, "This function not implemented yet", "Not implemented yet", JOptionPane.INFORMATION_MESSAGE);
+					JOptionPane.showMessageDialog(thisManager, "Retrieving all clients not implemented yet", "Not implemented yet", JOptionPane.INFORMATION_MESSAGE);
 				}
 			});
 		mniAllClients.setMnemonic('c');
@@ -631,7 +651,7 @@ public class DatasetPoolsManager extends JDialog {
 		updateLocalServicePool();
 		
 		enableControls(true);
-		JOptionPane.showMessageDialog(this, "Clear successfully batch.\nYou need to upload/scatter the pool change.", "Clear successfully batch", JOptionPane.INFORMATION_MESSAGE);
+		JOptionPane.showMessageDialog(this, "Clear successfully batch.\nYou should upload/scatter the pool change.", "Clear successfully batch", JOptionPane.INFORMATION_MESSAGE);
 	}
 	
 
@@ -703,7 +723,7 @@ public class DatasetPoolsManager extends JDialog {
 			poolTable.update(pool);
 			updateLocalServicePool();
 			
-			JOptionPane.showMessageDialog(this, "Load successfully batch.\nYou need to upload/scatter the pool change.", "Load successfully batch", JOptionPane.INFORMATION_MESSAGE);
+			JOptionPane.showMessageDialog(this, "Load successfully batch.\nYou should upload/scatter the pool change.", "Load successfully batch", JOptionPane.INFORMATION_MESSAGE);
 		}
 		catch (Throwable e) {
 			LogUtil.trace(e);
@@ -809,7 +829,7 @@ public class DatasetPoolsManager extends JDialog {
 			updateLocalServicePool();
 			
 			enableControls(true);
-			JOptionPane.showMessageDialog(this, "Add dataset successfully.\nYou need to upload/scatter the pool change.", "Add successfully dataset", JOptionPane.INFORMATION_MESSAGE);
+			JOptionPane.showMessageDialog(this, "Add dataset successfully.\nYou should upload/scatter the pool change.", "Add successfully dataset", JOptionPane.INFORMATION_MESSAGE);
 		}
 		catch (Throwable e) {
 			LogUtil.trace(e);

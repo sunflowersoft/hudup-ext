@@ -169,10 +169,11 @@ public class DatasetPoolExchanged  implements Serializable {
 	 * Checking whether containing only UUID (at clients).
 	 * @return true if containing only UUID (at clients).
 	 */
-	public boolean containsOnlyTrainingTestingUUIDs() {
+	public boolean containsOnlyUUID() {
 		for (DatasetPairExchanged pair : dspList) {
 			if (pair.training == null && pair.trainingUUID != null) return true;
 			if (pair.testing == null && pair.testingUUID != null) return true;
+			if (pair.whole == null && pair.wholeUUID != null) return true;
 		}
 		
 		return false;

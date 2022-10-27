@@ -9,6 +9,7 @@ package net.hudup.core.data;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -267,6 +268,14 @@ public class DatasetPool implements Serializable {
 		
 	}
 
+	
+	/**
+	 * Reversing pairs.
+	 */
+	public void reverse() {
+		Collections.reverse(dspList);
+	}
+	
 	
 	/**
      * Clearing this dataset pool, which means that all dataset pairs are removed from this dataset pool.

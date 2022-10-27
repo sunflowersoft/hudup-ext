@@ -542,37 +542,53 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			 */
 			private static final long serialVersionUID = 1L;
 
+			/**
+			 * Updating pool.
+			 */
+			private void updatePool() {
+				clearResult();
+				if (bindUri == null) {
+					try {
+						evaluator.updatePool(guiData.pool != null ? guiData.pool.toDatasetPoolExchangedClient(connectInfo) : null, getThisGUI(), timestamp = new Timestamp());
+					} catch (Throwable e) {LogUtil.trace(e);}
+				}
+				else
+					updateMode();
+			}
+			
 			@Override
 			public boolean removeSelectedRows() {
 				boolean ret = super.removeSelectedRows();
-				
-				if (ret) {
-					clearResult();
-					
-					if (bindUri == null) {
-						try {
-							evaluator.updatePool(guiData.pool != null ? guiData.pool.toDatasetPoolExchangedClient(connectInfo) : null, getThisGUI(), timestamp = new Timestamp());
-						} catch (Throwable e) {LogUtil.trace(e);}
-					}
-					else
-						updateMode();
-				}
-				
+				if (ret) updatePool();
 				return ret;
 			}
 			
+			@Override
+			public boolean moveRow(int start, int end, int to) {
+				boolean ret = super.moveRow(start, end, to);
+				if (ret) updatePool();
+				return ret;
+			}
+
+			@Override
+			public boolean reverseRows() {
+				boolean ret = super.reverseRows();
+				if (ret) updatePool();
+				return ret;
+			}
+
 			@Override
 			public void saveScript() {
 				saveBatchScript(true);
 			}
 
 			@Override
-			protected void addScript() {
+			public void addScript() {
 				loadBatchScript(true);
 			}
 
 			@Override
-			protected void addTraining() {
+			public void addTraining() {
 				addDataset(false, true);
 			}
 

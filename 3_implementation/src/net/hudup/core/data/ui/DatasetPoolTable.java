@@ -486,6 +486,15 @@ public class DatasetPoolTable extends JTable {
 				contextMenu.add(miMoveLast);
 			}
 			
+			JMenuItem miReverse = UIUtil.makeMenuItem((String)null, "Reverse", 
+				new ActionListener() {
+					
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						reverseRows();
+					}
+				});
+			contextMenu.add(miReverse);
 		}
 
 		
@@ -506,7 +515,7 @@ public class DatasetPoolTable extends JTable {
 	 * Removing selected rows.
 	 * @return whether remove successfully.
 	 */
-	public boolean removeSelectedRows() {
+	protected boolean removeSelectedRows() {
 		int[] idxes = this.getSelectedRows();
 		if (idxes == null || idxes.length == 0) {
 			JOptionPane.showMessageDialog(
@@ -583,14 +592,33 @@ public class DatasetPoolTable extends JTable {
 	 * @param start specified starting index.
 	 * @param end specified ending index.
 	 * @param to specified location.
+	 * @return true if moving rows is successful.
 	 */
-	protected void moveRow(int start, int end, int to) {
+	protected boolean moveRow(int start, int end, int to) {
 		DatasetPoolTableModel model = getPoolTableModel();
 		DatasetPool pool = model.getPool();
 		
 		pool.moveRow(start, end, to);
 		model.update(pool);
 		setupUI();
+		
+		return true;
+	}
+	
+	
+	/**
+	 * Reversing rows.
+	 * @return true if reversing is successful.
+	 */
+	protected boolean reverseRows() {
+		DatasetPoolTableModel model = getPoolTableModel();
+		DatasetPool pool = model.getPool();
+		
+		pool.reverse();
+		model.update(pool);
+		setupUI();
+		
+		return true;
 	}
 	
 	
@@ -598,8 +626,7 @@ public class DatasetPoolTable extends JTable {
 	 * Save script.
 	 */
 	protected void saveScript() {
-		JOptionPane.showMessageDialog(this, 
-			"Saving script not implemented yet", "Not implement yet", JOptionPane.WARNING_MESSAGE);
+		JOptionPane.showMessageDialog(this, "Saving script not implemented yet", "Not implement yet", JOptionPane.WARNING_MESSAGE);
 	}
 
 	
