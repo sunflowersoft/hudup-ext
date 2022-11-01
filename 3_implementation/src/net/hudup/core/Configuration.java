@@ -135,7 +135,7 @@ public class Configuration implements Serializable {
 						return;
 					}
 					else if (!Files.exists(Paths.get(enterWorkingName))) {
-						JOptionPane.showMessageDialog(cfg, "Woring directory \"" + enterWorkingName + "\" is inexistent.", "Inexistent", JOptionPane.INFORMATION_MESSAGE);
+						JOptionPane.showMessageDialog(cfg, "Working directory \"" + enterWorkingName + "\" is inexistent.", "Inexistent", JOptionPane.INFORMATION_MESSAGE);
 						return;
 					}
 							
