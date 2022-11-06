@@ -1357,7 +1357,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 				try {
 					Metrics tempResult = evaluator.getResult();
 					if (tempResult != null) {
-						result = tempResult;
+						//result = tempResult;
 						recoveredResult = tempResult;
 					}
 				} catch (Exception e) {LogUtil.trace(e);}

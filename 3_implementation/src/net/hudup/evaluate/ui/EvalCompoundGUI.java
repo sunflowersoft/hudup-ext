@@ -410,8 +410,14 @@ public class EvalCompoundGUI extends JFrame {
 
 				@Override
 				public void actionPerformed(ActionEvent e) {
+					boolean entire = false;
+					try {
+						entire = batchEvaluateGUI.getEvaluator().remoteIsStarted() &&
+								(JOptionPane.showConfirmDialog(getThisEvalGUI(), "Do you want to retrieve entire result (slower)?", "Entire result confirmation", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION);
+					} catch (Throwable ex) {}
+					
 					MetricsTable.showDlg(getThisEvalGUI(),
-						batchEvaluateGUI.getResult(true),
+						batchEvaluateGUI.getResult(entire),
 						batchEvaluateGUI.getAlgRegTable(),
 						batchEvaluateGUI.getEvaluator());
 				}
@@ -438,7 +444,7 @@ public class EvalCompoundGUI extends JFrame {
 						return;
 					}
 					
-					if (recoveredResult == batchEvaluateGUI.getResult(false)) {
+					if (recoveredResult == batchEvaluateGUI.getResult()) {
 						JOptionPane.showMessageDialog(
 							getThisEvalGUI(), 
 							"Evaluated result is not lost and so\n it is not necessary to recover it.", 
