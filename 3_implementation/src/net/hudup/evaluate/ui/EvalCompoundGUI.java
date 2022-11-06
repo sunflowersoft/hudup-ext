@@ -222,7 +222,7 @@ public class EvalCompoundGUI extends JFrame {
 		mnFile.add(mniSaveScript);
 
 		PowerServer server = EvaluatorAbstract.getServerByPluginChangedListenersPath(batchEvaluateGUI.getEvaluator());;
-		if (server != null) {
+		if (server != null || batchEvaluateGUI.getConnectInfo().bindUri != null) {
 			mnFile.addSeparator();
 			JMenu mnDatasetPool = new JMenu(I18nUtil.message("dataset_pool"));
 			mnFile.add(mnDatasetPool);

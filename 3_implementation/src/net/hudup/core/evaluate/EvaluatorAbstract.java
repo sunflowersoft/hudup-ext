@@ -1191,6 +1191,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 		
 		DatasetPool returnedPool = null;
 		if (evInfo.isRefPoolResult) {
+			//Returned pool here and in this implementation is not important.
 			returnedPool = this.poolResult != null ? this.poolResult.toDatasetPool(null) : new DatasetPool();
 			returnedPool.fillMissingUUID();
 		}

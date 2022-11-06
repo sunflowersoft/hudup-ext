@@ -50,6 +50,7 @@ import net.hudup.core.alg.ui.AlgListBox;
 import net.hudup.core.alg.ui.AlgListBox.AlgListChangedEvent;
 import net.hudup.core.alg.ui.AlgListChooser;
 import net.hudup.core.client.ConnectInfo;
+import net.hudup.core.client.Connector;
 import net.hudup.core.client.PowerServer;
 import net.hudup.core.client.Service;
 import net.hudup.core.client.ServiceExt;
@@ -1891,7 +1892,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			}
 			
 			try {
-				evaluator.refPool(true, poolItem.getPool(), poolItem.getName(), this, timestamp = new Timestamp());
+				evaluator.refPool(true, poolItem.getPool(), poolItem.getName(), null, timestamp = new Timestamp());
 				poolItem.addClient(evaluator);
 			} catch (Throwable e) {LogUtil.trace(e);}
 		}
@@ -1923,7 +1924,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 				return;
 			}
 
-			evaluator.refPool(false, null, null, this, timestamp = new Timestamp());
+			evaluator.refPool(false, null, null, null, timestamp = new Timestamp());
 			poolsService.removeClient(evaluator, false);
 		}
 		catch (Throwable e) {
@@ -1971,8 +1972,10 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 				return;
 			}
 			
+			//Calling toDatasetPool() aims to remove null (remote) datasets have only UUIDs; therefore, only real full datasets will be put to pool service.
+			//This work-around solution will be improved in the next version. 
 			DatasetPoolExchanged exchangedPool = guiData.pool.toDatasetPoolExchanged().toDatasetPool(null).toDatasetPoolExchanged();
-			evaluator.updatePoolWithoutClear(null, this, timestamp = new Timestamp());
+			evaluator.updatePoolWithoutClear(null, null, timestamp = new Timestamp());
 			if (poolsService.put(name, exchangedPool)) {
 				JOptionPane.showMessageDialog(this, "Successfull to put this pool \"" + DSUtil.shortenVerbalName(name) + "\"", "Successfull to put pool", JOptionPane.INFORMATION_MESSAGE);
 			}
@@ -1990,20 +1993,28 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 	 */
 	private DatasetPoolsService retrievePoolsService() {
 		PowerServer server = EvaluatorAbstract.getServerByPluginChangedListenersPath(this.evaluator);;
-		if (server == null) return null;
-		
+		Service service = null;
+		ConnectInfo connectInfo = null;
 		try {
-			Service service = server.getService();
+			if (server == null) {
+				Connector connector = Connector.connect();
+				service = connector.getService();
+				connectInfo = connector.getConnectInfo();
+			}
+			else
+				service = server.getService();
 			if (service == null || !(service instanceof ServiceExt)) return null;
 			
 			DatasetPoolsService poolsService = null;
 			if (service instanceof ExtendedService)
 				poolsService = ((ExtendedService)service).getDatasetPoolsService();
-			else {
+			else if (connectInfo == null) {
 				LoginDlg login = new LoginDlg(this, "Enter user name and password");
 				if (!login.wasLogin()) return null;
 				poolsService = ((ServiceExt)service).getDatasetPoolsService(login.getUsername(), login.getPassword());
 			}
+			else
+				poolsService = ((ServiceExt)service).getDatasetPoolsService(connectInfo.account.getName(), connectInfo.account.getPassword());
 			
 			return poolsService;
 		}

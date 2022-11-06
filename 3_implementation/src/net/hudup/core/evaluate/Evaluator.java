@@ -674,7 +674,7 @@ public interface Evaluator extends Remote, RemoteRunner, SetupAlgListener, Plugi
     
     
     /**
-     * Getting the internal referred service.
+     * Getting the internal referred service. Referred service often creates or manages this evaluator.
      * @return the internal referred service.
      * @throws RemoteException if any error raises.
      */
@@ -682,7 +682,7 @@ public interface Evaluator extends Remote, RemoteRunner, SetupAlgListener, Plugi
     
     
     /**
-     * Setting the internal referred service.
+     * Setting the internal referred service. Referred service often creates or manages this evaluator.
      * @param referredService the internal referred service.
      * @throws RemoteException if any error raises.
      */
