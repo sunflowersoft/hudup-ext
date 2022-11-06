@@ -1348,7 +1348,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 		}
 		
 		
-		result = evt.getMetrics();
+		result = evt.getMetrics(); //The expression result = evaluator.getResult() is more accurate but slower.
 		if (result != null) recoveredResult = result; 
 		if (evt.getType() == Type.done || evt.getType() == Type.done_one) {
 			if (evt.getType() == Type.done)
@@ -1356,7 +1356,10 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			else if (evt.getType() == Type.done_one) { //Limiting connect to server.
 				try {
 					Metrics tempResult = evaluator.getResult();
-					if (tempResult != null) recoveredResult = tempResult;
+					if (tempResult != null) {
+						result = tempResult;
+						recoveredResult = tempResult;
+					}
 				} catch (Exception e) {LogUtil.trace(e);}
 			}
 		}

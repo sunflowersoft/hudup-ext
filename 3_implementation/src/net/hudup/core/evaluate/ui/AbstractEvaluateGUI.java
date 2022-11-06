@@ -435,9 +435,21 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 	
 	/**
 	 * Getting evaluated result.
+	 * @param alsoUpdate also updating current result.
 	 * @return evaluated result.
 	 */
-	public Metrics getResult() {
+	public Metrics getResult(boolean alsoUpdate) {
+		if (evaluator == null || !alsoUpdate) return result;
+		
+		try {
+			Metrics tempResult = evaluator.getResult();
+			if (tempResult != null) {
+				result = tempResult;
+				recoveredResult = tempResult;
+			}
+
+		} catch (Throwable e) {LogUtil.trace(e);}
+		
 		return result;
 	}
 	

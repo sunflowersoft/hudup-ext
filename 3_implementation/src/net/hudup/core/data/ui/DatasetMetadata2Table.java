@@ -28,6 +28,7 @@ import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Dataset;
 import net.hudup.core.data.DatasetAbstract;
 import net.hudup.core.data.DatasetMetadata2;
+import net.hudup.core.data.DatasetUtil;
 import net.hudup.core.logistic.ClipboardUtil;
 import net.hudup.core.logistic.MathUtil;
 import net.hudup.core.logistic.ui.TextArea;
@@ -147,10 +148,11 @@ public class DatasetMetadata2Table extends JTable {
 		info.setEditable(false);
 		dlg.add(new JScrollPane(info), BorderLayout.SOUTH);
 		StringBuffer infoBuffer = new StringBuffer();
+		infoBuffer.append("Remote: " + DatasetUtil.isRemote(dataset));
 		if (dataset.getConfig() != null) {
 			DataConfig config = dataset.getConfig();
 			if (config.containsKey(DatasetAbstract.HARDWARE_ADDR_FIELD)) {
-				infoBuffer.append("Hardware address: " + config.getAsString(DatasetAbstract.HARDWARE_ADDR_FIELD));
+				infoBuffer.append("\nHardware address: " + config.getAsString(DatasetAbstract.HARDWARE_ADDR_FIELD));
 			}
 			if (config.containsKey(DatasetAbstract.HOST_ADDR_FIELD)) {
 				infoBuffer.append("\nHost address: " + config.getAsString(DatasetAbstract.HOST_ADDR_FIELD));

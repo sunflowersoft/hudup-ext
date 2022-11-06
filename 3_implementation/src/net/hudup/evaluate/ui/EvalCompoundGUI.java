@@ -411,7 +411,7 @@ public class EvalCompoundGUI extends JFrame {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					MetricsTable.showDlg(getThisEvalGUI(),
-						batchEvaluateGUI.getResult(),
+						batchEvaluateGUI.getResult(true),
 						batchEvaluateGUI.getAlgRegTable(),
 						batchEvaluateGUI.getEvaluator());
 				}
@@ -438,7 +438,7 @@ public class EvalCompoundGUI extends JFrame {
 						return;
 					}
 					
-					if (recoveredResult == batchEvaluateGUI.getResult()) {
+					if (recoveredResult == batchEvaluateGUI.getResult(false)) {
 						JOptionPane.showMessageDialog(
 							getThisEvalGUI(), 
 							"Evaluated result is not lost and so\n it is not necessary to recover it.", 
