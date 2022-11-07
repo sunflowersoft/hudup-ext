@@ -140,7 +140,7 @@ public class ClientWrapper implements Serializable, java.lang.AutoCloseable {
 			try {
 				Evaluator evaluator = (Evaluator)client;
 				evaluator.remoteStop();
-				evaluator.refPool(false, null, auxName, null, null);
+				evaluator.refPool(false, (DatasetPoolsService)null, null, null, new Timestamp());
 			}
 			catch (Throwable e) {LogUtil.trace(e);}
 		}

@@ -1895,7 +1895,10 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 			}
 			
 			try {
-				evaluator.refPool(true, poolItem.getPool(), poolItem.getName(), null, timestamp = new Timestamp());
+				if (connectInfo.bindUri == null)
+					evaluator.refPool(true, poolItem.getPool(), poolItem.getName(), null, timestamp = new Timestamp());
+				else
+					evaluator.refPool(true, poolItem.getName(), null, timestamp = new Timestamp());
 				poolItem.addClient(evaluator);
 			} catch (Throwable e) {LogUtil.trace(e);}
 		}
@@ -1927,7 +1930,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 				return;
 			}
 
-			evaluator.refPool(false, null, null, null, timestamp = new Timestamp());
+			evaluator.refPool(false, (DatasetPoolsService)null, null, null, timestamp = new Timestamp());
 			poolsService.removeClient(evaluator, false);
 		}
 		catch (Throwable e) {

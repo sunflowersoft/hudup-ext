@@ -73,7 +73,7 @@ public class StatusBar extends JPanel {
 					ctxMenu.show((Component)e.getSource(), e.getX(), e.getY());
 				}
 				else if(e.getClickCount() >= 2) {
-					showEvaluateProgress();
+					showProgress();
 				}
 			}
 		});
@@ -84,15 +84,15 @@ public class StatusBar extends JPanel {
 	 * Creating context menu.
 	 * @return context menu.
 	 */
-	private final JPopupMenu createContextMenu() {
+	protected JPopupMenu createContextMenu() {
 		JPopupMenu ctxMenu = new JPopupMenu();
 		
-		JMenuItem miShow = new JMenuItem(I18nUtil.message("show_evaluate_progress"));
+		JMenuItem miShow = new JMenuItem(I18nUtil.message("show_progress"));
 		miShow.addActionListener( 
 			new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					showEvaluateProgress();
+					showProgress();
 				}
 			});
 		ctxMenu.add(miShow);
@@ -102,9 +102,9 @@ public class StatusBar extends JPanel {
 	
 	
 	/**
-	 * Showing evaluation progress.
+	 * Showing progress.
 	 */
-	private void showEvaluateProgress() {
+	protected void showProgress() {
 		JDialog dlgShow = new JDialog(UIUtil.getDialogForComponent(this), false);
 		dlgShow.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		dlgShow.setSize(800, 100);

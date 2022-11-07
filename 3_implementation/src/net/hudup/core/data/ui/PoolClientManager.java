@@ -26,6 +26,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
+import javax.swing.table.TableColumnModel;
 
 import net.hudup.core.Util;
 import net.hudup.core.data.ClientWrapper;
@@ -152,7 +153,7 @@ public class PoolClientManager extends JDialog {
 	private void onApply() {
 		if (!tblPoolClient.isModified()) return;
 		
-		List<ClientWrapper> clients = tblPoolClient.getPoolClientTM().getClients(false);
+		List<ClientWrapper> clients = tblPoolClient.getClients(false);
 		for (ClientWrapper client : clients) {
 			try {
 				client.close();
@@ -242,10 +243,11 @@ class PoolClientTable extends SortableSelectableTable {
 	protected void init() {
 		super.init();
 		
-		if (getColumnModel().getColumnCount() > 1) {
-			getColumnModel().getColumn(1).setMaxWidth(0);
-			getColumnModel().getColumn(1).setMinWidth(0);
-			getColumnModel().getColumn(1).setPreferredWidth(0);
+		TableColumnModel tcm = getColumnModel();
+		if (tcm.getColumnCount() > PoolClientTM.CLIENT_OBJECT_INDEX) {
+			tcm.getColumn(PoolClientTM.CLIENT_OBJECT_INDEX).setMaxWidth(0);
+			tcm.getColumn(PoolClientTM.CLIENT_OBJECT_INDEX).setMinWidth(0);
+			tcm.getColumn(PoolClientTM.CLIENT_OBJECT_INDEX).setPreferredWidth(0);
 		}
 	}
 
@@ -276,11 +278,11 @@ class PoolClientTable extends SortableSelectableTable {
 	private void resetClient() {
 		int selectedRow = getSelectedRow();
 		if (selectedRow < 0) return;
-		ClientWrapper client = (ClientWrapper)getValueAt(selectedRow, 1);
+		ClientWrapper client = (ClientWrapper)getValueAt(selectedRow, PoolClientTM.CLIENT_OBJECT_INDEX);
 		if (client == null) return;
 		
 		client.reset();
-		setValueAt(client.getStatus(), selectedRow, 2);
+		setValueAt(client.getStatus(), selectedRow, PoolClientTM.STATUS_INDEX);
 	}
 	
 	
@@ -301,6 +303,24 @@ class PoolClientTable extends SortableSelectableTable {
 		return getPoolClientTM().isModified();
 	}
 	
+	
+	/**
+	 * Getting clients
+	 * @param attached attaching flag.
+	 * @return clients with attaching flag.
+	 */
+	protected List<ClientWrapper> getClients(boolean attached) {
+		List<ClientWrapper> clients = Util.newList();
+		for (int i = 0; i < getRowCount(); i++) {
+			ClientWrapper client = (ClientWrapper)getValueAt(i, PoolClientTM.CLIENT_OBJECT_INDEX);
+			boolean attachedIndicator = (boolean)getValueAt(i, PoolClientTM.ATTACHED_INDEX);
+			if (client != null && attachedIndicator == attached) clients.add(client);
+		}
+		
+		return clients;
+	}
+	
+	
 }
 
 
@@ -318,6 +338,24 @@ class PoolClientTM extends SortableSelectableTableModel {
 	 * Serial version UID for serializable class. 
 	 */
 	private static final long serialVersionUID = 1L;
+	
+	
+	/**
+	 * Object index 1.
+	 */
+	protected static final int CLIENT_OBJECT_INDEX = 1;
+
+	
+	/**
+	 * Status index.
+	 */
+	protected static final int STATUS_INDEX = 2;
+
+	
+	/**
+	 * Attached index.
+	 */
+	protected static final int ATTACHED_INDEX = 3;
 	
 	
 	/**
@@ -358,13 +396,8 @@ class PoolClientTM extends SortableSelectableTableModel {
 		for (int i = 0; i < pdeItem.getClientSize(); i++) {
 			try {
 				ClientWrapper client = pdeItem.getClient(i);
-				Vector<Object> row = Util.newVector();
-				row.add(client.getName());
-				row.add(client);
-				row.add(client.getStatus());
-				row.add(true);
-				
-				data.add(row);
+				Vector<Object> row = toRow(client);
+				if (row != null) data.add(row);
 			} catch (Exception e) {LogUtil.trace(e);}
 		}
 		
@@ -382,27 +415,10 @@ class PoolClientTM extends SortableSelectableTableModel {
 	
 	
 	/**
-	 * Getting clients
-	 * @param attached attaching flag.
-	 * @return clients with attaching flag.
-	 */
-	protected List<ClientWrapper> getClients(boolean attached) {
-		List<ClientWrapper> clients = Util.newList();
-		for (int i = 0; i < getRowCount(); i++) {
-			ClientWrapper client = (ClientWrapper)getValueAt(i, 1);
-			boolean attachedIndicator = (boolean)getValueAt(i, 3);
-			if (client != null && attachedIndicator == attached) clients.add(client);
-		}
-		
-		return clients;
-	}
-	
-	
-	/**
 	 * Creating a string vector for columns of this model.
 	 * @return a string vector for columns of this model, specified by {@link Vector} of string.
 	 */
-	protected Vector<String> toColumns() {
+	protected static Vector<String> toColumns() {
 		Vector<String> columns = Util.newVector();
 		columns.add("Client");
 		columns.add("Client object");
@@ -414,6 +430,24 @@ class PoolClientTM extends SortableSelectableTableModel {
 
 
 	/**
+	 * Create row from client.
+	 * @param client specified client.
+	 * @return row created from client.
+	 */
+	protected static Vector<Object> toRow(ClientWrapper client) {
+		if (client == null) return null;
+		
+		Vector<Object> row = Util.newVector();
+		row.add(client.getName());
+		row.add(client);
+		row.add(client.getStatus());
+		row.add(true);
+		
+		return row;
+	}
+	
+	
+	/**
 	 * Testing whether this model is modified.
 	 * @return whether model is modified.
 	 */
@@ -424,7 +458,7 @@ class PoolClientTM extends SortableSelectableTableModel {
 	
 	@Override
 	public Class<?> getColumnClass(int columnIndex) {
-		if (columnIndex == 3)
+		if (columnIndex == ATTACHED_INDEX)
 			return Boolean.class;
 		else
 			return super.getColumnClass(columnIndex);
@@ -435,7 +469,7 @@ class PoolClientTM extends SortableSelectableTableModel {
 	public boolean isCellEditable(int row, int column) {
 		if (!isEditable())
 			return false;
-		else if (column == 3)
+		else if (column == ATTACHED_INDEX)
 			return true;
 		else
 			return false;

@@ -201,6 +201,18 @@ public class DatasetPoolExchangedItem implements Serializable, Comparable<Datase
 	
 	
 	/**
+	 * Removing and releasing specified client.
+	 * @param client specified client.
+	 * @return true if removing and releasing client are successful.
+	 */
+	public boolean removeReleaseClient(ClientWrapper client) {
+		boolean ret1 = releaseClient(client);
+		boolean ret2 = clients.remove(client);
+		return ret1 && ret2;
+	}
+
+	
+	/**
 	 * Releasing client.
 	 * @param client specified client.
 	 * @return true if releasing client is successful.

@@ -25,6 +25,7 @@ import net.hudup.core.client.ClassProcessor;
 import net.hudup.core.client.Service;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.DatasetPoolExchanged;
+import net.hudup.core.data.DatasetPoolsService;
 import net.hudup.core.data.Simplify;
 import net.hudup.core.logistic.BaseClass;
 import net.hudup.core.logistic.CounterElapsedTimeEvent;
@@ -1042,6 +1043,18 @@ public class EvaluatorWrapperExt implements Evaluator, EvaluatorListener, Evalua
 	@Override
 	public boolean refPool(boolean ref, DatasetPoolExchanged refPool, String refName, EvaluatorListener localTargetListener, Timestamp timestamp) throws RemoteException {
 		return remoteEvaluator.refPool(ref, refPool, refName, localTargetListener, timestamp);
+	}
+
+
+	@Override
+	public boolean refPool(boolean ref, DatasetPoolsService poolsService, String refName, EvaluatorListener localTargetListener, Timestamp timestamp) throws RemoteException {
+		return remoteEvaluator.refPool(ref, poolsService, refName, localTargetListener, timestamp);
+	}
+
+
+	@Override
+	public boolean refPool(boolean ref, String refName, EvaluatorListener localTargetListener, Timestamp timestamp) throws RemoteException {
+		return remoteEvaluator.refPool(ref, refName, localTargetListener, timestamp);
 	}
 
 

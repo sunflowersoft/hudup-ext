@@ -26,6 +26,7 @@ import net.hudup.core.client.Service;
 import net.hudup.core.data.AutoCloseable;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.DatasetPoolExchanged;
+import net.hudup.core.data.DatasetPoolsService;
 import net.hudup.core.data.Exportable;
 import net.hudup.core.logistic.AgentSupport;
 import net.hudup.core.logistic.CounterElapsedTimeListener;
@@ -454,7 +455,7 @@ public interface Evaluator extends Remote, RemoteRunner, SetupAlgListener, Plugi
      * Setting referred pool to pool result.
      * @param ref reference flag.
      * @param refPool referred pool. If it is null, an empty pool is created.
-     * @param refName referred pool name. It can be null.
+     * @param refName referred pool name. It can be null and it is also unimportant.
      * @param localTargetListener local target listener. It can be null.
      * @param timestamp time stamp. It can be null.
      * @return true if successful.
@@ -462,6 +463,31 @@ public interface Evaluator extends Remote, RemoteRunner, SetupAlgListener, Plugi
      */
 	boolean refPool(boolean ref, DatasetPoolExchanged refPool, String refName, EvaluatorListener localTargetListener, Timestamp timestamp) throws RemoteException;
 	
+	
+    /**
+     * Setting referred pool to pool result.
+     * @param ref reference flag.
+     * @param poolsService pool service. If it is null, the referred service will be retrieved. If the retrieved service is null again, an empty pool will be created. 
+     * @param refName referred pool name. It can be null. If it is null, an empty pool will be created.
+     * @param localTargetListener local target listener. It can be null.
+     * @param timestamp time stamp. It can be null.
+     * @return true if successful.
+     * @throws RemoteException if any error raises.
+     */
+	boolean refPool(boolean ref, DatasetPoolsService poolsService, String refName, EvaluatorListener localTargetListener, Timestamp timestamp) throws RemoteException;
+	
+	
+    /**
+     * Setting referred pool to pool result.
+     * @param ref reference flag.
+     * @param refName referred pool name. It can be null. If it is null, an empty pool will be created.
+     * @param localTargetListener local target listener. It can be null.
+     * @param timestamp time stamp. It can be null.
+     * @return true if successful.
+     * @throws RemoteException if any error raises.
+     */
+	boolean refPool(boolean ref, String refName, EvaluatorListener localTargetListener, Timestamp timestamp) throws RemoteException;
+
 	
 	/**
 	 * Performing event task of specified listener.

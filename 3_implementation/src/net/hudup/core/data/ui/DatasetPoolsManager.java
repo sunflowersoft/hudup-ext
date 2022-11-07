@@ -453,7 +453,7 @@ public class DatasetPoolsManager extends JDialog {
 
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					JOptionPane.showMessageDialog(thisManager, "Retrieving all clients not implemented yet", "Not implemented yet", JOptionPane.INFORMATION_MESSAGE);
+					PoolClientManagerAll.show(poolsService, thisManager);
 				}
 			});
 		mniAllClients.setMnemonic('c');

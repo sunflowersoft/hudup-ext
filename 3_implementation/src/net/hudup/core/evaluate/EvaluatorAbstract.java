@@ -49,6 +49,7 @@ import net.hudup.core.data.DatasetPair;
 import net.hudup.core.data.DatasetPairExchanged;
 import net.hudup.core.data.DatasetPool;
 import net.hudup.core.data.DatasetPoolExchanged;
+import net.hudup.core.data.DatasetPoolsService;
 import net.hudup.core.data.DatasetRemoteWrapper;
 import net.hudup.core.data.DatasetUtil;
 import net.hudup.core.data.Fetcher;
@@ -73,6 +74,7 @@ import net.hudup.core.logistic.Timestamp;
 import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.xURI;
 import net.hudup.core.logistic.ui.LoginDlg;
+import net.hudup.server.ext.ExtendedService;
 
 /**
  * {@code Evaluator} is one of main objects of Hudup framework, which is responsible for executing and evaluation algorithms according to built-in and user-defined metrics.
@@ -1250,7 +1252,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 		if (this.poolResult != null && !this.evInfo.isRefPoolResult) this.poolResult.unexport(true);
 		this.poolResult = ref ? (refPool != null ? refPool : new DatasetPoolExchanged()) : new DatasetPoolExchanged();
 		this.evInfo.isRefPoolResult = ref;
-		this.evInfo.refPoolResultName = refName;
+		this.evInfo.refPoolResultName = ref ? refName : null;
 		
 		fireEvaluatorEvent(new EvaluatorEvent(
 			this, 
@@ -1264,6 +1266,50 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 	}
 
 	
+	@Override
+	public boolean refPool(boolean ref, DatasetPoolsService poolsService, String refName, EvaluatorListener localTargetListener, Timestamp timestamp) throws RemoteException {
+		if (isStarted() || this.evPool != null) {
+			LogUtil.error("Evaluator is running and so it cannot update pool");
+			return false;
+		}
+		if (this.evInfo.isRefPoolResult == ref)
+			return false;
+		
+		if (poolsService == null) poolsService = getDatasetPoolsService();
+		
+		if (this.poolResult != null && !this.evInfo.isRefPoolResult) this.poolResult.unexport(true);
+		if (poolsService == null || refName == null || !ref)
+			this.poolResult = new DatasetPoolExchanged();
+		else {
+			try {
+				this.poolResult = poolsService.get(refName).getPool();
+			}
+			catch (Throwable e) {
+				this.poolResult = new DatasetPoolExchanged();
+				LogUtil.trace(e);
+			}
+		}
+		this.evInfo.isRefPoolResult = ref;
+		this.evInfo.refPoolResultName = ref ? refName : null;;
+
+		fireEvaluatorEvent(new EvaluatorEvent(
+			this, 
+			ref ? EvaluatorEvent.Type.ref_pool : EvaluatorEvent.Type.unref_pool,
+			this.otherResult,
+			this.poolResult,
+			this.evInfo,
+			timestamp),
+			localTargetListener);
+		return true;
+	}
+
+
+	@Override
+	public boolean refPool(boolean ref, String refName, EvaluatorListener localTargetListener, Timestamp timestamp) throws RemoteException {
+		return refPool(ref, getDatasetPoolsService(), refName, localTargetListener, timestamp);
+	}
+
+
 	/*
 	 * This method only clears parameters.
 	 */
@@ -2268,6 +2314,18 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 	}
 
 
+	/**
+	 * Getting pool service.
+	 * @return pool service.
+	 */
+	public DatasetPoolsService getDatasetPoolsService() {
+		if ((referredService == null) || !(referredService instanceof ExtendedService))
+			return null;
+		else
+			return ((ExtendedService)referredService).getDatasetPoolsService();
+	}
+	
+	
 	/**
 	 * Extracting information from specified evaluation progress event.
 	 * @param evt specified evaluation progress event.
