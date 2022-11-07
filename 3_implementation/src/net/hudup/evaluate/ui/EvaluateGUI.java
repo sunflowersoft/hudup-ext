@@ -70,6 +70,7 @@ import net.hudup.core.data.ui.DatasetTextField;
 import net.hudup.core.evaluate.EvaluateEvent;
 import net.hudup.core.evaluate.EvaluateEvent.Type;
 import net.hudup.core.evaluate.EvaluateInfo;
+import net.hudup.core.evaluate.EvaluateInfoPersit;
 import net.hudup.core.evaluate.EvaluateProgressEvent;
 import net.hudup.core.evaluate.Evaluator;
 import net.hudup.core.evaluate.EvaluatorAbstract;
@@ -1480,7 +1481,9 @@ public class EvaluateGUI extends AbstractEvaluateGUI {
 				guiData.pool = new DatasetPool();
 			DatasetPoolExchanged poolResult = evt.getPoolResult();
 			if (poolResult != null) guiData.pool.add(poolResult.toDatasetPoolClient());
-			guiData.isRefPool = evt.getEvInfo().isRefPoolResult;
+			EvaluateInfoPersit evInfo = evt.getEvInfo();
+			guiData.isRefPool = evInfo.isRefPoolResult;
+			guiData.refPoolName = evInfo.refPoolResultName;
 			
 			if (guiData.pool.size() > 0) {
 				txtTrainingBrowse.setDataset(guiData.pool.get(0).getTraining(), false);

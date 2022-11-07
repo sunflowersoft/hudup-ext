@@ -37,6 +37,7 @@ import net.hudup.core.data.DatasetPoolExchanged;
 import net.hudup.core.data.Exportable;
 import net.hudup.core.evaluate.EvaluateEvent;
 import net.hudup.core.evaluate.EvaluateInfo;
+import net.hudup.core.evaluate.EvaluateInfoPersit;
 import net.hudup.core.evaluate.EvaluateListener;
 import net.hudup.core.evaluate.EvaluateProcessor;
 import net.hudup.core.evaluate.EvaluateProgressEvent;
@@ -338,7 +339,9 @@ public abstract class AbstractEvaluateGUI extends JPanel implements EvaluatorLis
 		}
 		
 		try {
-			guiData.isRefPool = this.evaluator.getInfo().isRefPoolResult; //From server
+			EvaluateInfoPersit evInfo = this.evaluator.getInfo(); //From server
+			guiData.isRefPool = evInfo.isRefPoolResult;
+			guiData.refPoolName = evInfo.refPoolResultName;
 		} catch (RemoteException e) {LogUtil.trace(e);}
 
 		if (connectInfo.bindUri == null) {

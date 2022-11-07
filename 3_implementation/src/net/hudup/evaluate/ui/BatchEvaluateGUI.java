@@ -60,7 +60,6 @@ import net.hudup.core.data.Dataset;
 import net.hudup.core.data.DatasetPair;
 import net.hudup.core.data.DatasetPool;
 import net.hudup.core.data.DatasetPoolExchanged;
-import net.hudup.core.data.DatasetPoolExchangedItem;
 import net.hudup.core.data.DatasetPoolsService;
 import net.hudup.core.data.DatasetUtil2;
 import net.hudup.core.data.NullPointer;
@@ -70,6 +69,7 @@ import net.hudup.core.data.ui.DatasetPoolsManager;
 import net.hudup.core.evaluate.EvaluateEvent;
 import net.hudup.core.evaluate.EvaluateEvent.Type;
 import net.hudup.core.evaluate.EvaluateInfo;
+import net.hudup.core.evaluate.EvaluateInfoPersit;
 import net.hudup.core.evaluate.EvaluateProgressEvent;
 import net.hudup.core.evaluate.Evaluator;
 import net.hudup.core.evaluate.EvaluatorAbstract;
@@ -1311,7 +1311,9 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 				guiData.pool = new DatasetPool();
 			DatasetPoolExchanged poolResult = evt.getPoolResult();
 			if (poolResult != null) guiData.pool.add(poolResult.toDatasetPoolClient());
-			guiData.isRefPool = evt.getEvInfo().isRefPoolResult;
+			EvaluateInfoPersit evInfo = evt.getEvInfo();
+			guiData.isRefPool = evInfo.isRefPoolResult;
+			guiData.refPoolName = evInfo.refPoolResultName;
 			
 			tblDatasetPool.update(guiData.pool);
 			
@@ -1888,18 +1890,14 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 				return;
 			}
 			DatasetPoolsManager manager = DatasetPoolsManager.show(poolsService, connectInfo, this);
-			DatasetPoolExchangedItem poolItem = manager.getSelectedPool();
-			if (poolItem == null) {
+			String poolName = manager.getSelectedPoolName();
+			if (poolName == null) {
 				JOptionPane.showMessageDialog(this, "Pool not selected", "Pool not selected.", JOptionPane.ERROR_MESSAGE);
 				return;
 			}
 			
 			try {
-				if (connectInfo.bindUri == null)
-					evaluator.refPool(true, poolItem.getPool(), poolItem.getName(), null, timestamp = new Timestamp());
-				else
-					evaluator.refPool(true, poolItem.getName(), null, timestamp = new Timestamp());
-				poolItem.addClient(evaluator);
+				evaluator.refPool(true, poolName, null, timestamp = new Timestamp());
 			} catch (Throwable e) {LogUtil.trace(e);}
 		}
 		catch (Throwable e) {
@@ -1913,7 +1911,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 	 * Detaching referred dataset pool.
 	 */
 	protected void detachRefDatasetPool() {
-		if (!guiData.isRefPool) {
+		if (!guiData.isRefPool || guiData.refPoolName == null) {
 			JOptionPane.showMessageDialog(this, "Dataset pool was not attached", "Dataset pool was not attached", JOptionPane.ERROR_MESSAGE);
 			return;
 		}
@@ -1924,14 +1922,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 				return;
 			}
 
-			DatasetPoolsService poolsService = retrievePoolsService();
-			if (poolsService == null) {
-				JOptionPane.showMessageDialog(this, "Cannot get pools service", "Cannot get pools service.", JOptionPane.ERROR_MESSAGE);
-				return;
-			}
-
-			evaluator.refPool(false, (DatasetPoolsService)null, null, null, timestamp = new Timestamp());
-			poolsService.removeClient(evaluator, false);
+			evaluator.refPool(false, guiData.refPoolName, null, timestamp = new Timestamp());
 		}
 		catch (Throwable e) {
 			updateMode();
@@ -1998,7 +1989,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 	 * @return pools service.
 	 */
 	private DatasetPoolsService retrievePoolsService() {
-		PowerServer server = EvaluatorAbstract.getServerByPluginChangedListenersPath(this.evaluator);;
+		PowerServer server = EvaluatorAbstract.getServerByPluginChangedListenersPath(this.evaluator);
 		Service service = null;
 		ConnectInfo connectInfo = null;
 		try {

@@ -73,13 +73,16 @@ public class DatasetPoolsServiceImpl implements DatasetPoolsService, Serializabl
 
 	@Override
 	public synchronized boolean contains(String name) throws RemoteException {
-		return poolItems.containsKey(name);
+		return name != null && poolItems.containsKey(name);
 	}
 
 
 	@Override
 	public synchronized DatasetPoolExchangedItem get(String name) throws RemoteException {
-		return poolItems.get(name);
+		if (contains(name))
+			return poolItems.get(name);
+		else
+			return null;
 	}
 
 

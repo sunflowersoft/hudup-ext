@@ -49,6 +49,7 @@ import net.hudup.core.data.DatasetPair;
 import net.hudup.core.data.DatasetPairExchanged;
 import net.hudup.core.data.DatasetPool;
 import net.hudup.core.data.DatasetPoolExchanged;
+import net.hudup.core.data.DatasetPoolExchangedItem;
 import net.hudup.core.data.DatasetPoolsService;
 import net.hudup.core.data.DatasetRemoteWrapper;
 import net.hudup.core.data.DatasetUtil;
@@ -1276,6 +1277,17 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 			return false;
 		
 		if (poolsService == null) poolsService = getDatasetPoolsService();
+		if (poolsService != null) {
+			try {
+				if (ref) {
+					DatasetPoolExchangedItem item = refName != null ? poolsService.get(refName) : null;
+					if (item != null) item.addClient(this);
+				}
+				else
+					poolsService.removeClient(this, false);
+			}
+			catch (Throwable e) {LogUtil.trace(e);}
+		}
 		
 		if (this.poolResult != null && !this.evInfo.isRefPoolResult) this.poolResult.unexport(true);
 		if (poolsService == null || refName == null || !ref)
@@ -1290,8 +1302,8 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 			}
 		}
 		this.evInfo.isRefPoolResult = ref;
-		this.evInfo.refPoolResultName = ref ? refName : null;;
-
+		this.evInfo.refPoolResultName = ref ? refName : null;
+		
 		fireEvaluatorEvent(new EvaluatorEvent(
 			this, 
 			ref ? EvaluatorEvent.Type.ref_pool : EvaluatorEvent.Type.unref_pool,
@@ -2318,11 +2330,21 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 	 * Getting pool service.
 	 * @return pool service.
 	 */
-	public DatasetPoolsService getDatasetPoolsService() {
-		if ((referredService == null) || !(referredService instanceof ExtendedService))
-			return null;
-		else
+	private DatasetPoolsService getDatasetPoolsService() {
+		if ((referredService != null) && (referredService instanceof ExtendedService))
 			return ((ExtendedService)referredService).getDatasetPoolsService();
+		
+		PowerServer server = EvaluatorAbstract.getServerByPluginChangedListenersPath(this);
+		if (server == null) return null;
+		try {
+			Service service = server.getService();
+			if ((service != null) && (service instanceof ExtendedService))
+				return ((ExtendedService)service).getDatasetPoolsService();
+			else
+				return null;
+		} catch (Throwable e) {LogUtil.trace(e);}
+		
+		return null;
 	}
 	
 	

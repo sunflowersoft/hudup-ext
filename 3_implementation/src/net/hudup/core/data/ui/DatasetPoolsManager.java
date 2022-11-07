@@ -856,6 +856,15 @@ public class DatasetPoolsManager extends JDialog {
 	
 	
 	/**
+	 * Getting selected pool name.
+	 * @return selected pool name.
+	 */
+	public String getSelectedPoolName() {
+		return selectedPool != null ? selectedPool.getName() : null;
+	}
+	
+	
+	/**
 	 * Showing pools manager.
 	 * @param poolsService pool manager.
 	 * @param connectInfo connection information.
