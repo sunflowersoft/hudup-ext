@@ -249,6 +249,7 @@ public class DatasetPoolExchanged  implements Serializable {
 	
 	/**
 	 * Converting exchanged dataset pool to normal dataset in client.
+	 * Note, in client, it is not necessary for dataset pool to contain only snapshot or scanner, it can contain wrappers as datasets. 
 	 * @return normal dataset in client.
 	 */
 	public DatasetPool toDatasetPoolClient() {
@@ -309,7 +310,7 @@ public class DatasetPoolExchanged  implements Serializable {
     	
 		List<DatasetPairExchanged> removedList = Util.newList();
 		for (DatasetPairExchanged pair : this.dspList) {
-			if (clientPool.findByTrainingUUID(pair.trainingUUID) == null) removedList.add(pair);
+			if (!clientPool.containsTrainingUUID(pair.trainingUUID)) removedList.add(pair);
 		}
 		for (DatasetPairExchanged pair : removedList) {
 			this.dspList.remove(pair);
@@ -344,19 +345,19 @@ public class DatasetPoolExchanged  implements Serializable {
 //    }
 //    
 //    
-//	/**
-//	 * Checking whether containing training UUID.
-//	 * @param trainingUUID training UUID;
-//	 * @return whether containing training UUID.
-//	 */
-//	private boolean containsTrainingUUID(UUID trainingUUID) {
-//		if (trainingUUID == null) return false;
-//		for (DatasetPairExchanged pair : dspList) {
-//			if (pair != null && pair.trainingUUID != null && pair.trainingUUID.equals(trainingUUID))
-//				return true; 
-//		}
-//		return false;
-//	}
+	/**
+	 * Checking whether containing training UUID.
+	 * @param trainingUUID training UUID;
+	 * @return whether containing training UUID.
+	 */
+	private boolean containsTrainingUUID(UUID trainingUUID) {
+		if (trainingUUID == null) return false;
+		for (DatasetPairExchanged pair : dspList) {
+			if (pair != null && pair.trainingUUID != null && pair.trainingUUID.equals(trainingUUID))
+				return true; 
+		}
+		return false;
+	}
 //	
 //	
 //	/**

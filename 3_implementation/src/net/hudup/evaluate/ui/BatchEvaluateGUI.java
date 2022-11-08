@@ -50,10 +50,6 @@ import net.hudup.core.alg.ui.AlgListBox;
 import net.hudup.core.alg.ui.AlgListBox.AlgListChangedEvent;
 import net.hudup.core.alg.ui.AlgListChooser;
 import net.hudup.core.client.ConnectInfo;
-import net.hudup.core.client.Connector;
-import net.hudup.core.client.PowerServer;
-import net.hudup.core.client.Service;
-import net.hudup.core.client.ServiceExt;
 import net.hudup.core.data.BatchScript;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.data.Dataset;
@@ -90,7 +86,6 @@ import net.hudup.core.logistic.Timestamp;
 import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.xURI;
 import net.hudup.core.logistic.ui.Light;
-import net.hudup.core.logistic.ui.LoginDlg;
 import net.hudup.core.logistic.ui.SortableSelectableTable;
 import net.hudup.core.logistic.ui.SortableSelectableTableModel;
 import net.hudup.core.logistic.ui.SortableTable;
@@ -100,7 +95,6 @@ import net.hudup.core.logistic.ui.TextField;
 import net.hudup.core.logistic.ui.TxtOutput;
 import net.hudup.core.logistic.ui.UIUtil;
 import net.hudup.core.logistic.ui.WaitDialog;
-import net.hudup.server.ext.ExtendedService;
 
 /**
  * This class represents a graphic user interface (GUI) for {@link EvaluatorAbstract} with many pairs of training dataset and testing dataset.
@@ -1884,7 +1878,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 				return;
 			}
 			
-			DatasetPoolsService poolsService = retrievePoolsService();
+			DatasetPoolsService poolsService = EvaluatorAbstract.getDatasetPoolsService(evaluator, true);
 			if (poolsService == null) {
 				JOptionPane.showMessageDialog(this, "Cannot get pools service", "Cannot get pools service.", JOptionPane.ERROR_MESSAGE);
 				return;
@@ -1954,7 +1948,7 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 				return;
 			}
 
-			DatasetPoolsService poolsService = retrievePoolsService();
+			DatasetPoolsService poolsService = EvaluatorAbstract.getDatasetPoolsService(evaluator, true);
 			if (poolsService == null) {
 				JOptionPane.showMessageDialog(this, "Cannot get pools service", "Cannot get pools service.", JOptionPane.ERROR_MESSAGE);
 				return;
@@ -1984,43 +1978,43 @@ public class BatchEvaluateGUI extends AbstractEvaluateGUI {
 	}
 	
 	
-	/**
-	 * Retrieving pools service.
-	 * @return pools service.
-	 */
-	private DatasetPoolsService retrievePoolsService() {
-		PowerServer server = EvaluatorAbstract.getServerByPluginChangedListenersPath(this.evaluator);
-		Service service = null;
-		ConnectInfo connectInfo = null;
-		try {
-			if (server == null) {
-				Connector connector = Connector.connect();
-				service = connector.getService();
-				connectInfo = connector.getConnectInfo();
-			}
-			else
-				service = server.getService();
-			if (service == null || !(service instanceof ServiceExt)) return null;
-			
-			DatasetPoolsService poolsService = null;
-			if (service instanceof ExtendedService)
-				poolsService = ((ExtendedService)service).getDatasetPoolsService();
-			else if (connectInfo == null) {
-				LoginDlg login = new LoginDlg(this, "Enter user name and password");
-				if (!login.wasLogin()) return null;
-				poolsService = ((ServiceExt)service).getDatasetPoolsService(login.getUsername(), login.getPassword());
-			}
-			else
-				poolsService = ((ServiceExt)service).getDatasetPoolsService(connectInfo.account.getName(), connectInfo.account.getPassword());
-			
-			return poolsService;
-		}
-		catch (Throwable e) {
-			LogUtil.trace(e);
-		}
-		
-		return null;
-	}
+//	/**
+//	 * Retrieving pools service.
+//	 * @return pools service.
+//	 */
+//	private DatasetPoolsService retrievePoolsService() {
+//		PowerServer server = EvaluatorAbstract.getServerByPluginChangedListenersPath(this.evaluator);
+//		Service service = null;
+//		ConnectInfo connectInfo = null;
+//		try {
+//			if (server == null) {
+//				Connector connector = Connector.connect();
+//				service = connector.getService();
+//				connectInfo = connector.getConnectInfo();
+//			}
+//			else
+//				service = server.getService();
+//			if (service == null || !(service instanceof ServiceExt)) return null;
+//			
+//			DatasetPoolsService poolsService = null;
+//			if (service instanceof ExtendedService)
+//				poolsService = ((ExtendedService)service).getDatasetPoolsService();
+//			else if (connectInfo == null) {
+//				LoginDlg login = new LoginDlg(this, "Enter user name and password");
+//				if (!login.wasLogin()) return null;
+//				poolsService = ((ServiceExt)service).getDatasetPoolsService(login.getUsername(), login.getPassword());
+//			}
+//			else
+//				poolsService = ((ServiceExt)service).getDatasetPoolsService(connectInfo.account.getName(), connectInfo.account.getPassword());
+//			
+//			return poolsService;
+//		}
+//		catch (Throwable e) {
+//			LogUtil.trace(e);
+//		}
+//		
+//		return null;
+//	}
 	
 	
 }

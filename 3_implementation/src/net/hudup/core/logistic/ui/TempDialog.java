@@ -43,7 +43,7 @@ import net.hudup.core.logistic.I18nUtil;
  * @version 1.0
  *
  */
-public class Dialog extends JDialog {
+public class TempDialog extends JDialog {
 
 	
 	/**
@@ -117,7 +117,7 @@ public class Dialog extends JDialog {
 	 * @param comp parent component
 	 * @param title specified title.
 	 */
-	public Dialog(Component comp, String title) {
+	public TempDialog(Component comp, String title) {
 		super(UIUtil.getDialogForComponent(comp), title, true);
 		
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
@@ -150,7 +150,7 @@ public class Dialog extends JDialog {
 					ctxMenu.show((Component)e.getSource(), e.getX(), e.getY());
 				}
 				else if (e.getClickCount() >= 2) {
-					doubleClick();
+					onDoubleClick();
 				}
 			}
 		});
@@ -211,7 +211,7 @@ public class Dialog extends JDialog {
 	 * @return menu bar.
 	 */
 	protected JMenuBar createMenuBar() {
-		Dialog thisApp = this;
+		TempDialog thisApp = this;
 		JMenuBar mnBar = new JMenuBar();
 		
 		JMenu mnFile = new JMenu(I18nUtil.message("file"));
@@ -243,7 +243,7 @@ public class Dialog extends JDialog {
 	 * @return context menu.
 	 */
 	protected JPopupMenu createContextMenu() {
-		Dialog thisApp = this;
+		TempDialog thisApp = this;
 		JPopupMenu ctxMenu = new JPopupMenu();
 		
 		JMenuItem miConfig = new JMenuItem("Configure");
@@ -274,7 +274,7 @@ public class Dialog extends JDialog {
 	 * @return tool bar.
 	 */
 	protected JToolBar createToolBar() {
-		Dialog thisApp = this;
+		TempDialog thisApp = this;
 		return new MovingToolbar() {
 			/**
 			 * Serial version UID for serializable class. 
@@ -312,7 +312,7 @@ public class Dialog extends JDialog {
 	/**
 	 * Event-driven method for mouse double click.
 	 */
-	protected void doubleClick() {
+	protected void onDoubleClick() {
 		JOptionPane.showMessageDialog(this, "Double click", "Double click", JOptionPane.INFORMATION_MESSAGE);
 	}
 
@@ -365,7 +365,7 @@ public class Dialog extends JDialog {
 	 * @param title specified title.
 	 */
 	public static void show(Component comp, String title) {
-		new Dialog(comp, title).setVisible(true);
+		new TempDialog(comp, title).setVisible(true);
 	}
 	
 	
@@ -374,8 +374,8 @@ public class Dialog extends JDialog {
 	 * @param args arguments.
 	 */
 	public static void main(String[] args) {
-		Dialog.show(null, "Dialog");
-		Frame.show("Frame");
+		TempDialog.show(null, "Dialog");
+		TempFrame.show("Frame");
 	}
 	
 }
@@ -389,7 +389,7 @@ public class Dialog extends JDialog {
  * @version 1.0
  *
  */
-class Frame extends JFrame {
+class TempFrame extends JFrame {
 
 	
 	/**
@@ -445,7 +445,7 @@ class Frame extends JFrame {
 	 * @param comp parent component
 	 * @param title specified title.
 	 */
-	public Frame(String title) {
+	public TempFrame(String title) {
 		super(title);
 		
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
@@ -479,7 +479,7 @@ class Frame extends JFrame {
 					ctxMenu.show((Component)e.getSource(), e.getX(), e.getY());
 				}
 				else if (e.getClickCount() >= 2) {
-					doubleClick();
+					onDoubleClick();
 				}
 			}
 		});
@@ -513,7 +513,7 @@ class Frame extends JFrame {
 	 * @return menu bar.
 	 */
 	protected JMenuBar createMenuBar() {
-		Frame thisApp = this;
+		TempFrame thisApp = this;
 		JMenuBar mnBar = new JMenuBar();
 		
 		JMenu mnFile = new JMenu(I18nUtil.message("file"));
@@ -563,7 +563,7 @@ class Frame extends JFrame {
 	 * @return context menu.
 	 */
 	protected JPopupMenu createContextMenu() {
-		Frame thisApp = this;
+		TempFrame thisApp = this;
 		JPopupMenu ctxMenu = new JPopupMenu();
 		
 		JMenuItem miConfig = new JMenuItem("Configure");
@@ -594,7 +594,7 @@ class Frame extends JFrame {
 	 * @return tool bar.
 	 */
 	protected JToolBar createToolBar() {
-		Frame thisApp = this;
+		TempFrame thisApp = this;
 		return new MovingToolbar() {
 			/**
 			 * Serial version UID for serializable class. 
@@ -641,7 +641,7 @@ class Frame extends JFrame {
 	/**
 	 * Event-driven method for mouse double click.
 	 */
-	protected void doubleClick() {
+	protected void onDoubleClick() {
 		JOptionPane.showMessageDialog(this, "Double click", "Double click", JOptionPane.INFORMATION_MESSAGE);
 	}
 	
@@ -668,7 +668,7 @@ class Frame extends JFrame {
 	 * @param title specified title.
 	 */
 	public static void show(String title) {
-		new Frame(title).setVisible(true);
+		new TempFrame(title).setVisible(true);
 	}
 	
 	

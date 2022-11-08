@@ -207,7 +207,7 @@ public class DatasetPoolsManager extends JDialog {
 			new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					addPool();
+					addNewPool();
 				}
 			});
 		btnAddPool.setMargin(new Insets(0, 0 , 0, 0));
@@ -276,7 +276,12 @@ public class DatasetPoolsManager extends JDialog {
 				updateLocalServicePool();
 				
 				enableControls(true);
-				JOptionPane.showMessageDialog(this, "Remove rows successfully.\nYou should upload/scatter the pool change.", "Remove successfully rows", JOptionPane.INFORMATION_MESSAGE);
+				if (connectInfo.bindUri == null) {
+					upload(false);
+					JOptionPane.showMessageDialog(this, "Remove rows successfully.", "Remove successfully rows", JOptionPane.INFORMATION_MESSAGE);
+				}
+				else
+					JOptionPane.showMessageDialog(this, "Remove rows successfully.\nYou should upload/scatter the pool change.", "Remove successfully rows", JOptionPane.INFORMATION_MESSAGE);
 				return ret;
 			}
 			
@@ -289,7 +294,12 @@ public class DatasetPoolsManager extends JDialog {
 				updateLocalServicePool();
 				
 				enableControls(true);
-				JOptionPane.showMessageDialog(this, "Move rows successfully.\nYou should upload/scatter the pool change.", "Move successfully rows", JOptionPane.INFORMATION_MESSAGE);
+				if (connectInfo.bindUri == null) {
+					upload(false);
+					JOptionPane.showMessageDialog(this, "Move rows successfully.", "Move successfully rows", JOptionPane.INFORMATION_MESSAGE);
+				}
+				else
+					JOptionPane.showMessageDialog(this, "Move rows successfully.\nYou should upload/scatter the pool change.", "Move successfully rows", JOptionPane.INFORMATION_MESSAGE);
 				return ret;
 			}
 
@@ -302,7 +312,12 @@ public class DatasetPoolsManager extends JDialog {
 				updateLocalServicePool();
 				
 				enableControls(true);
-				JOptionPane.showMessageDialog(this, "Reverse rows successfully.\nYou should upload/scatter the pool change.", "Reverse successfully rows", JOptionPane.INFORMATION_MESSAGE);
+				if (connectInfo.bindUri == null) {
+					upload(false);
+					JOptionPane.showMessageDialog(this, "Reverse rows successfully.", "Reverse successfully rows", JOptionPane.INFORMATION_MESSAGE);
+				}
+				else
+					JOptionPane.showMessageDialog(this, "Reverse rows successfully.\nYou should upload/scatter the pool change.", "Reverse successfully rows", JOptionPane.INFORMATION_MESSAGE);
 				return ret;
 			}
 
@@ -358,7 +373,7 @@ public class DatasetPoolsManager extends JDialog {
 			new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					upload();
+					upload(true);
 				}
 			});
 		btnUpload.setMargin(new Insets(0, 0 , 0, 0));
@@ -521,7 +536,7 @@ public class DatasetPoolsManager extends JDialog {
 	/**
 	 * Adding pool.
 	 */
-	private void addPool() {
+	private void addNewPool() {
 		String poolName = JOptionPane.showInputDialog(this, "Enter pool name", "Pool" + System.currentTimeMillis());
 		if (poolName == null || poolName.isEmpty()) return;
 		poolName = poolName.trim();
@@ -551,8 +566,9 @@ public class DatasetPoolsManager extends JDialog {
 	
 	/**
 	 * Uploading pool.
+	 * @param notice notice flag.
 	 */
-	private void upload() {
+	private void upload(boolean notice) {
 		DatasetPoolExchangedItem item = poolList.getSelectedValue();
 		if (item == null) return;
 		DatasetPool pool = poolTable.getPool();
@@ -568,10 +584,12 @@ public class DatasetPoolsManager extends JDialog {
 		
 		resetClients();
 		
-		poolList.update();
-		poolList.selectPool(poolName);
+		if (connectInfo.bindUri != null) {
+			poolList.update();
+			poolList.selectPool(poolName);
+		}
 		
-		JOptionPane.showMessageDialog(this, "Upload/scatter successfully", "Upload/scatter successfully", JOptionPane.INFORMATION_MESSAGE);
+		if (notice) JOptionPane.showMessageDialog(this, "Upload/scatter successfully", "Upload/scatter successfully", JOptionPane.INFORMATION_MESSAGE);
 	}
 	
 	
@@ -651,7 +669,12 @@ public class DatasetPoolsManager extends JDialog {
 		updateLocalServicePool();
 		
 		enableControls(true);
-		JOptionPane.showMessageDialog(this, "Clear successfully batch.\nYou should upload/scatter the pool change.", "Clear successfully batch", JOptionPane.INFORMATION_MESSAGE);
+		if (connectInfo.bindUri == null) {
+			upload(false);
+			JOptionPane.showMessageDialog(this, "Clear successfully batch.", "Clear successfully batch", JOptionPane.INFORMATION_MESSAGE);
+		}
+		else
+			JOptionPane.showMessageDialog(this, "Clear successfully batch.\nYou should upload/scatter the pool change.", "Clear successfully batch", JOptionPane.INFORMATION_MESSAGE);
 	}
 	
 
@@ -723,7 +746,13 @@ public class DatasetPoolsManager extends JDialog {
 			poolTable.update(pool);
 			updateLocalServicePool();
 			
-			JOptionPane.showMessageDialog(this, "Load successfully batch.\nYou should upload/scatter the pool change.", "Load successfully batch", JOptionPane.INFORMATION_MESSAGE);
+			enableControls(true);
+			if (connectInfo.bindUri == null) {
+				upload(false);
+				JOptionPane.showMessageDialog(this, "Load successfully batch.", "Load successfully batch", JOptionPane.INFORMATION_MESSAGE);
+			}
+			else
+				JOptionPane.showMessageDialog(this, "Load successfully batch.\nYou should upload/scatter the pool change.", "Load successfully batch", JOptionPane.INFORMATION_MESSAGE);
 		}
 		catch (Throwable e) {
 			LogUtil.trace(e);
@@ -829,7 +858,12 @@ public class DatasetPoolsManager extends JDialog {
 			updateLocalServicePool();
 			
 			enableControls(true);
-			JOptionPane.showMessageDialog(this, "Add dataset successfully.\nYou should upload/scatter the pool change.", "Add successfully dataset", JOptionPane.INFORMATION_MESSAGE);
+			if (connectInfo.bindUri == null) {
+				upload(false);
+				JOptionPane.showMessageDialog(this, "Add dataset successfully.", "Add successfully dataset", JOptionPane.INFORMATION_MESSAGE);
+			}
+			else
+				JOptionPane.showMessageDialog(this, "Add dataset successfully.\nYou should upload/scatter the pool change.", "Add successfully dataset", JOptionPane.INFORMATION_MESSAGE);
 		}
 		catch (Throwable e) {
 			LogUtil.trace(e);

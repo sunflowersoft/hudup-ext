@@ -520,7 +520,7 @@ public class DatasetPool implements Serializable {
 
 	
 	/**
-	 * Converting normal dataset pool to exchanged dataset.
+	 * Converting normal dataset pool to exchanged dataset. Exchanged pool contains wrappers.
 	 * @return exchanged dataset pool.
 	 */
 	public DatasetPoolExchanged toDatasetPoolExchanged() {
@@ -533,7 +533,7 @@ public class DatasetPool implements Serializable {
 			if (pair.training != null) {
 				if (pair.training instanceof DatasetRemoteWrapper)
 					training = (DatasetRemoteWrapper)pair.training;
-				else if (pair.training instanceof DatasetRemote)
+				else if (pair.training instanceof DatasetRemote) //Note, DatasetAbstract is also remote.
 					training = Util.getPluginManager().wrap((DatasetRemote)pair.training, false);
 				trainingUUID = training != null ? pair.trainingUUID : null;
 			}
@@ -543,7 +543,7 @@ public class DatasetPool implements Serializable {
 			if (pair.testing != null) {
 				if (pair.testing instanceof DatasetRemoteWrapper)
 					testing = (DatasetRemoteWrapper)pair.testing;
-				else if (pair.testing instanceof DatasetRemote)
+				else if (pair.testing instanceof DatasetRemote) //Note, DatasetAbstract is also remote.
 					testing = Util.getPluginManager().wrap((DatasetRemote)pair.testing, false);
 				testingUUID = testing != null ? pair.testingUUID : null;
 			}
@@ -553,7 +553,7 @@ public class DatasetPool implements Serializable {
 			if (pair.whole != null) {
 				if (pair.whole instanceof DatasetRemoteWrapper)
 					whole = (DatasetRemoteWrapper)pair.whole;
-				else if (pair.whole instanceof DatasetRemote)
+				else if (pair.whole instanceof DatasetRemote) //Note, DatasetAbstract is also remote.
 					whole = Util.getPluginManager().wrap((DatasetRemote)pair.whole, false);
 				wholeUUID = whole != null ? pair.wholeUUID : null;
 			}
@@ -575,7 +575,8 @@ public class DatasetPool implements Serializable {
 
 	
 	/**
-	 * Converting normal dataset pool to exchanged dataset from client, preparing to send to server. This method is often called by evaluator GUI.
+	 * Converting normal dataset pool to exchanged dataset from client, preparing to send to server.
+	 * Note, in client, exchanged pool should contain remote or UUIDs. This method is often called by evaluator GUI.
 	 * @return exchanged dataset pool in client.
 	 */
 	public DatasetPoolExchanged toDatasetPoolExchangedClient() {
@@ -590,7 +591,7 @@ public class DatasetPool implements Serializable {
 					training = null;
 					trainingUUID = pair.trainingUUID;
 				}
-				else if (pair.training instanceof DatasetRemote) { //AbstractDataset as usual.
+				else if (pair.training instanceof DatasetRemote) { //DatasetAbstract as usual.
 					training = (DatasetRemote)pair.training;
 					trainingUUID = pair.trainingUUID;
 					trainingUUID = trainingUUID != null ? trainingUUID : UUID.randomUUID();
@@ -604,7 +605,7 @@ public class DatasetPool implements Serializable {
 					testing = null;
 					testingUUID = pair.testingUUID;
 				}
-				else if (pair.testing instanceof DatasetRemote) { //AbstractDataset as usual.
+				else if (pair.testing instanceof DatasetRemote) { //DatasetAbstract as usual.
 					testing = (DatasetRemote)pair.testing;
 					testingUUID = pair.testingUUID;
 					testingUUID = testingUUID != null ? testingUUID : UUID.randomUUID();
@@ -618,7 +619,7 @@ public class DatasetPool implements Serializable {
 					whole = null;
 					wholeUUID = pair.wholeUUID;
 				}
-				else if (pair.whole instanceof DatasetRemote) { //AbstractDataset as usual.
+				else if (pair.whole instanceof DatasetRemote) { //DatasetAbstract as usual.
 					whole = (DatasetRemote)pair.whole;
 					wholeUUID = pair.wholeUUID;
 					wholeUUID = wholeUUID != null ? wholeUUID : UUID.randomUUID();

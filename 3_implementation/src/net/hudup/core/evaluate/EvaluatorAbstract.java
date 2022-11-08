@@ -38,6 +38,7 @@ import net.hudup.core.alg.SetupAlgEvent;
 import net.hudup.core.alg.SetupAlgListener;
 import net.hudup.core.client.ClassProcessor;
 import net.hudup.core.client.ConnectInfo;
+import net.hudup.core.client.Connector;
 import net.hudup.core.client.HudupRMIClassLoader;
 import net.hudup.core.client.PowerServer;
 import net.hudup.core.client.Service;
@@ -2327,28 +2328,6 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 
 
 	/**
-	 * Getting pool service.
-	 * @return pool service.
-	 */
-	private DatasetPoolsService getDatasetPoolsService() {
-		if ((referredService != null) && (referredService instanceof ExtendedService))
-			return ((ExtendedService)referredService).getDatasetPoolsService();
-		
-		PowerServer server = EvaluatorAbstract.getServerByPluginChangedListenersPath(this);
-		if (server == null) return null;
-		try {
-			Service service = server.getService();
-			if ((service != null) && (service instanceof ExtendedService))
-				return ((ExtendedService)service).getDatasetPoolsService();
-			else
-				return null;
-		} catch (Throwable e) {LogUtil.trace(e);}
-		
-		return null;
-	}
-	
-	
-	/**
 	 * Extracting information from specified evaluation progress event.
 	 * @param evt specified evaluation progress event.
 	 * @return information from evaluation progress event as string array.
@@ -2515,6 +2494,142 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 		return (listener != null) && (listener instanceof PowerServer) ? (PowerServer)listener : null;
 	}
 
+	
+	/**
+	 * Getting referred service by many possible ways.
+	 * @return referred service.
+	 */
+	private Service getReferredServiceExt() {
+		Service service = null;
+		try {
+			service = getReferredService();
+		} catch (Throwable e) {LogUtil.trace(e);}
+		if (service != null) return service;
+		
+		PowerServer server = EvaluatorAbstract.getServerByPluginChangedListenersPath(this);
+		if (server == null) return null;
+		try {
+			return server.getService();
+		} catch (Throwable e) {LogUtil.trace(e);}
+		
+		return null;
+	}
+	
+	
+	/**
+	 * Getting referred service.
+	 * @param evaluator specified evaluator.
+	 * @param loginIfNecessary flag to indicate whether show login dialog if necessary.
+	 * @return pool service.
+	 */
+	public static Service getReferredService(Evaluator evaluator, boolean loginIfNecessary) {
+		if (evaluator == null)
+			return null;
+		else if (evaluator instanceof EvaluatorAbstract)
+			return ((EvaluatorAbstract)evaluator).getReferredServiceExt();
+		else {
+			try {
+				Service service = evaluator.getReferredService();
+				if (service != null) return service;
+			} catch (Throwable e) {LogUtil.trace(e);}
+			
+			if (loginIfNecessary) {
+				try {
+					Connector connector = Connector.connect();
+					return connector.getService();
+				} catch (Throwable e) {LogUtil.trace(e);}
+				return null;
+			}
+			else
+				return null;
+		}
+	}
+	
+	
+	/**
+	 * Getting pool service.
+	 * @return pool service.
+	 */
+	private DatasetPoolsService getDatasetPoolsService() {
+		Service service = getReferredServiceExt();
+		if (service == null)
+			return null;
+		else if (service instanceof ExtendedService)
+			return ((ExtendedService)service).getDatasetPoolsService();
+		else
+			return null;
+	}
+	
+	
+	/**
+	 * Getting pool service given account and password.
+	 * @param account account name.
+	 * @param password account password.
+	 * @return pool service.
+	 */
+	private DatasetPoolsService getDatasetPoolsService(String account, String password) {
+		Service service = getReferredServiceExt();
+		if (service == null)
+			return null;
+		else if (service instanceof ExtendedService)
+			return ((ExtendedService)service).getDatasetPoolsService();
+		else if (service instanceof ServiceExt) {
+			try {
+				return ((ServiceExt)service).getDatasetPoolsService(account, password);
+			} catch (Throwable e) {LogUtil.trace(e);}
+			return null;
+		}
+		else
+			return null;
+	}
+
+	
+	/**
+	 * Getting pool service.
+	 * @param evaluator specified evaluator.
+	 * @param loginIfNecessary flag to indicate whether show login dialog if necessary.
+	 * @return pool service.
+	 */
+	public static DatasetPoolsService getDatasetPoolsService(Evaluator evaluator, boolean loginIfNecessary) {
+		if (evaluator == null) return null;
+		
+		DatasetPoolsService poolsService = null;
+		if (evaluator instanceof EvaluatorAbstract) {
+			poolsService = ((EvaluatorAbstract)evaluator).getDatasetPoolsService();
+			if (poolsService == null && loginIfNecessary) {
+				LoginDlg login = new LoginDlg(null, "Enter user name and password");
+				if (login.wasLogin())
+					poolsService = ((EvaluatorAbstract)evaluator).getDatasetPoolsService(login.getUsername(), login.getPassword());
+			}
+		}
+		if (poolsService != null) return poolsService;
+		if (!loginIfNecessary) return null;
+		
+		try {
+			ConnectInfo connectInfo = null;
+			Service service = evaluator.getReferredService();
+			if (service == null) {
+				Connector connector = Connector.connect();
+				service = connector.getService();
+				connectInfo = connector.getConnectInfo();
+			}
+			
+			if (service == null || !(service instanceof ServiceExt))
+				return null;
+			else if (service instanceof ExtendedService)
+				poolsService = ((ExtendedService)service).getDatasetPoolsService();
+			else if (connectInfo == null) {
+				LoginDlg login = new LoginDlg(null, "Enter user name and password");
+				if (!login.wasLogin()) return null;
+				poolsService = ((ServiceExt)service).getDatasetPoolsService(login.getUsername(), login.getPassword());
+			}
+			else
+				poolsService = ((ServiceExt)service).getDatasetPoolsService(connectInfo.account.getName(), connectInfo.account.getPassword());
+		} catch (Throwable e) {LogUtil.trace(e);}
+		
+		return poolsService;
+	}
+	
 	
 	/**
 	 * Checking whether the specified evaluator is wrapped evaluator.
