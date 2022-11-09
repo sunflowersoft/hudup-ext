@@ -767,14 +767,13 @@ public abstract class Connector extends JDialog {
 			 */
 			private static final long serialVersionUID = 1L;
 
-			@SuppressWarnings("deprecation")
 			@Override
 			protected void connect0() {
 				String host = txtHost.getText().trim();
 				int port = txtPort.getValue() instanceof Number ? ( (Number) txtPort.getValue()).intValue() : 0; 
 				String connectPath = normalizeNamingPath(txtConnectPath.getText());
 				String username = txtUsername.getText();
-				String password = txtPassword.getText();
+				String password = new String(txtPassword.getPassword());
 				
 				String myNamingPath = normalizeNamingPath(txtMyNamingPath.getText());
 				int bindPort = txtMyBindPort.getValue() instanceof Number ? ( (Number) txtMyBindPort.getValue()).intValue() : 0;

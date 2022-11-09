@@ -569,8 +569,8 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 	 * @return true if loading is successful.
 	 */
 	protected boolean onWatcherLoadLib(Path libPath) {
-		//Testing code, not important.
 		try {
+			//Testing code, not important.
 			if (libPath.getFileName() != null) {
 				String fileName = libPath.getFileName().toString();
 				if (fileName.equals(Watcher.TEST_WATCH_FILE_NAME)) {
@@ -1294,10 +1294,7 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 		try {
 			if (!Constants.CALL_FINALIZE) return;
 			shutdown();
-		}
-		catch (Throwable e) {
-			LogUtil.trace(e);
-		}
+		} catch (Throwable e) {LogUtil.errorNoLog("Finalize error: " + e.getMessage());}
 	}
 
 	

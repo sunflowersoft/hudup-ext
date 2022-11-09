@@ -370,8 +370,8 @@ public class Util {
 					instance = getPluginManager().loadClass(className, true).getDeclaredConstructor().newInstance();
 				}
 				catch (Throwable e) {
-					System.out.println("Cannot instantiate inner class " + className);
 					instance = null;
+					System.out.println("Cannot instantiate inner class " + className);
 				}
 			}
 			else

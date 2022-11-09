@@ -313,11 +313,11 @@ public class KBaseRemoteWrapper implements KBase, KBaseRemote {
 		
 		try {
 			if (!isEmpty()) close();
-		} catch (Throwable e) {LogUtil.trace(e);}
+		} catch (Throwable e) {LogUtil.errorNoLog("Finalize error: " + e.getMessage());}
 		
 		try {
 			unexport();;
-		} catch (Throwable e) {LogUtil.trace(e);}
+		} catch (Throwable e) {LogUtil.errorNoLog("Finalize error: " + e.getMessage());}
 	}
 
 

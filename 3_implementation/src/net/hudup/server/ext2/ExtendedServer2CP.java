@@ -32,6 +32,7 @@ import net.hudup.core.client.RemoteServerCP;
 import net.hudup.core.client.Server;
 import net.hudup.core.client.Service;
 import net.hudup.core.client.ServiceExt;
+import net.hudup.core.client.VirtualStorageManager;
 import net.hudup.core.data.DatasetPoolsService;
 import net.hudup.core.data.ui.DatasetPoolsManager;
 import net.hudup.core.logistic.I18nUtil;
@@ -41,7 +42,6 @@ import net.hudup.core.logistic.ui.LoginDlg;
 import net.hudup.core.logistic.ui.UIUtil;
 import net.hudup.server.ext.EvaluatorCPList;
 import net.hudup.server.ext.ExtendedService;
-import net.hudup.server.ext.WorkingDirectoryManager;
 import net.hudup.server.external.ui.ExternalServerCP;
 import net.hudup.server.ui.PowerServerCP;
 
@@ -100,7 +100,7 @@ public class ExtendedServer2CP extends ExternalServerCP {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					try {
-						WorkingDirectoryManager.show(cp, server.getStorageService());
+						VirtualStorageManager.show(cp, server.getStorageService());
 					} catch (RemoteException ex) {LogUtil.trace(ex);}
 				}
 			});

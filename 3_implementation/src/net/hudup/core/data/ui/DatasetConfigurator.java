@@ -604,7 +604,6 @@ public class DatasetConfigurator extends JDialog {
 	/**
 	 * Event-driven method for clicking connection button.
 	 */
-	@SuppressWarnings("deprecation")
 	private void connect() {
 		internalConfig.clear();
 		tblConfig.update(internalConfig);
@@ -618,7 +617,7 @@ public class DatasetConfigurator extends JDialog {
 		
 		DataConfig config = new DataConfig();
 		config.setStoreAccount(txtUsername.getText().trim());
-		config.setStorePassword( new HiddenText(txtPassword.getText()) );
+		config.setStorePassword( new HiddenText(txtPassword.getPassword()) );
 		config.setStoreUri(uri);
 		
 		boolean connect = lbUnits.connectUpdate(config);
@@ -655,7 +654,7 @@ public class DatasetConfigurator extends JDialog {
 		
 		if (dataDriver.getType() != DataType.file) {
 			internalConfig.setStoreAccount(txtUsername.getText().trim());
-			internalConfig.setStorePassword( new HiddenText(txtPassword.getText()) );
+			internalConfig.setStorePassword( new HiddenText(txtPassword.getPassword()) );
 		}
 		
 		List<String> unitNameList = lbUnits.getUnitList().toNameList();

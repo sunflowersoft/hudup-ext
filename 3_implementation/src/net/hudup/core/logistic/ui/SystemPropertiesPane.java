@@ -51,7 +51,6 @@ public class SystemPropertiesPane extends JPanel {
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					// TODO Auto-generated method stub
 					
 					txtSystemProperties.refresh();
 				}
@@ -63,7 +62,6 @@ public class SystemPropertiesPane extends JPanel {
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					// TODO Auto-generated method stub
 					
 					SystemUtil.enhance();
 					txtSystemProperties.refresh();

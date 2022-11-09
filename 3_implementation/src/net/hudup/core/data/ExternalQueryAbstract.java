@@ -70,10 +70,7 @@ public abstract class ExternalQueryAbstract extends AlgAbstract implements Exter
 		try {
 			if (!Constants.CALL_FINALIZE) return;
 			close();
-		}
-		catch (Throwable e) {
-			LogUtil.trace(e);
-		}
+		} catch (Throwable e) {LogUtil.errorNoLog("Finalize error: " + e.getMessage());}
 	}
 
 	

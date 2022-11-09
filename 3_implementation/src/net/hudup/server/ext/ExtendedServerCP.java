@@ -31,6 +31,7 @@ import net.hudup.core.client.RemoteServerCP;
 import net.hudup.core.client.Server;
 import net.hudup.core.client.Service;
 import net.hudup.core.client.ServiceExt;
+import net.hudup.core.client.VirtualStorageManager;
 import net.hudup.core.data.DatasetPoolsService;
 import net.hudup.core.data.ui.DatasetPoolsManager;
 import net.hudup.core.logistic.I18nUtil;
@@ -95,7 +96,7 @@ public class ExtendedServerCP extends PowerServerCP {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					try {
-						WorkingDirectoryManager.show(cp, server.getStorageService());
+						VirtualStorageManager.show(cp, server.getStorageService());
 					} catch (Exception ex) {LogUtil.trace(ex);}
 				}
 			});

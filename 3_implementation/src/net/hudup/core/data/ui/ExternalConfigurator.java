@@ -154,7 +154,6 @@ public class ExternalConfigurator extends JDialog {
 			
 			@Override
 			public void itemStateChanged(ItemEvent e) {
-				// TODO Auto-generated method stub
 				if (e.getStateChange() == ItemEvent.SELECTED)
 					dataDriverChanged();
 			}
@@ -191,7 +190,6 @@ public class ExternalConfigurator extends JDialog {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				
 				UriAdapter adapter = new UriAdapter();
 				xURI uri = adapter.chooseUri(getThis(), true, null, null, null, null);
@@ -239,7 +237,6 @@ public class ExternalConfigurator extends JDialog {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				connect();
 			}
 		});
@@ -266,7 +263,6 @@ public class ExternalConfigurator extends JDialog {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				setUnit(ExternalConfig.USER_UNIT);
 			}
 		});
@@ -277,7 +273,6 @@ public class ExternalConfigurator extends JDialog {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				setUnit(ExternalConfig.ITEM_UNIT);
 			}
 		});
@@ -288,7 +283,6 @@ public class ExternalConfigurator extends JDialog {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				setUnit(ExternalConfig.RATING_UNIT);
 			}
 		});
@@ -312,7 +306,6 @@ public class ExternalConfigurator extends JDialog {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				onOk();
 			}
 		});
@@ -323,7 +316,6 @@ public class ExternalConfigurator extends JDialog {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				config = null;
 				externalConfig = null;
 				dispose();
@@ -483,8 +475,10 @@ public class ExternalConfigurator extends JDialog {
 		dispose(); 
 	}
 
-	
-	@SuppressWarnings("deprecation")
+
+	/**
+	 * Event-driven method for clicking connection button.
+	 */
 	private void connect() {
 		externalConfig.clear();
 		tblConfig.update(externalConfig);
@@ -498,7 +492,7 @@ public class ExternalConfigurator extends JDialog {
 		
 		ExternalConfig config = new ExternalConfig();
 		config.setStoreAccount(txtUsername.getText().trim());
-		config.setStorePassword( new HiddenText(txtPassword.getText()) );
+		config.setStorePassword( new HiddenText(txtPassword.getPassword()) );
 		config.setStoreUri(uri);
 		
 		boolean connect = lbUnits.connectUpdate(config);
@@ -528,7 +522,7 @@ public class ExternalConfigurator extends JDialog {
 		
 		if (dataDriver.getType() != DataType.file) {
 			externalConfig.setStoreAccount(txtUsername.getText().trim());
-			externalConfig.setStorePassword( new HiddenText(txtPassword.getText()) );
+			externalConfig.setStorePassword( new HiddenText(txtPassword.getPassword()) );
 		}
 		
 		List<String> unitNameList = lbUnits.getUnitList().toNameList();
@@ -743,7 +737,6 @@ class MappingColumnDlg extends JDialog {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				ExternalConfig config = tblMapping.getMappingTM().extractResult();
 				
 				if (config.size() == 0) {
@@ -866,7 +859,6 @@ class MappingColumnDlg2 extends JDialog {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				tblMapping.clear();
 				AttributeList attributes = externalProvider.getProfileAttributes(new ParamSql(txtExternalSql.getText()), null);
 				tblMapping.update(attributes, mappingFields);
@@ -888,7 +880,6 @@ class MappingColumnDlg2 extends JDialog {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				ExternalConfig config = tblMapping.getMappingTM().extractResult();
 				
 				if (config.size() == 0) {
@@ -944,7 +935,6 @@ class MappingColumnDlg2 extends JDialog {
 	
 	@Override
 	public void dispose() {
-		// TODO Auto-generated method stub
 		super.dispose();
 		
 		if (externalProvider != null)
@@ -1082,7 +1072,6 @@ class MappingTM extends DefaultTableModel {
 	
 	@Override
 	public Class<?> getColumnClass(int columnIndex) {
-		// TODO Auto-generated method stub
 		if (columnIndex > 0)
 			return Boolean.class;
 		else
@@ -1092,7 +1081,6 @@ class MappingTM extends DefaultTableModel {
 
 	@Override
 	public boolean isCellEditable(int row, int column) {
-		// TODO Auto-generated method stub
 		return column > 0;
 	}
 
@@ -1117,7 +1105,6 @@ class MappingTM extends DefaultTableModel {
 	
 	@Override
 	public void setValueAt(Object aValue, int row, int column) {
-		// TODO Auto-generated method stub
 		super.setValueAt(aValue, row, column);
 		
 		if ( (aValue instanceof Boolean) && ((Boolean)aValue) ) {

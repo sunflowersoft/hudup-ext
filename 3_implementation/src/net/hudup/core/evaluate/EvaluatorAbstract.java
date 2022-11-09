@@ -76,7 +76,6 @@ import net.hudup.core.logistic.Timestamp;
 import net.hudup.core.logistic.UriAdapter;
 import net.hudup.core.logistic.xURI;
 import net.hudup.core.logistic.ui.LoginDlg;
-import net.hudup.server.ext.ExtendedService;
 
 /**
  * {@code Evaluator} is one of main objects of Hudup framework, which is responsible for executing and evaluation algorithms according to built-in and user-defined metrics.
@@ -2129,10 +2128,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 		try {
 			if (!Constants.CALL_FINALIZE) return;
 			close();
-		}
-		catch (Throwable e) {
-			LogUtil.trace(e);
-		}
+		} catch (Throwable e) {LogUtil.errorNoLog("Finalize error: " + e.getMessage());}
 	}
 
 	
@@ -2489,7 +2485,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 	 * @param evaluator specified evaluator.
 	 * @return power server;
 	 */
-	public static PowerServer getServerByPluginChangedListenersPath(Evaluator evaluator) {
+	public static PowerServer getServer(Evaluator evaluator) {
 		PluginChangedListener listener = EvaluatorAbstract.getTopMostPluginChangedListener(evaluator);
 		return (listener != null) && (listener instanceof PowerServer) ? (PowerServer)listener : null;
 	}
@@ -2506,7 +2502,7 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 		} catch (Throwable e) {LogUtil.trace(e);}
 		if (service != null) return service;
 		
-		PowerServer server = EvaluatorAbstract.getServerByPluginChangedListenersPath(this);
+		PowerServer server = EvaluatorAbstract.getServer(this);
 		if (server == null) return null;
 		try {
 			return server.getService();
@@ -2554,8 +2550,8 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 		Service service = getReferredServiceExt();
 		if (service == null)
 			return null;
-		else if (service instanceof ExtendedService)
-			return ((ExtendedService)service).getDatasetPoolsService();
+		else if (service instanceof ServiceLocal)
+			return ((ServiceLocal)service).getDatasetPoolsService();
 		else
 			return null;
 	}
@@ -2571,8 +2567,8 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 		Service service = getReferredServiceExt();
 		if (service == null)
 			return null;
-		else if (service instanceof ExtendedService)
-			return ((ExtendedService)service).getDatasetPoolsService();
+		else if (service instanceof ServiceLocal)
+			return ((ServiceLocal)service).getDatasetPoolsService();
 		else if (service instanceof ServiceExt) {
 			try {
 				return ((ServiceExt)service).getDatasetPoolsService(account, password);
@@ -2616,8 +2612,8 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 			
 			if (service == null || !(service instanceof ServiceExt))
 				return null;
-			else if (service instanceof ExtendedService)
-				poolsService = ((ExtendedService)service).getDatasetPoolsService();
+			else if (service instanceof ServiceLocal)
+				poolsService = ((ServiceLocal)service).getDatasetPoolsService();
 			else if (connectInfo == null) {
 				LoginDlg login = new LoginDlg(null, "Enter user name and password");
 				if (!login.wasLogin()) return null;

@@ -168,10 +168,7 @@ public abstract class DatasetAbstract implements Dataset, DatasetRemote {
 			if (!Constants.CALL_FINALIZE) return;
 //			clear(); //Clear method can close provider with scanner.
 			unexport();
-		}
-		catch (Throwable e) {
-			LogUtil.trace(e);
-		}
+		} catch (Throwable e) {LogUtil.errorNoLog("Finalize error: " + e.getMessage());}
 	}
 
 

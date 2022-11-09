@@ -664,7 +664,6 @@ public class UriChooser extends JDialog {
 	 * This method mainly connects with the remote storage from filled information to retrieve units from such remote storage.
 	 * The internal configuration is also updated.
 	 */
-	@SuppressWarnings("deprecation")
 	private void connect() {
 		internalConfig.clear();
 		lbSelectedUnits.clear();
@@ -678,7 +677,7 @@ public class UriChooser extends JDialog {
 		
 		DataConfig config = new DataConfig();
 		config.setStoreAccount(txtUsername.getText().trim());
-		config.setStorePassword( new HiddenText(txtPassword.getText()) );
+		config.setStorePassword( new HiddenText(txtPassword.getPassword()) );
 		config.setStoreUri(uri);
 		
 		boolean connect = lbUnits.connectUpdate(config);
@@ -717,7 +716,7 @@ public class UriChooser extends JDialog {
 		
 		if (dataDriver.getType() != DataType.file) {
 			internalConfig.setStoreAccount(txtUsername.getText().trim());
-			internalConfig.setStorePassword( new HiddenText(txtPassword.getText()) );
+			internalConfig.setStorePassword( new HiddenText(txtPassword.getPassword()) );
 		}
 		
 		internalConfig.setParser(getParser());

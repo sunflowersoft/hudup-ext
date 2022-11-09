@@ -221,7 +221,7 @@ public class EvalCompoundGUI extends JFrame {
 		mniSaveScript.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK));
 		mnFile.add(mniSaveScript);
 
-		PowerServer server = EvaluatorAbstract.getServerByPluginChangedListenersPath(batchEvaluateGUI.getEvaluator());;
+		PowerServer server = EvaluatorAbstract.getServer(batchEvaluateGUI.getEvaluator());;
 		if (server != null || batchEvaluateGUI.getConnectInfo().bindUri != null) {
 			mnFile.addSeparator();
 			JMenu mnDatasetPool = new JMenu(I18nUtil.message("dataset_pool"));

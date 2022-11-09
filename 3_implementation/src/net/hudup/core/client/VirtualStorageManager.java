@@ -5,7 +5,7 @@
  * Email: ng_phloc@yahoo.com
  * Phone: +84-975250362
  */
-package net.hudup.server.ext;
+package net.hudup.core.client;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -25,14 +25,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.WindowConstants;
 
-import net.hudup.core.client.Connector;
-import net.hudup.core.client.PowerServer;
-import net.hudup.core.client.RemoteStorageList;
-import net.hudup.core.client.RemoteStorageTree;
-import net.hudup.core.client.Server;
-import net.hudup.core.client.VirtualFileService;
-import net.hudup.core.client.VirtualStorageService;
-import net.hudup.core.client.VirtualStorageUnit;
 import net.hudup.core.data.ui.toolkit.Dispose;
 import net.hudup.core.logistic.DSUtil;
 import net.hudup.core.logistic.LogUtil;
@@ -45,7 +37,7 @@ import net.hudup.core.logistic.ui.UIUtil;
  * @version 1.0
  *
  */
-public class WorkingDirectoryManager extends JPanel implements Dispose {
+public class VirtualStorageManager extends JPanel implements Dispose {
 
 	
 	/**
@@ -82,7 +74,7 @@ public class WorkingDirectoryManager extends JPanel implements Dispose {
 	 * Default constructor with storage service.
 	 * @param service specified storage service.
 	 */
-	public WorkingDirectoryManager(VirtualStorageService service) {
+	public VirtualStorageManager(VirtualStorageService service) {
 		this.service = service;
 		
 		setLayout(new BorderLayout());
@@ -235,7 +227,7 @@ public class WorkingDirectoryManager extends JPanel implements Dispose {
 		dlgManager.setLayout(new BorderLayout());
 		
 		if (service == null) service = new VirtualFileService();
-		WorkingDirectoryManager manager = new WorkingDirectoryManager(service);
+		VirtualStorageManager manager = new VirtualStorageManager(service);
 		dlgManager.add(manager, BorderLayout.CENTER);
 		dlgManager.addWindowListener(new WindowAdapter() {
 

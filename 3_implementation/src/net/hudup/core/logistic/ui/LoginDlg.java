@@ -134,13 +134,12 @@ public class LoginDlg extends JDialog {
 
 	
 	/**
-	 * Login method can be overrided.
+	 * Login method can be overridden.
 	 */
 	protected void login() {
 		username = txtUsername.getText();
 		try {
 			password = new String(txtPassword.getPassword());
-			//password = txtPassword.getText();
 		}
 		catch (Exception e) {
 			LogUtil.trace(e);

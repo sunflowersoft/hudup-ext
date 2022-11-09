@@ -246,10 +246,7 @@ public class HudupSocketClassLoaderServer extends AbstractRunner {
 		try {
 			if (!Constants.CALL_FINALIZE) return;
 			stop();
-		}
-		catch (Throwable e) {
-			LogUtil.trace(e);
-		}
+		} catch (Throwable e) {LogUtil.errorNoLog("Finalize error: " + e.getMessage());}
 	}
 
 

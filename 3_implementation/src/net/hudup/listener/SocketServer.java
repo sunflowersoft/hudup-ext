@@ -972,10 +972,7 @@ public abstract class SocketServer extends AbstractRunner implements Server, Acc
 		try {
 			if (!Constants.CALL_FINALIZE) return;
 			shutdown();
-		}
-		catch (Throwable e) {
-			LogUtil.trace(e);
-		}
+		} catch (Throwable e) {LogUtil.errorNoLog("Finalize error: " + e.getMessage());}
 	}
 	
 	

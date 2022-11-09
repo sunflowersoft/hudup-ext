@@ -64,6 +64,8 @@ public class SystemPropertiesTextArea extends TextArea {
 	 * Refreshing this text area.
 	 */
 	public void refresh() {
+		SystemUtil.refreshSystemProperties();
+		
 		StringBuffer buffer = new StringBuffer();
 		PropList sysProps = SystemUtil.getSystemProperties();
 		List<String> keys = Util.newList();

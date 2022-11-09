@@ -383,10 +383,7 @@ public class AlgRemoteWrapper implements Alg, AlgRemote, Serializable {
 		try {
 			if (!Constants.CALL_FINALIZE) return;
 			unexport();
-		}
-		catch (Throwable e) {
-			LogUtil.trace(e);
-		}
+		} catch (Throwable e) {LogUtil.errorNoLog("Finalize error: " + e.getMessage());}
 	}
 
 

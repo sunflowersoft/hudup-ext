@@ -91,6 +91,15 @@ public class LogUtil {
 
 
 	/**
+	 * Printing out error without logging.
+	 * @param message error.
+	 */
+	public static void errorNoLog(Object message) {
+		System.out.println("ERROR " + "Hudup " + message);
+	}
+
+	
+	/**
 	 * Printing out warning information.
 	 * @param message warning information.
 	 */

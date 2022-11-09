@@ -12,6 +12,7 @@ import java.util.Properties;
 
 import net.hudup.core.Constants;
 import net.hudup.core.data.PropList;
+import net.hudup.core.logistic.NetUtil.InetHardware;
 
 /**
  * Utility class for system tasks.
@@ -124,6 +125,30 @@ public final class SystemUtil {
 		}
 
 		return props;
+	}
+	
+	
+	/**
+	 * Refreshing system properties.
+	 */
+	public static void refreshSystemProperties() {
+		try {
+			InetHardware ih = NetUtil.getInetHardware();
+			if (ih != null && ih.ni != null && ih.inetAddr != null) {
+				Constants.hardwareAddress = ih.getMACAddress();
+				Constants.hostAddress = ih.inetAddr.getHostAddress();
+			}
+			if (Constants.hardwareAddress == null || Constants.hostAddress == null) {
+				Constants.hardwareAddress = null;
+				Constants.hostAddress = null;
+			}
+		}
+		catch (Throwable e) {
+			Constants.hardwareAddress = null;
+			Constants.hostAddress = null;
+			System.out.println("Error when getting MAC and host addresses");
+		}
+
 	}
 	
 	

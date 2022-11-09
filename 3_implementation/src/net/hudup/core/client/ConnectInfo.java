@@ -34,19 +34,20 @@ public class ConnectInfo implements Serializable {
 
 	
 	/**
-	 * Connection URI.
+	 * Connection URI that refers to remote server/service.
 	 */
 	public xURI connectUri = null;
 
 	
 	/**
-	 * Bound URI.
+	 * Bound URI that is bound to this application when it connects to remote server/service.
+	 * If bound URI is not null, this application is remotely connected application. Otherwise, this application is local and stand alone application.
 	 */
 	public xURI bindUri = null;
 
 	
 	/**
-	 * Naming URI.
+	 * Naming URI that names this application as host in network. Naming URI is often in form of bound URI + name.
 	 */
 	public xURI namingUri = null;
 	
@@ -125,7 +126,7 @@ public class ConnectInfo implements Serializable {
 			buffer.append(", Global address = " + globalAddress);
 		
 		if (pullMode)
-			buffer.append(", Access period (miliseconds) = " + accessPeriod);
+			buffer.append(", Access period (seconds) = " + (accessPeriod/1000));
 
 		String text = buffer.toString();
 		if (text.startsWith(",")) text = text.substring(1);

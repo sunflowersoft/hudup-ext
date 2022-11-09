@@ -54,6 +54,15 @@ public class HiddenText implements Serializable {
 	
 	
 	/**
+	 * Constructor with real text as characters array.
+	 * @param text characters array.
+	 */
+	public HiddenText(char[] text) {
+		this.text = new String(text);
+	}
+	
+	
+	/**
 	 * Showing the appearance of the real content {@link #text}.
 	 * Concretely, the method returns a string of characters *, called mask.
 	 * The length of mask ranges from 0 to 7.

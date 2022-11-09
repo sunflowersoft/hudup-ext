@@ -410,10 +410,7 @@ public abstract class RecommenderAbstract extends AlgAbstract implements Recomme
 		try {
 			if (!Constants.CALL_FINALIZE) return;
 			unsetup();
-		}
-		catch (Throwable e) {
-			LogUtil.trace(e);
-		}
+		} catch (Throwable e) {LogUtil.errorNoLog("Finalize error: " + e.getMessage());}
 		
 	}
 	

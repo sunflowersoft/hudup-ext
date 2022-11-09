@@ -7,6 +7,8 @@
  */
 package net.hudup.core.client;
 
+import net.hudup.core.data.DatasetPoolsService;
+
 /**
  * This interface represents a local service.
  * 
@@ -24,4 +26,11 @@ public interface ServiceLocal {
 	PowerServer getReferredServer();
 
 
+	/**
+	 * Getting dataset pools service.
+	 * @return dataset pools service.
+	 */
+	DatasetPoolsService getDatasetPoolsService();
+
+	
 }

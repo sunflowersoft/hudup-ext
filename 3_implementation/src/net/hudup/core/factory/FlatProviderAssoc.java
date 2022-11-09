@@ -1000,7 +1000,7 @@ class DefaultCsvReader implements CsvReader {
 		try {
 			if (!Constants.CALL_FINALIZE) return;
 			close();
-		} catch (Throwable e) {LogUtil.trace(e);}
+		} catch (Throwable e) {LogUtil.errorNoLog("Finalize error: " + e.getMessage());}
 	}
 
 
@@ -1064,7 +1064,7 @@ class DefaultCsvWriter implements CsvWriter {
 		try {
 			if (!Constants.CALL_FINALIZE) return;
 			close();
-		} catch (Throwable e) {LogUtil.trace(e);}
+		} catch (Throwable e) {LogUtil.errorNoLog("Finalize error: " + e.getMessage());}
 	}
 
 
@@ -1207,7 +1207,7 @@ class ExcelReader implements CsvReader {
 		try {
 			if (!Constants.CALL_FINALIZE) return;
 			close();
-		} catch (Throwable e) {LogUtil.trace(e);}
+		} catch (Throwable e) {LogUtil.errorNoLog("Finalize error: " + e.getMessage());}
 	}
 
 
@@ -1416,7 +1416,7 @@ class ExcelWriter implements CsvWriter {
 		try {
 			if (!Constants.CALL_FINALIZE) return;
 			close();
-		} catch (Throwable e) {LogUtil.trace(e);}
+		} catch (Throwable e) {LogUtil.errorNoLog("Finalize error: " + e.getMessage());}
 	}
 
 
