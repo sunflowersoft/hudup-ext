@@ -25,7 +25,6 @@ import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 
@@ -38,7 +37,7 @@ import net.hudup.core.Util;
  * @version 1.0
  *
  */
-public class TempTable extends JTable {
+public class TempTable extends SortableSelectableTable {
 
 	
 	/**
@@ -57,14 +56,29 @@ public class TempTable extends JTable {
 	 * Default constructor.
 	 */
 	public TempTable() {
-		super();
-		setModel(new TempTableModel());
-		
+		super(new TempTableModel());
+		fixInit();
+	}
+
+	
+	/**
+	 * Constructor with model.
+	 * @param model specified model.
+	 */
+	public TempTable(TempTableModel model) {
+		super(model);
+		fixInit();
+	}
+
+
+	/**
+	 * Setting fixed configuration.
+	 */
+	protected void fixInit() {
 //		this.setDefaultEditor(Type.class, new TypeCellEditor());
 		
 //		setAutoResizeMode(AUTO_RESIZE_OFF); //Allowing horizontal scroll bar when putting it in JScrollPane.
-//		setAutoCreateRowSorter(true);
-		getTableHeader().setReorderingAllowed(false);
+//		getTableHeader().setReorderingAllowed(false); //Preventing change the column order.
 		
 		addMouseListener(new MouseAdapter() {
 			@Override
@@ -86,7 +100,19 @@ public class TempTable extends JTable {
 			}
 		});
 
-		update();
+	}
+	
+	
+	@Override
+	protected void init() {
+		super.init();
+		
+//		int lastColumn = getColumnCount() - 1;
+//		if (lastColumn > 0) {
+//			getColumnModel().getColumn(lastColumn).setMaxWidth(0);
+//			getColumnModel().getColumn(lastColumn).setMinWidth(0);
+//			getColumnModel().getColumn(lastColumn).setPreferredWidth(0);
+//		}
 	}
 
 	
@@ -95,6 +121,8 @@ public class TempTable extends JTable {
 	 * @return context menu.
 	 */
 	protected JPopupMenu createContextMenu() {
+		if (!isEditable()) return null;
+		
 		TempTable thisTable = this;
 		JPopupMenu ctxMenu = new JPopupMenu();
 		
@@ -113,44 +141,36 @@ public class TempTable extends JTable {
 	
 	
 	/**
-	 * Update table.
-	 */
-	public void update() {
-		int selectedRow = getSelectedRow();
-
-		getModel2().update();
-		init();
-		
-		if (selectedRow >= 0 && selectedRow < getRowCount()) {try {setRowSelectionInterval(selectedRow, selectedRow);} catch (Throwable e) {}}
-	}
-	
-	
-	/**
-	 * Initialize table UI. It is called by {@link #update()} method.
-	 */
-	protected void init() {
-//		int lastColumn = getColumnCount() - 1;
-//		if (lastColumn > 0) {
-//			getColumnModel().getColumn(lastColumn).setMaxWidth(0);
-//			getColumnModel().getColumn(lastColumn).setMinWidth(0);
-//			getColumnModel().getColumn(lastColumn).setPreferredWidth(0);
-//		}
-	}
-
-	
-	/**
 	 * Getting table model.
 	 * @return table model.
 	 */
-	protected TempTableModel getModel2() {
+	public TempTableModel getModel2() {
 		return (TempTableModel)getModel();
 	}
 	
 
 	/**
+	 * Update table by some parameter.
+	 * @param parameter some parameter.
+	 */
+	public void update(Object parameter) {
+//		int selectedRow = getSelectedRow();
+
+		getModel2().update(parameter);
+		init();
+		
+//		if (selectedRow >= 0 && selectedRow < getRowCount()) {try {setRowSelectionInterval(selectedRow, selectedRow);} catch (Throwable e) {}}
+	
+	}
+	
+
+	
+	/**
 	 * Double click event method.
 	 */
 	protected void onDoubleClick() {
+		if (!isEditable()) return;
+
 		JOptionPane.showMessageDialog(this, "Double click", "Double click", JOptionPane.INFORMATION_MESSAGE);
 	}
 	
@@ -160,50 +180,28 @@ public class TempTable extends JTable {
 	 * @param e key event.
 	 */
 	protected void onKeyPressed(KeyEvent e) {
+		if (!isEditable()) return;
+
 		if(e.getKeyCode() == KeyEvent.VK_ENTER) {
 			JOptionPane.showMessageDialog(this, "ENTER key pressed", "ENTER key pressed", JOptionPane.INFORMATION_MESSAGE);
 		}
 		else if(e.getKeyCode() == KeyEvent.VK_F5) {
-			update();
+			update((Object)null);
 		}
 	}
 
 	
-	/*
-	 * If setting this method as default super.getCellRenderer(row, column), the method getColumnClass(int) in model must be defined exactly according to column classes.
-	 */
 	@Override
 	public TableCellRenderer getCellRenderer(int row, int column) {
-		Object value = getValueAt(row, column);
-		if (value == null)
-			return super.getCellRenderer(row, column);
-		else {
-			TableCellRenderer renderer = getDefaultRenderer(value.getClass());
-			if(renderer == null)
-				return super.getCellRenderer(row, column);
-			else
-				return renderer;
-		}
-		
+		return super.getCellRenderer(row, column);
 //		if (column == 0) return highlightCellRenderer;
 	}
 
 	
-	/*
-	 * If setting this method as default super.getCellEditor(row, column), the method getColumnClass(int) in model must be defined exactly according to column classes.
-	 */
 	@Override
     public TableCellEditor getCellEditor(int row, int column) {
-		Object value = getValueAt(row, column);
-		if (value == null)
-			return super.getCellEditor(row, column);
-		else {
-			TableCellEditor editor = getDefaultEditor(value.getClass());
-			if(editor == null)
-				return super.getCellEditor(row, column);
-			else
-				return editor;
-		}
+		return super.getCellEditor(row, column);
+//		if (column == 1) return new TypeCellEditor();
     }
 	
 	
@@ -296,7 +294,7 @@ public class TempTable extends JTable {
  * @version 1.0
  *
  */
-class TempTableModel extends DefaultTableModel {
+class TempTableModel extends SortableSelectableTableModel {
 	
 	
 	/**
@@ -315,14 +313,15 @@ class TempTableModel extends DefaultTableModel {
 	 * Default constructor.
 	 */
 	public TempTableModel() {
-
+		super();
 	}
 	
 	
 	/**
-	 * Update method.
+	 * Update table by some parameter.
+	 * @param parameter some parameter.
 	 */
-	protected void update() {
+	protected void update(Object parameter) {
 		Vector<Vector<Object>> data = Util.newVector(0);
 		
 		setDataVector(data, toColumns());
@@ -345,7 +344,7 @@ class TempTableModel extends DefaultTableModel {
 	 * Getting list of column names.
 	 * @return list of column names.
 	 */
-	private Vector<String> toColumns() {
+	protected Vector<String> toColumns() {
 		Vector<String> columns = Util.newVector(0);
 		
 		return columns;
@@ -357,10 +356,13 @@ class TempTableModel extends DefaultTableModel {
 		return false;
 	}
 
-	
+	/**
+	 * 
+	 */
 	@Override
 	public Class<?> getColumnClass(int columnIndex) {
 		return super.getColumnClass(columnIndex);
+//		if (columnIndex == 3) return Boolean.class;
 	}
 	
 	

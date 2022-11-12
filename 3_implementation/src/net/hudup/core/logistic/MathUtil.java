@@ -7,6 +7,7 @@
  */
 package net.hudup.core.logistic;
 
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashSet;
@@ -186,7 +187,12 @@ public final class MathUtil {
 	 * @return text format of the specified number.
 	 */
 	public static String format(double number, int decimal) {
-		return "" + round(number, decimal);
+		String pattern = "#.";
+		for (int i = 0; i < decimal; i++) pattern += "#";
+		DecimalFormat df = new DecimalFormat(pattern);
+		return df.format(number);
+
+		//return "" + round(number, decimal);
 		//return String.format("%." + decimal + "f", number);
 	}
 
@@ -393,6 +399,16 @@ public final class MathUtil {
 		}
 		
 		return new double[] {extremeValue, extremeIndex};
+	}
+	
+	
+	/**
+	 * Testing main method.
+	 * @param args array of arguments.
+	 */
+	public static void main(String[] args) {
+		//DecimalFormat df = new DecimalFormat("#.####");
+		System.out.println(format(02512461899.99996));
 	}
 	
 	

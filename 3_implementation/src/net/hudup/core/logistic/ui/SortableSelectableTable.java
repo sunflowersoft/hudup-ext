@@ -310,7 +310,8 @@ public class SortableSelectableTable extends JTable {
 	
 	/*
 	 * The call of DefaultTableModel#getValueAt(int, int) can cause out of bound error from DefaultTableColumnModel#getColumn(int).
-	 * @see javax.swing.JTable#getCellRenderer(int, int)
+	 * @see javax.swing.JTable#getCellRenderer(int, int).
+	 * If setting this method as default super.getCellRenderer(row, column), the method getColumnClass(int) in model must be defined exactly according to column classes.
 	 */
 	@Override
 	public TableCellRenderer getCellRenderer(int row, int column) {

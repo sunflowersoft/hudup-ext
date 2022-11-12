@@ -33,7 +33,7 @@ public class SortableTableModel extends DefaultTableModel {
 	 * Default constructor.
 	 */
 	public SortableTableModel() {
-		// TODO Auto-generated constructor stub
+
 	}
 
 	
@@ -93,7 +93,6 @@ public class SortableTableModel extends DefaultTableModel {
 	 */
 	@Override
 	public Class<?> getColumnClass(int columnIndex) {
-		// TODO Auto-generated method stub
 		try {
 			if (getRowCount() == 0)
 				return super.getColumnClass(columnIndex);

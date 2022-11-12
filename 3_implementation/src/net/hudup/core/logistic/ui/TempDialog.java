@@ -18,6 +18,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.Arrays;
+import java.util.Vector;
 
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
@@ -29,11 +31,13 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 
+import net.hudup.core.Util;
 import net.hudup.core.logistic.I18nUtil;
 
 /**
@@ -364,7 +368,7 @@ public class TempDialog extends JDialog {
 	 * @param comp parent component
 	 * @param title specified title.
 	 */
-	public static void show(Component comp, String title) {
+	protected static void example(Component comp, String title) {
 		new TempDialog(comp, title).setVisible(true);
 	}
 	
@@ -374,8 +378,54 @@ public class TempDialog extends JDialog {
 	 * @param args arguments.
 	 */
 	public static void main(String[] args) {
-		TempDialog.show(null, "Dialog");
-		TempFrame.show("Frame");
+		TempDialog.example(null, "Dialog");
+		
+		TempDialog tempDlg = new TempDialog(null, "Table");
+		TempTableModel tempTableModel = new TempTableModel() {
+			
+			/**
+			 * Serial version UID for serializable class. 
+			 */
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			protected void update(Object parameter) {
+				Vector<Vector<Object>> data = Util.newVector(0);
+			
+				Vector<Object> row = Util.newVector();
+				row.add("attribute 1"); row.add("text 1"); row.add(1.0); row.add(true); data.add(row);
+				
+				row = Util.newVector();
+				row.add("attribute 2"); row.add("text 2"); row.add(2.0); row.add(false); data.add(row);
+
+				row = Util.newVector();
+				row.add("attribute 3"); row.add("text 3"); row.add(3.0); row.add(true); data.add(row);
+
+				setDataVector(data, toColumns());
+				modified = false;
+			}
+
+			@Override
+			protected Vector<String> toColumns() {
+				return new Vector<>(Arrays.asList("attribute", "text", "value", "boolean"));
+			}
+
+			@Override
+			public Class<?> getColumnClass(int columnIndex) {
+				if (columnIndex == 3)
+					return Boolean.class;
+				else
+					return super.getColumnClass(columnIndex);
+			}
+			
+		};
+		TempTable tempTable = new TempTable(tempTableModel);
+		tempTable.update((Object)null);
+		
+		tempDlg.body.add(new JScrollPane(tempTable), BorderLayout.CENTER);
+		tempDlg.setVisible(true);
+		
+		TempFrame.example("Frame");
 	}
 	
 }
@@ -667,7 +717,7 @@ class TempFrame extends JFrame {
 	 * Show dialog.
 	 * @param title specified title.
 	 */
-	public static void show(String title) {
+	protected static void example(String title) {
 		new TempFrame(title).setVisible(true);
 	}
 	

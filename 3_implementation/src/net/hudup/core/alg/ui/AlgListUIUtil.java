@@ -107,7 +107,7 @@ public final class AlgListUIUtil {
 								"Inspector option", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
 							
 							if (confirm == JOptionPane.NO_OPTION) {
-								if (alg instanceof Inspectable) inspector = getInspector(alg, evaluator);
+								inspector = getInspector(alg, evaluator);
 							}
 							else {
 								try {
@@ -117,7 +117,7 @@ public final class AlgListUIUtil {
 								} catch (Exception ex) {LogUtil.trace(ex);}
 							}
 						}
-						else if (alg instanceof Inspectable) {
+						else {
 							inspector = getInspector(alg, evaluator);
 						}
 						
@@ -212,7 +212,7 @@ public final class AlgListUIUtil {
 				remoteAlg = evaluator.getEvaluatedAlg(alg.getName(), true);
 			} catch (Exception e) {LogUtil.trace(e);}
 			
-			if (remoteAlg == null)
+			if (remoteAlg != null)
 				return getInspector(remoteAlg, null);
 			else
 				return getInspector(alg, null);

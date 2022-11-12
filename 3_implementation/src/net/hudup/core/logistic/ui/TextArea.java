@@ -183,6 +183,16 @@ public class TextArea extends JTextArea implements DocumentListener {
 			});
 		contextMenu.add(miCopyDesc);
 
+		JMenuItem miZoom = UIUtil.makeMenuItem(null, "Zoom", 
+			new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					zoom();
+				}
+			});
+		contextMenu.add(miZoom);
+
 		return contextMenu;
 	}
 	
@@ -192,9 +202,47 @@ public class TextArea extends JTextArea implements DocumentListener {
 	 * @param contextMenu specified context menu.
 	 */
 	protected void addToContextMenu(JPopupMenu contextMenu) {
-		
+
 	}
 
+	
+	/**
+	 * Zooming information inside text area.
+	 */
+	protected void zoom() {
+		String text = getText();
+		if (text == null || text.isEmpty()) return;
+		
+		JDialog dlgZoom = new JDialog(UIUtil.getDialogForComponent(this), "Text information", true);
+		dlgZoom.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+		dlgZoom.setSize(400, 300);
+		dlgZoom.setLocationRelativeTo(UIUtil.getDialogForComponent(this));
+		dlgZoom.setLayout(new BorderLayout());
+
+		JPanel body = new JPanel(new BorderLayout());
+		dlgZoom.add(body, BorderLayout.CENTER);
+
+		JTextArea txtInfo = new JTextArea(text);
+		txtInfo.setEditable(false);
+		txtInfo.setWrapStyleWord(true);
+		txtInfo.setLineWrap(true);
+		body.add(new JScrollPane(txtInfo), BorderLayout.CENTER);
+		
+		JPanel footer = new JPanel();
+		dlgZoom.add(footer, BorderLayout.SOUTH);
+
+		JButton btnOK = new JButton("OK");
+		btnOK.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				dlgZoom.dispose();
+			}
+		});
+		footer.add(btnOK);
+
+		dlgZoom.setVisible(true);
+	}
+	
 	
 	/**
 	 * Setting text from specified reader.

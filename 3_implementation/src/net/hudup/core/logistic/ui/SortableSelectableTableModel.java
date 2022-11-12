@@ -47,7 +47,6 @@ public class SortableSelectableTableModel extends DefaultTableModel {
 	 */
 	@Override
 	public Class<?> getColumnClass(int columnIndex) {
-		// TODO Auto-generated method stub
 		try {
 			if (getRowCount() == 0)
 				return super.getColumnClass(columnIndex);

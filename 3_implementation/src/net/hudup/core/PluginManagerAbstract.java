@@ -1005,6 +1005,9 @@ class ClassLoader2 extends URLClassLoader {
 	}
 
 
+	/*
+	 * This method call causes illegal access which will be fixed later.
+	 */
 	@Override
 	protected Class<?> findClass(String name) throws ClassNotFoundException {
 		if (cl == null) return null;
@@ -1012,17 +1015,19 @@ class ClassLoader2 extends URLClassLoader {
 	    Method method = null;
 		try {
 		    method = URLClassLoader.class.getDeclaredMethod("findClass", String.class);
-		    method.setAccessible(true);
-		}
-		catch (Exception e) {
-			method = null;
-		}
+		    
+		    try {
+		    	method.setAccessible(true); //This method call causes illegal access which will be fixed later.
+			} catch (Throwable e) {LogUtil.errorNoLog("ClassLoader2#findClass(String) calling Method#setAccessible(boolean) causes error: " + e.getMessage());}
+		    
+		} catch (Throwable e) {method = null;}
+		
 		if (method == null) return null;
 		
 		try {
 		    return (Class<?>)method.invoke(cl, name);
 		}
-		catch (Exception e) {}
+		catch (Throwable e) {}
 		
 		return null;
 	}
