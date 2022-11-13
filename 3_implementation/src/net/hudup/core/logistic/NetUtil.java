@@ -274,6 +274,11 @@ public class NetUtil {
 	 *
 	 */
 	public static class RegistryRemote {
+
+		/**
+		 * Flag to indicate whether export calling is executed.
+		 */
+		public static boolean exportCalled = false;
 		
 		/**
 		 * Registry. It should be serialized.
@@ -336,6 +341,7 @@ public class NetUtil {
 			Remote stub = null;
 			try {
 				stub = UnicastRemoteObject.exportObject(remote, port);
+				if (!exportCalled) exportCalled = true;
 			}
 			catch (Exception e) {
 				LogUtil.trace(e);

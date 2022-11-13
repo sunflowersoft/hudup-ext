@@ -664,14 +664,33 @@ public class EvalCompoundGUI extends JFrame {
 			boolean agent = false;
 			try {
 				agent = batchEvaluateGUI.getEvaluator().isAgent();
-			} 
-			catch (Exception e) {LogUtil.trace(e);}
+			} catch (Throwable e) {LogUtil.trace(e);}
 	
 			batchEvaluateGUI.dispose();
-			if (!agent || batchEvaluateGUI.getConnectInfo().bindUri != null)
+			
+			ConnectInfo connectInfo = batchEvaluateGUI.getConnectInfo();
+			boolean exit = false;
+			if (!agent || connectInfo.bindUri != null) {
 				PluginStorage.clear();
+				exit = true;
+			}
+			else {
+				try {
+					Service service = EvaluatorAbstract.getReferredService(batchEvaluateGUI.getEvaluator(), false);
+					//If there is stand alone and named evaluator, plug-in storage will be cleared. The naming URI is used to prevent unexpected problems.
+					//In the next version, plug-in storage will be cleared only in case of stand alone evaluator.
+					if (service == null && connectInfo.namingUri != null) {
+						PluginStorage.clear();
+						exit = true;
+					}
+				} catch (Throwable e) {LogUtil.trace(e);}
+			}
 			
 			super.dispose();
+			
+			if (exit /*&& NetUtil.RegistryRemote.exportCalled*/) { //Work around solution will be improved later.
+				System.exit(0);
+			}
 		}
 		catch (Throwable e) {
 			if (batchEvaluateGUI.getConnectInfo().bindUri != null)
