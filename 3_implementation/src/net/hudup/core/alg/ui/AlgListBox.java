@@ -510,7 +510,7 @@ public class AlgListBox extends JList<Alg> implements AlgListUI {
 	 * @return list of algorithms which were removed from this list.
 	 */
 	public List<Alg> removeSelectedList() {
-		List<Alg> selected = getSelectedList();
+		List<Alg> selected = getSelectedAlgList();
 		removeAll(selected);
 		return selected;
 	}
@@ -709,16 +709,23 @@ public class AlgListBox extends JList<Alg> implements AlgListUI {
 	 * Getting the list of selected algorithms.
 	 * @return {@link List} of selected algorithms.
 	 */
-	@SuppressWarnings("deprecation")
-	public List<Alg> getSelectedList() {
-		Object[] list = getSelectedValues();
-		List<Alg> algList = Util.newList();
-		for (Object object : list) {
-			algList.add((Alg)object);
-		}
-		return algList;
+	public List<Alg> getSelectedAlgList() {
+		return getSelectedValuesList();
 	}
 	
+	
+	/**
+	 * Getting the name list of selected algorithms.
+	 * @return name list of selected algorithms.
+	 */
+	public List<String> getSelectedAlgNameList() {
+		List<Alg> algList = getSelectedAlgList();
+		List<String> nameList = Util.newList();
+		for (Alg alg : algList) nameList.add(alg.getName());
+		
+		return nameList;
+	}
+
 	
 	/**
 	 * Setting whether or not this {@link AlgListBox} enables double-click operator.

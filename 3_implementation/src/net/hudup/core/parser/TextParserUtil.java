@@ -430,8 +430,33 @@ public final class TextParserUtil {
 		
 		int i = 0;
 		for (T value : list) {
-			if (i > 0)
-				buffer.append(sep + " ");
+			if (i > 0) buffer.append(sep + " ");
+			
+			if (value instanceof TextParsable)
+				buffer.append(((TextParsable)value).toText());
+			else
+				buffer.append(value);
+			
+			i++;
+		}
+			
+		return buffer.toString();
+	}
+	
+	
+	/**
+	 * Converting a specified collection of objects (any type) into a string in which each object is converted as a word in such string without blanks.
+	 * @param <T> type of each object in the specified collection.
+	 * @param list Specified collection of objects.
+	 * @param sep The character that is used to connect words in the returned string.
+	 * @return Text form (string) of the specified collection of objects.
+	 */
+	public static <T extends Object> String toTextWithoutBlanks(Collection<T> list, String sep) {
+		StringBuffer buffer = new StringBuffer();
+		
+		int i = 0;
+		for (T value : list) {
+			if (i > 0) buffer.append(sep);
 			
 			if (value instanceof TextParsable)
 				buffer.append(((TextParsable)value).toText());
