@@ -349,12 +349,12 @@ public class AlgListChooser extends JDialog {
 		/**
 		 * Text area for algorithms.
 		 */
-		private TextArea txtAlgs;
+		private TextArea txtAlgs = null;
 		
 		/**
 		 * Filtered algorithms.
 		 */
-		private List<String> filterAlgs = Util.newList();
+		private List<String> filterAlgs = null;
 		
 		/**
 		 * Default constructor.
@@ -402,7 +402,8 @@ public class AlgListChooser extends JDialog {
 		private void onOK() {
 			String algsText = txtAlgs.getText();
 			List<String> algNames = algsText != null ? Arrays.asList(algsText.split(DEFAULT_SEP)) : Util.newList(0);
-			filterAlgs.clear();
+			
+			filterAlgs = Util.newList();
 			for (String algName : algNames) {
 				algName = algName != null ? algName.trim() : "";
 				if (!algName.isEmpty()) filterAlgs.add(algName);
@@ -418,7 +419,7 @@ public class AlgListChooser extends JDialog {
 		public List<String> getFilterAlgs() {
 			return filterAlgs;
 		}
-		
+
 	}
 	
 
@@ -426,9 +427,15 @@ public class AlgListChooser extends JDialog {
 	 * Transferring selected algorithms from the left to the right.
 	 */
 	private void leftToRight() {
+		if (leftList.getSelectedAlgList().isEmpty()) {
+			JOptionPane.showMessageDialog(this, "Algorithm not selected or list empty", "List empty", JOptionPane.WARNING_MESSAGE);
+			return;
+		}
+
 		AlgFilter dlgFilter = new AlgFilter(leftList.getSelectedAlgNameList());
 		dlgFilter.setVisible(true);
-		leftToRight(dlgFilter.getFilterAlgs());
+		List<String> filterAlgs = dlgFilter.getFilterAlgs(); 
+		if (filterAlgs != null) leftToRight(filterAlgs);
 	}
 
 	
@@ -466,9 +473,15 @@ public class AlgListChooser extends JDialog {
 	 * Transferring all algorithms from the left to the right.
 	 */
 	private void leftToRightAll() {
+		if (leftList.getAlgList().isEmpty()) {
+			JOptionPane.showMessageDialog(this, "List empty", "List empty", JOptionPane.WARNING_MESSAGE);
+			return;
+		}
+
 		AlgFilter dlgFilter = new AlgFilter(leftList.getAlgNameList());
 		dlgFilter.setVisible(true);
-		leftToRightAll(dlgFilter.getFilterAlgs());
+		List<String> filterAlgs = dlgFilter.getFilterAlgs(); 
+		if (filterAlgs != null) leftToRightAll(filterAlgs);
 	}
 
 	
@@ -506,9 +519,15 @@ public class AlgListChooser extends JDialog {
 	 * Transferring selected algorithms from the right to the left.
 	 */
 	private void rightToLeft() {
+		if (rightList.getSelectedAlgList().isEmpty()) {
+			JOptionPane.showMessageDialog(this, "Algorithm not selected or list empty", "List empty", JOptionPane.WARNING_MESSAGE);
+			return;
+		}
+
 		AlgFilter dlgFilter = new AlgFilter(rightList.getSelectedAlgNameList());
 		dlgFilter.setVisible(true);
-		rightToLeft(dlgFilter.getFilterAlgs());
+		List<String> filterAlgs = dlgFilter.getFilterAlgs(); 
+		if (filterAlgs != null) rightToLeft(filterAlgs);
 	}
 	
 	
@@ -546,9 +565,15 @@ public class AlgListChooser extends JDialog {
 	 * Transferring all algorithms from the right to the left.
 	 */
 	private void rightToLeftAll() {
+		if (rightList.getAlgList().isEmpty()) {
+			JOptionPane.showMessageDialog(this, "List empty", "List empty", JOptionPane.WARNING_MESSAGE);
+			return;
+		}
+
 		AlgFilter dlgFilter = new AlgFilter(rightList.getAlgNameList());
 		dlgFilter.setVisible(true);
-		rightToLeftAll(dlgFilter.getFilterAlgs());
+		List<String> filterAlgs = dlgFilter.getFilterAlgs(); 
+		if (filterAlgs != null) rightToLeftAll(filterAlgs);
 	}
 	
 	
