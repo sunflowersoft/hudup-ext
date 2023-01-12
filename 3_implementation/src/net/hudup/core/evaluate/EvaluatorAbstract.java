@@ -2712,7 +2712,9 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 			
 			@Override
 			protected void task() {
-				purgeListeners(listenerList);
+				try {
+					purgeListeners(listenerList);
+				} catch (Throwable e) {LogUtil.trace(e);}
 			}
 			
 			@Override

@@ -179,7 +179,7 @@ public class DefaultServer extends PowerServerImpl {
 				service.updateRecommender();
 				if (service.recommender != null)
 					LogUtil.info("Server timer internal tasks: Learning recommendation algorithm is successful");
-			} catch (Exception e) {LogUtil.trace(e);}
+			} catch (Throwable e) {LogUtil.trace(e);}
 		}
 		
 		
@@ -191,7 +191,7 @@ public class DefaultServer extends PowerServerImpl {
 				try {
 					new PrintWriter(log).close();
 				}
-				catch (Exception e) {LogUtil.trace(e);}
+				catch (Throwable e) {LogUtil.trace(e);}
 			}
 			
 			File nextupdate = new File(Constants.LOGS_DIRECTORY + "/nextupdate.log");
@@ -199,10 +199,10 @@ public class DefaultServer extends PowerServerImpl {
 				try {
 					new PrintWriter(nextupdate).close();
 				}
-				catch (Exception e) {LogUtil.trace(e);}
+				catch (Throwable e) {LogUtil.trace(e);}
 			}
 		}
-		catch (Exception e) {
+		catch (Throwable e) {
 			LogUtil.trace(e);
 		}
 	}

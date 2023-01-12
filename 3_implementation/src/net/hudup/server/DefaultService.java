@@ -133,7 +133,7 @@ public class DefaultService implements Service, PluginChangedListener, AutoClose
 				Recommender recommender0 = null;
 				try {
 					recommender0 = createRecommender(serverConfig);
-				} catch (Exception e) {LogUtil.trace(e);}
+				} catch (Throwable e) {LogUtil.trace(e);}
 				
 				if (recommender0 != null) {
 					synchronized (this) {
@@ -182,10 +182,10 @@ public class DefaultService implements Service, PluginChangedListener, AutoClose
 			updateRecommender(params);
 		}
 		catch (Throwable e) {
-			LogUtil.trace(e);
 			close();
 			opened = false;
 			
+			LogUtil.trace(e);
 			LogUtil.error("Service fail to open, caused by " + e.getMessage());
 		}
 		

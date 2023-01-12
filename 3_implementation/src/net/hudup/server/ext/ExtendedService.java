@@ -138,8 +138,10 @@ public class ExtendedService extends DefaultService implements ServiceExt, Servi
 				
 				@Override
 				protected void task() {
-					purgeListeners();
-					LogUtil.info("Service timer internal tasks: Purging disconnected listeners is successful");
+					try {
+						purgeListeners();
+						LogUtil.info("Service timer internal tasks: Purging disconnected listeners is successful");
+					} catch (Throwable e) {LogUtil.trace(e);}
 				}
 				
 				@Override
