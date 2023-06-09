@@ -95,6 +95,12 @@ public class Util {
 	
 	
 	/**
+	 * Hudup test properties name.
+	 */
+	public final static String hudupTestPropName = hudupPropName + ".test";
+	
+	
+	/**
 	 * System properties.
 	 */
 	protected final static Properties props = new Properties();

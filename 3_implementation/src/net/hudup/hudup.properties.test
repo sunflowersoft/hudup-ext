@@ -1,0 +1,22 @@
+#HUDUP: A FRAMEWORK OF E-COMMERCIAL RECOMMENDATION ALGORITHMS
+#(C) Copyright by Loc Nguyen's Academic Network
+#Project homepage: http://www.locnguyen.net/st/products/hudup
+#Email: ng_phloc@yahoo.com
+#Phone: +84-975250362
+#Hudup properties for testing, which is stored in working directory.
+
+#This mode is calling explicitly finalize method, which is true if the finalize method of an object is called explicitly when the object is discarded.
+#call_finalize=true
+call_finalize=false
+
+#If flag is true, the framework supports compressed files (zip, jar) as storage.
+#Currently, Hudup used TrueZip (https://christian-schlichtherle.bitbucket.io/truezip) developed by Christian Schlichtherle to process compressed files.
+#When this flag is false, TrueZip is not used. It is more stable if setting this flag to be false. 
+compressed_file_support=false
+#compressed_file_support=true
+
+#Setting debug mode. If this flag is true, Hudup framework runs in debug mode in which thrown exceptions are printed traced, for example.
+#Otherwise, thrown exceptions are not traced and so only error meassages are printed.
+#It is faster if setting this flag to be false.
+debug=false
+#debug=true

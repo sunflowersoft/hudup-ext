@@ -239,6 +239,31 @@ public abstract class PluginManagerAbstract implements PluginManager {
 			LogUtil.trace(e);
 		}
 
+		//Copying the test property file.
+		try {
+			xURI testPropUri = null;
+			try {
+				URL testPropUrl = getClass().getResource(ROOT_PACKAGE + Util.hudupTestPropName);
+				if (testPropUrl != null) testPropUri = xURI.create(testPropUrl.toURI());
+			}
+			catch (Throwable e) {testPropUri = null;}
+
+			UriAdapter adapter = new UriAdapter(Constants.WORKING_DIRECTORY);
+			xURI workingTestPropUri = xURI.create(Constants.WORKING_DIRECTORY	+ "/" + Util.hudupTestPropName);
+			if (testPropUri != null && !adapter.exists(workingTestPropUri)) {
+				try {
+					adapter.copy(testPropUri, workingTestPropUri, false, null);
+				} catch (Throwable e) {
+					LogUtil.error("Copying test properties error by " + e.getMessage());
+				}
+			}
+			
+			adapter.close();
+		}
+		catch (Throwable e) {
+			LogUtil.trace(e);
+		}
+
 		//Adding working library class path into Java class path.
 		addWorkingLibClassPath();
 		
