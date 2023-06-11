@@ -664,6 +664,20 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 		if (!isRunning()) return;
 
 		try {
+			try {
+				String callServerTasksText = Util.getHudupProperty("call_server_tasks");
+				if (callServerTasksText != null && !callServerTasksText.isEmpty()) {
+					if (!Boolean.parseBoolean(callServerTasksText)) return;
+				}
+			}
+			catch (Throwable e) {}
+
+		}
+		catch (Throwable e) {
+			LogUtil.error("Reading property call_server_tasks causes error, which is " + e.getMessage());
+		}
+		
+		try {
 			serverTasks();
 			LogUtil.info("Power server has done timer internal tasks");
 		}
