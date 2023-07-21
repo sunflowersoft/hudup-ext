@@ -173,12 +173,12 @@ public class Util {
 
 
 	/**
-	 * Converting Hudup profile into PSO profile.
-	 * @param newAttRef PSO attributes.
+	 * Converting Hudup profile into W profile.
+	 * @param newAttRef W attributes.
 	 * @param profile Hudup profile.
-	 * @return PSO profile.
+	 * @return W profile.
 	 */
-	public static net.hudup.core.evaluate.wrapper.Profile toPSOProfile(net.hudup.core.evaluate.wrapper.AttributeList newAttRef, Profile profile) {
+	public static net.hudup.core.evaluate.wrapper.Profile toWProfile(net.hudup.core.evaluate.wrapper.AttributeList newAttRef, Profile profile) {
 		if (newAttRef == null || profile == null) return null;
 		
 		net.hudup.core.evaluate.wrapper.Profile newProfile = new net.hudup.core.evaluate.wrapper.Profile(newAttRef);
@@ -192,22 +192,22 @@ public class Util {
 	
 	
 	/**
-	 * Converting Hudup profile into PSO profile.
+	 * Converting Hudup profile into W profile.
 	 * @param profile Hudup profile.
-	 * @return PSO profile.
+	 * @return W profile.
 	 */
-	public static net.hudup.core.evaluate.wrapper.Profile toPSOProfile(Profile profile) {
-		net.hudup.core.evaluate.wrapper.AttributeList newAttRef = extractPSOAttributes(profile);
-		return toPSOProfile(newAttRef, profile);
+	public static net.hudup.core.evaluate.wrapper.Profile toWProfile(Profile profile) {
+		net.hudup.core.evaluate.wrapper.AttributeList newAttRef = extractWAttributes(profile);
+		return toWProfile(newAttRef, profile);
 	}
 
 		
 	/**
-	 * Extracting PSO attributes from Hudup profile.
+	 * Extracting W attributes from Hudup profile.
 	 * @param profile Hudup profile.
-	 * @return list of PSO attributes.
+	 * @return list of W attributes.
 	 */
-	public static net.hudup.core.evaluate.wrapper.AttributeList extractPSOAttributes(Profile profile) {
+	public static net.hudup.core.evaluate.wrapper.AttributeList extractWAttributes(Profile profile) {
 		if (profile == null) return new net.hudup.core.evaluate.wrapper.AttributeList();
 		
 		net.hudup.core.evaluate.wrapper.AttributeList newAttRef = new net.hudup.core.evaluate.wrapper.AttributeList();
@@ -250,35 +250,35 @@ public class Util {
 	
 	
 	/**
-	 * Convert Hudup configuration to PSO configuration.
+	 * Convert Hudup configuration to W configuration.
 	 * @param config Hudup configuration.
-	 * @return PSO configuration.
+	 * @return W configuration.
 	 */
-	public static WConfig transferToPSOConfig(DataConfig config) {
+	public static WConfig toWConfig(DataConfig config) {
 		if (config == null) return new WConfig();
 		
-		WConfig psoConfig = new WConfig();
+		WConfig wConfig = new WConfig();
 		Set<String> keys = config.keySet();
 		for (String key : keys) {
-			if (psoConfig.containsKey(key)) psoConfig.put(key, config.get(key));
+			if (wConfig.containsKey(key)) wConfig.put(key, config.get(key));
 		}
 		
-		return psoConfig;
+		return wConfig;
 	}
 
 
 	/**
-	 * Convert PSO configuration to Hudup configuration.
-	 * @param psoConfig PSO configuration.
+	 * Convert W configuration to Hudup configuration.
+	 * @param wConfig W configuration.
 	 * @return Hudup configuration.
 	 */
-	public static DataConfig toConfig(WConfig psoConfig) {
-		if (psoConfig == null) return new DataConfig();
+	public static DataConfig toConfig(WConfig wConfig) {
+		if (wConfig == null) return new DataConfig();
 		
 		DataConfig config = new DataConfig();
-		Set<String> keys = psoConfig.keySet();
+		Set<String> keys = wConfig.keySet();
 		for (String key : keys) {
-			config.put(key, psoConfig.get(key));
+			config.put(key, wConfig.get(key));
 		}
 		
 		return config;

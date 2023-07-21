@@ -79,8 +79,8 @@ public abstract class WAbstract extends ExecuteAsLearnAlgAbstract implements W, 
 	
 
 	/**
-	 * Create PSO instance.
-	 * @return PSO instance.
+	 * Create W instance.
+	 * @return W instance.
 	 */
 	protected abstract net.hudup.core.evaluate.wrapper.W createW();
 	

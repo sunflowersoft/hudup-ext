@@ -34,4 +34,13 @@ public class WSetting implements Cloneable, Serializable {
 	}
 
 	
+	/**
+	 * Extracting from configuration.
+	 * @param config specified configuration.
+	 */
+	public void extractConfig(WConfig config) {
+		
+	}
+	
+	
 }

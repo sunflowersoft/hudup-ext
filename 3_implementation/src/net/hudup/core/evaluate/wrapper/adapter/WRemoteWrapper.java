@@ -35,21 +35,21 @@ public class WRemoteWrapper extends ExecuteAsLearnAlgRemoteWrapper implements W,
 
 	
 	/**
-	 * Constructor with specified remote PSO algorithm.
-	 * @param remotePSO remote PSO algorithm.
+	 * Constructor with specified remote W algorithm.
+	 * @param remoteW remote W algorithm.
 	 */
-	public WRemoteWrapper(WRemote remotePSO) {
-		super(remotePSO);
+	public WRemoteWrapper(WRemote remoteW) {
+		super(remoteW);
 	}
 
 	
 	/**
-	 * Constructor with specified remote PSO algorithm and exclusive mode.
-	 * @param remotePSO remote PSO algorithm.
+	 * Constructor with specified remote W algorithm and exclusive mode.
+	 * @param remoteW remote W algorithm.
 	 * @param exclusive exclusive mode.
 	 */
-	public WRemoteWrapper(WRemote remotePSO, boolean exclusive) {
-		super(remotePSO, exclusive);
+	public WRemoteWrapper(WRemote remoteW, boolean exclusive) {
+		super(remoteW, exclusive);
 	}
 
 	
