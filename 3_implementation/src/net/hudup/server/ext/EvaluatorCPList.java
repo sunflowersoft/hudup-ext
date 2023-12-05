@@ -253,7 +253,7 @@ public class EvaluatorCPList extends JFrame {
 		toolbar.add(btnDelete);
 
 		btnServerEvent = UIUtil.makeIconButton(
-			"pause-16x16.png", 
+			"notify-pause-16x16.png", 
 			"receive", 
 			"Pause receving server events", 
 			"Pause receving server events", 
@@ -435,11 +435,11 @@ public class EvaluatorCPList extends JFrame {
 	private void setServerEventButton() {
 		synchronized (tblEvaluator.remoteSyncObject) {
 			if (tblEvaluator.remoteSyncObject.get()) {
-				btnServerEvent.setIcon(UIUtil.getImageIcon("pause-16x16.png", "Pause receving server events"));
+				btnServerEvent.setIcon(UIUtil.getImageIcon("notify-pause-16x16.png", "Pause receving server events"));
 				btnServerEvent.setToolTipText("Pause receving server events");
 			}
 			else {
-				btnServerEvent.setIcon(UIUtil.getImageIcon("start-16x16.png", "Start receving server events"));
+				btnServerEvent.setIcon(UIUtil.getImageIcon("notify-start-16x16.png", "Start receving server events"));
 				btnServerEvent.setToolTipText("Start receving server events");
 			}
 		}

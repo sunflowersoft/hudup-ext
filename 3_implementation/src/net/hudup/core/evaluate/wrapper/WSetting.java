@@ -15,7 +15,6 @@ import java.io.Serializable;
  * @author Loc Nguyen
  * @version 1.0
  *
- * @param <T> data type.
  */
 public class WSetting implements Cloneable, Serializable {
 
