@@ -5,7 +5,7 @@
  * Email: ng_phloc@yahoo.com
  * Phone: +84-975250362
  */
-package net.hudup.core;
+package net.hudup.core.app;
 
 import java.io.Serializable;
 import java.rmi.Remote;

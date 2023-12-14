@@ -3,20 +3,14 @@
  */
 package net.hudup.plugins.demo;
 
-import java.rmi.RemoteException;
-import java.util.Set;
-
-import net.hudup.core.alg.Alg;
-import net.hudup.core.alg.cf.MemoryBasedCF;
-import net.hudup.core.alg.RecommendParam;
-import net.hudup.core.data.RatingVector;
+import net.hudup.core.alg.cf.nb.beans.Pearson;
 
 /**
  * @author Loc Nguyen
  * @version 10.0
  *
  */
-public class PluginDemoCF2 extends MemoryBasedCF {
+public class PluginDemoCF2 extends Pearson {
 
 	
 	/**
@@ -26,7 +20,7 @@ public class PluginDemoCF2 extends MemoryBasedCF {
 
 
 	/**
-	 * 
+	 * Default constructor.
 	 */
 	public PluginDemoCF2() {
 		super();
@@ -39,10 +33,4 @@ public class PluginDemoCF2 extends MemoryBasedCF {
 	}
 
 	
-	@Override
-	public RatingVector estimate(RecommendParam param, Set<Integer> queryIds) throws RemoteException {
-		return null;
-	}
-
-
 }

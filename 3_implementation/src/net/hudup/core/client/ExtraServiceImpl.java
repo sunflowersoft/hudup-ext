@@ -16,9 +16,9 @@ import java.util.Map;
 import java.util.Set;
 
 import net.hudup.core.ExtraStorage;
-import net.hudup.core.App;
-import net.hudup.core.Appor;
 import net.hudup.core.Util;
+import net.hudup.core.app.App;
+import net.hudup.core.app.Appor;
 import net.hudup.core.logistic.LogUtil;
 
 /**

@@ -19,7 +19,6 @@ import java.util.Set;
 
 import javax.swing.event.EventListenerList;
 
-import net.hudup.core.Appor;
 import net.hudup.core.Constants;
 import net.hudup.core.ExtraStorage;
 import net.hudup.core.PluginAlgDesc2ListMap;
@@ -32,6 +31,7 @@ import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.AlgDesc2;
 import net.hudup.core.alg.AlgDesc2List;
 import net.hudup.core.alg.AlgList;
+import net.hudup.core.app.Appor;
 import net.hudup.core.client.ActiveMeasure;
 import net.hudup.core.client.ClassProcessor;
 import net.hudup.core.client.ExtraGateway;

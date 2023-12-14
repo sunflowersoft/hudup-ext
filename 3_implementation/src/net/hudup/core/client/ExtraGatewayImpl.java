@@ -11,7 +11,7 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.List;
 
-import net.hudup.core.App;
+import net.hudup.core.app.App;
 import net.hudup.core.data.DataConfig;
 
 /**

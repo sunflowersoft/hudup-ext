@@ -21,7 +21,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 
-import net.hudup.core.App;
+import net.hudup.core.app.App;
 import net.hudup.core.client.ConnectInfo;
 import net.hudup.core.client.Connector;
 import net.hudup.core.client.ExtraService;

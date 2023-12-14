@@ -16,8 +16,8 @@ import java.util.List;
 
 import javax.swing.JOptionPane;
 
-import net.hudup.core.App;
 import net.hudup.core.Constants;
+import net.hudup.core.app.App;
 import net.hudup.core.client.ExtraGateway;
 import net.hudup.core.client.ExtraGatewayImpl;
 import net.hudup.core.client.ExtraService;

@@ -42,6 +42,7 @@ import net.hudup.core.alg.Recommender;
 import net.hudup.core.alg.RecommenderRemote;
 import net.hudup.core.alg.RecommenderRemoteWrapper;
 import net.hudup.core.alg.ServiceAlg;
+import net.hudup.core.app.Appor;
 import net.hudup.core.data.DataDriver;
 import net.hudup.core.data.DataDriverList;
 import net.hudup.core.data.DatasetRemote;
