@@ -5,20 +5,6 @@
 #Phone: +84-975250362
 #Hudup properties for testing, which is stored in working directory.
 
-#This mode is calling explicitly finalize method, which is true if the finalize method of an object is called explicitly when the object is discarded.
-#call_finalize=true
-call_finalize=false
-
-#This is flag to indicate whether Hudup sever calls internal tasks periodly. It is set to be true by default. If it is false, internal tasks are not called, which can cause some implicit and unexpected problems but the server will be run faster and stabler.
-#call_server_tasks=true
-call_server_tasks=false
-
-#If flag is true, the framework supports compressed files (zip, jar) as storage.
-#Currently, Hudup used TrueZip (https://christian-schlichtherle.bitbucket.io/truezip) developed by Christian Schlichtherle to process compressed files.
-#When this flag is false, TrueZip is not used. It is more stable if setting this flag to be false. 
-compressed_file_support=false
-#compressed_file_support=true
-
 #Setting debug mode. If this flag is true, Hudup framework runs in debug mode in which thrown exceptions are printed traced, for example.
 #Otherwise, thrown exceptions are not traced and so only error meassages are printed.
 #It is faster if setting this flag to be false.
