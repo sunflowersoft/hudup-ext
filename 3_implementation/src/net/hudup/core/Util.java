@@ -7,8 +7,12 @@
  */
 package net.hudup.core;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Array;
 import java.nio.file.Files;
@@ -439,6 +443,76 @@ public class Util {
 			return obj;
 	}
 	
+	
+	/**
+	 * Clone object by serialization
+	 * @param object specified object.
+	 * @return cloned object.
+	 */
+	public static Object cloneBySerialize(Object object) {
+		if (object == null) return null;
+		try {
+			ByteArrayOutputStream os = new ByteArrayOutputStream();
+			ObjectOutputStream oos = new ObjectOutputStream(os);
+			oos.writeObject(object);
+			oos.flush();
+
+			ByteArrayInputStream is = new ByteArrayInputStream(os.toByteArray());
+			ObjectInputStream ois = new ObjectInputStream(is);
+			Object cloned = ois.readObject();
+			
+			oos.close();
+			ois.close();
+			return cloned;
+		}
+		catch (Throwable e) {
+			LogUtil.trace(e);
+		} 
+		
+		return null;
+	}
+
+	
+	/**
+	 * Writing (serializing) object to output stream.
+	 * @param object object will be serialized.
+	 * @param os output stream.
+	 * @return true if writing (serializing) is successful. 
+	 */
+	public static boolean serialize(Object object, OutputStream os) {
+		try {
+			if (object == null) return false;
+			ObjectOutputStream output = new ObjectOutputStream(os);
+			output.writeObject(object);
+			output.flush();
+			return true;
+		}
+		catch (Throwable e) {
+			LogUtil.trace(e);
+		}
+		
+		return false;
+	}
+
+	
+	/**
+	 * Reading (deserializing) object from input stream.
+	 * @param is input stream.
+	 * @return deserialized object. Returning null if deserializing is not successful.
+	 */
+	public static Object deserialize(InputStream is) {
+		try {
+			ObjectInputStream input = new ObjectInputStream(is);
+			Object object = input.readObject();
+			return object;
+		}
+		catch (Throwable e) {
+			LogUtil.trace(e);
+		}
+		
+		return null;
+	}
+
 	
 	/**
 	 * As a definition, a value is called {@code used} if it is not {@link Constants#UNUSED}; otherwise it is called {@code unused}.
