@@ -1,7 +1,6 @@
-package net.hudup.core.logistic;
+package net.hudup.core.logistic.console;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -11,23 +10,25 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.rmi.RemoteException;
+import java.util.Scanner;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 import javax.swing.WindowConstants;
+import javax.swing.event.EventListenerList;
 import javax.swing.text.BadLocationException;
-import javax.swing.text.MutableAttributeSet;
-import javax.swing.text.SimpleAttributeSet;
-import javax.swing.text.StyleConstants;
-import javax.swing.text.StyledDocument;
+import javax.swing.text.Document;
+import javax.swing.text.JTextComponent;
 
+import net.hudup.core.logistic.AbstractRunner;
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.ui.UIUtil;
 
 /**
@@ -37,7 +38,7 @@ import net.hudup.core.logistic.ui.UIUtil;
  * @author William Matrix Peckham
  * @version 1.0
  */
-public abstract class ConsoleImpl extends JTextPane implements Console {
+public abstract class ConsoleImpl extends AbstractRunner implements Console {
 	
 	
 	/**
@@ -47,15 +48,9 @@ public abstract class ConsoleImpl extends JTextPane implements Console {
 	
 	
 	/**
-	 * Internal output stream.
+	 * Text area.
 	 */
-	protected DocOutputStream out = null;
-	
-	
-	/**
-	 * Internal print stream.
-	 */
-	protected PrintStream pout = null;
+	protected JTextComponent txtArea = null;
 	
 	
 	/**
@@ -65,64 +60,166 @@ public abstract class ConsoleImpl extends JTextPane implements Console {
 	
 	
 	/**
-	 * Internal document.
+	 * Internal output stream.
 	 */
-	protected StyledDocument doc = null;
-	
+	protected DocOutputStream out = null;
 	
 	
 	/**
+	 * Holding a list of event listeners.
+	 * 
+	 */
+    protected EventListenerList listenerList = new EventListenerList();
+
+    
+    /**
 	 * Default constructor.
 	 */
 	public ConsoleImpl() {
 		super();
-		doc = this.getStyledDocument();
-		out = new DocOutputStream(doc,this);
-		pout = new PrintStream(out);
+		txtArea = new JTextPane();
+		txtArea.setEditable(false);
+		out = new DocOutputStream(txtArea);
 		in = new DocInputStream();
-		addKeyListener(in);
+		txtArea.addKeyListener(in);
 	}
 	
 	
 	@Override
-	public boolean stop(Object... params) throws Exception {
-		return false;
+	protected void task() {
+		send("Started");
+		taskOne();
+		send("Stopped");
+		
+		thread = null;
+		
+		if (paused) {
+			paused = false;
+			notifyAll();
+		}
+	}
+
+	
+	/**
+	 * The task is executed one time.
+	 */
+	protected abstract void taskOne();
+	
+
+	@Override
+	public boolean startConsole(Object... params) throws RemoteException {
+		boolean started = super.start();
+		return started;
 	}
 
 
-	/**
-	 * Get input.
-	 * @return internal input.
+	@Override
+	public boolean stopConsole(Object... params) throws RemoteException {
+		boolean stopped = super.forceStop();
+		send("Forcedly stopped");
+		return stopped;
+	}
+
+
+	@Override
+	protected void clear() {
+
+	}
+
+
+	@Override
+	public boolean isConsoleStarted() throws RemoteException {
+		return super.isStarted();
+	}
+
+
+	@Override
+	public String getContent() throws RemoteException {
+		return txtArea.getText();
+	}
+
+
+	@Override
+	public void addListener(ConsoleListener listener) throws RemoteException {
+		synchronized (listenerList) {
+			listenerList.add(ConsoleListener.class, listener);
+		}
+	}
+
+
+	@Override
+	public void removeListener(ConsoleListener listener) throws RemoteException {
+		synchronized (listenerList) {
+			listenerList.remove(ConsoleListener.class, listener);
+		}
+	}
+
+
+    /**
+     * Return array of listeners for this console.
+     * @return array of listeners for this console.
+     */
+    protected ConsoleListener[] getListeners() {
+		synchronized (listenerList) {
+			return listenerList.getListeners(ConsoleListener.class);
+		}
+    }
+
+    
+    /**
+     * Firing (issuing) an event from this console to all listeners. 
+     * @param evt event from this console.
+     */
+    protected void fireEvent(ConsoleEvent evt) {
+		ConsoleListener[] listeners = getListeners();
+		for (ConsoleListener listener : listeners) {
+	    	try {
+				listener.receiveMessage(evt);
+			}
+			catch (Exception e) {LogUtil.trace(e);}
+		}
+    }
+
+    
+    /**
+	 * Entering information.
+	 * @param prompt prompt message.
+	 * @return entered information.
 	 */
-	public InputStream getIn() {
-		return in;
+	protected String enter(String prompt) {
+		if (txtArea == null) return null;
+		boolean editable = txtArea.isEditable();
+		txtArea.setEditable(true);
+		
+		if(prompt != null) new PrintStream(out).print(prompt);
+		String info = null;
+		try {
+			@SuppressWarnings("resource")
+			Scanner scanner = new Scanner(in);
+			info = scanner.nextLine().trim();
+		} catch (Throwable e) {}
+		
+		txtArea.setEditable(editable);
+		return info;
 	}
 	
 	
 	/**
-	 * Getting out put.
-	 * @return print stream.
+	 * Sending message.
+	 * @param message specified message.
 	 */
-	public PrintStream getOut() {
-		return pout;
+	protected void send(String message) {
+		new PrintStream(out).println(message);
+		fireEvent(new ConsoleEvent(this, message));
 	}
 	
 	
 	/**
-	 * Setting foreground color.
-	 * @param fg foreground color.
+	 * Getting component.
+	 * @return component.
 	 */
-	public void setFGColor(Color fg) {
-		StyleConstants.setForeground(out.cur, fg);
-	}
-	
-	
-	/**
-	 * Setting background color.
-	 * @param bg background color.
-	 */
-	public void setBGColor(Color bg) {
-		StyleConstants.setBackground(out.cur, bg);
+	public JTextComponent getComponent() {
+		return txtArea;
 	}
 	
 	
@@ -134,36 +231,25 @@ public abstract class ConsoleImpl extends JTextPane implements Console {
 	private static class DocOutputStream extends OutputStream {
 		
 		/**
-		 * Internal document.
+		 * Text area.
 		 */
-		StyledDocument doc = null;
-		
-		/**
-		 * Internal attribute set.
-		 */
-		MutableAttributeSet cur = null;
-		
-		/**
-		 * Text panel.
-		 */
-		JTextPane pane = null;
+		JTextComponent txtArea = null;
 		
 		/**
 		 * Constructor with document and text pane.
 		 * @param doc specified document.
 		 * @param pane specified text pane.
 		 */
-		public DocOutputStream(StyledDocument doc, JTextPane pane) {
-			this.doc = doc;
-			this.pane = pane;
-			cur = new SimpleAttributeSet();
+		public DocOutputStream(JTextComponent txtArea) {
+			this.txtArea = txtArea;
 		}
 		
 		@Override
 		public void write(int b) throws IOException {
 			try {
-				doc.insertString(doc.getLength(), (char)b + "", cur);
-				pane.setCaretPosition(doc.getLength());
+				Document doc = txtArea.getDocument();
+				doc.insertString(doc.getLength(), (char)b + "", null);
+				txtArea.setCaretPosition(doc.getLength());
 			}
 			catch (BadLocationException e) {
 				Logger.getLogger(Console.class.getName()).log(Level.SEVERE, null, e);
@@ -283,13 +369,16 @@ public abstract class ConsoleImpl extends JTextPane implements Console {
 			private static final long serialVersionUID = 1L;
 
 			@Override
-			public boolean start(Object... params) throws Exception {
-				JOptionPane.showMessageDialog(dlgConsole, "Start", "Start", JOptionPane.INFORMATION_MESSAGE);
-				return true;
+			protected void taskOne() {
+				boolean load3d = false;
+				try {
+					load3d = Boolean.parseBoolean(enter("Load 3D (true) or load 2D (false) (false is default):").trim());
+				} catch (Throwable e) {}
+				send(load3d ? "Load 3D\n" : "Load 2D\n");
 			}
 			
 		};
-		dlgConsole.add(new JScrollPane(console), BorderLayout.CENTER);
+		dlgConsole.add(new JScrollPane(console.getComponent()), BorderLayout.CENTER);
 		
 		JPanel footer = new JPanel();
 		dlgConsole.add(footer, BorderLayout.SOUTH);
@@ -300,8 +389,8 @@ public abstract class ConsoleImpl extends JTextPane implements Console {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				try {
-					console.start();
-				} catch (Exception ex) {ex.printStackTrace();}
+					console.startConsole();
+				} catch (RemoteException ex) {LogUtil.trace(ex);}
 			}
 			
 		});

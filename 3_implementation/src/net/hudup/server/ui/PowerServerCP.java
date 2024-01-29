@@ -213,6 +213,7 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 	 */
 	protected ConnectInfo connectInfo = null;
 	
+	
 	/**
 	 * Internal time counter.
 	 * Every period in seconds, this control panel updates itself by server information.
@@ -310,7 +311,7 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 			try {
 				server.addStatusListener(this);
 			}
-			catch (Throwable e) {e.printStackTrace();}
+			catch (Throwable e) {LogUtil.trace(e);}
 		}
 		else if (!connectInfo.pullMode) {
 			try {
@@ -322,7 +323,7 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 				try {
 		        	UnicastRemoteObject.unexportObject(this, true);
 				}
-				catch (Throwable e1) {e1.printStackTrace();}
+				catch (Throwable e1) {LogUtil.trace(e1);}
 			}
 		}
 		
@@ -878,20 +879,19 @@ public class PowerServerCP extends JFrame implements ServerStatusListener {
 			boolean apply = paneConfig.apply();
 			if (!apply) {
 				JOptionPane.showMessageDialog(
-						this, 
-						"Cannot apply configuration", 
-						"Cannot apply configuration", 
-						JOptionPane.ERROR_MESSAGE);
+					this,
+					"Cannot apply configuration",
+					"Cannot apply configuration",
+					JOptionPane.ERROR_MESSAGE);
 			}
 			else {
-				server.setConfig(
-						(DataConfig)paneConfig.getPropTable().getPropList());
+				server.setConfig((DataConfig)paneConfig.getPropTable().getPropList());
 		
 				JOptionPane.showMessageDialog(
-						this, 
-						"Apply configuration to server successfully", 
-						"Apply configuration successfully", 
-						JOptionPane.INFORMATION_MESSAGE);
+					this,
+					"Apply configuration to server successfully",
+					"Apply configuration successfully",
+					JOptionPane.INFORMATION_MESSAGE);
 			}
 			
 			return apply;
