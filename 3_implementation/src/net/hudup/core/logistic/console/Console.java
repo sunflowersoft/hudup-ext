@@ -18,9 +18,15 @@ import java.rmi.RemoteException;
  * @version 1.0
  *
  */
-public interface Console extends Cloneable, Serializable, Remote {
+public interface Console extends Cloneable, Serializable, AutoCloseable, Remote {
 
 	
+	/**
+	 * Default text editable.
+	 */
+	static boolean DEFAULT_TEXT_EDITABLE = false;
+
+
 	/**
 	 * Starting console.
 	 * @param params additional parameters.
@@ -48,6 +54,14 @@ public interface Console extends Cloneable, Serializable, Remote {
 	
 	
 	/**
+	 * Getting console name.
+	 * @return console name.
+	 * @throws RemoteException if any error raises.
+	 */
+	String getName() throws RemoteException;
+	
+	
+	/**
 	 * Getting content.
 	 * @return entire content.
 	 * @throws RemoteException if any error raises.
@@ -71,4 +85,25 @@ public interface Console extends Cloneable, Serializable, Remote {
     void removeListener(ConsoleListener listener) throws RemoteException;
 	
 	
+    /**
+     * Exporting console.
+     * @param serverPort server port.
+     * @return true if exporting is successful.
+     * @throws RemoteException if any error raises.
+     */
+	boolean export(int serverPort) throws RemoteException;
+
+
+    /**
+     * Unexporting console.
+     * @return true if unexporting is successful.
+     * @throws RemoteException if any error raises.
+     */
+	boolean unexport() throws RemoteException;
+	
+	
+	@Override
+    void close() throws Exception;
+
+
 }

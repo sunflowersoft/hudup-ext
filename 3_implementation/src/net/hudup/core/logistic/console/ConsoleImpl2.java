@@ -40,13 +40,20 @@ import net.hudup.core.logistic.ui.UIUtil;
  * @author William Matrix Peckham
  * @version 1.0
  */
-public abstract class ConsoleImpl implements Console {
+@Deprecated
+public abstract class ConsoleImpl2 extends AbstractRunner implements Console {
 	
 	
 	/**
 	 * Serial version UID for serializable class. 
 	 */
 	private static final long serialVersionUID = 1L;
+	
+	
+	/**
+	 * Default text editable.
+	 */
+	protected final static boolean DEFAULT_TEXT_EDITABLE = false;
 	
 	
 	/**
@@ -75,12 +82,6 @@ public abstract class ConsoleImpl implements Console {
 
     
     /**
-     * Internal runner.
-     */
-	protected AbstractRunner runner = null;
-
-	
-	/**
      * Exporting flag.
      */
 	protected boolean exported = false;
@@ -89,39 +90,31 @@ public abstract class ConsoleImpl implements Console {
 	/**
 	 * Default constructor.
 	 */
-	public ConsoleImpl() {
+	public ConsoleImpl2() {
 		super();
 		txtArea = new JTextPane();
-		txtArea.setEditable(Console.DEFAULT_TEXT_EDITABLE);
+		txtArea.setEditable(DEFAULT_TEXT_EDITABLE);
 		out = new DocOutputStream(txtArea);
 		in = new DocInputStream();
 		txtArea.addKeyListener(in);
-		
-		runner = new AbstractRunner() {
-			
-			@Override
-			protected void task() {
-				getThisConsole().send("Started");
-				getThisConsole().consoleTask();
-				
-				thread = null;
-				
-				if (paused) {
-					paused = false;
-					notifyAll();
-				}
-				
-				getThisConsole().send("Stopped");
-			}
-			
-			@Override
-			protected void clear() {
-
-			}
-
-		};
 	}
 	
+	
+	@Override
+	protected void task() {
+		send("Started");
+		consoleTask();
+		
+		thread = null;
+		
+		if (paused) {
+			paused = false;
+			notifyAll();
+		}
+		
+		send("Stopped");
+	}
+
 	
 	/**
 	 * The task is executed one time.
@@ -131,23 +124,29 @@ public abstract class ConsoleImpl implements Console {
 
 	@Override
 	public boolean startConsole(Object... params) throws RemoteException {
-		txtArea.setEditable(Console.DEFAULT_TEXT_EDITABLE);
-		boolean started = runner.start();
+		txtArea.setEditable(DEFAULT_TEXT_EDITABLE);
+		boolean started = super.start();
 		return started;
 	}
 
 
 	@Override
 	public boolean stopConsole(Object... params) throws RemoteException {
-		boolean stopped = runner.forceStop();
+		boolean stopped = super.forceStop();
 		if (stopped) send("Forcedly stopped");
 		return stopped;
 	}
 
 
 	@Override
+	protected void clear() {
+
+	}
+
+
+	@Override
 	public boolean isConsoleStarted() throws RemoteException {
-		return runner.isStarted();
+		return super.isStarted();
 	}
 
 
@@ -262,7 +261,7 @@ public abstract class ConsoleImpl implements Console {
 	 * Getting this console.
 	 * @return this console.
 	 */
-	private ConsoleImpl getThisConsole() {
+	private ConsoleImpl2 getThisConsole() {
 		return this;
 	}
 	
@@ -429,7 +428,7 @@ public abstract class ConsoleImpl implements Console {
 	@Override
 	public void close() throws Exception {
 		try {
-			stopConsole();
+			stopConsole(new Object[] {});
 		} catch (Throwable e) {LogUtil.trace(e);}
 		
 		try {
@@ -449,7 +448,7 @@ public abstract class ConsoleImpl implements Console {
 		dlgConsole.setLocationRelativeTo(UIUtil.getDialogForComponent(comp));
 		dlgConsole.setLayout(new BorderLayout());
 		
-		ConsoleImpl console = new ConsoleImpl() {
+		ConsoleImpl2 console = new ConsoleImpl2() {
 			
 			/**
 			 * Serial version UID for serializable class. 
@@ -482,7 +481,7 @@ public abstract class ConsoleImpl implements Console {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				try {
-					console.startConsole();
+					console.startConsole(new Object[] {});
 				} catch (RemoteException ex) {LogUtil.trace(ex);}
 			}
 			

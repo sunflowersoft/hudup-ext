@@ -71,4 +71,21 @@ public interface App extends Remote, Serializable {
 	Remote getRemoteObject() throws RemoteException;
 	
 	
+    /**
+     * Exporting console.
+     * @param serverPort server port.
+     * @return true if exporting is successful.
+     * @throws RemoteException if any error raises.
+     */
+	boolean export(int serverPort) throws RemoteException;
+
+
+    /**
+     * Unexporting console.
+     * @return true if unexporting is successful.
+     * @throws RemoteException if any error raises.
+     */
+	boolean unexport() throws RemoteException;
+
+
 }

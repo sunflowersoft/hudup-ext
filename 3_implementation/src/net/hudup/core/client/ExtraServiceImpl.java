@@ -71,7 +71,10 @@ public class ExtraServiceImpl implements ExtraService, Serializable {
 				for (Appor appor : appors) {
 					try {
 						App app = appor.create(this.server);
-						if (app != null) this.apps.put(app.getName(), app);
+						if (app != null && !this.apps.containsKey(app.getName())) {
+							app.export(server.getPort());
+							this.apps.put(app.getName(), app);
+						}
 					}
 					catch (Exception e) {LogUtil.trace(e);}
 				}
@@ -89,7 +92,7 @@ public class ExtraServiceImpl implements ExtraService, Serializable {
 			Collection<App> appList = this.apps.values();
 			for (App app : appList) {
 				try {
-					app.discard();
+					app.discard(); //Also unexporting this application.
 				} catch (Throwable e) {LogUtil.trace(e);}
 			}
 			this.apps.clear();

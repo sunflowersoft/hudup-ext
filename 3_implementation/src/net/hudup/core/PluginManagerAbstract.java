@@ -10,10 +10,14 @@ package net.hudup.core;
 import static net.hudup.core.Constants.ROOT_PACKAGE;
 
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.Collection;
 import java.util.List;
 import java.util.Properties;
@@ -253,7 +257,17 @@ public abstract class PluginManagerAbstract implements PluginManager {
 			xURI workingTestPropUri = xURI.create(Constants.WORKING_DIRECTORY	+ "/" + Util.hudupTestPropName);
 			if (testPropUri != null && !adapter.exists(workingTestPropUri)) {
 				try {
-					adapter.copy(testPropUri, workingTestPropUri, false, null);
+					if (Constants.COMPRESSED_FILE_SUPPORT)
+						adapter.copy(testPropUri, workingTestPropUri, false, null);
+					else {
+						InputStream in = getClass().getResourceAsStream(ROOT_PACKAGE + Util.hudupTestPropName);
+						Properties testProps = new Properties();
+						testProps.load(in);
+						OutputStream out = Files.newOutputStream(Paths.get(workingTestPropUri.getURI()), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+						testProps.store(out, "Hudup properties for testing, which is stored in working directory");
+						in.close();
+						out.close();
+					}
 				} catch (Throwable e) {
 					LogUtil.error("Copying test properties error by " + e.getMessage());
 				}

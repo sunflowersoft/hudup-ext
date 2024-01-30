@@ -31,7 +31,7 @@ public class TestAppor extends ApporAbstract {
 	/**
 	 * Test application creator name.
 	 */
-	public final static String NAME = "Tester";
+	public final static String NAME = "tester";
 	
 	
 	/**
@@ -56,6 +56,7 @@ public class TestAppor extends ApporAbstract {
 		try {
 			//Getting or creating remote object.
 			Remote remoteObject = null;
+			//Exporting remote object here.
 			
 			return (app = new TestApp(server, this, remoteObject));
 		} catch (Throwable e) {LogUtil.trace(e);}

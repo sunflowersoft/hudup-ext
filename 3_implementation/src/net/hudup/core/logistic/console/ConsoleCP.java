@@ -13,13 +13,19 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -27,12 +33,17 @@ import javax.swing.JTextPane;
 import javax.swing.WindowConstants;
 import javax.swing.text.JTextComponent;
 
+import net.hudup.core.Util;
+import net.hudup.core.app.App;
 import net.hudup.core.client.ConnectInfo;
 import net.hudup.core.client.Connector;
 import net.hudup.core.client.PowerServer;
 import net.hudup.core.client.Server;
 import net.hudup.core.logistic.Counter;
 import net.hudup.core.logistic.LogUtil;
+import net.hudup.core.logistic.ui.StartDlg;
+import net.hudup.core.logistic.ui.TextArea;
+import net.hudup.core.logistic.ui.TooltipTextArea;
 import net.hudup.core.logistic.ui.UIUtil;
 
 /**
@@ -80,6 +91,18 @@ public class ConsoleCP extends JDialog implements ConsoleListener {
 	 */
 	protected JButton btnStop = null;
 	
+	
+	/**
+	 * Clearing text button.
+	 */
+	protected JButton btnClearText = null;
+
+	
+	/**
+	 * Refreshing button.
+	 */
+	protected JButton btnRefresh = null;
+
 	
 	/**
 	 * Closing button.
@@ -140,8 +163,6 @@ public class ConsoleCP extends JDialog implements ConsoleListener {
 			}
 			
 		});
-
-		setVisible(true);
 	}
 
 	
@@ -174,11 +195,12 @@ public class ConsoleCP extends JDialog implements ConsoleListener {
 			txtArea = ((ConsoleImpl)console).getComponent();
 		else {
 			txtArea = new JTextPane();
-			txtArea.setEditable(false);
+			txtArea.setEditable(Console.DEFAULT_TEXT_EDITABLE);
 		}
 		body.add(new JScrollPane(txtArea), BorderLayout.CENTER);
 		
 		JPanel footer = new JPanel();
+		add(footer, BorderLayout.SOUTH);
 		
 		btnStart = new JButton("Start");
 		btnStart.addActionListener(new ActionListener() {
@@ -205,6 +227,28 @@ public class ConsoleCP extends JDialog implements ConsoleListener {
 			
 		});
 		footer.add(btnStop);
+
+		btnClearText = new JButton("Clear text");
+		btnClearText.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				txtArea.setText("");
+			}
+			
+		});
+		footer.add(btnClearText);
+
+		btnRefresh = new JButton("Refresh");
+		btnRefresh.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				updateControls();
+			}
+			
+		});
+		footer.add(btnRefresh);
 
 		btnClose = new JButton("Close");
 		btnClose.addActionListener(new ActionListener() {
@@ -244,6 +288,7 @@ public class ConsoleCP extends JDialog implements ConsoleListener {
 		}
 		
 		btnStart.setVisible((connectInfo.bindUri == null) && (console instanceof ConsoleImpl));
+		btnRefresh.setVisible(connectInfo.bindUri != null);
 	}
 
 
@@ -256,6 +301,7 @@ public class ConsoleCP extends JDialog implements ConsoleListener {
 		if ((connectInfo.bindUri != null) || !(console instanceof ConsoleImpl)) {
 			try {
 				txtArea.setText(console.getContent());
+				txtArea.setCaretPosition(txtArea.getDocument().getLength());
 			} catch (Throwable e) {LogUtil.trace(e);}
 		}
 
@@ -297,6 +343,43 @@ public class ConsoleCP extends JDialog implements ConsoleListener {
 
 
 	/**
+	 * This class represents a named console.
+	 * @author Loc Nguyen
+	 * @version 1.0
+	 */
+	private static class NamedConsole {
+		
+		/**
+		 * Console.
+		 */
+		public Console console = null;
+		
+		/**
+		 * Name of console.
+		 */
+		public String name = null;
+		
+		/**
+		 * Constructor with specified console.
+		 * @param console specified console.
+		 */
+		public NamedConsole(Console console) {
+			this.console = console;
+			try {
+				this.name = console.getName();
+			} catch (Throwable e) {LogUtil.trace(e);}
+			this.name = this.name != null ? this.name : "noname";
+		}
+
+		@Override
+		public String toString() {
+			return name != null ? name : super.toString();
+		}
+		
+	}
+	
+	
+	/**
 	 * Connect method.
 	 */
 	public static void connect() {
@@ -318,10 +401,72 @@ public class ConsoleCP extends JDialog implements ConsoleListener {
 		}
 		if (!(server instanceof PowerServer)) {
 			JOptionPane.showMessageDialog(
-				null, "Not power server", "Not power server", JOptionPane.ERROR_MESSAGE);
+				null, "Not power server", "Not power server", JOptionPane.WARNING_MESSAGE);
 			return;
 		}
 		
+		List<App> apps = Util.newList();
+		try {
+			apps = ((PowerServer)server).getExtraService().getApps();
+		} catch (Throwable e) {LogUtil.trace(e);}
+		if (apps.size() == 0) {
+			JOptionPane.showMessageDialog(
+				null, "Applications empty", "Applications empty", JOptionPane.INFORMATION_MESSAGE);
+			return;
+		}
+		
+		List<NamedConsole> consoles = Util.newList();
+		for (App app : apps) {
+			try {
+				Remote ro = app.getRemoteObject();
+				if ((ro != null) && (ro instanceof Console)) consoles.add(new NamedConsole((Console)ro));
+			} catch (Throwable e) {LogUtil.trace(e);}
+		}
+		if (consoles.size() == 0) {
+			JOptionPane.showMessageDialog(
+				null, "Consoles empty", "Consoles empty", JOptionPane.INFORMATION_MESSAGE);
+			return;
+		}
+		
+		Collections.sort(consoles, new Comparator<NamedConsole>() {
+
+			@Override
+			public int compare(NamedConsole o1, NamedConsole o2) {
+				return o1.name.compareTo(o2.name);
+			}
+			
+		});
+
+		final StartDlg dlgStarter = new StartDlg((JFrame)null, "Consoles") {
+			
+			/**
+			 * Serial version UID for serializable class.
+			 */
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			protected void start() {
+				Console console = ((NamedConsole) getItemControl().getSelectedItem()).console;
+				dispose();
+				new ConsoleCP(console, connectInfo, null).setVisible(true);
+			}
+			
+			@Override
+			protected JComboBox<?> createItemControl() {
+				return new JComboBox<NamedConsole>(consoles.toArray(new NamedConsole[0]));
+			}
+			
+			@Override
+			protected TextArea createHelp() {
+				TooltipTextArea tooltip = new TooltipTextArea();
+				tooltip.setEditable(false);
+				return tooltip;
+			}
+		};
+
+		dlgStarter.setSize(600, 300);
+		dlgStarter.setLocationRelativeTo(null);
+        dlgStarter.setVisible(true);
 	}
 
 

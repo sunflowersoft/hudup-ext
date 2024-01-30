@@ -26,28 +26,67 @@ public class ConsoleEvent extends EventObject {
 
 	
 	/**
+	 * Type of console event.
+	 * @author Loc Nguyen
+	 * @version 10.0
+	 */
+	public static enum Type {
+		
+		/**
+		 * Starting console. 
+		 */
+		start,
+		
+		/**
+		 * Stopping console. 
+		 */
+		stop,
+		
+		/**
+		 * Prompting. 
+		 */
+		prompt,
+		
+		/**
+		 * Entering. 
+		 */
+		enter,
+		
+		/**
+		 * Informing. 
+		 */
+		inform,
+		
+		/**
+		 * Unknown. 
+		 */
+		unknown,
+		
+	}
+
+	
+	/**
+	 * Event type.
+	 */
+	protected Type type = Type.unknown;
+	
+	
+	/**
 	 * Internal message.
 	 */
 	protected String message = null;
 	
 	
 	/**
-	 * Constructor with specific console and message.
+	 * Constructor with specific console, type, and message.
 	 * @param console specific console.
+	 * @param type specific type.
 	 * @param message specified message.
 	 */
-	public ConsoleEvent(Console console, String message) {
+	public ConsoleEvent(Console console, Type type, String message) {
 		super(console);
+		this.type = type;
 		this.message = message;
-	}
-
-	
-	/**
-	 * Constructor with specific console.
-	 * @param console specific console.
-	 */
-	public ConsoleEvent(Console console) {
-		this(console, null);
 	}
 
 	

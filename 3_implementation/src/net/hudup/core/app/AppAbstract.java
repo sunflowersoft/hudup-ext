@@ -8,6 +8,9 @@
 package net.hudup.core.app;
 
 import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
+
+import net.hudup.core.logistic.LogUtil;
 
 /**
  * This is abstract implementation of application;
@@ -32,6 +35,12 @@ public abstract class AppAbstract implements App {
 	
 	
 	/**
+     * Exporting flag.
+     */
+	protected boolean exported = false;
+
+	
+	/**
 	 * Constructor with application creator.
 	 * @param appor specified application creator.
 	 */
@@ -53,6 +62,32 @@ public abstract class AppAbstract implements App {
 
 
 	@Override
+	public synchronized boolean export(int serverPort) throws RemoteException {
+		if (exported) return false;
+		try {
+			return (exported = (UnicastRemoteObject.exportObject(this, serverPort) != null));
+		}
+		catch (Throwable e) {LogUtil.trace(e);}
+		
+		return false;
+	}
+
+
+	@Override
+	public synchronized boolean unexport() throws RemoteException {
+		if (exported) {
+			try {
+	        	return !(exported = !UnicastRemoteObject.unexportObject(this, true));
+			}
+			catch (Throwable e) {LogUtil.trace(e);}
+			return false;
+		}
+		else
+			return false;
+	}
+
+	
+	@Override
 	public boolean discard() throws RemoteException {
 		boolean discarded = false;
 		if (appor == null || !(appor instanceof ApporAbstract))
@@ -66,6 +101,11 @@ public abstract class AppAbstract implements App {
 		}
 		
 		this.appor = null;
+		
+		try {
+			unexport();
+		} catch (Throwable e) {LogUtil.trace(e);}
+		
 		return discarded;
 	}
 

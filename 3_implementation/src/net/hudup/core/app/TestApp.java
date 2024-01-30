@@ -74,9 +74,9 @@ public class TestApp extends AppAbstract {
 				//Unexporting remote object.
 			} catch (Throwable e) {LogUtil.trace(e);}
 			remoteObject = null;
-			
-			return true;
 		}
+		
+		return true;
 	}
 
 	
