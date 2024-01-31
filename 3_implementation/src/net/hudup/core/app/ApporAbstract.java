@@ -51,7 +51,7 @@ public abstract class ApporAbstract implements Appor {
 			boolean discarded = false;
 			try {
 				discarded = (app instanceof AppAbstract) ? ((AppAbstract)app).discard0() : app.discard();
-				try {app.unexport();} catch (Throwable e) {}
+				try {app.unexport();} catch (Throwable e) {LogUtil.trace(e);}
 			} catch (Throwable e) {LogUtil.trace(e);}
 			
 			this.app = (app == this.app ? null : this.app);

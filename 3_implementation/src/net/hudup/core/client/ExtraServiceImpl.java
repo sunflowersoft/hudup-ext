@@ -72,7 +72,6 @@ public class ExtraServiceImpl implements ExtraService, Serializable {
 					try {
 						App app = appor.create(this.server);
 						if (app != null && !this.apps.containsKey(app.getName())) {
-							app.export(server.getPort());
 							this.apps.put(app.getName(), app);
 						}
 					}
@@ -92,7 +91,7 @@ public class ExtraServiceImpl implements ExtraService, Serializable {
 			Collection<App> appList = this.apps.values();
 			for (App app : appList) {
 				try {
-					app.discard(); //Also unexporting this application.
+					app.discard();
 				} catch (Throwable e) {LogUtil.trace(e);}
 			}
 			this.apps.clear();

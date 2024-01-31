@@ -93,7 +93,7 @@ public class TestApp extends AppAbstract {
 		
 		try {
 			//It is possible to obtain or refresh remote object.
-			JOptionPane.showMessageDialog(null, getDesc(), TestAppor.NAME, JOptionPane.INFORMATION_MESSAGE);
+			JOptionPane.showMessageDialog(null, getDesc(), appor.getName(), JOptionPane.INFORMATION_MESSAGE);
 		} catch (Throwable e) {LogUtil.trace(e);}
 	}
 

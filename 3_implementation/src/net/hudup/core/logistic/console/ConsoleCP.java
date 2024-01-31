@@ -169,10 +169,10 @@ public class ConsoleCP extends JDialog implements ConsoleListener {
 	/**
 	 * Constructor with console and connection information.
 	 * @param console specified console.
-	 * @param comp parent component.
+	 * @param connectInfo connection information.
 	 */
-	public ConsoleCP(Console console, Component comp) {
-		this(console, null, comp);
+	public ConsoleCP(Console console, ConnectInfo connectInfo) {
+		this(console, connectInfo, null);
 	}
 	
 	

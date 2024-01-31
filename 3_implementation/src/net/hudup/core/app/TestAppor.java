@@ -29,12 +29,6 @@ public class TestAppor extends ApporAbstract {
 
 
 	/**
-	 * Test application creator name.
-	 */
-	public final static String NAME = "tester";
-	
-	
-	/**
 	 * Default test application creator.
 	 */
 	public TestAppor() {
@@ -44,7 +38,7 @@ public class TestAppor extends ApporAbstract {
 	
 	@Override
 	public String getName() {
-		return NAME;
+		return "tester";
 	}
 
 
@@ -58,7 +52,9 @@ public class TestAppor extends ApporAbstract {
 			Remote remoteObject = null;
 			//Exporting remote object here.
 			
-			return (app = new TestApp(server, this, remoteObject));
+			app = new TestApp(server, this, remoteObject);
+			try {app.export(server.getPort());} catch (Throwable e) {LogUtil.trace(e);}
+			return app;
 		} catch (Throwable e) {LogUtil.trace(e);}
 		
 		return null;
