@@ -13,7 +13,7 @@ import net.hudup.core.client.PowerServer;
 import net.hudup.core.logistic.LogUtil;
 
 /**
- * This is an test application creator.
+ * This is a test application creator.
  * 
  * @author Loc Nguyen
  * @version 1.0
@@ -45,8 +45,8 @@ public class TestAppor extends ApporAbstract {
 	@Override
 	public App create(PowerServer server) {
 		if (app != null) return app;
-		
 		if (server == null) return null;
+		
 		try {
 			//Getting or creating remote object.
 			Remote remoteObject = null;

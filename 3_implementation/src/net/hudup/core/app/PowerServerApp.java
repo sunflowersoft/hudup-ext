@@ -7,24 +7,21 @@
  */
 package net.hudup.core.app;
 
+import java.io.Closeable;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
-import javax.swing.JOptionPane;
-
-import net.hudup.core.client.ConnectInfo;
 import net.hudup.core.client.PowerServer;
-import net.hudup.core.data.Exportable;
 import net.hudup.core.logistic.LogUtil;
 
 /**
- * This is a test application.
+ * This is an application associated with power server.
  * 
  * @author Loc Nguyen
  * @version 1.0
  *
  */
-public class TestApp extends AppAbstract {
+public abstract class PowerServerApp extends AppAbstract {
 
 	
 	/**
@@ -46,21 +43,15 @@ public class TestApp extends AppAbstract {
 
 	
 	/**
-	 * Constructor with server, test application creator, and remote object.
+	 * Constructor with server, application creator, and remote object.
 	 * @param server power server.
-	 * @param testAppor test application creator.
+	 * @param appor application creator.
 	 * @param remoteObject remote object.
 	 */
-	public TestApp(PowerServer server, TestAppor testAppor, Remote remoteObject) {
-		super(testAppor);
+	public PowerServerApp(PowerServer server, PowerServerAppor appor, Remote remoteObject) {
+		super(appor);
 		this.server = server;
 		this.remoteObject = remoteObject;
-	}
-
-	
-	@Override
-	public String getDesc() throws RemoteException {
-		return "Test application";
 	}
 
 	
@@ -69,16 +60,14 @@ public class TestApp extends AppAbstract {
 		if (remoteObject == null) return false;
 		
 		synchronized (remoteObject) {
-			//Doing something.
+			try {
+				if (remoteObject instanceof Closeable) ((Closeable)remoteObject).close();
+			} catch (Throwable e) {LogUtil.trace(e);}
 			
 			try {
-				//Unexporting remote object.
-				if (remoteObject instanceof Exportable)
-					((Exportable)remoteObject).unexport();
-				else {
-					//Unexporting manually remote object.
-				}
+				if (appor != null) ((PowerServerAppor)appor).unexportRemoteObject(remoteObject);
 			} catch (Throwable e) {LogUtil.trace(e);}
+			
 			remoteObject = null;
 		}
 		
@@ -88,22 +77,10 @@ public class TestApp extends AppAbstract {
 	
 	@Override
 	public boolean serverTask() throws RemoteException {
-		//Doing something.
 		return true;
 	}
 
-	
-	@Override
-	public void show(ConnectInfo connectInfo) throws RemoteException {
-		if (connectInfo == null) return;
-		
-		try {
-			//It is possible to obtain or refresh remote object.
-			JOptionPane.showMessageDialog(null, getDesc(), appor.getName(), JOptionPane.INFORMATION_MESSAGE);
-		} catch (Throwable e) {LogUtil.trace(e);}
-	}
 
-	
 	@Override
 	public Remote getRemoteObject() throws RemoteException {
 		return remoteObject;

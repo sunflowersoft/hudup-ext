@@ -1,6 +1,7 @@
 package net.hudup.core.logistic.console;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -93,6 +94,10 @@ public abstract class ConsoleImpl implements Console {
 		super();
 		txtArea = new JTextPane();
 		txtArea.setEditable(Console.DEFAULT_TEXT_EDITABLE);
+		txtArea.setBackground(new Color(0, 0, 0));
+		txtArea.setForeground(new Color(255, 255, 255));
+		txtArea.setCaretColor(new Color(255, 255, 255));
+		
 		out = new DocOutputStream(txtArea);
 		in = new DocInputStream();
 		txtArea.addKeyListener(in);

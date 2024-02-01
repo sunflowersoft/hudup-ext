@@ -5,26 +5,24 @@
  * Email: ng_phloc@yahoo.com
  * Phone: +84-975250362
  */
-package net.hudup.core.app;
+package net.hudup.core.logistic.console;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
-import javax.swing.JOptionPane;
-
+import net.hudup.core.app.AppAbstract;
 import net.hudup.core.client.ConnectInfo;
 import net.hudup.core.client.PowerServer;
-import net.hudup.core.data.Exportable;
 import net.hudup.core.logistic.LogUtil;
 
 /**
- * This is a test application.
+ * This class represents console application.
  * 
  * @author Loc Nguyen
  * @version 1.0
  *
  */
-public class TestApp extends AppAbstract {
+public abstract class ConsoleApp extends AppAbstract {
 
 	
 	/**
@@ -40,55 +38,45 @@ public class TestApp extends AppAbstract {
 
 
 	/**
-	 * Remote object.
+	 * Internal console.
 	 */
-	protected Remote remoteObject = null;
+	protected Console console = null;
 
 	
 	/**
-	 * Constructor with server, test application creator, and remote object.
+	 * Constructor with server, console application creator, and console.
 	 * @param server power server.
-	 * @param testAppor test application creator.
-	 * @param remoteObject remote object.
+	 * @param consoleAppor console application creator.
+	 * @param console console.
 	 */
-	public TestApp(PowerServer server, TestAppor testAppor, Remote remoteObject) {
-		super(testAppor);
+	public ConsoleApp(PowerServer server, ConsoleAppor consoleAppor, Console console) {
+		super(consoleAppor);
 		this.server = server;
-		this.remoteObject = remoteObject;
-	}
-
-	
-	@Override
-	public String getDesc() throws RemoteException {
-		return "Test application";
+		this.console = console;
 	}
 
 	
 	@Override
 	protected boolean discard0() {
-		if (remoteObject == null) return false;
+		if (console == null) return false;
 		
-		synchronized (remoteObject) {
-			//Doing something.
+		synchronized (console) {
+			try {
+				console.close();
+			} catch (Throwable e) {LogUtil.trace(e);}
 			
 			try {
-				//Unexporting remote object.
-				if (remoteObject instanceof Exportable)
-					((Exportable)remoteObject).unexport();
-				else {
-					//Unexporting manually remote object.
-				}
+				console.unexport();
 			} catch (Throwable e) {LogUtil.trace(e);}
-			remoteObject = null;
+
+			console = null;
 		}
-		
 		return true;
 	}
 
 	
 	@Override
 	public boolean serverTask() throws RemoteException {
-		//Doing something.
 		return true;
 	}
 
@@ -98,16 +86,23 @@ public class TestApp extends AppAbstract {
 		if (connectInfo == null) return;
 		
 		try {
-			//It is possible to obtain or refresh remote object.
-			JOptionPane.showMessageDialog(null, getDesc(), appor.getName(), JOptionPane.INFORMATION_MESSAGE);
+			ConsoleCP ccp = new ConsoleCP(console, connectInfo);
+			ccp.setTitle(getDesc());
+			ccp.setVisible(true);
 		} catch (Throwable e) {LogUtil.trace(e);}
 	}
 
 	
 	@Override
 	public Remote getRemoteObject() throws RemoteException {
-		return remoteObject;
+		return console;
 	}
 
 
+	/**
+	 * Console task.
+	 */
+	protected abstract void consoleTask();
+	
+	
 }
