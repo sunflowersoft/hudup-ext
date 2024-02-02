@@ -26,6 +26,7 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
+import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -132,7 +133,10 @@ public class ConsoleCP extends JDialog implements ConsoleListener {
 		setLocationRelativeTo(UIUtil.getDialogForComponent(comp));
 		setLayout(new BorderLayout());
 		
-		initUI();
+		JMenuBar mnuBar = createMenuBar();
+	    if (mnuBar != null) setJMenuBar(mnuBar);
+
+	    initUI();
 		
 		bindServer();
 		
@@ -182,6 +186,40 @@ public class ConsoleCP extends JDialog implements ConsoleListener {
 	 */
 	public ConsoleCP(Console console) {
 		this(console, null, null);
+	}
+
+	
+	/**
+	 * Creating main menu bar.
+	 * @return main menu bar.
+	 */
+	protected JMenuBar createMenuBar() {
+		return null;
+//		JMenuBar mnBar = new JMenuBar();
+//		
+//		JMenu mnFile = new JMenu(I18nUtil.message("file"));
+//		mnFile.setMnemonic('f');
+//		mnBar.add(mnFile);
+//
+//		JMenuItem mniSaveScript = new JMenuItem(
+//			new AbstractAction(I18nUtil.message("save_script")) {
+//				
+//				/**
+//				 * Serial version UID for serializable class. 
+//				 */
+//				private static final long serialVersionUID = 1L;
+//
+//				@Override
+//				public void actionPerformed(ActionEvent e) {
+//
+//				}
+//				
+//			});
+//		mniSaveScript.setMnemonic('s');
+//		mniSaveScript.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK));
+//		mnFile.add(mniSaveScript);
+//		
+//		return mnBar;
 	}
 
 	

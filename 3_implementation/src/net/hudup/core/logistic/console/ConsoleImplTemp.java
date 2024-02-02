@@ -42,7 +42,7 @@ import net.hudup.core.logistic.ui.UIUtil;
  * @version 1.0
  */
 @Deprecated
-public abstract class ConsoleImpl2 extends AbstractRunner implements Console {
+public abstract class ConsoleImplTemp extends AbstractRunner implements Console {
 	
 	
 	/**
@@ -91,7 +91,7 @@ public abstract class ConsoleImpl2 extends AbstractRunner implements Console {
 	/**
 	 * Default constructor.
 	 */
-	public ConsoleImpl2() {
+	public ConsoleImplTemp() {
 		super();
 		txtArea = new JTextPane();
 		txtArea.setEditable(DEFAULT_TEXT_EDITABLE);
@@ -266,7 +266,7 @@ public abstract class ConsoleImpl2 extends AbstractRunner implements Console {
 	 * Getting this console.
 	 * @return this console.
 	 */
-	private ConsoleImpl2 getThisConsole() {
+	private ConsoleImplTemp getThisConsole() {
 		return this;
 	}
 	
@@ -453,7 +453,7 @@ public abstract class ConsoleImpl2 extends AbstractRunner implements Console {
 		dlgConsole.setLocationRelativeTo(UIUtil.getDialogForComponent(comp));
 		dlgConsole.setLayout(new BorderLayout());
 		
-		ConsoleImpl2 console = new ConsoleImpl2() {
+		ConsoleImplTemp console = new ConsoleImplTemp() {
 			
 			/**
 			 * Serial version UID for serializable class. 

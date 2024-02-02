@@ -5,21 +5,21 @@
  * Email: ng_phloc@yahoo.com
  * Phone: +84-975250362
  */
-package net.hudup.core.app;
+package net.hudup.core.app.ext;
 
-import java.rmi.Remote;
-
+import net.hudup.core.app.App;
+import net.hudup.core.app.ApporAbstract;
 import net.hudup.core.client.PowerServer;
 import net.hudup.core.logistic.LogUtil;
 
 /**
- * This is an application creator associated with power server.
+ * This is an extensive application creator.
  * 
  * @author Loc Nguyen
  * @version 1.0
  *
  */
-public abstract class PowerServerAppor extends ApporAbstract {
+public abstract class ApporExtAbstract extends ApporAbstract {
 
 	
 	/**
@@ -31,7 +31,7 @@ public abstract class PowerServerAppor extends ApporAbstract {
 	/**
 	 * Default test application creator.
 	 */
-	public PowerServerAppor() {
+	public ApporExtAbstract() {
 		super();
 	}
 
@@ -42,7 +42,8 @@ public abstract class PowerServerAppor extends ApporAbstract {
 		
 		if (server == null) return null;
 		try {
-			Remote remoteObject = createRemoteObject(true);
+			AppRemote remoteObject = createRemoteObject();
+			try {remoteObject.export(server.getPort());} catch (Throwable e) {LogUtil.trace(e);}
 			
 			app = newApp(server, this, remoteObject);
 			try {app.export(server.getPort());} catch (Throwable e) {LogUtil.trace(e);}
@@ -54,28 +55,20 @@ public abstract class PowerServerAppor extends ApporAbstract {
 
 	
 	/**
-	 * Creating application with server, application creator, and remote object.
+	 * Creating extensive application with server, extensive application creator, and remote object.
 	 * @param server power server.
-	 * @param appor application creator.
+	 * @param appor extensive application creator.
 	 * @param remoteObject remote object.
 	 * @return application associated with power server.
 	 */
-	protected abstract PowerServerApp newApp(PowerServer server, PowerServerAppor appor, Remote remoteObject);
+	protected abstract AppExt newApp(PowerServer server, ApporExtAbstract appor, AppRemote remoteObject);
 	
 	
 	/**
 	 * Creating remote object.
-	 * @param export exporting flag.
 	 * @return remote object.
 	 */
-	protected abstract Remote createRemoteObject(boolean export);
-	
-	
-	/**
-	 * Unexporting remote object.
-	 * @param remoteObject remote object.
-	 */
-	protected abstract void unexportRemoteObject(Remote remoteObject);
+	protected abstract AppRemote createRemoteObject();
 	
 	
 }
