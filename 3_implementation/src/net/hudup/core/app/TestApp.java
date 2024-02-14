@@ -66,7 +66,7 @@ public class TestApp extends AppAbstract {
 	
 	@Override
 	protected boolean discard0() {
-		if (remoteObject == null) return false;
+		if (remoteObject == null) return true;
 		
 		synchronized (remoteObject) {
 			//Doing something.

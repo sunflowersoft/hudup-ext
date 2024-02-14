@@ -58,7 +58,7 @@ public abstract class ConsoleApp extends AppAbstract {
 	
 	@Override
 	protected boolean discard0() {
-		if (console == null) return false;
+		if (console == null) return true;
 		
 		synchronized (console) {
 			try {

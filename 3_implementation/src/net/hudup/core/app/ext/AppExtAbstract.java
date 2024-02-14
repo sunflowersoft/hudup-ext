@@ -67,7 +67,7 @@ public abstract class AppExtAbstract extends AppAbstract implements AppExt {
 	
 	@Override
 	protected boolean discard0() {
-		if (remoteObject == null) return false;
+		if (remoteObject == null) return true;
 		
 		synchronized (remoteObject) {
 			try {

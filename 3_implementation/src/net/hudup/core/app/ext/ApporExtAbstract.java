@@ -43,7 +43,8 @@ public abstract class ApporExtAbstract extends ApporAbstract {
 		if (server == null) return null;
 		try {
 			AppRemote remoteObject = createRemoteObject();
-			try {remoteObject.export(server.getPort());} catch (Throwable e) {LogUtil.trace(e);}
+			try {if (remoteObject != null) remoteObject.export(server.getPort());}
+			catch (Throwable e) {LogUtil.trace(e);}
 			
 			app = newApp(server, this, remoteObject);
 			try {app.export(server.getPort());} catch (Throwable e) {LogUtil.trace(e);}
