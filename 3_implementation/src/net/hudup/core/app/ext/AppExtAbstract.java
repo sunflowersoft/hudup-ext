@@ -65,6 +65,16 @@ public abstract class AppExtAbstract extends AppAbstract implements AppExt {
 	}
 
 	
+    /**
+	 * Constructor with server and extensive application creator.
+	 * @param server power server.
+	 * @param appor extensive application creator.
+	 */
+	public AppExtAbstract(PowerServer server, ApporExtAbstract appor) {
+		this(server, appor, null);
+	}
+
+	
 	@Override
 	protected boolean discard0() {
 		if (remoteObject == null) return true;

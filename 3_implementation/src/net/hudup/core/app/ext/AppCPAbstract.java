@@ -38,7 +38,7 @@ public abstract class AppCPAbstract extends JDialog implements AppCP, AppListene
 	/**
 	 * Extensive application.
 	 */
-	protected AppExtAbstract app;
+	protected AppExt app;
 	
 	
 	/**
@@ -53,7 +53,7 @@ public abstract class AppCPAbstract extends JDialog implements AppCP, AppListene
 	 * @param connectInfo connection information.
 	 * @param comp parent component.
 	 */
-	protected AppCPAbstract(AppExtAbstract app, ConnectInfo connectInfo, Component comp) {
+	protected AppCPAbstract(AppExt app, ConnectInfo connectInfo, Component comp) {
 		super(UIUtil.getDialogForComponent(comp), "Application control panel", true);
 		this.connectInfo = (connectInfo != null ? connectInfo : new ConnectInfo());
 		this.app = app;

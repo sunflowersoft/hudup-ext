@@ -66,10 +66,12 @@ public abstract class ApporExtAbstract extends ApporAbstract {
 	
 	
 	/**
-	 * Creating remote object.
+	 * Creating remote object. Default implementation returns null.
 	 * @return remote object.
 	 */
-	protected abstract AppRemote createRemoteObject();
+	protected AppRemote createRemoteObject() {
+		return null;
+	}
 	
 	
 }
