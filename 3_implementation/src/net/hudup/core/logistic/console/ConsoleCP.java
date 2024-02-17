@@ -11,6 +11,8 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.rmi.Remote;
@@ -22,15 +24,19 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
+import javax.swing.JMenu;
 import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
+import javax.swing.KeyStroke;
 import javax.swing.WindowConstants;
 import javax.swing.text.JTextComponent;
 
@@ -41,6 +47,7 @@ import net.hudup.core.client.Connector;
 import net.hudup.core.client.PowerServer;
 import net.hudup.core.client.Server;
 import net.hudup.core.logistic.Counter;
+import net.hudup.core.logistic.I18nUtil;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.ui.StartDlg;
 import net.hudup.core.logistic.ui.TextArea;
@@ -194,34 +201,41 @@ public class ConsoleCP extends JDialog implements ConsoleListener {
 	 * @return main menu bar.
 	 */
 	protected JMenuBar createMenuBar() {
-		return null;
-//		JMenuBar mnBar = new JMenuBar();
-//		
-//		JMenu mnFile = new JMenu(I18nUtil.message("file"));
-//		mnFile.setMnemonic('f');
-//		mnBar.add(mnFile);
-//
-//		JMenuItem mniSaveScript = new JMenuItem(
-//			new AbstractAction(I18nUtil.message("save_script")) {
-//				
-//				/**
-//				 * Serial version UID for serializable class. 
-//				 */
-//				private static final long serialVersionUID = 1L;
-//
-//				@Override
-//				public void actionPerformed(ActionEvent e) {
-//
-//				}
-//				
-//			});
-//		mniSaveScript.setMnemonic('s');
-//		mniSaveScript.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK));
-//		mnFile.add(mniSaveScript);
-//		
-//		return mnBar;
+		JMenuBar mnBar = new JMenuBar();
+		
+		JMenu mnFile = new JMenu(I18nUtil.message("file"));
+		mnFile.setMnemonic('f');
+		mnBar.add(mnFile);
+
+		JMenuItem mniChangeTask = new JMenuItem(
+			new AbstractAction("Change task") {
+				
+				/**
+				 * Serial version UID for serializable class. 
+				 */
+				private static final long serialVersionUID = 1L;
+
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					changeTask();
+				}
+				
+			});
+		mniChangeTask.setMnemonic('t');
+		mniChangeTask.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_T, InputEvent.CTRL_DOWN_MASK));
+		mnFile.add(mniChangeTask);
+		
+		return mnBar;
 	}
 
+	
+	/**
+	 * Changing task.
+	 */
+	protected void changeTask() {
+		JOptionPane.showMessageDialog(this, "Change no task", "Change no task", JOptionPane.INFORMATION_MESSAGE);
+	}
+	
 	
 	/**
 	 * Initialize user interface.
