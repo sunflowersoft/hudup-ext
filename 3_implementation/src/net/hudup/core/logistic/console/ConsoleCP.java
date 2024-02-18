@@ -233,6 +233,20 @@ public class ConsoleCP extends JDialog implements ConsoleListener {
 	 * Changing task.
 	 */
 	protected void changeTask() {
+		if ((connectInfo.bindUri != null) || !(console instanceof ConsoleImpl)) {
+			JOptionPane.showMessageDialog(this, "Unable to change remotely task", "Unable to change remotely task", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+		
+		boolean started = false;
+		try {
+			started = console.isConsoleStarted();
+		} catch (Throwable e) {LogUtil.trace(e);}
+		if (started) {
+			JOptionPane.showMessageDialog(this, "Unable to change task because some task was started", "Unable to change task", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+
 		JOptionPane.showMessageDialog(this, "Change no task", "Change no task", JOptionPane.INFORMATION_MESSAGE);
 	}
 	
@@ -372,6 +386,15 @@ public class ConsoleCP extends JDialog implements ConsoleListener {
 	}
 
 
+	/**
+	 * Getting connection information.
+	 * @return connection information.
+	 */
+	public ConnectInfo getConnectInfo() {
+		return connectInfo;
+	}
+	
+	
 	@Override
 	public void dispose() {
 		try {

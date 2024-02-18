@@ -43,6 +43,18 @@ public abstract class StartDlg extends JDialog {
     protected JComboBox<?> cmbItem = null;
     
     
+    /**
+     * Starting button.
+     */
+    protected JButton btnStart = null;
+    
+    
+    /**
+     * Text area.
+     */
+    protected TextArea txtHelp = null;
+    
+    
 	/**
 	 * Constructor with parent component and title.
 	 * @param comp parent component.
@@ -66,7 +78,7 @@ public abstract class StartDlg extends JDialog {
         this.cmbItem = createItemControl();
         header.add(this.cmbItem, BorderLayout.CENTER);
         
-        JButton btnStart = new JButton("Start");
+        this.btnStart = new JButton("Start");
         btnStart.addActionListener(new ActionListener() {
 			
 			@Override
@@ -74,14 +86,14 @@ public abstract class StartDlg extends JDialog {
 				start();
 			}
 		});
-        header.add(btnStart, BorderLayout.EAST);
+        header.add(this.btnStart, BorderLayout.EAST);
         
         JPanel body = new JPanel(new BorderLayout());
         add(body, BorderLayout.CENTER);
         
-        TextArea txtHelp = createHelp();
-        if (txtHelp != null)
-        	body.add(new JScrollPane(txtHelp), BorderLayout.CENTER);
+        this.txtHelp = createHelp();
+        if (this.txtHelp != null)
+        	body.add(new JScrollPane(this.txtHelp), BorderLayout.CENTER);
 	}
 
 
@@ -93,16 +105,20 @@ public abstract class StartDlg extends JDialog {
 	
 	
 	/**
-	 * Creating text area for showing some helpful information.
-	 * @return text area for showing some helpful information.
-	 */
-	protected abstract TextArea createHelp();
-	
-	
-	/**
 	 * Starting some application according to selected item.
 	 */
 	protected abstract void start();
+	
+	
+	/**
+	 * Creating text area for showing some helpful information.
+	 * @return text area for showing some helpful information.
+	 */
+	protected TextArea createHelp() {
+		TextArea tooltip = new TextArea(getGuidedText());
+		tooltip.setEditable(false);
+		return tooltip;
+	}
 	
 	
 	/**
