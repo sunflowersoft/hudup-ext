@@ -5,6 +5,7 @@ import java.rmi.RemoteException;
 import java.util.List;
 
 import net.hudup.core.app.App;
+import net.hudup.core.data.PropList;
 
 /**
  * This interface represents extra service.
@@ -37,6 +38,22 @@ public interface ExtraService extends Remote, AutoCloseable {
 	 * @throws RemoteException if any error raises.
 	 */
 	void updateApps() throws RemoteException;
+	
+	
+	/**
+	 * Getting system properties.
+	 * @return system properties.
+	 * @throws RemoteException if any error raises.
+	 */
+	PropList getSystemProperties() throws RemoteException;
+
+	
+	/**
+	 * Performing server tasks.
+	 * @return true if performance is possible.
+	 * @throws RemoteException if any error raises.
+	 */
+	boolean doServerTasks() throws RemoteException;
 	
 	
 }

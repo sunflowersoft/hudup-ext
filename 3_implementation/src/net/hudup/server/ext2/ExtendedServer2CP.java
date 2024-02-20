@@ -39,6 +39,7 @@ import net.hudup.core.logistic.I18nUtil;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.ui.HelpContent;
 import net.hudup.core.logistic.ui.LoginDlg;
+import net.hudup.core.logistic.ui.SystemPropertiesPaneRemote;
 import net.hudup.core.logistic.ui.UIUtil;
 import net.hudup.server.ext.EvaluatorCPList;
 import net.hudup.server.ext.ExtendedService;
@@ -144,6 +145,25 @@ public class ExtendedServer2CP extends ExternalServerCP {
 		});
 		mniDatasetPoolsManager.setMnemonic('d');
 		mnTool.add(mniDatasetPoolsManager);
+
+		JMenuItem mniSysConfig = new JMenuItem(
+			new AbstractAction(I18nUtil.message("system_manager")) {
+				
+				/**
+				 * Serial version UID for serializable class. 
+				 */
+				private static final long serialVersionUID = 1L;
+
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					try {
+						ExtraService service = server.getExtraService();
+						SystemPropertiesPaneRemote.showSysConfigDlg(service, cp);
+					} catch (Throwable ex) {LogUtil.trace(ex);}
+				}
+			});
+		mniSysConfig.setMnemonic('y');
+		mnTool.add(mniSysConfig);
 
 		mnTool.addSeparator();
 

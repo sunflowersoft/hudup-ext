@@ -10,17 +10,18 @@ package net.hudup.core.logistic.ui;
 import java.util.List;
 
 import net.hudup.core.Util;
+import net.hudup.core.client.ExtraService;
 import net.hudup.core.data.PropList;
-import net.hudup.core.logistic.SystemUtil;
+import net.hudup.core.logistic.LogUtil;
 
 /**
- * Text area to show system properties.
+ * Text area to show remotely system properties.
  * 
  * @author Loc Nguyen
- * @version 11.0
+ * @version 1.0
  *
  */
-public class SystemPropertiesTextArea extends TextArea {
+public class SystemPropertiesTextAreaRemote extends SystemPropertiesTextArea {
 
 	
 	/**
@@ -30,43 +31,31 @@ public class SystemPropertiesTextArea extends TextArea {
 
 	
 	/**
-	 * Constructor with specified rows and columns.
-	 * 
-	 * @param rows specified rows.
-	 * @param columns specified columns.
+	 * Internal power server
 	 */
-	public SystemPropertiesTextArea(int rows, int columns) {
-		super(rows, columns);
-		
-		init();
-	}
-
-
+	protected ExtraService service;
+	
+	
 	/**
-	 * Default constructor.
+	 * Constructor with specified service.
+	 * @param server specified service.
 	 */
-	public SystemPropertiesTextArea() {
+	public SystemPropertiesTextAreaRemote(ExtraService service) {
 		super();
-	}
-	
-	
-	@Override
-	protected void init() {
-		super.init();
-		setEditable(false);
-		
+		this.service = service;
 		refresh();
 	}
+
 	
-	
-	/**
-	 * Refreshing this text area.
-	 */
+	@Override
 	public void refresh() {
-		SystemUtil.refreshSystemProperties();
+		if (service == null) return;
+		PropList sysProps = new PropList();
+		try {
+			sysProps = service.getSystemProperties();
+		} catch (Throwable e) {LogUtil.trace(e);}
 		
 		StringBuffer buffer = new StringBuffer();
-		PropList sysProps = SystemUtil.getSystemProperties();
 		List<String> keys = Util.newList();
 		keys.addAll(sysProps.keySet());
 		for (int i = 0; i < keys.size(); i++) {
@@ -77,6 +66,6 @@ public class SystemPropertiesTextArea extends TextArea {
 		
 		setText(buffer.toString());
 	}
-	
-	
+
+
 }

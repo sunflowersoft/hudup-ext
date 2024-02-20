@@ -35,58 +35,94 @@ public class SystemPropertiesPane extends JPanel {
 
 	
 	/**
+	 * System properties text area.
+	 */
+	protected SystemPropertiesTextArea txtSystemProperties;
+	
+	
+	/**
+	 * Refreshing button.
+	 */
+	protected JButton btnRefresh;
+	
+	
+	/**
+	 * Enhancing button.
+	 */
+	protected JButton btnEnhancePerformance;
+	
+	
+	/**
+	 * Doing server tasks button.
+	 */
+	protected JButton btnDoServerTasks;
+
+	
+	/**
 	 * Default constructor.
 	 */
 	public SystemPropertiesPane() {
 		super(new BorderLayout());
 		
-		final SystemPropertiesTextArea txtSystemProperties = new SystemPropertiesTextArea();
-		add(new JScrollPane(txtSystemProperties), BorderLayout.CENTER);
+		this.txtSystemProperties = new SystemPropertiesTextArea();
+		add(new JScrollPane(this.txtSystemProperties), BorderLayout.CENTER);
 		
 		JPanel footer = new JPanel();
 		add(footer, BorderLayout.SOUTH);
 		
-		JButton btnRefresh = new JButton("Refresh");
-		btnRefresh.addActionListener(new ActionListener() {
+		this.btnRefresh = new JButton("Refresh");
+		this.btnRefresh.addActionListener(new ActionListener() {
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					
 					txtSystemProperties.refresh();
 				}
+				
 			});
-		footer.add(btnRefresh);
+		footer.add(this.btnRefresh);
 		
-		JButton btnEnhancePerformance = new JButton("Enhance performance");
-		btnEnhancePerformance.addActionListener(new ActionListener() {
+		this.btnEnhancePerformance = new JButton("Enhance performance");
+		this.btnEnhancePerformance.addActionListener(new ActionListener() {
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					
-					SystemUtil.enhance();
-					txtSystemProperties.refresh();
-					
-					JOptionPane.showMessageDialog(
-							UIUtil.getDialogForComponent(getThis()), 
-							"Enhance performance successfully", 
-							"Enhance performance", 
-							JOptionPane.INFORMATION_MESSAGE);
-
+					enhancePerformance();
 				}
+				
 			});
-		footer.add(btnEnhancePerformance);
+		footer.add(this.btnEnhancePerformance);
 		
+		this.btnDoServerTasks = new JButton("Do server task");
+		this.btnDoServerTasks.addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					doServerTasks();
+				}
+				
+			});
+		footer.add(this.btnDoServerTasks);
+		this.btnDoServerTasks.setVisible(false);
 	}
 	
 	
 	/**
-	 * Getting this system pane.
-	 * @return this system pane.
+	 * Enhancing performance.
 	 */
-	private SystemPropertiesPane getThis() {
-		return this;
+	protected void enhancePerformance() {
+		SystemUtil.enhance();
+		txtSystemProperties.refresh();
+		
+		JOptionPane.showMessageDialog(this, "Enhance performance successfully", "Enhance performance", JOptionPane.INFORMATION_MESSAGE);
 	}
 	
+	
+	/**
+	 * Performing server tasks.
+	 */
+	protected void doServerTasks() {
+		JOptionPane.showMessageDialog(this, "Server tasks performance not implemented yet", "Not implemented yet", JOptionPane.WARNING_MESSAGE);
+	}
 	
 	
 }
