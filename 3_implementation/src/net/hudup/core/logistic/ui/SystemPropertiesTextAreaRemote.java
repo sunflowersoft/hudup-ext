@@ -49,10 +49,9 @@ public class SystemPropertiesTextAreaRemote extends SystemPropertiesTextArea {
 	
 	@Override
 	public void refresh() {
-		if (service == null) return;
 		PropList sysProps = new PropList();
 		try {
-			sysProps = service.getSystemProperties();
+			if (service != null) sysProps = service.getSystemProperties();
 		} catch (Throwable e) {LogUtil.trace(e);}
 		
 		StringBuffer buffer = new StringBuffer();

@@ -328,7 +328,7 @@ public class ExtendedServer2CP extends ExternalServerCP {
 //		xURI curDir = xURI.create(".");
 //		conf.addProperty("wrapper.working.dir", curDir.getPath());
 //		conf.addProperty("wrapper.tmp.path", curDir.concat("working/temp").getPath());
-//		conf.addProperty("wrapper.logfile", curDir.concat("working/log/hudup.log").getPath());
+//		conf.addProperty("wrapper.logfile", curDir.concat(Constants.LOGS_DIRECTORY + "/" + LogUtil.LOG_FILENAME).getPath());
 //
 //		conf.addProperty("wrapper.java.classpath.1", curDir.concat("hudup.jar").getPath());
 //		conf.addProperty("wrapper.java.classpath.2", curDir.concat("hudup-runtime-lib.jar").getPath());

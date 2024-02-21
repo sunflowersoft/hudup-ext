@@ -185,8 +185,8 @@ public class DefaultServer extends PowerServerImpl {
 		
 		//Task 2: clearing log files
 		try {
-			long m10 = 1024*1024*10;
-			File log = new File(Constants.LOGS_DIRECTORY + "/hudup.log");
+			long m10 = 1024*1024*10; //10 MB
+			File log = new File(Constants.LOGS_DIRECTORY + "/" + LogUtil.LOG_FILENAME);
 			if (log.exists() && log.length() > m10) {
 				try {
 					new PrintWriter(log).close();
@@ -194,7 +194,7 @@ public class DefaultServer extends PowerServerImpl {
 				catch (Throwable e) {LogUtil.trace(e);}
 			}
 			
-			File nextupdate = new File(Constants.LOGS_DIRECTORY + "/nextupdate.log");
+			File nextupdate = new File(Constants.LOGS_DIRECTORY + "/" + LogUtil.NEXTUPDATE_FILENAME);
 			if (nextupdate.exists() && nextupdate.length() > m10) {
 				try {
 					new PrintWriter(nextupdate).close();

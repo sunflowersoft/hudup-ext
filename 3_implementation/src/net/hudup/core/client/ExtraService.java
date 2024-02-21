@@ -49,6 +49,13 @@ public interface ExtraService extends Remote, AutoCloseable {
 
 	
 	/**
+	 * Clearing logs.
+	 * @throws RemoteException if any error raises.
+	 */
+	void clearLogs() throws RemoteException;
+	
+	
+	/**
 	 * Performing server tasks.
 	 * @return true if performance is possible.
 	 * @throws RemoteException if any error raises.

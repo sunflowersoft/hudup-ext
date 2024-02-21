@@ -792,11 +792,9 @@ public abstract class PluginManagerAbstract implements PluginManager {
 		
 		AdapterWriter nextUpdateLog = null;
 		try {
-			nextUpdateLog = new AdapterWriter(xURI.create(Constants.LOGS_DIRECTORY +"/nextupdate.log"), false);
+			nextUpdateLog = new AdapterWriter(xURI.create(Constants.LOGS_DIRECTORY + "/" + LogUtil.NEXTUPDATE_FILENAME), false);
 		}
-		catch (Throwable e) {
-			LogUtil.trace(e);
-		}
+		catch (Throwable e) {LogUtil.trace(e);}
 
 		List<Alg> compositeAlgList = Util.newList();
 		for (Class<? extends Alg> algClass : algClasses) {
@@ -857,9 +855,7 @@ public abstract class PluginManagerAbstract implements PluginManager {
 			if (nextUpdateLog != null) nextUpdateLog.close();
 			nextUpdateLog = null;
 		}
-		catch (Throwable e) {
-			LogUtil.trace(e);
-		}
+		catch (Throwable e) {LogUtil.trace(e);}
 		
 	}
 

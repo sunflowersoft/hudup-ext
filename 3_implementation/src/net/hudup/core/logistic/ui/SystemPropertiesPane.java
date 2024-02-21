@@ -16,6 +16,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
+import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.SystemUtil;
 
 /**
@@ -51,6 +52,12 @@ public class SystemPropertiesPane extends JPanel {
 	 */
 	protected JButton btnEnhancePerformance;
 	
+	
+	/**
+	 * Clearing logs button.
+	 */
+	protected JButton btnClearLogs;
+
 	
 	/**
 	 * Doing server tasks button.
@@ -92,6 +99,17 @@ public class SystemPropertiesPane extends JPanel {
 			});
 		footer.add(this.btnEnhancePerformance);
 		
+		this.btnClearLogs = new JButton("Clear logs");
+		this.btnClearLogs.addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					clearLogs();
+				}
+				
+			});
+		footer.add(this.btnClearLogs);
+
 		this.btnDoServerTasks = new JButton("Do server task");
 		this.btnDoServerTasks.addActionListener(new ActionListener() {
 				
@@ -114,6 +132,15 @@ public class SystemPropertiesPane extends JPanel {
 		txtSystemProperties.refresh();
 		
 		JOptionPane.showMessageDialog(this, "Enhance performance successfully", "Enhance performance", JOptionPane.INFORMATION_MESSAGE);
+	}
+	
+	
+	/**
+	 * Clearing logs.
+	 */
+	protected void clearLogs() {
+		LogUtil.clearLogs();
+		JOptionPane.showMessageDialog(this, "Successful clearing logs", "Successful clearing logs", JOptionPane.INFORMATION_MESSAGE);
 	}
 	
 	

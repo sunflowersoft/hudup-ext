@@ -14,6 +14,7 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.WindowConstants;
@@ -56,6 +57,12 @@ public class SystemPropertiesPaneRemote extends JPanel {
 
 	
 	/**
+	 * Clearing logs button.
+	 */
+	protected JButton btnClearLogs;
+
+	
+	/**
 	 * Doing server tasks button.
 	 */
 	protected JButton btnDoServerTasks;
@@ -86,6 +93,17 @@ public class SystemPropertiesPaneRemote extends JPanel {
 			});
 		footer.add(this.btnRefresh);
 
+		this.btnClearLogs = new JButton("Clear logs");
+		this.btnClearLogs.addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					clearLogs();
+				}
+				
+			});
+		footer.add(this.btnClearLogs);
+
 		this.btnDoServerTasks = new JButton("Do server task");
 		this.btnDoServerTasks.addActionListener(new ActionListener() {
 				
@@ -100,11 +118,23 @@ public class SystemPropertiesPaneRemote extends JPanel {
 
 	
 	/**
+	 * Clearing logs.
+	 */
+	protected void clearLogs() {
+		try {
+			service.clearLogs();
+			JOptionPane.showMessageDialog(this, "Successful clearing logs", "Successful clearing logs", JOptionPane.INFORMATION_MESSAGE);
+		} catch (Throwable e) {LogUtil.trace(e);}
+	}
+	
+	
+	/**
 	 * Performing server tasks.
 	 */
 	protected void doServerTasks() {
 		try {
 			service.doServerTasks();
+			JOptionPane.showMessageDialog(this, "Server tasks done", "Server tasks done", JOptionPane.INFORMATION_MESSAGE);
 		} catch (Throwable e) {LogUtil.trace(e);}
 	}
 

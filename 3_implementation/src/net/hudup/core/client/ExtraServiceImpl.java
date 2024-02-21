@@ -186,6 +186,12 @@ public class ExtraServiceImpl implements ExtraService, Serializable {
 
 
 	@Override
+	public void clearLogs() throws RemoteException {
+		LogUtil.clearLogs();
+	}
+
+
+	@Override
 	public boolean doServerTasks() throws RemoteException {
 		if ((server == null) || !(server instanceof DefaultServer)) return false;
 		((DefaultServer)server).doServerTasksWithRisks();

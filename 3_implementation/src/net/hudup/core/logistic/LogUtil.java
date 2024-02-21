@@ -7,7 +7,9 @@
  */
 package net.hudup.core.logistic;
 
+import java.io.File;
 import java.io.InputStream;
+import java.io.PrintWriter;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
@@ -23,6 +25,18 @@ import net.hudup.core.Constants;
  *
  */
 public class LogUtil {
+
+	
+	/**
+	 * Log file name.
+	 */
+	public final static String LOG_FILENAME = "hudup.log";
+	
+	
+	/**
+	 * Log file name.
+	 */
+	public final static String NEXTUPDATE_FILENAME = "nextupdate.log";
 
 	
 	/**
@@ -48,7 +62,7 @@ public class LogUtil {
 	        props.load(cis); 
 	        cis.close(); 
 	        
-	        String logFilePath = "./" + Constants.WORKING_DIRECTORY + "/log/hudup.log";
+	        String logFilePath = "./" + Constants.LOGS_DIRECTORY + "/" + LOG_FILENAME;
 		    props.setProperty("log4j.appender.output.file", logFilePath);
 		    PropertyConfigurator.configure(props);
 		    
@@ -120,6 +134,28 @@ public class LogUtil {
 			e.printStackTrace();
 		else
 			System.out.println("Error by " + e.getMessage());
+	}
+	
+	
+	/**
+	 * Clearing logs.
+	 */
+	public static void clearLogs() {
+		File log = new File(Constants.LOGS_DIRECTORY + "/" + LOG_FILENAME);
+		if (log.exists()) {
+			try {
+				new PrintWriter(log).close();
+			}
+			catch (Throwable e) {LogUtil.trace(e);}
+		}
+		
+		File nextupdate = new File(Constants.LOGS_DIRECTORY + "/" + NEXTUPDATE_FILENAME);
+		if (nextupdate.exists()) {
+			try {
+				new PrintWriter(nextupdate).close();
+			}
+			catch (Throwable e) {LogUtil.trace(e);}
+		}
 	}
 	
 	
