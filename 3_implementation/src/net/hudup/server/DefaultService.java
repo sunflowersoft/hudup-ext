@@ -147,7 +147,7 @@ public class DefaultService implements Service, PluginChangedListener, AutoClose
 						
 						trans.unlockWrite();
 						
-						LogUtil.info("Service creates recommender successful");
+						LogUtil.info("Service creates successfully recommender");
 					}
 				}
 				
