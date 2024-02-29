@@ -46,7 +46,6 @@ public class WaitPanel extends JPanel implements Serializable {
 	 * Default constructor.
 	 */
 	public WaitPanel() {
-		// TODO Auto-generated constructor stub
 		setLayout(new BorderLayout());
 		
 		lblWait = new JLabel(WAIT_TEXT);

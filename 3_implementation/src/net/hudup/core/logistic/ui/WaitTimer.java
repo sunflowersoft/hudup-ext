@@ -52,7 +52,6 @@ public class WaitTimer extends Timer {
 			
 				@Override
 				public void run() {
-					// TODO Auto-generated method stub
 					try {
 						dlgWait.stop();
 						if (waitMode /*|| evaluator != null && evaluator.remoteIsRunning()*/)
@@ -80,7 +79,6 @@ public class WaitTimer extends Timer {
 
 	@Override
 	public void cancel() {
-		// TODO Auto-generated method stub
 		super.cancel();
 		
 		if (dlgWait != null) dlgWait.stop();

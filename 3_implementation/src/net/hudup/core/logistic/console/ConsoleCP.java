@@ -462,8 +462,7 @@ public class ConsoleCP extends JDialog implements ConsoleListener {
 		Server server = connector.getServer();
 		ConnectInfo connectInfo = connector.getConnectInfo();
 		if (server == null) {
-			JOptionPane.showMessageDialog(
-				null, "Fail to retrieve server", "Fail to retrieve server", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(null, "Fail to retrieve server", "Fail to retrieve server", JOptionPane.ERROR_MESSAGE);
 			return;
 		}
 		if (connectInfo.bindUri != null && !connectInfo.pullMode && Connector.isPullModeRequired(server)) {
@@ -475,8 +474,7 @@ public class ConsoleCP extends JDialog implements ConsoleListener {
 			return;
 		}
 		if (!(server instanceof PowerServer)) {
-			JOptionPane.showMessageDialog(
-				null, "Not power server", "Not power server", JOptionPane.WARNING_MESSAGE);
+			JOptionPane.showMessageDialog(null, "Not power server", "Not power server", JOptionPane.WARNING_MESSAGE);
 			return;
 		}
 		
@@ -485,8 +483,7 @@ public class ConsoleCP extends JDialog implements ConsoleListener {
 			apps = ((PowerServer)server).getExtraService().getApps();
 		} catch (Throwable e) {LogUtil.trace(e);}
 		if (apps.size() == 0) {
-			JOptionPane.showMessageDialog(
-				null, "Applications empty", "Applications empty", JOptionPane.INFORMATION_MESSAGE);
+			JOptionPane.showMessageDialog(null, "Applications empty", "Applications empty", JOptionPane.INFORMATION_MESSAGE);
 			return;
 		}
 		
@@ -498,8 +495,7 @@ public class ConsoleCP extends JDialog implements ConsoleListener {
 			} catch (Throwable e) {LogUtil.trace(e);}
 		}
 		if (consoles.size() == 0) {
-			JOptionPane.showMessageDialog(
-				null, "Consoles empty", "Consoles empty", JOptionPane.INFORMATION_MESSAGE);
+			JOptionPane.showMessageDialog(null, "Consoles empty", "Consoles empty", JOptionPane.INFORMATION_MESSAGE);
 			return;
 		}
 		
