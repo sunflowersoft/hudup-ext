@@ -10,14 +10,20 @@ package net.hudup.core.logistic.ui;
 import java.awt.Component;
 import java.awt.Dialog;
 import java.awt.Frame;
+import java.awt.Graphics2D;
 import java.awt.GraphicsEnvironment;
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.Window;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import java.io.InputStream;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Random;
 
+import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
@@ -303,4 +309,74 @@ public final class UIUtil {
 	}
 	
 	
+	/**
+	 * Getting image from path.
+	 * @param path specified path.
+	 * @return image loaded from path.
+	 */
+	public static BufferedImage loadImage(Path path) {
+		try {
+			InputStream is = Files.newInputStream(path);
+			BufferedImage image = ImageIO.read(is);
+			is.close();
+			
+			return image;
+		}
+		catch (Throwable e) {LogUtil.trace(e);}
+		
+		return null;
+	}
+
+	
+	/**
+	 * Resize image.
+	 * @param image specific image.
+	 * @param newWidth new width.
+	 * @param newHeight new height.
+	 * @return resized image.
+	 */
+	public static BufferedImage resizeImage(BufferedImage image, int newWidth, int newHeight) {
+		if (image == null || newWidth <= 0 || newHeight <= 0)
+			return null;
+		else if (image.getWidth() != newWidth || image.getHeight() != newHeight) {
+			int sourceImageType = image.getType();
+			Image resizedImage = image.getScaledInstance(newWidth, newHeight, Image.SCALE_DEFAULT);
+			if (resizedImage == null) return null;
+			
+			image = convertToSourceTypeImage(resizedImage, sourceImageType);
+			if (image == null)
+				return null;
+			//else if (image.getWidth() != newWidth || image.getHeight() != newHeight)
+			//	return null;
+			else
+				return image;
+		}
+		else
+			return image;
+	}
+
+
+	/**
+	 * Converting image to source type image. The code is available at https://stackoverflow.com/questions/13605248/java-converting-image-to-bufferedimage 
+	 * @param image specific image.
+	 * @param sourceImageType source image type.
+	 * @return buffered image.
+	 */
+	private static BufferedImage convertToSourceTypeImage(Image image, int sourceImageType) {
+		if (image == null) return null;
+		
+		if (image instanceof BufferedImage) {
+			BufferedImage bufferedImage = (BufferedImage)image;
+			if (bufferedImage.getType() == sourceImageType) return bufferedImage;
+		}
+	
+		BufferedImage bufferedImage = new BufferedImage(image.getWidth(null), image.getHeight(null), sourceImageType);
+	    Graphics2D g = bufferedImage.createGraphics();
+	    g.drawImage(image, 0, 0, null);
+	    g.dispose();
+	
+	    return bufferedImage;
+	}
+
+
 }
