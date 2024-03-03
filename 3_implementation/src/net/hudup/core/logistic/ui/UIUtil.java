@@ -7,8 +7,10 @@
  */
 package net.hudup.core.logistic.ui;
 
+import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dialog;
+import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.Graphics2D;
 import java.awt.GraphicsEnvironment;
@@ -17,6 +19,7 @@ import java.awt.Toolkit;
 import java.awt.Window;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.Files;
@@ -27,8 +30,14 @@ import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
+import javax.swing.SwingConstants;
 import javax.swing.UIManager;
+import javax.swing.WindowConstants;
 import javax.swing.UIManager.LookAndFeelInfo;
 
 import net.hudup.core.Constants;
@@ -322,6 +331,7 @@ public final class UIUtil {
 			
 			return image;
 		}
+		catch (IOException e) {System.out.println("Error when reading image.");}
 		catch (Throwable e) {LogUtil.trace(e);}
 		
 		return null;
@@ -359,7 +369,7 @@ public final class UIUtil {
 	/**
 	 * Converting image to source type image. The code is available at https://stackoverflow.com/questions/13605248/java-converting-image-to-bufferedimage 
 	 * @param image specific image.
-	 * @param sourceImageType source image type.
+	 * @param sourceImageType source image type. See {@link BufferedImage#getType()}.
 	 * @return buffered image.
 	 */
 	private static BufferedImage convertToSourceTypeImage(Image image, int sourceImageType) {
@@ -379,4 +389,57 @@ public final class UIUtil {
 	}
 
 
+	/**
+	 * Converting specified image to buffered image.
+	 * @param image specified image.
+	 * @return buffered image.
+	 */
+	public static BufferedImage convertToBufferedImage(Image image) {
+		if (image == null)
+			return null;
+		else if (image instanceof BufferedImage)
+			return (BufferedImage)image;
+		else
+			return convertToSourceTypeImage(image, BufferedImage.TYPE_INT_ARGB);
+	}
+	
+	
+	/**
+	 * Showing image.
+	 * @param image specified image.
+	 * @param comp parent component.
+	 */
+	public static void showImage(Image image, Component comp) {
+		if (image == null) {
+			JOptionPane.showMessageDialog(comp, "Null image", "Null image", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+		
+		JDialog dlgImage = new JDialog(UIUtil.getDialogForComponent(comp), "Image", true);
+		dlgImage.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+		Dimension imageSize = new Dimension(400, 300);
+		if (image instanceof BufferedImage) {
+			imageSize.width = ((BufferedImage)image).getWidth();
+			imageSize.height = ((BufferedImage)image).getHeight();
+		}
+		else {
+			BufferedImage bufImage = convertToBufferedImage(image);
+			if (bufImage != null) {
+				imageSize.width = bufImage.getWidth();
+				imageSize.height = bufImage.getHeight();
+			}
+		}
+		dlgImage.setSize(imageSize.width + 20, imageSize.height + 50);
+		dlgImage.setLocationRelativeTo(UIUtil.getDialogForComponent(comp));
+		dlgImage.setLayout(new BorderLayout());
+
+		JLabel lblImage = new JLabel();
+		lblImage.setHorizontalAlignment(SwingConstants.CENTER);
+		lblImage.setIcon(new ImageIcon(image));
+		dlgImage.add(new JScrollPane(lblImage), BorderLayout.CENTER);
+		
+		dlgImage.setVisible(true);
+	}
+	
+	
 }
