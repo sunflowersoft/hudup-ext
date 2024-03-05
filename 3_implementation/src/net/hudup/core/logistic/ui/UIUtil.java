@@ -407,15 +407,16 @@ public final class UIUtil {
 	/**
 	 * Showing image.
 	 * @param image specified image.
+	 * @param modal modal mode.
 	 * @param comp parent component.
 	 */
-	public static void showImage(Image image, Component comp) {
+	public static void showImage(Image image, boolean modal, Component comp) {
 		if (image == null) {
-			JOptionPane.showMessageDialog(comp, "Null image", "Null image", JOptionPane.ERROR_MESSAGE);
+			if (modal) JOptionPane.showMessageDialog(comp, "Null image", "Null image", JOptionPane.ERROR_MESSAGE);
 			return;
 		}
 		
-		JDialog dlgImage = new JDialog(UIUtil.getDialogForComponent(comp), "Image", true);
+		JDialog dlgImage = new JDialog(UIUtil.getDialogForComponent(comp), "Image", modal);
 		dlgImage.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		Dimension imageSize = new Dimension(400, 300);
 		if (image instanceof BufferedImage) {
@@ -439,6 +440,16 @@ public final class UIUtil {
 		dlgImage.add(new JScrollPane(lblImage), BorderLayout.CENTER);
 		
 		dlgImage.setVisible(true);
+	}
+	
+	
+	/**
+	 * Showing image.
+	 * @param image specified image.
+	 * @param comp parent component.
+	 */
+	public static void showImage(Image image, Component comp) {
+		showImage(image, true, comp);
 	}
 	
 	

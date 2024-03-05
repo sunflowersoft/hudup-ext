@@ -34,7 +34,6 @@ public class TextField extends JTextField {
 	 * Default constructor.
 	 */
 	public TextField() {
-		// TODO Auto-generated constructor stub
 		init();
 	}
 
@@ -45,7 +44,6 @@ public class TextField extends JTextField {
 	 */
 	public TextField(String text) {
 		super(text);
-		// TODO Auto-generated constructor stub
 		init();
 	}
 
@@ -56,7 +54,6 @@ public class TextField extends JTextField {
 	 */
 	public TextField(int columns) {
 		super(columns);
-		// TODO Auto-generated constructor stub
 		init();
 	}
 
@@ -68,7 +65,6 @@ public class TextField extends JTextField {
 	 */
 	public TextField(String text, int columns) {
 		super(text, columns);
-		// TODO Auto-generated constructor stub
 		init();
 	}
 
@@ -81,7 +77,6 @@ public class TextField extends JTextField {
 	 */
 	public TextField(Document doc, String text, int columns) {
 		super(doc, text, columns);
-		// TODO Auto-generated constructor stub
 		init();
 	}
 
@@ -94,7 +89,6 @@ public class TextField extends JTextField {
 
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				// TODO Auto-generated method stub
 				if(SwingUtilities.isRightMouseButton(e) ) {
 					JPopupMenu contextMenu = createContextMenu();
 					if(contextMenu == null) return;
@@ -104,6 +98,7 @@ public class TextField extends JTextField {
 					contextMenu.show((Component)e.getSource(), e.getX(), e.getY());
 				}
 				else {
+					
 				}
 			}
 			
@@ -145,7 +140,6 @@ public class TextField extends JTextField {
 
 	@Override
 	public void setText(String t) {
-		// TODO Auto-generated method stub
 		super.setText(t);
 		setCaretPosition(0);
 	}

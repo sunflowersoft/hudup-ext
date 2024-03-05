@@ -75,7 +75,6 @@ public interface Inspector extends Serializable {
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					// TODO Auto-generated method stub
 					dispose();
 				}
 			});
@@ -84,7 +83,6 @@ public interface Inspector extends Serializable {
 		
 		@Override
 		public void inspect() {
-			// TODO Auto-generated method stub
 			setVisible(true);
 		}
 		

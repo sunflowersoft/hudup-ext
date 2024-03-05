@@ -76,7 +76,6 @@ public class ProgressDlg extends JDialog implements ProgressListener {
 
 	@Override
 	public void receiveProgress(ProgressEvent evt) throws RemoteException {
-		// TODO Auto-generated method stub
 		if (disposed)
 			return;
 		
@@ -93,7 +92,6 @@ public class ProgressDlg extends JDialog implements ProgressListener {
 
 	@Override
 	public void dispose() {
-		// TODO Auto-generated method stub
 		super.dispose();
 		
 		disposed = true;
