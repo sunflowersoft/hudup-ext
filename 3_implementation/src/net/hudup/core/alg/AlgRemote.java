@@ -32,6 +32,10 @@ public interface AlgRemote extends AlgRemoteTask, SetupAlgListener, Remote, Seri
 	
 	
 	@Override
+	void putConfig(DataConfig config)  throws RemoteException;
+	
+	
+	@Override
 	String getDescription() throws RemoteException;
 
 	

@@ -231,7 +231,6 @@ public abstract class KBaseAbstract implements KBase, KBaseRemote {
 	
 	@Override
 	public DataConfig getConfig() {
-		
 		return config;
 	}
 	
@@ -242,6 +241,12 @@ public abstract class KBaseAbstract implements KBase, KBaseRemote {
 	}
 
 
+	@Override
+	public void putConfig(DataConfig config) throws RemoteException {
+		this.config.putAll(config);
+	}
+
+	
 	@Override
 	public synchronized void setConfig(DataConfig config) {
 		this.config = config;

@@ -25,7 +25,7 @@ public interface AlgRemoteTask extends Exportable /*, AgentSupport*/ {
 	/**
 	 * Getting name of this remote algorithm.
 	 * @return name of this remote algorithm.
-	 * @throws RemoteException if any error raises
+	 * @throws RemoteException if any error raises.
 	 */
 	String queryName() throws RemoteException;
 	
@@ -33,10 +33,18 @@ public interface AlgRemoteTask extends Exportable /*, AgentSupport*/ {
 	/**
 	 * Getting configuration of this remote algorithm.
 	 * @return configuration of this remote algorithm.
-	 * @throws RemoteException if any error raises
+	 * @throws RemoteException if any error raises.
 	 */
 	DataConfig queryConfig() throws RemoteException;
 	
+	
+	/**
+	 * Putting properties to configuration of this remote algorithm.
+	 * @param config client configuration.
+	 * @throws RemoteException if any error raises.
+	 */
+	void putConfig(DataConfig config)  throws RemoteException;
+
 	
 	/**
 	 * Getting description of this remote object.

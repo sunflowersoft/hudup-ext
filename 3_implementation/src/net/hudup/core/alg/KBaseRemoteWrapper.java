@@ -138,6 +138,12 @@ public class KBaseRemoteWrapper implements KBase, KBaseRemote {
 
 
 	@Override
+	public void putConfig(DataConfig config) throws RemoteException {
+		remoteKBase.putConfig(config);
+	}
+
+	
+	@Override
 	public void setConfig(DataConfig config) {
 		if (remoteKBase instanceof KBase)
 			((KBase)remoteKBase).setConfig(config);

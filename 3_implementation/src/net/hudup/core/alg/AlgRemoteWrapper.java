@@ -191,6 +191,14 @@ public class AlgRemoteWrapper implements Alg, AlgRemote, Serializable {
 
 	
 	@Override
+	public void putConfig(DataConfig config) throws RemoteException {
+		try {
+			remoteAlg.putConfig(config);
+		} catch (Throwable e) {LogUtil.trace(e);}
+	}
+
+
+	@Override
 	public DataConfig getConfig() {
 		try {
 			if (remoteAlg instanceof Alg)

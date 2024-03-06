@@ -255,6 +255,12 @@ public abstract class AlgAbstract implements Alg, AlgRemote {
 
 
 	@Override
+	public void putConfig(DataConfig config) throws RemoteException {
+		this.config.putAll(config);
+	}
+
+
+	@Override
 	public void addSetupListener(SetupAlgListener listener) throws RemoteException {
 		if (listenerList == null) listenerList = new EventListenerList2();
 		synchronized (listenerList) {
