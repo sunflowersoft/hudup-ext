@@ -73,7 +73,7 @@ public class JImageList<E> extends JList<ImageListItem<E>> {
 		super(new DefaultListModel<ImageListItem<E>>());
 		
 		setCellRenderer(createRender());
-		setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 		setLayoutOrientation(JList.HORIZONTAL_WRAP);
 		setVisibleRowCount(-1);
 		
@@ -157,7 +157,7 @@ public class JImageList<E> extends JList<ImageListItem<E>> {
 		}
 		else if (e.getClickCount() >= 2) {
 			if (item == null) return;
-			showItem(item);
+			viewItem(item);
 		}
 	}
 	
@@ -171,17 +171,17 @@ public class JImageList<E> extends JList<ImageListItem<E>> {
 		if (item == null) return null;
 		JPopupMenu ctxMenu = new JPopupMenu();
 		
-		JMenuItem miShowImage = new JMenuItem("Show");
-		miShowImage.addActionListener( 
+		JMenuItem miViewItem = new JMenuItem("View");
+		miViewItem.addActionListener( 
 			new ActionListener() {
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					showItem(item);
+					viewItem(item);
 				}
 				
 			});
-		ctxMenu.add(miShowImage);
+		ctxMenu.add(miViewItem);
 		
 		JMenuItem miDesc = new JMenuItem("Description");
 		miDesc.addActionListener( 
@@ -220,6 +220,20 @@ public class JImageList<E> extends JList<ImageListItem<E>> {
 			});
 		if (item.getTag() != null) ctxMenu.add(miTag);
 
+		ctxMenu.addSeparator();
+		
+		JMenuItem miRemoveSelectedItems = new JMenuItem("Remove");
+		miRemoveSelectedItems.addActionListener( 
+			new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					removeSelectedItems();
+				}
+				
+			});
+		ctxMenu.add(miRemoveSelectedItems);
+
 		return ctxMenu;
 	}
 	
@@ -237,7 +251,7 @@ public class JImageList<E> extends JList<ImageListItem<E>> {
      * Show image
      * @param item specified item.
      */
-    private void showItem(ImageListItem<E> item) {
+    protected void viewItem(ImageListItem<E> item) {
     	if (item != null) UIUtil.showImage(item.queryImage(), modal, this);
     }
     
@@ -247,7 +261,7 @@ public class JImageList<E> extends JList<ImageListItem<E>> {
      * @param item specified item.
      * @param info specified information.
      */
-    private void showInfo(ImageListItem<E> item, String info) {
+    protected void showInfo(ImageListItem<E> item, String info) {
     	if (item == null) {
     		if (modal) JOptionPane.showMessageDialog(this, "No information", "No information", JOptionPane.ERROR_MESSAGE);
     		return;
@@ -280,6 +294,14 @@ public class JImageList<E> extends JList<ImageListItem<E>> {
     	if (modal) JOptionPane.showMessageDialog(this, "Not implemented yet", "Not implemented yet", JOptionPane.WARNING_MESSAGE);
     }
     
+    
+    /**
+     * Removing selected items
+     */
+    protected void removeSelectedItems() {
+
+    }
+
     
     /**
      * Getting the number of items.
@@ -937,13 +959,21 @@ public class JImageList<E> extends JList<ImageListItem<E>> {
 		 */
 		public String getDesc() {
 			if (item != null) {
-				if (item instanceof Path)
-					return ((Path)item).toAbsolutePath().toString();
+				if (item instanceof Path) {
+					if (isPseudoPath())
+						return getPrepText();
+					else
+						return ((Path)item).toAbsolutePath().toString();
+				}
 				else
 					return getPrepText();
 			}
-			else if (altPath != null)
-				return altPath.toAbsolutePath().toString();
+			else if (altPath != null) {
+				if (isPseudoPath())
+					return getPrepText();
+				else
+					return altPath.toAbsolutePath().toString();
+			}
 			else
 				return getPrepText();
 		}
