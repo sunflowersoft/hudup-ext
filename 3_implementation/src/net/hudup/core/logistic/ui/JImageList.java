@@ -148,7 +148,6 @@ public class JImageList<E> extends JList<ImageListItem<E>> {
 	private void onMouseClicked(MouseEvent e) {
 		ImageListItem<E> item = getSelectedValue();
 		if(SwingUtilities.isRightMouseButton(e) ) {
-			if (item == null) return;
 			JPopupMenu contextMenu = createContextMenu();
 			if(contextMenu == null) return;
 			
@@ -168,7 +167,6 @@ public class JImageList<E> extends JList<ImageListItem<E>> {
 	 */
 	protected JPopupMenu createContextMenu() {
 		ImageListItem<E> item = getSelectedValue();
-		if (item == null) return null;
 		JPopupMenu ctxMenu = new JPopupMenu();
 		
 		JMenuItem miViewItem = new JMenuItem("View");
@@ -181,7 +179,7 @@ public class JImageList<E> extends JList<ImageListItem<E>> {
 				}
 				
 			});
-		ctxMenu.add(miViewItem);
+		if (item != null) ctxMenu.add(miViewItem);
 		
 		JMenuItem miDesc = new JMenuItem("Description");
 		miDesc.addActionListener( 
@@ -193,7 +191,7 @@ public class JImageList<E> extends JList<ImageListItem<E>> {
 				}
 				
 			});
-		ctxMenu.add(miDesc);
+		if (item != null) ctxMenu.add(miDesc);
 
 		JMenuItem miPath = new JMenuItem("Path");
 		miPath.addActionListener( 
@@ -206,7 +204,7 @@ public class JImageList<E> extends JList<ImageListItem<E>> {
 				}
 				
 			});
-		if ((!item.isPseudoPath()) && (item.queryPath() != null)) ctxMenu.add(miPath);
+		if ((item != null) && (!item.isPseudoPath()) && (item.queryPath() != null)) ctxMenu.add(miPath);
 
 		JMenuItem miTag = new JMenuItem("Tag");
 		miTag.addActionListener( 
@@ -218,9 +216,9 @@ public class JImageList<E> extends JList<ImageListItem<E>> {
 				}
 				
 			});
-		if (item.getTag() != null) ctxMenu.add(miTag);
+		if ((item != null) && (item.getTag() != null)) ctxMenu.add(miTag);
 
-		ctxMenu.addSeparator();
+		if (ctxMenu.getComponentCount() > 0) ctxMenu.addSeparator();
 		
 		JMenuItem miRemoveSelectedItems = new JMenuItem("Remove");
 		miRemoveSelectedItems.addActionListener( 
@@ -232,9 +230,9 @@ public class JImageList<E> extends JList<ImageListItem<E>> {
 				}
 				
 			});
-		ctxMenu.add(miRemoveSelectedItems);
+		if (item != null) ctxMenu.add(miRemoveSelectedItems);
 
-		return ctxMenu;
+		return ctxMenu.getComponentCount() > 0 ? ctxMenu : null;
 	}
 	
 	
@@ -299,7 +297,9 @@ public class JImageList<E> extends JList<ImageListItem<E>> {
      * Removing selected items
      */
     protected void removeSelectedItems() {
-
+    	List<ImageListItem<E>> selectedItems = getSelectedValuesList();
+    	if (selectedItems == null || selectedItems.size() == 0) return;
+    	for (ImageListItem<E> selectedItem : selectedItems) removeItem(selectedItem);
     }
 
     
