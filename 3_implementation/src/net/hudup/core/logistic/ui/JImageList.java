@@ -250,7 +250,7 @@ public class JImageList<E> extends JList<ImageListItem<E>> {
      * @param item specified item.
      */
     protected void viewItem(ImageListItem<E> item) {
-    	if (item != null) UIUtil.showImage(item.queryImage(), modal, this);
+    	if (item != null) UIUtil.viewImage(item.queryImage(), modal, this);
     }
     
     
@@ -949,40 +949,6 @@ public class JImageList<E> extends JList<ImageListItem<E>> {
 		 * @return possible name.
 		 */
 		public String getPossibleName() {
-			return getPrepText();
-		}
-		
-		
-		/**
-		 * Getting item description.
-		 * @return item description.
-		 */
-		public String getDesc() {
-			if (item != null) {
-				if (item instanceof Path) {
-					if (isPseudoPath())
-						return getPrepText();
-					else
-						return ((Path)item).toAbsolutePath().toString();
-				}
-				else
-					return getPrepText();
-			}
-			else if (altPath != null) {
-				if (isPseudoPath())
-					return getPrepText();
-				else
-					return altPath.toAbsolutePath().toString();
-			}
-			else
-				return getPrepText();
-		}
-		
-		/**
-		 * Getting text representation of item.
-		 * @return text representation of item.
-		 */
-		protected String getPrepText() {
 			if (item != null) {
 				if (item instanceof Path) {
 					Path fileName = ((Path)item).getFileName();
@@ -1001,9 +967,35 @@ public class JImageList<E> extends JList<ImageListItem<E>> {
 				return super.toString();
 		}
 		
+		
+		/**
+		 * Getting item description.
+		 * @return item description.
+		 */
+		public String getDesc() {
+			if (item != null) {
+				if (item instanceof Path) {
+					if (isPseudoPath())
+						return getPossibleName();
+					else
+						return ((Path)item).toAbsolutePath().toString();
+				}
+				else
+					return getPossibleName();
+			}
+			else if (altPath != null) {
+				if (isPseudoPath())
+					return getPossibleName();
+				else
+					return altPath.toAbsolutePath().toString();
+			}
+			else
+				return getPossibleName();
+		}
+		
 		@Override
 		public String toString() {
-			return DSUtil.shortenVerbalName(getPrepText());
+			return DSUtil.shortenVerbalName(getPossibleName());
 		}
 		
 		/**

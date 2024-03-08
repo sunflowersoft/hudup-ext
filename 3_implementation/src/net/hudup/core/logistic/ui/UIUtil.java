@@ -17,6 +17,7 @@ import java.awt.GraphicsEnvironment;
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.Window;
+import java.awt.Dialog.ModalityType;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -129,7 +130,6 @@ public final class UIUtil {
 	 */
 	public static JButton makeIconButton(String iconName, String cmd, String tooltip, String alt, 
 			ActionListener listener) {
-		
 		
 		return makeIconButton(getImageUrl(iconName), cmd, tooltip, alt, listener);
 	}
@@ -405,18 +405,18 @@ public final class UIUtil {
 	
 	
 	/**
-	 * Showing image.
+	 * Viewing image.
 	 * @param image specified image.
 	 * @param modal modal mode.
 	 * @param comp parent component.
 	 */
-	public static void showImage(Image image, boolean modal, Component comp) {
+	public static void viewImage(Image image, boolean modal, Component comp) {
 		if (image == null) {
 			if (modal) JOptionPane.showMessageDialog(comp, "Null image", "Null image", JOptionPane.ERROR_MESSAGE);
 			return;
 		}
 		
-		JDialog dlgImage = new JDialog(UIUtil.getDialogForComponent(comp), "Image", modal);
+		JDialog dlgImage = new JDialog(UIUtil.getWindowForComponent(comp), "Image", modal ? ModalityType.APPLICATION_MODAL : ModalityType.MODELESS);
 		dlgImage.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		Dimension imageSize = new Dimension(400, 300);
 		if (image instanceof BufferedImage) {
@@ -431,7 +431,7 @@ public final class UIUtil {
 			}
 		}
 		dlgImage.setSize(imageSize.width + 20, imageSize.height + 50);
-		dlgImage.setLocationRelativeTo(UIUtil.getDialogForComponent(comp));
+		dlgImage.setLocationRelativeTo(UIUtil.getWindowForComponent(comp));
 		dlgImage.setLayout(new BorderLayout());
 
 		JLabel lblImage = new JLabel();
@@ -444,12 +444,12 @@ public final class UIUtil {
 	
 	
 	/**
-	 * Showing image.
+	 * Viewing image.
 	 * @param image specified image.
 	 * @param comp parent component.
 	 */
-	public static void showImage(Image image, Component comp) {
-		showImage(image, true, comp);
+	public static void viewImage(Image image, Component comp) {
+		viewImage(image, true, comp);
 	}
 	
 	
