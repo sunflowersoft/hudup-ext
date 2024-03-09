@@ -265,17 +265,17 @@ public class JImageList<E> extends JList<ImageListItem<E>> {
     		return;
     	}
     	
-		JDialog dlgImage = new JDialog(UIUtil.getDialogForComponent(this), "Information", modal);
-		dlgImage.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-		dlgImage.setSize(400, 300);
-		dlgImage.setLocationRelativeTo(UIUtil.getDialogForComponent(this));
-		dlgImage.setLayout(new BorderLayout());
+		JDialog dlgInfo = new JDialog(UIUtil.getDialogForComponent(this), "Information", modal);
+		dlgInfo.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+		dlgInfo.setSize(300, 200);
+		dlgInfo.setLocationRelativeTo(UIUtil.getDialogForComponent(this));
+		dlgInfo.setLayout(new BorderLayout());
 
 		TextArea txtInfo = new TextArea(info != null ? info : item.getDesc());
 		txtInfo.setEditable(false);
-		dlgImage.add(new JScrollPane(txtInfo), BorderLayout.CENTER);
+		dlgInfo.add(new JScrollPane(txtInfo), BorderLayout.CENTER);
 		
-		dlgImage.setVisible(true);
+		dlgInfo.setVisible(true);
     }
 
     
