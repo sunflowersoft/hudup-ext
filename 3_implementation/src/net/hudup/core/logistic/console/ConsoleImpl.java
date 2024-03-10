@@ -285,9 +285,8 @@ public abstract class ConsoleImpl implements Console {
 		JTextComponent txtArea = null;
 		
 		/**
-		 * Constructor with document and text pane.
-		 * @param doc specified document.
-		 * @param pane specified text pane.
+		 * Constructor with text area.
+		 * @param txtArea specified text area.
 		 */
 		public DocOutputStream(JTextComponent txtArea) {
 			this.txtArea = txtArea;

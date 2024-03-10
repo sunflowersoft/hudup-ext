@@ -31,7 +31,7 @@ public interface Console extends Cloneable, Serializable, AutoCloseable, Remote 
 	 * Starting console.
 	 * @param params additional parameters.
 	 * @return true if starting is successfully.
-	 * @throws Exception if any error raises.
+	 * @throws RemoteException if any error raises.
 	 */
 	boolean startConsole(Object...params) throws RemoteException;
 	
@@ -40,7 +40,7 @@ public interface Console extends Cloneable, Serializable, AutoCloseable, Remote 
 	 * Stopping console.
 	 * @param params additional parameters.
 	 * @return true if starting is successfully.
-	 * @throws Exception if any error raises.
+	 * @throws RemoteException if any error raises.
 	 */
 	boolean stopConsole(Object...params) throws RemoteException;
 

@@ -85,6 +85,7 @@ public abstract class ConsoleAppor extends ApporAbstract {
 	 * @param server power server.
 	 * @param consoleAppor console application creator.
 	 * @param console console.
+	 * @return console application.
 	 */
 	protected abstract ConsoleApp newApp(PowerServer server, ConsoleAppor consoleAppor, Console console);
 

@@ -38,7 +38,7 @@ public class SystemPropertiesTextAreaRemote extends SystemPropertiesTextArea {
 	
 	/**
 	 * Constructor with specified service.
-	 * @param server specified service.
+	 * @param service specified service.
 	 */
 	public SystemPropertiesTextAreaRemote(ExtraService service) {
 		super();

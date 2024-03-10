@@ -484,7 +484,6 @@ public class JImageList<E> extends JList<ImageListItem<E>> {
 		/**
 		 * Setting image list from image directory.
 		 * @param imageDir image directory.
-		 * @param storeImage flag to indicate whether to store image.
 		 */
 		public void setListData(Path imageDir) {
 			setListData(imageDir, false, 0, true);
@@ -533,7 +532,6 @@ public class JImageList<E> extends JList<ImageListItem<E>> {
 		/**
 		 * Adding path item.
 		 * @param imagePath specified path.
-		 * @param iconSize icon size.
 		 * @return added item.
 		 */
 		public ImageListItem<Path> addItem(Path imagePath) {
@@ -573,7 +571,6 @@ public class JImageList<E> extends JList<ImageListItem<E>> {
 		 * Setting path item at specified index.
 		 * @param index specified index.
 		 * @param imagePath specified path.
-		 * @param iconSize icon size.
 		 * @return set item.
 		 */
 		public ImageListItem<Path> setItem(int index, Path imagePath) {
@@ -1209,7 +1206,7 @@ public class JImageList<E> extends JList<ImageListItem<E>> {
 /**
  * This class is the render that guides how to show image items in image list.
  * 
- * @param <E> type of the attached object.
+ * @param <T> type of the attached object.
  * @author Loc Nguyen
  * @version 1.0
  */
