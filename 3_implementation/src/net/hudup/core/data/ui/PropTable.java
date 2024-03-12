@@ -258,7 +258,7 @@ public class PropTable extends JTable {
 	 * Getting model of this {@link PropTable}
 	 * @return {@link PropTableModel} of this {@link PropTable}.
 	 */
-	protected PropTableModel getPropTableModel() {
+	public PropTableModel getPropTableModel() {
 		return (PropTableModel)getModel();
 	}
 	
@@ -443,6 +443,12 @@ class PropTableModel extends DefaultTableModel {
 	 */
 	protected boolean modified = false;
 
+	
+	/**
+	 * Flag to indicate whether to apply.
+	 */
+	protected boolean applied = false;
+	
 	
 	/**
 	 * Default constructor.
@@ -636,7 +642,17 @@ class PropTableModel extends DefaultTableModel {
 		}
 		
 		modified = false;
+		applied = true;
 		return true;
+	}
+	
+	
+	/**
+	 * Checking whether to apply properties.
+	 * @return whether to apply properties.
+	 */
+	public boolean isApplied() {
+		return applied;
 	}
 	
 	

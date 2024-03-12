@@ -359,6 +359,14 @@ public class PropPane extends JPanel {
 	
 	
 	/**
+	 * Checking whether to apply properties.
+	 * @return whether to apply properties.
+	 */
+	public boolean isApplied() {
+		return tblProp.getPropTableModel().isApplied();
+	}
+
+	/**
 	 * Resetting the configuration.
 	 * {@link PropPane} does not support this method but derived class can override this method.
 	 */
