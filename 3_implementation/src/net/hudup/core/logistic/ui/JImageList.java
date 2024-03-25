@@ -20,6 +20,7 @@ import java.io.Serializable;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Vector;
 
@@ -126,9 +127,7 @@ public class JImageList<E> extends JList<ImageListItem<E>> {
 
 	@Override
 	public void setListData(ImageListItem<E>[] listData) {
-		DefaultListModel<ImageListItem<E>> model = getModel2();
-		model.clear();
-		for (ImageListItem<E> element : listData) model.addElement(element);
+		setListData(Arrays.asList(listData));
 	}
 
 
@@ -497,13 +496,43 @@ public class JImageList<E> extends JList<ImageListItem<E>> {
 		 * @param storeImage flag to indicate whether to store image.
 		 * @return item created from path.
 		 */
-		private ImageListItem<Path> createItem(Path imagePath, boolean createIcon, int iconSize, boolean storeImage) {
+		private static ImageListItem<Path> createItem(Path imagePath, boolean createIcon, int iconSize, boolean storeImage) {
 			if (createIcon)
 				return ImageListItem.create(imagePath, iconSize, storeImage);
 			else
 				return ImageListItem.create(imagePath);
 		}
 		
+		/**
+		 * Creating path item from path.
+		 * @param imagePath specified path.
+		 * @param iconSize icon size.
+		 * @param storeImage flag to indicate whether to store image.
+		 * @return item created from path.
+		 */
+		public static ImageListItem<Path> createItem(Path imagePath, int iconSize, boolean storeImage) {
+			return createItem(imagePath, true, iconSize, storeImage);
+		}
+
+		/**
+		 * Creating path item from path.
+		 * @param imagePath specified path.
+		 * @param iconSize icon size.
+		 * @return item created from path.
+		 */
+		public static ImageListItem<Path> createItem(Path imagePath, int iconSize) {
+			return createItem(imagePath, true, iconSize, false);
+		}
+
+		/**
+		 * Creating path item from path.
+		 * @param imagePath specified path.
+		 * @return item created from path.
+		 */
+		public static ImageListItem<Path> createItem(Path imagePath) {
+			return createItem(imagePath, false, 0, true);
+		}
+
 		/**
 		 * Adding path item.
 		 * @param imagePath specified path.
@@ -512,7 +541,7 @@ public class JImageList<E> extends JList<ImageListItem<E>> {
 		 * @return added item.
 		 */
 		public ImageListItem<Path> addItem(Path imagePath, int iconSize, boolean storeImage) {
-			ImageListItem<Path> item = createItem(imagePath, true, iconSize, storeImage);
+			ImageListItem<Path> item = createItem(imagePath, iconSize, storeImage);
 			if (item != null) super.addItem(item);
 			return item;
 		}
@@ -524,7 +553,7 @@ public class JImageList<E> extends JList<ImageListItem<E>> {
 		 * @return added item.
 		 */
 		public ImageListItem<Path> addItem(Path imagePath, int iconSize) {
-			ImageListItem<Path> item = createItem(imagePath, true, iconSize, false);
+			ImageListItem<Path> item = createItem(imagePath, iconSize);
 			if (item != null) super.addItem(item);
 			return item;
 		}
@@ -535,7 +564,7 @@ public class JImageList<E> extends JList<ImageListItem<E>> {
 		 * @return added item.
 		 */
 		public ImageListItem<Path> addItem(Path imagePath) {
-			ImageListItem<Path> item = createItem(imagePath, false, 0, true);
+			ImageListItem<Path> item = createItem(imagePath);
 			if (item != null) super.addItem(item);
 			return item;
 		}
@@ -549,7 +578,7 @@ public class JImageList<E> extends JList<ImageListItem<E>> {
 		 * @return set item.
 		 */
 		public ImageListItem<Path> setItem(int index, Path imagePath, int iconSize, boolean storeImage) {
-			ImageListItem<Path> item = createItem(imagePath, true, iconSize, storeImage);
+			ImageListItem<Path> item = createItem(imagePath, iconSize, storeImage);
 			if (item != null) super.setItem(index, item);
 			return item;
 		}
@@ -562,7 +591,7 @@ public class JImageList<E> extends JList<ImageListItem<E>> {
 		 * @return set item.
 		 */
 		public ImageListItem<Path> setItem(int index, Path imagePath, int iconSize) {
-			ImageListItem<Path> item = createItem(imagePath, true, iconSize, false);
+			ImageListItem<Path> item = createItem(imagePath, iconSize);
 			if (item != null) super.setItem(index, item);
 			return item;
 		}
@@ -574,20 +603,20 @@ public class JImageList<E> extends JList<ImageListItem<E>> {
 		 * @return set item.
 		 */
 		public ImageListItem<Path> setItem(int index, Path imagePath) {
-			ImageListItem<Path> item = createItem(imagePath, false, 0, true);
+			ImageListItem<Path> item = createItem(imagePath);
 			if (item != null) super.setItem(index, item);
 			return item;
 		}
 		
 		/**
-		 * Creating path item from image.
+		 * Creating path item.
 		 * @param imageName image name.
 		 * @param image specified image.
 		 * @param createIcon flag to indicate whether to create icon.
 		 * @param iconSize icon size.
 		 * @return item created from image.
 		 */
-		private ImageListItem<Path> createItem(String imageName, Image image, boolean createIcon, int iconSize) {
+		private static ImageListItem<Path> createItem(String imageName, Image image, boolean createIcon, int iconSize) {
 			ImageListItem<String> item0 = ImageListItem.create(imageName, image, createIcon, iconSize, true);
 			if (item0 == null)
 				return null;
@@ -599,6 +628,63 @@ public class JImageList<E> extends JList<ImageListItem<E>> {
 		}
 
 		/**
+		 * Creating path item.
+		 * @param imageName image name.
+		 * @param image specified image.
+		 * @param iconSize icon size.
+		 * @return item created from image.
+		 */
+		public static ImageListItem<Path> createItem(String imageName, Image image, int iconSize) {
+			return createItem(imageName, image, true, iconSize);
+		}
+		
+		/**
+		 * Creating path item.
+		 * @param image specified image.
+		 * @param iconSize icon size.
+		 * @return item created from image.
+		 */
+		public static ImageListItem<Path> createItem(Image image, int iconSize) {
+			return createItem("", image, true, iconSize);
+		}
+
+		/**
+		 * Creating path item.
+		 * @param imageName image name.
+		 * @param image specified image.
+		 * @return item created from image.
+		 */
+		public static ImageListItem<Path> createItem(String imageName, Image image) {
+			return createItem(imageName, image, false, 0);
+		}
+		
+		/**
+		 * Creating path item.
+		 * @param image specified image.
+		 * @return item created from image.
+		 */
+		public static ImageListItem<Path> createItem(Image image) {
+			return createItem("", image, false, 0);
+		}
+
+		/**
+		 * Creating path item.
+		 * @param imageName image name.
+		 * @return item created from image.
+		 */
+		public static ImageListItem<Path> createItem(String imageName) {
+			return createItem(imageName, null, false, 0);
+		}
+		
+		/**
+		 * Creating path item from image.
+		 * @return item created from image.
+		 */
+		public static ImageListItem<Path> createItem() {
+			return createItem("", null, false, 0);
+		}
+
+		/**
 		 * Adding image item.
 		 * @param imageName image name.
 		 * @param image specified image.
@@ -606,7 +692,7 @@ public class JImageList<E> extends JList<ImageListItem<E>> {
 		 * @return added item.
 		 */
 		public ImageListItem<Path> addItem(String imageName, Image image, int iconSize) {
-			ImageListItem<Path> item = createItem(imageName, image, true, iconSize);
+			ImageListItem<Path> item = createItem(imageName, image, iconSize);
 			if (item != null) super.addItem(item);
 			return item;
 		}
@@ -618,7 +704,7 @@ public class JImageList<E> extends JList<ImageListItem<E>> {
 		 * @return added item.
 		 */
 		public ImageListItem<Path> addItem(String imageName, Image image) {
-			ImageListItem<Path> item = createItem(imageName, image, false, 0);
+			ImageListItem<Path> item = createItem(imageName, image);
 			if (item != null) super.addItem(item);
 			return item;
 		}
@@ -629,7 +715,7 @@ public class JImageList<E> extends JList<ImageListItem<E>> {
 		 * @return added item.
 		 */
 		public ImageListItem<Path> addItem(String imageName) {
-			ImageListItem<Path> item = createItem(imageName, null, false, 0);
+			ImageListItem<Path> item = createItem(imageName);
 			if (item != null) super.addItem(item);
 			return item;
 		}
@@ -654,6 +740,14 @@ public class JImageList<E> extends JList<ImageListItem<E>> {
 		}
 
 		/**
+		 * Adding image item.
+		 * @return added item.
+		 */
+		public ImageListItem<Path> addItem() {
+			return addItem("");
+		}
+
+		/**
 		 * Setting image item at specified index.
 		 * @param index specified index.
 		 * @param imageName image name.
@@ -662,7 +756,7 @@ public class JImageList<E> extends JList<ImageListItem<E>> {
 		 * @return set item.
 		 */
 		public ImageListItem<Path> setItem(int index, String imageName, Image image, int iconSize) {
-			ImageListItem<Path> item = createItem(imageName, image, true, iconSize);
+			ImageListItem<Path> item = createItem(imageName, image, iconSize);
 			if (item != null) super.setItem(index, item);
 			return item;
 		}
@@ -675,7 +769,7 @@ public class JImageList<E> extends JList<ImageListItem<E>> {
 		 * @return set item.
 		 */
 		public ImageListItem<Path> setItem(int index, String imageName, Image image) {
-			ImageListItem<Path> item = createItem(imageName, image, false, 0);
+			ImageListItem<Path> item = createItem(imageName, image);
 			if (item != null) super.setItem(index, item);
 			return item;
 		}
@@ -687,7 +781,7 @@ public class JImageList<E> extends JList<ImageListItem<E>> {
 		 * @return set item.
 		 */
 		public ImageListItem<Path> setItem(int index, String imageName) {
-			ImageListItem<Path> item = createItem(imageName, null, false, 0);
+			ImageListItem<Path> item = createItem(imageName);
 			if (item != null) super.setItem(index, item);
 			return item;
 		}
@@ -711,6 +805,15 @@ public class JImageList<E> extends JList<ImageListItem<E>> {
 		 */
 		public ImageListItem<Path> setItem(int index, Image image) {
 			return setItem(index, "", image);
+		}
+
+		/**
+		 * Setting image item at specified index.
+		 * @param index specified index.
+		 * @return set item.
+		 */
+		public ImageListItem<Path> setItem(int index) {
+			return setItem(index, "");
 		}
 
     }

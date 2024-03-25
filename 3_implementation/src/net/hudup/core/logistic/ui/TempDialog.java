@@ -238,7 +238,7 @@ public class TempDialog extends JDialog {
 		mniRefresh.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F5, 0));
 		mnFile.add(mniRefresh);
 
-		return mnBar;
+		return mnBar.getMenuCount() > 0 ? mnBar : null;
 	}
 
 	
@@ -604,7 +604,7 @@ class TempFrame extends JFrame {
 		mniExit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, InputEvent.ALT_DOWN_MASK));
 		mnFile.add(mniExit);
 		
-		return mnBar;
+		return mnBar.getMenuCount() > 0 ? mnBar : null;
 	}
 
 	
