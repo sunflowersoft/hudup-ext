@@ -242,13 +242,13 @@ public abstract class AbstractRunner implements Runner {
 		if (!isStarted()) return false;
 
 		try {
-			if (thread != null) thread.stop();
-		}
-		catch (Throwable e) {LogUtil.error("Calling thread stop() in AbstractRunner#forceStop causes error " + e.getMessage());}
-		try {
 			if (thread != null && !thread.isInterrupted()) thread.interrupt();
 		}
 		catch (Throwable e) {LogUtil.error("Calling thread interrupt() in AbstractRunner#forceStop causes error " + e.getMessage());}
+		try {
+			if (thread != null) thread.stop();
+		}
+		catch (Throwable e) {LogUtil.error("Calling thread stop() in AbstractRunner#forceStop causes error " + e.getMessage());}
 
 		thread = null;
 		paused = false;

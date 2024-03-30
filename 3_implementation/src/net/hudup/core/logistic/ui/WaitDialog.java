@@ -15,9 +15,13 @@ import java.io.Serializable;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.SwingWorker;
+
+import com.google.common.base.Objects;
 
 import net.hudup.core.logistic.AbstractRunner;
 import net.hudup.core.logistic.I18nUtil;
+import net.hudup.core.logistic.LogUtil;
 
 /**
  * This class shows a waiting dialog.
@@ -116,6 +120,70 @@ public class WaitDialog implements Serializable {
 
 		waitDlg.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 		return waitDlg;
+	}
+	
+	
+	/**
+	 * This is interface for doing some task.
+	 * @author Loc Nguyen
+	 * @version 1.0
+	 */
+	public static interface Task<T> {
+		
+		/**
+		 * Doing some task.
+		 * @param params array of parameters
+		 * @return some result. Type {@link Void} represents void.
+		 */
+		T doSomeTask(Objects...params);
+		
+	}
+
+	
+	/**
+	 * Doing some task.
+	 * @param <T> type of result. Type {@link Void} represents void.
+	 * @param task specified task.
+	 * @param comp parent component.
+	 * @param params array of parameters.
+	 * @return result.
+	 */
+	public static <T> T doTask(Task<T> task, Component comp, Objects...params) {
+		JDialog dlgWait = WaitDialog.createDialog(comp);
+		dlgWait.setUndecorated(true);
+		
+		SwingWorker<T, T> worker = new SwingWorker<T, T>() {
+			
+			@Override
+			protected T doInBackground() throws Exception {
+				return task.doSomeTask(params);
+			}
+			
+			@Override
+			protected void done() {
+				super.done();
+				dlgWait.dispose();
+			}
+		};
+		worker.execute();
+		
+		dlgWait.setVisible(true);
+		try {
+			return worker.get();
+		} catch (Throwable e) {LogUtil.trace(e);}
+		return null;
+	}
+	
+	
+	/**
+	 * Doing some task.
+	 * @param <T> type of result. Type {@link Void} represents void.
+	 * @param task specified task.
+	 * @param params array of parameters.
+	 * @return result.
+	 */
+	public static <T> T doTask(Task<T> task, Objects...params) {
+		return doTask(task, null, params);
 	}
 	
 	
