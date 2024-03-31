@@ -17,8 +17,6 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.SwingWorker;
 
-import com.google.common.base.Objects;
-
 import net.hudup.core.logistic.AbstractRunner;
 import net.hudup.core.logistic.I18nUtil;
 import net.hudup.core.logistic.LogUtil;
@@ -135,7 +133,7 @@ public class WaitDialog implements Serializable {
 		 * @param params array of parameters
 		 * @return some result. Type {@link Void} represents void.
 		 */
-		T doSomeTask(Objects...params);
+		T doSomeTask(Object...params);
 		
 	}
 
@@ -148,7 +146,7 @@ public class WaitDialog implements Serializable {
 	 * @param params array of parameters.
 	 * @return result.
 	 */
-	public static <T> T doTask(Task<T> task, Component comp, Objects...params) {
+	public static <T> T doTask(Task<T> task, Component comp, Object...params) {
 		JDialog dlgWait = WaitDialog.createDialog(comp);
 		dlgWait.setUndecorated(true);
 		
@@ -182,7 +180,7 @@ public class WaitDialog implements Serializable {
 	 * @param params array of parameters.
 	 * @return result.
 	 */
-	public static <T> T doTask(Task<T> task, Objects...params) {
+	public static <T> T doTask(Task<T> task, Object...params) {
 		return doTask(task, null, params);
 	}
 	
