@@ -44,35 +44,30 @@ public class MeanMetaMetric extends MetaMetric {
 	 * @throws RemoteException if any error raises.
 	 */
 	public void setup(Metric point) throws RemoteException {
-		// TODO Auto-generated method stub
 		super.setup(new Object[] { point });
 	}
 
 
 	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
 		return meta[0].getName();
 	}
 
 	
 	@Override
 	public String getDescription() throws RemoteException {
-		// TODO Auto-generated method stub
 		return meta[0].getDescription();
 	}
 
 	
 	@Override
 	public String getTypeName() throws RemoteException {
-		// TODO Auto-generated method stub
 		return meta[0].getTypeName();
 	}
 
 	
 	@Override
 	public boolean recalc(Object... params) throws RemoteException {
-		// TODO Auto-generated method stub
 		if ( params == null || params.length < 1 || !(params[0] instanceof Metric) )
 			return false;
 		

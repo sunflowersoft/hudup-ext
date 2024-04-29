@@ -53,7 +53,6 @@ public abstract class MeanMetricValue implements MetricValue {
 	 * @param value specified value.
 	 */
 	public MeanMetricValue(Object value) {
-		// TODO Auto-generated constructor stub
 		initialize(value);
 	}
 
@@ -74,21 +73,18 @@ public abstract class MeanMetricValue implements MetricValue {
 	
 	@Override
 	public Object value() {
-		// TODO Auto-generated method stub
 		return value;
 	}
 
 	
 	@Override
 	public boolean isUsed() {
-		// TODO Auto-generated method stub
 		return value != null && count > 0;
 	}
 
 	
 	@Override
 	public void reset() {
-		// TODO Auto-generated method stub
 		value = null;
 		count = 0;
 	}
@@ -96,7 +92,6 @@ public abstract class MeanMetricValue implements MetricValue {
 
 	@Override
 	public String toString() {
-		// TODO Auto-generated method stub
 		if (!isUsed())
 			return "";
 		else if (value instanceof Number)

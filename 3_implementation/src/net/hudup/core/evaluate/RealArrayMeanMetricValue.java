@@ -31,7 +31,7 @@ public class RealArrayMeanMetricValue extends ArrayMeanMetricValue {
 	 * Default constructor.
 	 */
 	public RealArrayMeanMetricValue() {
-		// TODO Auto-generated constructor stub
+
 	}
 
 	
@@ -46,7 +46,6 @@ public class RealArrayMeanMetricValue extends ArrayMeanMetricValue {
 	
 	@Override
 	public void initialize(Object value) {
-		// TODO Auto-generated method stub
 		reset();
 		if (value == null || !(value instanceof List<?>))
 			return;
@@ -63,7 +62,6 @@ public class RealArrayMeanMetricValue extends ArrayMeanMetricValue {
 
 	@Override
 	public Object makeMean(Object currentMean, int currentCount, Object newValue) {
-		// TODO Auto-generated method stub
 		if (!(currentMean instanceof Number) || !(newValue instanceof Number))
 			return null;
 		
@@ -78,7 +76,6 @@ public class RealArrayMeanMetricValue extends ArrayMeanMetricValue {
 	
 	@Override
 	public Object clone() {
-		// TODO Auto-generated method stub
 		if (!isUsed())
 			return new RealArrayMeanMetricValue();
 		
