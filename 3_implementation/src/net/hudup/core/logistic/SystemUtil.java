@@ -188,8 +188,10 @@ public final class SystemUtil {
 		if (policyUrl == null) return false;
 		
 		System.setProperty("java.security.policy", policyUrl.toString());
+		int version = SystemUtil.getJavaVersion();
+		if (version < 17) return true;
+		
 		if (System.getSecurityManager() == null) {
-			int version = SystemUtil.getJavaVersion();
 			if (version <= 8)
 				System.setSecurityManager(new java.rmi.RMISecurityManager());
 			else

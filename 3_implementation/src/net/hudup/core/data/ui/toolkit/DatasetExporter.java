@@ -102,7 +102,6 @@ public class DatasetExporter extends JPanel implements ProgressListener, Dispose
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				
 				DatasetConfigurator chooser = new DatasetConfigurator(
 						btnSource, 
@@ -132,7 +131,6 @@ public class DatasetExporter extends JPanel implements ProgressListener, Dispose
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				
 				DatasetConfigurator chooser = new DatasetConfigurator(
 						getThisExporter(),
@@ -176,7 +174,6 @@ public class DatasetExporter extends JPanel implements ProgressListener, Dispose
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				
 				exportData();
 			}
@@ -261,7 +258,6 @@ public class DatasetExporter extends JPanel implements ProgressListener, Dispose
 
 			@Override
 			public void run() {
-				// TODO Auto-generated method stub
 				super.run();
 				
 				Provider provider = new ProviderImpl(destConfig);
@@ -288,7 +284,6 @@ public class DatasetExporter extends JPanel implements ProgressListener, Dispose
 	
 	@Override
 	public void receiveProgress(ProgressEvent evt) throws RemoteException {
-		// TODO Auto-generated method stub
 		
 		int progressTotal = evt.getProgressTotal();
 		int progressStep = evt.getProgressStep();
@@ -304,7 +299,6 @@ public class DatasetExporter extends JPanel implements ProgressListener, Dispose
 	@SuppressWarnings("deprecation")
 	@Override
 	public void dispose() {
-		// TODO Auto-generated method stub
 		if (runningThread == null)
 			return;
 		
@@ -319,7 +313,6 @@ public class DatasetExporter extends JPanel implements ProgressListener, Dispose
 
 	@Override
 	public boolean isRunning() {
-		// TODO Auto-generated method stub
 		
 		return runningThread != null;
 	}

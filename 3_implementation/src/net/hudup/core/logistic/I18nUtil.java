@@ -207,7 +207,6 @@ public final class I18nUtil {
 					return value;
 			} 
 			catch (Throwable e) {
-				// TODO Auto-generated catch block
 				LogUtil.trace(e);
 			}
 			
@@ -348,7 +347,6 @@ public final class I18nUtil {
 				String format, ClassLoader loader, boolean reload)
 				throws IllegalAccessException, InstantiationException,
 				IOException {
-			// TODO Auto-generated method stub
 			
 			String resourceName = toResourceName(toBundleName(baseName, locale), "properties");
 			InputStream is = null;
