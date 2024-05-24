@@ -12,6 +12,7 @@ import java.awt.PopupMenu;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.nio.file.Path;
+import java.rmi.RemoteException;
 import java.util.List;
 
 import javax.swing.JOptionPane;
@@ -64,7 +65,20 @@ public class ExtendedServer extends DefaultServer {
 	@Override
 	protected ExtraService createExtraService() {
 		try {
-			return new ExtraServiceImpl(this);
+			return new ExtraServiceImpl(this) {
+				
+				/**
+				 * Default serial version UID.
+				 */
+				private static final long serialVersionUID = 1L;
+
+				@Override
+				public boolean doServerTasks() throws RemoteException {
+					doServerTasksWithRisks();
+					return true;
+				}
+				
+			};
 		}
 		catch (Throwable e) {LogUtil.trace(e);}
 		

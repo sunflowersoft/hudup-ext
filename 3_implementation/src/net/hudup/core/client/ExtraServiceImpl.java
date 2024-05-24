@@ -22,7 +22,6 @@ import net.hudup.core.app.Appor;
 import net.hudup.core.data.PropList;
 import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.SystemUtil;
-import net.hudup.server.DefaultServer;
 
 /**
  * This abstract class implements partially the extra service.
@@ -193,9 +192,10 @@ public class ExtraServiceImpl implements ExtraService, Serializable {
 
 	@Override
 	public boolean doServerTasks() throws RemoteException {
-		if ((server == null) || !(server instanceof DefaultServer)) return false;
-		((DefaultServer)server).doServerTasksWithRisks();
 		return false;
+//		if ((server == null) || !(server instanceof DefaultServer)) return false;
+//		((DefaultServer)server).doServerTasksWithRisks();
+//		return true;
 	}
 
 

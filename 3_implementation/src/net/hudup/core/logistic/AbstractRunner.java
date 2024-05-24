@@ -246,7 +246,7 @@ public abstract class AbstractRunner implements Runner {
 		}
 		catch (Throwable e) {LogUtil.error("Calling thread interrupt() in AbstractRunner#forceStop causes error " + e.getMessage());}
 		try {
-			if (thread != null) thread.stop();
+			if (thread != null && SystemUtil.getJavaVersion() <= 15) thread.stop();
 		}
 		catch (Throwable e) {LogUtil.error("Calling thread stop() in AbstractRunner#forceStop causes error " + e.getMessage());}
 

@@ -31,6 +31,7 @@ import net.hudup.core.client.ServerStatusEvent;
 import net.hudup.core.client.ServerStatusEvent.Status;
 import net.hudup.core.client.ServerStatusListener;
 import net.hudup.core.client.SocketWrapper;
+import net.hudup.core.data.BooleanWrapper;
 import net.hudup.core.data.DataConfig;
 import net.hudup.core.logistic.AbstractRunner;
 import net.hudup.core.logistic.LogUtil;
@@ -111,7 +112,7 @@ public abstract class SocketServer extends AbstractRunner implements Server, Acc
 	/**
 	 * Flag for some uses.
 	 */
-	protected volatile Boolean flag = false;
+	protected volatile BooleanWrapper flag = new BooleanWrapper(false);
 	
 	
 	/**
@@ -886,7 +887,7 @@ public abstract class SocketServer extends AbstractRunner implements Server, Acc
 	protected void pauseInternalRunners() {
 		synchronized (internalRunners) {
 			synchronized (flag) {
-				flag = true;
+				flag.set(true);
 				for (Object runner : internalRunners) {
 					try {
 						if (runner instanceof Runner)
@@ -898,7 +899,7 @@ public abstract class SocketServer extends AbstractRunner implements Server, Acc
 						LogUtil.trace(e);
 					}
 				}
-				flag = false;
+				flag.set(false);
 			}
 		}
 	}
@@ -911,7 +912,7 @@ public abstract class SocketServer extends AbstractRunner implements Server, Acc
 	protected void resumeInternalRunners() {
 		synchronized (internalRunners) {
 			synchronized (flag) {
-				flag = true;
+				flag.set(true);
 				for (Object runner : internalRunners) {
 					try {
 						if (runner instanceof Runner)
@@ -923,7 +924,7 @@ public abstract class SocketServer extends AbstractRunner implements Server, Acc
 						LogUtil.trace(e);
 					}
 				}
-				flag = false;
+				flag.set(false);
 			}
 		}
 	}
@@ -936,7 +937,7 @@ public abstract class SocketServer extends AbstractRunner implements Server, Acc
 	protected void stopInternalRunners() {
 		synchronized (internalRunners) {
 			synchronized (flag) {
-				flag = true;
+				flag.set(true);
 				for (Object runner : internalRunners) {
 					try {
 						if (runner instanceof Runner)
@@ -948,7 +949,7 @@ public abstract class SocketServer extends AbstractRunner implements Server, Acc
 						LogUtil.trace(e);
 					}
 				}
-				flag = false;
+				flag.set(false);
 			}
 		}
 	}
@@ -960,7 +961,7 @@ public abstract class SocketServer extends AbstractRunner implements Server, Acc
 	 */
 	protected boolean getFlag() {
 		synchronized (flag) {
-			return flag;
+			return flag.get();
 		}
 	}
 

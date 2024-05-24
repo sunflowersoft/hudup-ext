@@ -315,7 +315,9 @@ public final class I18nUtil {
 		ResourceBundle bundle = null;
 		try {
 			language = language == null || language.isEmpty() ? DEFAULT_LANGUAGE : language;
-			Locale locale = country == null || country.isEmpty() ? new Locale(language) : new Locale(language, country);
+			Locale.Builder builder = new Locale.Builder().setLanguage(language);
+			if (country != null && !country.isEmpty()) builder.setRegion(country);
+			Locale locale = builder.build();
 			
 			baseName = baseName == null || baseName.isEmpty() ? DEFAULT_BUNDLE_BASE_NAME : baseName;
 			baseName = UriAdapter.packageSlashToDot(baseName);

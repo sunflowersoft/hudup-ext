@@ -171,7 +171,7 @@ public final class SystemUtil {
 		    return Integer.parseInt(version);
 		}
 		catch (Throwable e) {
-			LogUtil.trace(e);
+			LogUtil.error("SystemUtil.getJavaVersion() causes error " + e.getMessage());
 		}
 		
 		return -1;

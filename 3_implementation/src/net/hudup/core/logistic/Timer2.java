@@ -144,12 +144,14 @@ public abstract class Timer2 extends AbstractRunner {
 		if (!isStarted()) return false;
 
 		try {
-			if (thread != null) thread.stop();
+			if (thread != null && !thread.isInterrupted()) thread.interrupt();
 		}
-		catch (Throwable e) {
-			LogUtil.error("Calling thread destroy() in Timer2#forceStop causes error " + e.getMessage());
+		catch (Throwable e) {LogUtil.error("Calling thread interrupt() causes error " + e.getMessage());}
+		try {
+			if (thread != null && SystemUtil.getJavaVersion() <= 15) thread.stop();
 		}
-		
+		catch (Throwable e) {LogUtil.error("Calling thread stop() in AbstractRunner#forceStop causes error " + e.getMessage());}
+
 		thread = null;
 		clear();
 		

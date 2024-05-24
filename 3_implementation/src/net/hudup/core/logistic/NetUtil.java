@@ -144,7 +144,7 @@ public class NetUtil {
 			reader = new BufferedReader(new InputStreamReader(url.openStream()));
 			publicAddr = reader.readLine().trim();
 		}
-		catch (Exception e) {
+		catch (Throwable e) {
 			publicAddr = null;
 		}
 		finally {

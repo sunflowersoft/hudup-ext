@@ -475,7 +475,7 @@ public class DefaultServer extends PowerServerImpl {
 	 * Performing server tasks with risks because server tasks are often called by internal timer.
 	 * This method is not important but please use carefully it.
 	 */
-	public void doServerTasksWithRisks() {
+	protected void doServerTasksWithRisks() {
 		serverTasks();
 	}
 	
