@@ -8,6 +8,7 @@
 package net.hudup.core.data;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -352,4 +353,90 @@ public class Pair implements Cloneable, Serializable {
 
 	
 }
+
+
+
+/**
+ * This class represents a pair of index and weight.
+ * @author Loc Nguyen
+ * @version 1.0
+ */
+class IndexedWeight implements Serializable, java.lang.Cloneable {
+	
+	
+	/**
+	 * Serial version UID for serializable class. 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	
+	/**
+	 * Index.
+	 */
+	public int index = 0;
+	
+	
+	/**
+	 * Weight.
+	 */
+	public double weight = 0;
+	
+	
+	/**
+	 * Default constructor.
+	 */
+	public IndexedWeight() {
+		
+	}
+	
+	
+	/**
+	 * Constructor with index and weight.
+	 * @param index index.
+	 * @param weight weight.
+	 */
+	public IndexedWeight(int index, double weight) {
+		this.index = index;
+		this.weight = weight;
+	}
+	
+	
+	/**
+	 * Creating array of indexed weights.
+	 * @param weights array of weights.
+	 * @return array of indexed weights.
+	 */
+	public static IndexedWeight[] create(double[] weights) {
+		if (weights == null || weights.length == 0) return null;
+		IndexedWeight[] indexedWeights = new IndexedWeight[weights.length];
+		for (int i = 0; i < weights.length; i++) indexedWeights[i] = new IndexedWeight(i, weights[i]);
+		return indexedWeights;
+	}
+	
+	
+	/**
+	 * Sorting array of indexed weights.
+	 * @param indexedWeights indexed weights.
+	 * @param ascend ascending flag.
+	 */
+	public static void sort(IndexedWeight[] indexedWeights, boolean ascend) {
+		Arrays.sort(indexedWeights, 0, indexedWeights.length, new Comparator<IndexedWeight>() {
+
+			@Override
+			public int compare(IndexedWeight o1, IndexedWeight o2) {
+				if (o1.weight < o2.weight)
+					return ascend ? -1 : 1;
+				else if (o1.weight == o2.weight)
+					return 0;
+				else
+					return ascend ? 1 : -1;
+			}
+			
+		});
+	}
+	
+	
+}
+
+
 
