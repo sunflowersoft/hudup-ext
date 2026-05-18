@@ -42,6 +42,26 @@ public class Firer extends PluginManagerAbstract {
 
 	
 	/**
+	 * Flag to indicate whether applying Relections (org.reflections.Reflections) library.
+	 */
+	protected static boolean RELECTIONS_LIB = true;
+	
+	
+	/**
+	 * Static code to load dynamic constant.
+	 */
+	static {
+		try {
+			String relectionsLib = Util.getHudupProperty("reflections_lib");
+			if (relectionsLib != null) RELECTIONS_LIB = Boolean.parseBoolean(relectionsLib);
+		}
+		catch (Throwable e) {
+			System.out.println("Error when parsing reflections_lib property");
+		}
+	}
+	
+	
+	/**
 	 * Default constructor.
 	 */
 	public Firer() {
@@ -73,32 +93,57 @@ public class Firer extends PluginManagerAbstract {
 	 * @param outObjList collection of objects (instances) as output.
 	 * @param storeUris array of stores.
 	 */
-	protected <T> void loadClassesInstances(Class<T> referredClass, Collection<Class<? extends T>> outClassList, Collection<T> outObjList, xURI...storeUris) {
+	private <T> void loadClassesInstances(Class<T> referredClass, Collection<Class<? extends T>> outClassList, Collection<T> outObjList, xURI...storeUris) {
 		if (storeUris == null || storeUris.length == 0) {
 			boolean added = addWorkingLibClassPath();
 			
 			String[] prefixList = Util.getLoadablePackages();
-			if (prefixList == null || prefixList.length == 0)
-				prefixList = new String[] {""};
+			if (prefixList == null || prefixList.length == 0) prefixList = new String[] {""};
 
-			Reflections reflections = null;
-			for (String prefix : prefixList) {
+			//Loading classes by org.reflections.Reflections.
+			if (RELECTIONS_LIB) {
 				try {
-					Reflections tempReflections = new Reflections(prefix);
-					if (reflections == null)
-						reflections = tempReflections;
-					else
-						reflections.merge(tempReflections);
-				}
-				catch (Exception e) {LogUtil.trace(e);}
+					Reflections reflections = null;
+					for (String prefix : prefixList) {
+						try {
+							Reflections tempReflections = new Reflections(prefix);
+							if (reflections == null)
+								reflections = tempReflections;
+							else
+								reflections.merge(tempReflections);
+						}
+						catch (Throwable e) {LogUtil.error(e.getMessage());}
+					}
+					
+					if (reflections != null) {
+						Set<Class<? extends T>> apClasses = reflections.getSubTypesOf(referredClass);
+						for (Class<? extends T> apClass : apClasses) {
+							if (apClass == null) continue;
+							if (referredClass != null && !referredClass.isAssignableFrom(apClass)) continue;
+							if (!isClassValid(apClass)) continue;
+			
+							if (outClassList != null) outClassList.add(apClass);
+							
+							if (outObjList != null) {
+								try {
+									T instance = Util.newInstance(apClass);
+									outObjList.add(instance);
+								}
+								catch (Throwable e) {LogUtil.error(e.getMessage());}
+							}
+						}
+					}
+				} catch (Throwable e) {
+					LogUtil.error("The library org.reflections.Reflections not supported");
+				} finally {}
 			}
 			
-			if (reflections != null) {
-				Set<Class<? extends T>> apClasses = reflections.getSubTypesOf(referredClass);
+			//Loading classes by internal library.
+			if ((outClassList != null && outClassList.size() == 0) || (outObjList != null && outObjList.size() == 0)) {
+				Set<Class<? extends T>> apClasses = findClasses2(prefixList, referredClass);
 				for (Class<? extends T> apClass : apClasses) {
 					if (apClass == null) continue;
-					if (referredClass != null && !referredClass.isAssignableFrom(apClass))
-						continue;
+					if (referredClass != null && !referredClass.isAssignableFrom(apClass)) continue;
 					if (!isClassValid(apClass)) continue;
 	
 					if (outClassList != null) outClassList.add(apClass);
@@ -108,7 +153,7 @@ public class Firer extends PluginManagerAbstract {
 							T instance = Util.newInstance(apClass);
 							outObjList.add(instance);
 						}
-						catch (Exception e) {LogUtil.trace(e);}
+						catch (Throwable e) {LogUtil.error(e);}
 					}
 				}
 			}
@@ -141,7 +186,7 @@ public class Firer extends PluginManagerAbstract {
 			catch (Exception e) {LogUtil.trace(e);}
 		}
 		
-		boolean createNewCP = false;
+		boolean createNewCL = false;
 		URLClassLoader classLoader = null;
 		for (URLClassLoader cl : extraClassLoaders) {
 			if (contains(cl.getURLs(), uris)) {
@@ -151,7 +196,7 @@ public class Firer extends PluginManagerAbstract {
 		}
 		if (classLoader == null) {
 			classLoader = createClassLoader(uriList.toArray(new xURI[] {}));
-			createNewCP = true;
+			createNewCL = true;
 		}
 		if (classLoader == null) return;
 		
@@ -162,7 +207,7 @@ public class Firer extends PluginManagerAbstract {
 			adapter.close();
 		}
 		
-		if (!createNewCP)
+		if (!createNewCL)
 			return;
 		else if (extraClassLoaders.size() == 0 || Constants.MAX_EXTRA_CLASSLOADERS <= 0 || extraClassLoaders.size() < Constants.MAX_EXTRA_CLASSLOADERS)
 			extraClassLoaders.add(0, classLoader);
@@ -178,12 +223,24 @@ public class Firer extends PluginManagerAbstract {
 	
 	
 	/**
+	 * Finding classes under prefix list.
+	 * @param <T> class type.
+	 * @param prefixList prefix list.
+	 * @param referredClass referred class.
+	 * @return set of classes under prefix list.
+	 */
+	protected <T> Set<Class<? extends T>> findClasses2(String[] prefixList, Class<T> referredClass) {
+		return ClassLoader2.findClasses(getClass().getClassLoader(), prefixList, referredClass);
+	}
+	
+	
+	/**
 	 * Testing whether the super URL set contains the sub URL set.
 	 * @param superUrls super URL set.
 	 * @param subUrls2 sub URL set.
 	 * @return whether the super URL set contains the sub URL set.
 	 */
-	private boolean contains(URL[] superUrls, URL[] subUrls2) {
+	private static boolean contains(URL[] superUrls, URL[] subUrls2) {
 		if (superUrls == null || subUrls2 == null) return false;
 		if (subUrls2.length == 0) return true;
 		

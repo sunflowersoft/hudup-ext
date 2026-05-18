@@ -9,6 +9,8 @@ package net.hudup.core;
 
 import static net.hudup.core.Constants.ROOT_PACKAGE;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Method;
@@ -18,9 +20,13 @@ import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 
 import net.hudup.core.alg.Alg;
 import net.hudup.core.alg.AlgRemote;
@@ -1084,13 +1090,13 @@ class ClassLoader2 extends URLClassLoader {
 			try {
 				cls = cl2.findClass(name);
 			}
-			catch (Exception e) {
+			catch (Throwable e) {
 			}
 			finally {
 				try {
 					cl2.close();
 				}
-				catch (Exception e) {}
+				catch (Throwable e) {}
 			}
 			if (cls != null) return cls;
 		}
@@ -1098,15 +1104,128 @@ class ClassLoader2 extends URLClassLoader {
 		try {
 			Class<?> cls = cl.loadClass(name);
 			if (cls != null) return cls;
-		} catch (Exception e) {}
+		} catch (Throwable e) {}
 		
 		try {
 			Class<?> cls = Class.forName(name, false, cl);
 			if (cls != null) return cls;
-		} catch (Exception e) {}
+		} catch (Throwable e) {}
 		
 		return null;
 	}
 
+	
+	/**
+	 * Finding classes under prefix list.
+	 * @param <T> class type.
+	 * @param cl class loader.
+	 * @param prefixes prefix list.
+	 * @param referredClass referred class.
+	 * @return set of classes under prefix list.
+	 */
+	public static <T> Set<Class<? extends T>> findClasses(ClassLoader cl, String[] prefixes, Class<T> referredClass) {
+		cl = cl != null ? cl : Thread.currentThread().getContextClassLoader();
+		Set<Class<? extends T>> apClassesResult = new HashSet<>();
+		for (String prefix : prefixes) {
+			Set<Class<? extends T>> apClasses = findClasses(cl, prefix, referredClass);
+			apClassesResult.addAll(apClasses);
+		}
+		return apClassesResult;
+	}
+	
+	
+	/**
+	 * Finding classes under prefix.
+	 * @param <T> class type.
+	 * @param cl class loader.
+	 * @param prefix prefix.
+	 * @param referredClass referred class.
+	 * @return set of classes under prefix.
+	 */
+	private static <T> Set<Class<? extends T>> findClasses(ClassLoader cl, String prefix, Class<T> referredClass) {
+		Set<Class<? extends T>> apClasses = new HashSet<>(); 
+	    try {
+	        List<Class<?>> classes = findClasses(cl, prefix);
+	        for (Class<?> clazz : classes) {
+	        	try {
+			        if (referredClass != null) {
+			        	if (referredClass.isAssignableFrom(clazz)) {
+				        	@SuppressWarnings({"unchecked" })
+							Class<? extends T> tClass = (Class<? extends T>)clazz;
+				        	apClasses.add(tClass);
+			        	}
+			        }
+			        else {
+			        	@SuppressWarnings({"unchecked" })
+						Class<? extends T> tClass = (Class<? extends T>)clazz;
+			        	apClasses.add(tClass);
+			        }
+	    	    } catch (Throwable e) {}
+	        }
+	    } catch (Throwable e) {}
+	    return apClasses;
+	}
+
+
+	/**
+	 * Scans all classes accessible from class loader which belong to the given package and sub-packages.
+	 * @param cl class loader.
+	 * @param packageName package name.
+	 * @return all classes accessible from class loader which belong to the given package and sub-packages.
+	 * @throws ClassNotFoundException if class not found.
+	 * @throws IOException if any IO error raises.
+	 * @author Gemini 2026
+	 */
+	private static List<Class<?>> findClasses(ClassLoader cl, String packageName) throws ClassNotFoundException, IOException {
+		//Convert package name to directory path format.
+		String path = packageName.replace('.', '/');
+		Enumeration<URL> resources = cl.getResources(path);
+		
+		List<File> dirs = new ArrayList<>();
+		while (resources.hasMoreElements()) {
+			URL resource = resources.nextElement();
+			try {
+				dirs.add(new File(resource.getFile()));
+			} catch (Throwable e) {LogUtil.errorNoLog("IO error: " + e.getMessage());}
+		}
+		
+		List<Class<?>> classes = new ArrayList<>();
+		for (File directory : dirs) {
+			classes.addAll(findClasses(cl, directory, packageName));
+		}
+		return classes;
+	}
+	
+
+	/**
+	 * Recursive method used to find all classes in a given directory and sub-directories.
+	 * @param directory specified directory.
+	 * @param packageName package name.
+	 * @return all classes in a given directory and sub-directories.
+	 * @throws ClassNotFoundException if class not found.
+	 * @author Gemini 2026
+	 */
+	private static List<Class<?>> findClasses(ClassLoader cl, File directory, String packageName) throws ClassNotFoundException {
+		List<Class<?>> classes = new ArrayList<>();
+		if (!directory.exists()) return classes;
+		
+		File[] files = directory.listFiles();
+		if (files == null) return classes;
+	
+		for (File file : files) {
+			if (file.isDirectory()) {
+				assert !file.getName().contains(".");
+				//Recursively scan sub-packages
+				classes.addAll(findClasses(cl, file, packageName + "." + file.getName()));
+			}
+			else if (file.getName().endsWith(".class")) {
+				//Remove the .class extension to get the raw class name
+				String className = packageName + '.' + file.getName().substring(0, file.getName().length() - 6);
+				classes.add(findClass(cl, className));
+			}
+		}
+		return classes;
+	}
+	
 	
 }
