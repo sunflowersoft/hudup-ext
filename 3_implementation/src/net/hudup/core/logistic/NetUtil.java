@@ -13,6 +13,7 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.ServerSocket;
+import java.net.URI;
 import java.net.URL;
 import java.rmi.Naming;
 import java.rmi.NoSuchObjectException;
@@ -140,7 +141,7 @@ public class NetUtil {
 		BufferedReader reader = null;
 		String publicAddr = null;
 		try {
-			URL url = new URL("http://bot.whatismyipaddress.com"); 
+			URL url = URI.create("http://bot.whatismyipaddress.com").toURL(); 
 			reader = new BufferedReader(new InputStreamReader(url.openStream()));
 			publicAddr = reader.readLine().trim();
 		}
@@ -687,12 +688,55 @@ public class NetUtil {
 	
 	
 	/**
-	 * Main method.
-	 * @param args arguments.
+	 * Creating RMI application.
+	 * @param app application.
+	 * @param port port.
+	 * @param bindUriText bind URI which can be name in short.
+	 * @return registry.
 	 */
-	public static void main(String[] args) {
-		System.out.println(getInetHardware().getMACAddress());
+	public static Registry createRMIApp(Remote app, int port, String bindUriText) {
+		port = port > 0 ? port : 1099;
+		RegistryRemote rr = null;
+		try {
+			rr = bindUriText != null ? RegistryRemote.registerExportNaming(app, port, bindUriText) : RegistryRemote.registerExport(app, port);
+		}
+		catch (Throwable e) {}
+		return rr != null ? rr.registry : null;
 	}
 	
+	
+	/**
+	 * Creating RMI application.
+	 * @param app application.
+	 * @param port port.
+	 * @return registry.
+	 */
+	public static Registry createRMIApp(Remote app, int port) {
+		return createRMIApp(app, port, null);
+	}
+
+	
+	/**
+	 * Destroying RMI application.
+	 * @param registry registry.
+	 * @param app application.
+	 * @param bindUriText bind URI which can be name in short.
+	 * @return true of destroying is successful.
+	 */
+	public static boolean destroyRMIApp(Registry registry, Remote app, String bindUriText) {
+		return RegistryRemote.unregisterUnexportUnnaming(registry, app, bindUriText);
+	}
+	
+	
+	/**
+	 * Destroying RMI application.
+	 * @param registry registry.
+	 * @param app application.
+	 * @return true of destroying is successful.
+	 */
+	public static boolean destroyRMIApp(Registry registry, Remote app) {
+		return RegistryRemote.unregisterUnexportUnnaming(registry, app, (String)null);
+	}
+
 	
 }

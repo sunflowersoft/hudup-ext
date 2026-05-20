@@ -236,19 +236,11 @@ public abstract class AbstractRunner implements Runner {
 	 * Please see {@link Thread#stop()} for more details.
 	 * @return true if forcing to stop successful.
 	 */
-	@SuppressWarnings("deprecation")
 	@NextUpdate
 	public synchronized boolean forceStop() {
 		if (!isStarted()) return false;
 
-		try {
-			if (thread != null && !thread.isInterrupted()) thread.interrupt();
-		}
-		catch (Throwable e) {LogUtil.error("Calling thread interrupt() in AbstractRunner#forceStop causes error " + e.getMessage());}
-		try {
-			if (thread != null && SystemUtil.getJavaVersion() <= 15) thread.stop();
-		}
-		catch (Throwable e) {LogUtil.error("Calling thread stop() in AbstractRunner#forceStop causes error " + e.getMessage());}
+		SystemUtil.stopThread(thread);
 
 		thread = null;
 		paused = false;

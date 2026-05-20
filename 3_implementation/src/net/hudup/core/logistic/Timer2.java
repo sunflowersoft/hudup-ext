@@ -138,19 +138,11 @@ public abstract class Timer2 extends AbstractRunner {
 	}
 	
 	
-	@SuppressWarnings("deprecation")
 	@Override
 	public synchronized boolean forceStop() {
 		if (!isStarted()) return false;
 
-		try {
-			if (thread != null && !thread.isInterrupted()) thread.interrupt();
-		}
-		catch (Throwable e) {LogUtil.error("Calling thread interrupt() causes error " + e.getMessage());}
-		try {
-			if (thread != null && SystemUtil.getJavaVersion() <= 15) thread.stop();
-		}
-		catch (Throwable e) {LogUtil.error("Calling thread stop() in AbstractRunner#forceStop causes error " + e.getMessage());}
+		SystemUtil.stopThread(thread);
 
 		thread = null;
 		clear();

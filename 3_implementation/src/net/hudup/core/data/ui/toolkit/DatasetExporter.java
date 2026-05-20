@@ -25,7 +25,6 @@ import net.hudup.core.data.Provider;
 import net.hudup.core.data.ProviderImpl;
 import net.hudup.core.data.ui.DataConfigTextField;
 import net.hudup.core.data.ui.DatasetConfigurator;
-import net.hudup.core.logistic.LogUtil;
 import net.hudup.core.logistic.SystemUtil;
 import net.hudup.core.logistic.ui.ProgressEvent;
 import net.hudup.core.logistic.ui.ProgressListener;
@@ -297,25 +296,14 @@ public class DatasetExporter extends JPanel implements ProgressListener, Dispose
 	}
 
 
-	@SuppressWarnings("deprecation")
 	@Override
 	public void dispose() {
-		if (runningThread == null) return;
-		
-		try {
-			if (runningThread != null && !runningThread.isInterrupted()) runningThread.interrupt();
-		}
-		catch (Throwable e) {LogUtil.error("Calling thread interrupt() causes error " + e.getMessage());}
-		try {
-			if (runningThread != null && SystemUtil.getJavaVersion() <= 15) runningThread.stop();
-		}
-		catch (Throwable e) {LogUtil.error("Calling thread stop() causes error " + e.getMessage());}
+		if (runningThread != null) SystemUtil.stopThread(runningThread);
 	}
 
 
 	@Override
 	public boolean isRunning() {
-		
 		return runningThread != null;
 	}
 

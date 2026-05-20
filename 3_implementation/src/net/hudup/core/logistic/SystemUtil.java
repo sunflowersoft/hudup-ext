@@ -7,6 +7,7 @@
  */
 package net.hudup.core.logistic;
 
+import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.Properties;
 
@@ -29,7 +30,8 @@ public final class SystemUtil {
 	 */
 	public final static void enhance() {
 		try {
-			System.runFinalization();
+			Method method = getMethod(System.class, "runFinalization");
+			if (method != null) method.invoke(null);
 		}
 		catch (Throwable e) {
 			LogUtil.trace(e);
@@ -183,7 +185,6 @@ public final class SystemUtil {
 	 * @param policyUrl security policy URL.
 	 * @return true if setting is successful.
 	 */
-	@SuppressWarnings("deprecation")
 	public static boolean setSecurityPolicy(URL policyUrl) {
 		if (policyUrl == null) return false;
 		
@@ -191,15 +192,71 @@ public final class SystemUtil {
 		int version = SystemUtil.getJavaVersion();
 		if (version < 17) return true;
 		
-		if (System.getSecurityManager() == null) {
-			if (version <= 8)
-				System.setSecurityManager(new java.rmi.RMISecurityManager());
-			else
-				System.setSecurityManager(new SecurityManager());
-		}
+//		if (System.getSecurityManager() == null) System.setSecurityManager(new SecurityManager());
 		
 		return true;
 	}
 	
+	
+	/**
+	 * Stopping thread.
+	 * @param thread specified thread;
+	 */
+	public static void stopThread(Thread thread) {
+		try {
+			if (thread == null) return;
+			try {
+				if (!thread.isInterrupted()) thread.interrupt();
+			}
+			catch (Throwable e) {System.out.println("Calling thread interrupt() causes error " + e.getMessage());}
+			if (SystemUtil.getJavaVersion() > 15) return;
+			
+			try {
+			    Method method = getMethod(thread.getClass(), "stop");
+			    if (method != null) method.invoke(thread);
+			}
+			catch (Throwable e) {System.out.println("Calling thread stop() causes error " + e.getMessage());}
+		} catch (Throwable e) {}
+	}
+	
+	
+	/**
+	 * Getting method.
+	 * @param clazz specified class.
+	 * @param methodName method name.
+	 * @param parameterTypes list of parameter types.
+	 * @return method.
+	 */
+	public static Method getMethod(Class<?> clazz, String methodName, Class<?>... parameterTypes) {
+		try {
+		    Method method = clazz.getDeclaredMethod(methodName, parameterTypes);
+		    if (method != null) return method;
+		}
+		catch (Throwable e) {}
+		try {
+		    Method method = clazz.getMethod(methodName, parameterTypes);
+		    if (method != null) return method;
+		}
+		catch (Throwable e) {}
+		return null;
+	}
+	    
+	
+	/**
+	 * Checking whether the method of specified class is deprecated.
+	 * @param clazz specified class.
+	 * @param methodName method name.
+	 * @param parameterTypes list of parameter types.
+	 * @return deprecated object.
+	 */
+	public static Deprecated isDeprecated(Class<?> clazz, String methodName, Class<?>... parameterTypes) {
+		try {
+			Method method = getMethod(clazz, methodName, parameterTypes);
+			return method.isAnnotationPresent(Deprecated.class) ? method.getAnnotation(Deprecated.class) : null;
+		}
+		catch (Throwable e) {}
+	    return null;
+	}
+
 	
 }

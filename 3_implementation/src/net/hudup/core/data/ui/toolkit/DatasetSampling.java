@@ -474,19 +474,9 @@ public class DatasetSampling extends JPanel implements ProgressListener, Dispose
 	}
 
 	
-	@SuppressWarnings("deprecation")
 	@Override
 	public void dispose() {
-		if (runningThread == null) return;
-		
-		try {
-			if (runningThread != null && !runningThread.isInterrupted()) runningThread.interrupt();
-		}
-		catch (Throwable e) {LogUtil.error("Calling thread interrupt() causes error " + e.getMessage());}
-		try {
-			if (runningThread != null && SystemUtil.getJavaVersion() <= 15) runningThread.stop();
-		}
-		catch (Throwable e) {LogUtil.error("Calling thread stop() causes error " + e.getMessage());}
+		if (runningThread != null) SystemUtil.stopThread(runningThread);
 	}
 
 

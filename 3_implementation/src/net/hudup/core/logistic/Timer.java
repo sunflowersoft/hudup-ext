@@ -177,13 +177,7 @@ public abstract class Timer extends AbstractRunner {
 	public synchronized boolean forceStop() {
 		if (!isStarted()) return false;
 
-		try {
-			if (thread != null)
-				thread.stop();
-		}
-		catch (Throwable e) {
-			LogUtil.error("Calling thread destroy() in Timer#forceStop causes error " + e.getMessage());
-		}
+		SystemUtil.stopThread(thread);
 		
 		wait = false;
 		thread = null;
