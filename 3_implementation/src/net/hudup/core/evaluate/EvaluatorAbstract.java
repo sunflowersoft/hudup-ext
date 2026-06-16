@@ -1087,6 +1087,16 @@ public abstract class EvaluatorAbstract extends AbstractRunner implements Evalua
 	
 	
 	/**
+	 * Calling the method {@link #getAlg(RegisterTable, String, boolean)} for outside calling.
+	 * @param algReg register table.
+	 * @param algName algorithm name.
+	 * @param remote true if getting remotely.
+	 * @return algorithm. It is exported if remote parameter is true.
+	 */
+	protected Alg getAlgCall(RegisterTable algReg, String algName, boolean remote) {return getAlg(algReg, algName, remote);}
+	
+	
+	/**
 	 * Updating exchanged pool result.
 	 * @param pool specified exchanged pool.
 	 * @return normal pool for evaluation.

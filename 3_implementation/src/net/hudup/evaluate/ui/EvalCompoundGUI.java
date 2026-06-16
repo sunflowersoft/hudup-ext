@@ -143,7 +143,7 @@ public class EvalCompoundGUI extends JFrame {
 			LogUtil.trace(e);
 			LogUtil.error("Error in getting evaluator configuration");
 		}
-		batchEvaluateGUI = new BatchEvaluateGUI(evaluator, connectInfo, referredData);
+		batchEvaluateGUI = createBatchEvaluateGUI(evaluator, connectInfo, referredData);
 		
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		addWindowListener(new WindowAdapter() {
@@ -185,12 +185,22 @@ public class EvalCompoundGUI extends JFrame {
 	
 	
 	/**
+	 * Creating batch GUI with specified evaluator, bound URI, and GUI data.
+	 * @param evaluator specified evaluator.
+	 * @param connectInfo connection information.
+	 * @param referredGUIData referred GUI data.
+	 * @return batch GUI.
+	 */
+	protected BatchEvaluateGUI createBatchEvaluateGUI(Evaluator evaluator, ConnectInfo connectInfo, EvaluateGUIData referredGUIData) {
+		return new BatchEvaluateGUI(evaluator, connectInfo, referredGUIData);
+	}
+
+	
+	/**
 	 * Getting this GUI.
 	 * @return this GUI.
 	 */
-	private EvalCompoundGUI getThisEvalGUI() {
-		return this;
-	}
+	private EvalCompoundGUI getThisEvalGUI() {return this;}
 	
 	
 	/**
@@ -468,6 +478,8 @@ public class EvalCompoundGUI extends JFrame {
 		mniRecoverResult.setMnemonic('c');
 		mnTools.add(mniRecoverResult);
 
+		addMoreTools(mnTools);
+		
 		
 		JMenu mnHelp = new JMenu(I18nUtil.message("help"));
 		mnHelp.setMnemonic('h');
@@ -493,6 +505,13 @@ public class EvalCompoundGUI extends JFrame {
 		return mnBar;
 	}
 
+	
+	/**
+	 * Adding more tools.
+	 * @param tools tool menu.
+	 */
+	protected void addMoreTools(JMenu tools) {}
+	
 	
 	/**
 	 * Creating tool bar.
@@ -1267,13 +1286,34 @@ public class EvalCompoundGUI extends JFrame {
 
 	
 	/**
+	 * This class shows compound GUI.
+	 * @author Loc Nguyen
+	 * @version 1.0
+	 *
+	 */
+	@FunctionalInterface
+	public static interface EvalCompoundGUIShower {
+		
+		/**
+		 * Showing compound GUI.
+		 * @param evaluator particular evaluator selected by user.
+		 * @param connectInfo connection information.
+		 * @param referredData evaluator GUI data.
+		 */
+		void show(Evaluator evaluator, ConnectInfo connectInfo, EvaluateGUIData referredData);
+		
+	}
+	
+	
+	/**
 	 * Staring the particular evaluator selected by user.
 	 * @param evaluator particular evaluator selected by user.
 	 * @param connectInfo connection information.
 	 * @param referredData evaluator GUI data.
 	 * @param oldGUI old GUI.
+	 * @param shower compound GUI shower.
 	 */
-	public static void run(Evaluator evaluator, ConnectInfo connectInfo, EvaluateGUIData referredData, Window oldGUI) {
+	public static void run(Evaluator evaluator, ConnectInfo connectInfo, EvaluateGUIData referredData, Window oldGUI, EvalCompoundGUIShower shower) {
 		if (oldGUI != null) oldGUI.dispose();
 
 		if (!Util.getPluginManager().isFired())
@@ -1298,12 +1338,27 @@ public class EvalCompoundGUI extends JFrame {
 					LogUtil.info("Registered algorithm: " + metricList.get(i).getName());
 			}
 
-			new EvalCompoundGUI(evaluator, connectInfo, referredData);
+			if (shower != null)
+				shower.show(evaluator, connectInfo, referredData);
+			else
+				new EvalCompoundGUI(evaluator, connectInfo, referredData);
 		}
 		catch (Exception e) {LogUtil.trace(e);}
 	}
 
 
+	/**
+	 * Staring the particular evaluator selected by user.
+	 * @param evaluator particular evaluator selected by user.
+	 * @param connectInfo connection information.
+	 * @param referredData evaluator GUI data.
+	 * @param oldGUI old GUI.
+	 */
+	public static void run(Evaluator evaluator, ConnectInfo connectInfo, EvaluateGUIData referredData, Window oldGUI) {
+		run(evaluator, connectInfo, referredData, oldGUI, null);
+	}
+	
+	
 	/**
 	 * Open evaluator.
 	 * @param evaluatorItem specified evaluator item.
