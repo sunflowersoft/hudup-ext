@@ -331,7 +331,9 @@ public final class UIUtil {
 			
 			return image;
 		}
-		catch (IOException e) {System.out.println("Error when reading image.");}
+		catch (IOException e) {
+			System.out.println("Error when reading image.");
+		}
 		catch (Throwable e) {LogUtil.trace(e);}
 		
 		return null;

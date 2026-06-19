@@ -97,13 +97,13 @@ public class EvalCompoundGUI extends JFrame {
 	/**
 	 * Evaluation configuration.
 	 */
-	private EvaluatorConfig thisConfig = null;
+	protected EvaluatorConfig thisConfig = null;
 	
 	
 	/**
 	 * Batch mode evaluator GUI.
 	 */
-	private BatchEvaluateGUI batchEvaluateGUI = null;
+	protected BatchEvaluateGUI batchEvaluateGUI = null;
 	
 	
 	/**
@@ -306,7 +306,7 @@ public class EvalCompoundGUI extends JFrame {
 
 					@Override
 					public void actionPerformed(ActionEvent e) {
-						switchEvaluator(false);
+						switchEvaluator(false, newShower());
 					}
 				});
 			mniSwitchLocalEvaluator.setMnemonic('l');
@@ -322,7 +322,7 @@ public class EvalCompoundGUI extends JFrame {
 
 					@Override
 					public void actionPerformed(ActionEvent e) {
-						switchEvaluator(true);
+						switchEvaluator(true, newShower());
 					}
 				});
 			mniSwitchRemoteEvaluator.setMnemonic('m');
@@ -719,10 +719,45 @@ public class EvalCompoundGUI extends JFrame {
 
 
 	/**
+	 * This class shows compound GUI.
+	 * @author Loc Nguyen
+	 * @version 1.0
+	 *
+	 */
+	@FunctionalInterface
+	public static interface EvalCompoundGUIShower {
+		
+		/**
+		 * Showing compound GUI.
+		 * @param evaluator particular evaluator selected by user.
+		 * @param connectInfo connection information.
+		 * @param referredData evaluator GUI data.
+		 */
+		void show(Evaluator evaluator, ConnectInfo connectInfo, EvaluateGUIData referredData);
+		
+	}
+	
+	
+	/**
+	 * Creating compound GUI shower.
+	 * @return compound GUI shower.
+	 */
+	protected EvalCompoundGUIShower newShower() {
+		return new EvalCompoundGUIShower() {
+			@Override
+			public void show(Evaluator evaluator, ConnectInfo connectInfo, EvaluateGUIData referredData) {
+				new EvalCompoundGUI(evaluator, connectInfo, referredData);
+			}
+		};
+	}
+	
+
+	/**
 	 * Switch evaluator.
 	 * @param remote remote flag.
+	 * @param shower compound GUI shower which can be null.
 	 */
-	private void switchEvaluator(boolean remote) {
+	private void switchEvaluator(boolean remote, EvalCompoundGUIShower shower) {
 		boolean isIdle = false;
 		try {
 			isIdle = batchEvaluateGUI.isIdle();
@@ -743,9 +778,9 @@ public class EvalCompoundGUI extends JFrame {
 	
 		try {
 			if (!remote)
-				switchEvaluator(batchEvaluateGUI.getEvaluator().getName(), this);
+				switchEvaluator(batchEvaluateGUI.getEvaluator().getName(), this, shower);
 			else
-				switchRemoteEvaluator(batchEvaluateGUI.getEvaluator().getName(), this);
+				switchRemoteEvaluator(batchEvaluateGUI.getEvaluator().getName(), this, shower);
 		}
 		catch (Exception e) {
 			LogUtil.trace(e);
@@ -756,124 +791,10 @@ public class EvalCompoundGUI extends JFrame {
 	/**
 	 * Switching evaluator.
 	 * @param selectedEvName selected evaluator name.
-	 * @param oldGUI old GUI.
+	 * @param oldGUI old GUI which can be null.
+	 * @param shower compound GUI shower which can be null.
 	 */
-	@SuppressWarnings("unused")
-	@Deprecated
-	private static void switchEvaluator0(String selectedEvName, Window oldGUI) {
-		List<Evaluator> evList = Util.getPluginManager().loadInstances(Evaluator.class);
-		if (evList.size() == 0) {
-			JOptionPane.showMessageDialog(
-					null, 
-					"There is no evaluator", 
-					"There is no evaluator", 
-					JOptionPane.INFORMATION_MESSAGE);
-			return;
-		}
-		
-		Collections.sort(evList, new Comparator<Evaluator>() {
-
-			@Override
-			public int compare(Evaluator o1, Evaluator o2) {
-				try {
-					return o1.getName().compareToIgnoreCase(o2.getName());
-				}
-				catch (Throwable e) {
-					LogUtil.trace(e);
-					return -1;
-				}
-			}
-		});
-		
-		Evaluator initialEv = null;
-		if (selectedEvName != null) {
-			for (Evaluator ev : evList) {
-				try {
-					if (ev.getName().equals(selectedEvName)) {
-						initialEv = ev;
-						break;
-					}
-				}
-				catch (Throwable e) {LogUtil.trace(e);}
-			}
-		}
-		
-		StartDlg dlgEvStarter = new StartDlg((JFrame)null, "List of evaluators") {
-			
-			/**
-			 * Serial version UID for serializable class.
-			 */
-			private static final long serialVersionUID = 1L;
-
-			/**
-			 * Flag to indicate whether evaluator is started.
-			 */
-			private boolean started = false;
-			
-			@Override
-			protected void start() {
-				final Evaluator evaluator = (Evaluator) getItemControl().getSelectedItem();
-				dispose();
-				if (oldGUI != null)
-					oldGUI.dispose();
-
-				for (Evaluator ev : evList) {
-					if (ev != evaluator) {
-						try {
-							ev.getConfig().setSaveAbility(false);
-							ev.close();
-						} catch (Exception e1) {LogUtil.trace(e1);}
-					}
-				}
-				started = true;
-				
-				try {
-					evaluator.stimulate();
-				} catch (Exception e) {LogUtil.trace(e);}
-				run(evaluator, null, null, null);
-			}
-			
-			@Override
-			protected JComboBox<?> createItemControl() {
-				return new JComboBox<Evaluator>(evList.toArray(new Evaluator[0]));
-			}
-			
-			@Override
-			protected TextArea createHelp() {
-				TextArea toolkit = new TextArea("Thank you for choosing evaluators");
-				toolkit.setEditable(false);
-				return toolkit;
-			}
-
-			@Override
-			public void dispose() {
-				super.dispose();
-				
-				if (started) return;
-				
-				for (Evaluator ev : evList) {
-					try {
-						ev.getConfig().setSaveAbility(false);
-						ev.close();
-					} catch (Exception e1) {LogUtil.trace(e1);}
-				}
-			}
-			
-		};
-		
-		if (initialEv != null)
-			dlgEvStarter.getItemControl().setSelectedItem(initialEv);
-		dlgEvStarter.setSize(400, 150);
-        dlgEvStarter.setVisible(true);
-	}
-	
-	
-	/**
-	 * Switching evaluator.
-	 * @param selectedEvName selected evaluator name.
-	 * @param oldGUI old GUI.
-	 */
-	public static void switchEvaluator(String selectedEvName, Window oldGUI) {
+	protected static void switchEvaluator(String selectedEvName, Window oldGUI, EvalCompoundGUIShower shower) {
 		List<Evaluator> evList = Util.getPluginManager().loadInstances(Evaluator.class);
 		if (evList.size() == 0) {
 			JOptionPane.showMessageDialog(
@@ -1113,7 +1034,7 @@ public class EvalCompoundGUI extends JFrame {
 				try {
 					evaluator.stimulate();
 				} catch (Exception ex) {LogUtil.trace(ex);}
-				run(evaluator, connectInfo, null, null);
+				run(evaluator, connectInfo, null, null, shower);
 			}
 		});
 		buttons.add(start);
@@ -1143,11 +1064,22 @@ public class EvalCompoundGUI extends JFrame {
 	
 	
 	/**
+	 * Switching evaluator.
+	 * @param selectedEvName selected evaluator name.
+	 * @param oldGUI old GUI which can be null.
+	 */
+	public static void switchEvaluator(String selectedEvName, Window oldGUI) {
+		switchEvaluator(selectedEvName, oldGUI, null);
+	}
+	
+	
+	/**
 	 * Switching remote evaluator.
 	 * @param selectedEvName selected evaluator name.
-	 * @param oldGUI old GUI.
+	 * @param oldGUI old GUI which can be null.
+	 * @param shower compound GUI shower which can be null.
 	 */
-	public static void switchRemoteEvaluator(String selectedEvName, Window oldGUI) {
+	protected static void switchRemoteEvaluator(String selectedEvName, Window oldGUI, EvalCompoundGUIShower shower) {
 		final Connector connectDlg = Connector.connect();
 		Service service = connectDlg.getService();
 		ConnectInfo connectInfo = connectDlg.getConnectInfo();
@@ -1175,7 +1107,7 @@ public class EvalCompoundGUI extends JFrame {
 						else
 							Util.getPluginManager().discover();
 					}
-					run(ev, connectInfo, null, null);
+					run(ev, connectInfo, null, null, shower);
 				}
 			}
 			
@@ -1243,7 +1175,7 @@ public class EvalCompoundGUI extends JFrame {
 								Util.getPluginManager().discover();
 						}
 						
-						run(ev, connectInfo, null, null);
+						run(ev, connectInfo, null, null, shower);
 					}
 					catch (Exception e) {
 						LogUtil.trace(e);
@@ -1286,22 +1218,12 @@ public class EvalCompoundGUI extends JFrame {
 
 	
 	/**
-	 * This class shows compound GUI.
-	 * @author Loc Nguyen
-	 * @version 1.0
-	 *
+	 * Switching remote evaluator.
+	 * @param selectedEvName selected evaluator name.
+	 * @param oldGUI old GUI which can be null.
 	 */
-	@FunctionalInterface
-	public static interface EvalCompoundGUIShower {
-		
-		/**
-		 * Showing compound GUI.
-		 * @param evaluator particular evaluator selected by user.
-		 * @param connectInfo connection information.
-		 * @param referredData evaluator GUI data.
-		 */
-		void show(Evaluator evaluator, ConnectInfo connectInfo, EvaluateGUIData referredData);
-		
+	public static void switchRemoteEvaluator(String selectedEvName, Window oldGUI) {
+		switchRemoteEvaluator(selectedEvName, oldGUI, null);
 	}
 	
 	
@@ -1310,10 +1232,10 @@ public class EvalCompoundGUI extends JFrame {
 	 * @param evaluator particular evaluator selected by user.
 	 * @param connectInfo connection information.
 	 * @param referredData evaluator GUI data.
-	 * @param oldGUI old GUI.
-	 * @param shower compound GUI shower.
+	 * @param oldGUI old GUI which can be null.
+	 * @param shower compound GUI shower which can be null.
 	 */
-	public static void run(Evaluator evaluator, ConnectInfo connectInfo, EvaluateGUIData referredData, Window oldGUI, EvalCompoundGUIShower shower) {
+	protected static void run(Evaluator evaluator, ConnectInfo connectInfo, EvaluateGUIData referredData, Window oldGUI, EvalCompoundGUIShower shower) {
 		if (oldGUI != null) oldGUI.dispose();
 
 		if (!Util.getPluginManager().isFired())
@@ -1352,7 +1274,7 @@ public class EvalCompoundGUI extends JFrame {
 	 * @param evaluator particular evaluator selected by user.
 	 * @param connectInfo connection information.
 	 * @param referredData evaluator GUI data.
-	 * @param oldGUI old GUI.
+	 * @param oldGUI old GUI which can be null.
 	 */
 	public static void run(Evaluator evaluator, ConnectInfo connectInfo, EvaluateGUIData referredData, Window oldGUI) {
 		run(evaluator, connectInfo, referredData, oldGUI, null);
@@ -1363,9 +1285,10 @@ public class EvalCompoundGUI extends JFrame {
 	 * Open evaluator.
 	 * @param evaluatorItem specified evaluator item.
 	 * @param connectInfo connection information.
-	 * @param parent parent component.
+	 * @param parent parent component which can be null.
+	 * @param shower compound GUI shower which can be null.
 	 */
-	public static void run(EvaluatorWrapper evaluatorItem, ConnectInfo connectInfo, Component parent) {
+	protected static void run(EvaluatorWrapper evaluatorItem, ConnectInfo connectInfo, Component parent, EvalCompoundGUIShower shower) {
 		if (evaluatorItem == null || evaluatorItem.evaluator == null) {
 			JOptionPane.showMessageDialog(parent, "Cannot open evaluator", "Cannot open evaluator", JOptionPane.ERROR_MESSAGE);
 			return;
@@ -1396,17 +1319,28 @@ public class EvalCompoundGUI extends JFrame {
 		}
 		catch (Exception ex) {
 			JOptionPane.showMessageDialog(
-					parent, 
-					"Cannot open evaluator control panel due to lack of evaluate package", 
-					"lack of evaluate package", 
-					JOptionPane.ERROR_MESSAGE);
+				parent,
+				"Cannot open evaluator control panel due to lack of evaluate package",
+				"lack of evaluate package",
+				JOptionPane.ERROR_MESSAGE);
 			return;
 		}
 
-		run(evaluatorItem.evaluator, connectInfo, evaluatorItem.guiData, null);
+		run(evaluatorItem.evaluator, connectInfo, evaluatorItem.guiData, null, shower);
 	}
 
 
+	/**
+	 * Open evaluator.
+	 * @param evaluatorItem specified evaluator item.
+	 * @param connectInfo connection information.
+	 * @param parent parent component which can be null.
+	 */
+	public static void run(EvaluatorWrapper evaluatorItem, ConnectInfo connectInfo, Component parent) {
+		run(evaluatorItem, connectInfo, parent, null);
+	}
+	
+	
 }
 
 

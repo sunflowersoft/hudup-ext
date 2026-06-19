@@ -19,6 +19,7 @@ import java.util.Set;
 
 import javax.swing.event.EventListenerList;
 
+import net.hudup.core.Configuration;
 import net.hudup.core.Constants;
 import net.hudup.core.ExtraStorage;
 import net.hudup.core.PluginAlgDesc2ListMap;
@@ -245,6 +246,8 @@ public abstract class PowerServerImpl implements PowerServer, Gateway {
 			
 		});
 		
+		//Addition code lines: Date: 2026.06.18.
+		Configuration.RMI_MODE = true;
 	}
 
 	

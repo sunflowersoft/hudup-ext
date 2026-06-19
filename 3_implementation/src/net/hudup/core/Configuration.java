@@ -62,6 +62,12 @@ public class Configuration implements Serializable {
 	
 	
 	/**
+	 * RMI mode.
+	 */
+	public static boolean RMI_MODE = false;
+
+	
+	/**
 	 * Internal properties.
 	 */
 	private static Properties properties = new Properties();
@@ -79,7 +85,7 @@ public class Configuration implements Serializable {
 	 */
 	private JTextField txtWorkingName = null;
 
-	
+
 	/**
 	 * Default constructor.
 	 */

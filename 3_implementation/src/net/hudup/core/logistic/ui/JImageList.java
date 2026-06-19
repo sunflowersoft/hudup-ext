@@ -108,6 +108,18 @@ public class JImageList<E> extends JList<ImageListItem<E>> {
 	
 	
 	/**
+	 * Getting all items.
+	 * @return all items.
+	 */
+	public List<ImageListItem<E>> getListData() {
+		int count = getItemCount();
+		List<ImageListItem<E>> listData = Util.newList(count);
+		for (int i = 0; i < count; i++) listData.add(getItem(i));
+		return listData;
+	}
+	
+	
+	/**
 	 * Setting list data.
 	 * @param listData list data.
 	 */
@@ -116,6 +128,7 @@ public class JImageList<E> extends JList<ImageListItem<E>> {
 		model.clear();
 		model.addAll(listData);
 	}
+	
 	
 	@Override
 	public void setListData(Vector<? extends ImageListItem<E>> listData) {
@@ -131,6 +144,17 @@ public class JImageList<E> extends JList<ImageListItem<E>> {
 	}
 
 
+	/**
+	 * Setting list data by other image list.
+	 * @param other other image list.
+	 */
+	public void setListData(JImageList<E> other) {
+		DefaultListModel<ImageListItem<E>> model = this.getModel2();
+		model.clear();
+		model.addAll(other.getListData());
+	}
+	
+	
 	/**
 	 * Creating render.
 	 * @return render.

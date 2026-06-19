@@ -333,6 +333,31 @@ public class NetUtil {
 		/**
 		 * Export remote object.
 		 * @param remote remote object.
+		 * @return successfully stub object. Return null if failed.
+		 */
+		public static Remote export(Remote remote) {
+			if (remote == null) return null;
+			
+			Remote stub = null;
+			try {
+				stub = UnicastRemoteObject.exportObject(remote, 0);
+			}
+			catch (Exception e) {
+				LogUtil.trace(e);
+				try {
+					if (stub != null) UnicastRemoteObject.unexportObject(remote, true);
+				}
+				catch (Exception e2) {e2.printStackTrace();}
+				
+				stub = null;
+			}
+			
+			return stub;
+		}
+
+		/**
+		 * Export remote object.
+		 * @param remote remote object.
 		 * @param port registered port.
 		 * @return successfully stub object. Return null if failed.
 		 */
@@ -342,17 +367,13 @@ public class NetUtil {
 			Remote stub = null;
 			try {
 				stub = UnicastRemoteObject.exportObject(remote, port);
-//				if (!exportCalled) exportCalled = true;
 			}
 			catch (Exception e) {
 				LogUtil.trace(e);
 				try {
-					if (stub != null)
-						UnicastRemoteObject.unexportObject(remote, true);
+					if (stub != null) UnicastRemoteObject.unexportObject(remote, true);
 				}
-				catch (Exception e2) {
-					e2.printStackTrace();
-				}
+				catch (Exception e2) {e2.printStackTrace();}
 				
 				stub = null;
 			}

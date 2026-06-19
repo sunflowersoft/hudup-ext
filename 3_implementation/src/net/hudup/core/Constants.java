@@ -298,7 +298,6 @@ public final class Constants {
 	 */
 	public static boolean CALL_FINALIZE                   = true;
 	
-	
 	/**
 	 * Static code to load dynamic constant.
 	 */

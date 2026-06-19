@@ -1213,16 +1213,18 @@ class ClassLoader2 extends URLClassLoader {
 		if (files == null) return classes;
 	
 		for (File file : files) {
-			if (file.isDirectory()) {
-				assert !file.getName().contains(".");
-				//Recursively scan sub-packages
-				classes.addAll(findClasses(cl, file, packageName + "." + file.getName()));
-			}
-			else if (file.getName().endsWith(".class")) {
-				//Remove the .class extension to get the raw class name
-				String className = packageName + '.' + file.getName().substring(0, file.getName().length() - 6);
-				classes.add(findClass(cl, className));
-			}
+			try {
+				if (file.isDirectory()) {
+					assert !file.getName().contains(".");
+					//Recursively scan sub-packages
+					classes.addAll(findClasses(cl, file, packageName + "." + file.getName()));
+				}
+				else if (file.getName().endsWith(".class")) {
+					//Remove the .class extension to get the raw class name
+					String className = packageName + '.' + file.getName().substring(0, file.getName().length() - 6);
+					classes.add(findClass(cl, className));
+				}
+			} catch (Throwable e) {LogUtil.trace(e);}
 		}
 		return classes;
 	}

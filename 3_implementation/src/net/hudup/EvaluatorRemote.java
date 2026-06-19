@@ -46,15 +46,11 @@ public class EvaluatorRemote implements AccessPoint {
 
 	
 	@Override
-	public String getName() {
-		return "Evaluator Remote";
-	}
+	public String getName() {return "Evaluator Remote";}
 
 	
 	@Override
-	public String toString() {
-		return getName();
-	}
+	public String toString() {return getName();}
 	
 	
 }
